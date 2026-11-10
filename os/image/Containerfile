@@ -1,7 +1,5 @@
-ARG FEDORA=45
-ARG MAJOR=1
-ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
-ARG SYSTEM=localhost/luft-system:${FEDORA}
+ARG BASE
+ARG SYSTEM
 
 FROM ${BASE} AS fedora
 
@@ -24,8 +22,7 @@ COPY --from=parts zypak/stage/ /
 COPY --from=parts apps/ /
 COPY os/image/files/ /
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
-COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
-ARG FEDORA
+COPY --from=parts keys/pcr-keys/ /usr/lib/luft/pcr-keys/
 ARG MAJOR
 ARG BASE
 RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \

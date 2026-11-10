@@ -3,7 +3,7 @@ id = "com.lantharos.draft"
 replaces = "app-draft"
 
 [[preinstall]]
-id = "com.lantharos.Flatbed"
+id = "com.lantharos.flatbed"
 replaces = "app-flatbed"
 
 [[preinstall]]

@@ -1,9 +1,3 @@
-// Picks the schelf.store releases the image preinstalls, and puts them in a stage the way Schelf reads them
-// on first sign-in: each app's listing, holding only the release that ships, next to that release's file.
-//
-//   releases.ts resolve                 prints ID=VERSION[=PART] for each app's newest release that's out, on any channel, on one line
-//   releases.ts stage DESTDIR ID=VERSION,...
-
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

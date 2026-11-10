@@ -14,7 +14,7 @@ os/image/build.sh luft luft-nvidia   # both
 
 The image is put together from parts (Kestrel, the boot and security services, the apps, NVIDIA's driver and so on), each cached by a hash of its sources, so later builds only remake what changed. Each app, service and Kestrel piece lists its part, what it needs and what it installs in an `image.toml` next to it ([Image components](../docs/image-components.md)). For the Rust in a part, that's the workspace crates it copies in and the locked packages they build on, so a dependency one app adds doesn't remake Kestrel. The web runtime is also remade when a newer CEF build comes out, and the apps the image ships from schelf.store come in a part of their own, with the newest release of each that's out. `LUFT_REBUILD=1` makes them all again. The first build takes about an hour.
 
-Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and `LUFT_PCR_KEY` (PEM). Without them they make throwaway keys that every local build and test VM shares. The public halves of the real keys are in `image/keys`.
+Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and, for the TPM policy, `LUFT_PCR_KEY_1`, `LUFT_PCR_KEY_2` and so on (PEM), one for each [generation](../docs/security.md#older-signed-startup-images) in `versions.env`. Without them they make throwaway keys that every local build and test VM shares. The public halves of the real keys are in `image/keys`.
 
 | Path | Holds |
 | --- | --- |
@@ -25,7 +25,8 @@ Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `L
 | `image/patches` | Changes to Fedora packages the image rebuilds, such as [bootc](image/patches/bootc/README.md) and [xdg-desktop-portal](image/patches/xdg-desktop-portal/README.md) |
 | `image/files` | Files copied into the image as they are |
 | `image/startup` | Building and signing the startup image |
-| `image/keys` | Luft's public Secure Boot certificate and TPM policy key |
+| `image/keys` | Luft's public Secure Boot certificate and TPM policy keys |
+| `versions.env` | The Fedora release, Luft's major version, the TPM policy key generations and the pinned build tools |
 
 ## Build the USB stick
 

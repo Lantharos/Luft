@@ -1,4 +1,5 @@
-FROM quay.io/fedora/fedora:45
+ARG FEDORA
+FROM quay.io/fedora/fedora:${FEDORA}
 
 RUN dnf install --assumeyes --setopt=install_weak_deps=False \
       git rustup gcc gcc-c++ clang-devel cmake pkgconf-pkg-config zstd \

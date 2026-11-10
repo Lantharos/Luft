@@ -24,6 +24,8 @@ on:
         required: true
       LUFT_ISO_MINISIGN_KEY:
         required: true
+      LUFT_MEET_UPDATE_KEY:
+        required: true
 
 concurrency:
   group: iso-${{ inputs.channel || 'nightly' }}
@@ -38,6 +40,7 @@ jobs:
     name: ISO
     runs-on: ubuntu-26.04
     timeout-minutes: 120
+    environment: signing
     env:
       DOWNLOADS: https://get.luft.computer
       LUFT_ISO: ${{ github.workspace }}/iso
@@ -45,11 +48,12 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
       KEPT_NIGHTLIES: 3
       REPOSITORY: ghcr.io/lantharos/luft
-      MAJOR: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: ./.github/actions/make-room
+
+      - uses: ./.github/actions/versions
 
       - uses: ./.github/actions/registry
 
@@ -116,6 +120,17 @@ jobs:
             --arg sha256 "$(cut -d' ' -f1 "$ISO_NAME.sha256")" '{name: $name, version: $version, size: $size, sha256: $sha256}' > latest.json
           cat latest.json
 
+      - name: Sign the description
+        if: env.SKIP != '1'
+        working-directory: ${{ env.LUFT_ISO }}
+        env:
+          LUFT_MEET_UPDATE_KEY: ${{ secrets.LUFT_MEET_UPDATE_KEY }}
+        run: |
+          key="$RUNNER_TEMP/luft-meet-update.key"
+          trap 'rm -f "$key"' EXIT
+          printf '%s\n' "$LUFT_MEET_UPDATE_KEY" > "$key"
+          minisign -S -s "$key" -m latest.json -t "$FOLDER/latest.json"
+
       - name: Upload to R2
         if: env.SKIP != '1'
         working-directory: ${{ env.LUFT_ISO }}
@@ -132,7 +147,9 @@ jobs:
           for file in "$ISO_NAME" "$ISO_NAME.sha256" "$ISO_NAME.sha256.minisig"; do
             s3 cp "$file" "s3://$R2_BUCKET/$FOLDER/$file"
           done
-          s3 cp latest.json "s3://$R2_BUCKET/$FOLDER/latest.json" --cache-control max-age=300
+          for file in latest.json latest.json.minisig; do
+            s3 cp "$file" "s3://$R2_BUCKET/$FOLDER/$file" --cache-control max-age=300
+          done
           if [[ "$FOLDER" == nightly ]]; then
             aws s3 ls "s3://$R2_BUCKET/nightly/" --endpoint-url "$endpoint" | sort -k1,2 | awk '{print $4}' | grep -E '^luft-.*\.iso$' | head -n -"$KEPT_NIGHTLIES" |
               while read -r old; do

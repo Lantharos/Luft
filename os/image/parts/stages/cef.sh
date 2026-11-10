@@ -1,28 +1,22 @@
 #!/usr/bin/env bash
-# Leaves the CEF build $1 as the only runtime in Sabine's runtimes folder $2,
-# downloading it when the folder doesn't have it yet, so Sabine stages exactly
-# that build for every user.
 set -euo pipefail
 shopt -s nullglob
 
-cef="$1"
-runtimes="$2"
+runtimes="$1"
+read -r cef sha256 <"$(dirname "$0")/../cef.lock"
 name="$cef-minimal"
 url="https://cef-builds.spotifycdn.com/cef_binary_${cef//+/%2B}_linux64_minimal.tar.bz2"
 
-mkdir -p "$runtimes"
-for runtime in "$runtimes"/*/; do
-  [[ "$(basename "$runtime")" == "$name" ]] || rm -rf "$runtime"
-done
+leave_only_this_build() {
+  local runtime
+  mkdir -p "$runtimes"
+  for runtime in "$runtimes"/*/; do
+    [[ "$(basename "$runtime")" == "$name" ]] || rm -rf "$runtime"
+  done
+}
 
-if [[ ! -f "$runtimes/$name/.sabine-version" ]]; then
-  work="$(mktemp -d /var/tmp/cef.XXXXXX)"
-  curl -fsSL --retry 5 -o "$work/cef.tar.bz2" "$url"
-  [[ "$(sha1sum "$work/cef.tar.bz2" | cut -d' ' -f1)" == "$(curl -fsSL --retry 5 "$url.sha1")" ]] || {
-    echo "CEF $cef doesn't match its published checksum" >&2
-    exit 1
-  }
-  python3 -I - "$work/cef.tar.bz2" "$work/runtime" <<'PYTHON'
+unpack_without_top_folder() {
+  python3 -I - "$1" "$2" <<'PYTHON'
 import sys
 import tarfile
 
@@ -31,7 +25,18 @@ with tarfile.open(sys.argv[1], "r:bz2") as archive:
         member.name = member.name.partition("/")[2]
     archive.extractall(sys.argv[2], members=[m for m in archive.getmembers() if m.name], filter="data")
 PYTHON
+}
+
+download() {
+  local work
+  work="$(mktemp -d /var/tmp/cef.XXXXXX)"
+  curl -fsSL --retry 5 -o "$work/cef.tar.bz2" "$url"
+  echo "$sha256  $work/cef.tar.bz2" | sha256sum --check --quiet
+  unpack_without_top_folder "$work/cef.tar.bz2" "$work/runtime"
   echo "$cef" >"$work/runtime/.sabine-version"
   mv "$work/runtime" "$runtimes/$name"
   rm -rf "$work"
-fi
+}
+
+leave_only_this_build
+[[ -f "$runtimes/$name/.sabine-version" ]] || download

@@ -5,16 +5,13 @@ system="$1"
 kernels="$2"
 key="$3"
 certificate="$4"
-pcr_key="$5"
+pcr_keys="$5"
 out="$6"
+shipped="$system/usr/lib/luft/pcr-keys"
 kernel="$(ls "$system/usr/lib/modules")"
 work="$(mktemp -d)"
 rescue_drops=(quiet rhgb loglevel systemd.show_status sushi plymouth.enable)
-unused_modules=(
-  network-manager network nfs iscsi nvmf fcoe plymouth ostree lvm mdraid dmraid multipath nvdimm resume
-  memstrack walinuxagent qemu qemu-net clevis clevis-pin-file clevis-pin-null clevis-pin-sss clevis-pin-tang clevis-pin-tpm2
-  fips fips-crypto-policies virtiofs virtfs lunmask i18n
-)
+unused_modules=(qemu lunmask i18n)
 unused_drivers=(
   nouveau
   xfs f2fs jfs jffs2 ceph libceph kafs rxrpc cifs cifs_md4 smb_compress netfs cachefiles grace nfs_acl nfs_localio sunrpc
@@ -53,6 +50,21 @@ startup_image() {
   bootc container ukify --rootfs "$system" --kernel-dir "$work/$kernel" -- "$@"
 }
 
+policy_signers() {
+  local public key signer
+  (umask 077 && csplit --quiet --elide-empty-files --prefix="$work/pcr-key-" "$pcr_keys" '/-----BEGIN/' '{*}')
+  for public in "$shipped"/*.pem; do
+    signer=""
+    for key in "$work"/pcr-key-*; do
+      ! cmp --silent "$public" <(openssl pkey -in "$key" -pubout) || signer="$key"
+    done
+    [[ -n "$signer" ]] || { echo "No key was given for the TPM policy generation ${public##*/} that $system ships" >&2; exit 1; }
+    echo "--pcr-private-key=$signer"
+    echo "--pcr-public-key=$public"
+    echo "--phases=enter-initrd"
+  done
+}
+
 mkdir -p "$work/$kernel"
 ln -s "$kernels/$kernel/vmlinuz" "$work/$kernel/vmlinuz"
 dracut --quiet --force --no-hostonly --omit "${unused_modules[*]}" --omit-drivers "${unused_drivers[*]}" \
@@ -62,17 +74,18 @@ main="$(command_line "$work/unsigned.efi")"
 rescue="$(without "$main") systemd.unit=rescue.target systemd.setenv=SYSTEMD_SULOGIN_FORCE=1"
 ukify build --profile=$'ID=rescue\nTITLE=Rescue' --cmdline="$rescue" --output="$work/rescue.efi"
 mkdir -p "$out"
+signers="$(policy_signers)"
+mapfile -t signers <<<"$signers"
 startup_image \
   --profile=ID=main \
   --join-profile="$work/rescue.efi" \
   --signtool=sbsign \
   --secureboot-private-key="$key" \
   --secureboot-certificate="$certificate" \
-  --pcr-private-key="$pcr_key" \
-  --phases=enter-initrd \
+  "${signers[@]}" \
   --sign-initrd-pcrs \
   --pcr-banks=sha256 \
   --sign-profile=main \
   --output="$out/luft.efi"
-python3 -I /usr/local/lib/luft-check-policy.py "$out/luft.efi" /usr/share/luft/secure-boot/pcr-policy.pem
+python3 -I /usr/local/lib/luft-check-policy.py "$out/luft.efi" "$shipped"/*.pem
 rm -rf "$work"

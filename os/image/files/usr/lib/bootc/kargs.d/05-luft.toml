@@ -1,1 +1,1 @@
-kargs = ["rw", "rootflags=compress=zstd:1,noatime", "lockdown=integrity", "intel_iommu=on", "iommu.passthrough=0", "sysctl.kernel.kexec_load_disabled=1"]
+kargs = ["rw", "rootflags=compress=zstd:1,noatime", "lockdown=integrity", "intel_iommu=on", "iommu.passthrough=0", "sysctl.kernel.kexec_load_disabled=1", "slab_nomerge", "init_on_alloc=1", "page_alloc.shuffle=1", "randomize_kstack_offset=on", "vsyscall=none"]

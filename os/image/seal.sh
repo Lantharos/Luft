@@ -2,19 +2,22 @@
 set -euo pipefail
 
 image="$(cd "$(dirname "$0")" && pwd)"
-kernel="${LUFT_IMAGE_NAME:-localhost/luft}-kernel:45"
+# shellcheck source=os/versions.env
+source "$image/../versions.env"
+kernel="${LUFT_IMAGE_NAME:-localhost/luft}-kernel:$FEDORA"
 
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: os/image/seal.sh SYSTEM SEALED
 
 Seals the image SYSTEM into SEALED: adds a startup image (kernel, initramfs and
 command line in one file) that names SYSTEM's exact root file system, signed for
 Secure Boot, with its TPM policy signed too, and checks that it names the
 system bootc installs from SEALED. The kernel comes from
-localhost/luft-kernel:45 (LUFT_IMAGE_NAME-kernel:45), made by os/image/build.sh.
-Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT and
-LUFT_PCR_KEY.
+localhost/luft-kernel:$FEDORA (LUFT_IMAGE_NAME-kernel:$FEDORA), made by os/image/build.sh.
+Signs with the keys named by LUFT_SECUREBOOT_KEY and LUFT_SECUREBOOT_CERT, and
+its TPM policy with the LUFT_PCR_KEY_1, LUFT_PCR_KEY_2... whose public halves
+SYSTEM ships in /usr/lib/luft/pcr-keys.
 USAGE
 }
 
@@ -24,7 +27,14 @@ esac
 (($# == 2)) || { usage >&2; exit 2; }
 system="$1"
 sealed="$2"
-: "${LUFT_SECUREBOOT_KEY:?}" "${LUFT_SECUREBOOT_CERT:?}" "${LUFT_PCR_KEY:?}"
+: "${LUFT_SECUREBOOT_KEY:?}" "${LUFT_SECUREBOOT_CERT:?}"
+# shellcheck source=os/image/throwaway-keys.sh
+source "$image/throwaway-keys.sh"
+policy_keys="$(mktemp)"
+trap 'rm -f "$policy_keys"' EXIT
+while read -r _ key; do
+  cat "$key"
+done < <(pcr_keys) > "$policy_keys"
 
 installed_digest() {
   local work
@@ -51,7 +61,7 @@ podman build --quiet --layers --file "$image/startup/Containerfile" \
   --build-arg "SIGNED_BY=$(openssl x509 -in "$LUFT_SECUREBOOT_CERT" -noout -fingerprint -sha256)" \
   --secret "id=secureboot-key,src=$LUFT_SECUREBOOT_KEY" \
   --secret "id=secureboot-cert,src=$LUFT_SECUREBOOT_CERT" \
-  --secret "id=pcr-key,src=$LUFT_PCR_KEY" \
+  --secret "id=pcr-keys,src=$policy_keys" \
   --tag "$sealed" "$image/startup" >/dev/null
 installed="$(installed_digest)"
 named="$(named_digest)"

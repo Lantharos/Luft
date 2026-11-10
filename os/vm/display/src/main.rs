@@ -6,6 +6,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use core::mem::MaybeUninit;
+use core::panic::PanicInfo;
 
 use uefi::boot::{
     self, LoadImageSource, OpenProtocolAttributes, OpenProtocolParams, ScopedProtocol, SearchType,
@@ -18,6 +19,7 @@ use uefi::proto::console::gop::GraphicsOutput;
 use uefi::proto::device_path::build::{self, media::FilePath};
 use uefi::proto::device_path::{DevicePath, DeviceSubType, DeviceType};
 use uefi::proto::media::fs::SimpleFileSystem;
+use uefi::runtime::ResetType;
 use uefi::{Guid, Handle, Identify, cstr16, guid};
 
 const SETTINGS: &uefi::CStr16 = cstr16!("\\vm-display.conf");
@@ -26,6 +28,12 @@ const EDID_PROTOCOLS: [Guid; 2] = [
     guid!("1c0c34f6-d380-41fa-a049-8ad06c1a66aa"),
     guid!("bd8c1056-9f36-44ec-92a8-a6337f817986"),
 ];
+
+#[panic_handler]
+fn switch_off(panic: &PanicInfo) -> ! {
+    log::error!("{panic}");
+    runtime::reset(ResetType::SHUTDOWN, Status::ABORTED, None)
+}
 
 #[repr(C)]
 struct EdidProtocol {

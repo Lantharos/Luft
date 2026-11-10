@@ -1,0 +1,11 @@
+name: Bun
+description: Installs the Bun release pinned in os/versions.env, and puts the other versions there into the environment.
+
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/versions
+
+    - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      with:
+        bun-version: ${{ env.BUN_VERSION }}

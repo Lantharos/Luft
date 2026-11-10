@@ -1,0 +1,222 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      nightly:
+        description: The tested nightly to release as the stable version it leads to, such as 1.2-nightly.21
+        type: string
+        required: true
+    secrets:
+      COSIGN_PRIVATE_KEY:
+        required: true
+      COSIGN_PASSWORD:
+        required: true
+      R2_ACCOUNT_ID:
+        required: true
+      R2_BUCKET:
+        required: true
+      R2_ACCESS_KEY_ID:
+        required: true
+      R2_SECRET_ACCESS_KEY:
+        required: true
+      LUFT_ISO_MINISIGN_KEY:
+        required: true
+      LUFT_MEET_UPDATE_KEY:
+        required: true
+    outputs:
+      store-releases:
+        description: The store releases the nightly shipped with
+        value: ${{ jobs.promote.outputs.store-releases }}
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ghcr.io/lantharos/luft
+  DOWNLOADS: https://get.luft.computer
+
+jobs:
+  promote:
+    name: Promote
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    environment: signing
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      revision: ${{ steps.release.outputs.revision }}
+      notes: ${{ steps.release.outputs.notes }}
+      digest: ${{ steps.release.outputs.digest }}
+      nvidia-digest: ${{ steps.release.outputs.nvidia-digest }}
+      store-releases: ${{ steps.release.outputs.store-releases }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            .github/actions
+            .github/scripts
+            os/image/files
+
+      - uses: ./.github/actions/bun
+
+      - uses: imjasonh/setup-crane@feee3b6bb0d4c68370f256a4502498c9227e5c6b # v0.7
+
+      - uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
+
+      - uses: ./.github/actions/registry
+
+      - name: Release the tested nightly
+        id: release
+        env:
+          NIGHTLY: ${{ inputs.nightly }}
+          GH_TOKEN: ${{ github.token }}
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          [[ "$NIGHTLY" =~ ^($MAJOR\.([0-9]+))-nightly\.[0-9]+$ ]] || { echo "$NIGHTLY doesn't name a Luft $MAJOR nightly." >&2; exit 1; }
+          version="${BASH_REMATCH[1]}" release="${BASH_REMATCH[2]}"
+          labels="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$NIGHTLY")"
+          revision="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$labels")"
+          [[ -n "$revision" ]] || { echo "$NIGHTLY doesn't say which commit it was built from." >&2; exit 1; }
+          tagged="$(git ls-remote --tags --refs origin "refs/tags/v$version" | cut -f1)"
+          if [[ -z "$tagged" ]]; then
+            last="$(git ls-remote --tags --refs origin "refs/tags/v$MAJOR.*" | sed -nE "s|.*refs/tags/v$MAJOR\.([0-9]+)$|\1|p" | sort -n | tail -n 1)"
+            (( release == ${last:--1} + 1 )) || { echo "$NIGHTLY leads to $version, but Luft $MAJOR.$(( ${last:--1} + 1 )) is next." >&2; exit 1; }
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/v$version" -f "sha=$revision" > /dev/null
+          elif [[ "$tagged" != "$revision" ]]; then
+            echo "v$version is already out, from $tagged." >&2
+            exit 1
+          fi
+          previous="" since=""
+          if ((release > 1)); then
+            previous="$MAJOR.$((release - 1))"
+            since="$(curl -sf "$DOWNLOADS/$MAJOR/notes/$previous.json" | jq -r .nightly)"
+          fi
+          nightly="$NIGHTLY"
+          while [[ -n "$nightly" && "$nightly" != "$since" ]]; do
+            entry="$(curl -sf "$DOWNLOADS/nightly/notes/$nightly.json")" || break
+            jq -c .notes <<<"$entry"
+            nightly="$(jq -r '.previous // empty' <<<"$entry")"
+          done > "$RUNNER_TEMP/nightlies.jsonl"
+          notes="$(bun .github/scripts/changelog/index.ts merge < "$RUNNER_TEMP/nightlies.jsonl")"
+          key="$(mktemp -d)"
+          trap 'rm -rf "$key"' EXIT
+          printf '%s\n' "$COSIGN_PRIVATE_KEY" > "$key/private"
+          printf '%s' "$COSIGN_PASSWORD" > "$key/password"
+          sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
+          install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
+          for suffix in "" -nvidia; do
+            stable="$IMAGE:$version$suffix"
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$IMAGE:$NIGHTLY$suffix")"
+            skopeo copy --retry-times 3 --preserve-digests --policy os/image/files/etc/containers/policy.json \
+              "docker://$IMAGE@$digest" "docker://$stable"
+            crane config "$stable" |
+              jq -c --arg version "$version" --arg notes "$notes" \
+                '.config.Labels += {"org.opencontainers.image.version": $version, "com.lantharos.release-notes": $notes}' |
+              crane edit config "$stable" > /dev/null
+            crane manifest "$stable" |
+              jq -c --arg version "$version" '.annotations += {"org.opencontainers.image.version": $version}' |
+              crane edit manifest "$stable" > /dev/null
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$stable")"
+            skopeo copy --retry-times 3 --preserve-digests --sign-by-sigstore-private-key "$key/private" \
+              --sign-passphrase-file "$key/password" "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
+            cosign sign --yes "$IMAGE@$digest"
+            echo "${suffix#-}${suffix:+-}digest=$digest" >> "$GITHUB_OUTPUT"
+          done
+          jq -n --arg version "$version" --arg previous "$previous" --arg nightly "$NIGHTLY" --argjson notes "$notes" \
+            '{version: $version, previous: (if $previous == "" then null else $previous end), nightly: $nightly, notes: $notes}' |
+            aws s3 cp - "s3://$R2_BUCKET/$MAJOR/notes/$version.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
+              --content-type application/json --only-show-errors
+          {
+            echo "version=$version"
+            echo "revision=$revision"
+            echo "notes=$notes"
+            echo "store-releases=$(jq -r '."com.lantharos.store-releases" // empty' <<<"$labels")"
+          } >> "$GITHUB_OUTPUT"
+
+  stick:
+    name: Stick
+    needs: promote
+    uses: ./.github/workflows/iso.yml
+    with:
+      channel: release
+    secrets:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      LUFT_ISO_MINISIGN_KEY: ${{ secrets.LUFT_ISO_MINISIGN_KEY }}
+      LUFT_MEET_UPDATE_KEY: ${{ secrets.LUFT_MEET_UPDATE_KEY }}
+    permissions:
+      contents: read
+      packages: read
+
+  release:
+    name: GitHub release
+    needs: [promote, stick]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.promote.outputs.version }}
+      REVISION: ${{ needs.promote.outputs.revision }}
+      NOTES: ${{ needs.promote.outputs.notes }}
+      DIGEST: ${{ needs.promote.outputs.digest }}
+      NVIDIA_DIGEST: ${{ needs.promote.outputs.nvidia-digest }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            .github/actions
+            .github/scripts
+            os/versions.env
+          sparse-checkout-cone-mode: false
+
+      - uses: ./.github/actions/bun
+
+      - name: Publish the release
+        run: |
+          bun .github/scripts/changelog/index.ts markdown <<<"$NOTES" > "$RUNNER_TEMP/CHANGES.md"
+          cd "$RUNNER_TEMP"
+          iso="luft-$VERSION.iso"
+          for file in "$iso.sha256" "$iso.sha256.minisig"; do
+            curl -sfLO "$DOWNLOADS/$MAJOR/$file"
+          done
+          key="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$REVISION/os/image/files/usr/share/pki/containers/luft.pub"
+          cat CHANGES.md - > body.md <<EOF
+
+          ## Downloads
+
+          - [$iso]($DOWNLOADS/$MAJOR/$iso), with its [checksum]($DOWNLOADS/$MAJOR/$iso.sha256) and [signature]($DOWNLOADS/$MAJOR/$iso.sha256.minisig)
+          - [Meet Luft](https://schelf.store/apps/com.lantharos.meet) for Windows and Linux
+
+          ## Images
+
+          | Image | Digest |
+          | --- | --- |
+          | \`$IMAGE:$MAJOR\` | \`$DIGEST\` |
+          | \`$IMAGE:$MAJOR-nvidia\` | \`$NVIDIA_DIGEST\` |
+
+          Both are signed with [Luft's key]($key), and by the workflow that released them, which the public log records:
+
+          \`\`\`
+          cosign verify --key luft.pub --insecure-ignore-tlog=true $IMAGE@$DIGEST
+          cosign verify --certificate-identity $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/.github/workflows/release.yml@$GITHUB_REF \\
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com $IMAGE@$DIGEST
+          \`\`\`
+          EOF
+          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --verify-tag --title "Luft $VERSION" \
+            --notes-file body.md CHANGES.md "$iso.sha256" "$iso.sha256.minisig"

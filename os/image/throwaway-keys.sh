@@ -6,7 +6,15 @@ throwaway_keys() {
   [[ -f "$keys/secureboot.key" ]] || openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
     -subj "/CN=Luft throwaway Secure Boot key/" -keyout "$keys/secureboot.key" -out "$keys/secureboot.crt"
   [[ -f "$keys/pcr.key" ]] || openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.key"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY="$keys/pcr.key"
+  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY_1="$keys/pcr.key"
+}
+
+pcr_keys() {
+  local generation name
+  for generation in ${PCR_GENERATIONS//,/ }; do
+    name="LUFT_PCR_KEY_$generation"
+    [[ -z "${!name:-}" ]] || echo "$generation ${!name}"
+  done
 }
 
 use_signing_keys() {

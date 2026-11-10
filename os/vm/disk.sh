@@ -2,17 +2,19 @@
 set -euo pipefail
 
 os="$(cd "$(dirname "$0")/.." && pwd)"
-image="${1:-${LUFT_IMAGE_NAME:-localhost/luft}:45}"
+# shellcheck source=os/versions.env
+source "$os/versions.env"
+image="${1:-${LUFT_IMAGE_NAME:-localhost/luft}:$FEDORA}"
 user="${VM_USER:-luft}"
 password="${VM_PASSWORD:-luft-vm}"
-followed="${VM_FOLLOWS:-ghcr.io/lantharos/luft:1}"
+followed="${VM_FOLLOWS:-ghcr.io/lantharos/luft:$MAJOR}"
 
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: os/vm/disk.sh [IMAGE]
 
-Installs the sealed image IMAGE (default localhost/luft:45 from
-os/image/build.sh, or LUFT_IMAGE_NAME:45) onto LUFT_VM/disk.qcow2 (default
+Installs the sealed image IMAGE (default localhost/luft:$FEDORA from
+os/image/build.sh, or LUFT_IMAGE_NAME:$FEDORA) onto LUFT_VM/disk.qcow2 (default
 os/vm/state) the way Install Luft does, without root on this computer: a
 helper VM started from the image itself runs the image's own installer onto
 an empty drive and creates the account VM_USER (default luft) with the
@@ -21,7 +23,7 @@ password VM_PASSWORD (default luft-vm).
 The installed system is set up and starts at the login screen. root has the
 same password on the serial console, and Luft's Secure Boot key is queued
 for shim with that password as the code, which os/vm/control.py enroll types.
-Updates follow VM_FOLLOWS (default ghcr.io/lantharos/luft:1).
+Updates follow VM_FOLLOWS (default ghcr.io/lantharos/luft:$MAJOR).
 USAGE
 }
 

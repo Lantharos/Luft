@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 set -euo pipefail
 
-state=/var/lib/luft/dev-layer
+layer_state=/var/lib/luft/dev-layer
 dropped=/run/luft-dev-layer-dropped
 
 field() {
@@ -13,13 +13,13 @@ booted() {
 }
 
 link() {
-  if [[ "$(field LUFT_DEV_DEPLOYMENT "$state/release")" == "$(booted)" ]]; then
+  if [[ "$(field LUFT_DEV_DEPLOYMENT "$layer_state/release")" == "$(booted)" ]]; then
     mkdir -p /run/extensions
-    ln -sfn "$state/luft-working-tree.raw" /run/extensions/luft-working-tree.raw
+    ln -sfn "$layer_state/luft-working-tree.raw" /run/extensions/luft-working-tree.raw
     return
   fi
-  install -m644 "$state/release" "$dropped"
-  rm -rf "$state"
+  install -m644 "$layer_state/release" "$dropped"
+  rm -rf "$layer_state"
   echo "Took off the development build of $(field LUFT_DEV_COMMIT "$dropped"), made for another version of Luft"
 }
 
@@ -29,6 +29,8 @@ notice() {
     "Luft updated, so the build of $(field LUFT_DEV_COMMIT "$dropped") no longer covers it. Apply it again to keep working on it." \
     "[]" "{}" -1 >/dev/null
 }
+
+[[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "$1" in
   link) link ;;

@@ -1,8 +1,8 @@
-ARG BASE=quay.io/fedora/fedora-bootc:45
+ARG BASE
 
 FROM ${BASE} AS builder
-ARG BUN_VERSION=1.4.2
-ARG BUN_SHA256=36368faef7527875d5ffa52e53cd48021741f2a83eb6208a8dd64068d422a913
+ARG BUN_VERSION
+ARG BUN_SHA256
 COPY os/image/packages/build.txt /tmp/build.txt
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf install -y --setopt=keepcache=True dnf5-plugins rust cargo rust-std-static-x86_64-unknown-uefi \
@@ -64,6 +64,7 @@ COPY --from=boot-build /out/ /
 FROM builder AS bootc-build
 ARG BOOTC
 COPY os/image/patches/bootc /src/os/image/patches/bootc
+COPY os/image/stages/koji.sh /src/os/image/stages/koji.sh
 COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
@@ -90,6 +91,7 @@ COPY --from=zypak-build /stage /stage
 FROM builder AS portal-build
 ARG PORTAL
 COPY os/image/patches/xdg-desktop-portal /src/os/image/patches/xdg-desktop-portal
+COPY os/image/stages/koji.sh /src/os/image/stages/koji.sh
 COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     /src/os/image/parts/stages/rebuild.sh xdg-desktop-portal "${PORTAL}" /out/rpms
@@ -109,10 +111,11 @@ RUN --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
 FROM sabine AS runtime-build
 ARG SABINE
 ARG CEF
+COPY os/image/parts/cef.lock /src/os/image/parts/cef.lock
 COPY os/image/parts/stages/cef.sh os/image/parts/stages/runtime.sh os/image/parts/stages/needed.sh \
   /src/os/image/parts/stages/
 RUN --mount=type=cache,from=cache,source=sabine,target=/root/.local/share/sabine \
-    /src/os/image/parts/stages/cef.sh "${CEF}" /root/.local/share/sabine/runtimes/cef && \
+    /src/os/image/parts/stages/cef.sh /root/.local/share/sabine/runtimes/cef && \
     sabine runtime install --system-wide --root /stage && \
     test -d "/stage/usr/lib/sabine/runtimes/cef/${CEF}-minimal" && \
     /src/os/image/parts/stages/runtime.sh /stage && \
@@ -198,14 +201,27 @@ COPY --from=app-build /out/ /
 
 FROM ${BASE} AS nvidia-build
 ARG BASE
-ARG SIGNED_BY
-COPY os/image/stages/rpmfusion.sh /src/os/image/stages/rpmfusion.sh
+COPY os/image/stages/rpmfusion.sh os/image/stages/koji.sh /src/os/image/stages/
 COPY os/image/parts/stages/nvidia.sh /src/os/image/parts/stages/nvidia.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    : "built for ${BASE}" && \
+    /src/os/image/parts/stages/nvidia.sh build /out
+
+FROM ${BASE} AS nvidia-sign
+ARG BASE
+ARG SIGNED_BY
+COPY os/image/stages/rpmfusion.sh os/image/stages/koji.sh /src/os/image/stages/
+COPY os/image/parts/stages/nvidia.sh /src/os/image/parts/stages/nvidia.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    : "built for ${BASE}" && \
+    /src/os/image/parts/stages/nvidia.sh kernel-devel
+COPY --from=nvidia-build /out/modules /unsigned
+RUN --network=none \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
-    : "signed by ${SIGNED_BY}, built for ${BASE}" && \
-    /src/os/image/parts/stages/nvidia.sh /run/secrets/secureboot-key /run/secrets/secureboot-cert /out
+    : "signed by ${SIGNED_BY}" && \
+    /src/os/image/parts/stages/nvidia.sh sign /run/secrets/secureboot-key /run/secrets/secureboot-cert /unsigned /stage
 
 FROM scratch AS nvidia
-COPY --from=nvidia-build /out/ /
+COPY --from=nvidia-build /out/rpms /rpms
+COPY --from=nvidia-sign /stage /stage

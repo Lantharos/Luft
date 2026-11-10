@@ -12,12 +12,15 @@ installkernel() {
     hostonly="" instmods erofs overlay loop isofs exfat ext4 btrfs xfs sr_mod cdrom usb_storage uas
 }
 
+keep_hooks_where_old_ventoy_puts_them() {
+    ln_r /var/lib/dracut/hooks /usr/lib/dracut/hooks
+}
+
 install() {
     inst_multiple mount udevadm blkid touch
     inst_hook cmdline 90 "$moddir/parse-luft-live.sh"
     inst_script "$moddir/luft-live-root.sh" /usr/libexec/luft-live-root
     inst_simple "$moddir/luft-live-root.service" "$systemdsystemunitdir/luft-live-root.service"
     inst_simple "$moddir/sysroot.conf" "$systemdsystemunitdir/sysroot.mount.d/luft-live.conf"
-    # Ventoy before 1.1.18 drops the hooks that map the ISO into /lib/dracut/hooks
-    ln_r /var/lib/dracut/hooks /usr/lib/dracut/hooks
+    keep_hooks_where_old_ventoy_puts_them
 }

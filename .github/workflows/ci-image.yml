@@ -8,6 +8,7 @@ on:
       - .github/workflows/ci-image.yml
       - os/image/packages/build.txt
       - os/image/packages/runtime.txt
+      - os/versions.env
   schedule:
     - cron: "0 3 * * 1"
   workflow_dispatch:
@@ -40,10 +41,19 @@ jobs:
 
       - uses: ./.github/actions/registry
 
+      - uses: ./.github/actions/versions
+
       - name: Build
+        env:
+          IMAGE: ${{ matrix.image }}
+          CONTAINERFILE: ${{ matrix.containerfile }}
+          CONTEXT: ${{ matrix.context }}
         run: >-
           podman build --pull=always --label org.opencontainers.image.source=https://github.com/Lantharos/Luft
-          --file "${{ matrix.containerfile }}" --tag "${{ matrix.image }}:latest" "${{ matrix.context }}"
+          --build-arg "FEDORA=$FEDORA" --build-arg "BUN_VERSION=$BUN_VERSION" --build-arg "BUN_SHA256=$BUN_SHA256"
+          --file "$CONTAINERFILE" --tag "$IMAGE:latest" "$CONTEXT"
 
       - name: Publish
-        run: podman push "${{ matrix.image }}:latest"
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: podman push "$IMAGE:latest"

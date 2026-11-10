@@ -1,0 +1,9 @@
+name: Versions
+description: Puts the Fedora release, Luft's major version and the pinned build tools from os/versions.env into the environment.
+
+runs:
+  using: composite
+  steps:
+    - name: Versions
+      shell: bash
+      run: cat os/versions.env >> "$GITHUB_ENV"

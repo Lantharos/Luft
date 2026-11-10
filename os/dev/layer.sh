@@ -2,11 +2,11 @@
 set -euo pipefail
 
 dev="$(cd "$(dirname "$0")" && pwd)"
-layer_state=/var/lib/luft/dev-layer
-dropped=/run/luft-dev-layer-dropped
 
 # shellcheck source=os/image/build.sh
 source "$dev/../image/build.sh"
+# shellcheck source=os/image/files/usr/libexec/luft-dev-layer
+source "$dev/../image/files/usr/libexec/luft-dev-layer"
 
 layer_usage() {
   cat <<'USAGE'
@@ -24,10 +24,6 @@ across restarts until reset, and is taken off by itself when Luft updates.
   services    The installer, updater, system packages, sleep, accounts, speech and Windows services
   app-NAME    An app from apps/system or apps/store
 USAGE
-}
-
-field() {
-  sed -n "s/^$1=//p" "$2"
 }
 
 check_parts() {

@@ -1,0 +1,36 @@
+name: CEF
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  follow:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/bun
+
+      - name: Follow the CEF build Sabine installs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FILE: os/image/parts/cef.lock
+        run: |
+          latest="$(bun os/image/parts/cef.ts)"
+          [[ "$latest" =~ ^[0-9]+(\.[0-9]+)+\+g[0-9a-f]+\+chromium-[0-9]+(\.[0-9]+)+$ ]] || { echo "Unexpected CEF build $latest" >&2; exit 1; }
+          [[ "$latest" != "$(cut -d' ' -f1 "$FILE")" ]] || exit 0
+          url="https://cef-builds.spotifycdn.com/cef_binary_${latest//+/%2B}_linux64_minimal.tar.bz2"
+          curl -fsSL --retry 5 -o "$RUNNER_TEMP/cef.tar.bz2" "$url"
+          echo "$(curl -fsSL --retry 5 "$url.sha1")  $RUNNER_TEMP/cef.tar.bz2" | sha1sum --check --quiet
+          sha256="$(sha256sum "$RUNNER_TEMP/cef.tar.bz2" | cut -d' ' -f1)"
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$FILE" \
+            -f message="Update CEF to $latest" \
+            -f content="$(echo "$latest $sha256" | base64 --wrap=0)" \
+            -f sha="$(git rev-parse "HEAD:$FILE")" \
+            -f branch="$GITHUB_REF_NAME"

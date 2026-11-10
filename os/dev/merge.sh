@@ -2,7 +2,9 @@
 set -euo pipefail
 
 dev="$(cd "$(dirname "$0")" && pwd)"
-state=/var/lib/luft/dev-layer
+# shellcheck source=os/image/files/usr/libexec/luft-dev-layer
+source "$dev/../image/files/usr/libexec/luft-dev-layer"
+state="$layer_state"
 work="$state/work"
 tree="$work/luft-working-tree"
 link=/run/extensions/luft-working-tree.raw
@@ -16,10 +18,6 @@ Usage: os/dev/merge.sh apply COMMIT PARTS STAGE...
 
 Run as root by os/dev/layer.sh.
 USAGE
-}
-
-booted() {
-  tr ' ' '\n' </proc/cmdline | sed -n 's/^composefs\.digest=[^:]*://p'
 }
 
 gather() {
@@ -90,11 +88,15 @@ settle() {
   done
 }
 
+turn_on_developer_tools() {
+  busctl call com.lantharos.Greeter1 /com/lantharos/Greeter1 com.lantharos.Greeter1 SetDeveloperTools b true >/dev/null
+}
+
 apply() {
   local commit="$1" parts="$2"
   shift 2
   mkdir -p "$state"
-  rm -f /run/luft-dev-layer-dropped
+  rm -f "$dropped"
   mkdir -p /run/extensions
   gather "$@"
   describe "$commit" "$parts"
@@ -104,6 +106,7 @@ apply() {
   systemd-sysext refresh >/dev/null
   echo "$parts from $commit is laid over /usr."
   settle "$state/units"
+  turn_on_developer_tools
   [[ " $parts " != *" kestrel "* ]] || echo "Log out and back in to run this Kestrel."
 }
 
@@ -112,7 +115,7 @@ reset() {
   [[ -f "$state/release" ]] || { echo "No development build is laid over /usr."; return; }
   units="$(mktemp)"
   cp "$state/units" "$units"
-  parts="$(sed -n 's/^LUFT_DEV_PARTS=//p' "$state/release")"
+  parts="$(field LUFT_DEV_PARTS "$state/release")"
   rm -f "$link"
   rm -rf "$state"
   systemd-sysext refresh >/dev/null

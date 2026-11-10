@@ -7,18 +7,21 @@ state="${LUFT_IMAGE_STATE:-$image/state}"
 cache="${LUFT_IMAGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/luft-image}"
 registry="${LUFT_PARTS:-localhost/luft-parts}"
 image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
-fedora=45
 signed_parts=(boot nvidia)
-bootc_minimum=1.17.3-1.fc45
-chunkah=quay.io/coreos/chunkah:v0.7.1
-bun="docker.io/oven/bun:$(sed -n 's/^ARG BUN_VERSION=//p' "$image/parts/Containerfile")-distroless"
 retries=(--retry 6 --retry-delay 20s)
+signer_issuer=https://token.actions.githubusercontent.com
+
+# shellcheck source=os/versions.env
+source "$luft/os/versions.env"
+bootc_minimum="1.17.3-1.fc$FEDORA"
 
 # shellcheck source=os/image/throwaway-keys.sh
 source "$image/throwaway-keys.sh"
 
+bun_arguments=(--build-arg "BUN_VERSION=$BUN_VERSION" --build-arg "BUN_SHA256=$BUN_SHA256")
+
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh plan [luft | luft-nvidia]
        os/image/build.sh part NAME [PODMAN BUILD OPTIONS...]
@@ -28,34 +31,38 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh store
        os/image/build.sh updates IMAGE
 
-Builds the Luft images with Podman and seals them as localhost/luft:45 and
-localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the systems
+Builds the Luft images with Podman and seals them as localhost/luft:$FEDORA and
+localhost/luft:$FEDORA-nvidia, with localhost/luft-system:$FEDORA(-nvidia) as the systems
 before sealing (LUFT_IMAGE_NAME names them something other than localhost/luft).
 The default system is split into layers by content with chunkah, so a layer
 only changes when what's in it does, and the NVIDIA system is that system plus
 the driver, so the two images share every layer below it. The kernel only
 ships inside the startup image, so it moves out of the systems into
-localhost/luft-kernel:45, where os/image/seal.sh takes it from.
+localhost/luft-kernel:$FEDORA, where os/image/seal.sh takes it from.
 
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc and xdg-desktop-portal, the web runtime, Helium, Zypak, the system
 services, each app, the schelf.store releases it preinstalls and NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
 the Fedora image's digest and the CEF build included, in LUFT_PARTS (default localhost/luft-parts),
-so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
+so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Parts in a registry are
+signed without a key as they're pushed, as LUFT_PARTS_SIGNER (the workflow that builds them), and a part
+that isn't signed by it counts as missing. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one
 part, stage copies the files one part puts into the image to FOLDER, building
 the part when it's missing, and base prints the Fedora image the parts are built on (LUFT_BASE, by
-digest). cef prints the CEF build the web runtime ships, the newest one Sabine
-would install (LUFT_CEF), so a new CEF build makes the runtime part again. store
+digest). cef prints the CEF build the web runtime ships, pinned with its checksum in
+os/image/parts/cef.lock, which the CEF workflow moves to the newest one Sabine would install. store
 prints the newest schelf.store release that's out, on any channel, of each app in
 os/image/parts/store/apps.toml as ID=VERSION=PART (LUFT_STORE, or empty for none);
 those apps ship from the store instead of being built into the image. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
-and LUFT_PCR_KEY, or with throwaway keys kept in ~/.local/state/luft/throwaway-keys
+and, for the TPM policy, LUFT_PCR_KEY_1, LUFT_PCR_KEY_2 and so on, one for each
+generation in os/versions.env that the image should unlock a disk for. Without
+any of them it signs with throwaway keys kept in ~/.local/state/luft/throwaway-keys
 (LUFT_THROWAWAY_KEYS), shared by every checkout and the VMs, which Secure Boot
 only accepts once they're enrolled.
 USAGE
@@ -70,7 +77,7 @@ keys_set() {
 
 require_keys() {
   keys_set "$@" && return
-  if [[ -n "${LUFT_SECUREBOOT_KEY:-}${LUFT_SECUREBOOT_CERT:-}${LUFT_PCR_KEY:-}" ]]; then
+  if [[ -n "${LUFT_SECUREBOOT_KEY:-}${LUFT_SECUREBOOT_CERT:-}$(pcr_keys)" ]]; then
     echo "Set $*, or none of the LUFT_ keys to sign with throwaway ones." >&2
     exit 1
   fi
@@ -84,12 +91,7 @@ signed_by() {
 }
 
 resolve_cef() {
-  if [[ -n "${LUFT_CEF:-}" ]]; then
-    echo "$LUFT_CEF"
-    return
-  fi
-  podman run "${retries[@]}" --quiet --rm --security-opt label=disable --volume "$image/parts:/parts:ro" \
-    "$bun" /parts/cef.ts
+  cut -d' ' -f1 "$image/parts/cef.lock"
 }
 
 resolve_store() {
@@ -98,7 +100,7 @@ resolve_store() {
     return
   fi
   podman run "${retries[@]}" --quiet --rm --security-opt label=disable --volume "$image/parts/store:/store:ro" \
-    "$bun" /store/releases.ts resolve
+    "$BUN_IMAGE" /store/releases.ts resolve
 }
 
 store_entries() {
@@ -114,7 +116,7 @@ store_versions() {
 }
 
 resolve_base() {
-  local base="${LUFT_BASE:-quay.io/fedora/fedora-bootc:$fedora}" digest
+  local base="${LUFT_BASE:-quay.io/fedora/fedora-bootc:$FEDORA}" digest
   if [[ "$base" == *@sha256:* ]]; then
     echo "$base"
     return
@@ -190,11 +192,11 @@ snapshot_tree() {
 
 in_bun() {
   podman run "${retries[@]}" --quiet --rm --interactive --network none --security-opt label=disable \
-    --volume "$luft:/luft:ro" --volume "$tree_listing:/tree:ro" "$bun" "$@"
+    --volume "$luft:/luft:ro" --volume "$tree_listing:/tree:ro" "$BUN_IMAGE" "$@"
 }
 
 part_refs() {
-  local name globals=(BASE="$base" SABINE="$(sabine_tag)")
+  local name globals=(BASE="$base" SABINE="$(sabine_tag)" BUN_VERSION="$BUN_VERSION" BUN_SHA256="$BUN_SHA256")
   for name in "$@"; do
     echo "$name $(part_target "$name")"
   done | in_bun /luft/os/image/parts/key.ts /luft/os/image/parts/Containerfile /tree /luft "${globals[@]}" |
@@ -208,12 +210,37 @@ part_sources() {
   git -C "$luft" archive --format=tar "$tree" -- "${paths[@]}" | tar -x -C "$dir"
 }
 
+signed_digest() {
+  local digest
+  digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$1" 2>/dev/null)" || return
+  cosign verify --certificate-identity "${LUFT_PARTS_SIGNER:?}" --certificate-oidc-issuer "$signer_issuer" \
+    "${1%:*}@$digest" >/dev/null 2>&1 || return
+  echo "$digest"
+}
+
 part_exists() {
   if [[ "$1" == localhost/* ]]; then
     podman image exists "$1"
   else
-    skopeo inspect --raw "docker://$1" >/dev/null 2>&1
+    signed_digest "$1" >/dev/null
   fi
+}
+
+publish_part() {
+  local digest
+  digest="$(mktemp)"
+  podman push "${retries[@]}" --quiet --digestfile "$digest" "$1"
+  cosign sign --yes "${1%:*}@$(<"$digest")"
+  rm "$digest"
+}
+
+pull_part() {
+  local digest
+  podman image exists "$1" && return
+  [[ "$1" != localhost/* ]] || { echo "$1 isn't built yet" >&2; return 1; }
+  digest="$(signed_digest "$1")" || { echo "$1 isn't signed by $LUFT_PARTS_SIGNER" >&2; return 1; }
+  podman pull "${retries[@]}" --quiet "${1%:*}@$digest" >/dev/null
+  podman tag "${1%:*}@$digest" "$1"
 }
 
 cache_dirs() {
@@ -239,11 +266,11 @@ build_part() {
   part_sources "$sources" "$name"
   podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target "$target" \
     --build-context "cache=$cache" --build-context "work=$cache/work/$work" --build-context "sources=$sources" \
-    --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" "${options[@]}" "${podman_options[@]}" \
+    --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" "${bun_arguments[@]}" "${options[@]}" "${podman_options[@]}" \
     --tag "$ref" "$luft" || status=$?
   rm -rf "$sources"
   ((status == 0)) || return "$status"
-  [[ "$ref" == localhost/* ]] || podman push "${retries[@]}" --quiet "$ref"
+  [[ "$ref" == localhost/* ]] || publish_part "$ref"
 }
 
 build_in_turn() {
@@ -263,11 +290,11 @@ build_parts() {
   ((${#jobs[@]})) || return 0
   cache_dirs
   podman build "${retries[@]}" --layers --file "$image/parts/Containerfile" --target builder --build-arg "BASE=$base" \
-    "${podman_options[@]}" "$luft"
+    "${bun_arguments[@]}" "${podman_options[@]}" "$luft"
   if printf '%s\n' "${jobs[@]}" | grep -qE '(^| )(runtime|app-)'; then
     podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target sabine \
       --build-context "cache=$cache" --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" \
-      "${podman_options[@]}" "$luft"
+      "${bun_arguments[@]}" "${podman_options[@]}" "$luft"
   fi
   for job in "${jobs[@]}"; do
     if ((running >= 3)); then
@@ -276,6 +303,23 @@ build_parts() {
     fi
     read -ra entries <<<"$job"
     build_in_turn "${entries[@]}" &
+    running=$((running + 1))
+  done
+  while ((running > 0)); do
+    wait -n || failed=1
+    running=$((running - 1))
+  done
+  ((failed == 0))
+}
+
+pull_parts() {
+  local ref running=0 failed=0
+  for ref; do
+    if ((running >= 6)); then
+      wait -n || failed=1
+      running=$((running - 1))
+    fi
+    pull_part "$ref" &
     running=$((running + 1))
   done
   while ((running > 0)); do
@@ -306,15 +350,13 @@ part_files() {
 }
 
 gather_parts() {
-  local parts="$state/parts" name ref i
+  local parts="$state/parts" name ref i generation key
   local -a names=() refs=()
   while read -r name ref; do
     names+=("$name")
     refs+=("$ref")
   done
-  for ref in "${refs[@]}"; do
-    podman image exists "$ref" || echo "$ref"
-  done | xargs --no-run-if-empty --max-procs 6 --max-args 1 podman pull "${retries[@]}" --quiet >/dev/null
+  pull_parts "${refs[@]}"
   for i in "${!names[@]}"; do
     extract_part "${names[$i]}" "${refs[$i]}"
   done
@@ -325,16 +367,21 @@ gather_parts() {
   done
   part_files needed.txt "${names[@]}" | sort -u | { grep -vxF -f <(part_files provided.txt "${names[@]}") || true; } |
     sed 's/$/()(64bit)/' > "$parts/needed.txt"
-  mkdir -p "$parts/keys"
+  rm -rf "$parts/keys"
+  mkdir -p "$parts/keys/pcr-keys"
   openssl x509 -in "$LUFT_SECUREBOOT_CERT" -outform DER -out "$parts/keys/luft-secureboot.der"
-  openssl pkey -in "$LUFT_PCR_KEY" -pubout -out "$parts/keys/luft-pcr-policy.pub.pem"
+  while read -r generation key; do
+    openssl pkey -in "$key" -pubout -out "$parts/keys/pcr-keys/$generation.pem"
+    echo "$generation" > "$parts/keys/pcr-keys/current"
+  done < <(pcr_keys)
 }
 
 build_system() {
   local target="$1" tag="$2"
   shift 2
   podman build "${retries[@]}" --layers --no-hosts --no-hostname --security-opt label=disable --target "$target" --file "$image/Containerfile" \
-    --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" --build-arg "STORE=$store" "$@" \
+    --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "MAJOR=$MAJOR" --build-arg "CEF=$cef" \
+    --build-arg "STORE=$store" "$@" \
     "${podman_options[@]}" --tag "$tag" "$luft"
 }
 
@@ -343,7 +390,7 @@ rechunk() {
   work="$(mktemp -d "${TMPDIR:-/var/tmp}/luft-rechunk.XXXXXX")"
   CHUNKAH_CONFIG_STR="$(podman image inspect "$system")" podman run "${retries[@]}" --rm --security-opt label=disable \
     --mount "type=image,source=$system,destination=/chunkah" --volume "$work:/out" --env CHUNKAH_CONFIG_STR \
-    "$chunkah" build --rootfs /chunkah --max-layers 128 --prune /sysroot/ --prune /kernel \
+    "$CHUNKAH_IMAGE" build --rootfs /chunkah --max-layers 128 --prune /sysroot/ --prune /kernel \
     --label ostree.commit- --label ostree.final-diffid- --label rpmostree.inputhash- --output oci:/out/system
   id="$(podman pull --quiet "oci:$work/system")"
   podman tag "$id" "$system"
@@ -351,24 +398,25 @@ rechunk() {
 }
 
 build_images() {
-  local variant parts=luft system="$image_name-system:$fedora" refs name ref names
+  local variant parts=luft system="$image_name-system:$FEDORA" refs name ref names
   [[ " $* " != *" luft-nvidia "* ]] || parts="luft-nvidia"
-  require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT LUFT_PCR_KEY
+  require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
+  [[ -n "$(pcr_keys)" ]] || { echo "Set LUFT_PCR_KEY_1, or the key of another generation in os/versions.env." >&2; exit 1; }
   mapfile -t names < <(part_names "$parts")
   refs="$(part_refs "${names[@]}")"
   while read -r name ref; do
     [[ -z "${LUFT_REBUILD:-}" ]] && part_exists "$ref" || echo "$name $ref"
   done <<<"$refs" | build_parts
   gather_parts <<<"$refs"
-  build_system luft-kernel "$image_name-kernel:$fedora"
-  build_system luft-split "$system"
+  build_system luft-kernel "$image_name-kernel:$FEDORA" --build-arg "SYSTEM=$system"
+  build_system luft-split "$system" --build-arg "SYSTEM=$system"
   rechunk "$system"
   for variant; do
     case "$variant" in
-      luft) "$image/seal.sh" "$system" "$image_name:$fedora" ;;
+      luft) "$image/seal.sh" "$system" "$image_name:$FEDORA" ;;
       luft-nvidia)
         build_system luft-nvidia "$system-nvidia" --build-arg "SYSTEM=$(podman image inspect --format '{{.Id}}' "$system")"
-        "$image/seal.sh" "$system-nvidia" "$image_name:$fedora-nvidia"
+        "$image/seal.sh" "$system-nvidia" "$image_name:$FEDORA-nvidia"
         ;;
     esac
   done
@@ -378,7 +426,7 @@ stage_part() {
   local name ref container
   read -r name ref <<<"$(part_refs "$1")"
   part_exists "$ref" || build_part "$name" "$ref"
-  podman image exists "$ref" || podman pull "${retries[@]}" --quiet "$ref" >/dev/null
+  pull_part "$ref"
   mkdir -p "$2"
   container="$(podman create "$ref" /part)"
   podman export "$container" | tar -x -p -C "$2" --strip-components=1 stage

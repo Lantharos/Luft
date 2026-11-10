@@ -2,14 +2,16 @@
 set -euo pipefail
 
 os="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=os/versions.env
+source "$os/versions.env"
 name="${LUFT_IMAGE_NAME:-localhost/luft}"
 
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: os/vm/updates.sh
 
 Makes two updates for the VM in LUFT_VM (default os/vm/state) to try going
-back with: update.img, the system from os/image/build.sh (LUFT_IMAGE_NAME-system:45)
+back with: update.img, the system from os/image/build.sh (LUFT_IMAGE_NAME-system:$FEDORA)
 under another version, and broken.img, the same with a login screen that never
 starts. Each is sealed with the keys os/image/build.sh signs with and saved on
 a drive labelled after it, for os/vm/check.py rollback.
@@ -23,13 +25,13 @@ esac
 # shellcheck source=os/image/throwaway-keys.sh
 source "$os/image/throwaway-keys.sh"
 use_signing_keys
-require_signed_by_keys "$name-system:45"
+require_signed_by_keys "$name-system:$FEDORA"
 mkdir -p "${LUFT_VM:-$os/vm/state}"
 vm="$(cd "${LUFT_VM:-$os/vm/state}" && pwd)"
 
 update() {
   local label="$1" version="$2" change="$3" work="$vm/$1"
-  podman build --quiet --no-hosts --no-hostname --tag "$name-$label-system" --build-arg "SYSTEM=$name-system:45" \
+  podman build --quiet --no-hosts --no-hostname --tag "$name-$label-system" --build-arg "SYSTEM=$name-system:$FEDORA" \
     --label "org.opencontainers.image.version=$version" --file - "$vm" >/dev/null <<CONTAINERFILE
 ARG SYSTEM
 FROM \${SYSTEM}

@@ -1,0 +1,39 @@
+[Unit]
+Description=Keep what the TPM seals to this computer closed in Rescue
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=tpm2.target
+Before=sysinit.target shutdown.target
+ConditionKernelCommandLine=systemd.unit=rescue.target
+ConditionSecurity=tpm2
+FailureAction=reboot-force
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/systemd/systemd-pcrextend --pcr=15 luft-rescue
+ReadWritePaths=/run
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=disconnected
+PrivateNetwork=yes
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=sysinit.target

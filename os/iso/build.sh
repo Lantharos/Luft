@@ -3,35 +3,33 @@ set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../.." && pwd)"
 iso="$luft/os/iso"
+# shellcheck source=os/versions.env
+source "$luft/os/versions.env"
 image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
-image="${1:-$image_name:45}"
+image="${1:-$image_name:$FEDORA}"
 state="${LUFT_ISO:-$iso/state}"
 work="$state/work"
 store="$work/store"
-fedora=45
-major=1
-label="Luft-$major"
-followed="${2:-ghcr.io/lantharos/luft:$major}"
-live_image=$image_name-live:$fedora
+label="Luft-$MAJOR"
+followed="${2:-ghcr.io/lantharos/luft:$MAJOR}"
+live_image=$image_name-live:$FEDORA
 tools=$image_name-iso-tools
 initramfs_omitted=(
-  ostree bootc plymouth trustd crypt systemd-cryptsetup lvm mdraid dmraid multipath resume btrfs nvdimm
-  clevis clevis-pin-tpm2 clevis-pin-file clevis-pin-null clevis-pin-sss clevis-pin-tang tpm2-tss systemd-pcrextend
-  fido2 pkcs11 pcsc fips fips-crypto-policies network network-manager nfs iscsi nbd nvmf fcoe fcoe-uefi cifs
-  virtiofs virtfs kdumpbase memstrack walinuxagent qemu-net
+  bootc trustd luft-added-files crypt systemd-cryptsetup btrfs tpm2-tss systemd-pcrextend fido2 pkcs11 pcsc nbd fcoe-uefi
+  cifs kdumpbase
 )
 initramfs_omitted_drivers=(nouveau nvidia amdgpu radeon i915 xe)
 
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: os/iso/build.sh [IMAGE [FOLLOWED]]
 
-Builds Luft's live USB image from IMAGE (default localhost/luft:45) and
+Builds Luft's live USB image from IMAGE (default localhost/luft:$FEDORA) and
 IMAGE-nvidia, pulling them when they aren't here yet. LUFT_IMAGE_NAME names
 its own images something other than localhost/luft. The stick starts the
 regular image and carries both, so it installs the right one for the computer
 without a network. Installed systems get their updates from FOLLOWED (default
-ghcr.io/lantharos/luft:1), or FOLLOWED-nvidia.
+ghcr.io/lantharos/luft:$MAJOR), or FOLLOWED-nvidia.
 
 Writes os/iso/state/luft-VERSION.iso with a .sha256 (LUFT_ISO picks another
 folder).
@@ -125,7 +123,7 @@ remove_work() {
 ensure_images
 remove_work
 mkdir -p "$work"
-podman build --quiet --tag "$tools" "$iso" >/dev/null
+podman build --quiet --tag "$tools" --build-arg "FEDORA=$FEDORA" "$iso" >/dev/null
 build_live "$image"
 make_initramfs
 build_live "$image" "${variants[@]}"

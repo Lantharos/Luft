@@ -13,10 +13,10 @@
 	"apps/system/schelf/desktop/src/cli/commands/remove.rs": {
 		"/etc": "Tells what removing system packages takes away"
 	},
-	"apps/system/schelf/sandbox/src/launch/profile.rs": {
+	"apps/system/schelf/sandbox/src/launch/profile/system.rs": {
 		"/etc": "Shows AppImages the system's configuration read-only"
 	},
-	"apps/system/settings/desktop/src/panels/protection/apps/startup.rs": {
+	"apps/system/settings/desktop/src/panels/system/apps/startup.rs": {
 		"/etc/xdg": "Reads the apps that start for everyone"
 	},
 	"apps/system/settings/desktop/src/panels/system/about/mod.rs": {
@@ -27,6 +27,9 @@
 	},
 	"apps/system/tern/desktop/src/shell/mod.rs": {
 		"/etc/shells": "Reads the shells people can pick"
+	},
+	"kestrel/greeter/data/kestrel-password.service": {
+		"/etc": "Lets changing a password update the account files, which the system's own tools keep there"
 	},
 	"kestrel/engine/data/session/kestrel-session.in": {
 		"/etc/dconf/profile/user": "Reads the dconf profile an administrator chose"

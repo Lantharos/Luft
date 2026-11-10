@@ -15,9 +15,9 @@ RUN --mount=type=bind,from=system,target=/target \
     --mount=type=bind,from=kernel,target=/kernel \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
-    --mount=type=secret,id=pcr-key \
+    --mount=type=secret,id=pcr-keys \
     : "signed by ${SIGNED_BY}" && \
-    luft-startup-image /target /kernel /run/secrets/secureboot-key /run/secrets/secureboot-cert /run/secrets/pcr-key /out
+    luft-startup-image /target /kernel /run/secrets/secureboot-key /run/secrets/secureboot-cert /run/secrets/pcr-keys /out
 
 FROM ${IMAGE}
 COPY --from=startup /out/ /boot/EFI/Linux/

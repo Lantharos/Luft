@@ -8,8 +8,14 @@ inputs:
   certificate:
     description: LUFT_SECUREBOOT_CERT
     required: true
-  pcr-key:
-    description: LUFT_PCR_KEY, for sealing
+  seal:
+    description: Whether the job seals images, which needs a TPM policy key for every generation in os/versions.env
+    default: "false"
+  pcr-key-1:
+    description: LUFT_PCR_KEY
+    required: false
+  pcr-key-2:
+    description: LUFT_PCR_KEY_2
     required: false
 
 runs:
@@ -20,7 +26,9 @@ runs:
       env:
         KEY: ${{ inputs.key }}
         CERT: ${{ inputs.certificate }}
-        PCR_KEY: ${{ inputs.pcr-key }}
+        SEAL: ${{ inputs.seal }}
+        PCR_KEY_1: ${{ inputs.pcr-key-1 }}
+        PCR_KEY_2: ${{ inputs.pcr-key-2 }}
       run: |
         [[ -n "$KEY" && -n "$CERT" ]] || { echo "::error::LUFT_SECUREBOOT_KEY or LUFT_SECUREBOOT_CERT isn't set."; exit 1; }
         keys="$RUNNER_TEMP/secure-boot"
@@ -34,8 +42,13 @@ runs:
           echo "LUFT_SECUREBOOT_KEY=$keys/key.pem"
           echo "LUFT_SECUREBOOT_CERT=$keys/cert.pem"
         } >> "$GITHUB_ENV"
-        [[ -n "$PCR_KEY" ]] || exit 0
-        printf '%s\n' "$PCR_KEY" > "$keys/pcr.pem"
-        cmp <(openssl pkey -in "$keys/pcr.pem" -pubout) os/image/keys/luft-pcr-policy.pub.pem ||
-          { echo "::error::LUFT_PCR_KEY doesn't match the public key in os/image/keys"; exit 1; }
-        echo "LUFT_PCR_KEY=$keys/pcr.pem" >> "$GITHUB_ENV"
+        [[ "$SEAL" == true ]] || exit 0
+        source os/versions.env
+        for generation in ${PCR_GENERATIONS//,/ }; do
+          name="PCR_KEY_$generation"
+          [[ -n "${!name:-}" ]] || { echo "::error::The TPM policy key of generation $generation isn't set."; exit 1; }
+          printf '%s\n' "${!name}" > "$keys/pcr-$generation.pem"
+          cmp <(openssl pkey -in "$keys/pcr-$generation.pem" -pubout) "os/image/keys/pcr/$generation.pem" ||
+            { echo "::error::The TPM policy key of generation $generation doesn't match os/image/keys/pcr/$generation.pem"; exit 1; }
+          echo "LUFT_PCR_KEY_$generation=$keys/pcr-$generation.pem" >> "$GITHUB_ENV"
+        done

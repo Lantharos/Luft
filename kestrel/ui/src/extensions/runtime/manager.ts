@@ -10,7 +10,7 @@ import { EffectsStage } from '../api/v1/screenEffects/stage.js';
 import { LayerStage } from '../api/v1/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
-import { dataFolder, discover, findOne, type Installed } from './folders.js';
+import { dataFolder, discover, findOne, removeTree, type Installed } from './folders.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
 import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
@@ -129,8 +129,8 @@ export class ExtensionManager {
   private erase({ id, path }: Installed): void {
     this.instances.get(id)?.stored.forget();
     this.drop(id);
-    removeFolder(path);
-    if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeFolder(dataFolder(id));
+    removeTree(Gio.File.new_for_path(path));
+    if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeTree(Gio.File.new_for_path(dataFolder(id)));
     forgetSecrets(id);
     this.store.forgetValues(id);
     this.store.forgetShortcuts(id);
@@ -206,15 +206,4 @@ export class ExtensionManager {
     for (const id of [...this.instances.keys()]) this.drop(id);
     if (this.snapshots) GLib.rmdir(this.snapshots);
   }
-}
-
-function removeFolder(path: string): void {
-  const remove = (file: Gio.File) => {
-    if (file.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
-      const children = file.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
-      for (let info = children.next_file(null); info; info = children.next_file(null)) remove(file.get_child(info.get_name()));
-    }
-    file.delete(null);
-  };
-  remove(Gio.File.new_for_path(path));
 }

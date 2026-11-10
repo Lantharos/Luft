@@ -12,6 +12,8 @@ import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import { addShowInFilesAction, openFile, screenshotNotificationSource } from './notifications.js';
 
 Gio._promisify(Shell.Screenshot, 'composite_to_stream');
+Gio._promisify(Gio.File.prototype, 'create_async');
+Gio._promisify(Gio.OutputStream.prototype, 'splice_async');
 
 interface Compositor {
   composite_to_stream(
@@ -54,19 +56,27 @@ function makeScreenshotsFolder(): Gio.File {
   return dir;
 }
 
-function writeScreenshot(bytes: GLib.Bytes, time: GLib.DateTime): Gio.File {
+async function createUnlessTaken(file: Gio.File): Promise<Gio.FileOutputStream | null> {
+  try {
+    return await file.create_async(Gio.FileCreateFlags.NONE, GLib.PRIORITY_DEFAULT, null);
+  } catch (e) {
+    if (!(e as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)) throw e;
+    return null;
+  }
+}
+
+async function writeScreenshot(bytes: GLib.Bytes, time: GLib.DateTime): Promise<Gio.File> {
   const dir = makeScreenshotsFolder();
   const name = KestrelUi.t('screenshot-file', { timestamp: time.format('%Y-%m-%d %H-%M-%S')! });
 
   for (let index = 0; ; index++) {
     const suffix = index === 0 ? '' : `-${index}`;
     const file = Gio.File.new_for_path(GLib.build_filenamev([dir.get_path()!, `${name}${suffix}.png`]));
-    try {
-      file.create(Gio.FileCreateFlags.NONE, null).write_bytes(bytes, null);
-      return file;
-    } catch (e) {
-      if (!(e as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)) throw e;
-    }
+    const stream = await createUnlessTaken(file);
+    if (!stream) continue;
+    await stream.splice_async(Gio.MemoryInputStream.new_from_bytes(bytes),
+      Gio.OutputStreamSpliceFlags.CLOSE_SOURCE | Gio.OutputStreamSpliceFlags.CLOSE_TARGET, GLib.PRIORITY_DEFAULT, null);
+    return file;
   }
 }
 
@@ -78,12 +88,12 @@ function thumbnail(pixbuf: GdkPixbuf.Pixbuf): St.ImageContent {
   return content;
 }
 
-function storeScreenshot(bytes: GLib.Bytes, pixbuf: GdkPixbuf.Pixbuf): Gio.File | null {
+async function storeScreenshot(bytes: GLib.Bytes, pixbuf: GdkPixbuf.Pixbuf): Promise<Gio.File | null> {
   St.Clipboard.get_default().set_content(St.ClipboardType.CLIPBOARD, 'image/png', bytes);
 
   const time = GLib.DateTime.new_now_local();
   const lockdown = new Gio.Settings({ schema_id: 'org.gnome.desktop.lockdown' });
-  const file = lockdown.get_boolean('disable-save-to-disk') ? null : writeScreenshot(bytes, time);
+  const file = lockdown.get_boolean('disable-save-to-disk') ? null : await writeScreenshot(bytes, time);
 
   const source = screenshotNotificationSource();
   const notification = new MessageTray.Notification({
@@ -123,7 +133,7 @@ export async function captureScreenshot(
     texture, x, y, w, h, scale, cursorTexture, cursorX, cursorY, cursorScale, markup, stream);
 
   stream.close(null);
-  const file = storeScreenshot(stream.steal_as_bytes(), pixbuf);
+  const file = await storeScreenshot(stream.steal_as_bytes(), pixbuf);
   KestrelUi.playSound('screenshot');
   return file;
 }

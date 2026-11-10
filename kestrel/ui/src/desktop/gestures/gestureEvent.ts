@@ -1,11 +1,11 @@
 import type Clutter from 'gi://Clutter';
 
-export interface GestureDevice {
+interface GestureDevice {
   get_dimensions(): [boolean, number, number];
   get_device_type(): Clutter.InputDeviceType;
 }
 
-export interface GestureFields {
+interface GestureFields {
   type: Clutter.EventType;
   phase: Clutter.TouchpadGesturePhase;
   fingers: number;

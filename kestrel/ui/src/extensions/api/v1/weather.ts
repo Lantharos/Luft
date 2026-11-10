@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Soup from 'gi://Soup?version=3.0';
+import Soup from 'gi://Soup';
 
 import type { ApiContext } from './context.js';
 import { whereabouts } from './location.js';
@@ -21,7 +21,7 @@ interface Forecast {
   daily: { sunrise: number[]; sunset: number[] };
 }
 
-export function seasonAt(latitude: number, date: Date): Season {
+function seasonAt(latitude: number, date: Date): Season {
   const northern = NORTHERN_SEASONS[date.getMonth()];
   return latitude >= 0 ? northern : OPPOSITE[northern];
 }

@@ -5,7 +5,7 @@ import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
 import * as MessageTray from '../../../surfaces/notifications/tray/messageTray.js';
 import { ScreencastError, ScreencastErrors } from '../../../core/runtime/dbusErrors.js';
-import { loadInterfaceXML } from '../../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
 import { addShowInFilesAction, openFile, screenshotNotificationSource } from '../notifications.js';
 
 type ScreencastOptions = Record<string, GLib.Variant>;
@@ -21,7 +21,7 @@ const ScreencastProxy = Gio.DBusProxy.makeProxyWrapper<ScreencastRemote>(loadInt
 
 type Phase = 'STARTUP' | 'RECORDING';
 
-export interface ScreencastArea {
+interface ScreencastArea {
   x: number;
   y: number;
   width: number;

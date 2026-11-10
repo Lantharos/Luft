@@ -14,7 +14,7 @@ enum State {
   SCROLLING,
 }
 
-export interface SwipeTrackerOptions {
+interface SwipeTrackerOptions {
   allowDrag?: boolean;
   allowScroll?: boolean;
   phase?: Clutter.EventPhase;
@@ -155,6 +155,7 @@ export const SwipeTracker = GObject.registerClass({
 
   destroy(): void {
     this.touchpadGesture.destroy();
+    this.scrollGesture?.destroy();
     this.panGesture.actor?.remove_action(this.panGesture);
   }
 

@@ -13,7 +13,7 @@ import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import { StripSwipe } from './scrolling/swipe.js';
 import { Tiler } from './tiler.js';
 
-export interface TilingContext {
+interface TilingContext {
   monitors(): Box[];
   primaryIndex(): number;
   workArea(monitor: number): Box;

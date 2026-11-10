@@ -7,7 +7,7 @@ import { ScreenshotService } from '../system/screenshot/service/screenshotServic
 import type { ScreenShield } from '../auth/lockScreen/screenShield.js';
 import type { BrightnessManager } from '../system/display/brightnessManager.js';
 
-import { loadInterfaceXML } from './runtime/fileUtils.js';
+import { loadInterfaceXML } from './runtime/dbusUtils.js';
 
 const GnomeShellIface = loadInterfaceXML('org.gnome.Shell')!;
 const ScreenSaverIface = loadInterfaceXML('org.gnome.ScreenSaver')!;
@@ -48,6 +48,12 @@ export class ScreenSaverDBus {
   }
 
   LockAsync(_parameters: [], invocation: Gio.DBusMethodInvocation): void {
+    if (this.screenShield.active || this.screenShield.locked) {
+      this.screenShield.lock(true);
+      invocation.return_value(null);
+      return;
+    }
+
     const id = this.screenShield.connect('lock-screen-shown', () => {
       this.screenShield.disconnect(id);
       invocation.return_value(null);

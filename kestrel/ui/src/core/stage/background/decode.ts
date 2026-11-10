@@ -42,7 +42,7 @@ const COGL_FORMATS = new Map<Gly.MemoryFormat, Cogl.PixelFormat>([
   [Gly.MemoryFormat.R32G32B32A32_FLOAT, Cogl.PixelFormat.RGBA_FP_32323232],
 ]);
 
-export interface DecodedFrame extends FrameData {
+interface DecodedFrame extends FrameData {
   bytes: GLib.Bytes;
 }
 

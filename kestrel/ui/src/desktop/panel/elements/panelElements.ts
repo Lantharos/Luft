@@ -25,7 +25,7 @@ function showLayout(keys: Shell.App, layout: string): void {
 
 const orientationOf = (edge: Edge) => isVertical(edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
 
-export interface ElementActions {
+interface ElementActions {
   quickSettings(): void;
   notifications(): void;
   stopScreencast(): void;

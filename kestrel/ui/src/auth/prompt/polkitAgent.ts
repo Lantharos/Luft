@@ -306,7 +306,6 @@ class AuthenticationDialog extends ModalDialog {
 
     if (delay) {
       this.sessionRequestTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, delay, resetDialog);
-      GLib.Source.set_name_by_id(this.sessionRequestTimeoutId, '[kestrel] this._sessionRequestTimeoutId');
     } else {
       resetDialog();
     }

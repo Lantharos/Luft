@@ -5,7 +5,7 @@ import * as KestrelUi from '../../kestrelUi.js';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import { allowsAutorun } from './automountManager.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 Gio._promisify(Gio.Mount.prototype, 'guess_content_type');
 
@@ -40,6 +40,17 @@ function defaultFileManager(): Gio.AppInfo {
   return Gio.app_info_get_default_for_type('inode/directory', false)!;
 }
 
+async function sniffedContentTypes(mount: Gio.Mount): Promise<string[]> {
+  try {
+    const hotplugSniffer = HotplugSniffer(Gio.DBus.session, 'com.lantharos.Kestrel.HotplugSniffer', '/com/lantharos/Kestrel/HotplugSniffer');
+    const [contentTypes] = await hotplugSniffer.SniffURIAsync(mount.get_root().get_uri());
+    return contentTypes;
+  } catch (error) {
+    log(`Unable to sniff content types on added mount ${mount.get_name()}: ${error}`);
+    return [];
+  }
+}
+
 async function guessApps(mount: Gio.Mount): Promise<Gio.AppInfo[]> {
   let contentTypes: string[] = [];
   if (!isMountNonLocal(mount)) {
@@ -49,10 +60,7 @@ async function guessApps(mount: Gio.Mount): Promise<Gio.AppInfo[]> {
       log(`Unable to guess content types on added mount ${mount.get_name()}: ${error}`);
     }
 
-    if (contentTypes.length === 0) {
-      const hotplugSniffer = HotplugSniffer(Gio.DBus.session, 'com.lantharos.Kestrel.HotplugSniffer', '/com/lantharos/Kestrel/HotplugSniffer');
-      [contentTypes] = await hotplugSniffer.SniffURIAsync(mount.get_root().get_uri());
-    }
+    if (contentTypes.length === 0) contentTypes = await sniffedContentTypes(mount);
   }
 
   contentTypes = contentTypes.filter(type => type !== 'x-content/win32-software');

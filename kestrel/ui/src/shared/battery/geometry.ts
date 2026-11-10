@@ -20,7 +20,7 @@ export interface BatteryGeometry {
   fontSize: number;
 }
 
-export interface GeometryOptions {
+interface GeometryOptions {
   size: number;
   margin: number;
   numbered: boolean;

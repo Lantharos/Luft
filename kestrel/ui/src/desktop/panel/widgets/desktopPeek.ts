@@ -41,7 +41,10 @@ export class DesktopPeek {
       this.peek(false, true);
       this.toggleDesktop();
     });
-    this.actor.connect('destroy', () => this.cancel());
+    this.actor.connect('destroy', () => {
+      this.cancel();
+      this.peek(false, true);
+    });
   }
 
   private cancel(): void {

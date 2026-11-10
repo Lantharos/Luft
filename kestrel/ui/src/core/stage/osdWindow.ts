@@ -13,9 +13,9 @@ import * as Main from '../main.js';
 const HIDE_TIMEOUT = 1500;
 const TASKBAR_GAP = 24;
 const FADE_TIME = 100;
-export const LEVEL_ANIMATION_TIME = 100;
+const LEVEL_ANIMATION_TIME = 100;
 
-export interface OsdLevel {
+interface OsdLevel {
   level?: number | null;
   maxLevel?: number;
 }
@@ -31,6 +31,7 @@ export class OsdWindow extends Clutter.Actor {
   readonly caption = new St.Label();
   private readonly level = new BarLevel.BarLevel({ style_class: 'level' });
   private hideTimeoutId = 0;
+  private keepsRedirect = false;
 
   constructor(private readonly monitorIndex: number) {
     super({
@@ -51,6 +52,18 @@ export class OsdWindow extends Clutter.Actor {
 
     this.reset();
     Main.uiGroup.add_child(this);
+    this.connect('destroy', () => {
+      if (this.hideTimeoutId) GLib.source_remove(this.hideTimeoutId);
+      this.hideTimeoutId = 0;
+      this.keepRedirect(false);
+    });
+  }
+
+  private keepRedirect(keep: boolean): void {
+    if (keep === this.keepsRedirect) return;
+    this.keepsRedirect = keep;
+    if (keep) global.compositor.disable_unredirect();
+    else global.compositor.enable_unredirect();
   }
 
   private updateBoxVisibility(): void {
@@ -91,7 +104,7 @@ export class OsdWindow extends Clutter.Actor {
 
     if (!this.visible) {
       this.hbox.style = this.clearOfTaskbar();
-      global.compositor.disable_unredirect();
+      this.keepRedirect(true);
       super.show();
       this.opacity = 0;
       this.get_parent()!.set_child_above_sibling(this, null);
@@ -107,7 +120,6 @@ export class OsdWindow extends Clutter.Actor {
       });
     }
     this.hideTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, HIDE_TIMEOUT, () => this.fadeOut());
-    GLib.Source.set_name_by_id(this.hideTimeoutId, '[kestrel] this._hide');
   }
 
   private clearOfTaskbar(): string {
@@ -128,9 +140,10 @@ export class OsdWindow extends Clutter.Actor {
       opacity: 0,
       duration: FADE_TIME,
       mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      onComplete: () => {
+      onStopped: finished => {
+        if (!finished) return;
         this.reset();
-        global.compositor.enable_unredirect();
+        this.keepRedirect(false);
       },
     });
   }

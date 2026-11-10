@@ -5,9 +5,9 @@ import St from 'gi://St';
 
 import type { EaseOptions } from '../../environment.js';
 
-export const DEFAULT_FADE_FACTOR = 0.4;
-export const VIGNETTE_BRIGHTNESS = 0.5;
-export const VIGNETTE_SHARPNESS = 0.7;
+const DEFAULT_FADE_FACTOR = 0.4;
+const VIGNETTE_BRIGHTNESS = 0.5;
+const VIGNETTE_SHARPNESS = 0.7;
 
 const VIGNETTE_DECLARATIONS = `
 uniform float brightness;
@@ -78,7 +78,7 @@ class RadialShaderEffect extends Clutter.ShaderEffect {
   }
 }
 
-export interface LightboxOptions {
+interface LightboxOptions {
   inhibitEvents?: boolean;
   width?: number;
   height?: number;

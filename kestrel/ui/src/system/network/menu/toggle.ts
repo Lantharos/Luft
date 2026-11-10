@@ -15,7 +15,7 @@ export namespace NMToggle {
   }
 }
 
-export interface DeviceMenuItem extends NMMenuItem {
+interface DeviceMenuItem extends NMMenuItem {
   singleDeviceMode: boolean;
   setDeviceName(name: string): void;
 }

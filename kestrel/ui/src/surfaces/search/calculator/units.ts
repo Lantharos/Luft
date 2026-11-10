@@ -1,6 +1,6 @@
 import { evaluate, type Decimal } from './expression.js';
 
-export type Dimension = 'length' | 'mass' | 'temperature' | 'data' | 'time' | 'volume' | 'speed' | 'currency';
+type Dimension = 'length' | 'mass' | 'temperature' | 'data' | 'time' | 'volume' | 'speed' | 'currency';
 
 export interface Unit {
   dimension: Dimension;
@@ -10,7 +10,7 @@ export interface Unit {
   partner?: string;
 }
 
-export interface Conversion {
+interface Conversion {
   value: number;
   from: Unit;
   to: Unit;

@@ -8,7 +8,7 @@ import { MonumentClock } from './clock.js';
 import { MonumentLayout } from './layout.js';
 import { MonumentWake } from './wake.js';
 
-export interface MonumentOptions {
+interface MonumentOptions {
   root: St.Widget;
   auth: Clutter.Actor;
   side: Clutter.Actor;

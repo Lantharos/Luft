@@ -69,7 +69,7 @@ function updateSubProperty(props: IBus.PropList | null, prop: IBus.Property): bo
   return false;
 }
 
-export class InputSourceManager extends EventEmitter {
+class InputSourceManager extends EventEmitter {
   declare connect: GObject.SignalMethods<this, InputSourceManagerSignals>['connect'];
   declare emit: GObject.SignalMethods<this, InputSourceManagerSignals>['emit'];
 

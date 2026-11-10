@@ -78,7 +78,6 @@ export const WorkspaceSwitcherPopup = GObject.registerClass(class WorkspaceSwitc
 
     if (this.timeoutId !== 0) GLib.source_remove(this.timeoutId);
     this.timeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, DISPLAY_TIMEOUT, () => this.onTimeout());
-    GLib.Source.set_name_by_id(this.timeoutId, '[kestrel] this._onTimeout');
 
     this.redisplayAllPopups();
 

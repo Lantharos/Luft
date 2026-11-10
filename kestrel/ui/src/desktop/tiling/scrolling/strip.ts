@@ -1,14 +1,14 @@
 import type { Box } from '../../../shared/layout/box.js';
 import { divide } from '../layouts/geometry.js';
 
-export const PRESET_WIDTHS = [1 / 3, 1 / 2, 2 / 3, 1];
+const PRESET_WIDTHS = [1 / 3, 1 / 2, 2 / 3, 1];
 const DEFAULT_WIDTH = 1 / 2;
 const WIDTH_STEP = 0.1;
 const MIN_WIDTH = 0.1;
 const MIN_ROW_SHARE = 0.15;
 const PRESET_TOLERANCE = 0.01;
 
-export interface Column<T> {
+interface Column<T> {
   windows: T[];
   weights: number[];
   width: number;

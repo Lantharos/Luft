@@ -224,7 +224,10 @@ export class Greeter {
   private async finish(): Promise<void> {
     const user = this.prompt.userName!;
     const session = this.session;
-    if (!session) return;
+    if (!session) {
+      this.prompt.cancel();
+      return;
+    }
     this.finishing = true;
     this.menus.close(true);
     await rememberSession(user, session.id, this.signIn.method);

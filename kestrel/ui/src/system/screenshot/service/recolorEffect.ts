@@ -25,7 +25,7 @@ const SOURCE = `
   cogl_color_out.rgb =                                    \n
     mix(recolor_color, cogl_color_out.rgb, blend);        \n`;
 
-export interface RecolorParams {
+interface RecolorParams {
   chroma: Cogl.Color;
   threshold: number;
   smoothing: number;

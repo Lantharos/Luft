@@ -10,7 +10,7 @@ import type { MonumentLayout } from './layout.js';
 
 const MODIFIER_KEYS = [Clutter.KEY_Shift_L, Clutter.KEY_Shift_R, Clutter.KEY_Shift_Lock, Clutter.KEY_Caps_Lock, Clutter.KEY_Num_Lock];
 
-export interface MonumentWakeOptions {
+interface MonumentWakeOptions {
   actor: St.Widget;
   layout: MonumentLayout;
   actionMode: Shell.ActionMode;

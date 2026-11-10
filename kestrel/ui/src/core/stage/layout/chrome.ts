@@ -6,18 +6,13 @@ import Mtk from 'gi://Mtk';
 import type { Monitor } from './monitor.js';
 
 export interface ChromeOptions {
-  trackFullscreen?: boolean;
   affectsStruts?: boolean;
 }
 
-interface TrackedActor extends Required<ChromeOptions> {
+interface TrackedActor {
   actor: Clutter.Actor;
+  affectsStruts: boolean;
 }
-
-const DEFAULT_OPTIONS: Required<ChromeOptions> = {
-  trackFullscreen: false,
-  affectsStruts: false,
-};
 
 function strutSide(monitor: Monitor, x1: number, y1: number, x2: number, y2: number): Meta.Side | null {
   if (x1 <= monitor.x && x2 >= monitor.x + monitor.width) {
@@ -46,15 +41,12 @@ export class ChromeTracker {
   track(actor: Clutter.Actor, options: ChromeOptions = {}): void {
     if (this.findActor(actor) !== -1) throw new Error('trying to re-track existing chrome actor');
 
-    const actorData = { ...DEFAULT_OPTIONS, ...options, actor };
-    actor.connectObject(
-      'notify::visible', () => this.queueUpdateRegions(),
-      'notify::allocation', () => this.queueUpdateRegions(),
-      'destroy', () => this.untrack(actor), this);
+    const affectsStruts = options.affectsStruts ?? false;
+    actor.connectObject('destroy', () => this.untrack(actor), this);
+    if (affectsStruts) actor.connectObject('notify::allocation', () => this.queueUpdateRegions(), this);
 
-    this.trackedActors.push(actorData);
-    this.updateActorVisibility(actorData);
-    this.queueUpdateRegions();
+    this.trackedActors.push({ actor, affectsStruts });
+    if (affectsStruts) this.queueUpdateRegions();
   }
 
   trackDescendant(actor: Clutter.Actor, options: ChromeOptions = {}): void {
@@ -65,25 +57,17 @@ export class ChromeTracker {
       index = this.findActor(ancestor);
     }
 
-    const ancestorData = ancestor ? this.trackedActors[index] : DEFAULT_OPTIONS;
-    this.track(actor, {
-      trackFullscreen: options.trackFullscreen ?? ancestorData.trackFullscreen,
-      affectsStruts: options.affectsStruts ?? ancestorData.affectsStruts,
-    });
+    this.track(actor, { affectsStruts: options.affectsStruts ?? (ancestor !== null && this.trackedActors[index].affectsStruts) });
   }
 
   untrack(actor: Clutter.Actor): void {
     const i = this.findActor(actor);
     if (i === -1) return;
 
-    this.trackedActors.splice(i, 1);
+    const [{ affectsStruts }] = this.trackedActors.splice(i, 1);
     actor.disconnectObject(this);
 
-    this.queueUpdateRegions();
-  }
-
-  updateVisibility(): void {
-    for (const actorData of this.trackedActors) this.updateActorVisibility(actorData);
+    if (affectsStruts) this.queueUpdateRegions();
   }
 
   queueUpdateRegions(): void {
@@ -135,12 +119,5 @@ export class ChromeTracker {
 
   private findActor(actor: Clutter.Actor | null): number {
     return this.trackedActors.findIndex(actorData => actorData.actor === actor);
-  }
-
-  private updateActorVisibility(actorData: TrackedActor): void {
-    if (!actorData.trackFullscreen) return;
-
-    const monitor = this.findMonitorForActor(actorData.actor);
-    actorData.actor.visible = !(global.window_group.visible && monitor && monitor.inFullscreen);
   }
 }

@@ -20,7 +20,7 @@ export interface ElementState {
   takesFiles: boolean;
 }
 
-export interface ElementHandlers {
+interface ElementHandlers {
   click(actor: Clutter.Actor): void;
   menu(actor: Clutter.Actor): void;
   expanded(expanded: boolean): void;

@@ -78,15 +78,19 @@ export class TaskbarSurface {
 
   shape(radius: number | null): void {
     this.shaped = radius;
-    this.round();
+    this.roundBar(this.separate);
   }
 
-  private round(): void {
-    const separate = this.separate;
+  private roundBar(separate: boolean): void {
     const radius = separate ? 0 : this.radius;
     this.blur.set_property('corner-radius', radius);
     this.actor.style = `border-radius: ${radius}px;`;
     this.peek.style = radius ? `border-radius: ${this.peekCorners(`${radius}px`)};` : null;
+  }
+
+  private round(): void {
+    const separate = this.separate;
+    this.roundBar(separate);
     const { thickness, button, radius: islandRadius } = this.screen().metrics;
     for (const { actor } of this.islands()) {
       this.blurOf(actor).set_property('corner-radius', separate ? islandRadius : 0);

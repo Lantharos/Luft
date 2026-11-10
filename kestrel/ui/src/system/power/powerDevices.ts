@@ -8,7 +8,7 @@ const CHARGING = 1;
 const DISCHARGING = 2;
 const FULLY_CHARGED = 4;
 
-export type Charge = 'charging' | 'discharging' | 'unknown';
+type Charge = 'charging' | 'discharging' | 'unknown';
 
 function chargeOf(state: number): Charge {
   if (state === CHARGING || state === FULLY_CHARGED) return 'charging';

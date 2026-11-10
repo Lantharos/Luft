@@ -34,7 +34,7 @@ function hasIBusVersion(major: number, minor: number, micro: number): boolean {
 if (!hasIBusVersion(1, 5, 2))
   throw new Error(`Found IBus version ${IBus.MAJOR_VERSION}.${IBus.MINOR_VERSION}.${IBus.MICRO_VERSION} but required is 1.5.2`);
 
-export interface CursorLocation {
+interface CursorLocation {
   x: number;
   y: number;
   width: number;

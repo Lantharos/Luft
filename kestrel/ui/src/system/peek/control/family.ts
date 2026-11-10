@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 
-export interface CaptureArea {
+interface CaptureArea {
   readonly x: number;
   readonly y: number;
   readonly width: number;

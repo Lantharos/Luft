@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { loadInterfaceXML } from './runtime/fileUtils.js';
+import { loadInterfaceXML } from './runtime/dbusUtils.js';
 
 const INTROSPECT_DBUS_API_VERSION = 3;
 

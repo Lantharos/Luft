@@ -29,7 +29,7 @@ export interface DropEvent {
   clutterEvent: Clutter.Event;
 }
 
-export interface DragMonitor {
+interface DragMonitor {
   dragMotion?(event: DragEvent): DragMotionResult;
   dragDrop?(event: DropEvent): DragDropResult;
 }

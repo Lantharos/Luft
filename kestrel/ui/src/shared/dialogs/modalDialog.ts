@@ -32,12 +32,9 @@ export const State = {
 } as const;
 export type State = typeof State[keyof typeof State];
 
-export interface ModalDialogOptions {
-  shellReactive?: boolean;
+interface ModalDialogOptions {
   styleClass?: string | null;
   actionMode?: Shell.ActionMode;
-  shouldFadeIn?: boolean;
-  shouldFadeOut?: boolean;
   destroyOnClose?: boolean;
   /**
    * A system prompt, such as a password request or a question about access: it ignores keys, clicks and taps for a
@@ -72,14 +69,11 @@ export const ModalDialog = GObject.registerClass({
   declare private currentState: State;
   declare private hasModal: boolean;
   declare private actionMode: Shell.ActionMode;
-  declare private shellReactive: boolean;
-  declare private shouldFadeIn: boolean;
-  declare private shouldFadeOut: boolean;
   declare private destroyOnClose: boolean;
   declare private backgroundBin: St.Bin;
   declare private monitorConstraint: InstanceType<typeof Layout.MonitorConstraint>;
-  declare private lightbox: InstanceType<typeof Lightbox.Lightbox> | undefined;
-  declare private eventBlocker: Clutter.Actor | undefined;
+  declare private lightbox: InstanceType<typeof Lightbox.Lightbox>;
+  declare private eventBlocker: Clutter.Actor;
   declare private initialKeyFocus: St.Widget | null;
   declare private savedKeyFocus: Clutter.Actor | null;
   declare private modalGrab: Clutter.Grab | null | undefined;
@@ -89,11 +83,8 @@ export const ModalDialog = GObject.registerClass({
   declare private earlyKeys: Set<number>;
 
   _init({
-    shellReactive = false,
     styleClass = null,
     actionMode = Shell.ActionMode.SYSTEM_MODAL,
-    shouldFadeIn = true,
-    shouldFadeOut = true,
     destroyOnClose = true,
     prompt = false,
   }: ModalDialogOptions = {}): void {
@@ -108,9 +99,6 @@ export const ModalDialog = GObject.registerClass({
     this.currentState = State.CLOSED;
     this.hasModal = false;
     this.actionMode = actionMode;
-    this.shellReactive = shellReactive;
-    this.shouldFadeIn = shouldFadeIn;
-    this.shouldFadeOut = shouldFadeOut;
     this.destroyOnClose = destroyOnClose;
 
     Main.layoutManager.modalDialogGroup.add_child(this);
@@ -134,16 +122,14 @@ export const ModalDialog = GObject.registerClass({
     this.contentLayout = this.dialogLayout.contentLayout;
     this.buttonLayout = this.dialogLayout.buttonLayout;
 
-    if (!this.shellReactive) {
-      this.lightbox = new Lightbox.Lightbox(this, {
-        inhibitEvents: true,
-        radialEffect: true,
-      });
-      this.lightbox.highlight(this.backgroundBin);
+    this.lightbox = new Lightbox.Lightbox(this, {
+      inhibitEvents: true,
+      radialEffect: true,
+    });
+    this.lightbox.highlight(this.backgroundBin);
 
-      this.eventBlocker = new Clutter.Actor({ reactive: true });
-      this.backgroundStack.add_child(this.eventBlocker);
-    }
+    this.eventBlocker = new Clutter.Actor({ reactive: true });
+    this.backgroundStack.add_child(this.eventBlocker);
 
     global.focus_manager.add_group(this.dialogLayout);
     this.initialKeyFocus = null;
@@ -218,20 +204,18 @@ export const ModalDialog = GObject.registerClass({
     this.setState(State.OPENING);
 
     this.dialogLayout.opacity = 255;
-    this.lightbox?.lightOn();
+    this.lightbox.lightOn();
     this.opacity = 0;
     this.show();
-    if (this.shouldFadeIn) {
-      this.dialogLayout.translation_y = OPEN_RISE_DISTANCE;
-      this.dialogLayout.ease({
-        translation_y: 0,
-        duration: OPEN_RISE_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUART,
-      });
-    }
+    this.dialogLayout.translation_y = OPEN_RISE_DISTANCE;
+    this.dialogLayout.ease({
+      translation_y: 0,
+      duration: OPEN_RISE_TIME,
+      mode: Clutter.AnimationMode.EASE_OUT_QUART,
+    });
     this.ease({
       opacity: 255,
-      duration: this.shouldFadeIn ? OPEN_AND_CLOSE_TIME : 0,
+      duration: OPEN_AND_CLOSE_TIME,
       mode: Clutter.AnimationMode.EASE_OUT_QUAD,
       onComplete: () => {
         this.setState(State.OPENED);
@@ -274,16 +258,12 @@ export const ModalDialog = GObject.registerClass({
     this.popModal();
     this.savedKeyFocus = null;
 
-    if (this.shouldFadeOut) {
-      this.ease({
-        opacity: 0,
-        duration: OPEN_AND_CLOSE_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        onComplete: () => this.closeComplete(),
-      });
-    } else {
-      this.closeComplete();
-    }
+    this.ease({
+      opacity: 0,
+      duration: OPEN_AND_CLOSE_TIME,
+      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      onComplete: () => this.closeComplete(),
+    });
   }
 
   popModal(): void {
@@ -295,7 +275,7 @@ export const ModalDialog = GObject.registerClass({
     this.modalGrab = null;
     this.hasModal = false;
 
-    if (!this.shellReactive) this.backgroundStack.set_child_above_sibling(this.eventBlocker!, null);
+    this.backgroundStack.set_child_above_sibling(this.eventBlocker, null);
   }
 
   pushModal(): boolean {
@@ -312,7 +292,7 @@ export const ModalDialog = GObject.registerClass({
       (this.initialKeyFocus || this.dialogLayout.initialKeyFocus).grab_key_focus();
     }
 
-    if (!this.shellReactive) this.backgroundStack.set_child_below_sibling(this.eventBlocker!, null);
+    this.backgroundStack.set_child_below_sibling(this.eventBlocker, null);
     return true;
   }
 

@@ -5,7 +5,7 @@ import St from 'gi://St';
 import * as Main from '../../../core/main.js';
 import type { PopupMenuBase } from './menuBase.js';
 
-export interface MenuGrabParams {
+interface MenuGrabParams {
   actionMode?: Shell.ActionMode;
 }
 

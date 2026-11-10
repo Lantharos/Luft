@@ -10,7 +10,7 @@ import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space, SpaceHost } from './space.js';
 import { appKey, floatsByNature, stretched } from './windows.js';
 
-export interface TilingSurroundings {
+interface TilingSurroundings {
   monitors(): Box[];
   primaryIndex(): number;
   workArea(monitor: number): Box;

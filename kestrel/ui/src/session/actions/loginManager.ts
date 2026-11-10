@@ -3,7 +3,7 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { EventEmitter } from '../../core/runtime/signals.js';
 
 const LOGIN = 'org.freedesktop.login1';
@@ -82,7 +82,6 @@ class LoginManager extends EventEmitter {
 
     let sessionId = GLib.getenv('XDG_SESSION_ID');
     if (!sessionId) {
-      log('Unset XDG_SESSION_ID, getCurrentSessionProxy() called outside a user session. Asking logind directly.');
       try {
         const autoSession = await SystemdLoginSession.newAsync(Gio.DBus.system, LOGIN, '/org/freedesktop/login1/session/auto');
         sessionId = autoSession.Id;
@@ -92,7 +91,6 @@ class LoginManager extends EventEmitter {
       }
     }
 
-    log(`Will monitor session ${sessionId}`);
     try {
       const [objectPath] = await this.proxy.GetSessionAsync(sessionId);
       this.currentSession = await SystemdLoginSession.newAsync(Gio.DBus.system, LOGIN, objectPath);

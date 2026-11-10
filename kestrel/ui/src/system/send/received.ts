@@ -10,8 +10,8 @@ Gio._promisify(Gio.InputStream.prototype, 'read_bytes_async');
 Gio._promisify(Gio.OutputStream.prototype, 'write_bytes_async');
 Gio._promisify(Gio.OutputStream.prototype, 'close_async');
 
-export const MOST_FILES = 32;
-export const MOST_BYTES = 2 * 1024 ** 3;
+const MOST_FILES = 32;
+const MOST_BYTES = 2 * 1024 ** 3;
 const CHUNK = 1024 ** 2;
 const LONGEST_NAME = 255;
 const KEPT_FOR = GLib.TIME_SPAN_DAY;

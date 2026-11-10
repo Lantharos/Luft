@@ -47,10 +47,10 @@ export function capture(): SavedWindow[] {
   return global.display.sort_windows_by_stacking(global.display.list_all_windows().filter(remembered)).map(save);
 }
 
-export function write(windows: SavedWindow[], written: () => void): void {
+export function write(windows: string, written: () => void): void {
   const target = file();
   GLib.mkdir_with_parents(target.get_parent()!.get_path()!, 0o700);
-  target.replace_contents_bytes_async(new GLib.Bytes(new TextEncoder().encode(JSON.stringify(windows))), null, false,
+  target.replace_contents_bytes_async(new GLib.Bytes(new TextEncoder().encode(windows)), null, false,
     Gio.FileCreateFlags.PRIVATE | Gio.FileCreateFlags.REPLACE_DESTINATION, null, (source, result) => {
       try {
         source!.replace_contents_finish(result);

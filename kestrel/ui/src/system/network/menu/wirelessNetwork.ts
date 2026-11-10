@@ -4,12 +4,12 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
-import Polkit from 'gi://Polkit';
 import St from 'gi://St';
 
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as PopupMenu from '../../../shared/popups/popupMenu.js';
 import * as Util from '../../../core/runtime/util.js';
+import { ownPermission } from '../../../shared/dbus/polkit.js';
 import { registerDestroyableType } from '../../../core/runtime/signalTracker.js';
 import { forgetUnlessJoined, NM80211Mode, signalToIcon } from './nmUtils.js';
 
@@ -182,15 +182,19 @@ export class WirelessNetwork extends GObject.Object {
     } else if (!this.canAutoconnect()) {
       Util.openSettings('network');
     } else {
-      const connection = new NM.SimpleConnection();
-      const permission = Polkit.Permission.new_sync('org.freedesktop.NetworkManager.settings.modify.system', null, null);
-      if (!permission?.get_allowed()) {
-        const setting = new NM.SettingConnection();
-        setting.add_permission('user', GLib.get_user_name(), null);
-        connection.add_setting(setting);
-      }
-      this.join(connection, ap);
+      this.joinNew(ap).catch(logError);
     }
+  }
+
+  private async joinNew(ap: NM.AccessPoint): Promise<void> {
+    const connection = new NM.SimpleConnection();
+    const permission = await ownPermission('org.freedesktop.NetworkManager.settings.modify.system');
+    if (!permission.get_allowed()) {
+      const setting = new NM.SettingConnection();
+      setting.add_permission('user', GLib.get_user_name(), null);
+      connection.add_setting(setting);
+    }
+    await this.join(connection, ap);
   }
 
   private async join(connection: NM.SimpleConnection, ap: NM.AccessPoint): Promise<void> {

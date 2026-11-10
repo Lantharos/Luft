@@ -48,7 +48,7 @@ export function colorModesOffered(printer: Printer): string[] {
   return [COLOR, MONOCHROME].filter(mode => printer.colorModes.includes(mode));
 }
 
-export function parseRanges(text: string): [number, number][] | null {
+function parseRanges(text: string): [number, number][] | null {
   const ranges: [number, number][] = [];
   for (const part of text.split(',').map(part => part.trim()).filter(Boolean)) {
     const match = RANGE.exec(part);

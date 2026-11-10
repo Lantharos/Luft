@@ -58,6 +58,7 @@ export const Keyboard = GObject.registerClass({
   private showIdleId = 0;
   private keyboardRestingId = 0;
   private keyboardHeightNotifyId = 0;
+  private keepsRedirect = false;
   private surroundingTextId = 0;
 
   private readonly keyHandler: KeyHandler = {
@@ -129,7 +130,6 @@ export const Keyboard = GObject.registerClass({
       this.clearKeyboardRestTimer();
       this.openNow();
     });
-    GLib.Source.set_name_by_id(this.keyboardRestingId, '[kestrel] this._clearKeyboardRestTimer');
   }
 
   close(immediate = false): void {
@@ -150,7 +150,6 @@ export const Keyboard = GObject.registerClass({
       this.clearKeyboardRestTimer();
       this.closeNow();
     });
-    GLib.Source.set_name_by_id(this.keyboardRestingId, '[kestrel] this._clearKeyboardRestTimer');
   }
 
   releaseFocusWindow(): void {
@@ -218,6 +217,8 @@ export const Keyboard = GObject.registerClass({
     this.clearShowIdle();
     this.stopWaitingForSurrounding();
     this.focusLift.liftChrome(false);
+    this.stopFollowingHeight();
+    this.keepRedirect(false);
 
     this.controller.setOskCompletion(false);
     this.controller.destroy();
@@ -339,7 +340,6 @@ export const Keyboard = GObject.registerClass({
       this.openOnFocus();
       this.showIdleId = 0;
     });
-    GLib.Source.set_name_by_id(this.showIdleId, '[kestrel] this.open');
   }
 
   private updateKeys(): void {
@@ -459,12 +459,26 @@ export const Keyboard = GObject.registerClass({
     this.levels.disableAllModifiers();
   }
 
+  private keepRedirect(keep: boolean): void {
+    if (keep === this.keepsRedirect) return;
+    this.keepsRedirect = keep;
+    if (keep) global.compositor.disable_unredirect();
+    else global.compositor.enable_unredirect();
+  }
+
+  private stopFollowingHeight(): void {
+    if (!this.keyboardHeightNotifyId) return;
+    Main.layoutManager.keyboardBox.disconnect(this.keyboardHeightNotifyId);
+    this.keyboardHeightNotifyId = 0;
+  }
+
   private animateShow(): void {
-    global.compositor.disable_unredirect();
+    this.keepRedirect(true);
 
     this.focusLift.slideWindow(true);
 
     Main.layoutManager.keyboardBox.show();
+    this.keyboardVisible = true;
     this.ease({
       translation_y: -this.height,
       opacity: 255,
@@ -476,7 +490,6 @@ export const Keyboard = GObject.registerClass({
         });
       },
     });
-    this.keyboardVisible = true;
     this.emit('visibility-changed');
     this.focusLift.liftChrome(true);
   }
@@ -485,22 +498,20 @@ export const Keyboard = GObject.registerClass({
     this.focusLift.slideWindow(false);
     this.focusLift.liftChrome(false);
 
-    if (this.keyboardHeightNotifyId) {
-      Main.layoutManager.keyboardBox.disconnect(this.keyboardHeightNotifyId);
-      this.keyboardHeightNotifyId = 0;
-    }
+    this.stopFollowingHeight();
+    this.keyboardVisible = false;
     this.ease({
       translation_y: 0,
       opacity: 0,
       duration: KEYBOARD_ANIMATION_TIME,
       mode: Clutter.AnimationMode.EASE_IN_QUAD,
-      onComplete: () => {
-        Main.layoutManager.keyboardBox.hide();
-        global.compositor.enable_unredirect();
+      onStopped: finished => {
+        if (this.keyboardVisible) return;
+        if (finished) Main.layoutManager.keyboardBox.hide();
+        this.keepRedirect(false);
       },
     });
 
-    this.keyboardVisible = false;
     this.emit('visibility-changed');
   }
 });

@@ -10,7 +10,7 @@ export interface Presses {
   cancel(): void;
 }
 
-export interface HoldActions {
+interface HoldActions {
   press(): void;
   begin(): void;
   end(): void;

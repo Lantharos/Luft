@@ -19,7 +19,7 @@ export interface Secret {
   validate?: (value: string) => boolean;
 }
 
-export interface SecretContent {
+interface SecretContent {
   title?: string;
   message?: string;
   iconName: string | null;

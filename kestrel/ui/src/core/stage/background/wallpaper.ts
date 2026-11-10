@@ -8,13 +8,13 @@ import Meta from 'gi://Meta';
 import * as KestrelUi from '../../../kestrelUi.js';
 import type { LayoutManager } from '../layout.js';
 import { getBackgroundCache } from './cache.js';
-import { BACKGROUND_SCHEMA, COLOR_SCHEME_KEY, INTERFACE_SCHEMA, KESTREL_SCHEMA } from './schemas.js';
+import { COLOR_SCHEME_KEY, INTERFACE_SCHEMA, KESTREL_SCHEMA } from './schemas.js';
 import { displaySignature, storeKey } from './sizing.js';
 import { getBackgroundTextureCache, graphicsRecovery } from './textureCache.js';
 
 export const DEFAULT_BACKGROUND_COLOR = new Cogl.Color({ red: 0, green: 0, blue: 0, alpha: 255 });
 
-export interface BackgroundOptions {
+interface BackgroundOptions {
   layoutManager: LayoutManager;
   settings: Gio.Settings;
   file: Gio.File | null;
@@ -117,7 +117,6 @@ export const Background = GObject.registerClass({
       this.changedIdleId = 0;
       this.emit('bg-changed');
     });
-    GLib.Source.set_name_by_id(this.changedIdleId, '[kestrel] Background._emitChangedSignal');
   }
 
   private setLoaded(): void {
@@ -126,8 +125,7 @@ export const Background = GObject.registerClass({
     this.isLoaded = true;
     if (this.cancellable.is_cancelled()) return;
 
-    const id = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this.emit('loaded'));
-    GLib.Source.set_name_by_id(id, '[kestrel] Background._setLoaded Idle');
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this.emit('loaded'));
   }
 
   private watchFile(file: Gio.File): void {
@@ -155,7 +153,7 @@ export const Background = GObject.registerClass({
       cache.hold(this, [entry]);
       const { texture, colorState, samples } = entry;
       this.set_texture(texture, this.style, colorState);
-      if (this.settings.schema_id === BACKGROUND_SCHEMA) KestrelUi.wallpaperSampled(samples);
+      KestrelUi.wallpaperSampled(samples);
       this.setLoaded();
     } catch (err) {
       if (!(err as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)) logError(err as Error, 'Failed to load background');

@@ -8,7 +8,7 @@ import type { Rgb } from '../../../appearance/color.js';
 
 export type Scheme = 'light' | 'dark';
 export type Halo = 'status-halo' | 'strong-halo' | 'no-halo';
-export type InkPart = 'ink' | 'soft-halo' | Halo;
+type InkPart = 'ink' | 'soft-halo' | Halo;
 
 const PLACEHOLDER = /\.kestrel-panel-(ink|soft-halo|status-halo|strong-halo|no-halo)(?![\w-])/;
 

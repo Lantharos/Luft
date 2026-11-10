@@ -54,7 +54,6 @@ class AutomountManager {
       'drive-eject-button', (_monitor: Gio.VolumeMonitor, drive: Gio.Drive) => this.onDriveEjectButton(drive), this);
 
     this.mountAllId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this.startupMountAll());
-    GLib.Source.set_name_by_id(this.mountAllId, '[kestrel] this._startupMountAll');
   }
 
   disable(): void {

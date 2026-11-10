@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
-export type KeyAction = 'hide' | 'languageMenu' | 'emoji' | 'modifier' | 'delete' | 'levelSwitch';
+type KeyAction = 'hide' | 'languageMenu' | 'emoji' | 'modifier' | 'delete' | 'levelSwitch';
 
 export interface ModelKey {
   strings?: string[];

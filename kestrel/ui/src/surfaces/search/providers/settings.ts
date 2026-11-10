@@ -19,16 +19,15 @@ function description(page: SettingsPage): string {
 
 const copilotKeySeen = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.copilot-key' }).get_boolean('seen');
 
-export class SettingsResults {
-  private pages: ({ page: SettingsPage } & Searchable)[] | null = null;
+let pages: ({ page: SettingsPage } & Searchable)[] | null = null;
+onLocaleChanged(() => (pages = null));
 
-  constructor(private readonly close: () => void) {
-    onLocaleChanged(() => (this.pages = null));
-  }
+export class SettingsResults {
+  constructor(private readonly close: () => void) {}
 
   find(search: Query, launches: (key: string) => number): Ranked[] {
-    this.pages ??= SETTINGS_PAGES.map(page => searchable({ page }, `setting:${page.id}`, settingsPageTitle(page, t), settingsPageKeywords(page, copilotKeySeen)));
-    return rank(this.pages, search, BIAS, launches).slice(0, LIMIT).map(({ entry, score }) => ({ item: this.item(entry.page, entry.key), score }));
+    pages ??= SETTINGS_PAGES.map(page => searchable({ page }, `setting:${page.id}`, settingsPageTitle(page, t), settingsPageKeywords(page, copilotKeySeen)));
+    return rank(pages, search, BIAS, launches).slice(0, LIMIT).map(({ entry, score }) => ({ item: this.item(entry.page, entry.key), score }));
   }
 
   private item(page: SettingsPage, key: string): SearchItem {

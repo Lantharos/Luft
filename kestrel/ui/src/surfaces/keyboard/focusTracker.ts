@@ -7,7 +7,7 @@ import * as Main from '../../core/main.js';
 import { EventEmitter } from '../../core/runtime/signals.js';
 import { getIBusManager } from '../../system/inputSources/ibusManager.js';
 
-export interface CursorRect {
+interface CursorRect {
   x: number;
   y: number;
   width: number;

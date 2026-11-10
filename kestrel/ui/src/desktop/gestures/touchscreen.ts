@@ -11,7 +11,7 @@ const BEGIN_THRESHOLD = 10;
 const PINCH_SLOP = 0.08;
 const UNITS_PER_MM = 1000 / 25.4;
 
-export interface TouchGestureTarget {
+interface TouchGestureTarget {
   handle(event: Clutter.Event): boolean;
   wantsSwipe(fingers: number, x: number, y: number): boolean;
   wantsPinch(x: number, y: number, pinched: boolean): boolean;

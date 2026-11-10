@@ -18,7 +18,7 @@ interface LoadedTexture {
   samples: Rgb[];
 }
 
-export interface TextureEntry extends LoadedTexture {
+interface TextureEntry extends LoadedTexture {
   key: string;
 }
 

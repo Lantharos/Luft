@@ -7,7 +7,7 @@ import * as KestrelUi from '../../kestrelUi.js';
 
 import { QuickToggle, SystemIndicator } from '../toggles/quickSettings.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const BUS_NAME = 'com.lantharos.Settings.Rfkill';
 const OBJECT_PATH = '/com/lantharos/Settings/Rfkill';

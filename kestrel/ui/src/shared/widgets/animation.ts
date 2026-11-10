@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-export const SPINNER_ANIMATION_TIME = 300;
+const SPINNER_ANIMATION_TIME = 300;
 const SPINNER_ANIMATION_DELAY = 1000;
 const SQUARE_LAP = 1000;
 const SQUARE_LEAD = 0.25;

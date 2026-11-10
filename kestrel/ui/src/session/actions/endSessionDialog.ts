@@ -19,7 +19,7 @@ import { DIALOG_CONTENT, DialogType, roundSecondsToInterval, type ConfirmSignal,
 
 import { ModalDialogErrors, ModalDialogError } from '../../core/runtime/dbusErrors.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { loadStagedImage, type StagedImage } from './stagedImage.js';
 import { inhibitIdle, uninhibitIdle } from '../../system/power/idleInhibit.js';
 
@@ -53,10 +53,17 @@ type OpenParams = [type: number, timestamp: number, totalSecondsToStayOpen: numb
 const LogindSession = Gio.DBusProxy.makeProxyWrapper<LogindSessionRemote>(loadInterfaceXML('org.freedesktop.login1.Session'));
 const UPowerProxy = Gio.DBusProxy.makeProxyWrapper<UPowerDeviceRemote>(loadInterfaceXML('org.freedesktop.UPower.Device'));
 
-function findAppFromInhibitor(inhibitor: Inhibitor): Shell.App | null {
+function logindSession(path: string): Promise<LogindSessionRemote & Gio.DBusProxy> {
+  return new Promise((resolve, reject) => LogindSession(Gio.DBus.system, 'org.freedesktop.login1', path, (proxy, error) => {
+    if (proxy) resolve(proxy);
+    else reject(error);
+  }));
+}
+
+async function findAppFromInhibitor(inhibitor: Inhibitor): Promise<Shell.App | null> {
   let desktopFile: string;
   try {
-    [desktopFile] = inhibitor.GetAppIdSync();
+    [desktopFile] = await inhibitor.GetAppIdAsync();
   } catch {
     log(`gnome-session gave us a dead inhibitor: ${inhibitor.get_object_path()}`);
     return null;
@@ -364,7 +371,6 @@ export class EndSessionDialog extends ModalDialog {
 
       return GLib.SOURCE_REMOVE;
     });
-    GLib.Source.set_name_by_id(this.timerId, '[kestrel] this._confirm');
   }
 
   private stopTimer(): void {
@@ -376,14 +382,14 @@ export class EndSessionDialog extends ModalDialog {
     this.secondsLeft = 0;
   }
 
-  private onInhibitorLoaded(inhibitor: Inhibitor): void {
+  private async onInhibitorLoaded(inhibitor: Inhibitor): Promise<void> {
+    const app = await findAppFromInhibitor(inhibitor);
+    const [flags] = app ? await inhibitor.GetFlagsAsync() : [0];
+    const blocksLogOut = app !== null && (flags & GnomeSession.InhibitFlags.LOGOUT) !== 0;
+    const [description] = blocksLogOut ? await inhibitor.GetReasonAsync() : [''];
     if (!this.applications.includes(inhibitor)) return;
 
-    const app = findAppFromInhibitor(inhibitor);
-    const [flags] = app ? inhibitor.GetFlagsSync() : [0];
-
-    if (app && flags & GnomeSession.InhibitFlags.LOGOUT) {
-      const [description] = inhibitor.GetReasonSync();
+    if (app && blocksLogOut) {
       this.applicationSection.list.add_child(new Dialog.ListSectionItem({
         icon_actor: KestrelUi.appIcon(app, ITEM_ICON_SIZE),
         title: app.get_name(),
@@ -400,7 +406,7 @@ export class EndSessionDialog extends ModalDialog {
     const sessionId = GLib.getenv('XDG_SESSION_ID') || (await this.loginManager.getCurrentSessionProxy())!.Id;
 
     for (const [, , userName, , sessionPath] of await this.loginManager.listSessions()) {
-      const proxy = LogindSession(Gio.DBus.system, 'org.freedesktop.login1', sessionPath);
+      const proxy = await logindSession(sessionPath);
 
       if (proxy.Class !== 'user' || proxy.State === 'closing' || proxy.Id === sessionId) continue;
 
@@ -460,7 +466,7 @@ export class EndSessionDialog extends ModalDialog {
     const content = this.dialogContent;
 
     for (const path of inhibitorObjectPaths) {
-      const inhibitor = GnomeSession.Inhibitor(path, proxy => this.onInhibitorLoaded(proxy));
+      const inhibitor = GnomeSession.Inhibitor(path, proxy => void this.onInhibitorLoaded(proxy).catch(logError));
       this.applications.push(inhibitor);
     }
 

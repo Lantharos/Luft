@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const BUS_NAME = 'org.gnome.SessionManager';
 
@@ -34,9 +34,9 @@ interface PresenceRemote {
 }
 
 interface InhibitorRemote {
-  GetAppIdSync(): [string];
-  GetFlagsSync(): [number];
-  GetReasonSync(): [string];
+  GetAppIdAsync(): Promise<[string]>;
+  GetFlagsAsync(): Promise<[number]>;
+  GetReasonAsync(): Promise<[string]>;
 }
 
 interface SessionManagerRemote {

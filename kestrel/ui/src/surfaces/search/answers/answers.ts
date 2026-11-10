@@ -20,7 +20,7 @@ export type Answer =
   | { kind: 'time'; instant: number; at: Location; from: Location | null }
   | { kind: 'number'; value: number; percent: boolean };
 
-export interface AnswerContext {
+interface AnswerContext {
   locale: string;
   now: number;
   zone: string;

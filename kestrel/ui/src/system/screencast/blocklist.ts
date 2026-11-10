@@ -13,7 +13,8 @@ export class PipelineBlocklist {
       const [, contents] = this.file.load_contents(null);
       this.previousCrashes = JSON.parse(new TextDecoder().decode(contents));
     } catch (e) {
-      if (!(e instanceof GLib.Error && e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND))) throw e;
+      if (!(e instanceof GLib.Error && e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND)))
+        console.warn(`The screen recording pipelines that crashed before could not be read: ${e}`);
     }
   }
 

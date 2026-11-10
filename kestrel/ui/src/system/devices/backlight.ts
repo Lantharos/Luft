@@ -9,7 +9,7 @@ import * as KestrelUi from '../../kestrelUi.js';
 import * as PopupMenu from '../../shared/popups/popupMenu.js';
 import { Slider } from '../../shared/widgets/slider.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const BUS_NAME = 'com.lantharos.Settings.KeyboardLight';
 const OBJECT_PATH = '/com/lantharos/Settings/KeyboardLight';

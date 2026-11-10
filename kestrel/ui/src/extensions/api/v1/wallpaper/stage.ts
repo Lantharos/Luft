@@ -11,7 +11,7 @@ import type { LayerOptions, Rect, TaskbarOutline } from '../types.js';
 import { DesktopPointers } from './pointers.js';
 import { SurfaceWatch } from './surfaces.js';
 
-export interface StagedLayer {
+interface StagedLayer {
   sync(): void;
   monitorsChanged(): void;
 }

@@ -35,7 +35,7 @@ function isoCodes(): Set<string> {
   return codes;
 }
 
-export function homeCurrency(locale: string): string {
+function homeCurrency(locale: string): string {
   const region = new Intl.Locale(locale).maximize().region ?? '';
   return EURO_REGIONS.has(region) ? 'EUR' : HOME[region] ?? 'EUR';
 }

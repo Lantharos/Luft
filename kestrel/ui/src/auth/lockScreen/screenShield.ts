@@ -213,7 +213,6 @@ export class ScreenShield extends Signals.EventEmitter {
         this.lockTimeoutId = 0;
         this.lock(false);
       });
-      GLib.Source.set_name_by_id(this.lockTimeoutId, '[kestrel] this.lock');
     }
 
     this.activateFade(this.longLightbox, STANDARD_FADE_TIME);
@@ -333,7 +332,6 @@ export class ScreenShield extends Signals.EventEmitter {
         this.fadeTimeoutId = 0;
         this.activateFade(this.shortLightbox, MANUAL_FADE_TIME);
       });
-      GLib.Source.set_name_by_id(this.fadeTimeoutId, '[kestrel] this._activateFade');
     } else {
       if (fadeToBlack) this.activateFade(this.shortLightbox, 0);
 

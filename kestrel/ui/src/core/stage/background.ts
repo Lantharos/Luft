@@ -6,7 +6,6 @@ import Meta from 'gi://Meta';
 import * as Main from '../main.js';
 import { EventEmitter } from '../runtime/signals.js';
 import { getBackgroundCache, type BackgroundSource } from './background/cache.js';
-import { BACKGROUND_SCHEMA } from './background/schemas.js';
 import { SystemBackground } from './background/system.js';
 import type { Background } from './background/wallpaper.js';
 import type { LayoutManager } from './layout.js';
@@ -20,14 +19,11 @@ export type BackgroundActor = Meta.BackgroundActor & {
   content: Meta.BackgroundContent & { background: Background };
 };
 
-export interface BackgroundManagerOptions {
+interface BackgroundManagerOptions {
   container: Clutter.Actor;
   monitorIndex: number;
   layoutManager?: LayoutManager;
-  vignette?: boolean;
   controlPosition?: boolean;
-  settingsSchema?: string;
-  useContentSize?: boolean;
 }
 
 interface BackgroundManagerSignals {
@@ -46,35 +42,26 @@ export class BackgroundManager extends EventEmitter {
   readonly container: Clutter.Actor;
   private readonly layoutManager: LayoutManager;
   private readonly monitorIndex: number;
-  private readonly vignette: boolean;
   private readonly controlPosition: boolean;
-  private readonly settingsSchema: string;
-  private readonly useContentSize: boolean;
 
   constructor({
     container,
     monitorIndex,
     layoutManager = Main.layoutManager,
-    vignette = false,
     controlPosition = true,
-    settingsSchema = BACKGROUND_SCHEMA,
-    useContentSize = true,
   }: BackgroundManagerOptions) {
     super();
-    this.settingsSchema = settingsSchema;
-    this.backgroundSource = getBackgroundCache().getBackgroundSource(layoutManager, settingsSchema);
+    this.backgroundSource = getBackgroundCache().getBackgroundSource(layoutManager);
     this.container = container;
     this.layoutManager = layoutManager;
-    this.vignette = vignette;
     this.monitorIndex = monitorIndex;
     this.controlPosition = controlPosition;
-    this.useContentSize = useContentSize;
 
     this.backgroundActor = this.createBackgroundActor();
   }
 
   destroy(): void {
-    getBackgroundCache().releaseBackgroundSource(this.settingsSchema);
+    getBackgroundCache().releaseBackgroundSource();
 
     this.newBackgroundActor?.destroy();
     this.newBackgroundActor = null;
@@ -139,15 +126,10 @@ export class BackgroundManager extends EventEmitter {
     const backgroundActor = new Meta.BackgroundActor({
       meta_display: global.display,
       monitor: this.monitorIndex,
-      request_mode: this.useContentSize
-        ? Clutter.RequestMode.CONTENT_SIZE
-        : Clutter.RequestMode.HEIGHT_FOR_WIDTH,
-      x_expand: !this.useContentSize,
-      y_expand: !this.useContentSize,
+      request_mode: Clutter.RequestMode.CONTENT_SIZE,
     }) as BackgroundActor;
     backgroundActor.content.set({
       background,
-      vignette: this.vignette,
       vignette_sharpness: 0.5,
       brightness: 0.5,
     });

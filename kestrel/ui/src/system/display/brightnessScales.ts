@@ -78,7 +78,7 @@ export class BrightnessScale extends GObject.Object {
 }
 SignalTracker.registerDestroyableType(BrightnessScale);
 
-export namespace MonitorBrightnessScale {
+namespace MonitorBrightnessScale {
   export interface Signals extends BrightnessScale.Signals {
     'backlights-changed': () => void;
   }

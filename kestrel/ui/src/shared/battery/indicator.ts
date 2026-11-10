@@ -11,7 +11,7 @@ const LOW_LEVEL = 20;
 const HALO_MARGIN = 2;
 const PERCENTAGE_KEY = 'show-battery-percentage';
 
-export type PercentageMode = 'setting' | 'never';
+type PercentageMode = 'setting' | 'never';
 
 function glyphFor(state: BatteryState, numbered: boolean): Glyph {
   if (state.status === 'discharging') return 'none';

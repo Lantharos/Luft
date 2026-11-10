@@ -9,7 +9,7 @@ import type { Tool } from './markupCanvas.js';
 
 export type Color = [number, number, number];
 
-export const SWATCHES: Color[] = [
+const SWATCHES: Color[] = [
   [0.9, 0.18, 0.2],
   [1, 0.84, 0.04],
   [0.2, 0.75, 0.35],
@@ -27,7 +27,7 @@ const TOOLS: [Tool, string, string][] = [
 
 const css = ([r, g, b]: Color) => `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
 
-export interface ToolbarActions {
+interface ToolbarActions {
   tool(tool: Tool): void;
   color(color: Color): void;
   undo(): void;

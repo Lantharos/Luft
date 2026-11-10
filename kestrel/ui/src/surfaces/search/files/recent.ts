@@ -10,7 +10,7 @@ Gio._promisify(Gio.File.prototype, 'query_info_async');
 const REMEMBERED = 300;
 const BIAS = 0.6;
 
-export interface RecentFile extends Searchable {
+interface RecentFile extends Searchable {
   file: FoundFile;
   location: string;
 }

@@ -17,7 +17,7 @@ interface StageArea {
 type Phase = DesktopPointerEvent['phase'];
 
 /** An extension's interest in the pointer: its areas, and which pointers it has heard of and not yet heard the last of. */
-export class PointerFollower {
+class PointerFollower {
   private areas: StageArea[] = [];
   readonly near = new Set<number>();
   readonly held = new Map<number, Sprite>();

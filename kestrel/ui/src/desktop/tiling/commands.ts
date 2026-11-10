@@ -7,7 +7,7 @@ import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space } from './space.js';
 import type { Tiler } from './tiler.js';
 
-export interface CommandSurroundings {
+interface CommandSurroundings {
   monitors(): Box[];
   activate(window: Meta.Window): void;
   boardShown(): boolean;

@@ -8,7 +8,7 @@ import { Urgency } from '../tray/notificationEnums.js';
 
 export type SerializedNotification = Record<string, GLib.Variant>;
 
-export interface AppSource extends Source {
+interface AppSource extends Source {
   activateAction(actionId: string, target: GLib.Variant | undefined): void;
   emitActionInvoked(notificationId: string, actionId: string, target: GLib.Variant | undefined): void;
 }

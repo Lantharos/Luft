@@ -71,7 +71,7 @@ export let shellDBusService!: ShellDBus.GnomeShell;
 export let shellMountOpDBusService!: MountOperationHandler;
 export let modalCount = 0;
 export let actionMode = Shell.ActionMode.NONE;
-export const modalActorFocusStack: ModalRecord[] = [];
+const modalActorFocusStack: ModalRecord[] = [];
 export let uiGroup!: Clutter.Actor;
 export let magnifier!: Magnifier.Magnifier;
 export let xdndHandler!: XdndHandler.XdndHandler;
@@ -80,7 +80,7 @@ export let layoutManager!: InstanceType<typeof Layout.LayoutManager>;
 export let kbdA11yDialog!: KbdA11yDialog.KbdA11yDialog;
 export let inputMethod!: InstanceType<typeof InputMethod.InputMethod>;
 export let introspectService!: Introspect.IntrospectService;
-export let locatePointer!: LocatePointer.LocatePointer;
+let locatePointer!: LocatePointer.LocatePointer;
 export let endSessionDialog!: InstanceType<typeof EndSessionDialog.EndSessionDialog>;
 export let brightnessManager!: InstanceType<typeof BrightnessManager.BrightnessManager>;
 export let brightnessDBus!: ShellDBus.BrightnessDBus;
@@ -111,10 +111,7 @@ function installLogging(): void {
   globalThis.log = console.log;
   globalThis.logError = (err?: unknown, msg?: unknown) => {
     const args = [formatError(err)];
-    try {
-      if (msg)
-        args.unshift(`${msg}:`);
-    } catch {}
+    if (msg) args.unshift(`${msg}:`);
 
     console.error(...args);
   };
@@ -388,7 +385,7 @@ async function initializeUI(): Promise<void> {
   });
 }
 
-export function reloadThemeResource(): void {
+function reloadThemeResource(): void {
   if (themeResource)
     Gio.resources_unregister(themeResource);
 

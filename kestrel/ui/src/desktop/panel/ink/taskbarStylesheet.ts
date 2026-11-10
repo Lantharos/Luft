@@ -12,7 +12,7 @@ const COMFORTABLE_CONTRAST = 5;
 const ACCENT_OPACITY = 0.62;
 const OTHER: Record<Scheme, Scheme> = { light: 'dark', dark: 'light' };
 
-export interface Tints {
+interface Tints {
   solid: string;
   accent: string;
 }

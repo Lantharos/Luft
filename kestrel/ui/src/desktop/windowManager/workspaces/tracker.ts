@@ -91,12 +91,11 @@ export class WorkspaceTracker {
   private windowRemoved(workspace: Meta.Workspace, window: Meta.Window): void {
     this.lastRemoved.set(workspace, window);
     this.queueCheckWorkspaces();
-    const id = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, LAST_WINDOW_GRACE_TIME, () => {
+    GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, LAST_WINDOW_GRACE_TIME, () => {
       if (this.lastRemoved.get(workspace) !== window) return;
       this.lastRemoved.delete(workspace);
       this.queueCheckWorkspaces();
     });
-    GLib.Source.set_name_by_id(id, '[kestrel] this._queueCheckWorkspaces');
   }
 
   private windowCrossedMonitor(monitorIndex: number): void {

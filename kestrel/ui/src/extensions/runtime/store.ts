@@ -15,7 +15,7 @@ const SETTINGS = 'extension-settings';
 const PROBLEMS = 'extension-problems';
 const SHORTCUTS = 'extension-shortcuts';
 
-export type ShortcutChoices = Record<string, Record<string, string[]>>;
+type ShortcutChoices = Record<string, Record<string, string[]>>;
 
 /** What the person decided about extensions, kept in Kestrel's settings. */
 export class ExtensionStore {

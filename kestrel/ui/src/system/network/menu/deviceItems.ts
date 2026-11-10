@@ -10,7 +10,7 @@ import { ItemSorter } from './itemSorter.js';
 import { NMDeviceConnectionItem, NMSectionItem, type ConnectionSection } from './menuItems.js';
 import { canReachInternet, signalToIcon } from './nmUtils.js';
 
-export class NMDeviceItem extends NMSectionItem implements ConnectionSection {
+class NMDeviceItem extends NMSectionItem implements ConnectionSection {
   static {
     GObject.registerClass({
       Properties: {

@@ -4,9 +4,9 @@ import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 
 import * as KestrelUi from '../../../kestrelUi.js';
-import * as MessageList from './messageList.js';
+import { Source } from '../messages/source.js';
 
-import { loadInterfaceXML } from '../../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
 
 interface DBusRemote {
   ListNamesAsync(): Promise<[string[]]>;
@@ -63,9 +63,9 @@ export const MprisPlayer = GObject.registerClass({
   declare connect: GObject.SignalMethods<this, MprisPlayer.Signals>['connect'];
   declare emit: GObject.SignalMethods<this, MprisPlayer.Signals>['emit'];
 
-  readonly source = new MessageList.Source();
-  private mprisProxy: MprisProxy | null;
-  private playerProxy: MprisPlayerProxy | null;
+  readonly source = new Source();
+  private readonly mprisProxy: MprisProxy;
+  private readonly playerProxy: MprisPlayerProxy;
   private canPlayValue = false;
   private artists: string[] = [];
   private title = '';
@@ -86,7 +86,7 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   get status(): string {
-    return this.playerProxy!.PlaybackStatus;
+    return this.playerProxy.PlaybackStatus;
   }
 
   get trackArtists(): string[] {
@@ -110,7 +110,7 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   get identity(): string {
-    return this.appValue?.get_name() ?? this.mprisProxy?.Identity ?? '';
+    return this.appValue?.get_name() ?? this.mprisProxy.Identity ?? '';
   }
 
   get trackAlbum(): string {
@@ -123,7 +123,7 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   get canSeek(): boolean {
-    return !!this.playerProxy?.CanSeek && !!this.trackId && this.lengthUs > 0;
+    return !!this.playerProxy.CanSeek && !!this.trackId && this.lengthUs > 0;
   }
 
   /** Where the track is, in microseconds. Players don't announce it as it moves, so it's asked for each time. */
@@ -134,45 +134,43 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   seekTo(microseconds: number): void {
-    if (this.canSeek) this.playerProxy!.SetPositionAsync(this.trackId, Math.round(microseconds)).catch(logError);
+    if (this.canSeek) this.playerProxy.SetPositionAsync(this.trackId, Math.round(microseconds)).catch(logError);
   }
 
   playPause(): void {
-    this.playerProxy!.PlayPauseAsync().catch(logError);
+    this.playerProxy.PlayPauseAsync().catch(logError);
   }
 
   get canGoNext(): boolean {
-    return this.playerProxy!.CanGoNext;
+    return this.playerProxy.CanGoNext;
   }
 
   next(): void {
-    this.playerProxy!.NextAsync().catch(logError);
+    this.playerProxy.NextAsync().catch(logError);
   }
 
   get canGoPrevious(): boolean {
-    return this.playerProxy!.CanGoPrevious;
+    return this.playerProxy.CanGoPrevious;
   }
 
   previous(): void {
-    this.playerProxy!.PreviousAsync().catch(logError);
+    this.playerProxy.PreviousAsync().catch(logError);
   }
 
   raise(): void {
     if (this.appValue)
       this.appValue.activate();
-    else if (this.mprisProxy!.CanRaise)
-      this.mprisProxy!.RaiseAsync().catch(logError);
+    else if (this.mprisProxy.CanRaise)
+      this.mprisProxy.RaiseAsync().catch(logError);
   }
 
   private close(): void {
-    this.mprisProxy!.disconnectObject(this);
-    this.mprisProxy = null;
-    this.playerProxy!.disconnectObject(this);
-    this.playerProxy = null;
+    this.mprisProxy.disconnectObject(this);
+    this.playerProxy.disconnectObject(this);
   }
 
   private onMprisProxyReady(): void {
-    const proxy = this.mprisProxy!;
+    const proxy = this.mprisProxy;
     proxy.connectObject('notify::g-name-owner', () => {
       if (!proxy.g_name_owner)
         this.close();
@@ -182,8 +180,8 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   private onPlayerProxyReady(): void {
-    this.playerProxy!.connectObject('g-properties-changed', () => this.updateState(), this);
-    this.playerProxy!.connectSignal('Seeked', () => this.emit('seeked'));
+    this.playerProxy.connectObject('g-properties-changed', () => this.updateState(), this);
+    this.playerProxy.connectSignal('Seeked', () => this.emit('seeked'));
     this.updateState();
   }
 
@@ -193,8 +191,7 @@ export const MprisPlayer = GObject.registerClass({
   }
 
   private updateState(): void {
-    const mprisProxy = this.mprisProxy!;
-    const playerProxy = this.playerProxy!;
+    const { mprisProxy, playerProxy } = this;
     const metadata: Record<string, unknown> = {};
     for (const prop in playerProxy.Metadata)
       metadata[prop] = playerProxy.Metadata[prop].deepUnpack();

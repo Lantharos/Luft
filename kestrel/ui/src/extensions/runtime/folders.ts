@@ -56,3 +56,11 @@ export function dataFolder(id: string): string {
 export function storageFile(id: string): string {
   return GLib.build_filenamev([GLib.get_user_state_dir(), 'luft', 'extension-storage', `${id}.json`]);
 }
+
+export function removeTree(file: Gio.File): void {
+  if (file.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
+    const children = file.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+    for (let info = children.next_file(null); info; info = children.next_file(null)) removeTree(file.get_child(info.get_name()));
+  }
+  file.delete(null);
+}

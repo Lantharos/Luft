@@ -22,11 +22,23 @@ function jobResult(systemd: Gio.DBusConnection, name: string): { result: Promise
   return { result, cancel: () => systemd.signal_unsubscribe(id) };
 }
 
+function connect(address: string): Promise<Gio.DBusConnection> {
+  return new Promise((resolve, reject) => Gio.DBusConnection.new_for_address(address, Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT, null, null,
+    (_source, result) => {
+      try {
+        resolve(Gio.DBusConnection.new_for_address_finish(result));
+      } catch (error) {
+        reject(error);
+      }
+    }));
+}
+
 export class Scopes {
   private systemd: Gio.DBusConnection | null = null;
+  private connecting: Promise<Gio.DBusConnection> | null = null;
 
   async start(name: string, program: PidFd): Promise<void> {
-    const systemd = this.connection();
+    const systemd = await this.connection();
     const job = jobResult(systemd, name);
     const fds = new Gio.UnixFDList();
     fds.append(program.fd);
@@ -46,16 +58,21 @@ export class Scopes {
     if (await job.result !== 'done') throw new PeekError('Failed', t('peek-error-launch-failed', { program: name }));
   }
 
-  private connection(): Gio.DBusConnection {
+  private async connection(): Promise<Gio.DBusConnection> {
     if (this.systemd && !this.systemd.is_closed()) return this.systemd;
-    this.systemd = Gio.DBusConnection.new_for_address_sync(`unix:path=${GLib.get_user_runtime_dir()}/systemd/private`,
-      Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT, null, null);
-    this.systemd.call_sync(null, SYSTEMD_PATH, MANAGER, 'Subscribe', null, null, Gio.DBusCallFlags.NONE, -1, null);
+    this.connecting ??= this.subscribed().finally(() => (this.connecting = null));
+    this.systemd = await this.connecting;
     return this.systemd;
   }
 
+  private async subscribed(): Promise<Gio.DBusConnection> {
+    const systemd = await connect(`unix:path=${GLib.get_user_runtime_dir()}/systemd/private`);
+    await systemd.call(null, SYSTEMD_PATH, MANAGER, 'Subscribe', null, null, Gio.DBusCallFlags.NONE, -1, null);
+    return systemd;
+  }
+
   async stop(name: string): Promise<void> {
-    await this.connection().call(null, SYSTEMD_PATH, MANAGER, 'StopUnit', new GLib.Variant('(ss)', [name, 'replace']),
+    await (await this.connection()).call(null, SYSTEMD_PATH, MANAGER, 'StopUnit', new GLib.Variant('(ss)', [name, 'replace']),
       new GLib.VariantType('(o)'), Gio.DBusCallFlags.NONE, -1, null);
   }
 

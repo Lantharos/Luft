@@ -22,6 +22,7 @@ export class WindowRecovery {
   private expireSource = 0;
   private writing = false;
   private dirty = false;
+  private noted = '';
 
   constructor(private readonly locked: () => boolean) {
     if (restartedAfterCrash) this.awaitReturn();
@@ -77,6 +78,7 @@ export class WindowRecovery {
     const configure = window.connect('configure', (_window, config: Meta.WindowConfig) => {
       if (!config.get_is_initial()) return;
       window.disconnect(configure);
+      signals.splice(signals.indexOf(configure), 1);
       this.claim(window, config);
     });
     signals.push(configure);
@@ -130,8 +132,11 @@ export class WindowRecovery {
       this.dirty = true;
       return;
     }
+    const windows = JSON.stringify(capture());
+    if (windows === this.noted) return;
+    this.noted = windows;
     this.writing = true;
-    write(capture(), () => {
+    write(windows, () => {
       this.writing = false;
       if (!this.dirty) return;
       this.dirty = false;

@@ -17,7 +17,7 @@ import { Outgoing } from './outgoing.js';
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
 
-export interface Notice {
+interface Notice {
   title: string;
   body?: string;
   actions?: { label: string; onActivate(): void }[];

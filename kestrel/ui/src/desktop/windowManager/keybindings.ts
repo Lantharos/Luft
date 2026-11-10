@@ -45,7 +45,7 @@ const SURFACE_KEYS: [string, Shell.ActionMode, () => void][] = [
   ['relight-displays', EVERYWHERE_BUT_SYSTEM_MODALS, () => recoverDisplays().catch(logError)],
 ];
 
-export interface KeyHandlers {
+interface KeyHandlers {
   workspaceSwitcher: Meta.KeyHandlerFunc;
   switcher: Meta.KeyHandlerFunc;
   a11ySwitcher: Meta.KeyHandlerFunc;

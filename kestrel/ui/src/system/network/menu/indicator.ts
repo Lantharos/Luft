@@ -2,11 +2,11 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
-import Polkit from 'gi://Polkit';
 import type St from 'gi://St';
 
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as MessageTray from '../../../surfaces/notifications/tray/messageTray.js';
+import { ownPermission } from '../../../shared/dbus/polkit.js';
 import { SystemIndicator } from '../../toggles/quickSettings.js';
 import { CaptivePortalHandler } from './captivePortal.js';
 import { NMBluetoothToggle, NMModemToggle, NMWiredToggle, NMWirelessToggle } from './deviceToggles.js';
@@ -20,10 +20,6 @@ const RECHECK_SECONDS = [3, 10, 30, 60];
 
 interface AsyncClient {
   new_async(cancellable: Gio.Cancellable | null): Promise<NM.Client>;
-}
-
-interface AsyncPermission {
-  'new'(actionId: string, subject: Polkit.Subject | null, cancellable: Gio.Cancellable | null): Promise<Polkit.Permission>;
 }
 
 export class Indicator extends SystemIndicator {
@@ -86,7 +82,7 @@ export class Indicator extends SystemIndicator {
     this.syncMainConnection();
 
     try {
-      const permission = await (Polkit.Permission as unknown as AsyncPermission).new('org.freedesktop.NetworkManager.network-control', null, null);
+      const permission = await ownPermission('org.freedesktop.NetworkManager.network-control');
       this.toggles.forEach(toggle => permission.bind_property('allowed', toggle, 'reactive', GObject.BindingFlags.SYNC_CREATE));
     } catch (e) {
       log(`No permission to control network connections: ${e}`);
@@ -138,10 +134,7 @@ export class Indicator extends SystemIndicator {
     if (this.client!.connectivity === NM.ConnectivityState.FULL) this.stopRechecking();
     else this.recheckLater();
 
-    let isPortal = this.client!.connectivity === NM.ConnectivityState.PORTAL;
-    if (GLib.getenv('KESTREL_CONNECTIVITY_TEST') != null) isPortal ||= this.client!.connectivity < NM.ConnectivityState.FULL;
-
-    if (isPortal) {
+    if (this.client!.connectivity === NM.ConnectivityState.PORTAL) {
       const [device] = this.mainConnection.get_devices();
       this.portalHandler!.addConnection(
         connectionName(this.mainConnection.connection, deviceKind(device)),

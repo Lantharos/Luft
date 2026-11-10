@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import * as KestrelUi from '../../../kestrelUi.js';
-import * as MessageList from './messageList.js';
+import { Source as MessageSource } from '../messages/source.js';
 import * as SignalTracker from '../../../core/runtime/signalTracker.js';
 import type { NotificationSound } from '../../../system/sounds/sounds.js';
 
@@ -224,7 +224,7 @@ export const Source = GObject.registerClass({
     'notification-removed': { param_types: [Notification.$gtype] },
     'notification-request-banner': { param_types: [Notification.$gtype] },
   },
-}, class Source extends MessageList.Source {
+}, class Source extends MessageSource {
   declare connect: GObject.SignalMethods<this, Source.Signals>['connect'];
   declare emit: GObject.SignalMethods<this, Source.Signals>['emit'];
 

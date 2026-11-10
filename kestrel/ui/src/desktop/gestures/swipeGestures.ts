@@ -62,7 +62,7 @@ export class EventHistory {
   }
 }
 
-export namespace SwipeGesture {
+namespace SwipeGesture {
   export interface Signals extends GObject.Object.SignalSignatures {
     'begin': (time: number, x: number, y: number) => void;
     'update': (time: number, delta: number, distance: number) => void;
@@ -96,10 +96,12 @@ export const TouchpadSwipeGesture = GObject.registerClass({
   private cumulativeX = 0;
   private cumulativeY = 0;
   private readonly touchpadSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.peripherals.touchpad' });
+  private naturalScroll = this.touchpadSettings.get_boolean('natural-scroll');
 
-  constructor(actor: Clutter.Actor, private readonly allowedModes: Shell.ActionMode) {
+  constructor(private readonly actor: Clutter.Actor, private readonly allowedModes: Shell.ActionMode) {
     super();
     actor.connectObject('event::touchpad', (target: Clutter.Actor, event: Clutter.Event) => this.handleEvent(target, event), this);
+    this.touchpadSettings.connectObject('changed::natural-scroll', () => (this.naturalScroll = this.touchpadSettings.get_boolean('natural-scroll')), this);
   }
 
   handleEvent(_actor: Clutter.Actor, event: Clutter.Event): boolean {
@@ -156,7 +158,7 @@ export const TouchpadSwipeGesture = GObject.registerClass({
     switch (event.get_gesture_phase()) {
     case Clutter.TouchpadGesturePhase.BEGIN:
     case Clutter.TouchpadGesturePhase.UPDATE:
-      if (this.touchpadSettings.get_boolean('natural-scroll')) delta = -delta;
+      if (this.naturalScroll) delta = -delta;
       this.emit('update', time, delta, distance);
       break;
 
@@ -171,7 +173,8 @@ export const TouchpadSwipeGesture = GObject.registerClass({
   }
 
   destroy(): void {
-    global.stage.disconnectObject(this);
+    this.actor.disconnectObject(this);
+    this.touchpadSettings.disconnectObject(this);
   }
 
   private distance(event: Clutter.Event, vertical: boolean): number {
@@ -200,9 +203,13 @@ export const ScrollGesture = GObject.registerClass({
   private began = false;
   private enabledValue = true;
 
-  constructor(actor: Clutter.Actor, private readonly allowedModes: Shell.ActionMode) {
+  constructor(private readonly actor: Clutter.Actor, private readonly allowedModes: Shell.ActionMode) {
     super();
-    actor.connect('scroll-event', (_actor, event) => this.handleEvent(event));
+    actor.connectObject('scroll-event', (_actor: Clutter.Actor, event: Clutter.Event) => this.handleEvent(event), this);
+  }
+
+  destroy(): void {
+    this.actor.disconnectObject(this);
   }
 
   get enabled(): boolean {

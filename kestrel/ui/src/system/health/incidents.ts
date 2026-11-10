@@ -28,6 +28,14 @@ async function text(file: Gio.File): Promise<string | null> {
   }
 }
 
+async function incidentIn(file: Gio.File): Promise<Incident | null> {
+  try {
+    return JSON.parse(await text(file) ?? 'null') as Incident | null;
+  } catch {
+    return null;
+  }
+}
+
 async function newestIncident(): Promise<Incident | null> {
   let newest: Incident | null = null;
   try {
@@ -35,8 +43,7 @@ async function newestIncident(): Promise<Incident | null> {
     for (let batch = await children.next_files_async(BATCH, GLib.PRIORITY_LOW, null); batch.length; batch = await children.next_files_async(BATCH, GLib.PRIORITY_LOW, null)) {
       for (const info of batch) {
         if (!info.get_name().endsWith('.json')) continue;
-        const contents = await text(INCIDENTS.get_child(info.get_name()));
-        const incident = contents ? JSON.parse(contents) as Incident : null;
+        const incident = await incidentIn(INCIDENTS.get_child(info.get_name()));
         if (incident && (!newest || incident.time > newest.time)) newest = incident;
       }
     }

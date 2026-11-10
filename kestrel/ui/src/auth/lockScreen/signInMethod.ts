@@ -7,14 +7,16 @@ export type SignInMethod = 'fingerprint' | 'password';
 
 const record = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'sign-in-method']));
 
-export function rememberedMethod(): SignInMethod | null {
+export function methodIn(file: Gio.File): SignInMethod | null {
   try {
-    const method = new TextDecoder().decode(record.load_contents(null)[1]);
+    const method = new TextDecoder().decode(file.load_contents(null)[1]);
     return method === 'fingerprint' || method === 'password' ? method : null;
   } catch {
     return null;
   }
 }
+
+export const rememberedMethod = (): SignInMethod | null => methodIn(record);
 
 export function rememberMethod(method: SignInMethod): void {
   if (method !== rememberedMethod()) {

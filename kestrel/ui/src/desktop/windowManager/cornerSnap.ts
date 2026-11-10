@@ -21,7 +21,7 @@ interface Snapped extends Size {
   rect: Mtk.Rectangle;
 }
 
-export type CornerPreview = (window: Meta.Window, rect: Mtk.Rectangle | null, monitorIndex: number) => void;
+type CornerPreview = (window: Meta.Window, rect: Mtk.Rectangle | null, monitorIndex: number) => void;
 
 function cornerAt(x: number, y: number, monitor: Monitor, area: Mtk.Rectangle): Mtk.Rectangle | null {
   const atLeft = x <= monitor.x + EDGE_REACH;

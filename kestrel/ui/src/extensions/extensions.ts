@@ -4,7 +4,7 @@ import { ExtensionManager } from './runtime/manager.js';
 import { FileActionsService } from './fileActions/service.js';
 import { ExtensionsService } from './service.js';
 
-export type HostParts = Omit<ExtensionHost, 'desktop' | 'watchMonitors'>;
+type HostParts = Omit<ExtensionHost, 'desktop' | 'watchMonitors'>;
 
 /** Luft extensions in this session: the runtime and its D-Bus interface. */
 export class Extensions {

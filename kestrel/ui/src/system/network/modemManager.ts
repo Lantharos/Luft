@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { lookup3gppMccMnc, lookupCdmaSid } from './mobileProviders.js';
 
 interface ModemRemote {
@@ -23,6 +23,11 @@ const MODEM_MANAGER = 'org.freedesktop.ModemManager1';
 const ModemProxy = Gio.DBusProxy.makeProxyWrapper<ModemRemote>(loadInterfaceXML('org.freedesktop.ModemManager1.Modem'));
 const Modem3gppProxy = Gio.DBusProxy.makeProxyWrapper<Modem3gppRemote>(loadInterfaceXML('org.freedesktop.ModemManager1.Modem.Modem3gpp'));
 const ModemCdmaProxy = Gio.DBusProxy.makeProxyWrapper<ModemCdmaRemote>(loadInterfaceXML('org.freedesktop.ModemManager1.Modem.ModemCdma'));
+
+const whenLoaded = (reload: () => void) => (_proxy: unknown, error: unknown) => {
+  if (error) logError(error);
+  else reload();
+};
 
 function findProviderForMccMnc(operatorName: string | null, operatorCode: string | null): string | null {
   if (operatorName) {
@@ -55,26 +60,23 @@ export const BroadbandModem = GObject.registerClass({
 
   constructor(path: string) {
     super();
-    this.proxy = ModemProxy(Gio.DBus.system, MODEM_MANAGER, path);
-    this.proxy3gpp = Modem3gppProxy(Gio.DBus.system, MODEM_MANAGER, path);
-    this.proxyCdma = ModemCdmaProxy(Gio.DBus.system, MODEM_MANAGER, path);
+    this.proxy = ModemProxy(Gio.DBus.system, MODEM_MANAGER, path, whenLoaded(() => this.reloadSignalQuality()));
+    this.proxy3gpp = Modem3gppProxy(Gio.DBus.system, MODEM_MANAGER, path, whenLoaded(() => this.reload3gppOperatorName()));
+    this.proxyCdma = ModemCdmaProxy(Gio.DBus.system, MODEM_MANAGER, path, whenLoaded(() => this.reloadCdmaOperatorName()));
 
     this.proxy.connect('g-properties-changed', (_proxy, properties: GLib.Variant) => {
       if (properties.lookup_value('SignalQuality', null)) this.reloadSignalQuality();
     });
-    this.reloadSignalQuality();
 
     this.proxy3gpp.connect('g-properties-changed', (_proxy, properties: GLib.Variant) => {
       const unpacked = properties.deepUnpack<Record<string, GLib.Variant>>();
       if ('OperatorName' in unpacked || 'OperatorCode' in unpacked) this.reload3gppOperatorName();
     });
-    this.reload3gppOperatorName();
 
     this.proxyCdma.connect('g-properties-changed', (_proxy, properties: GLib.Variant) => {
       const unpacked = properties.deepUnpack<Record<string, GLib.Variant>>();
       if ('Nid' in unpacked || 'Sid' in unpacked) this.reloadCdmaOperatorName();
     });
-    this.reloadCdmaOperatorName();
   }
 
   get operatorName(): string | null {

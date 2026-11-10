@@ -181,8 +181,8 @@ export class ClipboardPanel {
       clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, previous) => paste(() => this.copy(previous ?? '')));
     else if (mimetype)
       clipboard.get_content(St.ClipboardType.CLIPBOARD, mimetype, (_clipboard, bytes) => {
-        const previous = new GLib.Bytes(bytes.toArray());
-        paste(() => clipboard.set_content(St.ClipboardType.CLIPBOARD, mimetype, previous));
+        const previous = bytes && new GLib.Bytes(bytes.toArray());
+        paste(() => previous && clipboard.set_content(St.ClipboardType.CLIPBOARD, mimetype, previous));
       });
     else paste(() => {});
   }

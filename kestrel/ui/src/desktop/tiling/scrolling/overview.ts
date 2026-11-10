@@ -4,7 +4,7 @@ import type Meta from 'gi://Meta';
 import type { Box } from '../../../shared/layout/placement.js';
 import type { ScrollingSpace } from './scrollingSpace.js';
 
-export interface OverviewSurroundings {
+interface OverviewSurroundings {
   monitorBox(monitor: number): Box;
   addChrome(actor: Clutter.Actor): void;
   removeChrome(actor: Clutter.Actor): void;

@@ -9,7 +9,7 @@ const WINDOW_PREVIEW_MAXIMUM_SCALE = 0.95;
 const LAYOUT_SCALE_WEIGHT = 1;
 const LAYOUT_SPACE_WEIGHT = 0.1;
 
-export interface GridWindow extends Clutter.Actor {
+interface GridWindow extends Clutter.Actor {
   readonly boundingBox: Mtk.Rectangle;
   readonly windowCenter: { x: number; y: number };
 }

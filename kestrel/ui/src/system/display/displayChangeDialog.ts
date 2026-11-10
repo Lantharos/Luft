@@ -40,7 +40,6 @@ export class DisplayChangeDialog extends ModalDialog {
     });
 
     this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, ONE_SECOND, () => this.tick());
-    GLib.Source.set_name_by_id(this.timeoutId, '[kestrel] this._tick');
   }
 
   close(): void {

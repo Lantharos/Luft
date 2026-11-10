@@ -1,6 +1,6 @@
 import type Clutter from 'gi://Clutter';
 
-export interface WallpaperPicture {
+interface WallpaperPicture {
   actor: Clutter.Actor;
   /** Whether it lies below the windows, which then hide it. */
   underWindows: boolean;

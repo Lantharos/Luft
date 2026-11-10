@@ -104,6 +104,7 @@ class URLHighlighter extends St.Label {
   }
 
   private findUrlAtPos(stageX: number, stageY: number): number {
+    if (!this.urls.length) return -1;
     const [, x, y] = this.transform_stage_point(stageX, stageY);
     let findPos = -1;
     for (let i = 0; i < this.clutter_text.text.length; i++) {

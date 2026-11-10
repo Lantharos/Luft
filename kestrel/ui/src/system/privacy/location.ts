@@ -7,8 +7,8 @@ import St from 'gi://St';
 import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
-import { lookup, setApps, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
+import { lookup, setPermission, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
 
 const LOCATION_SCHEMA = 'org.gnome.system.location';
 const MAX_ACCURACY_LEVEL = 'max-accuracy-level';
@@ -170,7 +170,6 @@ const GeoclueAgent = GObject.registerClass({
 type GeoclueAgent = InstanceType<typeof GeoclueAgent>;
 
 class AppAuthorizer {
-  private permissions: Apps = {};
   private accuracyLevel: number = GeoclueAccuracyLevel.NONE;
 
   constructor(
@@ -181,20 +180,22 @@ class AppAuthorizer {
 
   async authorize(): Promise<number> {
     const app = Shell.AppSystem.get_default().lookup_app(`${this.desktopId}.desktop`);
-    if (app == null) return this.completeAuth();
+    if (app == null) return GeoclueAccuracyLevel.NONE;
 
-    try {
-      this.permissions = await lookup(Gio.DBus.session, LOCATION_PERMISSION);
-    } catch (error) {
-      log((error as Error).message);
-      this.permissions = {};
-    }
-
-    const permission = this.permissions[this.desktopId];
+    const permission = (await this.savedPermissions())[this.desktopId];
     if (permission == null) await this.userAuthorizeApp(app);
     else this.accuracyLevel = accuracyLevel(permission[0]);
 
     return this.completeAuth();
+  }
+
+  private async savedPermissions(): Promise<Apps> {
+    try {
+      return await lookup(Gio.DBus.session, LOCATION_PERMISSION);
+    } catch (error) {
+      log((error as Error).message);
+      return {};
+    }
   }
 
   private async userAuthorizeApp(app: Shell.App): Promise<void> {
@@ -212,10 +213,9 @@ class AppAuthorizer {
 
   private async saveToPermissionStore(): Promise<void> {
     const dateStr = Math.round(Date.now() / 1000).toString();
-    this.permissions[this.desktopId] = [accuracyLevelToString(this.accuracyLevel), dateStr];
 
     try {
-      await setApps(LOCATION_PERMISSION, this.permissions);
+      await setPermission(LOCATION_PERMISSION, this.desktopId, [accuracyLevelToString(this.accuracyLevel), dateStr]);
     } catch (error) {
       log((error as Error).message);
     }

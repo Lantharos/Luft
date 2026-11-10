@@ -60,20 +60,39 @@ export function claimable(accelerator: string): boolean {
   return !(held.every(modifier => modifier === 'ctrl' || modifier === 'alt') && EDITING_KEYS.has(name));
 }
 
-export function reservedAccelerators(): Set<string> {
-  const reserved = new Set<string>();
+let reserved: ReadonlySet<string> | null = null;
+let reservedIn: Gio.Settings[] = [];
+
+function followed(settings: Gio.Settings): Gio.Settings {
+  settings.connect('changed', () => {
+    reserved = null;
+    reservedIn = [];
+  });
+  reservedIn.push(settings);
+  return settings;
+}
+
+function readReserved(): Set<string> {
+  const accelerators = new Set<string>();
   for (const id of KEYBINDING_SCHEMAS) {
-    const settings = new Gio.Settings({ schema_id: id });
+    const settings = followed(new Gio.Settings({ schema_id: id }));
     const schema = settings.settings_schema;
     for (const key of schema.list_keys()) {
-      if (key === CUSTOM_KEYBINDINGS || schema.get_key(key).get_value_type().dup_string() !== 'as') continue;
-      for (const accelerator of settings.get_strv(key)) if (accelerator) reserved.add(canonical(accelerator));
+      if (key === CUSTOM_KEYBINDINGS) {
+        for (const path of settings.get_strv(key)) {
+          const accelerator = followed(new Gio.Settings({ schema_id: CUSTOM_KEYBINDING, path })).get_string('binding');
+          if (accelerator) accelerators.add(canonical(accelerator));
+        }
+      } else if (schema.get_key(key).get_value_type().dup_string() === 'as') {
+        for (const accelerator of settings.get_strv(key)) if (accelerator) accelerators.add(canonical(accelerator));
+      }
     }
   }
-  for (const path of new Gio.Settings({ schema_id: MEDIA_KEYS }).get_strv(CUSTOM_KEYBINDINGS)) {
-    const accelerator = new Gio.Settings({ schema_id: CUSTOM_KEYBINDING, path }).get_string('binding');
-    if (accelerator) reserved.add(canonical(accelerator));
-  }
+  return accelerators;
+}
+
+export function reservedAccelerators(): ReadonlySet<string> {
+  reserved ??= readReserved();
   return reserved;
 }
 

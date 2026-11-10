@@ -25,7 +25,7 @@ const PAGES: Record<SettingsPageId, readonly Permission[]> = {
 };
 const IMAGE = /\.(png|jpe?g|webp|svg)$/i;
 
-export class ManifestError extends Error {}
+class ManifestError extends Error {}
 
 type Table = Record<string, unknown>;
 
@@ -60,7 +60,7 @@ function list(source: Table, key: string, where: string): unknown[] {
   return value;
 }
 
-export function insideFolder(path: string): boolean {
+function insideFolder(path: string): boolean {
   return !path.startsWith('/') && !path.split('/').includes('..');
 }
 

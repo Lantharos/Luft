@@ -17,7 +17,7 @@ let tracking: GlideTrack | null = null;
 
 type TrackState = 'following' | 'released' | 'finishing';
 
-export class GlideTrack implements SwipeTrack {
+class GlideTrack implements SwipeTrack {
   private readonly glides: Glide[] = [];
   private readonly fades: Fade[] = [];
   private progress = 0;

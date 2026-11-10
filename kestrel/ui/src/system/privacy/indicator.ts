@@ -61,9 +61,18 @@ export class PrivacyIndicator {
     for (const kind of active) this.icons.add_child(new St.Icon({ icon_name: ICONS[kind], icon_size: 16 }));
   }
 
+  private async mediaUsers(): Promise<MediaUser[]> {
+    try {
+      return await mediaUsers(this.monitor.dictationPid);
+    } catch (error) {
+      console.error('Kestrel couldn\'t tell which apps use the camera or microphone', error);
+      return [];
+    }
+  }
+
   private async open(): Promise<void> {
     const state = this.monitor.state;
-    const users = state.camera || state.microphone ? await mediaUsers(this.monitor.dictationPid) : [];
+    const users = state.camera || state.microphone ? await this.mediaUsers() : [];
     const entries: MenuEntry[] = [];
     for (const user of users) entries.push(this.userEntry(user));
     if (state.camera && !users.some(user => user.kind === 'camera'))

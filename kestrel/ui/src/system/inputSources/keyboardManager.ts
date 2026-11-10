@@ -7,9 +7,9 @@ import Shell from 'gi://Shell';
 
 import { EventEmitter } from '../../core/runtime/signals.js';
 
-export const DEFAULT_LOCALE = 'en_US';
+const DEFAULT_LOCALE = 'en_US';
 export const DEFAULT_LAYOUT = 'us';
-export const DEFAULT_VARIANT = '';
+const DEFAULT_VARIANT = '';
 
 const MAX_LAYOUTS_PER_GROUP = 4;
 const USER_LAYOUT_FOLDERS = ['symbols', 'rules'];
@@ -55,7 +55,7 @@ interface XkbLayout {
   variant: string;
 }
 
-export interface LayoutInfo extends XkbLayout {
+interface LayoutInfo extends XkbLayout {
   id: string;
   displayName: string;
   shortName: string;

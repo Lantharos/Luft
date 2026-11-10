@@ -6,7 +6,7 @@ import * as Main from '../../../core/main.js';
 
 const FLASHSPOT_ANIMATION_OUT_TIME = 500;
 
-export interface FlashspotArea {
+interface FlashspotArea {
   x: number;
   y: number;
   width: number;

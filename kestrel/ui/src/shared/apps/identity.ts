@@ -19,16 +19,29 @@ function realPath(path: string): string {
   return path;
 }
 
-function appRunning(program: string): Shell.App | null {
-  const appSystem = Shell.AppSystem.get_default();
-  const info = appSystem.get_installed().find(candidate => {
-    const executable = GLib.find_program_in_path(candidate.get_executable());
-    return !!executable && realPath(executable) === program;
-  });
-  return info ? appSystem.lookup_app(info.get_id()!) : null;
+let appIdsByProgram: Map<string, string> | null = null;
+
+function installedPrograms(appSystem: Shell.AppSystem): Map<string, string> {
+  const ids = new Map<string, string>();
+  for (const info of appSystem.get_installed()) {
+    const executable = GLib.find_program_in_path(info.get_executable());
+    const program = executable && realPath(executable);
+    if (program && !ids.has(program)) ids.set(program, info.get_id()!);
+  }
+  return ids;
 }
 
-export interface VerifiedApp {
+function appRunning(program: string): Shell.App | null {
+  const appSystem = Shell.AppSystem.get_default();
+  if (!appIdsByProgram) {
+    appSystem.connect('installed-changed', () => (appIdsByProgram = null));
+    appIdsByProgram = installedPrograms(appSystem);
+  }
+  const id = appIdsByProgram.get(program);
+  return id ? appSystem.lookup_app(id) : null;
+}
+
+interface VerifiedApp {
   name: string;
   app: Shell.App | null;
 }

@@ -26,7 +26,7 @@ const STORE_DELAY = 1500;
 const used = new Set<string>();
 const pending = new Set<string>();
 
-export interface StoredBackground {
+interface StoredBackground {
   texture: Cogl.Texture;
   metadata: Uint8Array;
 }

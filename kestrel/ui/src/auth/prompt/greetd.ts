@@ -13,7 +13,7 @@ export interface SessionOptions {
   mode?: 'fingerprint';
 }
 
-export type GreetdRequest =
+type GreetdRequest =
   | { type: 'create_session'; username: string } & SessionOptions
   | { type: 'post_auth_message_response'; response?: string }
   | { type: 'start_session'; cmd: string[]; env: string[] }

@@ -35,7 +35,7 @@ interface LayoutManager {
   disconnect(id: number): void;
 }
 
-export interface ScreenKeyboard {
+interface ScreenKeyboard {
   readonly visible: boolean;
   connect(signal: 'visibility-changed', callback: () => void): number;
   disconnect(id: number): void;

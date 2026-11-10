@@ -33,7 +33,7 @@ export interface NotificationSource extends SignalSource {
   notifications: Notification[];
 }
 
-export interface CardMotion {
+interface CardMotion {
   moved: () => Clutter.Actor;
   dismissed: (actor: Clutter.Actor) => void;
 }

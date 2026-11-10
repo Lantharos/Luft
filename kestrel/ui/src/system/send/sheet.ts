@@ -84,6 +84,8 @@ function appRow(sheet: Sheet, app: Gio.AppInfo): St.Button {
   return button;
 }
 
+const nearby = ({ client, network }: Post) => JSON.stringify([client.devices, client.scanning, client.open, network.public]);
+
 /** Lays the sheet out again as devices come and go, keeping the focus on the row it was on. */
 function fill(sheet: Sheet, post: Post | null): void {
   const focused = global.stage.key_focus;
@@ -121,7 +123,15 @@ export async function openSendSheet(files: Received[], from: Shell.App | null): 
         child: sections, style_class: 'kestrel-portal-scroll', hscrollbar_policy: St.PolicyType.NEVER,
         vscrollbar_policy: St.PolicyType.AUTOMATIC, overlay_scrollbars: true,
       }));
-      if (post) unwatch = post.client.onChanged(() => fill(sheet, post));
+      if (post) {
+        let shown = nearby(post);
+        unwatch = post.client.onChanged(() => {
+          const found = nearby(post);
+          if (found === shown) return;
+          shown = found;
+          fill(sheet, post);
+        });
+      }
       fill(sheet, post);
       post?.client.scan();
       dialog.buttons([{ label: t('portal-cancel'), action: dialog.cancel }]);

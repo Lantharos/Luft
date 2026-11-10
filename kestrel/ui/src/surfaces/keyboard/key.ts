@@ -5,7 +5,7 @@ import St from 'gi://St';
 import * as Main from '../../core/main.js';
 import { NoGrabPopup } from './popups.js';
 
-export interface KeyOptions {
+interface KeyOptions {
   label?: string;
   iconName?: string;
   commitString?: string;

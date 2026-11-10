@@ -56,7 +56,7 @@ interface SurfaceParts extends SurfaceFactories {
 }
 
 /** Where the taskbar is on a display, for surfaces to open beside it. */
-export interface TaskbarPlacement {
+interface TaskbarPlacement {
   depths(monitor: Monitor): Depths;
   anchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor;
 }

@@ -1,7 +1,9 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type GObject from 'gi://GObject';
 
 import { extensionFile } from './audio/files.js';
+import { removeTree } from '../../runtime/folders.js';
 import type { ApiContext } from './context.js';
 import type { ChooseOptions, PickOptions, SaveOptions } from './types.js';
 
@@ -11,6 +13,7 @@ const CHOOSER = 'org.freedesktop.portal.FileChooser';
 const REQUEST = 'org.freedesktop.portal.Request';
 const PICKED = 'picked';
 const MOST_FOLDER_FILES = 32;
+const LISTED_AT_ONCE = 64;
 const LARGEST_FOLDER_FILE = 8 * 1024 * 1024;
 
 const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
@@ -20,6 +23,8 @@ const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
 };
 
 Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
+Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
+Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
 
 let requests = 0;
 
@@ -59,45 +64,51 @@ function chosen(options: PickOptions): Promise<string[]> {
   });
 }
 
-function copyIn(uri: string, folder: string): string {
+function copy(source: Gio.File, target: Gio.File): Promise<void> {
+  return new Promise((resolve, reject) => source.copy_async(target, Gio.FileCopyFlags.NONE, GLib.PRIORITY_DEFAULT, null, null,
+    ((_source: Gio.File, result: Gio.AsyncResult) => {
+      try {
+        source.copy_finish(result);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    }) as unknown as GObject.Closure));
+}
+
+async function copyIn(uri: string, folder: string): Promise<string> {
   const source = Gio.File.new_for_uri(uri);
   const name = source.get_basename() ?? 'file';
   const dot = name.lastIndexOf('.');
   const target = GLib.build_filenamev([folder, `${GLib.uuid_string_random()}${dot > 0 ? name.slice(dot).toLowerCase() : ''}`]);
-  source.copy(Gio.File.new_for_path(target), Gio.FileCopyFlags.NONE, null, null);
+  await copy(source, Gio.File.new_for_path(target));
   return target;
 }
 
-function regularFiles(folder: Gio.File): Gio.File[] {
-  const children = folder.enumerate_children('standard::name,standard::type,standard::size', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+async function regularFiles(folder: Gio.File): Promise<Gio.File[]> {
+  const children = await folder.enumerate_children_async('standard::name,standard::type,standard::size', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, GLib.PRIORITY_DEFAULT, null);
   const files: Gio.File[] = [];
-  for (let info = children.next_file(null); info; info = children.next_file(null)) {
-    if (info.get_file_type() !== Gio.FileType.REGULAR || info.get_size() > LARGEST_FOLDER_FILE) continue;
-    files.push(folder.get_child(info.get_name()));
+  for (let batch = await children.next_files_async(LISTED_AT_ONCE, GLib.PRIORITY_DEFAULT, null); batch.length && files.length < MOST_FOLDER_FILES; batch = await children.next_files_async(LISTED_AT_ONCE, GLib.PRIORITY_DEFAULT, null)) {
+    for (const info of batch) {
+      if (info.get_file_type() !== Gio.FileType.REGULAR || info.get_size() > LARGEST_FOLDER_FILE) continue;
+      files.push(folder.get_child(info.get_name()));
+    }
   }
   return files.slice(0, MOST_FOLDER_FILES);
 }
 
-function copyFolderIn(uri: string, folder: string): string {
+async function copyFolderIn(uri: string, folder: string): Promise<string> {
   const source = Gio.File.new_for_uri(uri);
   const target = Gio.File.new_for_path(GLib.build_filenamev([folder, GLib.uuid_string_random()]));
   target.make_directory(null);
-  for (const file of regularFiles(source)) file.copy(target.get_child(file.get_basename()!), Gio.FileCopyFlags.NONE, null, null);
+  for (const file of await regularFiles(source)) await copy(file, target.get_child(file.get_basename()!));
   return target.get_path()!;
-}
-
-function remove(file: Gio.File): void {
-  if (file.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
-    const children = file.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
-    for (let info = children.next_file(null); info; info = children.next_file(null)) remove(file.get_child(info.get_name()));
-  }
-  file.delete(null);
 }
 
 export function deleteFile(context: ApiContext, path: string): void {
   const file = extensionFile([context.dataPath], path);
   if (file.equal(Gio.File.new_for_path(context.dataPath))) throw new Error("The data folder itself can't be deleted");
-  remove(file);
+  removeTree(file);
 }
 
 export function readText(context: ApiContext, path: string): string | null {
@@ -112,7 +123,10 @@ export async function pickFiles(context: ApiContext, options: PickOptions): Prom
   const uris = await chosen(options);
   const folder = GLib.build_filenamev([context.dataPath, PICKED]);
   GLib.mkdir_with_parents(folder, 0o700);
-  return uris.map(uri => options.kind === 'folder' ? copyFolderIn(uri, folder) : copyIn(uri, folder));
+  const copyPicked = options.kind === 'folder' ? copyFolderIn : copyIn;
+  const copies: string[] = [];
+  for (const uri of uris) copies.push(await copyPicked(uri, folder));
+  return copies;
 }
 
 /** Lets people choose files or a folder with the file chooser, and returns where they are. */

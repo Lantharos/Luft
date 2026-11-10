@@ -17,7 +17,7 @@ export class Unsupported extends Error {
   }
 }
 
-export interface Heard {
+interface Heard {
   partial(text: string): void;
   typed(text: string): void;
   level(level: number): void;

@@ -15,7 +15,7 @@ export interface Peer {
   verified: boolean;
 }
 
-export interface Offered {
+interface Offered {
   name: string;
   size: number;
   type: string;
@@ -52,12 +52,12 @@ export interface Offer {
   size: number;
 }
 
-export interface YourDevice {
+interface YourDevice {
   id: string;
   alias: string;
 }
 
-export interface Listeners {
+interface Listeners {
   text(from: Peer, text: string, trusted: boolean): void;
   offer(offer: Offer): void;
   transfer(transfer: Transfer): void;

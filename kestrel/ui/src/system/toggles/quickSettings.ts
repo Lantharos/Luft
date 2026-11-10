@@ -11,11 +11,11 @@ import { QuickToggleMenu } from './quickToggleMenu.js';
 
 export { QuickToggleMenu } from './quickToggleMenu.js';
 
-export interface QuickSettingsItemProps extends Partial<St.Button.ConstructorProps> {
+interface QuickSettingsItemProps extends Partial<St.Button.ConstructorProps> {
   hasMenu?: boolean;
 }
 
-export interface QuickToggleProps extends QuickSettingsItemProps {
+interface QuickToggleProps extends QuickSettingsItemProps {
   title?: string | null;
   subtitle?: string | null;
   gicon?: Gio.Icon | null;
@@ -26,9 +26,9 @@ interface QuickMenuProps {
   menu_button_accessible_name?: string | null;
 }
 
-export interface QuickMenuToggleProps extends QuickToggleProps, QuickMenuProps {}
+interface QuickMenuToggleProps extends QuickToggleProps, QuickMenuProps {}
 
-export interface QuickSliderProps extends QuickSettingsItemProps, QuickMenuProps {
+interface QuickSliderProps extends QuickSettingsItemProps, QuickMenuProps {
   gicon?: Gio.Icon | null;
   icon_reactive?: boolean;
   icon_label?: string;
@@ -57,7 +57,7 @@ function menuButton(params: Partial<St.Button.ConstructorProps>): St.Button {
   });
 }
 
-export const QuickSettingsItem = GObject.registerClass({
+const QuickSettingsItem = GObject.registerClass({
   Properties: {
     'has-menu': GObject.ParamSpec.boolean('has-menu', null, null,
       GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT_ONLY, false),
@@ -79,7 +79,7 @@ export const QuickSettingsItem = GObject.registerClass({
     this.menuManager.addMenu(this.menu);
   }
 });
-export type QuickSettingsItem = InstanceType<typeof QuickSettingsItem>;
+type QuickSettingsItem = InstanceType<typeof QuickSettingsItem>;
 
 export const QuickToggle = GObject.registerClass({
   Properties: {

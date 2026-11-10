@@ -11,7 +11,7 @@ import * as PopupMenu from '../popups/popupMenu.js';
 
 type MenuItem = InstanceType<typeof PopupMenu.PopupMenuItem>;
 
-export class EntryMenu extends PopupMenu.PopupMenu {
+class EntryMenu extends PopupMenu.PopupMenu {
   private readonly clipboard = St.Clipboard.get_default();
   private readonly copyItem: MenuItem;
   private readonly pasteItem: MenuItem;

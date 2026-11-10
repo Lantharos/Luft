@@ -5,7 +5,7 @@ import type GObject from 'gi://GObject';
 import { EventEmitter } from '../../core/runtime/signals.js';
 import { INPUT_SOURCE_TYPE_XKB } from './inputSource.js';
 
-export interface InputSourceSpec {
+interface InputSourceSpec {
   type: string;
   id: string;
 }

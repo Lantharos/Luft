@@ -56,7 +56,7 @@ const CONTENT_PURPOSES = new Map<Clutter.InputContentPurpose, IBus.InputPurpose>
   [Clutter.InputContentPurpose.TERMINAL, IBus.InputPurpose.TERMINAL],
 ]);
 
-export interface CaretRect {
+interface CaretRect {
   x: number;
   y: number;
   width: number;

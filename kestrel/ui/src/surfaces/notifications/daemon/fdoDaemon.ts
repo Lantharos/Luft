@@ -302,7 +302,7 @@ export class FdoNotificationDaemon {
   GetServerInformation(): [string, string, string, string] {
     return [
       Config.PACKAGE_NAME,
-      'GNOME',
+      'Lantharos',
       Config.PACKAGE_VERSION,
       '1.2',
     ];

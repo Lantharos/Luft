@@ -8,7 +8,7 @@ import { QuickMenuToggle, SystemIndicator } from '../toggles/quickSettings.js';
 
 import * as PopupMenu from '../../shared/popups/popupMenu.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const BUS_NAME = 'org.freedesktop.UPower.PowerProfiles';
 const OBJECT_PATH = '/org/freedesktop/UPower/PowerProfiles';

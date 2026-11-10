@@ -17,14 +17,15 @@ const HANDLERS: Record<Exclude<Launcher, 'home' | 'calculator' | 'terminal'>, st
   email: 'x-scheme-handler/mailto',
   media: 'audio/x-vorbis+ogg',
 };
-const CALCULATORS = ['org.gnome.Calculator.desktop', 'gnome-calculator.desktop'];
 const TERMINAL = 'com.lantharos.tern.desktop';
 
-// Tern, or else the first app that says it is a terminal
-function terminal(): Shell.App | null {
+function firstAppIn(category: string): Shell.App | null {
   const apps = Shell.AppSystem.get_default();
-  return apps.lookup_app(TERMINAL) ??
-    apps.get_installed().map(info => apps.lookup_app(info.get_id() ?? '')).find(app => app?.app_info?.get_categories()?.split(';').includes('TerminalEmulator')) ?? null;
+  return apps.get_installed().map(info => apps.lookup_app(info.get_id() ?? '')).find(app => app?.app_info?.get_categories()?.split(';').includes(category)) ?? null;
+}
+
+function ternOrAnotherTerminal(): Shell.App | null {
+  return Shell.AppSystem.get_default().lookup_app(TERMINAL) ?? firstAppIn('TerminalEmulator');
 }
 
 function activate(info: Gio.AppInfo | null): void {
@@ -40,12 +41,11 @@ export function launch(launcher: Launcher): void {
     return;
   }
   if (launcher === 'terminal') {
-    terminal()?.open_new_window(-1);
+    ternOrAnotherTerminal()?.open_new_window(-1);
     return;
   }
   if (launcher === 'calculator') {
-    const app = CALCULATORS.map(id => Shell.AppSystem.get_default().lookup_app(id)).find(found => found);
-    app?.activate();
+    firstAppIn('Calculator')?.activate();
     return;
   }
   activate(Gio.AppInfo.get_default_for_type(HANDLERS[launcher], false));

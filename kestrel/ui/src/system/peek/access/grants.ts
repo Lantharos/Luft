@@ -9,7 +9,7 @@ import { askForAccess, type Level } from './prompt.js';
 
 export type { Level } from './prompt.js';
 
-export interface Grant {
+interface Grant {
   readonly caller: Caller;
   readonly level: Level;
 }

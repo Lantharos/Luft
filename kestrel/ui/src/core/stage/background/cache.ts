@@ -1,11 +1,10 @@
 import GDesktopEnums from 'gi://GDesktopEnums';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 
 import { EventEmitter } from '../../runtime/signals.js';
 import type { LayoutManager } from '../layout.js';
-import { FOCUS_DARK_KEY, FOCUS_KEY, INTERFACE_SCHEMA, BACKGROUND_STYLE_KEY, PICTURE_URI_DARK_KEY, PICTURE_URI_KEY } from './schemas.js';
+import { BACKGROUND_SCHEMA, FOCUS_DARK_KEY, FOCUS_KEY, INTERFACE_SCHEMA, BACKGROUND_STYLE_KEY, PICTURE_URI_DARK_KEY, PICTURE_URI_KEY } from './schemas.js';
 import { Background } from './wallpaper.js';
 
 interface BackgroundCacheSignals {
@@ -14,15 +13,13 @@ interface BackgroundCacheSignals {
 
 class BackgroundSource {
   useCount = 1;
-  private readonly overrideImage = GLib.getenv('SHELL_BACKGROUND_IMAGE');
-  private readonly settings: Gio.Settings;
+  private readonly settings = new Gio.Settings({ schema_id: BACKGROUND_SCHEMA });
   private readonly interfaceSettings = new Gio.Settings({ schema_id: INTERFACE_SCHEMA });
   private background: Background | null = null;
   private changedId = 0;
   private readonly monitorsChangedId: number;
 
-  constructor(private readonly layoutManager: LayoutManager, settingsSchema: string) {
-    this.settings = new Gio.Settings({ schema_id: settingsSchema });
+  constructor(private readonly layoutManager: LayoutManager) {
     this.monitorsChangedId = global.backend.get_monitor_manager().connect('monitors-changed', () => this.background?.updateResolution());
   }
 
@@ -30,19 +27,13 @@ class BackgroundSource {
     if (this.background) return this.background;
 
     let file = null;
-    let style;
     let focusKey = null;
 
-    if (this.overrideImage !== null) {
-      file = Gio.File.new_for_path(this.overrideImage);
-      style = GDesktopEnums.BackgroundStyle.ZOOM;
-    } else {
-      style = this.settings.get_enum(BACKGROUND_STYLE_KEY) as GDesktopEnums.BackgroundStyle;
-      if (style !== GDesktopEnums.BackgroundStyle.NONE) {
-        const dark = this.interfaceSettings.get_enum('color-scheme') === GDesktopEnums.ColorScheme.PREFER_DARK;
-        file = Gio.File.new_for_commandline_arg(this.settings.get_string(dark ? PICTURE_URI_DARK_KEY : PICTURE_URI_KEY));
-        focusKey = dark ? FOCUS_DARK_KEY : FOCUS_KEY;
-      }
+    const style = this.settings.get_enum(BACKGROUND_STYLE_KEY) as GDesktopEnums.BackgroundStyle;
+    if (style !== GDesktopEnums.BackgroundStyle.NONE) {
+      const dark = this.interfaceSettings.get_enum('color-scheme') === GDesktopEnums.ColorScheme.PREFER_DARK;
+      file = Gio.File.new_for_commandline_arg(this.settings.get_string(dark ? PICTURE_URI_DARK_KEY : PICTURE_URI_KEY));
+      focusKey = dark ? FOCUS_DARK_KEY : FOCUS_KEY;
     }
 
     const background = new Background({
@@ -77,7 +68,7 @@ class BackgroundCache extends EventEmitter {
   declare disconnect: (id: number) => void;
 
   private readonly fileMonitors = new Map<number, Gio.FileMonitor>();
-  private readonly backgroundSources = new Map<string, BackgroundSource>();
+  private backgroundSource: BackgroundSource | null = null;
 
   monitorFile(file: Gio.File): void {
     const key = file.hash();
@@ -92,27 +83,19 @@ class BackgroundCache extends EventEmitter {
     this.fileMonitors.set(key, monitor);
   }
 
-  getBackgroundSource(layoutManager: LayoutManager, settingsSchema: string): BackgroundSource {
-    const existing = this.backgroundSources.get(settingsSchema);
-    if (existing) {
-      existing.useCount++;
-      return existing;
-    }
-
-    const source = new BackgroundSource(layoutManager, settingsSchema);
-    this.backgroundSources.set(settingsSchema, source);
-    return source;
+  getBackgroundSource(layoutManager: LayoutManager): BackgroundSource {
+    if (this.backgroundSource) this.backgroundSource.useCount++;
+    else this.backgroundSource = new BackgroundSource(layoutManager);
+    return this.backgroundSource;
   }
 
-  releaseBackgroundSource(settingsSchema: string): void {
-    const source = this.backgroundSources.get(settingsSchema);
-    if (!source) return;
-
+  releaseBackgroundSource(): void {
+    const source = this.backgroundSource!;
     source.useCount--;
-    if (source.useCount === 0) {
-      this.backgroundSources.delete(settingsSchema);
-      source.destroy();
-    }
+    if (source.useCount > 0) return;
+
+    this.backgroundSource = null;
+    source.destroy();
   }
 }
 

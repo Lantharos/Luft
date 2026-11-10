@@ -3,7 +3,7 @@ import type GLib from 'gi://GLib';
 
 import * as KestrelUi from '../../kestrelUi.js';
 
-export type RetryReason = 'retry-scan' | 'swipe-too-short' | 'finger-not-centered' | 'remove-and-retry';
+type RetryReason = 'retry-scan' | 'swipe-too-short' | 'finger-not-centered' | 'remove-and-retry';
 
 export type FingerprintState =
   | { kind: 'idle' }

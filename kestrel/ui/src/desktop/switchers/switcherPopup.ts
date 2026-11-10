@@ -128,7 +128,6 @@ export abstract class SwitcherPopup<Item = unknown> extends St.Widget {
     }
 
     this.initialDelayTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, POPUP_DELAY_TIMEOUT, () => this.showImmediately());
-    GLib.Source.set_name_by_id(this.initialDelayTimeoutId, '[kestrel] Main.osdWindow.cancel');
     return true;
   }
 
@@ -210,7 +209,6 @@ export abstract class SwitcherPopup<Item = unknown> extends St.Widget {
       this.motionTimeoutId = 0;
       this.mouseActive = true;
     });
-    GLib.Source.set_name_by_id(this.motionTimeoutId, '[kestrel] this._mouseTimedOut');
   }
 
   private resetNoModsTimeout(): void {

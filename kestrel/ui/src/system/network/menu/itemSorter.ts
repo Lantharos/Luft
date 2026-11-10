@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 
 import * as Util from '../../../core/runtime/util.js';
 
-export interface SortableItem {
+interface SortableItem {
   readonly name: string | null;
   readonly timestamp: number;
 }

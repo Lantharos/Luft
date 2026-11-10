@@ -8,7 +8,7 @@ import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import { styleSurface } from '../../appearance/kestrelGlass.js';
 import { fixMarkup } from '../../core/runtime/util.js';
 import { MprisSource, type MprisPlayer } from '../../surfaces/notifications/tray/mpris.js';
-import { MediaMessage } from '../../surfaces/notifications/tray/messageList.js';
+import { MediaMessage } from '../../surfaces/notifications/messages/mediaMessage.js';
 import { notificationHolds } from '../../surfaces/notifications/tray/holds.js';
 
 const LOCK_SCREEN_PREVIEWS = 3;

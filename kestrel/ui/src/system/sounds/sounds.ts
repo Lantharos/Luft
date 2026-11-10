@@ -42,7 +42,7 @@ export type NotificationSound = { name: string } | { file: Gio.File } | { fds: G
 
 export type SoundChoice = 'automatic' | 'luft' | 'app' | 'none';
 
-export interface NotificationSoundRequest {
+interface NotificationSoundRequest {
   choice: SoundChoice;
   requested: NotificationSound | null | undefined;
   fallback: NotificationSound;

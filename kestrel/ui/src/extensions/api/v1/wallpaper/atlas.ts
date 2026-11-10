@@ -2,8 +2,8 @@ import Cogl from 'gi://Cogl';
 import GdkPixbuf from 'gi://GdkPixbuf';
 import GLib from 'gi://GLib';
 
-export const ATLAS_CELL = 128;
-export const ATLAS_PICTURES = 8;
+const ATLAS_CELL = 128;
+const ATLAS_PICTURES = 8;
 const COLUMNS = 8;
 const MOST_FRAMES = 64;
 const FRAMES_EACH = 16;

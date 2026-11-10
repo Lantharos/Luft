@@ -9,13 +9,13 @@ import { NMToggle } from './toggle.js';
 
 const VPN_SETTING_TYPES = [NM.SETTING_VPN_SETTING_NAME, NM.SETTING_WIREGUARD_SETTING_NAME];
 
-export namespace NMVpnConnectionItem {
+namespace NMVpnConnectionItem {
   export interface Signals extends PopupMenu.PopupBaseMenuItem.Signals {
     'activation-failed': () => void;
   }
 }
 
-export class NMVpnConnectionItem extends NMConnectionItem {
+class NMVpnConnectionItem extends NMConnectionItem {
   static {
     GObject.registerClass({
       Signals: {

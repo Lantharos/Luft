@@ -9,12 +9,6 @@ export interface InkSample {
 }
 
 const MOUSE_PRESSURE = 0.6;
-const PEN_TOOLS = [Clutter.InputDeviceToolType.PEN, Clutter.InputDeviceToolType.PENCIL, Clutter.InputDeviceToolType.BRUSH];
-
-export function isPen(event: Clutter.Event): boolean {
-  const tool = event.get_device_tool();
-  return !!tool && PEN_TOOLS.includes(tool.get_tool_type());
-}
 
 export function isEraserTip(event: Clutter.Event): boolean {
   return event.get_device_tool()?.get_tool_type() === Clutter.InputDeviceToolType.ERASER;

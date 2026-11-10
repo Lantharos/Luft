@@ -10,9 +10,9 @@ import { DragDropResult, DragMotionResult, dragMonitors, type DragDelegate, type
 
 export * from './dndTargets.js';
 
-export const SCALE_ANIMATION_TIME = 250;
-export const SNAP_BACK_ANIMATION_TIME = 250;
-export const REVERT_ANIMATION_TIME = 750;
+const SCALE_ANIMATION_TIME = 250;
+const SNAP_BACK_ANIMATION_TIME = 250;
+const REVERT_ANIMATION_TIME = 750;
 
 const DRAG_CURSOR_MAP: Record<Exclude<DragMotionResult, typeof DragMotionResult.CONTINUE>, Clutter.CursorType> = {
   [DragMotionResult.NO_DROP]: Clutter.CursorType.NO_DROP,
@@ -22,7 +22,7 @@ const DRAG_CURSOR_MAP: Record<Exclude<DragMotionResult, typeof DragMotionResult.
 
 type DelegateActor = Clutter.Actor & { _delegate?: DragDelegate };
 
-export interface DraggableOptions {
+interface DraggableOptions {
   manualMode?: boolean;
   timeoutThreshold?: number;
   restoreOnSuccess?: boolean;
@@ -330,7 +330,6 @@ class Draggable extends Signals.EventEmitter {
     if (this.updateHoverId) return;
 
     this.updateHoverId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this.updateDragHover());
-    GLib.Source.set_name_by_id(this.updateHoverId, '[kestrel] this._updateDragHover');
   }
 
   private updateDragPosition(event: Clutter.Event): void {

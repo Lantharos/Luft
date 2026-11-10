@@ -4,7 +4,7 @@ export type Direction = 'left' | 'right' | 'up' | 'down';
 export type Axis = 'horizontal' | 'vertical';
 
 export const DIRECTIONS: readonly Direction[] = ['left', 'right', 'up', 'down'];
-export const MIN_RATIO = 0.1;
+const MIN_RATIO = 0.1;
 
 export const axisOf = (direction: Direction): Axis => direction === 'left' || direction === 'right' ? 'horizontal' : 'vertical';
 export const forward = (direction: Direction): boolean => direction === 'right' || direction === 'down';

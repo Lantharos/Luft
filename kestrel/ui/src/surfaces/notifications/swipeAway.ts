@@ -12,7 +12,7 @@ const VELOCITY_WINDOW = 150;
 
 type Axis = 'x' | 'y';
 
-export interface SwipeAwayOptions {
+interface SwipeAwayOptions {
   downward: boolean;
   moved?: () => Clutter.Actor;
   held?: (held: boolean) => void;

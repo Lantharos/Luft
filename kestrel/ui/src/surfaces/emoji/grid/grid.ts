@@ -51,7 +51,7 @@ export class EmojiGrid {
     this.actor.vadjustment.connect('notify::value', () => this.refresh());
     this.actor.vadjustment.connect('notify::page-size', () => this.refresh());
     whenPixelScaleChanges(this.actor, () => this.redraw());
-    this.themeContext.connect('notify::scale-factor', () => this.redraw());
+    this.themeContext.connectObject('notify::scale-factor', () => this.redraw(), this.actor);
     this.actor.connect('style-changed', () => this.inkChanged());
   }
 

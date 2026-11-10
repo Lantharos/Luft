@@ -6,7 +6,6 @@ import { UnlockDialog } from '../auth/lockScreen/unlockDialog.js';
 type ModeName = 'restrictive' | 'greeter' | 'peek' | 'setup' | 'unlock-dialog' | 'user';
 
 interface ModeProperties {
-  parentMode: ModeName | null;
   stylesheetName: string;
   themeResourceName: string;
   allowSettings: boolean;
@@ -37,7 +36,6 @@ const USER_SESSION_COMPONENTS = [
 
 const modes: Record<ModeName, Partial<ModeProperties>> = {
   'restrictive': {
-    parentMode: null,
     stylesheetName: 'base.css',
     themeResourceName: 'kestrel-theme.gresource',
     allowSettings: false,
@@ -85,7 +83,6 @@ const modes: Record<ModeName, Partial<ModeProperties>> = {
     hasWindows: true,
     hasWmMenus: true,
     hasNotifications: true,
-    isLocked: false,
     isPrimary: true,
     unlockDialog: UnlockDialog,
     components: USER_SESSION_COMPONENTS,
@@ -127,12 +124,7 @@ export class SessionMode extends EventEmitter {
   }
 
   private sync(): void {
-    const current = modes[this.currentMode];
-    const parent = current.parentMode
-      ? { ...modes[DEFAULT_MODE], ...modes[current.parentMode] }
-      : { ...modes[DEFAULT_MODE] };
-
-    const params = { ...parent, ...current };
+    const params = { ...modes[DEFAULT_MODE], ...modes[this.currentMode] };
     const changed = Object.entries(params).filter(([, value]) => value !== undefined);
     Object.assign(this, Object.fromEntries(changed));
 

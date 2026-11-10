@@ -5,7 +5,7 @@ import * as Main from '../../core/main.js';
 
 type ModalOptions = Parameters<typeof Main.pushModal>[1];
 
-export interface GrabOptions {
+interface GrabOptions {
   actor: St.Widget;
   focus?: Clutter.Actor | null;
   onUngrab?: ((isUser: boolean) => void) | null;

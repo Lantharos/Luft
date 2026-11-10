@@ -11,7 +11,7 @@ import { CheckBox } from '../../shared/widgets/checkBox.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 
 import { DBusSenderChecker } from '../../core/runtime/util.js';
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const RequestIface = loadInterfaceXML('org.freedesktop.impl.portal.Request')!;
 const AccessIface = loadInterfaceXML('org.freedesktop.impl.portal.Access')!;

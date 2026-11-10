@@ -5,7 +5,7 @@ import * as KestrelUi from '../../kestrelUi.js';
 import { MountPasswordDialog } from './passwordDialog.js';
 import { MountProcessesDialog, MountQuestionDialog } from './choiceDialogs.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const MountOpIface = loadInterfaceXML('org.Gtk.MountOperationHandler')!;
 

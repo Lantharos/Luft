@@ -2,7 +2,7 @@ import { readProcFile as read } from '../../../shared/dbus/processes.js';
 
 const UNIT = /\.(?:scope|service)$/;
 
-export interface ProcessStat {
+interface ProcessStat {
   readonly parent: number;
   readonly started: number;
 }

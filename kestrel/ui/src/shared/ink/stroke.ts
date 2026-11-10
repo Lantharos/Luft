@@ -19,7 +19,7 @@ interface Bounds {
 const LIGHTEST = 0.25;
 const PER_PRESSURE = 1.25;
 
-export function widthAt(style: InkStyle, pressure: number): number {
+function widthAt(style: InkStyle, pressure: number): number {
   return style.pressure ? style.width * (LIGHTEST + PER_PRESSURE * pressure) : style.width;
 }
 

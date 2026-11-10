@@ -19,7 +19,7 @@ const MARGIN = 56;
 const LARGE_MARGIN = 88;
 const ASLEEP_DROP = 40;
 
-export interface MonumentParts {
+interface MonumentParts {
   time: St.Label;
   date: St.Label;
   hint: St.Label;

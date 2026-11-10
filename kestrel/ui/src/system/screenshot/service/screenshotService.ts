@@ -5,7 +5,7 @@ import St from 'gi://St';
 
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
-import { loadInterfaceXML } from '../../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
 import { UIMode } from '../ui/screenshotUI.js';
 import { Flashspot } from './flashspot.js';
 import { PickPixel } from './pickPixel.js';

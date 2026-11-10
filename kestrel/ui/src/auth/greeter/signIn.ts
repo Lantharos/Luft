@@ -3,7 +3,7 @@ import type GObject from 'gi://GObject';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Signals from '../../core/runtime/signals.js';
 import { getLoginManager } from '../../session/actions/loginManager.js';
-import type { SignInMethod } from '../lockScreen/signInMethod.js';
+import { methodIn, type SignInMethod } from '../lockScreen/signInMethod.js';
 import type { Authentication, AuthenticationSignals } from '../prompt/authentication.js';
 import type { AuthPrompt } from '../prompt/authPrompt.js';
 import { type FingerprintState, watchVerifyResults } from '../prompt/fingerprintState.js';
@@ -11,15 +11,6 @@ import { stateFile } from './config.js';
 
 const METHOD_QUESTION = 'Sign in with (fingerprint/password): ';
 const FINGERPRINT_QUESTION = 'Touch the fingerprint reader, or type password: ';
-
-function rememberedMethod(uid: number): SignInMethod | null {
-  try {
-    const method = new TextDecoder().decode(stateFile('users', String(uid), 'sign-in-method').load_contents(null)[1]);
-    return method === 'fingerprint' || method === 'password' ? method : null;
-  } catch {
-    return null;
-  }
-}
 
 export class GreeterSignIn extends Signals.EventEmitter {
   declare emit: GObject.SignalMethods<this, AuthenticationSignals>['emit'];
@@ -49,7 +40,7 @@ export class GreeterSignIn extends Signals.EventEmitter {
   }
 
   prepare(uid: number | null): void {
-    this.choice = uid === null ? null : rememberedMethod(uid);
+    this.choice = uid === null ? null : methodIn(stateFile('users', String(uid), 'sign-in-method'));
     this.method = this.loginManager.lidClosed ? 'password' : 'fingerprint';
     this.setFingerprint({ kind: 'idle' });
   }

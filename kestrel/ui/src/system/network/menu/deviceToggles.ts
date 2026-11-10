@@ -17,14 +17,18 @@ const WIFI_SCAN_FREQUENCY = 15;
 async function scanDevice(device: NM.DeviceWifi): Promise<void> {
   const { lastScan } = device;
   await device.request_scan_async(null);
+  if (device.lastScan !== lastScan) return;
 
-  return new Promise(resolve => {
-    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, () => {
-      if (device.lastScan === lastScan) return GLib.SOURCE_CONTINUE;
-
+  await new Promise<void>(resolve => {
+    const settle = () => {
+      GObject.signal_handler_disconnect(device, scanned);
       resolve();
-      return GLib.SOURCE_REMOVE;
+    };
+    const scanned = device.connect('notify::last-scan', () => {
+      GLib.source_remove(givenUp);
+      settle();
     });
+    const givenUp = GLib.timeout_add_seconds_once(GLib.PRIORITY_DEFAULT, WIFI_SCAN_FREQUENCY, settle);
   });
 }
 

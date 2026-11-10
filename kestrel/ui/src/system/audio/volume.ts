@@ -157,7 +157,6 @@ class StreamSlider extends QuickSlider {
         this.notifyVolumeChange();
         this.notifyVolumeChangeId = 0;
       });
-      GLib.Source.set_name_by_id(this.notifyVolumeChangeId, '[kestrel] this._notifyVolumeChangeId');
     }
   }
 
@@ -267,7 +266,7 @@ const InputStreamSlider = GObject.registerClass(class InputStreamSlider extends 
     });
   }
 });
-export type InputStreamSlider = InstanceType<typeof InputStreamSlider>;
+type InputStreamSlider = InstanceType<typeof InputStreamSlider>;
 
 export const OutputIndicator = GObject.registerClass(class OutputIndicator extends SystemIndicator {
   private readonly indicator: St.Icon;

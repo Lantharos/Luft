@@ -15,7 +15,7 @@ const RISE = 6;
 const OPEN = { duration: 150, mode: Clutter.AnimationMode.EASE_OUT_QUAD };
 const CLOSE = { duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD };
 
-export interface FrameOptions {
+interface FrameOptions {
   kind: 'panel' | 'window';
   title: string;
   width: number;

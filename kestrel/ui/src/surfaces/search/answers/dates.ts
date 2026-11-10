@@ -11,7 +11,7 @@ export type DateSpec =
   | { kind: 'relative'; days: number }
   | { kind: 'weekday'; weekday: number; which: 'next' | 'last' | 'nearest' };
 
-export interface Template {
+interface Template {
   before: string[];
   after: string[];
   unit: Unit;

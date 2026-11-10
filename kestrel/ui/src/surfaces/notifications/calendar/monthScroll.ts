@@ -5,7 +5,7 @@ const PIXELS_PER_UNIT = 10;
 const STEPS = new Map([[Clutter.ScrollDirection.UP, -1], [Clutter.ScrollDirection.DOWN, 1]]);
 const FINISHED = Clutter.ScrollFinishFlags.VERTICAL;
 
-export interface MonthScrollTarget {
+interface MonthScrollTarget {
   follow(distance: number): void;
   release(velocity: number): void;
   step(direction: number): void;

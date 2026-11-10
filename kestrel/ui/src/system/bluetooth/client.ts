@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { BluetoothDevice, BUS_NAME, DEVICE_INTERFACE } from './device.js';
 import { Reconnector } from './reconnect.js';
 

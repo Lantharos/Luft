@@ -44,7 +44,7 @@ function focusedExtentsOnScreen(accessible: Atspi.Accessible, extents: Atspi.Rec
     if (TOPLEVEL_ROLES.has(role)) parentWindow = iter;
   }
 
-  if (app?.get_name() === 'gnome-shell') return extents;
+  if (app?.get_name() === 'kestrel') return extents;
 
   const windowActive = parentWindow?.get_state_set().contains(Atspi.StateType.ACTIVE) ?? false;
   const accessibleFocused = accessible.get_state_set().contains(Atspi.StateType.FOCUSED);

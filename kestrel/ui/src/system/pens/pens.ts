@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GUdev from 'gi://GUdev';
 
-export type PenKind = 'screen' | 'tablet';
+type PenKind = 'screen' | 'tablet';
 
 export interface Pen {
   id: string;
@@ -9,7 +9,7 @@ export interface Pen {
   kind: PenKind;
 }
 
-export interface PensState {
+interface PensState {
   pens: Pen[];
 }
 

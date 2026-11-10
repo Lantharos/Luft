@@ -5,11 +5,6 @@ import type { Box } from './box.js';
 export type Edge = 'bottom' | 'left' | 'top' | 'right';
 export type Along = 'center' | 'end';
 
-export interface Inset {
-  edge: Edge;
-  depth: number;
-}
-
 export interface Offset {
   translation_x: number;
   translation_y: number;

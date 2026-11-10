@@ -2,7 +2,6 @@ import { setConsoleLogDomain } from 'console';
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Polkit from 'gi://Polkit';
@@ -59,6 +58,3 @@ Clutter.Actor.prototype[Symbol.iterator] = function* () {
 Clutter.Actor.prototype.toString = function () {
   return St.describe_actor(this);
 };
-
-const slowdownFactor = parseFloat(GLib.getenv('KESTREL_SLOWDOWN_FACTOR') ?? '');
-if (slowdownFactor > 0) St.Settings.get().slow_down_factor = slowdownFactor;

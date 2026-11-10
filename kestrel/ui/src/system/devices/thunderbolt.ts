@@ -1,16 +1,17 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Polkit from 'gi://Polkit';
+import type Polkit from 'gi://Polkit';
 import type St from 'gi://St';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import * as Util from '../../core/runtime/util.js';
+import { ownPermission } from '../../shared/dbus/polkit.js';
 import { SystemIndicator } from '../toggles/quickSettings.js';
 
-import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
+import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 
 const BOLT_DBUS_CLIENT_IFACE = 'org.freedesktop.bolt1.Manager';
 const BOLT_DBUS_NAME = 'org.freedesktop.bolt';
@@ -37,10 +38,6 @@ interface BoltManagerRemote {
 
 type BoltDevice = Gio.DBusProxy & BoltDeviceRemote;
 type BoltManager = Gio.DBusProxy & BoltManagerRemote;
-
-type AsyncPermission = {
-  'new'(actionId: string, subject: Polkit.Subject | null, cancellable: Gio.Cancellable | null): Promise<Polkit.Permission>;
-};
 
 const BoltDeviceProxy = Gio.DBusProxy.makeProxyWrapper<BoltDeviceRemote>(loadInterfaceXML('org.freedesktop.bolt1.Device'));
 
@@ -117,14 +114,14 @@ class AuthRobot {
 
   constructor(
     private readonly client: Client,
-    private readonly shouldEnroll: (device: BoltDevice) => boolean,
+    private readonly shouldEnroll: () => boolean,
     private readonly onEnrollFailed: (error: Error) => void,
   ) {}
 
   deviceAdded(device: BoltDevice): void {
     if (device.Status !== STATUS_CONNECTED) return;
     if (!this.client.authMode.split('|').includes(AUTH_MODE_ENABLED)) return;
-    if (!this.shouldEnroll(device)) return;
+    if (!this.shouldEnroll()) return;
 
     this.devicesToEnroll.push(device);
     this.enrollDevices();
@@ -138,18 +135,16 @@ class AuthRobot {
   }
 
   private async enrollNextDevice(): Promise<void> {
-    const device = this.devicesToEnroll.shift();
-    if (device === undefined) return;
+    const device = this.devicesToEnroll.shift()!;
 
     try {
       await this.client.enrollDevice(device.Uid, POLICY_DEFAULT);
-
-      this.enrolling = this.devicesToEnroll.length > 0;
-
-      if (this.enrolling) GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => void this.enrollNextDevice());
     } catch (error) {
       this.onEnrollFailed(error as Error);
     }
+
+    this.enrolling = this.devicesToEnroll.length > 0;
+    if (this.enrolling) GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => void this.enrollNextDevice());
   }
 }
 
@@ -167,7 +162,7 @@ export const Indicator = GObject.registerClass(class Indicator extends SystemInd
     this.indicator.icon_name = 'thunderbolt-symbolic';
 
     this.client = new Client(probing => this.onProbing(probing), device => this.robot.deviceAdded(device));
-    this.robot = new AuthRobot(this.client, device => this.shouldEnroll(device),
+    this.robot = new AuthRobot(this.client, () => this.shouldEnroll(),
       error => this.notifyUser(KestrelUi.t('thunderbolt-error-title'), KestrelUi.t('thunderbolt-error-body', { reason: error.message })));
 
     this.connect('destroy', () => this.client.close());
@@ -180,7 +175,7 @@ export const Indicator = GObject.registerClass(class Indicator extends SystemInd
 
   private async createPermission(): Promise<void> {
     try {
-      this.permission = await (Polkit.Permission as unknown as AsyncPermission).new('org.freedesktop.bolt.enroll', null, null);
+      this.permission = await ownPermission('org.freedesktop.bolt.enroll');
     } catch (e) {
       log(`Failed to get PolKit permission: ${e}`);
     }
@@ -214,14 +209,10 @@ export const Indicator = GObject.registerClass(class Indicator extends SystemInd
     this.sync();
   }
 
-  private shouldEnroll(device: BoltDevice): boolean {
+  private shouldEnroll(): boolean {
     const unlocked = !Main.sessionMode.isLocked;
     const allowed = this.permission?.allowed ?? false;
-    const auth = unlocked && allowed;
-
-    log(`thunderbolt: [${device.Name}] auto enrollment: ${auth ? 'yes' : 'no'} (allowed: ${allowed ? 'yes' : 'no'})`);
-
-    if (auth) return true;
+    if (unlocked && allowed) return true;
 
     if (!unlocked) this.notifyUser(KestrelUi.t('thunderbolt-unknown-title'), KestrelUi.t('thunderbolt-unknown-body'));
     else this.notifyUser(KestrelUi.t('thunderbolt-unauthorized-title'), KestrelUi.t('thunderbolt-unauthorized-body'));

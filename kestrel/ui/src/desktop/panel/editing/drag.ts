@@ -15,7 +15,7 @@ const GHOST_OPACITY = 90;
 /** What a press picked up: a whole island by its handle, or one element out of an island. */
 export type Grip = { island: Island } | { element: string; actor: Clutter.Actor };
 
-export interface DragHost {
+interface DragHost {
   readonly panel: KestrelPanel;
   readonly targets: SpotTargets;
   readonly layer: St.Widget;

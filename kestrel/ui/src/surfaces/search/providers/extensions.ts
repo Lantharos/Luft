@@ -32,12 +32,17 @@ export class ExtensionResults {
   constructor(private readonly changed: () => void, private readonly close: () => void) {}
 
   lookUp(text: string, cancellable: Gio.Cancellable): void {
-    for (const provider of extensionProviders.items) {
-      void provider.search(text).then(results => {
-        if (cancellable.is_cancelled()) return;
-        this.found.set(provider, { text, items: results.slice(0, SHOWN).map((result, index) => this.item(provider, result, index)) });
-        this.changed();
-      });
+    for (const provider of extensionProviders.items) void this.lookUpIn(provider, text, cancellable);
+  }
+
+  private async lookUpIn(provider: ExtensionProvider, text: string, cancellable: Gio.Cancellable): Promise<void> {
+    try {
+      const results = await provider.search(text);
+      if (cancellable.is_cancelled()) return;
+      this.found.set(provider, { text, items: results.slice(0, SHOWN).map((result, index) => this.item(provider, result, index)) });
+      this.changed();
+    } catch (error) {
+      console.warn(`The search of ${provider.title} failed: ${error}`);
     }
   }
 

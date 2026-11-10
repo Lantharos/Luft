@@ -10,7 +10,7 @@ import * as GnomeSession from '../../../session/actions/gnomeSession.js';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Layout from '../../../core/stage/layout.js';
 import * as Main from '../../../core/main.js';
-import * as MessageList from './messageList.js';
+import { NotificationMessage } from '../messages/notificationMessage.js';
 
 import { bannerAllowed, heldBack, soundAllowed } from './bannerRules.js';
 import { FocusGrabber } from './focusGrabber.js';
@@ -46,7 +46,7 @@ interface PresenceRemote {
   connectSignal(name: 'StatusChanged', callback: (proxy: Gio.DBusProxy, sender: string, args: [number]) => void): number;
 }
 
-type NotificationBanner = InstanceType<typeof MessageList.NotificationMessage>;
+type NotificationBanner = InstanceType<typeof NotificationMessage>;
 
 export namespace MessageTray {
   export interface Signals extends St.Widget.SignalSignatures {
@@ -323,7 +323,6 @@ export class MessageTray extends St.Widget {
 
   private scheduleNotificationLeftTimeout(timeout: number): void {
     this.notificationLeftTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, timeout, () => this.onNotificationLeftTimeout());
-    GLib.Source.set_name_by_id(this.notificationLeftTimeoutId, '[kestrel] this._onNotificationLeftTimeout');
   }
 
   private onStatusChanged(status: number): void {
@@ -415,7 +414,7 @@ export class MessageTray extends St.Widget {
     if (!this.userActiveWhileNotificationShown)
       this.idleMonitor.add_user_active_watch(() => this.onIdleMonitorBecameActive());
 
-    const banner = this.banner = new MessageList.NotificationMessage(notification);
+    const banner = this.banner = new NotificationMessage(notification);
     banner.can_focus = false;
     banner.header.expandButton.visible = false;
     banner.add_style_class_name('notification-banner');
@@ -493,7 +492,6 @@ export class MessageTray extends St.Widget {
     }
     if (timeout <= 0) return;
     this.notificationTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, timeout, () => this.notificationTimeout());
-    GLib.Source.set_name_by_id(this.notificationTimeoutId, '[kestrel] this._notificationTimeout');
   }
 
   private notificationTimeout(): void {

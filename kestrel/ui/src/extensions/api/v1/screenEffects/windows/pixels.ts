@@ -44,8 +44,6 @@ export const WindowPixels = GObject.registerClass(class ExtensionWindowPixels ex
   }
 });
 
-export type WindowPixelsEffect = InstanceType<typeof WindowPixels>;
-
 /** Where the window's frame sits in the buffer the shader sees, which also holds its shadows, from 0 to 1. */
 export function frameUniforms(uniforms: Uniforms, window: Meta.Window): void {
   const frame = window.get_frame_rect();

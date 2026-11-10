@@ -23,7 +23,6 @@ const STARTUP_SCALE = 0.94;
 export namespace LayoutManager {
   export interface Signals extends GObject.Object.SignalSignatures {
     'startup-complete': () => void;
-    'startup-prepared': () => void;
     'first-frame': () => void;
     'monitors-changed': () => void;
     'system-modal-opened': () => void;
@@ -33,7 +32,6 @@ export namespace LayoutManager {
 export const LayoutManager = GObject.registerClass({
   Signals: {
     'startup-complete': {},
-    'startup-prepared': {},
     'first-frame': {},
     'monitors-changed': {},
     'system-modal-opened': {},
@@ -45,9 +43,7 @@ export const LayoutManager = GObject.registerClass({
 
   monitors: Monitor[] = [];
   primaryMonitor: Monitor | null = null;
-  bottomMonitor: Monitor | null = null;
   primaryIndex = -1;
-  bottomIndex = -1;
   readonly uiGroup: InstanceType<typeof UiActor>;
   readonly screenShieldGroup: St.Widget;
   readonly modalDialogGroup: St.Widget;
@@ -149,7 +145,6 @@ export const LayoutManager = GObject.registerClass({
     this.backgrounds = new MonitorBackgrounds(this, this.bgGroup);
 
     global.workspace_manager.connect('notify::n-workspaces', () => this.chrome.queueUpdateRegions());
-    global.display.connect('in-fullscreen-changed', () => this.updateFullscreen());
     global.backend.get_monitor_manager().connectObject('monitors-changed', () => this.monitorsChanged(), this);
     this.monitorsChanged();
 
@@ -270,26 +265,16 @@ export const LayoutManager = GObject.registerClass({
     for (let i = 0; i < nMonitors; i++)
       this.monitors.push(new Monitor(i, display.get_monitor_geometry(i), display.get_monitor_scale(i)));
 
-    if (nMonitors === 0) {
-      this.primaryIndex = this.bottomIndex = -1;
-    } else if (nMonitors === 1) {
-      this.primaryIndex = this.bottomIndex = 0;
-    } else {
-      this.primaryIndex = this.bottomIndex = display.get_primary_monitor();
-      for (let i = 0; i < this.monitors.length; i++) {
-        const monitor = this.monitors[i];
-        if (this.isAboveOrBelowPrimary(monitor) && monitor.y > this.monitors[this.bottomIndex].y) this.bottomIndex = i;
-      }
-    }
+    if (nMonitors === 0) this.primaryIndex = -1;
+    else if (nMonitors === 1) this.primaryIndex = 0;
+    else this.primaryIndex = display.get_primary_monitor();
 
     if (this.primaryIndex === -1) {
       this.primaryMonitor = null;
-      this.bottomMonitor = null;
       return;
     }
 
     this.primaryMonitor = this.monitors[this.primaryIndex];
-    this.bottomMonitor = this.monitors[this.bottomIndex];
     this.primaryMonitorReadyResolver?.();
   }
 
@@ -302,22 +287,10 @@ export const LayoutManager = GObject.registerClass({
     this.updateMonitors();
     if (this.primaryMonitor) this.keyboardIndex = this.primaryIndex;
     this.backgrounds.update(this.startingUp).catch(logError);
-    this.updateFullscreen();
     this.updateVisibility();
     this.chrome.queueUpdateRegions();
 
     this.emit('monitors-changed');
-  }
-
-  private isAboveOrBelowPrimary(monitor: Monitor): boolean {
-    const primary = this.monitors[this.primaryIndex];
-    const monitorLeft = monitor.x, monitorRight = monitor.x + monitor.width;
-    const primaryLeft = primary.x, primaryRight = primary.x + primary.width;
-
-    return (monitorLeft >= primaryLeft && monitorLeft < primaryRight) ||
-      (monitorRight > primaryLeft && monitorRight <= primaryRight) ||
-      (primaryLeft >= monitorLeft && primaryLeft < monitorRight) ||
-      (primaryRight > monitorLeft && primaryRight <= monitorRight);
   }
 
   private async doStartupAnimation(interfaceReady: Promise<unknown>): Promise<void> {
@@ -397,8 +370,6 @@ export const LayoutManager = GObject.registerClass({
     this.uiGroup.opacity = 0;
 
     await this.backgrounds.update(this.startingUp);
-
-    this.emit('startup-prepared');
   }
 
   private async startupAnimation(): Promise<void> {
@@ -444,13 +415,6 @@ export const LayoutManager = GObject.registerClass({
 
     global.window_group.visible = windowsVisible;
     global.top_window_group.visible = windowsVisible;
-
-    this.chrome.updateVisibility();
-  }
-
-  private updateFullscreen(): void {
-    this.updateVisibility();
-    this.chrome.queueUpdateRegions();
   }
 
   private findIndexForRect(x: number, y: number, width: number, height: number): number {

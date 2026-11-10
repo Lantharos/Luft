@@ -7,7 +7,7 @@ import { openDialog } from '../core/dialog.js';
 import { requested, SUCCESS } from '../core/request.js';
 import { labels } from './accelerators.js';
 
-export interface RequestedShortcut {
+interface RequestedShortcut {
   readonly description: string;
   readonly shortcuts: string[];
 }

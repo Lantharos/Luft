@@ -3,7 +3,7 @@ import GObject from 'gi://GObject';
 
 import * as Main from '../../main.js';
 
-export interface MonitorConstraintOptions extends Partial<Clutter.Constraint.ConstructorProps> {
+interface MonitorConstraintOptions extends Partial<Clutter.Constraint.ConstructorProps> {
   primary?: boolean;
   index?: number;
   work_area?: boolean;

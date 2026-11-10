@@ -25,7 +25,7 @@ export interface ElementActor {
  * Something an extension added to the taskbar that the taskbar's layout places, by `id`, wherever people put it: an
  * island of its own or part of another. Each taskbar that shows it asks for an actor of its own.
  */
-export interface TaskbarElementEntry {
+interface TaskbarElementEntry {
   /** `extension-id/key`, the same across restarts and versions, which arrangements are kept by. */
   readonly id: string;
   readonly label: string;

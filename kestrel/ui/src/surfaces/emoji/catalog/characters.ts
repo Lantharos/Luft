@@ -1,6 +1,6 @@
 const WORD_BASE = 0x80;
 
-export interface StoredSection {
+interface StoredSection {
   readonly title: string;
   readonly characters: string;
   readonly names: string;

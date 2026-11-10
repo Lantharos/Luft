@@ -26,6 +26,10 @@ export const commands = {
 	networkForget: (params: {
 		ssid: string,
 	}, options?: CallOptions) => invoke<null>("network_forget", params, options),
+	networkForgetApp: (params: {
+		kind: FirewallAppKind,
+		id: string,
+	}, options?: CallOptions) => invoke<null>("network_forget_app", params, options),
 	networkJoin: (params: {
 		device: string,
 		ssid: string,

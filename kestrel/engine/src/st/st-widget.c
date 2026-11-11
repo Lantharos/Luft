@@ -77,7 +77,7 @@ struct _StWidgetPrivate
   gulong texture_file_changed_id;
   guint update_child_styles_id;
 
-  int enter_count;
+  GSList *sprites_within;
 
   StKeynavFlags keynav_flags;
 
@@ -328,6 +328,8 @@ st_widget_dispose (GObject *gobject)
   g_clear_object (&priv->first_visible_child);
   g_clear_object (&priv->last_visible_child);
 
+  g_clear_slist (&priv->sprites_within, g_object_unref);
+
   G_OBJECT_CLASS (st_widget_parent_class)->dispose (gobject);
 
   g_clear_handle_id (&priv->update_child_styles_id, g_source_remove);
@@ -497,6 +499,8 @@ st_widget_unmap (ClutterActor *actor)
   CLUTTER_ACTOR_CLASS (st_widget_parent_class)->unmap (actor);
 
   st_widget_remove_transition (self);
+
+  g_clear_slist (&priv->sprites_within, g_object_unref);
 
   if (priv->track_hover && priv->hover)
     st_widget_set_hover (self, FALSE);
@@ -696,33 +700,47 @@ st_widget_peek_theme_node (StWidget *widget)
   return ST_WIDGET_PRIVATE (widget)->theme_node;
 }
 
+static ClutterActor *
+crossing_destination (ClutterEvent *event)
+{
+  if (clutter_event_type (event) == CLUTTER_ENTER)
+    return clutter_event_get_source (event);
+
+  return clutter_event_get_related (event);
+}
+
+static void
+st_widget_follow_crossing (StWidget     *widget,
+                           ClutterEvent *event)
+{
+  StWidgetPrivate *priv = st_widget_get_instance_private (widget);
+  ClutterActor *actor = CLUTTER_ACTOR (widget);
+  ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
+  ClutterStage *stage = CLUTTER_STAGE (clutter_actor_get_stage (actor));
+  ClutterSprite *sprite = clutter_backend_get_sprite (backend, stage, event);
+  ClutterActor *destination = crossing_destination (event);
+  GSList *link = g_slist_find (priv->sprites_within, sprite);
+
+  if (destination && clutter_actor_contains (actor, destination))
+    {
+      if (!link)
+        priv->sprites_within = g_slist_prepend (priv->sprites_within, g_object_ref (sprite));
+    }
+  else if (link)
+    {
+      priv->sprites_within = g_slist_delete_link (priv->sprites_within, link);
+      g_object_unref (sprite);
+    }
+
+  if (priv->track_hover)
+    st_widget_set_hover (widget, priv->sprites_within != NULL);
+}
+
 static gboolean
 st_widget_enter (ClutterActor *actor,
                  ClutterEvent *event)
 {
-  StWidgetPrivate *priv = st_widget_get_instance_private (ST_WIDGET (actor));
-
-  priv->enter_count++;
-
-  if (priv->track_hover)
-    {
-      ClutterStage *stage;
-      ClutterActor *target;
-
-      stage = CLUTTER_STAGE (clutter_actor_get_stage (actor));
-      target = clutter_stage_get_event_actor (stage, event);
-
-      if (clutter_actor_contains (actor, target))
-        st_widget_set_hover (ST_WIDGET (actor), TRUE);
-      else
-        {
-          /* The widget has a grab and is being told about an
-           * enter-event outside its hierarchy. Hopefully we already
-           * got a leave-event, but if not, handle it now.
-           */
-          st_widget_set_hover (ST_WIDGET (actor), FALSE);
-        }
-    }
+  st_widget_follow_crossing (ST_WIDGET (actor), event);
 
   if (CLUTTER_ACTOR_CLASS (st_widget_parent_class)->enter_event)
     return CLUTTER_ACTOR_CLASS (st_widget_parent_class)->enter_event (actor, event);
@@ -734,19 +752,7 @@ static gboolean
 st_widget_leave (ClutterActor *actor,
                  ClutterEvent *event)
 {
-  StWidgetPrivate *priv = st_widget_get_instance_private (ST_WIDGET (actor));
-
-  priv->enter_count--;
-
-  if (priv->track_hover)
-    {
-      ClutterActor *related;
-
-      related = clutter_event_get_related (event);
-
-      if (!related || !clutter_actor_contains (actor, related))
-        st_widget_set_hover (ST_WIDGET (actor), FALSE);
-    }
+  st_widget_follow_crossing (ST_WIDGET (actor), event);
 
   if (CLUTTER_ACTOR_CLASS (st_widget_parent_class)->leave_event)
     return CLUTTER_ACTOR_CLASS (st_widget_parent_class)->leave_event (actor, event);
@@ -1527,8 +1533,11 @@ st_widget_reactive_notify (StWidget   *widget,
 
   st_widget_update_insensitive (widget);
 
+  if (!clutter_actor_get_reactive (CLUTTER_ACTOR (widget)))
+    g_clear_slist (&priv->sprites_within, g_object_unref);
+
   if (priv->track_hover)
-    st_widget_set_hover (widget, priv->enter_count > 0);
+    st_widget_set_hover (widget, priv->sprites_within != NULL);
 }
 
 static ClutterActor *
@@ -1824,7 +1833,7 @@ st_widget_set_track_hover (StWidget *widget,
       g_object_notify_by_pspec (G_OBJECT (widget), props[PROP_TRACK_HOVER]);
 
       if (priv->track_hover)
-        st_widget_set_hover (widget, priv->enter_count > 0);
+        st_widget_set_hover (widget, priv->sprites_within != NULL);
       else
         st_widget_set_hover (widget, FALSE);
     }
@@ -1898,7 +1907,7 @@ st_widget_sync_hover (StWidget *widget)
   g_return_if_fail (ST_IS_WIDGET (widget));
 
   priv = st_widget_get_instance_private (widget);
-  st_widget_set_hover (widget, priv->enter_count > 0);
+  st_widget_set_hover (widget, priv->sprites_within != NULL);
 }
 
 /**

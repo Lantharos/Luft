@@ -11,6 +11,10 @@ let screen: Clutter.VirtualInputDevice | null = null;
 
 const touchscreen = () => (screen ??= seat.create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE));
 
+export function plugInTouchscreen() {
+  touchscreen();
+}
+
 export async function fold(tablet: boolean) {
   touchscreen().notify_tablet_mode(tablet);
   await waitUntil(() => seat.touch_mode === tablet, `touch mode turns ${tablet ? 'on' : 'off'}`);

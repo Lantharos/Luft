@@ -8,8 +8,7 @@ export interface MarkLayer {
 
 export const MARK_WIDTH = 187;
 export const MARK_HEIGHT = 197;
-export const MARK_SCALE = 0.65;
-export const PAINTED_MARK_SCALE = 0.8;
+export const MARK_SCALE = 0.52;
 
 export const MARK_LAYERS: MarkLayer[] = [
 	{

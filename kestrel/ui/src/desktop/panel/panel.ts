@@ -102,14 +102,13 @@ export class KestrelPanel {
     this.actor.add_child(this.peek.actor);
     this.actor.add_child(this.layout.glide);
     this.actor.connect('notify::allocation', taskbarShapesChanged);
-    this.actor.connect('enter-event', () => {
-      this.taskbar.holdSteady(true);
+    const followPointer = (_actor: Clutter.Actor, event: Clutter.Event) => {
+      const destination = event.type() === Clutter.EventType.ENTER ? event.get_source() : event.get_related();
+      this.taskbar.holdSteady(!!destination && this.actor.contains(destination));
       return Clutter.EVENT_PROPAGATE;
-    });
-    this.actor.connect('leave-event', (_actor, event: Clutter.Event) => {
-      if (!this.actor.contains(event.get_related())) this.taskbar.holdSteady(false);
-      return Clutter.EVENT_PROPAGATE;
-    });
+    };
+    this.actor.connect('enter-event', followPointer);
+    this.actor.connect('leave-event', followPointer);
     for (const edge of ['bottom', 'left', 'top', 'right'] as const) this.struts.set(edge, new St.Widget());
     this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest, () => this.sliders);
     this.launcher = createLauncher(actions.start, this.screen.metrics.button,

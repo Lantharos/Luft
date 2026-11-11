@@ -1510,6 +1510,70 @@ export namespace St {
     }
 
 
+    namespace FittedIcon {
+        // Signal signatures
+        interface SignalSignatures extends GObject.Object.SignalSignatures {
+            "notify::fill": (pspec: GObject.ParamSpec) => void;
+            "notify::source": (pspec: GObject.ParamSpec) => void;
+        }
+
+        // Constructor properties interface
+        interface ConstructorProps extends GObject.Object.ConstructorProps, Gio.Icon.ConstructorProps {
+            fill: number;
+            source: Gio.Icon;
+        }
+    }
+
+    class FittedIcon extends GObject.Object implements Gio.Icon {
+        static $gtype: GObject.GType<FittedIcon>;
+
+        // Properties
+        get fill(): number;
+
+        get source(): Gio.Icon;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: FittedIcon.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<FittedIcon.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof FittedIcon.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, FittedIcon.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof FittedIcon.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, FittedIcon.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof FittedIcon.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<FittedIcon.SignalSignatures[K]>): void;
+
+        equal(icon2: Gio.Icon | null): boolean;
+
+        hash(): number;
+
+        serialize(): GLib.Variant | null;
+
+        to_string(): string | null;
+
+        vfunc_equal(icon2: Gio.Icon | null): boolean;
+
+        vfunc_hash(): number;
+
+        vfunc_serialize(): GLib.Variant | null;
+
+        vfunc_to_tokens(): [boolean, string[], number];
+    }
+
+
     namespace FocusManager {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {}
@@ -4174,6 +4238,8 @@ export namespace St {
     type DrawingAreaClass = typeof DrawingArea;
 
     type EntryClass = typeof Entry;
+
+    type FittedIconClass = typeof FittedIcon;
 
     type FocusManagerClass = typeof FocusManager;
 

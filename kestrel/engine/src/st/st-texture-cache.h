@@ -30,6 +30,7 @@
 #include <gio/gio.h>
 
 #include <st/st-types.h>
+#include <st/st-fitted-icon.h>
 #include <st/st-styled-icon.h>
 #include <st/st-theme-node.h>
 #include <st/st-widget.h>

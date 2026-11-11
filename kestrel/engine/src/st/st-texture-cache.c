@@ -26,6 +26,7 @@
 #include "st-private.h"
 #include "st-settings.h"
 #include "st-icon-theme.h"
+#include "st-fitted-icon-private.h"
 #include "st-styled-icon-private.h"
 #include <math.h>
 #include <string.h>
@@ -33,6 +34,7 @@
 
 #define CACHE_PREFIX_ICON "icon:"
 #define CACHE_PREFIX_STYLED_ICON CACHE_PREFIX_ICON "styled:"
+#define CACHE_PREFIX_FITTED_ICON CACHE_PREFIX_ICON "fitted:"
 #define CACHE_PREFIX_FILE "file:"
 #define CACHE_PREFIX_FILE_FOR_CAIRO "file-for-cairo:"
 
@@ -55,6 +57,7 @@ typedef struct {
   StIconInfo *icon_info;
   StIconColors *colors;
   StStyledIcon *styled;
+  StFittedIcon *fitted;
   gboolean glyph;
   GFile *file;
   CoglContext *cogl_context;
@@ -110,6 +113,7 @@ texture_load_data_free (gpointer p)
   g_clear_object (&data->icon_info);
   g_clear_pointer (&data->colors, st_icon_colors_unref);
   g_clear_object (&data->styled);
+  g_clear_object (&data->fitted);
   g_clear_object (&data->file);
   g_clear_pointer (&data->key, g_free);
 
@@ -832,6 +836,17 @@ on_styled_icon_loaded (GObject      *source,
 }
 
 static void
+on_fitted_icon_loaded (GObject      *source,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  GdkPixbuf *pixbuf;
+  pixbuf = _st_fitted_icon_render_finish (result, NULL);
+  finish_texture_load (user_data, pixbuf);
+  g_clear_object (&pixbuf);
+}
+
+static void
 on_pixbuf_loaded (GObject      *source,
                   GAsyncResult *result,
                   gpointer      user_data)
@@ -893,6 +908,16 @@ load_texture_async (StTextureCache       *cache,
                                     lookup_size * lookup_scale,
                                     data->paint_scale * data->resource_scale,
                                     NULL, cache->cancellable, on_styled_icon_loaded, data);
+    }
+  else if (data->fitted)
+    {
+      int lookup_size, lookup_scale;
+
+      icon_lookup_size (data->width, data->paint_scale, data->resource_scale,
+                        &lookup_size, &lookup_scale);
+      _st_fitted_icon_render_async (data->fitted, cache, data->icon_info,
+                                    lookup_size * lookup_scale,
+                                    cache->cancellable, on_fitted_icon_loaded, data);
     }
   else if (data->icon_info)
     {
@@ -1060,6 +1085,56 @@ load_styled_icon (StTextureCache *cache,
   return actor;
 }
 
+static ClutterActor *
+load_fitted_icon (StTextureCache *cache,
+                  StFittedIcon   *icon,
+                  int             size,
+                  int             paint_scale,
+                  float           resource_scale)
+{
+  AsyncTextureLoadData *request;
+  ClutterActor *actor = create_invisible_actor ();
+  int lookup_size, lookup_scale;
+  g_autofree char *icon_string = g_icon_to_string (G_ICON (icon));
+  g_autofree char *key = NULL;
+  StTextureCachePolicy policy = icon_string ? ST_TEXTURE_CACHE_POLICY_FOREVER
+                                            : ST_TEXTURE_CACHE_POLICY_NONE;
+
+  icon_lookup_size (size, paint_scale, resource_scale, &lookup_size, &lookup_scale);
+  key = g_strdup_printf (CACHE_PREFIX_FITTED_ICON "%s,size=%d,pixels=%d,scale=%d",
+                         icon_string ? icon_string : "", size, lookup_size, lookup_scale);
+  clutter_actor_set_content_gravity (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
+  clutter_actor_set_size (actor, size * paint_scale, size * paint_scale);
+  if (!ensure_request (cache, key, policy, &request, actor))
+    {
+      ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
+      StIconInfo *info = _st_fitted_icon_lookup (icon, cache->icon_theme,
+                                                 lookup_size * lookup_scale);
+
+      if (info == NULL)
+        {
+          g_hash_table_remove (cache->outstanding_requests, key);
+          texture_load_data_free (request);
+          g_object_unref (actor);
+          return NULL;
+        }
+
+      request->cache = cache;
+      request->key = g_steal_pointer (&key);
+      request->policy = policy;
+      request->icon_info = info;
+      request->fitted = g_object_ref (icon);
+      request->width = request->height = size;
+      request->paint_scale = paint_scale;
+      request->resource_scale = resource_scale;
+      request->cogl_context = clutter_backend_get_cogl_context (backend);
+
+      load_texture_async (cache, request);
+    }
+
+  return actor;
+}
+
 /**
  * st_texture_cache_load_gicon:
  * @cache: A #StTextureCache
@@ -1100,6 +1175,9 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
 
   if (ST_IS_STYLED_ICON (icon))
     return load_styled_icon (cache, ST_STYLED_ICON (icon), size, paint_scale, resource_scale);
+
+  if (ST_IS_FITTED_ICON (icon))
+    return load_fitted_icon (cache, ST_FITTED_ICON (icon), size, paint_scale, resource_scale);
 
   if (ST_IS_IMAGE_CONTENT (icon))
     {

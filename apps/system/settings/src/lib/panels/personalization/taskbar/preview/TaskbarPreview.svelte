@@ -40,10 +40,10 @@
 
 	let { wallpaper, apps, arrangement, look, style, size, autoHide, shown, present, label, onarrange }: Props = $props();
 
-	const METRICS: Record<Size, { height: number; button: number; icon: number }> = {
-		compact: { height: 26, button: 22, icon: 14 },
-		normal: { height: 31, button: 26, icon: 18 },
-		large: { height: 36, button: 31, icon: 22 }
+	const METRICS: Record<Size, { height: number; button: number; icon: number; plate: number }> = {
+		compact: { height: 26, button: 22, icon: 14, plate: 14 },
+		normal: { height: 31, button: 26, icon: 16, plate: 18 },
+		large: { height: 36, button: 31, icon: 20, plate: 22 }
 	};
 	const SCALE = 0.65;
 	const FLOATING_MARGIN = 8;
@@ -241,7 +241,7 @@
 						onpointerdown={(event) => arranging.press(event, { element }, boxIn(event.currentTarget))}
 						onkeydown={(event) => arranging.key(event, { element })}
 					>
-						<PreviewElement id={element} {vertical} {apps} button={metrics.button} icon={metrics.icon} mark={paint?.mark} />
+						<PreviewElement id={element} {vertical} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} mark={paint?.mark} />
 					</button>
 				{/each}
 				<button
@@ -259,7 +259,7 @@
 	{#if arranging.grip && 'element' in arranging.grip}
 		{@const element = arranging.grip.element}
 		<div class="carried island separate" style:left="{arranging.pointer.x - arranging.offset.x}px" style:top="{arranging.pointer.y - arranging.offset.y}px">
-			<PreviewElement id={element} vertical={false} {apps} button={metrics.button} icon={metrics.icon} mark={paint?.mark} />
+			<PreviewElement id={element} vertical={false} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} mark={paint?.mark} />
 		</div>
 	{/if}
 

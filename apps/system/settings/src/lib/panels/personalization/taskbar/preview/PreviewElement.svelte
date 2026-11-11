@@ -3,7 +3,7 @@
 	import Puzzle from '@lucide/svelte/icons/puzzle';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
-	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE } from '@luft/ui';
+	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH } from '@luft/ui';
 	import type { App } from '#lib/bindings.js';
 	import PreviewClock from './PreviewClock.svelte';
 
@@ -13,17 +13,18 @@
 		apps: App[];
 		button: number;
 		icon: number;
+		plate: number;
 		mark: { shade: string; ink: string } | undefined;
 	}
 
-	let { id, vertical, apps, button, icon, mark }: Props = $props();
+	let { id, vertical, apps, button, icon, plate, mark }: Props = $props();
 
 	const RUNNING = 2;
 	const VERTICAL_APPS = 3;
 	let markSize = $derived(Math.round(button * MARK_SCALE));
-	let markIcon = $derived(Math.round(markSize * ((appearance.appIcons?.style ?? 'default') === 'default' ? 1 : PAINTED_MARK_SCALE)));
+	let appIcon = $derived((appearance.appIcons?.style ?? 'default') === 'default' ? icon : plate);
 	let shownApps = $derived(vertical ? apps.slice(0, VERTICAL_APPS) : apps);
-	let small = $derived(icon * 0.62);
+	let small = $derived(plate * 0.62);
 </script>
 
 <span class="element" class:vertical style:--button="{button}px">
@@ -31,7 +32,7 @@
 		<span class="slot">
 			<span class="mark" style:width="{markSize}px" style:height="{markSize}px">
 				{#each MARK_LAYERS as layer, index (index)}
-					<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={markIcon} height={markIcon} class:halo={layer.halo} fill={mark?.[layer.fill]}>
+					<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={markSize} height={markSize} class:halo={layer.halo} fill={mark?.[layer.fill]}>
 						<path d={layer.path} />
 					</svg>
 				{/each}
@@ -40,7 +41,7 @@
 	{:else if id === 'dock'}
 		{#each shownApps as app, index (app.id)}
 			<span class="slot" class:focused={index === 0}>
-				<span class="icon"><AppIcon icon={app.icon} id={app.id} size={icon} /></span>
+				<span class="icon"><AppIcon icon={app.icon} id={app.id} size={appIcon} /></span>
 				{#if index < RUNNING}
 					<span class="dot"></span>
 				{/if}

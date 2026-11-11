@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { MARK_LAYERS, MARK_SCALE, markLayerSvg, PAINTED_MARK_SCALE, type MarkFills, type MarkLayer } from '../../../../../../packages/web/ui/src/taskbar/mark';
+import { MARK_LAYERS, MARK_SCALE, markLayerSvg, type MarkFills, type MarkLayer } from '../../../../../../packages/web/ui/src/taskbar/mark';
 import { markFills } from './shade.js';
 import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
@@ -50,7 +50,6 @@ function markPaint(button: St.Button, surface: () => St.Widget, backdropOf: Back
 
 function animatedMark(button: St.Button, surface: () => St.Widget, backdropOf: BackdropOf): [St.Widget, (size: number) => void] {
   const mark = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-  let size = 0;
   const icons = MARK_LAYERS.map(({ direction, pivot: [pivotX, pivotY], halo }) => {
     const icon = new St.Icon({ style: halo ? null : 'icon-shadow: none;' });
     icon.set_pivot_point(pivotX, pivotY);
@@ -72,10 +71,7 @@ function animatedMark(button: St.Button, surface: () => St.Widget, backdropOf: B
   let painted: MarkFills | null = null;
   const paint = () => {
     const fills = painted = current();
-    MARK_LAYERS.forEach((layer, index) => {
-      icons[index].icon_size = Math.round(size * (appIcons.taskbarPaint ? PAINTED_MARK_SCALE : 1));
-      icons[index].gicon = svgIcon(layer, fills[layer.fill]);
-    });
+    MARK_LAYERS.forEach((layer, index) => { icons[index].gicon = svgIcon(layer, fills[layer.fill]); });
   };
   const repaint = () => {
     if (current() !== painted) paint();
@@ -84,9 +80,9 @@ function animatedMark(button: St.Button, surface: () => St.Widget, backdropOf: B
   mark.connect('destroy', () => unwatch.forEach(stop => stop()));
   button.connect('style-changed', repaint);
   if (backdropOf !== wholeFloor) button.connect('notify::allocation', repaint);
-  return [mark, markSize => {
-    size = markSize;
+  return [mark, size => {
     mark.set_size(size, size);
+    for (const icon of icons) icon.icon_size = size;
     paint();
   }];
 }

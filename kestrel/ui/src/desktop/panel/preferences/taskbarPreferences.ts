@@ -17,18 +17,20 @@ export interface TaskbarMetrics {
   thickness: number;
   button: number;
   icon: number;
+  artwork: number;
+  plate: number;
   margin: number;
   radius: number;
   inset: number;
   gap: number;
 }
 
-const SIZES: Record<TaskbarSize, { thickness: number; button: number; icon: number; buttonRadius: number }> = {
-  compact: { thickness: 40, button: 34, icon: 22, buttonRadius: 10 },
-  normal: { thickness: 48, button: 40, icon: 28, buttonRadius: 12 },
-  large: { thickness: 56, button: 48, icon: 34, buttonRadius: 14 },
+const SIZES: Record<TaskbarSize, { thickness: number; button: number; icon: number; artwork: number; plate: number; buttonRadius: number }> = {
+  compact: { thickness: 40, button: 34, icon: 26, artwork: 21, plate: 22, buttonRadius: 10 },
+  normal: { thickness: 48, button: 40, icon: 28, artwork: 25, plate: 28, buttonRadius: 12 },
+  large: { thickness: 56, button: 48, icon: 32, artwork: 30, plate: 34, buttonRadius: 14 },
 };
-const TOUCH = { thickness: 64, button: 52, icon: 36 };
+const TOUCH = { thickness: 64, button: 52, icon: 36, artwork: 32, plate: 36 };
 const FLOATING_MARGIN = 8;
 const BAR_INSET = 4;
 const TOUCH_INSET = 12;

@@ -39,7 +39,7 @@ export function styledIcon(app: IconApp, paint: Paint, square = false): St.Style
 class AppIcons {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly bound = new Map<St.Icon, IconApp>();
-  private readonly onTaskbar = new Set<St.Icon>();
+  private readonly taskbarFills = new Map<St.Icon, number>();
   private readonly hidden = new Set<St.Icon>();
   private readonly listeners = new Set<() => void>();
   private accent: { seed: Seed; dark: boolean; taskbarDark: boolean } | null = null;
@@ -76,23 +76,30 @@ class AppIcons {
     return this.style === 'default' ? null : this.taskbarPaints?.[this.style] ?? null;
   }
 
-  gicon(app: IconApp, paint = this.paint): Gio.Icon {
-    return paint ? styledIcon(app, paint, this.square) : sourceIcon(app);
+  gicon(app: IconApp, paint = this.paint, fill = 1): Gio.Icon {
+    return paint ? styledIcon(app, paint, this.square) : new St.FittedIcon({ source: sourceIcon(app), fill });
   }
 
   private iconOf(icon: St.Icon): Gio.Icon {
-    return this.gicon(this.bound.get(icon)!, this.onTaskbar.has(icon) ? this.taskbarPaint : this.paint);
+    const fill = this.taskbarFills.get(icon);
+    return this.gicon(this.bound.get(icon)!, fill === undefined ? this.paint : this.taskbarPaint, fill);
   }
 
-  bind(icon: St.Icon, app: IconApp, taskbar = false): void {
+  fit(icon: St.Icon, fill: number): void {
+    if (this.taskbarFills.get(icon) === fill) return;
+    this.taskbarFills.set(icon, fill);
+    icon.gicon = this.iconOf(icon);
+  }
+
+  bind(icon: St.Icon, app: IconApp, fill?: number): void {
     this.bound.set(icon, app);
-    if (taskbar) this.onTaskbar.add(icon);
+    if (fill !== undefined) this.taskbarFills.set(icon, fill);
     icon.gicon = this.iconOf(icon);
     if (this.paint && !icon.mapped) this.restyleHidden(icon);
     const iconChanged = app instanceof Shell.App ? app.connect('notify::icon', () => { icon.gicon = this.iconOf(icon); }) : 0;
     icon.connect('destroy', () => {
       this.bound.delete(icon);
-      this.onTaskbar.delete(icon);
+      this.taskbarFills.delete(icon);
       this.hidden.delete(icon);
       if (iconChanged) (app as Shell.App).disconnect(iconChanged);
     });
@@ -145,9 +152,9 @@ export function appIcon(app: IconApp, size: number, params: Partial<St.Icon.Cons
   return icon;
 }
 
-export function taskbarAppIcon(app: IconApp, size: number): St.Icon {
+export function taskbarAppIcon(app: IconApp, size: number, fill: number): St.Icon {
   const icon = new St.Icon({ icon_size: size, fallback_icon_name: 'application-x-executable' });
-  appIcons.bind(icon, app, true);
+  appIcons.bind(icon, app, fill);
   return icon;
 }
 
@@ -156,5 +163,5 @@ export function sourceApp(source: { policy?: { id?: string } }): Shell.App | nul
 }
 
 export function windowIcon(app: Shell.App, window: Meta.Window, size: number): Clutter.Actor {
-  return appIcons.style === 'default' ? app.create_window_icon_texture(window, size) : appIcon(app, size);
+  return appIcons.style === 'default' && app.is_window_backed() ? app.create_window_icon_texture(window, size) : appIcon(app, size);
 }

@@ -23,8 +23,10 @@ export class StartGrid {
   private readonly results: SearchResults;
   private readonly resultsBox = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true, visible: false });
   private catalogDirty = false;
+  private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
   private apps = new Map<string, Gio.AppInfo>();
+  private pinned = new Set<string>();
   private searchView: SearchView | null = null;
   private folder: string | null = null;
   private headerKey: string | null = null;
@@ -44,10 +46,17 @@ export class StartGrid {
   }
 
   update(apps: Gio.AppInfo[]): void {
+    if (apps === this.catalog) return;
+    this.catalog = apps;
     const named = apps.map(app => ({ app, name: appName(app) })).sort((a, b) => a.name.localeCompare(b.name));
     this.apps = new Map(named.map(({ app }) => [app.get_id()!, app]));
     this.layout.sync([...this.apps.keys()]);
     this.catalogDirty = true;
+    if (!this.drag.active) this.render();
+  }
+
+  setPinned(pinned: Set<string>): void {
+    this.pinned = pinned;
     if (!this.drag.active) this.render();
   }
 
@@ -87,7 +96,7 @@ export class StartGrid {
 
   private visible(id: string): boolean {
     const folder = this.layout.folder(id);
-    return folder ? folder.apps.some(app => this.apps.has(app)) : this.apps.has(id);
+    return folder ? folder.apps.some(app => this.apps.has(app) && !this.pinned.has(app)) : this.apps.has(id) && !this.pinned.has(id);
   }
 
   private render(animate = false, reorder = false): void {

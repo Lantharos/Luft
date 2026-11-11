@@ -8,7 +8,7 @@ import type { WindowPreviews } from '../windowPreviews.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
-import { taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
+import { appIcons, taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Curve, Duration, liftIcon } from '../../../shared/motion/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
@@ -61,6 +61,7 @@ export class Taskbar {
     this.disconnectors.push(
       () => signals.forEach(id => display.disconnect(id)),
       launcherEntries.watch(appId => { const item = this.items.get(appId); if (item) this.updateIndicator(item); }),
+      appIcons.watch(() => { for (const item of this.items.values()) this.placeIcon(item); }),
     );
   }
 
@@ -106,19 +107,34 @@ export class Taskbar {
     return this.metrics.button + this.metrics.gap;
   }
 
-  private layoutItem(item: AppItem): void {
-    const { button, icon, gap } = this.metrics;
-    const vertical = this.vertical;
+  private get iconSize(): number {
+    return appIcons.style === 'default' ? this.metrics.icon : this.metrics.plate;
+  }
+
+  private get artworkFill(): number {
+    return this.metrics.artwork / this.metrics.icon;
+  }
+
+  private placeIcon(item: AppItem): void {
+    const { button } = this.metrics;
+    const icon = this.iconSize;
     const nudge = -outward(this.edge);
     const centered = (button - icon) / 2;
+    item.icon.set_size(icon, icon);
+    if (this.vertical) item.icon.set_position(Math.round(centered) + nudge, centered);
+    else item.icon.set_position(centered, Math.round(centered) + nudge);
+    (item.icon.child as St.Icon).icon_size = icon;
+    appIcons.fit(item.icon.child as St.Icon, this.artworkFill);
+  }
+
+  private layoutItem(item: AppItem): void {
+    const { button, gap } = this.metrics;
+    const vertical = this.vertical;
     item.slot[vertical ? 'width' : 'height'] = button;
     item.button.set_position(vertical ? 0 : Math.floor(gap / 2), vertical ? Math.floor(gap / 2) : 0);
     item.button.set_size(button, button);
     item.button.child.set_size(button, button);
-    item.icon.set_size(icon, icon);
-    if (vertical) item.icon.set_position(Math.round(centered) + nudge, centered);
-    else item.icon.set_position(centered, Math.round(centered) + nudge);
-    (item.icon.child as St.Icon).icon_size = icon;
+    this.placeIcon(item);
     const dotOffset = outward(this.edge) > 0 ? button - DOT_SIZE : 0;
     for (const dot of item.dots) {
       if (vertical) dot.set({ x: dotOffset, width: DOT_SIZE });
@@ -187,7 +203,7 @@ export class Taskbar {
         const currentItem = item;
         item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(currentItem));
         item.icon.child.destroy();
-        item.icon.child = taskbarAppIcon(app, this.metrics.icon);
+        item.icon.child = taskbarAppIcon(app, this.iconSize, this.artworkFill);
       }
       item.button.accessible_name = app.get_name();
       item.draggable.enabled = pinned.has(app.id);
@@ -228,7 +244,7 @@ export class Taskbar {
     (item.button as St.Button & { _delegate: object })._delegate = {
       get id() { return item.app.id; },
       folder: false,
-      getDragActor: () => taskbarAppIcon(item.app, this.metrics.icon),
+      getDragActor: () => taskbarAppIcon(item.app, this.iconSize, this.artworkFill),
       getDragActorSource: () => item.icon,
     };
     const draggable = DND.makeDraggable(item.button, { dragActorOpacity: 220 });
@@ -275,7 +291,7 @@ export class Taskbar {
   }
 
   private create(app: Shell.App): AppItem {
-    const icon = new St.Bin({ child: taskbarAppIcon(app, this.metrics.icon) });
+    const icon = new St.Bin({ child: taskbarAppIcon(app, this.iconSize, this.artworkFill) });
     const content = new St.Widget();
     content.add_child(icon);
     const dots = Array.from({ length: 4 }, () => {

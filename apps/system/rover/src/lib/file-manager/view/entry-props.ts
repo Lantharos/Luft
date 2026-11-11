@@ -37,11 +37,12 @@ export function entryProps(entry: FileEntry, { manager, drag, view, chooser }: E
 	if (entry.path === DRAFT_PATH) return {};
 	const key = entry.isDir ? dropKey('entry', entry.path) : undefined;
 	const blocked = (event: Event) => event.preventDefault();
+	const renaming = manager.draft?.mode === 'rename' && manager.draft.targetPath === entry.path;
 	return {
 		role: 'option',
 		'aria-selected': manager.selection.has(entry.path),
 		'data-entry-path': entry.path,
-		draggable: !chooser,
+		draggable: !chooser && !renaming,
 		onclick: (event: MouseEvent) => select(entry, event),
 		ondblclick: () => (chooser ? chooser.open(entry) : manager.openEntry(entry)),
 		onauxclick: (event: MouseEvent) => {

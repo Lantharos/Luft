@@ -13,6 +13,10 @@ case ":$XDG_DATA_DIRS:" in
   *:@datadir@:*) ;;
   *) XDG_DATA_DIRS="@datadir@:$XDG_DATA_DIRS" ;;
 esac
+case ":$XDG_DATA_DIRS:" in
+  *:/run/luft-system-packages/share:*) ;;
+  *) XDG_DATA_DIRS="$XDG_DATA_DIRS:/run/luft-system-packages/share" ;;
+esac
 export XDG_DATA_DIRS
 export IBUS_DAEMON_ARGS="--panel disable"
 export QT_WAYLAND_RECONNECT=1 QT_QPA_PLATFORMTHEME=gnome

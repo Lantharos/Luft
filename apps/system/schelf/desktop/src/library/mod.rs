@@ -2,6 +2,7 @@ mod appimages;
 mod debian;
 mod flatpaks;
 pub mod full_access;
+mod opening;
 mod settings;
 pub mod sources;
 mod store;
@@ -51,12 +52,6 @@ pub struct InstalledApp {
 }
 
 #[derive(Deserialize, Type)]
-struct Desktop {
-    desktop: String,
-    token: Option<String>,
-}
-
-#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct FlatpakRef {
     installation: Installation,
@@ -86,10 +81,6 @@ pub fn installed() -> Vec<InstalledApp> {
     apps
 }
 
-fn launch(Desktop { desktop, token }: Desktop) -> Result<(), String> {
-    launch_desktop(&desktop, token.as_deref())
-}
-
 fn launch_desktop(desktop: &str, token: Option<&str>) -> Result<(), String> {
     let info =
         gio_unix::DesktopAppInfo::new(desktop).ok_or("That app isn't installed any more.")?;
@@ -108,7 +99,7 @@ fn permissions(
 pub fn register(window: SabineWindow) -> SabineWindow {
     sources::register(window)
         .command("library_installed", |Empty {}| Ok(installed()))
-        .command("library_launch", launch)
+        .command_async("library_open", opening::open)
         .command("library_permissions", permissions)
         .command_async("library_sandbox", appimages::sandbox)
         .command_async("library_set_sandbox_switch", appimages::set_switch)

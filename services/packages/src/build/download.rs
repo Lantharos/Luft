@@ -7,7 +7,7 @@ use anyhow::{Context, Result, anyhow};
 use serde::Deserialize;
 
 use super::DNF_CACHE;
-use crate::command::failure;
+use crate::command::{failure, run};
 use crate::repositories::{self, FOLDER, KEYS};
 use crate::state::manifest::Origin;
 use crate::state::requested::Requested;
@@ -119,6 +119,24 @@ fn resolve(command: &mut Command) -> Result<()> {
     }
 }
 
+/// Puts a package file installed by itself where the stored transaction names it, since dnf
+/// only stores what it downloads.
+fn store_file(sources: &Sources, at: &Path) -> Result<()> {
+    if at.exists() {
+        return Ok(());
+    }
+    let kept = sources
+        .files
+        .values()
+        .find(|file| file.file_name() == at.file_name())
+        .with_context(|| format!("The package file for {} is missing", at.display()))?;
+    if let Some(folder) = at.parent() {
+        fs::create_dir_all(folder)?;
+    }
+    fs::copy(kept, at).context("Copying the package file")?;
+    Ok(())
+}
+
 /// Downloads the packages in `requested` and what they need into `store`, resolved against the
 /// build root's own packages, and says where each came from. Packages kept from earlier builds
 /// aren't downloaded again; rpm checks them like any other when it installs them.
@@ -147,7 +165,7 @@ pub fn download(
                 inside(root, FOLDER).display()
             ))
             .args([
-                "--setopt=install_weak_deps=False",
+                "--setopt=install_weak_deps=True",
                 "--setopt=countme=False",
                 "--assumeyes",
                 "--quiet",
@@ -177,11 +195,35 @@ pub fn download(
         } else {
             Origin::Fedora
         };
-        if origin != Origin::File {
+        if origin == Origin::File {
+            store_file(sources, &path)?;
+        } else {
             downloads.push((repository, path.clone()));
         }
         origins.insert(path, origin);
     }
     keep(&downloads)?;
     Ok(origins)
+}
+
+/// The package in Fedora or the added sources that provides `capability`, such as a library's
+/// `libfoo.so.1()(64bit)` or `perl(Foo::Bar)`, from the metadata the last build downloaded.
+pub fn provider(capability: &str) -> Result<Option<String>> {
+    let output = run(Command::new("dnf")
+        .arg(format!("--setopt=cachedir={DNF_CACHE}"))
+        .arg(format!("--setopt=reposdir={FEDORA},{FOLDER}"))
+        .args([
+            "--cacheonly",
+            "--quiet",
+            "repoquery",
+            "--latest-limit=1",
+            "--queryformat=%{name}\\n",
+            "--whatprovides",
+        ])
+        .arg(capability))?;
+    Ok(String::from_utf8_lossy(&output)
+        .lines()
+        .map(str::trim)
+        .find(|name| !name.is_empty())
+        .map(str::to_owned))
 }

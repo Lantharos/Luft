@@ -1,3 +1,4 @@
+mod exports;
 pub mod request;
 mod selinux;
 mod system;
@@ -57,7 +58,9 @@ fn bring_in(digest: &str) -> Result<()> {
 /// noted, so removing them again finishes the job.
 fn take_away(old: Option<&Build>) -> Result<()> {
     let stopped = units::stop_leaving(old, None);
-    let unlinked = system::link(None).and_then(|()| system::refresh());
+    let unlinked = system::link(None)
+        .and_then(|()| system::refresh())
+        .and_then(|()| exports::export(None));
     let cleared = state::footprint().and_then(|mut footprint| {
         let cleared = footprint.clear(&Declared::default());
         state::save_footprint(&footprint)?;
@@ -84,6 +87,7 @@ fn apply(
     system::link(Some(&folder(digest, "")))?;
     system::refresh()?;
     system::settle(build)?;
+    exports::export(Some(build))?;
     system::create_tmpfiles(build)?;
     if removes(old, build) {
         footprint.clear(&build.declared)?;
@@ -107,7 +111,9 @@ fn restore(
     before: &Footprint,
 ) -> Result<()> {
     let stopped = units::stop_leaving(Some(build), old);
-    let relinked = relink(digest, old).and_then(|()| system::refresh());
+    let relinked = relink(digest, old)
+        .and_then(|()| system::refresh())
+        .and_then(|()| exports::export(old));
     let cleared = footprint
         .clear(&before.with(old.map(|old| &old.declared)))
         .and_then(|()| state::save_footprint(footprint));
@@ -151,5 +157,6 @@ pub fn settle() -> Result<()> {
     footprint.note(&build.declared);
     state::save_footprint(&footprint)?;
     system::settle(&build)?;
+    exports::export(Some(&build))?;
     units::queue_enabled(&build)
 }

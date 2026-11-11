@@ -23,6 +23,7 @@ use crate::state::manifest::{Build, Package};
 use crate::state::requested::Requested;
 use crate::state::sources::Sources;
 use crate::state::{self, NAME, deployment};
+pub use download::provider;
 use stage::Layout;
 
 pub const CACHE: &str = "/var/cache/luft/system-packages";

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, WindowControls } from '@luft/ui';
+	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import AppPage from '#lib/pages/app/AppPage.svelte';
 	import Browse from '#lib/pages/browse/Browse.svelte';
@@ -13,6 +14,7 @@
 	import Updates from '#lib/pages/updates/Updates.svelte';
 	import { start } from '#lib/state/app.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { opening } from '#lib/state/opening.svelte.js';
 	import { title } from '#lib/state/titles.js';
 
 	let ready = $state(false);
@@ -73,3 +75,7 @@
 		</div>
 	</main>
 </GlassShell>
+
+{#if opening.failed}
+	<OpenFailedDialog failed={opening.failed} />
+{/if}

@@ -101,6 +101,18 @@ pub async fn list() -> Result<SystemPackages, String> {
     serde_json::from_str(&text).map_err(failed)
 }
 
+/// The package in Fedora or the added sources that provides `capability`, such as
+/// `libfoo.so.1()(64bit)` or `perl(Foo::Bar)`.
+pub async fn provider(capability: &str) -> Result<Option<String>, String> {
+    let package: String = PACKAGES
+        .proxy()
+        .await?
+        .call("Provider", &(capability,))
+        .await
+        .map_err(|error| dbus::explain(&error))?;
+    Ok(Some(package).filter(|package| !package.is_empty()))
+}
+
 fn stage(step: &str, method: &str) -> Stage {
     match (step, method) {
         ("downloading", _) => Stage::Downloading,

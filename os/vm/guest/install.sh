@@ -52,7 +52,9 @@ finish_setup() {
   cat /run/shadow >"$root/etc/shadow"
   mkdir -p "$root/etc/systemd/system/getty.target.wants"
   ln -sf /usr/lib/systemd/system/serial-getty@.service "$root/etc/systemd/system/getty.target.wants/serial-getty@ttyS0.service"
-  setfiles -r "$root" "$root/etc/selinux/targeted/contexts/files/file_contexts" "$root/etc/systemd/system/getty.target.wants"
+  install -Dm644 /run/luft-source/serial-console.conf "$root/etc/systemd/system/serial-getty@ttyS0.service.d/luft-vm.conf"
+  setfiles -r "$root" "$root/etc/selinux/targeted/contexts/files/file_contexts" \
+    "$root/etc/systemd/system/getty.target.wants" "$root/etc/systemd/system/serial-getty@ttyS0.service.d"
   umount /run/target
   report "setup is finished and root can sign in on the serial console"
 }

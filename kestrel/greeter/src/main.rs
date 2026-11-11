@@ -17,6 +17,7 @@ use std::time::Duration;
 use idle::Idle;
 use options::Options;
 use service::Greeter;
+use store::Store;
 use system::greetd::Greetd;
 
 const NAME: &str = "com.lantharos.Greeter1";
@@ -38,6 +39,9 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    if options.developer_tools_on {
+        return developer_tools_on(&options);
+    }
     if let Some(path) = &options.write_greetd_config {
         return write_greetd_config(&options, path);
     }
@@ -57,6 +61,17 @@ fn write_greetd_config(options: &Options, path: &Path) -> ExitCode {
             eprintln!("Couldn't write {}: {error}", path.display());
             ExitCode::FAILURE
         }
+    }
+}
+
+fn developer_tools_on(options: &Options) -> ExitCode {
+    if Store::new(options.state_dir.clone())
+        .config()
+        .developer_tools
+    {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::FAILURE
     }
 }
 

@@ -4,6 +4,7 @@ pub struct Options {
     pub unprivileged: bool,
     pub state_dir: PathBuf,
     pub write_greetd_config: Option<PathBuf>,
+    pub developer_tools_on: bool,
 }
 
 impl Options {
@@ -12,10 +13,12 @@ impl Options {
             unprivileged: false,
             state_dir: PathBuf::from("/var/lib/kestrel-greeter"),
             write_greetd_config: None,
+            developer_tools_on: false,
         };
         while let Some(arg) = args.next() {
             match arg.as_str() {
                 "--unprivileged" => options.unprivileged = true,
+                "--developer-tools-on" => options.developer_tools_on = true,
                 "--state-dir" => options.state_dir = path_after(&arg, args.next())?,
                 "--write-greetd-config" => {
                     options.write_greetd_config = Some(path_after(&arg, args.next())?)

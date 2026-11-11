@@ -26,7 +26,7 @@
   </action>
   <action id="com.lantharos.greeter.developer-tools">
     <description>Turn developer tools on or off</description>
-    <message>Developer tools let programs see and control your windows. Authentication is required to turn them on or off</message>
+    <message>Developer tools let programs see and control your windows, and open text consoles. Authentication is required to turn them on or off</message>
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>

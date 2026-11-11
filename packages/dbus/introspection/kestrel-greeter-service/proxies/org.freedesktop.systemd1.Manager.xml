@@ -1,0 +1,14 @@
+<node>
+  <interface name="org.freedesktop.systemd1.Manager">
+    <method name="ListUnitsByPatterns">
+      <arg type="as" direction="in"/>
+      <arg type="as" direction="in"/>
+      <arg type="a(ssssssouso)" direction="out"/>
+    </method>
+    <method name="StopUnit">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

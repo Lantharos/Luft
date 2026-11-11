@@ -17,7 +17,7 @@ use crate::options::Options;
 use crate::store::{self, Config, Focus, SignInMethod, Store, Style, StyleChoice};
 use crate::system::greetd::{Greetd, InitialSession};
 use crate::system::sessions::{self, Session};
-use crate::system::{accounts, users};
+use crate::system::{accounts, consoles, users};
 use crate::wallpaper;
 
 pub struct Greeter {
@@ -341,7 +341,11 @@ impl Greeter {
             .await?;
         self.change_config(|config| config.developer_tools = on)
             .await?;
-        Ok(self.developer_tools_changed(&emitter).await?)
+        self.developer_tools_changed(&emitter).await?;
+        if !on {
+            consoles::close(connection).await?;
+        }
+        Ok(())
     }
 
     async fn set_show_users(

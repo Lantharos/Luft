@@ -38,7 +38,7 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=
+CapabilityBoundingSet=CAP_SYS_PTRACE
 
 [Install]
 WantedBy=multi-user.target

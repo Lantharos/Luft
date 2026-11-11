@@ -10,6 +10,7 @@ use zbus::names::BusName;
 
 use crate::permissions::{self, FULL_ACCESS};
 use crate::process::{self, Sandbox};
+use crate::program::{self, Program};
 use crate::unit::{self, SessionUnit};
 
 pub use crate::process::pid_of;
@@ -67,6 +68,24 @@ pub async fn of_sender(connection: &Connection, header: &Header<'_>) -> Caller {
         Some(pidfd) => of_process(connection, pidfd.as_fd()).await,
         None => Caller::Unknown,
     }
+}
+
+/// Which of `installed`, Luft's own programs named by where the system
+/// installs them, sent a message: the program the sender runs is checked
+/// through the pidfd the bus gave for it, never by its name or path alone.
+pub async fn luft_program(
+    connection: &Connection,
+    header: &Header<'_>,
+    installed: &[&str],
+) -> Option<Program> {
+    let credentials = DBusProxy::new(connection)
+        .await
+        .ok()?
+        .get_connection_credentials(BusName::Unique(header.sender()?.to_owned()))
+        .await
+        .ok()?;
+    program::of_process(credentials.process_fd()?.as_fd())
+        .filter(|program| installed.iter().any(|path| program.is(path)))
 }
 
 /// The unit of the desktop that sent a message, when a process in the

@@ -37,7 +37,7 @@ SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
 SystemCallFilter=bpf
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_BPF
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_BPF CAP_SYS_PTRACE
 IPAddressDeny=any
 
 [Install]

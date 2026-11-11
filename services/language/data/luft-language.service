@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 [Service]
 Type=dbus
 BusName=com.lantharos.Language1
-ExecStart=/usr/libexec/luft-language
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-language
 Restart=on-failure
 Nice=19
 CPUSchedulingPolicy=idle

@@ -3,6 +3,9 @@ mod files;
 
 use std::sync::Arc;
 
+use zbus::Connection;
+use zbus::message::Header;
+
 pub use accounts::Accounts;
 pub use files::Files;
 
@@ -15,10 +18,31 @@ luft_dbus::errors!("com.lantharos.Accounts1.Error" {
     Unsynced,
 });
 
+pub const SETTINGS: &str = "/usr/lib/sabine/com.lantharos.settings/settings";
+pub const ROVER: &str = "/usr/lib/sabine/com.lantharos.rover/rover";
+
 impl Error {
     pub fn account_gone() -> Self {
         Self::Gone("That account isn't here anymore.".to_owned())
     }
+}
+
+/// Lets a call go on only when one of `programs`, as Luft installs them,
+/// made it: your online accounts and the files on them are for Settings and
+/// Rover, not for whatever else runs as you.
+pub async fn admit(
+    connection: &Connection,
+    header: &Header<'_>,
+    programs: &[&str],
+) -> Result<(), Error> {
+    luft_identity::caller::luft_program(connection, header, programs)
+        .await
+        .map(drop)
+        .ok_or_else(|| {
+            Error::NotAuthorized(
+                "Only Settings and Rover can reach your online accounts.".to_owned(),
+            )
+        })
 }
 
 pub fn serve(hub: &Arc<Hub>) -> (Accounts, Files) {

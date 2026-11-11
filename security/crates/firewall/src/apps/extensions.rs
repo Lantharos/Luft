@@ -46,6 +46,14 @@ impl Extensions {
         Ok(())
     }
 
+    /// Whether `ports` opens any port `unit` doesn't listen on already.
+    pub fn widens(&self, unit: &str, ports: &BTreeSet<Port>) -> bool {
+        self.listening
+            .get(unit)
+            .is_none_or(|listening| !ports.is_subset(listening))
+            && !ports.is_empty()
+    }
+
     pub fn listen(&mut self, unit: String, ports: BTreeSet<Port>) {
         if ports.is_empty() {
             self.listening.remove(&unit);

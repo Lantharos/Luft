@@ -174,6 +174,10 @@ impl Firewall {
         self.apps.new_to(uid, ports)
     }
 
+    pub fn widens(&self, unit: &str, ports: &BTreeSet<Port>) -> bool {
+        self.apps.widens(unit, ports)
+    }
+
     pub async fn declare(
         &mut self,
         uid: u32,

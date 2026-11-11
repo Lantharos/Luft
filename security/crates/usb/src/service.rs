@@ -14,6 +14,7 @@ pub const NAME: &str = "com.lantharos.UsbProtection1";
 pub const PATH: &str = "/com/lantharos/UsbProtection1";
 const CONFIGURE: &str = "com.lantharos.usb-protection.configure";
 const SHELLS: [&str; 2] = ["kestrel.service", "kestrel-setup.service"];
+const KESTREL: &str = "/usr/bin/kestrel";
 
 pub struct UsbProtection {
     protection: Arc<Mutex<Protection>>,
@@ -84,6 +85,17 @@ impl UsbProtection {
             .await
             .filter(|unit| SHELLS.contains(&unit.name.as_str()))
             .ok_or_else(Error::not_authorized)?;
+        if !locked
+            && luft_identity::caller::luft_program(connection, &header, &[KESTREL])
+                .await
+                .is_none()
+        {
+            eprintln!(
+                "Refused to count {} as unlocked: the caller in it isn't {KESTREL} from the system image",
+                shell.name
+            );
+            return Err(Error::not_authorized());
+        }
         let sender = header.sender().ok_or_else(Error::not_authorized)?;
         let change =
             self.protection

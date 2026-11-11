@@ -5,9 +5,12 @@
 //! in the `.flatpak-info` that Flatpak, or Luft's AppImage sandbox, puts at
 //! the root of every process it starts, read through a pidfd the kernel gave
 //! for the caller. The rules are in [docs/security.md](../../docs/security.md#who-an-app-is).
+//! Which of Luft's own programs runs a process is told from the file it
+//! runs, the way [`program`] describes.
 
 pub mod caller;
 pub mod permissions;
 mod process;
+pub mod program;
 mod sandbox_info;
 pub mod unit;

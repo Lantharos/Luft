@@ -1,4 +1,6 @@
 use std::fs::{self, DirBuilder};
+use std::io::{PipeReader, Write};
+use std::os::fd::{AsRawFd, RawFd};
 use std::os::unix::fs::DirBuilderExt;
 use std::path::PathBuf;
 use std::process::Stdio;
@@ -11,15 +13,18 @@ use tokio::sync::{broadcast, watch};
 use tokio::time::{sleep, timeout};
 
 use super::rc::Rc;
+use super::secret::Secret;
 
 const STARTUP: Duration = Duration::from_secs(20);
 const RESTART_DELAY: Duration = Duration::from_secs(3);
 const LONGEST_RESTART_DELAY: Duration = Duration::from_secs(5 * 60);
 const STEADY: Duration = Duration::from_secs(60);
+const PASSWORDS: RawFd = 3;
 
 pub struct Process {
     socket: PathBuf,
     cache: PathBuf,
+    secret: Secret,
     logs: broadcast::Sender<String>,
     started: watch::Sender<u64>,
 }
@@ -29,6 +34,7 @@ impl Process {
         runtime: PathBuf,
         socket: PathBuf,
         cache: PathBuf,
+        secret: Secret,
     ) -> Result<(Self, broadcast::Sender<String>, watch::Receiver<u64>)> {
         DirBuilder::new()
             .recursive(true)
@@ -40,6 +46,7 @@ impl Process {
         let process = Self {
             socket,
             cache,
+            secret,
             logs: logs.clone(),
             started,
         };
@@ -65,7 +72,7 @@ impl Process {
     async fn run_once(&self) -> Result<()> {
         let _ = fs::remove_file(&self.socket);
         let mut child = self.spawn()?;
-        let rc = Rc::new(self.socket.clone());
+        let rc = Rc::new(self.socket.clone(), &self.secret);
         let ready = timeout(STARTUP, async {
             while !rc.reachable().await {
                 sleep(Duration::from_millis(50)).await;
@@ -81,12 +88,31 @@ impl Process {
         Ok(())
     }
 
+    fn passwords(&self) -> Result<PipeReader> {
+        let (reader, mut writer) = std::io::pipe()?;
+        writer.write_all(self.secret.htpasswd().as_bytes())?;
+        Ok(reader)
+    }
+
     fn spawn(&self) -> Result<Child> {
-        let mut child = Command::new("rclone")
+        let passwords = self.passwords()?;
+        let inherited = passwords.as_raw_fd();
+        let mut command = Command::new("rclone");
+        unsafe {
+            command.pre_exec(move || {
+                if libc::dup2(inherited, PASSWORDS) < 0
+                    || libc::fcntl(PASSWORDS, libc::F_SETFD, 0) < 0
+                {
+                    return Err(std::io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+        let mut child = command
             .arg("rcd")
             .arg(format!("--rc-addr=unix://{}", self.socket.display()))
+            .arg(format!("--rc-htpasswd=/dev/fd/{PASSWORDS}"))
             .args([
-                "--rc-no-auth",
                 "--config=/notfound",
                 "--log-level=INFO",
                 "--use-mmap",
@@ -98,6 +124,7 @@ impl Process {
             .stderr(Stdio::piped())
             .kill_on_drop(true)
             .spawn()?;
+        drop(passwords);
         let stderr = child.stderr.take().expect("stderr is piped");
         let logs = self.logs.clone();
         tokio::spawn(async move {

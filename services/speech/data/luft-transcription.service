@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 [Service]
 Type=dbus
 BusName=com.lantharos.Transcription1
-ExecStart=/usr/libexec/luft-speech --transcription
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-speech --transcription
 Environment=GIO_USE_VFS=local
 Restart=on-failure
 Nice=19

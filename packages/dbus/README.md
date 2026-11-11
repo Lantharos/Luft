@@ -12,6 +12,7 @@ luft-dbus.workspace = true
 | `at(address)` | A connection to any other bus |
 | `objects::Objects` | A snapshot of an `ObjectManager` tree; `signals` streams what a service sends and `settle` waits out a burst of them |
 | `service::Service` | A system service's name, path and interface: `read` its properties, `change` calls a method allowing a password prompt, `changes` streams its property changes |
+| `environment::yours` | Your environment as your systemd keeps it, for the programs a Luft app starts for you |
 | `power::on_battery` | Whether the computer runs on its battery, as UPower sees it |
 | `polkit::authorize` | Lets a call go on only when polkit allows its caller the action, asking for a password when the caller allows it |
 | `polkit::is_authorized_to`, `polkit::Details` | The same check with a prompt that names what is about to change, and values for polkit rules |

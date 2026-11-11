@@ -30,7 +30,7 @@ pub fn pid_of(pidfd: BorrowedFd<'_>) -> Option<u32> {
         .filter(|pid| *pid > 0)
 }
 
-fn open_folder(pid: u32) -> Option<OwnedFd> {
+pub(crate) fn open_folder(pid: u32) -> Option<OwnedFd> {
     let path = CString::new(format!("/proc/{pid}")).ok()?;
     let fd = unsafe {
         libc::open(
@@ -41,7 +41,7 @@ fn open_folder(pid: u32) -> Option<OwnedFd> {
     (fd >= 0).then(|| unsafe { OwnedFd::from_raw_fd(fd) })
 }
 
-fn open_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<File> {
+pub(crate) fn open_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<File> {
     let fd = unsafe {
         libc::openat(
             folder.as_raw_fd(),

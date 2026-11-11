@@ -176,6 +176,10 @@ impl Apps {
         self.extensions.new_to(uid, ports)
     }
 
+    pub fn widens(&self, unit: &str, ports: &BTreeSet<Port>) -> bool {
+        self.extensions.widens(unit, ports)
+    }
+
     pub fn declare(&mut self, uid: u32, unit: String, ports: BTreeSet<Port>) -> io::Result<()> {
         let new = self.extensions.new_to(uid, &ports);
         if !new.is_empty() {

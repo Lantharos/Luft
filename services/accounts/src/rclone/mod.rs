@@ -1,5 +1,6 @@
 mod process;
 mod rc;
+mod secret;
 
 use std::path::Path;
 use std::sync::{Arc, Mutex};
@@ -82,10 +83,15 @@ pub struct Example {
 
 impl Rclone {
     pub fn prepare(paths: &Paths) -> Result<Self> {
-        let (process, logs, starts) =
-            process::Process::prepare(paths.runtime.clone(), paths.socket(), paths.cache.clone())?;
+        let secret = secret::Secret::new();
+        let (process, logs, starts) = process::Process::prepare(
+            paths.runtime.clone(),
+            paths.socket(),
+            paths.cache.clone(),
+            secret.clone(),
+        )?;
         Ok(Self {
-            rc: Rc::new(paths.socket()),
+            rc: Rc::new(paths.socket(), &secret),
             logs,
             starts,
             idle: Arc::new(Mutex::new(Some(process))),

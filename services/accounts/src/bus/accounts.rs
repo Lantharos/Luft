@@ -5,11 +5,12 @@ use std::sync::Arc;
 use anyhow::Context;
 use luft_accounts::types::{Account, Answer, Credentials, Provider};
 use luft_dbus_macros::introspect;
+use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::{OwnedFd, interface};
+use zbus::{Connection, OwnedFd, interface};
 use zeroize::Zeroizing;
 
-use super::{Error, json, parse};
+use super::{Error, SETTINGS, admit, json, parse};
 use crate::accounts;
 use crate::hub::Hub;
 use crate::signin::{self, Typed};
@@ -46,7 +47,12 @@ async fn typed_password(password: OwnedFd) -> Result<Option<Zeroizing<String>>, 
 #[introspect]
 #[interface(name = "com.lantharos.Accounts1")]
 impl Accounts {
-    fn accounts(&self) -> String {
+    async fn accounts(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<String, Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         let accounts: Vec<Account> = self
             .hub
             .records()
@@ -54,15 +60,18 @@ impl Accounts {
             .iter()
             .map(|record| record.account())
             .collect();
-        json(&accounts)
+        Ok(json(&accounts))
     }
 
     async fn sign_in(
         &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
         provider: String,
         credentials: String,
         password: OwnedFd,
     ) -> Result<String, Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         let provider: Provider = parse(&format!("\"{provider}\""))?;
         let typed = Typed {
             credentials: parse::<Credentials>(&credentials)?,
@@ -73,10 +82,13 @@ impl Accounts {
 
     async fn sign_in_again(
         &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
         account: String,
         credentials: String,
         password: OwnedFd,
     ) -> Result<String, Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         let typed = Typed {
             credentials: parse::<Credentials>(&credentials)?,
             password: typed_password(password).await?,
@@ -90,7 +102,13 @@ impl Accounts {
         Ok(signin::start(&self.hub, provider, typed, Some(account)).await?)
     }
 
-    fn step(&self, session: String) -> Result<String, Error> {
+    async fn step(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        session: String,
+    ) -> Result<String, Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         let step = self
             .hub
             .signins
@@ -99,21 +117,49 @@ impl Accounts {
         Ok(json(&step))
     }
 
-    fn answer(&self, session: String, answer: String) -> Result<(), Error> {
+    async fn answer(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        session: String,
+        answer: String,
+    ) -> Result<(), Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         let answer: Answer = parse(&answer)?;
         Ok(self.hub.signins.answer(&session, answer)?)
     }
 
-    fn cancel(&self, session: String) {
+    async fn cancel(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        session: String,
+    ) -> Result<(), Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         self.hub.signins.cancel(&session);
         self.hub.demand.notify_one();
+        Ok(())
     }
 
-    async fn rename(&self, account: String, name: String) -> Result<(), Error> {
+    async fn rename(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        account: String,
+        name: String,
+    ) -> Result<(), Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         Ok(accounts::rename(&self.hub, &account, &name).await?)
     }
 
-    async fn remove(&self, account: String, discard_unsynced: bool) -> Result<(), Error> {
+    async fn remove(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        account: String,
+        discard_unsynced: bool,
+    ) -> Result<(), Error> {
+        admit(connection, &header, &[SETTINGS]).await?;
         Ok(accounts::remove(&self.hub, &account, discard_unsynced).await?)
     }
 

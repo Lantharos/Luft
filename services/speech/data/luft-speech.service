@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 [Service]
 Type=dbus
 BusName=com.lantharos.Speech1
-ExecStart=/usr/libexec/luft-speech
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-speech
 Environment=GIO_USE_VFS=local
 Restart=on-failure
 MemoryHigh=1600M

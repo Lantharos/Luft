@@ -8,7 +8,7 @@ ConditionPathExists=|!%S/luft/windows-checked
 
 [Service]
 Type=exec
-ExecStart=/usr/libexec/luft-windows notice
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-windows notice
 NoNewPrivileges=yes
 RestrictAddressFamilies=AF_UNIX
 RestrictNamespaces=yes

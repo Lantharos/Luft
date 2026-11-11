@@ -1,3 +1,4 @@
+pub mod environment;
 pub mod error;
 pub mod idle;
 pub mod objects;

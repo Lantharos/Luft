@@ -5,6 +5,8 @@ use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::UnixStream;
 
+use super::secret::Secret;
+
 #[derive(Debug)]
 struct Refused(String);
 
@@ -19,11 +21,15 @@ impl std::error::Error for Refused {}
 #[derive(Clone)]
 pub struct Rc {
     socket: PathBuf,
+    authorization: String,
 }
 
 impl Rc {
-    pub fn new(socket: PathBuf) -> Self {
-        Self { socket }
+    pub fn new(socket: PathBuf, secret: &Secret) -> Self {
+        Self {
+            socket,
+            authorization: secret.authorization(),
+        }
     }
 
     pub async fn reachable(&self) -> bool {
@@ -36,7 +42,8 @@ impl Rc {
             .await
             .context("rclone isn't running")?;
         let head = format!(
-            "POST /{method} HTTP/1.1\r\nHost: rclone\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+            "POST /{method} HTTP/1.1\r\nHost: rclone\r\nAuthorization: {}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+            self.authorization,
             body.len()
         );
         stream.write_all(head.as_bytes()).await?;

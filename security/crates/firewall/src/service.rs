@@ -25,8 +25,8 @@ const OPEN: &str = "com.lantharos.firewall.open-ports";
 const OPEN_ANYWHERE: &str = "com.lantharos.firewall.open-ports-anywhere";
 const APPS: &str = "com.lantharos.firewall.apps";
 const ANYWHERE: &str = "com.lantharos.firewall.apps-anywhere";
-const POST: &str = "kestrel-post.service";
-const KESTREL: &str = "kestrel.service";
+const POST: (&str, &str) = ("kestrel-post.service", "/usr/libexec/kestrel-post");
+const KESTREL: (&str, &str) = ("kestrel.service", "/usr/bin/kestrel");
 const HOME: &str = "home";
 const PUBLIC: &str = "public";
 
@@ -102,12 +102,32 @@ fn identity(kind: &str, id: &str) -> Result<Identity, Error> {
 async fn session_unit(
     connection: &Connection,
     header: &Header<'_>,
-    name: &str,
+    (name, _): (&str, &str),
 ) -> Result<SessionUnit, Error> {
     caller::session_unit(connection, header)
         .await
         .filter(|unit| unit.name == name)
         .ok_or_else(Error::not_authorized)
+}
+
+/// Opening ports takes the program itself, from the system image: anything
+/// else of yours could place itself in its unit. Closing them takes only the
+/// unit, so a desktop whose program can't be confirmed can always close
+/// what it opened.
+async fn require_program(
+    connection: &Connection,
+    header: &Header<'_>,
+    (name, program): (&str, &str),
+) -> Result<(), Error> {
+    match caller::luft_program(connection, header, &[program]).await {
+        Some(_) => Ok(()),
+        None => {
+            eprintln!(
+                "Refused to open ports for a caller in {name} that isn't {program} from the system image"
+            );
+            Err(Error::not_authorized())
+        }
+    }
 }
 
 #[introspect]
@@ -319,6 +339,9 @@ impl Service {
         open: bool,
     ) -> Result<(), Error> {
         let post = session_unit(connection, &header, POST).await?;
+        if open {
+            require_program(connection, &header, POST).await?;
+        }
         self.firewall
             .lock()
             .await
@@ -341,6 +364,9 @@ impl Service {
                 Error::InvalidArgs("Extensions listen on TCP or UDP ports from 1 to 65535".into())
             })?;
         let SessionUnit { uid, cgroup, .. } = session_unit(connection, &header, KESTREL).await?;
+        if self.firewall.lock().await.widens(&cgroup, &ports) {
+            require_program(connection, &header, KESTREL).await?;
+        }
         let new = self.firewall.lock().await.new_to(uid, &ports);
         if !new.is_empty() {
             let new: Vec<String> = new.iter().map(Port::to_string).collect();

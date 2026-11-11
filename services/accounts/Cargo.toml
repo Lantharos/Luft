@@ -19,10 +19,12 @@ inotify = { workspace = true, features = ["default"] }
 libc.workspace = true
 luft-accounts.workspace = true
 luft-dbus.workspace = true
+luft-identity.workspace = true
 luft-dbus-macros.workspace = true
 rand.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sha1.workspace = true
 sha2.workspace = true
 time = { workspace = true, features = ["formatting", "parsing"] }
 tokio = { workspace = true, features = [

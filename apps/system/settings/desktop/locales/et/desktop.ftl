@@ -262,3 +262,7 @@ desktop-sound-unplayable = { $name } - faili esitamine ei õnnestu. Proovi muud 
 desktop-sound-too-long = { $name } on liiga pikk. Süsteemi heli kestus võib olla kuni { $seconds } sekundit.
 desktop-sound-set-empty = Selles kaustas pole ühtegi faili, mis oleks nimetatud süsteemse heli järgi.
 desktop-sound-set-unusable = Ühtegi selle kausta helifaili ei saa kasutada.
+desktop-remote-login-choose-title = Vali avalik võti
+desktop-remote-login-filter = SSH avalikud võtmed
+desktop-remote-login-unreadable = See fail pole tõlgendatav SSH avaliku võtmena
+desktop-post-choose-folder = Salvesta vastuvõetud failid kausta

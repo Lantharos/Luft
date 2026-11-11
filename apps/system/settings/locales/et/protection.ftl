@@ -99,7 +99,7 @@ settings-security-anti-cheat-ready-description = Mängud saavad kontrollida, kui
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Eemalda võtmed taaskäivitamisel
-settings-security-key-steps-remove-description = Pärast taaskäivitust küsib sinine ekraan võtmete eemaldamise kohta. See ootab ainult 10 sekundit, seega vajuta mõnda klahvi kohe, kui see ilmub.
+settings-security-key-steps-remove-description = Pärast taaskäivitust küsib sinine ekraan võtmete eemaldamise kohta.
 settings-security-key-enter = Enter
 settings-security-key-code = Kood { $code }
 settings-security-key-steps-remove-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja saad siin uuesti proovida.
@@ -465,3 +465,25 @@ settings-apps-services-count =
     }
 settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
 settings-apps-full-access-give = Anna täielik ligipääs
+settings-privacy-delete-screenshots = Kustuta ekraanitõmmised automaatselt
+settings-privacy-delete-screenshots-hint = Vana ekraanitõmmised viskame esmalt prügikasti ja vajadusel saad neid taastada
+settings-security-secure-boot-unfinished = Secure Boot pole Lufti jaoks veel seadistatud
+settings-security-signed-startup-finish = Järgmisel taaskäivitusel lõpeta sinisest ekraanivaatest Secure Booti seadistamine
+settings-security-signed-startup-retry = Sinine käivitusekraan jäi vahele. Näed seda järgmisel taaskäivitusel uuesti
+settings-security-signed-startup-gave-up = Secure Boot jäi mitme taaskäivituse käigus seadistamata
+settings-secure-boot-off = Secure Boot pole kasutusel
+settings-secure-boot-not-set-up = Pole veel Lufti jaoks seadistatud
+settings-secure-boot-off-description = Saad ta sisse lülitada oma arvuti püsivara seadistustest
+settings-secure-boot-ready = Seadista Lufti jaoks
+settings-secure-boot-pending-title = Lõpeta Secure Booti seadistamine
+settings-secure-boot-pending-description = Käivita arvuti uuesti ja sinise käivitusekraani kuvamisel järgi seal nimetatud samme
+settings-encryption-unlocks-without-secure-boot = Kuni Secure Boot pole seadistatud, siis võib ta küsida taastevõtit
+settings-secure-boot-missed-description = Sinine ekraan jäi viimati märkamata. Taaskäivita ja proovi sama koodiga uuesti
+settings-secure-boot-none-title = Seadista Luft Secure Boot'i jaoks
+settings-secure-boot-none-description = Vaja on üks taaskäivitus ja sisestad algkäivitusel sinises ekraanivaates ühe koodi
+settings-remote-login-key-add = Lisa võti
+settings-remote-login-key-add-title = Võtme lisamine
+settings-remote-login-key = Avalik võti
+settings-remote-login-key-add-description = Kopeeri ühendatava seadme avalik võti või vali selle .pub-fail. Kui seadmel seda pole, saad selle luua käsuga ssh-keygen.
+settings-remote-login-key-choose = Vali fail…
+settings-remote-login-key-add-button = Lisa võti

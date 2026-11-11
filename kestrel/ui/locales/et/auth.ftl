@@ -100,8 +100,8 @@ polkit-failed = See ei õnnestunud. Proovi uuesti.
 
 ## Log out, power off and restart dialog
 
-end-session-log-out-user = Kasutaja { $userName } väljalogimine
-end-session-log-out-title = Väljalogimine
+end-session-log-out-user = Kas logid { $userName } kasutaja välja?
+end-session-log-out-title = Kas logid välja?
 end-session-log-out-user-countdown =
     { $seconds ->
         [one] Kasutaja { $userName } logitakse automaatselt välja { $seconds } sekundi pärast
@@ -113,30 +113,30 @@ end-session-log-out-countdown =
        *[other] Sind logitakse automaatselt välja { $seconds } sekundi pärast
     }
 end-session-log-out-button = Logi välja
-end-session-power-off-title = Väljalülitamine
-end-session-power-off-updates-title = Värskenduste installimine ja väljalülitamine
+end-session-power-off-title = Kas lülitad arvuti välja?
+end-session-power-off-updates-title = Kas paigaldad uuenduse ja lülitad arvuti välja?
 end-session-power-off-countdown =
     { $seconds ->
         [one] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
        *[other] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
     }
 end-session-power-off-button = Lülita välja
-end-session-restart-title = Taaskäivitamine
-end-session-restart-updates-title = Värskenduste installimine ja taaskäivitamine
+end-session-restart-title = Kas käivitad arvuti uuesti?
+end-session-restart-updates-title = Kas paigaldad uuenduse ja käivitad arvuti uuesti?
 end-session-restart-countdown =
     { $seconds ->
         [one] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
        *[other] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
     }
 end-session-restart-button = Taaskäivita
-end-session-update-restart-title = Taaskäivitamine ja värskenduste installimine
+end-session-update-restart-title = Kas käivitad arvuti uuesti ja paigaldad uuenduse?
 end-session-update-restart-countdown =
     { $seconds ->
         [one] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
        *[other] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
     }
-end-session-update-restart-button = Taaskäivita ja installi
-end-session-install-updates = Installi ootel tarkvaravärskendused
+end-session-update-restart-button = Taaskäivita ja paigalda
+end-session-install-updates = Paigalda ootel tarkvarauuendused
 end-session-install-version = Installi versioon { $version }
 end-session-version-nightly = { $release } öine järk { $number }
 end-session-low-battery = Aku tase on madal: enne värskenduste installimist ühenda arvuti vooluvõrku
@@ -156,3 +156,6 @@ ctrl-alt-tab-unlock = Lukust avamine
 end-session-power-options-title = Mida peaks see arvuti tegema?
 end-session-power-options-description = Sa vajutasid toitenuppu.
 end-session-suspend-button = Unerežiim
+greeter-wake-hint = Sisselogimiseks klõpsa või vajuta ükspuha mis klahvi
+lock-screen-wake-hint = Lukustuse avamiseks klõpsa või vajuta ükspuha mis klahvi
+end-session-awake-reason = Väljalülitamise, uuesti käivitamise või väljalogimise pöördloendus

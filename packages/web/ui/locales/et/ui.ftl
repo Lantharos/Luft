@@ -72,7 +72,6 @@ ui-finger-right-little = Parem väike sõrm
     .inline = parem väike sõrm
 ui-finger-left-little = Vasak väike sõrm
     .inline = vasak väike sõrm
-
 ui-fingerprint-place = Aseta oma { $finger } andurile.
 ui-fingerprint-swipe = Libista oma { $finger } üle anduri.
 ui-fingerprint-stage-passed = Hästi. Tõsta sõrm üles ja aseta see uuesti.
@@ -106,12 +105,25 @@ ui-dialog-done = Valmis
 ui-passphrase-field = Paroolifraas
 ui-passphrase-confirm = Kinnita
 ui-passphrase-type-again = Tipi uuesti
-ui-passphrase-length = { $min ->
-    [one] Vähemalt { $min } märk
-   *[other] Vähemalt { $min } märki
-}
+ui-passphrase-length =
+    { $min ->
+        [one] Vähemalt { $min } märk
+       *[other] Vähemalt { $min } märki
+    }
 ui-passphrase-mismatch = Paroolifraasid ei ühti
 
 ## Encryption
 
 ui-encryption-checking = Kontrollimine
+ui-recovery-key-checked = Ülesmärgitud
+ui-recovery-key-save-failed = Võtme salvestamine ei õnnestunud
+ui-recovery-key-print-failed = Võtme printimine ei õnnestunud
+ui-recovery-key-copy-failed = Võtme kopeerimine ei õnnestunud
+ui-recovery-key-write = Märgi üles
+ui-recovery-key-write-title = Talleta oma taasetvõti
+ui-recovery-key-written = Ma olen nad üles tähendanud
+ui-recovery-key-write-description = Kirjuta need 12 sõna paberile või välisesse salasõnalaekasse just selles järjekorras. Hoia paberit või salasõnalaegast turvalisel viisil sellest arvutist eemal.
+ui-recovery-key-check-title = Kontrolli, mida oled üles tähendanud
+ui-recovery-key-word = { $number }. sõna
+ui-recovery-key-word-wrong = See pole { $number }. sõna
+ui-recovery-key-check = Sisesta { $first }., { $second }. ja { $third }. sõna oma paberilt või salasõnalaekast. Igaühe puhul piisab neljast tähest.

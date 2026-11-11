@@ -361,3 +361,20 @@ settings-bluetooth-windows-more =
         [one] veel { $count }
        *[other] veel { $count }
     }
+settings-network-firewall-summary-home = „{ $network }“ on kodune võrk
+settings-network-firewall-summary-public = „{ $network }“ on avalik võrk
+settings-network-firewall = Tulemüür
+    .description = Võrgus olevad seadmed pääsevad ligi ainult sellele, millele juurdepääsu sa neile lubad.
+settings-network-firewall-how = Kuidas see toimib
+settings-network-firewall-how-done = Valmis
+settings-network-firewall-home = Kodu
+settings-network-firewall-public = Avalik
+settings-network-firewall-connected = Ühendatud
+settings-network-firewall-unchosen = Seni, kuni sa pole otsustanud, loetakse avalikuks võrguks
+settings-network-firewall-no-networks = Pole veel ühtegi WiFi- või traadiga võrku
+settings-network-firewall-apps = Rakendused
+settings-network-firewall-forget = Unusta „{ $app }“
+settings-network-firewall-apps-none = Ükski rakendus pole veel luba küsinud
+settings-network-firewall-access-home = Koduvõrgud
+settings-network-firewall-access-anywhere = Kõik võrgud
+settings-network-firewall-access-blocked = Pole lubatud

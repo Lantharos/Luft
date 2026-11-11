@@ -2,6 +2,7 @@ mod activation;
 mod build;
 mod changes;
 mod command;
+mod extensions;
 mod repositories;
 mod service;
 mod state;
@@ -9,6 +10,7 @@ mod state;
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
+    luft_dbus::panics::report();
     let result = match std::env::args().nth(1).as_deref() {
         None => service::run(),
         Some("activate") => activation::serve(),

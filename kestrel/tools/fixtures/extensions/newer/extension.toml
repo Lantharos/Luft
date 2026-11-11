@@ -1,0 +1,8 @@
+id = "com.example.Newer"
+name = "Newer"
+description = "Needs a version of Luft that isn't out yet."
+version = "1.0.0"
+api = 1
+
+[luft]
+minimum = "99.0"

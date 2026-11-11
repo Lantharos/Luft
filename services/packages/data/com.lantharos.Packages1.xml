@@ -8,8 +8,9 @@
 
     Install, InstallFile and Remove need com.lantharos.packages.change, AddRepository and
     RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
-    the running system uses the new set; Step tells how far they are. List and
-    DescribeRepository need nothing. Only root can call Rebuild and Update.
+    the running system uses the new set; Step tells how far they are. List, Provider and
+    DescribeRepository need nothing. Only root can call Rebuild and Update. InstallExtension and
+    RemoveExtension need com.lantharos.packages.extensions and only change the caller's own folder.
   -->
   <interface name="com.lantharos.Packages1">
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
@@ -32,6 +33,13 @@
     <method name="Remove">
       <arg name="names" type="as" direction="in"/>
     </method>
+    <!-- The package in Fedora or the added repositories that provides a capability, such as
+         "libfoo.so.1()(64bit)", "unpaper" or "perl(Foo::Bar)", or "" when none does,
+         from the metadata the last build downloaded. -->
+    <method name="Provider">
+      <arg name="capability" type="s" direction="in"/>
+      <arg name="package" type="s" direction="out"/>
+    </method>
     <!-- Checks a repository file to be kept as /var/lib/luft/system-packages/repositories/FILE.repo,
          and the keys it names, each given by the address its gpgkey has. Every source that's turned
          on must check signatures and be reached over HTTPS. JSON: {"file", "sources": [...], "keys":
@@ -52,6 +60,24 @@
     <!-- Removes a repository and the packages that came from it. -->
     <method name="RemoveRepository">
       <arg name="file" type="s" direction="in"/>
+    </method>
+    <!-- Installs a Luft extension release into /var/lib/luft/extensions/UID/ID for the caller, where
+         only root can change it, in place of any earlier version. The listing is schelf.store's signed
+         index/v1/apps/ID.json and the keys its trust/v1/store-keys.json, each with its .sig seal as
+         sent. The service checks the keys against schelf.store's root key and the listing against the
+         keys, that the listing hasn't expired, that its publisher is verified, and that the archive is
+         the file of a release it marks runs_in_shell. Anything else is refused. -->
+    <method name="InstallExtension">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="listing" type="ay" direction="in"/>
+      <arg name="listing_seal" type="ay" direction="in"/>
+      <arg name="keys" type="ay" direction="in"/>
+      <arg name="keys_seal" type="ay" direction="in"/>
+      <arg name="archive" type="h" direction="in"/>
+    </method>
+    <!-- Removes an extension InstallExtension installed for the caller. -->
+    <method name="RemoveExtension">
+      <arg name="id" type="s" direction="in"/>
     </method>
     <!-- Builds the packages for the running version when it has none for the current list, and
          for the other versions on the computer, such as an update that was just staged. Returns

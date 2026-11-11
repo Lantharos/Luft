@@ -335,6 +335,17 @@ settings-extensions-enabled = Turned on
 settings-extensions-failed = Turned off because it stopped working
 settings-extensions-crashed = Turned off because the desktop restarted twice while it ran
 settings-extensions-invalid = Can't run on this version of Luft
+# $version is the version of Luft the extension needs, such as "1.2"
+settings-extensions-needs-newer-luft = Needs Luft { $version } or newer. It turns on by itself once Luft is updated.
+settings-extensions-runs-separately = Waits for a Luft that can run extensions from your own folder on their own
+settings-extensions-from-store = From schelf.store, approved to run inside Luft
+settings-extensions-from-development = From a development folder, running inside this build of Luft
+settings-extensions-from-own = From your own folder. It runs on its own and can only do what's listed
+# $count is how many other copies of the extension there are
+settings-extensions-ignored = { $count ->
+    [one] A copy in your own folder is ignored
+   *[other] Copies in your own folder are ignored
+}
 settings-extensions-problem = What went wrong
 settings-extensions-settings = Settings
 settings-extensions-permissions = What it can do

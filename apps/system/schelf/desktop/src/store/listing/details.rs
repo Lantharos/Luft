@@ -74,6 +74,13 @@ pub struct StoreDetails {
     /// releases of it any more. A copy you have keeps working.
     pub withdrawn: bool,
     pub replaced_by: Option<ReplacedBy>,
+    /// The oldest version of Luft the release above runs on.
+    pub luft: Option<String>,
+    /// The version of Luft the newest release needs, when this one is older.
+    pub needs_luft: Option<String>,
+    /// Whether schelf.store approved the extension's release to run inside
+    /// Luft, the only extensions Luft runs for now.
+    pub in_shell: bool,
 }
 
 impl StoreDetails {
@@ -109,6 +116,9 @@ impl StoreDetails {
             provenance: None,
             withdrawn: true,
             replaced_by: None,
+            luft: None,
+            needs_luft: None,
+            in_shell: false,
         }
     }
 }
@@ -126,7 +136,11 @@ impl From<Listing> for StoreDetails {
             .map(|offer| offer.release)
             .or(download.map(|(release, _)| release))
             .cloned();
-        let installer = installable.map(|offer| offer.format);
+        let in_shell = installable.is_some_and(|offer| listing.runs_in_shell(offer.release));
+        let installer = installable
+            .map(|offer| offer.format)
+            .filter(|format| *format != Format::LuftExtension || in_shell);
+        let needs_luft = listing.held_back(&following, platforms, draw);
         let size = installable.map(|offer| offer.artifact.size);
         let download = download.map(|(_, artifact)| Download {
             url: artifact.url.clone(),
@@ -168,6 +182,9 @@ impl From<Listing> for StoreDetails {
                 .as_ref()
                 .map(|release| release.notes.clone())
                 .unwrap_or_default(),
+            luft: release
+                .as_ref()
+                .and_then(|release| release.luft().map(str::to_owned)),
             provenance: release.map(|release| release.provenance),
             verified: listing.publisher.verified,
             developer: listing.publisher.name,
@@ -179,6 +196,8 @@ impl From<Listing> for StoreDetails {
             license: listing.licence,
             withdrawn,
             replaced_by: listing.replaced_by.and_then(ReplacedBy::listed),
+            needs_luft,
+            in_shell,
         }
     }
 }

@@ -2,6 +2,7 @@ import { parse } from 'smol-toml';
 
 import type { ChoiceOption, ListenPort, Manifest, Permission, SettingCondition, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription, SliderRange } from '../api/v1/types.js';
 import { API_VERSIONS } from '../api/versions.js';
+import { parseLuftVersion } from './installed/luftVersion.js';
 
 export const MANIFEST = 'extension.toml';
 export const MODULE = 'extension.js';
@@ -245,6 +246,13 @@ function shortcuts(source: Table): ShortcutDescription[] {
   return described;
 }
 
+function luft(source: Table): Manifest['luft'] {
+  if (source.luft === undefined) return undefined;
+  const minimum = text(table(source.luft, 'luft'), 'minimum', 'luft');
+  if (!parseLuftVersion(minimum)) fail('luft.minimum must be a version of Luft, such as 1.2 or 1.2-nightly.21');
+  return { minimum };
+}
+
 export function parseManifest(source: string): Manifest {
   let document: Table;
   try {
@@ -277,5 +285,6 @@ export function parseManifest(source: string): Manifest {
     shortcuts: shortcuts(document),
     helper: helper(document),
     network: network(document),
+    luft: luft(document),
   };
 }

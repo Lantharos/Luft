@@ -32,6 +32,7 @@ export interface ApiContext {
   readonly layers: LayerStage;
   readonly screenEffects: EffectsStage;
   readonly helpers: Set<Gio.Subprocess>;
+  readonly chosen: Set<string>;
   openSettings(): void;
   fromPerson<Args extends unknown[], Result>(callback: (...args: Args) => Result): (...args: Args) => Result | undefined;
 }

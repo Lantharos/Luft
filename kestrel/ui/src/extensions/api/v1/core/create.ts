@@ -1,7 +1,8 @@
 import GLib from 'gi://GLib';
 
 import { appearanceApi } from '../desktop/appearance.js';
-import { open, sessionApi, settingsApi, storageApi, timersApi } from './basics.js';
+import { sessionApi, settingsApi, storageApi, timersApi } from './basics.js';
+import { opener } from './opening.js';
 import type { ApiContext } from './context.js';
 import { helperApi } from './helper.js';
 import { locationApi } from '../services/location.js';
@@ -77,7 +78,7 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
     power: powerApi(context),
     appearance: appearanceApi(context),
     t: (id, args) => translations.t(id, args),
-    open,
+    open: opener(context),
     openSettings: () => context.openSettings(),
     pickFiles: options => pickFiles(context, options),
     chooseFiles: options => chooseFiles(context, options),

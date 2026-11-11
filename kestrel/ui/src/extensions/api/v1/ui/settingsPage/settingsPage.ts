@@ -10,7 +10,7 @@ export function settingsPageApi(context: ApiContext): SettingsPage {
       const guarded = scope.guard(build);
       page.describe(() => {
         const sections = guarded();
-        return sections ? pageBuilder([path, dataPath], path, settings, context.manifest.id)(sections) : null;
+        return sections ? pageBuilder([path, dataPath], settings, context.manifest.id)(sections) : null;
       }, context.fromPerson);
       return scope.disposable(() => page.describe(null, context.fromPerson));
     },

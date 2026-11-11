@@ -246,6 +246,8 @@ export interface Manifest {
    * ports the extension's helper listens on, which Luft's firewall opens on networks people trust.
    */
   network?: { hosts: string[]; listen: ListenPort[] };
+  /** The oldest version of Luft the extension runs on, such as `1.2` or `1.2-nightly.21`. Luft leaves it off until it's updated that far. */
+  luft?: { minimum: string };
 }
 
 /** A port an extension's helper takes connections or datagrams on. */

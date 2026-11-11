@@ -173,3 +173,6 @@ depends = "on"
 type = "switch"
 label = "ambient"
 default = true
+
+[luft]
+minimum = "1.0-nightly.27"

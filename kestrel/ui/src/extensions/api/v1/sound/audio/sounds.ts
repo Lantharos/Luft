@@ -2,7 +2,7 @@ import Shell from 'gi://Shell';
 
 import type { ApiContext } from '../../core/context.js';
 import type { Disposable, LockedSounds, Sound, SoundOptions, Sounds } from '../../types.js';
-import { extensionFile } from './files.js';
+import { confinedFile } from '../../core/confined.js';
 
 const ICON = 'application-x-addon-symbolic';
 const LOCK_FADE_MS = 600;
@@ -76,7 +76,7 @@ export function soundsApi(context: ApiContext): Sounds {
     },
     play: (file: string, options: SoundOptions = {}): Sound => {
       const sounds = open();
-      const id = sounds.play(extensionFile([path, dataPath], file), !!options.loop, unit(options.volume ?? 1), milliseconds(options.fadeIn));
+      const id = sounds.play(confinedFile([path, dataPath], file), !!options.loop, unit(options.volume ?? 1), milliseconds(options.fadeIn));
       let playing = true;
       const listeners = new Set<() => void>();
       ended.set(id, () => {

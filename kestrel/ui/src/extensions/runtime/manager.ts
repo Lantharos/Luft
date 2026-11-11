@@ -10,7 +10,11 @@ import { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
 import { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
-import { dataFolder, discover, findOne, removeTree, type Installed } from './folders.js';
+import { dataFolder, discover, findOne, removeTree, type Installed } from './installed/folders.js';
+import { luftVersionAtLeast } from './installed/luftVersion.js';
+import { runsInShell } from './installed/origins.js';
+import { askLuftVersion, rememberedLuftVersion } from './installed/runningLuft.js';
+import { removeFromStoreFolder } from './installed/storeFolder.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
 import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
@@ -28,6 +32,7 @@ export class ExtensionManager {
   private readonly disconnectors: (() => void)[];
   private snapshots: string | null = null;
   private loads = 0;
+  private luft = rememberedLuftVersion();
 
   constructor(host: ExtensionHost) {
     this.services = {
@@ -53,6 +58,20 @@ export class ExtensionManager {
     ];
     this.rescan();
     for (const id of culprits) this.notice(id, 'crash');
+    void askLuftVersion().then(version => {
+      if (!version || version === this.luft) return;
+      this.luft = version;
+      this.sync();
+    });
+  }
+
+  fitsLuft({ manifest }: Installed): boolean {
+    const minimum = manifest?.luft?.minimum;
+    return !minimum || (!!this.luft && luftVersionAtLeast(this.luft, minimum));
+  }
+
+  private runs(installed: Installed): boolean {
+    return runsInShell(installed.origin) && this.fitsLuft(installed);
   }
 
   get all(): readonly Installed[] {
@@ -82,7 +101,7 @@ export class ExtensionManager {
     for (const id of [...this.instances.keys()].filter(id => !this.installed.some(installed => installed.id === id))) this.drop(id);
     for (const installed of this.installed.filter(hasManifest)) {
       const instance = this.instances.get(installed.id);
-      if (instance?.installed.path === installed.path && instance.manifest.version === installed.manifest.version) continue;
+      if (instance?.installed.path === installed.path && instance.installed.origin === installed.origin && instance.manifest.version === installed.manifest.version) continue;
       this.replace(installed);
     }
     this.sync();
@@ -112,23 +131,24 @@ export class ExtensionManager {
     this.undoElsewhere(id);
   }
 
-  remove(id: string): void {
+  async remove(id: string): Promise<void> {
     const installed = this.installed.find(candidate => candidate.id === id);
     if (!installed) return;
     this.undoElsewhere(id);
-    this.erase(installed);
+    this.instances.get(id)?.stored.forget();
+    this.drop(id);
+    if (installed.systemOwned) await removeFromStoreFolder(id);
+    else removeTree(Gio.File.new_for_path(installed.path));
+    this.erase(id);
     this.rescan();
   }
 
   private undoElsewhere(id: string): void {
     const installed = this.installed.find(candidate => candidate.id === id);
-    if (installed && hasManifest(installed)) runTurnedOffHelper(installed.path, installed.manifest);
+    if (installed && hasManifest(installed) && this.runs(installed)) runTurnedOffHelper(installed.path, installed.manifest);
   }
 
-  private erase({ id, path }: Installed): void {
-    this.instances.get(id)?.stored.forget();
-    this.drop(id);
-    removeTree(Gio.File.new_for_path(path));
+  private erase(id: string): void {
     if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeTree(Gio.File.new_for_path(dataFolder(id)));
     forgetSecrets(id);
     this.store.forgetValues(id);
@@ -170,7 +190,7 @@ export class ExtensionManager {
   private sync(): void {
     const disabled = this.store.disabled;
     for (const instance of this.instances.values()) {
-      const wanted = !disabled.has(instance.id);
+      const wanted = !disabled.has(instance.id) && this.runs(instance.installed);
       if (wanted && !instance.running) this.start(instance);
       else if (!wanted && instance.running) instance.stop();
     }

@@ -12,14 +12,17 @@ function changed(): void {
   for (const listener of listeners) listener();
 }
 
-export function showsWallpaper(actor: Clutter.Actor, underWindows: boolean): void {
+export function showsWallpaper(actor: Clutter.Actor, underWindows: boolean): () => void {
   const picture = { actor, underWindows };
   pictures.add(picture);
-  actor.connect('destroy', () => {
+  const destroyed = actor.connect('destroy', () => forget());
+  const forget = () => {
+    actor.disconnect(destroyed);
     pictures.delete(picture);
     changed();
-  });
+  };
   changed();
+  return forget;
 }
 
 export const wallpaperPictures = (): WallpaperPicture[] => [...pictures];

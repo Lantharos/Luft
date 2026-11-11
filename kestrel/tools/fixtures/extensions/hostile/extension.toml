@@ -1,0 +1,6 @@
+id = "com.example.Hostile"
+name = "Hostile"
+description = "Hands the shell paths that lead out of its folders."
+version = "1.0.0"
+api = 1
+permissions = ["clipboard", "sounds", "taskbar", "popups", "wallpaper"]

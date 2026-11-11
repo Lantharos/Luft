@@ -7,7 +7,7 @@ import type { Manifest } from '../api/v1/types.js';
 import { OpenPopups } from '../api/v1/ui/popups/popups.js';
 import type { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
 import type { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
-import { dataFolder, type Installed } from './folders.js';
+import { dataFolder, type Installed } from './installed/folders.js';
 import { Gestures } from './gestures.js';
 import { ExtensionPage } from './page.js';
 import { MODULE } from './manifest.js';
@@ -77,7 +77,7 @@ export class ExtensionInstance {
       const gestures = this.gestures;
       const api = API_VERSIONS[this.manifest.api]({
         manifest: this.manifest, name: this.name, path: this.installed.path, dataPath: dataFolder(this.id), host: this.services.host, scope,
-        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, popups: new OpenPopups(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers,
+        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, popups: new OpenPopups(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers, chosen: new Set(),
         openSettings: () => this.services.openSettings(this.id),
         fromPerson: callback => (...args) => scope.run(() => {
           gestures.used();

@@ -96,4 +96,4 @@ settings-page-datetime = Date and time
 settings-page-users = Users
     .keywords = account, name, picture, avatar, password, fingerprint
 settings-page-updates = Updates
-    .keywords = software updates, system updates, upgrade, firmware, kernel, restart and install, packages, automatic updates, security updates
+    .keywords = software updates, system updates, upgrade, firmware, kernel, restart and install, packages, automatic updates, security updates, release channel, channel, nightly, stable, report a problem, bug, feedback, issue

@@ -17,6 +17,7 @@ sidebar:
 | `version` | The extension's version, such as `1.2.0` |
 | `api` | The extension API version it targets. Luft keeps every version it shipped working, and refuses versions it doesn't know |
 | `permissions` | What it uses beyond the basics, see below |
+| `[luft]` | `minimum` is the oldest version of Luft the extension runs on, such as `"1.2"` or `"1.2-nightly.21"`, where every nightly comes before the release it leads to. Schelf requires it, only installs the extension on a Luft that new, and Luft leaves it off until it's updated that far |
 | `[helper]` | `path` names a program in the folder that the API can start. `turned-off` is an optional list of arguments it runs with once when people turn the extension off or remove it, so it can undo what it changed outside its folder |
 | `[network]` | `hosts` names the hosts it connects to, such as `["api.example.com"]`. `listen` names the ports its helper takes connections on from other devices, such as `[{ port = 53317, protocol = "tcp" }, { port = 53317, protocol = "udp" }]` |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
@@ -26,7 +27,7 @@ sidebar:
 
 Permissions say what your extension uses. The API object only has the parts you asked for, Settings and Schelf show each permission to people in plain words, and schelf.store reviews a release that asks for more than the one before.
 
-They're a declaration, not a sandbox. Extensions run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review is what stands behind that trust. Use only the API object: it's what stays stable between versions.
+They're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions.
 
 | Permission | Shown as | Gives |
 | --- | --- | --- |

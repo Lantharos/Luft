@@ -274,7 +274,11 @@ export interface Basics {
   readonly appearance: Appearance;
   /** A message from the extension's translations, in the language Kestrel uses. Kestrel turns the extension off and on again when the language changes. */
   t(id: string, args?: Record<string, string | number>): string;
-  /** Opens a web link in the browser, or a file or folder in the app that opens it, such as `https://luft.computer` or `file:///home/…`. */
+  /**
+   * Opens an `https:` link in the browser, a `mailto:` address, a `schelf:` page, or a file or folder in the app that opens
+   * it, such as `https://luft.computer` or `file://` and a path. Files have to be in {@link path}, {@link dataPath} or what
+   * people chose with {@link chooseFiles}, and can't be programs or launchers. Anything else throws.
+   */
   open(uri: string): void;
   /** Opens the extension's page in Settings. */
   openSettings(): void;
@@ -1280,9 +1284,9 @@ export interface Response {
  */
 export interface Clipboard {
   setText(text: string): void;
-  /** Copies a PNG, JPEG, WebP or GIF picture, by its full path. */
+  /** Copies a PNG, JPEG, WebP or GIF picture, by its full path in the extension's folders or what people chose. */
   setImage(path: string): Promise<void>;
-  /** Copies files and folders, by their full paths, to paste in Rover and other apps. */
+  /** Copies files and folders, by their full paths in the extension's folders or what people chose, to paste in Rover and other apps. */
   setFiles(paths: readonly string[]): void;
 }
 
@@ -1718,6 +1722,8 @@ export interface Manifest {
    * ports the extension's helper listens on, which Luft's firewall opens on networks people trust.
    */
   network?: { hosts: string[]; listen: ListenPort[] };
+  /** The oldest version of Luft the extension runs on, such as `1.2` or `1.2-nightly.21`. Luft leaves it off until it's updated that far. */
+  luft?: { minimum: string };
 }
 
 /** A port an extension's helper takes connections or datagrams on. */

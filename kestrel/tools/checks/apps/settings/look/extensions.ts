@@ -11,8 +11,8 @@ import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 
 const {eventually, require} = checks('Luft app');
 const HEAVY: Point = [955, 318];
-const LEFT_EDGE: Point = [902, 291];
-const RIGHT_EDGE: Point = [962, 291];
+const LEFT_EDGE: Point = [902, 236];
+const RIGHT_EDGE: Point = [962, 236];
 const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

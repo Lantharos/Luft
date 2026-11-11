@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::access::{Declared, ExtensionAccess};
+use super::luft;
 use crate::store::device;
 use crate::store::install::extensions;
 
@@ -85,6 +86,7 @@ pub struct Provenance {
 #[derive(Deserialize, Clone)]
 struct Requires {
     extension_api: Option<u32>,
+    luft: Option<String>,
 }
 
 /// Whether the app runs in a sandbox that holds it to its declaration.
@@ -112,6 +114,8 @@ pub struct Release {
     pub extension: Option<ExtensionAccess>,
     access: Access,
     requires: Requires,
+    #[serde(default)]
+    runs_in_shell: bool,
     pub provenance: Provenance,
     artifacts: Vec<Artifact>,
 }
@@ -130,6 +134,22 @@ impl Release {
         self.requires
             .extension_api
             .is_none_or(|api| extensions::api_versions().contains(&api))
+            && self.needs_luft().is_none()
+    }
+
+    /// The oldest version of Luft the release runs on.
+    pub fn luft(&self) -> Option<&str> {
+        self.requires.luft.as_deref()
+    }
+
+    /// The version of Luft the release needs, when this one is older.
+    pub fn needs_luft(&self) -> Option<&str> {
+        self.luft().filter(|minimum| !luft::reaches(minimum))
+    }
+
+    /// Whether schelf.store approved this release to run inside Luft.
+    pub fn runs_in_shell(&self) -> bool {
+        self.runs_in_shell
     }
 
     /// The file a device on `platforms`, most specific first, installs, and

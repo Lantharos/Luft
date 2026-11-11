@@ -76,6 +76,9 @@ pub(super) struct Listed {
     name: String,
     description: Option<String>,
     version: Option<String>,
+    origin: String,
+    ignored: Vec<String>,
+    luft: Option<String>,
     enabled: bool,
     state: String,
     problem: String,
@@ -133,6 +136,12 @@ pub struct Extension {
     name: String,
     description: String,
     version: String,
+    /// Where it comes from: `store`, `development` or `own`.
+    origin: String,
+    /// Copies of it elsewhere that are left alone.
+    ignored: Vec<String>,
+    /// The oldest version of Luft it runs on.
+    luft: String,
     enabled: bool,
     state: String,
     problem: String,
@@ -204,6 +213,9 @@ impl From<Listed> for Extension {
             name: listed.name,
             description: listed.description.unwrap_or_default(),
             version: listed.version.unwrap_or_default(),
+            origin: listed.origin,
+            ignored: listed.ignored,
+            luft: listed.luft.unwrap_or_default(),
             enabled: listed.enabled,
             state: listed.state,
             problem: listed.problem,

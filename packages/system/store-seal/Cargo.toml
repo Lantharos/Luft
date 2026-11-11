@@ -1,0 +1,19 @@
+[package]
+name = "luft-store-seal"
+version = "0.1.0"
+description = "Checks schelf.store's signatures on its documents and which extension releases may run inside the shell, shared by Schelf and the system packages service"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+base64.workspace = true
+chrono = { workspace = true, features = ["serde"] }
+ed25519-dalek.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

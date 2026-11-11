@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {copyFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, setting, userFolder} from './lib/extensions.js';
+import {copyFolder, developmentFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, setting} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
 const PROBE = 'com.example.Probe';
@@ -28,8 +28,8 @@ const probeTile = () => descendants(named('kestrel-quick-settings')!).find(actor
 const notified = (title: string) => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === title));
 
 async function checkSeasons() {
-  const seasons = await eventually(() => listed(SEASONS), 'Seasons is preinstalled for a new account and listed');
-  require(seasons.state === 'running' && seasons.version === '1.0.0', 'Seasons runs from the copy in the account');
+  const seasons = await eventually(() => listed(SEASONS), 'Seasons is listed');
+  require(seasons.state === 'running' && seasons.origin === 'development' && seasons.version === '1.0.0', 'Seasons runs from the development folder');
   require(layerSheets(SEASONS).length === 0, 'Seasons draws nothing while it is off: its layers have no actors');
 }
 
@@ -75,7 +75,7 @@ async function checkDisabledCleansUp() {
 async function checkReload() {
   await request('Enable', PROBE);
   await eventually(() => taskbarItem(), 'the probe runs again');
-  const folder = userFolder(PROBE);
+  const folder = developmentFolder(PROBE);
   rewrite(`${folder}/extension.toml`, text => text.replace('version = "1.0.0"', 'version = "1.1.0"'));
   rewrite(`${folder}/extension.js`, text => text.replace('version: probe.version', "version: `${probe.version} new`"));
   await request('Reload', PROBE);
@@ -125,7 +125,7 @@ async function checkConditions() {
 }
 
 async function checkRefusedConditions() {
-  const folder = userFolder(PROBE);
+  const folder = developmentFolder(PROBE);
   const [, original] = GLib.file_get_contents(`${folder}/extension.toml`);
   const manifest = new TextDecoder().decode(original);
   const wrong: [string, string, string][] = [
@@ -164,10 +164,10 @@ async function checkThrowing() {
 
 function keep(id: string) {
   const kept = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), `kept-${id}`]));
-  copyFolder(Gio.File.new_for_path(userFolder(id)), kept);
+  copyFolder(Gio.File.new_for_path(developmentFolder(id)), kept);
   return {
     async restore() {
-      kept.move(Gio.File.new_for_path(userFolder(id)), Gio.FileCopyFlags.NONE, null, null);
+      kept.move(Gio.File.new_for_path(developmentFolder(id)), Gio.FileCopyFlags.NONE, null, null);
       await request('Reload', id);
     },
   };
@@ -178,7 +178,7 @@ async function checkRemovingSeasons() {
   try {
     await request('Remove', SEASONS);
     await eventually(async () => !await listed(SEASONS), 'removing Seasons takes it away');
-    require(!GLib.file_test(userFolder(SEASONS), GLib.FileTest.EXISTS), 'and deletes its folder');
+    require(!GLib.file_test(developmentFolder(SEASONS), GLib.FileTest.EXISTS), 'and deletes its folder');
     await request('Reload', SEASONS);
     require(!await listed(SEASONS), 'no other copy of Seasons comes back');
   } finally {

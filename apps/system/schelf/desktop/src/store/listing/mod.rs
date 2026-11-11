@@ -1,6 +1,7 @@
 mod access;
 pub mod channel;
 mod details;
+mod luft;
 mod release;
 #[cfg(test)]
 mod tests;
@@ -148,6 +149,30 @@ impl Listing {
             .into_iter()
             .filter_map(|channel| self.newest(channel, platforms, draw))
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
+    }
+
+    /// The version of Luft the newest release you follow needs, when this
+    /// Luft is older and so gets an older release or none.
+    pub fn needs_luft(&self) -> Option<String> {
+        let platforms = self.platforms();
+        self.held_back(&self.following(platforms), platforms, device::draw())
+    }
+
+    fn held_back(&self, following: &Following, platforms: &[&str], draw: f64) -> Option<String> {
+        let sources = following.sources();
+        self.releases
+            .iter()
+            .filter(|release| sources.contains(&release.channel.as_str()) && release.reaches(draw))
+            .filter(|release| release.installable(platforms).is_some())
+            .max_by(|left, right| version::compare(&left.version, &right.version))?
+            .needs_luft()
+            .map(str::to_owned)
+    }
+
+    /// Whether schelf.store vouches for the publisher and approved `release`
+    /// to run inside Luft.
+    pub fn runs_in_shell(&self, release: &Release) -> bool {
+        self.kind == Kind::Extension && self.publisher.verified && release.runs_in_shell()
     }
 
     /// The release this device may install, from the channel you follow.

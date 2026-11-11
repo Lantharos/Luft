@@ -11,7 +11,7 @@
 	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
 	import { describe, type Access } from '#lib/app/permissions.js';
 	import { broadAccess } from '#lib/catalog/flathub.js';
-	import { launch } from '#lib/bridge/index.js';
+	import { opening } from '#lib/state/opening.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -152,7 +152,7 @@
 					{#if operation && operation.state !== 'failed'}
 						<ProgressButton {operation} large />
 					{:else if desktop && (finished || file.kind !== 'appImage')}
-						<button type="button" class="button primary large" onclick={() => launch(desktop)}>Open</button>
+						<button type="button" class="button primary large" onclick={() => installed && opening.open(installed, desktop)}>Open</button>
 					{:else if finished && file.kind === 'flatpakRepo'}
 						<button type="button" class="button large" onclick={() => navigation.open({ page: 'discover' })}>Done</button>
 					{:else if (file.kind === 'package' || file.kind === 'deb') && (file.installed || installed)}
@@ -183,7 +183,7 @@
 						{#if flathubOperation && flathubOperation.state !== 'failed'}
 							<ProgressButton operation={flathubOperation} />
 						{:else if fromFlathub?.desktop}
-							<button type="button" class="button primary" onclick={() => launch(fromFlathub.desktop!)}>Open</button>
+							<button type="button" class="button primary" onclick={() => opening.open(fromFlathub)}>Open</button>
 						{:else}
 							<button type="button" class="button primary" onclick={askForFlathub}>Install from Flathub</button>
 						{/if}

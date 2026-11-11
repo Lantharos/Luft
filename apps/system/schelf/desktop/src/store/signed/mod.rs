@@ -1,5 +1,4 @@
 mod stamp;
-mod trust;
 
 use std::fs;
 use std::path::PathBuf;
@@ -10,10 +9,8 @@ use luft_software::http::{self, MISSING, OFFLINE};
 
 use super::DOWNLOADS;
 use crate::catalog::cache;
-use stamp::{Expiry, Stamp};
-use trust::{Keys, Seal};
+use luft_store_seal::{Expiry, Keys, STORE_KEYS, Seal, Stamp};
 
-const STORE_KEYS: &str = "trust/v1/store-keys.json";
 const SEAL: &str = ".sig";
 const LENGTH: usize = size_of::<u64>();
 
@@ -182,7 +179,7 @@ fn load<T>(
             let seal = bytes(&format!("{url}{SEAL}"))?;
             let fresh = Stored { body, seal, tag };
             let (checked, stamp) = trusted(&fresh)?;
-            stamp.accept(document)?;
+            stamp::accept(&stamp, document)?;
             cached.store(&fresh);
             Ok(Some((fresh.body, checked)))
         }
@@ -218,6 +215,23 @@ pub fn fetch(document: &str, age: Age) -> Result<Vec<u8>, String> {
             .or_else(|_| keys(Age::Current)?.verify(body, seal))
     })?;
     Ok(body)
+}
+
+/// A document and its seal as Schelf last took them from schelf.store, for a
+/// service that checks the store's signature itself.
+pub struct Sealed {
+    pub body: Vec<u8>,
+    pub seal: Vec<u8>,
+}
+
+pub fn sealed(document: &str) -> Result<Sealed, String> {
+    let stored = Cached::of(document)
+        .read()
+        .ok_or_else(|| format!("Schelf has no copy of {document} from schelf.store."))?;
+    Ok(Sealed {
+        body: stored.body,
+        seal: stored.seal,
+    })
 }
 
 #[cfg(test)]

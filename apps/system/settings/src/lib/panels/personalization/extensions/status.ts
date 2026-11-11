@@ -4,7 +4,14 @@ import type { Extension } from '#lib/bindings.js';
 const PROBLEMS: Record<string, string> = {
 	failed: 'settings-extensions-failed',
 	crashed: 'settings-extensions-crashed',
-	invalid: 'settings-extensions-invalid'
+	invalid: 'settings-extensions-invalid',
+	'runs-separately': 'settings-extensions-runs-separately'
+};
+
+const ORIGINS: Record<string, string> = {
+	store: 'settings-extensions-from-store',
+	development: 'settings-extensions-from-development',
+	own: 'settings-extensions-from-own'
 };
 
 export const PERMISSIONS: Record<string, string> = {
@@ -30,6 +37,9 @@ export const PERMISSIONS: Record<string, string> = {
 };
 
 export function summary(extension: Extension): string {
+	if (extension.state === 'needs-newer-luft') return t('settings-extensions-needs-newer-luft', { version: extension.luft });
 	const problem = PROBLEMS[extension.state];
 	return problem ? t(problem) : extension.description;
 }
+
+export const origin = (extension: Extension) => t(ORIGINS[extension.origin] ?? ORIGINS.own);

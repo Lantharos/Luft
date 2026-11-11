@@ -15,7 +15,7 @@ import {settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
 import {closeStart, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {installBuilt, listed, request, rewrite, userFolder} from '../extensions/lib/extensions.js';
+import {installBuilt, listed, request, rewrite, developmentFolder} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Pult');
 const PULT = 'com.lantharos.Pult';
@@ -107,8 +107,8 @@ export async function run() {
   const pult = new StandInPult(freePorts('pult').pult);
   try {
     await installBuilt(PULT);
-    rewrite(GLib.build_filenamev([userFolder(PULT), 'extension.toml']), text => text.replace('"app.pult.sh"', `"127.0.0.1:${pult.port}"`));
-    rewrite(GLib.build_filenamev([userFolder(PULT), 'extension.js']), text => text.replaceAll('https://app.pult.sh', pult.base));
+    rewrite(GLib.build_filenamev([developmentFolder(PULT), 'extension.toml']), text => text.replace('"app.pult.sh"', `"127.0.0.1:${pult.port}"`));
+    rewrite(GLib.build_filenamev([developmentFolder(PULT), 'extension.js']), text => text.replaceAll('https://app.pult.sh', pult.base));
     await request('Reload', PULT);
     await eventually(async () => (await listed(PULT))?.state === 'running', 'Pult runs once installed');
     await checkSignedOut();

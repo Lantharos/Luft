@@ -24,4 +24,14 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
+
+  <action id="com.lantharos.packages.extensions">
+    <description>Install extensions schelf.store approved to run inside Luft</description>
+    <message>Authentication is required to install an extension</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
 </policyconfig>

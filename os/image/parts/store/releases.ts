@@ -4,11 +4,11 @@ import { join } from 'node:path';
 
 type Artifact = { platform: string; kind: string; url: string; size: number; sha256: string };
 type Release = { version: string; published: string; artifacts: Artifact[] };
-type Listing = { id: string; kind: 'app' | 'extension'; releases: Release[] } & Record<string, unknown>;
+type Listing = { id: string; releases: Release[] } & Record<string, unknown>;
 type Preinstall = { id: string; replaces?: string };
 
 const INDEX = 'https://dl.schelf.store/index/v1/apps';
-const PLATFORMS = { app: [['linux-x86_64', 'archive']], extension: [['luft-x86_64', 'extension'], ['luft', 'extension']] };
+const PLATFORM = 'linux-x86_64';
 const PREINSTALL = '/usr/share/luft/preinstall';
 
 async function listing(id: string): Promise<Listing | undefined> {
@@ -18,15 +18,11 @@ async function listing(id: string): Promise<Listing | undefined> {
   return response.json();
 }
 
-function artifact(listing: Listing, release: Release) {
-  for (const [platform, kind] of PLATFORMS[listing.kind]) {
-    const found = release.artifacts.find((artifact) => artifact.platform === platform && artifact.kind === kind);
-    if (found) return found;
-  }
-}
+const artifact = (release: Release) =>
+  release.artifacts.find((artifact) => artifact.platform === PLATFORM && artifact.kind === 'archive');
 
 const newest = (listing?: Listing) =>
-  listing?.releases.filter((release) => artifact(listing, release)).sort((a, b) => b.published.localeCompare(a.published))[0];
+  listing?.releases.filter((release) => artifact(release)).sort((a, b) => b.published.localeCompare(a.published))[0];
 
 async function resolve() {
   const { preinstall } = Bun.TOML.parse(await Bun.file(join(import.meta.dir, 'apps.toml')).text()) as { preinstall: Preinstall[] };
@@ -42,7 +38,7 @@ async function stage(destdir: string, versions: string) {
     const [id, version] = pinned.split('=');
     const found = await listing(id);
     const release = found?.releases.find((candidate) => candidate.version === version);
-    const file = found && release && artifact(found, release);
+    const file = release && artifact(release);
     if (!found || !release || !file) throw new Error(`schelf.store has no ${id} ${version} for this image`);
     const bytes = new Uint8Array(await (await fetch(file.url)).arrayBuffer());
     if (bytes.length !== file.size || createHash('sha256').update(bytes).digest('hex') !== file.sha256) {

@@ -5,7 +5,8 @@
 	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { launch, openUrl } from '#lib/bridge/index.js';
+	import { openUrl } from '#lib/bridge/index.js';
+	import { opening } from '#lib/state/opening.svelte.js';
 	import { transferred } from '#lib/format.js';
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -83,15 +84,24 @@
 				<button type="button" class="button large" onclick={updateNow}>Update</button>
 			{/if}
 			{#if installed.desktop && !pulled}
-				<button type="button" class="button primary large" onclick={() => launch(installed.desktop!)}>Open</button>
+				<button type="button" class="button primary large" onclick={() => opening.open(installed)}>Open</button>
 			{/if}
 		{:else if listing && (listing.origin !== 'schelf' || store?.installer)}
 			<button type="button" class="button primary large" onclick={install}>Install</button>
+		{:else if store?.needsLuft}
+			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">Needs Luft {store.needsLuft} or newer. Update Luft in Settings to install it.</p>
+		{:else if store?.kind === 'extension' && store.version && !store.inShell}
+			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">Luft only runs extensions schelf.store approved to run inside it for now.</p>
 		{:else if store?.download}
 			{@const file = store.download}
 			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>Download</button>
 		{/if}
 	</div>
+	{#if installed && store?.needsLuft && !active}
+		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">Its newest version needs Luft {store.needsLuft} or newer.</p>
+	{:else if store?.luft && !active}
+		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">Runs on Luft {store.luft} and newer</p>
+	{/if}
 	{#if active && transferred(active)}
 		<p class="text-[12.5px] text-[var(--text-muted)] tabular-nums">{transferred(active)}</p>
 	{:else if operation?.state === 'failed'}

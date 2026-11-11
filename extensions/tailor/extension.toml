@@ -44,3 +44,6 @@ label = "vesktop"
 default = true
 depends = "found"
 when = ["vesktop"]
+
+[luft]
+minimum = "1.0-nightly.27"

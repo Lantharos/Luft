@@ -1,9 +1,10 @@
 import GLib from 'gi://GLib';
 
 import type { SettingDescription, SliderRange } from './api/v1/types.js';
-import type { Installed } from './runtime/folders.js';
+import type { Installed } from './runtime/installed/folders.js';
 import type { ExtensionInstance } from './runtime/instance.js';
 import type { ExtensionManager } from './runtime/manager.js';
+import { runsInShell } from './runtime/installed/origins.js';
 import { chosenShortcuts } from './runtime/shortcuts.js';
 import { variant } from './runtime/store.js';
 
@@ -66,6 +67,8 @@ function state(installed: Installed, manager: ExtensionManager): string {
   const instance = manager.instance(installed.id);
   if (!instance) return 'invalid';
   if (instance.running) return 'running';
+  if (!manager.fitsLuft(installed)) return 'needs-newer-luft';
+  if (!runsInShell(installed.origin)) return 'runs-separately';
   const problem = manager.store.problem(installed.id);
   if (problem) return problem.kind === 'crash' ? 'crashed' : 'failed';
   return 'off';
@@ -76,6 +79,8 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
   const fields: Fields = {
     id: text(installed.id),
     path: text(installed.path),
+    origin: text(installed.origin),
+    ignored: GLib.Variant.new_strv(installed.ignored),
     enabled: GLib.Variant.new_boolean(!manager.store.disabled.has(installed.id)),
     state: text(state(installed, manager)),
     problem: text(installed.problem ?? manager.store.problem(installed.id)?.detail ?? ''),
@@ -87,6 +92,7 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
     name: text(instance.name),
     description: text(instance.description),
     version: text(manifest.version),
+    luft: text(manifest.luft?.minimum ?? ''),
     api: GLib.Variant.new_uint32(manifest.api),
     permissions: GLib.Variant.new_strv(manifest.permissions ?? []),
     helper: GLib.Variant.new_boolean(!!manifest.helper),

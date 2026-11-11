@@ -29,3 +29,6 @@ key = "hide-empty"
 type = "switch"
 label = "hide-empty"
 default = false
+
+[luft]
+minimum = "1.0-nightly.27"

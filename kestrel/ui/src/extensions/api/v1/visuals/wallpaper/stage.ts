@@ -1,10 +1,11 @@
-import type Clutter from 'gi://Clutter';
+import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import { visibleWallpaperMonitors } from '../../../../../desktop/panel/coverage.js';
 import type { Monitor } from '../../../../../desktop/panel/panel.js';
 import { PlaybackConditions } from '../../../../../desktop/wallpaper/conditions.js';
+import { showsWallpaper } from '../../../../../desktop/wallpaper/pictures.js';
 import { reducedMotion } from '../../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../../host.js';
 import type { LayerOptions, Rect, TaskbarOutline } from '../../types.js';
@@ -21,7 +22,8 @@ export class LayerStage {
   private readonly shell = St.Settings.get();
   private conditions: PlaybackConditions | null = null;
   private disconnectors: (() => void)[] = [];
-  private belowWindows: Meta.BackgroundGroup | null = null;
+  private belowWindows: Clutter.Actor | null = null;
+  private forgetPicture: (() => void) | null = null;
   readonly surfaces: SurfaceWatch;
   readonly pointers: DesktopPointers;
 
@@ -75,12 +77,26 @@ export class LayerStage {
     else global.window_group.get_parent()!.insert_child_above(actor, global.window_group);
   }
 
-  private belowWindowsGroup(): Meta.BackgroundGroup {
+  private belowWindowsGroup(): Clutter.Actor {
     if (!this.belowWindows) {
-      this.belowWindows = new Meta.BackgroundGroup();
-      this.host.desktopLayer.add_child(this.belowWindows);
+      this.belowWindows = new Clutter.Actor();
+      global.display.connect('restacked', () => this.stackOverWallpaper());
+      this.stackOverWallpaper();
     }
     return this.belowWindows;
+  }
+
+  private stackOverWallpaper(): void {
+    const group = this.belowWindows!;
+    const video = global.get_window_actors().findLast(actor => actor.meta_window?.get_window_type() === Meta.WindowType.DESKTOP);
+    const parent = video ? global.window_group : this.host.desktopLayer;
+    if (group.get_parent() !== parent) {
+      group.get_parent()?.remove_child(group);
+      parent.add_child(group);
+      this.forgetPicture?.();
+      this.forgetPicture = video ? showsWallpaper(group, true) : null;
+    }
+    if (video) global.window_group.set_child_above_sibling(group, video);
   }
 
   taskbar(monitor: Monitor): Rect | null {

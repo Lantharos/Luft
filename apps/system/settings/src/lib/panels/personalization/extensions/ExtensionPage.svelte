@@ -6,7 +6,7 @@
 	import { extensions, shown } from './extensions.svelte';
 	import PageView from './PageView.svelte';
 	import SettingRow from './SettingRow.svelte';
-	import { PERMISSIONS, summary } from './status';
+	import { origin, PERMISSIONS, summary } from './status';
 
 	let { extension, onclose }: { extension: Extension; onclose: () => void } = $props();
 
@@ -56,7 +56,11 @@
 	{/if}
 
 	<Section>
-		<Row title={t('settings-extensions-remove')} description={t('settings-extensions-installed', { version: extension.version })} onclick={() => (removing = true)} />
+		<Row title={origin(extension)} description={t('settings-extensions-installed', { version: extension.version })} />
+		{#if extension.ignored.length}
+			<Row title={t('settings-extensions-ignored', { count: extension.ignored.length })} description={extension.ignored.join(', ')} />
+		{/if}
+		<Row title={t('settings-extensions-remove')} onclick={() => (removing = true)} />
 	</Section>
 </SubPage>
 

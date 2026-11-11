@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import * as Main from '../../../../../core/main.js';
 import type { ApiContext } from '../../core/context.js';
 import type { InputSound, InputSoundFiles, InputSounds } from '../../types.js';
-import { extensionFile } from './files.js';
+import { confinedFile } from '../../core/confined.js';
 import { openMix } from './sounds.js';
 
 const KINDS: Record<InputSound, Shell.KeySound> = {
@@ -46,7 +46,7 @@ export function inputSoundsApi(context: ApiContext): InputSounds {
 
   return {
     load: (files: InputSoundFiles) => {
-      const named = Object.entries(files).flatMap(([kind, paths]) => paths.map(file => ({ kind: KINDS[kind as InputSound], file: extensionFile([path, dataPath], file) })));
+      const named = Object.entries(files).flatMap(([kind, paths]) => paths.map(file => ({ kind: KINDS[kind as InputSound], file: confinedFile([path, dataPath], file) })));
       const opened = open();
       finishLoading?.(null);
       return new Promise<string | null>(resolve => {

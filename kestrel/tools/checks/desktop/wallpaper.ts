@@ -7,6 +7,7 @@ import {descendants, existing, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {checkWallpaperModes} from './wallpaper/modes.js';
+import {liveCost} from './wallpaper/overlays.js';
 import {framesOn, makeVideo, wallpapers} from './wallpaper/video.js';
 
 type Monitor = typeof Main.layoutManager.monitors[number];
@@ -81,6 +82,7 @@ export async function run() {
   kestrel.set_string('live-wallpaper', video.get_uri());
   try {
     const actors = await checkPlaying(picture, darkPicture);
+    await liveCost('playing on an empty desktop');
     await checkCovered(actors);
     await checkWallpaperModes(darkPicture);
     background.set_string('picture-uri', picture);

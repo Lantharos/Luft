@@ -4,6 +4,10 @@ set -euo pipefail
 extension="$(cd "$1" && pwd)"
 out="$2"
 id="$(sed -n 's/^id = "\(.*\)"$/\1/p' "$extension/extension.toml")"
+if ! sed -n '/^\[luft\]/,/^\[/p' "$extension/extension.toml" | grep -q '^minimum = "'; then
+  echo "$id names no [luft] minimum in extension.toml, the oldest version of Luft it runs on" >&2
+  exit 1
+fi
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 

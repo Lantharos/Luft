@@ -18,7 +18,7 @@ com.example.Hello/
     de/hello.ftl
 ```
 
-The folder's name is the extension's id, in reverse DNS. Put it in `~/.local/share/luft/extensions/` while you work on it.
+The folder's name is the extension's id, in reverse DNS. Luft lists an extension in `~/.local/share/luft/extensions/`, but only runs the ones it installed from Schelf inside the desktop, so for now try yours in a development build of Luft's desktop, started from its build folder with `KESTREL_DEVELOPMENT_EXTENSIONS` naming the folder that holds it.
 
 ## The manifest
 
@@ -30,6 +30,9 @@ version = "1.0.0"
 api = 1
 permissions = ["quick-settings", "notifications"]
 
+[luft]
+minimum = "1.2"
+
 [[settings]]
 key = "loud"
 type = "switch"
@@ -37,7 +40,7 @@ label = "loud"
 default = false
 ```
 
-`api` is the version of the extension API it's written for. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for, and people see the list before they install it. It's a declaration rather than a sandbox, as the [manifest reference](/extensions/manifest/#permissions) explains. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
+`api` is the version of the extension API it's written for, and `[luft] minimum` the oldest version of Luft it runs on. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for, and people see the list before they install it. It's a declaration rather than a sandbox, as the [manifest reference](/extensions/manifest/#permissions) explains. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
 
 ## The code
 

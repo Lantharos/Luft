@@ -1,4 +1,4 @@
-import { extensionFile } from '../../sound/audio/files.js';
+import { confinedPath } from '../../core/confined.js';
 import type { ApiContext } from '../../core/context.js';
 import type { Layer, LayerOptions, Wallpaper } from '../../types.js';
 import { WallpaperLayer } from './layer.js';
@@ -7,7 +7,7 @@ import { DesktopSprites } from './sprites.js';
 export function wallpaperApi({ layers, scope, manifest, path, dataPath }: ApiContext): Wallpaper {
   return {
     addSprites: () => {
-      const sprites = new DesktopSprites(layers, scope, `extension-sprite:${manifest.id}`, file => extensionFile([path, dataPath], file).get_path()!);
+      const sprites = new DesktopSprites(layers, scope, `extension-sprite:${manifest.id}`, file => confinedPath([path, dataPath], file));
       const handle = scope.disposable(() => sprites.destroy());
       return {
         loadSheet: options => sprites.loadSheet(options),
@@ -40,7 +40,7 @@ export function wallpaperApi({ layers, scope, manifest, path, dataPath }: ApiCon
           layer.active = active;
         },
         reshape: () => layer.reshape(),
-        setPictures: (name, files) => layer.setPictures(name, files.map(file => extensionFile([path, dataPath], file).get_path()!)),
+        setPictures: (name, files) => layer.setPictures(name, files.map(file => confinedPath([path, dataPath], file))),
         dispose: () => handle.dispose(),
       };
     },

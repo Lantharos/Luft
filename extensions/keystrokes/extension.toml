@@ -40,3 +40,6 @@ max = 1
 step = 0.05
 unit = "percent"
 page = "sound"
+
+[luft]
+minimum = "1.0-nightly.27"

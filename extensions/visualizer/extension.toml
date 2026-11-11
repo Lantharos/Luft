@@ -70,3 +70,6 @@ options = [
   { value = "all", label = "every-display" },
   { value = "primary", label = "main-display" },
 ]
+
+[luft]
+minimum = "1.0-nightly.27"

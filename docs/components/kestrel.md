@@ -16,7 +16,7 @@ peek stop $h
 
 `peek run` gives the program its own hidden display, so nothing reaches your screen. An app you already have open starts a separate copy there with its own runtime folder, cache and profile, instead of handing over to yours; `--shared` lets it use yours. `--here` opens it on your screen instead, and `--size 1920x1200:302x189mm` sets the hidden display's resolution and physical size. Windows you opened yourself need your permission first, which the privacy menu in the taskbar shows and takes back.
 
-peek is a developer tool and stays off until Developer tools is turned on. The switch is `DeveloperTools` on `com.lantharos.Greeter1`, kept in `/var/lib/kestrel-greeter/config.json`, which only root can write; `SetDeveloperTools(b)` changes it and always asks for an administrator's password, so a program can't turn it on by itself.
+peek is a developer tool and stays off until Developer tools is turned on. The switch is `DeveloperTools` on `com.lantharos.Greeter1`, kept in `/var/lib/kestrel-greeter/config.json`, which only root can write; `SetDeveloperTools(b)` changes it and always asks for an administrator's password, so a program can't turn it on by itself. The same switch opens the text consoles ([Security](../security.md#text-consoles)).
 
 ## Open windows
 
@@ -157,13 +157,13 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 
 `com.lantharos.Password1` at `/com/lantharos/Password1` on the system bus changes the caller's own password, for people in an active session at the computer: `ChangePassword(h current, h new)`. Both passwords come through file descriptors, never in the message. It checks the new one against the system's password rules, then runs the `kestrel-password` PAM rules: the current password has to be right, and Luft Keyring is locked with the new one in the same step. It answers `WrongPassword`, `TooWeak` (whose message is `too-short`, `too-similar`, `dictionary-word`, `contains-name`, `too-simple` or `rejected`) or `Failed`. It is `kestrel-greeter-service --passwords` in a unit of its own, `kestrel-password.service`, which D-Bus starts for the call and which quits half a minute later, so the login screen's settings service keeps no way to write `/etc`.
 
-greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
+greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Settings turns it on with `SetAutomaticLogin`, and first asks to confirm in a dialog when nothing asks for a password while the computer starts: the disk isn't encrypted, or the TPM unlocks it without a PIN. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
 
 `kestrel-session --setup` runs Install Luft alone over the blurred wallpaper first ([Install](../install.md)). The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior.
 
 ## Extensions
 
-Kestrel runs extensions, such as Seasons, which ships with Luft. How they load, what they may use, their D-Bus interface, the crash guard and shaders on windows and the screen are in [Extensions](../extensions.md).
+Kestrel runs extensions people install from Schelf, such as Seasons. How they load, what they may use, their D-Bus interface, the crash guard and shaders on windows and the screen are in [Extensions](../extensions.md).
 
 ## Signing in and unlocking
 

@@ -40,3 +40,6 @@ key = "expand-on-hover"
 type = "switch"
 label = "expand-on-hover"
 default = true
+
+[luft]
+minimum = "1.0-nightly.27"

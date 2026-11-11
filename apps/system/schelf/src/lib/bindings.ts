@@ -38,16 +38,17 @@ export const commands = {
 		source: Source,
 	}, options?: CallOptions) => invoke<boolean>("library_full_access", params, options),
 	libraryInstalled: (options?: CallOptions) => invoke<InstalledApp[]>("library_installed", {}, options),
-	libraryLaunch: (params: {
-		desktop: string,
-		token?: string | null,
-	}, options?: CallOptions) => invoke<null>("library_launch", params, options),
 	libraryNames: (params: {
 		desktop: string,
 	}, options?: CallOptions) => invoke<Names>("library_names", params, options),
 	libraryNotifications: (params: {
 		desktop: string,
 	}, options?: CallOptions) => invoke<Notifications>("library_notifications", params, options),
+	libraryOpen: (params: {
+		desktop: string,
+		token?: string | null,
+		source: Source,
+	}, options?: CallOptions) => invoke<Failure | null>("library_open", params, options),
 	libraryPermissions: (params: {
 		installation: Installation,
 		reference: string,
@@ -295,6 +296,15 @@ export type ExtensionAccess = {
 	listen: ListenPort[],
 };
 
+/**  Why an app closed right after it started. */
+export type Failure = {
+	crashed: boolean,
+	missing: Missing | null,
+	/**  The system package that provides what's missing. */
+	package: string | null,
+	output: string[],
+};
+
 /**  A Fedora package's page, from Fedora's software sources. */
 export type FedoraDetails = {
 	version: string,
@@ -374,12 +384,20 @@ export type Locale = {
 	fixed: boolean,
 };
 
+/**  Something an app looked for when it started and didn't find. */
+export type Missing = {
+	kind: Need,
+	name: string,
+};
+
 export type Motion = "full" | "reduced" | "off";
 
 export type Names = {
 	own: string,
 	custom: string | null,
 };
+
+export type Need = "library" | "program" | "perlModule" | "pythonModule" | "typelib";
 
 export type Notifications = {
 	allowed: boolean,
@@ -554,6 +572,15 @@ export type StoreDetails = {
 	 */
 	withdrawn: boolean,
 	replacedBy: ReplacedBy | null,
+	/**  The oldest version of Luft the release above runs on. */
+	luft: string | null,
+	/**  The version of Luft the newest release needs, when this one is older. */
+	needsLuft: string | null,
+	/**
+	 *  Whether schelf.store approved the extension's release to run inside
+	 *  Luft, the only extensions Luft runs for now.
+	 */
+	inShell: boolean,
 };
 
 export type StoreState = {

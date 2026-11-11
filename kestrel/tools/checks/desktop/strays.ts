@@ -12,9 +12,10 @@ import {capture, screenshot} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {removeTree} from '../apps/lib/files.js';
 import {openWindow} from '../tiling/lib/tiling.js';
-import {installBuilt, listed, request, userFolder} from '../extensions/lib/extensions.js';
+import {installBuilt, listed, request, developmentFolder} from '../extensions/lib/extensions.js';
 import {atRest, foot, middle, mood, near, paintsOver, report, setStrays, sprite, sprites, STRAYS, surfaceTop, taskbarTop, withRandom} from './lib/strays.js';
 import {checkRiding} from './lib/straysRiding.js';
+import {litShares, onLiveWallpaper, paintsBetween} from './wallpaper/overlays.js';
 
 const {require, eventually} = checks('strays');
 const NAME = 'com.lantharos.Kestrel';
@@ -32,6 +33,7 @@ const SEQUENCE_STEP_MS = 100;
 const GRIP_SHARE = 0.25;
 const SETTLE_MS = 12000;
 const SEEK_ABOVE_TASKBAR = 380;
+const SPRITE_SHARE = 0.1;
 const PACKS = scratch('stray-packs');
 const TOGETHER = /saying hello|chasing|running away|playing|sneaking up|getting bumped/;
 
@@ -107,6 +109,28 @@ async function checkWalkingOnTheTaskbar() {
   require(near(foot(), taskbarTop()), 'it stays on the taskbar as it walks');
   await eventually(atRest, 'it settles again', 15000);
   await capture('strays-taskbar');
+}
+
+function spriteArea() {
+  const extents = sprite().get_transformed_extents();
+  return {x: Math.round(extents.get_x()), y: Math.round(extents.get_y()), width: Math.round(extents.get_width()), height: Math.round(extents.get_height())};
+}
+
+async function checkOverLiveWallpaper() {
+  await eventually(atRest, 'it rests before a live wallpaper starts');
+  await onLiveWallpaper(eventually, async () => {
+    const shares = await eventually(async () => {
+      const lit = await litShares(spriteArea());
+      return Math.min(...lit) > SPRITE_SHARE && lit;
+    }, 'a stray shows over a live wallpaper in every frame');
+    report('lit share of its box over a live wallpaper', shares);
+    await capture('strays-live-wallpaper');
+    const {window} = await openWindow('Away from a stray', 360, 240);
+    window.move_frame(true, 10, 10);
+    require(paintsBetween(sprite(), [window]), 'it draws over the video and under windows');
+    await eventually(atRest, 'it stays at rest over the video');
+    window.delete(global.get_current_time());
+  });
 }
 
 async function checkLandingOnAWindow() {
@@ -327,7 +351,7 @@ async function answerFolder(path: string) {
 function packFolder(name: string, change: (manifest: Record<string, Record<string, unknown>>) => void) {
   const folder = GLib.build_filenamev([PACKS, name]);
   GLib.mkdir_with_parents(folder, 0o755);
-  const template = GLib.build_filenamev([userFolder(STRAYS), 'template', 'example']);
+  const template = GLib.build_filenamev([developmentFolder(STRAYS), 'template', 'example']);
   Gio.File.new_for_path(`${template}/sheet.png`).copy(Gio.File.new_for_path(`${folder}/sheet.png`), Gio.FileCopyFlags.NONE, null, null);
   const manifest = JSON.parse(new TextDecoder().decode(GLib.file_get_contents(`${template}/pack.json`)[1]));
   change(manifest);
@@ -384,6 +408,7 @@ export async function run() {
 
     await withRandom(0.99, async () => {
       await checkWalkingOnTheTaskbar();
+      await checkOverLiveWallpaper();
       await checkLandingOnAWindow();
       await checkNoticingAWindow();
       await checkPipFlies();

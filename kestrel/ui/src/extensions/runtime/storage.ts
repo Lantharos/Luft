@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { Stored } from '../api/v1/types.js';
-import { storageFile } from './folders.js';
+import { storageFile } from './installed/folders.js';
 
 const LIMIT_BYTES = 1024 * 1024;
 const WRITE_DELAY_MS = 1000;

@@ -5,15 +5,13 @@ sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult, in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. You find them in [Schelf](/apps/schelf/), such as Seasons, [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult.
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**.
 
-The list under **What it can do** is what the extension says it uses, and what [Schelf](/apps/schelf/) showed you before installing it. It isn't a lock: extensions become part of the desktop itself, so unlike apps they don't run in a sandbox, and one that set out to misbehave could do more than its list says. Extensions in Schelf go through its checks and review before they're published, and are signed so that what you install is what was reviewed. Install extensions from Schelf, from people you trust, the way you would an app you give full access.
+The list under **What it can do** is what the extension says it uses, and what [Schelf](/apps/schelf/) showed you before installing it. Extensions that run inside the desktop become part of it, so unlike apps they don't run in a sandbox. That's why Luft only runs an extension there when Schelf's store approved that release for it, from a publisher it verified, and keeps it where your own programs can't change it. An extension you put in your own folder yourself is meant to run on its own instead, limited to exactly what's listed; until Luft can do that, it's listed but doesn't run.
 
 If an extension stops working, Luft turns it off by itself and tells you. The same happens to the extensions that were running when the desktop restarted twice in a row after a problem. Turn it back on in Settings once you've updated it, or leave it off.
-
-Removing an extension that came with Luft removes it for your account only; Schelf can bring it back.
 
 ## Seasons
 

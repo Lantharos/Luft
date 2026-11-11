@@ -1,6 +1,6 @@
 # Extensions
 
-Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the whole screen, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process, as part of it: Kestrel hands each one a versioned API object, which is what extensions are written against, but nothing walls an extension off from the rest of Kestrel, so an extension is trusted the way Kestrel is ([what permissions are](#what-permissions-are-and-arent)). What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
+Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the whole screen, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. Extensions are written against a versioned API object Kestrel hands each one, never against Kestrel's own code. Only trusted extensions run inside Kestrel's process: the ones that come with Luft, and those schelf.store approved to run there. Anything else, such as an extension copied into your own folder, is meant to run on its own in a separate process, and until Luft can do that it doesn't run at all ([where extensions come from](#where-extensions-come-from)). What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
 
 | Where | What |
 | --- | --- |
@@ -15,7 +15,7 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 ## On disk
 
 ```
-~/.local/share/luft/extensions/<id>/       one folder per installed extension
+<folder>/<id>/                             one folder per extension, in one of the folders below
   extension.toml                           the manifest
   extension.js                             one ES module whose default export is enable(extension)
   locales/<language>/*.ftl                 translations, English in locales/en
@@ -24,7 +24,29 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 
 What an extension keeps for itself lives outside its folder, so updates keep it: files in `~/.local/share/luft/extension-data/<id>/` and stored values in `~/.local/state/luft/extension-storage/<id>.json`. Removing the extension deletes both. `writeText` writes a file there through GIO on a worker thread, to a temporary file that's synced and renamed over the old one, so a crash leaves the old contents or the new ones, and the compositor never waits for the disk.
 
-Each folder in `luft/extensions` under `XDG_DATA_HOME` is an extension, and its name must be the manifest's `id`. There's no system-wide folder: extensions Luft comes with, such as Seasons, are store releases the image carries in `/usr/share/luft/preinstall`, which Schelf installs into each account at sign-in, once and offline ([Schelf](components/schelf.md#preinstalled-apps-and-background-updates)), and updates from schelf.store after that. Removing one deletes its folder, and it stays removed. An extension runs unless it's turned off.
+### Where extensions come from
+
+Extensions come from Schelf; Luft itself doesn't ship any. Kestrel looks in these folders, in this order, and each folder in them is an extension whose name must be the manifest's `id`:
+
+| Folder | Comes from | Runs |
+| --- | --- | --- |
+| `/var/lib/luft/extensions/<uid>` | schelf.store, for that account only | Inside Kestrel |
+| `~/.local/share/luft/extensions` | Anything else, such as an extension someone unpacked themselves | Not yet: it's listed as `runs-separately` |
+
+Kestrel decides by the folder alone, never by anything inside the extension. An extension only counts as coming from the store when the folder it's in, and every folder above it, belongs to root and nobody else can write to it; otherwise it's treated like one from your own folder. Only the system packages service (`com.lantharos.Packages1`) writes there, after it checked the release itself against schelf.store's signature ([Schelf](components/schelf.md#extensions)). A copy in your own folder of an extension the store's folder has is ignored and listed in `ignored`; its settings, stored values and data are keyed by id, so the one that runs keeps them.
+
+An extension runs unless it's turned off. Removing a store extension asks the system packages service to delete it.
+
+A development build of Kestrel, started from its build folder and not the installed one, also honours `KESTREL_STORE_EXTENSIONS`, a folder that stands in for the account's store folder without being owned by root, and `KESTREL_DEVELOPMENT_EXTENSIONS`, a folder after it whose extensions run inside Kestrel like store ones, for working on Kestrel and Lantharos's own extensions. Headless sessions use both. The installed Kestrel ignores them.
+
+### The version of Luft an extension needs
+
+```toml
+[luft]
+minimum = "1.2"   # or a nightly, such as "1.2-nightly.21"
+```
+
+An extension says the oldest version of Luft it runs on in its manifest, and schelf.store copies it into the release's `requires.luft` in its signed index. Versions are ordered the way Luft releases them: every nightly comes before the release it leads to, so `1.2-nightly.21` is older than `1.2` and newer than `1.1`. The running version is the image's own, which Kestrel asks the update service for each time it starts. It keeps the answer in `~/.local/state/kestrel/luft-version` with the system's startup image it came from, so the next start on that image can use it at once; an image that's only renamed, as a nightly promoted to a release is, keeps the older name there until the answer arrives, which can only hold an extension back, never let one through early. An extension whose minimum is newer isn't loaded, whichever folder it's in, and is listed as `needs-newer-luft`; it loads by itself once an update makes the version new enough. While Kestrel doesn't know the version, extensions that name one wait. Schelf refuses to install or update to a release that needs a newer Luft before it downloads anything, offers the newest release this Luft can run when the index lists one, and says on the store page which version the newest needs. `extensions/pack.sh` refuses to pack an extension without it.
 
 ## Manifest
 
@@ -116,7 +138,7 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `Enable(s id)` | Turns it on, forgetting why Kestrel turned it off |
 | `Disable(s id)` | Turns it off |
 | `Reload(s id)` | Reads its folder again: a new or updated extension starts, a removed one stops. A new version of an extension Kestrel turned off runs again |
-| `Remove(s id)` | Stops it and deletes its folder and settings |
+| `Remove(s id)` | Stops it and deletes it with its settings |
 | `SetSetting(s id, s key, v value)` | Changes one of its declared settings; a value that doesn't fit is refused |
 | `SetShortcut(s id, s key, as accelerators)` | Sets one of its declared shortcuts |
 | `ResetShortcut(s id, s key)` | Puts a shortcut back to its default |
@@ -126,7 +148,7 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 | `PageChanged(s id)` (signal) | The extension's page should be built again: it asked, or a setting changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `listen` (`a(qs)`, each port its helper listens on with `tcp` or `udp`), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `when` (`av`, the values it shows for) or `when-min` and `when-max` (the part of a slider it shows for), `page`, and `options` or `swatches` as `a(ss)` of value and label, with `min` the fewest options a `choices` setting keeps, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `origin` (`store`, `development` or `own`), `ignored` (`as`, copies of it elsewhere that are left alone), `luft` (the oldest version of Luft it runs on), `permissions`, `helper`, `network` (the hosts it connects to), `listen` (`a(qs)`, each port its helper listens on with `tcp` or `udp`), `enabled`, `state` (`running`, `off`, `failed`, `crashed`, `invalid`, `needs-newer-luft` or `runs-separately`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `when` (`av`, the values it shows for) or `when-min` and `when-max` (the part of a slider it shows for), `page`, and `options` or `swatches` as `a(ss)` of value and label, with `min` the fewest options a `choices` setting keeps, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
 
 ## Settings pages
 
@@ -164,7 +186,7 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 `clipboard` puts text, a picture in its own type, or files as a `text/uri-list` on the clipboard through `St.Clipboard` (`api/v1/desktop/clipboard.ts`). Clipboard history sees it like any other copy.
 
-`chooseFiles` asks the file chooser portal for files or a folder and returns their paths where they are, for what an extension hands its helper; `pickFiles` copies what was picked into the data folder instead. Both only work right after the person used the extension.
+`chooseFiles` asks the file chooser portal for files or a folder and returns their paths where they are, for what an extension hands its helper; `pickFiles` copies what was picked into the data folder instead. Both only work right after the person used the extension. The clipboard only takes pictures and files in the extension's folders and what the person chose while it runs.
 
 ## File actions
 
@@ -185,7 +207,7 @@ A taskbar element with `onDrop` takes files dragged from apps. Kestrel can't rea
 
 ## Wallpaper layers
 
-A layer draws one actor for each rectangle of its `area`, so what it leaves out costs nothing: the Visualizer has a band for each edge that's on. `below-windows` layers and sprites sit in a background group of their own right above the wallpaper, since Mutter lowers windows past any other actor in the window group whenever it restacks them. Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island, with the edge it sits on. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder. It also takes `calendars`, and `saveFile` asks where to save a text file the same way. Picking a `folder` copies the files directly inside it, up to 32 of up to 8 MB each, into a new folder there, and `readText` reads text files back.
+A layer draws one actor for each rectangle of its `area`, so what it leaves out costs nothing: the Visualizer has a band for each edge that's on. `below-windows` layers and sprites sit in a group of their own right above the wallpaper: over a picture inside the wallpaper's background group, and over a live wallpaper in the window group right above the wallpaper's windows, where it's put back after every restack, since Mutter lowers windows past any other actor in the window group whenever it restacks them. Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island, with the edge it sits on. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder. It also takes `calendars`, and `saveFile` asks where to save a text file the same way. Picking a `folder` copies the files directly inside it, up to 32 of up to 8 MB each, into a new folder there, and `readText` reads text files back.
 
 ## Sprites
 
@@ -242,7 +264,7 @@ A filter can also go on the desktop alone, the wallpaper and the taskbar with wi
 
 The texture stays while nothing in the actor changes, so a window moving over the wallpaper costs one textured rectangle in what it damaged. When something does change, `reach` grows the redraw clip by as far as the filter carries a pixel, through a redraw clip filter. A filter that moves repaints what's left of the desktop: `meta_compositor_get_uncovered_region()` keeps the region the compositor culled with, and `clutter_stage_view_queue_redraw_region()` repaints it with no actor marked as changed, so opaque windows aren't drawn again for a tick, and behind a fullscreen window nothing is drawn at all.
 
-The wallpaper and what's drawn on it share one actor, `desktopLayer` in the layout manager. Pieces that aren't in it, a live wallpaper's windows and the frozen wallpaper behind a see-through window, get an effect of their own. The taskbar's blur can't follow a bend, so it's held off while one is on. For the same reason a bent desktop doesn't use the software pointer: over the desktop a stand-in actor is drawn where `shownAt` says the picture shows the pointer's position, and over windows the real pointer stays, on its hardware plane.
+The wallpaper and what's drawn on it share one actor, `desktopLayer` in the layout manager. Pieces that aren't in it, a live wallpaper's windows with the layers and sprites over them and the frozen wallpaper behind a see-through window, get an effect of their own. The taskbar's blur can't follow a bend, so it's held off while one is on. For the same reason a bent desktop doesn't use the software pointer: over the desktop a stand-in actor is drawn where `shownAt` says the picture shows the pointer's position, and over windows the real pointer stays, on its hardware plane.
 
 Filters run before rotation and the output color transform, in the view's blending color space, so they see what the desktop drew. Each logical display is one filter, except a tiled monitor made of two views, which bends each half on its own.
 
@@ -343,7 +365,7 @@ The stream stays running for 2 to 4 seconds after the last press, so the first k
 
 `media` builds on Kestrel's MPRIS client: every player, its album, length, position and seeking, and artwork as a local file. Art a player gives as a web address is downloaded once into `~/.cache/kestrel/media-art`, which keeps the last 64 pictures, and views may show files from there. Any app can be a player, so Kestrel only fetches art from hosts on the internet: an address on this computer or the local network is refused, also when a redirect leads there, and a picture over 16 MB is dropped. `media.output` sets the output's volume and device through `ShellMixer`.
 
-To install an extension, unpack it into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
+To try an extension while working on Kestrel, unpack it into the development folder of a development build ([where extensions come from](#where-extensions-come-from)) and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
 
 ## Weather
 
@@ -357,35 +379,37 @@ Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-exte
 
 ## What permissions are, and aren't
 
-An extension is JavaScript that Kestrel imports into its own realm, the one the compositor and the shell run in. That's what makes extensions cheap and lets them draw in the same scene as everything else, and it also means there's no boundary between an extension and Kestrel.
-
-What the permission list does:
+What the permission list does, for every extension:
 
 - **It decides what the API object has.** `createApi` (`api/v1/core/create.ts`) builds the object from the basics plus one part for each permission, the helper, shortcuts and network hosts the manifest names. An extension that didn't ask for `taskbar` has no `taskbar`. The parts hold to their own rules: `network.fetch` refuses hosts the manifest doesn't name, `typing.type` only works right after the person used the extension, and so on.
 - **It's what people are shown.** Schelf lists the permissions, the hosts and whether there's a helper before installing, and Settings lists them on the extension's page. Schelf records what the person agreed to, and an update that asks for more waits until they agree again.
 - **It's what schelf.store checks and reviews.** The store reads the list from the release itself, refuses permissions the API doesn't have, and sends a release that adds a permission, a host or a helper to review.
 
-What it doesn't do:
+What else holds depends on where the extension comes from ([where extensions come from](#where-extensions-come-from)).
 
-- **It isn't a sandbox.** Code in Kestrel's realm can `import` from `gi://` like Kestrel's own modules do, and reach everything the compositor can: the windows and what's in them, the keyboard and pointer, the clipboard, the person's files, the network and other programs. An extension that goes around the API object isn't held to its permissions, the hosts it named, or anything this page says an extension can't see or do. Those statements describe the API, which is what an honest extension uses, not a limit a hostile one meets.
-- **A helper is a program running as the person.** It's started outside any sandbox, with their files and network.
-- **Kestrel doesn't check where an extension came from.** It runs whatever is in `~/.local/share/luft/extensions`. Schelf checks signatures before it puts anything there, but a program already running as the person can write to that folder too, and what it puts there runs inside the compositor at the next start. A sandboxed app can't, unless it was given the home folder: it sees neither that folder nor the D-Bus interface.
+**Extensions that schelf.store approved run inside Kestrel.** They're JavaScript Kestrel imports into its own realm, the one the compositor and the shell run in, which is what lets them draw in the same scene as everything else. There the permissions describe the API, which is all these extensions use, and are not a wall: code in Kestrel's realm could `import` from `gi://` like Kestrel's own modules do. So only extensions someone vouched for get there: a store extension only lands in its folder when schelf.store's signed index says its publisher is verified and that exact release was approved to run inside Luft, which the system packages service checks itself before it unpacks anything. A program running as the person can't change that folder, so it can't swap in code that runs inside the compositor. A helper of these extensions is a program running as the person, started outside any sandbox, with their files and network, including when it's run to undo its changes as the extension is turned off.
 
-So installing an extension is a decision to trust its author with the session, much like installing an app with full access, and more than installing a sandboxed app. What stands between people and a bad extension today:
+**Anything else is meant to run on its own, in a separate process, holding to exactly what's listed**: a copy in your own folder can't reach more than the API it's handed. Until Luft can run extensions that way, those don't run at all, their helpers included.
 
-- **schelf.store.** Extensions go through the same checks and review as apps: a publisher with a proven namespace, the automatic checks, native helpers scanned like any program, and a person's review where the store's rules call for one.
-- **Signatures.** Schelf only installs a release named in the store's signed index, and throws away a download whose size or SHA-256 differs from the signed entry ([Schelf](components/schelf.md)).
+What Kestrel checks for every extension, whatever its folder:
+
+- **Files stay in the extension's folders.** Every path an extension hands the API, to read or write a file, play a sound, show a picture or icon or copy to the clipboard, is resolved with every link on the way followed, and refused unless it ends inside the extension's own folder, its data folder or something the person chose with `chooseFiles`. A link planted in the data folder can't lead anywhere else.
+- **`open` only opens what's safe to open.** `https:` links, `mailto:` addresses, `schelf:` pages, and files and folders in those same folders, never a program, a script or a launcher such as a `.desktop` file.
+- **The version of Luft it needs**, see [above](#the-version-of-luft-an-extension-needs).
+
+What stands between people and a bad extension:
+
+- **schelf.store.** Extensions go through the same checks and review as apps: a publisher with a proven namespace, the automatic checks, native helpers scanned like any program, and a person's review where the store's rules call for one. Running inside Luft also needs the owner's approval of each release.
+- **Signatures.** Schelf only installs a release named in the store's signed index, and throws away a download whose size or SHA-256 differs from the signed entry ([Schelf](components/schelf.md)). The system packages service checks the same signature again before it installs an extension.
 - **Being asked.** The permission list shown before installing, and again when an update widens it.
 - **Pulling a release.** When schelf.store pulls an extension, Schelf turns it off on the computers that have it.
 - **The guards below**, which are about mistakes, not malice: they keep a broken extension from taking the desktop down with it.
-
-Running extensions outside Kestrel's process would make permissions enforceable. Nothing does that today.
 
 ## Safety
 
 - Every call into an extension's code is timed and guarded. An extension that throws while it turns on, or from anything Kestrel calls in it later, is turned off, everything it made is taken away, and a notification says so.
 - Kestrel writes which extensions run to `~/.local/state/kestrel/extensions-running.json`. When `kestrel-wrapper` starts it again after a crash, each extension that was running gets a crash counted; at two in a row it stays off, with a notification. A start that isn't after a crash forgets the counts.
-- The API object only has what the manifest asked for, which keeps an extension from using a part by accident. It's not a security boundary ([what permissions are](#what-permissions-are-and-arent)).
+- The API object only has what the manifest asked for, which keeps an extension from using a part by accident. Inside Kestrel it's not a security boundary ([what permissions are](#what-permissions-are-and-arent)).
 - A turned off extension costs nothing: its module is never loaded. A wallpaper layer has no actors while it's inactive and stops its frame clock while nothing shows, and its shader only runs over the area it asks for.
 - Modules load once per path in GJS, so Kestrel copies `extension.js` to a temporary file for each load. That's what lets `Reload` run new code without restarting Kestrel.
 

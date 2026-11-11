@@ -44,3 +44,6 @@ options = [
   { value = "medium", label = "medium" },
   { value = "large", label = "large" },
 ]
+
+[luft]
+minimum = "1.0-nightly.27"

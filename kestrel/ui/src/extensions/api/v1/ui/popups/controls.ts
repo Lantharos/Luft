@@ -9,6 +9,7 @@ import { BarLevel } from '../../../../../shared/widgets/barLevel.js';
 import { Slider } from '../../../../../shared/widgets/slider.js';
 import { Switch } from '../../../../../shared/popups/menu/switch.js';
 import { animateActor, Curve, Duration } from '../../../../../shared/motion/motion.js';
+import { confinedFile } from '../../core/confined.js';
 import { resolveIcon } from '../../desktop/icons.js';
 import { artwork } from '../../sound/media/artwork.js';
 import type { ButtonView, EntryView, IconView, ImageView, ItemView, ProgressView, SliderView, SwitchView, TextView, View } from '../../types.js';
@@ -25,10 +26,7 @@ export interface ControlHost {
 }
 
 export function imageFile(host: ControlHost, path: string): Gio.File {
-  const file = Gio.File.new_for_path(GLib.path_is_absolute(path) ? path : GLib.build_filenamev([host.extensionPath, path]));
-  if (!host.folders.some(folder => file.has_prefix(Gio.File.new_for_path(folder))) && !artwork.holds(file.get_path()!))
-    throw new Error(`${path} is outside the extension's folders`);
-  return file;
+  return artwork.holds(path) ? Gio.File.new_for_path(path) : confinedFile(host.folders, path);
 }
 
 const MARQUEE_PAUSE_MS = 1200;

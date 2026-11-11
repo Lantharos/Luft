@@ -16,7 +16,7 @@ import {prepareForSleep} from '../lockScreen/lib/sleep.js';
 import {closeStart, descriptionOf, openStart, rows, search, titleOf} from '../start/search/results.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
-import {installBuilt, listed, request, setSetting, userFolder} from '../extensions/lib/extensions.js';
+import {installBuilt, listed, request, setSetting, developmentFolder} from '../extensions/lib/extensions.js';
 import {FOCUS, REMINDERS, STATE, type Stored, answer, answerChooser, bannerMentions, banners, buttonIn, cleanSlate, only, crashKestrel, element, file, keepFor, mentions, openPanel, popup, push, read, readJson, reminder, requeue, row, saved, seed, sentence} from './reminders/world.js';
 
 const {require, eventually} = checks('Reminders');
@@ -440,7 +440,7 @@ async function verifyRestart() {
   GLib.unlink(STATE);
   clearNotifications();
   await request('Remove', REMINDERS);
-  require(!GLib.file_test(userFolder(REMINDERS), GLib.FileTest.EXISTS) && !GLib.file_test(folder.get_path()!, GLib.FileTest.EXISTS), 'removing it deletes its data too');
+  require(!GLib.file_test(developmentFolder(REMINDERS), GLib.FileTest.EXISTS) && !GLib.file_test(folder.get_path()!, GLib.FileTest.EXISTS), 'removing it deletes its data too');
 }
 
 export async function run() {

@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { confinedPath } from './confined.js';
 import type { ApiContext } from './context.js';
 import type { Disposable, Helper, HelperProcess, Manifest } from '../types.js';
 
@@ -23,11 +24,15 @@ function listeners<Arg>(context: ApiContext, owned: Disposable[]) {
   };
 }
 
-function start(context: ApiContext, program: string, args: string[]): HelperProcess {
-  const launcher = new Gio.SubprocessLauncher({ flags: Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE });
-  launcher.set_cwd(context.path);
-  launcher.setenv('LUFT_EXTENSION_DIR', context.path, true);
-  const process = launcher.spawnv([program, ...args]);
+function spawn(folder: string, { helper }: Manifest, args: string[], flags: Gio.SubprocessFlags): Gio.Subprocess {
+  const launcher = new Gio.SubprocessLauncher({ flags });
+  launcher.set_cwd(folder);
+  launcher.setenv('LUFT_EXTENSION_DIR', folder, true);
+  return launcher.spawnv([confinedPath([folder], helper!.path), ...args]);
+}
+
+function start(context: ApiContext, args: string[]): HelperProcess {
+  const process = spawn(context.path, context.manifest, args, Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE);
   const running = new Gio.Cancellable();
   const owned: Disposable[] = [];
   const lines = listeners<string>(context, owned);
@@ -73,15 +78,10 @@ function start(context: ApiContext, program: string, args: string[]): HelperProc
   };
 }
 
-export function runTurnedOffHelper(path: string, { helper }: Manifest): void {
-  if (!helper?.turnedOff) return;
-  const launcher = new Gio.SubprocessLauncher({ flags: Gio.SubprocessFlags.NONE });
-  launcher.set_cwd(path);
-  launcher.setenv('LUFT_EXTENSION_DIR', path, true);
-  launcher.spawnv([GLib.build_filenamev([path, helper.path]), ...helper.turnedOff]);
+export function runTurnedOffHelper(path: string, manifest: Manifest): void {
+  if (manifest.helper?.turnedOff) spawn(path, manifest, manifest.helper.turnedOff, Gio.SubprocessFlags.NONE);
 }
 
 export function helperApi(context: ApiContext): Helper {
-  const program = GLib.build_filenamev([context.path, context.manifest.helper!.path]);
-  return { start: (args = []) => start(context, program, args) };
+  return { start: (args = []) => start(context, args) };
 }

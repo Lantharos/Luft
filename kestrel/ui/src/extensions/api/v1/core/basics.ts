@@ -1,7 +1,6 @@
 import GLib from 'gi://GLib';
 
 import { clockChanges } from '../clock.js';
-import { openUriAsync } from '../../../../shared/apps/launch.js';
 import type { ApiContext } from './context.js';
 import type { Disposable, Session, Settings, Storage, Timers } from '../types.js';
 
@@ -60,10 +59,4 @@ export function storageApi({ stored }: ApiContext): Storage {
     delete: key => stored.delete(key),
     keys: () => stored.keys(),
   };
-}
-
-export function open(uri: string): void {
-  const scheme = GLib.uri_peek_scheme(uri);
-  if (!scheme) throw new Error(`${uri} isn't a link or a file`);
-  openUriAsync(uri).catch(error => console.warn(`${uri} could not be opened: ${error}`));
 }

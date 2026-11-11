@@ -109,9 +109,9 @@ export interface Response {
  */
 export interface Clipboard {
   setText(text: string): void;
-  /** Copies a PNG, JPEG, WebP or GIF picture, by its full path. */
+  /** Copies a PNG, JPEG, WebP or GIF picture, by its full path in the extension's folders or what people chose. */
   setImage(path: string): Promise<void>;
-  /** Copies files and folders, by their full paths, to paste in Rover and other apps. */
+  /** Copies files and folders, by their full paths in the extension's folders or what people chose, to paste in Rover and other apps. */
   setFiles(paths: readonly string[]): void;
 }
 

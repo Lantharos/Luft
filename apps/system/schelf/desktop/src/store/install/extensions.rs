@@ -1,12 +1,15 @@
-use std::fs::{self, File};
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 use luft_app::{block_on, dbus};
 use luft_dbus_macros::introspect;
 use luft_software::progress::Stage;
+use luft_software::system::store_extensions::{self, Signed};
 use luft_software::task::Task;
 use zbus::proxy;
+
+use crate::store::signed::{self, Sealed};
 
 #[introspect]
 #[proxy(
@@ -54,50 +57,41 @@ pub fn api_versions() -> &'static [u32] {
     })
 }
 
-/// The extension's own folder inside what was unpacked: the archive holds
-/// either its contents or the folder itself.
-fn root(unpacked: &Path) -> Result<PathBuf, String> {
-    let entries: Vec<PathBuf> = fs::read_dir(unpacked)
-        .map_err(failed)?
-        .map(|entry| entry.map(|entry| entry.path()))
-        .collect::<Result<_, _>>()
-        .map_err(failed)?;
-    match entries.as_slice() {
-        [only] if only.is_dir() => Ok(only.clone()),
-        _ => Ok(unpacked.to_path_buf()),
+fn signed_by_store(document: &Sealed) -> Signed<'_> {
+    Signed {
+        body: &document.body,
+        seal: &document.seal,
     }
 }
 
-/// Unpacks the extension into `~/.local/share/luft/extensions/ID` in place of
-/// any earlier version, and has the desktop load it.
+/// Has the system install the extension for this account, where the
+/// account's own programs can't change it, once it confirmed that
+/// schelf.store approved this release to run inside Luft, and has the
+/// desktop load it. A copy an earlier Luft unpacked into the account's own
+/// folder goes.
 pub fn install(id: &str, archive: &Path, task: Task) -> Result<String, String> {
     task.progress(Stage::Installing, None);
-    let extensions = folder();
-    let staging = extensions.join(format!(".{id}.unpacking"));
-    let _ = fs::remove_dir_all(&staging);
-    fs::create_dir_all(&staging).map_err(failed)?;
-    let unpacked = zstd::Decoder::new(File::open(archive).map_err(failed)?)
-        .map(tar::Archive::new)
-        .and_then(|mut contents| {
-            contents.set_preserve_permissions(false);
-            contents.set_unpack_xattrs(false);
-            contents.unpack(&staging)
-        });
-    if let Err(error) = unpacked {
-        let _ = fs::remove_dir_all(&staging);
-        return Err(format!("The extension couldn't be unpacked: {error}"));
-    }
-    let destination = extensions.join(id);
-    let previous = extensions.join(format!(".{id}.previous"));
-    let _ = fs::remove_dir_all(&previous);
-    if destination.exists() {
-        fs::rename(&destination, &previous).map_err(failed)?;
-    }
-    fs::rename(root(&staging)?, &destination).map_err(failed)?;
-    let _ = fs::remove_dir_all(&staging);
-    let _ = fs::remove_dir_all(&previous);
+    let listing = signed::sealed(&luft_store_seal::listing_document(id))?;
+    let keys = signed::sealed(luft_store_seal::STORE_KEYS)?;
+    block_on(store_extensions::install(
+        id,
+        signed_by_store(&listing),
+        signed_by_store(&keys),
+        archive,
+    ))?;
+    remove_own_copy(id)?;
     reload(id);
     Ok(id.to_owned())
+}
+
+/// Removes the copy of an extension in the account's own folder, which Luft
+/// no longer runs inside the desktop.
+fn remove_own_copy(id: &str) -> Result<(), String> {
+    let own = folder().join(id);
+    if own.exists() {
+        fs::remove_dir_all(own).map_err(failed)?;
+    }
+    Ok(())
 }
 
 /// Turns off an extension schelf.store pulled, keeping its files.
@@ -105,15 +99,12 @@ pub async fn disable(id: &str) -> Result<(), String> {
     desktop().await?.disable(id).await.map_err(failed)
 }
 
-/// Takes the extension off the desktop with what it saved, or removes its
-/// folder when the desktop isn't running.
+/// Takes the extension off the desktop with what it saved, or removes it
+/// when the desktop isn't running.
 pub fn remove(id: &str) -> Result<(), String> {
     if block_on(async { desktop().await?.remove(id).await.map_err(failed) }).is_ok() {
         return Ok(());
     }
-    let destination = folder().join(id);
-    if destination.exists() {
-        fs::remove_dir_all(destination).map_err(failed)?;
-    }
-    Ok(())
+    block_on(store_extensions::remove(id))?;
+    remove_own_copy(id)
 }

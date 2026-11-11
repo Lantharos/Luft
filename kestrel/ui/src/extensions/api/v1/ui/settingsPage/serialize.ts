@@ -1,6 +1,4 @@
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-
+import { confinedPath } from '../../core/confined.js';
 import type { PageItem, PageSection } from '../../types.js';
 
 type Callback = (value: unknown) => void;
@@ -31,7 +29,7 @@ function finite(value: unknown, what: string): number {
 
 const ELEMENT_KEY = /^[a-z][a-z0-9-]*$/;
 
-export function pageBuilder(folders: readonly string[], extensionPath: string, settings: ReadonlySet<string>, id: string) {
+export function pageBuilder(folders: readonly string[], settings: ReadonlySet<string>, id: string) {
   const callbacks = new Map<string, Callback>();
   const callback = (run: unknown, what: string): string => {
     if (typeof run !== 'function') throw new Error(`${what} must be a function`);
@@ -41,10 +39,8 @@ export function pageBuilder(folders: readonly string[], extensionPath: string, s
   };
   const image = (path: unknown, what: string): string | undefined => {
     if (path === undefined) return undefined;
-    const file = Gio.File.new_for_path(GLib.path_is_absolute(text(path, what)) ? path as string : GLib.build_filenamev([extensionPath, path as string]));
-    if (!IMAGE.test(path as string) || !folders.some(folder => file.has_prefix(Gio.File.new_for_path(folder))))
-      throw new Error(`${what} must be a PNG, JPEG, WebP or SVG in the extension's folders`);
-    return file.get_path()!;
+    if (!IMAGE.test(text(path, what))) throw new Error(`${what} must be a PNG, JPEG, WebP or SVG in the extension's folders`);
+    return confinedPath(folders, path as string);
   };
   const actions = (list: unknown, where: string) => ((list ?? []) as Plain[]).map((action, number) => ({
     label: text(action.label, `${where}.actions[${number}].label`), danger: !!action.danger,

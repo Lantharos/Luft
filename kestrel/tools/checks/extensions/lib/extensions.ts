@@ -15,6 +15,8 @@ export interface Listed {
   id: string;
   name: string;
   version?: string;
+  origin: string;
+  ignored: string[];
   enabled: boolean;
   state: string;
   problem: string;
@@ -41,7 +43,11 @@ export async function setting(id: string, key: string) {
 
 export const layerSheets = (id: string) => descendants(global.stage).filter(actor => actor.name === `extension-layer:${id}`);
 
-export const userFolder = (id: string) => GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extensions', id]);
+export const developmentFolder = (id: string) => GLib.build_filenamev([GLib.getenv('KESTREL_DEVELOPMENT_EXTENSIONS')!, id]);
+
+export const ownFolder = (id: string) => GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extensions', id]);
+
+export const storeFolder = (id: string) => GLib.build_filenamev([GLib.getenv('KESTREL_STORE_EXTENSIONS')!, id]);
 
 export function copyFolder(from: Gio.File, to: Gio.File) {
   GLib.mkdir_with_parents(to.get_path()!, 0o755);
@@ -54,16 +60,24 @@ export function copyFolder(from: Gio.File, to: Gio.File) {
   }
 }
 
-export function install(name: string, id: string) {
-  copyFolder(Gio.File.new_for_path(fixture('extensions', name)), Gio.File.new_for_path(userFolder(id)));
+export function install(name: string, id: string, folder = developmentFolder) {
+  copyFolder(Gio.File.new_for_path(fixture('extensions', name)), Gio.File.new_for_path(folder(id)));
 }
 
 export async function installBuilt(id: string) {
-  copyFolder(Gio.File.new_for_path(builtExtension(id)), Gio.File.new_for_path(userFolder(id)));
+  copyFolder(Gio.File.new_for_path(builtExtension(id)), Gio.File.new_for_path(developmentFolder(id)));
   await request('Reload', id);
 }
 
 export function rewrite(path: string, change: (text: string) => string) {
   const [, contents] = GLib.file_get_contents(path);
   GLib.file_set_contents(path, change(new TextDecoder().decode(contents)));
+}
+
+export function removeFolder(folder: Gio.File) {
+  if (folder.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
+    const children = folder.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+    for (let info = children.next_file(null); info; info = children.next_file(null)) removeFolder(folder.get_child(info.get_name()));
+  }
+  folder.delete(null);
 }

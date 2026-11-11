@@ -344,3 +344,6 @@ options = [
   { value = "lines", label = "lines" },
   { value = "scanlines", label = "scanlines" },
 ]
+
+[luft]
+minimum = "1.0-nightly.27"

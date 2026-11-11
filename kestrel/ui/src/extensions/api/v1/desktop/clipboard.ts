@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
+import { confinedPath, reachableFolders } from '../core/confined.js';
 import type { ApiContext } from '../core/context.js';
 import type { Clipboard } from '../types.js';
 
@@ -15,21 +16,21 @@ function imageType(path: string): string {
   return type;
 }
 
-function fullPath(path: string): string {
+function reachable(context: ApiContext, path: string): string {
   if (!GLib.path_is_absolute(path)) throw new Error(`${path} isn't a full path`);
-  return path;
+  return confinedPath(reachableFolders(context), path);
 }
 
 const copy = (type: string, contents: Uint8Array) => St.Clipboard.get_default().set_content(St.ClipboardType.CLIPBOARD, type, new GLib.Bytes(contents));
 
-export function clipboardApi(_context: ApiContext): Clipboard {
+export function clipboardApi(context: ApiContext): Clipboard {
   return {
     setText: text => St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, text),
     setImage: async path => {
-      const type = imageType(fullPath(path));
-      const [contents] = await Gio.File.new_for_path(path).load_contents_async(null);
+      const type = imageType(path);
+      const [contents] = await Gio.File.new_for_path(reachable(context, path)).load_contents_async(null);
       copy(type, contents);
     },
-    setFiles: paths => copy('text/uri-list', new TextEncoder().encode(paths.map(path => `${GLib.filename_to_uri(fullPath(path), null)}\r\n`).join(''))),
+    setFiles: paths => copy('text/uri-list', new TextEncoder().encode(paths.map(path => `${GLib.filename_to_uri(reachable(context, path), null)}\r\n`).join(''))),
   };
 }

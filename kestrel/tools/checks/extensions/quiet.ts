@@ -14,7 +14,7 @@ import {spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {install, request, rewrite, userFolder} from './lib/extensions.js';
+import {install, request, rewrite, developmentFolder} from './lib/extensions.js';
 
 const {require, eventually} = checks('quiet extension API');
 const QUIET = 'com.example.Quiet';
@@ -165,7 +165,7 @@ export async function run() {
   require(await keyring.own(), 'a scratch keyring stands in for the Secret Service');
   const {web} = freePorts('web');
   install('quiet', QUIET);
-  rewrite(GLib.build_filenamev([userFolder(QUIET), 'extension.toml']), text => text.replace('127.0.0.1:1', `127.0.0.1:${web}`));
+  rewrite(GLib.build_filenamev([developmentFolder(QUIET), 'extension.toml']), text => text.replace('127.0.0.1:1', `127.0.0.1:${web}`));
   await request('Reload', QUIET);
   try {
     await eventually(() => (globalThis as {quiet?: Quiet}).quiet?.inCall !== undefined, 'an extension with the new permissions runs');

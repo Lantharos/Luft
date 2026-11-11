@@ -6,16 +6,19 @@ import {QuickMenuToggle} from 'resource:///com/lantharos/kestrel/kestrel.js';
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, press, release} from '../lib/input/input.js';
-import {fixture, stopAll} from '../lib/processes.js';
+import {fixture, gjs, stop, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
-import {openWindow} from '../tiling/lib/tiling.js';
+import {focus, openWindow} from '../tiling/lib/tiling.js';
 import {layerSheets, request, SEASONS, setSetting} from '../extensions/lib/extensions.js';
 import {checkParting, listening, partsForPointer} from './lib/seasonsParting.js';
+import {litShares, liveCost, onLiveWallpaper, paintsBetween, topOfDesktop} from './wallpaper/overlays.js';
+import {framesOn} from './wallpaper/video.js';
 
-const {eventually} = checks('seasons');
+const {require, eventually} = checks('seasons');
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SETTLING_MS = 20000;
+const RAIN_SHARE = 0.002;
 const BY_MONTH = ['Snow', 'Snow', 'Rain', 'Rain', 'Rain', null, null, null, 'Autumn leaves', 'Autumn leaves', 'Autumn leaves', 'Snow'];
 
 function primarySheets() {
@@ -118,6 +121,39 @@ async function checkFollowing() {
   await choose('effect', 'rain');
 }
 
+async function showsOverVideo(label: string) {
+  const shares = await eventually(async () => {
+    const lit = await litShares(topOfDesktop());
+    return Math.min(...lit) > RAIN_SHARE && lit;
+  }, label);
+  console.log(`Kestrel seasons, ${label}: ${shares.map(share => share.toFixed(4)).join(', ')} of the top of the desktop lit in successive frames`);
+}
+
+async function checkOverLiveWallpaper() {
+  await onLiveWallpaper(eventually, async () => {
+    await eventually(falling, 'rain keeps falling over a live wallpaper');
+    await showsOverVideo('it shows over the video in every frame');
+    await capture('seasons-live-wallpaper');
+    await liveCost('with rain falling over it');
+    const {window: lower} = await openWindow('Under the raised one', 480, 320);
+    const {window: raised} = await openWindow('Raised over the rain', 480, 320);
+    await focus(lower);
+    require(primarySheets().every(sheet => paintsBetween(sheet, [lower, raised])), 'the rain draws over the video and under both windows after they restack');
+    for (const window of [lower, raised]) window.delete(global.get_current_time());
+
+    const app = gjs('clients/windows/window.js');
+    const covering = await waitForWindow('Kestrel window check');
+    covering.maximize();
+    await eventually(dry, 'a maximized window hides it over a live wallpaper');
+    const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+    await eventually(async () => await framesOn(monitor, 500) <= 1, 'and the covered display stops repainting');
+    covering.unmaximize();
+    await eventually(falling, 'unmaximizing the window brings it back over the video');
+    await showsOverVideo('it shows over the video again');
+    await stop(app);
+  });
+}
+
 async function checkCovered() {
   await eventually(falling, 'rain falls again');
   const {window} = await openWindow('Covering');
@@ -147,6 +183,7 @@ export async function run() {
     await checkIslands();
     await checkPictures();
     await checkFollowing();
+    await checkOverLiveWallpaper();
     await checkCovered();
   } finally {
     for (const key of ['extension-settings', 'rounded-window-corners', 'taskbar-style']) kestrel.reset(key);

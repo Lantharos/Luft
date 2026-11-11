@@ -34,7 +34,7 @@ Modules come in two groups: `apps` for apps however they're installed, and `syst
 
 | Module | Provides |
 | --- | --- |
-| `system::image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
+| `system::image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`, `channel_choice`), `download`, `switch`, `switch_channel`, `stable_release`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../../packages/system/variant/README.md), which image suits this computer |
 | `system::system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-packages`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
 | `system::repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
@@ -51,6 +51,8 @@ Modules come in two groups: `apps` for apps however they're installed, and `syst
 `Deployments::status()` gives the running version, a downloaded one waiting for a restart, the previous version, and the previous version when going back to it is queued. `check()` asks the registry for the newest image and how much of it is new. `download` fetches it with `bootc upgrade --download-only`, with progress from bootc's `--progress-fd`. A downloaded update stays locked until Kestrel's restart and power off dialog unlocks it with `Apply`, so leaving the box unticked simply doesn't install it. `rollback` makes the previous version start next time, and calling it again stays on the current one.
 
 `variant_offer` names the other image when it suits the computer better: the NVIDIA one with NVIDIA graphics, the standard one without. `switch` asks the updater to `bootc switch` to it, on the same channel and version, derived from the reference `bootc status` follows; it's staged for the next restart, and the current image stays as the previous version. `switch_size` is how much of it isn't on the computer yet.
+
+`channel_choice` says whether the system follows the stable or nightly channel, or waits to move to the other one, which the updater reports in `Status`; while it waits, `check` looks at that channel and offers nothing older than the running version. `switch_channel` asks the updater to move, and says whether the move started now or waits for the channel to catch up. `stable_release` asks the updater whether a stable version is out, `Unknown` when it couldn't tell.
 
 Versions and release notes come from the image's labels:
 

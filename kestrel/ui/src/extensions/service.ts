@@ -106,11 +106,11 @@ export class ExtensionsService {
     });
   }
 
-  private answer(invocation: Gio.DBusMethodInvocation, action: string, act: () => GLib.Variant | void): void {
-    void refuseSandboxed(invocation, action).then(refused => {
+  private answer(invocation: Gio.DBusMethodInvocation, action: string, act: () => GLib.Variant | void | Promise<void>): void {
+    void refuseSandboxed(invocation, action).then(async refused => {
       if (refused) return;
       try {
-        invocation.return_value(act() ?? null);
+        invocation.return_value(await act() ?? null);
       } catch (error) {
         invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', (error as Error).message);
       }

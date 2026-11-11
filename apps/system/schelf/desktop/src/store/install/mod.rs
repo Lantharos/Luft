@@ -203,6 +203,13 @@ fn replace(id: &str, replacement: &str, consent: &Consent, task: Task) -> Result
     remove(id)
 }
 
+fn unavailable(listing: &Listing) -> String {
+    match listing.needs_luft() {
+        Some(minimum) => format!("{} needs Luft {minimum} or newer.", listing.name()),
+        None => format!("{} isn't available for this computer.", listing.name()),
+    }
+}
+
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
 /// Updating an app another took the place of moves you to that one.
 pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
@@ -211,9 +218,13 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
         return replace(id, &replacement.id, consent, task);
     }
-    let offer = listing
-        .release()
-        .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;
+    let offer = listing.release().ok_or_else(|| unavailable(&listing))?;
+    if offer.format == Format::LuftExtension && !listing.runs_in_shell(offer.release) {
+        return Err(format!(
+            "schelf.store hasn't approved {} to run inside Luft, and Luft can't run extensions on their own yet.",
+            listing.name()
+        ));
+    }
     agreed(&listing, offer.release, consent)?;
     refuse_pulled(&listing, offer.release)?;
     let file = download::verified(&listing.id, offer.artifact, reason.query(), task)?;
@@ -222,7 +233,7 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     placed
 }
 
-/// Installs a store app or extension from the copy of its listing and its
+/// Installs a store app from the copy of its listing and its
 /// file that came with the system, next to each other in one folder, unless
 /// it's already installed from the store. Nothing goes online.
 pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {

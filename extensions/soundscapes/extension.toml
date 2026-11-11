@@ -40,3 +40,6 @@ key = "pause-for-calls"
 type = "switch"
 label = "pause-for-calls"
 default = true
+
+[luft]
+minimum = "1.0-nightly.27"

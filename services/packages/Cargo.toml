@@ -1,7 +1,7 @@
 [package]
 name = "luft-packages"
 version = "0.1.0"
-description = "Builds the system packages Luft merges over its image as a system extension, for Schelf"
+description = "Builds the system packages Luft merges over its image as a system extension, and installs approved extensions, for Schelf"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true
@@ -13,11 +13,19 @@ libc.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
+luft-store-seal.workspace = true
+luft-unpack.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
 walkdir.workspace = true
 zbus = { workspace = true, features = ["service", "tokio"] }
+zstd.workspace = true
+
+[dev-dependencies]
+tar.workspace = true
+tempfile.workspace = true
 
 [lints]
 workspace = true

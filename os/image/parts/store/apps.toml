@@ -13,6 +13,3 @@ replaces = "app-magpie"
 [[preinstall]]
 id = "com.lantharos.mailman"
 replaces = "app-mailman"
-
-[[preinstall]]
-id = "com.lantharos.Seasons"

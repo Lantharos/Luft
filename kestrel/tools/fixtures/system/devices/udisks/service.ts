@@ -3,6 +3,7 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
 import {failureOf} from '../../../../checks/lib/errors.js';
+import {prepareSystemFolders} from './drives.js';
 import {type Block, type Configuration, type Drive, Failure, type FormatOptions, Model, type PartitionEntry} from './model.js';
 
 const ROOT = '/org/freedesktop/UDisks2';
@@ -58,6 +59,7 @@ export function publishUdisks(calls: string[]) {
   const user = GLib.get_user_name();
   const exported = new Map<string, Gio.DBusObjectSkeleton>();
   let model: Model;
+  prepareSystemFolders();
 
   function returnFd(invocation: Gio.DBusMethodInvocation, stream: Gio.InputStream | Gio.OutputStream) {
     if (!(stream instanceof GioUnix.FileDescriptorBased)) throw new Error('Fixture images are local files');
@@ -165,7 +167,7 @@ export function publishUdisks(calls: string[]) {
     }
     if (block.encrypted) {
       interfaces.push(skeleton('Encrypted', {
-        ChildConfiguration: [], HintEncryptionType: 'luks2', MetadataSize: 16 * 1024 * 1024, CleartextDevice: block.encrypted.cleartext,
+        ChildConfiguration: [], HintEncryptionType: '', MetadataSize: 16 * 1024 * 1024, CleartextDevice: block.encrypted.cleartext,
         UnlockAsync: ([passphrase]: [string, Options], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
           record('Unlock');
           return new GLib.Variant('(o)', [model.unlock(block.path, passphrase)]);

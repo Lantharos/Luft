@@ -96,7 +96,11 @@ export class Model {
       const block = this._block(`${device}${partitionPrefix}${number}`, length, drive.path,
         {partition: {number, offset, type, name, flags, uuid: partitionUuid, table: whole.path}, ...ids});
       if (ids.IdUsage === 'filesystem') block.mountPoints = mounts ?? [];
-      if (encrypted) block.encrypted = {...encrypted, cleartext: '/'};
+      if (encrypted) {
+        const {mounted, ...keys} = encrypted;
+        block.encrypted = {...keys, cleartext: '/'};
+        if (mounted) this._unlocked(block).mountPoints = mounted;
+      }
       wholeTable.partitions.push(block.path);
     }
   }
@@ -269,16 +273,20 @@ export class Model {
     this.changed(block.path);
   }
 
-  private _open(block: Block) {
-    const path = block.path;
+  private _unlocked(block: Block) {
     const encrypted = block.encrypted!;
     const clear = this._block(`dm_2d${this._mappers++}`, block.size - 16 * MiB, '/',
-      {cryptoBacking: path, IdUsage: 'filesystem', ...encrypted.inner});
+      {cryptoBacking: block.path, IdUsage: 'filesystem', ...encrypted.inner});
     clear.device = `/dev/dm-${this._mappers - 1}`;
     clear.mountPoints = [];
     encrypted.cleartext = clear.path;
+    return clear;
+  }
+
+  private _open(block: Block) {
+    const clear = this._unlocked(block);
     this.changed(clear.path);
-    this.changed(path);
+    this.changed(block.path);
     return clear.path;
   }
 

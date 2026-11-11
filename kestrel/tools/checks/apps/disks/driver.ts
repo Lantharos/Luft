@@ -15,7 +15,7 @@ export const AT = {
   more: [945, 219], unmount: [900, 357], mount: [1005, 219], saveImage: [900, 550], done: [1001, 310],
   format: [900, 641], safelyRemove: [983, 85],
   wdc: [130, 157], seagate: [130, 100], unlock: [1005, 219], newPartition: [1008, 275],
-  health: [600, 360], firstDrive: [560, 282], next: [686, 488], write: [666, 419],
+  health: [600, 360], firstDrive: [560, 258], next: [686, 512], write: [666, 419],
   largest: [1009, 467], trash: [860, 565],
   turnOn: [885, 448], checked: [755, 448], writeDown: [570, 447], keySaved: [755, 525], unlocking: [755, 436], encrypt: [759, 429],
   encryption: [885, 499], lock: [900, 300],
@@ -24,7 +24,8 @@ export const AT = {
   deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [782, 198],
   apply: [924, 30], confirmApply: [766, 482],
   crucial: [130, 262], removeSystem: [992, 534], confirmRemoveSystem: [728, 517], systemDone: [767, 530],
-  samsung: [130, 43], moveLuft: [876, 230], moveToSeagate: [540, 255], moveOn: [755, 577],
+  micron: [130, 330], systemVolume: [400, 219],
+  samsung: [130, 43], moveLuft: [876, 230], moveToSeagate: [540, 231], moveOn: [755, 605],
   placeFree: [540, 327], placeErase: [540, 382], placeOn: [755, 448], eraseName: [540, 440], eraseBack: [605, 495], sizeOn: [755, 490], moveIt: [752, 464], callOff: [582, 425],
 } satisfies Record<string, Point>;
 

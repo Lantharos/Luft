@@ -1,4 +1,5 @@
 pub mod health;
+mod mounts;
 pub mod room;
 pub mod snapshot;
 pub(crate) mod system;

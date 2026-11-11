@@ -39,8 +39,7 @@
 	let more = $state(false);
 
 	function encryption() {
-		const kind = volume.encryption?.kind.toUpperCase();
-		return volume.encryption?.cleartext ? `${filesystemName(contents)}, encrypted with ${kind}` : `Encrypted with ${kind}, locked`;
+		return volume.encryption?.cleartext ? `${filesystemName(contents)}, encrypted` : 'Encrypted, locked';
 	}
 
 	function explore() {

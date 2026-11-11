@@ -13,6 +13,13 @@ const MICROSOFT_RESERVED = 'e3c9e316-0b5c-4db8-817d-f92df00215ae';
 const WINDOWS_RECOVERY = 'de94bba4-06d1-4d40-a16a-bfd50179d6ac';
 const LINUX_SWAP = '0657fd6d-a4ab-43c4-84e5-0933c84b4f4f';
 const SPACE_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
+export const SYSTEM_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'System']);
+export const SYSTEM_MOUNTS = ['etc', 'sysroot', 'var'].map(name => GLib.build_filenamev([SYSTEM_FOLDER, name]));
+
+export function prepareSystemFolders() {
+  SYSTEM_MOUNTS.forEach(folder => GLib.mkdir_with_parents(folder, 0o755));
+  GLib.chmod(SYSTEM_MOUNTS[0], 0o000);
+}
 
 export interface Identity {
   IdType: string;
@@ -50,7 +57,7 @@ interface Filesystem extends Partial<Identity> {
   IdUsage?: string;
   IdVersion?: string;
   mounts?: string[];
-  encrypted?: {passphrase: string; inner: Identity};
+  encrypted?: {passphrase: string; inner: Identity; mounted?: string[]};
 }
 
 const drive = (id: string, props: DriveDetails) => ({
@@ -135,6 +142,15 @@ export function fixtureDrives(user: string): FixtureDrive[] {
         partition('', 4, 530 * MiB, 2 * GiB, LINUX_DATA, {IdUsage: 'filesystem', IdType: 'ext4', IdLabel: 'Projects', IdUUID: 'lab-projects', mounts: [SPACE_FOLDER]}),
         partition('', 5, 2578 * MiB, GiB, LINUX_DATA, {IdUsage: 'filesystem', IdType: 'ext4', IdLabel: 'Scratch', IdUUID: 'lab-scratch', mounts: []}),
         partition('', 6, 3602 * MiB, 256 * MiB, LINUX_DATA, {}),
+      ],
+    },
+    {
+      drive: drive('Micron_7450', {Vendor: 'Micron', Model: '7450 PRO', Size: 1000 * GiB, SortKey: '00coldplug/zzzz-Micron'}),
+      nvme: {SmartUpdated: 1, SmartCriticalWarning: [], SmartPowerOnHours: 480, SmartTemperature: 308, SmartSelftestStatus: 'success'},
+      device: 'nvme2n1', partitionPrefix: 'p', size: 1000 * GiB, table: 'gpt',
+      partitions: [
+        partition('', 1, MiB, 999 * GiB, LINUX_DATA, {IdUsage: 'crypto', IdType: 'crypto_LUKS', IdVersion: '2', IdUUID: 'system-luks',
+          encrypted: {passphrase: PASSPHRASE, inner: {IdType: 'btrfs', IdLabel: 'luft', IdUUID: 'system-btrfs'}, mounted: SYSTEM_MOUNTS}}),
       ],
     },
   ];

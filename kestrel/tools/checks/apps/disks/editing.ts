@@ -40,11 +40,11 @@ function spaceButtonAt(frame: Frame, colors: Colors) {
   return control >= BUTTON_PIXELS ? y : null;
 }
 
-async function details(driver: Driver, name: Control, palette: Palette) {
+export async function details(driver: Driver, name: Control, palette: Palette) {
   return spaceButtonAt(await driver.click(name), palette.dark);
 }
 
-async function trashLargest(driver: Driver, folder: string, name: string, label: string) {
+export async function trashLargest(driver: Driver, folder: string, name: string, label: string) {
   const before = trashed(name);
   await driver.click('largest');
   await driver.click('trash');

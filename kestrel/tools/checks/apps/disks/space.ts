@@ -2,8 +2,7 @@ import GLib from 'gi://GLib';
 
 import {children, write} from '../lib/files.js';
 
-export function writeSpace() {
-  const root = GLib.build_filenamev([GLib.get_home_dir(), 'Space']);
+export function writeSpace(root = GLib.build_filenamev([GLib.get_home_dir(), 'Space'])) {
   const fill = (name: string, bytes: number) => write(GLib.build_filenamev([root, name]), new Uint8Array(bytes).fill(1));
   fill('Videos/trip.mov', 48 << 20);
   fill('Videos/raw/take-1.mov', 24 << 20);

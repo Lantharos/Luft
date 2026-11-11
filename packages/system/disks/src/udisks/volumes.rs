@@ -7,6 +7,7 @@ use serde::Serialize;
 use specta::Type;
 use zbus::OwnedVariant;
 
+use super::mounts::overview_first;
 use super::snapshot::{Job, Jobs};
 use super::system::Usage;
 use super::{BLOCK, ENCRYPTED, FILESYSTEM, PARTITION, SWAP, TABLE, bytes_text};
@@ -161,13 +162,14 @@ fn volume(
     usage: &Usage,
 ) -> Volume {
     let text = |name: &str| block.get::<String>(name).unwrap_or_default();
-    let mount_points: Vec<String> = objects
+    let mut mount_points: Vec<String> = objects
         .get(block.path, FILESYSTEM)
         .and_then(|filesystem| filesystem.get::<Vec<Vec<u8>>>("MountPoints"))
         .unwrap_or_default()
         .into_iter()
         .map(bytes_text)
         .collect();
+    overview_first(&mut mount_points);
     let swap_active = objects
         .get(block.path, SWAP)
         .is_some_and(|swap| swap.flag("Active"));
@@ -207,10 +209,13 @@ fn volume(
         encryption: objects
             .get(block.path, ENCRYPTED)
             .map(|encrypted| Encryption {
-                kind: encrypted
-                    .get::<String>("HintEncryptionType")
-                    .filter(|kind| !kind.is_empty())
-                    .unwrap_or_else(|| text("IdVersion")),
+                kind: encryption_kind(
+                    &encrypted
+                        .get::<String>("HintEncryptionType")
+                        .unwrap_or_default(),
+                    &text("IdType"),
+                    &text("IdVersion"),
+                ),
                 cleartext: cleartext(objects, block.path)
                     .map(|clear| Box::new(volume(objects, &clear, None, jobs, usage))),
             }),
@@ -218,6 +223,19 @@ fn volume(
         job: jobs.on(block.path),
         swap_active,
         mount_points,
+    }
+}
+
+fn encryption_kind(hint: &str, fs_type: &str, version: &str) -> String {
+    let kind = match (hint, fs_type) {
+        ("", "crypto_LUKS") => "LUKS",
+        ("", other) => other,
+        (hint, _) => hint,
+    };
+    if kind == "LUKS" {
+        format!("LUKS{version}")
+    } else {
+        kind.to_owned()
     }
 }
 
@@ -259,4 +277,21 @@ pub fn used_space(mount_point: &str) -> Option<u64> {
     }
     let stat = unsafe { stat.assume_init() };
     Some((stat.f_blocks - stat.f_bfree) * stat.f_frsize)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::encryption_kind;
+
+    #[test]
+    fn luks_keeps_its_version() {
+        assert_eq!(encryption_kind("", "crypto_LUKS", "2"), "LUKS2");
+        assert_eq!(encryption_kind("LUKS", "crypto_LUKS", "1"), "LUKS1");
+    }
+
+    #[test]
+    fn other_encryption_is_named_by_its_hint_or_type() {
+        assert_eq!(encryption_kind("", "BitLocker", ""), "BitLocker");
+        assert_eq!(encryption_kind("VeraCrypt", "", ""), "VeraCrypt");
+    }
 }

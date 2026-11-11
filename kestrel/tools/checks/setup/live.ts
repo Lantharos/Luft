@@ -77,12 +77,14 @@ async function checkFromMeet() {
   await setup.type('custom');
   await setup.shot('welcome-keyboard-custom');
   await setup.click(AT.outside, 'clicking outside closes the list');
+  await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
   await setup.click(AT.continue, 'continuing shows the room Meet Luft made');
   await setup.shot('destination-meet');
   await setup.click(AT.moreOptions, 'more options shows the other ways to install');
   await setup.shot('destination-meet-choices');
   await setup.click(AT.back, 'going back shows the room Meet Luft made again');
-  await setup.click(AT.back, 'going back from the room shows the first screen');
+  await setup.click(AT.back, 'going back from the room shows the early note');
+  await setup.click(AT.back, 'going back from the early note shows the first screen');
   await setup.shot('destination-meet-back');
   await setup.close();
   await setup.useMeet(false);
@@ -99,6 +101,7 @@ export async function checkLive() {
   await setup.type('dvorak');
   await setup.shot('welcome-keyboard');
   await setup.click(AT.outside, 'clicking outside closes the list');
+  await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
   await setup.click(AT.continue, 'continuing shows where to install');
   await setup.shot('destination');
   await setup.click(AT.whole, 'choosing a whole drive lists the drives');

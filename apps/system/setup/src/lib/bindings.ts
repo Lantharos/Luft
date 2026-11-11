@@ -331,6 +331,7 @@ export type InstallerState = {
 	progress: number,
 	error: string,
 	secureBootCode: string,
+	release: Release,
 };
 
 export type Intent = "try" | "install" | "replace";
@@ -487,6 +488,16 @@ export type Radio = {
 };
 
 export type Reason = "password" | "other";
+
+/**
+ *  Where the Luft being installed stands: still early, a nightly, and whether a
+ *  stable version was out when it was built.
+ */
+export type Release = {
+	early: boolean,
+	nightly: boolean,
+	stableReleased: boolean,
+};
 
 export type Room = {
 	offset: number,

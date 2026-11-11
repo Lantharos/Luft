@@ -1,7 +1,7 @@
 use futures_util::{Stream, StreamExt};
 use luft_app::dbus::service::{Service, get};
 use luft_app::dbus::{self, failed};
-use luft_variant::Variant;
+use luft_variant::{Channel, Variant};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use zbus::fdo::DBusProxy;
@@ -203,6 +203,47 @@ pub async fn switch(variant: Variant, size: Option<u64>, task: Task<'_>) -> Resu
         .await
         .map_err(|error| dbus::explain(&error))?;
     cancellable(signals, size, task).await
+}
+
+/// Moves the system to another channel, following the download when the move starts now.
+/// Returns whether it did; otherwise the system waits for the channel to catch up.
+pub async fn switch_channel(channel: Channel, task: Task<'_>) -> Result<bool, String> {
+    let signals = signals().await?;
+    task.progress(Stage::Preparing, None);
+    let moving: bool = UPDATER
+        .change("SwitchChannel", &(channel.name(),))
+        .await
+        .map_err(|error| dbus::explain(&error))?;
+    if moving {
+        cancellable(signals, None, task).await?;
+    }
+    Ok(moving)
+}
+
+/// Whether a stable version of Luft is out, as far as the update server could say.
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StableRelease {
+    Released,
+    NotYet,
+    Unknown,
+}
+
+pub async fn stable_release() -> StableRelease {
+    let answer: Result<String, String> = async {
+        UPDATER
+            .proxy()
+            .await?
+            .call("StableReleased", &())
+            .await
+            .map_err(|error| dbus::explain(&error))
+    }
+    .await;
+    match answer.as_deref() {
+        Ok("yes") => StableRelease::Released,
+        Ok("no") => StableRelease::NotYet,
+        _ => StableRelease::Unknown,
+    }
 }
 
 pub async fn follow(size: Option<u64>, task: Task<'_>) -> Result<(), String> {

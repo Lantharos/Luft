@@ -60,8 +60,12 @@ followed_of() {
   esac
 }
 
+image_version() {
+  image_value "$image" '{{index .Labels "org.opencontainers.image.version"}}'
+}
+
 iso_name() {
-  echo "luft-$(image_value "$image" '{{index .Labels "org.opencontainers.image.version"}}').iso"
+  echo "luft-$(image_version).iso"
 }
 
 ensure_images() {
@@ -74,6 +78,7 @@ ensure_images() {
 
 install_images() {
   local variant
+  printf 'version = "%s"\n' "$(image_version)"
   for variant; do
     printf '\n[images.%s]\nsource = "containers-storage:%s"\ntarget = "%s"\nsize = %s\n' \
       "$variant" "$(followed_of "$variant")" "$(followed_of "$variant")" "$(image_value "$(image_of "$variant")" '{{.Size}}')"

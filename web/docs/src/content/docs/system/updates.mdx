@@ -43,13 +43,13 @@ A new version gets three tries to reach the login screen. If it doesn't get ther
 
 Releases are numbered Luft 1.1, 1.2 and on, and the number before the dot changes with each new Fedora release Luft moves to. A nightly build is named after the release it leads to, such as Luft 1.2 Nightly 21, the 21st nightly build on the way to 1.2. Settings, under System, About shows which one you have and the day it was built.
 
-There are no releases yet, so for now every computer follows the nightly builds. A computer follows whatever it was installed from: one installed from a nightly ISO keeps getting nightly builds. To move between them, run this in [Tern](/apps/tern/) and restart:
+A computer follows the channel it was installed from: one installed from a nightly stick keeps getting nightly builds. To change it, choose **Stable** or **Nightly** under **Release channel** in Settings, under System. Luft asks you to confirm, then for an administrator's password, and keeps your choice of the standard or NVIDIA image.
 
-```sh
-sudo bootc switch ghcr.io/lantharos/luft:1-nightly   # or :1 for releases
-```
+Switching never installs an older version than the one you have. When the other channel already has a version at least as new, Luft downloads it and it starts at the next restart. When it doesn't, which is usual right after a stable release when you're coming from the nightly builds, your computer keeps the version it has, gets no nightly updates in the meantime, and moves to the stable version as soon as one at least as new is out. Settings says when it's waiting.
 
-On a computer with NVIDIA graphics, add `-nvidia` to the end, such as `:1-nightly-nvidia`.
+**Stable** can only be chosen once a stable version has been released; until then Settings says so. When Luft can't reach the update server, it says it couldn't check.
+
+Nightly builds get the least testing: nobody has used one for long before it reaches you. When something breaks or looks wrong, Settings › System › Report a problem opens a new issue with your version filled in.
 
 Every image is signed with Luft's key, and Luft refuses an update that isn't. It also refuses one that's older than the version you have, so nobody can hand your computer an old version with holes that were fixed since. Going back to the previous version is always your choice. To check an image yourself with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
 

@@ -15,7 +15,14 @@
     <method name="Status">
       <arg type="s" direction="out"/>
     </method>
+    <method name="StableReleased">
+      <arg type="s" direction="out"/>
+    </method>
     <method name="Download">
+    </method>
+    <method name="SwitchChannel">
+      <arg name="channel" type="s" direction="in"/>
+      <arg type="b" direction="out"/>
     </method>
     <method name="SwitchVariant">
       <arg name="variant" type="s" direction="in"/>

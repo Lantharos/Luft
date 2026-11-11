@@ -1,8 +1,8 @@
 import type { Phase } from '#lib/bindings.js';
 
-export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing' | 'network-type' | 'secure-boot' | 'protect' | 'fingerprint' | 'ready';
+export type Step = 'region' | 'early' | 'destination' | 'network' | 'account' | 'finishing' | 'network-type' | 'secure-boot' | 'protect' | 'fingerprint' | 'ready';
 
-const LIVE: Step[] = ['region', 'destination', 'protect', 'network', 'account', 'finishing'];
+const LIVE: Step[] = ['region', 'early', 'destination', 'protect', 'network', 'account', 'finishing'];
 const FIRST_BOOT: Step[] = ['network-type', 'secure-boot', 'fingerprint', 'ready'];
 const WHILE_INSTALLING: Step[] = ['network', 'account', 'finishing'];
 const FINAL: Step[] = ['finishing', 'ready'];

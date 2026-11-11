@@ -1,10 +1,11 @@
 use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
-use luft_variant::Variant;
+use luft_variant::{Channel, Variant};
 use tokio::sync::mpsc;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
@@ -12,13 +13,15 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::error::Error;
-use crate::bootc::{self, Fetch, Process};
+use crate::bootc::{self, Fetch, Next, Process};
 use crate::schedule::{self, Every, Schedule};
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
 const SCHEDULE: &str = "com.lantharos.updater.schedule";
 const VARIANT: &str = "com.lantharos.updater.variant";
+const CHANNEL: &str = "com.lantharos.updater.channel";
+const PUBLISHED_FOR: Duration = Duration::from_secs(10 * 60);
 const SYSTEM_PACKAGES: &str = "/var/lib/luft/system-packages/packages";
 const PACKAGES: &str = "com.lantharos.Packages1";
 const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
@@ -28,6 +31,7 @@ pub struct Updater {
     downloading: Mutex<Option<Process>>,
     downloaded: AtomicU64,
     schedule: Mutex<Schedule>,
+    stable: Mutex<Option<(Instant, bool)>>,
 }
 
 impl Updater {
@@ -37,6 +41,7 @@ impl Updater {
             downloading: Mutex::new(None),
             downloaded: AtomicU64::new(0),
             schedule: Mutex::new(Schedule::load()),
+            stable: Mutex::new(None),
         }
     }
 
@@ -52,6 +57,35 @@ impl Updater {
         self.blocking(move || planned.save()).await?;
         *self.schedule.lock().expect("schedule lock") = planned;
         Ok(())
+    }
+
+    async fn wait_for(&self, waiting: Option<Channel>) -> Result<(), Error> {
+        self.plan(Schedule {
+            waiting,
+            ..self.planned()
+        })
+        .await
+    }
+
+    async fn fetch_next(
+        &self,
+        next: Next,
+        scheduled: bool,
+        server: &ObjectServer,
+        emitter: &SignalEmitter<'_>,
+    ) -> Result<bool, Error> {
+        match next {
+            Next::Nothing => return Ok(false),
+            Next::Update => {
+                self.begin(Fetch::upgrade, scheduled, false, server, emitter)
+                    .await?
+            }
+            Next::Move(target) => {
+                self.begin(|| Fetch::switch(&target), scheduled, true, server, emitter)
+                    .await?
+            }
+        }
+        Ok(true)
     }
 
     async fn authorize(
@@ -71,6 +105,7 @@ impl Updater {
         &self,
         fetch: impl FnOnce() -> anyhow::Result<Fetch>,
         scheduled: bool,
+        moving: bool,
         server: &ObjectServer,
         emitter: &SignalEmitter<'_>,
     ) -> Result<(), Error> {
@@ -89,7 +124,7 @@ impl Updater {
         let _ = self.downloaded_changed(emitter).await;
         let _ = self.downloading_changed(emitter).await;
         let updater = server.interface::<_, Updater>(PATH).await?;
-        tokio::spawn(follow(updater, fetch, scheduled, self.idle.clone()));
+        tokio::spawn(follow(updater, fetch, scheduled, moving, self.idle.clone()));
         Ok(())
     }
 
@@ -112,7 +147,13 @@ impl Updater {
     }
 }
 
-async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, scheduled: bool, idle: Arc<Idle>) {
+async fn follow(
+    updater: InterfaceRef<Updater>,
+    fetch: Fetch,
+    scheduled: bool,
+    moving: bool,
+    idle: Arc<Idle>,
+) {
     let _activity = idle.hold();
     let (sender, mut fetched) = mpsc::unbounded_channel();
     let work = tokio::task::spawn_blocking(move || {
@@ -135,6 +176,9 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, scheduled: bool, i
     let _ = inner.downloading_changed(emitter).await;
     let error = match result {
         Ok(Ok(())) => {
+            if moving {
+                let _ = inner.wait_for(None).await;
+            }
             if scheduled {
                 let _ = Updater::update_found(emitter, true).await;
             }
@@ -244,7 +288,8 @@ impl Updater {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
         }
-        let Ok(available) = self.blocking(bootc::available).await else {
+        let waiting = planned.waiting;
+        let Ok(next) = self.blocking(move || bootc::next(waiting)).await else {
             return Ok(());
         };
         self.plan(Schedule {
@@ -253,8 +298,10 @@ impl Updater {
         })
         .await?;
         let _ = self.last_checked_changed(&emitter).await;
+        let available = !matches!(next, Next::Nothing);
         if available && planned.download {
-            return self.begin(Fetch::upgrade, true, server, &emitter).await;
+            self.fetch_next(next, true, server, &emitter).await?;
+            return Ok(());
         }
         tokio::spawn(update_system_packages(
             connection.clone(),
@@ -267,7 +314,31 @@ impl Updater {
     }
 
     async fn status(&self) -> Result<String, Error> {
-        self.blocking(bootc::status).await
+        let waiting = self.planned().waiting;
+        self.blocking(move || bootc::status(waiting)).await
+    }
+
+    /// "yes" or "no" for whether a stable version is out, or "unknown" when the registry
+    /// couldn't be asked. An answer is kept for a few minutes.
+    async fn stable_released(&self) -> Result<&'static str, Error> {
+        let kept = *self.stable.lock().expect("stable lock");
+        let known = match kept.filter(|(asked, _)| asked.elapsed() < PUBLISHED_FOR) {
+            Some((_, published)) => Some(published),
+            None => {
+                let published = self
+                    .blocking(|| Ok(bootc::published(Channel::Stable)))
+                    .await?;
+                if let Some(published) = published {
+                    *self.stable.lock().expect("stable lock") = Some((Instant::now(), published));
+                }
+                published
+            }
+        };
+        Ok(match known {
+            Some(true) => "yes",
+            Some(false) => "no",
+            None => "unknown",
+        })
     }
 
     async fn download(
@@ -278,7 +349,43 @@ impl Updater {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        self.begin(Fetch::upgrade, false, server, &emitter).await
+        let Some(channel) = self.planned().waiting else {
+            return self
+                .begin(Fetch::upgrade, false, false, server, &emitter)
+                .await;
+        };
+        let next = self.blocking(move || bootc::next(Some(channel))).await?;
+        if !self.fetch_next(next, false, server, &emitter).await? {
+            return Err(Error::Failed(format!(
+                "The {} channel has no version as new as this one yet.",
+                channel.name()
+            )));
+        }
+        Ok(())
+    }
+
+    /// Has updates come from `channel` from now on. Returns whether the move started right away,
+    /// which it does when the channel has a version at least as new as the running one;
+    /// otherwise the system keeps its version and moves once the channel catches up.
+    async fn switch_channel(
+        &self,
+        channel: &str,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(object_server)] server: &ObjectServer,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<bool, Error> {
+        self.authorize(connection, &header, CHANNEL).await?;
+        self.refuse_while_downloading()?;
+        let channel = Channel::named(channel)
+            .ok_or_else(|| Error::Failed(format!("“{channel}” isn't one of Luft's channels.")))?;
+        if self.blocking(bootc::followed_channel).await? == Some(channel) {
+            self.wait_for(None).await?;
+            return Ok(false);
+        }
+        self.wait_for(Some(channel)).await?;
+        let next = self.blocking(move || bootc::next(Some(channel))).await?;
+        self.fetch_next(next, false, server, &emitter).await
     }
 
     async fn switch_variant(
@@ -298,7 +405,7 @@ impl Updater {
             )));
         }
         let target = self.blocking(move || bootc::switch_target(named)).await?;
-        self.begin(|| Fetch::switch(&target), false, server, &emitter)
+        self.begin(|| Fetch::switch(&target), false, false, server, &emitter)
             .await
     }
 

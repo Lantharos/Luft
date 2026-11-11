@@ -25,10 +25,12 @@ COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=parts keys/pcr-keys/ /usr/lib/luft/pcr-keys/
 ARG MAJOR
 ARG BASE
+ARG EARLY=""
+ARG STABLE_RELEASED=""
 RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,source=packages/i18n/src/locales.ts,target=/run/luft/locales.ts \
     --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
-    /run/luft/stages/finalize.sh luft "${MAJOR}" "${BASE}"
+    /run/luft/stages/finalize.sh luft "${MAJOR}" "${BASE}" "${EARLY}" "${STABLE_RELEASED}"
 RUN bootc container lint
 ARG VERSION=dev
 ARG RELEASE_NOTES=""

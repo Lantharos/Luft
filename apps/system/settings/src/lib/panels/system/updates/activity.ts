@@ -11,6 +11,8 @@ export function describe(activity: Activity) {
 			return t('settings-updates-rolling-back');
 		case 'switch':
 			return activity.target === 'nvidia' ? t('settings-updates-switching-nvidia') : t('settings-updates-switching-standard');
+		case 'channel':
+			return activity.target === 'stable' ? t('settings-updates-moving-stable') : t('settings-updates-moving-nightly');
 		default:
 			return null;
 	}

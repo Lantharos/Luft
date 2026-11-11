@@ -10,6 +10,7 @@
 	import Ready from '#lib/steps/firstboot/Ready.svelte';
 	import Account from '#lib/steps/live/Account.svelte';
 	import Destination from '#lib/steps/live/destination/Destination.svelte';
+	import Early from '#lib/steps/live/Early.svelte';
 	import Finishing from '#lib/steps/live/Finishing.svelte';
 	import Network from '#lib/steps/live/network/Network.svelte';
 	import Protect from '#lib/steps/live/Protect.svelte';
@@ -19,7 +20,7 @@
 	import { regional } from '#lib/state/regional.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 
-	const STEPS = { region: Region, destination: Destination, network: Network, account: Account, finishing: Finishing, 'network-type': NetworkType, 'secure-boot': SecureBoot, protect: Protect, fingerprint: Fingerprint, ready: Ready };
+	const STEPS = { region: Region, early: Early, destination: Destination, network: Network, account: Account, finishing: Finishing, 'network-type': NetworkType, 'secure-boot': SecureBoot, protect: Protect, fingerprint: Fingerprint, ready: Ready };
 	const SLIDE = 28;
 
 	onMount(() => {

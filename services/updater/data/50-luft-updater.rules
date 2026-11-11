@@ -1,7 +1,7 @@
 // Administrators at the computer can download and prepare system updates
 // without a password, so updates also arrive in the background. Changing when
-// updates are looked for, switching to Luft's other image and going back to
-// an earlier version still ask.
+// updates are looked for, switching to Luft's other image or channel and
+// going back to an earlier version still ask.
 polkit.addRule(function (action, subject) {
     if (action.id == "com.lantharos.updater.download" && subject.local && subject.active && subject.isInGroup("wheel")) {
         return polkit.Result.YES;

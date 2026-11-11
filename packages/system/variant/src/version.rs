@@ -25,6 +25,11 @@ impl Version {
         })
     }
 
+    /// Whether `text` is a nightly's version, such as 1.2-nightly.21.
+    pub fn is_nightly(text: &str) -> bool {
+        Self::parse(text).is_some_and(|version| !version.released)
+    }
+
     /// Whether `version` was released after `than`, which is never true of
     /// text that isn't a version of Luft.
     pub fn newer(version: &str, than: &str) -> bool {
@@ -62,6 +67,13 @@ mod tests {
         assert!(!Version::newer("1.1-nightly.21", "1.1"));
         assert!(!Version::newer("1.2", "1.2"));
         assert!(!Version::newer("1.2", "dev"));
+    }
+
+    #[test]
+    fn only_versions_with_a_nightly_number_are_nightlies() {
+        assert!(Version::is_nightly("1.0-nightly.26"));
+        assert!(!Version::is_nightly("1.0"));
+        assert!(!Version::is_nightly("dev"));
     }
 
     #[test]

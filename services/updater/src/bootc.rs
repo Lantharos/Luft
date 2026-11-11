@@ -7,7 +7,7 @@ use std::process::{Child, ChildStderr, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use anyhow::{Context, Result, anyhow, bail};
-use luft_variant::{Variant, Version};
+use luft_variant::{Channel, Variant, Version};
 use serde::Deserialize;
 use serde_json::{Map, Value, json};
 
@@ -24,6 +24,7 @@ const OLDER: &str =
     "This update is older than the version of Luft on this computer, so it wasn't installed.";
 const VERSION: &str = "/config/Labels/org.opencontainers.image.version";
 const STAGED: &str = "/status/staged/composefs/verity";
+const NOT_PUBLISHED: [&str; 2] = ["manifest unknown", "name unknown"];
 const KEPT_TO_GO_BACK_TO: &str = "same fs-verity digest as the existing Some(Rollback) deployment";
 const SIGNATURE_REFUSALS: [&str; 4] = [
     "A signature was required",
@@ -120,37 +121,85 @@ fn refuse_older() -> Result<()> {
     bail!(OLDER);
 }
 
-pub fn status() -> Result<String> {
+pub fn status(waiting: Option<Channel>) -> Result<String> {
     let host = host()?;
     let configs: Map<String, Value> = digests(&host)
         .filter_map(|digest| Some((digest.to_owned(), image_config(digest)?)))
         .collect();
-    Ok(json!({ "host": host, "configs": configs }).to_string())
+    Ok(json!({ "host": host, "configs": configs, "waiting": waiting }).to_string())
 }
 
 fn layers(config: &Value) -> Option<&Value> {
     config.pointer("/rootfs/diff_ids")
 }
 
+fn offered(image: &str) -> Result<Value> {
+    Ok(serde_json::from_slice(&run(Command::new("skopeo")
+        .args(["--command-timeout", CHECK_TIMEOUT, "inspect", "--config"])
+        .arg(format!("docker://{image}")))?)?)
+}
+
+fn not_published(error: &anyhow::Error) -> bool {
+    let error = error.to_string();
+    NOT_PUBLISHED.iter().any(|missing| error.contains(missing))
+}
+
 /// Whether the image this system follows has changed from every version on the computer.
-pub fn available() -> Result<bool> {
-    let host = host()?;
-    let Reference { image, transport } = followed(&host)?;
+fn available(host: &Value) -> Result<bool> {
+    let Reference { image, transport } = followed(host)?;
     if transport != REGISTRY {
         return Ok(false);
     }
-    let offered: Value = serde_json::from_slice(&run(Command::new("skopeo")
-        .args(["--command-timeout", CHECK_TIMEOUT, "inspect", "--config"])
-        .arg(format!("docker://{image}")))?)?;
-    if older_than_running(&host, Some(&offered)) {
+    let offered = offered(&image)?;
+    if older_than_running(host, Some(&offered)) {
         eprintln!("The update server offers a version older than the running one.");
         return Ok(false);
     }
     let offered = layers(&offered).context("The update server sent no image layers.")?;
-    let present = digests(&host)
+    let present = digests(host)
         .filter_map(image_config)
         .any(|config| layers(&config) == Some(offered));
     Ok(!present)
+}
+
+/// What to download next: an update on the channel this system follows, or, while it waits
+/// for another channel, the move there once that channel has a version at least as new as the
+/// running one. Nothing older than the running version is ever offered.
+pub enum Next {
+    Nothing,
+    Update,
+    Move(Reference),
+}
+
+pub fn next(waiting: Option<Channel>) -> Result<Next> {
+    let host = host()?;
+    let Some(channel) = waiting else {
+        return Ok(if available(&host)? {
+            Next::Update
+        } else {
+            Next::Nothing
+        });
+    };
+    let target = on_channel(&host, channel)?;
+    match offered(&target.image) {
+        Ok(config) if !older_than_running(&host, Some(&config)) => Ok(Next::Move(target)),
+        Ok(_) => Ok(Next::Nothing),
+        Err(error) if not_published(&error) => Ok(Next::Nothing),
+        Err(error) => Err(error),
+    }
+}
+
+/// Whether the channel has a version out, or `None` when the registry couldn't be asked.
+pub fn published(channel: Channel) -> Option<bool> {
+    let target = on_channel(&host().ok()?, channel).ok()?;
+    match offered(&target.image) {
+        Ok(_) => Some(true),
+        Err(error) if not_published(&error) => Some(false),
+        Err(error) => {
+            eprintln!("Looking for the {} channel: {error:#}", channel.name());
+            None
+        }
+    }
 }
 
 pub fn rollback() -> Result<()> {
@@ -192,6 +241,18 @@ fn followed(host: &Value) -> Result<Reference> {
     host.pointer("/spec/image")
         .and_then(|image| Reference::deserialize(image).ok())
         .ok_or_else(|| anyhow!("This system doesn't get its updates from an image."))
+}
+
+pub fn followed_channel() -> Result<Option<Channel>> {
+    Ok(Channel::of(&followed(&host()?)?.image))
+}
+
+fn on_channel(host: &Value, channel: Channel) -> Result<Reference> {
+    let Reference { image, transport } = followed(host)?;
+    let image = channel
+        .reference(&image)
+        .ok_or_else(|| anyhow!("This system follows one fixed build of its image."))?;
+    Ok(Reference { image, transport })
 }
 
 pub fn switch_target(variant: Variant) -> Result<Reference> {

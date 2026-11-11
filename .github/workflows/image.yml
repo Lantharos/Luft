@@ -84,6 +84,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       tags: ${{ steps.version.outputs.tags }}
       notes: ${{ steps.version.outputs.notes }}
+      stable-released: ${{ steps.version.outputs.stable-released }}
       base: ${{ steps.parts.outputs.base }}
       store: ${{ steps.parts.outputs.store }}
       parts: ${{ steps.parts.outputs.parts }}
@@ -141,6 +142,7 @@ jobs:
           {
             echo "version=$version"
             echo "tags=${tags[*]}"
+            echo "stable-released=${last:+1}"
             echo "notes=$(bun .github/scripts/changelog/index.ts since "$built")"
           } >> "$GITHUB_OUTPUT"
 
@@ -393,6 +395,7 @@ jobs:
       STORE_RELEASES: ${{ needs.store-part.outputs.releases }}
       VERSION: ${{ needs.plan.outputs.version }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
+      LUFT_STABLE_RELEASED: ${{ needs.plan.outputs.stable-released }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 

@@ -12,10 +12,17 @@
     DownloadAutomatically: whether an update found on schedule is downloaded and staged too.
     LastChecked: when an update was last checked for on schedule, in seconds since 1970, or 0.
 
+    Luft's images follow a channel by their tag: stable (":1") or nightly (":1-nightly"), each in the
+    standard and NVIDIA image. SwitchChannel moves the system to the same image on the other channel
+    when that channel has a version at least as new as the running one, staged like SwitchVariant.
+    When it doesn't, the system keeps its version, the channel is kept as the one it waits for in
+    schedule.json, and Download and RunSchedule move it there once the channel has caught up, in
+    place of updates on the channel it still follows.
+
     Download, Cancel and Apply need com.lantharos.updater.download, which administrators at the
     computer have without being asked; SwitchVariant needs com.lantharos.updater.variant,
-    SetSchedule com.lantharos.updater.schedule and Rollback com.lantharos.updater.rollback, which
-    ask for a password. Status needs nothing. Only root can call RunSchedule.
+    SwitchChannel com.lantharos.updater.channel, SetSchedule com.lantharos.updater.schedule and Rollback com.lantharos.updater.rollback, which
+    ask for a password. Status and StableReleased need nothing. Only root can call RunSchedule.
 
     A version older than the running one is never staged or applied: its version is read from the
     image's configuration, which its signature covers. Only Rollback starts an older version, the
@@ -32,7 +39,8 @@
     <property name="LastChecked" type="t" access="read"/>
 
     <!-- JSON: {"host": `bootc status` as JSON, "configs": {manifest digest: OCI image config}} for the
-         booted, staged and rollback images. -->
+         booted, staged and rollback images, and "waiting": the channel the system moves to once it
+         has caught up, "stable" or "nightly", or null. -->
     <method name="Status">
       <arg name="status" type="s" direction="out"/>
     </method>
@@ -45,6 +53,16 @@
          Downloaded and Finished report it like an update. -->
     <method name="SwitchVariant">
       <arg name="variant" type="s" direction="in"/>
+    </method>
+    <!-- "stable" or "nightly". Returns whether the move to it started now. -->
+    <method name="SwitchChannel">
+      <arg name="channel" type="s" direction="in"/>
+      <arg name="moving" type="b" direction="out"/>
+    </method>
+    <!-- "yes" when a stable version of this image is published, "no" when none is, "unknown" when
+         the registry couldn't be asked. Asked at most every ten minutes. -->
+    <method name="StableReleased">
+      <arg name="released" type="s" direction="out"/>
     </method>
     <method name="Cancel"/>
     <!-- Installs the downloaded update at the next restart or power off. -->

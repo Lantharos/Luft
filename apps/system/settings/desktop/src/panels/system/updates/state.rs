@@ -20,6 +20,7 @@ pub enum UpdateKind {
     Firmware,
     Rollback,
     Switch,
+    Channel,
 }
 
 #[derive(Serialize, Clone, Default, Type)]

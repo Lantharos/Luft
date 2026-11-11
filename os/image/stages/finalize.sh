@@ -41,6 +41,15 @@ write_base_image() {
   echo "$base" | install -Dm644 /dev/stdin /usr/share/luft/base-image
 }
 
+said() {
+  if [[ "$1" == 1 ]]; then echo true; else echo false; fi
+}
+
+write_release_facts() {
+  printf 'early=%s\nstable-released=%s\n' "$(said "$early")" "$(said "$stable_released")" |
+    install -Dm644 /dev/stdin /usr/share/luft/release
+}
+
 configure_toolbox() {
   printf '[general]\ndistro = "fedora"\nrelease = "%s"\n' "$fedora" >/etc/containers/toolbox.conf
 }
@@ -124,8 +133,11 @@ clean_build_state() {
 variant="$1"
 major="$2"
 base="$3"
+early="$4"
+stable_released="$5"
 write_os_release
 write_base_image
+write_release_facts
 enable_units
 configure_toolbox
 configure_security

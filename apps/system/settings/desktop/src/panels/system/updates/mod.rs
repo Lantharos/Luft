@@ -10,8 +10,8 @@ mod waiting;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
 use luft_app::{Commands, Empty, Events};
-use luft_software::system::image::{self as system_image, UpdatePolicy};
-use luft_software::variant::Variant;
+use luft_software::system::image::{self as system_image, StableRelease, UpdatePolicy};
+use luft_software::variant::{Channel, Variant};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use specta::Type;
@@ -35,6 +35,11 @@ struct FirmwareDevice {
 #[derive(Deserialize, Type)]
 struct VariantSwitch {
     variant: Variant,
+}
+
+#[derive(Deserialize, Type)]
+struct ChannelSwitch {
+    channel: Channel,
 }
 
 fn load(Empty {}: Empty) -> Result<(), String> {
@@ -93,6 +98,28 @@ fn switch(VariantSwitch { variant }: VariantSwitch) -> Result<(), String> {
     started
         .then_some(())
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
+}
+
+fn switch_channel(ChannelSwitch { channel }: ChannelSwitch) -> Result<(), String> {
+    let activity = Activity {
+        target: Some(channel.name().to_owned()),
+        ..Activity::new(UpdateKind::Channel)
+    };
+    let started = state::start(
+        activity,
+        move |task| image::switch_channel(channel, task),
+        || {
+            overview::reload();
+            scan();
+        },
+    );
+    started
+        .then_some(())
+        .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
+}
+
+async fn stable_release(Empty {}: Empty) -> Result<StableRelease, String> {
+    Ok(system_image::stable_release().await)
 }
 
 fn install_firmware(FirmwareDevice { id }: FirmwareDevice) -> Result<(), String> {
@@ -160,6 +187,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_firmware_install", install_firmware)
         .command("updates_rollback", rollback)
         .command("updates_switch", switch)
+        .command("updates_switch_channel", switch_channel)
+        .command_async("updates_stable_release", stable_release)
         .command_async("updates_restart", restart)
         .command_async("updates_preferences", policy)
         .command_async("updates_set_preferences", system_image::set_policy)

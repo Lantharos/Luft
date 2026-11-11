@@ -1,0 +1,23 @@
+name: Report a problem
+description: Something in Luft looks, feels or works wrong, however small.
+body:
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: input
+    id: version
+    attributes:
+      label: Luft version
+      description: Settings › System › Report a problem fills this in. Otherwise it's in Settings › System › About.
+  - type: textarea
+    id: else
+    attributes:
+      label: Anything else
+      description: Screenshots, steps to make it happen again, or anything that might help.

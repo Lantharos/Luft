@@ -4,6 +4,7 @@ use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
 use luft_installer_contract::{InstallPlan, MovingBox, Regional, Survey};
+use luft_variant::Version;
 use sabine::{BridgeEvent, SabineWindow};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -53,6 +54,17 @@ pub struct InstallerState {
     progress: f64,
     error: String,
     secure_boot_code: String,
+    release: Release,
+}
+
+/// Where the Luft being installed stands: still early, a nightly, and whether a
+/// stable version was out when it was built.
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct Release {
+    early: bool,
+    nightly: bool,
+    stable_released: bool,
 }
 
 #[derive(Deserialize, Type)]
@@ -81,6 +93,11 @@ pub async fn state() -> Result<Option<InstallerState>, String> {
         progress: get(&map, "Progress").unwrap_or_default(),
         error: text(&map, "Error"),
         secure_boot_code: text(&map, "SecureBootCode"),
+        release: Release {
+            early: get(&map, "Early").unwrap_or_default(),
+            nightly: Version::is_nightly(&text(&map, "Version")),
+            stable_released: get(&map, "StableReleased").unwrap_or_default(),
+        },
     }))
 }
 

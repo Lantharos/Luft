@@ -4,9 +4,11 @@
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
+	import { reportProblem } from '../about/api';
 	import { firmware, openApps, openInstalledApps } from './api';
 	import AutomaticRows from './AutomaticRows.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
+	import ChannelRows from './image/ChannelRows.svelte';
 	import PendingImage from './image/PendingImage.svelte';
 	import VersionRows from './image/VersionRows.svelte';
 	import StatusCard from './StatusCard.svelte';
@@ -70,6 +72,7 @@
 			onclick={app.update ? openApps : openInstalledApps}
 		/>
 	{/each}
+	<Row title={t('settings-about-report')} description={t('settings-about-report-description')} onclick={reportProblem} />
 </Section>
 
 {#if devices.length}
@@ -84,5 +87,11 @@
 		{#if system && versionRows}
 			<VersionRows overview={system} {activity} {attempt} />
 		{/if}
+	</Section>
+{/if}
+
+{#if system?.channel}
+	<Section title={t('settings-updates-channel')}>
+		<ChannelRows choice={system.channel} {activity} {attempt} />
 	</Section>
 {/if}

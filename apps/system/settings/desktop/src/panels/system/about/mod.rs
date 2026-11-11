@@ -1,4 +1,5 @@
 mod problems;
+mod report;
 mod sample;
 mod systems;
 
@@ -265,6 +266,7 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
         .command_async("about_other_systems", |Empty {}| systems::list())
         .command("about_remove_system", systems::remove)
         .command("about_problems", |Empty {}| problems::problems())
+        .command_async("about_report_problem", report::report)
         .command_async("about_firmware_restart", |Empty {}| {
             problems::restart_to_firmware()
         })

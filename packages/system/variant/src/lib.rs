@@ -1,10 +1,14 @@
+mod channel;
 mod graphics;
+mod release;
 mod version;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+pub use channel::Channel;
 pub use graphics::nvidia_cards;
+pub use release::ReleaseFacts;
 pub use version::Version;
 
 const NVIDIA_TAG: &str = "-nvidia";

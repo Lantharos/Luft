@@ -139,6 +139,10 @@ settings-login-automatic = Automatic login
 settings-login-automatic-description = Signs in without a password at startup
 # Automatic login is turned off
 settings-login-automatic-off = Off
+# $name is the person who would be signed in
+settings-login-automatic-title = Sign { $name } in automatically?
+settings-login-automatic-warning = Nothing asks for a password while this computer starts, so anyone who can switch it on will reach { $name }’s desktop and files without typing anything. Passwords in Luft Keyring stay locked until the password is typed. The lock screen still asks for the password after the computer sleeps or the screen locks, while Lock the screen when it turns off is on under Privacy, but restarting the computer gets past it.
+settings-login-automatic-confirm = Sign in automatically
 
 ## Updates
 
@@ -227,9 +231,32 @@ settings-updates-variant-nvidia-reason = Full speed from your NVIDIA graphics
 settings-updates-variant-standard-reason = Smaller, as this computer has no NVIDIA graphics
 # Button, verb
 settings-updates-switch = Switch
+
+settings-updates-channel = Release channel
+settings-updates-channel-stable = Stable
+settings-updates-channel-nightly = Nightly
+settings-updates-channel-stable-description = Tested builds, fewer changes.
+settings-updates-channel-nightly-description = A new build every day, less tested.
+settings-updates-channel-stable-none = No stable version has been released yet. You can choose it once one is.
+settings-updates-channel-stable-unknown = Couldn’t check whether a stable version is out. Try again when you’re online.
+settings-updates-channel-waiting-stable = This computer keeps its current build and moves to stable once a stable version at least as new is out.
+settings-updates-channel-waiting-nightly = This computer keeps its current build and moves to the nightly builds once one at least as new is out.
+# Shown on the channel this computer gets its updates from
+settings-updates-channel-in-use = In use
+settings-updates-moving-stable = Moving to the stable version
+settings-updates-moving-nightly = Moving to the nightly builds
+settings-updates-nightly-confirm-title = Switch to nightly builds?
+settings-updates-nightly-confirm-body = Nightly builds come out every day with the newest changes. They get less testing than the stable version, so you’ll see new things sooner and more things broken. You can switch back at any time.
+settings-updates-nightly-confirm = Switch to nightly
+settings-updates-stable-confirm-title = Switch to stable?
+settings-updates-stable-confirm-body = Stable versions are tested before they come out and change less often. This computer never goes back to an older build: it moves to the stable version as soon as one at least as new as this one is out, which may be right away or may take a while. You can switch back at any time.
+settings-updates-stable-confirm = Switch to stable
 settings-updates-done = Done
 
 ## About
+
+settings-about-report = Report a problem
+settings-about-report-description = Tell us what went wrong, however small. Opens Luft’s issue tracker with your version filled in.
 
 settings-about-device-name = Device name
 # Button, verb

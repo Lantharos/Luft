@@ -59,6 +59,10 @@ os/image/parts/store/apps.toml as ID=VERSION=PART (LUFT_STORE, or empty for none
 those apps ship from the store instead of being built into the image. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.
 
+The image says Luft is still early when os/versions.env sets EARLY=1, and that a
+stable version is out when LUFT_STABLE_RELEASED=1, which the nightly sets once
+there's a v$MAJOR.N tag; both land in /usr/share/luft/release.
+
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
 and, for the TPM policy, LUFT_PCR_KEY_1, LUFT_PCR_KEY_2 and so on, one for each
 generation in os/versions.env that the image should unlock a disk for. Without
@@ -381,7 +385,7 @@ build_system() {
   shift 2
   podman build "${retries[@]}" --layers --no-hosts --no-hostname --security-opt label=disable --target "$target" --file "$image/Containerfile" \
     --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "MAJOR=$MAJOR" --build-arg "CEF=$cef" \
-    --build-arg "STORE=$store" "$@" \
+    --build-arg "STORE=$store" --build-arg "EARLY=${EARLY:-}" --build-arg "STABLE_RELEASED=${LUFT_STABLE_RELEASED:-}" "$@" \
     "${podman_options[@]}" --tag "$tag" "$luft"
 }
 

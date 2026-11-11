@@ -6,7 +6,7 @@ mod updater;
 
 use std::collections::HashSet;
 
-use luft_variant::Variant;
+use luft_variant::{Channel, Variant, Version};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -16,8 +16,8 @@ use registry::Image;
 pub use config::Release;
 pub use notes::Section;
 pub use updater::{
-    Schedule, UpdatePolicy, changes, download, downloading, follow, policy, rollback, set_policy,
-    switch,
+    Schedule, StableRelease, UpdatePolicy, changes, download, downloading, follow, policy,
+    rollback, set_policy, stable_release, switch, switch_channel,
 };
 
 const NOT_FROM_AN_IMAGE: &str = "This system doesn't get its updates from an image.";
@@ -38,6 +38,20 @@ pub struct Update {
     pub release: Release,
     pub size: u64,
     layers: Vec<String>,
+}
+
+/// The build this computer is running: its version, release channel and image digest.
+pub struct Running {
+    pub version: Option<String>,
+    pub channel: Option<&'static str>,
+    pub digest: Option<String>,
+}
+
+#[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelChoice {
+    pub chosen: Channel,
+    pub waiting: bool,
 }
 
 pub struct Deployments(Host);
@@ -74,6 +88,25 @@ impl Deployments {
         }
     }
 
+    pub fn running(&self) -> Running {
+        let booted = &self.0.booted;
+        Running {
+            version: booted.release().version,
+            channel: booted.channel(),
+            digest: booted.digest().map(str::to_owned),
+        }
+    }
+
+    /// The channel this system gets its updates from, and whether it's still waiting for that
+    /// channel to catch up with the running version before it moves there.
+    pub fn channel_choice(&self) -> Option<ChannelChoice> {
+        let followed = self.0.followed.as_ref()?.follows()?;
+        Some(ChannelChoice {
+            chosen: self.0.waiting.unwrap_or(followed),
+            waiting: self.0.waiting.is_some_and(|waiting| waiting != followed),
+        })
+    }
+
     fn followed(&self) -> Result<&Reference, String> {
         self.0
             .followed
@@ -99,19 +132,32 @@ impl Deployments {
             .sum()
     }
 
-    pub fn check(&self) -> Result<Option<Update>, String> {
+    /// The channel this system gets its updates from, or the one it waits to move to.
+    fn source(&self) -> Result<Reference, String> {
         let followed = self.followed()?;
-        let location = followed.location().ok_or(NOT_FROM_AN_IMAGE)?;
+        Ok(match self.0.waiting {
+            Some(channel) => followed.as_channel(channel).ok_or(NOT_FROM_AN_IMAGE)?,
+            None => followed.clone(),
+        })
+    }
+
+    pub fn check(&self) -> Result<Option<Update>, String> {
+        let source = self.source()?;
+        let location = source.location().ok_or(NOT_FROM_AN_IMAGE)?;
         let image = registry::fetch(&location)?;
         if image.config.layers() == self.0.booted.layers() {
             return Ok(None);
         }
         let mut release = image.config.release();
-        if let (Some(channel), Some(installed), Some(offered)) = (
-            followed.channel(),
-            self.0.booted.release().version,
-            release.version.as_deref(),
-        ) {
+        let installed = self.0.booted.release().version;
+        if let (Some(installed), Some(offered)) = (&installed, &release.version)
+            && Version::newer(installed, offered)
+        {
+            return Ok(None);
+        }
+        if let (Some(channel), Some(installed), Some(offered)) =
+            (source.channel(), installed, release.version.as_deref())
+        {
             release.notes = notes::between(channel, &installed, offered).or(release.notes);
         }
         Ok(Some(Update {

@@ -10,6 +10,7 @@ use luft_installer_contract::{InstallPlan, Regional};
 use luft_meet::Handoff;
 use luft_meet::sealed::Code;
 use luft_trust::TRUST;
+use luft_variant::ReleaseFacts;
 use tokio::sync::watch;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
@@ -40,6 +41,7 @@ const FIREWALL_PATH: &str = "/com/lantharos/Firewall1";
 pub struct Installer {
     options: Arc<Options>,
     config: Arc<Config>,
+    release: ReleaseFacts,
     idle: Arc<Idle>,
     status: Arc<Mutex<Status>>,
     answers: Arc<Answers>,
@@ -55,6 +57,7 @@ impl Installer {
             meet,
             options: Arc::new(options),
             config: Arc::new(config),
+            release: ReleaseFacts::of_this_system(),
             idle,
             status: Arc::new(Mutex::new(Status::idle())),
             answers: Arc::default(),
@@ -154,6 +157,21 @@ impl Installer {
     #[zbus(property)]
     fn secure_boot_code(&self) -> String {
         self.current().secure_boot_code
+    }
+
+    #[zbus(property)]
+    fn version(&self) -> String {
+        self.config.version.clone()
+    }
+
+    #[zbus(property)]
+    fn early(&self) -> bool {
+        self.release.early
+    }
+
+    #[zbus(property)]
+    fn stable_released(&self) -> bool {
+        self.release.stable_released
     }
 
     async fn survey(

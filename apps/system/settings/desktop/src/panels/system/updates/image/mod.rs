@@ -1,8 +1,11 @@
 mod switch;
 mod watch;
 
-use luft_software::system::image::{self, Deployments, Release, Section, Status, Update};
+use luft_software::system::image::{
+    self, ChannelChoice, Deployments, Release, Section, Status, Update,
+};
 use luft_software::task::Task;
+use luft_software::variant::Channel;
 use serde::Serialize;
 use specta::Type;
 
@@ -26,6 +29,7 @@ pub struct ImageOverview {
     status: Status,
     available: Option<Available>,
     offer: Option<switch::Offer>,
+    channel: Option<ChannelChoice>,
 }
 
 fn check(deployments: &Deployments) -> Result<Option<Update>, String> {
@@ -90,6 +94,7 @@ pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
     Ok(ImageOverview {
         status,
         available,
+        channel: deployments.channel_choice(),
         offer: switch::offer(deployments, refreshed),
     })
 }
@@ -100,4 +105,8 @@ pub fn download(task: Task) -> Result<(), String> {
 
 pub fn rollback(_: Task) -> Result<(), String> {
     luft_app::block_on(image::rollback())
+}
+
+pub fn switch_channel(channel: Channel, task: Task) -> Result<(), String> {
+    luft_app::block_on(image::switch_channel(channel, task)).map(drop)
 }

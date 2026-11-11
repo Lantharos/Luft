@@ -28,6 +28,12 @@ interface RegionalRequest {
 
 type Request = InstallRequest & RegionalRequest;
 
+export interface Release {
+  version: string;
+  early: boolean;
+  stableReleased: boolean;
+}
+
 export class Setup {
   readonly seen: string[] = [];
   private _app: LuftApp | null = null;
@@ -57,6 +63,10 @@ export class Setup {
 
   useMeet(meet: boolean) {
     return this.control('UseMeet', new GLib.Variant('(b)', [meet]));
+  }
+
+  useRelease({version, early, stableReleased}: Release) {
+    return this.control('UseRelease', new GLib.Variant('(sbb)', [version, early, stableReleased]));
   }
 
   setSigningKey(state: string) {

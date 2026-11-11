@@ -16,6 +16,8 @@ pub struct Config {
     images: HashMap<String, Source>,
     #[serde(default = "smallest_system")]
     pub smallest_system: u64,
+    #[serde(default)]
+    pub version: String,
 }
 
 #[derive(Deserialize)]

@@ -5,3 +5,5 @@ export const openDisks = async () => commands.aboutOpenDisks({ token: await acti
 
 export const removeSystem = async (id: string) => commands.aboutRemoveSystem({ id, token: await activationToken() });
 
+
+export const reportProblem = async () => commands.aboutReportProblem({ token: await activationToken() });

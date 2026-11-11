@@ -39,10 +39,13 @@
       <arg name="result" type="s"/>
       <arg name="done" type="b"/>
     </signal>
+    <property name="Early" type="b" access="read"/>
     <property name="Error" type="s" access="read"/>
     <property name="Phase" type="s" access="read"/>
     <property name="Progress" type="d" access="read"/>
     <property name="SecureBootCode" type="s" access="read"/>
+    <property name="StableReleased" type="b" access="read"/>
     <property name="Stage" type="s" access="read"/>
+    <property name="Version" type="s" access="read"/>
   </interface>
 </node>

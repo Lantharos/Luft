@@ -46,6 +46,17 @@ setup-region-field-language = language
 setup-region-field-keyboard = keyboard
 setup-region-field-time-zone = time zone
 
+## Note that Luft is still early, shown after the welcome step
+
+setup-early-title = Luft isn’t finished yet
+setup-early-body = You’re early. Luft works well enough to use every day, but it’s still being built. Things will change, some will break, and a few will be missing.
+setup-early-reports = If something looks or feels wrong, tell us. Nothing is too small: an icon that’s off by a pixel, a word that reads oddly, a moment where you didn’t know what to do. Those reports are how Luft gets good.
+setup-early-nightly = This is a nightly build. A new one comes out every day with the latest changes, and nobody has used it for long before it reaches you.
+# Shown instead of setup-early-nightly once a stable version is out
+setup-early-nightly-stable = This is a nightly build. A new one comes out every day with the latest changes, and nobody has used it for long before it reaches you. If you’d rather have fewer surprises, you can switch to the stable version in Settings later.
+# github.com/Lantharos/Luft/issues stays as it is
+setup-early-report = Report a problem at github.com/Lantharos/Luft/issues
+
 ## Where Luft goes
 
 setup-destination-choose-title = Where should Luft go?

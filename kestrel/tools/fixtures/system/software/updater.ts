@@ -6,6 +6,8 @@ const UPDATER = `<node><interface name="com.lantharos.Updater1">
   <property name="Downloading" type="b" access="read"/>
   <property name="Downloaded" type="t" access="read"/>
   <method name="Status"><arg type="s" direction="out"/></method>
+  <method name="StableReleased"><arg type="s" direction="out"/></method>
+  <method name="SwitchChannel"><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
   <method name="Apply"/>
   <method name="Download"/>
   <method name="Cancel"/>
@@ -13,6 +15,7 @@ const UPDATER = `<node><interface name="com.lantharos.Updater1">
 </interface></node>`;
 const UPDATER_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Updater">
   <method name="Stage"><arg type="b" direction="in"/></method>
+  <method name="UseChannel"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
 </interface></node>`;
 
 export const UPDATER_NAME = 'com.lantharos.Updater1';
@@ -20,6 +23,7 @@ export const DOWNLOAD_SIZE = 200_000_000;
 const DOWNLOAD_STEP_MS = 250;
 const DOWNLOAD_STEPS = 160;
 const IMAGE = {image: 'ghcr.io/lantharos/luft:1-nightly', transport: 'registry'};
+const CHANNEL_TAGS: Record<string, string> = {stable: '1', nightly: '1-nightly'};
 const VERSION = '1.2-nightly.21';
 const DIGEST = 'sha256:4c5f0f8a1b6e2d7c9a3e5b1f7d2c8a6e4b0f9d3c7a1e5b2f8d6c4a0e9b3f7d1c';
 const NEXT_VERSION = '1.2-nightly.22';
@@ -27,9 +31,19 @@ const NEXT_DIGEST = 'sha256:9e1d3b7f5a2c8e4d6b0a9f3c7e1b5d2a8f4c6e0b9d3a7f1e5c2b
 
 const configOf = (created: string, version: string) => ({created, config: {Labels: {'org.opencontainers.image.version': version}}});
 
-const status = (staged: boolean) => JSON.stringify({
+interface Channels {
+  followed: string;
+  waiting: string | null;
+  stable: string;
+}
+
+const followedImage = (channel: string) =>
+  channel ? {image: `ghcr.io/lantharos/luft:${CHANNEL_TAGS[channel]}`, transport: 'containers-storage'} : null;
+
+const status = (staged: boolean, channels: Channels) => JSON.stringify({
+  waiting: channels.waiting,
   host: {
-    spec: {image: null},
+    spec: {image: followedImage(channels.followed)},
     status: {
       booted: {image: {image: IMAGE, version: VERSION, imageDigest: DIGEST}},
       staged: staged ? {downloadOnly: false, image: {image: IMAGE, version: NEXT_VERSION, imageDigest: NEXT_DIGEST}} : null,
@@ -48,15 +62,25 @@ export function publishUpdater(publish: Publish, calls: string[]) {
   let downloaded = 0;
   let step = 0;
   let staged = false;
+  const channels: Channels = {followed: '', waiting: null, stable: 'no'};
   publish(UPDATER_CONTROL, {
     Stage: (scheduled: boolean) => {
       staged = scheduled;
+    },
+    UseChannel: (followed: string, stable: string) => {
+      Object.assign(channels, {followed, waiting: null, stable});
     },
   }, '/com/lantharos/KestrelChecks/Updater');
   const updater = publish(UPDATER, {
     get Downloading() { return downloading; },
     get Downloaded() { return downloaded; },
-    Status: () => status(staged),
+    Status: () => status(staged, channels),
+    StableReleased: () => channels.stable,
+    SwitchChannel: (channel: string) => {
+      calls.push(`Updater SwitchChannel ${channel}`);
+      channels.waiting = channel === channels.followed ? null : channel;
+      return false;
+    },
     Apply: () => calls.push('Updater Apply'),
     Download: () => {
       calls.push('Updater Download');

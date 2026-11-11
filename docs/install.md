@@ -40,6 +40,7 @@ The stick runs on the open-source drivers, including nouveau on NVIDIA graphics 
 
 ```toml
 # smallest-system = 34359738368       # bytes; drives or spaces below it aren't offered
+version = "1.2-nightly.21"                                # the version of Luft on the stick
 
 [images.default]
 source = "containers-storage:ghcr.io/lantharos/luft:1"    # where the stick has the image
@@ -47,7 +48,7 @@ target = "ghcr.io/lantharos/luft:1"                       # where the installed 
 size = 5286520084                                         # bytes installed, for the progress bar
 ```
 
-The image ships only the settings above the `[images]` tables. The stick's build adds a table for each image it carries, with the size Podman reports for it. `[images.nvidia]` is used on computers with an NVIDIA graphics card. A stick with a single table installs that image on any computer. Each table's `target` is where the installed system gets its updates: `ghcr.io/lantharos/luft:1` on a release's stick, `:1-nightly` on a nightly's, with `-nvidia` for the NVIDIA image. The image itself doesn't know its channel, so a release can be the same image as the nightly it was tested as.
+The image ships only the settings above the `[images]` tables. The stick's build adds the version it carries, from the image's label, which is how Install Luft knows it's installing a nightly, and a table for each image it carries, with the size Podman reports for it. `[images.nvidia]` is used on computers with an NVIDIA graphics card. A stick with a single table installs that image on any computer. Each table's `target` is where the installed system gets its updates: `ghcr.io/lantharos/luft:1` on a release's stick, `:1-nightly` on a nightly's, with `-nvidia` for the NVIDIA image. The image itself doesn't know its channel, so a release can be the same image as the nightly it was tested as.
 
 - The stick ([os/iso](../os/iso)) keeps both images in a read-only image store on the stick, which the session there adds to Podman's storage, so `containers-storage:` sources install without a network. While bootc installs, the installer puts `/var/tmp` on the new drive, where bootc keeps each layer it reads from the store until it's unpacked, so installing needs no room in memory, which is where the live session keeps its changes.
 - Its kernel command line has `rd.live.image`, which tells the installer it's on the stick. greetd signs the passwordless `live` account in with `kestrel-session --setup` as its `initial_session`, and polkit allows that account everything, installing included. Install Luft is listed in Start only there.

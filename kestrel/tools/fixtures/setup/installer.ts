@@ -9,6 +9,9 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <property name="Progress" type="d" access="read"/>
   <property name="Error" type="s" access="read"/>
   <property name="SecureBootCode" type="s" access="read"/>
+  <property name="Version" type="s" access="read"/>
+  <property name="Early" type="b" access="read"/>
+  <property name="StableReleased" type="b" access="read"/>
   <method name="Survey"><arg type="s" direction="out"/></method>
   <method name="Install"><arg type="s" direction="in"/></method>
   <method name="OpenMovingBox"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
@@ -26,6 +29,7 @@ const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Installer">
   <method name="SetStage"><arg type="s" direction="in"/><arg type="d" direction="in"/></method>
   <method name="Requests"><arg type="as" direction="out"/></method>
   <method name="UseMeet"><arg type="b" direction="in"/></method>
+  <method name="UseRelease"><arg type="s" direction="in"/><arg type="b" direction="in"/><arg type="b" direction="in"/></method>
 </interface></node>`;
 
 type Endpoint = [string, string, string];
@@ -40,6 +44,7 @@ const GB = 1e9;
 const MIB = 1024 ** 2;
 const GIB = 1024 ** 3;
 const SECURE_BOOT_CODE = '48203917';
+export const NIGHTLY_RELEASE = {version: '1.2-nightly.21', early: true, stableReleased: false};
 
 const SURVEY = {
   drives: [
@@ -130,6 +135,7 @@ export function publishInstaller(publish: Publish, calls: string[]) {
   const state = {Phase: 'live', Stage: 'idle', Progress: 0, Error: '', SecureBootCode: ''};
   const requests: string[] = [];
   let survey: typeof SURVEY | typeof FROM_MEET = SURVEY;
+  let release = NIGHTLY_RELEASE;
   let exported: Gio.DBusExportedObject | null = null;
   const fingerprints = relayFingerprints(status => exported!.emit_signal('FingerprintStatus', status));
   const set = (changes: Partial<typeof state>) => {
@@ -152,6 +158,15 @@ export function publishInstaller(publish: Publish, calls: string[]) {
     },
     get SecureBootCode() {
       return state.SecureBootCode;
+    },
+    get Version() {
+      return release.version;
+    },
+    get Early() {
+      return release.early;
+    },
+    get StableReleased() {
+      return release.stableReleased;
     },
     Survey: () => JSON.stringify(survey),
     Install: (request: string) => {
@@ -181,6 +196,9 @@ export function publishInstaller(publish: Publish, calls: string[]) {
     Requests: () => requests.splice(0),
     UseMeet: (meet: boolean) => {
       survey = meet ? FROM_MEET : SURVEY;
+    },
+    UseRelease: (version: string, early: boolean, stableReleased: boolean) => {
+      release = {version, early, stableReleased};
     },
   }, '/com/lantharos/KestrelChecks/Installer');
 }

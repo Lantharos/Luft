@@ -36,7 +36,7 @@ class SetupState {
 			flow.begin(phase, firstBootSkips(this.trust, this.hardware, this.newNetworks));
 		} else {
 			await regional.start();
-			flow.begin(phase, []);
+			flow.begin(phase, install.status?.release.early ? [] : ['early']);
 		}
 		this.ready = true;
 		return () => stops.forEach((stop) => stop());

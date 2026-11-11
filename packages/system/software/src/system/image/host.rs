@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use luft_variant::Variant;
+use luft_variant::{Channel, Variant};
 use serde::Deserialize;
 
 use super::config::{Config, Release};
@@ -11,6 +11,8 @@ struct Reply {
     host: Document,
     #[serde(default)]
     configs: HashMap<String, Config>,
+    #[serde(default)]
+    waiting: Option<Channel>,
 }
 
 #[derive(Deserialize)]
@@ -48,7 +50,7 @@ struct Image {
     image_digest: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Reference {
     image: String,
     transport: String,
@@ -87,6 +89,17 @@ impl Reference {
         }
     }
 
+    pub fn follows(&self) -> Option<Channel> {
+        Channel::of(&self.image)
+    }
+
+    pub fn as_channel(&self, channel: Channel) -> Option<Self> {
+        Some(Self {
+            image: channel.reference(&self.image)?,
+            transport: self.transport.clone(),
+        })
+    }
+
     pub fn as_variant(&self, variant: Variant) -> Option<Self> {
         Some(Self {
             image: variant.reference(&self.image)?,
@@ -106,6 +119,7 @@ pub struct Host {
     pub staged: Option<Deployment>,
     pub rollback: Option<Deployment>,
     pub rollback_queued: bool,
+    pub waiting: Option<Channel>,
 }
 
 impl Host {
@@ -113,6 +127,7 @@ impl Host {
         let Reply {
             host: Document { spec, status },
             mut configs,
+            waiting,
         } = serde_json::from_str(json).map_err(|error| error.to_string())?;
         let mut deployment = |entry: Entry| Deployment {
             config: entry
@@ -131,6 +146,7 @@ impl Host {
             staged: status.staged.map(&mut deployment),
             rollback: status.rollback.map(&mut deployment),
             rollback_queued: status.rollback_queued,
+            waiting,
         })
     }
 }
@@ -152,5 +168,13 @@ impl Deployment {
 
     pub fn variant(&self) -> Option<Variant> {
         Some(self.image.as_ref()?.image.variant())
+    }
+
+    pub fn channel(&self) -> Option<&'static str> {
+        self.image.as_ref()?.image.release_channel()
+    }
+
+    pub fn digest(&self) -> Option<&str> {
+        Some(&self.image.as_ref()?.image_digest)
     }
 }

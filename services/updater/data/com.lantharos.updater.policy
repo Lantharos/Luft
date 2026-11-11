@@ -35,6 +35,16 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.updater.channel">
+    <description>Switch between Luft's stable and nightly versions</description>
+    <message>Authentication is required to change which versions of Luft this computer gets</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.updater.rollback">
     <description>Go back to the previous version of the system</description>
     <message>Authentication is required to go back to the previous version</message>

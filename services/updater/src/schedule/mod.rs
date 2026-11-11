@@ -6,6 +6,7 @@ use std::path::Path;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, bail};
+use luft_variant::Channel;
 use serde::{Deserialize, Serialize};
 
 pub use conditions::metered;
@@ -55,6 +56,10 @@ pub struct Schedule {
     pub every: Every,
     pub download: bool,
     pub checked: u64,
+    /// A channel chosen while it had nothing as new as the running version, which the system
+    /// moves to once it does.
+    #[serde(default)]
+    pub waiting: Option<Channel>,
 }
 
 impl Default for Schedule {
@@ -63,6 +68,7 @@ impl Default for Schedule {
             every: Every::Daily,
             download: true,
             checked: 0,
+            waiting: None,
         }
     }
 }

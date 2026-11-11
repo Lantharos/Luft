@@ -10,6 +10,9 @@
     Progress: 0 to 1 over the whole install.
     SecureBootCode: once finished, the code to type when the computer next starts so Secure Boot trusts Luft's
       signing key, or empty when it already does or Secure Boot is off.
+    Version: the version of Luft the USB stick installs, such as "1.2-nightly.21", or empty when it doesn't say.
+    Early: whether this image's build marked Luft as still early, which Install Luft says before anything is written.
+    StableReleased: whether a stable version of Luft was out when this image was built.
 
     Survey, Install, OpenMovingBox, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
@@ -22,6 +25,9 @@
     <property name="Progress" type="d" access="read"/>
     <property name="Error" type="s" access="read"/>
     <property name="SecureBootCode" type="s" access="read"/>
+    <property name="Version" type="s" access="read"/>
+    <property name="Early" type="b" access="read"/>
+    <property name="StableReleased" type="b" access="read"/>
 
     <!-- JSON: drives with their free spaces, EFI system partition and Windows (size, used, smallest it can
          shrink to, room for Luft, version, fast startup, whether its clock is in UTC, how many

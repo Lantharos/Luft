@@ -18,7 +18,9 @@ const XDG_OPEN: &str = "/usr/bin/xdg-open";
 const PIPEWIRE_SOCKET: &str = "pipewire-0";
 const HOME_READ_ONLY: [&str; 2] = [".local/share/fonts", ".local/share/icons"];
 const X11_AUTHORITY: &str = "Xauthority";
+const SOUND_CARDS: &str = "/dev/snd";
 
+use system::SHARED_MEMORY;
 pub use system::write_accounts;
 
 /// Everything the app's sandbox is made of.
@@ -167,14 +169,23 @@ impl Profile<'_> {
         Ok(arguments)
     }
 
+    /// The devices the app was given. Every device still leaves out the
+    /// computer's shared memory, and sound cards and cameras unless their
+    /// own switches are on.
     fn devices(&self, arguments: &mut Arguments) {
         if self.grants.has(Device::All) {
-            arguments.same("--dev-bind", "/dev");
-            return;
-        }
-        arguments.0.extend(self.gpu().0);
-        for device in &self.decoys.devices {
-            arguments.same("--dev-bind-try", device);
+            arguments
+                .same("--dev-bind", "/dev")
+                .flag("--tmpfs")
+                .flag(SHARED_MEMORY);
+            if !self.grants.microphone && Path::new(SOUND_CARDS).is_dir() {
+                arguments.flag("--tmpfs").flag(SOUND_CARDS);
+            }
+        } else {
+            arguments.0.extend(self.gpu().0);
+            for device in &self.decoys.devices {
+                arguments.same("--dev-bind-try", device);
+            }
         }
         for (decoy, device) in &self.decoys.binds {
             arguments.bind("--bind", decoy, device);

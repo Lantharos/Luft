@@ -46,7 +46,10 @@ function files(filesystems: string[]): Access[] {
 	});
 	const hidden = ['xdg-run', 'xdg-config', 'xdg-cache', 'xdg-data', '/run/'];
 	const granted = entries.filter((entry) => !entry.denied && !hidden.some((prefix) => entry.place.startsWith(prefix)));
-	const mode = (readOnly: boolean) => (readOnly ? 'It can look at them but not change them.' : 'It can read and change them.');
+	const mode = (readOnly: boolean, several = true) => {
+		const what = several ? 'them' : 'it';
+		return readOnly ? `It can look at ${what} but not change ${what}.` : `It can read and change ${what}.`;
+	};
 	const access: Access[] = [];
 	const host = granted.find((entry) => entry.place === 'host' || entry.place === 'host-os' || entry.place === 'host-etc');
 	if (host) {
@@ -54,12 +57,12 @@ function files(filesystems: string[]): Access[] {
 		return access;
 	}
 	const home = granted.find((entry) => entry.place === 'home' || entry.place === '~');
-	if (home) access.push({ icon: FolderOpen, title: 'Your home folder', description: mode(home.readOnly), notable: true });
+	if (home) access.push({ icon: FolderOpen, title: 'Your home folder', description: mode(home.readOnly, false), notable: true });
 	const folders = granted.filter((entry) => FOLDERS[entry.place]);
 	for (const readOnly of [false, true]) {
 		const group = folders.filter((entry) => entry.readOnly === readOnly);
 		if (!group.length) continue;
-		access.push({ icon: Folder, title: `${listing(group.map((entry) => FOLDERS[entry.place]))} ${group.length > 1 ? 'folders' : 'folder'}`, description: mode(readOnly), notable: !readOnly });
+		access.push({ icon: Folder, title: `${listing(group.map((entry) => FOLDERS[entry.place]))} ${group.length > 1 ? 'folders' : 'folder'}`, description: mode(readOnly, group.length > 1), notable: !readOnly });
 	}
 	const others = granted.filter((entry) => entry !== home && !FOLDERS[entry.place]);
 	if (others.length) {

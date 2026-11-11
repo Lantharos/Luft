@@ -23,6 +23,24 @@ async fn store(
         .map_err(|error| dbus::explain(&error))
 }
 
+async fn held(
+    connection: &Connection,
+    permission: &Permission,
+    id: &str,
+) -> Result<Vec<String>, String> {
+    permissions::values(connection, permission, id)
+        .await
+        .map_err(|error| dbus::explain(&error))
+}
+
+async fn given(connection: &Connection, permission: &Permission, id: &str) -> Result<bool, String> {
+    Ok(held(connection, permission, id)
+        .await?
+        .first()
+        .map(String::as_str)
+        == Some(YES))
+}
+
 const EVERYTHING: [&Permission; 10] = [
     &FULL_ACCESS,
     &FOLDERS,
@@ -196,12 +214,12 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
         return Ok(());
     }
     let connection = dbus::session().await?;
-    let (changed, read_only, devices, talk) = futures_util::join!(
-        permissions::values(connection, &FOLDERS, id),
-        permissions::values(connection, &READ_ONLY_FOLDERS, id),
-        permissions::values(connection, &DEVICES, id),
-        permissions::values(connection, &BUS, id),
-    );
+    let (changed, read_only, devices, talk) = futures_util::try_join!(
+        held(connection, &FOLDERS, id),
+        held(connection, &READ_ONLY_FOLDERS, id),
+        held(connection, &DEVICES, id),
+        held(connection, &BUS, id),
+    )?;
     let (changed_before, read_only_before) = folder_names(before);
     let (changed_after, read_only_after) = folder_names(after);
     let declared_before = [changed_before, read_only_before].concat();
@@ -244,17 +262,17 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
 /// What the app's sandbox opens to it, in Flatpak's words.
 pub async fn granted(id: &str) -> Result<Permissions, String> {
     let connection = dbus::session().await?;
-    let (folders, read_only, devices, network, talk, downloads, x11, microphone, camera) = futures_util::join!(
-        permissions::values(connection, &FOLDERS, id),
-        permissions::values(connection, &READ_ONLY_FOLDERS, id),
-        permissions::values(connection, &DEVICES, id),
-        permissions::values(connection, &NETWORK, id),
-        permissions::values(connection, &BUS, id),
-        permissions::values(connection, &DOWNLOADS, id),
-        permissions::allowed(connection, &X11, id),
-        permissions::allowed(connection, &MICROPHONE, id),
-        permissions::allowed(connection, &CAMERA, id),
-    );
+    let (folders, read_only, devices, network, talk, downloads, x11, microphone, camera) = futures_util::try_join!(
+        held(connection, &FOLDERS, id),
+        held(connection, &READ_ONLY_FOLDERS, id),
+        held(connection, &DEVICES, id),
+        held(connection, &NETWORK, id),
+        held(connection, &BUS, id),
+        held(connection, &DOWNLOADS, id),
+        given(connection, &X11, id),
+        given(connection, &MICROPHONE, id),
+        given(connection, &CAMERA, id),
+    )?;
     let closed = |answer: &[String]| answer.first().map(String::as_str) == Some(NO);
     Ok(Declaration {
         network: !closed(&network),

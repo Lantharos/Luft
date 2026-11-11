@@ -63,7 +63,7 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
     let session = runtime
         .block_on(Connection::session())
         .map_err(|error| error.to_string())?;
-    let grants = runtime.block_on(Grants::of(&session, id));
+    let grants = runtime.block_on(Grants::of(&session, id))?;
     let folder = Folder::of(id)?;
     let lock = folder.lock()?;
     if matches!(lock, Lock::Running) && folder.unsandboxed().is_some() {

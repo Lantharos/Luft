@@ -155,12 +155,15 @@ pub async fn allowed(connection: &Connection, permission: &Permission, app: &str
 }
 
 /// Everything the app was given in one entry, such as the folders it may use.
-pub async fn values(connection: &Connection, permission: &Permission, app: &str) -> Vec<String> {
-    lookup(connection, permission.table, permission.id)
-        .await
-        .ok()
-        .and_then(|mut apps| apps.remove(app))
-        .unwrap_or_default()
+pub async fn values(
+    connection: &Connection,
+    permission: &Permission,
+    app: &str,
+) -> zbus::Result<Vec<String>> {
+    Ok(lookup(connection, permission.table, permission.id)
+        .await?
+        .remove(app)
+        .unwrap_or_default())
 }
 
 pub async fn set_values(

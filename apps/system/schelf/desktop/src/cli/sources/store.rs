@@ -140,7 +140,7 @@ pub fn access(declared: &Declared) -> Vec<String> {
             match device.as_str() {
                 "usb" => "USB devices",
                 "serial" => "Devices on a serial port",
-                _ => "Every device, such as cameras and microphones",
+                _ => "Every device you plug in",
             }
             .to_owned(),
         );

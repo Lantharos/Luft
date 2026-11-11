@@ -11,10 +11,12 @@ const STALE: &str =
 const OLDER: &str = "schelf.store sent an older copy of its list than the one Schelf has.";
 const UNSTAMPED: &str = "Schelf couldn't confirm this is schelf.store's current list.";
 
-/// What every signed document says about its own age: a number that only
-/// grows from one version to the next, and the day it stops counting.
+/// What every signed document says about itself: the path it was signed
+/// for, a number that only grows from one version to the next, and the day
+/// it stops counting.
 #[derive(Deserialize)]
 pub struct Stamp {
+    path: String,
     serial: u64,
     expires: Option<DateTime<Utc>>,
 }
@@ -34,9 +36,12 @@ fn last_accepted(document: &str) -> PathBuf {
 }
 
 impl Stamp {
-    pub fn read(body: &[u8], expiry: Expiry) -> Result<Self, String> {
+    /// The stamp of the document asked for at `document`, so one signed
+    /// document can't be served in place of another.
+    pub fn read(body: &[u8], document: &str, expiry: Expiry) -> Result<Self, String> {
         serde_json::from_slice::<Self>(body)
             .ok()
+            .filter(|stamp| stamp.path == document)
             .filter(|stamp| stamp.expires.is_some() || matches!(expiry, Expiry::WhenGiven))
             .ok_or_else(|| UNSTAMPED.to_owned())
     }
@@ -72,11 +77,16 @@ impl Stamp {
 mod tests {
     use super::{Expiry, Stamp};
 
+    const CATALOG: &str = "index/v1/catalog.json";
+    const KEYS: &str = "trust/v1/store-keys.json";
+
     #[test]
     fn a_document_counts_until_it_expires() {
         let read = |expires: &str, expiry| {
             Stamp::read(
-                format!(r#"{{"serial":7,"expires":"{expires}","apps":[]}}"#).as_bytes(),
+                format!(r#"{{"path":"{CATALOG}","serial":7,"expires":"{expires}","apps":[]}}"#)
+                    .as_bytes(),
+                CATALOG,
                 expiry,
             )
         };
@@ -93,15 +103,25 @@ mod tests {
                     .current()
                     .is_err()
             );
-            assert!(Stamp::read(br#"{"keys":[]}"#, expiry).is_err());
+            assert!(Stamp::read(br#"{"keys":[]}"#, CATALOG, expiry).is_err());
         }
     }
 
     #[test]
     fn only_the_key_list_may_leave_its_expiry_out() {
-        let unexpiring = br#"{"serial":7,"keys":[]}"#;
-        assert!(Stamp::read(unexpiring, Expiry::Required).is_err());
-        let keys = Stamp::read(unexpiring, Expiry::WhenGiven).unwrap();
+        let unexpiring = br#"{"path":"trust/v1/store-keys.json","serial":7,"keys":[]}"#;
+        assert!(Stamp::read(unexpiring, KEYS, Expiry::Required).is_err());
+        let keys = Stamp::read(unexpiring, KEYS, Expiry::WhenGiven).unwrap();
         assert!(keys.current().is_ok());
+    }
+
+    #[test]
+    fn a_document_only_counts_at_the_path_it_was_signed_for() {
+        let listing = br#"{"path":"index/v1/apps/com.example.App.json","serial":9,"expires":"2999-01-01T00:00:00Z"}"#;
+        let read = |document| Stamp::read(listing, document, Expiry::Required);
+        assert!(read("index/v1/apps/com.example.App.json").is_ok());
+        assert!(read("index/v1/apps/com.example.Other.json").is_err());
+        assert!(read("/index/v1/apps/com.example.App.json").is_err());
+        assert!(read(CATALOG).is_err());
     }
 }

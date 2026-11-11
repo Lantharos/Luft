@@ -9,3 +9,5 @@ sandbox-microphone-body = It tried to record sound, which it isn’t allowed to 
 sandbox-camera-body = It tried to use a camera, which it isn’t allowed to do. You can allow that in Schelf. It may need a restart to find the camera.
 # Button on the notification that opens Schelf to give the app more access
 sandbox-review = Review access
+# Shown when an app can't start because the record of what it may do couldn't be read
+sandbox-unreadable = Luft couldn’t read what it’s allowed to do.

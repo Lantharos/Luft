@@ -1,12 +1,14 @@
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use luft_identity::permissions::{
-    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS,
-    X11,
+    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
+    READ_ONLY_FOLDERS, X11,
 };
 use luft_software::apps::appimage;
 use zbus::Connection;
 
+use crate::L10N;
 use crate::escalate::Asking;
 
 pub struct App {
@@ -62,6 +64,7 @@ pub struct Grants {
     pub network: bool,
     pub downloads: bool,
     pub x11: bool,
+    pub microphone: bool,
     pub camera: bool,
     pub bus: Vec<String>,
 }
@@ -75,7 +78,7 @@ fn existing_folders(paths: Vec<String>) -> Vec<PathBuf> {
 }
 
 impl Grants {
-    pub async fn of(connection: &Connection, id: &str) -> Self {
+    pub async fn of(connection: &Connection, id: &str) -> Result<Self, String> {
         let (
             full_access,
             folders,
@@ -85,6 +88,7 @@ impl Grants {
             downloads,
             bus,
             x11,
+            microphone,
             camera,
         ) = tokio::join!(
             permissions::allowed(connection, &FULL_ACCESS, id),
@@ -95,22 +99,26 @@ impl Grants {
             permissions::values(connection, &DOWNLOADS, id),
             permissions::values(connection, &BUS, id),
             permissions::allowed(connection, &X11, id),
+            permissions::allowed(connection, &MICROPHONE, id),
             permissions::allowed(connection, &CAMERA, id),
         );
-        Self {
+        let given =
+            |values: zbus::Result<Vec<String>>| values.map_err(|_| t!(L10N, "sandbox-unreadable"));
+        Ok(Self {
             full_access,
-            folders: existing_folders(folders),
-            read_only_folders: existing_folders(read_only_folders),
-            devices: devices
+            folders: existing_folders(given(folders)?),
+            read_only_folders: existing_folders(given(read_only_folders)?),
+            devices: given(devices)?
                 .iter()
                 .filter_map(|name| Device::parse(name))
                 .collect(),
-            network: network.first().map(String::as_str) != Some(NO),
-            downloads: downloads.first().map(String::as_str) != Some(NO),
-            bus,
+            network: given(network)?.first().map(String::as_str) != Some(NO),
+            downloads: given(downloads)?.first().map(String::as_str) != Some(NO),
+            bus: given(bus)?,
             x11,
+            microphone,
             camera,
-        }
+        })
     }
 
     pub fn has(&self, device: Device) -> bool {

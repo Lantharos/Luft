@@ -146,8 +146,8 @@ fn bytes(url: &str) -> Result<Vec<u8>, String> {
 /// asked again, and the copy on disk stands in when it can't be reached.
 /// Only what passes `check` is used or kept, so a damaged copy on disk is
 /// fetched anew rather than asked about by its tag. A copy that has expired
-/// is never used, and one older than the last taken from schelf.store is
-/// never taken. `expiry` says whether the document has to expire at all.
+/// is never used, one signed for another path is never used, and one older
+/// than the last taken from schelf.store is never taken. `expiry` says whether the document has to expire at all.
 fn load<T>(
     document: &str,
     age: Age,
@@ -157,7 +157,7 @@ fn load<T>(
     let cached = Cached::of(document);
     let trusted = |stored: &Stored| {
         let checked = check(&stored.body, &Seal::read(&stored.seal)?)?;
-        Ok::<_, String>((checked, Stamp::read(&stored.body, expiry)?))
+        Ok::<_, String>((checked, Stamp::read(&stored.body, document, expiry)?))
     };
     let on_disk = cached
         .read()

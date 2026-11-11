@@ -102,6 +102,10 @@
 		-webkit-app-region: no-drag;
 	}
 
+	.glass-sidebar :focus-visible {
+		outline-offset: -2px;
+	}
+
 	.hidden-scroll {
 		scrollbar-width: none;
 	}

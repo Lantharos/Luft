@@ -17,19 +17,18 @@ folders = ["dep:dirs"]
 fonts = ["dep:dirs", "dep:gio", "dep:memmap2", "dep:skrifa"]
 ibus = ["dep:dirs"]
 launch = ["dep:gio"]
-recovery = ["dep:libc"]
+recovery = []
 settings = ["dep:dirs"]
 thumbnails = [
     "dep:dirs",
     "dep:fast_image_resize",
     "dep:gio",
     "dep:image",
-    "dep:libc",
     "dep:md-5",
     "dep:parking_lot",
     "dep:png",
 ]
-watch = ["dep:inotify", "dep:libc", "dep:parking_lot"]
+watch = ["dep:inotify", "dep:parking_lot"]
 
 [dependencies]
 dirs = { workspace = true, optional = true }
@@ -49,7 +48,7 @@ image = { workspace = true, features = [
   "webp",
 ], optional = true }
 inotify = { workspace = true, optional = true }
-libc = { workspace = true, optional = true }
+libc.workspace = true
 luft-dbus.workspace = true
 luft-identity.workspace = true
 luft-i18n.workspace = true

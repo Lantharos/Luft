@@ -4,7 +4,8 @@
 -- until the person allowed it. Such an app only gets streams of its own:
 -- it cannot make links, and the session manager does not link anything into
 -- a node of its unless the permission store holds "yes" for it under
--- devices/microphone (sound) or devices/camera (video).
+-- devices/microphone (sound) or devices/camera (video). Which of the two a
+-- link needs comes from the node being listened to, never from the app's own.
 
 cutils = require ("common-utils")
 log = Log.open_topic ("s-client")
@@ -47,14 +48,22 @@ function ownerOf (node)
   }
 end
 
--- Whether nothing may be linked into the node: it belongs to a sandboxed app
--- that was not given what its kind of media needs.
-function refused (node)
+function kindOf (node)
   local class = node.properties ["media.class"] or ""
-  local kind = KINDS [class:match ("Audio") or class:match ("Video")]
-  local owner = kind and ownerOf (node)
+  return KINDS [class:match ("Audio") or class:match ("Video")]
+end
+
+-- Whether the sender may not be linked into the receiver: the receiver
+-- belongs to a sandboxed app that was not given what the sender's kind of
+-- media needs. The receiver's own description of itself is not trusted.
+function refused (receiver, sender)
+  local owner = ownerOf (receiver)
   local app = owner and appOf (owner)
-  return app ~= nil and not allowed (app, kind)
+  if app == nil then
+    return false
+  end
+  local kind = kindOf (sender)
+  return kind == nil or not allowed (app, kind)
 end
 
 function receives (linkable)
@@ -107,25 +116,33 @@ SimpleEventHook {
   execute = function (event)
     local si = event:get_subject ()
     local target = event:get_data ("target")
-    local receiver = receives (si) and si or target
-    if receiver == nil then
+    if target == nil then
       return
     end
+    local receiver, sender = target, si
+    if receives (si) then
+      receiver, sender = si, target
+    end
     local node = receiver:get_associated_proxy ("node")
-    if refused (node) then
+    if refused (node, sender:get_associated_proxy ("node")) then
       log:info (node, "Not linking into a sandboxed app without permission")
       event:stop_processing ()
     end
   end
 }:register ()
 
+function nodeOf (nodes, id)
+  return nodes:lookup {
+    Constraint { "bound-id", "=", id, type = "gobject" },
+  }
+end
+
 function unlinkRefused ()
   local nodes = cutils.get_object_manager ("node")
   for link in cutils.get_object_manager ("link"):iterate () do
-    local node = nodes:lookup {
-      Constraint { "bound-id", "=", link.properties ["link.input.node"], type = "gobject" },
-    }
-    if node and refused (node) then
+    local receiver = nodeOf (nodes, link.properties ["link.input.node"])
+    local sender = nodeOf (nodes, link.properties ["link.output.node"])
+    if receiver and sender and refused (receiver, sender) then
       link:request_destroy ()
     end
   end

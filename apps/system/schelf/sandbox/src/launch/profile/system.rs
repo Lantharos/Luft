@@ -9,6 +9,7 @@ const SETTINGS: &str = "/etc";
 const USERS: &str = "passwd";
 const GROUPS: &str = "group";
 const NOBODY: u32 = 65534;
+pub(super) const SHARED_MEMORY: &str = "/dev/shm";
 const SYSTEM_FOLDERS: [&str; 5] = [
     "/sys/block",
     "/sys/bus",
@@ -196,7 +197,7 @@ impl Profile<'_> {
             .flag("--dev")
             .flag("/dev")
             .flag("--tmpfs")
-            .flag("/dev/shm")
+            .flag(SHARED_MEMORY)
             .flag("--perms")
             .flag("0700")
             .flag("--dir")

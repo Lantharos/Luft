@@ -1,3 +1,5 @@
+mod documents;
+
 use std::collections::HashMap;
 use std::os::unix::ffi::{OsStrExt, OsStringExt};
 use std::path::{Path, PathBuf};
@@ -9,6 +11,7 @@ use zbus::zvariant::DynamicType;
 use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use crate::dbus::{self, failed};
+use documents::Picked;
 
 pub(crate) const PORTAL: &str = "org.freedesktop.portal.Desktop";
 pub(crate) const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
@@ -60,11 +63,20 @@ pub struct FileChooser<'a> {
 
 impl FileChooser<'_> {
     pub async fn open(&self) -> Result<Vec<String>, String> {
-        self.request("OpenFile").await
+        let picked = if self.directory {
+            Picked::Folder
+        } else {
+            Picked::File
+        };
+        documents::within_reach(self.request("OpenFile").await?, picked).await
     }
 
     pub async fn save(&self) -> Result<Option<String>, String> {
-        Ok(self.request("SaveFile").await?.into_iter().next())
+        let chosen = self.request("SaveFile").await?;
+        Ok(documents::within_reach(chosen, Picked::NewFile)
+            .await?
+            .into_iter()
+            .next())
     }
 
     fn options(&self, token: &str) -> HashMap<&'static str, Variant<'_>> {

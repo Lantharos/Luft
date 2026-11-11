@@ -248,6 +248,11 @@
       <default>true</default>
       <summary>Whether pressing Super twice or swiping up with four fingers turns a workspace into a board</summary>
     </key>
+    <key name="reopen-apps" type="b">
+      <default>false</default>
+      <summary>Whether the apps and windows open when you signed out, restarted or turned off the computer open again when you sign in</summary>
+      <description>They always open again after a restart to install an update, and after Kestrel stops unexpectedly.</description>
+    </key>
     <key name="monitors-needing-wake" type="as">
       <default>[]</default>
       <summary>Monitors that show no picture unless woken through a slower mode</summary>

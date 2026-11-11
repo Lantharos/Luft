@@ -7,12 +7,13 @@ out="$session_dir/capture"
 durations="$session_dir/capture-durations.tsv"
 session_timeout=30m
 max_startup_failures=3
+max_sign_ins=8
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 laptop_areas=(board input:dictation input:scrolling panel:battery panel:markup panel:repaints panel:screenshot tablet:keyboard tablet:longPress windows:serverDecorations windows:x11Frames)
 taskbar_positions=(left top right)
 position_areas=(taskbar start panel tiling)
-two_display_groups=(tiling:monitors system:dimming windows:seeThroughWallpaper taskbar:arrangement desktop:playthings)
+two_display_groups=(tiling:monitors system:dimming windows:seeThroughWallpaper taskbar:arrangement desktop:playthings restore:monitors)
 second_display=1280x720
 
 usage() {
@@ -114,9 +115,8 @@ seconds_since() {
 }
 
 start_worker() {
-  local name="worker-$((++workers))" size capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
+  local name="$1" size="$2" resumed="${3:-}" capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
   local secondary="${KESTREL_CAPTURE_SECONDARY_SIZE:-}" position="" variant
-  size=$(next_size)
   variant="$size"
   if [[ "$variant" == dual* ]]; then
     secondary="$second_display"
@@ -134,8 +134,8 @@ start_worker() {
   KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \
     KESTREL_CAPTURE_CLAIMED="$out/claimed" KESTREL_CAPTURE_RESULTS="$out/results" \
     KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_SECONDARY_SIZE="$secondary" KESTREL_CAPTURE_DIR="$captures" \
-    KESTREL_CAPTURE_TASKBAR="$position" \
-    timeout "$session_timeout" "$tools/session/desktop.sh" capture > "$out/workers/$name.log" 2>&1 &
+    KESTREL_CAPTURE_TASKBAR="$position" KESTREL_CAPTURE_RESUMED="$resumed" \
+    timeout "$session_timeout" "$tools/session/desktop.sh" capture >> "$out/workers/$name.log" 2>&1 &
   running[$!]="$name"
   sizes[$!]="$size"
 }
@@ -163,6 +163,15 @@ record_standalone() {
   fi
 }
 
+next_sign_in() {
+  local entry
+  entry=$(compgen -G "$out/queue/*/*~$1-*" | head -n1) && basename "$(dirname "$entry")"
+}
+
+start_next_worker() {
+  start_worker "worker-$((++workers))" "$(next_size)"
+}
+
 finished_worker() {
   if [[ -n "$(open_groups "$2")" ]] && ! compgen -G "$out/claimed/*@$1" > /dev/null && ((++startup_failures >= max_startup_failures)); then
     echo "Sessions keep ending before running a check, see $out/workers/$1.log" >&2
@@ -171,20 +180,27 @@ finished_worker() {
 }
 
 run_sessions() {
-  local pid status queued_groups group
+  local pid status queued_groups group signing_in size
   queued_groups=$(open_groups | wc -l)
   for group in "${separate[@]}"; do start_standalone "$group"; done
-  while ((${#running[@]} < jobs && workers < queued_groups)); do start_worker; done
+  while ((${#running[@]} < jobs && workers < queued_groups)); do start_next_worker; done
   while ((${#running[@]} > 0)); do
     status=0
+    signing_in=()
     wait -n -p pid || status=$?
     if standalone "${running[$pid]}"; then
       record_standalone "${running[$pid]}" "$status"
+    elif size=$(next_sign_in "${running[$pid]}") && ((++sign_ins[${running[$pid]}] <= max_sign_ins)); then
+      signing_in=("${running[$pid]}" "$size")
     else
       finished_worker "${running[$pid]}" "${sizes[$pid]}"
     fi
     unset "running[$pid]" "sizes[$pid]"
-    if queued && ((${#running[@]} < jobs)); then start_worker; fi
+    if ((${#signing_in[@]})); then
+      start_worker "${signing_in[@]}" 1
+    elif queued && ((${#running[@]} < jobs)); then
+      start_next_worker
+    fi
   done
 }
 
@@ -278,6 +294,7 @@ started=$EPOCHREALTIME
 declare -A running=()
 declare -A sizes=()
 declare -A started_at=()
+declare -A sign_ins=()
 separate=()
 workers=0
 startup_failures=0

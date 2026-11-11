@@ -27,7 +27,7 @@ restore_settings() {
       dconf reset -f "/org/gnome/desktop/$section/"
       dconf load "/org/gnome/desktop/$section/" < "$session/$section.ini"
     done
-  else
+  elif [[ -z "${KESTREL_CAPTURE_RESUMED:-}" ]]; then
     dconf reset -f /
   fi
   if [[ -s "$session/favorites.txt" ]]; then

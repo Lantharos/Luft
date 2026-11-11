@@ -22,6 +22,7 @@ import { ModalDialogErrors, ModalDialogError } from '../../core/runtime/dbusErro
 
 import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { loadStagedImage, type StagedImage } from './stagedImage.js';
+import type { SessionRecorder } from '../restore/recorder.js';
 import { inhibitIdle, uninhibitIdle } from '../../system/hardware/power/idleInhibit.js';
 
 const ITEM_ICON_SIZE = 64;
@@ -120,7 +121,7 @@ export class EndSessionDialog extends ModalDialog {
   private rebootButton: St.Button | null = null;
   private rebootButtonAlt: St.Button | null = null;
 
-  constructor() {
+  constructor(private readonly sessionRecorder: SessionRecorder) {
     super({
       styleClass: 'end-session-dialog',
       destroyOnClose: false,
@@ -333,7 +334,9 @@ export class EndSessionDialog extends ModalDialog {
   }
 
   private async confirm(signal: ConfirmSignal): Promise<void> {
-    if (this.installsStagedImage(signal)) await this.applyStagedImage();
+    const installs = this.installsStagedImage(signal);
+    this.sessionRecorder.end(installs ? 'update' : 'ordinary');
+    if (installs) await this.applyStagedImage();
 
     this.fadeOutDialog();
     this.stopTimer();

@@ -2,7 +2,8 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
 import { restartedAfterCrash } from '../../../system/status/health/restarted.js';
-import { appOf, capture, read, remembered, type SavedWindow, write } from './snapshot.js';
+import { place, restoreState } from './placement.js';
+import { alive, appOf, capture, read, remembered, type SavedWindow, write } from './snapshot.js';
 
 const NOTE_AFTER_MS = 500;
 const RETURN_WITHIN_SECONDS = 60;
@@ -13,6 +14,7 @@ interface Returned {
 }
 
 export class WindowRecovery {
+  readonly lost: SavedWindow[] = [];
   private readonly watched = new Map<Meta.Window, number[]>();
   private awaited: SavedWindow[] = [];
   private readonly claimed = new Set<SavedWindow>();
@@ -21,9 +23,9 @@ export class WindowRecovery {
   private expireSource = 0;
   private writing = false;
   private dirty = false;
-  private noted = '';
+  private written = '';
 
-  constructor(private readonly locked: () => boolean) {
+  constructor(private readonly locked: () => boolean, private readonly noted: (windows: SavedWindow[]) => void) {
     if (restartedAfterCrash) this.awaitReturn();
     const display = global.display;
     display.connect('window-created', (_display, window: Meta.Window) => this.created(window));
@@ -33,7 +35,10 @@ export class WindowRecovery {
   }
 
   private awaitReturn(): void {
-    this.awaited = read();
+    const saved = read();
+    this.awaited = saved.filter(alive);
+    const returning = new Set(this.awaited.map(window => window.appId));
+    this.lost.push(...saved.filter(window => !returning.has(window.appId)));
     if (!this.awaited.length) return;
     this.expireSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, RETURN_WITHIN_SECONDS, () => {
       this.expireSource = 0;
@@ -131,41 +136,17 @@ export class WindowRecovery {
       this.dirty = true;
       return;
     }
-    const windows = JSON.stringify(capture());
-    if (windows === this.noted) return;
-    this.noted = windows;
+    const windows = capture();
+    const contents = JSON.stringify(windows);
+    if (contents === this.written) return;
+    this.written = contents;
     this.writing = true;
-    write(windows, () => {
+    this.noted(windows);
+    write(contents, () => {
       this.writing = false;
       if (!this.dirty) return;
       this.dirty = false;
       this.save();
     });
   }
-}
-
-function place(window: Meta.Window, saved: SavedWindow, config: Meta.WindowConfig | null): void {
-  if (saved.workspace < 0) {
-    window.stick();
-  } else {
-    const manager = global.workspace_manager;
-    while (manager.n_workspaces <= saved.workspace) manager.append_new_workspace(false, global.get_current_time());
-    window.change_workspace_by_index(saved.workspace, false);
-  }
-  if (saved.maximized || saved.fullscreen) return;
-  const { x, y, width, height } = saved.frame;
-  if (!config) {
-    window.move_resize_frame(true, x, y, width, height);
-    return;
-  }
-  config.set_position(x, y);
-  config.set_size(width, height);
-}
-
-function restoreState(window: Meta.Window, saved: SavedWindow): void {
-  if (saved.maximized) window.maximize();
-  if (saved.fullscreen) window.make_fullscreen();
-  if (saved.above) window.make_above();
-  if (saved.edges && !saved.maximized && !saved.fullscreen) window.set_tiled_edges(saved.edges);
-  if (saved.minimized) window.minimize();
 }

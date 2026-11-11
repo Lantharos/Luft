@@ -6,39 +6,58 @@ const UPDATER = `<node><interface name="com.lantharos.Updater1">
   <property name="Downloading" type="b" access="read"/>
   <property name="Downloaded" type="t" access="read"/>
   <method name="Status"><arg type="s" direction="out"/></method>
+  <method name="Apply"/>
   <method name="Download"/>
   <method name="Cancel"/>
   <signal name="Finished"><arg type="s"/></signal>
+</interface></node>`;
+const UPDATER_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Updater">
+  <method name="Stage"><arg type="b" direction="in"/></method>
 </interface></node>`;
 
 export const UPDATER_NAME = 'com.lantharos.Updater1';
 export const DOWNLOAD_SIZE = 200_000_000;
 const DOWNLOAD_STEP_MS = 250;
 const DOWNLOAD_STEPS = 160;
+const IMAGE = {image: 'ghcr.io/lantharos/luft:1-nightly', transport: 'registry'};
 const VERSION = '1.2-nightly.21';
 const DIGEST = 'sha256:4c5f0f8a1b6e2d7c9a3e5b1f7d2c8a6e4b0f9d3c7a1e5b2f8d6c4a0e9b3f7d1c';
+const NEXT_VERSION = '1.2-nightly.22';
+const NEXT_DIGEST = 'sha256:9e1d3b7f5a2c8e4d6b0a9f3c7e1b5d2a8f4c6e0b9d3a7f1e5c2b8d4a6f0e9c3b';
 
-const status = () => JSON.stringify({
+const configOf = (created: string, version: string) => ({created, config: {Labels: {'org.opencontainers.image.version': version}}});
+
+const status = (staged: boolean) => JSON.stringify({
   host: {
     spec: {image: null},
     status: {
-      booted: {image: {image: {image: 'ghcr.io/lantharos/luft:1-nightly', transport: 'registry'}, version: VERSION, imageDigest: DIGEST}},
-      staged: null,
+      booted: {image: {image: IMAGE, version: VERSION, imageDigest: DIGEST}},
+      staged: staged ? {downloadOnly: false, image: {image: IMAGE, version: NEXT_VERSION, imageDigest: NEXT_DIGEST}} : null,
       rollback: null,
       rollbackQueued: false,
     },
   },
-  configs: {[DIGEST]: {created: '2026-10-27T02:14:09Z', config: {Labels: {'org.opencontainers.image.version': VERSION}}}},
+  configs: {
+    [DIGEST]: configOf('2026-10-27T02:14:09Z', VERSION),
+    ...staged && {[NEXT_DIGEST]: configOf('2026-10-28T02:11:40Z', NEXT_VERSION)},
+  },
 });
 
 export function publishUpdater(publish: Publish, calls: string[]) {
   let downloading = false;
   let downloaded = 0;
   let step = 0;
+  let staged = false;
+  publish(UPDATER_CONTROL, {
+    Stage: (scheduled: boolean) => {
+      staged = scheduled;
+    },
+  }, '/com/lantharos/KestrelChecks/Updater');
   const updater = publish(UPDATER, {
     get Downloading() { return downloading; },
     get Downloaded() { return downloaded; },
-    Status: status,
+    Status: () => status(staged),
+    Apply: () => calls.push('Updater Apply'),
     Download: () => {
       calls.push('Updater Download');
       downloading = true;

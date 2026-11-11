@@ -1,21 +1,18 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
-import type { Box } from '../../../shared/layout/placement.js';
 import { boxOf } from '../frames.js';
+import type { Placement } from './placement.js';
 
-export interface SavedWindow {
+export interface SavedWindow extends Placement {
   pid: number;
   app: string;
+  appId: string;
   title: string;
-  frame: Box;
-  workspace: number;
-  maximized: boolean;
-  fullscreen: boolean;
-  minimized: boolean;
-  above: boolean;
-  edges: number;
+  monitor: number;
+  sequence: number;
   focused: boolean;
 }
 
@@ -23,28 +20,37 @@ const file = () => Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_run
 
 export const appOf = (window: Meta.Window) => window.get_wm_class() ?? '';
 
+export function appIdOf(window: Meta.Window): string {
+  const app = Shell.WindowTracker.get_default().get_window_app(window);
+  return app && !app.is_window_backed() ? app.get_id() : '';
+}
+
 export function remembered(window: Meta.Window): boolean {
   return window.window_type === Meta.WindowType.NORMAL && !window.is_override_redirect() && (window.get_pid() as number) > 0;
 }
 
-function save(window: Meta.Window): SavedWindow {
+function save(window: Meta.Window, lastFocused: Meta.Window | undefined): SavedWindow {
   return {
     pid: window.get_pid() as number,
     app: appOf(window),
+    appId: appIdOf(window),
     title: window.get_title() ?? '',
     frame: boxOf(window.get_frame_rect()),
+    monitor: window.get_monitor(),
+    sequence: window.get_stable_sequence(),
     workspace: window.is_on_all_workspaces() ? -1 : window.get_workspace()?.index() ?? 0,
     maximized: window.maximized_horizontally && window.maximized_vertically,
     fullscreen: window.fullscreen,
     minimized: window.minimized,
     above: window.above,
     edges: window.get_tiled_edges(),
-    focused: window.has_focus(),
+    focused: window === lastFocused,
   };
 }
 
 export function capture(): SavedWindow[] {
-  return global.display.sort_windows_by_stacking(global.display.list_all_windows().filter(remembered)).map(save);
+  const [lastFocused] = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
+  return global.display.sort_windows_by_stacking(global.display.list_all_windows().filter(remembered)).map(window => save(window, lastFocused));
 }
 
 export function write(windows: string, written: () => void): void {
@@ -60,6 +66,8 @@ export function write(windows: string, written: () => void): void {
       written();
     });
 }
+
+export const alive = (saved: SavedWindow) => GLib.file_test(`/proc/${saved.pid}`, GLib.FileTest.EXISTS);
 
 export function read(): SavedWindow[] {
   try {

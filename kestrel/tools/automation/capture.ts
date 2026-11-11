@@ -22,7 +22,7 @@ function claim() {
     const [, addressee, group] = QUEUED.exec(name)!;
     if (addressee && addressee !== worker) continue;
     try {
-      queue.get_child(name).move(claimed.get_child(`${name}@${worker}`), Gio.FileCopyFlags.NO_FALLBACK_FOR_MOVE, null, null);
+      queue.get_child(name).move(claimed.get_child(`${name}@${worker}`), Gio.FileCopyFlags.NO_FALLBACK_FOR_MOVE | Gio.FileCopyFlags.OVERWRITE, null, null);
       return group;
     } catch {
       continue;

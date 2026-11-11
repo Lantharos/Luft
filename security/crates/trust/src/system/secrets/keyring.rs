@@ -8,6 +8,7 @@ const KEYCTL_SEARCH: libc::c_long = 10;
 const KEYCTL_READ: libc::c_long = 11;
 const KEYCTL_INVALIDATE: libc::c_long = 21;
 const OWNER_ONLY: libc::c_long = 0x3f3f_0000;
+const HOLDERS_ONLY: libc::c_long = 0x3f00_0000;
 
 fn description(name: &str) -> CString {
     CString::new(format!("trustd:{name}")).expect("key names have no NUL bytes")
@@ -33,6 +34,14 @@ fn search(description: &std::ffi::CStr) -> Option<libc::c_long> {
 }
 
 pub fn keep(name: &str, secret: &Secret) -> bool {
+    keep_for(OWNER_ONLY, name, secret)
+}
+
+pub fn keep_for_trust_units(name: &str, secret: &Secret) -> bool {
+    keep_for(HOLDERS_ONLY, name, secret)
+}
+
+fn keep_for(readers: libc::c_long, name: &str, secret: &Secret) -> bool {
     let kind = c"user";
     let description = description(name);
     let id = unsafe {
@@ -48,8 +57,7 @@ pub fn keep(name: &str, secret: &Secret) -> bool {
     if id <= 0 {
         return false;
     }
-    unsafe { libc::syscall(libc::SYS_keyctl, KEYCTL_SETPERM, id, OWNER_ONLY) };
-    true
+    unsafe { libc::syscall(libc::SYS_keyctl, KEYCTL_SETPERM, id, readers) == 0 }
 }
 
 pub fn take(name: &str) -> Option<Secret> {

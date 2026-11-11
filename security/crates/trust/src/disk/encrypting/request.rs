@@ -49,7 +49,7 @@ impl Keys {
     }
 
     pub fn keep_in_memory(&self) {
-        keyring::keep(FIRST_KEY, self.first());
+        keyring::keep_for_trust_units(FIRST_KEY, self.first());
     }
 }
 

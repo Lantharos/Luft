@@ -75,7 +75,7 @@ pub fn open_in_initrd() -> Result<()> {
         Some(header) if header.reencrypting.is_some() => match request::sealed_key() {
             Some(key) => {
                 open(&partition, &key)?;
-                keyring::keep(request::FIRST_KEY, &key);
+                keyring::keep_for_trust_units(request::FIRST_KEY, &key);
                 Ok(())
             }
             None => Ok(()),

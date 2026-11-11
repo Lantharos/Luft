@@ -34,6 +34,7 @@ impl Readiness {
 fn firmware(secure_boot: SecureBoot) -> Option<String> {
     let state = match secure_boot {
         SecureBoot::On => return None,
+        SecureBoot::Off if efi::shim_checks_off() => "has its checks turned off in shim",
         SecureBoot::Off => "is off in your firmware",
         SecureBoot::Setup => "is in setup mode in your firmware",
         SecureBoot::Unsupported => "this computer doesn't have",
@@ -61,11 +62,7 @@ fn other_keys(count: usize) -> Option<String> {
 }
 
 fn secure_boot(startup: &Startup) -> Option<String> {
-    firmware(startup.secure_boot)
-        .or_else(|| {
-            efi::shim_checks_off().then(|| "Shim's signature checks are turned off".to_owned())
-        })
-        .or_else(|| other_keys(startup.other_keys))
+    firmware(startup.secure_boot).or_else(|| other_keys(startup.other_keys))
 }
 
 fn measured(startup: &Startup) -> Option<String> {

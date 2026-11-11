@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Result, bail};
 use luft_recovery_key::Reading;
 
+use super::generations;
 use super::luks::{self, Header};
 use crate::errors::{MistypedKey, NeedsKey, Unsupported, WrongKey};
 use crate::keys as signing;
@@ -154,11 +155,17 @@ pub fn unavailable_reason(tpm: &Tpm) -> Option<String> {
     if !tpm.usable {
         return Some(tpm.reason.clone());
     }
+    if efi::shim_checks_off() {
+        return Some("Secure Boot's checks were turned off with mokutil, so anything can start this computer and the TPM can't tell Luft from something made to look like it. Run mokutil --enable-validation, restart and confirm it on the blue screen, and the TPM can unlock the disk.".to_owned());
+    }
     if matches!(efi::secure_boot(), SecureBoot::Off | SecureBoot::Setup) {
         return Some("Secure Boot is off, so anything can start this computer and the TPM can't tell Luft from something made to look like it. Turn Secure Boot on in the firmware settings, and the TPM can unlock the disk.".to_owned());
     }
     if !signing::shipped() || !efi::measured_uki() {
         return Some("Restart through Luft's signed startup first, so the TPM can check how the computer started.".to_owned());
+    }
+    if generations::retired_here() {
+        return Some("This version of Luft is older than the ones the TPM unlocks this disk for. Start the newest version, and the TPM unlocks the disk by itself again.".to_owned());
     }
     None
 }

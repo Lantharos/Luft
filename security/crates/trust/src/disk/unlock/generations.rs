@@ -23,6 +23,7 @@ struct Deployment {
 #[derive(Serialize, Deserialize, Default, PartialEq, Eq, Debug)]
 struct Record {
     slots: BTreeMap<u32, u32>,
+    retired: BTreeSet<u32>,
     booted: Option<Deployment>,
     before: Option<Deployment>,
 }
@@ -83,10 +84,13 @@ impl Record {
         self.before = self.booted.replace(Deployment { id, generations });
     }
 
+    fn linkable(&self, shipped: &BTreeSet<u32>) -> BTreeSet<u32> {
+        shipped.difference(&self.retired).copied().collect()
+    }
+
     fn missing(&self, shipped: &BTreeSet<u32>) -> Vec<u32> {
-        shipped
-            .iter()
-            .copied()
+        self.linkable(shipped)
+            .into_iter()
             .filter(|generation| !self.slots.contains_key(generation))
             .collect()
     }
@@ -141,6 +145,12 @@ fn enroll(
         .context("The TPM's key didn't get a keyslot")
 }
 
+pub fn retired_here() -> bool {
+    Record::load(Path::new(paths::STATE))
+        .linkable(&shipped())
+        .is_empty()
+}
+
 pub fn link(
     device: &Path,
     unlock: &Secret,
@@ -150,7 +160,7 @@ pub fn link(
 ) -> Result<()> {
     let mut record = Record::load(state);
     record.slots.clear();
-    for (index, generation) in shipped().into_iter().enumerate() {
+    for (index, generation) in record.linkable(&shipped()).into_iter().enumerate() {
         let slot = enroll(device, unlock, pin, secure_boot_pcr, generation, index == 0)?;
         record.slots.insert(generation, slot);
     }
@@ -222,7 +232,9 @@ pub fn follow_up() -> Result<()> {
             "The TPM now also unlocks the disk for startup images signed with policy key {generation}"
         );
     }
-    for generation in record.unused() {
+    record.retired.extend(record.unused());
+    record.save(state)?;
+    for generation in record.retired.clone() {
         if let Some(slot) = record.slots.remove(&generation) {
             remove(&device, slot)?;
             record.save(state)?;
@@ -257,5 +269,11 @@ mod tests {
         assert!(record.unused().is_empty());
         started(&mut record, "newer", &[2]);
         assert_eq!(record.unused(), vec![1]);
+        record.slots.remove(&1);
+        record.retired.insert(1);
+        started(&mut record, "old", &[1]);
+        assert!(record.missing(&[1].into()).is_empty());
+        assert!(record.linkable(&[1].into()).is_empty());
+        assert_eq!(record.linkable(&[1, 2].into()), [2].into());
     }
 }

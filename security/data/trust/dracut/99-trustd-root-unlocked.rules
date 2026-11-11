@@ -1,0 +1,1 @@
+SUBSYSTEM=="block", ACTION!="remove", ENV{DM_UUID}=="CRYPT-*", ENV{DM_NAME}=="root", ENV{SYSTEMD_READY}="1"

@@ -50,7 +50,7 @@ pub fn secure_boot() -> SecureBoot {
     }
     match (flag("SecureBoot", GLOBAL), flag("SetupMode", GLOBAL)) {
         (_, Some(true)) => SecureBoot::Setup,
-        (Some(true), _) => SecureBoot::On,
+        (Some(true), _) if !shim_checks_off() => SecureBoot::On,
         _ => SecureBoot::Off,
     }
 }

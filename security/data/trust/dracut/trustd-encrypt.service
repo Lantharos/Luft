@@ -2,7 +2,6 @@
 Description=Start encrypting Luft's partition, or open it while it's being encrypted
 DefaultDependencies=no
 ConditionPathExists=/sys/firmware/efi/efivars/EncryptingSystemDisk-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
-Wants=tpm2.target
 After=tpm2.target systemd-pcrphase-initrd.service luft-added-files.service
 Before=cryptsetup.target initrd-root-device.target sysroot.mount systemd-cryptsetup@root.service
 

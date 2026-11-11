@@ -9,8 +9,8 @@
     <description>Make a network public, or stop other devices from connecting to an app</description>
     <message>Authentication is required to change what other devices can connect to</message>
     <defaults>
-      <allow_any>auth_admin_keep</allow_any>
-      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
   </action>
@@ -19,9 +19,9 @@
     <description>Make a network a home network</description>
     <message>Authentication is required to make this a home network</message>
     <defaults>
-      <allow_any>auth_admin_keep</allow_any>
-      <allow_inactive>auth_admin_keep</allow_inactive>
-      <allow_active>auth_self_keep</allow_active>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_self</allow_active>
     </defaults>
   </action>
 
@@ -29,9 +29,9 @@
     <description>Open or close ports on home networks</description>
     <message>Authentication is required to change which ports are open on home networks</message>
     <defaults>
-      <allow_any>auth_admin_keep</allow_any>
-      <allow_inactive>auth_admin_keep</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
     </defaults>
   </action>
   <action id="com.lantharos.firewall.open-ports-anywhere">
@@ -40,7 +40,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>auth_admin</allow_active>
     </defaults>
   </action>
 
@@ -48,9 +48,9 @@
     <description>Let devices on home networks connect to an app</description>
     <message>Authentication is required to let devices on home networks connect to an app</message>
     <defaults>
-      <allow_any>auth_admin_keep</allow_any>
-      <allow_inactive>auth_admin_keep</allow_inactive>
-      <allow_active>auth_self_keep</allow_active>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_self</allow_active>
     </defaults>
   </action>
 
@@ -58,9 +58,9 @@
     <description>Let devices on public networks connect to an app</description>
     <message>Authentication is required to let devices on public networks connect to an app</message>
     <defaults>
-      <allow_any>auth_admin_keep</allow_any>
-      <allow_inactive>auth_admin_keep</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
     </defaults>
   </action>
 </policyconfig>

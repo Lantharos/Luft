@@ -51,6 +51,7 @@ table inet luft {
 		icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
 		ct state invalid drop
 		icmp type { destination-unreachable, time-exceeded, parameter-problem } accept
+		ip protocol igmp accept
 		udp sport 67 udp dport 68 accept
 		ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
 		iifname "virbr*" jump guests

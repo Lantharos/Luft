@@ -1,12 +1,12 @@
 use std::collections::{BTreeSet, HashMap};
 use std::fmt;
-use std::future::ready;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
-use futures_util::{Stream, StreamExt};
+use futures_util::{Stream, StreamExt, stream};
 use luft_dbus::failed;
 use luft_dbus::objects::{self, Object, Objects};
 use nix::unistd::{Uid, User};
+use tokio::sync::mpsc::{self, error::TrySendError};
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 use zbus::{Connection, Message, OwnedObjectPath, OwnedVariant, Proxy, Variant};
@@ -249,8 +249,20 @@ fn relevant(message: &Message) -> bool {
 }
 
 pub async fn changes(connection: &Connection) -> Result<impl Stream<Item = ()> + Unpin, String> {
-    let messages = objects::signals(connection, SERVICE, ROOT).await?;
-    Ok(messages.filter_map(|message| ready(message.ok().filter(relevant).map(drop))))
+    let mut messages = objects::signals(connection, SERVICE, ROOT).await?;
+    let (changed, changes) = mpsc::channel(1);
+    tokio::spawn(async move {
+        while let Some(message) = messages.next().await {
+            let relevant = message.is_ok_and(|message| relevant(&message));
+            if relevant && matches!(changed.try_send(()), Err(TrySendError::Closed(()))) {
+                break;
+            }
+        }
+    });
+    Ok(Box::pin(stream::unfold(
+        changes,
+        |mut changes| async move { changes.recv().await.map(|()| ((), changes)) },
+    )))
 }
 
 pub struct Saved<'a> {

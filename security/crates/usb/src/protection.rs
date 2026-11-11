@@ -176,6 +176,7 @@ impl Protection {
     fn catch_up(&mut self) {
         self.held.retain(|id, _| usb::exists(id));
         if self.guarding {
+            usb::hold_new_devices();
             usb::waiting().for_each(|id| self.hold(&id));
         }
     }

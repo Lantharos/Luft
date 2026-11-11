@@ -9,6 +9,7 @@ use descriptors::Function;
 use sysfs::{Bus, Device};
 
 pub fn hold_new_devices() {
+    sysfs::hold_on_new_buses();
     Bus::all().for_each(|bus| bus.hold_new_devices());
 }
 
@@ -17,6 +18,7 @@ pub fn hold_new_devices_on(bus: &str) {
 }
 
 pub fn welcome_new_devices() {
+    sysfs::welcome_on_new_buses();
     Bus::all().for_each(|bus| bus.welcome_new_devices());
 }
 

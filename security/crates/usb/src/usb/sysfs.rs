@@ -5,7 +5,9 @@ use super::descriptors::Function;
 
 const BUS: &str = "/sys/bus/usb";
 const DEVICES: &str = "/sys/bus/usb/devices";
-const DEFAULT_POLICY: &str = "/sys/module/usbcore/parameters/authorized_default";
+const PARAMETERS: &str = "/sys/module/usbcore/parameters";
+const DEFAULT_POLICY: &str = "authorized_default";
+const SYSTEM_POLICY: &str = "/run/luft-usb-protection/system-policy";
 const UNNAMED: &str = "USB device";
 
 pub struct Device {
@@ -146,10 +148,40 @@ impl Bus {
     }
 }
 
-fn system_policy() -> &'static str {
-    match fs::read_to_string(DEFAULT_POLICY).as_deref().map(str::trim) {
-        Ok("0") => "0",
-        Ok("2") => "2",
+fn policy(value: &str) -> &'static str {
+    match value.trim() {
+        "0" => "0",
+        "2" => "2",
         _ => "1",
+    }
+}
+
+fn system_policy() -> &'static str {
+    read(Path::new(PARAMETERS), DEFAULT_POLICY).map_or("1", |value| policy(&value))
+}
+
+/// Has buses that appear from now on, such as a dock's, start out holding
+/// their devices, since a new bus takes the kernel's own policy until its
+/// event is handled. The policy the system had is kept in `/run`, so it comes
+/// back with [`welcome_on_new_buses`] even after this service restarted, and a
+/// service that never comes back leaves new buses holding.
+pub fn hold_on_new_buses() {
+    let kept = Path::new(SYSTEM_POLICY);
+    if !kept.exists()
+        && let Err(error) = fs::write(kept, system_policy())
+    {
+        eprintln!("Couldn't keep the system's USB policy, so new USB buses aren't held: {error}");
+        return;
+    }
+    write(Path::new(PARAMETERS), DEFAULT_POLICY, "0");
+}
+
+pub fn welcome_on_new_buses() {
+    let Ok(kept) = fs::read_to_string(SYSTEM_POLICY) else {
+        return;
+    };
+    write(Path::new(PARAMETERS), DEFAULT_POLICY, policy(&kept));
+    if let Err(error) = fs::remove_file(SYSTEM_POLICY) {
+        eprintln!("Couldn't forget the kept USB policy: {error}");
     }
 }

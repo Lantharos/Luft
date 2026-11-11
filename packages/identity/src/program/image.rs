@@ -104,6 +104,17 @@ pub fn running(folder: &OwnedFd) -> Option<Running> {
     })
 }
 
+/// Whether `path` is a file of the read-only image under `/usr`, owned by
+/// root and writable by nobody else.
+pub fn is_image_path(path: &std::path::Path) -> bool {
+    let Ok(within) = CString::new(path.as_os_str().as_bytes()) else {
+        return false;
+    };
+    path.starts_with(IMAGE)
+        && open_path(libc::AT_FDCWD, &within, libc::O_NOFOLLOW)
+            .is_some_and(|fd| status(&fd).is_some_and(|file| is_image_file(&fd, &file)))
+}
+
 impl Running {
     fn is_at_its_path(&self) -> bool {
         let Ok(path) = CString::new(self.path.as_os_str().as_bytes()) else {

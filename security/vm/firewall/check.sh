@@ -47,7 +47,11 @@ neighbor() {
   home_interfaces | grep -q '"lan8"' || fail "the second home network isn't among the home interfaces"
 }
 from_peer() { ip netns exec peer curl -s -o /dev/null -m 3 "http://$1/"; }
-post_reaches() { ip netns exec neighbor curl -s -o /dev/null -m 3 "http://192.168.88.1:53317/"; }
+post_reaches() { ip netns exec neighbor timeout 3 bash -c '< /dev/tcp/192.168.88.1/53317'; }
+post_visible_to() {
+  as_person busctl --user call com.lantharos.Kestrel.Post /com/lantharos/Kestrel/Post com.lantharos.Kestrel.Post \
+    Configure sssas "$1" Checker "" 0 || fail "Post doesn't take who may find the computer"
+}
 
 expect() {
   local verdict="$1" label="$2"
@@ -156,10 +160,11 @@ serve() {
   serve_as dev-server.service 8002
   serve_as app-com.example.Local@check.service 8004 127.0.0.1
   as_person systemctl --user start kestrel.service kestrel-post.service
+  post_visible_to your-devices
   receive_as app-com.example.Approved@udp.service 9000
   receive_as app-com.example.Other@udp.service 9001
   eventually "the test receivers listen" sh -c 'ss -lun | grep -q ":9000 " && ss -lun | grep -q ":9001 "'
-  eventually "the test servers listen" sh -c 'for port in 80 8000 8001 8002 8003 8004 53317; do curl -s -o /dev/null http://localhost:$port/ || exit 1; done'
+  eventually "the test servers listen" sh -c 'for port in 80 8000 8001 8002 8003 8004; do curl -s -o /dev/null http://localhost:$port/ || exit 1; done && ss -ltn | grep -q ":53317 "'
 }
 
 person() {
@@ -256,19 +261,22 @@ apps_on_home() {
   expect closed "a program nobody allowed" reaches "$program"
   decide program python3 home || fail "SetAppAccess for a program"
   expect open "a program allowed on home networks" reaches "$program"
-  expect open "a port Kestrel's extensions listen on" reaches "$extension"
+  [[ -e "/home/$person/kestrel-refused" ]] || fail "a program in Kestrel's unit that isn't Kestrel opened ports"
+  [[ -e "/home/$person/kestrel-closed" ]] || fail "Kestrel's unit can't close the ports of its extensions"
+  expect closed "a port only a stand-in for Kestrel asked for" reaches "$extension"
   as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@check.service -- \
     busctl call "$name" "$path" "$name" SetExtensionPorts 'a(qs)' 1 8001 tcp 2> /dev/null && fail "an app opened ports as if it were Kestrel"
   as_person systemd-run --user --quiet --wait --pipe --collect --unit=other-extensions.service --slice=session.slice -- \
     busctl call "$name" "$path" "$name" SetExtensionPorts 'a(qs)' 1 8001 tcp 2> /dev/null && fail "another part of the desktop opened ports as if it were Kestrel"
   say "ok: only Kestrel declares extension ports"
+  eventually "Post opens its port while someone may find the computer" post_reaches
   expect open "Post while someone may find the computer" post_reaches
   as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@post.service -- \
     busctl call "$name" "$path" "$name" SetPostOpen b true 2> /dev/null && fail "an app opened Post's port"
   as_person systemd-run --user --quiet --wait --pipe --collect --unit=other-post.service --slice=session.slice -- \
     busctl call "$name" "$path" "$name" SetPostOpen b true 2> /dev/null && fail "another part of the desktop opened Post's port"
-  touch "/home/$person/post-closed"
-  eventually "Post's port closes once no one may find the computer" sh -c '! ip netns exec neighbor curl -s -o /dev/null -m 1 http://192.168.88.1:53317/'
+  post_visible_to no-one
+  eventually "Post's port closes once no one may find the computer" sh -c "! ip netns exec neighbor timeout 1 bash -c '< /dev/tcp/192.168.88.1/53317'"
   say "ok: Post's port follows who may find the computer"
 }
 
@@ -314,7 +322,6 @@ second() {
   eventually "the network becomes public" is_public
   [[ "$(home_interfaces)" == "as 0" ]] || fail "a public network is among the home interfaces"
   expect closed "an app allowed on home networks, on a public network" reaches "$approved"
-  expect closed "Kestrel's extensions on a public network" reaches "$extension"
   decide app com.example.Approved anywhere || fail "SetAppAccess anywhere"
   expect open "an app allowed on public networks too" reaches "$approved"
   expect closed "a program allowed only on home networks, on a public network" reaches "$program"

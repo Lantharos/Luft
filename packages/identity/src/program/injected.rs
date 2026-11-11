@@ -12,8 +12,9 @@ use super::image::{self, Mapped};
 use crate::process::open_at;
 
 const MAPS: &CStr = c"maps";
-const ENVIRON: &CStr = c"environ";
+const STAT: &CStr = c"stat";
 const CMDLINE: &CStr = c"cmdline";
+const FIELDS_BEFORE_ENVIRONMENT: usize = 47;
 const DELETED: &str = " (deleted)";
 const SABINE_APPS: &str = "/usr/lib/sabine/";
 const UNSAFE: &str = include_str!(concat!(
@@ -44,6 +45,40 @@ fn read(folder: &OwnedFd, name: &CStr) -> Option<Vec<u8>> {
         .and_then(|mut file| file.read_to_end(&mut contents))
         .ok()?;
     Some(contents)
+}
+
+/// Where the starting environment lies in the process's memory, from the
+/// `env_start` and `env_end` fields of its `stat`, which read as 0 to anyone
+/// not allowed to trace it.
+fn environment_range(stat: &[u8]) -> Option<(usize, usize)> {
+    let after_name = &stat[stat.iter().rposition(|&byte| byte == b')')? + 1..];
+    let mut fields = std::str::from_utf8(after_name)
+        .ok()?
+        .split_ascii_whitespace()
+        .skip(FIELDS_BEFORE_ENVIRONMENT);
+    let start: usize = fields.next()?.parse().ok()?;
+    let end: usize = fields.next()?.parse().ok()?;
+    (start != 0 && end >= start).then_some((start, end))
+}
+
+/// The starting environment, read from the process's memory as a tracer
+/// would. `/proc/<pid>/environ` is readable by the process's owner alone, and
+/// reading it as root would take reading every file on the computer.
+fn environment(folder: &OwnedFd, pid: u32) -> Option<Vec<u8>> {
+    let (start, end) = environment_range(&read(folder, STAT)?)?;
+    let mut environment = vec![0u8; end - start];
+    let local = libc::iovec {
+        iov_base: environment.as_mut_ptr().cast(),
+        iov_len: environment.len(),
+    };
+    let remote = libc::iovec {
+        iov_base: start as *mut libc::c_void,
+        iov_len: environment.len(),
+    };
+    let copied = unsafe {
+        libc::process_vm_readv(libc::pid_t::try_from(pid).ok()?, &local, 1, &remote, 1, 0)
+    };
+    (usize::try_from(copied).ok()? == environment.len()).then_some(environment)
 }
 
 struct Mapping<'a> {
@@ -105,14 +140,14 @@ fn opens_browser(arguments: &[u8]) -> bool {
     })
 }
 
-/// Whether the installed program at `program`, running behind a `/proc`
-/// folder, was started with something slipped in. A process whose files
-/// can't be read counts as one that was.
-pub fn into(folder: &OwnedFd, program: &Path) -> bool {
+/// Whether the installed program at `program`, running as `pid` behind a
+/// `/proc` folder, was started with something slipped in. A process whose
+/// files or memory can't be read counts as one that was.
+pub fn into(folder: &OwnedFd, pid: u32, program: &Path) -> bool {
     let sabine_app = program.starts_with(SABINE_APPS);
     let (Some(maps), Some(environment), Some(arguments)) = (
         read(folder, MAPS),
-        read(folder, ENVIRON),
+        environment(folder, pid),
         read(folder, CMDLINE),
     ) else {
         return true;
@@ -167,6 +202,15 @@ mod tests {
         assert!(names_unsafe(b"GTK_MODULES=payload\0", false));
         assert!(names_unsafe(b"SABINE_WEB_ENTRY=/tmp/page\0", true));
         assert!(!names_unsafe(b"SABINE_WEB_ENTRY=/tmp/page\0", false));
+    }
+
+    #[test]
+    fn finds_the_environment_after_a_name_with_brackets() {
+        let fields: Vec<String> = (3..=52).map(|field| field.to_string()).collect();
+        let stat = format!("4242 (a) b (c)) {}\n", fields.join(" "));
+        assert_eq!(environment_range(stat.as_bytes()), Some((50, 51)));
+        let hidden = stat.replace(" 50 51 ", " 0 0 ");
+        assert_eq!(environment_range(hidden.as_bytes()), None);
     }
 
     #[test]

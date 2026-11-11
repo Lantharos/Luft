@@ -10,7 +10,7 @@ use crate::process::open_folder;
 
 const BUILT_PROGRAMS: [&str; 2] = ["KESTREL_LUFT_APPS", "KESTREL_BUILDDIR"];
 
-fn is_development_build() -> bool {
+pub fn is_development_build() -> bool {
     static DEVELOPMENT: OnceLock<bool> = OnceLock::new();
     *DEVELOPMENT.get_or_init(|| {
         open_folder(std::process::id())

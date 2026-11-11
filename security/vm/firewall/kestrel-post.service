@@ -1,6 +1,0 @@
-[Unit]
-Description=Stand-in for Post
-
-[Service]
-Slice=session.slice
-ExecStart=/usr/bin/sh -c "busctl call com.lantharos.Firewall1 /com/lantharos/Firewall1 com.lantharos.Firewall1 SetPostOpen b true; python3 -m http.server 53317 --directory /usr/share & while [ ! -e %h/post-closed ]; do sleep 0.2; done; busctl call com.lantharos.Firewall1 /com/lantharos/Firewall1 com.lantharos.Firewall1 SetPostOpen b false; wait"

@@ -138,7 +138,7 @@ impl Service {
                 .collect()
         };
         let (mut unlocked, mut locked) = (Vec::new(), Vec::new());
-        for key in found {
+        for key in self.daemon.found(&requester, &query, found).await {
             let path = super::item_path(&key.0, key.1);
             if self.daemon.allowed(&requester, &key).await {
                 unlocked.push(path);

@@ -26,6 +26,7 @@ use modules::GtkModule;
 use snapshot::{INTERFACE, Inputs, SCHEMAS, Snapshot};
 
 const PATH: &str = "/com/lantharos/Settings";
+const KESTREL: &str = "org.gnome.Shell";
 const MUTTER_X11: Endpoint = Endpoint {
     service: "org.gnome.Mutter.X11",
     path: "/org/gnome/Mutter/X11",
@@ -84,7 +85,7 @@ async fn sent_by_the_compositor(connection: &Connection, header: &Header<'_>) ->
     let Ok(bus) = fdo::DBusProxy::new(connection).await else {
         return false;
     };
-    let name = BusName::from_static_str(MUTTER_X11.service).expect("a valid bus name");
+    let name = BusName::from_static_str(KESTREL).expect("a valid bus name");
     let Ok(owner) = bus.get_name_owner(name).await else {
         return false;
     };

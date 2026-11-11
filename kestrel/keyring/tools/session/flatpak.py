@@ -58,8 +58,14 @@ def exercise_flatpaks(session, check, login):
     session.script(access="allow", remember=True)
     before = asked()
     check(
-        sandboxed("read", "service", "github.com") == "gh-token" and asked() == before + 1,
-        "a Flatpak is asked before it uses your item",
+        sandboxed("read", "service", "github.com") == ""
+        and sandboxed("read", "user", "mara") == ""
+        and asked() == before,
+        "a Flatpak that names only part of your item isn't told it's there",
+    )
+    check(
+        sandboxed("read", "service", "github.com", "user", "mara") == "gh-token" and asked() == before + 1,
+        "a Flatpak that names your item in full is asked before it uses it",
     )
     check(
         session.requests("access")[-1]["request"]["title"] == "Allow Notebook to use “GitHub”?",
@@ -76,7 +82,7 @@ def exercise_flatpaks(session, check, login):
     )
     check(
         sandboxed("read", "service", "github.com") == "gh-token" and asked() == before + 1,
-        "a Flatpak's remembered choice holds on its next launch",
+        "a Flatpak's remembered choice holds on its next launch, however it searches",
     )
 
     session.script(access="deny", remember=True)

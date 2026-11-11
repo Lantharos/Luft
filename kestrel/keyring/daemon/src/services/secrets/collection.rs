@@ -155,12 +155,7 @@ impl Collection {
             })
             .await
             .unwrap_or_default();
-        let listed = if query.is_empty() {
-            self.daemon.shown(&requester, found).await
-        } else {
-            found
-        };
-        paths(&listed)
+        paths(&self.daemon.found(&requester, &query, found).await)
     }
 
     async fn create_item(

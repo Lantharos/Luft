@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
-	import { Avatar, ItemRow, Row, Section, Select, Switch } from '@luft/ui';
+	import { Avatar, ConfirmDialog, ItemRow, Row, Section, Select, Switch } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { LoginScreen, User } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { displayName } from '../users/api';
-	import { chooseWallpaper, clearWallpaper, setAutomaticLogin, setDefaultSession, setHiddenUsers, setShowUsers } from './api';
+	import { chooseWallpaper, clearWallpaper, setAutomaticLogin, setDefaultSession, setHiddenUsers, setShowUsers, startsWithoutPassword } from './api';
 	import WallpaperSection from './WallpaperSection.svelte';
 
 	type Area = 'wallpaper' | 'people' | 'signing-in';
@@ -17,6 +17,7 @@
 	let people = $state<User[]>([]);
 	let version = $state(0);
 	let problem = $state<{ area: Area; message: string } | null>(null);
+	let confirming = $state<User | null>(null);
 
 	let sessions = $derived([
 		{ value: '', label: t('settings-login-session-automatic') },
@@ -36,6 +37,17 @@
 		} catch (reason) {
 			problem = { area, message: String(reason) };
 		}
+		receive(await commands.loginScreen());
+	}
+
+	async function chooseAutomaticLogin(userName: string) {
+		const person = people.find((user) => user.userName === userName);
+		if (person && (await startsWithoutPassword())) confirming = person;
+		else await attempt('signing-in', () => setAutomaticLogin(userName));
+	}
+
+	async function signInAutomatically(person: User) {
+		await setAutomaticLogin(person.userName);
 		receive(await commands.loginScreen());
 	}
 
@@ -92,9 +104,21 @@
 				</Row>
 			{/if}
 			<Row title={t('settings-login-automatic')} description={t('settings-login-automatic-description')}>
-				<Select label={t('settings-login-automatic')} options={automaticLogins} value={screen.automaticLogin} onchange={(user) => attempt('signing-in', () => setAutomaticLogin(user))} />
+				<Select label={t('settings-login-automatic')} options={automaticLogins} value={screen.automaticLogin} onchange={chooseAutomaticLogin} />
 			</Row>
 		</Section>
 		{@render trouble('signing-in')}
 	{/if}
 </SubPage>
+
+{#if confirming}
+	{@const person = confirming}
+	<ConfirmDialog
+		title={t('settings-login-automatic-title', { name: displayName(person) })}
+		description={t('settings-login-automatic-warning', { name: displayName(person) })}
+		action={t('settings-login-automatic-confirm')}
+		danger
+		run={() => signInAutomatically(person)}
+		onclose={() => (confirming = null)}
+	/>
+{/if}

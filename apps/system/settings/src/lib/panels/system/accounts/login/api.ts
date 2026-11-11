@@ -8,3 +8,11 @@ export const setShowUsers = (enabled: boolean) => commands.loginSetShowUsers({ e
 export const setHiddenUsers = (users: string[]) => commands.loginSetHiddenUsers({ users }, WAIT_FOR_PERMISSION);
 export const setDefaultSession = (session: string) => commands.loginSetDefaultSession({ session }, WAIT_FOR_PERMISSION);
 export const setAutomaticLogin = (user: string) => commands.loginSetAutomaticLogin({ user }, WAIT_FOR_PERMISSION);
+
+export async function startsWithoutPassword() {
+	const trust = await commands.securityTrust().catch(() => null);
+	if (!trust) return false;
+	const { encrypted, encrypting, unlock } = trust.disk;
+	if (!encrypted) return encrypting === 'no';
+	return unlock.includes('tpm') && !unlock.includes('pin');
+}

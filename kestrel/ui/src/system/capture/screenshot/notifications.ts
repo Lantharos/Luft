@@ -3,6 +3,7 @@ import Gio from 'gi://Gio';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
 import * as MessageTray from '../../../surfaces/notifications/tray/messageTray.js';
+import { launchContext, openUri } from '../../../shared/apps/launch.js';
 
 let source: MessageTray.Source | null = null;
 
@@ -27,13 +28,13 @@ export function addShowInFilesAction(notification: MessageTray.Notification, fil
       return;
     }
 
-    app.launch([file], global.create_app_launch_context(0, -1));
+    app.launch([file], launchContext(app));
   });
 }
 
 export function openFile(file: Gio.File): void {
   try {
-    Gio.app_info_launch_default_for_uri(file.get_uri(), global.create_app_launch_context(0, -1));
+    openUri(file.get_uri());
   } catch (error) {
     logError(error as object, `Error opening ${file.get_uri()}`);
   }

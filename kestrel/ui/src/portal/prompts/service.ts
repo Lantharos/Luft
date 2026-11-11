@@ -15,6 +15,7 @@ import { choosePrint } from './print/printDialog.js';
 import { printer, type Reported } from './print/printers.js';
 import { chooseDevices, type Device } from './usb.js';
 import { confirmWallpaper } from './wallpaper.js';
+import { launch } from '../../shared/apps/launch.js';
 
 Gio._promisify(Gio.OutputStream.prototype, 'splice_async');
 
@@ -134,7 +135,7 @@ export class PortalDialogs {
     this.answer(invocation, async () => {
       const app = GioUnix.DesktopAppInfo.new(desktopId);
       if (!app) throw new Error(`${desktopId} isn't installed`);
-      app.launch_uris(uris, global.create_app_launch_context(0, -1));
+      launch(app, uris);
       return null;
     });
   }

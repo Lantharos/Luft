@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 
 import { t } from '../../shared/i18n/index.js';
 import { notifyError } from '../main.js';
+import { launchContext, openUri } from '../../shared/apps/launch.js';
 
 const balancedParens = '\\([^\\s()<>]+\\)';
 const leadingJunk = '[\\s`(\\[{\'\\"<\u00AB\u201C\u2018]';
@@ -55,14 +56,13 @@ export function spawnCommandLine(commandLine: string): void {
 }
 
 export function openSettings(page: string): void {
-  Gio.AppInfo.launch_default_for_uri(`kestrel-settings:${page}`, global.create_app_launch_context(0, -1));
+  openUri(`kestrel-settings:${page}`);
 }
 
 function trySpawn(argv: string[]): void {
   let pid;
   try {
-    const launchContext = global.create_app_launch_context(0, -1);
-    pid = Shell.util_spawn_async(null, argv, launchContext.get_environment(),
+    pid = Shell.util_spawn_async(null, argv, launchContext().get_environment(),
       GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD);
   } catch (err) {
     if (!(err instanceof GLib.Error)) throw err;

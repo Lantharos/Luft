@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=org.freedesktop.impl.portal.desktop.rover
 Exec=/usr/bin/rover --portal-backend
+SystemdService=luft-rover-portal.service

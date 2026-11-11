@@ -15,6 +15,7 @@ Slice=session.slice
 Type=notify
 ExecStart=@bindir@/kestrel --setup --wayland --display-server --no-x11
 Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
+UnsetEnvironment=@unsafe_environment@
 ExecStopPost=-systemctl --user unset-environment WAYLAND_DISPLAY
 Restart=no
 TimeoutStopSec=5

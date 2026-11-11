@@ -6,6 +6,7 @@ import * as MessageTray from '../../../surfaces/notifications/tray/messageTray.j
 import { allowsAutorun } from './automountManager.js';
 
 import { loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 Gio._promisify(Gio.Mount.prototype, 'guess_content_type');
 
@@ -30,7 +31,7 @@ function isMountNonLocal(mount: Gio.Mount): boolean {
 
 function startAppForMount(app: Gio.AppInfo, mount: Gio.Mount): void {
   try {
-    app.launch([mount.get_root()], global.create_app_launch_context(0, -1));
+    app.launch([mount.get_root()], launchContext(app));
   } catch (error) {
     log(`Unable to launch the app ${app.get_name()}: ${error}`);
   }

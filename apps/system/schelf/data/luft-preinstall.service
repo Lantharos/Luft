@@ -6,7 +6,7 @@ ConditionUser=!@system
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/schelf --preinstall
+ExecStart=/usr/libexec/luft-launch /usr/bin/schelf --preinstall
 Nice=10
 
 [Install]

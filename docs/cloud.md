@@ -25,7 +25,7 @@ A password typed in Settings reaches the service through a pipe handed over with
 
 `cargo test` in `services/accounts` covers token exchange against a stand-in server, filters, conflict names and how errors read.
 
-`kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and Settings and Rover built, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover.
+`kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and Settings and Rover built, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover. It talks to the service through stand-ins for Settings and Rover, and checks that Kestrel, a copy of Settings from elsewhere and Rover asking for the accounts themselves are turned away.
 
 Signing in to iCloud Drive, OneDrive and Dropbox needs real accounts, so check these by hand after changing sign-in:
 

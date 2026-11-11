@@ -1,0 +1,19 @@
+[Unit]
+Description=Kestrel's look into newly connected drives
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+
+[Service]
+Slice=session.slice
+Type=exec
+ExecStart=@libexecdir@/luft-launch @libexecdir@/kestrel-hotplug-sniffer
+TimeoutStopSec=5
+NoNewPrivileges=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+SystemCallFilter=@system-service

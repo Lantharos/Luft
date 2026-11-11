@@ -3,7 +3,8 @@ import GLib from 'gi://GLib';
 import type NM from 'gi://NM';
 
 import { t } from '../../../shared/i18n/index.js';
-import { helperProgram } from '../../../shared/apps/programs.js';
+import { helperLauncher, helperProgram } from '../../../shared/apps/programs.js';
+import { openUri } from '../../../shared/apps/launch.js';
 import type { Field, Step } from './vpnDialog.js';
 
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
@@ -40,7 +41,7 @@ export class OpenConnectSignIn {
   private readonly lines: Gio.DataInputStream;
 
   constructor(connection: NM.Connection) {
-    this.helper = Gio.Subprocess.new([HELPER], Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE);
+    this.helper = helperLauncher(Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE).spawnv([HELPER]);
     this.lines = new Gio.DataInputStream({ base_stream: this.helper.get_stdout_pipe()! });
     const setting = connection.get_setting_vpn()!;
     const data: Record<string, string> = {};
@@ -60,7 +61,7 @@ export class OpenConnectSignIn {
     return line ? JSON.parse(new TextDecoder().decode(line)) as Message : null;
   }
 
-  async run(steps: SignInSteps, launch: () => Gio.AppLaunchContext): Promise<Record<string, string> | null> {
+  async run(steps: SignInSteps): Promise<Record<string, string> | null> {
     for (let message = await this.next(); message; message = await this.next()) {
       switch (message.type) {
       case 'form': {
@@ -84,7 +85,7 @@ export class OpenConnectSignIn {
       }
       case 'browse':
         if (GLib.Uri.peek_scheme(message.uri) !== 'https') throw new Error(`The VPN asked to open ${message.uri}, which isn't an HTTPS page`);
-        Gio.AppInfo.launch_default_for_uri(message.uri, launch());
+        openUri(message.uri);
         steps.wait(t('vpn-finish-in-browser'));
         break;
       case 'done':

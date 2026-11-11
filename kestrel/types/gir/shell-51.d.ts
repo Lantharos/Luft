@@ -829,6 +829,8 @@ export namespace Shell {
         // Methods
         create_app_launch_context(timestamp: number, workspace: number): Gio.AppLaunchContext;
 
+        create_launch_context_for_app(app: Gio.AppInfo | null, timestamp: number, workspace: number): Gio.AppLaunchContext;
+
         get_app_system(): AppSystem;
 
         get_automation_script(): Gio.File;
@@ -848,6 +850,8 @@ export namespace Shell {
         get_focus_manager(): St.FocusManager;
 
         get_force_animations(): boolean;
+
+        get_luft_environment(): string[];
 
         get_persistent_state(property_type: string, property_name: string): GLib.Variant;
 

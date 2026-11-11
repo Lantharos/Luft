@@ -42,6 +42,7 @@ export PULSE_SERVER="unix:$PULSE_RUNTIME_PATH/native"
 [[ "$mode" == nested ]] || use_fixture_desktop "$drives"
 
 scope="kestrel-session-$(session_hash "$session" 12)"
+export KESTREL_SESSION_SCOPE="$scope.scope"
 trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true; fusermount3 -uz "$KESTREL_APP_RUNTIME_DIR/doc" 2> /dev/null || true; rm -rf --one-file-system "$cache_link" "$KESTREL_APP_RUNTIME_DIR" "$drives" "$runtime"-*' EXIT
 trap 'exit 143' TERM INT
 

@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 
 import type { Monitor } from '../panel/panel.js';
 import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
-import { helperProgram } from '../../shared/apps/programs.js';
+import { helperLauncher, helperProgram } from '../../shared/apps/programs.js';
 import { showsWallpaper } from './pictures.js';
 
 const SIGTERM = 15;
@@ -42,7 +42,7 @@ export class Renderer {
   }
 
   private spawn(): void {
-    const launcher = new Gio.SubprocessLauncher({ flags: Gio.SubprocessFlags.STDIN_PIPE });
+    const launcher = helperLauncher(Gio.SubprocessFlags.STDIN_PIPE);
     this.client = Meta.WaylandClient.new_subprocess(global.context, launcher, [RENDERER, this.uri]);
     const process = this.client.get_subprocess();
     this.commands = process.get_stdin_pipe()!;

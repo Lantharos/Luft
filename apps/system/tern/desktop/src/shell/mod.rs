@@ -23,6 +23,16 @@ const LAUNCHER_VARIABLES: [&str; 8] = [
     "GIO_LAUNCHED_DESKTOP_FILE_PID",
 ];
 
+/// Your environment for the shell, which Tern itself, as one of Luft's own
+/// apps, doesn't carry. Without a systemd of yours to ask, the shell gets
+/// Tern's.
+fn your_environment() -> Vec<(String, String)> {
+    luft_app::block_on(async {
+        luft_app::dbus::environment::yours(luft_app::dbus::session().await.ok()?).await
+    })
+    .unwrap_or_default()
+}
+
 pub fn default_shell() -> PathBuf {
     uzers::get_user_by_uid(uzers::get_current_uid())
         .map(|user| user.shell().to_path_buf())
@@ -64,6 +74,9 @@ pub fn command(shell: &Path, directory: &Path, run: Option<&[String]>) -> Comman
         }
         _ => interactive(shell),
     };
+    for (name, value) in your_environment() {
+        command.env(name, value);
+    }
     for (key, _) in env::vars_os() {
         if key.to_string_lossy().starts_with("SABINE_") {
             command.env_remove(key);

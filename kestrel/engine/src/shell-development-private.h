@@ -3,4 +3,6 @@
 
 #include <glib.h>
 
+gboolean shell_development_build (void);
+
 const char *shell_development_path (const char *variable);

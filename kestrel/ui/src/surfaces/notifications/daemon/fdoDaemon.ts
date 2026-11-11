@@ -13,6 +13,7 @@ import { connectionRuns, identify, identifySender, type Caller } from '../../../
 import { Notification, Sound } from '../tray/notification.js';
 import { NotificationDestroyedReason, PrivacyScope, Urgency } from '../tray/notificationEnums.js';
 import { FdoNotificationDaemonSource } from './fdoSource.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 const FdoNotificationsIface = loadInterfaceXML('org.freedesktop.Notifications')!;
 const RELAY = 'org.freedesktop.Notifications';
@@ -365,7 +366,7 @@ export class FdoNotificationDaemon {
   }
 
   private emitActivationToken(id: number, invocation: Gio.DBusMethodInvocation): void {
-    const context = global.create_app_launch_context(0, -1);
+    const context = launchContext();
     const token = context.get_startup_notify_id(null, []);
     emitSignalToDestination(this.dbusImpl, invocation.get_sender(), 'ActivationToken',
       GLib.Variant.new('(us)', [id, token!]));

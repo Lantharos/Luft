@@ -1,0 +1,2 @@
+[Service]
+UnsetEnvironment=@unsafe_environment@

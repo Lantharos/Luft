@@ -43,6 +43,10 @@ lock-screen-restart = Restart…
 lock-screen-power-off = Power off…
 # Reason given to the system for delaying sleep until the screen is locked, shown by tools that list what delays sleep
 lock-inhibit-reason = Kestrel needs to lock the screen
+# Shown when USB protection couldn't confirm that the desktop unlocking it is Kestrel itself, so new USB devices keep waiting
+usb-protection-refused-title = New USB devices are waiting
+usb-protection-refused-body = Luft couldn't confirm that it's your desktop that was unlocked, so USB devices you plug in won't connect yet. Keyboards and mice still work. Turning off USB protection in Settings lets them in.
+usb-protection-refused-settings = Settings
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 

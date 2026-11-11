@@ -9,7 +9,7 @@ Slice=session.slice
 Type=dbus
 BusName=com.lantharos.Settings
 Environment=GIO_USE_VFS=local
-ExecStart=@libexecdir@/kestrel-settings
+ExecStart=@libexecdir@/luft-launch @libexecdir@/kestrel-settings
 Restart=on-failure
 TimeoutStopSec=5
 OOMScoreAdjust=-800

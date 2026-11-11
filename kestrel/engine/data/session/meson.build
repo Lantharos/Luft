@@ -63,6 +63,19 @@ configure_file(
   install_dir: systemduserunitdir,
 )
 
+foreach helper : ['notifications', 'screencast', 'hotplug-sniffer']
+  helperconf = configuration_data()
+  helperconf.set('libexecdir', libexecdir)
+  helperconf.set('pkgdatadir', pkgdatadir)
+  helperconf.set('gjs', gjs.full_path())
+  configure_file(
+    input: 'kestrel-' + helper + '.service.in',
+    output: 'kestrel-' + helper + '.service',
+    configuration: helperconf,
+    install_dir: systemduserunitdir,
+  )
+endforeach
+
 configure_file(
   input: 'com.lantharos.Kestrel.Post.service.in',
   output: 'com.lantharos.Kestrel.Post.service',
@@ -76,6 +89,17 @@ configure_file(
   configuration: settingsconf,
   install_dir: servicedir,
 )
+
+environmentconf = configuration_data()
+environmentconf.set('unsafe_environment', luft_environment['unsafe'])
+luft_environment_dropin = configure_file(
+  input: 'luft-environment.conf.in',
+  output: 'luft-environment.conf',
+  configuration: environmentconf,
+)
+foreach prefix : ['kestrel-', 'luft-']
+  install_data(luft_environment_dropin, install_dir: systemduserunitdir / prefix + '.service.d', rename: '50-luft-environment.conf')
+endforeach
 
 install_data('kestrel-session.target', 'kestrel-setup.target', install_dir: systemduserunitdir)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')

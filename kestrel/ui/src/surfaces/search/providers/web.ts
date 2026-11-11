@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 
 import { t } from '../../../shared/i18n/index.js';
+import { openUriAsync } from '../../../shared/apps/launch.js';
 import { themedIcon } from '../icons.js';
 import type { SearchItem } from '../item.js';
 
@@ -25,14 +26,8 @@ export class WebSearch {
       key: 'web', title: t('start-search-web', { query: text }), description: engine.name, icon: themedIcon('web-browser-symbolic'),
       activate: () => {
         this.close();
-        Gio.AppInfo.launch_default_for_uri_async(`${engine.address}${encodeURIComponent(text)}`,
-          global.create_app_launch_context(0, -1), null, (_source, result) => {
-            try {
-              Gio.AppInfo.launch_default_for_uri_finish(result);
-            } catch (error) {
-              console.warn(`The web search could not be opened: ${error}`);
-            }
-          });
+        openUriAsync(`${engine.address}${encodeURIComponent(text)}`)
+          .catch(error => console.warn(`The web search could not be opened: ${error}`));
       },
     };
   }

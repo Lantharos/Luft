@@ -6,7 +6,7 @@ ConditionPathExists=/run/luft-dev-layer-dropped
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-dev-layer notice
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-dev-layer notice
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=yes

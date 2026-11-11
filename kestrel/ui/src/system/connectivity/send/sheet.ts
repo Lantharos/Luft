@@ -12,6 +12,7 @@ import { deviceIcon } from '../post/format.js';
 import { currentPost, type Post } from '../post/post.js';
 import type { Received } from './received.js';
 import { receivingApps } from './targets.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 const ICON = 'document-send-symbolic';
 const LOOK_AGAIN_ICON = 'view-refresh-symbolic';
@@ -77,7 +78,7 @@ function appRow(sheet: Sheet, app: Gio.AppInfo): St.Button {
   const button = row({ icon: appIcon(app, 28, { style_class: 'kestrel-portal-row-icon' }), title: app.get_name() });
   button.name = `app:${app.get_id()}`;
   button.connect('clicked', () => {
-    app.launch(sheet.files.map(file => Gio.File.new_for_path(file.path)), global.create_app_launch_context(0, -1));
+    app.launch(sheet.files.map(file => Gio.File.new_for_path(file.path)), launchContext(app));
     sheet.dialog.finish(SUCCESS);
   });
   return button;

@@ -9,6 +9,7 @@ import { logErrorUnlessCancelled } from '../../../core/runtime/errorUtils.js';
 import { PopupAnimation } from '../../../shared/popups/boxpointer.js';
 import { CandidatePopup } from './ibusCandidatePopup.js';
 import * as Main from '../../../core/main.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 Gio._promisify(IBus.Bus.prototype, 'list_engines_async', 'list_engines_async_finish');
 Gio._promisify(IBus.Bus.prototype, 'list_active_engines_async', 'list_active_engines_async_finish');
@@ -118,7 +119,7 @@ class IBusManager extends EventEmitter {
   private spawn(extraArgs: string[]): void {
     try {
       const cmdLine = ['ibus-daemon', '--panel', 'disable', ...extraArgs];
-      const env = global.create_app_launch_context(0, -1).get_environment();
+      const env = launchContext().get_environment();
       const pid = Shell.util_spawn_async(null, cmdLine, env, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD);
       GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, () => GLib.spawn_close_pid(pid));
     } catch (e) {

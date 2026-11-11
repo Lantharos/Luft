@@ -13,6 +13,7 @@ import { PortalBackend } from '../../portal/backend.js';
 import { terminateOnceShown } from '../../shared/apps/handoff.js';
 import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { centerOnArrival } from './placement.js';
+import { launchContext } from '../../shared/apps/launch.js';
 
 const APP = 'com.lantharos.setup.desktop';
 const NAME = 'com.lantharos.Kestrel.Setup';
@@ -70,7 +71,7 @@ export class Setup {
   private launch(): boolean {
     const app = GioUnix.DesktopAppInfo.new(APP);
     if (!app) return false;
-    const context = global.create_app_launch_context(0, -1);
+    const context = launchContext(app);
     return app.launch_uris_as_manager([], context, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, null, (_app, pid) => {
       GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, () => {
         GLib.spawn_close_pid(pid);

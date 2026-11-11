@@ -6,6 +6,7 @@ import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { SwipeAway } from './swipeAway.js';
+import { openUri } from '../../shared/apps/launch.js';
 
 export interface SignalSource {
   connectObject(...args: any[]): void;
@@ -39,7 +40,7 @@ interface CardMotion {
 }
 
 function openNotificationSettings(appId: string): void {
-  Gio.AppInfo.launch_default_for_uri(`schelf:app?${GLib.uri_escape_string(appId, null, false)}`, global.create_app_launch_context(0, -1));
+  openUri(`schelf:app?${GLib.uri_escape_string(appId, null, false)}`);
 }
 
 export class NotificationCard {

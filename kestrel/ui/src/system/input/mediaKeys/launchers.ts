@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import { spawnCommandLine } from '../../../core/runtime/util.js';
 
 import type { Keybindings } from '../../../context.js';
+import { launchContext, openUri } from '../../../shared/apps/launch.js';
 
 const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM = 'com.lantharos.kestrel.custom-keybinding';
@@ -32,12 +33,12 @@ function activate(info: Gio.AppInfo | null): void {
   if (!info) return;
   const app = Shell.AppSystem.get_default().lookup_app(info.get_id() ?? '');
   if (app) app.activate();
-  else info.launch([], global.create_app_launch_context(0, -1));
+  else info.launch([], launchContext(info));
 }
 
 export function launch(launcher: Launcher): void {
   if (launcher === 'home') {
-    Gio.AppInfo.launch_default_for_uri(Gio.File.new_for_path(GLib.get_home_dir()).get_uri(), global.create_app_launch_context(0, -1));
+    openUri(Gio.File.new_for_path(GLib.get_home_dir()).get_uri());
     return;
   }
   if (launcher === 'terminal') {

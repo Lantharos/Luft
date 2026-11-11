@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { t } from '../../../shared/i18n/index.js';
+import { launchContext, openUriAsync } from '../../../shared/apps/launch.js';
 import { fileIcon } from '../icons.js';
 import type { SearchItem } from '../item.js';
 
@@ -21,10 +22,6 @@ const home = GLib.get_home_dir();
 
 export function shortFolder(path: string): string {
   return path === home || path.startsWith(`${home}/`) ? `~${path.slice(home.length)}` : path;
-}
-
-function launchContext(): Gio.AppLaunchContext {
-  return global.create_app_launch_context(0, -1);
 }
 
 export class FileOpener {
@@ -52,7 +49,7 @@ export class FileOpener {
 
   private reveal(uri: string): void {
     const manager = Gio.AppInfo.get_default_for_type(FOLDER_TYPE, false);
-    const token = launchContext().get_startup_notify_id(manager, [Gio.File.new_for_uri(uri)]) ?? '';
+    const token = launchContext(manager).get_startup_notify_id(manager, [Gio.File.new_for_uri(uri)]) ?? '';
     this.run(() => Gio.DBus.session.call(FILE_MANAGER, FILE_MANAGER_PATH, FILE_MANAGER, 'ShowItems', new GLib.Variant('(ass)', [[uri], token]),
       null, Gio.DBusCallFlags.NONE, -1, null, (connection, result) => {
         try {
@@ -64,13 +61,7 @@ export class FileOpener {
   }
 
   private open(uri: string): void {
-    this.run(() => Gio.AppInfo.launch_default_for_uri_async(uri, launchContext(), null, (_source, result) => {
-      try {
-        Gio.AppInfo.launch_default_for_uri_finish(result);
-      } catch (error) {
-        console.warn(`Could not open ${uri}: ${error}`);
-      }
-    }));
+    this.run(() => openUriAsync(uri).catch(error => console.warn(`Could not open ${uri}: ${error}`)));
   }
 
   private run(action: () => void): void {

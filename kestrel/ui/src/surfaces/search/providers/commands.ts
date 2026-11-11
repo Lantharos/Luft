@@ -5,6 +5,7 @@ import { launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
 import { appName } from '../../../shared/apps/names.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 const LIMIT = 3;
 const BIAS = 0.3;
@@ -37,7 +38,7 @@ export class CommandResults {
       activate: () => {
         launchHistory.record(key);
         this.close();
-        app.launch_action(action, global.create_app_launch_context(0, -1));
+        app.launch_action(action, launchContext(app));
       },
     };
   }

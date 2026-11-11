@@ -1,0 +1,9 @@
+[Unit]
+Description=Rover choosing files for other apps
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.impl.portal.desktop.rover
+ExecStart=/usr/libexec/luft-launch /usr/bin/rover --portal-backend

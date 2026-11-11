@@ -190,7 +190,7 @@ It doesn't protect you when:
 Luft only tells apps apart where something an app can't fake vouches for them.
 
 - **Apps in a sandbox are isolated.** Flatpak gives each app's sandbox its app ID, which no app inside a sandbox can change or borrow from another. Kestrel and Luft's services hold sandboxed apps to their sandbox: no background clipboard, no windows kept above others or out of the taskbar, no screen recording or display changes without the portal, none of the shell's private services, and only their own secrets in the keyring. The D-Bus services the compositor itself offers on the session bus, from display settings and screen recording to its debugging switches, refuse sandboxed apps too, their writable properties included; only the idle monitor answers them, with the ten-second floor Wayland's idle notifications have. The two names sandboxed apps are commonly let through to, `org.gtk.Notifications` and the tray's `org.kde.StatusNotifierWatcher`, each sit on a bus connection of their own (`ownOnItsOwnConnection` in `kestrel/ui/src/shared/dbus/dedicatedName.ts`). A sandbox's bus proxy opens a whole connection once one of its names is allowed, so this keeps an app that may post notifications or show a tray icon from reaching anything else Kestrel offers.
-- **Apps outside a sandbox are you.** Every program you run outside a sandbox has your rights: it can read your files, change another program's settings, start it with a library slipped in, or name itself after any app. So Luft treats all of them as one caller, you, and never trusts a name, path, systemd scope or launcher entry to tell them apart. Secrets you saved are open to them without prompts, the same as your files are, and so are the secrets of sandboxed apps. Programs from system packages and from your Toolbox containers are you too.
+- **Apps outside a sandbox are you.** Every program you run outside a sandbox has your rights: it can read your files, change another program's settings, start it with a library slipped in, or name itself after any app. So Luft treats all of them as one caller, you, and never trusts a name, path, systemd scope or launcher entry to tell them apart. The one exception is a few calls that only one of Luft's own programs may make, which are checked by the program file itself, see [Luft's own programs](#lufts-own-programs). Secrets you saved are open to them without prompts, the same as your files are, and so are the secrets of sandboxed apps. Programs from system packages and from your Toolbox containers are you too.
 - **Sandboxed apps with full access are you too.** Schelf opens a Flatpak's sandbox with a Flatpak override, and Kestrel and Luft's services treat it like an app installed on the system.
 
 Every service judges its callers the same way, from the kernel's view of the D-Bus connection or socket and a pidfd that pins the process while it's looked at. A sandbox marks every process it starts with a `.flatpak-info` file at the root of the process's view of the files, which the process can't remove or change; the app ID in it is the app. A process without one is you. A process that keeps others out of its memory hides its root, so it is you when its mount table, which anyone may read, has nothing mounted at `/.flatpak-info`, and counts as an unknown sandbox otherwise, as does a process that quits while it's looked at. Sandboxed apps reach the session bus only through a filtering proxy that runs in a sandbox of its own with the same marker, so services see the app behind every message, and Wayland only through a socket the compositor tags with the app's ID.
@@ -198,6 +198,50 @@ Every service judges its callers the same way, from the kernel's view of the D-B
 The Rust services, Kestrel's session manager among them, share these rules through the `luft-identity` crate, and Kestrel's compositor applies them to Wayland clients and answers the shell's D-Bus services with `meta_context_identify_sender()`. Both are checked against the same cases in `packages/identity/sandbox-cases.ini`, and read `.flatpak-info` the way GLib reads key files, as Flatpak does.
 
 A program running as you can make a sandbox of its own that names any app, so it can pass as a sandboxed app, but never the other way round: a sandboxed app can't make itself look like you.
+
+## Luft's own programs
+
+Kestrel, its helpers, Luft's services and the apps that come with the system are installed in the read-only system image. Two things keep the rest of your programs from passing as one of them.
+
+### A clean start
+
+Your environment, from `~/.config/environment.d`, `systemctl --user set-environment` and your login shell's profile, can point a program at libraries, toolkit modules and script folders of anyone's choosing: `LD_PRELOAD`, `GTK_MODULES`, `GIO_EXTRA_MODULES`, `GI_TYPELIB_PATH`, `GJS_PATH`, `PYTHONPATH` and many more. Luft's own programs don't start in it.
+
+- Kestrel and Kestrel during setup start with those variables taken out by their units, the full list in `kestrel/engine/src/environment/unsafe.list`. The same list is taken out of every user service whose name starts with `kestrel-` or `luft-`, by `50-luft-environment.conf` in `/usr/lib/systemd/user/kestrel-.service.d` and `luft-.service.d`. systemd applies it after everything else, so no variable your systemd holds reaches them, whichever way it got there.
+- Kestrel's helpers and Luft's user services then start through `luft-launch`, which keeps only the variables on the list in `kestrel/engine/src/environment/allowed.list` and sets `PATH` to `/usr/local/bin:/usr/bin`: your language and region settings, the session's own folders, display and bus addresses, and what systemd tells a service about itself. Helpers that D-Bus starts on demand, such as notifications, screen recording and Rover's file chooser for other apps, run as units of their own for this, rather than in one D-Bus makes up.
+- Kestrel starts Luft's apps with the same short list, whether you open them from Start, the taskbar, a notification or a link. An app counts as Luft's when its entry is named `com.lantharos.` or the program it runs is installed under `/usr/lib/sabine/com.lantharos.`.
+- Every other app Kestrel starts gets your whole environment, the variables Kestrel itself doesn't take included, exactly as before. So do the programs Luft's apps start for you: a shell in Tern, an app opened from Rover or Settings, an AppImage you gave full access. They take your environment from your systemd rather than from the app.
+- The login screen's Kestrel starts from greetd, whose environment only system configuration sets.
+
+A development build of Kestrel, started from `KESTREL_BUILDDIR`, also passes the variables in `kestrel/engine/src/environment/development.list` to the apps it starts, so test sessions can point them at their stand-ins. An installed Kestrel ignores them.
+
+What this doesn't cover: systemd reads unit files and drop-ins you put in `~/.config/systemd/user`, so a program running as you can still give one of Luft's user services, or Kestrel itself, an environment or a command of its choosing that way, and Vulkan loads layers listed in `~/.local/share/vulkan`. Closing these needs Luft's programs to run apart from what you can configure, which comes with giving them domains of their own.
+
+### Telling them apart
+
+A few calls are for one of Luft's programs alone. Before answering one, the service asks the bus for a pidfd of the caller, never a bare process ID, and while the pidfd pins the process it checks that:
+
+- the program file the process runs is in the read-only image under `/usr`, owned by root and writable by nobody else, and is still the file at that path, neither deleted nor replaced since the process started;
+- it is the one program the call is for, by where the system installs it;
+- no file outside the image that is still there is mapped into the process as code, the way a library slipped in through the loader or a module folder is, and its starting environment holds none of the variables above, and a Sabine app wasn't started with switches that open its browser to others, such as `--remote-debugging-port` or `--load-extension`.
+
+`luft-identity` has this as `caller::luft_program` and, for sockets, `program::of_process`. A development build of a service, one not running from the image itself, also accepts the program of the same name in the folders `KESTREL_LUFT_APPS` lists or in `KESTREL_BUILDDIR`, as Kestrel does.
+
+The calls it guards:
+
+| Service | Calls | Only from |
+| --- | --- | --- |
+| `com.lantharos.Accounts1` | Listing, adding, changing and removing online accounts and answering their sign-in | Settings |
+| `com.lantharos.Accounts1.Files` | The cloud drives, keeping and freeing files, share links | Settings and Rover |
+| `com.lantharos.UsbProtection1` | `SetLocked` | Kestrel |
+| `com.lantharos.Firewall1` | `SetExtensionPorts` | Kestrel |
+| `com.lantharos.Firewall1` | `SetPostOpen` | Post |
+
+The accounts service drives `rclone`, which holds the drives' sign-ins, over a socket in its runtime folder. rclone asks every request on it for a password the service makes up each time it starts and hands rclone through a pipe, so nothing else that finds the socket can drive it.
+
+Code a program makes for itself isn't held against it: graphics drivers and JIT compilers, such as NVIDIA's driver and GStreamer's, run code from memory or from a file they delete right away, and the check tells those apart from a library by whether the file mapped is still at its path, by its inode rather than by the name the kernel shows. That also means a program already running code inside a Luft program could map code that looks like it made it itself; the check doesn't claim to see that. What keeps such code out is the clean start above and the kernel's limit on tracing.
+
+This stops a renamed or copied program, a program of yours that takes a Luft program's bus name or unit, and one of Luft's programs started with a library or module of yours slipped in. It doesn't stop a program of yours that takes over one of Luft's programs while it runs: `kernel.yama.ptrace_scope=1` keeps programs from tracing or reading the memory of ones they didn't start, but a program can start one of Luft's apps itself and trace it, feed it files and settings of its choosing, or steer its windows through the accessibility bus. On the session bus, which the accounts service uses, the pidfd comes from the bus itself, and that runs as you, so a bus started through a drop-in of yours could hand over any process; the system bus, where USB protection and the firewall listen, runs as its own account. Store apps that updated themselves into your home folder aren't in the image either, so they don't count as Luft's own until the system's copy is current again. Telling Luft's programs apart from those comes with giving them domains of their own.
 
 ## The AppImage sandbox
 
@@ -280,7 +324,7 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 - At unlock everything that waited connects, and Kestrel names it in a notification. Each device is then announced again as if just plugged in, so what sets devices up, such as printer setup and `ipp-usb`, sees it connected.
 - It uses the kernel's `authorized_default` and `interface_authorized_default` switches per bus and costs nothing while unlocked. It is not meant to run alongside USBGuard.
 - A dock plugged in while locked brings USB buses of its own. So that nothing on them connects before the service has seen the new bus, the kernel's policy for new buses (`usbcore.authorized_default`) is set to hold as well for as long as the screen is locked; keyboards, mice and hubs on the dock are then let in by the same rule as everywhere else. The policy the system had is kept in `/run/luft-usb-protection` and put back at unlock. If the service stops unexpectedly while locked, everything stays held, and the service picks up where it was when it starts again.
-- Kestrel tells it when the screen locks and unlocks, with `SetLocked` on `com.lantharos.UsbProtection1`. The service takes that only from a process in the desktop's own unit (`kestrel.service`, or `kestrel-setup.service` during setup) of the person whose session is on screen, pinned by a pidfd while its control group is read. logind's lock hint, which any program in the session may set, plays no part. A desktop counts as locked until its shell says it isn't, and again the moment that shell leaves the bus, so a shell that crashes or is killed while the screen is locked doesn't let devices in. The login screen always counts as locked. A text console has no lock screen, so whoever signed in there counts as unlocked.
+- Kestrel tells it when the screen locks and unlocks, with `SetLocked` on `com.lantharos.UsbProtection1`. The service takes that only from Kestrel itself, installed with the system, running in the desktop's own unit (`kestrel.service`, or `kestrel-setup.service` during setup) of the person whose session is on screen, pinned by a pidfd while its control group and program are read. logind's lock hint, which any program in the session may set, plays no part. A desktop counts as locked until its shell says it isn't, and again the moment that shell leaves the bus, so a shell that crashes or is killed while the screen is locked doesn't let devices in. The login screen always counts as locked. A text console has no lock screen, so whoever signed in there counts as unlocked.
 - When the service is stopped on purpose, it lets everything that waited connect. When it fails, what waited keeps waiting: systemd starts it again a second later, however often that happens, and it carries on with the devices that wait.
 - On by default; turning it off in Settings needs an administrator. The choice is kept in `/var/lib/luft-usb-protection`.
 
@@ -293,6 +337,7 @@ Settings the image adds on top of Fedora's, each chosen because it costs nothing
 | `kernel.kptr_restrict=2` | Kernel addresses in `/proc` read as zero for everyone, so a leak can't be used to aim an exploit. A kernel profiler that needs them can lower it for the session with `sysctl kernel.kptr_restrict=1` |
 | `kernel.unprivileged_bpf_disabled=1` | Only root loads eBPF programs, and the setting can't be turned back on until the next start. Fedora's default leaves it switchable |
 | `net.core.bpf_jit_harden=2` | Constants in compiled BPF programs are blinded, so a filter can't be used to smuggle machine code into the kernel |
+| `kernel.yama.ptrace_scope=1` | A program can only trace or read the memory of programs it started itself, so one of yours can't attach to Kestrel or one of Luft's apps after the fact and act in its name. Debuggers still start the program they debug, and a debugger attaching to a running program needs `sudo`. Fedora sets the same today; naming it keeps it if that default changes |
 | `dev.tty.ldisc_autoload=0` | A program without privileges can't make the kernel load a rarely used line discipline, a recurring source of kernel bugs. Bluetooth and modems load theirs as root |
 | `sysctl.kernel.kexec_load_disabled=1` | Nothing can replace the running kernel with another one behind Secure Boot's back |
 | `lockdown=integrity` | Even root can't write kernel memory or load unsigned code into the kernel |
@@ -300,7 +345,7 @@ Settings the image adds on top of Fedora's, each chosen because it costs nothing
 | `page_alloc.shuffle=1` | Free memory pages are handed out in a shuffled order, which makes heap layouts harder to predict |
 | `vsyscall=none` | Removes a fixed-address page only programs built before 2012 call into |
 
-`kernel.perf_event_paranoid` stays at Fedora's 2: the stricter 3 needs a kernel patch Fedora doesn't carry. `kernel.yama.ptrace_scope`, user namespaces, the CPU mitigations and zeroing memory on free are left as Fedora has them, since changing them would cost speed or break debuggers, sandboxes and containers.
+`kernel.perf_event_paranoid` stays at Fedora's 2: the stricter 3 needs a kernel patch Fedora doesn't carry. User namespaces, the CPU mitigations and zeroing memory on free are left as Fedora has them, since changing them would cost speed or break debuggers, sandboxes and containers.
 
 ## On the network
 
@@ -381,7 +426,7 @@ It opens each folder on the way to an item without following links and treats th
 
 A few calls on system services are for one part of the desktop alone: Post opening its port, Kestrel naming its extensions' ports and Kestrel saying the screen is locked or unlocked. The service asks the bus for a pidfd of the caller, reads the caller's control group while the pidfd pins it, and goes on only when that is the right unit in `session.slice` of the caller's own systemd (`kestrel-post.service` or `kestrel.service`). `luft-identity` has this as `caller::session_unit`.
 
-That keeps out sandboxed apps, which can't reach the system bus or move between units, and other accounts. It doesn't tell your own programs apart: your systemd and its units are yours, and a program running as you outside a sandbox can place itself in any of them, [as it can do anything else of yours](#who-an-app-is). So none of these calls gives more than such a program has anyway: one port on home networks, ports you agreed to when installing an extension, and devices you plugged in.
+That keeps out sandboxed apps, which can't reach the system bus or move between units, and other accounts. Your systemd and its units are yours, though, and a program running as you outside a sandbox can place itself in any of them, so the service also checks that the caller runs the right program from the system image, Kestrel or Post, the way [Luft's own programs](#telling-them-apart) describes. None of these calls gives more than a program of yours has anyway: one port on home networks, ports you agreed to when installing an extension, and devices you plugged in.
 
 ## The login screen's pictures
 

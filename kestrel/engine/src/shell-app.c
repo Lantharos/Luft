@@ -1243,7 +1243,7 @@ shell_app_launch (ShellApp           *app,
     }
 
   global = shell_global_get ();
-  context = shell_global_create_app_launch_context (global, timestamp, workspace);
+  context = shell_global_create_launch_context_for_app (global, G_APP_INFO (app->info), timestamp, workspace);
   if (gpu_pref == SHELL_APP_LAUNCH_GPU_APP_PREF)
     discrete_gpu = g_desktop_app_info_get_boolean (app->info, "PrefersNonDefaultGPU");
   else
@@ -1305,7 +1305,7 @@ shell_app_launch_action (ShellApp        *app,
   GAppLaunchContext *context;
 
   global = shell_global_get ();
-  context = shell_global_create_app_launch_context (global, timestamp, workspace);
+  context = shell_global_create_launch_context_for_app (global, G_APP_INFO (app->info), timestamp, workspace);
 
   g_desktop_app_info_launch_action (G_DESKTOP_APP_INFO (app->info),
                                     action_name, context);

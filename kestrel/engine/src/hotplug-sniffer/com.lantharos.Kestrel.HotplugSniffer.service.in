@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=com.lantharos.Kestrel.HotplugSniffer
 Exec=@libexecdir@/kestrel-hotplug-sniffer
+SystemdService=kestrel-hotplug-sniffer.service

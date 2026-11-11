@@ -91,6 +91,7 @@ foreach name, service : activated_names
   serviceconf.set('service', service)
   serviceconf.set('gjs', gjs.full_path())
   serviceconf.set('pkgdatadir', pkgdatadir)
+  serviceconf.set('unit', 'kestrel-' + service.split('.')[-1].to_lower() + '.service')
 
   configure_file(
     input: 'dbus-service.service.in',

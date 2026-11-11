@@ -2,4 +2,5 @@ part = "app-rover"
 
 [files]
 "/usr/share/xdg-desktop-portal/portals/" = ["data/rover.portal"]
+"/usr/lib/systemd/user/" = ["data/luft-rover-file-manager.service", "data/luft-rover-portal.service"]
 "/usr/share/dbus-1/services/" = ["data/dbus/org.freedesktop.FileManager1.service", "data/dbus/org.freedesktop.impl.portal.desktop.rover.service"]

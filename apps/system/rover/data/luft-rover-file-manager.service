@@ -1,0 +1,9 @@
+[Unit]
+Description=Rover showing files for other apps
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.FileManager1
+ExecStart=/usr/libexec/luft-launch /usr/bin/rover --file-manager-bus

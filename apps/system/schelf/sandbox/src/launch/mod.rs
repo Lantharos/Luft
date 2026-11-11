@@ -66,17 +66,17 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
     let grants = runtime.block_on(Grants::of(&session, id))?;
     let folder = Folder::of(id)?;
     let lock = folder.lock()?;
-    if matches!(lock, Lock::Running) && folder.unsandboxed().is_some() {
-        return Err(unsandboxed::hand_over(
-            &app,
-            &folder,
-            files::unmarked(arguments),
-        ));
-    }
-    if let Lock::Ours(_) = lock
-        && grants.full_access
-    {
-        return unsandboxed::run(&app, &folder, files::unmarked(arguments));
+    let unsandboxed = (matches!(lock, Lock::Running) && folder.unsandboxed().is_some())
+        || (matches!(lock, Lock::Ours(_)) && grants.full_access);
+    if unsandboxed {
+        let yours = runtime
+            .block_on(luft_dbus::environment::yours(&session))
+            .unwrap_or_default();
+        let arguments = files::unmarked(arguments);
+        return match lock {
+            Lock::Running => Err(unsandboxed::hand_over(&app, &folder, arguments, &yours)),
+            Lock::Ours(_) => unsandboxed::run(&app, &folder, arguments, &yours),
+        };
     }
     runtime.block_on(files::mount_point(&session));
     let arguments = runtime.block_on(files::forward(&session, id, arguments))?;

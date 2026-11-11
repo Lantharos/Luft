@@ -28,6 +28,8 @@ import * as ShellDBus from './shellDBus.js';
 import { MountOperationHandler } from '../system/hardware/drives/mountOpHandler.js';
 import * as WindowManager from '../desktop/windowManager/windowManager.js';
 import { WindowRecovery } from '../desktop/windows/recovery/recovery.js';
+import { SessionRecorder } from '../session/restore/recorder.js';
+import { reopenSession } from '../session/restore/reopen.js';
 import * as Magnifier from '../system/input/accessibility/magnifier.js';
 import * as XdndHandler from './stage/xdndHandler.js';
 import * as KbdA11yDialog from '../system/input/accessibility/kbdA11yDialog.js';
@@ -333,7 +335,8 @@ async function initializeUI(): Promise<void> {
   locatePointer = new LocatePointer.LocatePointer();
 
   screenShield = new ScreenShield.ScreenShield();
-  new WindowRecovery(() => screenShield.locked);
+  const sessionRecorder = new SessionRecorder();
+  const windowRecovery = new WindowRecovery(() => screenShield.locked, windows => sessionRecorder.note(windows));
 
   startInputMethod();
 
@@ -360,7 +363,7 @@ async function initializeUI(): Promise<void> {
   global.connect('locate-pointer', () => locatePointer.show());
   global.context.connect('notify::unsafe-mode', notifyUnsafeMode);
 
-  endSessionDialog = new EndSessionDialog.EndSessionDialog();
+  endSessionDialog = new EndSessionDialog.EndSessionDialog(sessionRecorder);
 
   KestrelUi.portalPublished.then(() => Shell.util_sd_notify());
   GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => global.context.notify_ready());
@@ -381,6 +384,7 @@ async function initializeUI(): Promise<void> {
     if (!runAutomation && new Gio.Credentials().get_unix_user() === 0)
       notify(KestrelUi.t('privileged-user-title'), KestrelUi.t('privileged-user-body'));
 
+    reopenSession(sessionRecorder, windowRecovery.lost, screenShield).catch(logError);
     runAutomation?.();
   });
 }

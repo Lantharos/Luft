@@ -18,6 +18,7 @@ Type=notify
 NotifyAccess=all
 ExecStart=@libexecdir@/kestrel-wrapper @bindir@/kestrel
 Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
+UnsetEnvironment=@unsafe_environment@
 # unset some environment variables that were set by the shell and won't work now that the shell is gone
 ExecStopPost=-systemctl --user unset-environment GNOME_SETUP_DISPLAY WAYLAND_DISPLAY DISPLAY XAUTHORITY
 

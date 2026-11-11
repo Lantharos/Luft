@@ -58,6 +58,14 @@ GAppLaunchContext *
                                                  guint32       timestamp,
                                                  int           workspace);
 
+GAppLaunchContext *
+         shell_global_create_launch_context_for_app (ShellGlobal  *global,
+                                                     GAppInfo     *app,
+                                                     guint32       timestamp,
+                                                     int           workspace);
+
+char   **shell_global_get_luft_environment      (ShellGlobal  *global);
+
 void     shell_global_notify_error              (ShellGlobal  *global,
                                                  const char   *msg,
                                                  const char   *details);

@@ -1,10 +1,10 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import * as Util from '../../../core/runtime/util.js';
+import { openUri } from '../../../shared/apps/launch.js';
 
 export const URLHighlighter = GObject.registerClass(
 class URLHighlighter extends St.Label {
@@ -59,7 +59,7 @@ class URLHighlighter extends St.Label {
     if (!url.includes(':'))
       url = `http://${url}`;
 
-    Gio.app_info_launch_default_for_uri(url, global.create_app_launch_context(0, -1));
+    openUri(url);
   }
 
   private onMotion(x: number, y: number): void {

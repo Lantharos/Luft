@@ -181,7 +181,19 @@ At the login screen, the `greetd` PAM rules start with `pam_kestrel_sign_in.so`,
 | --- | --- |
 | Sabine apps, which every Luft app is | Reconnect, with their pages as they were |
 | Qt 6 apps | Reconnect, since the session sets `QT_WAYLAND_RECONNECT=1` |
-| GTK 3 and GTK 4 apps, Firefox, Chromium and Electron apps | Close; they can't reconnect to a display |
-| X11 apps | Close with Xwayland, which starts again for the next one |
+| GTK 3 and GTK 4 apps, Firefox, Chromium and Electron apps | Close, since they can't reconnect to a display, and open again |
+| X11 apps | Close with Xwayland, which starts again, and open again |
 
-Kestrel notes where every window is in `$XDG_RUNTIME_DIR/kestrel/DISPLAY/windows.json`. Windows of apps that reconnect within a minute of the restart come back on their workspace with their position, size, maximized, fullscreen, minimized and always-on-top state, in their stacking order, and the one that had focus gets it back. With window tiling on, tiled windows are laid out again with the others in their space.
+Kestrel notes where every window is in `$XDG_RUNTIME_DIR/kestrel/DISPLAY/windows.json`. Windows of apps that reconnect within a minute of the restart come back on their workspace with their position, size, maximized, fullscreen, minimized and always-on-top state, in their stacking order, and the one that had focus gets it back. With window tiling on, tiled windows are laid out again with the others in their space. Apps whose every process ended with Kestrel are opened again once and their windows put back the same way, as after an update below; apps that are still running are never opened a second time.
+
+## Reopening apps
+
+Every Luft update needs a restart, so Kestrel brings back what was open. It keeps a record in `~/.local/state/kestrel/session.json`, readable only by the account: which apps were open and, for each window, its workspace, display, position and size, whether it was maximized, tiled, fullscreen, minimized or always on top, the stacking order and which window had focus. It holds no titles or contents. Kestrel rewrites it half a second after windows open, close, move or change, so a power cut still leaves a recent one, and when the session ends it notes how:
+
+| The session ended | At the next sign-in |
+| --- | --- |
+| With a restart to install an update, from Settings or the Restart dialog | The apps open again |
+| Without warning, such as a power cut, or with Kestrel crashing for good | The apps open again |
+| With an ordinary sign-out, restart or power off | The apps open again only with **Reopen apps when I sign in** on, in Settings → Apps (`reopen-apps` in `com.lantharos.kestrel`, off by default) |
+
+Nothing opens before the session is unlocked. Kestrel then starts each app once through its launcher, a little apart so the desktop can be used at once, and puts its windows back in the order the app opens them: on their workspace, where they were, as they were. Windows of Wayland apps are placed before they first show; those of X11 apps right after. A window whose display is gone opens centered on the main one, and one that no longer fits its display is moved and shrunk until it does. Apps that were removed are left out, apps that open by themselves at sign-in aren't started again, and an app that opens fewer windows, more, or none is left as it is. Half a minute after the last app starts at the latest, the windows are stacked as they were and the one that had focus gets it back, unless you have started using another window by then.

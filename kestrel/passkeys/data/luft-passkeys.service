@@ -6,7 +6,7 @@ After=graphical-session.target
 [Service]
 Type=dbus
 BusName=com.lantharos.Passkeys
-ExecStart=@libexecdir@/luft-passkeys
+ExecStart=@libexecdir@/luft-launch @libexecdir@/luft-passkeys
 Restart=on-failure
 Slice=session.slice
 NoNewPrivileges=yes

@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
+import { launchContext } from '../../shared/apps/launch.js';
 
 const ACTIVATION_XML = `<node><interface name="com.lantharos.Kestrel.Activation">
   <method name="Token">
@@ -51,7 +52,7 @@ export class ActivationTokens {
         invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only the app in front can bring another window forward');
         return;
       }
-      const token = global.create_app_launch_context(0, -1).get_startup_notify_id(null, []);
+      const token = launchContext().get_startup_notify_id(null, []);
       invocation.return_value(new GLib.Variant('(s)', [token ?? '']));
     });
   }

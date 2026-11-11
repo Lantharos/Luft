@@ -16,11 +16,12 @@ import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import type { Taskbar } from '../taskbar/taskbar.js';
 import type { PanelElements } from '../islands/islandSet.js';
 import { taskbarElements, type ElementActor, type ElementLayout } from './extensionElements.js';
+import { launch } from '../../../shared/apps/launch.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 
 function showLayout(keys: Shell.App, layout: string): void {
-  keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], global.create_app_launch_context(0, -1));
+  launch(keys.get_app_info(), [`kestrel-keys:view/${encodeURIComponent(layout)}`]);
 }
 
 const orientationOf = (edge: Edge) => isVertical(edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;

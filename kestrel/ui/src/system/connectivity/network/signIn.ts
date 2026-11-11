@@ -1,5 +1,5 @@
-import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
+import { launch, openUri } from '../../../shared/apps/launch.js';
 
 const SIGN_IN_APP = 'com.lantharos.signin.desktop';
 
@@ -8,8 +8,7 @@ function signInLink(network: string, url: string): string {
 }
 
 export function signInToNetwork(network: string, url: string): void {
-  const context = global.create_app_launch_context(0, -1);
   const app = Shell.AppSystem.get_default().lookup_app(SIGN_IN_APP);
-  if (app) app.get_app_info().launch_uris([signInLink(network, url)], context);
-  else Gio.AppInfo.launch_default_for_uri(url, context);
+  if (app) launch(app.get_app_info(), [signInLink(network, url)]);
+  else openUri(url);
 }

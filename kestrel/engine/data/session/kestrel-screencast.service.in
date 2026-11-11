@@ -1,0 +1,14 @@
+[Unit]
+Description=Kestrel screen recording
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+
+[Service]
+Slice=session.slice
+Type=exec
+ExecStart=@libexecdir@/luft-launch @gjs@ -m @pkgdatadir@/com.lantharos.Kestrel.Screencast
+TimeoutStopSec=5
+NoNewPrivileges=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native

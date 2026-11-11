@@ -4,12 +4,14 @@ import { basename, join } from 'node:path';
 
 import type { Unit } from './units';
 
+const UNSAFE_ENVIRONMENT = join(import.meta.dir, '../../../kestrel/engine/src/environment/unsafe.list');
 const SUBSTITUTIONS: Record<string, string> = {
 	bindir: '/usr/bin',
 	gjs: '/usr/bin/gjs',
 	libexecdir: '/usr/libexec',
 	pkgdatadir: '/usr/share/kestrel',
 	schemadir: '/usr/share/glib-2.0/schemas',
+	unsafe_environment: readFileSync(UNSAFE_ENVIRONMENT, 'utf8').split(/\s+/).filter(Boolean).join(' '),
 };
 const PLACEHOLDER = /@([a-z_]+)@/g;
 const TEMPLATE = /@(\.service)$/;

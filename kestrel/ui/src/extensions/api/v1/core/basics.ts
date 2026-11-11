@@ -1,7 +1,7 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { clockChanges } from '../clock.js';
+import { openUriAsync } from '../../../../shared/apps/launch.js';
 import type { ApiContext } from './context.js';
 import type { Disposable, Session, Settings, Storage, Timers } from '../types.js';
 
@@ -65,5 +65,5 @@ export function storageApi({ stored }: ApiContext): Storage {
 export function open(uri: string): void {
   const scheme = GLib.uri_peek_scheme(uri);
   if (!scheme) throw new Error(`${uri} isn't a link or a file`);
-  Gio.AppInfo.launch_default_for_uri_async(uri, global.create_app_launch_context(0, -1), null, null);
+  openUriAsync(uri).catch(error => console.warn(`${uri} could not be opened: ${error}`));
 }

@@ -26,10 +26,10 @@ pub fn open_files(
     files: &[gio::File],
     token: Option<&str>,
 ) -> Result<(), glib::Error> {
-    app.launch(files, Some(&context(token)))
+    app.launch(files, Some(&context(app, token)))
 }
 
 /// Starts `app` with `uris`, handing it `token`.
 pub fn start(app: &gio::AppInfo, uris: &[&str], token: Option<&str>) -> Result<(), glib::Error> {
-    app.launch_uris(uris, Some(&context(token)))
+    app.launch_uris(uris, Some(&context(app, token)))
 }

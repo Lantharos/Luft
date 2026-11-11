@@ -1,0 +1,18 @@
+[Unit]
+Description=Notifications for Kestrel and apps
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+
+[Service]
+Slice=session.slice
+Type=exec
+ExecStart=@libexecdir@/luft-launch @gjs@ -m @pkgdatadir@/com.lantharos.Kestrel.Notifications
+TimeoutStopSec=5
+NoNewPrivileges=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+SystemCallFilter=@system-service

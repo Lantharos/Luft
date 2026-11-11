@@ -17,6 +17,7 @@ subdir('st')
 subdir('authenticate')
 subdir('wallpaper')
 subdir('sound/decoder')
+subdir('environment')
 
 typelib_cflags = [
   '-DMUTTER_TYPELIB_DIR="@0@"'.format(mutter_typelibdir),
@@ -34,7 +35,7 @@ kestrel_cflags = [
   '-DKESTREL_HOST_CPU="@0@"'.format(host_machine.cpu()),
   '-DKESTREL_DATADIR="@0@"'.format(pkgdatadir),
   '-DKESTREL_PKGLIBDIR="@0@"'.format(pkglibdir)
-]
+] + luft_environment_cflags
 
 kestrel_deps = [
   gio_unix_dep,
@@ -94,6 +95,8 @@ libshell_public_headers = [
 ]
 
 libshell_private_headers = [
+  'environment/environment.h',
+  'environment/shell-launch-environment.h',
   'shell-desktop-filter-picture.h',
   'shell-app-private.h',
   'shell-app-scope-private.h',
@@ -157,6 +160,8 @@ libshell_sources = [
 ]
 
 libshell_private_sources = [
+  'environment/environment.c',
+  'environment/shell-launch-environment.c',
   'shell-desktop-filter-picture.c',
   'shell-app-cache.c',
 ]

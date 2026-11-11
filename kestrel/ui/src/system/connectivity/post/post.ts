@@ -14,6 +14,7 @@ import { Incoming } from './incoming.js';
 import { Messages } from './messages.js';
 import { NetworkType } from './network.js';
 import { Outgoing } from './outgoing.js';
+import { openUri } from '../../../shared/apps/launch.js';
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
 
@@ -57,7 +58,7 @@ export class Post {
   }
 
   open(uri: string): void {
-    Gio.AppInfo.launch_default_for_uri(uri, global.create_app_launch_context(0, -1));
+    openUri(uri);
   }
 
   async chooseFiles(title: string, folder: boolean): Promise<string[]> {

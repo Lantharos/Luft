@@ -28,8 +28,8 @@ started_from_build (void)
   return same_file ("/proc/self/exe", built);
 }
 
-const char *
-shell_development_path (const char *variable)
+gboolean
+shell_development_build (void)
 {
   static gsize checked = 0;
   static gboolean from_build = FALSE;
@@ -40,5 +40,11 @@ shell_development_path (const char *variable)
       g_once_init_leave (&checked, 1);
     }
 
-  return from_build ? g_getenv (variable) : NULL;
+  return from_build;
+}
+
+const char *
+shell_development_path (const char *variable)
+{
+  return shell_development_build () ? g_getenv (variable) : NULL;
 }

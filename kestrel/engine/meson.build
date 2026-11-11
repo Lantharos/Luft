@@ -38,6 +38,15 @@ secret_req = '>= 0.18'
 fs = import('fs')
 gnome = import('gnome')
 
+luft_environment = {}
+foreach list : ['allowed', 'development', 'unsafe']
+  luft_environment += {list: ' '.join(fs.read('src/environment' / list + '.list').split())}
+endforeach
+luft_environment_cflags = []
+foreach list, names : luft_environment
+  luft_environment_cflags += '-DLUFT_@0@_ENVIRONMENT="@1@"'.format(list.to_upper(), names)
+endforeach
+
 prefix = get_option('prefix')
 
 bindir = join_paths(prefix, get_option('bindir'))

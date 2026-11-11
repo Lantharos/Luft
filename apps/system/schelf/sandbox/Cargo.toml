@@ -12,6 +12,7 @@ dirs.workspace = true
 futures-util.workspace = true
 landlock.workspace = true
 libc.workspace = true
+luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-i18n.workspace = true
 luft-identity.workspace = true

@@ -87,6 +87,7 @@ unitconf = configuration_data()
 unitconf.set('bindir', bindir)
 unitconf.set('libexecdir', libexecdir)
 unitconf.set('schemadir', schemadir)
+unitconf.set('unsafe_environment', luft_environment['unsafe'])
 foreach unit : ['kestrel.service', 'kestrel-setup.service']
   configure_file(
     input: unit + '.in',

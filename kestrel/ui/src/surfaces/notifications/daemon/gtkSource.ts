@@ -8,6 +8,7 @@ import { Source } from '../tray/notification.js';
 import { NotificationDestroyedReason } from '../tray/notificationEnums.js';
 import { NotificationApplicationPolicy } from '../tray/notificationPolicy.js';
 import type { GtkNotificationDaemonNotification } from './gtkNotification.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 export class InvalidAppError extends Error {}
 
@@ -44,7 +45,7 @@ class GtkNotificationDaemonAppSource extends Source {
   }
 
   emitActionInvoked(notificationId: string, actionId: string, target: GLib.Variant | undefined): void {
-    const context = global.create_app_launch_context(0, -1);
+    const context = launchContext(this.app.get_app_info());
     const launching = this.app.state === Shell.AppState.STOPPED;
     const token = context.get_startup_notify_id(launching ? this.app.get_app_info() : null, []);
 

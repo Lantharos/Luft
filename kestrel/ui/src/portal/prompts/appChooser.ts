@@ -8,6 +8,7 @@ import { t } from '../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../core/dialog.js';
 import { CANCELLED, SUCCESS, option, type Dismissal, type Options } from '../core/request.js';
 import { choose, list, row } from '../core/rows.js';
+import { launch } from '../../shared/apps/launch.js';
 
 const STORE = 'com.lantharos.schelf.desktop';
 const SCROLL_AFTER = 6;
@@ -42,7 +43,7 @@ function heading(location: string | undefined, contentType: string | null): { ti
 
 function findInStore(store: GioUnix.DesktopAppInfo, contentType: string | null): void {
   const query = contentType ? Gio.content_type_get_description(contentType) : '';
-  store.launch_uris([`schelf:search?${GLib.uri_escape_string(query, null, false)}`], global.create_app_launch_context(0, -1));
+  launch(store, [`schelf:search?${GLib.uri_escape_string(query, null, false)}`]);
 }
 
 function nothingInstalled(): St.Widget {

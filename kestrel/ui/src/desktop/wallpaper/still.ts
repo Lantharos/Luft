@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { RENDERER } from './renderer.js';
+import { helperLauncher } from '../../shared/apps/programs.js';
 
 const STILLS = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), 'kestrel', 'wallpapers']));
 
@@ -15,7 +16,7 @@ export function stillUri(uri: string): string {
 
 function extract(uri: string, still: Gio.File): Promise<boolean> {
   GLib.mkdir_with_parents(STILLS.get_path()!, 0o755);
-  const extractor = Gio.Subprocess.new([RENDERER, '--still', uri, still.get_path()!], Gio.SubprocessFlags.NONE);
+  const extractor = helperLauncher().spawnv([RENDERER, '--still', uri, still.get_path()!]);
   return new Promise(resolve => extractor.wait_check_async(null, (process, result) => {
     try {
       resolve(process!.wait_check_finish(result));

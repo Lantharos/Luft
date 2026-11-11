@@ -33,6 +33,7 @@
 #endif
 
 #include "shell-app-scope-private.h"
+#include "environment/shell-launch-environment.h"
 #include "shell-development-private.h"
 #include "shell-enum-types.h"
 #include "shell-fonts.h"
@@ -320,6 +321,7 @@ shell_global_init (ShellGlobal *global)
   global->datadir = datadir;
 
   shell_app_scope_init ();
+  shell_launch_environment_init ();
 
   shell_fonts_add_bundled (datadir);
 
@@ -948,20 +950,24 @@ shell_global_app_launched_cb (GAppLaunchContext *context,
 }
 
 /**
- * shell_global_create_app_launch_context:
+ * shell_global_create_launch_context_for_app:
  * @global: A #ShellGlobal
+ * @app: (nullable): the app the context launches, or %NULL for any other program
  * @timestamp: the timestamp for the launch (or 0 for current time)
  * @workspace: a workspace index, or -1 to indicate no specific one
  *
- * Create a #GAppLaunchContext set up with the correct timestamp, and
- * targeted to activate on @workspace.
+ * Create a #GAppLaunchContext set up with the correct timestamp, targeted
+ * to activate on @workspace, with the environment @app starts in: only
+ * what Luft's own apps need for them, and the person's whole environment
+ * for every other program.
  *
  * Return value: (transfer full): A new #GAppLaunchContext
  */
 GAppLaunchContext *
-shell_global_create_app_launch_context (ShellGlobal *global,
-                                        guint32      timestamp,
-                                        int          workspace)
+shell_global_create_launch_context_for_app (ShellGlobal *global,
+                                            GAppInfo    *app,
+                                            guint32      timestamp,
+                                            int          workspace)
 {
   MetaWorkspaceManager *workspace_manager = global->workspace_manager;
   MetaStartupNotification *sn;
@@ -988,7 +994,42 @@ shell_global_create_app_launch_context (ShellGlobal *global,
                     G_CALLBACK (shell_global_app_launched_cb),
                     NULL);
 
-  return (GAppLaunchContext *) context;
+  shell_launch_environment_apply (G_APP_LAUNCH_CONTEXT (context), app);
+  return G_APP_LAUNCH_CONTEXT (context);
+}
+
+/**
+ * shell_global_get_luft_environment:
+ * @global: A #ShellGlobal
+ *
+ * The environment Kestrel starts its own helper programs in: only what
+ * Luft's own programs need.
+ *
+ * Return value: (transfer full) (array zero-terminated=1): the environment
+ */
+char **
+shell_global_get_luft_environment (ShellGlobal *global)
+{
+  return shell_launch_environment_for_luft ();
+}
+
+/**
+ * shell_global_create_app_launch_context:
+ * @global: A #ShellGlobal
+ * @timestamp: the timestamp for the launch (or 0 for current time)
+ * @workspace: a workspace index, or -1 to indicate no specific one
+ *
+ * Create a #GAppLaunchContext set up with the correct timestamp, and
+ * targeted to activate on @workspace, for any program but Luft's own apps.
+ *
+ * Return value: (transfer full): A new #GAppLaunchContext
+ */
+GAppLaunchContext *
+shell_global_create_app_launch_context (ShellGlobal *global,
+                                        guint32      timestamp,
+                                        int          workspace)
+{
+  return shell_global_create_launch_context_for_app (global, NULL, timestamp, workspace);
 }
 
 const char *

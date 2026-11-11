@@ -8,6 +8,7 @@ import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
 import { appName } from '../../../shared/apps/names.js';
+import { launchContext } from '../../../shared/apps/launch.js';
 
 const LIMIT = 8;
 
@@ -26,7 +27,7 @@ export function launchApp(app: Gio.AppInfo): void {
   launchHistory.record(appKey(app.get_id()!));
   const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id() ?? '');
   if (shellApp) shellApp.activate();
-  else app.launch([], global.create_app_launch_context(0, -1));
+  else app.launch([], launchContext(app));
 }
 
 export class AppResults {

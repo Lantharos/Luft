@@ -5,7 +5,7 @@ Conflicts=shutdown.target
 After=tpm2.target
 Before=sysinit.target shutdown.target
 ConditionKernelCommandLine=systemd.unit=rescue.target
-ConditionSecurity=tpm2
+ConditionPathExists=/dev/tpmrm0
 FailureAction=reboot-force
 
 [Service]

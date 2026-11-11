@@ -70,5 +70,5 @@
 	"sushi/data/systemd/sushi-shell@.service": 9.4,
 	"sushi/data/systemd/sushi-shutdown.service": 2.8,
 	"sushi/data/systemd/sushi-switch-root.service": 2.8,
-	"sushi/data/systemd/sushi.service": 4.4
+	"sushi/data/systemd/sushi.service": 4.5
 }

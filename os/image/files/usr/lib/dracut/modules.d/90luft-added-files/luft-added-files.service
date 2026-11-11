@@ -2,10 +2,10 @@
 Description=Keep the TPM from unlocking after files were added beside the startup image
 DefaultDependencies=no
 Conflicts=shutdown.target
-Wants=tpm2.target cryptsetup-pre.target
+Wants=cryptsetup-pre.target
 After=tpm2.target systemd-pcrphase-initrd.service
 Before=cryptsetup-pre.target systemd-cryptsetup@root.service sysinit.target shutdown.target
-ConditionSecurity=tpm2
+ConditionPathExists=/dev/tpmrm0
 ConditionDirectoryNotEmpty=|/.extra/credentials
 ConditionDirectoryNotEmpty=|/.extra/global_credentials
 ConditionDirectoryNotEmpty=|/.extra/sysext

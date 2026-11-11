@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 11 Nov 2026 01:10:00 +0100
+Subject: [PATCH] initramfs: Name the partition beneath an unlocked root for
+ systemd-gpt-auto-generator
+
+/run/systemd/volatile-root tells systemd-gpt-auto-generator which device
+the root file system is on, since it can't tell from the composefs
+overlay. It was a link to /dev/gpt-auto-root, which on an encrypted
+system is the unlocked LUKS volume. The generator takes the device as it
+is and looks for the ESP and XBOOTLDR partitions on its disk, and a
+device-mapper volume has none, so /boot and /efi got no automount.
+systemd-bless-boot then failed with "Couldn't find $BOOT partition", and
+a boot entry with a boot counter was never marked good.
+
+Follow the device down through its sysfs slaves while there is exactly
+one, as systemd's block_get_originating() does, and link the partition.
+---
+ crates/initramfs/src/lib.rs | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/crates/initramfs/src/lib.rs b/crates/initramfs/src/lib.rs
+index ed989c57..d2926a26 100644
+--- a/crates/initramfs/src/lib.rs
++++ b/crates/initramfs/src/lib.rs
+@@ -492,6 +492,21 @@
+     }
+ }
+ 
++/// The device a mapping such as an unlocked LUKS volume sits on, both as
++/// major:minor, when it sits on exactly one
++fn device_beneath(device: &str) -> Result<Option<String>> {
++    let mut beneath = match std::fs::read_dir(format!("/sys/dev/block/{device}/slaves")) {
++        Ok(beneath) => beneath,
++        Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
++        Err(e) => Err(e)?,
++    };
++    let (Some(only), None) = (beneath.next().transpose()?, beneath.next()) else {
++        return Ok(None);
++    };
++    let number = std::fs::read_to_string(only.path().join("dev"))?;
++    Ok(Some(number.trim().to_owned()))
++}
++
+ #[context("GPT workaround")]
+ /// Workaround for /dev/gpt-auto-root
+ pub fn gpt_workaround() -> Result<()> {
+@@ -504,11 +519,14 @@
+         Err(e) => Err(e)?,
+     };
+ 
+-    let target = format!(
+-        "/dev/block/{}:{}",
+-        major(rootdev.st_rdev),
+-        minor(rootdev.st_rdev)
+-    );
++    // systemd-gpt-auto-generator looks for the ESP and XBOOTLDR partitions on
++    // the disk of the device named here, and takes that device as it is: it
++    // doesn't look beneath an unlocked LUKS volume for the partition.
++    let mut device = format!("{}:{}", major(rootdev.st_rdev), minor(rootdev.st_rdev));
++    while let Some(beneath) = device_beneath(&device)? {
++        device = beneath;
++    }
++    let target = format!("/dev/block/{device}");
+     // Handle the case where the symlink was already created before bootc
+     // runs, e.g. by ostree-prepare-root
+     // (https://github.com/ostreedev/ostree/pull/3608).
+-- 
+2.56.0
+

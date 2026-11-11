@@ -10,6 +10,7 @@ The image build rebuilds Fedora's bootc package with these patches ([`parts/stag
 | `image-version.patch` | The boot entry bootc writes for each version's startup image carries the image's version, the one `bootc status` shows, instead of the startup image's `VERSION_ID`. SushiBoot shows it in its menu, so a release can be a nightly renamed without new layers |
 | `require-verity.patch` | The startup image mounts the system only when the image's fs-verity digest is the one its signed command line names, and with fs-verity required on every file in it. The initramfs otherwise lets the composefs repository's `meta.json` decide whether to check fs-verity, and a repository without fs-verity there, as bootc's install before 1.17 made it, mounts an image without checking any file, so replacing the image file was enough to start something else |
 | `rollback-entry-names.patch` | `bootc rollback` rewrote both boot entries as `bootc_bootc-…` with matching sort keys, instead of keeping the `bootc_luft-…` names every other change writes. It now keeps the name the entries carry and only swaps which one comes first |
+| `root-partition.patch` | The startup image tells systemd which device the system is on, so that it finds the EFI system partition and the startup partition on the same drive and mounts them at `/boot` and `/efi` when something opens them. On an encrypted Luft it named the unlocked volume, where systemd finds no partitions, so nothing was mounted there, `systemd-bless-boot` never marked an update as good, and SushiBoot went back to the version before on the fourth start. It now names the partition the volume sits on |
 | `staged-entries.patch` | Staging an update over one that was already staged left the earlier version's boot entry next to the new one, since each entry is named after its version. Clean-up then took that version's image away while its entry stayed, and `bootc status` failed from then on, so no update could be staged. Staging now replaces the staged entries |
 | `xbootldr.patch` | The composefs backend puts startup images and boot entries on an XBOOTLDR partition next to the EFI system partition when there is one. Next to Windows the EFI system partition is often 100 MB, too small for even one startup image |
 
@@ -22,6 +23,8 @@ The patches are against bootc 1.17.3. A change that a bootc release carries need
 `grub-started.patch` isn't upstream: bootc 1.17.3 takes any `LoaderInfo` other than systemd-boot's or GRUB CC's for a GRUB system.
 
 `boot-counting.patch` isn't upstream: bootc's main branch writes its entries without a counter, though `kernel-install` gives new entries tries from `/etc/kernel/tries`.
+
+`root-partition.patch` isn't upstream: bootc's main branch still links `/run/systemd/volatile-root` to `/dev/gpt-auto-root` as it is.
 
 `staged-entries.patch` is [bootc-dev/bootc#2630](https://github.com/bootc-dev/bootc/pull/2630), which isn't merged yet: bootc's main branch still writes a staged UKI's entries next to those already staged.
 

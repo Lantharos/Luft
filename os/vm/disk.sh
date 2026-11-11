@@ -38,7 +38,7 @@ rm -rf "$work"
 mkdir -p "$work/source"
 
 podman save --quiet --format oci-archive --output "$work/source/luft.ociarchive" "$image"
-cp "$os/vm/guest/install.sh" "$work/source/install.sh"
+cp "$os/vm/guest/install.sh" "$os/vm/guest/queue-key.sh" "$work/source/"
 printf '%s\n%s\n' "$user" "$password" >"$work/source/account"
 mkfs.ext4 -q -L luft-source -d "$work/source" "$work/source.img" "$(($(du -sm "$work/source" | cut -f1) + 256))M"
 rm -rf "$work/source"

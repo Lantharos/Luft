@@ -5,9 +5,6 @@ BUS=(com.lantharos.Installer1 /com/lantharos/Installer1 com.lantharos.Installer1
 TARGET=/dev/vdb
 INSTALL_TIMEOUT=1500
 ESP_ID=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
-SHIM=605dab50-e046-4300-abb6-3dd810dd8b23
-X509_TYPE='\xa1\x59\xc0\xa5\xe4\x94\xa7\x4a\x87\xb5\xab\x15\x5c\x2b\xf0\x72'
-SHIM_OWNER='\x50\xab\x5d\x60\x46\xe0\x00\x43\xab\xb6\x3d\xd8\x10\xdd\x8b\x23'
 { read -r user; read -r password; } </run/luft-source/account
 
 report() { echo "luft-vm-install: $*"; }
@@ -60,25 +57,8 @@ finish_setup() {
   report "setup is finished and root can sign in on the serial console"
 }
 
-le32() {
-  printf '%b' "$(printf '\\x%02x' $(($1 & 255)) $(($1 >> 8 & 255)) $(($1 >> 16 & 255)) $(($1 >> 24 & 255)))"
-}
-
-efi_variable() {
-  { printf '\x07\x00\x00\x00'; cat "$2"; } >"$2.variable"
-  cat "$2.variable" >"/sys/firmware/efi/efivars/$1-$SHIM"
-}
-
 queue_key() {
-  local certificate=/run/esp/EFI/luft/luft.cer size request=/run/mok-new auth=/run/mok-auth
-  mkdir -p /run/esp
-  mount "$(partition "$ESP_ID")" /run/esp
-  size="$(stat -c %s "$certificate")"
-  { printf '%b' "$X509_TYPE"; le32 $((28 + 16 + size)); le32 0; le32 $((16 + size)); printf '%b' "$SHIM_OWNER"; cat "$certificate"; } >"$request"
-  { cat "$request"; printf %s "$password" | iconv -t UTF-16LE; } | openssl dgst -sha256 -binary >"$auth"
-  umount /run/esp
-  efi_variable MokNew "$request"
-  efi_variable MokAuth "$auth"
+  bash /run/luft-source/queue-key.sh "$(partition "$ESP_ID")" "$password"
   report "Luft's key is queued for shim"
 }
 

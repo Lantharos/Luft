@@ -27,7 +27,7 @@ Rover is Luft's file manager. It's also the file dialog: when any app asks you t
 - Copy and move run in the background, with pause, cancel and a choice when names clash. Every file operation can be undone and redone. Copies on the same Btrfs or XFS drive are instant and take no extra space until one of them changes, and files with empty stretches, such as virtual machine disks, stay as small as they were.
 - **Copy** and **Cut** put files on the clipboard for other apps as well, and **Paste** takes files copied anywhere.
 - While files are being copied, moved or deleted, the computer won't go to sleep or shut down without asking, and closing Rover asks first.
-- Changing files that belong to the system or to someone else asks for an administrator's password. Files you move to the trash this way land in your own trash.
+- Changing files that belong to the system or to someone else asks for an administrator's password, once for everything you selected, in a prompt that says what is about to change. The password covers that change only. Files you move to the trash this way land in your own trash.
 - [Cloud drives](/files/cloud-drives/) have no trash: there, Rover offers **Delete permanently** and asks first.
 - **Batch rename** a selection: change the case, replace text, or number them.
 - **Compress** to zip or tar.zst, and **extract** zip, tar, 7z and single compressed files. Opening an archive extracts it next to itself and selects what came out.

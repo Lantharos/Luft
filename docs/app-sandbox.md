@@ -28,7 +28,7 @@ camera = false
 | --- | --- | --- |
 | `network` | `true` | It can go online |
 | `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app's own files are in `~/.var/app/APP-ID` |
-| `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing |
+| `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing; recording and cameras are `microphone` and `camera`, with `all` too |
 | `microphone` | `false` | It records sound: from a microphone, or what the computer plays |
 | `camera` | `false` | It uses cameras. An app that only asks through the camera portal can leave this out and is asked about the first time |
 | `x11` | `false` | It draws through X11 instead of Wayland. X11 apps can see each other's windows and typing, so this is shown before you install it |
@@ -71,11 +71,11 @@ Apps draw through Wayland. An app that wasn't given X11 still finds a socket whe
 
 Every sandboxed AppImage can play sound. Recording it, and using a camera, are permissions of their own, off until the app declared them and you installed it, or you turned them on.
 
-The app reaches the session's PipeWire as its sandbox, which PipeWire reads from the process that connects, so nothing the app says about itself changes who it is. A WirePlumber script shipped with Luft, `client/find-schelf-access.lua`, then holds it to streams of its own: it can't make links itself, and WirePlumber links nothing into a stream or node of the app unless the permission store says `yes`, under `devices` / `microphone` for sound and `devices` / `camera` for video. That covers microphones, the monitor of what the computer plays, and other apps' streams alike. The answer applies right away in both directions: a waiting recording starts when you turn the switch on, and a running one is cut when you turn it off.
+The app reaches the session's PipeWire as its sandbox, which PipeWire reads from the process that connects, so nothing the app says about itself changes who it is. A WirePlumber script shipped with Luft, `client/find-schelf-access.lua`, then holds it to streams of its own: it can't make links itself, and WirePlumber links nothing into a stream or node of the app unless the permission store says `yes`, under `devices` / `microphone` for sound and `devices` / `camera` for video. Which of the two a link needs is read from the device or stream being listened to, not from how the app describes its own stream, and a link whose kind can't be told is refused. That covers microphones, the monitor of what the computer plays, and other apps' streams alike. The answer applies right away in both directions: a waiting recording starts when you turn the switch on, and a running one is cut when you turn it off.
 
 Apps that speak PulseAudio get a PulseAudio server of their own inside the sandbox, started when they first connect, which reaches PipeWire as the app. They never get the session's PulseAudio socket, where a program can describe itself as it likes.
 
-With the camera allowed, the app also finds the computer's `/dev/video*` devices the next time it starts, for apps that open cameras directly; without it they are stand-ins, as USB devices are.
+With the camera allowed, the app also finds the computer's `/dev/video*` devices the next time it starts, for apps that open cameras directly; without it they are stand-ins, as USB devices are. An app given `all` devices is held to the same switches: it finds the cameras as stand-ins and no sound cards under `/dev/snd` until they are on, and it keeps a shared memory folder of its own.
 
 When an app without the permission opens a recording stream, a camera stream or a camera stand-in, Luft says so once while it runs and offers to review its access, which opens the switches on its page in Schelf. Until then the app records silence, as it would with no microphone plugged in.
 
@@ -84,6 +84,10 @@ When an app without the permission opens a recording stream, a camera stream or 
 An app's own folder, `~/.var/app/APP-ID`, shows in the sandbox at that same path, and `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME` and `XDG_STATE_HOME` point into it, so what an app keeps in them has one path inside the sandbox and outside. Unless the app was given your home folder, its folder also stands in for your home, for programs that write there directly. Besides its own files, an app sees `/usr`, and from `/etc` only what programs and their libraries read to work: how names are looked up, certificates, fonts, time zone, graphics and sound settings. Its `/etc/passwd` and `/etc/group` hold just you and `nobody`, so it can't list who else has an account. It has its own process, host name and, unless it uses X11, IPC namespaces.
 
 The system call filter is Flatpak's: no kernel log, accounting, kernel keyrings, memory placement, `ptrace`, `perf_event_open`, mounting or namespaces of its own (`clone3` and the newer mount calls answer as if the kernel lacked them, so programs fall back to the calls the filter can inspect), no `personality` other than Linux's, no typing into the terminal, and only local, internet and netlink sockets. Its launcher keeps only the name, description, categories, file types and actions from the AppImage's own desktop entry, so an AppImage can't mark itself as something else there. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
+
+## Files you pick
+
+A file or folder you pick in a file dialog reaches the app whatever it declared. For an app in a sandbox, the desktop portal hands the app the file through the document portal, at a path below `$XDG_RUNTIME_DIR/doc`, which the sandbox shows the app's own share of. An app that holds itself to its declaration, such as one of Luft's own apps started from the image, gets the real path from the portal, since the portal takes it for an unsandboxed app. `luft_app::portal::FileChooser` then asks the document portal itself for whatever the app can't open, a file outside its folders, a new file to save or a folder to save into, and gives the app the path below `$XDG_RUNTIME_DIR/doc` instead. Paths the app can already use stay as they are, so an app keeps real paths to what's in its own folders.
 
 ## One Chromium for Luft, one each for everyone else
 

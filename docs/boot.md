@@ -22,7 +22,7 @@ Next to Windows, whose EFI system partition is usually too small for them, the s
 - `bootc rollback` makes the previous version the default from a running system. That's the only way back: the updater refuses an image older than the running one, even a signed one ([image updates](components/software.md#schedule)).
 - After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's at the next start. It replaces SushiBoot before shim, one whole file at a time, so a power cut partway leaves an older shim with the newer SushiBoot, which still starts. bootupd, which does this on other bootc systems, is turned off.
 
-While Luft runs, the partition with the startup images and entries is at `/boot`: the EFI system partition, or the startup partition next to Windows, with the EFI system partition at `/efi` then. Each mounts when something opens it and unmounts after two idle minutes. trustd and bootc don't rely on those folders: they find the EFI system partition the computer started from, and the startup partition by its type on the same drive.
+While Luft runs, the partition with the startup images and entries is at `/boot`: the EFI system partition, or the startup partition next to Windows, with the EFI system partition at `/efi` then. Each mounts when something opens it and unmounts after two idle minutes. systemd looks for both on the drive the system partition is on, which the startup image names to it; on an encrypted Luft that's the partition under the unlocked disk ([`root-partition.patch`](../os/image/patches/bootc/README.md)). `systemd-bless-boot` needs `/boot` to mark an update as good. trustd and bootc don't rely on those folders: they find the EFI system partition the computer started from, and the startup partition by its type on the same drive.
 
 ### Switching between the standard and NVIDIA images
 
@@ -74,6 +74,8 @@ Luft never leaves anyone at systemd's emergency prompt. Whenever the startup ima
 
 A system file that doesn't match the version that started never gets read: the startup image refuses a system image whose fs-verity digest isn't the one on the signed command line, and the kernel refuses any file whose digest isn't the one the image records. If it refused one before the login screen, `sushi-integrity.service` stops there with the same screen, saying a system file is damaged.
 
+systemd holds an unlocked disk back for as long as it finds no file system on it, which would leave a Luft whose file system is gone waiting forever behind the splash. The startup image marks Luft's unlocked disk as ready whatever is on it (`99-trustd-root-unlocked.rules`), so mounting it fails and the screen says the system disk couldn't be opened.
+
 The targets themselves stay as they are, so everything that isolates to them still does. Only `emergency.service` and `rescue.service`, and dracut's `dracut-emergency.service` in the startup image, run `sushictl failure` in place of `sulogin`. If Sushi isn't running it starts it; without a display the same choices are listed on the console, picked by number. Nothing on the screen times out.
 
 SushiBoot names the version before the one it started in `LuftBootPrevious`, and the screen asks for it by writing the started entry to `LuftBootGoBack` (vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), which SushiBoot clears when it reads it.
@@ -83,9 +85,11 @@ SushiBoot names the version before the one it started in `LuftBootPrevious`, and
 A shell can do anything, so it opens only for someone who could unlock the computer anyway, and the TPM stops unlocking for whatever a shell could have changed:
 
 - When root has a password on the installed system, `sulogin` asks for it.
-- Otherwise, with an encrypted disk, the recovery key or passphrase of the disk Luft started from, checked against that disk with `cryptsetup`. No other encrypted drive counts, so a prepared USB stick opens nothing. Esc goes back to the screen.
-- On an unencrypted disk, in Rescue, from a stick, or in the startup image when Luft's disk never showed up, the shell opens without asking. Anyone at an unencrypted computer can read it from a USB stick anyway, and Rescue only starts after the recovery key or passphrase, since the TPM never unlocks the disk for it.
+- Otherwise, with an encrypted disk, the recovery key or passphrase of the disk Luft started from, checked against that disk with `cryptsetup`. No other encrypted drive counts, so a prepared USB stick opens nothing. The key also has to open every partition an unlocked disk sits on: in the startup image all of them, on the installed system the one Luft runs from. So a disk that was unlocked is never vouched for by another one that took its place. Esc goes back to the screen.
+- On an unencrypted disk, in Rescue, from a stick, or in the startup image when no encrypted disk is there, neither found nor unlocked, the shell opens without asking. Anyone at an unencrypted computer can read it from a USB stick anyway, and Rescue only starts after the recovery key or passphrase, since the TPM never unlocks the disk for it.
 - On the installed system, when Luft can't tell which disk it started from, no shell opens, and the screen says so.
+
+A disk the TPM unlocked can be pulled out afterwards, and the kernel would go on holding its key, which a copy of the disk shares with the original. Before any shell, Sushi looks through the unlocked disks (`/sys/class/block/dm-*`) and, for each whose partition is gone, replaces its mapping with one that fails (`dmsetup wipe_table`), which makes the kernel drop the key, and removes it. If that doesn't work, no shell opens. A shell in the startup image also starts with root's kernel keyring emptied, so a passphrase typed at startup, or the key Luft is being encrypted with, isn't there to read; encrypting then carries on after the next restart.
 
 Before a shell opens in the startup image, and before any shell that opened without a password or key, Sushi extends PCR 11 and PCR 15 in the TPM. The disk's TPM token is bound to PCR 11 and Luft Keyring to PCR 15, so until the next restart neither unlocks by itself: the disk asks for its recovery key or passphrase and Luft Keyring for the account password. The shell says so when it opens. Proving who you are with the key doesn't spare the startup image this, because the disk Luft started from isn't always the one the TPM unlocks: a copy of Luft on a stick has its own. When the TPM is there but doesn't take the change, no shell opens.
 
@@ -93,7 +97,7 @@ Leaving the shell brings the screen back.
 
 ### Rescue
 
-Every startup image has a Rescue profile, under the newest version in the menu. It starts `rescue.target` with messages on screen and the splash off. The TPM never unlocks the disk in Rescue, so it asks for the recovery key or passphrase, then shows the same screen titled Luft is in Rescue, where Open a shell needs nothing more. Luft Keyring asks for the account password after a shell was open. Rescue also extends PCR 15 as it starts (`luft-rescue-seal.service`), before anything can open a shell, so nothing Luft Keyring or another program sealed to this installation opens there, on an unencrypted disk too. If the TPM doesn't take the change, Rescue restarts the computer.
+Every startup image has a Rescue profile, under the newest version in the menu. It starts `rescue.target` with messages on screen and the splash off. The TPM never unlocks the disk in Rescue, so it asks for the recovery key or passphrase, then shows the same screen titled Luft is in Rescue, where Open a shell needs nothing more. Luft Keyring asks for the account password after a shell was open. Rescue also extends PCR 15 as it starts (`luft-rescue-seal.service`), before anything can open a shell, so nothing Luft Keyring or another program sealed to this installation opens there, on an unencrypted disk too. If the TPM doesn't take the change, Rescue restarts the computer. A TPM the firmware announces but that never shows up as a device can't unseal anything either, so Rescue starts without this step.
 
 ## Moving to another drive
 

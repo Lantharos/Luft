@@ -12,7 +12,7 @@ depends() {
 
 install() {
     inst_multiple sushid sushictl
-    inst_multiple -o cryptsetup systemd-ask-password
+    inst_multiple -o cryptsetup dmsetup systemd-ask-password
     inst_multiple -o /etc/sushi/sushi.conf /usr/lib/modprobe.d/sushi.conf
     inst_multiple \
         "$systemdsystemunitdir/sushi.service" \

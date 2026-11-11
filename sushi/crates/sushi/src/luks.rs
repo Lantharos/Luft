@@ -76,12 +76,11 @@ fn parse(json: &[u8]) -> Option<Unlocking> {
         .keyslots
         .values()
         .any(|keyslot| keyslot.kind == "reencrypt" && keyslot.mode.as_deref() != Some("decrypt"));
-    let only_the_new_key = being_encrypted && !recovery_key;
     Some(Unlocking {
         tpm: has("systemd-tpm2"),
         security_key: has("systemd-fido2"),
-        recovery_key: recovery_key || (only_the_new_key && unclaimed),
-        passphrase: unclaimed && !only_the_new_key,
+        recovery_key: recovery_key || (being_encrypted && unclaimed),
+        passphrase: unclaimed,
     })
 }
 
@@ -105,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn takes_only_the_recovery_key_while_the_disk_is_being_encrypted() {
+    fn takes_either_key_while_the_disk_is_being_encrypted() {
         let json = br#"{"keyslots":{"0":{"type":"luks2"},"1":{"type":"reencrypt","mode":"encrypt"}},"tokens":{}}"#;
         assert_eq!(
             parse(json),
@@ -113,7 +112,7 @@ mod tests {
                 tpm: false,
                 security_key: false,
                 recovery_key: true,
-                passphrase: false,
+                passphrase: true,
             })
         );
     }

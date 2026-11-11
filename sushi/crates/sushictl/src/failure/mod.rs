@@ -1,5 +1,6 @@
 mod boot;
 mod disk;
+mod keys;
 mod refused;
 mod shell;
 mod situation;
@@ -14,9 +15,6 @@ use std::time::Duration;
 use situation::{Action, Situation};
 
 const RETRY_WAIT: Duration = Duration::from_secs(2);
-const KEYCTL_SEARCH: libc::c_long = 10;
-const KEYCTL_INVALIDATE: libc::c_long = 21;
-const KEY_SPEC_USER_KEYRING: libc::c_long = -4;
 
 struct Place {
     in_initrd: bool,
@@ -49,24 +47,8 @@ fn restart() -> ! {
     }
 }
 
-fn forget_typed_keys() {
-    let key = unsafe {
-        libc::syscall(
-            libc::SYS_keyctl,
-            KEYCTL_SEARCH,
-            KEY_SPEC_USER_KEYRING,
-            c"user".as_ptr(),
-            c"cryptsetup".as_ptr(),
-            0,
-        )
-    };
-    if key > 0 {
-        unsafe { libc::syscall(libc::SYS_keyctl, KEYCTL_INVALIDATE, key) };
-    }
-}
-
 fn try_again(place: &Place) -> ExitCode {
-    forget_typed_keys();
+    keys::forget_typed();
     if !place.returns_to_caller {
         systemctl(&["reset-failed"]);
         systemctl(&["--no-block", "isolate", "default.target"]);

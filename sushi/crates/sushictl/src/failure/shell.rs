@@ -8,8 +8,8 @@ use std::process::{Command, Stdio};
 use sushi::ipc::password::{SHELL, Secret};
 use sushi::started;
 
-use super::disk::SystemDisk;
-use super::{splash, text, tpm};
+use super::disk::{self, SystemDisk};
+use super::{keys, splash, text, tpm};
 
 const GREETING: &str = "\x1b[H\x1b[2JThis shell can change anything on this computer.\nType exit to go back to the Luft screen.\n";
 const ASKS_FOR_KEY: &str = "Until the next restart, this computer asks for its recovery key or passphrase\nin place of unlocking by itself.\n";
@@ -17,13 +17,17 @@ const NO_SHELL: &str = "A shell can't open here";
 const UNKNOWN_DISK: &str =
     "Luft can't tell which disk it started from, so it can't check who is asking.";
 const SILENT_TPM: &str = "The TPM didn't answer, and it has to before a shell may open.";
+const KEY_OF_LOST_DISK: &str =
+    "A disk that was unlocked is gone and its key is still in memory. Restart the computer.";
+const KEYS_IN_MEMORY: &str =
+    "Luft couldn't clear the keys it keeps in memory, and it has to before a shell may open.";
 const VT_ACTIVATE: libc::c_ulong = 0x5606;
 const VT_WAITACTIVE: libc::c_ulong = 0x5607;
 const FIRST_CONSOLE: libc::c_int = 1;
 
 enum Gate {
     Password,
-    Key(PathBuf),
+    Key(Vec<PathBuf>),
     Open,
     Closed,
 }
@@ -50,20 +54,16 @@ impl Gate {
         if presence_proven() {
             return Self::Open;
         }
-        match SystemDisk::find() {
-            SystemDisk::Encrypted(partition) => Self::Key(partition),
+        match SystemDisk::find(in_initrd) {
+            SystemDisk::Encrypted(partitions) => Self::Key(partitions),
             SystemDisk::Plain => Self::Open,
             SystemDisk::Unknown if in_initrd || started::from_stick() => Self::Open,
             SystemDisk::Unknown => Self::Closed,
         }
     }
 
-    fn stop_the_tpm_unlocking(&self, in_initrd: bool) -> std::io::Result<bool> {
-        if !in_initrd && matches!(self, Self::Password | Self::Key(_)) {
-            Ok(false)
-        } else {
-            tpm::stop_unlocking()
-        }
+    fn proves_who_asks(&self, in_initrd: bool) -> bool {
+        !in_initrd && matches!(self, Self::Password | Self::Key(_))
     }
 }
 
@@ -103,12 +103,12 @@ fn opens(disk: &Path, key: &Secret) -> bool {
     checking.wait().is_ok_and(|status| status.success())
 }
 
-fn unlocked_by_person(disk: &Path, on_splash: bool) -> bool {
+fn unlocked_by_person(disks: &[PathBuf], on_splash: bool) -> bool {
     loop {
         let Some(key) = ask_for_key(on_splash) else {
             return false;
         };
-        if opens(disk, &key) {
+        if disks.iter().all(|disk| opens(disk, &key)) {
             return true;
         }
         if !on_splash {
@@ -180,17 +180,28 @@ fn console(on_splash: bool) -> Option<PathBuf> {
 }
 
 pub fn open(on_splash: bool, in_initrd: bool) {
+    if !disk::forget_keys_of_lost_disks() {
+        return refuse(on_splash, KEY_OF_LOST_DISK);
+    }
     let gate = Gate::for_this_system(in_initrd);
     match &gate {
         Gate::Closed => return refuse(on_splash, UNKNOWN_DISK),
-        Gate::Key(disk) if !unlocked_by_person(disk, on_splash) => return,
+        Gate::Key(disks) if !unlocked_by_person(disks, on_splash) => return,
         _ => {}
     }
-    let asks_for_key = match gate.stop_the_tpm_unlocking(in_initrd) {
-        Ok(stopped) => stopped,
-        Err(error) => {
-            eprintln!("Couldn't keep the TPM from unlocking for the shell: {error}");
-            return refuse(on_splash, SILENT_TPM);
+    if in_initrd && let Err(error) = keys::forget_all() {
+        eprintln!("Couldn't clear the keys kept in memory for the shell: {error}");
+        return refuse(on_splash, KEYS_IN_MEMORY);
+    }
+    let asks_for_key = if gate.proves_who_asks(in_initrd) {
+        false
+    } else {
+        match tpm::stop_unlocking() {
+            Ok(stopped) => stopped,
+            Err(error) => {
+                eprintln!("Couldn't keep the TPM from unlocking for the shell: {error}");
+                return refuse(on_splash, SILENT_TPM);
+            }
         }
     };
     let Some(console) = console(on_splash) else {

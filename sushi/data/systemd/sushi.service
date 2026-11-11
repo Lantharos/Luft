@@ -25,7 +25,7 @@ SystemCallArchitectures=native
 SystemCallFilter=~@clock @cpu-emulation @debug @obsolete @raw-io @reboot @swap @mount
 SystemCallFilter=chroot
 SystemCallErrorNumber=EPERM
-CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_CHROOT CAP_SYS_MODULE CAP_SYS_TTY_CONFIG CAP_DAC_OVERRIDE
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_CHROOT CAP_SYS_MODULE CAP_SYS_TTY_CONFIG CAP_DAC_OVERRIDE CAP_NET_ADMIN
 
 [Install]
 WantedBy=sysinit.target

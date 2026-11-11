@@ -37,15 +37,18 @@ export async function link(from: string, to: string): Promise<boolean> {
   return ok || stderr.includes('File exists');
 }
 
-export async function intoRecorder(source: Match, recorder: Match): Promise<boolean> {
-  if (!await givePorts(recorder, 'Input', 2)) return false;
+async function ports(match: Match, direction: 'input' | 'output'): Promise<DumpedNode[]> {
   const objects = JSON.parse((await outcome(['pw-dump'])).stdout || '[]') as DumpedNode[];
-  const matching = (match: Match) => objects.find(object => object.type === 'PipeWire:Interface:Node' &&
+  const node = objects.find(object => object.type === 'PipeWire:Interface:Node' &&
     Object.entries(match).every(([key, value]) => object.info?.props?.[key] === value));
-  const ports = (node: DumpedNode | undefined, direction: string) => objects.filter(object => object.type === 'PipeWire:Interface:Port' &&
+  return objects.filter(object => object.type === 'PipeWire:Interface:Port' &&
     object.info?.direction === direction && object.info.props?.['node.id'] === node?.id && !object.info.props?.['port.monitor']);
-  const outputs = ports(matching(source), 'output');
-  const inputs = ports(matching(recorder), 'input');
+}
+
+export async function intoRecorder(source: Match, recorder: Match): Promise<boolean> {
+  if (!(await ports(source, 'output')).length && !await givePorts(source, 'Output', 2)) return false;
+  if (!await givePorts(recorder, 'Input', 2)) return false;
+  const [outputs, inputs] = [await ports(source, 'output'), await ports(recorder, 'input')];
   if (!outputs.length || !inputs.length) return false;
   const linked = await Promise.all(inputs.map((input, index) => link(`${outputs[Math.min(index, outputs.length - 1)].id}`, `${input.id}`)));
   return linked.every(Boolean);

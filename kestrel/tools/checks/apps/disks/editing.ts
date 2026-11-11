@@ -11,7 +11,7 @@ import {trashed, writeSpace} from './space.js';
 
 const {require, eventually} = checks('Luft app');
 const DONE_X = 744;
-const SPACE_BUTTON = [290, 450];
+const SPACE_BUTTON = [565, 720];
 const ACCENT_TOLERANCE = 24;
 const CONTROL_TOLERANCE = 4;
 const BUTTON_PIXELS = 12;
@@ -88,11 +88,12 @@ async function checkPlan(driver: Driver, palette: Palette) {
   await driver.enter('0');
   await driver.tab();
   await driver.enter('512');
+  await driver.key(Clutter.KEY_Escape);
   await driver.click('barFree');
   await driver.tab();
   await driver.key(Clutter.KEY_Return);
-  await driver.enter('1024');
-  await driver.tab(4);
+  await driver.enter('1024 MiB');
+  await driver.tab(3);
   await driver.enter('data');
   await driver.click('settings');
   await driver.tab();

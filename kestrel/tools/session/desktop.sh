@@ -35,16 +35,14 @@ export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" CARGO_HOME="${CARGO_HOME:-$HO
 export HOME="$home"
 
 runtime="${XDG_RUNTIME_DIR:-/tmp}/kestrel-$(session_hash "$session" 12)"
-app_runtime="${XDG_RUNTIME_DIR:-/tmp}/ka-$(session_hash "$session" 8)"
 drives="${TMPDIR:-/tmp}/kestrel-drives-$(session_hash "$session" 12)"
 export PIPEWIRE_RUNTIME_DIR="$runtime-pipewire" PULSE_RUNTIME_PATH="$runtime-pulse"
 export CUPS_SERVER="$runtime-cups.sock" KESTREL_AUTHENTICATE_SOCK="$runtime-authenticate.sock" KESTREL_READY_SOCK="$runtime-ready.sock"
 export PULSE_SERVER="unix:$PULSE_RUNTIME_PATH/native"
-export KESTREL_APP_RUNTIME_DIR="$app_runtime"
 [[ "$mode" == nested ]] || use_fixture_desktop "$drives"
 
 scope="kestrel-session-$(session_hash "$session" 12)"
-trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true; rm -rf "$cache_link" "$app_runtime" "$drives" "$runtime"-*' EXIT
+trap 'systemctl --user stop "$scope.scope" 2> /dev/null || true; fusermount3 -uz "$KESTREL_APP_RUNTIME_DIR/doc" 2> /dev/null || true; rm -rf --one-file-system "$cache_link" "$KESTREL_APP_RUNTIME_DIR" "$drives" "$runtime"-*' EXIT
 trap 'exit 143' TERM INT
 
 systemd-run --user --scope --quiet --collect --expand-environment=no --unit="$scope" \

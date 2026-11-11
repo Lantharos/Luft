@@ -9,7 +9,7 @@ import {shown, showsText, styled} from '../lib/actors.js';
 import {freePorts} from '../lib/apps/ports.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {intoSpeakers, speakersIntoLevels} from '../lib/audio/routing.js';
+import {intoRecorder, intoSpeakers, speakersIntoLevels} from '../lib/audio/routing.js';
 import {spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
@@ -53,10 +53,13 @@ function clearNotifications() {
     for (const notification of [...source.notifications]) notification.destroy();
 }
 
+const CALLER = 'com.example.Caller';
+
 async function checkCalls() {
   require(!quiet().inCall(), 'nothing is in a call at first');
-  const recorder = spawn(['parecord', '--device=microphone', '/dev/null']);
+  const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${CALLER}`, '/dev/null']);
   try {
+    await eventually(() => intoRecorder({'node.name': 'microphone'}, {'application.id': CALLER, 'media.class': 'Stream/Input/Audio'}), 'the microphone reaches the recorder');
     await eventually(() => quiet().inCall() && quiet().calls === 1, 'an app recording from the microphone starts a call');
   } finally {
     await stop(recorder);

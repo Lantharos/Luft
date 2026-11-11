@@ -19,6 +19,7 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="RemoveTpmUnlock"><arg name="unlock" type="s" direction="in"/></method>
   <method name="ShowRecoveryKey"><arg name="key" type="s" direction="out"/></method>
   <method name="AcceptSecureBootChange"/>
+  <method name="ConfirmStartup"/>
   <method name="ReplaceRecoveryKey"><arg name="unlock" type="s" direction="in"/><arg name="key" type="s" direction="out"/></method>
   <method name="EnrollSigningKey"><arg name="code" type="s" direction="out"/></method>
   <method name="CancelSigningKeyEnrollment"/>
@@ -105,6 +106,7 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
     RemoveTpmUnlock: () => calls.push('RemoveTpmUnlock'),
     ShowRecoveryKey: () => LETTERS_RECOVERY_KEY,
     AcceptSecureBootChange: () => calls.push('AcceptSecureBootChange'),
+    ConfirmStartup: () => {},
     ReplaceRecoveryKey: () => NEW_RECOVERY_KEY,
     EnrollSigningKey: () => '48203917',
     CancelSigningKeyEnrollment: () => calls.push('CancelSigningKeyEnrollment'),

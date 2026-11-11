@@ -6,18 +6,26 @@
 #include "shell-development-private.h"
 
 static gboolean
+same_file (const char *first,
+           const char *second)
+{
+  struct stat a, b;
+
+  return stat (first, &a) == 0 && stat (second, &b) == 0 &&
+         a.st_dev == b.st_dev && a.st_ino == b.st_ino;
+}
+
+static gboolean
 started_from_build (void)
 {
   const char *build = g_getenv ("KESTREL_BUILDDIR");
   g_autofree char *built = NULL;
-  struct stat own, candidate;
 
-  if (!build)
+  if (!build || same_file ("/proc/self/exe", KESTREL_BINDIR "/kestrel"))
     return FALSE;
 
   built = g_build_filename (build, "kestrel", NULL);
-  return stat ("/proc/self/exe", &own) == 0 && stat (built, &candidate) == 0 &&
-         own.st_dev == candidate.st_dev && own.st_ino == candidate.st_ino;
+  return same_file ("/proc/self/exe", built);
 }
 
 const char *

@@ -154,6 +154,8 @@ export namespace Shell {
 
     function util_get_event_axis(event: Clutter.Event, axis: Clutter.InputAxis): number;
 
+    function util_get_frame_clock(view: Clutter.StageView): Clutter.FrameClock;
+
     function util_get_week_start(locale: string): number;
 
     function util_paint_offscreen(actor: Clutter.Actor): void;

@@ -39,9 +39,16 @@ class PromptGate {
     this.invitation = { prompt, until: GLib.get_monotonic_time() + INVITATION_TIME };
   }
 
-  admits(prompt: Prompt): boolean {
+  takeInvitation(prompt: Prompt): boolean {
+    const invitation = this.invitation;
+    if (invitation?.prompt !== prompt) return false;
+    this.invitation = null;
+    return GLib.get_monotonic_time() <= invitation.until;
+  }
+
+  admits(prompt: Prompt, invited: boolean): boolean {
     this.follow();
-    if (this.locked && !this.invited(prompt)) {
+    if (this.locked && !invited) {
       if (prompt.whileLocked === 'wait') this.waiting.add(prompt);
       return false;
     }
@@ -52,13 +59,6 @@ class PromptGate {
   forget(prompt: Prompt): boolean {
     this.showing.delete(prompt);
     return this.waiting.delete(prompt);
-  }
-
-  private invited(prompt: Prompt): boolean {
-    const invitation = this.invitation;
-    if (invitation?.prompt !== prompt) return false;
-    this.invitation = null;
-    return GLib.get_monotonic_time() <= invitation.until;
   }
 
   private follow(): void {

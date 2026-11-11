@@ -23,7 +23,10 @@ const CONVERTIBLE = 'com.lantharos.convertible.desktop';
 const SEPARATOR = null;
 const EDITING = [SEPARATOR, 'Cut', 'Copy', 'Duplicate', 'Copy path', SEPARATOR, 'Rename', 'Compress…', 'Convert…'];
 const TEXT_MENU = ['Open', 'Quick Look', 'Add to Favorites', ...EDITING, 'Print…', 'Send to device'];
-const FOLDER_MENU = ['Open', 'Open in tab', 'Add to Favorites', 'Change icon…', ...EDITING, 'Send to device'];
+const BELOW_FOLDER_ACTION = ['Share with', 'Open in terminal', 'See what’s using space', 'Properties', SEPARATOR, 'Move to trash'];
+const MENU_ITEM = 38;
+const MENU_SEPARATOR = 9;
+const MENU_END = 34;
 
 interface Chosen {
   key: string;
@@ -45,6 +48,11 @@ function added(point: Point, menu: (string | null)[], index: number) {
   const separators = before.filter(label => label === SEPARATOR).length;
   return menuItem(point, before.length - separators + index, separators);
 }
+function addedToFolder(app: LuftApp): Point {
+  const separators = BELOW_FOLDER_ACTION.filter(label => label === SEPARATOR).length;
+  const lower = (BELOW_FOLDER_ACTION.length - separators) * MENU_ITEM + separators * MENU_SEPARATOR;
+  return [FOLDER[0] + 70, app.window.get_frame_rect().height - MENU_END - lower];
+}
 const last = () => fixture().chosen.at(-1);
 const fileId = (path: string) => Gio.File.new_for_path(path).query_info('id::file', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('id::file');
 const chosenOn = (path: string) => last()!.paths.length === 1 && fileId(last()!.paths[0]!) === fileId(path);
@@ -63,7 +71,7 @@ async function checkPlainActions(app: LuftApp, folder: string, note: string) {
 
   await changes(app, 'right-clicking a folder opens its menu', () => app.click(FOLDER, Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-folder-menu');
-  await changes(app, 'choosing the folder action closes the menu', () => app.click(added(FOLDER, FOLDER_MENU, 0)));
+  await changes(app, 'choosing the folder action closes the menu', () => app.click(addedToFolder(app)));
   await eventually(() => last()?.key === 'tidy' && chosenOn(folder), 'an action for folders shows on folders, without the one for text');
 }
 

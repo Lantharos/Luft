@@ -69,7 +69,10 @@ decode_theme_sound (Decoding *decoding)
     return FALSE;
 
   decoding->custom = FALSE;
-  _shell_sound_decode (decoding->name, file, SHELL_SOUND_ANY_LENGTH, player->cancellable, on_sound_decoded, decoding);
+  if (_shell_sound_theme_ships (file))
+    _shell_sound_decode (decoding->name, file, SHELL_SOUND_ANY_LENGTH, player->cancellable, on_sound_decoded, decoding);
+  else
+    _shell_sound_decode_isolated (decoding->name, file, TRUE, player->cancellable, on_sound_decoded, decoding);
   return TRUE;
 }
 

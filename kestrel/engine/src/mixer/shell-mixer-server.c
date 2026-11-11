@@ -6,6 +6,7 @@
 #include "shell-mixer-private.h"
 
 #define RECONNECT_DELAY_SECONDS 1
+#define LINK_SETTLE_MS 250
 #define PROP_SECURE_PID "pipewire.sec.pid"
 
 struct _ShellMixerServer
@@ -14,6 +15,7 @@ struct _ShellMixerServer
   pa_glib_mainloop *mainloop;
   pa_context *context;
   guint reconnect_id;
+  guint settle_id;
 };
 
 static void connect_to_server (ShellMixerServer *server);
@@ -94,6 +96,36 @@ on_source_info (pa_context           *context,
 }
 
 static void
+note_source_output (ShellMixerServer            *server,
+                    const pa_source_output_info *info)
+{
+  if (info->source == PA_INVALID_INDEX)
+    _shell_mixer_remove_recorder (server->mixer, info->index);
+  else
+    _shell_mixer_update_recorder (server->mixer, info->index, info->client);
+}
+
+static void
+on_settled_source_output_info (pa_context                  *context,
+                               const pa_source_output_info *info,
+                               int                          eol,
+                               gpointer                     user_data)
+{
+  if (!eol)
+    note_source_output (user_data, info);
+}
+
+static gboolean
+ask_again_once_links_settle (gpointer user_data)
+{
+  ShellMixerServer *server = user_data;
+
+  server->settle_id = 0;
+  drop_operation (pa_context_get_source_output_info_list (server->context, on_settled_source_output_info, server));
+  return G_SOURCE_REMOVE;
+}
+
+static void
 on_source_output_info (pa_context                  *context,
                        const pa_source_output_info *info,
                        int                          eol,
@@ -104,10 +136,12 @@ on_source_output_info (pa_context                  *context,
   if (eol)
     return;
 
-  if (info->source == PA_INVALID_INDEX)
-    _shell_mixer_remove_recorder (server->mixer, info->index);
-  else
-    _shell_mixer_update_recorder (server->mixer, info->index, info->client);
+  note_source_output (server, info);
+  if (info->source == PA_INVALID_INDEX && !server->settle_id)
+    {
+      server->settle_id = g_timeout_add (LINK_SETTLE_MS, ask_again_once_links_settle, server);
+      g_source_set_name_by_id (server->settle_id, "[kestrel] ask which source a recorder got");
+    }
 }
 
 static void
@@ -285,6 +319,7 @@ disconnect_from_server (ShellMixerServer *server)
   if (!server->context)
     return;
 
+  g_clear_handle_id (&server->settle_id, g_source_remove);
   pa_context_set_state_callback (server->context, NULL, NULL);
   pa_context_set_subscribe_callback (server->context, NULL, NULL);
   pa_context_disconnect (server->context);

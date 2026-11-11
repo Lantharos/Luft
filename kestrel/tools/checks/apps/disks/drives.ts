@@ -55,7 +55,7 @@ export async function checkEncrypted(driver: Driver, keyring: ScratchKeyring) {
   await driver.key(Clutter.KEY_space);
   await driver.tab(2, true);
   await driver.key(Clutter.KEY_Return);
-  await driver.called(['udisks Unlock /dev/sda1'], 'disks unlocks an encrypted partition with its passphrase');
+  await driver.called(['UnlockWithPassphrase /dev/sda1'], 'disks unlocks an encrypted partition with its passphrase');
   require(keyring.items.some(item => item.attributes['gvfs-luks-uuid'] === ARCHIVE && item.secret === PASSPHRASE),
     'disks remembers the passphrase where the desktop looks when the drive is plugged in');
 
@@ -65,7 +65,7 @@ export async function checkEncrypted(driver: Driver, keyring: ScratchKeyring) {
   keyring.forget();
   keyring.store({'gvfs-luks-uuid': ARCHIVE}, 'Encryption passphrase for Archive', PASSPHRASE);
   (await driver.click('unlock')).save('disks-unlocked-dark');
-  await driver.called(['udisks Unlock /dev/sda1'], 'disks unlocks with a passphrase the desktop remembered');
+  await driver.called(['UnlockWithPassphrase /dev/sda1'], 'disks unlocks with a passphrase the desktop remembered');
 
   (await driver.click('newPartition')).save('disks-new-partition-dark');
   await driver.key(Clutter.KEY_Return);

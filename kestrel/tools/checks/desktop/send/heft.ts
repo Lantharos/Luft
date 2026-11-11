@@ -16,13 +16,15 @@ const {require, eventually} = checks('Send sheet');
 const HEFT = 'com.lantharos.heft';
 const FIRST_SUBJECT: [number, number] = [-140, 19];
 const LOADING = 3000;
+const DOCUMENTS = GLib.build_filenamev([GLib.get_home_dir(), 'Documents']);
+const USER_FOLDERS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.dirs']);
 
 const children = (folder: Gio.File) => folder.query_exists(null)
   ? [...folder.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null)].map(info => folder.get_child(info.get_name()))
   : [];
 
 function kept(name: string, folder: string): string[] {
-  const library = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir(), 'Documents', 'Heft']));
+  const library = Gio.File.new_for_path(GLib.build_filenamev([DOCUMENTS, 'Heft']));
   const notebook = children(library).map(subject => subject.get_child(`${name}.heft`)).find(found => found.query_exists(null));
   return notebook ? children(notebook.get_child(folder)).map(file => file.get_basename()!) : [];
 }
@@ -60,14 +62,18 @@ export async function checkHeft(choice: (name: string) => Clutter.Actor | null, 
   }
   const picture = GLib.build_filenamev([scratch('send'), 'Whiteboard.png']);
   savePicture(picture);
-  const heft = await sendTo({'Scan.pdf': scan}, choice, 'a PDF');
+  GLib.mkdir_with_parents(DOCUMENTS, 0o755);
+  GLib.file_set_contents(USER_FOLDERS, 'XDG_DOCUMENTS_DIR="$HOME/Documents"\n');
+  let heft: Meta.Window | null = null;
   try {
+    heft = await sendTo({'Scan.pdf': scan}, choice, 'a PDF');
     await eventually(() => kept('Scan', 'sources').some(name => name.endsWith('.pdf')), 'the PDF becomes a book in Heft', 15000);
     await sendTo({'Whiteboard.png': picture}, choice, 'a picture');
     await eventually(() => kept('Whiteboard', 'assets').some(name => name.endsWith('.png')), 'the picture goes into a new notebook in Heft', 15000);
     await pause(LOADING);
     await captureArea('send-heft-notebook', windowArea(heft));
   } finally {
-    await outcome(['kill', String(heft.get_pid())]);
+    GLib.unlink(USER_FOLDERS);
+    if (heft) await outcome(['kill', String(heft.get_pid())]);
   }
 }

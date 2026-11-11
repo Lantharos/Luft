@@ -12,6 +12,7 @@ import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkLooks} from './rover/looks.js';
 import {checkNetwork} from './rover/network.js';
 import {checkPlaces, withUserFolders} from './rover/places.js';
+import {checkPrivileged} from './rover/privileged.js';
 import {checkThumbnails, withThumbnailers} from './rover/thumbnails.js';
 
 const {require, eventually} = checks('Luft app');
@@ -75,6 +76,7 @@ export async function run() {
         await checkPalette(app, palette, {accent: true});
         await showDark(app, palette);
         await checkDrag(app);
+        await checkPrivileged(app, GLib.build_filenamev([FOLDER, 'Locked']), open);
         await checkPrinting(app);
         await checkTextMenu(app);
         await checkProperties(app);

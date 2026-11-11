@@ -15,6 +15,7 @@ import * as SystemActions from './systemActions.js';
 import * as UserWidget from '../../shared/widgets/userWidget.js';
 import { CheckBox } from '../../shared/widgets/checkBox.js';
 import { ModalDialog, State } from '../../shared/dialogs/modalDialog.js';
+import { promptGate } from '../../shared/dialogs/promptGate.js';
 import { DIALOG_CONTENT, DialogType, roundSecondsToInterval, type ConfirmSignal, type EndSessionContent } from './endSessionContent.js';
 
 import { ModalDialogErrors, ModalDialogError } from '../../core/runtime/dbusErrors.js';
@@ -435,6 +436,7 @@ export class EndSessionDialog extends ModalDialog {
   }
 
   async OpenAsync([type, , totalSecondsToStayOpen, inhibitorObjectPaths]: OpenParams, invocation: Gio.DBusMethodInvocation): Promise<void> {
+    const invited = promptGate.takeInvitation(this);
     if (await KestrelUi.refuseSandboxed(invocation, 'ask to end the session')) return;
 
     if (type === this.type && (this.state === State.OPENING || this.state === State.OPENED)) {
@@ -482,7 +484,7 @@ export class EndSessionDialog extends ModalDialog {
 
     this.updateButtons();
 
-    if (!this.open()) {
+    if (!this.open(invited)) {
       invocation.return_error_literal(ModalDialogErrors, ModalDialogError.GRAB_FAILED, 'The screen is locked');
       return;
     }

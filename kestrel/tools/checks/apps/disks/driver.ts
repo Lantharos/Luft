@@ -21,11 +21,11 @@ export const AT = {
   encryption: [885, 499], lock: [900, 300],
   efi: [400, 219], boot: [400, 275], fedora: [400, 331], lab: [130, 205], projects: [400, 387],
   moreDrive: [1025, 86], editPartitions: [876, 183], barProjects: [460, 118], barScratch: [598, 118], barRaw: [657, 118], barFree: [900, 118],
-  deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [861, 198],
+  deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [782, 198],
   apply: [924, 30], confirmApply: [766, 482],
   crucial: [130, 262], removeSystem: [992, 534], confirmRemoveSystem: [728, 517], systemDone: [767, 530],
   samsung: [130, 43], moveLuft: [876, 230], moveToSeagate: [540, 255], moveOn: [755, 577],
-  placeFree: [540, 327], placeErase: [540, 382], placeOn: [755, 448], eraseBack: [605, 447], sizeOn: [755, 490], moveIt: [752, 464], callOff: [582, 425],
+  placeFree: [540, 327], placeErase: [540, 382], placeOn: [755, 448], eraseName: [540, 440], eraseBack: [605, 495], sizeOn: [755, 490], moveIt: [752, 464], callOff: [582, 425],
 } satisfies Record<string, Point>;
 
 export type Control = keyof typeof AT;

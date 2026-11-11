@@ -9,14 +9,16 @@ Gio._promisify(Meta.Context.prototype, 'identify_sender');
 
 export type Caller = { kind: 'you' } | { kind: 'app'; app: string } | { kind: 'unknown' };
 
-export async function identify(invocation: Gio.DBusMethodInvocation): Promise<Caller> {
+export async function identifySender(connection: Gio.DBusConnection, sender: string): Promise<Caller> {
   try {
-    const app = await global.context.identify_sender(invocation.get_connection(), invocation.get_sender()!, null);
+    const app = await global.context.identify_sender(connection, sender, null);
     return app ? { kind: 'app', app } : { kind: 'you' };
   } catch {
     return { kind: 'unknown' };
   }
 }
+
+export const identify = (invocation: Gio.DBusMethodInvocation) => identifySender(invocation.get_connection(), invocation.get_sender()!);
 
 export async function sandboxed(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
   return (await identify(invocation)).kind !== 'you';

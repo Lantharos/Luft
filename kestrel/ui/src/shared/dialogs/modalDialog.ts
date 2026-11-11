@@ -233,12 +233,12 @@ export const ModalDialog = GObject.registerClass({
     actor.connectObject('destroy', () => (this.initialKeyFocus = null), this);
   }
 
-  open(): boolean {
+  open(invited = false): boolean {
     this.clearClosingSelection?.();
     this.clearClosingSelection = null;
     if (this.state === State.OPENED || this.state === State.OPENING) return true;
 
-    if (!promptGate.admits(this)) {
+    if (!promptGate.admits(this, invited)) {
       if (this.whileLocked === 'refuse') return false;
       this.leaveStage();
       return true;

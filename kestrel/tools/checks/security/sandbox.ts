@@ -304,7 +304,7 @@ async function checkWindowImpostors() {
     require(x11Prompt === 'gjs-console wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
     const waylandPrompt = await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland'));
     require(typeof waylandPrompt === 'string', 'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
-    require(typeof waylandPrompt === 'string' && waylandPrompt.startsWith('The app python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
+    require(typeof waylandPrompt === 'string' && waylandPrompt.startsWith('python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
     require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `${SANDBOXED_APP} wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.`,
       'a sandboxed app with a Luft app ID asks before it inhibits shortcuts, named by its sandbox');
   } finally {

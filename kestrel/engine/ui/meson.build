@@ -1,7 +1,7 @@
 bun = find_program('bun')
 build_ts = files('../../ui/build.ts')
-build_config = '{"PACKAGE_NAME": "@0@", "PACKAGE_VERSION": "@1@", "LIBEXECDIR": "@2@", "PKGDATADIR": "@3@", "LIBMUTTER_API_VERSION": "@4@"}'.format(
-  meson.project_name(), meson.project_version(), libexecdir, pkgdatadir, mutter_api_version)
+build_config = '{"PACKAGE_NAME": "@0@", "PACKAGE_VERSION": "@1@", "BINDIR": "@2@", "LIBEXECDIR": "@3@", "PKGDATADIR": "@4@", "LIBMUTTER_API_VERSION": "@5@"}'.format(
+  meson.project_name(), meson.project_version(), bindir, libexecdir, pkgdatadir, mutter_api_version)
 
 kestrel_js = custom_target('kestrel-js',
   input: files('../../ui/src/kestrel.ts'),

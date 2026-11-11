@@ -15,6 +15,7 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <method name="Configure"><arg type="s" direction="in"/></method>
   <method name="CreateAccount"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="FinishFirstBoot"/>
+  <method name="SetNetworkType"><arg type="o" direction="in"/><arg type="s" direction="in"/></method>
   <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
   <method name="EnrollFingerprint"><arg type="s" direction="in"/></method>
   <method name="StopFingerprint"/>
@@ -31,6 +32,7 @@ type Endpoint = [string, string, string];
 
 export const INSTALLER_NAME = 'com.lantharos.Installer1';
 const TRUST: Endpoint = ['com.lantharos.Trust1', '/com/lantharos/Trust1', 'com.lantharos.Trust1'];
+const FIREWALL: Endpoint = ['com.lantharos.Firewall1', '/com/lantharos/Firewall1', 'com.lantharos.Firewall1'];
 const FPRINT = 'net.reactivated.Fprint';
 const FPRINT_DEVICE = 'net.reactivated.Fprint.Device';
 
@@ -167,6 +169,8 @@ export function publishInstaller(publish: Publish, calls: string[]) {
     },
     CreateAccount: (name: string, fullName: string) => calls.push(`installer CreateAccount ${name} ${fullName}`),
     FinishFirstBoot: () => calls.push('installer FinishFirstBoot'),
+    SetNetworkTypeAsync: (parameters: [string, string], invocation: Gio.DBusMethodInvocation) =>
+      answer(invocation, relay(FIREWALL, 'SetNetworkType', new GLib.Variant('(os)', parameters))),
     EnrollSigningKeyAsync: (_parameters: [], invocation: Gio.DBusMethodInvocation) => answer(invocation, relay(TRUST, 'EnrollSigningKey')),
     EnrollFingerprintAsync: ([finger]: [string], invocation: Gio.DBusMethodInvocation) => answer(invocation, fingerprints.start(finger)),
     StopFingerprintAsync: (_parameters: [], invocation: Gio.DBusMethodInvocation) => answer(invocation, fingerprints.stop()),

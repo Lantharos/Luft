@@ -122,7 +122,10 @@ export class FingerprintGlyph extends St.DrawingArea {
     super({ style_class: 'kestrel-fingerprint-glyph', reactive: false });
     this.frames = new Clutter.Timeline({ actor: this, duration: 1000, repeat_count: -1 });
     this.frames.connect('new-frame', () => this.tick());
-    this.connect('destroy', () => this.cancelHold());
+    this.connect('destroy', () => {
+      this.cancelHold();
+      this.frames.stop();
+    });
   }
 
   present(state: FingerprintState): void {

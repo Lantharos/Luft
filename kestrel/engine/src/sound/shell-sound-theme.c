@@ -1,6 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 #include "config.h"
 
+#include <glib/gstdio.h>
+
 #include "shell-sound-private.h"
 
 #define FALLBACK_THEME "freedesktop"
@@ -136,4 +138,19 @@ _shell_sound_theme_lookup (ShellSoundTheme *theme,
         return NULL;
       *dash = '\0';
     }
+}
+
+gboolean
+_shell_sound_theme_ships (GFile *file)
+{
+  for (const char * const *dir = g_get_system_data_dirs (); *dir; dir++)
+    {
+      g_autoptr (GFile) folder = g_file_new_for_path (*dir);
+      GStatBuf info;
+
+      if (g_file_has_prefix (file, folder))
+        return g_lstat (*dir, &info) == 0 && info.st_uid == 0;
+    }
+
+  return FALSE;
 }

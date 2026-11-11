@@ -59,8 +59,8 @@ async function checkWarnings(calls: () => string[]) {
   await setBattery({Percentage: 12, TimeToEmpty: 9 * MINUTE});
   const critical = await eventually(() => notice('Battery almost empty'), 'the critical warning comes at 10 minutes left');
   require(critical.urgency === MessageTray.Urgency.CRITICAL && !notice('Battery low'), 'the critical warning is urgent and replaces the low one');
-  require(critical.body === '12% left, about 9 min. Plug in now, or the computer will suspend soon.',
-    'without hibernation the warning says the computer will suspend');
+  require(critical.body === '12% left, about 9 min. Plug in now, or the computer will go to sleep soon.',
+    'without hibernation the warning says the computer will go to sleep');
   await setBattery({Percentage: 4});
   await eventually(() => calls().includes('Suspend'), 'at 4% the computer suspends');
   await setBattery(CHARGING);

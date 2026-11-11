@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
 import {failureOf} from '../../../checks/lib/errors.js';
@@ -12,6 +13,7 @@ export const DRIVES = `<node><interface name="com.lantharos.Trust1.Drives">
   </method>
   <method name="Decrypt"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="SetUpUnlocking"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="b" direction="in"/></method>
+  <method name="UnlockWithPassphrase"><arg type="s" direction="in"/><arg type="h" direction="in"/><arg type="s" direction="out"/></method>
   <method name="Pause"><arg type="s" direction="in"/></method>
   <method name="Resume"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="ShowRecoveryKey"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
@@ -23,6 +25,7 @@ const STEPS = 6;
 const SYSTEM = ['/dev/nvme0n1p1', '/dev/nvme0n1p2', '/dev/nvme0n1p3'];
 const REFORMAT = ['/dev/sdb1'];
 const WRONG_KEY = 'com.lantharos.Trust1.Error.WrongKey';
+const SECRET_BYTES = 4096;
 
 type Drive = {
   Device: string;
@@ -48,6 +51,12 @@ class Failure extends Error {
     super(message);
     this.name = name;
   }
+}
+
+function secret(invocation: Gio.DBusMethodInvocation, handle: number) {
+  const fd = invocation.get_message().get_unix_fd_list()!.get(handle);
+  const stream = new GioUnix.InputStream({fd, close_fd: true});
+  return new TextDecoder().decode(stream.read_bytes(SECRET_BYTES, null).toArray());
 }
 
 export function drivesService(calls: string[], model: Model, recoveryKey: string) {
@@ -123,6 +132,13 @@ export function drivesService(calls: string[], model: Model, recoveryKey: string
       const drive = drives.get(uuid) ?? {Device: device};
       drives.set(uuid, Object.assign(drive, {AutoUnlock: autoUnlock, RecoveryKeyStored: drive.RecoveryKeyStored || recovery.length > 0}));
       changed();
+    }),
+    UnlockWithPassphraseAsync: ([device, handle]: [string, number], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
+      calls.push(`UnlockWithPassphrase ${device}`);
+      const block = model.byDevice(device);
+      const passphrase = secret(invocation, handle);
+      if (passphrase !== block.encrypted?.passphrase) throw new Failure(WRONG_KEY, 'That passphrase doesn’t open this drive.');
+      return new GLib.Variant('(s)', [model.block(model.unlock(block.path, passphrase)).device]);
     }),
     PauseAsync: ([uuid]: [string], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
       calls.push(`Pause ${uuid}`);

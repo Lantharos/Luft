@@ -29,6 +29,7 @@ kestrel_cflags = [
   '-DVERSION="@0@"'.format(meson.project_version()),
   '-DLOCALEDIR="@0@"'.format(localedir),
   '-DDATADIR="@0@"'.format(datadir),
+  '-DKESTREL_BINDIR="@0@"'.format(bindir),
   '-DKESTREL_LIBEXECDIR="@0@"'.format(libexecdir),
   '-DKESTREL_HOST_CPU="@0@"'.format(host_machine.cpu()),
   '-DKESTREL_DATADIR="@0@"'.format(pkgdatadir),

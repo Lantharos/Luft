@@ -147,7 +147,7 @@ async function checkPrompt() {
   require(showsText(SEE_REQUEST, dialog), 'the prompt asks about the program without naming it');
   click(labelled('Don’t allow', dialog)!);
   const denied = await refused;
-  require(!denied.ok && denied.stderr.includes("didn't allow"), 'Don’t allow refuses the picture');
+  require(!denied.ok && denied.stderr.includes('didn’t allow'), 'Don’t allow refuses the picture');
   await eventually(() => !peekDialog(), 'Don’t allow closes the prompt');
   const again = await peek('window', id);
   require(!again.ok && again.stderr.includes('declined') && !peekDialog(), 'a declined program is refused without asking again');

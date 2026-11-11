@@ -13,7 +13,7 @@ const RESIZE: Record<string, number> = {ext4: 2 | 4 | 16, btrfs: 2 | 4 | 8 | 16,
 const IMAGE_BYTES = 8 * 1024 * 1024;
 
 const nodeInfo = Gio.DBusNodeInfo.new_for_xml(new TextDecoder().decode(GLib.file_get_contents(
-  GLib.build_filenamev([KESTREL_TOOLS.root, 'kestrel/tools/fixtures/system/udisks/interfaces.xml']))[1]));
+  GLib.build_filenamev([KESTREL_TOOLS.root, 'kestrel/tools/fixtures/system/devices/udisks/interfaces.xml']))[1]));
 const bytes = (text: string) => [...new TextEncoder().encode(text), 0];
 const unpack = (options: Options): FormatOptions => Object.fromEntries(Object.entries(options).map(([key, value]) => [key, value.deepUnpack<FormatOptions[keyof FormatOptions]>()]));
 

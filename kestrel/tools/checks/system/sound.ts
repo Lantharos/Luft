@@ -3,12 +3,14 @@ import Shell from 'gi://Shell';
 import {QuickSlider, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, existing, labelled, shown} from '../lib/actors.js';
+import {intoRecorder} from '../lib/audio/routing.js';
 import {checks} from '../lib/check.js';
 import {press} from '../lib/input/input.js';
 import {spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 
 const {require, eventually} = checks('sound');
+const RECORDER = 'com.example.Recorder';
 
 export async function run() {
   const mixer = Shell.Mixer.get_default();
@@ -51,7 +53,8 @@ export async function run() {
   mixer.activate_device(require(device('Speakers'), 'the speakers can be chosen'));
   await eventually(() => mixer.output?.description === 'Speakers', 'and back to the speakers');
 
-  const recorder = spawn(['parecord', '--device=microphone', '/dev/null']);
+  const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${RECORDER}`, '/dev/null']);
+  await eventually(() => intoRecorder({'node.name': 'microphone'}, {'application.id': RECORDER, 'media.class': 'Stream/Input/Audio'}), 'the microphone reaches the recorder');
   await eventually(() => mixer.recording, 'an app recording from the microphone shows');
   await stop(recorder);
   await eventually(() => !mixer.recording, 'and stops showing once it stops');

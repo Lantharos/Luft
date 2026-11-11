@@ -49,6 +49,18 @@ shell_util_get_event_axis (const ClutterEvent *event,
 }
 
 /**
+ * shell_util_get_frame_clock:
+ * @view: a #ClutterStageView
+ *
+ * Returns: (transfer none): the clock that paces the frames of @view
+ */
+ClutterFrameClock *
+shell_util_get_frame_clock (ClutterStageView *view)
+{
+  return clutter_stage_view_get_frame_clock (view);
+}
+
+/**
  * shell_util_set_hidden_from_pick:
  * @actor: A #ClutterActor
  * @hidden: Whether @actor should be hidden from pick

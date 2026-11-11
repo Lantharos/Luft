@@ -34,6 +34,8 @@ void shell_util_systemd_unit_exists (const gchar         *unit,
 gboolean shell_util_systemd_unit_exists_finish (GAsyncResult  *res,
                                                 GError       **error);
 
+ClutterFrameClock *shell_util_get_frame_clock (ClutterStageView *view);
+
 double shell_util_get_event_axis (const ClutterEvent *event,
                                   ClutterInputAxis    axis);
 

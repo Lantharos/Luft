@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {ACCOUNTS_NAME, publishAccounts} from './accounts/accounts.js';
 import {BASIC_NAMES, publishBasics} from './basics.js';
+import {FILES_NAME, publishFiles} from './software/files.js';
 import {FINGERPRINT_NAME, publishFingerprint} from './security/fingerprint.js';
 import {LOGIN_SCREEN_NAME, publishLoginScreen} from './security/loginScreen.js';
 import {FIREWALL_NAME, publishFirewall} from './network/firewall.js';
@@ -45,6 +46,7 @@ publish(CALLS, {
 }, '/com/lantharos/KestrelChecks');
 publishSecurity(publish, calls, publishUdisks(calls));
 publishWindows(publish);
+publishFiles(publish, calls);
 publishSleep(publish, calls);
 publishPrinters(publish, calls);
 publishUpdater(publish, calls);
@@ -52,6 +54,6 @@ publishPackages(publish, calls);
 publishFingerprint(publish, calls);
 publishLoginScreen(publish, calls);
 
-for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, PRINTERS_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, REMOTE_LOGIN_NAME, LOGIN_SCREEN_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, FILES_NAME, SLEEP_NAME, PRINTERS_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, REMOTE_LOGIN_NAME, LOGIN_SCREEN_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

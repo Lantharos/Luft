@@ -7,6 +7,7 @@ import St from 'gi://St';
 import {taskbarDepths, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, existing, firstStyled, named, ofType, shown, textOf} from '../lib/actors.js';
+import {intoRecorder} from '../lib/audio/routing.js';
 import {checks} from '../lib/check.js';
 import {centerOf, drag, fingerScroll, keyboard, liftFingers, moveTo, rest} from '../lib/input/input.js';
 import {gjs, repository, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
@@ -31,6 +32,7 @@ interface Holding {
 
 const {require, eventually} = checks('dictation');
 const SPEECH = 'com.lantharos.Speech1';
+const MICROPHONE = {'node.name': 'microphone'};
 const SERVICE = repository('target', 'release', 'luft-speech');
 const RECORDING = GLib.getenv('KESTREL_DICTATION');
 const KEY_ESC = 1;
@@ -154,12 +156,14 @@ async function checkPill() {
   }, 'the pill floats centred just above the taskbar');
   await eventually(() => preedit(window).length > 0, 'what is heard shows in the text field as it is said');
   require(!ofType(firstStyled('kestrel-dictation-text'), St.Label).visible, 'the pill leaves the words to the text field');
+  await eventually(() => intoRecorder(MICROPHONE, {'node.name': 'pw-record', 'application.id': 'com.lantharos.Speech'}), 'the microphone reaches dictation');
   await eventually(() => mixer.dictating, 'dictation has the microphone open');
   await pause(500);
   require(!privacy().visible, 'the privacy indicator stays hidden for dictation the person is holding');
   await capture('dictation-listening');
 
   const recorder = spawn(['parecord', '--device=microphone', '--property=application.id=com.lantharos.Speech', '/dev/null']);
+  await eventually(() => intoRecorder(MICROPHONE, {'node.name': 'parecord', 'application.id': 'com.lantharos.Speech'}), 'the microphone reaches that app');
   await eventually(usesMicrophone, 'an app recording at the same time, even named after the dictation service, still shows the microphone in the privacy indicator');
   await stop(recorder);
   await eventually(() => !privacy().visible, 'the privacy indicator goes once that app stops');
@@ -183,6 +187,7 @@ async function checkPill() {
   require(entryText(window) === before && !privacy().visible, 'nothing is typed after Escape and the microphone is closed');
 
   await callSpeech('Start');
+  await eventually(() => intoRecorder(MICROPHONE, {'node.name': 'pw-record', 'application.id': 'com.lantharos.Speech'}), 'the microphone reaches dictation started elsewhere');
   await eventually(usesMicrophone, 'dictation started by something other than Kestrel shows in the privacy indicator');
   await callSpeech('Cancel');
   await eventually(() => !privacy().visible, 'and goes once it stops');

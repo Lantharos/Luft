@@ -1,6 +1,7 @@
 interface BuildConfig {
   PACKAGE_NAME: string;
   PACKAGE_VERSION: string;
+  BINDIR: string;
   LIBEXECDIR: string;
   PKGDATADIR: string;
 }
@@ -9,5 +10,6 @@ declare const KESTREL_CONFIG: BuildConfig;
 
 export const PACKAGE_NAME = KESTREL_CONFIG.PACKAGE_NAME;
 export const PACKAGE_VERSION = KESTREL_CONFIG.PACKAGE_VERSION;
+export const BINDIR = KESTREL_CONFIG.BINDIR;
 export const LIBEXECDIR = KESTREL_CONFIG.LIBEXECDIR;
 export const PKGDATADIR = KESTREL_CONFIG.PKGDATADIR;

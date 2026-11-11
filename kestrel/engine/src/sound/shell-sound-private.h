@@ -53,6 +53,7 @@ void             _shell_sound_theme_free   (ShellSoundTheme *theme);
 GFile           *_shell_sound_theme_lookup (ShellSoundTheme *theme,
                                             const char      *name,
                                             gboolean        *disabled);
+gboolean         _shell_sound_theme_ships  (GFile           *file);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (ShellSoundTheme, _shell_sound_theme_free)
 

@@ -116,8 +116,10 @@ async function checkRemoteDesktop() {
   const dialog = ofType(portalDialog(), St.Widget);
   const choices = ['Keyboard', 'Mouse and touchpad', 'Share the clipboard'].map(title => ofType(labelled(title, dialog), St.Button));
   require(choices.every(choice => !choice.checked), 'remote control starts with no device and no clipboard allowed');
-  for (const choice of choices) click(choice);
-  await eventually(() => choices.every(choice => choice.checked), 'devices and the clipboard can be allowed one by one');
+  for (const choice of choices) {
+    click(choice);
+    await eventually(() => choice.checked, `${choice.accessible_name ?? choice.label} can be allowed by itself`);
+  }
   await pickFirstSource('Allow');
   const [response, results] = (await started).recursiveUnpack<[number, {devices: number; clipboard_enabled: boolean; streams: Streams}]>();
   require(response === 0 && results.devices === KEYBOARD_AND_POINTER && results.clipboard_enabled && results.streams.length === 1,

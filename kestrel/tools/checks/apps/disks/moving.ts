@@ -1,3 +1,4 @@
+import {type} from '../../lib/input/input.js';
 import {squareCorners} from '../lib/corners.js';
 import {saveBothStyles, type Palette} from '../lib/palette.js';
 import type {Driver} from './driver.js';
@@ -19,6 +20,9 @@ export async function checkMoveLuft(driver: Driver, palette: Palette) {
   await driver.click('placeErase');
   await driver.click('placeOn');
   await saveLooks(driver, palette, 'disks-move-erase');
+  await driver.click('eraseName');
+  await driver.act('typing the drive’s name lets it be erased', () => type('Seagate ST1000DM010'));
+  await saveLooks(driver, palette, 'disks-move-erase-named');
   await driver.click('eraseBack');
   await driver.click('placeFree');
   await saveLooks(driver, palette, 'disks-move-size');

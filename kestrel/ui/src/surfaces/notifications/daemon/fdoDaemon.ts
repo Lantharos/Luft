@@ -9,7 +9,7 @@ import * as Main from '../../../core/main.js';
 import { emitSignalToDestination, loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
 import { systemPrograms } from '../../../shared/apps/luftApps.js';
 import { callerOwns, callerProcess } from '../../../shared/dbus/processes.js';
-import { connectionRuns } from '../../../shared/dbus/sandbox.js';
+import { connectionRuns, identify, identifySender, type Caller } from '../../../shared/dbus/sandbox.js';
 import { Notification, Sound } from '../tray/notification.js';
 import { NotificationDestroyedReason, PrivacyScope, Urgency } from '../tray/notificationEnums.js';
 import { FdoNotificationDaemonSource } from './fdoSource.js';
@@ -65,6 +65,7 @@ interface DaemonNotification {
 interface Origin {
   readonly sender: string | undefined;
   readonly pid: number;
+  readonly caller: Caller;
 }
 
 interface SourceWithoutApp {
@@ -141,10 +142,13 @@ function unpackHints(packed: Record<string, GLib.Variant>): Hints {
   return hints;
 }
 
-function getApp(pid: number, appId: string | undefined, appName: string): Shell.App | null {
+function getApp({ pid, caller }: Origin, appId: string | undefined, appName: string): Shell.App | null {
   const appSys = Shell.AppSystem.get_default();
+  if (caller.kind === 'app') return appSys.lookup_app(`${caller.app}.desktop`);
+
   let app: Shell.App | null = Shell.WindowTracker.get_default().get_app_from_pid(pid);
-  if (!app && appId)
+  if (app || caller.kind === 'unknown') return app;
+  if (appId)
     app = appSys.lookup_app(`${appId}.desktop`);
   if (!app)
     app = appSys.lookup_app(`${appName}.desktop`);
@@ -193,7 +197,7 @@ export class FdoNotificationDaemon {
   }
 
   private createNotification(origin: Origin, hints: Hints, appName: string, invocation: Gio.DBusMethodInvocation): [number, DaemonNotification] {
-    const app = getApp(origin.pid, hints['desktop-entry'], appName);
+    const app = getApp(origin, hints['desktop-entry'], appName);
 
     const id = this.nextNotificationId++;
     const source = app
@@ -225,8 +229,12 @@ export class FdoNotificationDaemon {
   }
 
   private async origin(hints: Hints, invocation: Gio.DBusMethodInvocation): Promise<Origin> {
-    if (await this.relayed(invocation)) return { sender: hints['x-shell-sender'], pid: hints['x-shell-sender-pid'] ?? 0 };
-    return { sender: invocation.get_sender()!, pid: await callerPid(invocation) };
+    if (!await this.relayed(invocation))
+      return { sender: invocation.get_sender()!, pid: await callerPid(invocation), caller: await identify(invocation) };
+
+    const sender = hints['x-shell-sender'];
+    const caller: Caller = sender ? await identifySender(invocation.get_connection(), sender) : { kind: 'you' };
+    return { sender, pid: hints['x-shell-sender-pid'] ?? 0, caller };
   }
 
   private async relayed(invocation: Gio.DBusMethodInvocation): Promise<boolean> {

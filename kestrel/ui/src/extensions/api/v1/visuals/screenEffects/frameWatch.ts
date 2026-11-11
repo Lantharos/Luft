@@ -2,6 +2,7 @@ import type Clutter from 'gi://Clutter';
 import type Cogl from 'gi://Cogl';
 import GLib from 'gi://GLib';
 import GLibUnix from 'gi://GLibUnix';
+import Shell from 'gi://Shell';
 
 const PROBE_EVERY_MS = 2000;
 const SLOW_FRAME_MS = 250;
@@ -16,8 +17,10 @@ class FenceWait {
   private seenPending = 0;
   private readySource: number;
   private checkSource: number;
+  private readonly clocks = global.stage.peek_stage_views().map(view => Shell.util_get_frame_clock(view));
 
   constructor(private readonly fence: number, private readonly done: (milliseconds: number) => void) {
+    this.clocks.forEach(clock => clock.inhibit());
     this.readySource = GLibUnix.fd_add_full(GLib.PRIORITY_HIGH, fence, GLib.IOCondition.IN, () => {
       this.readySource = 0;
       this.finish();
@@ -40,7 +43,10 @@ class FenceWait {
   cancel(): void {
     if (this.readySource) GLib.source_remove(this.readySource);
     if (this.checkSource) GLib.source_remove(this.checkSource);
-    if (this.readySource || this.checkSource) GLib.close(this.fence);
+    if (this.readySource || this.checkSource) {
+      GLib.close(this.fence);
+      this.clocks.forEach(clock => clock.uninhibit());
+    }
     this.readySource = this.checkSource = 0;
   }
 }
@@ -96,9 +102,12 @@ export class FrameWatch {
   private took(milliseconds: number): void {
     this.measured();
     this.slow = milliseconds >= SLOW_FRAME_MS ? this.slow + 1 : 0;
-    if (milliseconds < STUCK_FRAME_MS && this.slow < SLOW_PROBES_IN_A_ROW) return;
-    this.slow = 0;
-    this.tooSlow();
+    if (milliseconds >= STUCK_FRAME_MS || this.slow >= SLOW_PROBES_IN_A_ROW) {
+      this.slow = 0;
+      this.tooSlow();
+    } else if (this.slow) {
+      this.probe();
+    }
   }
 }
 

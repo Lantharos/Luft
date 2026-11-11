@@ -13,14 +13,7 @@ How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them 
 
 ## App registrations
 
-OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbox. The client IDs and secrets of both are in `services/accounts/data/apps.json`, which is built into `luft-accounts`; Dropbox uses Luft's own registration and OneDrive uses rclone's until Luft has one:
-
-| Service | Where | Settings |
-| --- | --- | --- |
-| OneDrive | [Microsoft Entra admin center](https://entra.microsoft.com), App registrations | Accounts in any organizational directory and personal Microsoft accounts; a Web or Mobile and desktop redirect URI of `http://localhost:53682/`; a client secret; delegated Microsoft Graph permissions `Files.Read`, `Files.ReadWrite`, `Files.Read.All`, `Files.ReadWrite.All`, `Sites.Read.All`, `offline_access`, `openid`, `email` and `profile` |
-| Dropbox | [Dropbox App Console](https://www.dropbox.com/developers/apps) | Scoped access, Full Dropbox; redirect URI `http://localhost:53682/`; permissions `account_info.read`, `files.metadata.write`, `files.content.write`, `files.content.read` and `sharing.write`; then apply for production so more than 500 people can sign in |
-
-Put the new IDs and secrets in `apps.json`. OneDrive and Dropbox accounts signed in with other registrations have to sign in again. iCloud Drive, Nextcloud and WebDAV need no registration.
+OneDrive and Dropbox sign in through a registered app, whose client ID and secret are in `services/accounts/data/apps.json`, built into `luft-accounts`. Dropbox uses Luft's own registration from the [Dropbox App Console](https://www.dropbox.com/developers/apps): scoped access to the full Dropbox, redirect URI `http://localhost:53682/`, and the permissions `account_info.read`, `files.metadata.write`, `files.content.write`, `files.content.read` and `sharing.write`. It has to be approved for production before more than 500 people can sign in. OneDrive uses rclone's registration. iCloud Drive, Nextcloud and WebDAV need none.
 
 ## Signing in and removing
 

@@ -13,7 +13,7 @@ How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them 
 
 ## App registrations
 
-OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbox. The client IDs and secrets of both are in `services/accounts/data/apps.json`, which is built into `luft-accounts`; it holds rclone's registrations until Luft's own are registered:
+OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbox. The client IDs and secrets of both are in `services/accounts/data/apps.json`, which is built into `luft-accounts`; Dropbox uses Luft's own registration and OneDrive uses rclone's until Luft has one:
 
 | Service | Where | Settings |
 | --- | --- | --- |

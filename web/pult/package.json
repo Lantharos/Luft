@@ -1,0 +1,17 @@
+{
+	"name": "@luft/pult",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "pult build",
+		"check": "pult check && tsc --noEmit",
+		"deploy": "pult deploy"
+	},
+	"dependencies": {
+		"@lantharos/pult": "0.14.0",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"typescript": "^6"
+	}
+}

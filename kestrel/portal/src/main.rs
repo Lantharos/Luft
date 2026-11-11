@@ -20,6 +20,7 @@ static L10N: Localizer = luft_i18n::localizer!("locales", ["portal"]);
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    luft_dbus::panics::report();
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {

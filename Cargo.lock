@@ -4830,6 +4830,7 @@ dependencies = [
  "gio",
  "gio-unix",
  "glib",
+ "luft-dbus",
  "luft-dbus-macros",
  "luft-i18n",
  "rustix",
@@ -4851,6 +4852,7 @@ dependencies = [
  "hyper",
  "hyper-util",
  "jiff",
+ "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
  "nix",
@@ -4874,6 +4876,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "ignore",
+ "luft-dbus",
  "luft-dbus-macros",
  "memchr",
  "rusqlite",
@@ -4924,6 +4927,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "jiff",
+ "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
  "rustix",
@@ -5512,6 +5516,61 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-crash-collector"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "luft-crash-report",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-crash-fixture"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "luft-dbus",
+]
+
+[[package]]
+name = "luft-crash-report"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
+name = "luft-crash-reports"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "dirs",
+ "futures-util",
+ "getrandom 0.4.3",
+ "luft-crash-report",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "toml",
+ "ureq",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-cups"
 version = "0.1.0"
 dependencies = [
@@ -5531,6 +5590,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "futures-util",
+ "libc",
  "luft-dbus-macros",
  "serde",
  "tokio",
@@ -5675,6 +5735,7 @@ dependencies = [
  "luft-keyring-vault",
  "luft-meet",
  "luft-trust",
+ "luft-variant",
  "luft-windows",
  "serde",
  "serde_json",
@@ -5850,11 +5911,17 @@ dependencies = [
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
+ "luft-store-seal",
+ "luft-unpack",
  "serde",
  "serde_json",
+ "sha2",
+ "tar",
+ "tempfile",
  "tokio",
  "walkdir",
  "zbus 6.0.0",
+ "zstd 0.14.3",
 ]
 
 [[package]]
@@ -6023,6 +6090,18 @@ dependencies = [
  "tokio",
  "whisper-rs",
  "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-store-seal"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "chrono",
+ "ed25519-dalek",
+ "serde",
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]
@@ -7323,6 +7402,7 @@ name = "peek"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "luft-dbus",
  "luft-dbus-macros",
  "rustix",
  "serde_json",
@@ -8878,10 +8958,8 @@ dependencies = [
 name = "schelf"
 version = "0.1.0"
 dependencies = [
- "base64 0.23.1",
  "chrono",
  "dirs",
- "ed25519-dalek",
  "flate2",
  "futures-util",
  "getrandom 0.4.3",
@@ -8892,6 +8970,7 @@ dependencies = [
  "luft-dbus-macros",
  "luft-sandbox",
  "luft-software",
+ "luft-store-seal",
  "memmap2",
  "quick-xml 0.42.0",
  "sabine",
@@ -9152,6 +9231,7 @@ dependencies = [
  "luft-speech",
  "luft-trust",
  "luft-unpack",
+ "percent-encoding",
  "pipewire",
  "roxmltree 0.21.1",
  "sabine",

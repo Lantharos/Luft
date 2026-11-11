@@ -1,0 +1,10 @@
+[Unit]
+Description=Check Luft's crash collector by crashing programs in this VM
+After=dbus.service systemd-journald.service luft-crash-collector.socket local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-crashes-check
+
+[Install]
+WantedBy=multi-user.target

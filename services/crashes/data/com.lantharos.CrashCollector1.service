@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.CrashCollector1
+Exec=/usr/libexec/luft-crash-collector
+User=luft-crash-reports
+SystemdService=luft-crash-collector.service

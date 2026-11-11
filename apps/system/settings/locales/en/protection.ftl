@@ -55,6 +55,29 @@ settings-privacy-microphone-allow = Allow apps to use the microphone
 settings-privacy-online = Online
 settings-privacy-lookups = Weather and currency rates
 settings-privacy-lookups-hint = Looked up through luft.computer, which is only told roughly which area you’re in, never your exact place
+settings-crash-reports = Crash reports
+settings-crash-reports-description = When one of Luft’s own programs closes unexpectedly, a report can help fix it. Apps you installed yourself are never reported.
+settings-crash-reports-unavailable = This version of Luft doesn’t send crash reports, so nothing leaves your computer.
+settings-crash-reports-send = Send reports
+settings-crash-reports-ask = Ask each time
+settings-crash-reports-always = Send without asking
+settings-crash-reports-never = Never send
+settings-crash-reports-contents = What’s in a report
+settings-crash-reports-contents-hint = Each time you’re asked, you can also see the exact report
+settings-crash-reports-show = Show
+settings-crash-reports-contents-description = A report holds only what’s needed to find the problem.
+settings-crash-reports-holds-program = Which program closed and the version of Luft you have
+settings-crash-reports-holds-failure = How it closed, such as the error it ran into
+settings-crash-reports-holds-stack = Where in the program’s code it was, by position in its files
+settings-crash-reports-holds-system = Who made your graphics card, and whether NVIDIA’s driver runs it
+settings-crash-reports-holds-install = A random number for this computer, so the same problem is counted once per computer
+settings-crash-reports-never-holds = It never holds your files, what was on the screen, the program’s memory, your name, your computer’s name or anything else that says who you are. Paths in your home folder are taken out.
+settings-crash-reports-close = Close
+settings-crash-reports-install = Random number for this computer
+settings-crash-reports-install-hint = Made when the first report is sent
+settings-crash-reports-reset = Reset
+settings-crash-reports-reset-title = Reset the random number?
+settings-crash-reports-reset-description = The next report sent gets a new one, so it can’t be linked to reports sent before.
 
 ## Privacy: file history
 
@@ -565,9 +588,9 @@ settings-sharing-revoke-active = It stops sharing right away, and has to ask aga
 ## Developer tools
 
 settings-developer-tools = Developer tools
-settings-developer-tools-description = Lets developer tools control apps and the screen
+settings-developer-tools-description = Lets developer tools control apps and the screen, and opens text consoles
 settings-developer-tools-title = Turn on developer tools?
-settings-developer-tools-warning = Programs you run can then see your screen and use your mouse and keyboard without asking. Leave this off unless you build apps for Luft. Turning it on asks for an administrator’s password.
+settings-developer-tools-warning = Programs you run can then see your screen and use your mouse and keyboard without asking. Text consoles open too, on Ctrl+Alt+F3 and the keys next to it, where anyone at the computer can sign in with an account’s password without going through the login screen. Leave this off unless you build apps for Luft. Turning it on asks for an administrator’s password.
 
 ## Checking the recovery key
 

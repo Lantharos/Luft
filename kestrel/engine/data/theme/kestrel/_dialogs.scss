@@ -63,6 +63,9 @@
 .audio-device-selection-dialog .audio-selection-device-label:rtl,
 .prompt-dialog .prompt-dialog-error-label:rtl, .prompt-dialog .prompt-dialog-info-label:rtl,
 .access-dialog:rtl { text-align: right; }
+.access-dialog.kestrel-crash-report-contents { width: 36em; }
+.kestrel-crash-report-scroll { max-height: 24em; margin-top: 8px; padding: 10px 12px; border-radius: 10px; background-color: fill(0.05); }
+.kestrel-crash-report-json { font-family: "Maple Mono", monospace; font-size: 12px; color: ink(0.85); }
 .kestrel-portal-dialog { width: 28em; }
 .kestrel-portal-dialog.kestrel-peek-dialog { width: 34em; }
 .kestrel-portal-dialog .message-dialog-content { margin-bottom: 0; }

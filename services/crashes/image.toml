@@ -1,0 +1,22 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-crash-collector", "luft-crash-reports"]
+
+[files]
+"/usr/lib/systemd/system/" = [
+    "data/luft-crash-collector.service",
+    "data/luft-crash-collector.socket",
+    "data/luft-crash-collector-poke.service",
+]
+"/usr/lib/systemd/system/systemd-coredump@.service.d/luft-crash-reports.conf" = "data/systemd-coredump.conf"
+"/usr/lib/systemd/user/" = ["data/luft-crash-reports.service"]
+"/usr/lib/sysusers.d/luft-crash-reports.conf" = "data/luft-crash-reports.sysusers"
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.CrashCollector1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.CrashCollector1.service"]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.CrashReports1.service"]
+"/usr/share/luft/" = ["data/crash-reports.toml"]
+
+[enable]
+system = ["luft-crash-collector.socket"]
+user = ["luft-crash-reports.service"]

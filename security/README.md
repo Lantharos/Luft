@@ -13,7 +13,7 @@ How the pieces protect the computer is in [docs/security.md](../docs/security.md
 
 ## Build
 
-`bun os/image/parts/components/install.ts DESTDIR security` builds the services and stages their files the way the [Luft image](../os/README.md) installs them, as `image.toml` lists them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock. `vm/firewall/run.sh` and `vm/remote-login/run.sh` check the firewall and remote login in a VM with SELinux enforcing.
+`bun os/image/parts/components/install.ts DESTDIR security` builds the services and stages their files the way the [Luft image](../os/README.md) installs them, as `image.toml` lists them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock. `vm/firewall/run.sh` and `vm/remote-login/run.sh` check the firewall and remote login in a VM with SELinux enforcing. The firewall check keeps `/usr` read-only, as on an installed Luft, so the image's own Post opens its port while a stand-in in Kestrel's unit is refused.
 
 ## trustctl
 

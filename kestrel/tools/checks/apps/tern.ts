@@ -1,6 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
@@ -9,7 +7,7 @@ import {checks} from '../lib/check.js';
 import {click, hold, moveTo, press, release, type Point} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {changes, withApp} from './lib/apps.js';
-import {write} from './lib/files.js';
+import {installBrowser} from './lib/browser.js';
 import {pause} from '../lib/wait.js';
 import {checkPalette, withPalette} from './lib/palette.js';
 
@@ -29,8 +27,6 @@ const CONFIRMED = 'alpha\nbravo\n';
 const LINK = 'https://example.test/harbour-photos-from-saturday';
 const ON_LINK: Point = [60, 61];
 const HOVER = 500;
-const BROWSER = 'com.lantharos.KestrelChecks.LinkBrowser';
-const WEB_LINKS = ['x-scheme-handler/http', 'x-scheme-handler/https'];
 
 const promptScript = (result: string) => `printf '${PRINTED}\\n'
 read -r typed
@@ -85,19 +81,6 @@ async function checkPasting(app: LuftApp, result: string) {
   const [typed, first, second] = received.split('\n');
   require(typed === MENU_PASTE, 'tern pastes from the context menu');
   require(first === 'alpha' && second === 'bravo', 'Enter confirms the paste dialog at a password prompt, after Escape cancelled the one before');
-}
-
-function installBrowser(record: string) {
-  const path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', `${BROWSER}.desktop`]);
-  const script = scratch('link-browser.sh');
-  write(script, `printf '%s' "$1" > ${GLib.shell_quote(record)}\n`);
-  write(path, `[Desktop Entry]\nType=Application\nName=Link browser\nExec=sh ${script} %u\nMimeType=${WEB_LINKS.join(';')};\n`);
-  const browser = GioUnix.DesktopAppInfo.new_from_filename(path)!;
-  WEB_LINKS.forEach(scheme => browser.set_as_default_for_type(scheme));
-  return () => {
-    WEB_LINKS.forEach(scheme => Gio.AppInfo.reset_type_associations(scheme));
-    GLib.unlink(path);
-  };
 }
 
 async function checkLinks() {

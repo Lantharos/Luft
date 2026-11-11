@@ -40,6 +40,10 @@ The TPM keeps unlocking through Luft's updates and ordinary firmware updates. If
 
 Your passwords, sign-in tokens and keys live in Luft Keyring, encrypted in one file. Signing in unlocks it, with your password or a fingerprint, and it locks with the screen if you like. [Keyring and passkeys](/files/keyring-and-passkeys/) explains how apps get access.
 
+## Signing in automatically
+
+Settings, under Accounts → Login screen, can sign one person in at startup without a password. It's off unless you turn it on. When nothing asks for a password while the computer starts, because the disk isn't encrypted or the TPM unlocks it without a PIN, Settings asks you to confirm first: anyone who can switch the computer on then reaches that person's desktop and files without typing anything. Luft Keyring stays locked until the password is typed, and the lock screen still asks for it after the computer sleeps or locks, as long as **Lock the screen when it turns off** is on under Privacy. Restarting the computer gets past the lock screen, though.
+
 ## USB protection
 
 While the screen is locked, and at the login screen, new USB devices wait until you unlock. Plain keyboards, mice and hubs connect right away, so you can always type your password, but a gadget that also poses as a network adapter or a drive only gets its keyboard part. Drives, network adapters, security keys and other special devices wait. When you unlock, everything that waited connects and a notification names it.
@@ -76,6 +80,10 @@ The page also chooses which accounts can sign in. Each one adds its own keys whi
 - **Also on public networks** lets devices on public networks, like in a café or hotel, connect as well. They can then see that the computer takes SSH connections.
 
 Luft slows down anyone who keeps trying: after a few failed sign-ins from one address, that address has to wait before it can try again, up to an hour.
+
+## Developer tools
+
+**Developer tools**, under Security, is for people who build apps for Luft, and stays off otherwise. Turning it on needs an administrator. It lets developer tools such as `peek` see and control your windows, and it opens the text consoles: pressing Ctrl+Alt+F3 or the keys next to it then shows a text login, as on other Linux systems, where anyone at the computer can sign in with an account's password without the login screen. While it's off, those keys show an empty screen, and Ctrl+Alt+F7 returns to where you were. Turning it off closes the text consoles that are open. [Rescue](/system/recovery/#rescue) keeps working either way.
 
 ## Games with anti-cheat
 

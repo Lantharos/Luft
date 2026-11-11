@@ -7,6 +7,7 @@ use std::process::ExitCode;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    luft_dbus::panics::report();
     match std::env::args().nth(1).as_deref() {
         None => daemon::run().await,
         Some("boot") => boot::run().await,

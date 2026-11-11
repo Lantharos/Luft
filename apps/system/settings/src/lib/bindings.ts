@@ -17,6 +17,9 @@ export const commands = {
 	aboutRename: (params: {
 		name: string,
 	}, options?: CallOptions) => invoke<null>("about_rename", params, options),
+	aboutReportProblem: (params: {
+		token?: string | null,
+	}, options?: CallOptions) => invoke<null>("about_report_problem", params, options),
 	accessibilityScreenReader: (options?: CallOptions) => invoke<boolean>("accessibility_screen_reader", {}, options),
 	accounts: (options?: CallOptions) => invoke<AccountsSnapshot>("accounts", {}, options),
 	accountsAnswer: (params: {
@@ -188,6 +191,11 @@ export const commands = {
 		timeout: number,
 	}, options?: CallOptions) => invoke<null>("bluetooth_set_visible", params, options),
 	bluetoothWindows: (options?: CallOptions) => invoke<WindowsDevice[]>("bluetooth_windows", {}, options),
+	crashReportsChoose: (params: {
+		choice: string,
+	}, options?: CallOptions) => invoke<null>("crash_reports_choose", params, options),
+	crashReportsResetInstall: (options?: CallOptions) => invoke<null>("crash_reports_reset_install", {}, options),
+	crashReportsState: (options?: CallOptions) => invoke<CrashReportsState>("crash_reports_state", {}, options),
 	datetimeClock: (options?: CallOptions) => invoke<Clock>("datetime_clock", {}, options),
 	datetimeSetAutomatic: (params: {
 		enabled: boolean,
@@ -630,10 +638,14 @@ export const commands = {
 		schedule: Schedule,
 		download: boolean,
 	}, options?: CallOptions) => invoke<null>("updates_set_preferences", params, options),
+	updatesStableRelease: (options?: CallOptions) => invoke<StableRelease>("updates_stable_release", {}, options),
 	updatesStatus: (options?: CallOptions) => invoke<UpdatesStatus>("updates_status", {}, options),
 	updatesSwitch: (params: {
 		variant: Variant,
 	}, options?: CallOptions) => invoke<null>("updates_switch", params, options),
+	updatesSwitchChannel: (params: {
+		channel: Channel,
+	}, options?: CallOptions) => invoke<null>("updates_switch_channel", params, options),
 	users: (options?: CallOptions) => invoke<Users>("users", {}, options),
 	usersChangePassword: (params: {
 		current?: string | null,
@@ -895,6 +907,17 @@ export type Changing = {
 	progress: number,
 };
 
+/**
+ *  Which of Luft's releases a computer follows: the stable versions, tagged with the major
+ *  version alone such as `:1`, or the nightly builds, tagged `:1-nightly`.
+ */
+export type Channel = "stable" | "nightly";
+
+export type ChannelChoice = {
+	chosen: Channel,
+	waiting: boolean,
+};
+
 export type Charge = "charging" | "discharging" | "empty" | "full" | "not-charging";
 
 export type ChargeLimit = {
@@ -926,6 +949,11 @@ export type CloudConflict = {
 };
 
 export type Corners = "rounded" | "square";
+
+export type CrashReportsState = {
+	available: boolean,
+	choice: string,
+};
 
 export type Credentials = {
 	server?: string | null,
@@ -1055,6 +1083,12 @@ export type Extension = {
 	name: string,
 	description: string,
 	version: string,
+	/**  Where it comes from: `store`, `development` or `own`. */
+	origin: string,
+	/**  Copies of it elsewhere that are left alone. */
+	ignored: string[],
+	/**  The oldest version of Luft it runs on. */
+	luft: string,
 	enabled: boolean,
 	state: string,
 	problem: string,
@@ -1211,6 +1245,7 @@ export type Identity = {
 export type ImageOverview = {
 	available: Available | null,
 	offer: Offer | null,
+	channel: ChannelChoice | null,
 } & Status;
 
 export type InputMethod = {
@@ -1786,6 +1821,9 @@ export type SshSession = {
 	since: number,
 };
 
+/**  Whether a stable version of Luft is out, as far as the update server could say. */
+export type StableRelease = "released" | "notYet" | "unknown";
+
 export type Stage = "waiting" | "preparing" | "downloading" | "installing" | "removing" | "finishing";
 
 export type Standing = { kind: "ready" } | { kind: "signInAgain"; reason: string };
@@ -1881,7 +1919,7 @@ export type Typography = {
 
 export type UnlockMethod = "tpm" | "pin" | "passphrase" | "recovery-key" | "security-key";
 
-export type UpdateKind = "check" | "download" | "firmware" | "rollback" | "switch";
+export type UpdateKind = "check" | "download" | "firmware" | "rollback" | "switch" | "channel";
 
 /**  How often the system looks for updates by itself, and whether it downloads what it finds. */
 export type UpdatePolicy = {

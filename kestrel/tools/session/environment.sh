@@ -67,7 +67,8 @@ build_helpers() {
   bun "$tools/build.ts" "$KESTREL_BUILT"
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
-    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio)
+    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio \
+    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture)
 }
 
 dbus_service() {
@@ -88,6 +89,9 @@ write_dbus_services() {
   dbus_service com.lantharos.Kestrel.Portal "$root/target/release/kestrel-portal"
   dbus_service com.lantharos.Kestrel.Post "$tools/session/postNetwork.sh" run "$session/post-network" this "$root/target/release/kestrel-post"
   dbus_service org.freedesktop.impl.portal.desktop.rover "$(command -v gjs)" -m "$built_tools/fixtures/session/fileChooser.js"
+  export LUFT_CRASH_COLLECTOR_POKE="$KESTREL_APP_RUNTIME_DIR/crash-collector.poke"
+  dbus_service com.lantharos.CrashCollector1 /bin/sh -c "'DBUS_SYSTEM_BUS_ADDRESS=\$DBUS_SESSION_BUS_ADDRESS STATE_DIRECTORY=$session/crash-collector exec $root/target/release/luft-crash-collector'"
+  dbus_service com.lantharos.CrashReports1 /usr/bin/env "LUFT_CRASH_REPORTS_CONFIG=$session/crash-reports.toml" "$root/target/release/luft-crash-reports"
   for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \
     org.gtk.vfs.AfcVolumeMonitor org.gtk.vfs.GPhoto2VolumeMonitor org.gtk.vfs.MTPVolumeMonitor; do
     dbus_service "$name" /usr/bin/false
@@ -148,16 +152,16 @@ use_luft_defaults() {
   unset LANGUAGE "${!LC_@}"
 }
 
-preinstall_extensions() {
-  local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" id
-  mkdir -p "$installed" "${record%/*}"
+place_extensions() {
+  local development="$session/extensions/development" store="$session/extensions/store" record="$session/extensions/installed" id
+  mkdir -p "$development" "$store"
   touch "$record"
-  for id in $(sed -n 's/^id = "\(.*\)"$/\1/p' "$root/os/image/parts/store/apps.toml") ${KESTREL_EXTENSIONS:-}; do
-    [[ -d "$built_extensions/$id" ]] || continue
-    grep -qxF "$id.json" "$record" && continue
-    cp -r "$built_extensions/$id" "$installed/"
-    echo "$id.json" >> "$record"
+  for id in com.lantharos.Seasons ${KESTREL_EXTENSIONS:-}; do
+    grep -qxF "$id" "$record" && continue
+    cp -r "$built_extensions/$id" "$development/"
+    echo "$id" >> "$record"
   done
+  export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store"
 }
 
 prepare_session() {
@@ -190,6 +194,6 @@ prepare_session() {
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
   ln -sfn "$root/apps/system/rover/data/rover.portal" "$session/data/xdg-desktop-portal/portals/rover.portal"
   export_build_paths
-  preinstall_extensions
+  place_extensions
   [[ "$mode" == nested ]] || use_luft_defaults
 }

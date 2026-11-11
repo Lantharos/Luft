@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.CrashReports1
+Exec=/usr/libexec/luft-launch /usr/libexec/luft-crash-reports
+SystemdService=luft-crash-reports.service

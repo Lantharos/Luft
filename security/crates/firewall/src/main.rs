@@ -29,6 +29,7 @@ async fn settled(deadline: Option<Instant>) {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
+    luft_dbus::panics::report();
     let connection = Connection::system().await?;
     let mut changes = network::changes(&connection)
         .await

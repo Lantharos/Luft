@@ -19,6 +19,10 @@
     <method name="Remove">
       <arg name="names" type="as" direction="in"/>
     </method>
+    <method name="Provider">
+      <arg name="capability" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
     <method name="DescribeRepository">
       <arg name="file" type="s" direction="in"/>
       <arg name="text" type="s" direction="in"/>
@@ -29,6 +33,17 @@
       <arg name="file" type="s" direction="in"/>
       <arg name="text" type="s" direction="in"/>
       <arg name="keys" type="a{ss}" direction="in"/>
+    </method>
+    <method name="InstallExtension">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="listing" type="ay" direction="in"/>
+      <arg name="listing_seal" type="ay" direction="in"/>
+      <arg name="keys" type="ay" direction="in"/>
+      <arg name="keys_seal" type="ay" direction="in"/>
+      <arg name="archive" type="h" direction="in"/>
+    </method>
+    <method name="RemoveExtension">
+      <arg name="id" type="s" direction="in"/>
     </method>
     <method name="RemoveRepository">
       <arg name="file" type="s" direction="in"/>

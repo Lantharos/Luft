@@ -219,6 +219,7 @@ async fn dispatch(action: Action) -> Result<(), Failure> {
 }
 
 fn main() -> ExitCode {
+    luft_dbus::panics::report();
     let arguments: Vec<OsString> = std::env::args_os().collect();
     match arguments.get(1).and_then(|argument| argument.to_str()) {
         Some(STUB) => return start_program(&arguments[2..]),

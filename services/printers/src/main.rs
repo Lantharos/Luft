@@ -5,6 +5,7 @@ mod usb;
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
+    luft_dbus::panics::report();
     let command = std::env::args().nth(1);
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()

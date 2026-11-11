@@ -23,6 +23,7 @@ const SHELL_READY: &str = "org.freedesktop.impl.portal.desktop.kestrel";
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    luft_dbus::panics::report();
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {

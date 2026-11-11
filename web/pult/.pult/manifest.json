@@ -1,0 +1,190 @@
+{
+  "project": "luft",
+  "environments": [
+    "prod"
+  ],
+  "sync": "prod",
+  "delivery": {
+    "mode": "socket"
+  },
+  "resources": {},
+  "actions": {},
+  "inboxes": {
+    "crashes": {
+      "source": "src/crashes.ts:4",
+      "label": "Crashes",
+      "icon": "bug",
+      "resource": null,
+      "layout": "list",
+      "states": [
+        "open",
+        "fixed",
+        "ignored"
+      ],
+      "closed": [
+        "fixed",
+        "ignored"
+      ],
+      "reopen": [
+        "fixed"
+      ],
+      "data": {
+        "type": "object",
+        "properties": {
+          "signature": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "program": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "build": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{16,64}$"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "signal",
+              "panic",
+              "script"
+            ]
+          },
+          "signal": {
+            "type": "string",
+            "pattern": "^SIG[A-Z0-9]+$"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "frames": {
+            "maxItems": 32,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "module": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "build": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{16,64}$"
+                },
+                "offset": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-f]{1,16}$"
+                },
+                "function": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              },
+              "required": [
+                "module",
+                "offset"
+              ]
+            }
+          },
+          "script": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "image": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "stable",
+              "nightly",
+              "development"
+            ]
+          },
+          "graphics": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "intel",
+                "amd",
+                "nvidia",
+                "other"
+              ]
+            }
+          },
+          "nvidiaDriver": {
+            "type": "boolean"
+          },
+          "install": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "signature",
+          "program",
+          "summary",
+          "kind",
+          "frames",
+          "image",
+          "channel",
+          "graphics",
+          "nvidiaDriver",
+          "install"
+        ],
+        "additionalProperties": false
+      },
+      "columns": [
+        "title",
+        "occurrences",
+        "users",
+        "data.image",
+        "lastSeen"
+      ],
+      "intake": null,
+      "clients": {
+        "fingerprint": [
+          "signature"
+        ],
+        "title": "{program}: {summary}",
+        "user": "install",
+        "perDay": 5000,
+        "tags": [
+          "crash"
+        ]
+      },
+      "triage": null,
+      "reply": false,
+      "hooks": {
+        "state": false
+      },
+      "sla": {}
+    }
+  },
+  "views": {},
+  "pages": {},
+  "flags": {},
+  "roles": {},
+  "spaces": [],
+  "notify": {},
+  "status": null,
+  "version": "85019a74ac4a"
+}

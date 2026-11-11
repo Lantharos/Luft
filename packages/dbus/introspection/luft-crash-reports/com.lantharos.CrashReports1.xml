@@ -1,0 +1,18 @@
+<node>
+  <interface name="com.lantharos.CrashReports1">
+    <method name="Answer">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="send" type="b" direction="in"/>
+      <arg name="remember" type="b" direction="in"/>
+    </method>
+    <method name="SetChoice">
+      <arg name="choice" type="s" direction="in"/>
+    </method>
+    <method name="ResetInstall">
+    </method>
+    <property name="Available" type="b" access="read"/>
+    <property name="Choice" type="s" access="read"/>
+    <property name="Queued" type="u" access="read"/>
+    <property name="Waiting" type="s" access="read"/>
+  </interface>
+</node>

@@ -317,6 +317,46 @@ shell_init_debug (const char *debug_env)
                                        G_N_ELEMENTS (keys));
 }
 
+static const char *
+log_field (const GLogField *fields,
+           gsize            n_fields,
+           const char      *key)
+{
+  gsize i;
+
+  for (i = 0; i < n_fields; i++)
+    {
+      if (g_strcmp0 (fields[i].key, key) == 0 && fields[i].length < 0)
+        return fields[i].value;
+    }
+  return NULL;
+}
+
+static gboolean
+is_script_error (const GLogField *fields,
+                 gsize            n_fields)
+{
+  const char *message = log_field (fields, n_fields, "MESSAGE");
+
+  return g_strcmp0 (log_field (fields, n_fields, "GLIB_DOMAIN"), "Gjs") == 0 &&
+         message != NULL &&
+         (g_str_has_prefix (message, "JS ERROR: ") ||
+          g_str_has_prefix (message, "Unhandled promise rejection"));
+}
+
+static void
+mark_script_error (GLogLevelFlags   log_level,
+                   const GLogField *fields,
+                   gsize            n_fields,
+                   gpointer         user_data)
+{
+  GLogField *marked = g_newa (GLogField, n_fields + 1);
+
+  memcpy (marked, fields, n_fields * sizeof (GLogField));
+  marked[n_fields] = (GLogField) { "KESTREL_SCRIPT_ERROR", "1", -1 };
+  g_log_writer_journald (log_level, marked, n_fields + 1, user_data);
+}
+
 static GLogWriterOutput
 default_log_writer (GLogLevelFlags   log_level,
                     const GLogField *fields,
@@ -325,6 +365,13 @@ default_log_writer (GLogLevelFlags   log_level,
 {
   GLogWriterOutput output;
   int i;
+
+  if (is_script_error (fields, n_fields))
+    {
+      mark_script_error (log_level, fields, n_fields, user_data);
+      if (g_log_writer_is_journald (fileno (stderr)))
+        return G_LOG_WRITER_HANDLED;
+    }
 
   output = g_log_writer_default (log_level, fields, n_fields, user_data);
 

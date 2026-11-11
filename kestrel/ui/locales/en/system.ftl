@@ -708,6 +708,43 @@ updates-available-body = Open Settings to download and install them.
 updates-ready-title = Updates are ready to install
 updates-ready-body = Restart when it suits you to install them.
 
+## Crash reports
+# Title when the desktop itself closed and started again
+crash-reports-title-desktop = The desktop closed unexpectedly
+# Title when one of Luft's apps or named services closed; $app is its name
+crash-reports-title-app = { $app } closed unexpectedly
+# Names of Luft's background services and helpers, put into crash-reports-title-app at the start of the sentence
+crash-reports-name-post = Post
+crash-reports-name-search = Search
+crash-reports-name-desktop-settings = The desktop’s settings service
+crash-reports-name-watchdog = The graphics watchdog
+crash-reports-name-accounts = Online accounts
+crash-reports-name-firewall = The firewall
+crash-reports-name-handwriting = Handwriting recognition
+crash-reports-name-keyring = Luft Keyring
+crash-reports-name-passkeys = Luft Passkeys
+crash-reports-name-printers = Printing
+crash-reports-name-remote-login = Remote login
+crash-reports-name-dictation = Dictation
+crash-reports-name-thumbnails = Thumbnails
+crash-reports-name-updates = Updates
+crash-reports-name-usb-protection = USB protection
+crash-reports-name-peek = Peek
+crash-reports-name-encryption = Device encryption
+# Title when one of Luft's background services or helpers closed and it has no name of its own
+crash-reports-title-part = A part of Luft closed unexpectedly
+crash-reports-body = Luft can send a report to help fix this. It says what closed, how and where in its code, which version of Luft you have and who made your graphics card. It never includes your files, what was on the screen, or anything that says who you are.
+# Check box: sending now means always sending, not sending means never asking again
+crash-reports-remember = Do the same next time without asking
+# Button that shows the report itself
+crash-reports-contents = What’s in it
+crash-reports-dont-send = Don’t send
+crash-reports-send = Send
+# Title of the window that shows the report
+crash-reports-contents-title = What the report says
+crash-reports-contents-body = This is exactly what would be sent.
+crash-reports-close = Close
+
 ## Extensions
 # Menu item of an extension's quick settings tile or taskbar button; $name is the extension's name
 extension-menu-settings = { $name } settings

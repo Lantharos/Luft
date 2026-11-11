@@ -12,6 +12,8 @@ use serde::Deserialize;
 use specta::Type;
 
 #[cfg(feature = "launch")]
+pub use context::context;
+#[cfg(feature = "launch")]
 pub use start::{open, open_files, start};
 
 pub const TOKEN_VARIABLES: [&str; 2] = ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"];

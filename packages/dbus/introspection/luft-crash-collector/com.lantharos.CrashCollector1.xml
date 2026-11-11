@@ -1,0 +1,9 @@
+<node>
+  <interface name="com.lantharos.CrashCollector1">
+    <method name="Take">
+      <arg type="as" direction="out"/>
+    </method>
+    <signal name="Collected">
+    </signal>
+  </interface>
+</node>

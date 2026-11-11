@@ -20,6 +20,7 @@ static L10N: Localizer = luft_i18n::localizer!("locales", ["settings"]);
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    luft_dbus::panics::report();
     let options = match Options::parse(std::env::args().skip(1)) {
         Ok(options) => options,
         Err(message) => {

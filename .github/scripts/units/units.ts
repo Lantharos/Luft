@@ -29,7 +29,10 @@ const SCOPES: [string, Scope][] = [
 	['os/iso/live/files/usr/lib/dracut/**', 'system'],
 	['security/data/**', 'system'],
 	['services/accounts/data/*', 'user'],
+	['services/handwriting/data/*', 'user'],
+	['services/language/data/*', 'user'],
 	['services/speech/data/*', 'user'],
+	['services/crashes/data/luft-crash-reports.service', 'user'],
 	['services/windows/data/luft-windows-notice.service', 'user'],
 	['services/*/data/*', 'system'],
 ];

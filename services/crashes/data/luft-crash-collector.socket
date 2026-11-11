@@ -1,0 +1,11 @@
+[Unit]
+Description=Wakes Luft's crash collector
+
+[Socket]
+ListenDatagram=/run/luft-crash-collector/poke
+SocketMode=0666
+DirectoryMode=0755
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,16 @@
+[package]
+name = "luft-crash-report"
+version = "0.1.0"
+description = "What a crash report of one of Luft's own programs says, and how the same crash is recognised"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

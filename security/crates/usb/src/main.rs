@@ -24,6 +24,7 @@ const NO_OWNER: &str = "";
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
+    luft_dbus::panics::report();
     let events = Events::open()?;
     let connection = Connection::system().await?;
     let mut signed_in = seat::watch_signed_in(&connection).await?;

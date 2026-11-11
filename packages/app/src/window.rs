@@ -120,6 +120,7 @@ pub fn run(
     build: impl FnOnce(SabineWindow) -> SabineWindow,
     started: impl FnOnce(Events),
 ) -> ! {
+    luft_dbus::panics::report();
     let events = events.clone();
     SabineWindow::main_with_process(
         move |window| Ok(desktop::declare_appearance(build(window))),

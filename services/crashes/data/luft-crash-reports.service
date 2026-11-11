@@ -1,0 +1,23 @@
+[Unit]
+Description=Luft's crash reports
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.CrashReports1
+ExecStart=/usr/libexec/luft-launch /usr/libexec/luft-crash-reports
+Restart=on-failure
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+[Install]
+WantedBy=graphical-session.target

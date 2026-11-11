@@ -14,6 +14,7 @@ const UUID = '4b0c6f0e-3a51-4c0d-9a63-6f1d5a0e2b7c';
 const ETHERNET = 1;
 const DEVICE_ACTIVATED = 100;
 const GLOBAL_CONNECTED = 70;
+const NOT_METERED = 4;
 const ACTIVATED = 2;
 const FULL = 4;
 const CHECK_URI = 'http://luft.computer/connectivity';
@@ -47,6 +48,7 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
 
   let connectivity = FULL;
   let checkUri = CHECK_URI;
+  let metered = NOT_METERED;
   let checks = 0;
   const devices = [WIRED_DEVICE];
   const connections = [WIRED_CONNECTION];
@@ -61,6 +63,9 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
       ConnectivityCheckEnabled: true,
       get ConnectivityCheckUri() {
         return checkUri;
+      },
+      get Metered() {
+        return metered;
       },
       NetworkingEnabled: true,
       WirelessEnabled: true,
@@ -142,6 +147,10 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
     SetConnectivityCheckUri(uri: string) {
       checkUri = uri;
       manager.emit_property_changed('ConnectivityCheckUri', variant('s', uri));
+    },
+    SetMetered(state: number) {
+      metered = state;
+      manager.emit_property_changed('Metered', variant('u', state));
     },
     Checks: () => checks,
     AddWifi: (networks: Network[]) => wifi.add(networks),

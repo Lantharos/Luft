@@ -1,3 +1,4 @@
+pub mod crash_reports;
 pub mod developer;
 pub mod keyring;
 pub mod passkeys;

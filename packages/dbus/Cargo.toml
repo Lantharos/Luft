@@ -13,6 +13,7 @@ service = ["tokio/macros", "tokio/signal", "zbus/service"]
 [dependencies]
 anyhow.workspace = true
 futures-util.workspace = true
+libc.workspace = true
 luft-dbus-macros.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = ["sync", "time"] }

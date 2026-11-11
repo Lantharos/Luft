@@ -39,6 +39,7 @@ fn database(home: &std::path::Path) -> std::io::Result<PathBuf> {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    luft_dbus::panics::report();
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {

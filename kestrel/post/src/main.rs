@@ -18,6 +18,7 @@ const WORKERS: usize = 2;
 const FOLDER: &str = "kestrel/post";
 
 fn main() -> ExitCode {
+    luft_dbus::panics::report();
     let data = dirs::data_dir().expect("people have a data folder").join(FOLDER);
     let identity = match Identity::load_or_create(&data) {
         Ok(identity) => identity,

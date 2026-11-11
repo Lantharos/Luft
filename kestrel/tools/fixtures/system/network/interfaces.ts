@@ -6,6 +6,7 @@ export const NETWORK_MANAGER_XML = `<node>
   <property name="ConnectivityCheckAvailable" type="b" access="read"/>
   <property name="ConnectivityCheckEnabled" type="b" access="read"/>
   <property name="ConnectivityCheckUri" type="s" access="read"/>
+  <property name="Metered" type="u" access="read"/>
   <property name="NetworkingEnabled" type="b" access="read"/>
   <property name="WirelessEnabled" type="b" access="readwrite"/>
   <property name="WirelessHardwareEnabled" type="b" access="read"/>
@@ -99,6 +100,7 @@ export const NETWORK_MANAGER_XML = `<node>
 export const CONTROL_XML = `<node><interface name="com.lantharos.KestrelChecks.NetworkManager">
   <method name="SetConnectivity"><arg type="u" direction="in"/></method>
   <method name="SetConnectivityCheckUri"><arg type="s" direction="in"/></method>
+  <method name="SetMetered"><arg type="u" direction="in"/></method>
   <method name="Checks"><arg type="u" direction="out"/></method>
   <method name="AddWifi"><arg type="a(sbs)" direction="in"/></method>
   <method name="RemoveWifi"/>

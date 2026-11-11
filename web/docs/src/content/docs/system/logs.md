@@ -9,6 +9,14 @@ sidebar:
 
 Report problems on [GitHub](https://github.com/Lantharos/Luft/issues). Say what you did, what you expected and what happened, which computer it is (its model and graphics), and whether Windows is on it. A photo helps when the problem is on screen before the desktop.
 
+## Crash reports
+
+When one of Luft's own programs closes unexpectedly, such as an app that comes with Luft, a background service or the desktop itself, Luft asks whether to send a report. If the desktop or the computer went down, it asks after you sign in again. Apps you installed yourself are never reported.
+
+A report says which program closed and how, where in its code it was, which version of Luft you have and who made your graphics card. It never holds your files, what was on the screen, your name, your computer's name or anything else that says who you are. **What's in it** shows the exact report before you decide, and **Do the same next time without asking** remembers your answer.
+
+You're asked about the same problem once per version of Luft. To change your answer, open Settings, then **Privacy**, and choose under **Crash reports** whether to be asked each time, to send without asking or never to send. **Reset** there gives your computer a new random number, so later reports can't be linked to earlier ones. Reports wait while you're offline or on a metered connection.
+
 ## What to collect
 
 Right after something goes wrong, these show the most. Run them in [Tern](/apps/tern/):

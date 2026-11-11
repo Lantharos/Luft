@@ -1,0 +1,16 @@
+[package]
+name = "luft-crash-fixture"
+version = "0.1.0"
+description = "A program of Luft's in a development build that crashes or panics when a check asks it to"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+libc.workspace = true
+luft-dbus.workspace = true
+
+[lints]
+workspace = true

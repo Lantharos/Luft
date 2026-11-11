@@ -7,6 +7,7 @@
 	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { days, including } from './format';
+	import CrashReports from './CrashReports.svelte';
 	import MessageContent from './MessageContent.svelte';
 	import SharingPage from './sharing/SharingPage.svelte';
 
@@ -122,6 +123,8 @@
 		/>
 	</Row>
 </Section>
+
+<CrashReports />
 
 <Section>
 	<ActionRow title={t('settings-sharing')} icon={MonitorUp} description={t('settings-sharing-description')} onclick={() => (app.section = 'sharing')} />

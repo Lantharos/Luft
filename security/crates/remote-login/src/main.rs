@@ -19,6 +19,7 @@ const IDLE_TIMEOUT: Duration = Duration::from_secs(60);
 const WRITE_SSHD_CONFIG: &str = "--write-sshd-config";
 
 fn main() -> anyhow::Result<()> {
+    luft_dbus::panics::report();
     match std::env::args().nth(1).as_deref() {
         None => serve(),
         Some(WRITE_SSHD_CONFIG) => Ok(Choices::load()?.write_sshd_config()?),

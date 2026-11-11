@@ -26,6 +26,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = personalization::taskbar::register(window);
     let window = system::apps::register(window, events);
     let window = protection::privacy::register(window);
+    let window = protection::crash_reports::register(window);
     let window = protection::sharing::register(window, events);
     let window = protection::developer::register(window);
     let window = protection::passkeys::register(window, events);

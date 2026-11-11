@@ -51,6 +51,7 @@ pub async fn serve<I: zbus::object_server::Interface>(
     path: &'static str,
     interface: impl FnOnce(Arc<Idle>) -> I,
 ) -> zbus::Result<()> {
+    crate::panics::report();
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()
         .serve_at(path, interface(idle.clone()))
@@ -68,6 +69,7 @@ pub async fn serve<I: zbus::object_server::Interface>(
 pub async fn until_idle(mut busy: impl FnMut() -> bool) -> std::io::Result<()> {
     use tokio::signal::unix::{SignalKind, signal};
 
+    crate::panics::report();
     let mut terminate = signal(SignalKind::terminate())?;
     let mut interrupt = signal(SignalKind::interrupt())?;
     let mut tick = tokio::time::interval(CHECK_EVERY);

@@ -38,10 +38,12 @@ import { ShareService } from './connectivity/send/service.js';
 import { SoundService } from './sound/sounds/service.js';
 import { playSound } from './sound/sounds/sounds.js';
 import { UpdateNotices } from './status/updates/updateNotices.js';
+import { CrashReports } from './status/crashReports/crashReports.js';
 
 export class SystemServices {
   private readonly memoryNotices = new MemoryNotices();
   private readonly updateNotices = new UpdateNotices();
+  private readonly crashReports = new CrashReports();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly chargerSound = new ChargerSound();
@@ -93,6 +95,7 @@ export class SystemServices {
     this.peek.destroy();
     this.sharing.destroy();
     this.firewallQuestions.destroy();
+    this.crashReports.destroy();
     this.keyring.destroy();
     this.appearance.destroy();
     for (const sync of this.loginScreen) sync.destroy();

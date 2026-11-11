@@ -1,4 +1,4 @@
-import type { Component, Snippet } from 'svelte';
+import { untrack, type Component, type Snippet } from 'svelte';
 import { events as sabineEvents } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
@@ -57,7 +57,7 @@ class AppStore {
 	}
 
 	showPage(page: OpenPage) {
-		this.#pages = [...this.#pages, page];
+		this.#pages = [...untrack(() => this.#pages), page];
 		return () => (this.#pages = this.#pages.filter((shown) => shown !== page));
 	}
 

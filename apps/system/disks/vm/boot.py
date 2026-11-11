@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Starts the installed drives, types the disk's passphrase whenever the startup shows its prompt, and switches the
-VM off at once the first time the serial console shows CUT, as a power cut would."""
+VM off at once the first time the serial console shows CUT, as a power cut would. With Secure Boot it can first add
+Luft's key on shim's blue screen."""
 
 import argparse
 import os
@@ -22,7 +23,7 @@ def boot(arguments) -> subprocess.Popen:
     environment = os.environ | {
         "DISK": arguments.drive, "DRIVES": arguments.drives, "TPM": arguments.tpm, "NETWORK": "0",
         "HEADLESS": "1", "MEMORY": "4096", "SERIAL": str(arguments.log), "TIMEOUT": str(arguments.minutes * 60),
-        "LUFT_VM": str(arguments.vm),
+        "LUFT_VM": str(arguments.vm), "SECURE_BOOT": "1" if arguments.secure_boot else "0",
     }
     return subprocess.Popen([str(luft / "os" / "vm" / "qemu.sh")], env=environment)
 
@@ -34,12 +35,25 @@ def asking(machine: Machine) -> bool:
     return corner == (0, 0, 0) and len(set(field)) == 1 and 30 <= field[0] <= 70
 
 
+def add_key(arguments, qemu: subprocess.Popen):
+    machine = Machine(arguments.vm, seconds=30)
+    try:
+        machine.enroll(arguments.enroll, 120)
+    except MachineError as error:
+        machine.qmp("quit")
+        qemu.wait()
+        sys.exit(f"{arguments.check}: FAIL Luft's key couldn't be added: {error}")
+    print(f"{arguments.check}: added Luft's key on shim's blue screen", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--vm", type=Path, required=True)
     parser.add_argument("--drive", default="", help="the drive to start from, as qemu.sh's DISK")
     parser.add_argument("--drives", default="", help="more drives, as qemu.sh's DRIVES")
     parser.add_argument("--tpm", default="0", help="as qemu.sh's TPM")
+    parser.add_argument("--secure-boot", action="store_true", help="start with Secure Boot on")
+    parser.add_argument("--enroll", default="", help="add Luft's key, queued with this code, on shim's blue screen first")
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--check", required=True, help="the prefix the check's lines start with")
     parser.add_argument("--passphrase", required=True)
@@ -49,6 +63,8 @@ def main():
 
     check = f"{arguments.check}: ".encode()
     qemu = boot(arguments)
+    if arguments.enroll:
+        add_key(arguments, qemu)
     machine = None
     answered = 0.0
     seen = 0

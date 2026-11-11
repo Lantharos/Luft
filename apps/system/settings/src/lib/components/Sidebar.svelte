@@ -18,7 +18,6 @@
 	$effect(() => {
 		void app.query;
 		void app.panel;
-		void found;
 		void tick().then(() => {
 			const current = nav?.querySelector('[aria-current="page"]');
 			if (current) current.scrollIntoView({ block: 'nearest' });
@@ -42,7 +41,7 @@
 		aria-current={!setting && app.panel === panel.id ? 'page' : undefined}
 		onclick={() => app.open(panel.id)}
 	>
-		<Icon size={18} />
+		<Icon size={18} class="flex-none" />
 		{#if setting}
 			<span class="flex min-w-0 flex-col">
 				<span class="truncate text-[13.5px] leading-tight">{setting}</span>
@@ -61,7 +60,7 @@
 	<SearchField variant="sidebar" label={t('settings-search')} bind:value={app.query} onkeydown={openFirst} />
 	<nav bind:this={nav} class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		{#if present}
-			{#each groups as group (group.title)}
+			{#each groups as group, index (index)}
 				<section class="flex flex-col gap-0.5">
 					<h2 class="flex h-8 items-center px-3 text-[13px] font-medium text-[var(--sidebar-text-muted)]">{group.title}</h2>
 					{#each group.panels as panel (panel.id)}

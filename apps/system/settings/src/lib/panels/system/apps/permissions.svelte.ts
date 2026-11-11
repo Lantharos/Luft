@@ -8,7 +8,10 @@ export class Permissions {
 	error = $state('');
 
 	start() {
-		void commands.appsPermissions().then((apps) => (this.apps = apps));
+		void commands.appsPermissions().then(
+			(apps) => (this.apps = apps),
+			(reason) => (this.error = errorText(reason))
+		);
 		return events.appsPermissions((apps) => (this.apps = apps));
 	}
 

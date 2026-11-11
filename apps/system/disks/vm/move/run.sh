@@ -9,6 +9,7 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 base="${LUFT_SYSTEM:-$image_name-system:45}"
 image=$image_name-move-check
 passphrase='correct horse battery'
+key_code=48151623
 drives="$vm/sata.img:sata $vm/nvme.img:nvme $vm/empty.img:nvme"
 
 # shellcheck source=os/image/throwaway-keys.sh
@@ -23,6 +24,7 @@ place 755 "${CARGO_TARGET_DIR:-$luft/target}/release/examples/other-systems" /us
 place 755 "$here/prepare.sh" /usr/libexec/luft-move-prepare
 place 755 "$here/check.sh" /usr/libexec/luft-move-check
 place 755 "$here/flatpak.sh" /usr/libexec/luft-move-flatpak
+place 755 "$luft/os/vm/guest/queue-key.sh" /usr/libexec/luft-vm-queue-key
 place 644 "$here/luft-move-prepare.service" /usr/lib/systemd/system/luft-move-prepare.service
 place 644 "$here/luft-move-check.service" /usr/lib/systemd/system/luft-move-check.service
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-move-check.rules
@@ -44,11 +46,11 @@ expect_in_log "$vm/prepare.log" luft-move-check PREPARED
 rm -f "$vm/root.img" "$vm/source.img"
 
 starts() {
-  "$here/../boot.py" --vm "$vm" --drives "$drives" --tpm 2 --log "$vm/$1.log" --check luft-move-check \
+  "$here/../boot.py" --vm "$vm" --drives "$drives" --tpm 2 --secure-boot --log "$vm/$1.log" --check luft-move-check \
     --passphrase "$passphrase" --minutes 120 "${@:2}"
 }
 
-starts cut --cut "Moving Luft: 30%"
+starts cut --enroll "$key_code" --cut "Moving Luft: 30%"
 grep -qa "luft-move-check: MOVING" "$vm/cut.log" && ! grep -qa "luft-move-check: FAIL" "$vm/cut.log"
 starts moved
 expect_in_log "$vm/moved.log" luft-move-check DONE

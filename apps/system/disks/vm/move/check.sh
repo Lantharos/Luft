@@ -7,6 +7,7 @@ NVME="$(readlink -f /dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_drive1)"
 EMPTY="$(readlink -f /dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_drive2)"
 ROOT_TYPE=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
 TRUST=(com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1)
+RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
 APP=com.lantharos.MoveCheck
 NOTE="written before Luft moved"
 GIB=$((1024 ** 3))
@@ -78,7 +79,26 @@ carried_over() {
   pass "the home folder, the Flatpak, the setting, the Wi-Fi network, the computer's name and SELinux labels came along"
 }
 
-tpm_unlocked() { journalctl -b -u systemd-cryptsetup@root --no-pager | grep -q "TPM2 token unlocks volume"; }
+tpm_unlocked() {
+  local unlocking
+  unlocking="$(journalctl -b -u systemd-cryptsetup@root --no-pager)"
+  grep -q "TPM2 token unlocks volume" <<< "$unlocking" && ! grep -q "falling back to traditional unlocking" <<< "$unlocking"
+}
+
+startup_partitions_mount() {
+  [[ -d /boot/loader/entries && -d /efi/EFI/luft ]] ||
+    fail "the startup partition and the EFI system partition don't mount at /boot and /efi: $(systemctl list-units --all --no-legend '*.automount' | xargs)"
+  pass "next to Windows, the startup partition mounts at /boot and the EFI system partition at /efi"
+}
+
+link_tpm() {
+  mokutil --sb-state | grep -q "SecureBoot enabled" || fail "Secure Boot is off: $(mokutil --sb-state)"
+  tpm_unlocked && fail "the TPM unlocked a disk that was installed without Secure Boot"
+  busctl call "${TRUST[@]}" SetUpTpmUnlock ss "$RECOVERY_KEY" "" > /dev/null ||
+    fail "the TPM couldn't be linked to the disk: $(busctl --json=short get-property "${TRUST[@]}" Tpm)"
+  [[ "$(disk Unlock)" == *tpm* ]] || fail "the disk has no TPM token after linking: $(disk Unlock)"
+  pass "the first start asked for the passphrase, and with Secure Boot on the TPM is linked to the disk"
+}
 
 unlocked_by_tpm() {
   tpm_unlocked || fail "the TPM didn't unlock the disk: $(journalctl -b -u systemd-cryptsetup@root --no-pager | tail -5)"
@@ -213,7 +233,8 @@ settled
 case "$(cat "$STATE/stage")" in
   1)
     [[ "$(running_disk)" == "$SATA" ]] || fail "Luft didn't start from the SATA drive"
-    tpm_unlocked && pass "the TPM unlocked the disk at the first start" || report "the first start asked for the passphrase, and trustd sealed the disk key to how it starts"
+    startup_partitions_mount
+    link_tpm
     seed
     shrink_and_move
     report MOVING

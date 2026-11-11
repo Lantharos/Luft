@@ -71,7 +71,7 @@ async fn change(
     app: &str,
     edit: impl FnOnce(&mut Vec<String>),
 ) -> zbus::Result<()> {
-    let mut values = permissions::values(connection, permission, app).await;
+    let mut values = permissions::values(connection, permission, app).await?;
     edit(&mut values);
     let values: Vec<&str> = values.iter().map(String::as_str).collect();
     permissions::set_values(connection, permission, app, &values).await

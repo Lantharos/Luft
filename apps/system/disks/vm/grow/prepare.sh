@@ -7,7 +7,7 @@ TARGET=/run/luft-check/target
 DRIVE=/dev/vdb
 INSTALL_TIMEOUT=1800
 ROOT_TYPE=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
-RECOVERY_KEY=cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv
+RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
 PASSPHRASE='correct horse battery'
 GIB=$((1024 ** 3))
 

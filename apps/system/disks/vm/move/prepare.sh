@@ -8,8 +8,9 @@ SATA=/dev/sda
 NVME="$(readlink -f /dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_drive2)"
 INSTALL_TIMEOUT=1800
 ROOT_TYPE=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
-RECOVERY_KEY=cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv
+RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
 PASSPHRASE='correct horse battery'
+KEY_CODE=48151623
 GIB=$((1024 ** 3))
 
 report() { echo "luft-move-check: $*" > /dev/ttyS0; }
@@ -85,5 +86,7 @@ make_windows
 make_data
 install_alongside
 mark_first_stage
+/usr/libexec/luft-vm-queue-key "${SATA}1" "$KEY_CODE" || fail "Luft's key couldn't be queued for shim"
+report "PASS Luft's Secure Boot key waits for shim's blue screen"
 report "layout $(sfdisk -d "$SATA" | grep '^/dev' | tr -s ' ' | xargs)"
 report PREPARED

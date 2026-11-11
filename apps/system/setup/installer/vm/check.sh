@@ -69,7 +69,7 @@ check_wifi_carried() {
 HINTS='{"language":"en_US","locale":"de_AT","timezone":"Europe/Vienna","keyboards":[{"layout":"at","variant":"nodeadkeys"},{"layout":"us","variant":""}]}'
 ASKED=/run/luft-check/asked-for-code
 CODE=31415926
-RECOVERY_KEY=cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv
+RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
 PASSPHRASE='correct horse battery'
 
 check_meet_hints() {

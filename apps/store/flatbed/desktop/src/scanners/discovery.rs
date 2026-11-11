@@ -4,9 +4,10 @@ use std::sync::Mutex;
 
 use mdns_sd::{ResolvedService, ServiceDaemon, ServiceEvent};
 
-use super::{escl, found_escl, lost, sane};
+use super::{escl, found_escl, known, lost, sane};
 
-const ESCL: [(&str, bool); 2] = [("_uscan._tcp.local.", false), ("_uscans._tcp.local.", true)];
+const PLAIN: &str = "_uscan._tcp.local.";
+const SECURE: &str = "_uscans._tcp.local.";
 const BJNP: &str = "_canon-bjnp1._tcp.local.";
 
 static BJNP_HOSTS: Mutex<BTreeSet<IpAddr>> = Mutex::new(BTreeSet::new());
@@ -19,7 +20,7 @@ pub fn start() {
             return;
         }
     };
-    for (service, secure) in ESCL {
+    for (service, secure) in [(PLAIN, false), (SECURE, true)] {
         browse(&daemon, service, move |found| escl_found(found, secure));
     }
     browse(&daemon, BJNP, bjnp_found);
@@ -47,6 +48,14 @@ fn browse(
         .expect("a thread for finding scanners");
 }
 
+/// The name a scanner found on the network goes by, whichever way it's spoken to.
+pub fn instance(id: &str) -> Option<&str> {
+    let fullname = id.strip_prefix("escl:")?;
+    [PLAIN, SECURE]
+        .iter()
+        .find_map(|service| fullname.strip_suffix(service))
+}
+
 fn address(service: &ResolvedService) -> Option<IpAddr> {
     let mut addresses: Vec<IpAddr> = service
         .addresses
@@ -61,6 +70,13 @@ fn escl_found(service: &ResolvedService, secure: bool) {
     let Some(address) = address(service) else {
         return;
     };
+    let known_secure = service
+        .fullname
+        .strip_suffix(PLAIN)
+        .is_some_and(|instance| known::pinned(&format!("escl:{instance}{SECURE}")));
+    if !secure && known_secure {
+        return;
+    }
     let name = service
         .get_property_val_str("ty")
         .unwrap_or_default()

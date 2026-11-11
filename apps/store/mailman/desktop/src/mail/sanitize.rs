@@ -3,8 +3,9 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
-use ammonia::Builder;
+use ammonia::{Builder, UrlRelative};
 use lol_html::{RewriteStrSettings, element, rewrite_str};
+use url::Url;
 
 const EXTRA_TAGS: [&str; 4] = ["style", "font", "center", "big"];
 const EXTRA_ATTRIBUTES: [&str; 17] = [
@@ -70,6 +71,7 @@ fn sanitizer() -> &'static Builder<'static> {
             .rm_clean_content_tags(["style"])
             .add_generic_attributes(EXTRA_ATTRIBUTES)
             .url_schemes(HashSet::from(SCHEMES))
+            .url_relative(UrlRelative::Deny)
             .link_rel(Some("noopener noreferrer"))
             .strip_comments(true);
         builder
@@ -118,25 +120,31 @@ pub fn clean(html: &str, inline: &HashMap<String, PathBuf>) -> Cleaned {
         RewriteStrSettings::new()
             .append_element_content_handler(element!("img", |image| {
                 let source = image.get_attribute("src").unwrap_or_default();
-                let tracker = tiny(image.get_attribute("width"))
-                    || tiny(image.get_attribute("height"))
-                    || hidden(image.get_attribute("style"))
-                    || is_tracker(&source);
-                if let Some(cid) = source.strip_prefix("cid:") {
-                    image.remove_attribute("src");
-                    if let Some(path) = inline.get(cid) {
-                        image.set_attribute("data-mm-file", &path.to_string_lossy())?;
-                        cids.borrow_mut().push(cid.to_owned());
-                    }
-                } else if tracker && source.starts_with("http") {
-                    *trackers.borrow_mut() += 1;
-                    image.remove();
-                } else if source.starts_with("http") {
-                    image.remove_attribute("src");
-                    image.set_attribute("data-mm-remote", &source)?;
-                    remote.borrow_mut().push(source);
-                }
+                image.remove_attribute("src");
                 image.remove_attribute("srcset");
+                match Url::parse(&source) {
+                    Ok(url) if url.scheme() == "cid" => {
+                        let cid = source.trim().split_once(':').map_or("", |(_, cid)| cid);
+                        if let Some(path) = inline.get(cid) {
+                            image.set_attribute("data-mm-file", &path.to_string_lossy())?;
+                            cids.borrow_mut().push(cid.to_owned());
+                        }
+                    }
+                    Ok(url) if matches!(url.scheme(), "http" | "https") => {
+                        let tracker = tiny(image.get_attribute("width"))
+                            || tiny(image.get_attribute("height"))
+                            || hidden(image.get_attribute("style"))
+                            || is_tracker(url.as_str());
+                        if tracker {
+                            *trackers.borrow_mut() += 1;
+                            image.remove();
+                        } else {
+                            image.set_attribute("data-mm-remote", url.as_str())?;
+                            remote.borrow_mut().push(url.into());
+                        }
+                    }
+                    _ => {}
+                }
                 Ok(())
             }))
             .append_element_content_handler(element!("[background]", |element| {

@@ -18,7 +18,15 @@ use ureq::unversioned::transport::{
 #[derive(Clone, Debug, Default)]
 pub struct Pin {
     expected: Option<String>,
-    shown: Arc<Mutex<Option<String>>>,
+    shown: Arc<Mutex<Shown>>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+enum Shown {
+    #[default]
+    Nothing,
+    Certificate(String),
+    NoCertificate,
 }
 
 impl Pin {
@@ -29,20 +37,31 @@ impl Pin {
         }
     }
 
-    fn shown(&self) -> Option<String> {
+    fn shown(&self) -> Shown {
         self.shown.lock().expect("pin lock").clone()
+    }
+
+    fn show(&self, shown: Shown) {
+        *self.shown.lock().expect("pin lock") = shown;
     }
 
     /// The certificate to remember, when the scanner showed its first one.
     pub fn first(&self) -> Option<String> {
-        self.shown().filter(|_| self.expected.is_none())
+        match self.shown() {
+            Shown::Certificate(first) if self.expected.is_none() => Some(first),
+            _ => None,
+        }
     }
 
+    /// Whether the scanner showed another certificate than the one it's
+    /// known by, or answered without one.
     pub fn changed(&self) -> bool {
         self.expected.is_some()
-            && self
-                .shown()
-                .is_some_and(|shown| Some(shown) != self.expected)
+            && match self.shown() {
+                Shown::Nothing => false,
+                Shown::Certificate(shown) => Some(shown) != self.expected,
+                Shown::NoCertificate => true,
+            }
     }
 }
 
@@ -65,7 +84,7 @@ impl ServerCertVerifier for Pinned {
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect();
-        *self.pin.shown.lock().expect("pin lock") = Some(shown);
+        self.pin.show(Shown::Certificate(shown));
         if self.pin.changed() {
             return Err(rustls::Error::General(
                 "the scanner's certificate changed".into(),
@@ -101,9 +120,11 @@ impl ServerCertVerifier for Pinned {
     }
 }
 
-/// Wraps a connection to an `https` scanner in TLS that holds it to `pin`.
+/// Wraps a connection to an `https` scanner in TLS that holds it to `pin`,
+/// and refuses a plain one to a scanner that's known by a certificate.
 #[derive(Debug)]
 pub struct PinnedTls {
+    pin: Pin,
     config: Arc<ClientConfig>,
 }
 
@@ -120,6 +141,7 @@ impl PinnedTls {
             }))
             .with_no_client_auth();
         Self {
+            pin: pin.clone(),
             config: Arc::new(config),
         }
     }
@@ -137,6 +159,10 @@ impl<In: Transport> Connector<In> for PinnedTls {
             return Ok(None);
         };
         if !details.needs_tls() {
+            if self.pin.expected.is_some() {
+                self.pin.show(Shown::NoCertificate);
+                return Err(Error::Tls("the scanner no longer shows its certificate"));
+            }
             return Ok(Some(Either::A(transport)));
         }
         let host = details.uri.host().unwrap_or_default();

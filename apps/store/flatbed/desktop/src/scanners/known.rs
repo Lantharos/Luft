@@ -23,6 +23,15 @@ pub fn pin(id: &str) -> Pin {
     Pin::expecting(change(|certificates| certificates.get(id).cloned()))
 }
 
+/// Whether the scanner `id` is known by a certificate.
+pub fn pinned(id: &str) -> bool {
+    change(|certificates| {
+        certificates
+            .keys()
+            .any(|known| known.eq_ignore_ascii_case(id))
+    })
+}
+
 /// Remembers the certificate a scanner showed the first time.
 pub fn remember(id: &str, pin: &Pin) {
     if let Some(first) = pin.first() {

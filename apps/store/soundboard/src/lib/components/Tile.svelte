@@ -83,6 +83,7 @@
 	.tile {
 		position: relative;
 		display: flex;
+		width: 100%;
 		aspect-ratio: 4 / 3;
 		flex-direction: column;
 		justify-content: flex-end;

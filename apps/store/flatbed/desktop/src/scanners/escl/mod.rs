@@ -46,6 +46,10 @@ impl Endpoint {
         }
     }
 
+    pub fn secure(&self) -> bool {
+        self.base.starts_with("https://")
+    }
+
     fn origin(&self) -> &str {
         let after_scheme = self.base.find("://").map_or(0, |at| at + 3);
         let end = self.base[after_scheme..]

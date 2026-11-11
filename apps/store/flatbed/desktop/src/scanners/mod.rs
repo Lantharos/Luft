@@ -73,6 +73,31 @@ struct Entry {
     address: Option<IpAddr>,
 }
 
+impl Entry {
+    fn escl(&self) -> Option<&escl::Endpoint> {
+        match &self.backend {
+            Backend::Escl(endpoint) => Some(endpoint),
+            Backend::Sane(_) => None,
+        }
+    }
+
+    fn at(&self, address: IpAddr) -> bool {
+        self.address == Some(address)
+    }
+
+    fn same_scanner(&self, other: &Entry) -> bool {
+        let instance = discovery::instance(&self.scanner.id);
+        let named_alike = instance.is_some_and(|instance| {
+            discovery::instance(&other.scanner.id)
+                .is_some_and(|other| other.eq_ignore_ascii_case(instance))
+        });
+        let at_same_address = self
+            .address
+            .is_some_and(|address| !address.is_loopback() && other.at(address));
+        named_alike || at_same_address
+    }
+}
+
 static SCANNERS: Mutex<Vec<Entry>> = Mutex::new(Vec::new());
 static JOB: Mutex<Option<Arc<AtomicBool>>> = Mutex::new(None);
 
@@ -91,16 +116,24 @@ pub fn list() -> Vec<Scanner> {
 }
 
 fn visible(entries: &[Entry]) -> Vec<Scanner> {
-    let escl: Vec<IpAddr> = entries
+    let escl: Vec<&Entry> = entries
         .iter()
-        .filter(|entry| matches!(entry.backend, Backend::Escl(_)))
-        .filter_map(|entry| entry.address)
+        .filter(|entry| entry.escl().is_some())
+        .collect();
+    let secure: Vec<&Entry> = escl
+        .iter()
+        .copied()
+        .filter(|entry| entry.escl().is_some_and(escl::Endpoint::secure))
         .collect();
     entries
         .iter()
-        .filter(|entry| {
-            matches!(entry.backend, Backend::Escl(_))
-                || entry.address.is_none_or(|address| !escl.contains(&address))
+        .filter(|entry| match entry.escl() {
+            Some(endpoint) => {
+                endpoint.secure() || !secure.iter().any(|other| other.same_scanner(entry))
+            }
+            None => entry
+                .address
+                .is_none_or(|address| !escl.iter().any(|other| other.at(address))),
         })
         .map(|entry| entry.scanner.clone())
         .collect()
@@ -131,15 +164,28 @@ fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Opti
     let id = format!("escl:{key}");
     let pin = known::pin(&id);
     let capabilities = escl::capabilities(&endpoint, &pin);
-    let name = match &capabilities {
-        Ok(capabilities) if name.is_empty() => capabilities.model.clone(),
-        Err(_) if name.is_empty() => key.trim_start_matches(ADDRESS).to_owned(),
-        _ => name,
-    };
     if capabilities.is_err() && !pin.changed() {
         return;
     }
     known::remember(&id, &pin);
+    show_escl(id, name, endpoint, address, capabilities.ok());
+}
+
+fn show_escl(
+    id: String,
+    name: String,
+    endpoint: escl::Endpoint,
+    address: Option<IpAddr>,
+    capabilities: Option<escl::Capabilities>,
+) {
+    let name = match &capabilities {
+        Some(capabilities) if name.is_empty() => capabilities.model.clone(),
+        None if name.is_empty() => id
+            .trim_start_matches("escl:")
+            .trim_start_matches(ADDRESS)
+            .to_owned(),
+        _ => name,
+    };
     let connection = if address.is_some_and(|address| address.is_loopback()) {
         Connection::Usb
     } else {
@@ -151,7 +197,7 @@ fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Opti
             name,
             connection,
             feeds: capabilities.as_ref().map(feeds).unwrap_or_default(),
-            identity_changed: capabilities.is_err(),
+            identity_changed: capabilities.is_none(),
         },
         backend: Backend::Escl(endpoint),
         address,
@@ -175,22 +221,23 @@ pub fn trust(id: &str) -> Result<(), String> {
     let Backend::Escl(endpoint) = entry.backend else {
         return Ok(());
     };
+    let pin = escl::Pin::default();
+    let capabilities =
+        escl::capabilities(&endpoint, &pin).map_err(|_| "The scanner didn't answer")?;
     known::forget(id);
-    let key = id.trim_start_matches("escl:");
-    let advertised = if key.starts_with(ADDRESS) {
+    known::remember(id, &pin);
+    let advertised = if id.trim_start_matches("escl:").starts_with(ADDRESS) {
         String::new()
     } else {
         entry.scanner.name
     };
-    found_escl(key.to_owned(), advertised, endpoint, entry.address);
-    let unanswered = SCANNERS
-        .lock()
-        .expect("scanners lock")
-        .iter()
-        .any(|entry| entry.scanner.id == id && entry.scanner.identity_changed);
-    if unanswered {
-        return Err("The scanner didn't answer".into());
-    }
+    show_escl(
+        id.to_owned(),
+        advertised,
+        endpoint,
+        entry.address,
+        Some(capabilities),
+    );
     Ok(())
 }
 
@@ -231,7 +278,7 @@ pub fn add_address(address: &str) -> Result<(), String> {
     };
     let key = format!("{ADDRESS}{address}");
     let id = format!("escl:{key}");
-    let tries = [(false, port.unwrap_or(80)), (true, port.unwrap_or(443))];
+    let tries = [(true, port.unwrap_or(443)), (false, port.unwrap_or(80))];
     let endpoint = tries
         .into_iter()
         .filter(|(secure, _)| {

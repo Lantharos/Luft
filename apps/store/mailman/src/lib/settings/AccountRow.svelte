@@ -40,8 +40,7 @@
 <Row title={account.name || account.email} description="{account.email} · {kind}" expanded={open} onclick={toggle}>
 	{#snippet below()}
 		{#if open}
-			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-			<div class="flex flex-col gap-3 pt-1" onclick={(event) => event.stopPropagation()}>
+			<div class="flex flex-col gap-3 pt-1">
 				<TextField bind:value={name} label="Account name" showLabel onkeydown={(event) => event.key === 'Enter' && void rename()} />
 				<Identities {account} />
 				<div class="flex gap-2">

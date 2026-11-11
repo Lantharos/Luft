@@ -35,15 +35,22 @@
 			<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)] transition-transform duration-200 {expanded ? 'rotate-90' : ''}" />
 		{/if}
 	</div>
-	{#if below}
-		<div class="below">{@render below()}</div>
-	{/if}
 {/snippet}
 
 {#if onclick}
-	<button type="button" class="row interactive" aria-expanded={expanded} {disabled} {onclick}>{@render content()}</button>
+	<div class="group">
+		<button type="button" class="row interactive" class:attached={below} aria-expanded={expanded} {disabled} {onclick}>{@render content()}</button>
+		{#if below}
+			<div class="below detached">{@render below()}</div>
+		{/if}
+	</div>
 {:else}
-	<div class="row" class:disabled>{@render content()}</div>
+	<div class="row" class:disabled>
+		{@render content()}
+		{#if below}
+			<div class="below">{@render below()}</div>
+		{/if}
+	</div>
 {/if}
 
 <style>
@@ -54,6 +61,15 @@
 		gap: 12px;
 		padding: 14px 16px;
 		text-align: left;
+	}
+
+	.group {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.row.attached {
+		padding-bottom: 12px;
 	}
 
 	.row.disabled,
@@ -130,5 +146,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
+	}
+
+	.detached {
+		padding: 0 16px 14px;
 	}
 </style>

@@ -10,6 +10,7 @@ import {children, exists, removeTree, write} from './lib/files.js';
 import {checkPalette, showDark, withPalette, type Palette} from './lib/palette.js';
 import {checkBackground} from './mailman/background.js';
 import {checkDelivery} from './mailman/delivery.js';
+import {checkSettings} from './mailman/settings.js';
 
 const {eventually} = checks('Luft app');
 const MESSAGE = 'From: Theo Brandt <theo@example.test>\r\nTo: Mara Lindqvist <mara@example.test>\r\nSubject: Harbour photos\r\n\r\nThe photos from Saturday are in the shared folder.\r\n';
@@ -43,6 +44,7 @@ export async function run() {
       await checkPalette(app, palette, {accent: true});
       await checkDrop(app, palette);
     }));
+    await checkSettings();
     await checkBackground();
     const stalwart = GLib.find_program_in_path('stalwart');
     if (stalwart) await checkDelivery(stalwart);

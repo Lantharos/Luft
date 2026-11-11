@@ -10,8 +10,7 @@ dnf install -y --setopt=install_weak_deps=False --setopt=tsflags=nodocs "${runti
 
 use_rpmfusion
 mapfile -t codecs <"$image/packages/codecs.txt"
-dnf install -y --setopt=install_weak_deps=False --setopt=tsflags=nodocs --allowerasing \
-  --enablerepo=updates-testing --setopt=updates-testing.includepkgs='mesa-*' "${codecs[@]}"
+dnf install -y --setopt=install_weak_deps=False --setopt=tsflags=nodocs --allowerasing "${codecs[@]}"
 forget_rpmfusion
 
 mapfile -t unwanted < <(cat "$image/packages/replaced.txt" "$image/packages/unused.txt")

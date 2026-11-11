@@ -15,6 +15,7 @@ import {fixture, gjs, scratch, spawn, stop, waitForWindow, type Process} from '.
 import {capture} from '../lib/screenshots.js';
 import {pause, settled, waitUntil} from '../lib/wait.js';
 import {darkened, lock, unlock} from '../lockScreen/lib/shield.js';
+import {palmWatchOver} from './lib/pen.js';
 import {fold, tap, touchDown, touchUp} from './lib/touch.js';
 
 const {require, eventually} = checks('on-screen keyboard');
@@ -207,6 +208,7 @@ async function checkHeft() {
     require(!Main.inputMethod.currentFocus, 'text typed on the paper in Heft keeps the on-screen keyboard out of it');
     await tapsBeside('text being typed in Heft', paper);
     await capture('tablet-keyboard-heft');
+    await palmWatchOver();
   } finally {
     await heft.close();
   }

@@ -30,11 +30,10 @@ export const InhibitShortcutsDialog = GObject.registerClass({
 }, class InhibitShortcutsDialog extends GObject.Object {
   declare emit: GObject.SignalMethods<this, InhibitShortcutsDialog.Signals>['emit'];
 
-  private readonly dialog = new ModalDialog({ prompt: true });
+  private dialog: ModalDialog | null = null;
 
   constructor(private currentWindow: Meta.Window) {
     super();
-    this.buildLayout();
   }
 
   get window(): Meta.Window {
@@ -75,7 +74,8 @@ export const InhibitShortcutsDialog = GObject.registerClass({
     return title ? KestrelUi.t('inhibit-shortcuts-titled-app', { title }) : KestrelUi.t('inhibit-shortcuts-unknown-app');
   }
 
-  private buildLayout(): void {
+  private build(): ModalDialog {
+    const dialog = new ModalDialog({ prompt: true });
     const content = new Dialog.MessageDialogContent({
       title: KestrelUi.t('inhibit-shortcuts-title'),
       iconName: 'input-keyboard-symbolic',
@@ -93,9 +93,9 @@ export const InhibitShortcutsDialog = GObject.registerClass({
       content.add_child(restoreLabel);
     }
 
-    this.dialog.contentLayout.add_child(content);
+    dialog.contentLayout.add_child(content);
 
-    this.dialog.addButton({
+    dialog.addButton({
       label: KestrelUi.t('inhibit-shortcuts-deny'),
       action: () => {
         void this.saveToPermissionStore(DENIED);
@@ -103,7 +103,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
       },
     });
 
-    this.dialog.addButton({
+    dialog.addButton({
       label: KestrelUi.t('inhibit-shortcuts-allow'),
       action: () => {
         void this.saveToPermissionStore(GRANTED);
@@ -111,11 +111,17 @@ export const InhibitShortcutsDialog = GObject.registerClass({
       },
       default: true,
     });
+    return dialog;
+  }
+
+  private ask(): void {
+    this.dialog ??= this.build();
+    this.dialog.open();
   }
 
   private emitResponse(response: Meta.InhibitShortcutsDialogResponse): void {
     this.emit('response', response);
-    this.dialog.close();
+    this.vfunc_hide();
   }
 
   vfunc_show(): void {
@@ -126,26 +132,27 @@ export const InhibitShortcutsDialog = GObject.registerClass({
 
     const appId = this.permissionId;
     if (!appId) {
-      this.dialog.open();
+      this.ask();
       return;
     }
 
     lookup(Gio.DBus.session, SHORTCUTS_INHIBITOR).then(apps => {
       const permission = apps[appId];
       if (permission === undefined)
-        this.dialog.open();
+        this.ask();
       else if (permission[0] === GRANTED)
         this.emitResponse(DialogResponse.ALLOW);
       else
         this.emitResponse(DialogResponse.DENY);
     }).catch((error: Error) => {
-      this.dialog.open();
+      this.ask();
       log(error.message);
     });
   }
 
   vfunc_hide(): void {
-    this.dialog.close();
+    this.dialog?.close();
+    this.dialog = null;
   }
 });
 export type InhibitShortcutsDialog = InstanceType<typeof InhibitShortcutsDialog>;

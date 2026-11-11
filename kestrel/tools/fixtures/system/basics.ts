@@ -34,6 +34,7 @@ const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login"
   <method name="PrepareForSleep"><arg type="b" direction="in"/></method>
   <method name="SetCanHibernate"><arg type="s" direction="in"/></method>
   <method name="SetSleepRefused"><arg type="b" direction="in"/></method>
+  <method name="SetRestartRefused"><arg type="b" direction="in"/></method>
 </interface></node>`;
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
@@ -152,6 +153,7 @@ export function publishBasics(publish: Publish, calls: string[]) {
   let lidClosed = false;
   let canHibernate = 'na';
   let sleepRefused = false;
+  let restartRefused = false;
   const login = publish(LOGIN, {
     InhibitAsync([what, , , mode]: string[], invocation: Gio.DBusMethodInvocation) {
       calls.push(`Inhibit ${what} ${mode}`);
@@ -166,7 +168,10 @@ export function publishBasics(publish: Publish, calls: string[]) {
     },
     HibernateWithFlags: () => calls.push('Hibernate'),
     PowerOffWithFlags: () => calls.push('PowerOff'),
-    Reboot: () => calls.push('Reboot'),
+    Reboot() {
+      calls.push('Reboot');
+      if (restartRefused) throw new Error('The computer refused to restart');
+    },
     CanPowerOff: () => 'yes',
     CanReboot: () => 'yes',
     CanSuspend: () => 'yes',
@@ -191,6 +196,9 @@ export function publishBasics(publish: Publish, calls: string[]) {
     },
     SetSleepRefused: (refused: boolean) => {
       sleepRefused = refused;
+    },
+    SetRestartRefused: (refused: boolean) => {
+      restartRefused = refused;
     },
   }, '/com/lantharos/KestrelChecks/Login');
   publish(LOGIN_USER, {Display: [SESSION_ID, SESSION_PATH]}, '/org/freedesktop/login1/user/self');

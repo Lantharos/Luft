@@ -41,8 +41,9 @@ async function checkOwnPages(app: LuftApp) {
     await pause(300);
     require(String(await setting(VISUALIZER, 'edges')) === 'right', 'the last edge can’t be turned off');
     (await showEnd(app, 'appearance')).save('settings-appearance-extension-rows');
-    (await show(app, `extensions/${NOW_PLAYING.toLowerCase()}`)).save('settings-extension-now-playing');
-    (await showEnd(app, `extensions/${NOW_PLAYING.toLowerCase()}`)).save('settings-extension-now-playing-place');
+    const nowPlaying = await show(app, `extensions/${NOW_PLAYING.toLowerCase()}`);
+    nowPlaying.save('settings-extension-now-playing');
+    (await scrollToEnd(app, nowPlaying)).save('settings-extension-now-playing-place');
     await show(app, 'extensions');
     const compact = await show(app, `extensions/${NOW_PLAYING.toLowerCase()}`, 'the compact layout offers what shows under the title');
     await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'cover'));
@@ -69,16 +70,18 @@ async function checkOwnPages(app: LuftApp) {
   }
   await installBuilt(STRAYS);
   try {
-    (await show(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays');
-    (await showEnd(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays-end');
+    const strays = await show(app, `extensions/${STRAYS.toLowerCase()}`);
+    strays.save('settings-extension-strays');
+    (await scrollToEnd(app, strays)).save('settings-extension-strays-end');
   } finally {
     await request('Remove', STRAYS);
   }
   await installBuilt(PLAYTHINGS);
   try {
     await setSetting(PLAYTHINGS, 'ambient', new GLib.Variant('b', false));
-    (await show(app, `extensions/${PLAYTHINGS.toLowerCase()}`)).save('settings-extension-playthings');
-    (await showEnd(app, `extensions/${PLAYTHINGS.toLowerCase()}`)).save('settings-extension-playthings-end');
+    const playthings = await show(app, `extensions/${PLAYTHINGS.toLowerCase()}`);
+    playthings.save('settings-extension-playthings');
+    (await scrollToEnd(app, playthings)).save('settings-extension-playthings-end');
   } finally {
     await request('Remove', PLAYTHINGS);
   }
@@ -104,7 +107,6 @@ async function checkOwnPages(app: LuftApp) {
 }
 
 export async function checkExtensions(app: LuftApp) {
-  await installBuilt(SEASONS);
   try {
     (await show(app, 'extensions')).save('settings-extensions');
     (await show(app, `extensions/${SEASONS}`)).save('settings-extension-seasons');
@@ -119,7 +121,7 @@ export async function checkExtensions(app: LuftApp) {
     await app.changes(rain, 'snow has no rain color or sound, and their section goes with them');
     (await app.settle(() => true)).save('settings-extension-seasons-snow');
   } finally {
-    await request('Remove', SEASONS);
+    kestrel.reset('extension-settings');
   }
   await checkOwnPages(app);
 }

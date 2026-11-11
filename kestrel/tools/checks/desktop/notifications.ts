@@ -9,6 +9,7 @@ import {descendants, existing, firstStyled, labelled, named, ofType, shown, styl
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
 import {centerOf, click, type Point, fingerScroll, liftFingers, moveTo, pressButton, releaseButton, rest, scroll} from '../lib/input/input.js';
+import {clearNotifications} from '../lib/notifications.js';
 import {LuftApp} from '../lib/apps/luftApp.js';
 import {gjs, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -38,11 +39,6 @@ async function notify(app: string, title: string, body: string, actions: string[
 
 const classed = (name: string, root: Clutter.Actor) =>
   descendants(root).filter((actor): actor is St.Widget => actor instanceof St.Widget && actor.get_style_class_name() === name);
-
-function clearAll() {
-  for (const source of Main.messageTray.getSources())
-    for (const notification of [...source.notifications]) notification.destroy();
-}
 
 function squareInset(card: Clutter.Actor, headerClass: string) {
   const first = firstStyled(headerClass, card)!.get_children().find(child => child.visible)!;
@@ -87,7 +83,7 @@ async function checkCenter(replies: Reply[]) {
 }
 
 async function checkBanner(replies: Reply[]) {
-  clearAll();
+  clearNotifications();
   const id = await notify('Chatter', 'Maya', 'Are you coming?', ['inline-reply', 'Reply']);
   const banner = await waitUntil(() => descendants(global.stage)
     .find((actor): actor is NotificationMessage => actor instanceof NotificationMessage && actor.has_style_class_name('notification-banner') && actor.mapped),
@@ -105,7 +101,7 @@ async function checkBanner(replies: Reply[]) {
   entry.set_text('On my way');
   entry.clutter_text.emit('activate');
   await eventually(() => replies.some(([replied, text]) => replied === id && text === 'On my way'), 'banner replies reach the app');
-  clearAll();
+  clearNotifications();
   dismissImmediately();
 }
 
@@ -254,7 +250,7 @@ async function checkCalendarScrolling() {
     require(card.translation_x === 0 && card.translation_y === 0, 'scrolling the list leaves its notifications in place');
   } finally {
     rest();
-    clearAll();
+    clearNotifications();
     dismissImmediately();
   }
 }
@@ -265,7 +261,7 @@ const bannerOf = (title: string) => descendants(global.stage).find((actor): acto
   actor.has_style_class_name('notification-banner') && actor.mapped && actor.notification?.title === title) ?? null;
 
 async function showBanner(title: string, actions: string[] = []) {
-  clearAll();
+  clearNotifications();
   const id = await notify('Chatter', title, 'Swipe this away', actions);
   const banner = await waitUntil(() => bannerOf(title), `the ${title} banner shows`);
   await waitUntil(() => Main.messageTray.bannerState === MessageTray.State.SHOWN, `the ${title} banner settles`);
@@ -361,11 +357,11 @@ async function checkBannerSwipes(closed: Map<number, number>, invoked: Reply[]) 
   liftFingers();
   await eventually(() => closed.get(id) === DISMISSED, 'a two-finger swipe dismisses a banner');
   rest();
-  clearAll();
+  clearNotifications();
 }
 
 async function checkCenterSwipes(closed: Map<number, number>) {
-  clearAll();
+  clearNotifications();
   const weather = await notify('Weather', 'Wind', 'Gusts up to 60 km/h.');
   const noor = await notify('Chatter', 'Noor', 'The draft is ready.');
   const sam = await notify('Chatter', 'Sam', 'Shipped it.');
@@ -413,19 +409,19 @@ async function checkCenterSwipes(closed: Map<number, number>) {
     await eventually(() => closed.get(noor) === DISMISSED && groups().length === 0, 'the close button still dismisses a notification');
   } finally {
     rest();
-    clearAll();
+    clearNotifications();
     dismissImmediately();
   }
 }
 
 async function checkWindowlessApp() {
-  clearAll();
+  clearNotifications();
   const sender = spawn(['notify-send', '--wait', '--app-name=Mail', '--hint=string:desktop-entry:com.lantharos.mailman',
     '--category=email.arrived', 'Theo Brandt', 'Harbour photos']);
   try {
     await eventually(() => bannerOf('Theo Brandt'), 'mail from an app running without a window slides in as a banner');
   } finally {
-    clearAll();
+    clearNotifications();
     await stop(sender);
   }
 }
@@ -465,7 +461,7 @@ async function checkActivation() {
     unsubscribe();
     await stop(other);
     await settings.close();
-    clearAll();
+    clearNotifications();
   }
 }
 
@@ -482,7 +478,7 @@ export async function run() {
   const forced = global.force_animations;
   global.force_animations = true;
   try {
-    clearAll();
+    clearNotifications();
     await checkCenter(replies);
     await checkBanner(replies);
     await checkWindowlessApp();
@@ -496,6 +492,6 @@ export async function run() {
   } finally {
     global.force_animations = forced;
     for (const unsubscribe of unsubscribes) unsubscribe();
-    clearAll();
+    clearNotifications();
   }
 }

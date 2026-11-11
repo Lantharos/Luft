@@ -4,6 +4,7 @@ import {dismissImmediately, Main} from 'resource:///com/lantharos/kestrel/kestre
 
 import {activateInAppRuntime} from '../checks/lib/apps/luftApp.js';
 import {rest} from '../checks/lib/input/input.js';
+import {clearNotifications} from '../checks/lib/notifications.js';
 import {stopAll} from '../checks/lib/processes.js';
 import {settled} from '../checks/lib/wait.js';
 import {endSession, runGroup} from './runner.js';
@@ -38,6 +39,7 @@ function pinFileManager() {
 
 async function reset() {
   dismissImmediately();
+  clearNotifications();
   await stopAll();
   global.workspace_manager.get_workspace_by_index(0)!.activate(global.get_current_time());
   rest();

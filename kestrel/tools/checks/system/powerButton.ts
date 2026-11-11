@@ -6,7 +6,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 import {call} from '../lib/dbus.js';
 import {answerable, existing, firstStyled, labelled, named, shown, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, moveBy, press} from '../lib/input/input.js';
+import {centerOf, click, moveBy, press} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -26,6 +26,11 @@ const asking = () => shown(Main.endSessionDialog) && showsText(TITLE, Main.endSe
 const lockMenu = () => firstStyled('kestrel-lock-menu');
 const ended = () => takeCalls().filter(name => END_CALLS.includes(name));
 const pressButton = () => press(Clutter.KEY_PowerOff);
+
+function taskbarReachable() {
+  const taskbar = existing('kestrel-panel');
+  return taskbar.contains(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, ...centerOf(taskbar)));
+}
 
 function controlLogin(method: string, value: GLib.Variant) {
   return call('org.freedesktop.login1', '/com/lantharos/KestrelChecks/Login', 'com.lantharos.KestrelChecks.Login', method, value, null, {connection: Gio.DBus.system});
@@ -122,9 +127,15 @@ async function checkScreenOff() {
 }
 
 async function checkRestart() {
-  await asked('before restarting');
-  click(labelled('Restart', Main.endSessionDialog)!);
-  await eventually(() => takeCalls().includes('Reboot'), 'choosing Restart restarts the computer');
+  await controlLogin('SetRestartRefused', new GLib.Variant('(b)', [true]));
+  try {
+    await asked('before restarting');
+    click(labelled('Restart', Main.endSessionDialog)!);
+    await eventually(() => takeCalls().includes('Reboot'), 'choosing Restart restarts the computer');
+    await eventually(taskbarReachable, 'the desktop comes back when the computer refuses to restart');
+  } finally {
+    await controlLogin('SetRestartRefused', new GLib.Variant('(b)', [false]));
+  }
 }
 
 async function checkSleepingChoice(power: Gio.Settings) {

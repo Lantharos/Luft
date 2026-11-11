@@ -14,9 +14,12 @@ const decoder = new TextDecoder();
 export class CrashGuard {
   private readonly file = GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'extensions-running.json']);
   private readonly record: Record;
+  readonly culprits: string[];
 
   constructor() {
     this.record = restartedAfterCrash ? this.afterCrash() : { running: [], crashes: {} };
+    this.culprits = Object.entries(this.record.crashes).filter(([, crashes]) => crashes >= CRASHES_BEFORE_OFF).map(([id]) => id);
+    for (const id of this.culprits) delete this.record.crashes[id];
   }
 
   private afterCrash(): Record {
@@ -27,10 +30,6 @@ export class CrashGuard {
     } catch {
       return { running: [], crashes: {} };
     }
-  }
-
-  get culprits(): string[] {
-    return Object.entries(this.record.crashes).filter(([, crashes]) => crashes >= CRASHES_BEFORE_OFF).map(([id]) => id);
   }
 
   running(ids: string[]): void {

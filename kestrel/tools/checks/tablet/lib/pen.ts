@@ -9,6 +9,7 @@ export const BTN_STYLUS = 0x14b;
 export const BTN_STYLUS2 = 0x14c;
 
 const PRESS = 60;
+const PALM_WATCH = 4600;
 const seat = global.stage.context.get_backend().get_default_seat();
 const now = () => GLib.get_monotonic_time();
 let device: Clutter.VirtualInputDevice | null = null;
@@ -23,6 +24,8 @@ export function hover([x, y]: Point) {
 export function leave() {
   pen().notify_tablet_proximity(now(), false, Clutter.InputDeviceToolType.PEN);
 }
+
+export const palmWatchOver = () => pause(PALM_WATCH);
 
 export async function pressButton(button: number) {
   pen().notify_tablet_button(now(), button, Clutter.ButtonState.PRESSED);

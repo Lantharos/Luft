@@ -87,11 +87,6 @@ export const answer = (name: string) => ofType(labelled(name, banners()[0]!), St
 
 export const row = (title: string) => popup() && descendants(popup()!).find(actor => actor instanceof St.Button && actor.accessible_name?.startsWith(`${title},`) && actor.mapped) as St.Button | undefined;
 
-export function clearNotifications() {
-  for (const source of Main.messageTray.getSources())
-    for (const notification of [...source.notifications]) notification.destroy();
-}
-
 export async function openPanel() {
   click(element()!);
   await waitUntil(popup, 'the pop-up opens');

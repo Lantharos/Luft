@@ -7,6 +7,7 @@ import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {moveClock, realClock, setClock} from '../lib/fakeClock.js';
 import {click, press, rest, type} from '../lib/input/input.js';
+import {clearNotifications} from '../lib/notifications.js';
 import {capture} from '../lib/screenshots.js';
 import {threads} from '../lib/threads.js';
 import {pause, settled} from '../lib/wait.js';
@@ -16,7 +17,7 @@ import {closeStart, descriptionOf, openStart, rows, search, titleOf} from '../st
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
 import {installBuilt, listed, request, setSetting, userFolder} from '../extensions/lib/extensions.js';
-import {FOCUS, REMINDERS, STATE, type Stored, answer, answerChooser, bannerMentions, banners, buttonIn, cleanSlate, clearNotifications, only, crashKestrel, element, file, keepFor, mentions, openPanel, popup, push, read, readJson, reminder, requeue, row, saved, seed, sentence} from './reminders/world.js';
+import {FOCUS, REMINDERS, STATE, type Stored, answer, answerChooser, bannerMentions, banners, buttonIn, cleanSlate, only, crashKestrel, element, file, keepFor, mentions, openPanel, popup, push, read, readJson, reminder, requeue, row, saved, seed, sentence} from './reminders/world.js';
 
 const {require, eventually} = checks('Reminders');
 const THURSDAY_NOON = new Date(2026, 10, 5, 12, 0).getTime();

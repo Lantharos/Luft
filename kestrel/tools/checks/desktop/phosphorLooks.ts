@@ -117,8 +117,6 @@ export async function run() {
     await eventually(async () => (await listed(PHOSPHOR))?.state === 'running', 'Phosphor runs');
     const striped = await open('Striped', 100, 90);
     await open('Other', 760, 300, 'boardWindow');
-    for (const source of Main.messageTray.getSources())
-      for (const notification of [...source.notifications]) notification.destroy();
     await checkEveryLook();
     await checkTransitions();
     await checkRules(striped);

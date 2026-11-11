@@ -7,6 +7,7 @@ import {descendants, shown, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, moveTo, rest} from '../lib/input/input.js';
+import {clearNotifications} from '../lib/notifications.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
@@ -38,11 +39,6 @@ async function soundscapesPlays(): Promise<boolean> {
 async function notify(app: string, title: string) {
   await call('org.gnome.Shell', '/org/freedesktop/Notifications', 'org.freedesktop.Notifications', 'Notify',
     new GLib.Variant('(susssasa{sv}i)', [app, 0, '', title, 'Can you take a look?', [], {}, -1]), '(u)');
-}
-
-function clearNotifications() {
-  for (const source of Main.messageTray.getSources())
-    for (const notification of [...source.notifications]) notification.destroy();
 }
 
 async function shortSession() {

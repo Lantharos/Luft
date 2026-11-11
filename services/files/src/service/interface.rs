@@ -18,6 +18,8 @@ use crate::work::{copy, create, processes, remove, trash};
 const CHANGE: &str = "com.lantharos.files.change";
 const PROCESSES: &str = "com.lantharos.files.processes";
 
+type Pair = (Vec<u8>, Vec<u8>);
+
 pub struct Files {
     idle: Arc<Idle>,
 }
@@ -33,7 +35,7 @@ impl Files {
         header: &Header<'_>,
         action: &str,
         prompt: &Prompt,
-        work: impl FnOnce() -> io::Result<T> + Send + 'static,
+        work: impl FnOnce() -> Result<T, Error> + Send + 'static,
     ) -> Result<T, Error> {
         let _activity = self.idle.hold();
         if !polkit::is_authorized_to(connection, header, action, &prompt.details()).await? {
@@ -42,8 +44,18 @@ impl Files {
         tokio::task::spawn_blocking(work)
             .await
             .map_err(io::Error::other)?
-            .map_err(Error::from)
     }
+}
+
+/// Changes the items in turn and stops at the first that can't be changed.
+fn each<Item>(
+    items: &[Item],
+    path: impl Fn(&Item) -> &[u8],
+    change: impl Fn(&Item) -> io::Result<()>,
+) -> Result<(), Error> {
+    items.iter().try_for_each(|item| {
+        change(item).map_err(|error| Error::among(items.len(), path(item), &error))
+    })
 }
 
 async fn caller(connection: &Connection, header: &Header<'_>) -> Result<u32, Error> {
@@ -59,14 +71,17 @@ async fn caller(connection: &Connection, header: &Header<'_>) -> Result<u32, Err
 impl Files {
     async fn copy(
         &self,
-        source: Vec<u8>,
-        target: Vec<u8>,
+        items: Vec<Pair>,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        let prompt = Prompt::copy(&source, &target);
+        let prompt = Prompt::copy(&items)?;
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            copy::copy(&Place::find(&source)?, &Place::find(&target)?)
+            each(
+                &items,
+                |(source, _)| source,
+                |(source, target)| copy::copy(&Place::find(source)?, &Place::find(target)?),
+            )
         })
         .await
     }
@@ -74,42 +89,56 @@ impl Files {
     #[zbus(name = "Move")]
     async fn move_to(
         &self,
-        source: Vec<u8>,
-        target: Vec<u8>,
+        items: Vec<Pair>,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        let prompt = Prompt::move_to(&source, &target);
+        let prompt = Prompt::move_to(&items)?;
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            copy::move_to(&Place::find(&source)?, &Place::find(&target)?)
+            each(
+                &items,
+                |(source, _)| source,
+                |(source, target)| copy::move_to(&Place::find(source)?, &Place::find(target)?),
+            )
         })
         .await
     }
 
     async fn delete(
         &self,
-        path: Vec<u8>,
+        paths: Vec<Vec<u8>>,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        let prompt = Prompt::delete(&path);
+        let prompt = Prompt::delete(&paths)?;
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            remove::remove(&Place::find(&path)?)
+            each(
+                &paths,
+                |path| path,
+                |path| remove::remove(&Place::find(path)?),
+            )
         })
         .await
     }
 
-    #[zbus(out_args("file", "info"))]
+    #[zbus(out_args("trashed"))]
     async fn trash(
         &self,
-        path: Vec<u8>,
+        paths: Vec<Vec<u8>>,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
-    ) -> Result<(Vec<u8>, Vec<u8>), Error> {
+    ) -> Result<Vec<Pair>, Error> {
         let user = caller(connection, &header).await?;
-        let prompt = Prompt::trash(&path);
+        let prompt = Prompt::trash(&paths)?;
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            trash::put(&path, &Person::find(user)?)
+            let person = Person::find(user)?;
+            paths
+                .iter()
+                .map(|path| {
+                    trash::put(path, &person)
+                        .map_err(|error| Error::among(paths.len(), path, &error))
+                })
+                .collect()
         })
         .await
     }
@@ -123,7 +152,7 @@ impl Files {
     ) -> Result<bool, Error> {
         let prompt = Prompt::make_folder(&path);
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            create::folder(&path)
+            Ok(create::folder(&path)?)
         })
         .await
     }
@@ -136,7 +165,7 @@ impl Files {
     ) -> Result<(), Error> {
         let prompt = Prompt::make_file(&path);
         self.allowed(connection, &header, CHANGE, &prompt, move || {
-            create::file(&Place::find(&path)?)
+            Ok(create::file(&Place::find(&path)?)?)
         })
         .await
     }
@@ -151,7 +180,7 @@ impl Files {
         let signal = processes::allowed(signal)?;
         let prompt = Prompt::signal(&processes, signal);
         self.allowed(connection, &header, PROCESSES, &prompt, move || {
-            processes::signal(&processes, signal)
+            Ok(processes::signal(&processes, signal)?)
         })
         .await
     }
@@ -165,7 +194,7 @@ impl Files {
     ) -> Result<(), Error> {
         let prompt = Prompt::set_priority(process);
         self.allowed(connection, &header, PROCESSES, &prompt, move || {
-            processes::set_priority(process, nice)
+            Ok(processes::set_priority(process, nice)?)
         })
         .await
     }

@@ -1,6 +1,7 @@
 use std::fs;
 use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::{PermissionsExt, symlink};
+use std::os::unix::net::UnixListener;
 use std::path::Path;
 
 use super::copy::{copy, move_to};
@@ -86,4 +87,42 @@ fn copies_moves_and_removes_links_as_links() {
         fs::read_to_string(root.join("outside/precious")).unwrap(),
         "kept"
     );
+}
+
+#[test]
+fn a_copy_that_cannot_start_leaves_the_target_alone() {
+    let scratch = tempfile::tempdir().unwrap();
+    let root = scratch.path().canonicalize().unwrap();
+    fs::create_dir(root.join("documents")).unwrap();
+    fs::write(root.join("documents/thesis"), "kept").unwrap();
+    fs::create_dir(root.join("far")).unwrap();
+    let _socket = UnixListener::bind(root.join("socket")).unwrap();
+    let target = || place(&root.join("documents")).unwrap();
+
+    assert!(copy(&place(&root.join("gone")).unwrap(), &target()).is_err());
+    assert!(copy(&place(&root.join("socket")).unwrap(), &target()).is_err());
+    assert!(copy(&place(&root.join("far")).unwrap(), &target()).is_err());
+    assert!(move_to(&place(&root.join("gone")).unwrap(), &target()).is_err());
+    assert_eq!(
+        fs::read_to_string(root.join("documents/thesis")).unwrap(),
+        "kept"
+    );
+}
+
+#[test]
+fn a_copy_that_cannot_finish_is_taken_away() {
+    let scratch = tempfile::tempdir().unwrap();
+    let root = scratch.path().canonicalize().unwrap();
+    fs::create_dir(root.join("tree")).unwrap();
+    fs::write(root.join("tree/file"), "contents").unwrap();
+    let _socket = UnixListener::bind(root.join("tree/socket")).unwrap();
+
+    assert!(
+        copy(
+            &place(&root.join("tree")).unwrap(),
+            &place(&root.join("copy")).unwrap()
+        )
+        .is_err()
+    );
+    assert!(!root.join("copy").exists());
 }

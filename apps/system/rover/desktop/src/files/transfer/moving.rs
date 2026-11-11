@@ -6,7 +6,7 @@ use super::copy::{copy_to, parent};
 use super::resolve::available_destination;
 use super::tracker::Tracker;
 use crate::files::operations::Resolution;
-use crate::files::privileged::{self, is_permission_error};
+use crate::files::privileged::is_permission_error;
 use crate::files::rename_no_replace;
 use crate::history::Step;
 
@@ -33,8 +33,11 @@ pub(super) fn move_to(
                 return copy_to(source, target, true, tracker);
             }
             Err(error) if is_permission_error(&error) => {
-                privileged::move_to(source, &target)?;
-                return moved(source, target, tracker);
+                if tracker.claims(&target) {
+                    tracker.settle()?;
+                    continue;
+                }
+                return tracker.defer(source, target);
             }
             Err(error) => return Err(error.to_string()),
         }
@@ -56,6 +59,6 @@ fn merge(source: &Path, target: &Path, tracker: &mut Tracker) -> Result<(), Stri
         let name = child.file_name().ok_or("Invalid file name")?;
         move_to(&child, target.join(name), tracker)?;
     }
-    let _ = fs::remove_dir(source);
+    tracker.leave(source);
     Ok(())
 }

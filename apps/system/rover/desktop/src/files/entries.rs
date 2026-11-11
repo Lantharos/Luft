@@ -134,7 +134,7 @@ pub fn rename_item(path: String, new_name: String, history: &History) -> Result<
             return Err("An item with that name already exists".to_string());
         }
         Err(error) if is_permission_error(&error) => {
-            privileged::move_to(&old_path, &new_path)?;
+            privileged::rename(&old_path, &new_path)?;
         }
         Err(error) => return Err(error.to_string()),
     }

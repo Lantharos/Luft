@@ -6,32 +6,37 @@
     and stops when idle. Paths are absolute, as bytes, and may not pass through a link on the way to
     the item; the item itself may be a link and is then handled as the link, never what it points to.
     The file methods need com.lantharos.files.change, Signal and SetPriority need
-    com.lantharos.files.processes. The password prompt names the item or the processes and what is
-    about to happen to them; polkit rules get the same as "operation", "path", "target" and
-    "processes".
+    com.lantharos.files.processes. Every call asks for an administrator's password, and the answer
+    covers that call alone. The prompt says what the call is about to do: one item is named in full,
+    several are counted together with the folder they are all in, and processes are named. polkit
+    rules get the same as "operation", "path" (the item, or the folder for several), "target",
+    "count" and "processes".
+
+    Copy, Move, Delete and Trash take every item of one change in a single call. They work through
+    the items in order and stop at the first that can't be changed, with an error that names it;
+    the items before it stay changed.
   -->
   <interface name="com.lantharos.Files1">
-    <!-- Copies a file, folder or link. Fails when the target exists. The copy belongs to whoever
-         owns the folder it lands in and never keeps setuid or setgid. -->
+    <!-- Copies files, folders or links, each source to its target. A target that exists is left
+         alone and fails the call, and a copy that can't be finished is removed again. Each copy
+         belongs to whoever owns the folder it lands in and never keeps setuid or setgid. -->
     <method name="Copy">
-      <arg name="source" type="ay" direction="in"/>
-      <arg name="target" type="ay" direction="in"/>
+      <arg name="items" type="a(ayay)" direction="in"/>
     </method>
-    <!-- Moves or renames an item. Fails when the target exists. -->
+    <!-- Moves or renames items, each source to its target. A target that exists is left alone and
+         fails the call. -->
     <method name="Move">
-      <arg name="source" type="ay" direction="in"/>
-      <arg name="target" type="ay" direction="in"/>
+      <arg name="items" type="a(ayay)" direction="in"/>
     </method>
-    <!-- Removes an item and everything in it for good. -->
+    <!-- Removes items and everything in them for good. -->
     <method name="Delete">
-      <arg name="path" type="ay" direction="in"/>
+      <arg name="paths" type="aay" direction="in"/>
     </method>
-    <!-- Moves an item to the caller's own trash, on the drive it's on, and returns where the item
-         and its note went. -->
+    <!-- Moves items to the caller's own trash, on the drive each is on, and returns where each item
+         and its note went, in the order given. -->
     <method name="Trash">
-      <arg name="path" type="ay" direction="in"/>
-      <arg name="file" type="ay" direction="out"/>
-      <arg name="info" type="ay" direction="out"/>
+      <arg name="paths" type="aay" direction="in"/>
+      <arg name="trashed" type="a(ayay)" direction="out"/>
     </method>
     <!-- Makes a folder and the missing folders above it, each owned by whoever owns the folder it's
          in. Answers whether the folder is new. -->

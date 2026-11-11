@@ -27,26 +27,33 @@ pub struct Trashed {
     pub info: PathBuf,
 }
 
-pub async fn copy(source: &Path, target: &Path) -> Result<(), String> {
-    call("Copy", &(named(source), named(target))).await
+/// Copies every source to its target. The file changes here take all their
+/// items in one call, so an administrator is asked once for the lot, and stop
+/// at the first item that can't be changed.
+pub async fn copy(items: &[(PathBuf, PathBuf)]) -> Result<(), String> {
+    call("Copy", &(pairs(items),)).await
 }
 
-pub async fn move_to(source: &Path, target: &Path) -> Result<(), String> {
-    call("Move", &(named(source), named(target))).await
+pub async fn move_to(items: &[(PathBuf, PathBuf)]) -> Result<(), String> {
+    call("Move", &(pairs(items),)).await
 }
 
-pub async fn delete(path: &Path) -> Result<(), String> {
-    call("Delete", &(named(path),)).await
+pub async fn delete(paths: &[PathBuf]) -> Result<(), String> {
+    call("Delete", &(names(paths),)).await
 }
 
-/// Moves an item to the trash of the person asking, not the administrator's.
-pub async fn trash(path: &Path) -> Result<Trashed, String> {
-    let (file, info): (Vec<u8>, Vec<u8>) = call("Trash", &(named(path),)).await?;
+/// Moves items to the trash of the person asking, not the administrator's,
+/// and answers where each went, in the order they were given.
+pub async fn trash(paths: &[PathBuf]) -> Result<Vec<Trashed>, String> {
+    let trashed: Vec<(Vec<u8>, Vec<u8>)> = call("Trash", &(names(paths),)).await?;
     let path = |bytes: Vec<u8>| PathBuf::from(OsStr::from_bytes(&bytes));
-    Ok(Trashed {
-        file: path(file),
-        info: path(info),
-    })
+    Ok(trashed
+        .into_iter()
+        .map(|(file, info)| Trashed {
+            file: path(file),
+            info: path(info),
+        })
+        .collect())
 }
 
 /// Makes a folder and the folders above it that are missing. Answers whether
@@ -76,6 +83,17 @@ where
         .change(method, body)
         .await
         .map_err(|error| luft_dbus::explain(&error))
+}
+
+fn names(paths: &[PathBuf]) -> Vec<Vec<u8>> {
+    paths.iter().map(|path| named(path)).collect()
+}
+
+fn pairs(items: &[(PathBuf, PathBuf)]) -> Vec<(Vec<u8>, Vec<u8>)> {
+    items
+        .iter()
+        .map(|(source, target)| (named(source), named(target)))
+        .collect()
 }
 
 fn named(path: &Path) -> Vec<u8> {

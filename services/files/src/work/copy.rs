@@ -1,6 +1,6 @@
 use std::ffi::CStr;
 use std::io;
-use std::os::fd::AsFd;
+use std::os::fd::{AsFd, OwnedFd};
 
 use luft_files::data;
 use rustix::fs::{
@@ -38,7 +38,7 @@ impl Owned {
 /// belongs to whoever owns the folder it lands in.
 pub fn copy(from: &Place, to: &Place) -> io::Result<()> {
     let owned = Owned::By(Owner::of(&to.folder)?);
-    copy_whole(from, to, owned)
+    copy_in(&from.folder, &from.name, &to.folder, &to.name, owned)
 }
 
 /// Moves an item without replacing anything. Across drives it's copied with
@@ -46,7 +46,13 @@ pub fn copy(from: &Place, to: &Place) -> io::Result<()> {
 pub fn move_to(from: &Place, to: &Place) -> io::Result<()> {
     match rename_new(&from.folder, &from.name, &to.folder, &to.name) {
         Err(Errno::XDEV) => {
-            copy_whole(from, to, Owned::AsBefore)?;
+            copy_in(
+                &from.folder,
+                &from.name,
+                &to.folder,
+                &to.name,
+                Owned::AsBefore,
+            )?;
             remove_in(&from.folder, &from.name)
         }
         renamed => Ok(renamed?),
@@ -68,17 +74,52 @@ pub fn rename_new(
     }
 }
 
-fn copy_whole(from: &Place, to: &Place, owned: Owned) -> io::Result<()> {
-    let copied = copy_in(&from.folder, &from.name, &to.folder, &to.name, owned);
-    if copied
-        .as_ref()
-        .is_err_and(|error| error.kind() != io::ErrorKind::AlreadyExists)
-    {
-        let _ = remove_in(&to.folder, &to.name);
-    }
-    copied
+/// What a copy carries over from the item it was made from.
+struct Kept {
+    owner: Owner,
+    mode: Mode,
+    times: Timestamps,
 }
 
+impl Kept {
+    fn of(stat: &Stat, owned: Owned) -> Self {
+        Self {
+            owner: owned.owner(stat),
+            mode: Mode::from_raw_mode(stat.st_mode & KEPT_BITS),
+            times: Timestamps {
+                last_access: Timespec {
+                    tv_sec: stat.st_atime as _,
+                    tv_nsec: stat.st_atime_nsec as _,
+                },
+                last_modification: Timespec {
+                    tv_sec: stat.st_mtime as _,
+                    tv_nsec: stat.st_mtime_nsec as _,
+                },
+            },
+        }
+    }
+
+    fn settle(&self, source: impl AsFd, target: impl AsFd) -> io::Result<()> {
+        data::attributes(&source, &target)?;
+        fchown(&target, Some(self.owner.user), Some(self.owner.group))?;
+        fchmod(&target, self.mode)?;
+        Ok(futimens(&target, &self.times)?)
+    }
+
+    fn settle_link(&self, folder: impl AsFd, name: &CStr) -> io::Result<()> {
+        self.owner.take(&folder, name)?;
+        Ok(utimensat(
+            &folder,
+            name,
+            &self.times,
+            AtFlags::SYMLINK_NOFOLLOW,
+        )?)
+    }
+}
+
+/// Makes the copy under a name that must be free, then fills it. A copy that
+/// can't be finished is taken away again; one that couldn't be started leaves
+/// whatever has that name alone.
 fn copy_in(
     from: impl AsFd,
     from_name: &CStr,
@@ -87,40 +128,17 @@ fn copy_in(
     owned: Owned,
 ) -> io::Result<()> {
     let stat = statat(&from, from_name, AtFlags::SYMLINK_NOFOLLOW)?;
-    let owner = owned.owner(&stat);
-    let mode = Mode::from_raw_mode(stat.st_mode & KEPT_BITS);
-    let times = Timestamps {
-        last_access: Timespec {
-            tv_sec: stat.st_atime as _,
-            tv_nsec: stat.st_atime_nsec as _,
-        },
-        last_modification: Timespec {
-            tv_sec: stat.st_mtime as _,
-            tv_nsec: stat.st_mtime_nsec as _,
-        },
-    };
-    match FileType::from_raw_mode(stat.st_mode) {
+    let kept = Kept::of(&stat, owned);
+    let filled = match FileType::from_raw_mode(stat.st_mode) {
         FileType::Directory => {
-            mkdirat(&to, to_name, WHILE_COPYING)?;
             let source = enter(&from, from_name)?;
-            let target = enter(&to, to_name)?;
-            for entry in Dir::read_from(&source)? {
-                let entry = entry?;
-                let name = entry.file_name();
-                if name != c"." && name != c".." {
-                    copy_in(&source, name, &target, name, owned)?;
-                }
-            }
-            data::attributes(&source, &target)?;
-            fchown(&target, Some(owner.user), Some(owner.group))?;
-            fchmod(&target, mode)?;
-            futimens(&target, &times)?;
+            mkdirat(&to, to_name, WHILE_COPYING)?;
+            fill_folder(&source, &to, to_name, owned, &kept)
         }
         FileType::Symlink => {
             let link = readlinkat(&from, from_name, Vec::new())?;
             symlinkat(link, &to, to_name)?;
-            owner.take(&to, to_name)?;
-            utimensat(&to, to_name, &times, AtFlags::SYMLINK_NOFOLLOW)?;
+            kept.settle_link(&to, to_name)
         }
         FileType::RegularFile => {
             let source = openat(
@@ -135,17 +153,35 @@ fn copy_in(
                 OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL | OFlags::NOFOLLOW | OFlags::CLOEXEC,
                 WHILE_COPYING,
             )?;
-            data::contents(&source, &target, stat.st_size as u64, |_| Ok(()))?;
-            data::attributes(&source, &target)?;
-            fchown(&target, Some(owner.user), Some(owner.group))?;
-            fchmod(&target, mode)?;
-            futimens(&target, &times)?;
+            data::contents(&source, &target, stat.st_size as u64, |_| Ok(()))
+                .and_then(|()| kept.settle(&source, &target))
         }
         _ => {
             return Err(io::Error::other(
                 "Only files, folders and links can be copied",
             ));
         }
+    };
+    if filled.is_err() {
+        let _ = remove_in(&to, to_name);
     }
-    Ok(())
+    filled
+}
+
+fn fill_folder(
+    source: &OwnedFd,
+    to: impl AsFd,
+    to_name: &CStr,
+    owned: Owned,
+    kept: &Kept,
+) -> io::Result<()> {
+    let target = enter(&to, to_name)?;
+    for entry in Dir::read_from(source)? {
+        let entry = entry?;
+        let name = entry.file_name();
+        if name != c"." && name != c".." {
+            copy_in(source, name, &target, name, owned)?;
+        }
+    }
+    kept.settle(source, &target)
 }

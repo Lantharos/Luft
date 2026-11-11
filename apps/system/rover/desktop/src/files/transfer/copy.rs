@@ -55,6 +55,10 @@ pub(super) fn copy_to(
                 }
             }
             Err(error) if is_permission_error(&error) => {
+                if tracker.claims(&target) {
+                    tracker.settle()?;
+                    continue;
+                }
                 return copy_elevated(source, &target, record, tracker);
             }
             Err(error) => return Err(error.to_string()),
@@ -121,7 +125,7 @@ fn merge(source: &Path, target: &Path, tracker: &mut Tracker) -> Result<(), Stri
         copy_to(&child, target.join(name), true, tracker)?;
     }
     if tracker.mode == Mode::Move {
-        let _ = fs::remove_dir(source);
+        tracker.leave(source);
     }
     Ok(())
 }
@@ -155,12 +159,11 @@ fn copy_elevated(
     } else {
         target.to_path_buf()
     };
-    privileged::copy(source, &target)?;
-    tracker.mark_done(source)?;
     if record {
-        tracker.placed(source, &target)?;
+        return tracker.defer(source, target);
     }
-    Ok(())
+    privileged::copy(&[(source.to_path_buf(), target)])?;
+    tracker.mark_done(source)
 }
 
 pub(super) fn parent(path: &Path) -> &Path {

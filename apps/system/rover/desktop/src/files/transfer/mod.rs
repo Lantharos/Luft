@@ -113,7 +113,8 @@ pub(crate) fn relocate(
 ) -> Result<(), String> {
     let mut tracker = Tracker::new(queue, id, Mode::Move, Resolver::default());
     tracker.prepare(&[(from.to_path_buf(), copy::parent(to).to_path_buf())]);
-    copy::copy_to(from, to.to_path_buf(), true, &mut tracker)
+    copy::copy_to(from, to.to_path_buf(), true, &mut tracker)?;
+    tracker.settle()
 }
 
 fn start(
@@ -177,6 +178,7 @@ fn copy_all(plan: &Plan, tracker: &mut Tracker) -> Result<(), String> {
     for (source, destination) in plan {
         copy::copy_to(source, target(source, destination)?, true, tracker)?;
     }
+    tracker.settle()?;
     finalize(tracker)
 }
 
@@ -189,6 +191,7 @@ fn move_all(plan: &Plan, tracker: &mut Tracker) -> Result<(), String> {
     for (source, destination) in plan {
         moving::move_to(source, target(source, destination)?, tracker)?;
     }
+    tracker.settle()?;
     if crossing {
         finalize(tracker)?;
     }

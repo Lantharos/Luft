@@ -7,14 +7,17 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
-use super::privileged::remove_path;
+use super::privileged::{self, remove_or_defer, remove_paths};
 use crate::files::text::{items, subject};
 use crate::history::{History, Step};
 use crate::locations::cloud::is_cloud;
 pub use locations::TrashLocation;
 use locations::parse_trashinfo;
 pub(crate) use locations::trash_locations;
-pub use put::{Trashed, put, restore as restore_item};
+pub use put::{
+    Trashed, put, put_denied, put_or_defer, restore as restore_item, restore_denied,
+    restore_or_defer,
+};
 use specta::Type;
 
 #[derive(Debug, Serialize, Type)]
@@ -65,7 +68,8 @@ pub fn move_to_trash(
     let label = format!("Moved {} to the trash", subject(&paths));
     let undo_label = format!("Put back {}", subject(&paths));
     let mut steps = Vec::new();
-    let result = run_batch(
+    let mut denied = Vec::new();
+    let (id, placed) = run_batch(
         queue,
         OperationType::Trash,
         OperationPhase::Moving,
@@ -74,58 +78,86 @@ pub fn move_to_trash(
             if is_cloud(&path) {
                 return Err("Cloud drives have no trash".to_string());
             }
-            steps.push(Step::Trashed(put(Path::new(&path))?));
+            let trashed = put_or_defer(Path::new(&path), &mut denied)?;
+            steps.extend(trashed.map(Step::Trashed));
             Ok(())
         },
     );
+    let result = placed.and_then(|()| {
+        steps.extend(put_denied(&denied)?.into_iter().map(Step::Trashed));
+        Ok(())
+    });
     history.record(label, undo_label, steps, true);
-    result
+    queue.finish(&id, result)
 }
 
 pub fn restore(ids: Vec<String>, queue: &OperationsQueue, history: &History) -> Result<(), String> {
     let label = format!("Restored {}", items(ids.len()));
     let undo_label = format!("Moved {} back to the trash", items(ids.len()));
     let mut steps = Vec::new();
+    let mut denied = Vec::new();
     let locations = trash_locations()?;
-    let result = run_batch(
+    let (id, moved) = run_batch(
         queue,
         OperationType::Move,
         OperationPhase::Moving,
         ids,
         |id| {
-            let original = restore_item(&Located::find(&id, &locations)?.trashed()?)?;
-            steps.push(Step::Created(original));
+            let item = Located::find(&id, &locations)?.trashed()?;
+            if restore_or_defer(&item, &mut denied)? {
+                steps.push(Step::Created(item.original));
+            }
             Ok(())
         },
     );
+    let result = moved.and_then(|()| {
+        let (restored, result) = restore_denied(denied);
+        steps.extend(restored.into_iter().map(Step::Created));
+        result
+    });
     history.record(label, undo_label, steps, false);
-    result
+    queue.finish(&id, result)
 }
 
 pub fn delete_items(paths: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
-    run_batch(
+    let mut denied = Vec::new();
+    let (id, removed) = run_batch(
         queue,
         OperationType::Delete,
         OperationPhase::Deleting,
         paths,
-        |path| remove_path(Path::new(&path)),
-    )
+        |path| remove_or_defer(PathBuf::from(path), &mut denied).map(drop),
+    );
+    queue.finish(&id, removed.and_then(|()| privileged::delete(&denied)))
 }
 
 pub fn delete_permanently(ids: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
     let locations = trash_locations()?;
-    run_batch(
+    let mut denied = Vec::new();
+    let mut notes = Vec::new();
+    let (id, removed) = run_batch(
         queue,
         OperationType::Delete,
         OperationPhase::Deleting,
         ids,
         |id| {
             let item = Located::find(&id, &locations)?;
-            remove_path(&item.file)?;
-            let _ = fs::remove_file(&item.info);
+            if remove_or_defer(item.file, &mut denied)? {
+                let _ = fs::remove_file(&item.info);
+            } else {
+                notes.push(item.info);
+            }
             Ok(())
         },
-    )
+    );
+    let result = removed.and_then(|()| {
+        privileged::delete(&denied)?;
+        for note in notes {
+            let _ = fs::remove_file(note);
+        }
+        Ok(())
+    });
+    queue.finish(&id, result)
 }
 
 pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
@@ -138,27 +170,29 @@ pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
             .map(|location| location.path)
             .collect(),
     };
-    for target in targets {
-        let target = Path::new(&target);
-        remove_contents(&target.join("files"))?;
-        remove_contents(&target.join("info"))?;
-    }
-    Ok(())
+    remove_paths(targets.iter().flat_map(|target| {
+        ["files", "info"]
+            .into_iter()
+            .filter_map(|folder| fs::read_dir(Path::new(target).join(folder)).ok())
+            .flat_map(|entries| entries.flatten().map(|entry| entry.path()))
+    }))
 }
 
+/// Runs `action` on every item, showing how far it got, and answers the
+/// operation to finish once what's left of the work is done.
 fn run_batch(
     queue: &OperationsQueue,
     op_type: OperationType,
     phase: OperationPhase,
     items: Vec<String>,
     mut action: impl FnMut(String) -> Result<(), String>,
-) -> Result<(), String> {
+) -> (String, Result<(), String>) {
     let id = queue.start(op_type, phase, items.len());
     let result = items.into_iter().enumerate().try_for_each(|(index, item)| {
         queue.update_progress(&id, Some(item.clone()), 0, index);
         action(item)
     });
-    queue.finish(&id, result)
+    (id, result)
 }
 
 struct Located {
@@ -238,14 +272,4 @@ fn dir_size(path: &Path) -> u64 {
         .filter(fs::Metadata::is_file)
         .map(|metadata| metadata.len())
         .sum()
-}
-
-fn remove_contents(path: &Path) -> Result<(), String> {
-    let Ok(entries) = fs::read_dir(path) else {
-        return Ok(());
-    };
-    for entry in entries {
-        remove_path(&entry.map_err(|error| error.to_string())?.path())?;
-    }
-    Ok(())
 }

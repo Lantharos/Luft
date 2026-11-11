@@ -1,9 +1,10 @@
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use super::resolve::Resolver;
 use super::space::{file_name, path_items, path_size};
 use crate::files::operations::{OperationStatus, OperationsQueue, Resolution};
-use crate::files::privileged::remove_path;
+use crate::files::privileged::{self, Pair, arrived, remove_path, remove_paths};
 use crate::files::trash;
 use crate::history::Step;
 use crate::locations::drives;
@@ -23,6 +24,8 @@ pub(super) struct Tracker<'a> {
     bytes_processed: u64,
     items_processed: usize,
     resolver: Resolver,
+    denied: Vec<Pair>,
+    emptied: Vec<PathBuf>,
 }
 
 impl<'a> Tracker<'a> {
@@ -36,6 +39,8 @@ impl<'a> Tracker<'a> {
             bytes_processed: 0,
             items_processed: 0,
             resolver,
+            denied: Vec::new(),
+            emptied: Vec::new(),
         }
     }
 
@@ -126,13 +131,65 @@ impl<'a> Tracker<'a> {
         })
     }
 
+    /// Leaves an item this account may not place for [`Tracker::settle`],
+    /// which asks an administrator about all of them at once.
+    pub fn defer(&mut self, source: &Path, target: PathBuf) -> Result<(), String> {
+        self.mark_done(source)?;
+        self.denied.push((source.to_path_buf(), target));
+        Ok(())
+    }
+
+    pub fn claims(&self, target: &Path) -> bool {
+        self.denied.iter().any(|(_, claimed)| claimed == target)
+    }
+
+    /// Removes a folder whose contents were moved into another one, once
+    /// nothing of it is still waiting to move.
+    pub fn leave(&mut self, folder: &Path) {
+        if self.denied.is_empty() {
+            let _ = fs::remove_dir(folder);
+        } else {
+            self.emptied.push(folder.to_path_buf());
+        }
+    }
+
+    pub fn settle(&mut self) -> Result<(), String> {
+        let denied = std::mem::take(&mut self.denied);
+        let settled = match self.mode {
+            Mode::Copy => privileged::copy(&denied),
+            Mode::Move => privileged::move_to(&denied),
+        };
+        for (source, target) in denied {
+            match self.mode {
+                Mode::Copy if target.symlink_metadata().is_ok() => {
+                    self.steps.push(Step::Created(target));
+                }
+                Mode::Move if arrived(&source, &target) => self.steps.push(Step::Moved {
+                    from: source,
+                    to: target,
+                }),
+                _ => {}
+            }
+        }
+        for folder in self.emptied.drain(..) {
+            let _ = fs::remove_dir(folder);
+        }
+        settled
+    }
+
     pub fn roll_back(&mut self) {
+        let mut created = Vec::new();
+        let mut trashed = Vec::new();
         for step in self.steps.drain(..).rev() {
-            let _ = match step {
-                Step::Created(path) => remove_path(&path),
-                Step::Trashed(item) => trash::restore_item(&item).map(drop),
-                Step::Moved { .. } => Ok(()),
-            };
+            match step {
+                Step::Created(path) => created.push(path),
+                Step::Trashed(item) => trashed.push(item),
+                Step::Moved { .. } => {}
+            }
+        }
+        let _ = remove_paths(created);
+        for item in trashed {
+            let _ = trash::restore_item(&item);
         }
     }
 }

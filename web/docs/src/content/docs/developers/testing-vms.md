@@ -59,6 +59,8 @@ Disks, startup, installing and system services are tested in QEMU VMs from `os/v
 
 Checks of single parts, such as the installer, Luft Keyring, the system packages service, crash reports, printing, sleep, Windows and Disks, live in a `vm` folder next to their code and share `os/vm/check.sh`: a check image with the check's files on top of the system, started directly with the image's kernel or installed with `disk.sh`. A drive started that way has SELinux off, since its files carry no labels; `relabel_root_drive` labels it once, after which `SELINUX="selinux=1 enforcing=1"` starts it enforcing, so a check fails on anything SELinux denies.
 
+Luft opens no text console unless Developer tools is on, so no check waits for a `login:` prompt. A service in the check image writes each result to the serial console instead, and `disk.sh` opens root's console on the drives it makes. The installer check installs its own check image, so each drive it installs says on the serial console that it started through SushiBoot and that setup stayed on screen.
+
 For startup, `qemu.sh` also takes:
 
 | Variable | Effect |

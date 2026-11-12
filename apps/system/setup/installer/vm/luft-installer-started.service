@@ -1,0 +1,9 @@
+[Unit]
+Description=Tell the installer check that the installed system started into setup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-installer-started
+
+[Install]
+WantedBy=graphical.target

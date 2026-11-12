@@ -342,23 +342,28 @@ FPRINT
 session_state() {
   local leader
   leader="$(systemctl show -p MainPID --value ada-session)"
-  sed -n 's/^STATE=//p' "/run/systemd/sessions/$(sed -n 's|.*/session-\(.*\)\.scope$|\1|p' "/proc/$leader/cgroup")" 2> /dev/null
+  sed -n 's/^STATE=//p' "/run/systemd/sessions/$(sed -n 's|.*/session-\(.*\)\.scope$|\1|p' "/proc/$leader/cgroup" 2> /dev/null)" 2> /dev/null
+}
+
+session_becomes() {
+  for _ in $(seq 20); do
+    [[ "$(session_state)" == "$1" ]] && return
+    sleep 0.5
+  done
+  return 1
 }
 
 switch_to() {
   local console="$1" state="$2"
   chvt "$console"
-  for _ in $(seq 20); do
-    [[ "$(session_state)" == "$state" ]] && return
-    sleep 0.5
-  done
-  fail "ada's session didn't become $state on tty$console"
+  session_becomes "$state" || fail "ada's session didn't become $state on tty$console"
 }
 
 sign_in_ada() {
   install -d -o ada "$ADA" && mkfifo -m 600 "$ADA/in" && chown ada "$ADA/in"
   systemd-run --quiet --unit=ada-session -p PAMName=login -p User=ada -p TTYPath=/dev/tty3 -p StandardInput=tty \
     bash -c "while read -r command < $ADA/in; do eval \"\$command\" > $ADA/out 2>&1; echo \$? > $ADA/status.new; mv $ADA/status.new $ADA/status; done"
+  session_becomes online || fail "ada's session on tty3 didn't start"
   switch_to 3 active
 }
 

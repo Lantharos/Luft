@@ -36,5 +36,5 @@ export const sidebar: Sidebar = [
 			group('Security', 'security', true)
 		]
 	},
-	group('Extensions', 'extensions')
+	group('Extensions', 'extensions', true)
 ];

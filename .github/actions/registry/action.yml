@@ -9,6 +9,11 @@ runs:
       env:
         TOKEN: ${{ github.token }}
       run: |
-        export REGISTRY_AUTH_FILE="$RUNNER_TEMP/registry.json"
-        echo "REGISTRY_AUTH_FILE=$REGISTRY_AUTH_FILE" >> "$GITHUB_ENV"
+        export DOCKER_CONFIG="$RUNNER_TEMP/registry"
+        export REGISTRY_AUTH_FILE="$DOCKER_CONFIG/config.json"
+        mkdir -p "$DOCKER_CONFIG"
+        {
+          echo "DOCKER_CONFIG=$DOCKER_CONFIG"
+          echo "REGISTRY_AUTH_FILE=$REGISTRY_AUTH_FILE"
+        } >> "$GITHUB_ENV"
         podman login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<<"$TOKEN"

@@ -3,14 +3,14 @@ import GLib from 'gi://GLib';
 import type NM from 'gi://NM';
 
 import { t } from '../../../shared/i18n/index.js';
-import { helperLauncher, helperProgram } from '../../../shared/apps/programs.js';
+import { helperLauncher, luftProgram } from '../../../shared/apps/programs.js';
 import { openUri } from '../../../shared/apps/launch.js';
 import type { Field, Step } from './vpnDialog.js';
 
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
 
-const HELPER = helperProgram('kestrel-openconnect', '../../../target/release/kestrel-openconnect');
+const HELPER = luftProgram('kestrel-openconnect');
 
 interface HelperField {
   name: string;

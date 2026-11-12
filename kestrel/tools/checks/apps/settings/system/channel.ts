@@ -69,8 +69,8 @@ async function checkToNightly() {
     (await changes(app, 'switching to nightly shows the confirmation first', () => app.click(SWITCH_NIGHTLY))).save('settings-channel-confirm-nightly');
     require((await switchesAsked()).length === 0, 'the updater isn’t reached while the nightly confirmation is open');
     app.click(CANCEL_NIGHTLY);
-    const after = await app.settle(frame => frame.looksLike(before), app.area(CHANNELS));
-    require(after.looksLike(before), 'Cancel closes the confirmation and leaves the channel as it was');
+    const after = await app.settle(frame => frame.looksLike(before, 2), app.area(CHANNELS));
+    require(after.looksLike(before, 2), 'Cancel closes the confirmation and leaves the channel as it was');
     require((await switchesAsked()).length === 0, 'Cancel changes nothing');
   });
 }

@@ -9,6 +9,7 @@ const HIDDEN: &str = "…";
 const SHORTEST_NAME: usize = 3;
 
 const QUOTES: &str = "\"'`";
+const NAME_WORDS: usize = 4;
 
 fn ends_clause(bytes: &[u8], at: usize, character: char) -> bool {
     match character {
@@ -30,9 +31,9 @@ fn has_extension(word: &str) -> bool {
     })
 }
 
-/// Where an unquoted path ends. Folder and file names may hold spaces, so it
-/// runs to the end of the clause, minus what follows the last folder when
-/// that is plainly a file name followed by more sentence, or another path.
+/// Where an unquoted path ends. Folders may hold spaces, so it runs to the
+/// last folder of the clause. The name after it ends at its first word,
+/// unless one of the next few has a file extension, as in `Tax 2025.pdf`.
 fn unquoted_length(path: &str) -> usize {
     let bytes = path.as_bytes();
     let mut clause = path.len();
@@ -46,14 +47,15 @@ fn unquoted_length(path: &str) -> usize {
     let clause_text = &path[..clause];
     let name_start = clause_text.rfind('/').map_or(0, |slash| slash + 1);
     let name = &clause_text[name_start..];
+    let first_word = name.find(' ').unwrap_or(name.len());
     let mut offset = 0;
-    for (index, word) in name.split(' ').enumerate() {
+    for (index, word) in name.split(' ').take(NAME_WORDS).enumerate() {
         offset += word.len();
         if has_extension(word) {
             return name_start + offset + index;
         }
     }
-    clause
+    name_start + first_word
 }
 
 /// Where a path ends: at its closing quote when it is quoted, which lets it
@@ -213,6 +215,10 @@ mod tests {
         assert_eq!(
             scrub("failed on /home/anna/My Files/a.txt and gave up"),
             "failed on ~/… and gave up"
+        );
+        assert_eq!(
+            scrub("the fixture at /home/anna/Some Folder/fixture panicked as asked"),
+            "the fixture at ~/… panicked as asked"
         );
     }
 

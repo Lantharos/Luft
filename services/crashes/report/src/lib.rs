@@ -10,6 +10,6 @@ mod signature;
 mod system;
 
 pub use assemble::{Details, program_name, report};
-pub use report::{Body, Crash, Frame, Kind, Report, Sent, Vendor};
 pub use names::PEOPLE;
+pub use report::{Body, Crash, Frame, Kind, Report, Sent, Vendor};
 pub use scrub::Scrubber;

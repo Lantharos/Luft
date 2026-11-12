@@ -1,6 +1,11 @@
 glossary = "packages/i18n/glossary/{lang}.tbx"
 icon = "web/site/public/favicon.svg"
 
+[[generated]]
+lang = "sr-Latn"
+from = "sr"
+transform = "serbian-cyrillic-to-latin"
+
 [[areas]]
 name = "Desktop"
 files = ["kestrel/ui/locales/{lang}/desktop.ftl"]
@@ -10,7 +15,7 @@ name = "Start and quick settings"
 files = ["kestrel/ui/locales/{lang}/surfaces.ftl"]
 
 [[areas]]
-name = "System"
+name = "System menus and notices"
 files = ["kestrel/ui/locales/{lang}/system.ftl", "kestrel/settings/locales/{lang}/settings.ftl"]
 
 [[areas]]
@@ -28,6 +33,111 @@ files = ["kestrel/ui/locales/{lang}/shell.ftl"]
 [[areas]]
 name = "App toolkit"
 files = ["packages/web/ui/locales/{lang}/ui.ftl", "packages/system/trust/locales/{lang}/trust.ftl"]
+
+[[areas]]
+name = "Settings"
+files = [
+  "apps/system/settings/locales/{lang}/settings.ftl",
+  "apps/system/settings/desktop/locales/{lang}/desktop.ftl",
+  "packages/web/settings-pages/locales/{lang}/pages.ftl",
+]
+icon = "apps/system/settings/public/favicon.svg"
+
+[[areas]]
+name = "Settings: Connections"
+files = ["apps/system/settings/locales/{lang}/connections.ftl"]
+
+[[areas]]
+name = "Settings: Devices"
+files = ["apps/system/settings/locales/{lang}/devices.ftl"]
+
+[[areas]]
+name = "Settings: Look and feel"
+files = ["apps/system/settings/locales/{lang}/personalization.ftl"]
+
+[[areas]]
+name = "Settings: Protection"
+files = ["apps/system/settings/locales/{lang}/protection.ftl"]
+
+[[areas]]
+name = "Settings: System"
+files = ["apps/system/settings/locales/{lang}/system.ftl"]
+
+[[areas]]
+name = "Install Luft and setup"
+files = ["apps/system/setup/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Schelf"
+files = ["apps/system/schelf/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Convertible"
+files = ["apps/store/convertible/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Flatbed"
+files = ["apps/store/flatbed/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Heft"
+files = ["apps/store/heft/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Meet Luft"
+files = ["apps/store/meet/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Soundboard"
+files = ["apps/store/soundboard/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Focus"
+files = ["extensions/focus/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Keystrokes"
+files = ["extensions/keystrokes/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Now Playing"
+files = ["extensions/now-playing/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Phosphor"
+files = ["extensions/phosphor/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Playthings"
+files = ["extensions/playthings/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Pult"
+files = ["extensions/pult/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Reminders"
+files = ["extensions/reminders/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Seasons"
+files = ["extensions/seasons/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Soundscapes"
+files = ["extensions/soundscapes/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Strays"
+files = ["extensions/strays/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Tailor"
+files = ["extensions/tailor/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Visualizer"
+files = ["extensions/visualizer/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Website"

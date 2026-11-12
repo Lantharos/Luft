@@ -1,8 +1,8 @@
 mod bus;
-#[cfg(test)]
-mod check;
 mod job;
 mod languages;
+#[cfg(feature = "measure")]
+pub mod measure;
 mod opus;
 mod regions;
 mod resample;

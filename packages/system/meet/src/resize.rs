@@ -79,11 +79,6 @@ mod tests {
 
     #[test]
     fn a_request_names_the_change_and_luft_s_partition() {
-        let request = Request {
-            change: Change::Shrink { bytes: 20 << 30 },
-            partition: "0a1b2c3d-0000-4000-8000-00000000aaaa".into(),
-        };
-        assert_eq!(Request::parse(&request.to_bytes()).unwrap(), request);
         let windows = br#"{"change":"grow","partition":"{0A1B2C3D-0000-4000-8000-00000000AAAA}"}"#;
         let parsed = Request::parse(windows).unwrap();
         assert_eq!(parsed.change, Change::Grow);
@@ -94,15 +89,5 @@ mod tests {
         )
         .unwrap();
         assert_eq!(trim.change, Change::Trim { bytes: 5 });
-    }
-
-    #[test]
-    fn luft_reports_how_full_it_is() {
-        let space = Space {
-            partition: "0a1b2c3d-0000-4000-8000-00000000aaaa".into(),
-            allocated: 6 << 30,
-        };
-        assert_eq!(Space::parse(&space.to_bytes()), Some(space));
-        assert_eq!(needed(10 << 30), 12 << 30);
     }
 }

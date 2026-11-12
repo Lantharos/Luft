@@ -1,5 +1,5 @@
-#[cfg(test)]
-mod check;
+#[cfg(feature = "measure")]
+pub mod measure;
 mod worker;
 
 use std::sync::mpsc::{self, Sender};

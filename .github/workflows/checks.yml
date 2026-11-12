@@ -73,7 +73,7 @@ jobs:
         run: cargo clippy --locked --all-targets $PACKAGES -- -D warnings
 
       - if: matrix.check == 'test'
-        run: cargo test --locked $PACKAGES
+        run: cargo test --locked --no-fail-fast $PACKAGES
 
       - if: matrix.check == 'test' && matrix.group.name == 'apps'
         run: .github/scripts/bindings/check.sh $PACKAGES

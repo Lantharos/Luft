@@ -181,25 +181,22 @@ mod tests {
     }
 
     #[test]
-    fn reads_a_well_formed_header() {
-        let header = parse_header(&wide_header(64, 30, 29)).unwrap();
-        assert_eq!(header.table_bytes(), Some(64 * 30));
-    }
-
-    #[test]
-    fn refuses_entries_of_the_wrong_size() {
-        assert!(parse_header(&wide_header(0, 30, 29)).is_none());
-        assert!(parse_header(&wide_header(40, 30, 29)).is_none());
-        assert!(parse_header(&wide_header(u16::MAX, 30, 29)).is_none());
-    }
-
-    #[test]
-    fn refuses_huge_section_tables() {
-        assert!(parse_header(&wide_header(64, u16::MAX, 0)).is_none());
-    }
-
-    #[test]
-    fn refuses_a_name_table_past_the_end() {
-        assert!(parse_header(&wide_header(64, 30, 30)).is_none());
+    fn reads_only_headers_whose_section_table_fits() {
+        let cases = [
+            ((64, 30, 29), Some(Some(64 * 30))),
+            ((0, 30, 29), None),
+            ((40, 30, 29), None),
+            ((u16::MAX, 30, 29), None),
+            ((64, u16::MAX, 0), None),
+            ((64, 30, 30), None),
+        ];
+        for ((entry, count, names), table_bytes) in cases {
+            let header = parse_header(&wide_header(entry, count, names));
+            assert_eq!(
+                header.map(|header| header.table_bytes()),
+                table_bytes,
+                "{entry} {count} {names}"
+            );
+        }
     }
 }

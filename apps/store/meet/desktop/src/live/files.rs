@@ -49,8 +49,8 @@ pub fn missing(entries: &[Entry]) -> Option<&'static str> {
         .find(|wanted| !entries.iter().any(|entry| entry.path == *wanted))
 }
 
-#[cfg(any(windows, test))]
-pub fn grub_config(live_partition: &str) -> String {
+#[cfg(windows)]
+fn grub_config(live_partition: &str) -> String {
     format!("set medium='PARTUUID={live_partition}'\nexport medium\nsource /boot/menu.cfg\n")
 }
 
@@ -201,7 +201,8 @@ mod tests {
 
     #[test]
     fn files_reach_their_place_only_once_put_there() {
-        let root = std::env::temp_dir().join(format!("meet-volumes-{}", std::process::id()));
+        let scratch = tempfile::tempdir().unwrap();
+        let root = scratch.path();
         let target = |root: PathBuf| move |path: &str| on(&root, path);
         let mut kept = Volumes::new(target(root.join("kept")));
         kept.write("LiveOS/luft.erofs", 0, b"luft").unwrap();
@@ -214,16 +215,7 @@ mod tests {
         drop(dropped);
         let erofs = fs::read(root.join("kept/LiveOS/luft.erofs")).unwrap();
         let leftovers = fs::read_dir(root.join("dropped/LiveOS")).unwrap().count();
-        fs::remove_dir_all(&root).unwrap();
         assert_eq!(erofs, b"luft!");
         assert_eq!(leftovers, 0);
-    }
-
-    #[test]
-    fn grub_finds_the_live_system_by_its_partition() {
-        assert_eq!(
-            grub_config("0a1b2c3d-0000-4000-8000-00000000bbbb"),
-            "set medium='PARTUUID=0a1b2c3d-0000-4000-8000-00000000bbbb'\nexport medium\nsource /boot/menu.cfg\n"
-        );
     }
 }

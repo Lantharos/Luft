@@ -59,6 +59,9 @@ windows = { workspace = true, features = [
   "Win32_UI_WindowsAndMessaging",
 ] }
 
+[dev-dependencies]
+tempfile.workspace = true
+
 [build-dependencies]
 embed-resource.workspace = true
 

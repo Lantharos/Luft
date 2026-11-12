@@ -217,7 +217,8 @@ mod tests {
 
     #[test]
     fn only_luft_isos_count_as_older() {
-        let root = std::env::temp_dir().join(format!("meet-older-{}", std::process::id()));
+        let scratch = tempfile::tempdir().unwrap();
+        let root = scratch.path();
         fs::create_dir_all(root.join("ventoy")).unwrap();
         for name in [
             "luft-nightly.iso",
@@ -227,12 +228,11 @@ mod tests {
         ] {
             fs::write(root.join(name), b"iso").unwrap();
         }
-        let names: Vec<String> = older(&root)
+        let names: Vec<String> = older(root)
             .unwrap()
             .into_iter()
             .map(|older| older.name)
             .collect();
-        fs::remove_dir_all(&root).unwrap();
         assert_eq!(names, ["Luft-1.1.ISO", "luft-nightly.iso"]);
     }
 
@@ -245,13 +245,13 @@ mod tests {
 
     #[test]
     fn a_copy_reads_back_with_the_same_digest() {
-        let path = std::env::temp_dir().join(format!("meet-copy-{}.iso", std::process::id()));
+        let scratch = tempfile::tempdir().unwrap();
+        let path = scratch.path().join("luft.iso");
         let iso: Vec<u8> = (0..(5 << 20) + 17)
             .map(|index| (index % 253) as u8)
             .collect();
         let written = copy(&mut &iso[..], iso.len() as u64, &path, |_| {}).unwrap();
         let read = digest(&mut File::open(&path).unwrap(), |_| {}).unwrap();
-        fs::remove_file(&path).unwrap();
         assert_eq!(read, written);
         assert_eq!(written, <[u8; 32]>::from(Sha256::digest(&iso)));
     }

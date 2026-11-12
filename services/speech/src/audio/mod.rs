@@ -4,7 +4,7 @@ mod pauses;
 #[cfg(feature = "recorded-audio")]
 mod recorded;
 mod voice;
-#[cfg(any(test, feature = "recorded-audio"))]
+#[cfg(any(test, feature = "recorded-audio", feature = "measure"))]
 mod wav;
 
 use std::sync::mpsc::Sender;
@@ -14,7 +14,7 @@ use anyhow::Result;
 pub use level::Meter;
 pub use pauses::Segmenter;
 pub use voice::{FRAME, Voice};
-#[cfg(test)]
+#[cfg(any(test, feature = "measure"))]
 pub use wav::pcm16_mono;
 
 pub const RATE: usize = 16_000;

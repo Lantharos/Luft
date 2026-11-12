@@ -41,7 +41,24 @@ async fn tell_listener(
     }
 }
 
+#[cfg(feature = "measure")]
+fn measure(what: &str) -> Result<()> {
+    match what {
+        "recognize" => engines::measure::recognize_recorded_speech(),
+        "dictate" => dictation::measure::dictate_long_recordings(),
+        "transcribe" => transcription::measure::transcribe_recordings(),
+        _ => anyhow::bail!("Measure recognize, dictate or transcribe"),
+    }
+    Ok(())
+}
+
 fn main() -> Result<()> {
+    #[cfg(feature = "measure")]
+    if let [_, measuring, what] = std::env::args().collect::<Vec<_>>().as_slice()
+        && measuring == "measure"
+    {
+        return measure(what);
+    }
     tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_all()

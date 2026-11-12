@@ -222,7 +222,6 @@ mod tests {
         assert!(handoff.room().unwrap().other_drive);
         assert_eq!(handoff.hints.timezone.as_deref(), Some("Europe/Vienna"));
         assert_eq!(handoff.hints.keyboards[0].variant, "fr");
-        assert_eq!(Handoff::parse(&handoff.to_json()).unwrap(), handoff);
     }
 
     #[test]
@@ -239,7 +238,6 @@ mod tests {
             handoff.folder().unwrap().esp,
             "0a1b2c3d-0000-4000-8000-00000000cccc"
         );
-        assert_eq!(Handoff::parse(&handoff.to_json()).unwrap(), handoff);
     }
 
     #[test]

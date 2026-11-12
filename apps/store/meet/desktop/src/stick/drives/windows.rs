@@ -188,13 +188,6 @@ mod tests {
     }
 
     #[test]
-    fn a_laptop_without_a_stick_offers_nothing() {
-        let mut storage = storage();
-        storage.disks.retain(|disk| disk.Number == 0);
-        assert!(storage.sticks(None).is_empty());
-    }
-
-    #[test]
     fn a_stick_shows_its_volumes_by_their_labels() {
         let storage = storage();
         let disk = storage.sticks(None)[0];

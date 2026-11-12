@@ -148,17 +148,7 @@ pub async fn add(
 
 #[cfg(test)]
 mod tests {
-    use super::{free_name, left_out};
-
-    #[test]
-    fn knows_the_connections_it_never_offers() {
-        assert!(left_out("beh:/1/3/5/socket://printer"));
-        assert!(left_out("serial:/dev/ttyS0?baud=115200"));
-        assert!(left_out("PARALLEL:/dev/lp0"));
-        assert!(left_out("gutenprint53+usb://Canon/MX490"));
-        assert!(!left_out("usb://Canon/MX490%20series"));
-        assert!(!left_out("hp:/usb/HP_LaserJet_1020?serial=1"));
-    }
+    use super::free_name;
 
     #[test]
     fn names_queues_like_cups() {

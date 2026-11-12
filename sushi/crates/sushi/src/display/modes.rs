@@ -220,6 +220,7 @@ mod tests {
             .wanted("DP-1", &["DP-1".into(), "HDMI-A-1".into()])
             .unwrap();
         assert_eq!((paired.width, paired.height), (2560, 1080));
+        assert!(hints.wanted("eDP-1", &["eDP-1".into()]).is_none());
     }
 
     fn mode(clock: u32, htotal: u16, vtotal: u16) -> Mode {
@@ -240,11 +241,5 @@ mod tests {
         let waking = hdmi_wake_mode(&fast, &modes).unwrap();
         assert_eq!(waking.clock(), 148_500);
         assert_eq!(hdmi_wake_mode(&waking, &modes), None);
-    }
-
-    #[test]
-    fn unknown_monitors_keep_their_preferred_mode() {
-        let hints = ModeHints::parse(SAVED);
-        assert!(hints.wanted("eDP-1", &["eDP-1".into()]).is_none());
     }
 }

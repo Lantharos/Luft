@@ -4,10 +4,19 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
+use convertible_lib::engine::capabilities::Capabilities;
 use convertible_lib::engine::error::Result;
 use convertible_lib::engine::job::{Conflict, Edits, Job, Options};
 use convertible_lib::engine::{self, Progress};
 use image::{Rgba, RgbaImage};
+
+pub fn installed(found: &Capabilities, id: &str) -> bool {
+    let missing = found.missing.iter().any(|missing| missing == id);
+    if missing {
+        eprintln!("{id} isn't installed here, so it goes untested");
+    }
+    !missing
+}
 
 pub fn fixture(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))

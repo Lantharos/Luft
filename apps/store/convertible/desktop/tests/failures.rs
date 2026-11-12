@@ -9,17 +9,21 @@ use tempfile::tempdir;
 #[test]
 fn a_failed_job_leaves_nothing_behind() {
     let folder = tempdir().unwrap();
+    let misleading: Option<&[u8]> = Some(b"this file is not what its name says");
     let inputs = [
-        ("broken.png", "png", "out.jpg", "jpeg"),
-        ("broken.mp4", "mp4", "out.webm", "webm"),
-        ("broken.flac", "flac", "out.mp3", "mp3"),
-        ("broken.pdf", "pdf", "out.png", "png"),
-        ("broken.zip", "zip", "out.7z", "7z"),
-        ("broken.woff2", "woff2", "out.ttf", "ttf"),
+        ("broken.png", misleading, "out.jpg", "jpeg"),
+        ("broken.mp4", misleading, "out.webm", "webm"),
+        ("broken.flac", misleading, "out.mp3", "mp3"),
+        ("broken.pdf", misleading, "out.png", "png"),
+        ("broken.zip", misleading, "out.7z", "7z"),
+        ("broken.woff2", misleading, "out.ttf", "ttf"),
+        ("gone.png", None, "out.jpg", "jpeg"),
     ];
-    for (name, _, output, format) in inputs {
+    for (name, contents, output, format) in inputs {
         let source = folder.path().join(name);
-        fs::write(&source, b"this file is not what its name says").unwrap();
+        if let Some(contents) = contents {
+            fs::write(&source, contents).unwrap();
+        }
         let before = only_entries(folder.path());
         run(&job(&[&source], folder.path(), output, format)).expect_err(name);
         assert_eq!(
@@ -66,12 +70,4 @@ fn keeps_the_original_time_when_asked() {
     keep.keep_times = true;
     let output = run(&keep).unwrap();
     assert_eq!(fs::metadata(output).unwrap().modified().unwrap(), earlier);
-}
-
-#[test]
-fn a_missing_input_is_reported() {
-    let folder = tempdir().unwrap();
-    let missing = folder.path().join("gone.png");
-    assert!(run(&job(&[&missing], folder.path(), "out.jpg", "jpeg")).is_err());
-    assert!(only_entries(folder.path()).is_empty());
 }

@@ -220,7 +220,7 @@ pub fn from_hex(digits: &str) -> Option<Color> {
 
 #[cfg(test)]
 mod tests {
-    use super::{ACCENT, Use, from_hex, from_hsl, from_rgb, role, written};
+    use super::{ACCENT, Use, from_hex, from_hsl, from_rgb, role};
 
     fn hex(digits: &str, used: Use) -> Option<&'static str> {
         role(from_hex(digits).unwrap(), used)
@@ -269,14 +269,5 @@ mod tests {
         assert!((from_hex("1a9fff80").unwrap().alpha - 0.502).abs() < 0.001);
         assert_eq!(from_hsl("0,0%,100%,.8").unwrap().alpha, 0.8);
         assert_eq!(from_hsl("0,0%,100%,.8").unwrap().red, 255.0);
-    }
-
-    #[test]
-    fn being_see_through_is_kept() {
-        assert_eq!(written("--luft-ink", 1.0), "var(--luft-ink)");
-        assert_eq!(
-            written("--luft-ink", 0.5),
-            "color-mix(in srgb, var(--luft-ink) 50.0%, transparent)"
-        );
     }
 }

@@ -1,6 +1,8 @@
 use std::net::TcpListener;
+use std::os::fd::AsRawFd;
+use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use luft_keyring_wire::Problem;
 use tss_esapi::handles::PcrHandle;
@@ -9,33 +11,63 @@ use tss_esapi::structures::{Digest, DigestValues};
 
 use super::Chip;
 
+const STARTING: Duration = Duration::from_secs(10);
+
+/// A software TPM on a command port of its own. Its control port, the next
+/// one up, stays bound by the test, so no other test's TPM takes the pair.
 struct Swtpm {
     process: Child,
     port: u16,
+    _control: TcpListener,
     _state: tempfile::TempDir,
 }
 
 impl Swtpm {
     fn start() -> Self {
+        let deadline = Instant::now() + STARTING;
+        loop {
+            let mut tpm = Self::spawn();
+            while tpm.process.try_wait().unwrap().is_none() {
+                if Chip::open(&tpm.tcti()).is_ok() {
+                    return tpm;
+                }
+                assert!(Instant::now() < deadline, "swtpm didn't start");
+                std::thread::sleep(Duration::from_millis(5));
+            }
+        }
+    }
+
+    fn spawn() -> Self {
         let state = tempfile::tempdir().unwrap();
-        let port = free_port();
-        let process = Command::new("swtpm")
+        let (port, control) = command_port_below_a_control_port();
+        let fd = control.as_raw_fd();
+        let mut swtpm = Command::new("swtpm");
+        swtpm
             .args(["socket", "--tpm2", "--flags", "not-need-init,startup-clear"])
             .args(["--server", &format!("type=tcp,port={port}")])
-            .args(["--ctrl", &format!("type=tcp,port={}", port + 1)])
-            .args(["--tpmstate", &format!("dir={}", state.path().display())])
-            .spawn()
-            .expect("swtpm is installed");
-        std::thread::sleep(Duration::from_millis(300));
+            .args(["--ctrl", &format!("type=tcp,fd={fd}")])
+            .args(["--tpmstate", &format!("dir={}", state.path().display())]);
+        // SAFETY: fcntl is safe to call between fork and exec.
+        unsafe {
+            swtpm.pre_exec(move || match libc::fcntl(fd, libc::F_SETFD, 0) {
+                -1 => Err(std::io::Error::last_os_error()),
+                _ => Ok(()),
+            });
+        }
         Self {
-            process,
+            process: swtpm.spawn().expect("swtpm is installed"),
             port,
+            _control: control,
             _state: state,
         }
     }
 
+    fn tcti(&self) -> String {
+        format!("swtpm:host=127.0.0.1,port={}", self.port)
+    }
+
     fn chip(&self) -> Chip {
-        Chip::open(&format!("swtpm:host=127.0.0.1,port={}", self.port)).unwrap()
+        Chip::open(&self.tcti()).unwrap()
     }
 }
 
@@ -46,15 +78,15 @@ impl Drop for Swtpm {
     }
 }
 
-fn free_port() -> u16 {
+fn command_port_below_a_control_port() -> (u16, TcpListener) {
     loop {
         let port = TcpListener::bind("127.0.0.1:0")
             .unwrap()
             .local_addr()
             .unwrap()
             .port();
-        if TcpListener::bind(("127.0.0.1", port + 1)).is_ok() {
-            return port;
+        if let Ok(control) = TcpListener::bind(("127.0.0.1", port + 1)) {
+            return (port, control);
         }
     }
 }

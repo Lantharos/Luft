@@ -12,6 +12,7 @@ name = "luft-speech"
 path = "src/main.rs"
 
 [features]
+measure = []
 recorded-audio = []
 
 [dependencies]

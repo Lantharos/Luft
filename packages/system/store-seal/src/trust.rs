@@ -75,13 +75,21 @@ pub struct Keys(Vec<Key>);
 
 impl Keys {
     pub fn read(document: &[u8], seal: &Seal) -> Result<Self, String> {
-        let root = Key::read(ROOT)?;
+        Self::read_under(ROOT, document, seal, Utc::now())
+    }
+
+    fn read_under(
+        root: &str,
+        document: &[u8],
+        seal: &Seal,
+        now: DateTime<Utc>,
+    ) -> Result<Self, String> {
+        let root = Key::read(root)?;
         if seal.key != root.id {
             return Err(UNTRUSTED.into());
         }
         check(&root.key, document, seal)?;
         let listed: StoreKeys = serde_json::from_slice(document).map_err(|_| UNTRUSTED)?;
-        let now = Utc::now();
         let keys = listed
             .keys
             .into_iter()
@@ -105,3 +113,6 @@ impl Keys {
         check(&key.key, bytes, seal)
     }
 }
+
+#[cfg(test)]
+mod tests;

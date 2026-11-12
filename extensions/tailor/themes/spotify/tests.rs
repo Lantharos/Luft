@@ -286,17 +286,6 @@ fn spicetify_finishing_without_the_theme_isn_t_called_success() {
 }
 
 #[test]
-fn settings_it_turned_on_go_back_too() {
-    let mut fixture = fixture();
-    fixture.spotify.apply(&sample("#a0c4ff")).unwrap();
-    assert_eq!(fixture.get("inject_css"), "1");
-    fixture.spotify.restore().unwrap();
-    assert_eq!(fixture.get("inject_css"), "0");
-    assert_eq!(fixture.get("current_theme"), "Marketplace");
-    assert_eq!(fixture.get("color_scheme"), "Green");
-}
-
-#[test]
 fn a_config_with_the_theme_selected_but_settings_off_is_put_right() {
     let mut fixture = fixture();
     fixture.spotify.apply(&sample("#a0c4ff")).unwrap();

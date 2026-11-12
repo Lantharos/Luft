@@ -61,24 +61,27 @@ const FLATPAK: &str = ".var/app/com.valvesoftware.Steam/.local/share/Steam";
 
 #[test]
 fn restoring_puts_every_file_back_exactly() {
-    let mut fixture = fixture(FLATPAK);
-    let library = fixture.folder.join("steamui/css").join(LIBRARY);
-    let old = SystemTime::UNIX_EPOCH + Duration::from_secs(1_700_000_000);
-    fs::File::options()
-        .write(true)
-        .open(&library)
-        .unwrap()
-        .set_modified(old)
-        .unwrap();
-    let before = snapshot(&fixture.folder);
+    for inside in [FLATPAK, ".local/share/Steam"] {
+        let mut fixture = fixture(inside);
+        let library = fixture.folder.join("steamui/css").join(LIBRARY);
+        let old = SystemTime::UNIX_EPOCH + Duration::from_secs(1_700_000_000);
+        fs::File::options()
+            .write(true)
+            .open(&library)
+            .unwrap()
+            .set_modified(old)
+            .unwrap();
+        let before = snapshot(&fixture.folder);
 
-    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
-    assert!(fs::read(&library).unwrap().starts_with(super::MARK));
-    fixture.steam.restore().unwrap();
+        assert_eq!(fixture.steam.apply(&sample("#a0c4ff")).unwrap(), "ready");
+        assert!(fs::read(&library).unwrap().starts_with(super::MARK));
+        assert!(!fixture.steam.watched().is_empty());
+        fixture.steam.restore().unwrap();
 
-    assert_eq!(snapshot(&fixture.folder), before);
-    assert!(!fixture.folder.join("steamui/tailor").exists());
-    assert!(fixture.steam.watched().is_empty());
+        assert_eq!(snapshot(&fixture.folder), before);
+        assert!(!fixture.folder.join("steamui/tailor").exists());
+        assert!(fixture.steam.watched().is_empty());
+    }
 }
 
 #[test]
@@ -143,16 +146,6 @@ fn an_update_while_tailor_was_off_leaves_nothing_of_ours_behind() {
 
     assert_eq!(fs::read_to_string(styles.join(LIBRARY)).unwrap(), updated);
     assert!(!styles.join(ORIGINAL).exists());
-}
-
-#[test]
-fn a_native_steam_works_the_same_way() {
-    let mut fixture = fixture(".local/share/Steam");
-    let before = snapshot(&fixture.folder);
-    assert_eq!(fixture.steam.apply(&sample("#a0c4ff")).unwrap(), "ready");
-    assert!(!fixture.steam.watched().is_empty());
-    fixture.steam.restore().unwrap();
-    assert_eq!(snapshot(&fixture.folder), before);
 }
 
 #[test]

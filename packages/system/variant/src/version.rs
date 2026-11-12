@@ -70,16 +70,12 @@ mod tests {
     }
 
     #[test]
-    fn only_versions_with_a_nightly_number_are_nightlies() {
-        assert!(Version::is_nightly("1.0-nightly.26"));
-        assert!(!Version::is_nightly("1.0"));
-        assert!(!Version::is_nightly("dev"));
-    }
-
-    #[test]
     fn only_luft_versions_are_read() {
         for text in ["dev", "1", "1.2-nightly.", "1.x", ""] {
             assert_eq!(Version::parse(text), None, "{text}");
+            assert!(!Version::is_nightly(text));
         }
+        assert!(Version::is_nightly("1.0-nightly.26"));
+        assert!(!Version::is_nightly("1.0"));
     }
 }

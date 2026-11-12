@@ -2,7 +2,7 @@ mod common;
 
 use std::fs;
 
-use common::{fixture, job, run};
+use common::{fixture, installed, job, run};
 use convertible_lib::engine::capabilities;
 use convertible_lib::engine::job::{Audio, Range};
 use convertible_lib::engine::media::{frame, probe};
@@ -54,7 +54,7 @@ fn audio_converts_and_keeps_tags_and_cover() {
         ("m4a", "m4a"),
         ("flac", "flac"),
     ] {
-        if found.missing.iter().any(|missing| missing == id) {
+        if !installed(&found, id) {
             continue;
         }
         let output = run(&job(
@@ -114,6 +114,8 @@ fn video_converts_between_containers() {
         assert_eq!(info.video.unwrap().codec, "h264");
         assert!(close(info.duration, 1.0, 0.2));
         assert!(!info.audio.is_empty());
+    } else {
+        eprintln!("h264 isn't installed here, so it goes untested");
     }
 }
 

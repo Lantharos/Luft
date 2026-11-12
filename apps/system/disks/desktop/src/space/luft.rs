@@ -167,12 +167,11 @@ pub fn parts(state: &Arc<Node>, versions: &Versions) -> Vec<Part> {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
     use luft_app::Events;
 
     use super::*;
     use crate::space::Explorer;
+    use crate::space::tests::wait;
 
     #[test]
     fn names_the_parts_of_the_state_folder_and_luft_versions() {
@@ -192,9 +191,7 @@ mod tests {
             .start(&Events::default(), state.path().to_str().unwrap())
             .unwrap();
         let scan = explorer.current().unwrap();
-        while scan.took.lock().is_none() {
-            std::thread::sleep(Duration::from_millis(5));
-        }
+        wait(&scan);
         let versions = Versions(Mutex::new(Some(Some(Space {
             version: Some("1.2-nightly.27".to_owned()),
             running: 9 << 30,

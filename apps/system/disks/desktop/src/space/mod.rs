@@ -249,8 +249,12 @@ mod tests {
 
     use super::*;
 
-    fn wait(scan: &Scan) {
+    const SCANNING: Duration = Duration::from_secs(10);
+
+    pub(super) fn wait(scan: &Scan) {
+        let deadline = Instant::now() + SCANNING;
         while scan.took.lock().is_none() {
+            assert!(Instant::now() < deadline, "the scan never finished");
             std::thread::sleep(Duration::from_millis(5));
         }
     }
@@ -261,8 +265,8 @@ mod tests {
 
     #[test]
     fn counts_hard_links_once_and_folds_small_files() {
-        let root = std::env::temp_dir().join(format!("disks-space-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&root);
+        let scratch = tempfile::tempdir().unwrap();
+        let root = scratch.path();
         std::fs::create_dir_all(root.join("videos/raw")).unwrap();
         std::fs::create_dir_all(root.join("notes")).unwrap();
         std::fs::write(root.join("videos/raw/take.mov"), vec![7u8; 3 << 20]).unwrap();
@@ -289,12 +293,12 @@ mod tests {
             + allocated(&root.join("videos/raw"))
             + allocated(&root.join("notes"));
         assert_eq!(
-            videos.size() + notes.size() + allocated(&root),
+            videos.size() + notes.size() + allocated(root),
             scan.root.size()
         );
         assert_eq!(
             scan.root.size(),
-            allocated(&root) + folders + movie + 40 * allocated(&root.join("notes/0.txt"))
+            allocated(root) + folders + movie + 40 * allocated(&root.join("notes/0.txt"))
         );
         assert!(scan.root.done());
 
@@ -303,7 +307,5 @@ mod tests {
             view.children.as_slice(),
             [tree::SpaceItem::Other { count: 40, .. }]
         ));
-
-        std::fs::remove_dir_all(&root).unwrap();
     }
 }

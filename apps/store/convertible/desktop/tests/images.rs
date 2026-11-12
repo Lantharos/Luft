@@ -2,7 +2,7 @@ mod common;
 
 use std::fs;
 
-use common::{difference, job, run, scene, write_scene};
+use common::{difference, installed, job, run, scene, write_scene};
 use convertible_lib::engine::capabilities;
 use convertible_lib::engine::formats;
 use convertible_lib::engine::image::decode;
@@ -56,7 +56,7 @@ fn the_system_encoders_write_files_that_decode() {
     let source = write_scene(folder.path(), 96, 64);
     let reference = scene(96, 64);
     for (id, extension) in [("avif", "avif"), ("heic", "heic"), ("jxl", "jxl")] {
-        if found.missing.iter().any(|missing| missing == id) {
+        if !installed(&found, id) {
             continue;
         }
         let output = run(&job(

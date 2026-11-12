@@ -187,39 +187,37 @@ mod tests {
     }
 
     #[test]
-    fn hides_home_folders() {
-        assert_eq!(
-            scrub("couldn't open \"/var/home/mara/Documents/Tax 2025.pdf\": denied"),
-            "couldn't open \"~/…\": denied"
-        );
-        assert_eq!(
-            scrub("at file:///home/someone/x.js:3:1"),
-            "at file://~/…:3:1"
-        );
-    }
-
-    #[test]
-    fn hides_home_folders_with_spaces() {
-        assert_eq!(
-            scrub("panicked: cannot read /home/anna/My Documents/Tax 2025.pdf: denied"),
-            "panicked: cannot read ~/…: denied"
-        );
-        assert_eq!(
-            scrub("no such file /var/home/anna/Some Folder/x"),
-            "no such file ~/…"
-        );
-        assert_eq!(
-            scrub("opened '/home/anna/Some Folder/x y' fine"),
-            "opened '~/…' fine"
-        );
-        assert_eq!(
-            scrub("failed on /home/anna/My Files/a.txt and gave up"),
-            "failed on ~/… and gave up"
-        );
-        assert_eq!(
-            scrub("the fixture at /home/anna/Some Folder/fixture panicked as asked"),
-            "the fixture at ~/… panicked as asked"
-        );
+    fn hides_home_folders_with_and_without_spaces() {
+        let cases = [
+            (
+                "couldn't open \"/var/home/mara/Documents/Tax 2025.pdf\": denied",
+                "couldn't open \"~/…\": denied",
+            ),
+            ("at file:///home/someone/x.js:3:1", "at file://~/…:3:1"),
+            (
+                "panicked: cannot read /home/anna/My Documents/Tax 2025.pdf: denied",
+                "panicked: cannot read ~/…: denied",
+            ),
+            (
+                "no such file /var/home/anna/Some Folder/x",
+                "no such file ~/…",
+            ),
+            (
+                "opened '/home/anna/Some Folder/x y' fine",
+                "opened '~/…' fine",
+            ),
+            (
+                "failed on /home/anna/My Files/a.txt and gave up",
+                "failed on ~/… and gave up",
+            ),
+            (
+                "the fixture at /home/anna/Some Folder/fixture panicked as asked",
+                "the fixture at ~/… panicked as asked",
+            ),
+        ];
+        for (text, scrubbed) in cases {
+            assert_eq!(scrub(text), scrubbed);
+        }
     }
 
     #[test]

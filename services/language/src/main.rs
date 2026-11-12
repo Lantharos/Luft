@@ -14,6 +14,11 @@ use bus::Models;
 use hub::{CATALOG, Hub, NAME, PATH};
 
 fn main() -> Result<()> {
+    #[cfg(feature = "measure")]
+    if std::env::args().nth(1).as_deref() == Some("measure") {
+        notes::measure::notes_of_transcripts();
+        return Ok(());
+    }
     tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_all()

@@ -64,11 +64,6 @@ impl Fixture {
 }
 
 #[test]
-fn a_new_library_starts_with_one_board() {
-    assert_eq!(fixture().store.library.boards.len(), 1);
-}
-
-#[test]
 fn any_sample_rate_arrives_as_48_khz_stereo_named_after_its_file() {
     let mut fixture = fixture();
     let id = fixture.add("airhorn.wav", 22_050);

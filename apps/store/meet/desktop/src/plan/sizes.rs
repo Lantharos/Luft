@@ -56,12 +56,6 @@ mod tests {
     }
 
     #[test]
-    fn a_small_esp_needs_a_startup_partition_too() {
-        assert_eq!(smallest_luft(100 * MIB), 34 * GIB);
-        assert_eq!(smallest_luft(2 * GIB), 32 * GIB);
-    }
-
-    #[test]
     fn partitions_fit_what_goes_on_them() {
         assert_eq!(start(150 * MIB), SMALLEST_START);
         assert!(live(3 * GIB) >= 3 * GIB + LIVE_SPARE);

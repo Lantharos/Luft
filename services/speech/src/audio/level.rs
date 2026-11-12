@@ -46,14 +46,10 @@ mod tests {
     use super::level;
 
     #[test]
-    fn silence_is_zero_and_full_scale_is_one() {
+    fn silence_is_zero_speech_sits_in_between_and_full_scale_is_one() {
         assert_eq!(level(0.0), 0.0);
-        assert_eq!(level(1.0), 1.0);
-    }
-
-    #[test]
-    fn speech_sits_in_between() {
         let speech = level(0.05f64.powi(2));
         assert!(speech > 0.4 && speech < 0.6, "{speech}");
+        assert_eq!(level(1.0), 1.0);
     }
 }

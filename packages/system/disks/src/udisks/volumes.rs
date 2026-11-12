@@ -284,14 +284,15 @@ mod tests {
     use super::encryption_kind;
 
     #[test]
-    fn luks_keeps_its_version() {
-        assert_eq!(encryption_kind("", "crypto_LUKS", "2"), "LUKS2");
-        assert_eq!(encryption_kind("LUKS", "crypto_LUKS", "1"), "LUKS1");
-    }
-
-    #[test]
-    fn other_encryption_is_named_by_its_hint_or_type() {
-        assert_eq!(encryption_kind("", "BitLocker", ""), "BitLocker");
-        assert_eq!(encryption_kind("VeraCrypt", "", ""), "VeraCrypt");
+    fn encryption_is_named_by_its_hint_or_type_and_luks_keeps_its_version() {
+        let cases = [
+            (("", "crypto_LUKS", "2"), "LUKS2"),
+            (("LUKS", "crypto_LUKS", "1"), "LUKS1"),
+            (("", "BitLocker", ""), "BitLocker"),
+            (("VeraCrypt", "", ""), "VeraCrypt"),
+        ];
+        for ((hint, fs_type, version), named) in cases {
+            assert_eq!(encryption_kind(hint, fs_type, version), named);
+        }
     }
 }

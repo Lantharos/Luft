@@ -37,9 +37,7 @@ struct Tally {
     milliseconds: Vec<f64>,
 }
 
-#[test]
-#[ignore]
-fn accuracy() {
+pub fn accuracy() {
     let models =
         PathBuf::from(std::env::var("LUFT_HANDWRITING_MODELS").expect("LUFT_HANDWRITING_MODELS"));
     let samples =

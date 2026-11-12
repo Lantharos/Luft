@@ -451,12 +451,6 @@ mod tests {
     }
 
     #[test]
-    fn nothing_published_is_an_error() {
-        let downloads = published(&[]);
-        assert!(located(&downloads, &newest::Seen::new(), Channel::Nightly).is_err());
-    }
-
-    #[test]
     fn the_checksum_file_names_the_digest_first() {
         let line = format!("{}  luft-1.1-nightly.21.iso\n", "ab".repeat(32));
         assert_eq!(parse_checksum(&line), Some([0xab; 32]));

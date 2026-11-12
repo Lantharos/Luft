@@ -1,6 +1,7 @@
 use std::fs::{self, File};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use std::sync::OnceLock;
 use std::time::{Duration, SystemTime};
 
 const IMAGE_SIZE: u64 = 32 << 20;
@@ -26,6 +27,10 @@ impl Image {
                 "skipping: {} are needed to build NTFS images",
                 TOOLS.join(", ")
             );
+            return None;
+        }
+        if !entries.is_empty() && !user_namespaces_work() {
+            eprintln!("skipping: unshare can't map this account into a user namespace here");
             return None;
         }
         let directory =
@@ -101,8 +106,20 @@ impl Image {
 
 impl Drop for Image {
     fn drop(&mut self) {
-        fs::remove_dir_all(&self.directory).unwrap();
+        let _ = fs::remove_dir_all(&self.directory);
     }
+}
+
+fn user_namespaces_work() -> bool {
+    static WORK: OnceLock<bool> = OnceLock::new();
+    *WORK.get_or_init(|| {
+        Command::new("unshare")
+            .args(["--map-root-user", "--map-auto", "--mount", "true"])
+            .stderr(Stdio::null())
+            .status()
+            .unwrap()
+            .success()
+    })
 }
 
 fn installed(tool: &str) -> bool {

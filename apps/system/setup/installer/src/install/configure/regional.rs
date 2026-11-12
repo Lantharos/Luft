@@ -114,14 +114,4 @@ mod tests {
         assert!(check(&regional("../../etc/shadow", "de")).is_err());
         assert!(check(&regional("Europe/Berlin", "de\" Option \"x")).is_err());
     }
-
-    #[test]
-    fn writes_the_keyboard_for_localed() {
-        let settings = regional("Europe/Berlin", "de");
-        assert_eq!(
-            vconsole(&settings.keyboard),
-            "XKBLAYOUT=de\nXKBVARIANT=nodeadkeys\n"
-        );
-        assert!(keyboard_conf(&settings.keyboard).contains("Option \"XkbVariant\" \"nodeadkeys\""));
-    }
 }

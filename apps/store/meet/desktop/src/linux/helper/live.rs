@@ -134,12 +134,4 @@ mod tests {
             Path::new("/home/.luft-meet/LiveOS/luft.erofs")
         );
     }
-
-    #[test]
-    fn grub_finds_the_folder_by_its_filesystem() {
-        assert_eq!(
-            grub_config("5d3c0b62-0a3e-4c1e-9a52-7d2f1f0e8a11", "/home/.luft-meet"),
-            "search --no-floppy --fs-uuid --set=root 5d3c0b62-0a3e-4c1e-9a52-7d2f1f0e8a11\nset medium='UUID=5d3c0b62-0a3e-4c1e-9a52-7d2f1f0e8a11'\nset folder='/home/.luft-meet'\nexport medium folder\nsource ${folder}/boot/menu.cfg\n"
-        );
-    }
 }

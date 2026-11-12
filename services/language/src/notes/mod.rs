@@ -140,5 +140,5 @@ pub fn heading(writer: &Writer, request: &HeadingRequest) -> Result<Heading> {
     serde_json::from_str(&answer).context("The heading didn't come out whole")
 }
 
-#[cfg(test)]
-mod check;
+#[cfg(feature = "measure")]
+pub mod measure;

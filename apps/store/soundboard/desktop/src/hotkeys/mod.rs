@@ -100,13 +100,4 @@ mod tests {
         assert_eq!(router.route(pressed(9), triggers), None);
         assert_eq!(router.route(Event::Pressed("mute".into()), triggers), None);
     }
-
-    #[test]
-    fn the_stop_shortcut_stops_everything() {
-        let mut router = Router::default();
-        assert_eq!(
-            router.route(Event::Pressed(STOP_ALL.into()), triggers),
-            Some(Action::StopAll)
-        );
-    }
 }

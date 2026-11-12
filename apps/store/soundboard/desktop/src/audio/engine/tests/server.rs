@@ -1,8 +1,8 @@
+use std::ffi::{OsStr, OsString};
 use std::os::unix::process::CommandExt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
-use std::sync::Mutex;
-use std::sync::{Arc, LazyLock};
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use pipewire as pw;
@@ -14,6 +14,7 @@ use crate::audio::{CHANNELS, RATE};
 const QUIET: f32 = 0.02;
 const CLICK: f32 = 0.3;
 const CLICK_PERIOD: Duration = Duration::from_millis(100);
+const POLL: Duration = Duration::from_millis(50);
 const CONFIG: &str = r#"
 context.properties = { default.clock.rate = 48000 default.clock.quantum = 1024 default.clock.min-quantum = 32 support.dbus = false core.daemon = true core.name = pipewire-0 }
 context.spa-libs = { audio.convert.* = audioconvert/libspa-audioconvert support.* = support/libspa-support }
@@ -62,14 +63,37 @@ wireplumber.profiles = { main = {
 } }
 "#;
 
-pub static SERVER: LazyLock<Server> = LazyLock::new(|| {
-    let (started, server) = std::sync::mpsc::channel();
-    std::thread::spawn(move || {
-        started.send(Server::start()).unwrap();
-        std::thread::park();
-    });
-    server.recv().unwrap()
-});
+const FOLDER: &str = "SOUNDBOARD_TEST_SERVER";
+
+fn environment(folder: &Path) -> [(&'static str, OsString); 8] {
+    let path = |name: &str| folder.join(name).into_os_string();
+    let mut pulse = OsString::from("unix:");
+    pulse.push(path("pulse/native"));
+    [
+        (FOLDER, folder.as_os_str().to_owned()),
+        ("XDG_RUNTIME_DIR", path("run")),
+        ("PIPEWIRE_RUNTIME_DIR", path("run")),
+        ("PIPEWIRE_REMOTE", "pipewire-0".into()),
+        ("PULSE_SERVER", pulse),
+        ("XDG_CONFIG_HOME", path("config")),
+        ("XDG_STATE_HOME", path("state")),
+        ("PULSE_RUNTIME_PATH", path("pulse")),
+    ]
+}
+
+/// Runs the calling test against a sound server of its own, in a process
+/// that starts with that server's environment.
+pub fn on_own_server(body: impl FnOnce(&Server)) {
+    match std::env::var_os(FOLDER) {
+        Some(folder) => {
+            pw::init();
+            body(&Server {
+                folder: folder.into(),
+            });
+        }
+        None => Daemons::start().run(std::thread::current().name().unwrap()),
+    }
+}
 
 fn spawn_tied(command: &mut Command) -> Child {
     // SAFETY: prctl is safe to call between fork and exec.
@@ -79,15 +103,17 @@ fn spawn_tied(command: &mut Command) -> Child {
             Ok(())
         });
     }
-    command.spawn().unwrap()
+    command
+        .spawn()
+        .expect("pipewire, wireplumber and pw-dump are installed")
 }
 
-pub struct Server {
+struct Daemons {
     folder: tempfile::TempDir,
-    _daemons: Mutex<Vec<Child>>,
+    running: Vec<Child>,
 }
 
-impl Server {
+impl Daemons {
     fn start() -> Self {
         let folder = tempfile::tempdir().unwrap();
         let path = |name: &str| folder.path().join(name);
@@ -106,49 +132,79 @@ impl Server {
             NO_HARDWARE,
         )
         .unwrap();
-        // SAFETY: this runs once, before the test binary starts anything that reads the environment.
-        unsafe {
-            std::env::set_var("XDG_RUNTIME_DIR", path("run"));
-            std::env::set_var("PIPEWIRE_RUNTIME_DIR", path("run"));
-            std::env::set_var("PIPEWIRE_REMOTE", "pipewire-0");
-            std::env::set_var(
-                "PULSE_SERVER",
-                format!("unix:{}", path("pulse/native").display()),
-            );
-            std::env::set_var("XDG_CONFIG_HOME", path("config"));
-            std::env::set_var("XDG_STATE_HOME", path("state"));
-            std::env::set_var("PULSE_RUNTIME_PATH", path("pulse"));
-            std::env::remove_var("DBUS_SESSION_BUS_ADDRESS");
-        }
-        let daemon = |program: &str, conf: Option<PathBuf>| {
-            let mut command = Command::new(program);
-            if let Some(conf) = conf {
-                command.arg("-c").arg(conf);
-            }
-            spawn_tied(command.stdout(Stdio::null()))
-        };
-        let mut daemons = vec![daemon("pipewire", Some(path("pipewire.conf")))];
-        wait_until("the sound server starts", || {
-            path("run/pipewire-0").exists()
-        });
-        daemons.push(daemon("wireplumber", None));
-        daemons.push(daemon("pipewire", Some(path("pipewire-pulse.conf"))));
-        wait_until("the PulseAudio side starts", || {
-            path("pulse/native").exists()
-        });
-        pw::init();
-        let server = Self {
+        let mut daemons = Self {
             folder,
-            _daemons: Mutex::new(daemons),
+            running: Vec::new(),
+        };
+        daemons.spawn("pipewire", Some("pipewire.conf"));
+        wait_until("the sound server starts", || {
+            daemons.folder.path().join("run/pipewire-0").exists()
+        });
+        daemons.spawn("wireplumber", None);
+        daemons.spawn("pipewire", Some("pipewire-pulse.conf"));
+        wait_until("the PulseAudio side starts", || {
+            daemons.folder.path().join("pulse/native").exists()
+        });
+        let server = Server {
+            folder: daemons.folder.path().to_owned(),
         };
         wait_until("the session manager takes over", || {
             server.dump().contains("default.audio.sink")
         });
-        server
+        daemons
     }
 
+    fn command(&self, program: impl AsRef<OsStr>) -> Command {
+        let mut command = Command::new(program);
+        command
+            .envs(environment(self.folder.path()))
+            .env_remove("DBUS_SESSION_BUS_ADDRESS");
+        command
+    }
+
+    fn spawn(&mut self, program: &str, conf: Option<&str>) {
+        let mut command = self.command(program);
+        if let Some(conf) = conf {
+            command.arg("-c").arg(self.folder.path().join(conf));
+        }
+        self.running.push(spawn_tied(command.stdout(Stdio::null())));
+    }
+
+    fn run(&self, test: &str) {
+        let output = self
+            .command(std::env::current_exe().unwrap())
+            .args(["--exact", test, "--nocapture"])
+            .output()
+            .unwrap();
+        let printed = String::from_utf8_lossy(&output.stdout);
+        print!("{printed}");
+        eprint!("{}", String::from_utf8_lossy(&output.stderr));
+        assert!(
+            output.status.success() && printed.contains("1 passed"),
+            "{test} failed on its own sound server"
+        );
+    }
+}
+
+impl Drop for Daemons {
+    fn drop(&mut self) {
+        for daemon in &mut self.running {
+            let _ = daemon.kill();
+            let _ = daemon.wait();
+        }
+    }
+}
+
+pub struct Server {
+    folder: PathBuf,
+}
+
+impl Server {
     fn dump(&self) -> String {
-        let output = Command::new("pw-dump").output().unwrap();
+        let output = Command::new("pw-dump")
+            .envs(environment(&self.folder))
+            .output()
+            .unwrap();
         String::from_utf8_lossy(&output.stdout).into_owned()
     }
 
@@ -174,24 +230,23 @@ impl Server {
     }
 
     pub fn speak(&self, level: f32) -> FakeMicrophone {
-        FakeMicrophone::start("fake-mic", Pattern::Hum(level))
+        FakeMicrophone::start(self, "fake-mic", Pattern::Hum(level))
     }
 
     pub fn click_track(&self) -> FakeMicrophone {
-        FakeMicrophone::start("fake-mic", Pattern::Clicks)
+        FakeMicrophone::start(self, "fake-mic", Pattern::Clicks)
     }
 
     pub fn killable_engine(&self) -> Child {
+        let (_crate, module) = module_path!().split_once("::").unwrap();
         let program = std::env::current_exe().unwrap();
         spawn_tied(
             Command::new(program)
                 .args([
                     "--exact",
-                    "audio::engine::tests::server::engine_until_killed",
+                    &format!("{module}::engine_until_killed"),
                     "--ignored",
-                    "--nocapture",
                 ])
-                .env("SOUNDBOARD_TEST_SERVER", self.folder.path())
                 .stdout(Stdio::null()),
         )
     }
@@ -200,9 +255,9 @@ impl Server {
 #[test]
 #[ignore = "the process other tests start in order to kill it"]
 fn engine_until_killed() {
-    let folder = PathBuf::from(std::env::var("SOUNDBOARD_TEST_SERVER").unwrap());
-    // SAFETY: nothing else runs in this process yet.
-    unsafe { std::env::set_var("PIPEWIRE_RUNTIME_DIR", folder.join("run")) };
+    if std::env::var_os(FOLDER).is_none() {
+        return;
+    }
     let _engine = super::Engine::start(super::Mix::default(), |_| {});
     std::thread::sleep(Duration::from_secs(600));
 }
@@ -211,7 +266,7 @@ pub fn wait_until(what: &str, done: impl Fn() -> bool) {
     let deadline = Instant::now() + WAIT;
     while !done() {
         assert!(Instant::now() < deadline, "timed out waiting until {what}");
-        std::thread::sleep(Duration::from_millis(5));
+        std::thread::sleep(POLL);
     }
 }
 
@@ -228,7 +283,7 @@ pub struct FakeMicrophone {
 }
 
 impl FakeMicrophone {
-    fn start(name: &str, pattern: Pattern) -> Self {
+    fn start(server: &Server, name: &str, pattern: Pattern) -> Self {
         let (quit, receiver) = pw::channel::channel();
         let node = name.to_owned();
         let thread = std::thread::spawn(move || {
@@ -273,7 +328,7 @@ impl FakeMicrophone {
             let _quit = receiver.attach(mainloop.loop_(), move |()| stop.quit());
             mainloop.run();
         });
-        wait_until("the fake microphone appears", || SERVER.has_source(name));
+        wait_until("the fake microphone appears", || server.has_source(name));
         Self {
             name: name.to_owned(),
             quit,
@@ -304,23 +359,38 @@ fn connect(stream: &pw::stream::Stream, direction: pw::spa::utils::Direction) {
         .unwrap();
 }
 
+fn audio_time(frames: u64) -> Duration {
+    Duration::from_secs_f64(frames as f64 / f64::from(RATE))
+}
+
 #[derive(Default)]
 struct Heard {
     samples: Vec<f32>,
-    armed: bool,
-    first: Option<Instant>,
-    clicks: Vec<Instant>,
+    armed_at: Option<usize>,
+    first: Option<usize>,
+    clicks: Vec<Duration>,
     since_loud: usize,
 }
 
 impl Heard {
-    fn note_clicks(&mut self, samples: &[f32], arrived: Instant) {
-        let frames = samples.len() / CHANNELS;
+    fn frames(&self) -> usize {
+        self.samples.len() / CHANNELS
+    }
+
+    fn note_first_sound(&mut self, samples: &[f32]) {
+        let Some(armed_at) = self.armed_at.filter(|_| self.first.is_none()) else {
+            return;
+        };
+        if let Some(index) = samples.iter().position(|sample| sample.abs() > QUIET) {
+            self.first = Some(self.frames() + index / CHANNELS - armed_at);
+        }
+    }
+
+    fn note_clicks(&mut self, samples: &[f32], cycle: Duration) {
         for (index, frame) in samples.as_chunks::<CHANNELS>().0.iter().enumerate() {
             if frame[0].abs() > CLICK {
                 if self.since_loud > RATE as usize / 40 {
-                    let later = Duration::from_secs_f64((frames - index) as f64 / f64::from(RATE));
-                    self.clicks.push(arrived - later);
+                    self.clicks.push(cycle + audio_time(index as u64));
                 }
                 self.since_loud = 0;
             } else {
@@ -340,7 +410,7 @@ impl Listener {
     pub fn on(source: &str) -> Self {
         let (quit, receiver) = pw::channel::channel();
         let heard = Arc::new(Mutex::new(Heard {
-            armed: true,
+            armed_at: Some(0),
             ..Heard::default()
         }));
         let writer = heard.clone();
@@ -359,6 +429,9 @@ impl Listener {
             let _listener = stream
                 .add_local_listener_with_user_data(writer)
                 .process(|stream, heard| {
+                    let cycle = stream.time().map_or(Duration::ZERO, |time| {
+                        Duration::from_nanos(time.now().unsigned_abs())
+                    });
                     let Some(mut buffer) = stream.dequeue_buffer() else {
                         return;
                     };
@@ -366,14 +439,10 @@ impl Listener {
                     let size = data.chunk().size() as usize;
                     let bytes = data.data().unwrap();
                     let (_, samples, _) = unsafe { bytes[..size].align_to::<f32>() };
-                    let now = Instant::now();
                     let mut heard = heard.lock().unwrap();
-                    if heard.armed && samples.iter().any(|sample| sample.abs() > QUIET) {
-                        heard.armed = false;
-                        heard.first = Some(now);
-                    }
+                    heard.note_first_sound(samples);
+                    heard.note_clicks(samples, cycle);
                     heard.samples.extend_from_slice(samples);
-                    heard.note_clicks(samples, now);
                 })
                 .register()
                 .unwrap();
@@ -391,15 +460,16 @@ impl Listener {
 
     pub fn rearm(&self) {
         let mut heard = self.heard.lock().unwrap();
-        heard.armed = true;
+        heard.armed_at = Some(heard.frames());
         heard.first = None;
     }
 
-    pub fn first_sound(&self, within: Duration) -> Option<Instant> {
+    /// How much sound went by between arming and the first loud sample.
+    pub fn first_sound(&self, within: Duration) -> Option<Duration> {
         let deadline = Instant::now() + within;
         while Instant::now() < deadline {
             if let Some(first) = self.heard.lock().unwrap().first {
-                return Some(first);
+                return Some(audio_time(first as u64));
             }
             std::thread::sleep(Duration::from_micros(200));
         }
@@ -418,19 +488,19 @@ impl Listener {
             .fold(0f32, |peak, sample| peak.max(sample.abs()))
     }
 
+    /// How much later, by the sound server's clock, each click the direct
+    /// listener heard reached the other one.
     pub fn delays(direct: &Self, through: &Self) -> Vec<Duration> {
-        std::thread::sleep(Duration::from_millis(1500));
         let first = direct.heard.lock().unwrap().clicks.clone();
         let second = through.heard.lock().unwrap().clicks.clone();
         first
             .iter()
             .skip(1)
             .filter_map(|click| {
-                let matching = second.iter().find(|other| {
-                    other.saturating_duration_since(*click) < CLICK_PERIOD / 2
-                        && click.saturating_duration_since(**other) < CLICK_PERIOD / 2
-                })?;
-                Some(matching.saturating_duration_since(*click))
+                let matching = second
+                    .iter()
+                    .find(|other| click.abs_diff(**other) < CLICK_PERIOD / 2)?;
+                Some(matching.saturating_sub(*click))
             })
             .collect()
     }

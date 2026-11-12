@@ -39,5 +39,8 @@ ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 zstd.workspace = true
 
+[dev-dependencies]
+tempfile.workspace = true
+
 [lints]
 workspace = true

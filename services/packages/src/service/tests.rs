@@ -10,6 +10,7 @@ use zbus::{Connection, interface};
 use super::{NAME, PATH, Packages};
 
 const FOLDER: &str = "/var/home/mara/.local/share/luft/extensions/com.example.Clock";
+const GREETER_PATH: &str = "/com/lantharos/Greeter1";
 
 struct Bus {
     daemon: Child,
@@ -58,10 +59,31 @@ impl Greeter {
     }
 }
 
-async fn refusal(bus: &Bus, developer_tools: bool) -> String {
-    let _greeter = bus
+async fn refusal(caller: &Connection) -> String {
+    caller
+        .call_method(
+            Some(NAME),
+            PATH,
+            Some(NAME),
+            "AllowExtensionFolder",
+            &("com.example.Clock", FOLDER),
+        )
+        .await
+        .unwrap_err()
+        .to_string()
+}
+
+#[tokio::test]
+async fn an_unreviewed_extension_is_refused_without_developer_tools_and_to_all_but_settings() {
+    let bus = Bus::start();
+    let greeter = bus
         .connect()
-        .serve_at("/com/lantharos/Greeter1", Greeter { developer_tools })
+        .serve_at(
+            GREETER_PATH,
+            Greeter {
+                developer_tools: false,
+            },
+        )
         .name("com.lantharos.Greeter1")
         .build()
         .await
@@ -74,27 +96,15 @@ async fn refusal(bus: &Bus, developer_tools: bool) -> String {
         .await
         .unwrap();
     let caller: Connection = bus.connect().build().await.unwrap();
-    let error = caller
-        .call_method(
-            Some(NAME),
-            PATH,
-            Some(NAME),
-            "AllowExtensionFolder",
-            &("com.example.Clock", FOLDER),
-        )
+    assert!(refusal(&caller).await.contains("Developer tools"));
+
+    greeter
+        .object_server()
+        .interface::<_, Greeter>(GREETER_PATH)
         .await
-        .unwrap_err();
-    error.to_string()
-}
-
-#[tokio::test]
-async fn an_unreviewed_extension_is_refused_while_developer_tools_is_off() {
-    let bus = Bus::start();
-    assert!(refusal(&bus, false).await.contains("Developer tools"));
-}
-
-#[tokio::test]
-async fn an_unreviewed_extension_is_refused_to_any_program_but_settings() {
-    let bus = Bus::start();
-    assert!(refusal(&bus, true).await.contains("Only Luft's Settings"));
+        .unwrap()
+        .get_mut()
+        .await
+        .developer_tools = true;
+    assert!(refusal(&caller).await.contains("Only Luft's Settings"));
 }

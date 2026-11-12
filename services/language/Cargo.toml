@@ -11,6 +11,9 @@ rust-version.workspace = true
 name = "luft-language"
 path = "src/main.rs"
 
+[features]
+measure = []
+
 [dependencies]
 anyhow.workspace = true
 luft-dbus = { workspace = true, features = ["service"] }

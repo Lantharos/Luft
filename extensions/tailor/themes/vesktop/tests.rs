@@ -62,20 +62,22 @@ const FLATPAK: &str = ".var/app/dev.vencord.Vesktop/config/vesktop";
 
 #[test]
 fn turning_off_gives_back_the_settings_byte_for_byte() {
-    let mut fixture = fixture(FLATPAK);
-    assert_eq!(fixture.vesktop.apply(&sample("#a0c4ff")).unwrap(), "ready");
-    assert!(fixture.settings().contains(FILE));
-    assert!(fixture.folder.join("themes").join(FILE).is_file());
+    for inside in [FLATPAK, ".config/vesktop"] {
+        let mut fixture = fixture(inside);
+        assert_eq!(fixture.vesktop.apply(&sample("#a0c4ff")).unwrap(), "ready");
+        assert!(fixture.settings().contains(FILE));
+        assert!(fixture.folder.join("themes").join(FILE).is_file());
 
-    fixture.vesktop.restore().unwrap();
+        fixture.vesktop.restore().unwrap();
 
-    assert_eq!(fixture.settings(), SETTINGS);
-    assert!(!fixture.folder.join("themes").join(FILE).exists());
-    assert_eq!(
-        fs::read_dir(fixture.folder.join("themes")).unwrap().count(),
-        0
-    );
-    assert!(fixture.vesktop.watched().is_empty());
+        assert_eq!(fixture.settings(), SETTINGS);
+        assert!(!fixture.folder.join("themes").join(FILE).exists());
+        assert_eq!(
+            fs::read_dir(fixture.folder.join("themes")).unwrap().count(),
+            0
+        );
+        assert!(fixture.vesktop.watched().is_empty());
+    }
 }
 
 #[test]
@@ -149,14 +151,6 @@ fn a_new_look_rewrites_the_theme_vesktop_reloads_by_itself() {
     assert!(theme.contains("--kestrel-primary: #ffb4ab;"));
     assert!(theme.starts_with("/**\n * @name Luft"));
     assert_eq!(fixture.settings(), settings);
-}
-
-#[test]
-fn a_native_vesktop_works_the_same_way() {
-    let mut fixture = fixture(".config/vesktop");
-    assert_eq!(fixture.vesktop.apply(&sample("#a0c4ff")).unwrap(), "ready");
-    fixture.vesktop.restore().unwrap();
-    assert_eq!(fixture.settings(), SETTINGS);
 }
 
 #[test]

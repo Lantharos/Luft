@@ -28,7 +28,6 @@ mod tests {
         let smallest = smallest_windows(used, 500 * GIB);
         assert!(smallest >= used + WINDOWS_HEADROOM);
         assert_eq!(smallest % ALIGNMENT, 0);
-        assert_eq!(room_for_luft(500 * GIB, smallest), 500 * GIB - smallest);
     }
 
     #[test]

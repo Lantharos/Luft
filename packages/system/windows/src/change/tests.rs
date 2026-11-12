@@ -106,7 +106,7 @@ impl Folder {
 
 impl Drop for Folder {
     fn drop(&mut self) {
-        fs::remove_dir_all(&self.0).unwrap();
+        let _ = fs::remove_dir_all(&self.0);
     }
 }
 

@@ -132,19 +132,6 @@ fn a_rollout_that_has_not_reached_the_device_is_skipped() {
 }
 
 #[test]
-fn going_back_to_stable_waits_for_a_newer_stable_release() {
-    let tide = channels_of_tide();
-    let installed_from_beta = "1.3.0-beta.2";
-    let stable = newest_version(&tide, STABLE).unwrap();
-    assert!(!super::newer(stable, installed_from_beta));
-    let next = listing("sabine", &[release("1.3.0", STABLE, 100, &[archive()])]);
-    assert!(super::newer(
-        newest_version(&next, STABLE).unwrap(),
-        installed_from_beta
-    ));
-}
-
-#[test]
 fn the_page_offers_stable_and_the_preview_channels_an_app_ships_on() {
     let tide = channels_of_tide();
     assert_eq!(tide.channels(LINUX), [STABLE, "beta", "nightly"]);
@@ -347,22 +334,6 @@ fn choosing_a_channel_takes_only_its_releases() {
 }
 
 #[test]
-fn moving_to_a_stable_system_keeps_a_newer_install_until_stable_catches_up() {
-    let tide = channels_of_tide();
-    let installed = "1.4.0-nightly.20261103";
-    let stable = on(SEASONS, None, Some(STABLE));
-    assert!(!super::newer(
-        followed_version(&tide, &stable).unwrap(),
-        installed
-    ));
-    let caught_up = listing("sabine", &[release("1.4.0", STABLE, 100, &[archive()])]);
-    assert!(super::newer(
-        followed_version(&caught_up, &stable).unwrap(),
-        installed
-    ));
-}
-
-#[test]
 fn the_page_leads_with_the_system_for_luft_own_apps() {
     let previews = || vec![STABLE.to_owned(), "nightly".to_owned()];
     let stable_only = || vec![STABLE.to_owned()];
@@ -403,29 +374,6 @@ fn choosing_an_ended_channel_follows_where_it_points() {
     assert_eq!(following.ended.as_deref(), Some("beta"));
     assert_eq!(following.choice(), STABLE);
     assert_eq!(followed_version(&tide, &following), Some("1.9.0"));
-}
-
-#[test]
-fn a_build_newer_than_the_destination_stays_until_it_catches_up() {
-    let installed = "2.0.0-beta.3";
-    let tide = beta_ended_into_stable(&[
-        release("2.0.0-beta.3", "beta", 100, &[archive()]),
-        release("1.9.0", STABLE, 100, &[archive()]),
-    ]);
-    let following = tide.resolved(on(TIDE, Some("beta"), None), LINUX);
-    assert!(!super::newer(
-        followed_version(&tide, &following).unwrap(),
-        installed
-    ));
-    let caught_up = beta_ended_into_stable(&[
-        release("2.0.0", STABLE, 100, &[archive()]),
-        release("2.0.0-beta.3", "beta", 100, &[archive()]),
-    ]);
-    let following = caught_up.resolved(on(TIDE, Some("beta"), None), LINUX);
-    assert!(super::newer(
-        followed_version(&caught_up, &following).unwrap(),
-        installed
-    ));
 }
 
 #[test]

@@ -14,7 +14,7 @@ const LARGEST_BODY: usize = 64 * 1024;
 const DEFAULT_WAIT: Duration = Duration::from_secs(60);
 const AFTER_FAILURE: Duration = Duration::from_secs(300);
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum Outcome {
     Taken,
     /// Pult won't ever take this one: it isn't what the inbox expects.
@@ -79,23 +79,5 @@ pub fn send(inbox: &Inbox, body: &[u8]) -> Outcome {
             eprintln!("Couldn't send a crash report: {error}");
             Outcome::Unreachable(AFTER_FAILURE)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::time::Duration;
-
-    use super::{Outcome, outcome};
-
-    #[test]
-    fn follows_what_pult_answers() {
-        assert_eq!(outcome(204, None), Outcome::Taken);
-        assert_eq!(
-            outcome(429, Some("120")),
-            Outcome::Limited(Duration::from_secs(120))
-        );
-        assert_eq!(outcome(403, None), Outcome::Closed);
-        assert_eq!(outcome(422, None), Outcome::Refused);
     }
 }

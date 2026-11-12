@@ -1,5 +1,5 @@
-#[cfg(test)]
-pub mod check;
+#[cfg(feature = "measure")]
+pub mod measure;
 mod parakeet;
 mod processor;
 mod whisper;

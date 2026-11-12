@@ -74,8 +74,6 @@ home-security-secure-boot = A Secure Boot bekapcsolva marad
 home-security-secure-boot-text = A rendszerindítás minden lépése alá van írva a pendrive-tól az asztalig, így a firmware-ben semmit sem kell kikapcsolni.
 home-security-encryption = Titkosítás gépelés nélkül
 home-security-encryption-text = Kapcsolja be a titkosítást egy kattintással. TPM-mel a lemez magától oldódik fel, és csak a hozzá tartozó rendszer számára.
-home-security-passkeys = Jelkulcsok mindenhol
-home-security-passkeys-text = A jelkulcsok a számítógépén vannak, és minden böngészőben működnek, ujjlenyomattal vagy jelszóval megerősítve.
 home-security-keyring = Egyetlen kulcstartó
 home-security-keyring-text = A jelszavak, bejelentkezések, SSH-kulcsok és a GnuPG egy helyen vannak, és bejelentkezéskor feloldódnak.
 

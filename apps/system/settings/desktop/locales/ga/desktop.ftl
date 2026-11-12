@@ -185,9 +185,6 @@ desktop-keyring-denied = Ní féidir é seo a athrú ach leis an aip Socruithe s
 desktop-keyring-unsupported = Ní féidir le d’fháinne eochrach é seo a dhéanamh fós
 desktop-keyring-reseal-failed = Níorbh fhéidir leis an tslis slándála d’fháinne eochrach a chosaint faoi láthair
 
-## Passkeys
-desktop-passkeys-missing = Níl an eochair rochtana sin ann
-
 ## Device security
 desktop-security-recovery-file-name = Eochair athshlánaithe.txt
 desktop-security-usb-unavailable = Níl cosaint USB ar fáil ar an ríomhaire seo

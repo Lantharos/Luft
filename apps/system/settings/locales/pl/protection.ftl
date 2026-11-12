@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Przechowuj w procesorze zabezpieczeń
 settings-passwords-ssh-chip-description = Nigdy nie da się go skopiować z tego komputera, nawet tobie
 settings-passwords-ssh-chip-unsupported = Procesor zabezpieczeń tego komputera nie obsługuje kluczy SSH
 settings-passwords-ssh-add = Dodaj klucz
-
-## Passkeys
-
-settings-passkeys-title = Klucze dostępu
-settings-passkeys-unavailable = Odblokuj pęk kluczy, aby zobaczyć klucze dostępu.
-settings-passkeys-chip-fingerprint = Zapieczętowane przez procesor zabezpieczeń tego komputera. Każde logowanie wymaga odcisku palca lub hasła.
-settings-passkeys-chip-password = Zapieczętowane przez procesor zabezpieczeń tego komputera. Każde logowanie wymaga hasła.
-settings-passkeys-password-fingerprint = Zaszyfrowane twoim hasłem. Każde logowanie wymaga odcisku palca lub hasła.
-settings-passkeys-password = Zaszyfrowane twoim hasłem. Każde logowanie wymaga hasła.
-settings-passkeys-last-used = Ostatnio użyty { $when }
-settings-passkeys-never-used = Nigdy nieużyty
-settings-passkeys-password-only = Chroniony hasłem
-settings-passkeys-unreachable = Przeglądarki nie mają dostępu do kluczy dostępu
-settings-passkeys-unreachable-description = Wrócą, gdy usługa kluczy dostępu zostanie uruchomiona
-settings-passkeys-rename-label = Zmień nazwę klucza dostępu dla witryny { $site }
-settings-passkeys-remove-label = Usuń klucz dostępu dla witryny { $site }
-settings-passkeys-empty = Brak kluczy dostępu
-settings-passkeys-empty-description = Klucze tworzone przez witryny są zapisywane tutaj dla wszystkich przeglądarek
-settings-passkeys-remove-title = Usunąć ten klucz dostępu?
-settings-passkeys-remove-description = Nie da się już nim zalogować w witrynie { $site }, więc upewnij się, że masz inny sposób dostępu.
-settings-passkeys-rename-title = Zmień nazwę klucza dostępu
-settings-passkeys-rename-description = Nadaj kluczowi dostępu dla witryny { $site } nazwę, którą rozpoznasz.
-settings-passkeys-name = Nazwa
-settings-passkeys-save = Zapisz
-

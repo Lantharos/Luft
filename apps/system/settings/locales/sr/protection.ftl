@@ -360,28 +360,3 @@ settings-passwords-ssh-chip = Чувај у безбедносном чипу
 settings-passwords-ssh-chip-description = Никад не може да се копира са овог рачунара, чак ни од вас
 settings-passwords-ssh-chip-unsupported = Безбедносни чип овог рачунара не може да чува SSH кључеве
 settings-passwords-ssh-add = Додај кључ
-
-## Passkeys
-
-settings-passkeys-title = Приступни кључеви
-settings-passkeys-unavailable = Откључајте привезак кључева да бисте видели приступне кључеве.
-settings-passkeys-chip-fingerprint = Запечаћени безбедносним чипом овог рачунара. Свака пријава тражи отисак прста или лозинку.
-settings-passkeys-chip-password = Запечаћени безбедносним чипом овог рачунара. Свака пријава тражи лозинку.
-settings-passkeys-password-fingerprint = Шифровани вашом лозинком. Свака пријава тражи отисак прста или лозинку.
-settings-passkeys-password = Шифровани вашом лозинком. Свака пријава тражи лозинку.
-settings-passkeys-last-used = Последњи пут коришћен { $when }
-settings-passkeys-never-used = Никад коришћен
-settings-passkeys-password-only = Заштићен вашом лозинком
-settings-passkeys-unreachable = Прегледачи не могу да приступе вашим приступним кључевима
-settings-passkeys-unreachable-description = Поново су доступни чим се покрене услуга приступних кључева
-settings-passkeys-rename-label = Преименуј приступни кључ за { $site }
-settings-passkeys-remove-label = Уклони приступни кључ за { $site }
-settings-passkeys-empty = Још нема приступних кључева
-settings-passkeys-empty-description = Кључеви које сајтови направе чувају се овде за све прегледаче
-settings-passkeys-remove-title = Уклонити овај приступни кључ?
-settings-passkeys-remove-description = Њиме више нећете моћи да се пријавите на { $site }, па проверите да имате други начин приступа.
-settings-passkeys-rename-title = Преименујте приступни кључ
-settings-passkeys-rename-description = Дајте приступном кључу за { $site } назив који ћете препознати.
-settings-passkeys-name = Назив
-settings-passkeys-save = Сачувај
-

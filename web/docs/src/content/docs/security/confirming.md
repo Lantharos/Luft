@@ -13,7 +13,7 @@ These prompts can't stop malware that already runs as you, which could act on th
 
 Every system prompt, from the firewall's question and polkit's password to the portal's requests, stays until one of its buttons is picked. Clicking elsewhere, Escape and typing don't close it. For 0.75 seconds after it appears it ignores keys, clicks and taps, so a key held down for something else can't answer it.
 
-No prompt shows over the lock screen. Every dialog goes through one gate in Kestrel: while the screen is locked a prompt waits off screen, where it can't take the keyboard, and shows after the unlock. Keyring and passkey prompts, and the confirmation to restart or log out, are refused instead and asked again later. The one prompt the lock screen lets through is the confirmation for its own power menu.
+No prompt shows over the lock screen. Every dialog goes through one gate in Kestrel: while the screen is locked a prompt waits off screen, where it can't take the keyboard, and shows after the unlock. Keyring prompts and the confirmation to restart or log out, are refused instead and asked again later. The one prompt the lock screen lets through is the confirmation for its own power menu.
 
 A Kestrel that starts again after a crash holds all input until it knows whether the screen was locked and has put the lock screen back, so nothing typed in between reaches the desktop behind it.
 

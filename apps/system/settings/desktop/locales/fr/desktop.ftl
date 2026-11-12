@@ -185,9 +185,6 @@ desktop-keyring-denied = Seule l’application Paramètres installée peut modif
 desktop-keyring-unsupported = Votre trousseau ne peut pas encore faire cela
 desktop-keyring-reseal-failed = La puce de sécurité n’a pas pu protéger votre trousseau pour le moment
 
-## Passkeys
-desktop-passkeys-missing = Cette clé d’accès n’existe pas
-
 ## Device security
 desktop-security-recovery-file-name = Clé de récupération.txt
 desktop-security-usb-unavailable = La protection USB n’est pas disponible sur cet ordinateur

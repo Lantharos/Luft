@@ -40,35 +40,6 @@ keyring-mismatch = Wpisy nie są zgodne
 keyring-unlock = Odblokuj
 keyring-cancel = Anuluj
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Utworzyć klucz dostępu dla witryny { $site }?
-passkeys-register-account-by-app = { $app } chce zapisać klucz dostępu dla konta { $account }. Pozostanie on na tym komputerze.
-passkeys-register-account = Aplikacja chce zapisać klucz dostępu dla konta { $account }. Pozostanie on na tym komputerze.
-passkeys-register-by-app = { $app } chce zapisać klucz dostępu. Pozostanie on na tym komputerze.
-passkeys-register = Aplikacja chce zapisać klucz dostępu. Pozostanie on na tym komputerze.
-passkeys-sign-in-title = Zalogować się do witryny { $site } kluczem dostępu?
-passkeys-sign-in-choose-by-app = { $app } prosi o klucz dostępu. Wybierz konto, na które chcesz się zalogować.
-passkeys-sign-in-choose = Aplikacja prosi o klucz dostępu. Wybierz konto, na które chcesz się zalogować.
-passkeys-sign-in-by-app = { $app } prosi o twój klucz dostępu.
-passkeys-sign-in = Aplikacja prosi o twój klucz dostępu.
-passkeys-manage-title-by-app = Zezwolić aplikacji { $app } na zarządzanie kluczami dostępu?
-passkeys-manage-title = Zezwolić tej aplikacji na zarządzanie kluczami dostępu?
-passkeys-manage-description = Aplikacja zobaczy, dla których witryn masz klucze dostępu, i będzie mogła je usuwać.
-passkeys-registered-title = Masz już klucz dostępu dla witryny { $site }
-passkeys-registered-description = Zaloguj się za pomocą istniejącego klucza.
-passkeys-choose-title = Użyć kluczy dostępu z tego komputera?
-passkeys-choose-by-app = { $app } pyta, gdzie jest twój klucz dostępu.
-passkeys-choose = Aplikacja pyta, gdzie jest twój klucz dostępu.
-passkeys-use-password = Użyj hasła
-passkeys-password = Hasło
-passkeys-cancel = Anuluj
-passkeys-continue = Kontynuuj
-passkeys-ok = OK
-passkeys-use-this-computer = Użyj tego komputera
-passkeys-fingerprint-unavailable = Aby kontynuować, użyj hasła.
-passkeys-wrong-password = Nieprawidłowe hasło. Spróbuj ponownie.
-
 ## Sign-in prompt
 
 auth-prompt-password = Hasło

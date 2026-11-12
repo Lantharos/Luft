@@ -185,9 +185,6 @@ desktop-keyring-denied = Bunu yalnızca yüklü Ayarlar uygulaması değiştireb
 desktop-keyring-unsupported = Anahtarlığınız bunu henüz yapamıyor
 desktop-keyring-reseal-failed = Güvenlik çipi anahtarlığınızı şu anda koruyamadı
 
-## Passkeys
-desktop-passkeys-missing = Bu geçiş anahtarı yok
-
 ## Device security
 desktop-security-recovery-file-name = Kurtarma anahtarı.txt
 desktop-security-usb-unavailable = USB koruması bu bilgisayarda kullanılamıyor

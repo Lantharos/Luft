@@ -197,10 +197,6 @@ desktop-keyring-denied = Seda saab muuta ainult paigaldatud rakendus Seadistused
 desktop-keyring-unsupported = Võtmerõngas ei oska seda veel teha
 desktop-keyring-reseal-failed = Turvakiip ei saanud praegu võtmerõngast kaitsta
 
-## Passkeys
-
-desktop-passkeys-missing = Seda pääsuvõtit pole olemas
-
 ## Device security
 
 desktop-security-recovery-file-name = Taastevõti.txt

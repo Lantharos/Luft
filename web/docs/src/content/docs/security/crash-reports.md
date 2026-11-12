@@ -9,7 +9,7 @@ When one of Luft's own programs crashes, Luft can send a short report, only with
 
 ## Core dumps
 
-Crashes go to `systemd-coredump` as on Fedora. It writes the crashed thread's stack into the journal and keeps the compressed core in `/var/lib/systemd/coredump`, readable by root and the crashed program's own account, until systemd's retention removes it. Luft Keyring, its unlock service and Luft Passkeys run with `LimitCORE=0`, so a crash of any of them leaves only the journal entry; the keyring and Luft Passkeys also aren't dumpable while they run.
+Crashes go to `systemd-coredump` as on Fedora. It writes the crashed thread's stack into the journal and keeps the compressed core in `/var/lib/systemd/coredump`, readable by root and the crashed program's own account, until systemd's retention removes it. Luft Keyring and its unlock service run with `LimitCORE=0`, so a crash of either leaves only the journal entry; the keyring also isn't dumpable while it runs.
 
 ## How reports are made
 

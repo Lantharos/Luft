@@ -57,7 +57,6 @@ minutes-left = { $count ->
 | suspend, sleep | spanje | pripravljenost | Windows' word |
 | hibernate | mirovanje | hibernacija | Windows' word |
 | Night light | Nočna svetloba | Nočna lučka | GNOME's word; lučka sounds like a lamp |
-| passkey | ključ za dostop | passkey, geslo za dostop | Windows and Google |
 | Keyring | zbirka ključev | obesek za ključe | GNOME's word |
 | clipboard | odložišče | odlagališče | Windows and GNOME |
 | emoji | emodži | čustvenček, emoji | Standard spelling; čustvenček is an emoticon |

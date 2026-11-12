@@ -62,7 +62,6 @@ windows-open = { $count ->
 | suspend, sleep | Kvilemodus | Ventemodus | Windows' word in Nynorsk form |
 | hibernate | Dvalemodus | Dvale | Pairs with Kvilemodus |
 | power, Power saver | straum, Straumsparing | kraft, Batterisparing | Matches Straummodus |
-| passkey | tilgangsnøkkel | passkey | Google and Microsoft |
 | recovery key | gjenopprettingsnøkkel | gjenopprettingskode | BitLocker's word |
 | Keyring | Nøkkelring | Nøkkelknippe | GNOME and macOS |
 | security, security chip | tryggleik, tryggleiksbrikke | sikkerheit, TPM-brikke | KDE and GNOME; Luft avoids the abbreviation |

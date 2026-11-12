@@ -185,9 +185,6 @@ desktop-keyring-denied = Solo l’app Impostazioni installata può cambiare ques
 desktop-keyring-unsupported = Il Portachiavi non può ancora farlo
 desktop-keyring-reseal-failed = Il chip di sicurezza non riesce a proteggere il Portachiavi al momento
 
-## Passkeys
-desktop-passkeys-missing = Questa passkey non esiste
-
 ## Device security
 desktop-security-recovery-file-name = Chiave di ripristino.txt
 desktop-security-usb-unavailable = La protezione USB non è disponibile su questo computer

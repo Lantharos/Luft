@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Laikyti saugos luste
 settings-passwords-ssh-chip-description = Jo niekada nebus galima nukopijuoti iš šio kompiuterio, net jums
 settings-passwords-ssh-chip-unsupported = Šio kompiuterio saugos lustas negali laikyti SSH raktų
 settings-passwords-ssh-add = Pridėti raktą
-
-## Passkeys
-
-settings-passkeys-title = Prieigos raktai
-settings-passkeys-unavailable = Atrakinkite raktinę, kad pamatytumėte savo prieigos raktus.
-settings-passkeys-chip-fingerprint = Užplombuoti šio kompiuterio saugos lustu. Kiekvieną kartą prisijungiant prašoma piršto atspaudo arba slaptažodžio.
-settings-passkeys-chip-password = Užplombuoti šio kompiuterio saugos lustu. Kiekvieną kartą prisijungiant prašoma slaptažodžio.
-settings-passkeys-password-fingerprint = Užšifruoti jūsų slaptažodžiu. Kiekvieną kartą prisijungiant prašoma piršto atspaudo arba slaptažodžio.
-settings-passkeys-password = Užšifruoti jūsų slaptažodžiu. Kiekvieną kartą prisijungiant prašoma slaptažodžio.
-settings-passkeys-last-used = Paskutinį kartą naudotas { $when }
-settings-passkeys-never-used = Niekada nenaudotas
-settings-passkeys-password-only = Apsaugotas jūsų slaptažodžiu
-settings-passkeys-unreachable = Naršyklės negali pasiekti jūsų prieigos raktų
-settings-passkeys-unreachable-description = Jie vėl bus pasiekiami, kai pasileis prieigos raktų tarnyba
-settings-passkeys-rename-label = Pervardyti svetainės { $site } prieigos raktą
-settings-passkeys-remove-label = Pašalinti svetainės { $site } prieigos raktą
-settings-passkeys-empty = Prieigos raktų kol kas nėra
-settings-passkeys-empty-description = Svetainių sukurti raktai įrašomi čia ir tinka visoms naršyklėms
-settings-passkeys-remove-title = Pašalinti šį prieigos raktą?
-settings-passkeys-remove-description = Su juo nebegalėsite prisijungti prie svetainės { $site }, todėl įsitikinkite, kad turite kitą būdą prisijungti.
-settings-passkeys-rename-title = Pervardyti prieigos raktą
-settings-passkeys-rename-description = Suteikite svetainės { $site } prieigos raktui pavadinimą, kurį lengvai atpažinsite.
-settings-passkeys-name = Pavadinimas
-settings-passkeys-save = Įrašyti
-

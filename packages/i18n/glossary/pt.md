@@ -60,7 +60,6 @@ files-selected = { $count ->
 | trash | Lixo | Reciclagem | GNOME and macOS |
 | encryption | encriptação | criptografia | Windows' word; criptografia is Brazilian |
 | startup | arranque | inicialização | The European word |
-| passkey | chave de acesso | passkey | Windows and Google |
 | Keyring | Porta-chaves | Chaveiro | GNOME and macOS; chaveiro is Brazilian |
 | clipboard | área de transferência | prancheta | Windows and GNOME |
 | screenshot | captura de ecrã | captura de tela | European vocabulary |

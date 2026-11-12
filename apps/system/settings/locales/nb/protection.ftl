@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Oppbevar den i sikkerhetsbrikken
 settings-passwords-ssh-chip-description = Den kan aldri kopieres fra denne datamaskinen, ikke engang av deg
 settings-passwords-ssh-chip-unsupported = Sikkerhetsbrikken på denne datamaskinen kan ikke lagre SSH-nøkler
 settings-passwords-ssh-add = Legg til nøkkel
-
-## Passkeys
-
-settings-passkeys-title = Tilgangsnøkler
-settings-passkeys-unavailable = Lås opp nøkkelringen for å se tilgangsnøklene dine.
-settings-passkeys-chip-fingerprint = Forseglet av sikkerhetsbrikken på denne datamaskinen. Hver pålogging ber om fingeravtrykket eller passordet ditt.
-settings-passkeys-chip-password = Forseglet av sikkerhetsbrikken på denne datamaskinen. Hver pålogging ber om passordet ditt.
-settings-passkeys-password-fingerprint = Kryptert med passordet ditt. Hver pålogging ber om fingeravtrykket eller passordet ditt.
-settings-passkeys-password = Kryptert med passordet ditt. Hver pålogging ber om passordet ditt.
-settings-passkeys-last-used = Sist brukt { $when }
-settings-passkeys-never-used = Aldri brukt
-settings-passkeys-password-only = Beskyttet av passordet ditt
-settings-passkeys-unreachable = Nettlesere får ikke tilgang til tilgangsnøklene dine
-settings-passkeys-unreachable-description = De er tilbake når tjenesten for tilgangsnøkler kjører
-settings-passkeys-rename-label = Gi nytt navn til tilgangsnøkkelen for { $site }
-settings-passkeys-remove-label = Fjern tilgangsnøkkelen for { $site }
-settings-passkeys-empty = Ingen tilgangsnøkler ennå
-settings-passkeys-empty-description = Nøkler som nettsteder lager, lagres her for alle nettlesere
-settings-passkeys-remove-title = Vil du fjerne denne tilgangsnøkkelen?
-settings-passkeys-remove-description = Du kan ikke lenger logge inn på { $site } med den, så sørg for at du har en annen måte å komme inn på.
-settings-passkeys-rename-title = Gi nytt navn til tilgangsnøkkel
-settings-passkeys-rename-description = Gi tilgangsnøkkelen for { $site } et navn du kjenner igjen.
-settings-passkeys-name = Navn
-settings-passkeys-save = Lagre
-

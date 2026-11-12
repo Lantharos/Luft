@@ -43,7 +43,7 @@ Kestrel is the desktop shell and login screen:
 | `kestrel/wrapper`, `kestrel/session` | The process that starts Kestrel and keeps its display, and the session manager |
 | `kestrel/settings` | `kestrel-settings`, in place of gnome-settings-daemon: XSETTINGS, Night Light, power, printing and time zones |
 | `kestrel/greeter`, `kestrel/portal`, `kestrel/search`, `kestrel/post` | The login screen's service, the portal backend, the file index behind Start, and Post |
-| `kestrel/keyring`, `kestrel/passkeys` | Luft Keyring and Luft Passkeys |
+| `kestrel/keyring` | Luft Keyring |
 | `kestrel/watchdog` | Restarts cleanly when the GPU hangs |
 
 The session identifies as `Kestrel;GNOME`, so apps that look for GNOME keep their keyring, theme and autostart behaviour. Kestrel backs every xdg-desktop-portal interface except file dialogs, which [Rover](/apps/rover/) provides, and secrets, which Luft Keyring provides. [Kestrel](/developers/desktop/kestrel/) describes the session and how it survives crashes, and [The compositor](/developers/desktop/compositor/) the Mutter patches.
@@ -80,7 +80,7 @@ So anything a service writes to `/etc` belongs to one version only. Going back l
 
 The one place Luft writes into `/etc` itself is settling system packages: configuration files that packages bring are copied there when they're missing, at every start, so a version that lacks them gets them back.
 
-`/etc/passwd` and `/etc/group` belong to the computer, and systemd-sysusers gives a new system group the next free ID there. Image files carry a group's ID, not its name, so a group that owns files in the image has a fixed ID from 290 up, the bottom of the range Fedora hands out from the top: `luft-keyring` is 290 and `luft-passkeys` 291. The image build stops when one comes out different.
+`/etc/passwd` and `/etc/group` belong to the computer, and systemd-sysusers gives a new system group the next free ID there. Image files carry a group's ID, not its name, so a group that owns files in the image has a fixed ID from 290 up, the bottom of the range Fedora hands out from the top: `luft-keyring` is 290. The image build stops when one comes out different.
 
 `bun .github/scripts/etc/index.ts` keeps the rule. It looks for `/etc` paths in Luft's code, and every one has to be listed in `.github/scripts/etc/allowed.json` with the reason it's fine: the code only reads it, or it's configuration an administrator chooses. A new path fails until it's listed, and a listed path that's gone from the code fails too.
 

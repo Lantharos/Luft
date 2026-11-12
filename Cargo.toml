@@ -36,9 +36,6 @@ members = [
     "kestrel/keyring/vault",
     "kestrel/keyring/wire",
     "kestrel/openconnect",
-    "kestrel/passkeys/crates/agent",
-    "kestrel/passkeys/crates/ctap",
-    "kestrel/passkeys/crates/relay",
     "kestrel/peek",
     "kestrel/portal",
     "kestrel/post",
@@ -126,9 +123,6 @@ default-members = [
     "kestrel/keyring/vault",
     "kestrel/keyring/wire",
     "kestrel/openconnect",
-    "kestrel/passkeys/crates/agent",
-    "kestrel/passkeys/crates/ctap",
-    "kestrel/passkeys/crates/relay",
     "kestrel/peek",
     "kestrel/portal",
     "kestrel/post",
@@ -191,7 +185,6 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/Lantharos/Luft"
 
 [workspace.dependencies]
-ctap = { path = "kestrel/passkeys/crates/ctap" }
 luft-accounts = { path = "packages/system/accounts" }
 luft-app = { path = "packages/app" }
 luft-cups = { path = "packages/system/cups" }
@@ -272,7 +265,6 @@ gstreamer-video = "0.25.4"
 hayro = "0.9.0"
 hickory-resolver = "0.26.3"
 hkdf = "0.13.0"
-hmac = "0.13.0"
 htmd = "0.5.6"
 http-body = "1.1.0"
 http-body-util = "0.1.5"
@@ -326,7 +318,6 @@ percent-encoding = "2.3.2"
 pdf-writer = "0.15.0"
 pipewire = "0.10.1"
 png = "0.18.1"
-pollster = "1.0.1"
 postcard = { version = "1.1.3", default-features = false, features = ["use-std"] }
 proc-macro2 = "1.0.107"
 pulldown-cmark = { version = "0.13.6", default-features = false, features = ["html"] }

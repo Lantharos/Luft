@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot forbliver slået til
 home-security-secure-boot-text = Hvert trin i opstarten er signeret, fra USB-stikket til skrivebordet, så der er intet at slå fra i firmwaren.
 home-security-encryption = Krypteret, uden at taste
 home-security-encryption-text = Slå kryptering til med ét klik. Med en TPM låser disken sig selv op, og kun for det system, den hører til.
-home-security-passkeys = Adgangsnøgler overalt
-home-security-passkeys-text = Adgangsnøgler ligger på din computer og virker i alle browsere, bekræftet med dit fingeraftryk eller din adgangskode.
 home-security-keyring = Én nøglering
 home-security-keyring-text = Adgangskoder, logins, SSH-nøgler og GnuPG samlet ét sted og låst op, når du logger ind.
 

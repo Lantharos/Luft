@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Shrani v varnostni čip
 settings-passwords-ssh-chip-description = Iz tega računalnika ga ne bo mogoče nikoli kopirati, niti vam
 settings-passwords-ssh-chip-unsupported = Varnostni čip tega računalnika ne more hraniti ključev SSH
 settings-passwords-ssh-add = Dodaj ključ
-
-## Passkeys
-
-settings-passkeys-title = Ključi za dostop
-settings-passkeys-unavailable = Odklenite zbirko ključev, da vidite ključe za dostop.
-settings-passkeys-chip-fingerprint = Zapečateno z varnostnim čipom tega računalnika. Vsaka prijava zahteva prstni odtis ali geslo.
-settings-passkeys-chip-password = Zapečateno z varnostnim čipom tega računalnika. Vsaka prijava zahteva geslo.
-settings-passkeys-password-fingerprint = Šifrirano z vašim geslom. Vsaka prijava zahteva prstni odtis ali geslo.
-settings-passkeys-password = Šifrirano z vašim geslom. Vsaka prijava zahteva geslo.
-settings-passkeys-last-used = Nazadnje uporabljen { $when }
-settings-passkeys-never-used = Še ni bil uporabljen
-settings-passkeys-password-only = Zaščiten z vašim geslom
-settings-passkeys-unreachable = Brskalniki ne morejo dostopati do ključev za dostop
-settings-passkeys-unreachable-description = Znova so na voljo, ko se zažene storitev ključev za dostop
-settings-passkeys-rename-label = Preimenuj ključ za dostop za { $site }
-settings-passkeys-remove-label = Odstrani ključ za dostop za { $site }
-settings-passkeys-empty = Ni še ključev za dostop
-settings-passkeys-empty-description = Ključi, ki jih ustvarijo spletna mesta, se shranijo tukaj za vse brskalnike
-settings-passkeys-remove-title = Želite odstraniti ta ključ za dostop?
-settings-passkeys-remove-description = Z njim se ne boste več mogli prijaviti v { $site }, zato poskrbite, da imate drug način dostopa.
-settings-passkeys-rename-title = Preimenujte ključ za dostop
-settings-passkeys-rename-description = Ključu za dostop za { $site } dajte ime, ki ga boste prepoznali.
-settings-passkeys-name = Ime
-settings-passkeys-save = Shrani
-

@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot açık kalır
 home-security-secure-boot-text = USB bellekten masaüstüne kadar başlatmanın her adımı imzalıdır; üretici yazılımında kapatmanız gereken bir şey yoktur.
 home-security-encryption = Yazmadan şifreleme
 home-security-encryption-text = Şifrelemeyi tek tıkla açın. TPM varsa disk kendi kilidini açar, üstelik yalnızca ait olduğu sistem için.
-home-security-passkeys = Her yerde geçiş anahtarları
-home-security-passkeys-text = Geçiş anahtarları bilgisayarınızda durur ve her tarayıcıda çalışır; parmak izinizle ya da parolanızla onaylanır.
 home-security-keyring = Tek anahtarlık
 home-security-keyring-text = Parolalar, oturum bilgileri, SSH anahtarları ve GnuPG tek yerde tutulur, oturum açtığınızda kilidi açılır.
 

@@ -58,7 +58,6 @@ notifications-count = { $count ->
 | clipboard | Appunti | clipboard | Windows' word |
 | screenshot, take a screenshot | screenshot, acquisire uno screenshot | schermata, catturare | What people say; Windows' verb |
 | Keyring | Portachiavi | Keyring | macOS and GNOME |
-| passkey | passkey | chiave d’accesso | Apple, Google and websites |
 | encryption | crittografia | cifratura | Windows' word |
 | keyboard shortcut | scorciatoia da tastiera | tasto di scelta rapida | GNOME and KDE; shorter |
 | pin, unpin | aggiungere, rimuovere | fissare, bloccare | Windows' words |

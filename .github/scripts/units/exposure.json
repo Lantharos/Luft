@@ -23,8 +23,6 @@
 	"kestrel/greeter/data/kestrel-password.service": 1.4,
 	"kestrel/keyring/data/system/luft-keyring-unlock.service": 1.5,
 	"kestrel/keyring/data/user/luft-keyring.service": 9.2,
-	"kestrel/passkeys/data/luft-passkeys-relay@.service": 0.9,
-	"kestrel/passkeys/data/luft-passkeys.service": 9.2,
 	"kestrel/watchdog/data/kestrel-incident.service": 2.3,
 	"kestrel/watchdog/data/kestrel-watchdog.service": 3,
 	"os/image/files/usr/lib/dracut/modules.d/90luft-added-files/luft-added-files.service": 9.4,

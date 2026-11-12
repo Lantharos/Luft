@@ -220,9 +220,6 @@ desktop-keyring-denied = Only the installed Settings app can change this
 desktop-keyring-unsupported = Passwords and keys can’t do this yet
 desktop-keyring-reseal-failed = The security chip couldn’t protect your passwords and keys right now
 
-## Passkeys
-desktop-passkeys-missing = That passkey doesn't exist
-
 ## Device security
 # Suggested file name when saving the drive recovery key
 desktop-security-recovery-file-name = Recovery key.txt

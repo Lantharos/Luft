@@ -77,8 +77,6 @@ home-security-secure-boot = Secure Boot jibqa’ mixgħul
 home-security-secure-boot-text = Kull pass tal-istartjar huwa ffirmat, mid-drajv USB sad-desktop, għalhekk m’hemm xejn x’titfi fil-firmware.
 home-security-encryption = Iċċifrar, mingħajr ma tikteb
 home-security-encryption-text = Ixgħel iċ-ċċifrar bi klikk. B’TPM, id-diska tiżblokka waħedha, u biss għas-sistema li tappartjeni għaliha.
-home-security-passkeys = Passkeys kullimkien
-home-security-passkeys-text = Il-passkeys jinsabu fuq il-kompjuter tiegħek u jaħdmu f’kull browser, ikkonfermati bil-marka tas-saba’ jew bil-password.
 home-security-keyring = Ċurkett taċ-ċwievet wieħed
 home-security-keyring-text = Passwords, dħul, ċwievet SSH u GnuPG jinżammu f’post wieħed, u jiżblokkaw meta tidħol.
 

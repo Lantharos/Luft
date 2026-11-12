@@ -80,8 +80,6 @@ home-security-secure-boot = Secure Boot stays on
 home-security-secure-boot-text = Every step of startup is signed, from the USB stick to the desktop, so there’s nothing to turn off in the firmware.
 home-security-encryption = Encrypted, without the typing
 home-security-encryption-text = Turn on encryption with a click. With a TPM, the disk unlocks by itself, and only for the system that belongs to it.
-home-security-passkeys = Passkeys everywhere
-home-security-passkeys-text = Passkeys live on your computer and work in every browser, confirmed with your fingerprint or password.
 home-security-keyring = One keyring
 home-security-keyring-text = Passwords, sign-ins, SSH keys and GnuPG are kept in one place, unlocked when you sign in.
 

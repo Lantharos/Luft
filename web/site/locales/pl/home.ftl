@@ -76,8 +76,6 @@ home-security-secure-boot = Secure Boot zostaje włączony
 home-security-secure-boot-text = Każdy etap uruchamiania jest podpisany, od pamięci USB po pulpit, więc w oprogramowaniu układowym nie trzeba niczego wyłączać.
 home-security-encryption = Szyfrowanie bez wpisywania
 home-security-encryption-text = Włącz szyfrowanie jednym kliknięciem. Z układem TPM dysk odblokowuje się sam i tylko dla systemu, do którego należy.
-home-security-passkeys = Klucze dostępu wszędzie
-home-security-passkeys-text = Klucze dostępu są przechowywane na komputerze i działają w każdej przeglądarce, a potwierdza się je odciskiem palca lub hasłem.
 home-security-keyring = Jeden pęk kluczy
 home-security-keyring-text = Hasła, dane logowania, klucze SSH i GnuPG są w jednym miejscu i odblokowują się przy logowaniu.
 

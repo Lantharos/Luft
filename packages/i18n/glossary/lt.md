@@ -61,7 +61,6 @@ windows-open = { $count ->
 | Quick settings | Spartieji nustatymai | Greitieji nustatymai | Android; matches spartieji klavišai |
 | emoji | jaustukas | emodži | Windows and the language commission |
 | clipboard | iškarpinė | mainų sritis | Windows |
-| passkey | prieigos raktas | passkey | Google and Apple |
 | Keyring | raktinė | raktų žiedas | GNOME |
 | firmware | programinė aparatinė įranga | mikroprograma | Windows; known from update screens |
 | touchpad | jutiklinis kilimėlis | jutiklinė planšetė | GNOME; planšetė reads as a tablet |

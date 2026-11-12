@@ -364,28 +364,3 @@ settings-passwords-ssh-chip = Čuvaj u sigurnosnom čipu
 settings-passwords-ssh-chip-description = Nikad se ne može kopirati s ovog računala, čak ni vi to ne možete
 settings-passwords-ssh-chip-unsupported = Sigurnosni čip ovog računala ne može čuvati SSH ključeve
 settings-passwords-ssh-add = Dodaj ključ
-
-## Passkeys
-
-settings-passkeys-title = Pristupni ključevi
-settings-passkeys-unavailable = Otključajte skup ključeva da biste vidjeli svoje pristupne ključeve.
-settings-passkeys-chip-fingerprint = Zapečaćeno sigurnosnim čipom ovog računala. Svaka prijava traži vaš otisak prsta ili lozinku.
-settings-passkeys-chip-password = Zapečaćeno sigurnosnim čipom ovog računala. Svaka prijava traži vašu lozinku.
-settings-passkeys-password-fingerprint = Šifrirano vašom lozinkom. Svaka prijava traži vaš otisak prsta ili lozinku.
-settings-passkeys-password = Šifrirano vašom lozinkom. Svaka prijava traži vašu lozinku.
-settings-passkeys-last-used = Zadnja upotreba: { $when }
-settings-passkeys-never-used = Nikad korišteno
-settings-passkeys-password-only = Zaštićeno vašom lozinkom
-settings-passkeys-unreachable = Preglednici ne mogu pristupiti vašim pristupnim ključevima
-settings-passkeys-unreachable-description = Ponovno su dostupni kad se pokrene usluga pristupnih ključeva
-settings-passkeys-rename-label = Preimenuj pristupni ključ za { $site }
-settings-passkeys-remove-label = Ukloni pristupni ključ za { $site }
-settings-passkeys-empty = Još nema pristupnih ključeva
-settings-passkeys-empty-description = Ključevi koje izrade web-mjesta spremaju se ovdje za sve preglednike
-settings-passkeys-remove-title = Ukloniti ovaj pristupni ključ?
-settings-passkeys-remove-description = Njime se više nećete moći prijaviti na { $site }, stoga provjerite imate li drugi način pristupa.
-settings-passkeys-rename-title = Preimenuj pristupni ključ
-settings-passkeys-rename-description = Dajte pristupnom ključu za { $site } naziv koji ćete prepoznati.
-settings-passkeys-name = Naziv
-settings-passkeys-save = Spremi
-

@@ -429,14 +429,6 @@ export const commands = {
 	networkWireguardPublicKey: (params: {
 		key: string,
 	}, options?: CallOptions) => invoke<string>("network_wireguard_public_key", params, options),
-	passkeys: (options?: CallOptions) => invoke<Passkeys | null>("passkeys", {}, options),
-	passkeysDelete: (params: {
-		id: string,
-	}, options?: CallOptions) => invoke<null>("passkeys_delete", params, options),
-	passkeysRename: (params: {
-		id: string,
-		name: string,
-	}, options?: CallOptions) => invoke<null>("passkeys_rename", params, options),
 	penDevices: (options?: CallOptions) => invoke<PenDevice[]>("pen_devices", {}, options),
 	penNotesInstalled: (options?: CallOptions) => invoke<boolean>("pen_notes_installed", {}, options),
 	postChooseFolder: (options?: CallOptions) => invoke<string | null>("post_choose_folder", {}, options),
@@ -699,7 +691,6 @@ export const events = {
 	loginChanged: (callback: (payload: LoginScreen) => void) => listen<LoginScreen>("login.changed", callback),
 	networkChanged: (callback: (payload: Network) => void) => listen<Network>("network.changed", callback),
 	networkFailed: (callback: (payload: Failure) => void) => listen<Failure>("network.failed", callback),
-	passkeysChanged: (callback: (payload: Passkeys) => void) => listen<Passkeys>("passkeys.changed", callback),
 	powerChanged: (callback: (payload: PowerState) => void) => listen<PowerState>("power.changed", callback),
 	printersChanged: (callback: (payload: PrintersState) => void) => listen<PrintersState>("printers.changed", callback),
 	remoteLoginChanged: (callback: (payload: RemoteLogin) => void) => listen<RemoteLogin>("remote-login.changed", callback),
@@ -1098,7 +1089,10 @@ export type Extension = {
 	description: string,
 	version: string,
 	path: string,
-	/**  Where it comes from: `store`, `copy`, `development`, `folder` or `own`. */
+	/**
+	 *  Where it comes from: `store`, `store-sandboxed`, `copy`, `development`,
+	 *  `folder` or `own`.
+	 */
 	origin: string,
 	/**  Copies of it elsewhere that are left alone. */
 	ignored: string[],
@@ -1516,26 +1510,6 @@ export type Palette = {
 	terminal: SchemeColors,
 	appIcons: AppIcons,
 	taskbar: import("@luft/ui").TaskbarLooks,
-};
-
-export type Passkey = {
-	id: string,
-	site: string,
-	siteName: string,
-	account: string,
-	displayName: string,
-	nickname: string,
-	created: number,
-	used: number,
-	chip: boolean,
-};
-
-export type PasskeyProtection = "chip" | "password" | "unavailable";
-
-export type Passkeys = {
-	protection: PasskeyProtection,
-	ready: boolean,
-	passkeys: Passkey[],
 };
 
 export type PasswordOutcome = "changed" | "wrongPassword" | { tooWeak: Weakness };

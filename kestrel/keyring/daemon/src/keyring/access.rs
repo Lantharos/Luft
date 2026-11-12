@@ -31,9 +31,9 @@ pub fn decide(requester: &Requester, item: &Item) -> Decision {
 }
 
 pub fn has_protected_schema(attributes: &BTreeMap<String, String>) -> bool {
-    attributes.get("xdg:schema").is_some_and(|schema| {
-        schema == PORTAL_SCHEMA || schema == crate::services::passkeys::SCHEMA
-    })
+    attributes
+        .get("xdg:schema")
+        .is_some_and(|schema| schema == PORTAL_SCHEMA)
 }
 
 impl View {

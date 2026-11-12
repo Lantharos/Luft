@@ -40,35 +40,6 @@ keyring-mismatch = Įvesti slaptažodžiai nesutampa
 keyring-unlock = Atrakinti
 keyring-cancel = Atšaukti
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Sukurti prieigos raktą svetainei { $site }?
-passkeys-register-account-by-app = { $app } nori įrašyti prieigos raktą paskyrai { $account }. Jis liks šiame kompiuteryje.
-passkeys-register-account = Programa nori įrašyti prieigos raktą paskyrai { $account }. Jis liks šiame kompiuteryje.
-passkeys-register-by-app = { $app } nori įrašyti prieigos raktą. Jis liks šiame kompiuteryje.
-passkeys-register = Programa nori įrašyti prieigos raktą. Jis liks šiame kompiuteryje.
-passkeys-sign-in-title = Prisijungti prie svetainės { $site } prieigos raktu?
-passkeys-sign-in-choose-by-app = { $app } prašo prieigos rakto. Pasirinkite paskyrą, kuria prisijungsite.
-passkeys-sign-in-choose = Programa prašo prieigos rakto. Pasirinkite paskyrą, kuria prisijungsite.
-passkeys-sign-in-by-app = { $app } prašo jūsų prieigos rakto.
-passkeys-sign-in = Programa prašo jūsų prieigos rakto.
-passkeys-manage-title-by-app = Leisti programai { $app } tvarkyti jūsų prieigos raktus?
-passkeys-manage-title = Leisti šiai programai tvarkyti jūsų prieigos raktus?
-passkeys-manage-description = Ji matys, kurioms svetainėms turite prieigos raktų, ir galės juos pašalinti.
-passkeys-registered-title = Svetainei { $site } jau turite prieigos raktą
-passkeys-registered-description = Prisijunkite turimu raktu.
-passkeys-choose-title = Naudoti šiame kompiuteryje esančius prieigos raktus?
-passkeys-choose-by-app = { $app } klausia, kur yra jūsų prieigos raktas.
-passkeys-choose = Programa klausia, kur yra jūsų prieigos raktas.
-passkeys-use-password = Naudoti slaptažodį
-passkeys-password = Slaptažodis
-passkeys-cancel = Atšaukti
-passkeys-continue = Tęsti
-passkeys-ok = Gerai
-passkeys-use-this-computer = Naudoti šį kompiuterį
-passkeys-fingerprint-unavailable = Norėdami tęsti, įveskite slaptažodį.
-passkeys-wrong-password = Slaptažodis neteisingas. Bandykite dar kartą.
-
 ## Sign-in prompt
 
 auth-prompt-password = Slaptažodis

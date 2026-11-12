@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Хранить в чипе безопасност�
 settings-passwords-ssh-chip-description = Его нельзя будет скопировать с этого компьютера, даже вам
 settings-passwords-ssh-chip-unsupported = Чип безопасности этого компьютера не может хранить ключи SSH
 settings-passwords-ssh-add = Добавить ключ
-
-## Passkeys
-
-settings-passkeys-title = Ключи доступа
-settings-passkeys-unavailable = Разблокируйте связку ключей, чтобы увидеть ключи доступа.
-settings-passkeys-chip-fingerprint = Запечатаны чипом безопасности этого компьютера. При каждом входе запрашивается отпечаток пальца или пароль.
-settings-passkeys-chip-password = Запечатаны чипом безопасности этого компьютера. При каждом входе запрашивается пароль.
-settings-passkeys-password-fingerprint = Зашифрованы вашим паролем. При каждом входе запрашивается отпечаток пальца или пароль.
-settings-passkeys-password = Зашифрованы вашим паролем. При каждом входе запрашивается пароль.
-settings-passkeys-last-used = Последнее использование: { $when }
-settings-passkeys-never-used = Не использовался
-settings-passkeys-password-only = Защищён паролем
-settings-passkeys-unreachable = Браузеры не могут получить доступ к ключам доступа
-settings-passkeys-unreachable-description = Доступ вернётся, когда служба ключей доступа запустится
-settings-passkeys-rename-label = Переименовать ключ доступа для { $site }
-settings-passkeys-remove-label = Удалить ключ доступа для { $site }
-settings-passkeys-empty = Ключей доступа пока нет
-settings-passkeys-empty-description = Ключи, которые создают сайты, сохраняются здесь для всех браузеров
-settings-passkeys-remove-title = Удалить этот ключ доступа?
-settings-passkeys-remove-description = С ним больше не получится войти на { $site }, поэтому убедитесь, что у вас есть другой способ входа.
-settings-passkeys-rename-title = Переименовать ключ доступа
-settings-passkeys-rename-description = Дайте ключу доступа для { $site } понятное вам название.
-settings-passkeys-name = Название
-settings-passkeys-save = Сохранить
-

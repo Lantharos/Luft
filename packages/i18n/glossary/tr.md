@@ -52,7 +52,6 @@ notifications-count = { $count ->
 | wallpaper | duvar kâğıdı | arka plan | Arka plan is ambiguous next to colours |
 | suspend, sleep | Uyku | Askıya al | Windows' word |
 | Dictation | Dikte | Sesle yazma | macOS' word, and short |
-| passkey | geçiş anahtarı | passkey | Apple and Google |
 | Keyring | Anahtarlık | Anahtar zinciri | GNOME's word, and short |
 | clipboard | pano | kopyalama arabelleği | Windows and GNOME |
 | sandbox | korumalı alan | sanal alan | Windows' word |

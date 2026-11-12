@@ -57,7 +57,6 @@ files-copied = { $count ->
 | suspend, sleep | Repaus | Suspendare | Windows' word |
 | Night light | Lumină de noapte | Lumină nocturnă | Windows' word |
 | Keyring | Portchei | Inel de chei | macOS's word |
-| passkey | cheie de acces | passkey | Google and Apple |
 | keyboard shortcut | comandă rapidă | scurtătură | Windows' word |
 | folder, computer, clipboard | folder, computer, clipboard | dosar, calculator, memorie temporară | Windows' words, and what people say |
 | sandbox | mediu izolat | sandbox | Plain Romanian |

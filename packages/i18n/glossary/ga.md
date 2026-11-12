@@ -62,7 +62,6 @@ Nouns starting with a vowel don't change after 1–6 and take n- after 7–10: �
 | sign in | sínigh isteach | logáil isteach | Windows and Microsoft accounts |
 | suspend, sleep | Codladh | Cuir ar fionraí | Windows' word |
 | shut down | múch | dún | Windows' word; dún is close |
-| passkey | eochair rochtana | passkey | Reads as Irish and declines |
 | Keyring | fáinne eochrach | eochairfháinne | GNOME's word |
 | clipboard | gearrthaisce | gearrthaisceadán | Windows' word |
 | firmware | dochtearraí | firmware | Microsoft's term |

@@ -185,9 +185,6 @@ desktop-keyring-denied = Toto může změnit jen nainstalovaná aplikace Nastave
 desktop-keyring-unsupported = Vaše klíčenka to zatím neumí
 desktop-keyring-reseal-failed = Bezpečnostní čip teď nemohl vaši klíčenku ochránit
 
-## Passkeys
-desktop-passkeys-missing = Tento přístupový klíč neexistuje
-
 ## Device security
 desktop-security-recovery-file-name = Obnovovací klíč.txt
 desktop-security-usb-unavailable = Ochrana USB není v tomto počítači k dispozici

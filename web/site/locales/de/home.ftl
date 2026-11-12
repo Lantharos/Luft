@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot bleibt an
 home-security-secure-boot-text = Jeder Schritt beim Start ist signiert, vom USB-Stick bis zum Desktop, also musst du in der Firmware nichts ausschalten.
 home-security-encryption = Verschlüsselt, ohne Tipperei
 home-security-encryption-text = Schalte die Verschlüsselung mit einem Klick ein. Mit einem TPM entsperrt sich der Datenträger von selbst, und nur für das System, zu dem er gehört.
-home-security-passkeys = Passkeys überall
-home-security-passkeys-text = Passkeys liegen auf deinem Computer und funktionieren in jedem Browser, bestätigt mit Fingerabdruck oder Passwort.
 home-security-keyring = Ein Schlüsselbund
 home-security-keyring-text = Passwörter, Anmeldungen, SSH-Schlüssel und GnuPG an einem Ort, entsperrt, sobald du dich anmeldest.
 

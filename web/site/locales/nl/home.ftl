@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot blijft aan
 home-security-secure-boot-text = Elke stap van het opstarten is ondertekend, van de usb-stick tot het bureaublad, dus er hoeft niets uit in de firmware.
 home-security-encryption = Versleuteld, zonder typen
 home-security-encryption-text = Zet versleuteling aan met één klik. Met een TPM ontgrendelt de schijf zichzelf, en alleen voor het systeem waar hij bij hoort.
-home-security-passkeys = Overal toegangssleutels
-home-security-passkeys-text = Toegangssleutels staan op je computer en werken in elke browser, bevestigd met je vingerafdruk of wachtwoord.
 home-security-keyring = Eén sleutelbos
 home-security-keyring-text = Wachtwoorden, aanmeldingen, SSH-sleutels en GnuPG op één plek, ontgrendeld zodra je je aanmeldt.
 

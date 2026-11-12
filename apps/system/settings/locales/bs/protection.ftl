@@ -360,28 +360,3 @@ settings-passwords-ssh-chip = Čuvaj ga u sigurnosnom čipu
 settings-passwords-ssh-chip-description = Nikad se ne može kopirati s ovog računara, čak ni vi to ne možete
 settings-passwords-ssh-chip-unsupported = Sigurnosni čip ovog računara ne može čuvati SSH ključeve
 settings-passwords-ssh-add = Dodaj ključ
-
-## Passkeys
-
-settings-passkeys-title = Pristupni ključevi
-settings-passkeys-unavailable = Otključajte privjesak ključeva da vidite pristupne ključeve.
-settings-passkeys-chip-fingerprint = Zapečaćeni sigurnosnim čipom ovog računara. Svaka prijava traži vaš otisak prsta ili lozinku.
-settings-passkeys-chip-password = Zapečaćeni sigurnosnim čipom ovog računara. Svaka prijava traži vašu lozinku.
-settings-passkeys-password-fingerprint = Šifrirani vašom lozinkom. Svaka prijava traži vaš otisak prsta ili lozinku.
-settings-passkeys-password = Šifrirani vašom lozinkom. Svaka prijava traži vašu lozinku.
-settings-passkeys-last-used = Posljednja upotreba: { $when }
-settings-passkeys-never-used = Nikad korišten
-settings-passkeys-password-only = Zaštićen vašom lozinkom
-settings-passkeys-unreachable = Preglednici ne mogu pristupiti vašim pristupnim ključevima
-settings-passkeys-unreachable-description = Ponovo su dostupni kad se pokrene usluga pristupnih ključeva
-settings-passkeys-rename-label = Preimenuj pristupni ključ za { $site }
-settings-passkeys-remove-label = Ukloni pristupni ključ za { $site }
-settings-passkeys-empty = Još nema pristupnih ključeva
-settings-passkeys-empty-description = Ključevi koje web-stranice naprave čuvaju se ovdje za sve preglednike
-settings-passkeys-remove-title = Ukloniti ovaj pristupni ključ?
-settings-passkeys-remove-description = Više se nećete moći njime prijaviti na { $site }, zato provjerite imate li drugi način pristupa.
-settings-passkeys-rename-title = Preimenuj pristupni ključ
-settings-passkeys-rename-description = Dajte pristupnom ključu za { $site } naziv koji ćete prepoznati.
-settings-passkeys-name = Naziv
-settings-passkeys-save = Sačuvaj
-

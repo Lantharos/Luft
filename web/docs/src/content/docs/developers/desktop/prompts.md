@@ -1,11 +1,11 @@
 ---
 title: Kestrel's prompts
-description: The D-Bus interfaces through which Luft Keyring, GnuPG, Luft Passkeys and the luft command ask through Kestrel's own dialogs.
+description: The D-Bus interfaces through which Luft Keyring, GnuPG and the luft command ask through Kestrel's own dialogs.
 sidebar:
   order: 6.5
 ---
 
-Luft Keyring, GnuPG's pinentry, Luft Passkeys and the `luft` command never draw their own dialogs. They ask Kestrel, whose prompts never show on the lock screen. Each interface answers exactly one program, judged by the executable it runs rather than its bus name, since whoever calls chooses the dialog's words and gets what's typed. Secrets never cross the bus: they travel through file descriptors. [Who an app is](/security/identity/) explains how Kestrel tells these programs apart from everything else running as you.
+Luft Keyring, GnuPG's pinentry and the `luft` command never draw their own dialogs. They ask Kestrel, whose prompts never show on the lock screen. Each interface answers exactly one program, judged by the executable it runs rather than its bus name, since whoever calls chooses the dialog's words and gets what's typed. Secrets never cross the bus: they travel through file descriptors. [Who an app is](/security/identity/) explains how Kestrel tells these programs apart from everything else running as you.
 
 ## Keyring prompter
 
@@ -41,22 +41,6 @@ The response is 0 when allowed or entered, 1 when declined, and 2 when closed by
 | `Close` | `s` handle | |
 
 Password requests can carry `cancel`, `mismatch` for when two entries differ, `remember` to offer saving the passphrase in the keyring under the `org.gnupg.Passphrase` schema, and `quality` to show GnuPG's rating while typing. Confirmations can carry `alternative`, a third button answered with 3, and `single`, for a message with one button. The channel is a socket: Kestrel writes `Q<length>` and the passphrase so far when it needs a rating and reads the rating back as a line, then writes `P<length>` and the passphrase once entered.
-
-## Passkeys
-
-| Bus name | Object | Interface | For |
-| --- | --- | --- | --- |
-| `com.lantharos.Passkeys` | `/com/lantharos/Passkeys1` | `com.lantharos.Passkeys1` | Settings: `List`, `Rename` and `Delete` for programs outside a sandbox, the `Protection` and `Ready` properties, and `Changed` |
-| `com.lantharos.Kestrel.Passkeys` | `/com/lantharos/Kestrel/Passkeys` | `com.lantharos.Kestrel.Passkeys1` | The confirmation prompt, for `luft-passkeys` only |
-| `com.lantharos.Keyring1` | `/com/lantharos/Keyring1` | `com.lantharos.Keyring1.Passkeys` | Storage and signing, for `luft-passkeys` only |
-
-`Open(a{sv})` on the prompt interface answers only the owner of `com.lantharos.Passkeys` running `/usr/libexec/luft-passkeys` with its setgid group, and not while the screen is locked. The details name the `purpose` (`register`, `sign-in`, `manage`, `registered` or `choose`) and the `accounts`, and can name the `site`, its `site_name`, the `requester`'s process ID and a `fingerprint` hint. It returns a prompt object with `com.lantharos.Kestrel.Passkeys1.Prompt`, which answers only the caller that opened it:
-
-| Method | Does |
-| --- | --- |
-| `Next() → (s, a{sv})` | Waits for the person's next action: `account` with its `index`, `password` with the `password`, `confirm` or `cancel` |
-| `Update(s state, s message)` | Shows `fingerprint-hint` with a message, `fingerprint-unavailable` or `wrong-password` |
-| `Close()` | Closes the prompt |
 
 ## Reviewing changes
 

@@ -832,19 +832,6 @@
           </tig>
         </langSet>
       </termEntry>
-      <termEntry id="63">
-        <langSet xml:lang="en">
-          <tig>
-            <term>passkey</term>
-          </tig>
-        </langSet>
-        <langSet xml:lang="nb">
-          <tig>
-            <term>tilgangsnøkkel</term>
-            <note from="translator">Sign-in key that replaces a password on websites; en tilgangsnøkkel, plural tilgangsnøkler</note>
-          </tig>
-        </langSet>
-      </termEntry>
       <termEntry id="64">
         <langSet xml:lang="en">
           <tig>

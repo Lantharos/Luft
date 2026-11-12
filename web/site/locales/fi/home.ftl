@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot pysyy päällä
 home-security-secure-boot-text = Käynnistyksen jokainen vaihe on allekirjoitettu USB-tikulta työpöydälle asti, joten laiteohjelmistosta ei tarvitse poistaa mitään käytöstä.
 home-security-encryption = Salaus ilman näppäilyä
 home-security-encryption-text = Ota salaus käyttöön yhdellä napsautuksella. TPM:n kanssa levyn lukitus avautuu itsestään, ja vain sille järjestelmälle, johon levy kuuluu.
-home-security-passkeys = Pääsyavaimet kaikkialla
-home-security-passkeys-text = Pääsyavaimet ovat tietokoneellasi ja toimivat kaikissa selaimissa, ja ne vahvistetaan sormenjäljellä tai salasanalla.
 home-security-keyring = Yksi avainnippu
 home-security-keyring-text = Salasanat, kirjautumiset, SSH-avaimet ja GnuPG ovat yhdessä paikassa, ja ne avautuvat, kun kirjaudut sisään.
 

@@ -40,35 +40,6 @@ keyring-mismatch = Unosi se ne podudaraju
 keyring-unlock = Otključaj
 keyring-cancel = Odustani
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Stvoriti pristupni ključ za { $site }?
-passkeys-register-account-by-app = { $app } želi spremiti pristupni ključ za { $account }. Ključ ostaje na ovom računalu.
-passkeys-register-account = Aplikacija želi spremiti pristupni ključ za { $account }. Ključ ostaje na ovom računalu.
-passkeys-register-by-app = { $app } želi spremiti pristupni ključ. Ključ ostaje na ovom računalu.
-passkeys-register = Aplikacija želi spremiti pristupni ključ. Ključ ostaje na ovom računalu.
-passkeys-sign-in-title = Prijaviti se na { $site } pristupnim ključem?
-passkeys-sign-in-choose-by-app = { $app } traži pristupni ključ. Odaberite račun za prijavu.
-passkeys-sign-in-choose = Aplikacija traži pristupni ključ. Odaberite račun za prijavu.
-passkeys-sign-in-by-app = { $app } traži vaš pristupni ključ.
-passkeys-sign-in = Aplikacija traži vaš pristupni ključ.
-passkeys-manage-title-by-app = Dopustiti da { $app } upravlja vašim pristupnim ključevima?
-passkeys-manage-title = Dopustiti ovoj aplikaciji upravljanje vašim pristupnim ključevima?
-passkeys-manage-description = Vidjet će za koje web-stranice imate pristupne ključeve i moći će ih ukloniti.
-passkeys-registered-title = Već imate pristupni ključ za { $site }
-passkeys-registered-description = Umjesto toga prijavite se postojećim ključem.
-passkeys-choose-title = Koristiti pristupne ključeve na ovom računalu?
-passkeys-choose-by-app = { $app } pita gdje se nalazi vaš pristupni ključ.
-passkeys-choose = Aplikacija pita gdje se nalazi vaš pristupni ključ.
-passkeys-use-password = Koristi lozinku
-passkeys-password = Lozinka
-passkeys-cancel = Odustani
-passkeys-continue = Nastavi
-passkeys-ok = U redu
-passkeys-use-this-computer = Koristi ovo računalo
-passkeys-fingerprint-unavailable = Za nastavak upotrijebite lozinku.
-passkeys-wrong-password = Lozinka nije točna. Pokušajte ponovno.
-
 ## Sign-in prompt
 
 auth-prompt-password = Lozinka

@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Зберігати в процесорі безп�
 settings-passwords-ssh-chip-description = Його ніколи не можна буде скопіювати з цього комп’ютера, навіть вам
 settings-passwords-ssh-chip-unsupported = Процесор безпеки цього комп’ютера не може зберігати ключі SSH
 settings-passwords-ssh-add = Додати ключ
-
-## Passkeys
-
-settings-passkeys-title = Ключі доступу
-settings-passkeys-unavailable = Розблокуйте в’язку ключів, щоб побачити ключі доступу.
-settings-passkeys-chip-fingerprint = Запечатано процесором безпеки цього комп’ютера. Під час кожного входу запитується відбиток пальця або пароль.
-settings-passkeys-chip-password = Запечатано процесором безпеки цього комп’ютера. Під час кожного входу запитується пароль.
-settings-passkeys-password-fingerprint = Зашифровано вашим паролем. Під час кожного входу запитується відбиток пальця або пароль.
-settings-passkeys-password = Зашифровано вашим паролем. Під час кожного входу запитується пароль.
-settings-passkeys-last-used = Востаннє використано { $when }
-settings-passkeys-never-used = Ще не використано
-settings-passkeys-password-only = Захищено вашим паролем
-settings-passkeys-unreachable = Браузери не мають доступу до ваших ключів доступу
-settings-passkeys-unreachable-description = Доступ відновиться, щойно запуститься служба ключів доступу
-settings-passkeys-rename-label = Перейменувати ключ доступу для { $site }
-settings-passkeys-remove-label = Вилучити ключ доступу для { $site }
-settings-passkeys-empty = Ключів доступу ще немає
-settings-passkeys-empty-description = Ключі, створені сайтами, зберігаються тут для всіх браузерів
-settings-passkeys-remove-title = Вилучити цей ключ доступу?
-settings-passkeys-remove-description = Ви більше не зможете ввійти з ним на { $site }, тож переконайтеся, що маєте інший спосіб входу.
-settings-passkeys-rename-title = Перейменувати ключ доступу
-settings-passkeys-rename-description = Дайте ключу доступу для { $site } назву, яку ви впізнаєте.
-settings-passkeys-name = Назва
-settings-passkeys-save = Зберегти
-

@@ -71,12 +71,12 @@ This stops a renamed or copied program, one that takes a Luft program's bus name
 
 ### Shielded helpers
 
-Two helpers hold what your other programs mustn't reach, even though they run as you: Luft Keyring, with your unlocked secrets and the key the TPM releases for it, and Luft Passkeys. Each is installed setgid to a group of its own, `luft-keyring` and `luft-passkeys`, with no account in either.
+Luft Keyring holds what your other programs mustn't reach, even though it runs as you: your unlocked secrets and the key the TPM releases for it. It is installed setgid to a group of its own, `luft-keyring`, with no account in it.
 
 - Starting a setgid program counts as a change of identity to the kernel. The loader ignores `LD_PRELOAD` and its kind, and from the first instruction nothing without `CAP_SYS_PTRACE` can trace the process or read its memory, environment, maps or open files. The helper then keeps itself out of core dumps and locks itself down with a system call filter that also stops it starting other programs, so the group can't be handed on.
-- The kernel only grants the group when nothing traces the start and no-new-privileges isn't set, so the group proves a clean start. Whatever acts for a helper checks for it: the TPM unlock service, the keyring's Passkeys collection, the passkey relay, and Kestrel's keyring and passkey prompts. A program that takes the helper's bus name while it isn't running gets nothing.
-- systemd sets no-new-privileges for any user unit that filters system calls or restricts namespaces, so these units set none of that and the helpers lock themselves down. `systemd-analyze security` can't see that and scores them as exposed.
+- The kernel only grants the group when nothing traces the start and no-new-privileges isn't set, so the group proves a clean start. Whatever acts for a helper checks for it: the TPM unlock service and Kestrel's keyring prompts. A program that takes the helper's bus name while it isn't running gets nothing.
+- systemd sets no-new-privileges for any user unit that filters system calls or restricts namespaces, so a helper's unit sets none of that and the helper locks itself down. `systemd-analyze security` can't see that and scores it as exposed.
 
-A program of yours can still restart a shielded helper or start it with an environment of its choosing, but the helper asks for consent itself and reaches the keyring over its own connections, so that gains nothing. Root reaches it as it reaches everything. Cloud drive sign-ins, VPN passwords and GnuPG passphrases end up with rclone, NetworkManager or `gpg-agent`, which hand them to your programs anyway, so the helpers in between aren't shielded. [Luft Keyring and passkeys](/security/keyring/) covers the keyring itself.
+A program of yours can still restart the keyring or start it with an environment of its choosing, but the keyring asks for consent itself, so that gains nothing. Root reaches it as it reaches everything. Cloud drive sign-ins, VPN passwords and GnuPG passphrases end up with rclone, NetworkManager or `gpg-agent`, which hand them to your programs anyway, so the helpers in between aren't shielded. [Luft Keyring](/security/keyring/) covers the keyring itself.
 
 Extensions are judged by where they're installed rather than by who calls; [How extensions run](/extensions/how-extensions-run/) covers that.

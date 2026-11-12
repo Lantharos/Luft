@@ -9,7 +9,7 @@ mod syscalls;
 
 use std::io;
 
-pub use process::{Process, group_of};
+pub use process::Process;
 
 /// Shuts the running helper in before it reads anything. It keeps your group
 /// for the files it opens and the processes it looks at, stays out of reach of

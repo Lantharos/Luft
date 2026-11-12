@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Φύλαξη στο τσιπ ασφαλείας
 settings-passwords-ssh-chip-description = Δεν μπορεί ποτέ να αντιγραφεί έξω από αυτόν τον υπολογιστή, ούτε καν από εσάς
 settings-passwords-ssh-chip-unsupported = Το τσιπ ασφαλείας αυτού του υπολογιστή δεν μπορεί να φυλάξει κλειδιά SSH
 settings-passwords-ssh-add = Προσθήκη κλειδιού
-
-## Passkeys
-
-settings-passkeys-title = Κλειδιά πρόσβασης
-settings-passkeys-unavailable = Ξεκλειδώστε την κλειδοθήκη σας για να δείτε τα κλειδιά πρόσβασής σας.
-settings-passkeys-chip-fingerprint = Σφραγισμένα από το τσιπ ασφαλείας αυτού του υπολογιστή. Κάθε σύνδεση ζητά το δακτυλικό σας αποτύπωμα ή τον κωδικό πρόσβασής σας.
-settings-passkeys-chip-password = Σφραγισμένα από το τσιπ ασφαλείας αυτού του υπολογιστή. Κάθε σύνδεση ζητά τον κωδικό πρόσβασής σας.
-settings-passkeys-password-fingerprint = Κρυπτογραφημένα με τον κωδικό πρόσβασής σας. Κάθε σύνδεση ζητά το δακτυλικό σας αποτύπωμα ή τον κωδικό πρόσβασής σας.
-settings-passkeys-password = Κρυπτογραφημένα με τον κωδικό πρόσβασής σας. Κάθε σύνδεση ζητά τον κωδικό πρόσβασής σας.
-settings-passkeys-last-used = Τελευταία χρήση { $when }
-settings-passkeys-never-used = Δεν έχει χρησιμοποιηθεί
-settings-passkeys-password-only = Προστατεύεται με τον κωδικό πρόσβασής σας
-settings-passkeys-unreachable = Τα προγράμματα περιήγησης δεν έχουν πρόσβαση στα κλειδιά πρόσβασής σας
-settings-passkeys-unreachable-description = Θα είναι ξανά διαθέσιμα μόλις εκτελείται η υπηρεσία κλειδιών πρόσβασης
-settings-passkeys-rename-label = Μετονομασία κλειδιού πρόσβασης για { $site }
-settings-passkeys-remove-label = Αφαίρεση κλειδιού πρόσβασης για { $site }
-settings-passkeys-empty = Δεν υπάρχουν ακόμη κλειδιά πρόσβασης
-settings-passkeys-empty-description = Όσα δημιουργούν οι ιστότοποι αποθηκεύονται εδώ για όλα τα προγράμματα περιήγησης
-settings-passkeys-remove-title = Αφαίρεση αυτού του κλειδιού πρόσβασης;
-settings-passkeys-remove-description = Δεν θα μπορείτε πια να συνδεθείτε στον ιστότοπο { $site } με αυτό, οπότε βεβαιωθείτε ότι έχετε άλλον τρόπο πρόσβασης.
-settings-passkeys-rename-title = Μετονομασία κλειδιού πρόσβασης
-settings-passkeys-rename-description = Δώστε στο κλειδί πρόσβασης για { $site } ένα όνομα που θα αναγνωρίζετε.
-settings-passkeys-name = Όνομα
-settings-passkeys-save = Αποθήκευση
-

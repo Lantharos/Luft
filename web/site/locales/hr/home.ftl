@@ -75,8 +75,6 @@ home-security-secure-boot = Secure Boot ostaje uključen
 home-security-secure-boot-text = Svaki je korak pokretanja potpisan, od USB memorije do radne površine, pa u firmveru nema što isključivati.
 home-security-encryption = Šifriranje bez upisivanja
 home-security-encryption-text = Uključite šifriranje jednim klikom. Uz TPM se disk otključava sam, i to samo za sustav kojem pripada.
-home-security-passkeys = Pristupni ključevi posvuda
-home-security-passkeys-text = Pristupni ključevi nalaze se na vašem računalu i rade u svakom pregledniku, a potvrđujete ih otiskom prsta ili lozinkom.
 home-security-keyring = Jedan skup ključeva
 home-security-keyring-text = Lozinke, prijave, SSH ključevi i GnuPG čuvaju se na jednom mjestu i otključavaju se kad se prijavite.
 

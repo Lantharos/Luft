@@ -40,35 +40,6 @@ keyring-mismatch = Sisestused ei ühti
 keyring-unlock = Ava lukustus
 keyring-cancel = Loobu
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Kas luua pääsuvõti saidile { $site }?
-passkeys-register-account-by-app = { $app } soovib salvestada pääsuvõtme konto { $account } jaoks. See jääb sellesse arvutisse.
-passkeys-register-account = Üks rakendus soovib salvestada pääsuvõtme konto { $account } jaoks. See jääb sellesse arvutisse.
-passkeys-register-by-app = { $app } soovib salvestada pääsuvõtme. See jääb sellesse arvutisse.
-passkeys-register = Üks rakendus soovib salvestada pääsuvõtme. See jääb sellesse arvutisse.
-passkeys-sign-in-title = Kas logida saidile { $site } sisse pääsuvõtmega?
-passkeys-sign-in-choose-by-app = { $app } küsib pääsuvõtit. Vali konto, millega sisse logida.
-passkeys-sign-in-choose = Üks rakendus küsib pääsuvõtit. Vali konto, millega sisse logida.
-passkeys-sign-in-by-app = { $app } küsib sinu pääsuvõtit.
-passkeys-sign-in = Üks rakendus küsib sinu pääsuvõtit.
-passkeys-manage-title-by-app = Kas lubad rakendusel { $app } hallata sinu pääsuvõtmeid?
-passkeys-manage-title = Kas lubad sellel rakendusel hallata sinu pääsuvõtmeid?
-passkeys-manage-description = See näeb, millistel saitidel on sul pääsuvõtmed, ja saab neid eemaldada.
-passkeys-registered-title = Sul on saidi { $site } jaoks juba pääsuvõti
-passkeys-registered-description = Logi selle asemel sisse olemasoleva pääsuvõtmega.
-passkeys-choose-title = Kas kasutada selle arvuti pääsuvõtmeid?
-passkeys-choose-by-app = { $app } küsib, kus sinu pääsuvõti asub.
-passkeys-choose = Üks rakendus küsib, kus sinu pääsuvõti asub.
-passkeys-use-password = Kasuta salasõna
-passkeys-password = Salasõna
-passkeys-cancel = Loobu
-passkeys-continue = Jätka
-passkeys-ok = OK
-passkeys-use-this-computer = Kasuta seda arvutit
-passkeys-fingerprint-unavailable = Jätkamiseks kasuta salasõna.
-passkeys-wrong-password = See salasõna pole õige. Proovi uuesti.
-
 ## Sign-in prompt
 
 auth-prompt-password = Salasõna

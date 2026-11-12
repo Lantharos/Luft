@@ -15,13 +15,11 @@ ed25519-dalek.workspace = true
 futures-util.workspace = true
 getrandom.workspace = true
 hkdf.workspace = true
-hmac.workspace = true
 libc.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 luft-shield.workspace = true
 p256 = { workspace = true, features = ["ecdsa", "std"] }
-postcard.workspace = true
 rustix = { workspace = true, features = ["fs", "mm", "net", "pipe", "process"] }
 serde.workspace = true
 serde_json.workspace = true

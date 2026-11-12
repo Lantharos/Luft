@@ -62,7 +62,6 @@ disks-found = { $count ->
 | clipboard | клипборд | привремена меморија | Short, and what people say |
 | account | сметка | профил, налог | Windows' word; налог is Serbian |
 | notification | известување | нотификација, обавестување | Standard Macedonian; обавестување is Serbian |
-| passkey | клуч за пристап | passkey | Translated like the other keys |
 | Keyring | привезок за клучеви | клучарник | Plain and understandable |
 | keyboard shortcut | кратенка на тастатура | брза комбинација | Windows' word |
 | computer | компјутер | сметач, рачунар | What Macedonians say; рачунар is Serbian |

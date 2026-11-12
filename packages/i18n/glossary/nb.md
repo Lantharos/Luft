@@ -59,7 +59,6 @@ windows-open = { $count ->
 | suspend, sleep | Hvilemodus | Ventemodus | Windows' word |
 | shut down | Slå av | Avslutt | Windows and GNOME |
 | Power saver | Strømsparing | Best strømeffektivitet | Short, and matches Strømmodus |
-| passkey | tilgangsnøkkel | passkey, passnøkkel | Windows and Google |
 | recovery key | gjenopprettingsnøkkel | gjenopprettelsesnøkkel | BitLocker's word |
 | Keyring | Nøkkelring | Nøkkelknippe | GNOME and macOS |
 | security chip | sikkerhetsbrikke | TPM-brikke | Luft avoids the abbreviation |

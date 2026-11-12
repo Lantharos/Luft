@@ -60,7 +60,6 @@ windows-open = { $count ->
 | Night light | Öövalgus | Öörežiim | Windows' word |
 | update | värskendus | uuendus | Windows' word |
 | security | turve | turvalisus | Windows' page name, shorter |
-| passkey | pääsuvõti | passkey | Apple and Google |
 | Keyring | Võtmerõngas | Võtmehoidja | GNOME's word |
 | clipboard | lõikelaud | puhver | Windows and GNOME |
 | firmware | püsivara | firmware | The established term |

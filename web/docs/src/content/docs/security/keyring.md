@@ -1,11 +1,11 @@
 ---
-title: Luft Keyring and passkeys
-description: How Luft Keyring encrypts and unlocks your secrets, which apps it lets use them, and where passkeys are kept.
+title: Luft Keyring
+description: How Luft Keyring encrypts and unlocks your secrets, and which apps it lets use them.
 sidebar:
   order: 2.6
 ---
 
-Luft Keyring keeps passwords, tokens and keys for the Secret Service, the Secret portal, SSH and GnuPG, and holds passkeys for Luft Passkeys. [Keyring and passkeys](/files/keyring-and-passkeys/) covers using it.
+Luft Keyring keeps passwords, tokens and keys for the Secret Service, the Secret portal, SSH and GnuPG. [Keyring](/files/keyring/) covers using it.
 
 ## The vault
 
@@ -38,10 +38,6 @@ Managing the keyring, such as reading the access history or removing an SSH key,
 
 Apps can also keep tokens of their own, apart from the items people see, through [`AppSecrets`](/developers/desktop/dbus/#keyring), where a sandboxed app can only name its own app ID.
 
-## Passkeys
-
-Luft Passkeys makes each private key inside the TPM when there is one, so it never leaves the chip; otherwise the keyring holds it and signs with it itself. Passkeys never leave the computer and are never marked as backed up. Luft Passkeys is a shielded helper too: the keyring's passkeys collection, the passkey relay and Kestrel's passkey prompt only answer `luft-passkeys` running with its group, so neither a Flatpak app nor a program of yours that takes its bus name gets through.
-
 ## Limits
 
-Beyond what [Keyring and passkeys](/files/keyring-and-passkeys/#what-it-protects-against) lists, the keyring can't help when root is compromised on a correctly started computer, when a signed component with a flaw is abused, or when memory is read physically while it's unlocked.
+Beyond what [Keyring](/files/keyring/#what-it-protects-against) lists, the keyring can't help when root is compromised on a correctly started computer, when a signed component with a flaw is abused, or when memory is read physically while it's unlocked.

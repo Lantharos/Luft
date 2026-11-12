@@ -63,7 +63,6 @@ minutes-left = { $count ->
 | security | zabezpečenie | bezpečnosť | Windows' settings page |
 | privacy | súkromie | ochrana osobných údajov | Short; GNOME and macOS |
 | Keyring | zväzok kľúčov | kľúčenka | GNOME's word |
-| passkey | prístupový kľúč | passkey | Windows and Apple |
 | firmware | firmvér | firmware | Slovak spelling, used by Windows |
 | USB stick | USB kľúč | jednotka USB flash | What people say |
 | passphrase | prístupová fráza | heslo | Apart from the account password |

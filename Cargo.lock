@@ -1613,22 +1613,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ctap"
-version = "0.1.0"
-dependencies = [
- "aes",
- "cbc",
- "ciborium",
- "getrandom 0.4.3",
- "hkdf",
- "hmac",
- "p256",
- "pollster 1.0.1",
- "sha2",
- "zeroize",
-]
-
-[[package]]
 name = "ctutils"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1828,7 +1812,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a878c850e9e421b20262e9b41f9c860e4785fa07541c266b62ff9d1ef998a80a"
 dependencies = [
  "const-oid",
- "pem-rfc7468",
  "zeroize",
 ]
 
@@ -2174,9 +2157,7 @@ dependencies = [
  "digest",
  "ff",
  "group",
- "hkdf",
  "hybrid-array",
- "pem-rfc7468",
  "pkcs8",
  "rand_core 0.10.1",
  "sec1",
@@ -5823,7 +5804,6 @@ dependencies = [
  "futures-util",
  "getrandom 0.4.3",
  "hkdf",
- "hmac",
  "libc",
  "luft-dbus-macros",
  "luft-identity",
@@ -5831,7 +5811,6 @@ dependencies = [
  "luft-keyring-wire",
  "luft-shield",
  "p256",
- "postcard",
  "rustix",
  "serde",
  "serde_json",
@@ -5978,31 +5957,6 @@ dependencies = [
  "walkdir",
  "zbus 6.0.0",
  "zstd 0.14.3",
-]
-
-[[package]]
-name = "luft-passkeys"
-version = "0.1.0"
-dependencies = [
- "ctap",
- "libc",
- "luft-dbus-macros",
- "luft-identity",
- "luft-shield",
- "serde",
- "serde_json",
- "tokio",
- "zbus 6.0.0",
- "zeroize",
-]
-
-[[package]]
-name = "luft-passkeys-relay"
-version = "0.1.0"
-dependencies = [
- "getrandom 0.4.3",
- "luft-shield",
- "rustix",
 ]
 
 [[package]]
@@ -7478,15 +7432,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pem-rfc7468"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6305423e0e7738146434843d1694d621cce767262b2a86910beab705e4493d9"
-dependencies = [
- "base64ct",
-]
-
-[[package]]
 name = "peniko"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7775,12 +7720,6 @@ name = "pollster"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2f3a9f18d041e6d0e102a0a46750538147e5e8992d3b4873aaafee2520b00ce3"
-
-[[package]]
-name = "pollster"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc6355899e1c9462875b6757c79f3caa011a1fdae12bbb1a2e72dd1f234f8336"
 
 [[package]]
 name = "poly1305"
@@ -8529,7 +8468,7 @@ dependencies = [
  "objc2-core-foundation",
  "objc2-foundation",
  "percent-encoding",
- "pollster 0.4.0",
+ "pollster",
  "raw-window-handle",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -8893,7 +8832,7 @@ dependencies = [
  "objc2-io-surface",
  "objc2-metal",
  "objc2-quartz-core",
- "pollster 0.4.0",
+ "pollster",
  "raw-window-handle",
  "rfd",
  "sabine-bridge",

@@ -832,19 +832,6 @@
           </tig>
         </langSet>
       </termEntry>
-      <termEntry id="63">
-        <langSet xml:lang="en">
-          <tig>
-            <term>passkey</term>
-          </tig>
-        </langSet>
-        <langSet xml:lang="mt">
-          <tig>
-            <term>passkey</term>
-            <note from="translator">Sign-in key that replaces a password on websites; masculine, plural passkeys</note>
-          </tig>
-        </langSet>
-      </termEntry>
       <termEntry id="64">
         <langSet xml:lang="en">
           <tig>

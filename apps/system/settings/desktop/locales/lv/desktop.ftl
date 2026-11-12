@@ -185,9 +185,6 @@ desktop-keyring-denied = To var mainīt tikai instalētā lietotne Iestatījumi
 desktop-keyring-unsupported = Jūsu atslēgu saišķis to vēl neprot
 desktop-keyring-reseal-failed = Drošības mikroshēma pašlaik nevarēja aizsargāt jūsu atslēgu saišķi
 
-## Passkeys
-desktop-passkeys-missing = Šāda piekļuves atslēga nepastāv
-
 ## Device security
 desktop-security-recovery-file-name = Atkopšanas atslēga.txt
 desktop-security-usb-unavailable = USB aizsardzība šajā datorā nav pieejama

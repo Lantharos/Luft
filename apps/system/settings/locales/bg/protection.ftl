@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Пазене в чипа за сигурност
 settings-passwords-ssh-chip-description = Никога не може да бъде копиран от този компютър, дори от вас
 settings-passwords-ssh-chip-unsupported = Чипът за сигурност на този компютър не може да съхранява SSH ключове
 settings-passwords-ssh-add = Добави ключ
-
-## Passkeys
-
-settings-passkeys-title = Ключове за достъп
-settings-passkeys-unavailable = Отключете ключодържателя, за да видите ключовете си за достъп.
-settings-passkeys-chip-fingerprint = Запечатани с чипа за сигурност на този компютър. При всеки вход се иска пръстов отпечатък или парола.
-settings-passkeys-chip-password = Запечатани с чипа за сигурност на този компютър. При всеки вход се иска паролата ви.
-settings-passkeys-password-fingerprint = Шифровани с паролата ви. При всеки вход се иска пръстов отпечатък или парола.
-settings-passkeys-password = Шифровани с паролата ви. При всеки вход се иска паролата ви.
-settings-passkeys-last-used = Последно използван { $when }
-settings-passkeys-never-used = Никога не е използван
-settings-passkeys-password-only = Защитен с паролата ви
-settings-passkeys-unreachable = Браузърите нямат достъп до ключовете ви за достъп
-settings-passkeys-unreachable-description = Ще се върнат, щом услугата за ключове за достъп стартира
-settings-passkeys-rename-label = Преименувай ключа за достъп за { $site }
-settings-passkeys-remove-label = Премахни ключа за достъп за { $site }
-settings-passkeys-empty = Още няма ключове за достъп
-settings-passkeys-empty-description = Ключовете, създадени от сайтовете, се запазват тук за всички браузъри
-settings-passkeys-remove-title = Да се премахне ли този ключ за достъп?
-settings-passkeys-remove-description = Вече няма да можете да влизате в { $site } с него, затова се уверете, че имате друг начин за вход.
-settings-passkeys-rename-title = Преименуване на ключ за достъп
-settings-passkeys-rename-description = Дайте на ключа си за достъп за { $site } име, което ще разпознаете.
-settings-passkeys-name = Име
-settings-passkeys-save = Запази
-

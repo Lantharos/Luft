@@ -40,35 +40,6 @@ keyring-mismatch = As senhas não coincidem
 keyring-unlock = Desbloquear
 keyring-cancel = Cancelar
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Criar uma chave de acesso para { $site }?
-passkeys-register-account-by-app = { $app } quer salvar uma chave de acesso para { $account }. Ela fica neste computador.
-passkeys-register-account = Um app quer salvar uma chave de acesso para { $account }. Ela fica neste computador.
-passkeys-register-by-app = { $app } quer salvar uma chave de acesso. Ela fica neste computador.
-passkeys-register = Um app quer salvar uma chave de acesso. Ela fica neste computador.
-passkeys-sign-in-title = Entrar em { $site } com sua chave de acesso?
-passkeys-sign-in-choose-by-app = { $app } está pedindo uma chave de acesso. Escolha a conta com a qual entrar.
-passkeys-sign-in-choose = Um app está pedindo uma chave de acesso. Escolha a conta com a qual entrar.
-passkeys-sign-in-by-app = { $app } está pedindo sua chave de acesso.
-passkeys-sign-in = Um app está pedindo sua chave de acesso.
-passkeys-manage-title-by-app = Permitir que { $app } gerencie suas chaves de acesso?
-passkeys-manage-title = Permitir que este app gerencie suas chaves de acesso?
-passkeys-manage-description = Ele verá para quais sites você tem chaves de acesso e poderá removê-las.
-passkeys-registered-title = Você já tem uma chave de acesso para { $site }
-passkeys-registered-description = Entre com a que você já tem.
-passkeys-choose-title = Usar as chaves de acesso deste computador?
-passkeys-choose-by-app = { $app } está perguntando onde está sua chave de acesso.
-passkeys-choose = Um app está perguntando onde está sua chave de acesso.
-passkeys-use-password = Usar senha
-passkeys-password = Senha
-passkeys-cancel = Cancelar
-passkeys-continue = Continuar
-passkeys-ok = OK
-passkeys-use-this-computer = Usar este computador
-passkeys-fingerprint-unavailable = Use sua senha para continuar.
-passkeys-wrong-password = Senha incorreta. Tente novamente.
-
 ## Sign-in prompt
 
 auth-prompt-password = Senha

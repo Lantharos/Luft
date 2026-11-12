@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Geyma í öryggiskubbnum
 settings-passwords-ssh-chip-description = Enginn getur afritað hann af þessari tölvu, ekki heldur þú
 settings-passwords-ssh-chip-unsupported = Öryggiskubbur þessarar tölvu getur ekki geymt SSH-lykla
 settings-passwords-ssh-add = Bæta við lykli
-
-## Passkeys
-
-settings-passkeys-title = Aðgangslyklar
-settings-passkeys-unavailable = Taktu lyklakippuna úr lás til að sjá aðgangslyklana þína.
-settings-passkeys-chip-fingerprint = Innsiglaðir af öryggiskubbi þessarar tölvu. Við hverja innskráningu er beðið um fingrafar eða lykilorð.
-settings-passkeys-chip-password = Innsiglaðir af öryggiskubbi þessarar tölvu. Við hverja innskráningu er beðið um lykilorðið þitt.
-settings-passkeys-password-fingerprint = Dulritaðir með lykilorðinu þínu. Við hverja innskráningu er beðið um fingrafar eða lykilorð.
-settings-passkeys-password = Dulritaðir með lykilorðinu þínu. Við hverja innskráningu er beðið um lykilorðið þitt.
-settings-passkeys-last-used = Síðast notaður { $when }
-settings-passkeys-never-used = Aldrei notaður
-settings-passkeys-password-only = Varinn með lykilorðinu þínu
-settings-passkeys-unreachable = Vafrar ná ekki í aðgangslyklana þína
-settings-passkeys-unreachable-description = Þeir koma aftur þegar aðgangslyklaþjónustan er komin í gang
-settings-passkeys-rename-label = Endurnefna aðgangslykil fyrir { $site }
-settings-passkeys-remove-label = Fjarlægja aðgangslykil fyrir { $site }
-settings-passkeys-empty = Engir aðgangslyklar enn
-settings-passkeys-empty-description = Aðgangslyklar sem vefsvæði búa til eru vistaðir hér fyrir alla vafra
-settings-passkeys-remove-title = Fjarlægja þennan aðgangslykil?
-settings-passkeys-remove-description = Þú getur ekki lengur skráð þig inn á { $site } með honum, svo gakktu úr skugga um að þú hafir aðra leið inn.
-settings-passkeys-rename-title = Endurnefna aðgangslykil
-settings-passkeys-rename-description = Gefðu aðgangslyklinum fyrir { $site } heiti sem þú þekkir.
-settings-passkeys-name = Heiti
-settings-passkeys-save = Vista
-

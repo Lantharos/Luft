@@ -40,35 +40,6 @@ keyring-mismatch = Введені значення не збігаються
 keyring-unlock = Розблокувати
 keyring-cancel = Скасувати
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Створити ключ доступу для { $site }?
-passkeys-register-account-by-app = { $app } хоче зберегти ключ доступу для { $account }. Він залишиться на цьому комп’ютері.
-passkeys-register-account = Програма хоче зберегти ключ доступу для { $account }. Він залишиться на цьому комп’ютері.
-passkeys-register-by-app = { $app } хоче зберегти ключ доступу. Він залишиться на цьому комп’ютері.
-passkeys-register = Програма хоче зберегти ключ доступу. Він залишиться на цьому комп’ютері.
-passkeys-sign-in-title = Увійти на { $site } за допомогою ключа доступу?
-passkeys-sign-in-choose-by-app = { $app } запитує ключ доступу. Виберіть обліковий запис для входу.
-passkeys-sign-in-choose = Програма запитує ключ доступу. Виберіть обліковий запис для входу.
-passkeys-sign-in-by-app = { $app } запитує ваш ключ доступу.
-passkeys-sign-in = Програма запитує ваш ключ доступу.
-passkeys-manage-title-by-app = Дозволити { $app } керувати вашими ключами доступу?
-passkeys-manage-title = Дозволити цій програмі керувати вашими ключами доступу?
-passkeys-manage-description = Вона бачитиме, для яких сайтів у вас є ключі доступу, і зможе їх вилучати.
-passkeys-registered-title = У вас уже є ключ доступу для { $site }
-passkeys-registered-description = Увійдіть за допомогою наявного ключа.
-passkeys-choose-title = Використати ключі доступу на цьому комп’ютері?
-passkeys-choose-by-app = { $app } запитує, де зберігається ваш ключ доступу.
-passkeys-choose = Програма запитує, де зберігається ваш ключ доступу.
-passkeys-use-password = Використати пароль
-passkeys-password = Пароль
-passkeys-cancel = Скасувати
-passkeys-continue = Продовжити
-passkeys-ok = OK
-passkeys-use-this-computer = Використати цей комп’ютер
-passkeys-fingerprint-unavailable = Щоб продовжити, введіть пароль.
-passkeys-wrong-password = Неправильний пароль. Спробуйте ще раз.
-
 ## Sign-in prompt
 
 auth-prompt-password = Пароль

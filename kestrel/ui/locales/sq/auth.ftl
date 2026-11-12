@@ -40,35 +40,6 @@ keyring-mismatch = Të dhënat nuk përputhen
 keyring-unlock = Zhblloko
 keyring-cancel = Anulo
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Të krijohet një çelës kalimi për { $site }?
-passkeys-register-account-by-app = { $app } dëshiron të ruajë një çelës kalimi për { $account }. Ai mbetet në këtë kompjuter.
-passkeys-register-account = Një aplikacion dëshiron të ruajë një çelës kalimi për { $account }. Ai mbetet në këtë kompjuter.
-passkeys-register-by-app = { $app } dëshiron të ruajë një çelës kalimi. Ai mbetet në këtë kompjuter.
-passkeys-register = Një aplikacion dëshiron të ruajë një çelës kalimi. Ai mbetet në këtë kompjuter.
-passkeys-sign-in-title = Të hysh në { $site } me çelësin tënd të kalimit?
-passkeys-sign-in-choose-by-app = { $app } po kërkon një çelës kalimi. Zgjidh llogarinë me të cilën do të hysh.
-passkeys-sign-in-choose = Një aplikacion po kërkon një çelës kalimi. Zgjidh llogarinë me të cilën do të hysh.
-passkeys-sign-in-by-app = { $app } po kërkon çelësin tënd të kalimit.
-passkeys-sign-in = Një aplikacion po kërkon çelësin tënd të kalimit.
-passkeys-manage-title-by-app = Të lejohet { $app } të menaxhojë çelësat e tu të kalimit?
-passkeys-manage-title = Të lejohet ky aplikacion të menaxhojë çelësat e tu të kalimit?
-passkeys-manage-description = Do të shohë për cilat sajte ke çelësa kalimi dhe mund t’i heqë.
-passkeys-registered-title = Ke tashmë një çelës kalimi për { $site }
-passkeys-registered-description = Hyr me atë që ke.
-passkeys-choose-title = Të përdoren çelësat e kalimit në këtë kompjuter?
-passkeys-choose-by-app = { $app } po pyet ku e ke çelësin e kalimit.
-passkeys-choose = Një aplikacion po pyet ku e ke çelësin e kalimit.
-passkeys-use-password = Përdor fjalëkalimin
-passkeys-password = Fjalëkalimi
-passkeys-cancel = Anulo
-passkeys-continue = Vazhdo
-passkeys-ok = OK
-passkeys-use-this-computer = Përdor këtë kompjuter
-passkeys-fingerprint-unavailable = Përdor fjalëkalimin për të vazhduar.
-passkeys-wrong-password = Fjalëkalimi nuk është i saktë. Provo sërish.
-
 ## Sign-in prompt
 
 auth-prompt-password = Fjalëkalimi

@@ -72,8 +72,6 @@ home-security-secure-boot = Secure Boot helst virkt
 home-security-secure-boot-text = Hvert skref ræsingarinnar er undirritað, frá USB-lyklinum að skjáborðinu, svo það er ekkert sem þú þarft að slökkva á í fastbúnaðinum.
 home-security-encryption = Dulritun án innsláttar
 home-security-encryption-text = Kveiktu á dulritun með einum smelli. Með TPM tekur diskurinn sig sjálfur úr lás, og aðeins fyrir kerfið sem hann tilheyrir.
-home-security-passkeys = Aðgangslyklar alls staðar
-home-security-passkeys-text = Aðgangslyklar eru geymdir á tölvunni þinni og virka í öllum vöfrum, staðfestir með fingrafari eða lykilorði.
 home-security-keyring = Ein lyklakippa
 home-security-keyring-text = Lykilorð, innskráningar, SSH-lyklar og GnuPG eru geymd á einum stað og opnast þegar þú skráir þig inn.
 

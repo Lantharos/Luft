@@ -535,32 +535,6 @@ settings-remote-login-disconnect = Disconnect
 settings-remote-login-disconnect-title = Disconnect { $account } at { $address }?
 settings-remote-login-disconnect-description = Their connection ends right away, along with anything running in it. They can sign in again with their key.
 
-## Passkeys
-
-settings-passkeys-title = Passkeys
-settings-passkeys-unavailable = Unlock your passwords and keys to see your passkeys.
-settings-passkeys-chip-fingerprint = Sealed by this computer’s security chip. Each sign-in asks for your fingerprint or password.
-settings-passkeys-chip-password = Sealed by this computer’s security chip. Each sign-in asks for your password.
-settings-passkeys-password-fingerprint = Encrypted with your password. Each sign-in asks for your fingerprint or password.
-settings-passkeys-password = Encrypted with your password. Each sign-in asks for your password.
-# $when is a relative time, such as "3 days ago"
-settings-passkeys-last-used = Last used { $when }
-settings-passkeys-never-used = Never used
-settings-passkeys-password-only = Protected by your password
-settings-passkeys-unreachable = Browsers can’t reach your passkeys
-settings-passkeys-unreachable-description = They’re back once the passkey service is running
-# Screen reader labels. $site is a website name
-settings-passkeys-rename-label = Rename passkey for { $site }
-settings-passkeys-remove-label = Remove passkey for { $site }
-settings-passkeys-empty = No passkeys yet
-settings-passkeys-empty-description = Ones that sites create are saved here for every browser
-settings-passkeys-remove-title = Remove this passkey?
-settings-passkeys-remove-description = You won’t be able to sign in to { $site } with it anymore, so make sure you have another way in.
-settings-passkeys-rename-title = Rename passkey
-settings-passkeys-rename-description = Give your passkey for { $site } a name you’ll recognize.
-settings-passkeys-name = Name
-settings-passkeys-save = Save
-
 ## Screen and input sharing
 
 settings-sharing = Screen and input sharing

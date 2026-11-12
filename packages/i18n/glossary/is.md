@@ -60,7 +60,6 @@ windows-open = { $count ->
 | Dictation | Raddinnsláttur | Upplestur | Upplestur is reading aloud |
 | clipboard | klippiborð | klippispjald | Windows' word |
 | emoji | tjákn | emoji | The established Icelandic word |
-| passkey | aðgangslykill | passkey | Apple's word |
 | Keyring | lyklakippa | lyklahringur | GNOME's word |
 | encryption | dulritun | dulkóðun | Microsoft's word; dulkóðun is a search word |
 | account | aðgangur | reikningur | Reikningur is a bill |

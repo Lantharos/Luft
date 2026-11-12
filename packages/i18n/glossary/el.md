@@ -59,7 +59,6 @@ minutes-left = { $count ->
 | suspend, sleep | αναστολή λειτουργίας | ύπνος, αναμονή | Windows' word |
 | Night light | Νυχτερινός φωτισμός | Νυχτερινό φως | Windows' word |
 | Keep awake | Παραμονή σε εγρήγορση | Κράτα ξύπνιο | A noun like the other toggles |
-| passkey | κλειδί πρόσβασης | passkey | Windows, Apple and Google |
 | Keyring | κλειδοθήκη, lowercase | Μπρελόκ | GNOME and macOS; a common noun |
 | emoji | emoji, neuter, not inflected | εικονίδιο διάθεσης | What Windows and phones say |
 | firmware | υλικολογισμικό | firmware | Windows' word |

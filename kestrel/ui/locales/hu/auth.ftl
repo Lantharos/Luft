@@ -40,35 +40,6 @@ keyring-mismatch = A beírt jelszavak nem egyeznek
 keyring-unlock = Feloldás
 keyring-cancel = Mégse
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Létrehoz egy jelkulcsot ehhez a webhelyhez: { $site }?
-passkeys-register-account-by-app = { $app } jelkulcsot szeretne menteni ehhez a fiókhoz: { $account }. A jelkulcs ezen a számítógépen marad.
-passkeys-register-account = Egy alkalmazás jelkulcsot szeretne menteni ehhez a fiókhoz: { $account }. A jelkulcs ezen a számítógépen marad.
-passkeys-register-by-app = { $app } jelkulcsot szeretne menteni. A jelkulcs ezen a számítógépen marad.
-passkeys-register = Egy alkalmazás jelkulcsot szeretne menteni. A jelkulcs ezen a számítógépen marad.
-passkeys-sign-in-title = Bejelentkezik jelkulccsal ide: { $site }?
-passkeys-sign-in-choose-by-app = { $app } jelkulcsot kér. Válassza ki, melyik fiókkal jelentkezik be.
-passkeys-sign-in-choose = Egy alkalmazás jelkulcsot kér. Válassza ki, melyik fiókkal jelentkezik be.
-passkeys-sign-in-by-app = { $app } a jelkulcsát kéri.
-passkeys-sign-in = Egy alkalmazás a jelkulcsát kéri.
-passkeys-manage-title-by-app = Engedélyezi, hogy { $app } kezelje a jelkulcsait?
-passkeys-manage-title = Engedélyezi, hogy ez az alkalmazás kezelje a jelkulcsait?
-passkeys-manage-description = Látni fogja, mely webhelyekhez van jelkulcsa, és el is távolíthatja őket.
-passkeys-registered-title = Már van jelkulcsa ehhez a webhelyhez: { $site }
-passkeys-registered-description = Jelentkezzen be inkább a meglévővel.
-passkeys-choose-title = A számítógépen tárolt jelkulcsokat használja?
-passkeys-choose-by-app = { $app } azt kérdezi, hol található a jelkulcsa.
-passkeys-choose = Egy alkalmazás azt kérdezi, hol található a jelkulcsa.
-passkeys-use-password = Jelszó használata
-passkeys-password = Jelszó
-passkeys-cancel = Mégse
-passkeys-continue = Folytatás
-passkeys-ok = OK
-passkeys-use-this-computer = Ez a számítógép
-passkeys-fingerprint-unavailable = A folytatáshoz adja meg a jelszavát.
-passkeys-wrong-password = Ez a jelszó nem megfelelő. Próbálja újra.
-
 ## Sign-in prompt
 
 auth-prompt-password = Jelszó

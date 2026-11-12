@@ -3,7 +3,6 @@
 	import { Row, Section } from '@luft/ui';
 	import type { Access } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import PasskeysSection from '../passkeys/PasskeysSection.svelte';
 	import AccessPage from './access/AccessPage.svelte';
 	import { keyringAccess } from './api';
 	import SshSection from './ssh/SshSection.svelte';
@@ -53,7 +52,5 @@
 				<SshSection ssh={keyring.current.ssh} refresh={keyring.load} />
 			{/if}
 		{/if}
-
-		<PasskeysSection {fingerprintReader} />
 	</SubPage>
 {/if}

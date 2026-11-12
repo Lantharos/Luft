@@ -40,35 +40,6 @@ keyring-mismatch = Zadání se neshodují
 keyring-unlock = Odemknout
 keyring-cancel = Zrušit
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Vytvořit přístupový klíč pro { $site }?
-passkeys-register-account-by-app = { $app } chce uložit přístupový klíč pro { $account }. Zůstane v tomto počítači.
-passkeys-register-account = Aplikace chce uložit přístupový klíč pro { $account }. Zůstane v tomto počítači.
-passkeys-register-by-app = { $app } chce uložit přístupový klíč. Zůstane v tomto počítači.
-passkeys-register = Aplikace chce uložit přístupový klíč. Zůstane v tomto počítači.
-passkeys-sign-in-title = Přihlásit se k { $site } pomocí přístupového klíče?
-passkeys-sign-in-choose-by-app = { $app } žádá o přístupový klíč. Vyberte účet, kterým se chcete přihlásit.
-passkeys-sign-in-choose = Aplikace žádá o přístupový klíč. Vyberte účet, kterým se chcete přihlásit.
-passkeys-sign-in-by-app = { $app } žádá o váš přístupový klíč.
-passkeys-sign-in = Aplikace žádá o váš přístupový klíč.
-passkeys-manage-title-by-app = Povolit aplikaci { $app } spravovat vaše přístupové klíče?
-passkeys-manage-title = Povolit této aplikaci spravovat vaše přístupové klíče?
-passkeys-manage-description = Uvidí, pro které weby máte přístupové klíče, a bude je moct odstranit.
-passkeys-registered-title = Pro { $site } už přístupový klíč máte
-passkeys-registered-description = Přihlaste se tím, který už máte.
-passkeys-choose-title = Použít přístupové klíče v tomto počítači?
-passkeys-choose-by-app = { $app } se ptá, kde máte přístupový klíč.
-passkeys-choose = Aplikace se ptá, kde máte přístupový klíč.
-passkeys-use-password = Použít heslo
-passkeys-password = Heslo
-passkeys-cancel = Zrušit
-passkeys-continue = Pokračovat
-passkeys-ok = OK
-passkeys-use-this-computer = Použít tento počítač
-passkeys-fingerprint-unavailable = Pokračujte zadáním hesla.
-passkeys-wrong-password = Heslo není správné. Zkuste to znovu.
-
 ## Sign-in prompt
 
 auth-prompt-password = Heslo

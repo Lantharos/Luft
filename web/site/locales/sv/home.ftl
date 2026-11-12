@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot förblir på
 home-security-secure-boot-text = Varje steg i uppstarten är signerat, från USB-minnet till skrivbordet, så det finns inget att stänga av i firmware.
 home-security-encryption = Krypterat, utan att skriva
 home-security-encryption-text = Slå på kryptering med ett klick. Med ett TPM låser disken upp sig själv, och bara för systemet den hör till.
-home-security-passkeys = Lösennycklar överallt
-home-security-passkeys-text = Lösennycklar finns på din dator och fungerar i alla webbläsare, bekräftade med fingeravtryck eller lösenord.
 home-security-keyring = En nyckelring
 home-security-keyring-text = Lösenord, inloggningar, SSH-nycklar och GnuPG samlas på ett ställe och låses upp när du loggar in.
 

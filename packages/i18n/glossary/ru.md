@@ -67,7 +67,6 @@ files-selected = { $count ->
 | Airplane mode | Режим полёта | Режим «в самолёте» | Shorter; Android and GNOME |
 | Keep awake | Не засыпать | Не отключать экран | Short and plain |
 | Dictation | Диктовка | Голосовой ввод | macOS; голосовой ввод is the broader idea |
-| passkey | ключ доступа | passkey | Google and Apple |
 | Keyring | связка ключей | хранилище ключей | macOS and GNOME |
 | security chip | чип безопасности | процессор безопасности, модуль TPM | Plainer than Windows' word |
 | firmware | прошивка | встроенное ПО, микропрограмма | The word people use; GNOME Firmware says it too |

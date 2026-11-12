@@ -384,28 +384,3 @@ settings-passwords-ssh-chip = Coinnigh sa tslis slándála í
 settings-passwords-ssh-chip-description = Ní féidir í a chóipeáil den ríomhaire seo choíche, fiú agat féin
 settings-passwords-ssh-chip-unsupported = Ní féidir le slis slándála an ríomhaire seo eochracha SSH a choinneáil
 settings-passwords-ssh-add = Cuir an eochair leis
-
-## Passkeys
-
-settings-passkeys-title = Eochracha rochtana
-settings-passkeys-unavailable = Díghlasáil d’fháinne eochrach chun d’eochracha rochtana a fheiceáil.
-settings-passkeys-chip-fingerprint = Séalaithe ag slis slándála an ríomhaire seo. Iarrann gach síniú isteach do mhéarlorg nó do phasfhocal.
-settings-passkeys-chip-password = Séalaithe ag slis slándála an ríomhaire seo. Iarrann gach síniú isteach do phasfhocal.
-settings-passkeys-password-fingerprint = Criptithe le do phasfhocal. Iarrann gach síniú isteach do mhéarlorg nó do phasfhocal.
-settings-passkeys-password = Criptithe le do phasfhocal. Iarrann gach síniú isteach do phasfhocal.
-settings-passkeys-last-used = Úsáidte go deireanach { $when }
-settings-passkeys-never-used = Níor úsáideadh riamh
-settings-passkeys-password-only = Cosanta ag do phasfhocal
-settings-passkeys-unreachable = Ní féidir le brabhsálaithe teacht ar d’eochracha rochtana
-settings-passkeys-unreachable-description = Beidh siad ar ais nuair a bheidh an tseirbhís eochracha rochtana ag rith
-settings-passkeys-rename-label = Athainmnigh an eochair rochtana le haghaidh { $site }
-settings-passkeys-remove-label = Bain an eochair rochtana le haghaidh { $site }
-settings-passkeys-empty = Níl aon eochracha rochtana ann fós
-settings-passkeys-empty-description = Sábháiltear anseo na cinn a chruthaíonn suíomhanna, do gach brabhsálaí
-settings-passkeys-remove-title = Bain an eochair rochtana seo?
-settings-passkeys-remove-description = Ní bheidh tú in ann síniú isteach ar an suíomh { $site } léi a thuilleadh, mar sin cinntigh go bhfuil bealach eile isteach agat.
-settings-passkeys-rename-title = Athainmnigh an eochair rochtana
-settings-passkeys-rename-description = Tabhair ainm a aithneoidh tú ar d’eochair rochtana le haghaidh { $site }.
-settings-passkeys-name = Ainm
-settings-passkeys-save = Sábháil
-

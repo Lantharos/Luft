@@ -722,7 +722,6 @@ crash-reports-name-accounts = Online accounts
 crash-reports-name-firewall = The firewall
 crash-reports-name-handwriting = Handwriting recognition
 crash-reports-name-keyring = Luft Keyring
-crash-reports-name-passkeys = Luft Passkeys
 crash-reports-name-printers = Printing
 crash-reports-name-remote-login = Remote login
 crash-reports-name-dictation = Dictation

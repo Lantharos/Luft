@@ -40,35 +40,6 @@ keyring-mismatch = Οι κωδικοί δεν ταιριάζουν
 keyring-unlock = Ξεκλείδωμα
 keyring-cancel = Ακύρωση
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Δημιουργία κλειδιού πρόσβασης για το { $site };
-passkeys-register-account-by-app = Η εφαρμογή { $app } θέλει να αποθηκεύσει ένα κλειδί πρόσβασης για τον λογαριασμό { $account }. Θα μείνει σε αυτόν τον υπολογιστή.
-passkeys-register-account = Μια εφαρμογή θέλει να αποθηκεύσει ένα κλειδί πρόσβασης για τον λογαριασμό { $account }. Θα μείνει σε αυτόν τον υπολογιστή.
-passkeys-register-by-app = Η εφαρμογή { $app } θέλει να αποθηκεύσει ένα κλειδί πρόσβασης. Θα μείνει σε αυτόν τον υπολογιστή.
-passkeys-register = Μια εφαρμογή θέλει να αποθηκεύσει ένα κλειδί πρόσβασης. Θα μείνει σε αυτόν τον υπολογιστή.
-passkeys-sign-in-title = Σύνδεση στο { $site } με το κλειδί πρόσβασής σας;
-passkeys-sign-in-choose-by-app = Η εφαρμογή { $app } ζητά ένα κλειδί πρόσβασης. Επιλέξτε τον λογαριασμό με τον οποίο θα συνδεθείτε.
-passkeys-sign-in-choose = Μια εφαρμογή ζητά ένα κλειδί πρόσβασης. Επιλέξτε τον λογαριασμό με τον οποίο θα συνδεθείτε.
-passkeys-sign-in-by-app = Η εφαρμογή { $app } ζητά το κλειδί πρόσβασής σας.
-passkeys-sign-in = Μια εφαρμογή ζητά το κλειδί πρόσβασής σας.
-passkeys-manage-title-by-app = Να επιτρέπεται στην εφαρμογή { $app } η διαχείριση των κλειδιών πρόσβασής σας;
-passkeys-manage-title = Να επιτρέπεται σε αυτήν την εφαρμογή η διαχείριση των κλειδιών πρόσβασής σας;
-passkeys-manage-description = Θα βλέπει για ποιους ιστότοπους έχετε κλειδιά πρόσβασης και θα μπορεί να τα αφαιρεί.
-passkeys-registered-title = Έχετε ήδη κλειδί πρόσβασης για το { $site }
-passkeys-registered-description = Συνδεθείτε με αυτό που ήδη έχετε.
-passkeys-choose-title = Χρήση των κλειδιών πρόσβασης αυτού του υπολογιστή;
-passkeys-choose-by-app = Η εφαρμογή { $app } ρωτά πού βρίσκεται το κλειδί πρόσβασής σας.
-passkeys-choose = Μια εφαρμογή ρωτά πού βρίσκεται το κλειδί πρόσβασής σας.
-passkeys-use-password = Χρήση κωδικού πρόσβασης
-passkeys-password = Κωδικός πρόσβασης
-passkeys-cancel = Ακύρωση
-passkeys-continue = Συνέχεια
-passkeys-ok = OK
-passkeys-use-this-computer = Χρήση αυτού του υπολογιστή
-passkeys-fingerprint-unavailable = Χρησιμοποιήστε τον κωδικό πρόσβασής σας για να συνεχίσετε.
-passkeys-wrong-password = Ο κωδικός πρόσβασης δεν είναι σωστός. Δοκιμάστε ξανά.
-
 ## Sign-in prompt
 
 auth-prompt-password = Κωδικός πρόσβασης

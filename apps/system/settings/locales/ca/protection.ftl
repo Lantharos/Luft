@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Guarda-la al xip de seguretat
 settings-passwords-ssh-chip-description = No es podrà copiar mai fora d’aquest ordinador, ni tan sols vosaltres
 settings-passwords-ssh-chip-unsupported = El xip de seguretat d’aquest ordinador no pot guardar claus SSH
 settings-passwords-ssh-add = Afegeix la clau
-
-## Passkeys
-
-settings-passkeys-title = Claus d’accés
-settings-passkeys-unavailable = Desbloquegeu el clauer per veure les claus d’accés.
-settings-passkeys-chip-fingerprint = Segellades pel xip de seguretat d’aquest ordinador. Cada inici de sessió demana l’empremta digital o la contrasenya.
-settings-passkeys-chip-password = Segellades pel xip de seguretat d’aquest ordinador. Cada inici de sessió demana la contrasenya.
-settings-passkeys-password-fingerprint = Xifrades amb la contrasenya. Cada inici de sessió demana l’empremta digital o la contrasenya.
-settings-passkeys-password = Xifrades amb la contrasenya. Cada inici de sessió demana la contrasenya.
-settings-passkeys-last-used = Darrer ús: { $when }
-settings-passkeys-never-used = No s’ha fet servir mai
-settings-passkeys-password-only = Protegida amb la contrasenya
-settings-passkeys-unreachable = Els navegadors no poden accedir a les claus d’accés
-settings-passkeys-unreachable-description = Hi tornaran a poder accedir quan el servei de claus d’accés estigui en marxa
-settings-passkeys-rename-label = Canvia el nom de la clau d’accés de { $site }
-settings-passkeys-remove-label = Suprimeix la clau d’accés de { $site }
-settings-passkeys-empty = Encara no hi ha cap clau d’accés
-settings-passkeys-empty-description = Les que creïn els llocs web es desaran aquí per a tots els navegadors
-settings-passkeys-remove-title = Voleu suprimir aquesta clau d’accés?
-settings-passkeys-remove-description = Ja no podreu iniciar la sessió a { $site } amb ella, així que assegureu-vos que teniu una altra manera d’entrar.
-settings-passkeys-rename-title = Canvieu el nom de la clau d’accés
-settings-passkeys-rename-description = Doneu a la clau d’accés de { $site } un nom que reconegueu.
-settings-passkeys-name = Nom
-settings-passkeys-save = Desa
-

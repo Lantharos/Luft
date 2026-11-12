@@ -60,7 +60,6 @@ files-selected = { $count ->
 | restart | Перезавантажити | Перезапустити | Windows; перезапустити is for apps |
 | remove, delete | вилучити, видалити | видалити for both | GNOME and KDE keep the pair apart |
 | Keep awake | Не засинати | Не вимикати екран | Short enough for a tile |
-| passkey | ключ доступу | passkey | Google and Apple |
 | Keyring | в’язка ключів | брелок | GNOME and macOS |
 | security chip | процесор безпеки | мікросхема TPM | Windows' name for the TPM |
 | firmware | мікропрограма | прошивка | Windows and GNOME; прошивка is slang |

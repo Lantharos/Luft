@@ -56,7 +56,6 @@ minutes-left = { $count ->
 | snap, snap layout | поравнати, распоред прозора | закачити | Закачити is pin |
 | workspace | радни простор | радна површина | Радна површина is the desktop |
 | suspend, sleep | стање спавања; the button is Спавање | обустави | Windows' word |
-| passkey | приступни кључ | кључ за пролаз | Windows' word, and clearer |
 | Keyring | привезак кључева | | GNOME's word |
 | clipboard | остава | међуспремник | GNOME's word, and Serbian rather than Croatian |
 | file, folder | датотека, фасцикла | фајл, фолдер | GNOME and Windows |

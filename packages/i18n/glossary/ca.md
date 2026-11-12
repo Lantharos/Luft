@@ -66,7 +66,6 @@ windows-open = { $count ->
 | suspend, sleep | suspendre | dormir, repòs | Softcatalà and GNOME |
 | Language & Region | Llengua i regió | Idioma i regió | Softcatalà prefers llengua; idioma is a search word |
 | About | Quant a | Informació | Softcatalà, GNOME and KDE |
-| passkey | clau d’accés | passkey | Apple and Google |
 | Keyring | Clauer | Anell de claus | GNOME and macOS |
 | clipboard | porta-retalls | porta-papers | Softcatalà and Windows |
 | privacy | privadesa | privacitat | TERMCAT and Windows |

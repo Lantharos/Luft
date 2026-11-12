@@ -54,7 +54,6 @@ windows-open = { $count ->
 | shut down | izslēgt | beidzēt | Windows; clear in context |
 | Night light | Nakts gaisma | Nakts režīms | Windows and GNOME |
 | emoji | emocijzīme | emodži | Windows and the term commission; declines naturally |
-| passkey | piekļuves atslēga | passkey | Apple and Google |
 | Keyring | atslēgu saišķis | atslēgu gredzens | GNOME |
 | firmware | aparātprogrammatūra | programmaparatūra | Windows' word |
 | touchpad | skārienpaliktnis | skārienpanelis | Windows' word; skārienpanelis is a touchscreen |

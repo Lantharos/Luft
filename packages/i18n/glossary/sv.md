@@ -60,7 +60,6 @@ notifications-count = { $count ->
 | hibernate | Dvala | Viloläge | Keeps it apart from sleep; KDE and Ubuntu |
 | Power saver | Energisparläge | Batterisparläge | Matches Energiläge |
 | Dictation | Diktering | Röstskrivning | macOS' word |
-| passkey | lösennyckel | passkey, nyckel | Apple's word; nyckel alone is too vague next to the recovery key |
 | Keyring | Nyckelring | Nyckelhanterare | GNOME's word |
 | privacy | Integritet | Sekretess | macOS and GNOME; sekretess sounds like confidentiality |
 | accessibility | Hjälpmedel | Tillgänglighet | Windows and GNOME |

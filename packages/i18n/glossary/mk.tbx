@@ -833,19 +833,6 @@
           </tig>
         </langSet>
       </termEntry>
-      <termEntry id="63">
-        <langSet xml:lang="en">
-          <tig>
-            <term>passkey</term>
-          </tig>
-        </langSet>
-        <langSet xml:lang="mk">
-          <tig>
-            <term>клуч за пристап</term>
-            <note from="translator">Sign-in key that replaces a password on websites; m, plural клучеви за пристап</note>
-          </tig>
-        </langSet>
-      </termEntry>
       <termEntry id="64">
         <langSet xml:lang="en">
           <tig>

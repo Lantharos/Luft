@@ -76,8 +76,6 @@ home-security-secure-boot = Secure Boot lieka įjungtas
 home-security-secure-boot-text = Kiekvienas paleidimo žingsnis pasirašytas – nuo USB atmintuko iki darbalaukio, todėl programinėje aparatinėje įrangoje nieko nereikia išjungti.
 home-security-encryption = Šifravimas be rašymo
 home-security-encryption-text = Įjunkite šifravimą vienu spustelėjimu. Su TPM diskas atsirakina pats ir tik jam priklausančiai sistemai.
-home-security-passkeys = Prieigos raktai visur
-home-security-passkeys-text = Prieigos raktai saugomi jūsų kompiuteryje ir veikia kiekvienoje naršyklėje, patvirtinami piršto atspaudu arba slaptažodžiu.
 home-security-keyring = Viena raktinė
 home-security-keyring-text = Slaptažodžiai, prisijungimai, SSH raktai ir GnuPG laikomi vienoje vietoje ir atrakinami jums prisijungus.
 

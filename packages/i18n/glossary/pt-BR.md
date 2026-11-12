@@ -59,7 +59,6 @@ notifications-count = { $count ->
 | Do Not Disturb | Não perturbe | Não incomodar | macOS, Android and GNOME |
 | suspend, sleep | suspender | dormir, repouso | GNOME and Windows' power menu |
 | Keep awake | Manter ativo | Manter acordado | Plain, no metaphor |
-| passkey | chave de acesso | passkey | Apple, Google and Microsoft in Brazil |
 | Keyring | Chaveiro | | GNOME and older macOS |
 | encryption | criptografia | encriptação | Windows and common use |
 | USB stick | pen drive | unidade flash USB | What Brazilians say |

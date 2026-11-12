@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Opbevar den i sikkerhedschippen
 settings-passwords-ssh-chip-description = Den kan aldrig kopieres fra denne computer, heller ikke af dig
 settings-passwords-ssh-chip-unsupported = Denne computers sikkerhedschip kan ikke rumme SSH-nøgler
 settings-passwords-ssh-add = Tilføj nøgle
-
-## Passkeys
-
-settings-passkeys-title = Adgangsnøgler
-settings-passkeys-unavailable = Lås din nøglering op for at se dine adgangsnøgler.
-settings-passkeys-chip-fingerprint = Forseglet af denne computers sikkerhedschip. Hvert login beder om dit fingeraftryk eller din adgangskode.
-settings-passkeys-chip-password = Forseglet af denne computers sikkerhedschip. Hvert login beder om din adgangskode.
-settings-passkeys-password-fingerprint = Krypteret med din adgangskode. Hvert login beder om dit fingeraftryk eller din adgangskode.
-settings-passkeys-password = Krypteret med din adgangskode. Hvert login beder om din adgangskode.
-settings-passkeys-last-used = Sidst brugt { $when }
-settings-passkeys-never-used = Aldrig brugt
-settings-passkeys-password-only = Beskyttet af din adgangskode
-settings-passkeys-unreachable = Browsere kan ikke få fat i dine adgangsnøgler
-settings-passkeys-unreachable-description = De er tilbage, når tjenesten for adgangsnøgler kører
-settings-passkeys-rename-label = Omdøb adgangsnøgle til { $site }
-settings-passkeys-remove-label = Fjern adgangsnøgle til { $site }
-settings-passkeys-empty = Ingen adgangsnøgler endnu
-settings-passkeys-empty-description = Dem, websteder opretter, gemmes her til alle browsere
-settings-passkeys-remove-title = Vil du fjerne denne adgangsnøgle?
-settings-passkeys-remove-description = Du kan ikke længere logge ind på { $site } med den, så sørg for, at du har en anden måde at komme ind på.
-settings-passkeys-rename-title = Omdøb adgangsnøgle
-settings-passkeys-rename-description = Giv din adgangsnøgle til { $site } et navn, du kan genkende.
-settings-passkeys-name = Navn
-settings-passkeys-save = Gem
-

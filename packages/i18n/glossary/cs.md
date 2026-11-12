@@ -57,7 +57,6 @@ windows-open = { $count ->
 | Night light | Noční světlo | Noční osvětlení | Shorter; GNOME's word |
 | Quick settings | Rychlé nastavení | Rychlá nastavení | Windows 11 |
 | Keep awake | Nevypínat obrazovku | Zůstat vzhůru | Says what it does, without a figure of speech |
-| passkey | přístupový klíč | passkey | Apple, Google and Windows |
 | Keyring | klíčenka | svazek klíčů | GNOME and macOS |
 | recovery key | obnovovací klíč | klíč pro obnovení | BitLocker's word |
 | sandbox | izolované prostředí | sandbox | Understandable without the English word |

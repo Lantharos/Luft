@@ -18,7 +18,6 @@ const PARTS: Record<string, string> = {
   'luft-firewall': 'crash-reports-name-firewall',
   'luft-handwriting': 'crash-reports-name-handwriting',
   'luft-keyring': 'crash-reports-name-keyring',
-  'luft-passkeys': 'crash-reports-name-passkeys',
   'luft-printers': 'crash-reports-name-printers',
   'luft-remote-login': 'crash-reports-name-remote-login',
   'luft-speech': 'crash-reports-name-dictation',

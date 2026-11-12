@@ -185,9 +185,6 @@ desktop-keyring-denied = Solo la aplicación Configuración instalada puede camb
 desktop-keyring-unsupported = El llavero aún no puede hacer esto
 desktop-keyring-reseal-failed = El chip de seguridad no ha podido proteger el llavero en este momento
 
-## Passkeys
-desktop-passkeys-missing = Esa llave de acceso no existe
-
 ## Device security
 desktop-security-recovery-file-name = Clave de recuperación.txt
 desktop-security-usb-unavailable = La protección USB no está disponible en este ordenador

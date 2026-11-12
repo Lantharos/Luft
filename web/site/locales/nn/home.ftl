@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot blir verande på
 home-security-secure-boot-text = Kvart steg i oppstarten er signert, frå minnepinnen til skrivebordet, så det er ingenting å slå av i fastvara.
 home-security-encryption = Kryptert, utan tasting
 home-security-encryption-text = Slå på kryptering med eitt klikk. Med ein TPM låser disken seg opp sjølv, og berre for systemet han høyrer til.
-home-security-passkeys = Tilgangsnøklar overalt
-home-security-passkeys-text = Tilgangsnøklar ligg på datamaskinen din og verkar i alle nettlesarar, stadfesta med fingeravtrykk eller passord.
 home-security-keyring = Éin nøkkelring
 home-security-keyring-text = Passord, innloggingar, SSH-nøklar og GnuPG samla på éin stad og låste opp når du loggar inn.
 

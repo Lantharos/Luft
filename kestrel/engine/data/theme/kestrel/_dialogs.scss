@@ -83,15 +83,12 @@
 .kestrel-portal-row-title { font-size: 14px; font-weight: 500; }
 .kestrel-portal-row-subtitle { font-size: 12px; color: ink(0.62); }
 .kestrel-changes-note { padding-top: 4px; }
-.kestrel-changes-scroll StScrollBar { min-width: 6px; padding-left: 8px; }
+.kestrel-dialog-scroll StScrollBar { min-width: 6px; padding-left: 8px; }
 .kestrel-portal-row-check { icon-size: 16px; color: ink(); }
 
 .kestrel-portal-field { spacing: 6px; }
 .kestrel-portal-label { font-size: 13px; font-weight: 500; color: ink(0.82); }
 .kestrel-portal-note { font-size: 13px; color: ink(0.62); }
-
-.kestrel-portal-link { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background-color: transparent; color: ink(0.82); }
-.kestrel-portal-link:hover, .kestrel-portal-link:focus { background-color: fill(0.10); color: ink(); }
 
 .kestrel-portal-row-title:rtl, .kestrel-portal-row-subtitle:rtl, .kestrel-portal-label:rtl, .kestrel-portal-note:rtl { text-align: right; }
 
@@ -131,10 +128,3 @@
 .kestrel-print-pick-arrow { icon-size: 14px; color: ink(0.62); }
 .kestrel-print-ranges { padding: 9px 14px; font-size: 13px; }
 .kestrel-print-field-label:rtl { text-align: right; }
-.kestrel-passkey-dialog .kestrel-portal-content { spacing: 12px; }
-.kestrel-passkey-fingerprint { spacing: 12px; padding: 10px 6px 10px 14px; border-radius: 14px; background-color: fill(0.07); }
-.kestrel-passkey-fingerprint-icon { icon-size: 28px; color: ink(); }
-.kestrel-passkey-fingerprint-label { font-size: 14px; font-weight: 500; color: ink(); }
-.kestrel-passkey-password { width: auto; margin: 0; }
-.kestrel-passkey-status { padding: 0 4px; font-size: 13px; color: ink(0.72); }
-.kestrel-passkey-fingerprint-label:rtl, .kestrel-passkey-status:rtl { text-align: right; }

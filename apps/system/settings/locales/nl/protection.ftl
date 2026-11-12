@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Bewaren in de beveiligingschip
 settings-passwords-ssh-chip-description = De sleutel kan nooit van deze computer worden gekopieerd, zelfs niet door jou
 settings-passwords-ssh-chip-unsupported = De beveiligingschip van deze computer kan geen SSH-sleutels bewaren
 settings-passwords-ssh-add = Sleutel toevoegen
-
-## Passkeys
-
-settings-passkeys-title = Toegangssleutels
-settings-passkeys-unavailable = Ontgrendel je sleutelbos om je toegangssleutels te zien.
-settings-passkeys-chip-fingerprint = Verzegeld door de beveiligingschip van deze computer. Bij elke aanmelding wordt om je vingerafdruk of wachtwoord gevraagd.
-settings-passkeys-chip-password = Verzegeld door de beveiligingschip van deze computer. Bij elke aanmelding wordt om je wachtwoord gevraagd.
-settings-passkeys-password-fingerprint = Versleuteld met je wachtwoord. Bij elke aanmelding wordt om je vingerafdruk of wachtwoord gevraagd.
-settings-passkeys-password = Versleuteld met je wachtwoord. Bij elke aanmelding wordt om je wachtwoord gevraagd.
-settings-passkeys-last-used = Laatst gebruikt: { $when }
-settings-passkeys-never-used = Nooit gebruikt
-settings-passkeys-password-only = Beveiligd met je wachtwoord
-settings-passkeys-unreachable = Browsers kunnen je toegangssleutels niet bereiken
-settings-passkeys-unreachable-description = Ze zijn terug zodra de toegangssleuteldienst draait
-settings-passkeys-rename-label = Toegangssleutel voor { $site } hernoemen
-settings-passkeys-remove-label = Toegangssleutel voor { $site } verwijderen
-settings-passkeys-empty = Nog geen toegangssleutels
-settings-passkeys-empty-description = Toegangssleutels die websites maken, worden hier bewaard voor elke browser
-settings-passkeys-remove-title = Deze toegangssleutel verwijderen?
-settings-passkeys-remove-description = Je kunt je er niet meer mee aanmelden bij { $site }, dus zorg dat je een andere manier hebt om binnen te komen.
-settings-passkeys-rename-title = Toegangssleutel hernoemen
-settings-passkeys-rename-description = Geef je toegangssleutel voor { $site } een naam die je herkent.
-settings-passkeys-name = Naam
-settings-passkeys-save = Opslaan
-

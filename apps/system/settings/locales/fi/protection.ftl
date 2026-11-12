@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Säilytä suojaussirussa
 settings-passwords-ssh-chip-description = Sitä ei voi koskaan kopioida pois tästä tietokoneesta, et edes sinä itse
 settings-passwords-ssh-chip-unsupported = Tämän tietokoneen suojaussiru ei voi säilyttää SSH-avaimia
 settings-passwords-ssh-add = Lisää avain
-
-## Passkeys
-
-settings-passkeys-title = Pääsyavaimet
-settings-passkeys-unavailable = Avaa avainnipun lukitus nähdäksesi pääsyavaimesi.
-settings-passkeys-chip-fingerprint = Sinetöity tämän tietokoneen suojaussirulla. Jokainen kirjautuminen kysyy sormenjälkeäsi tai salasanaasi.
-settings-passkeys-chip-password = Sinetöity tämän tietokoneen suojaussirulla. Jokainen kirjautuminen kysyy salasanaasi.
-settings-passkeys-password-fingerprint = Salattu salasanallasi. Jokainen kirjautuminen kysyy sormenjälkeäsi tai salasanaasi.
-settings-passkeys-password = Salattu salasanallasi. Jokainen kirjautuminen kysyy salasanaasi.
-settings-passkeys-last-used = Viimeksi käytetty { $when }
-settings-passkeys-never-used = Ei koskaan käytetty
-settings-passkeys-password-only = Suojattu salasanallasi
-settings-passkeys-unreachable = Selaimet eivät tavoita pääsyavaimiasi
-settings-passkeys-unreachable-description = Ne palaavat, kun pääsyavainpalvelu on käynnissä
-settings-passkeys-rename-label = Nimeä uudelleen sivuston { $site } pääsyavain
-settings-passkeys-remove-label = Poista sivuston { $site } pääsyavain
-settings-passkeys-empty = Ei vielä pääsyavaimia
-settings-passkeys-empty-description = Sivustojen luomat pääsyavaimet tallennetaan tänne kaikkien selainten käyttöön
-settings-passkeys-remove-title = Poistetaanko tämä pääsyavain?
-settings-passkeys-remove-description = Et voi enää kirjautua sillä sivustolle { $site }, joten varmista, että pääset sisään muullakin tavalla.
-settings-passkeys-rename-title = Nimeä pääsyavain uudelleen
-settings-passkeys-rename-description = Anna sivuston { $site } pääsyavaimelle nimi, jonka tunnistat.
-settings-passkeys-name = Nimi
-settings-passkeys-save = Tallenna
-

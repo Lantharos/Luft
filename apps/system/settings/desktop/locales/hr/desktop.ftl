@@ -192,9 +192,6 @@ desktop-keyring-denied = Ovo može promijeniti samo instalirana aplikacija Posta
 desktop-keyring-unsupported = Vaš skup ključeva to još ne podržava
 desktop-keyring-reseal-failed = Sigurnosni čip trenutačno ne može zaštititi vaš skup ključeva
 
-## Passkeys
-desktop-passkeys-missing = Taj pristupni ključ ne postoji
-
 ## Device security
 desktop-security-recovery-file-name = Ključ za oporavak.txt
 desktop-security-usb-unavailable = Zaštita USB-a nije dostupna na ovom računalu

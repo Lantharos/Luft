@@ -185,9 +185,6 @@ desktop-keyring-denied = Tai pakeisti gali tik įdiegta programa Nustatymai
 desktop-keyring-unsupported = Raktinė to dar negali
 desktop-keyring-reseal-failed = Saugos lustui šiuo metu nepavyko apsaugoti raktinės
 
-## Passkeys
-desktop-passkeys-missing = Tokio prieigos rakto nėra
-
 ## Device security
 desktop-security-recovery-file-name = Atkūrimo raktas.txt
 desktop-security-usb-unavailable = USB apsauga šiame kompiuteryje nepasiekiama

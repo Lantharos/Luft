@@ -72,8 +72,6 @@ home-security-secure-boot = Secure Boot es queda activat
 home-security-secure-boot-text = Cada pas de l’arrencada està signat, de la memòria USB a l’escriptori, així que no cal desactivar res al microprogramari.
 home-security-encryption = Xifrat, sense escriure res
 home-security-encryption-text = Activeu el xifratge amb un clic. Amb un TPM, el disc es desbloqueja sol, i només per al sistema al qual pertany.
-home-security-passkeys = Claus d’accés arreu
-home-security-passkeys-text = Les claus d’accés viuen a l’ordinador i funcionen a qualsevol navegador, confirmades amb l’empremta o la contrasenya.
 home-security-keyring = Un sol clauer
 home-security-keyring-text = Contrasenyes, inicis de sessió, claus SSH i GnuPG es guarden en un sol lloc i es desbloquegen quan inicieu la sessió.
 

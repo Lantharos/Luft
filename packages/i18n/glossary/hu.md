@@ -54,7 +54,6 @@ notifications-count = { $count ->
 | Power mode, power | Energiamód, Tápellátás | Energiagazdálkodási mód, Energia | Fits the tile; Windows' settings page |
 | suspend, sleep | alvó állapot | felfüggesztés | Windows' word |
 | emoji | emodzsi | emoji | Windows and Hungarian spelling |
-| passkey | jelkulcs | azonosítókulcs | Windows and Apple |
 | Keyring | kulcstartó | Kulcskarika | GNOME's word; lowercase in running text |
 | sandbox | homokozó | sandbox | Established Hungarian IT word |
 | trash | Lomtár | Kuka | Windows' word |

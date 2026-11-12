@@ -56,7 +56,6 @@ windows-open = { $count ->
 | suspend, sleep | заспиване | спящ режим, суспендиране | Matches the other power menu nouns |
 | Do Not Disturb | Не безпокойте | Не ме безпокойте | Windows and Android |
 | notification | известие | уведомление | Android, GNOME and today's Windows |
-| passkey | ключ за достъп | passkey | What Google and Windows say |
 | Keyring | ключодържател | | GNOME's word |
 | clipboard | клипборд | буфер | Windows' word, known to everyone |
 | account | акаунт | профил, сметка | Windows, Google and Apple |

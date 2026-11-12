@@ -19,8 +19,6 @@ const SCOPES: [string, Scope][] = [
 	['kestrel/greeter/data/*', 'system'],
 	['kestrel/keyring/data/system/*', 'system'],
 	['kestrel/keyring/data/user/*', 'user'],
-	['kestrel/passkeys/data/luft-passkeys-relay@.service', 'system'],
-	['kestrel/passkeys/data/luft-passkeys.service', 'user'],
 	['kestrel/watchdog/data/*', 'system'],
 	['os/image/files/usr/lib/dracut/**', 'system'],
 	['os/image/files/usr/lib/systemd/system/*', 'system'],

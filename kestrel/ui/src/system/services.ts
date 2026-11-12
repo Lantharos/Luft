@@ -5,7 +5,6 @@ import type { Context } from '../context.js';
 import { AppearanceService } from '../appearance/service.js';
 import { FontRefresh } from '../appearance/fonts.js';
 import { SystemPrompts } from '../auth/keyring/prompts.js';
-import { PasskeyPrompts } from '../auth/passkeys/service.js';
 import { LoginWallpaper } from '../desktop/wallpaper/loginWallpaper.js';
 import { LaunchFeedback } from '../desktop/windows/launchFeedback.js';
 import { ActivationTokens } from '../desktop/windows/activationTokens.js';
@@ -67,7 +66,6 @@ export class SystemServices {
   private readonly farewell = new Farewell();
   private readonly fontRefresh = new FontRefresh();
   private readonly portal: PortalBackend;
-  private readonly passkeys: PasskeyPrompts;
   readonly appearance: AppearanceService;
   private readonly keyring: SystemPrompts;
   private readonly mediaKeys: MediaKeys;
@@ -79,7 +77,6 @@ export class SystemServices {
     this.titleBars = new TitleBars((window, x, y) =>
       context.showWindowMenu(window, new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: 0, height: 0 })));
     this.portal = PortalBackend.forSession(context);
-    this.passkeys = new PasskeyPrompts();
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.keyring = new SystemPrompts();
     this.mediaKeys = new MediaKeys(context, openStart);
@@ -125,6 +122,5 @@ export class SystemServices {
     this.outerEdges.destroy();
     this.titleBars.destroy();
     this.portal.destroy();
-    this.passkeys.destroy();
   }
 }

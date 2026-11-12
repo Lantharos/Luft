@@ -56,7 +56,6 @@ windows-open = { $count ->
 | snap, snap layout | poravnati, raspored prozora | prikaz na dijelu ekrana | Shorter; zakačiti is pin |
 | workspace | radni prostor | radni sto | Radna površina is the desktop |
 | suspend, sleep | stanje mirovanja; the button is Mirovanje | suspenduj | Plain language |
-| passkey | pristupni ključ | passkey | Windows' word |
 | Keyring | privjesak ključeva | prsten ključeva | Natural Bosnian |
 | clipboard | međuspremnik | klipbord | Windows' word |
 | encryption | šifriranje | enkripcija | Windows' word |

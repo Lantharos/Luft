@@ -74,8 +74,6 @@ home-security-secure-boot = Secure Boot mbetet aktiv
 home-security-secure-boot-text = Çdo hap i nisjes është i nënshkruar, nga memoria USB te desktopi, ndaj s’ke asgjë për të çaktivizuar në firmware.
 home-security-encryption = Enkriptim, pa shtypur asgjë
 home-security-encryption-text = Aktivizo enkriptimin me një klik. Me një TPM, disku zhbllokohet vetë dhe vetëm për sistemin të cilit i përket.
-home-security-passkeys = Çelësa kalimi kudo
-home-security-passkeys-text = Çelësat e kalimit rrinë në kompjuterin tënd dhe funksionojnë në çdo shfletues, të konfirmuar me gjurmën e gishtit ose fjalëkalimin.
 home-security-keyring = Një varg çelësash
 home-security-keyring-text = Fjalëkalimet, hyrjet, çelësat SSH dhe GnuPG ruhen në një vend dhe zhbllokohen kur hyn.
 

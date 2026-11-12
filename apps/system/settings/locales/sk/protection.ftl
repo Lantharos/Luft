@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Uložiť v bezpečnostnom čipe
 settings-passwords-ssh-chip-description = Nikdy sa nedá skopírovať z tohto počítača, ani vami
 settings-passwords-ssh-chip-unsupported = Bezpečnostný čip tohto počítača nedokáže uchovávať kľúče SSH
 settings-passwords-ssh-add = Pridať kľúč
-
-## Passkeys
-
-settings-passkeys-title = Prístupové kľúče
-settings-passkeys-unavailable = Ak chcete vidieť prístupové kľúče, odomknite zväzok kľúčov.
-settings-passkeys-chip-fingerprint = Zapečatené bezpečnostným čipom tohto počítača. Pri každom prihlásení sa vyžaduje odtlačok prsta alebo heslo.
-settings-passkeys-chip-password = Zapečatené bezpečnostným čipom tohto počítača. Pri každom prihlásení sa vyžaduje heslo.
-settings-passkeys-password-fingerprint = Zašifrované vaším heslom. Pri každom prihlásení sa vyžaduje odtlačok prsta alebo heslo.
-settings-passkeys-password = Zašifrované vaším heslom. Pri každom prihlásení sa vyžaduje heslo.
-settings-passkeys-last-used = Naposledy použitý { $when }
-settings-passkeys-never-used = Nikdy nepoužitý
-settings-passkeys-password-only = Chránené vaším heslom
-settings-passkeys-unreachable = Prehliadače nemajú prístup k vašim prístupovým kľúčom
-settings-passkeys-unreachable-description = Vrátia sa, keď sa spustí služba prístupových kľúčov
-settings-passkeys-rename-label = Premenovať prístupový kľúč pre { $site }
-settings-passkeys-remove-label = Odstrániť prístupový kľúč pre { $site }
-settings-passkeys-empty = Zatiaľ žiadne prístupové kľúče
-settings-passkeys-empty-description = Kľúče, ktoré vytvoria weby, sa tu uložia pre všetky prehliadače
-settings-passkeys-remove-title = Odstrániť tento prístupový kľúč?
-settings-passkeys-remove-description = Už sa ním nebudete môcť prihlásiť do { $site }, preto sa uistite, že máte iný spôsob prihlásenia.
-settings-passkeys-rename-title = Premenovať prístupový kľúč
-settings-passkeys-rename-description = Pomenujte prístupový kľúč pre { $site } tak, aby ste ho spoznali.
-settings-passkeys-name = Názov
-settings-passkeys-save = Uložiť
-

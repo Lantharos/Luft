@@ -374,28 +374,3 @@ settings-passwords-ssh-chip = Uložit v bezpečnostním čipu
 settings-passwords-ssh-chip-description = Nikdy ho nepůjde z tohoto počítače zkopírovat, ani vámi
 settings-passwords-ssh-chip-unsupported = Bezpečnostní čip tohoto počítače neumí uchovávat klíče SSH
 settings-passwords-ssh-add = Přidat klíč
-
-## Passkeys
-
-settings-passkeys-title = Přístupové klíče
-settings-passkeys-unavailable = Chcete-li zobrazit přístupové klíče, odemkněte klíčenku.
-settings-passkeys-chip-fingerprint = Zapečetěno bezpečnostním čipem tohoto počítače. Každé přihlášení vyžaduje otisk prstu nebo heslo.
-settings-passkeys-chip-password = Zapečetěno bezpečnostním čipem tohoto počítače. Každé přihlášení vyžaduje heslo.
-settings-passkeys-password-fingerprint = Zašifrováno vaším heslem. Každé přihlášení vyžaduje otisk prstu nebo heslo.
-settings-passkeys-password = Zašifrováno vaším heslem. Každé přihlášení vyžaduje heslo.
-settings-passkeys-last-used = Naposledy použito { $when }
-settings-passkeys-never-used = Nikdy nepoužito
-settings-passkeys-password-only = Chráněno vaším heslem
-settings-passkeys-unreachable = Prohlížeče se k přístupovým klíčům nedostanou
-settings-passkeys-unreachable-description = Budou zase dostupné, jakmile poběží služba přístupových klíčů
-settings-passkeys-rename-label = Přejmenovat přístupový klíč pro { $site }
-settings-passkeys-remove-label = Odebrat přístupový klíč pro { $site }
-settings-passkeys-empty = Zatím žádné přístupové klíče
-settings-passkeys-empty-description = Klíče, které vytvoří weby, se ukládají sem pro všechny prohlížeče
-settings-passkeys-remove-title = Odebrat tento přístupový klíč?
-settings-passkeys-remove-description = Na web { $site } se s ním už nepřihlásíte, proto se ujistěte, že se tam dostanete jinak.
-settings-passkeys-rename-title = Přejmenovat přístupový klíč
-settings-passkeys-rename-description = Pojmenujte přístupový klíč pro { $site } tak, abyste ho poznali.
-settings-passkeys-name = Název
-settings-passkeys-save = Uložit
-

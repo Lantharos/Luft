@@ -185,9 +185,6 @@ desktop-keyring-denied = Vain asennettu Asetukset-sovellus voi muuttaa tätä
 desktop-keyring-unsupported = Avainnippu ei osaa tehdä tätä vielä
 desktop-keyring-reseal-failed = Suojaussiru ei voinut suojata avainnippua juuri nyt
 
-## Passkeys
-desktop-passkeys-missing = Tätä pääsyavainta ei ole olemassa
-
 ## Device security
 desktop-security-recovery-file-name = Palautusavain.txt
 desktop-security-usb-unavailable = USB-suojaus ei ole käytettävissä tässä tietokoneessa

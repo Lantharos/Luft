@@ -75,8 +75,6 @@ home-security-secure-boot = Fanann Secure Boot air
 home-security-secure-boot-text = Tá gach céim den tosú sínithe, ón gcipín USB go dtí an deasc, mar sin níl aon rud le casadh as sna dochtearraí.
 home-security-encryption = Criptithe, gan chlóscríobh
 home-security-encryption-text = Cas criptiú air le cliceáil amháin. Le TPM, díghlasálann an diosca é féin, agus don chóras lena mbaineann sé amháin.
-home-security-passkeys = Eochracha rochtana i ngach áit
-home-security-passkeys-text = Bíonn eochracha rochtana ar do ríomhaire agus oibríonn siad i ngach brabhsálaí, deimhnithe le do mhéarlorg nó le do phasfhocal.
 home-security-keyring = Fáinne eochrach amháin
 home-security-keyring-text = Coinnítear pasfhocail, sínithe isteach, eochracha SSH agus GnuPG in aon áit amháin, agus díghlasáiltear iad nuair a shíníonn tú isteach.
 

@@ -75,8 +75,6 @@ home-security-secure-boot = Secure Boot paliek ieslēgts
 home-security-secure-boot-text = Katrs startēšanas solis ir parakstīts, no USB zibatmiņas līdz darbvirsmai, tāpēc aparātprogrammatūrā nekas nav jāizslēdz.
 home-security-encryption = Šifrēšana bez rakstīšanas
 home-security-encryption-text = Ieslēdziet šifrēšanu ar vienu klikšķi. Ar TPM disks atbloķējas pats un tikai tai sistēmai, kurai tas pieder.
-home-security-passkeys = Piekļuves atslēgas visur
-home-security-passkeys-text = Piekļuves atslēgas glabājas jūsu datorā un darbojas katrā pārlūkā, apstiprinātas ar pirksta nospiedumu vai paroli.
 home-security-keyring = Viens atslēgu saišķis
 home-security-keyring-text = Paroles, pieteikšanās dati, SSH atslēgas un GnuPG glabājas vienuviet un tiek atbloķēti, kad pierakstāties.
 

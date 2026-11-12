@@ -185,9 +185,6 @@ desktop-keyring-denied = Μόνο η εγκατεστημένη εφαρμογή
 desktop-keyring-unsupported = Η κλειδοθήκη σας δεν μπορεί να το κάνει αυτό ακόμη
 desktop-keyring-reseal-failed = Το τσιπ ασφαλείας δεν μπόρεσε να προστατεύσει την κλειδοθήκη σας αυτήν τη στιγμή
 
-## Passkeys
-desktop-passkeys-missing = Αυτό το κλειδί πρόσβασης δεν υπάρχει
-
 ## Device security
 desktop-security-recovery-file-name = Κλειδί αποκατάστασης.txt
 desktop-security-usb-unavailable = Η προστασία USB δεν είναι διαθέσιμη σε αυτόν τον υπολογιστή

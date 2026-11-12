@@ -185,9 +185,6 @@ desktop-keyring-denied = Ezt csak a telepített Beállítások alkalmazás módo
 desktop-keyring-unsupported = A kulcstartó ezt még nem támogatja
 desktop-keyring-reseal-failed = A biztonsági chip most nem tudta védelem alá helyezni a kulcstartót
 
-## Passkeys
-desktop-passkeys-missing = Ez a jelkulcs nem létezik
-
 ## Device security
 desktop-security-recovery-file-name = Helyreállítási kulcs.txt
 desktop-security-usb-unavailable = Az USB-védelem nem érhető el ezen a számítógépen

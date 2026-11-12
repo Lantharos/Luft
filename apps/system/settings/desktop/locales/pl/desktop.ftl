@@ -185,9 +185,6 @@ desktop-keyring-denied = Tylko zainstalowana aplikacja Ustawienia może to zmien
 desktop-keyring-unsupported = Pęk kluczy jeszcze tego nie obsługuje
 desktop-keyring-reseal-failed = Procesor zabezpieczeń nie mógł teraz ochronić pęku kluczy
 
-## Passkeys
-desktop-passkeys-missing = Ten klucz dostępu nie istnieje
-
 ## Device security
 desktop-security-recovery-file-name = Klucz odzyskiwania.txt
 desktop-security-usb-unavailable = Ochrona USB jest niedostępna na tym komputerze

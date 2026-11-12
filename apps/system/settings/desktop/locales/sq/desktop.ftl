@@ -192,9 +192,6 @@ desktop-keyring-denied = Vetëm aplikacioni i instaluar Cilësimet mund ta ndrys
 desktop-keyring-unsupported = Vargu yt i çelësave nuk mund ta bëjë ende këtë
 desktop-keyring-reseal-failed = Çipi i sigurisë nuk mundi ta mbrojë vargun e çelësave tani
 
-## Passkeys
-desktop-passkeys-missing = Ky çelës kalimi nuk ekziston
-
 ## Device security
 desktop-security-recovery-file-name = Çelësi i rikuperimit.txt
 desktop-security-usb-unavailable = Mbrojtja USB nuk ofrohet në këtë kompjuter

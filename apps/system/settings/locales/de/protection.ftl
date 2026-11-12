@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Im Sicherheitschip aufbewahren
 settings-passwords-ssh-chip-description = Er kann nie von diesem Computer kopiert werden, nicht einmal von dir
 settings-passwords-ssh-chip-unsupported = Der Sicherheitschip dieses Computers kann keine SSH-Schlüssel aufnehmen
 settings-passwords-ssh-add = Schlüssel hinzufügen
-
-## Passkeys
-
-settings-passkeys-title = Passkeys
-settings-passkeys-unavailable = Entsperr deinen Schlüsselbund, um deine Passkeys zu sehen.
-settings-passkeys-chip-fingerprint = Vom Sicherheitschip dieses Computers versiegelt. Jede Anmeldung fragt nach deinem Fingerabdruck oder Passwort.
-settings-passkeys-chip-password = Vom Sicherheitschip dieses Computers versiegelt. Jede Anmeldung fragt nach deinem Passwort.
-settings-passkeys-password-fingerprint = Mit deinem Passwort verschlüsselt. Jede Anmeldung fragt nach deinem Fingerabdruck oder Passwort.
-settings-passkeys-password = Mit deinem Passwort verschlüsselt. Jede Anmeldung fragt nach deinem Passwort.
-settings-passkeys-last-used = Zuletzt verwendet { $when }
-settings-passkeys-never-used = Nie verwendet
-settings-passkeys-password-only = Geschützt durch dein Passwort
-settings-passkeys-unreachable = Browser können deine Passkeys nicht erreichen
-settings-passkeys-unreachable-description = Sie sind wieder da, sobald der Passkey-Dienst läuft
-settings-passkeys-rename-label = Passkey für { $site } umbenennen
-settings-passkeys-remove-label = Passkey für { $site } entfernen
-settings-passkeys-empty = Noch keine Passkeys
-settings-passkeys-empty-description = Passkeys, die Websites erstellen, werden hier für alle Browser gespeichert
-settings-passkeys-remove-title = Diesen Passkey entfernen?
-settings-passkeys-remove-description = Du kannst dich damit nicht mehr bei { $site } anmelden, also sorg dafür, dass du einen anderen Zugang hast.
-settings-passkeys-rename-title = Passkey umbenennen
-settings-passkeys-rename-description = Gib deinem Passkey für { $site } einen Namen, den du wiedererkennst.
-settings-passkeys-name = Name
-settings-passkeys-save = Speichern
-

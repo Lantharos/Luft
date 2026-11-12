@@ -57,7 +57,6 @@ windows-open = { $count ->
 | suspend, sleep | Slumre, slumretilstand | Pause, Hvile | Windows' word |
 | shut down | Sluk | Luk computeren | Shorter; GNOME and KDE |
 | Power saver | Strømbesparelse | Bedste energieffektivitet | Short, and matches Strømtilstand |
-| passkey | adgangsnøgle | passkey | Apple and Google |
 | recovery key | genoprettelsesnøgle | gendannelsesnøgle | BitLocker's word, which people meet first |
 | Keyring | Nøglering | Nøglebundt | GNOME and macOS |
 | security chip | sikkerhedschip | TPM-chip | Luft avoids the abbreviation |

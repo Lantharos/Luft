@@ -67,7 +67,7 @@ let token: Option<Vec<u8>> = secrets::load(APP_ID, "account-token").await?;
 secrets::delete(APP_ID, "account-token").await?;
 ```
 
-A new kind of data for the keyring gets its own place in the vault's `Contents`, and its own module and interface in the daemon next to `ssh` and `manage`, the way Luft Passkeys does.
+A new kind of data for the keyring gets its own place in the vault's `Contents`, and its own module and interface in the daemon next to `ssh` and `manage`.
 
 ## Changing a password
 

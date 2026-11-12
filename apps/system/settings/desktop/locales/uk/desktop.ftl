@@ -185,9 +185,6 @@ desktop-keyring-denied = Змінити це можуть лише встано�
 desktop-keyring-unsupported = В’язка ключів поки цього не підтримує
 desktop-keyring-reseal-failed = Процесор безпеки зараз не зміг захистити в’язку ключів
 
-## Passkeys
-desktop-passkeys-missing = Такого ключа доступу не існує
-
 ## Device security
 desktop-security-recovery-file-name = Ключ відновлення.txt
 desktop-security-usb-unavailable = Захист USB недоступний на цьому комп’ютері

@@ -185,9 +185,6 @@ desktop-keyring-denied = Само инсталираната апликациј�
 desktop-keyring-unsupported = Привезокот за клучеви сè уште не го поддржува ова
 desktop-keyring-reseal-failed = Безбедносниот чип моментално не можеше да го заштити привезокот за клучеви
 
-## Passkeys
-desktop-passkeys-missing = Тој клуч за пристап не постои
-
 ## Device security
 desktop-security-recovery-file-name = Клуч за обновување.txt
 desktop-security-usb-unavailable = USB-заштитата не е достапна на овој компјутер

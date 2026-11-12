@@ -57,7 +57,6 @@ notifications-count = { $count ->
 | shut down | Afsluiten | Uitschakelen | Windows; uitschakelen is for features |
 | Power saver | Energiebesparing | Energiebesparingsmodus | Windows' word, short |
 | Night light | Nachtlampje | Nachtlicht | Windows' word |
-| passkey | toegangssleutel | passkey | Apple, Google and Windows |
 | Keyring | sleutelbos | sleutelhanger | GNOME's word; sleutelhanger is Apple's Keychain |
 | security chip | beveiligingschip | TPM-chip | Luft avoids the abbreviation |
 | keyboard shortcut | sneltoets | toetscombinatie | Windows, GNOME and KDE |

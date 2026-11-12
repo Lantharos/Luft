@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Guardarla en el chip de seguridad
 settings-passwords-ssh-chip-description = Nunca se podrá copiar fuera de este ordenador, ni siquiera por ti
 settings-passwords-ssh-chip-unsupported = El chip de seguridad de este ordenador no puede guardar claves SSH
 settings-passwords-ssh-add = Añadir clave
-
-## Passkeys
-
-settings-passkeys-title = Llaves de acceso
-settings-passkeys-unavailable = Desbloquea tu llavero para ver tus llaves de acceso.
-settings-passkeys-chip-fingerprint = Selladas por el chip de seguridad de este ordenador. Cada inicio de sesión pide tu huella o tu contraseña.
-settings-passkeys-chip-password = Selladas por el chip de seguridad de este ordenador. Cada inicio de sesión pide tu contraseña.
-settings-passkeys-password-fingerprint = Cifradas con tu contraseña. Cada inicio de sesión pide tu huella o tu contraseña.
-settings-passkeys-password = Cifradas con tu contraseña. Cada inicio de sesión pide tu contraseña.
-settings-passkeys-last-used = Último uso: { $when }
-settings-passkeys-never-used = Nunca se ha usado
-settings-passkeys-password-only = Protegida con tu contraseña
-settings-passkeys-unreachable = Los navegadores no pueden acceder a tus llaves de acceso
-settings-passkeys-unreachable-description = Volverán a estar disponibles cuando el servicio de llaves de acceso esté en marcha
-settings-passkeys-rename-label = Cambiar el nombre de la llave de acceso de { $site }
-settings-passkeys-remove-label = Quitar la llave de acceso de { $site }
-settings-passkeys-empty = Aún no hay llaves de acceso
-settings-passkeys-empty-description = Las que creen los sitios web se guardan aquí para todos los navegadores
-settings-passkeys-remove-title = ¿Quitar esta llave de acceso?
-settings-passkeys-remove-description = Ya no podrás iniciar sesión en { $site } con ella, así que asegúrate de tener otra forma de entrar.
-settings-passkeys-rename-title = Cambiar el nombre de la llave de acceso
-settings-passkeys-rename-description = Pon a tu llave de acceso de { $site } un nombre que reconozcas.
-settings-passkeys-name = Nombre
-settings-passkeys-save = Guardar
-

@@ -73,8 +73,6 @@ home-security-secure-boot = Secure Boot rămâne activat
 home-security-secure-boot-text = Fiecare pas al pornirii este semnat, de la stickul USB până la desktop, așa că nu trebuie dezactivat nimic în firmware.
 home-security-encryption = Criptare fără tastare
 home-security-encryption-text = Activați criptarea cu un clic. Cu un TPM, discul se deblochează singur și doar pentru sistemul căruia îi aparține.
-home-security-passkeys = Chei de acces peste tot
-home-security-passkeys-text = Cheile de acces stau pe computer și funcționează în orice browser, confirmate cu amprenta sau cu parola.
 home-security-keyring = Un singur portchei
 home-security-keyring-text = Parolele, conectările, cheile SSH și GnuPG sunt păstrate într-un singur loc și se deblochează când vă conectați.
 

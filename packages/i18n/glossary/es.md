@@ -56,7 +56,6 @@ windows-open = { $count ->
 | wallpaper | fondo de pantalla | fondo de escritorio | Windows and macOS |
 | accent color | color de énfasis | color de acento | Windows' word |
 | suspend, sleep | suspender | dormir, reposo | Windows and GNOME |
-| passkey | llave de acceso | clave de acceso | Apple and Google; keeps clave for the recovery key |
 | Keyring | Llavero | Depósito de claves | macOS, and the plain word |
 | encryption | cifrado | encriptación | The standard term; Windows' word |
 | keyboard shortcut | atajo de teclado | método abreviado | Shorter and what people say |

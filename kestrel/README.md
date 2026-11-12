@@ -20,7 +20,6 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | `portal` | `kestrel-portal`, the desktop portal requests that need no compositor: email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown |
 | `greeter` | `kestrel-greeter-service`, which stores the login screen's settings |
 | [`keyring`](keyring/README.md) | Luft Keyring |
-| [`passkeys`](passkeys/README.md) | Luft Passkeys |
 | `openconnect` | `kestrel-openconnect`, OpenConnect VPN sign-in |
 | `watchdog` | `kestrel-watchdog`, restarts cleanly when the GPU hangs |
 | `wrapper` | `kestrel-wrapper`, which holds the Wayland socket and starts Kestrel again after a crash |

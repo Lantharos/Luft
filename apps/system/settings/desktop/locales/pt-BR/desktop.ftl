@@ -185,9 +185,6 @@ desktop-keyring-denied = Só o app Configurações instalado pode alterar isso
 desktop-keyring-unsupported = O Chaveiro ainda não consegue fazer isso
 desktop-keyring-reseal-failed = O chip de segurança não conseguiu proteger o Chaveiro agora
 
-## Passkeys
-desktop-passkeys-missing = Essa chave de acesso não existe
-
 ## Device security
 desktop-security-recovery-file-name = Chave de recuperação.txt
 desktop-security-usb-unavailable = A proteção USB não está disponível neste computador

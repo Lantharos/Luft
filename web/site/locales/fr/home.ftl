@@ -72,8 +72,6 @@ home-security-secure-boot = Secure Boot reste activé
 home-security-secure-boot-text = Chaque étape du démarrage est signée, de la clé USB jusqu’au bureau, il n’y a donc rien à désactiver dans le micrologiciel.
 home-security-encryption = Chiffré, sans rien taper
 home-security-encryption-text = Activez le chiffrement d’un clic. Avec un TPM, le disque se déverrouille tout seul, et seulement pour le système auquel il appartient.
-home-security-passkeys = Des clés d’accès partout
-home-security-passkeys-text = Les clés d’accès sont stockées sur votre ordinateur et fonctionnent dans tous les navigateurs, confirmées par votre empreinte ou votre mot de passe.
 home-security-keyring = Un seul trousseau
 home-security-keyring-text = Mots de passe, connexions, clés SSH et GnuPG sont conservés au même endroit, déverrouillés quand vous vous connectez.
 

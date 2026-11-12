@@ -1,6 +1,6 @@
 [Unit]
 Description=Check that Luft's shielded helpers keep your other programs out
-After=dbus.service systemd-logind.service luft-keyring-unlock.socket luft-passkeys-relay.socket kestrel-authenticate.socket
+After=dbus.service systemd-logind.service luft-keyring-unlock.socket kestrel-authenticate.socket
 
 [Service]
 Type=oneshot

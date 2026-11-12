@@ -365,29 +365,6 @@ settings-passwords-ssh-chip-description = Seda ei saa kunagi sellest arvutist ko
 settings-passwords-ssh-chip-unsupported = Selle arvuti turvakiip ei saa SSH-võtmeid hoida
 settings-passwords-ssh-add = Lisa võti
 
-## Passkeys
-
-settings-passkeys-title = Pääsuvõtmed
-settings-passkeys-unavailable = Pääsuvõtmete nägemiseks ava võtmerõngas.
-settings-passkeys-chip-fingerprint = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib sõrmejälge või salasõna.
-settings-passkeys-chip-password = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib salasõna.
-settings-passkeys-password-fingerprint = Krüptitud sinu salasõnaga. Iga sisselogimine küsib sõrmejälge või salasõna.
-settings-passkeys-password = Krüptitud sinu salasõnaga. Iga sisselogimine küsib salasõna.
-settings-passkeys-last-used = Viimati kasutatud { $when }
-settings-passkeys-never-used = Pole kasutatud
-settings-passkeys-password-only = Kaitstud sinu salasõnaga
-settings-passkeys-unreachable = Brauserid ei pääse sinu pääsuvõtmetele juurde
-settings-passkeys-unreachable-description = Need on tagasi, kui pääsuvõtmete teenus töötab
-settings-passkeys-rename-label = Nimeta ümber saidi { $site } pääsuvõti
-settings-passkeys-remove-label = Eemalda saidi { $site } pääsuvõti
-settings-passkeys-empty = Pääsuvõtmeid pole veel
-settings-passkeys-empty-description = Saitide loodud pääsuvõtmed salvestatakse siia kõigi brauserite jaoks
-settings-passkeys-remove-title = Kas eemaldada see pääsuvõti?
-settings-passkeys-remove-description = Sa ei saa sellega enam saidile { $site } sisse logida, seega veendu, et sul on muu viis sisse pääseda.
-settings-passkeys-rename-title = Pääsuvõtme ümbernimetamine
-settings-passkeys-rename-description = Anna saidi { $site } pääsuvõtmele nimi, mille ära tunned.
-settings-passkeys-name = Nimi
-settings-passkeys-save = Salvesta
 settings-privacy-delete-screenshots = Kustuta ekraanitõmmised automaatselt
 settings-privacy-delete-screenshots-hint = Vana ekraanitõmmised viskame esmalt prügikasti ja vajadusel saad neid taastada
 settings-security-secure-boot-unfinished = Secure Boot pole Lufti jaoks veel seadistatud

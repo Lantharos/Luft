@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Tárolás a biztonsági chipben
 settings-passwords-ssh-chip-description = Senki sem másolhatja le erről a számítógépről, saját maga sem
 settings-passwords-ssh-chip-unsupported = Ennek a számítógépnek a biztonsági chipje nem tud SSH-kulcsokat tárolni
 settings-passwords-ssh-add = Kulcs hozzáadása
-
-## Passkeys
-
-settings-passkeys-title = Jelkulcsok
-settings-passkeys-unavailable = A jelkulcsok megtekintéséhez oldja fel a kulcstartót.
-settings-passkeys-chip-fingerprint = A számítógép biztonsági chipje zárja le őket. Minden bejelentkezéskor ujjlenyomatot vagy jelszót kér.
-settings-passkeys-chip-password = A számítógép biztonsági chipje zárja le őket. Minden bejelentkezéskor jelszót kér.
-settings-passkeys-password-fingerprint = A jelszavával titkosítva. Minden bejelentkezéskor ujjlenyomatot vagy jelszót kér.
-settings-passkeys-password = A jelszavával titkosítva. Minden bejelentkezéskor jelszót kér.
-settings-passkeys-last-used = Utoljára használva: { $when }
-settings-passkeys-never-used = Még nem használt
-settings-passkeys-password-only = A jelszava védi
-settings-passkeys-unreachable = A böngészők nem érik el a jelkulcsokat
-settings-passkeys-unreachable-description = Amint a jelkulcsszolgáltatás fut, újra elérhetők
-settings-passkeys-rename-label = Jelkulcs átnevezése: { $site }
-settings-passkeys-remove-label = Jelkulcs eltávolítása: { $site }
-settings-passkeys-empty = Még nincsenek jelkulcsok
-settings-passkeys-empty-description = A webhelyek által létrehozott jelkulcsok itt tárolódnak, minden böngésző számára
-settings-passkeys-remove-title = Eltávolítja ezt a jelkulcsot?
-settings-passkeys-remove-description = Ezzel többé nem tud bejelentkezni ide: { $site }. Győződjön meg róla, hogy van más módja a belépésre.
-settings-passkeys-rename-title = Jelkulcs átnevezése
-settings-passkeys-rename-description = Adjon felismerhető nevet a jelkulcsnak ehhez: { $site }.
-settings-passkeys-name = Név
-settings-passkeys-save = Mentés
-

@@ -21,7 +21,7 @@ Use the standard orthography of the Kunsill Nazzjonali tal-Ilsien Malti, with ċ
 Maltese software keeps many English words, and Luft follows Windows in Maltese: Settings, taskbar, desktop, app, password, touchpad, firmware.
 
 - Words Maltese has taken in follow Maltese spelling where Windows does: fajl, fowlder, kompjuter, skrin, netwerk, drajv, vidjo.
-- Others keep their English spelling, without italics or quotation marks: taskbar, desktop, screenshot, passkey.
+- Others keep their English spelling, without italics or quotation marks: taskbar, desktop, screenshot.
 - They take the Maltese article with sun-letter assimilation: is-Settings, it-taskbar, l-app.
 - Verbs from English take Maltese forms: issejvja, irristartja, ikkopja.
 - Plurals are as the glossary gives them, usually the English -s (apps, fajls).

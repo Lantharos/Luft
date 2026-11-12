@@ -185,9 +185,6 @@ desktop-keyring-denied = Bara den installerade appen Inställningar kan ändra d
 desktop-keyring-unsupported = Nyckelringen kan inte göra det här än
 desktop-keyring-reseal-failed = Säkerhetschippet kunde inte skydda nyckelringen just nu
 
-## Passkeys
-desktop-passkeys-missing = Lösennyckeln finns inte
-
 ## Device security
 desktop-security-recovery-file-name = Återställningsnyckel.txt
 desktop-security-usb-unavailable = USB-skydd är inte tillgängligt på den här datorn

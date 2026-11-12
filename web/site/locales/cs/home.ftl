@@ -76,8 +76,6 @@ home-security-secure-boot = Secure Boot zůstává zapnutý
 home-security-secure-boot-text = Každý krok spouštění je podepsaný, od flash disku po plochu, takže ve firmwaru není co vypínat.
 home-security-encryption = Šifrování bez psaní
 home-security-encryption-text = Šifrování zapnete jedním kliknutím. S čipem TPM se disk odemkne sám, a jen pro systém, ke kterému patří.
-home-security-passkeys = Přístupové klíče všude
-home-security-passkeys-text = Přístupové klíče jsou uložené v počítači, fungují v každém prohlížeči a potvrzují se otiskem prstu nebo heslem.
 home-security-keyring = Jedna klíčenka
 home-security-keyring-text = Hesla, přihlašovací údaje, klíče SSH i GnuPG jsou na jednom místě a odemknou se, když se přihlásíte.
 

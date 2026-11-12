@@ -11,7 +11,7 @@ import {failureOf} from '../lib/errors.js';
 import {withFullAccess} from '../lib/access/permissions.js';
 import {call, ownName, subscribe} from '../lib/dbus.js';
 import {press} from '../lib/input/input.js';
-import {builtFixture, fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
+import {fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {SANDBOXED_APP, bubblewrapped, inAppScope, onSessionBus, sandboxedApp} from '../lib/access/sandbox.js';
@@ -26,16 +26,12 @@ const ACCESS_DENIED = 'org.freedesktop.DBus.Error.AccessDenied';
 const NOT_IN_INITIALIZATION = 'org.gnome.SessionManager.NotInInitialization';
 const NO_CONFIRMATION = 1;
 const SCREENCAST_SERVICE = 'com.lantharos.Kestrel.Screencast';
-const PASSKEYS = ['/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Passkeys1'] as const;
 const SERVICE_CHANNEL = ['/org/gnome/Mutter/ServiceChannel', 'org.gnome.Mutter.ServiceChannel'] as const;
 const IDLE_MONITOR = ['/org/gnome/Mutter/IdleMonitor/Core', 'org.gnome.Mutter.IdleMonitor'] as const;
 const PORTAL_BACKEND_CLIENT = 1;
 const SHORT_IDLE = 200;
-const PASSKEYS_AGENT = 'com.lantharos.Passkeys';
 const SETTINGS_APP = 'com.lantharos.settings';
-const PRELOADED = 'libm.so.6';
 const NAMED_CLIENT = fixture('clients', 'wayland', 'blurClient.py');
-const PASSKEYS_IMPOSTOR = builtFixture('clients', 'apps', 'passkeysImpostor.js');
 const DECLARED_FILE = 'Downloads/release-notes.txt';
 const UNHANDED_FILE = 'Projects/garden-planner/README.md';
 const USER_FOLDERS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.dirs']);
@@ -100,8 +96,6 @@ async function checkShellServices(app: SandboxedApp) {
     require(await failure(app.call(path, iface, method, parameters)) === ACCESS_DENIED, label);
   require(`${await failure(app.call('/com/lantharos/Kestrel/Peek', 'com.lantharos.Kestrel.Peek', 'List', new GLib.Variant('(s)', ['']))) ?? ''}`.endsWith('Denied'),
     'sandboxed apps cannot see or use other windows through peek');
-  await denied('/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Passkeys1', 'Open', new GLib.Variant('(a{sv})', [{}]),
-    'sandboxed apps cannot open passkey prompts');
   await denied('/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness', 'SetDimming', new GLib.Variant('(b)', [true]),
     'sandboxed apps cannot dim the screen');
   await denied('/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler', 'AskPassword',
@@ -250,12 +244,6 @@ async function checkHostImpostors() {
   require(scoped.stderr.includes(ACCESS_DENIED), 'a sandboxed app in a scope named after Settings still cannot change the session environment');
   const dimming = await outcome(inAppScope(SETTINGS_APP, [...onSessionBus(SANDBOXED_APP), ...dim]));
   require(dimming.stderr.includes('Sandboxed apps'), 'a sandboxed app in a scope named after Settings is still refused by Kestrel\'s services');
-
-  const preloaded = await outcome(inAppScope(PASSKEYS_AGENT, gdbus('com.lantharos.Kestrel.Passkeys', PASSKEYS, 'Open', '{}')), {env: {LD_PRELOAD: PRELOADED}});
-  require(preloaded.stderr.includes('Only Luft Passkeys'), 'a scope named after Luft Passkeys and a preloaded library do not pass as Luft Passkeys');
-  const impostor = await outcome(['gjs', '-m', PASSKEYS_IMPOSTOR]);
-  require(impostor.stderr === ACCESS_DENIED, 'a program that takes Luft Passkeys\' name while it is free cannot ask about passkeys');
-  require(Main.modalCount === 0, 'no passkey prompt opens for a program that only holds Luft Passkeys\' name');
 }
 
 async function checkFullAccess() {

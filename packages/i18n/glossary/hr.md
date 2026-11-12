@@ -54,7 +54,6 @@ minutes-left = { $count ->
 | wallpaper | pozadina | podloga, tapeta | Windows and GNOME |
 | suspend, sleep | stanje mirovanja; the button is Mirovanje | suspendiraj | Windows' word |
 | Night light | Noćno svjetlo | Noćno osvjetljenje | Shorter; Windows' word |
-| passkey | pristupni ključ | passkey | Windows and Apple in Croatian |
 | Keyring | skup ključeva | privjesak za ključeve | GNOME's word |
 | clipboard | međuspremnik | odlagalište | Windows and GNOME |
 | emoji | emotikon | emoji | Declines naturally |

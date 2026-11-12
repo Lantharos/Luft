@@ -72,8 +72,6 @@ home-security-secure-boot = Secure Boot sigue activado
 home-security-secure-boot-text = Cada paso del arranque está firmado, desde la memoria USB hasta el escritorio, así que no hay nada que desactivar en el firmware.
 home-security-encryption = Cifrado, sin escribir nada
 home-security-encryption-text = Activa el cifrado con un clic. Con un TPM, el disco se desbloquea solo, y únicamente para el sistema al que pertenece.
-home-security-passkeys = Llaves de acceso en todas partes
-home-security-passkeys-text = Las llaves de acceso viven en tu ordenador y funcionan en cualquier navegador, confirmadas con tu huella o tu contraseña.
 home-security-keyring = Un solo llavero
 home-security-keyring-text = Contraseñas, inicios de sesión, claves SSH y GnuPG se guardan en un solo lugar y se desbloquean al iniciar sesión.
 

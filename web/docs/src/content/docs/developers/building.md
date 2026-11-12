@@ -68,7 +68,7 @@ os/dev/layer.sh reset                    # back to the signed image
 
 | Part | Holds |
 | --- | --- |
-| `kestrel` | Kestrel, its settings service, search, the login screen's service, Luft Keyring, Luft Passkeys and the watchdog |
+| `kestrel` | Kestrel, its settings service, search, the login screen's service, Luft Keyring and the watchdog |
 | `boot` | trustd, USB protection and Sushi's shutdown screen |
 | `services` | The installer, updater, system packages, sleep, accounts, speech and Windows services |
 | `app-NAME` | The app called NAME in `apps/system` or `apps/store` |

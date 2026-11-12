@@ -19,7 +19,7 @@ touching its signed image. apply builds the parts the way the image build does
 (default: kestrel) and lays them over /usr as a system extension. It stays
 across restarts until reset, and is taken off by itself when Luft updates.
 
-  kestrel     Kestrel, its settings, search, greeter, keyring, passkeys and watchdog
+  kestrel     Kestrel, its settings, search, greeter, keyring and watchdog
   boot        trustd, USB protection and Sushi, as far as they run after startup
   services    The installer, updater, system packages, sleep, accounts, speech and Windows services
   app-NAME    An app from apps/system or apps/store

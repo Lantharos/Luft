@@ -364,28 +364,3 @@ settings-passwords-ssh-chip = Glabāt drošības mikroshēmā
 settings-passwords-ssh-chip-description = To nekad nevarēs nokopēt no šī datora, pat jūs
 settings-passwords-ssh-chip-unsupported = Šī datora drošības mikroshēma nevar glabāt SSH atslēgas
 settings-passwords-ssh-add = Pievienot atslēgu
-
-## Passkeys
-
-settings-passkeys-title = Piekļuves atslēgas
-settings-passkeys-unavailable = Atbloķējiet atslēgu saišķi, lai redzētu piekļuves atslēgas.
-settings-passkeys-chip-fingerprint = Aizzīmogotas ar šī datora drošības mikroshēmu. Katrā pierakstīšanās reizē tiek prasīts pirksta nospiedums vai parole.
-settings-passkeys-chip-password = Aizzīmogotas ar šī datora drošības mikroshēmu. Katrā pierakstīšanās reizē tiek prasīta parole.
-settings-passkeys-password-fingerprint = Šifrētas ar jūsu paroli. Katrā pierakstīšanās reizē tiek prasīts pirksta nospiedums vai parole.
-settings-passkeys-password = Šifrētas ar jūsu paroli. Katrā pierakstīšanās reizē tiek prasīta parole.
-settings-passkeys-last-used = Pēdējoreiz izmantota: { $when }
-settings-passkeys-never-used = Nekad nav izmantota
-settings-passkeys-password-only = Aizsargāta ar jūsu paroli
-settings-passkeys-unreachable = Pārlūki nevar piekļūt jūsu piekļuves atslēgām
-settings-passkeys-unreachable-description = Tās atkal būs pieejamas, kad darbosies piekļuves atslēgu pakalpojums
-settings-passkeys-rename-label = Pārdēvēt vietnes { $site } piekļuves atslēgu
-settings-passkeys-remove-label = Noņemt vietnes { $site } piekļuves atslēgu
-settings-passkeys-empty = Vēl nav piekļuves atslēgu
-settings-passkeys-empty-description = Vietņu izveidotās atslēgas tiek saglabātas šeit un ir pieejamas visos pārlūkos
-settings-passkeys-remove-title = Noņemt šo piekļuves atslēgu?
-settings-passkeys-remove-description = Ar to vairs nevarēsiet pierakstīties vietnē { $site }, tāpēc pārliecinieties, ka jums ir cits piekļuves veids.
-settings-passkeys-rename-title = Pārdēvēt piekļuves atslēgu
-settings-passkeys-rename-description = Piešķiriet vietnes { $site } piekļuves atslēgai nosaukumu, ko atpazīsiet.
-settings-passkeys-name = Nosaukums
-settings-passkeys-save = Saglabāt
-

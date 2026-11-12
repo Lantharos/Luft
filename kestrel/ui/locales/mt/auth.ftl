@@ -40,35 +40,6 @@ keyring-mismatch = Dak li dħalt ma jaqbilx
 keyring-unlock = Żblokka
 keyring-cancel = Ikkanċella
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Toħloq passkey għal { $site }?
-passkeys-register-account-by-app = L-app { $app } trid tissejvja passkey għal { $account }. Jibqa’ fuq dan il-kompjuter.
-passkeys-register-account = App trid tissejvja passkey għal { $account }. Jibqa’ fuq dan il-kompjuter.
-passkeys-register-by-app = L-app { $app } trid tissejvja passkey. Jibqa’ fuq dan il-kompjuter.
-passkeys-register = App trid tissejvja passkey. Jibqa’ fuq dan il-kompjuter.
-passkeys-sign-in-title = Tidħol f’{ $site } bil-passkey?
-passkeys-sign-in-choose-by-app = L-app { $app } qed titlob passkey. Agħżel il-kont li bih tidħol.
-passkeys-sign-in-choose = App qed titlob passkey. Agħżel il-kont li bih tidħol.
-passkeys-sign-in-by-app = L-app { $app } qed titlob il-passkey.
-passkeys-sign-in = App qed titlob il-passkey.
-passkeys-manage-title-by-app = Tħalli lill-app { $app } timmaniġġja l-passkeys?
-passkeys-manage-title = Tħalli lil din l-app timmaniġġja l-passkeys?
-passkeys-manage-description = Tkun tista’ tara għal liema siti għandek passkeys u tista’ tneħħihom.
-passkeys-registered-title = Diġà għandek passkey għal { $site }
-passkeys-registered-description = Minflok, idħol b’dak li għandek.
-passkeys-choose-title = Tuża l-passkeys fuq dan il-kompjuter?
-passkeys-choose-by-app = L-app { $app } qed tistaqsi fejn hu l-passkey.
-passkeys-choose = App qed tistaqsi fejn hu l-passkey.
-passkeys-use-password = Uża l-password
-passkeys-password = Password
-passkeys-cancel = Ikkanċella
-passkeys-continue = Kompli
-passkeys-ok = OK
-passkeys-use-this-computer = Uża dan il-kompjuter
-passkeys-fingerprint-unavailable = Uża l-password biex tkompli.
-passkeys-wrong-password = Il-password mhix tajba. Erġa’ pprova.
-
 ## Sign-in prompt
 
 auth-prompt-password = Password

@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Guardar no chip de segurança
 settings-passwords-ssh-chip-description = Ela nunca poderá ser copiada deste computador, nem mesmo por você
 settings-passwords-ssh-chip-unsupported = O chip de segurança deste computador não comporta chaves SSH
 settings-passwords-ssh-add = Adicionar chave
-
-## Passkeys
-
-settings-passkeys-title = Chaves de acesso
-settings-passkeys-unavailable = Desbloqueie o Chaveiro para ver suas chaves de acesso.
-settings-passkeys-chip-fingerprint = Seladas pelo chip de segurança deste computador. Cada login pede sua impressão digital ou senha.
-settings-passkeys-chip-password = Seladas pelo chip de segurança deste computador. Cada login pede sua senha.
-settings-passkeys-password-fingerprint = Criptografadas com sua senha. Cada login pede sua impressão digital ou senha.
-settings-passkeys-password = Criptografadas com sua senha. Cada login pede sua senha.
-settings-passkeys-last-used = Usada pela última vez { $when }
-settings-passkeys-never-used = Nunca usada
-settings-passkeys-password-only = Protegida pela sua senha
-settings-passkeys-unreachable = Os navegadores não conseguem acessar suas chaves de acesso
-settings-passkeys-unreachable-description = Elas voltam assim que o serviço de chaves de acesso estiver em execução
-settings-passkeys-rename-label = Renomear a chave de acesso de { $site }
-settings-passkeys-remove-label = Remover a chave de acesso de { $site }
-settings-passkeys-empty = Nenhuma chave de acesso ainda
-settings-passkeys-empty-description = As que os sites criarem ficam salvas aqui para todos os navegadores
-settings-passkeys-remove-title = Remover esta chave de acesso?
-settings-passkeys-remove-description = Você não vai mais conseguir entrar em { $site } com ela, então confira se tem outra forma de acesso.
-settings-passkeys-rename-title = Renomear chave de acesso
-settings-passkeys-rename-description = Dê à chave de acesso de { $site } um nome que você reconheça.
-settings-passkeys-name = Nome
-settings-passkeys-save = Salvar
-

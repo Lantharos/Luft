@@ -364,28 +364,3 @@ settings-passwords-ssh-chip = Păstrează în cipul de securitate
 settings-passwords-ssh-chip-description = Nimeni nu o poate copia vreodată de pe acest computer, nici măcar proprietarul
 settings-passwords-ssh-chip-unsupported = Cipul de securitate al acestui computer nu poate păstra chei SSH
 settings-passwords-ssh-add = Adaugă cheia
-
-## Passkeys
-
-settings-passkeys-title = Chei de acces
-settings-passkeys-unavailable = Deblocați portcheiul pentru a vedea cheile de acces.
-settings-passkeys-chip-fingerprint = Sigilate de cipul de securitate al acestui computer. La fiecare conectare se cere amprenta sau parola.
-settings-passkeys-chip-password = Sigilate de cipul de securitate al acestui computer. La fiecare conectare se cere parola.
-settings-passkeys-password-fingerprint = Criptate cu parola. La fiecare conectare se cere amprenta sau parola.
-settings-passkeys-password = Criptate cu parola. La fiecare conectare se cere parola.
-settings-passkeys-last-used = Ultima utilizare: { $when }
-settings-passkeys-never-used = Nefolosită niciodată
-settings-passkeys-password-only = Protejate de parolă
-settings-passkeys-unreachable = Browserele nu pot accesa cheile de acces
-settings-passkeys-unreachable-description = Revin după ce pornește serviciul pentru chei de acces
-settings-passkeys-rename-label = Redenumește cheia de acces pentru { $site }
-settings-passkeys-remove-label = Elimină cheia de acces pentru { $site }
-settings-passkeys-empty = Încă nu există chei de acces
-settings-passkeys-empty-description = Cele create de site-uri sunt salvate aici pentru toate browserele
-settings-passkeys-remove-title = Eliminați această cheie de acces?
-settings-passkeys-remove-description = Nu vă veți mai putea conecta la { $site } cu ea, așa că asigurați-vă că aveți altă cale de acces.
-settings-passkeys-rename-title = Redenumiți cheia de acces
-settings-passkeys-rename-description = Dați cheii de acces pentru { $site } un nume pe care să-l recunoașteți.
-settings-passkeys-name = Nume
-settings-passkeys-save = Salvează
-

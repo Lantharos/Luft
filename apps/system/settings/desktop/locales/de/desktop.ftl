@@ -192,9 +192,6 @@ desktop-keyring-denied = Nur die installierte App Einstellungen kann das ändern
 desktop-keyring-unsupported = Dein Schlüsselbund kann das noch nicht
 desktop-keyring-reseal-failed = Der Sicherheitschip konnte deinen Schlüsselbund gerade nicht schützen
 
-## Passkeys
-desktop-passkeys-missing = Diesen Passkey gibt es nicht
-
 ## Device security
 desktop-security-recovery-file-name = Wiederherstellungsschlüssel.txt
 desktop-security-usb-unavailable = Der USB-Schutz ist auf diesem Computer nicht verfügbar

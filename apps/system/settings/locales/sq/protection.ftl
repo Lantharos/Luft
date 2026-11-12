@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Ruaje në çipin e sigurisë
 settings-passwords-ssh-chip-description = Nuk mund të kopjohet kurrë jashtë këtij kompjuteri, as nga ti
 settings-passwords-ssh-chip-unsupported = Çipi i sigurisë i këtij kompjuteri nuk mund të mbajë çelësa SSH
 settings-passwords-ssh-add = Shto çelësin
-
-## Passkeys
-
-settings-passkeys-title = Çelësat e kalimit
-settings-passkeys-unavailable = Zhblloko vargun e çelësave për të parë çelësat e kalimit.
-settings-passkeys-chip-fingerprint = Të vulosur nga çipi i sigurisë i këtij kompjuteri. Çdo hyrje kërkon gjurmën e gishtit ose fjalëkalimin.
-settings-passkeys-chip-password = Të vulosur nga çipi i sigurisë i këtij kompjuteri. Çdo hyrje kërkon fjalëkalimin.
-settings-passkeys-password-fingerprint = Të enkriptuar me fjalëkalimin tënd. Çdo hyrje kërkon gjurmën e gishtit ose fjalëkalimin.
-settings-passkeys-password = Të enkriptuar me fjalëkalimin tënd. Çdo hyrje kërkon fjalëkalimin.
-settings-passkeys-last-used = Përdorur për herë të fundit { $when }
-settings-passkeys-never-used = Nuk është përdorur kurrë
-settings-passkeys-password-only = I mbrojtur nga fjalëkalimi yt
-settings-passkeys-unreachable = Shfletuesit nuk i arrijnë dot çelësat e kalimit
-settings-passkeys-unreachable-description = Kthehen sapo shërbimi i çelësave të kalimit të jetë në punë
-settings-passkeys-rename-label = Riemërto çelësin e kalimit për { $site }
-settings-passkeys-remove-label = Hiq çelësin e kalimit për { $site }
-settings-passkeys-empty = Ende nuk ka çelësa kalimi
-settings-passkeys-empty-description = Ata që krijojnë sajtet ruhen këtu për çdo shfletues
-settings-passkeys-remove-title = Të hiqet ky çelës kalimi?
-settings-passkeys-remove-description = Nuk do të mund të hysh më në { $site } me të, ndaj sigurohu që ke një mënyrë tjetër për të hyrë.
-settings-passkeys-rename-title = Riemërto çelësin e kalimit
-settings-passkeys-rename-description = Jepi çelësit të kalimit për { $site } një emër që do ta njohësh.
-settings-passkeys-name = Emri
-settings-passkeys-save = Ruaj
-

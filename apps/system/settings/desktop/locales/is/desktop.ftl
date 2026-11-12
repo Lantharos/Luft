@@ -185,9 +185,6 @@ desktop-keyring-denied = Aðeins uppsettu Stillingarnar geta breytt þessu
 desktop-keyring-unsupported = Lyklakippan þín getur þetta ekki enn
 desktop-keyring-reseal-failed = Öryggiskubburinn gat ekki varið lyklakippuna þína eins og er
 
-## Passkeys
-desktop-passkeys-missing = Þessi aðgangslykill er ekki til
-
 ## Device security
 desktop-security-recovery-file-name = Endurheimtarlykill.txt
 desktop-security-usb-unavailable = USB-vörn er ekki í boði á þessari tölvu

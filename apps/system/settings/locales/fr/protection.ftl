@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = La conserver dans la puce de sécurité
 settings-passwords-ssh-chip-description = Elle ne pourra jamais être copiée hors de cet ordinateur, pas même par vous
 settings-passwords-ssh-chip-unsupported = La puce de sécurité de cet ordinateur ne peut pas contenir de clés SSH
 settings-passwords-ssh-add = Ajouter la clé
-
-## Passkeys
-
-settings-passkeys-title = Clés d’accès
-settings-passkeys-unavailable = Déverrouillez votre trousseau pour afficher vos clés d’accès.
-settings-passkeys-chip-fingerprint = Scellées par la puce de sécurité de cet ordinateur. Chaque connexion demande votre empreinte digitale ou votre mot de passe.
-settings-passkeys-chip-password = Scellées par la puce de sécurité de cet ordinateur. Chaque connexion demande votre mot de passe.
-settings-passkeys-password-fingerprint = Chiffrées avec votre mot de passe. Chaque connexion demande votre empreinte digitale ou votre mot de passe.
-settings-passkeys-password = Chiffrées avec votre mot de passe. Chaque connexion demande votre mot de passe.
-settings-passkeys-last-used = Dernière utilisation : { $when }
-settings-passkeys-never-used = Jamais utilisée
-settings-passkeys-password-only = Protégée par votre mot de passe
-settings-passkeys-unreachable = Les navigateurs n’ont pas accès à vos clés d’accès
-settings-passkeys-unreachable-description = Elles seront de nouveau disponibles dès que le service des clés d’accès sera lancé
-settings-passkeys-rename-label = Renommer la clé d’accès de { $site }
-settings-passkeys-remove-label = Supprimer la clé d’accès de { $site }
-settings-passkeys-empty = Aucune clé d’accès pour l’instant
-settings-passkeys-empty-description = Celles que créent les sites sont enregistrées ici pour tous les navigateurs
-settings-passkeys-remove-title = Supprimer cette clé d’accès ?
-settings-passkeys-remove-description = Vous ne pourrez plus vous connecter à { $site } avec elle : assurez-vous d’avoir un autre moyen d’accès.
-settings-passkeys-rename-title = Renommer la clé d’accès
-settings-passkeys-rename-description = Donnez à votre clé d’accès pour { $site } un nom que vous reconnaîtrez.
-settings-passkeys-name = Nom
-settings-passkeys-save = Enregistrer
-

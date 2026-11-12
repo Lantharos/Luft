@@ -64,7 +64,7 @@ configure_security() {
   shield_helpers /
 }
 
-shielded=(luft-keyring luft-passkeys)
+shielded=(luft-keyring)
 
 shield_helpers() {
   local tree="$1" helper fixed

@@ -56,7 +56,6 @@ notifications-count = { $count ->
 | Night light | Yövalo | Yötila | Windows and GNOME |
 | suspend, sleep | lepotila | keskeytä, valmiustila | Windows' word |
 | hibernate | horrostila | talvihorros | Windows' word |
-| passkey | pääsyavain | passkey | Apple and Google |
 | Keyring | Avainnippu | avainrengas | macOS and GNOME |
 | touchpad | kosketuslevy | kosketusalusta | Windows' word |
 | security | suojaus | tietoturva | Windows' word; matches suojaussiru |

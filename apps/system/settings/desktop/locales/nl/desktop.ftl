@@ -185,9 +185,6 @@ desktop-keyring-denied = Alleen de geïnstalleerde app Instellingen kan dit wijz
 desktop-keyring-unsupported = Je sleutelbos kan dit nog niet
 desktop-keyring-reseal-failed = De beveiligingschip kan je sleutelbos nu niet beschermen
 
-## Passkeys
-desktop-passkeys-missing = Die toegangssleutel bestaat niet
-
 ## Device security
 desktop-security-recovery-file-name = Herstelsleutel.txt
 desktop-security-usb-unavailable = Usb-beveiliging is niet beschikbaar op deze computer

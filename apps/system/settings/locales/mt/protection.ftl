@@ -384,28 +384,3 @@ settings-passwords-ssh-chip = Żommha fiċ-ċippa tas-sigurtà
 settings-passwords-ssh-chip-description = Qatt ma tista’ tiġi kkopjata minn dan il-kompjuter, lanqas minnek
 settings-passwords-ssh-chip-unsupported = Iċ-ċippa tas-sigurtà ta’ dan il-kompjuter ma tistax iżżomm ċwievet SSH
 settings-passwords-ssh-add = Żid ċavetta
-
-## Passkeys
-
-settings-passkeys-title = Passkeys
-settings-passkeys-unavailable = Żblokka ċ-ċurkett taċ-ċwievet biex tara l-passkeys.
-settings-passkeys-chip-fingerprint = Issiġillati biċ-ċippa tas-sigurtà ta’ dan il-kompjuter. Kull dħul jitlob il-marka tas-saba’ jew il-password.
-settings-passkeys-chip-password = Issiġillati biċ-ċippa tas-sigurtà ta’ dan il-kompjuter. Kull dħul jitlob il-password.
-settings-passkeys-password-fingerprint = Iċċifrati bil-password. Kull dħul jitlob il-marka tas-saba’ jew il-password.
-settings-passkeys-password = Iċċifrati bil-password. Kull dħul jitlob il-password.
-settings-passkeys-last-used = L-aħħar użu: { $when }
-settings-passkeys-never-used = Qatt ma ntuża
-settings-passkeys-password-only = Protett bil-password
-settings-passkeys-unreachable = Il-browsers ma jistgħux jaslu għall-passkeys
-settings-passkeys-unreachable-description = Jerġgħu jidhru ladarba jibda jaħdem is-servizz tal-passkeys
-settings-passkeys-rename-label = Semmi mill-ġdid il-passkey għal { $site }
-settings-passkeys-remove-label = Neħħi l-passkey għal { $site }
-settings-passkeys-empty = Għad m’hemm l-ebda passkey
-settings-passkeys-empty-description = Dawk li joħolqu s-siti jiġu ssejvjati hawn għal kull browser
-settings-passkeys-remove-title = Tneħħi dan il-passkey?
-settings-passkeys-remove-description = Ma tkunx tista’ tibqa’ tidħol f’{ $site } bih, għalhekk kun ċert li għandek mod ieħor kif tidħol.
-settings-passkeys-rename-title = Semmi mill-ġdid il-passkey
-settings-passkeys-rename-description = Agħti lill-passkey għal { $site } isem li tagħrfu.
-settings-passkeys-name = Isem
-settings-passkeys-save = Issejvja
-

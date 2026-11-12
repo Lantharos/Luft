@@ -18,8 +18,8 @@ sidebar:
 | | What it adds |
 | --- | --- |
 | Secure Boot | A signed startup from the firmware to the system, and games with anti-cheat. Luft starts with Secure Boot on or off |
-| TPM 2.0 | An encrypted disk that unlocks by itself, a keyring that unlocks when you sign in, and passkeys whose keys never leave the chip. Without one, an encrypted disk asks for a passphrase at every start |
-| Fingerprint reader | Signing in, unlocking and confirming passkeys with a finger |
+| TPM 2.0 | An encrypted disk that unlocks by itself and a keyring that unlocks when you sign in. Without one, an encrypted disk asks for a passphrase at every start |
+| Fingerprint reader | Signing in, unlocking and confirming it's you with a finger |
 | An internet connection | Not needed to install from the universal stick, which carries everything. Meet Luft needs one unless you give it an ISO |
 
 ## Graphics

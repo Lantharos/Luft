@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Güvenlik çipinde sakla
 settings-passwords-ssh-chip-description = Bu bilgisayardan hiçbir zaman kopyalanamaz, siz bile kopyalayamazsınız
 settings-passwords-ssh-chip-unsupported = Bu bilgisayarın güvenlik çipi SSH anahtarlarını saklayamıyor
 settings-passwords-ssh-add = Anahtar ekle
-
-## Passkeys
-
-settings-passkeys-title = Geçiş anahtarları
-settings-passkeys-unavailable = Geçiş anahtarlarınızı görmek için anahtarlığınızın kilidini açın.
-settings-passkeys-chip-fingerprint = Bu bilgisayarın güvenlik çipiyle mühürlendi. Her oturum açmada parmak iziniz ya da parolanız istenir.
-settings-passkeys-chip-password = Bu bilgisayarın güvenlik çipiyle mühürlendi. Her oturum açmada parolanız istenir.
-settings-passkeys-password-fingerprint = Parolanızla şifrelendi. Her oturum açmada parmak iziniz ya da parolanız istenir.
-settings-passkeys-password = Parolanızla şifrelendi. Her oturum açmada parolanız istenir.
-settings-passkeys-last-used = Son kullanım: { $when }
-settings-passkeys-never-used = Hiç kullanılmadı
-settings-passkeys-password-only = Parolanızla korunuyor
-settings-passkeys-unreachable = Tarayıcılar geçiş anahtarlarınıza ulaşamıyor
-settings-passkeys-unreachable-description = Geçiş anahtarı hizmeti çalışmaya başlayınca yeniden kullanılabilir
-settings-passkeys-rename-label = Geçiş anahtarını yeniden adlandır: { $site }
-settings-passkeys-remove-label = Geçiş anahtarını kaldır: { $site }
-settings-passkeys-empty = Henüz geçiş anahtarı yok
-settings-passkeys-empty-description = Sitelerin oluşturduğu geçiş anahtarları, her tarayıcıda kullanılmak üzere burada saklanır
-settings-passkeys-remove-title = Bu geçiş anahtarı kaldırılsın mı?
-settings-passkeys-remove-description = Artık bu anahtarla { $site } sitesinde oturum açamazsınız, bu yüzden başka bir giriş yolunuz olduğundan emin olun.
-settings-passkeys-rename-title = Geçiş anahtarını yeniden adlandır
-settings-passkeys-rename-description = { $site } için geçiş anahtarınıza tanıyacağınız bir ad verin.
-settings-passkeys-name = Ad
-settings-passkeys-save = Kaydet
-

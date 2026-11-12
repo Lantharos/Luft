@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Чувај го во безбедносниот ч
 settings-passwords-ssh-chip-description = Никогаш не може да се копира од овој компјутер, дури ни од вас
 settings-passwords-ssh-chip-unsupported = Безбедносниот чип на овој компјутер не може да чува SSH-клучеви
 settings-passwords-ssh-add = Додај клуч
-
-## Passkeys
-
-settings-passkeys-title = Клучеви за пристап
-settings-passkeys-unavailable = Отклучете го привезокот за клучеви за да ги видите клучевите за пристап.
-settings-passkeys-chip-fingerprint = Запечатени со безбедносниот чип на овој компјутер. Секоја најава бара отпечаток од прст или лозинка.
-settings-passkeys-chip-password = Запечатени со безбедносниот чип на овој компјутер. Секоја најава бара лозинка.
-settings-passkeys-password-fingerprint = Шифрирани со вашата лозинка. Секоја најава бара отпечаток од прст или лозинка.
-settings-passkeys-password = Шифрирани со вашата лозинка. Секоја најава бара лозинка.
-settings-passkeys-last-used = Последно користен { $when }
-settings-passkeys-never-used = Никогаш не е користен
-settings-passkeys-password-only = Заштитени со вашата лозинка
-settings-passkeys-unreachable = Прелистувачите не можат да пристапат до клучевите за пристап
-settings-passkeys-unreachable-description = Ќе се вратат штом услугата за клучеви за пристап ќе проработи
-settings-passkeys-rename-label = Преименувај го клучот за пристап за { $site }
-settings-passkeys-remove-label = Отстрани го клучот за пристап за { $site }
-settings-passkeys-empty = Сè уште нема клучеви за пристап
-settings-passkeys-empty-description = Оние што ќе ги создадат страниците се зачувуваат тука за секој прелистувач
-settings-passkeys-remove-title = Да се отстрани овој клуч за пристап?
-settings-passkeys-remove-description = Повеќе нема да можете да се најавите на { $site } со него, затоа проверете дали имате друг начин за пристап.
-settings-passkeys-rename-title = Преименување клуч за пристап
-settings-passkeys-rename-description = Дајте му на клучот за пристап за { $site } име што ќе го препознаете.
-settings-passkeys-name = Име
-settings-passkeys-save = Зачувај
-

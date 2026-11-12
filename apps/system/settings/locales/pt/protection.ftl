@@ -356,28 +356,3 @@ settings-passwords-ssh-chip = Guardar no chip de segurança
 settings-passwords-ssh-chip-description = Nunca pode ser copiada para fora deste computador, nem sequer pelo utilizador
 settings-passwords-ssh-chip-unsupported = O chip de segurança deste computador não consegue guardar chaves SSH
 settings-passwords-ssh-add = Adicionar chave
-
-## Passkeys
-
-settings-passkeys-title = Chaves de acesso
-settings-passkeys-unavailable = Desbloqueie o porta-chaves para ver as chaves de acesso.
-settings-passkeys-chip-fingerprint = Seladas pelo chip de segurança deste computador. Cada início de sessão pede a impressão digital ou a palavra-passe.
-settings-passkeys-chip-password = Seladas pelo chip de segurança deste computador. Cada início de sessão pede a palavra-passe.
-settings-passkeys-password-fingerprint = Encriptadas com a palavra-passe. Cada início de sessão pede a impressão digital ou a palavra-passe.
-settings-passkeys-password = Encriptadas com a palavra-passe. Cada início de sessão pede a palavra-passe.
-settings-passkeys-last-used = Utilizada pela última vez { $when }
-settings-passkeys-never-used = Nunca utilizada
-settings-passkeys-password-only = Protegida pela palavra-passe
-settings-passkeys-unreachable = Os browsers não conseguem aceder às chaves de acesso
-settings-passkeys-unreachable-description = Voltam a estar disponíveis quando o serviço de chaves de acesso estiver em execução
-settings-passkeys-rename-label = Mudar o nome da chave de acesso de { $site }
-settings-passkeys-remove-label = Remover a chave de acesso de { $site }
-settings-passkeys-empty = Ainda não há chaves de acesso
-settings-passkeys-empty-description = As que os sites criarem são guardadas aqui para todos os browsers
-settings-passkeys-remove-title = Remover esta chave de acesso?
-settings-passkeys-remove-description = Deixa de poder iniciar sessão em { $site } com ela, por isso confirme que tem outra forma de entrar.
-settings-passkeys-rename-title = Mudar o nome da chave de acesso
-settings-passkeys-rename-description = Dê à chave de acesso de { $site } um nome que reconheça.
-settings-passkeys-name = Nome
-settings-passkeys-save = Guardar
-

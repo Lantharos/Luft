@@ -48,7 +48,6 @@ files-count = { $count ->
 | snap | mbërthe | ngjit | Windows' word; ngjit is paste |
 | lock, unlock | blloko, zhblloko | kyç, shkyç | Matches ekrani i bllokimit |
 | clipboard | kujtesa e fragmenteve | e papastra | Windows' word |
-| passkey | çelës kalimi | kod kalimi | Windows' word, and it is a key, not a code |
 | Keyring | varg çelësash | mbajtëse çelësash | Closest to the English image |
 | encryption | enkriptim | fshehtëzim | Windows' word, more widely understood |
 | sound | zëri; a sound that plays: tingull | | Two different things in Albanian |

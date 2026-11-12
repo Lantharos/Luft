@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Förvara den i säkerhetschippet
 settings-passwords-ssh-chip-description = Den kan aldrig kopieras från den här datorn, inte ens av dig
 settings-passwords-ssh-chip-unsupported = Den här datorns säkerhetschip kan inte förvara SSH-nycklar
 settings-passwords-ssh-add = Lägg till nyckel
-
-## Passkeys
-
-settings-passkeys-title = Lösennycklar
-settings-passkeys-unavailable = Lås upp nyckelringen för att se dina lösennycklar.
-settings-passkeys-chip-fingerprint = Förseglade av den här datorns säkerhetschip. Varje inloggning kräver ditt fingeravtryck eller lösenord.
-settings-passkeys-chip-password = Förseglade av den här datorns säkerhetschip. Varje inloggning kräver ditt lösenord.
-settings-passkeys-password-fingerprint = Krypterade med ditt lösenord. Varje inloggning kräver ditt fingeravtryck eller lösenord.
-settings-passkeys-password = Krypterade med ditt lösenord. Varje inloggning kräver ditt lösenord.
-settings-passkeys-last-used = Senast använd { $when }
-settings-passkeys-never-used = Aldrig använd
-settings-passkeys-password-only = Skyddad av ditt lösenord
-settings-passkeys-unreachable = Webbläsare når inte dina lösennycklar
-settings-passkeys-unreachable-description = De blir tillgängliga igen när tjänsten för lösennycklar körs
-settings-passkeys-rename-label = Byt namn på lösennyckeln för { $site }
-settings-passkeys-remove-label = Ta bort lösennyckeln för { $site }
-settings-passkeys-empty = Inga lösennycklar än
-settings-passkeys-empty-description = Lösennycklar som webbplatser skapar sparas här för alla webbläsare
-settings-passkeys-remove-title = Vill du ta bort den här lösennyckeln?
-settings-passkeys-remove-description = Du kan inte längre logga in på { $site } med den, så se till att du har ett annat sätt att komma in.
-settings-passkeys-rename-title = Byt namn på lösennyckeln
-settings-passkeys-rename-description = Ge lösennyckeln för { $site } ett namn som du känner igen.
-settings-passkeys-name = Namn
-settings-passkeys-save = Spara
-

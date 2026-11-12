@@ -354,28 +354,3 @@ settings-passwords-ssh-chip = Conservala nel chip di sicurezza
 settings-passwords-ssh-chip-description = Non potrà mai essere copiata fuori da questo computer, nemmeno da te
 settings-passwords-ssh-chip-unsupported = Il chip di sicurezza di questo computer non può contenere chiavi SSH
 settings-passwords-ssh-add = Aggiungi chiave
-
-## Passkeys
-
-settings-passkeys-title = Passkey
-settings-passkeys-unavailable = Sblocca il Portachiavi per vedere le tue passkey.
-settings-passkeys-chip-fingerprint = Sigillate dal chip di sicurezza di questo computer. Ogni accesso chiede l’impronta digitale o la password.
-settings-passkeys-chip-password = Sigillate dal chip di sicurezza di questo computer. Ogni accesso chiede la password.
-settings-passkeys-password-fingerprint = Crittografate con la tua password. Ogni accesso chiede l’impronta digitale o la password.
-settings-passkeys-password = Crittografate con la tua password. Ogni accesso chiede la password.
-settings-passkeys-last-used = Ultimo utilizzo: { $when }
-settings-passkeys-never-used = Mai usata
-settings-passkeys-password-only = Protetta dalla tua password
-settings-passkeys-unreachable = I browser non riescono a raggiungere le tue passkey
-settings-passkeys-unreachable-description = Tornano disponibili appena il servizio delle passkey è in esecuzione
-settings-passkeys-rename-label = Rinomina la passkey per { $site }
-settings-passkeys-remove-label = Rimuovi la passkey per { $site }
-settings-passkeys-empty = Ancora nessuna passkey
-settings-passkeys-empty-description = Quelle create dai siti vengono salvate qui per tutti i browser
-settings-passkeys-remove-title = Rimuovere questa passkey?
-settings-passkeys-remove-description = Non potrai più accedere a { $site } con questa passkey, quindi assicurati di avere un altro modo per entrare.
-settings-passkeys-rename-title = Rinomina la passkey
-settings-passkeys-rename-description = Dai alla passkey per { $site } un nome che riconoscerai.
-settings-passkeys-name = Nome
-settings-passkeys-save = Salva
-

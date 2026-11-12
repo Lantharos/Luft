@@ -56,7 +56,6 @@ windows-open = { $count ->
 | Night light | Éclairage nocturne | Veilleuse | Windows and GNOME |
 | suspend, sleep | mettre en veille, veille | suspendre | Windows and macOS |
 | shut down | éteindre | arrêter | macOS and GNOME; arrêter is ambiguous for apps and timers |
-| passkey | clé d’accès | passkey | Windows and Google |
 | Keyring | trousseau | porte-clés | macOS and GNOME |
 | encryption | chiffrement | cryptage | The correct term; Windows and GNOME |
 | firmware | micrologiciel | firmware | GNOME and KDE; firmware stays a search word |

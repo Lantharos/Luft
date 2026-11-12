@@ -185,9 +185,6 @@ desktop-keyring-denied = Doar aplicația Setări instalată poate schimba acest 
 desktop-keyring-unsupported = Portcheiul nu poate face încă acest lucru
 desktop-keyring-reseal-failed = Cipul de securitate nu a putut proteja portcheiul momentan
 
-## Passkeys
-desktop-passkeys-missing = Această cheie de acces nu există
-
 ## Device security
 desktop-security-recovery-file-name = Cheie de recuperare.txt
 desktop-security-usb-unavailable = Protecția USB nu este disponibilă pe acest computer

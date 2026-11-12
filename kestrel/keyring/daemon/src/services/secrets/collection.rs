@@ -16,7 +16,6 @@ use crate::daemon::Daemon;
 use crate::keyring::has_protected_schema;
 use crate::prompter::{Answer, Request};
 use crate::requester::Requester;
-use crate::services::passkeys;
 
 const ITEM_LABEL: &str = "org.freedesktop.Secret.Item.Label";
 const ITEM_ATTRIBUTES: &str = "org.freedesktop.Secret.Item.Attributes";
@@ -86,9 +85,6 @@ impl Collection {
     ) -> Result<OwnedObjectPath, SecretError> {
         let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
-        if id == passkeys::COLLECTION {
-            return Err(SecretError::refused());
-        }
         if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
@@ -168,9 +164,6 @@ impl Collection {
     ) -> Result<(OwnedObjectPath, OwnedObjectPath), SecretError> {
         let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
-        if id == passkeys::COLLECTION {
-            return Err(SecretError::refused());
-        }
         let transfer = self
             .daemon
             .sessions

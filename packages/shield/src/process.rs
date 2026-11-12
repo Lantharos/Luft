@@ -81,7 +81,7 @@ impl<'a> Process<'a> {
 
 /// The group `program` is installed setgid to, when root owns it, nobody
 /// else may change it, and the group isn't root's.
-pub fn group_of(program: &Path) -> Result<u32, &'static str> {
+fn group_of(program: &Path) -> Result<u32, &'static str> {
     let binary = fs::metadata(program).map_err(|_| "the program isn't installed")?;
     let mode = binary.permissions().mode();
     check(

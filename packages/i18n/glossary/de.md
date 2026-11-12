@@ -53,7 +53,6 @@ notifications-count = { $count ->
 | Power saver | Energie sparen | Stromsparmodus | Matches the other power modes |
 | Night light | Nachtmodus | Nachtlicht | Windows' word |
 | Dictation | Diktieren | Spracheingabe | Spracheingabe is a different Windows feature |
-| passkey | Passkey, der | Hauptschlüssel | The word websites, Apple and Google use |
 | Keyring | Schlüsselbund | Schlüsselring | GNOME and macOS |
 | security chip | Sicherheitschip | TPM-Chip | Luft avoids the abbreviation in the interface |
 | Full access | Vollzugriff | Voller Zugriff | Windows' word |

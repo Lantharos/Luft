@@ -185,9 +185,6 @@ desktop-keyring-denied = To lahko spremeni samo nameščena aplikacija Nastavitv
 desktop-keyring-unsupported = Zbirka ključev tega še ne podpira
 desktop-keyring-reseal-failed = Varnostni čip trenutno ne more zaščititi zbirke ključev
 
-## Passkeys
-desktop-passkeys-missing = Ta ključ za dostop ne obstaja
-
 ## Device security
 desktop-security-recovery-file-name = Obnovitveni ključ.txt
 desktop-security-usb-unavailable = Zaščita USB v tem računalniku ni na voljo

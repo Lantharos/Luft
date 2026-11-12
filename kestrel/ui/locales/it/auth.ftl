@@ -40,35 +40,6 @@ keyring-mismatch = Le password non corrispondono
 keyring-unlock = Sblocca
 keyring-cancel = Annulla
 
-## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address
-
-passkeys-register-title = Creare una passkey per { $site }?
-passkeys-register-account-by-app = { $app } vuole salvare una passkey per { $account }. Resta su questo computer.
-passkeys-register-account = Un’app vuole salvare una passkey per { $account }. Resta su questo computer.
-passkeys-register-by-app = { $app } vuole salvare una passkey. Resta su questo computer.
-passkeys-register = Un’app vuole salvare una passkey. Resta su questo computer.
-passkeys-sign-in-title = Accedere a { $site } con la tua passkey?
-passkeys-sign-in-choose-by-app = { $app } chiede una passkey. Scegli l’account con cui accedere.
-passkeys-sign-in-choose = Un’app chiede una passkey. Scegli l’account con cui accedere.
-passkeys-sign-in-by-app = { $app } chiede la tua passkey.
-passkeys-sign-in = Un’app chiede la tua passkey.
-passkeys-manage-title-by-app = Consentire a { $app } di gestire le tue passkey?
-passkeys-manage-title = Consentire a questa app di gestire le tue passkey?
-passkeys-manage-description = Vedrà per quali siti hai una passkey e potrà rimuoverle.
-passkeys-registered-title = Hai già una passkey per { $site }
-passkeys-registered-description = Accedi con quella che hai già.
-passkeys-choose-title = Usare le passkey di questo computer?
-passkeys-choose-by-app = { $app } chiede dove si trova la tua passkey.
-passkeys-choose = Un’app chiede dove si trova la tua passkey.
-passkeys-use-password = Usa la password
-passkeys-password = Password
-passkeys-cancel = Annulla
-passkeys-continue = Continua
-passkeys-ok = OK
-passkeys-use-this-computer = Usa questo computer
-passkeys-fingerprint-unavailable = Usa la password per continuare.
-passkeys-wrong-password = La password non è corretta. Riprova.
-
 ## Sign-in prompt
 
 auth-prompt-password = Password

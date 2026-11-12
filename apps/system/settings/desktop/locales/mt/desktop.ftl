@@ -185,9 +185,6 @@ desktop-keyring-denied = L-app Settings installata biss tista’ tibdel dan
 desktop-keyring-unsupported = Iċ-ċurkett taċ-ċwievet għadu ma jistax jagħmel dan
 desktop-keyring-reseal-failed = Iċ-ċippa tas-sigurtà ma setgħetx tipproteġi ċ-ċurkett taċ-ċwievet bħalissa
 
-## Passkeys
-desktop-passkeys-missing = Dak il-passkey ma jeżistix
-
 ## Device security
 desktop-security-recovery-file-name = Ċavetta tal-irkupru.txt
 desktop-security-usb-unavailable = Il-protezzjoni tal-USB mhix disponibbli f’dan il-kompjuter

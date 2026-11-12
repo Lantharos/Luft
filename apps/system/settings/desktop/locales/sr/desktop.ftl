@@ -192,9 +192,6 @@ desktop-keyring-denied = Ово могу да промене само инста
 desktop-keyring-unsupported = Привезак кључева ово још не подржава
 desktop-keyring-reseal-failed = Безбедносни чип тренутно не може да заштити привезак кључева
 
-## Passkeys
-desktop-passkeys-missing = Тај приступни кључ не постоји
-
 ## Device security
 desktop-security-recovery-file-name = Кључ за опоравак.txt
 desktop-security-usb-unavailable = USB заштита није доступна на овом рачунару

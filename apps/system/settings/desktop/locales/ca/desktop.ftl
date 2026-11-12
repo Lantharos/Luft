@@ -185,9 +185,6 @@ desktop-keyring-denied = Només l’aplicació Configuració instal·lada pot ca
 desktop-keyring-unsupported = El clauer encara no pot fer això
 desktop-keyring-reseal-failed = Ara mateix el xip de seguretat no ha pogut protegir el clauer
 
-## Passkeys
-desktop-passkeys-missing = Aquesta clau d’accés no existeix
-
 ## Device security
 desktop-security-recovery-file-name = Clau de recuperació.txt
 desktop-security-usb-unavailable = La protecció USB no està disponible en aquest ordinador

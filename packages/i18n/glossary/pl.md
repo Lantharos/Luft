@@ -53,7 +53,6 @@ files-selected = { $count ->
 | shut down | Wyłącz | Zamknij | Zamknij closes a window |
 | Night light | Oświetlenie nocne | Nocne światło | Windows' word |
 | Keep awake | Nie usypiaj | Utrzymuj aktywność | Short and plain |
-| passkey | klucz dostępu | passkey | Google and Apple |
 | Keyring | pęk kluczy | baza kluczy | macOS |
 | security chip | procesor zabezpieczeń | układ TPM | Windows' name for the TPM |
 | firmware | oprogramowanie układowe | firmware | Windows' word |

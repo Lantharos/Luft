@@ -16,7 +16,7 @@ done
 cc -O2 -o "$vm/luft-launch" "${launch_flags[@]}" "$environment/environment.c" "$environment/luft-launch.c"
 
 start_stage
-bun "$luft/os/image/parts/components/install.ts" "$stage/root" kestrel/keyring kestrel/passkeys
+bun "$luft/os/image/parts/components/install.ts" "$stage/root" kestrel/keyring
 place 755 "$vm/luft-launch" /usr/libexec/luft-launch
 place 644 "$luft/os/image/stages/finalize.sh" /usr/share/luft-shield-check/finalize.sh
 place 644 "$luft/kestrel/keyring/tools/session/prompter.py" /usr/share/luft-shield-check/prompter.py

@@ -29,7 +29,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = protection::crash_reports::register(window);
     let window = protection::sharing::register(window, events);
     let window = protection::developer::register(window);
-    let window = protection::passkeys::register(window, events);
     let window = protection::security::register(window, events);
     let window = protection::keyring::register(window, events);
     let window = protection::remote_login::register(window, events);

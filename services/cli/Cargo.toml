@@ -1,0 +1,38 @@
+[package]
+name = "luft-cli"
+version = "0.1.0"
+description = "luft, the command line for Luft's settings, updates, logs and extensions"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "luft"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+clap_complete.workspace = true
+dirs.workspace = true
+gio.workspace = true
+glib.workspace = true
+luft-crash-report.workspace = true
+luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
+luft-software = { workspace = true, features = ["image"] }
+rmcp = { workspace = true, features = ["server", "transport-io"] }
+serde.workspace = true
+serde_json.workspace = true
+tar.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["io-std", "macros", "rt"] }
+toml.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+zstd.workspace = true
+
+[build-dependencies]
+serde_json.workspace = true
+
+[lints]
+workspace = true

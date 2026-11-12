@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Greeter1">
+    <method name="SetDeveloperTools">
+      <arg type="b" direction="in"/>
+    </method>
+    <property name="DeveloperTools" type="b" access="read"/>
+  </interface>
+</node>

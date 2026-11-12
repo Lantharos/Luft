@@ -1,0 +1,20 @@
+<node>
+  <interface name="com.lantharos.Updater1">
+    <method name="Status">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="StableReleased">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SwitchChannel">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="SetSchedule">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="in"/>
+    </method>
+    <property name="DownloadAutomatically" type="b" access="read"/>
+    <property name="Schedule" type="s" access="read"/>
+  </interface>
+</node>

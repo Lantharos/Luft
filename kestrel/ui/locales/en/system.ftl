@@ -772,3 +772,24 @@ extension-held-body = { $count ->
     [one] One came in from { $apps }
    *[other] { $count } came in from { $apps }
 }
+
+## Reviewing changes luft was asked to make, often by an AI agent working for you
+
+# { $count } is how many settings would change
+changes-title = { $count ->
+    [one] Change this setting?
+   *[other] Change these { $count } settings?
+}
+# { $requester } is the program that ran luft, such as a terminal or an AI agent
+changes-asked-by = { $requester } asked luft to make these changes. Nothing changes unless you approve.
+changes-asked = A program asked luft to make these changes. Nothing changes unless you approve.
+changes-administrator = Approving asks for an administrator’s password next.
+# A setting with the page of Settings it is on, as Settings' search shows it, such as "Taskbar and Start · Size"
+changes-setting = { $page } · { $setting }
+# A setting going from its current value to the new one, such as "Off → On"
+changes-from-to = { $from } → { $to }
+changes-on = On
+changes-off = Off
+changes-unknown = Not known
+changes-decline = Don’t change
+changes-approve = Change

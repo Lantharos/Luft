@@ -1,0 +1,32 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Changes1">
+  <!--
+    Reads and changes the system settings luft offers, for Kestrel's review of changes. Started on
+    demand and stops when idle.
+
+    The settings are named developer-tools, usb-protection, download-updates and automatic-time,
+    which are on or off, and update-channel ("stable" or "nightly"), update-schedule ("daily",
+    "weekly" or "never") and time-zone (a zone of the system's time zone data, or "UTC"), which
+    are text. Each is read and changed through the service that owns it.
+
+    Read answers anyone. Apply answers only /usr/bin/kestrel from the system image, running in
+    kestrel.service of the caller's own systemd, and needs com.lantharos.changes.apply, which
+    asks for an administrator's password every time, in a prompt that names every change.
+  -->
+  <interface name="com.lantharos.Changes1">
+    <!-- The current value of each setting named. -->
+    <method name="Read">
+      <arg name="settings" type="as" direction="in"/>
+      <arg type="a(sv)" direction="out"/>
+    </method>
+    <!-- Checks every change before making any, then makes them in order. Returns what each
+         setting it changed was before, and an empty string, or why it stopped at the change
+         after them. -->
+    <method name="Apply">
+      <arg name="changes" type="a(sv)" direction="in"/>
+      <arg type="a(sv)" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

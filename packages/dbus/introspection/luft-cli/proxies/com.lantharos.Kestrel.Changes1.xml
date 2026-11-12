@@ -1,0 +1,11 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Changes1">
+    <method name="Review">
+      <arg type="a(sv)" direction="in"/>
+      <arg type="b" direction="out"/>
+      <arg type="aa{sv}" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

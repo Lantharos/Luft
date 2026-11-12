@@ -1,0 +1,2 @@
+#compdef luft
+eval "$(luft completions zsh)"

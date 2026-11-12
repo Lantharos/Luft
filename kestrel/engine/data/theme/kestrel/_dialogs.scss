@@ -65,7 +65,7 @@
 .access-dialog:rtl { text-align: right; }
 .access-dialog.kestrel-crash-report-contents { width: 36em; }
 .kestrel-crash-report-scroll { max-height: 24em; margin-top: 8px; padding: 10px 12px; border-radius: 10px; background-color: fill(0.05); }
-.kestrel-crash-report-json { font-family: "Maple Mono", monospace; font-size: 12px; color: ink(0.85); }
+.kestrel-crash-report-json { font-family: "Maple Mono", monospace; font-size: 12px; font-feature-settings: "calt" 0, "liga" 0; color: ink(0.85); }
 .kestrel-portal-dialog { width: 28em; }
 .kestrel-portal-dialog.kestrel-peek-dialog { width: 34em; }
 .kestrel-portal-dialog .message-dialog-content { margin-bottom: 0; }
@@ -82,6 +82,7 @@
 .kestrel-portal-row-text { spacing: 1px; }
 .kestrel-portal-row-title { font-size: 14px; font-weight: 500; }
 .kestrel-portal-row-subtitle { font-size: 12px; color: ink(0.62); }
+.kestrel-changes-note { padding-top: 4px; }
 .kestrel-portal-row-check { icon-size: 16px; color: ink(); }
 
 .kestrel-portal-field { spacing: 6px; }

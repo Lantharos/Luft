@@ -2,7 +2,6 @@ use std::sync::Mutex;
 
 use luft_identity::program;
 
-use crate::accounts;
 use crate::crashes::Reading;
 use crate::journal::{self, CURSOR};
 use crate::spool::Spool;
@@ -51,7 +50,7 @@ impl Collector {
             .unwrap_or_default()
             .trim()
             .replace('-', "");
-        let scrubber = accounts::scrubber();
+        let scrubber = luft_crash_report::Scrubber::for_this_computer();
         let mut panicked = spool.panicked();
         let mut reading = Reading {
             scrubber: &scrubber,

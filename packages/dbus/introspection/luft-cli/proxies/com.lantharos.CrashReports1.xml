@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.CrashReports1">
+    <method name="SetChoice">
+      <arg type="s" direction="in"/>
+    </method>
+    <property name="Choice" type="s" access="read"/>
+  </interface>
+</node>

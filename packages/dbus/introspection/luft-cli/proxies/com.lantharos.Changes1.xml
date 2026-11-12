@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Changes1">
+    <method name="Read">
+      <arg type="as" direction="in"/>
+      <arg type="a(sv)" direction="out"/>
+    </method>
+  </interface>
+</node>

@@ -1,0 +1,14 @@
+part = "services"
+sources = [
+    "apps/system/settings/locales/en",
+    "packages/web/settings-catalogue/catalogue.json",
+    "packages/web/settings-pages/locales/en",
+]
+
+[programs]
+"/usr/bin/" = ["luft"]
+
+[files]
+"/usr/share/bash-completion/completions/luft" = "data/luft.bash"
+"/usr/share/fish/vendor_completions.d/" = ["data/luft.fish"]
+"/usr/share/zsh/site-functions/" = ["data/_luft"]

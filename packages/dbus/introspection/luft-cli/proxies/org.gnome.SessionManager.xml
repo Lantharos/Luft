@@ -1,0 +1,6 @@
+<node>
+  <interface name="org.gnome.SessionManager">
+    <method name="Reboot">
+    </method>
+  </interface>
+</node>

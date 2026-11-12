@@ -1,0 +1,7 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Extensions">
+    <method name="Reload">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

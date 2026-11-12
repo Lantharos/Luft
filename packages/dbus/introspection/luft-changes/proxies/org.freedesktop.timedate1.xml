@@ -1,0 +1,14 @@
+<node>
+  <interface name="org.freedesktop.timedate1">
+    <method name="SetTimezone">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="in"/>
+    </method>
+    <method name="SetNTP">
+      <arg type="b" direction="in"/>
+      <arg type="b" direction="in"/>
+    </method>
+    <property name="NTP" type="b" access="read"/>
+    <property name="Timezone" type="s" access="read"/>
+  </interface>
+</node>

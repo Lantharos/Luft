@@ -6,7 +6,9 @@ sources = [
     "packages/extension-api",
     "packages/i18n/tools",
     "packages/web/motion",
+    "packages/web/settings-catalogue",
     "packages/web/settings-pages",
+    "apps/system/settings/locales",
     "packages/web/ui/src/taskbar",
 ]
 

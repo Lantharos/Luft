@@ -38,3 +38,11 @@ kestrel/ui/src/system/connectivity/send/service.ts	The Send sheet is already ope
 kestrel/ui/src/system/connectivity/send/service.ts	Too many Send sheets opened in the last minute
 kestrel/ui/src/extensions/fileActions/service.ts	Only Rover can use file actions
 kestrel/ui/src/system/sound/sounds/service.ts	Sounds are played by name
+kestrel/ui/src/system/changes/items.ts	There is nothing to review
+kestrel/ui/src/system/changes/items.ts	There is no setting called ${id}
+kestrel/ui/src/system/changes/service.ts	Only luft from the system image can ask for a review of changes
+kestrel/ui/src/system/changes/service.ts	The screen is locked. Unlock it and ask again.
+kestrel/ui/src/system/changes/service.ts	Another set of changes is waiting for review.
+kestrel/ui/src/system/changes/service.ts	Too many reviews were asked for in the last minute. Wait a little and ask again.
+kestrel/ui/src/system/changes/service.ts	The review couldn’t be shown. Unlock the screen and ask again.
+kestrel/ui/src/extensions/sandbox/shell/limits.ts	Extension ${id}, sandboxed by Kestrel

@@ -1,0 +1,7 @@
+<node>
+  <interface name="com.lantharos.Trust1">
+    <property name="Disk" type="a{sv}" access="read"/>
+    <property name="SecureBoot" type="s" access="read"/>
+    <property name="Tpm" type="a{sv}" access="read"/>
+  </interface>
+</node>

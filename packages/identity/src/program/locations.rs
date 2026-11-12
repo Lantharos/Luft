@@ -6,7 +6,7 @@ use std::path::Path;
 const APPS: &str = "/usr/lib/sabine/com.lantharos.";
 const PROGRAM_FOLDERS: [&str; 2] = ["/usr/bin", "/usr/libexec"];
 const PREFIXES: [&str; 3] = ["kestrel", "luft-", "mutter-"];
-const NAMED: [&str; 5] = ["peek", "sushictl", "sushid", "trustctl", "trustd"];
+const NAMED: [&str; 6] = ["luft", "peek", "sushictl", "sushid", "trustctl", "trustd"];
 
 pub fn is_luft_location(path: &Path) -> bool {
     if path.to_string_lossy().starts_with(APPS) {
@@ -35,6 +35,7 @@ mod tests {
             "/usr/libexec/kestrel-settings",
             "/usr/libexec/luft-firewall",
             "/usr/libexec/trustd",
+            "/usr/bin/luft",
             "/usr/lib/sabine/com.lantharos.settings/settings",
         ] {
             assert!(is_luft_location(Path::new(luft)), "{luft}");

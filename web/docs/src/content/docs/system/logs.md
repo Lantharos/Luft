@@ -19,7 +19,7 @@ You're asked about the same problem once per version of Luft. To change your ans
 
 ## What to collect
 
-Right after something goes wrong, these show the most. Run them in [Tern](/apps/tern/):
+Right after something goes wrong, `luft report` saves most of this in one file, with your name, your computer's name and paths in your home folder taken out ([the luft command](/system/terminal/#logs-and-bug-reports)). These show more. Run them in [Tern](/apps/tern/):
 
 | Command | Shows |
 | --- | --- |

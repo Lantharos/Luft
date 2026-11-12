@@ -1,0 +1,485 @@
+{
+	"settings": [
+		{
+			"id": "appearance.style",
+			"page": "appearance",
+			"title": "settings-appearance-style",
+			"type": "choice",
+			"options": [
+				{
+					"value": "light",
+					"label": "settings-appearance-style-light",
+					"when": { "com.lantharos.kestrel dark-schedule": { "in": ["off"] }, "org.gnome.desktop.interface color-scheme": { "not": ["prefer-dark"] } },
+					"set": { "com.lantharos.kestrel dark-schedule": "off", "org.gnome.desktop.interface color-scheme": "default" }
+				},
+				{
+					"value": "dark",
+					"label": "settings-appearance-style-dark",
+					"when": { "com.lantharos.kestrel dark-schedule": { "in": ["off"] }, "org.gnome.desktop.interface color-scheme": { "in": ["prefer-dark"] } },
+					"set": { "com.lantharos.kestrel dark-schedule": "off", "org.gnome.desktop.interface color-scheme": "prefer-dark" }
+				},
+				{
+					"value": "automatic",
+					"label": "settings-appearance-style-auto",
+					"when": { "com.lantharos.kestrel dark-schedule": { "not": ["off"] } },
+					"set": { "com.lantharos.kestrel dark-schedule": "sunset" }
+				}
+			]
+		},
+		{
+			"id": "appearance.dark-schedule",
+			"page": "appearance",
+			"title": "settings-appearance-schedule",
+			"key": "com.lantharos.kestrel dark-schedule",
+			"options": [
+				{ "value": "sunset", "label": "settings-appearance-schedule-sunset" },
+				{ "value": "custom", "label": "settings-appearance-schedule-custom" }
+			]
+		},
+		{
+			"id": "appearance.pure-black",
+			"page": "appearance",
+			"title": "settings-appearance-pure-black",
+			"key": "com.lantharos.kestrel pure-black"
+		},
+		{
+			"id": "appearance.accent",
+			"page": "appearance",
+			"title": "settings-appearance-accent",
+			"key": "com.lantharos.kestrel accent",
+			"options": [
+				{ "value": "wallpaper", "label": "settings-appearance-accent-wallpaper" },
+				{ "value": "white", "label": "settings-appearance-accent-white" },
+				{ "value": "custom", "label": "settings-appearance-accent-custom" }
+			]
+		},
+		{
+			"id": "appearance.corners",
+			"page": "appearance",
+			"title": "settings-appearance-corners",
+			"type": "choice",
+			"options": [
+				{
+					"value": "rounded",
+					"label": "settings-appearance-corners-rounded",
+					"when": { "com.lantharos.kestrel rounded-window-corners": { "in": [true] } },
+					"set": { "com.lantharos.kestrel rounded-window-corners": true }
+				},
+				{
+					"value": "square",
+					"label": "settings-appearance-corners-square",
+					"when": { "com.lantharos.kestrel rounded-window-corners": { "in": [false] } },
+					"set": { "com.lantharos.kestrel rounded-window-corners": false }
+				}
+			]
+		},
+		{
+			"id": "taskbar.shown",
+			"page": "taskbar",
+			"title": "settings-taskbar-shown",
+			"key": "com.lantharos.kestrel taskbar-shown"
+		},
+		{
+			"id": "taskbar.auto-hide",
+			"page": "taskbar",
+			"title": "settings-taskbar-auto-hide",
+			"key": "com.lantharos.kestrel taskbar-auto-hide",
+			"options": [
+				{ "value": "never", "label": "settings-taskbar-hide-never" },
+				{ "value": "always", "label": "settings-taskbar-hide-always" },
+				{ "value": "windows", "label": "settings-taskbar-hide-windows" }
+			]
+		},
+		{
+			"id": "taskbar.shape",
+			"page": "taskbar",
+			"title": "settings-taskbar-shape",
+			"key": "com.lantharos.kestrel taskbar-style",
+			"options": [
+				{ "value": "bar", "label": "settings-taskbar-shape-bar" },
+				{ "value": "floating", "label": "settings-taskbar-shape-floating" },
+				{ "value": "separate", "label": "settings-taskbar-shape-separate" }
+			]
+		},
+		{
+			"id": "taskbar.look",
+			"page": "taskbar",
+			"title": "settings-taskbar-look",
+			"key": "com.lantharos.kestrel taskbar-look",
+			"options": [
+				{ "value": "glass", "label": "settings-taskbar-look-glass" },
+				{ "value": "solid", "label": "settings-taskbar-look-solid" },
+				{ "value": "transparent", "label": "settings-taskbar-look-transparent" },
+				{ "value": "accent", "label": "settings-taskbar-look-accent" }
+			]
+		},
+		{
+			"id": "taskbar.size",
+			"page": "taskbar",
+			"title": "settings-taskbar-size",
+			"key": "com.lantharos.kestrel taskbar-size",
+			"options": [
+				{ "value": "compact", "label": "settings-taskbar-size-small" },
+				{ "value": "normal", "label": "settings-taskbar-size-medium" },
+				{ "value": "large", "label": "settings-taskbar-size-large" }
+			]
+		},
+		{
+			"id": "taskbar.show-pinned",
+			"page": "taskbar",
+			"title": "settings-taskbar-show-pinned",
+			"key": "com.lantharos.kestrel taskbar-show-pinned"
+		},
+		{
+			"id": "taskbar.per-workspace",
+			"page": "taskbar",
+			"title": "settings-taskbar-per-workspace",
+			"key": "com.lantharos.kestrel taskbar-windows-per-workspace"
+		},
+		{
+			"id": "taskbar.every-display",
+			"page": "taskbar",
+			"title": "settings-taskbar-every-display",
+			"type": "switch",
+			"options": [
+				{
+					"value": true,
+					"when": { "com.lantharos.kestrel taskbar-displays": { "in": ["all"] } },
+					"set": { "com.lantharos.kestrel taskbar-displays": "all" }
+				},
+				{
+					"value": false,
+					"when": { "com.lantharos.kestrel taskbar-displays": { "in": ["primary"] } },
+					"set": { "com.lantharos.kestrel taskbar-displays": "primary" }
+				}
+			]
+		},
+		{
+			"id": "taskbar.per-display",
+			"page": "taskbar",
+			"title": "settings-taskbar-per-display",
+			"key": "com.lantharos.kestrel taskbar-windows-per-display"
+		},
+		{
+			"id": "start.style",
+			"page": "taskbar",
+			"title": "settings-start-style",
+			"key": "com.lantharos.kestrel start-style",
+			"options": [
+				{ "value": "menu", "label": "settings-start-style-menu" },
+				{ "value": "palette", "label": "settings-start-style-palette" }
+			]
+		},
+		{
+			"id": "start.button",
+			"page": "taskbar",
+			"title": "settings-start-button",
+			"key": "com.lantharos.kestrel taskbar-start-button"
+		},
+		{
+			"id": "start.web-search",
+			"page": "taskbar",
+			"title": "settings-start-web",
+			"key": "com.lantharos.kestrel search-web-engine",
+			"options": [
+				{ "value": "duckduckgo", "name": "DuckDuckGo" },
+				{ "value": "google", "name": "Google" },
+				{ "value": "bing", "name": "Bing" },
+				{ "value": "brave", "name": "Brave Search" },
+				{ "value": "ecosia", "name": "Ecosia" },
+				{ "value": "startpage", "name": "Startpage" },
+				{ "value": "kagi", "name": "Kagi" }
+			]
+		},
+		{
+			"id": "windows.see-through-blur",
+			"page": "windows",
+			"title": "settings-see-through-blur",
+			"key": "com.lantharos.kestrel see-through-blur"
+		},
+		{
+			"id": "windows.see-through-text",
+			"page": "windows",
+			"title": "settings-see-through-text",
+			"key": "com.lantharos.kestrel see-through-keep-text"
+		},
+		{
+			"id": "display.night-light",
+			"page": "display",
+			"title": "settings-display-night-light",
+			"key": "com.lantharos.kestrel.night-light enabled"
+		},
+		{
+			"id": "display.night-light-schedule",
+			"page": "display",
+			"title": "settings-display-night-light-schedule",
+			"type": "choice",
+			"options": [
+				{
+					"value": "automatic",
+					"label": "settings-display-night-light-automatic",
+					"when": { "com.lantharos.kestrel.night-light schedule-automatic": { "in": [true] } },
+					"set": { "com.lantharos.kestrel.night-light schedule-automatic": true }
+				},
+				{
+					"value": "custom",
+					"label": "settings-display-night-light-custom",
+					"when": { "com.lantharos.kestrel.night-light schedule-automatic": { "in": [false] } },
+					"set": { "com.lantharos.kestrel.night-light schedule-automatic": false }
+				}
+			]
+		},
+		{
+			"id": "keyboard.repeat",
+			"page": "input",
+			"title": "settings-keyboard-repeat",
+			"key": "org.gnome.desktop.peripherals.keyboard repeat"
+		},
+		{
+			"id": "keyboard.repeat-delay",
+			"page": "input",
+			"title": "settings-keyboard-repeat-delay",
+			"key": "org.gnome.desktop.peripherals.keyboard delay",
+			"unit": "milliseconds",
+			"range": { "min": 100, "max": 2000 }
+		},
+		{
+			"id": "keyboard.lock-notices",
+			"page": "input",
+			"title": "settings-keyboard-lock-notices",
+			"key": "com.lantharos.kestrel.media-keys lock-key-notices"
+		},
+		{
+			"id": "touchpad.tap-to-click",
+			"page": "input",
+			"title": "settings-mouse-touchpad-tap",
+			"key": "org.gnome.desktop.peripherals.touchpad tap-to-click"
+		},
+		{
+			"id": "touchpad.natural-scrolling",
+			"page": "input",
+			"title": "settings-mouse-touchpad-natural-scrolling",
+			"key": "org.gnome.desktop.peripherals.touchpad natural-scroll"
+		},
+		{
+			"id": "touchpad.disable-while-typing",
+			"page": "input",
+			"title": "settings-mouse-touchpad-disable-typing",
+			"key": "org.gnome.desktop.peripherals.touchpad disable-while-typing"
+		},
+		{
+			"id": "power.screen-off",
+			"page": "power",
+			"title": "settings-power-screen-off",
+			"key": "org.gnome.desktop.session idle-delay",
+			"unit": "seconds"
+		},
+		{
+			"id": "power.button",
+			"page": "power",
+			"title": "settings-power-button",
+			"key": "com.lantharos.kestrel.power power-button-action",
+			"options": [
+				{ "value": "suspend", "label": "settings-power-button-suspend" },
+				{ "value": "hibernate", "label": "settings-power-button-hibernate" },
+				{ "value": "interactive", "label": "settings-power-button-ask" },
+				{ "value": "nothing", "label": "settings-power-button-nothing" }
+			]
+		},
+		{
+			"id": "power.saver-on-low-battery",
+			"page": "power",
+			"title": "settings-power-saver-low-battery",
+			"key": "com.lantharos.kestrel.power power-saver-profile-on-low-battery"
+		},
+		{
+			"id": "accessibility.large-text",
+			"page": "accessibility",
+			"title": "settings-accessibility-large-text",
+			"type": "switch",
+			"options": [
+				{
+					"value": true,
+					"when": { "org.gnome.desktop.interface text-scaling-factor": { "above": 1 } },
+					"set": { "org.gnome.desktop.interface text-scaling-factor": 1.25 }
+				},
+				{
+					"value": false,
+					"when": { "org.gnome.desktop.interface text-scaling-factor": { "not-above": 1 } },
+					"set": { "org.gnome.desktop.interface text-scaling-factor": null }
+				}
+			]
+		},
+		{
+			"id": "accessibility.high-contrast",
+			"page": "accessibility",
+			"title": "settings-accessibility-high-contrast",
+			"key": "org.gnome.desktop.a11y.interface high-contrast"
+		},
+		{
+			"id": "accessibility.motion",
+			"page": "accessibility",
+			"title": "settings-accessibility-motion",
+			"type": "choice",
+			"options": [
+				{
+					"value": "full",
+					"label": "settings-accessibility-motion-full",
+					"when": { "org.gnome.desktop.interface enable-animations": { "in": [true] }, "org.gnome.desktop.a11y.interface reduced-motion": { "not": ["reduce"] } },
+					"set": { "org.gnome.desktop.interface enable-animations": true, "org.gnome.desktop.a11y.interface reduced-motion": "no-preference" }
+				},
+				{
+					"value": "reduced",
+					"label": "settings-accessibility-motion-reduced",
+					"when": { "org.gnome.desktop.interface enable-animations": { "in": [true] }, "org.gnome.desktop.a11y.interface reduced-motion": { "in": ["reduce"] } },
+					"set": { "org.gnome.desktop.interface enable-animations": true, "org.gnome.desktop.a11y.interface reduced-motion": "reduce" }
+				},
+				{
+					"value": "off",
+					"label": "settings-accessibility-motion-off",
+					"when": { "org.gnome.desktop.interface enable-animations": { "in": [false] } },
+					"set": { "org.gnome.desktop.interface enable-animations": false }
+				}
+			]
+		},
+		{
+			"id": "accessibility.screen-reader",
+			"page": "accessibility",
+			"title": "settings-accessibility-screen-reader",
+			"key": "org.gnome.desktop.a11y.applications screen-reader-enabled"
+		},
+		{
+			"id": "accessibility.zoom",
+			"page": "accessibility",
+			"title": "settings-accessibility-zoom",
+			"key": "org.gnome.desktop.a11y.applications screen-magnifier-enabled"
+		},
+		{
+			"id": "privacy.notification-content",
+			"page": "privacy",
+			"title": "settings-notifications-content-lock-screen",
+			"key": "com.lantharos.kestrel lock-screen-content"
+		},
+		{
+			"id": "privacy.crash-reports",
+			"page": "privacy",
+			"title": "settings-crash-reports",
+			"service": "crash-reports",
+			"type": "choice",
+			"options": [
+				{ "value": "ask", "label": "settings-crash-reports-ask" },
+				{ "value": "always", "label": "settings-crash-reports-always" },
+				{ "value": "never", "label": "settings-crash-reports-never" }
+			]
+		},
+		{
+			"id": "clock.format",
+			"page": "language",
+			"title": "settings-datetime-time-format",
+			"key": "org.gnome.desktop.interface clock-format",
+			"options": [
+				{ "value": "24h", "label": "settings-datetime-format-24h" },
+				{ "value": "12h", "label": "settings-datetime-format-12h" }
+			]
+		},
+		{
+			"id": "clock.seconds",
+			"page": "language",
+			"title": "settings-datetime-seconds",
+			"key": "org.gnome.desktop.interface clock-show-seconds"
+		},
+		{
+			"id": "clock.weekday",
+			"page": "language",
+			"title": "settings-datetime-weekday",
+			"key": "org.gnome.desktop.interface clock-show-weekday"
+		},
+		{
+			"id": "time.zone",
+			"page": "language",
+			"title": "settings-datetime-zone",
+			"system": "time-zone",
+			"type": "text"
+		},
+		{
+			"id": "time.automatic",
+			"page": "language",
+			"title": "settings-datetime-automatic",
+			"system": "automatic-time",
+			"type": "switch"
+		},
+		{
+			"id": "updates.channel",
+			"page": "system",
+			"title": "settings-updates-channel",
+			"system": "update-channel",
+			"type": "choice",
+			"options": [
+				{ "value": "stable", "label": "settings-updates-channel-stable", "note": "settings-updates-stable-confirm-body" },
+				{ "value": "nightly", "label": "settings-updates-channel-nightly", "note": "settings-updates-nightly-confirm-body" }
+			]
+		},
+		{
+			"id": "updates.look",
+			"page": "system",
+			"title": "settings-updates-look",
+			"system": "update-schedule",
+			"type": "choice",
+			"options": [
+				{ "value": "daily", "label": "settings-updates-schedule-daily" },
+				{ "value": "weekly", "label": "settings-updates-schedule-weekly" },
+				{ "value": "never", "label": "settings-updates-schedule-never" }
+			]
+		},
+		{
+			"id": "updates.download",
+			"page": "system",
+			"title": "settings-updates-background-label",
+			"system": "download-updates",
+			"type": "switch"
+		},
+		{
+			"id": "security.usb-protection",
+			"page": "security",
+			"title": "settings-usb-hold-back",
+			"system": "usb-protection",
+			"type": "switch",
+			"options": [
+				{ "value": false, "note": "settings-usb-turn-off-warning" },
+				{ "value": true }
+			]
+		},
+		{
+			"id": "security.developer-tools",
+			"page": "security",
+			"title": "settings-developer-tools",
+			"system": "developer-tools",
+			"type": "switch",
+			"options": [
+				{ "value": true, "note": "settings-developer-tools-warning" },
+				{ "value": false }
+			]
+		},
+		{
+			"id": "developer.log-direct-scanout",
+			"developer": true,
+			"name": "Log when displays show fullscreen windows directly",
+			"key": "com.lantharos.kestrel.diagnostics log-direct-scanout"
+		},
+		{
+			"id": "developer.log-variable-refresh",
+			"developer": true,
+			"name": "Log when displays switch between variable and fixed refresh",
+			"key": "com.lantharos.kestrel.diagnostics log-variable-refresh"
+		}
+	],
+	"settingsOnly": [
+		{ "id": "accounts.online", "page": "accounts/add", "title": "settings-page-add-account", "why": "Online accounts hold sign-ins that only Settings may reach." },
+		{ "id": "accounts.login", "page": "accounts/login", "title": "settings-page-login", "why": "Automatic login and the login screen are set where Settings can warn about what they mean." },
+		{ "id": "security.remote-login", "page": "security/remote-login", "title": "settings-page-remote-login", "why": "Letting others sign in over SSH is turned on where Settings can warn about it." },
+		{ "id": "security.encryption", "page": "security/encryption", "title": "settings-page-encryption", "why": "Encryption, the recovery key and the TPM are managed in Settings." },
+		{ "id": "security.keyring", "page": "security/keyring", "title": "settings-page-keyring", "why": "Luft Keyring is managed in Settings, after you confirm it's you." },
+		{ "id": "network.firewall", "page": "network/firewall", "title": "settings-page-firewall", "why": "Which networks are home and which apps and ports others may reach are chosen in Settings." },
+		{ "id": "extensions.inside-luft", "page": "extensions", "title": "settings-page-extensions", "why": "Running an extension from its folder inside the desktop is approved in Settings." }
+	]
+}

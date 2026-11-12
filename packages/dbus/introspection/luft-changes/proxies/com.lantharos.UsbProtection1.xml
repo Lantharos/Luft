@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.UsbProtection1">
+    <method name="SetEnabled">
+      <arg type="b" direction="in"/>
+    </method>
+    <property name="Enabled" type="b" access="read"/>
+  </interface>
+</node>

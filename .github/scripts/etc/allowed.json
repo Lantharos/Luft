@@ -83,7 +83,7 @@
 	"security/crates/trust/src/drives/target.rs": {
 		"/etc/fstab": "Reads the drives an administrator mounts"
 	},
-	"services/crashes/collector/src/accounts.rs": {
+	"services/crashes/report/src/names.rs": {
 		"/etc/passwd": "Reads the names of the people with an account, to take them out of crash reports",
 		"/etc/machine-info": "Reads the computer's name, to take it out of crash reports"
 	},

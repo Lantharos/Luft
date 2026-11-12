@@ -1,0 +1,92 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 12 Nov 2026 15:26:17 +0100
+Subject: [PATCH] wayland: keep where a window was when it maximizes during a
+ state change
+
+Maximizing a floating window saves its rectangle so unmaximizing can
+put it back. While a configuration is still waiting for the client's
+ack, the rectangle came from that configuration, and only the parts it
+carried were saved. A configuration sent for a state change, such as
+the window gaining focus, carries no position for a floating window,
+so a window maximized right after it was focused kept whatever
+position was saved before, the top-left corner for a new window, and
+went there when it was unmaximized.
+
+Start from the window's current rectangle and take the position and
+size the pending configuration carries over it.
+
+Upstream-Status: forwardable
+---
+ src/wayland/meta-window-wayland.c | 53 ++++++++++---------------------
+ 1 file changed, 16 insertions(+), 37 deletions(-)
+
+diff --git a/src/wayland/meta-window-wayland.c b/src/wayland/meta-window-wayland.c
+index c5f33b8e3c6c67ecaccd8150818bc60ac29c2b5c..db83f7a8514773f66fedb20c0705620f03fb1964 100644
+--- a/src/wayland/meta-window-wayland.c
++++ b/src/wayland/meta-window-wayland.c
+@@ -1114,48 +1114,27 @@ maybe_save_rect (MetaWindow                     *window,
+       meta_window_drag_get_window (window_drag) == window)
+     return FALSE;
+ 
+-  frame_rect = meta_window_config_get_rect (config);
++  frame_rect = meta_window_config_get_rect (window->config);
++  if (configuration && configuration->has_position)
++    {
++      frame_rect.x = configuration->x;
++      frame_rect.y = configuration->y;
++    }
++  if (configuration && configuration->has_size)
++    {
++      frame_rect.width = configuration->width;
++      frame_rect.height = configuration->height;
++    }
++
+   if (!meta_window_config_is_maximized_horizontally (config))
+     {
+-      if (configuration)
+-        {
+-          if (configuration->has_position)
+-            window->saved_rect.x = configuration->x;
+-        }
+-      else
+-        {
+-          window->saved_rect.x = frame_rect.x;
+-        }
+-      if (configuration)
+-        {
+-          if (configuration->has_size)
+-            window->saved_rect.width = configuration->width;
+-        }
+-      else
+-        {
+-          window->saved_rect.width = frame_rect.width;
+-        }
++      window->saved_rect.x = frame_rect.x;
++      window->saved_rect.width = frame_rect.width;
+     }
+   if (!meta_window_config_is_maximized_vertically (config))
+     {
+-      if (configuration)
+-        {
+-          if (configuration->has_position)
+-            window->saved_rect.y = configuration->y;
+-        }
+-      else
+-        {
+-          window->saved_rect.y = frame_rect.y;
+-        }
+-      if (configuration)
+-        {
+-          if (configuration->has_size)
+-            window->saved_rect.height = configuration->height;
+-        }
+-      else
+-        {
+-          window->saved_rect.height = frame_rect.height;
+-        }
++      window->saved_rect.y = frame_rect.y;
++      window->saved_rect.height = frame_rect.height;
+     }
+ 
+   return TRUE;

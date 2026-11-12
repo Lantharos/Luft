@@ -12,7 +12,7 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 - **Its own desktop.** Kestrel has a taskbar, Start with search across apps, settings and the text of your files, quick settings, snap layouts, and a board where windows sit side by side on an endless canvas. Its colors come from your wallpaper, and the apps follow.
 - **Its own apps.** Settings, Rover for files, Magpie for photos, videos, music and PDFs, Mailman for mail, Draft for text and code, Tern for the terminal, Schelf for everything else from Flathub and AppImages.
 - **Updates you don't think about.** The system updates as a whole at the next restart. If a new version doesn't start, Luft goes back to the one that did.
-- **A startup you can trust.** Secure Boot can stay on, the disk unlocks with the TPM, a keyring keeps your passwords and passkeys, and new USB devices wait while the screen is locked.
+- **A startup you can trust.** Secure Boot can stay on, the disk unlocks with the TPM, a keyring keeps your passwords and keys, and new USB devices wait while the screen is locked.
 - **Easy to try.** Meet Luft gets a Windows or Linux PC ready without a USB stick, and Luft installs next to Windows or in place of another Linux, keeping your files.
 
 <p>
@@ -43,7 +43,7 @@ Luft is young. There's no stable release yet: the downloads are nightly builds o
 | Folder | What it is |
 | --- | --- |
 | [`os`](os/README.md) | The system image, the USB stick and VMs to try them in |
-| [`kestrel`](kestrel/README.md) | The desktop, login screen, keyring, passkeys and session services |
+| [`kestrel`](kestrel/README.md) | The desktop, login screen, keyring and session services |
 | [`apps`](apps) | Luft's apps: `system` for the ones in the image, Install Luft among them, and `store` for the ones on schelf.store, Meet Luft among them |
 | [`extensions`](extensions) | Luft's own desktop extensions, such as Seasons |
 | [`packages`](packages) | Code the apps and services share: the native app shell, D-Bus and translations, libraries for the system's parts in `system` and the UI kit in `web` |
@@ -59,6 +59,8 @@ Each folder's README says what it is and how to build it.
 [Building Luft](https://docs.luft.computer/developers/building/) sets up a development machine and runs Kestrel in a window, the apps on their own, and the image and USB stick in VMs. [How Luft fits together](https://docs.luft.computer/developers/architecture/) is the place to start reading, and [Contributing](https://docs.luft.computer/developers/contributing/) covers how to send changes. Problems and ideas go in [the issues](https://github.com/Lantharos/Luft/issues).
 
 ## Translating
+
+<a href="https://babblebird.dev/p/lantharos/luft"><picture><source media="(prefers-color-scheme: dark)" srcset="https://babblebird.dev/api/badge/help.svg?theme=dark"><img alt="Help translate on Babblebird" src="https://babblebird.dev/api/badge/help.svg"></picture></a>
 
 Luft is translated on [Babblebird](https://babblebird.dev), in the browser, with no programming needed: sign in, pick Luft and your language, and translate with checks, the glossary and earlier translations at hand. The work comes back here as one pull request, and Serbian in Latin script is made from the Cyrillic automatically. [Translating Luft](https://docs.luft.computer/developers/translating/) covers the rest.
 

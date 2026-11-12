@@ -290,7 +290,7 @@ fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
         .map(str::to_owned)
         .collect();
     if bundle.chromium {
-        chromium::enable_finger_scrolling(&mut arguments);
+        chromium::enable_features(&mut arguments);
         chromium::load_autoscroll(&mut arguments);
     }
     [quoted(&launcher()), SANDBOX.to_owned(), id.to_owned()]

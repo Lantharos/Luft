@@ -15,7 +15,8 @@ import {withApp} from './lib/apps.js';
 import {write} from './lib/files.js';
 import {showEnd} from './settings/navigation.js';
 import {withFullAccess} from '../lib/access/permissions.js';
-import {desktopFile, install, launchLine, SABINE_BUILDER} from './lib/appImages.js';
+import {desktopFile, IN_SESSION, install, launchLine, SABINE_BUILDER} from './lib/appImages.js';
+import {checkHandover} from './appimages/handover.js';
 
 const {require} = checks('AppImage sandbox');
 const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
@@ -33,7 +34,7 @@ export const timeout = 1200000;
 
 function launch(id: string) {
   const {program, rest} = launchLine(id);
-  return spawn([program, ...rest]);
+  return spawn([program, ...rest], IN_SESSION);
 }
 
 const isWayland = (window: Meta.Window) => window.get_client_type() === Meta.WindowClientType.WAYLAND;
@@ -93,7 +94,7 @@ async function checkRendererSandbox(electron: string) {
     'an Electron AppImage is built');
   const id = await install(image);
   const {program, rest} = launchLine(id);
-  const ran = await outcome([program, ...rest]);
+  const ran = await outcome([program, ...rest], IN_SESSION);
   const line = ran.stdout.split('\n').find(text => text.startsWith('{'));
   if (!line) console.log(`Kestrel AppImage sandbox: ${id} said\n${ran.stderr}`);
   require(line, `${id} reports how its renderer runs`);
@@ -114,7 +115,7 @@ async function checkDeclaredAccess() {
   const {program, rest} = launchLine(id);
   const script = 'cut -d: -f1 /proc/net/dev | tail -n +3 | tr -d " "; test -f "$HOME/harbor-marker" && echo home; ' +
     'touch "$HOME/written" 2>/dev/null && echo written; mkdir -p "$XDG_DATA_HOME" && touch "$XDG_DATA_HOME/own" && echo own';
-  const lines = (await outcome([program, ...rest, 'sh', '-c', script])).stdout.split('\n');
+  const lines = (await outcome([program, ...rest, 'sh', '-c', script], IN_SESSION)).stdout.split('\n');
   const interfaces = lines.filter(line => line && !['home', 'written', 'own'].includes(line));
   require(interfaces.join() === 'lo', 'a Sabine app that declares it stays offline gets no network');
   require(lines.includes('home'), 'a Sabine app sees the folder it declared');
@@ -159,7 +160,7 @@ async function checkOpening() {
   const uninstall = installOpener(record);
   const ownNamespace = GLib.file_read_link('/proc/self/ns/mnt');
   const {program, rest} = launchLine(id);
-  const open = () => outcome([program, ...rest, 'xdg-open', page]);
+  const open = () => outcome([program, ...rest, 'xdg-open', page], IN_SESSION);
   try {
     require((await open()).ok, 'a sandboxed AppImage opens a download');
     const sandboxed = await opened(record, 'a file a sandboxed AppImage opens reaches the app for it');
@@ -192,6 +193,7 @@ export async function run() {
   }
   await checkDeclaredAccess();
   await checkOpening();
+  await checkHandover();
   const electron = GLib.getenv('KESTREL_ELECTRON');
   if (electron && GLib.file_test(ZYPAK, GLib.FileTest.IS_EXECUTABLE)) await checkRendererSandbox(electron);
   else if (electron) console.log('Kestrel AppImage sandbox: Electron\'s renderer sandbox skipped without Zypak');

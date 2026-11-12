@@ -2,6 +2,7 @@ pub const RESOURCES: &str = "chrome_100_percent.pak";
 pub const ENABLE_FEATURES: &str = "--enable-features=";
 pub const FINGER_SCROLLING: &str = "WaylandUnscaledTouchpadScrolling:scroll_scaling_factor/1";
 const FINGER_SCROLLING_FEATURE: &str = "WaylandUnscaledTouchpadScrolling";
+const FILE_TRANSFER: &str = "XdgFileTransferPortal";
 const LOAD_EXTENSION: &str = "--load-extension=";
 /// Middle-click autoscroll, which Chromium has on Windows only.
 const AUTOSCROLL_EXTENSION: &str = "/usr/share/luft/chromium/autoscroll";
@@ -10,16 +11,21 @@ pub fn mentions_finger_scrolling(text: &str) -> bool {
     text.contains(FINGER_SCROLLING_FEATURE)
 }
 
-pub fn enable_finger_scrolling(arguments: &mut Vec<String>) {
+/// Turns on what Luft wants of an AppImage's Chromium: touchpad scrolling
+/// at the distance fingers move, and retrieving the files a drop or paste
+/// hands it through the document portal, which Chromium only does by itself
+/// from version 151.
+pub fn enable_features(arguments: &mut Vec<String>) {
+    let wanted = format!("{FINGER_SCROLLING},{FILE_TRANSFER}");
     match arguments
         .iter_mut()
         .rfind(|argument| argument.starts_with(ENABLE_FEATURES))
     {
         Some(features) => {
             features.push(',');
-            features.push_str(FINGER_SCROLLING);
+            features.push_str(&wanted);
         }
-        None => arguments.insert(0, format!("{ENABLE_FEATURES}{FINGER_SCROLLING}")),
+        None => arguments.insert(0, format!("{ENABLE_FEATURES}{wanted}")),
     }
 }
 

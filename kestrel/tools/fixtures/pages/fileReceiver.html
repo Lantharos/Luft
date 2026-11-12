@@ -1,0 +1,14 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Kestrel file receiver</title>
+<style>html, body { margin: 0; height: 100%; outline: 0; }</style>
+<body contenteditable>
+<script>
+let answers = 0;
+const report = answer => { document.title = `Kestrel file receiver ${++answers}: ${JSON.stringify(answer)}`; };
+const read = file => file.text().then(text => ({name: file.name, text}), error => ({name: file.name, error: error.name}));
+const received = async (how, transfer) => report({how, offered: [...transfer.types], files: await Promise.all([...transfer.files].map(read))});
+addEventListener('dragover', event => event.preventDefault());
+addEventListener('drop', event => { event.preventDefault(); received('drop', event.dataTransfer); });
+addEventListener('paste', event => { event.preventDefault(); received('paste', event.clipboardData); });
+</script>

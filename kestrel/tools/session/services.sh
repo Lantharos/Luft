@@ -105,6 +105,6 @@ DBUS_SYSTEM_BUS_ADDRESS="$system_bus" GIO_USE_VFS=local start "$root/target/rele
 gdbus wait --session --timeout 10 com.lantharos.Settings
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$root/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search
-start python3 "$fixtures/session/portalFrontend.py" "$KESTREL_READY_SOCK" /usr/libexec/xdg-desktop-portal
+XDG_RUNTIME_DIR="$KESTREL_APP_RUNTIME_DIR" start python3 "$fixtures/session/portalFrontend.py" "$KESTREL_READY_SOCK" /usr/libexec/xdg-desktop-portal
 wait_until "the readiness socket" test -S "$KESTREL_READY_SOCK"
 NOTIFY_SOCKET="$KESTREL_READY_SOCK" "$root/target/release/kestrel-wrapper" meson devenv -C "$build" "$build/src/kestrel" "$@"

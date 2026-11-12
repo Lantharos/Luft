@@ -7,7 +7,7 @@ import {press} from '../../lib/input/input.js';
 import {builtFixture, outcome, scratch} from '../../lib/processes.js';
 import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
-import {install, launchLine, SABINE_BUILDER} from '../../apps/lib/appImages.js';
+import {IN_SESSION, install, launchLine, SABINE_BUILDER} from '../../apps/lib/appImages.js';
 import {Caller, callerArguments} from './caller.js';
 
 const {require, eventually} = checks('Send sheet');
@@ -28,7 +28,7 @@ export async function checkSandboxed(sheet: () => unknown, pdf: Uint8Array) {
   GLib.file_set_contents(letter, pdf);
   const {program, rest} = launchLine(id);
   const caller = await Caller.run([program, ...rest, 'gjs', '-m', script, ...callerArguments({'Letter.pdf': letter})],
-    'a sandboxed app opens a window', window => window.get_sandboxed_app_id() === id);
+    'a sandboxed app opens a window', window => window.get_sandboxed_app_id() === id, IN_SESSION);
   try {
     await caller.probe();
     const probed = JSON.parse((await caller.next('the sandboxed app tries Kestrel', 15000)).replace(/^probed /, '')) as Record<string, string>;

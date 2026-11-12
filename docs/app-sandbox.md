@@ -27,7 +27,7 @@ camera = false
 | Key | Default | Means |
 | --- | --- | --- |
 | `network` | `true` | It can go online |
-| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog, drop on it or open with it always reach it. An app's own files are in `~/.var/app/APP-ID` |
+| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog, drop on it, paste into it or open with it always reach it. An app's own files are in `~/.var/app/APP-ID` |
 | `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing; recording and cameras are `microphone` and `camera`, with `all` too |
 | `microphone` | `false` | It records sound: from a microphone, or what the computer plays |
 | `camera` | `false` | It uses cameras. An app that only asks through the camera portal can leave this out and is asked about the first time |
@@ -87,7 +87,9 @@ The system call filter is Flatpak's: no kernel log, accounting, kernel keyrings,
 
 ## Files you hand an app
 
-A file or folder you pick in a file dialog, drop on an app's window, open with the app from Rover or send to it reaches the app whatever it declared, and nothing else outside its folders does. For an app in a sandbox, the desktop portal and the sandbox's launcher hand it the file through the document portal, at a path below `$XDG_RUNTIME_DIR/doc`, which the sandbox shows the app's own share of.
+A file or folder you pick in a file dialog, drop on an app's window, paste into it, open with the app from Rover or send to it reaches the app whatever it declared, and nothing else outside its folders does. For an app in a sandbox, the desktop portal and the sandbox's launcher hand it the file through the document portal, at a path below `$XDG_RUNTIME_DIR/doc`, which the sandbox shows the app's own share of.
+
+Files you drag or copy from Rover, Luft's other apps or Kestrel reach a sandboxed app as they reach a Flatpak: besides the files' paths, the drag or copy offers the document portal's file transfer, which GTK 3 and 4, Qt 6.12 and later, and Chromium 151 and later look for when they run in a sandbox. Only when the app asks does the source register the files with the portal, on a thread of its own, and hand the app a key, which the app trades for the files below `$XDG_RUNTIME_DIR/doc`. Each key works once, and files you can change reach the app writable. Schelf turns the same lookup on for Electron 41 to 43, whose Chromium has it switched off. Apps whose toolkit doesn't look for it, such as older Electron and Qt apps, still get only the paths, which they can't open.
 
 An app that holds itself to its declaration, such as one of Luft's own apps started from the image, gets real paths, since the portals and launchers take it for an unsandboxed app. It brings each one it can't open itself within reach through the document portal and uses the path below `$XDG_RUNTIME_DIR/doc` instead:
 

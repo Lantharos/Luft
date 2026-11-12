@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {runtime} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {fixture, outcome, repository, scratch} from '../../lib/processes.js';
 
@@ -9,6 +10,8 @@ const SCHELF = repository('target', 'release', 'schelf');
 const SANDBOX = '--sandbox';
 
 export const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
+/** Sandboxes start in the session's runtime folder for apps, where its portals look for them. */
+export const IN_SESSION = {env: runtime()};
 
 const applications = () => GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
 export const desktopFile = (id: string) => GLib.build_filenamev([applications(), `${id}.desktop`]);

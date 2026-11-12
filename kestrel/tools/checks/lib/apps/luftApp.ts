@@ -35,7 +35,7 @@ interface LifecycleChange {
 let home: string | null = null;
 let service: Promise<Service> | null = null;
 
-const runtime = () => ({
+export const runtime = () => ({
   XDG_RUNTIME_DIR: GLib.getenv('KESTREL_APP_RUNTIME_DIR')!,
   WAYLAND_DISPLAY: GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')!]),
 });

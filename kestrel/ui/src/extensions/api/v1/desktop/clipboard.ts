@@ -31,6 +31,6 @@ export function clipboardApi(context: ApiContext): Clipboard {
       const [contents] = await Gio.File.new_for_path(reachable(context, path)).load_contents_async(null);
       copy(type, contents);
     },
-    setFiles: paths => copy('text/uri-list', new TextEncoder().encode(paths.map(path => `${GLib.filename_to_uri(reachable(context, path), null)}\r\n`).join(''))),
+    setFiles: paths => St.Clipboard.get_default().set_files(St.ClipboardType.CLIPBOARD, paths.map(path => reachable(context, path))),
   };
 }

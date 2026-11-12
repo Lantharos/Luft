@@ -1,6 +1,6 @@
 import type Meta from 'gi://Meta';
 
-import {gjs, outcome, type Process, spawn, stop, waitForWindow, windows} from '../../lib/processes.js';
+import {gjs, outcome, type Process, spawn, type SpawnOptions, stop, waitForWindow, windows} from '../../lib/processes.js';
 import {waitUntil} from '../../lib/wait.js';
 
 const TITLE = 'Kestrel send caller';
@@ -20,8 +20,8 @@ export class Caller {
     return Caller.launch(() => gjs(SCRIPT, callerArguments(files)), label);
   }
 
-  static async run(argv: string[], label: string, accepts: (window: Meta.Window) => boolean = () => true): Promise<Caller> {
-    return Caller.launch(() => spawn(argv), label, accepts);
+  static async run(argv: string[], label: string, accepts: (window: Meta.Window) => boolean, options: SpawnOptions): Promise<Caller> {
+    return Caller.launch(() => spawn(argv, options), label, accepts);
   }
 
   private static async launch(start: () => Process, label: string, accepts: (window: Meta.Window) => boolean = () => true) {

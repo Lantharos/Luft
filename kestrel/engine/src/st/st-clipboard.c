@@ -30,6 +30,7 @@
 #include "config.h"
 
 #include "st-clipboard.h"
+#include "st-clipboard-files.h"
 
 #include <meta/display.h>
 #include <meta/meta-selection-source-memory.h>
@@ -343,6 +344,35 @@ st_clipboard_set_text (StClipboard     *clipboard,
   bytes = g_bytes_new_take (g_strdup (text), strlen (text));
   st_clipboard_set_content (clipboard, type, "text/plain;charset=utf-8", bytes);
   g_bytes_unref (bytes);
+}
+
+/**
+ * st_clipboard_set_files:
+ * @clipboard: A #StClipboard
+ * @type: The type of clipboard that you want to set
+ * @paths: (array zero-terminated=1): full paths of the files to copy
+ *
+ * Sets files as the current contents of the clipboard, for apps in a
+ * sandbox too, which get them through the document portal.
+ */
+void
+st_clipboard_set_files (StClipboard        *clipboard,
+                        StClipboardType     type,
+                        const char * const *paths)
+{
+  MetaSelectionType selection_type;
+  MetaSelectionSource *source;
+
+  g_return_if_fail (ST_IS_CLIPBOARD (clipboard));
+  g_return_if_fail (meta_selection != NULL);
+  g_return_if_fail (paths != NULL);
+
+  if (!convert_type (type, &selection_type))
+    return;
+
+  source = st_clipboard_files_new (paths);
+  meta_selection_set_owner (meta_selection, selection_type, source);
+  g_object_unref (source);
 }
 
 /**

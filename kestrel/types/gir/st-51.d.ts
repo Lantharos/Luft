@@ -1012,6 +1012,8 @@ export namespace St {
 
         set_content(type: ClipboardType, mimetype: string, bytes: GLib.Bytes | Uint8Array): void;
 
+        set_files(type: ClipboardType, paths: string[]): void;
+
         set_text(type: ClipboardType, text: string): void;
     }
 

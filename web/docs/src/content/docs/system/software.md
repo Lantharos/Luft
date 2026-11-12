@@ -44,7 +44,7 @@ Open an `.AppImage` file and Schelf offers to install it. It keeps it out of you
 AppImages run in a sandbox, like Flatpak apps:
 
 - They get the internet, your Downloads folder, the graphics card, sound, notifications and windows, and keep their settings and data in a folder of their own, `~/.var/app/` followed by the app's ID.
-- Your files reach them through the file chooser: what you pick is shared with the app, nothing else. Files you open with the app from Rover are shared the same way.
+- Your files reach them through the file chooser: what you pick is shared with the app, nothing else. Files you open with the app from Rover, drag onto it or copy and paste into it are shared the same way, in apps made with GTK, Qt 6.12 or later, Chromium or Electron 41 or later.
 - Secrets they save, such as an app's sign-in, are theirs. Other sandboxed apps can't read them without you confirming.
 - In Settings → Apps you can give one a folder, or USB or serial devices, or take away its Downloads folder or the internet, from the next time it opens.
 

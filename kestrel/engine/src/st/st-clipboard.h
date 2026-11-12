@@ -85,6 +85,9 @@ void st_clipboard_set_content (StClipboard          *clipboard,
                                StClipboardType       type,
                                const gchar          *mimetype,
                                GBytes               *bytes);
+void st_clipboard_set_files (StClipboard          *clipboard,
+                             StClipboardType       type,
+                             const char * const   *paths);
 void st_clipboard_get_content (StClipboard                    *clipboard,
                                StClipboardType                 type,
                                const gchar                    *mimetype,

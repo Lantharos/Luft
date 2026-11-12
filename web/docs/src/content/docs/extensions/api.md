@@ -369,7 +369,7 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 
 ## clipboard
 
-`clipboard.setText(text)` copies text, `clipboard.setImage(path)` a PNG, JPEG, WebP or GIF picture by its full path, resolving once it's there, and `clipboard.setFiles(paths)` files and folders, to paste in Rover and other apps. It's as if people copied them, so clipboard history keeps them too. Reading the clipboard isn't offered.
+`clipboard.setText(text)` copies text, `clipboard.setImage(path)` a PNG, JPEG, WebP or GIF picture by its full path, resolving once it's there, and `clipboard.setFiles(paths)` files and folders, to paste in Rover and other apps, sandboxed ones too. It's as if people copied them, so clipboard history keeps them too. Reading the clipboard isn't offered.
 
 ## fileActions
 

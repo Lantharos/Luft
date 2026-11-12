@@ -1,7 +1,11 @@
+name = "Convertible"
 summary = "Convert, edit and compress files, all on your computer"
 description = "Drop pictures, videos, music, documents, archives or fonts and pick a format. Crop, trim, mark up, redact and resize in the same window, run whole folders in a queue, and keep everything offline."
+keywords = ["convert", "converter", "file converter", "resize", "crop", "compress", "pdf", "merge pdf", "split pdf", "video", "audio", "image", "webp", "heic", "mp4", "mp3", "zip", "redact", "metadata", "handbrake"]
+icon = "icon.svg"
 screenshots = ["light.webp", "dark.webp"]
 categories = ["Utility", "AudioVideo", "Graphics"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#2f6f5e"
+listed = true

@@ -1,7 +1,11 @@
+name = "Flatbed"
 summary = "Scan documents with your scanner or your camera"
 description = "Scans from scanners on your network and over USB, or takes a photo of the page and straightens it, evens out the light and cleans it up so it looks like it came off a flatbed. Add pages, put them in order, turn and crop them, then save a PDF whose text you can search and copy, read on your computer in Albanian, German, Croatian, English and more, or save each page as a picture."
+keywords = ["scan", "scanner", "scanning", "document", "documents", "paper", "pdf", "ocr", "text recognition", "camera", "photo", "receipt", "airscan", "escl", "sane", "simple-scan", "document scanner", "skeniraj", "skener", "skano"]
+icon = "icon.svg"
 screenshots = ["light.webp", "dark.webp"]
 categories = ["Graphics", "Office"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#3c5a4e"
+listed = true

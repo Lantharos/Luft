@@ -1,8 +1,11 @@
+name = "Phosphor"
 summary = "A full rice for your desktop: CRT, borders, bloom and glitches"
 description = "Animated borders and glow around your windows, CRT, scanlines and colour fringes inside the apps you pick, windows that open and close with a glitch, a fold, a burn or a CRT turning on, and filters over the whole screen or just the wallpaper and taskbar: curvature, colour grading, inverted colours, boosted shadows, chromatic aberration and bloom drawn from what's on it. Lines across the taskbar, Quick Settings and Luft's apps finish it off. Every effect is off until you turn it on, and off it costs nothing. Rules decide which apps get what, games stay untouched in fullscreen unless you say so, and Ctrl+Alt+Escape turns everything off at once. Phosphor draws over everything on your screen, so it asks for that permission; what it draws never leaves your computer."
-screenshots = ["windows.webp", "crt.webp", "bloom.webp", "taskbar.webp", "settings.webp"]
+icon = "icon.svg"
+screenshots = ["windows.webp", "crt.webp", "bloom.webp", "taskbar.webp"]
 keywords = ["rice", "crt", "scanlines", "bloom", "chromatic aberration", "shader", "borders", "glow", "window effects", "filters", "theme"]
 categories = ["Utility", "Graphics"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#1f7a3d"
+listed = true

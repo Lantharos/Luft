@@ -1,8 +1,11 @@
+name = "Tailor"
 summary = "Other apps in Luft's look"
 description = "Tailor dresses the apps you already use in the colors of your wallpaper, with Luft's fonts and its light and dark styles. Settings lists the ones it finds on your computer, says what it does to each, and has a switch for every one. Spotify, through Spicetify, and Vesktop change with the desktop while they're open, and Steam picks up the look when it opens, and keeps it after updates. Turning an app off, or removing the extension, puts that app back exactly as it was."
-screenshots = ["settings.webp", "dark.webp", "light.webp", "steam.webp"]
+icon = "icon.svg"
+screenshots = ["settings.webp", "dark.webp", "light.webp"]
 keywords = ["spotify", "spicetify", "steam", "vesktop", "vencord", "discord", "theme", "colors", "dark mode"]
 categories = ["Utility"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#3a6b52"
+listed = true

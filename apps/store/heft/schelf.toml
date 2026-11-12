@@ -3,6 +3,8 @@ kind = "app"
 format = "sabine"
 permissions = "Sabine.toml"
 listing = "store/"
+licence = "GPL-3.0-or-later"
+repository = "Lantharos/Luft"
 
 [requires]
 sabine = "0.81"

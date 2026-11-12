@@ -1,8 +1,11 @@
+name = "Keystrokes"
 summary = "Soft sounds as you type and click, without seeing what you type"
 description = "Hear every key and click: crisp mechanical switches, a quiet membrane, a deep thock, or a typewriter with its bell and carriage return. Space, Enter and Backspace each sound like themselves, every press varies a little so it never sounds like a machine gun, and the sound starts the moment you press. Typing and mouse clicks switch on and off separately and have their own volume. Make your own set from a folder of sounds and share it with friends. Keystrokes can't see what you type: Luft plays the sounds itself, tells only a letter or other key from Space, Enter and Backspace, and the extension never hears of a press at all, not which key, how many or when. It stays silent while the screen is locked and while a password field has the keyboard. Luft knows a password field when an app says it is one, so terminals and some older apps still click, and Keystrokes still learns nothing from them."
+icon = "icon.svg"
 screenshots = ["settings.webp", "privacy.webp", "sound.webp"]
 keywords = ["typing sounds", "keyboard sounds", "mechanical keyboard", "typewriter", "mouse click", "asmr", "keystroke", "soundpack"]
 categories = ["AudioVideo", "Utility"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#8c95ad"
+listed = true

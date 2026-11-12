@@ -1,7 +1,11 @@
+name = "Magpie"
 summary = "One viewer for your photos, videos, music, PDFs and fonts"
 description = "Opens photos, videos, songs, PDFs and fonts, with the rest of the folder an arrow key away."
+keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "fonts", "font viewer", "typeface", "media player"]
+icon = "icon.svg"
 screenshots = ["light.webp", "dark.webp"]
 categories = ["AudioVideo", "Graphics"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#5b3a6e"
+listed = true

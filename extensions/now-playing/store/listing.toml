@@ -1,8 +1,11 @@
+name = "Now Playing"
 summary = "What's playing, in the taskbar"
 description = "The song or video that's playing sits in the taskbar with its cover and controls, and a pop-up lets you seek, change the volume and output, and switch between players."
+icon = "icon.svg"
 screenshots = ["taskbar.webp", "popup.webp", "side.webp"]
 keywords = ["music", "media controls", "player", "now playing", "taskbar", "song"]
 categories = ["AudioVideo", "Utility"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#8a3a55"
+listed = true

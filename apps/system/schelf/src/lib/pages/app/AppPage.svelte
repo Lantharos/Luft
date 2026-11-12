@@ -163,7 +163,7 @@
 			{:else if permissions}
 				<AccessList {permissions} />
 			{:else if store?.extension}
-				<Section title="What it can do">
+				<Section title="What it can do" description={store.installer ? (store.inShell ? 'Runs inside Luft, approved by schelf.store' : 'Runs in a sandbox, with only what’s listed') : undefined}>
 					{#each abilities(store.extension) as ability (ability.title)}
 						<Row title={ability.title} icon={ability.icon} />
 					{/each}

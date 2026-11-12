@@ -34,7 +34,7 @@ Opening a `.flatpak`, `.flatpakref`, `.deb`, `.AppImage` or `.rpm` file shows a 
 
 ## Apps from schelf.store
 
-Everything Schelf downloads from schelf.store is signed, and Schelf checks the signature and every file before it installs anything; [App permissions](/security/app-permissions/#trusting-the-catalog) describes the checks. AppImages run in their [sandbox](/system/software/#full-access) with the access they declared, apps built with Sabine install like Luft's own apps, and extensions are added to your desktop.
+Everything Schelf downloads from schelf.store is signed, and Schelf checks the signature and every file before it installs anything; [App permissions](/security/app-permissions/#trusting-the-catalog) describes the checks. AppImages run in their [sandbox](/system/software/#full-access) with the access they declared, apps built with Sabine install like Luft's own apps, and extensions are added to your desktop, inside it when the store approved them and in a sandbox otherwise ([how extensions run](/personalize/extensions/)).
 
 Some apps on schelf.store come as installers and archives for each system instead. Schelf installs their AppImage like any other. When an app only has another kind of Linux file, such as a `.deb`, `.rpm` or `.flatpak`, its page offers it to download, and opening the file shows where it would go before anything is installed. Apps with nothing for Linux aren't shown.
 

@@ -30,6 +30,9 @@ pub struct StoreUpdate {
     /// The name of the app that took this one's place, which the update
     /// moves you to.
     pub replacement: Option<String>,
+    /// Whether it's an extension in a sandbox that schelf.store approved to
+    /// run inside Luft, where the update moves it.
+    pub moves_inside: bool,
 }
 
 fn widens_extension(after: Option<&ExtensionAccess>, before: Option<&ExtensionAccess>) -> bool {
@@ -75,14 +78,20 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         release,
         artifact,
         format,
-    }) = listing.release()
+    }) = listing.release(!replacing && installed.inside_luft())
     else {
         return Ok(None);
     };
     let pulled = revocations::current()
         .and_then(|list| list.block(&listing.id, Some(&release.version)))
         .is_some_and(|block| block.action == Severity::Block);
-    if pulled || !(replacing || listing::newer(&release.version, &installed.version)) {
+    let moves_inside = !replacing
+        && installed.sandboxed
+        && listing.runs_in_shell(release)
+        && !listing::newer(&installed.version, &release.version);
+    if pulled
+        || !(replacing || moves_inside || listing::newer(&release.version, &installed.version))
+    {
         return Ok(None);
     }
     let replacement_installed = replacing && record::get(&listing.id).is_some();
@@ -115,6 +124,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         to: release.version.clone(),
         icon: listing.icon.clone(),
         replacement: replacing.then(|| listing.name().to_owned()),
+        moves_inside,
         name: installed.name,
         kind: installed.kind,
         format: installed.format,

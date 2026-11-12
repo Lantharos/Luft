@@ -29,7 +29,7 @@ Permissions say what your extension uses. The API object only has the parts you 
 
 Inside the desktop they're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions. [How extensions run](/extensions/how-extensions-run/) explains what holds an extension in each place.
 
-Everywhere else they're the wall. An extension in your own folder runs in a sandbox, see [below](#in-a-sandbox).
+Everywhere else they're the wall. A release the store hasn't approved and an extension in your own folder run in a sandbox, see [below](#in-a-sandbox).
 
 | Permission | Shown as | Gives |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ Everywhere else they're the wall. An extension in your own folder runs in a sand
 
 ### In a sandbox
 
-An extension in your own folder, `~/.local/share/luft/extensions/<id>/`, runs in a process of its own: it sees its own folder, read-only, and its data folder, and nothing else of the computer, with no network, no other programs and no session bus. Its `[helper]` runs in the same sandbox. Everything it does on the desktop goes through the API object, which works the same way there, with these parts left out:
+A sandboxed extension runs in a process of its own: it sees its own folder, read-only, and its data folder, and nothing else of the computer, with no network, no other programs and no session bus. Its `[helper]` runs in the same sandbox. Everything it does on the desktop goes through the API object, which works the same way there, with these parts left out:
 
 | Not in a sandbox | Why |
 | --- | --- |
@@ -69,7 +69,7 @@ An extension in your own folder, `~/.local/share/luft/extensions/<id>/`, runs in
 | `file-actions`, `chooseFiles` and a taskbar element's `onDrop` | They hand over your own files, which the sandbox can't open. `pickFiles` copies what people pick into the data folder instead |
 | `listen` under `[network]` | The sandbox has no network to listen on |
 
-An extension that asks for one of these permissions, or for `listen`, doesn't run from your own folder, and Settings says which it asked for. `chooseFiles` rejects there. Ask only for what the sandbox has, and the same extension runs from your folder and, once Schelf's store approved it, from Schelf.
+A sandboxed extension that asks for one of these permissions, or for `listen`, doesn't run, and Settings says which it asked for; Schelf only installs such a release once the store approved it to run inside the desktop. `chooseFiles` rejects there. Ask only for what the sandbox has, and the same extension runs from your folder and from Schelf, before and after the store approved it.
 
 Kestrel answers what an extension reads at once, such as `session.active` or a setting, from a copy kept next to it, and does everything else a moment later. A call that returns nothing can't throw where it was made, so when Kestrel refuses it, such as `open` with a plain `http:` link, the reason goes to the desktop's log instead; one that returns a promise rejects it as it does inside the desktop. Arguments of the wrong kind turn the extension off with the reason. A callback that takes longer than ten seconds to return, or a stream of calls far faster than any desktop needs, turns it off too.
 

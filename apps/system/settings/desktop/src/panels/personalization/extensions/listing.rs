@@ -138,7 +138,8 @@ pub struct Extension {
     description: String,
     version: String,
     path: String,
-    /// Where it comes from: `store`, `copy`, `development`, `folder` or `own`.
+    /// Where it comes from: `store`, `store-sandboxed`, `copy`, `development`,
+    /// `folder` or `own`.
     origin: String,
     /// Copies of it elsewhere that are left alone.
     ignored: Vec<String>,

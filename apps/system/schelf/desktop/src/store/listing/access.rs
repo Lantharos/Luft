@@ -137,6 +137,19 @@ pub struct ExtensionAccess {
 }
 
 impl ExtensionAccess {
+    /// What it asks for out of `left_out`, the parts of the extension API a
+    /// sandbox leaves out, as Kestrel names them: permissions, and `listen`
+    /// for taking connections.
+    pub fn left_out(&self, left_out: &[String]) -> Vec<String> {
+        let listens = (!self.listen.is_empty()).then(|| "listen".to_owned());
+        self.permissions
+            .iter()
+            .cloned()
+            .chain(listens)
+            .filter(|part| left_out.contains(part))
+            .collect()
+    }
+
     /// Whether `self` asks for something `before` didn't.
     pub fn widens(&self, before: &Self) -> bool {
         (self.helper && !before.helper)
@@ -149,6 +162,52 @@ impl ExtensionAccess {
                 .iter()
                 .any(|host| !before.network.contains(host))
             || self.listen.iter().any(|port| !before.listen.contains(port))
+    }
+}
+
+/// A permission of the extension API in the words Settings uses.
+pub fn permission_title(permission: &str) -> &str {
+    match permission {
+        "wallpaper" => "Draw over the wallpaper",
+        "quick-settings" => "Add tiles to quick settings",
+        "taskbar" => "Add buttons to the taskbar",
+        "search" => "Add results to search",
+        "notifications" => "Send notifications",
+        "weather" => "See the weather where you are",
+        "location" => "See roughly where you are",
+        "media" => "See and control what's playing",
+        "popups" => "Show panels and small windows",
+        "typing" => "Type into other apps",
+        "sounds" => "Play sounds",
+        "audio-levels" => "Follow the beat of what's playing",
+        "calls" => "Know when you're in a call",
+        "locked-sounds" => "Keep playing sounds while the screen is locked",
+        "input-sounds" => "Play a sound when you type and click, without seeing your keys",
+        "do-not-disturb" => "Hold back notifications for a while",
+        "screen-effects" => "Draw over and change how your windows and the whole screen look",
+        "clipboard" => "Copy to your clipboard",
+        "file-actions" => "Add to the menu of files and folders in Rover",
+        other => other,
+    }
+}
+
+/// The parts of the extension API a sandbox leaves out, `parts`, as what an
+/// extension couldn't do there.
+pub fn sandbox_lacks(parts: &[String]) -> String {
+    let phrases: Vec<String> = parts
+        .iter()
+        .map(|part| match part.as_str() {
+            "listen" => "take connections from devices on your network".to_owned(),
+            permission => {
+                let title = permission_title(permission);
+                title[..1].to_lowercase() + &title[1..]
+            }
+        })
+        .collect();
+    match phrases.split_last() {
+        Some((last, [])) => last.clone(),
+        Some((last, rest)) => format!("{} and {last}", rest.join(", ")),
+        None => String::new(),
     }
 }
 

@@ -30,7 +30,9 @@
 		description={updating
 			? `This version of ${store.name} asks for more than before. It can use:`
 			: store.extension
-				? `schelf.store approved ${store.name} to run inside Luft. It can:`
+				? store.inShell
+					? `schelf.store approved ${store.name} to run inside Luft. It can:`
+					: `${store.name} runs in a sandbox. It can only:`
 				: `${store.name} runs in a sandbox. It can use:`}
 		{access}
 		{note}

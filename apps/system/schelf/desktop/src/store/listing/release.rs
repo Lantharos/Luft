@@ -152,6 +152,13 @@ impl Release {
         self.runs_in_shell
     }
 
+    /// What the extension asks for that it couldn't have in a sandbox.
+    pub fn left_out_in_sandbox(&self) -> Vec<String> {
+        self.extension.as_ref().map_or_else(Vec::new, |access| {
+            access.left_out(extensions::sandbox_leaves_out())
+        })
+    }
+
     /// The file a device on `platforms`, most specific first, installs, and
     /// how it installs.
     pub fn installable(&self, platforms: &[&str]) -> Option<(&Artifact, Format)> {

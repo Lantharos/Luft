@@ -16,10 +16,12 @@ pub struct Signed<'a> {
     pub seal: &'a [u8],
 }
 
-/// Has the system install an extension release schelf.store approved to run
-/// inside Luft, for this account, where the account's own programs can't
-/// change it. The system checks `listing` and `keys` against schelf.store's
-/// signature and `archive` against `listing` itself.
+/// Has the system install an extension release schelf.store lists, for this
+/// account, where the account's own programs can't change it: with the
+/// releases Luft runs inside the desktop when the store approved it to run
+/// there, otherwise with the ones it runs in a sandbox. The system checks
+/// `listing` and `keys` against schelf.store's signature and `archive`
+/// against `listing` itself.
 pub async fn install(
     id: &str,
     listing: Signed<'_>,

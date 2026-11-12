@@ -4,7 +4,7 @@ Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://sche
 
 | Source | Installed for |
 |--------|---------------|
-| schelf.store | Your account: AppImages in `~/.local/share/luft/appimages` in the AppImage sandbox with the access they declare, Sabine apps through Sabine's service, extensions approved to run inside Luft in `/var/lib/luft/extensions/<uid>`, installed by the system packages service |
+| schelf.store | Your account: AppImages in `~/.local/share/luft/appimages` in the AppImage sandbox with the access they declare, Sabine apps through Sabine's service, extensions in `/var/lib/luft/extensions/<uid>` when approved to run inside Luft and in `/var/lib/luft/sandboxed-extensions/<uid>` otherwise, installed by the system packages service |
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/.local/share/luft/appimages`, with a menu entry, icon and automatic updates, running in a sandbox |
 | `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |

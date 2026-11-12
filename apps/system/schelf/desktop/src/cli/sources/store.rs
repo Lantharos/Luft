@@ -8,10 +8,11 @@ use crate::cli::terminal::prompt;
 use crate::library;
 use crate::operations::Job;
 use crate::store::catalog::{self, Entry, Origin};
-use crate::store::install::Consent;
+use crate::store::install::{self, Consent};
 use crate::store::listing::{
     self, Declared, ExtensionAccess, Format, ListenPort, Listing, Offer, Release, channel,
 };
+use crate::store::record;
 use crate::store::signed::Age;
 
 fn kind(entry: &Entry) -> Kind {
@@ -170,33 +171,7 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
     let mut lines: Vec<String> = access
         .permissions
         .iter()
-        .map(|permission| {
-            match permission.as_str() {
-                "wallpaper" => "Draw over the wallpaper",
-                "quick-settings" => "Add tiles to quick settings",
-                "taskbar" => "Add buttons to the taskbar",
-                "search" => "Add results to search",
-                "notifications" => "Send notifications",
-                "weather" => "See the weather where you are",
-                "location" => "See roughly where you are",
-                "media" => "See and control what's playing",
-                "popups" => "Show panels and small windows",
-                "typing" => "Type into other apps",
-                "sounds" => "Play sounds",
-                "audio-levels" => "Follow the beat of what's playing",
-                "calls" => "Know when you're in a call",
-                "locked-sounds" => "Keep playing sounds while the screen is locked",
-                "input-sounds" => "Play a sound when you type and click, without seeing your keys",
-                "do-not-disturb" => "Hold back notifications for a while",
-                "screen-effects" => {
-                    "Draw over and change how your windows and the whole screen look"
-                }
-                "clipboard" => "Copy to your clipboard",
-                "file-actions" => "Add to the menu of files and folders in Rover",
-                other => other,
-            }
-            .to_owned()
-        })
+        .map(|permission| listing::permission_title(permission).to_owned())
         .collect();
     if !access.network.is_empty() {
         lines.push(format!("Connect to {}", access.network.join(", ")));
@@ -222,7 +197,11 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
     let ink = Ink::stderr();
     let name = ink.bold(listing.name());
     if let Some(access) = &release.extension {
-        eprintln!("{name} can:");
+        if listing.runs_in_shell(release) {
+            eprintln!("schelf.store approved {name} to run inside Luft. It can:");
+        } else {
+            eprintln!("{name} runs in a sandbox. It can:");
+        }
         for line in extension_access(access) {
             eprintln!("  {line}");
         }
@@ -259,9 +238,10 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         eprintln!("{error}");
         Exit::Failed
     })?;
+    let inside_luft = record::get(id).is_some_and(|installed| installed.inside_luft());
     let Some(Offer {
         release, format, ..
-    }) = listing.release()
+    }) = listing.release(inside_luft)
     else {
         let following = listing.following(listing.platforms());
         if following.chosen && following.channel != channel::STABLE {
@@ -271,7 +251,7 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
                 following.channel
             );
         } else {
-            eprintln!("{} isn't available for this computer.", listing.name());
+            eprintln!("{}", install::unavailable(&listing));
         }
         return Err(Exit::Missing);
     };

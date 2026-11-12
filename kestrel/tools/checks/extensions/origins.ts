@@ -5,16 +5,30 @@ import {checks} from '../lib/check.js';
 import {pause} from '../lib/wait.js';
 import {developmentFolder, install, listed, ownFolder, removeFolder, request, rewrite, storeFolder} from './lib/extensions.js';
 import {hostsOf, installOwn} from './lib/sandbox.js';
+import {installFromStore, sandboxedStoreFolder, sandboxLeavesOut} from './lib/store.js';
+import {refused} from './lib/unreviewed.js';
 
 const {require, eventually} = checks('extensions');
 const STORE = 'com.example.Marker';
 const OWN = 'com.example.Own';
 const NEWER = 'com.example.Newer';
 const OWN_NEWER = 'com.example.OwnNewer';
+const SANDBOXED_STORE = 'com.example.StoreSandboxed';
+const STORE_DRAWING = 'com.example.StoreDrawing';
 const RUNNING_LUFT = '1.2-nightly.21';
 
 const markers = () => (globalThis as {markers?: string[]}).markers ?? [];
 const state = async (id: string) => (await listed(id))?.state;
+const exists = (folder: string) => GLib.file_test(folder, GLib.FileTest.EXISTS);
+const sandboxHosts = (id: string) => hostsOf(id, sandboxedStoreFolder(id));
+
+async function reaches(id: string, origin: string, wanted: string, label: string) {
+  await request('Reload', id);
+  return eventually(async () => {
+    const found = await listed(id);
+    return found?.origin === origin && found.state === wanted ? found : null;
+  }, label, 20000);
+}
 
 function installAs(id: string, folder: (id: string) => string, version = '1.0.0') {
   install('marker', id, folder);
@@ -51,6 +65,33 @@ async function checkOwnFolder() {
   require(own.origin === 'own' && !markers().includes(OWN), 'it runs in its sandbox, never inside the desktop');
 }
 
+async function checkSandboxedStore() {
+  await installFromStore('marker', SANDBOXED_STORE, {version: '1.0.0', approved: false});
+  await reaches(SANDBOXED_STORE, 'store-sandboxed', 'running', 'a store release not approved to run inside the desktop runs');
+  require(!markers().includes(SANDBOXED_STORE), 'none of its code ran inside the desktop');
+  await eventually(() => sandboxHosts(SANDBOXED_STORE).length > 0, 'it runs in a host of its own, in a sandbox');
+  require(!exists(storeFolder(SANDBOXED_STORE)), 'and it never lands in the folder of releases approved to run inside the desktop');
+}
+
+async function checkApprovedUpdate() {
+  await installFromStore('marker', SANDBOXED_STORE, {version: '1.1.0', approved: true});
+  const inside = await reaches(SANDBOXED_STORE, 'store', 'running', 'an approved update moves it inside the desktop');
+  require(inside.version === '1.1.0' && markers().includes(SANDBOXED_STORE) && !exists(sandboxedStoreFolder(SANDBOXED_STORE)),
+    'its code runs inside the desktop, and no sandboxed copy is left');
+  await eventually(() => !sandboxHosts(SANDBOXED_STORE).length, 'and its sandbox ends');
+  const refusal = await refused(() => installFromStore('marker', SANDBOXED_STORE, {version: '1.2.0', approved: false}));
+  require(!!refusal?.includes('approved version stays') && (await listed(SANDBOXED_STORE))?.version === '1.1.0',
+    `a newer release that isn't approved yet doesn't replace the approved one (${refusal})`);
+}
+
+async function checkStoreDrawing() {
+  await installFromStore('marker', STORE_DRAWING, {version: '1.0.0', approved: false, permissions: ['wallpaper']});
+  const drawing = await reaches(STORE_DRAWING, 'store-sandboxed', 'store-only', 'a store release that draws on the wallpaper, not approved to run inside the desktop, waits');
+  require(drawing.problem.includes('wallpaper') && (await sandboxLeavesOut()).includes('wallpaper'), `it says why, from the list Schelf reads (${drawing.problem})`);
+  await pause(300);
+  require(!sandboxHosts(STORE_DRAWING).length && !markers().includes(STORE_DRAWING), 'and it runs nowhere');
+}
+
 async function checkOwnNewerLuft() {
   installOwn('newer', OWN_NEWER);
   await request('Reload', OWN_NEWER);
@@ -79,10 +120,13 @@ export async function run() {
     await checkStoreFolder();
     await checkIgnoredCopy();
     await checkOwnFolder();
+    await checkSandboxedStore();
+    await checkApprovedUpdate();
+    await checkStoreDrawing();
     await checkOwnNewerLuft();
     await checkNewerLuft();
   } finally {
-    for (const id of [STORE, OWN, OWN_NEWER, NEWER]) await request('Remove', id);
+    for (const id of [STORE, OWN, OWN_NEWER, NEWER, SANDBOXED_STORE, STORE_DRAWING]) await request('Remove', id);
     if (GLib.file_test(ownFolder(STORE), GLib.FileTest.IS_DIR)) removeFolder(Gio.File.new_for_path(ownFolder(STORE)));
     await request('Reload', STORE);
   }

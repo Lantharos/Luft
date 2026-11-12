@@ -153,15 +153,15 @@ use_luft_defaults() {
 }
 
 place_extensions() {
-  local development="$session/extensions/development" store="$session/extensions/store" unreviewed="$session/extensions/unreviewed" record="$session/extensions/installed" id
-  mkdir -p "$development" "$store" "$unreviewed"
+  local development="$session/extensions/development" store="$session/extensions/store" sandboxed="$session/extensions/sandboxed" unreviewed="$session/extensions/unreviewed" record="$session/extensions/installed" id
+  mkdir -p "$development" "$store" "$sandboxed" "$unreviewed"
   touch "$record"
   for id in com.lantharos.Seasons ${KESTREL_EXTENSIONS:-}; do
     grep -qxF "$id" "$record" && continue
     cp -r "$built_extensions/$id" "$development/"
     echo "$id" >> "$record"
   done
-  export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store" KESTREL_UNREVIEWED_EXTENSIONS="$unreviewed"
+  export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store" KESTREL_SANDBOXED_STORE_EXTENSIONS="$sandboxed" KESTREL_UNREVIEWED_EXTENSIONS="$unreviewed"
 }
 
 prepare_session() {

@@ -9,7 +9,8 @@ use crate::cli::sources::{
 use crate::cli::terminal::Line;
 use crate::cli::terminal::{Ink, Look, Table, bytes, wrap};
 use crate::library::{InstalledApp, Source};
-use crate::store::listing::{self, Builder, StoreDetails, channel};
+use crate::store::listing::{self, Builder, Format, StoreDetails, channel};
+use crate::store::record;
 use crate::store::signed::Age;
 
 const INDENT: &str = "  ";
@@ -218,7 +219,8 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     let installed = apps
         .iter()
         .find(|app| app.listing.as_deref() == Some(listing.id.as_str()));
-    let details = StoreDetails::from(listing);
+    let record = record::get(&listing.id);
+    let details = StoreDetails::new(listing, record.as_ref());
     let mut facts = Facts(Vec::new());
     facts.add(
         "Source",
@@ -249,6 +251,7 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     facts.add("Developer", Some(details.developer.clone()));
     facts.add("Website", details.homepage.clone());
     facts.add("Built", built(&details));
+    facts.add("Runs", runs(&details));
     let access = match (&details.extension, &details.declared) {
         (Some(extension), _) => store::extension_access(extension),
         (None, Some(declared)) if details.access.is_some() => store::access(declared),
@@ -264,6 +267,26 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
         &text_of(&details.description),
     );
     Ok(())
+}
+
+fn runs(details: &StoreDetails) -> Option<String> {
+    if !details.needs_review.is_empty() {
+        return Some(format!(
+            "Not yet: it needs to {}, which only runs inside Luft once schelf.store approves it",
+            listing::sandbox_lacks(&details.needs_review)
+        ));
+    }
+    details
+        .installer
+        .filter(|format| *format == Format::LuftExtension)?;
+    Some(
+        if details.in_shell {
+            "Inside Luft, approved by schelf.store"
+        } else {
+            "In a sandbox"
+        }
+        .to_owned(),
+    )
 }
 
 fn built(details: &StoreDetails) -> Option<String> {

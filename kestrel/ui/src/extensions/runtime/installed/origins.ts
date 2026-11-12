@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import { developmentPath } from '../../../shared/apps/development.js';
 
-export type Origin = 'store' | 'copy' | 'development' | 'folder' | 'own';
+export type Origin = 'store' | 'store-sandboxed' | 'copy' | 'development' | 'folder' | 'own';
 
 export interface Source {
   origin: Origin;
@@ -12,6 +12,7 @@ export interface Source {
 }
 
 const STORE = '/var/lib/luft/extensions';
+const SANDBOXED_STORE = '/var/lib/luft/sandboxed-extensions';
 const UNREVIEWED = '/var/lib/luft/unreviewed-extensions';
 const WRITABLE_BY_OTHERS = 0o022;
 const ATTRIBUTES = 'standard::type,unix::uid,unix::mode';
@@ -49,9 +50,11 @@ export function unreviewedSource(): Source {
 
 export function sources(): Source[] {
   const store = developmentPath('KESTREL_STORE_EXTENSIONS');
+  const sandboxedStore = developmentPath('KESTREL_SANDBOXED_STORE_EXTENSIONS');
   const development = developmentPath('KESTREL_DEVELOPMENT_EXTENSIONS');
   return [
     { origin: 'store', folder: store ?? GLib.build_filenamev([STORE, `${uid}`]), heldBySystem: !store },
+    { origin: 'store-sandboxed', folder: sandboxedStore ?? GLib.build_filenamev([SANDBOXED_STORE, `${uid}`]), heldBySystem: !sandboxedStore },
     unreviewedSource(),
     ...development ? [{ origin: 'development' as const, folder: development, heldBySystem: false }] : [],
     { origin: 'own', folder: GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extensions']), heldBySystem: false },
@@ -59,3 +62,5 @@ export function sources(): Source[] {
 }
 
 export const unreviewed = (origin: Origin) => origin === 'copy' || origin === 'folder';
+
+export const vouchedFor = (origin: Origin) => origin === 'store' || origin === 'development';

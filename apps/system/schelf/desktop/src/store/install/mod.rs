@@ -184,6 +184,7 @@ fn place(
             local: local.clone(),
             agreed: release.permissions.clone(),
             agreed_extension: release.extension.clone(),
+            sandboxed: format == Format::LuftExtension && !listing.runs_in_shell(release),
         },
     )?;
     match previous {
@@ -203,11 +204,20 @@ fn replace(id: &str, replacement: &str, consent: &Consent, task: Task) -> Result
     remove(id)
 }
 
-fn unavailable(listing: &Listing) -> String {
-    match listing.needs_luft() {
-        Some(minimum) => format!("{} needs Luft {minimum} or newer.", listing.name()),
-        None => format!("{} isn't available for this computer.", listing.name()),
+/// Why this computer can't install anything of `listing`.
+pub fn unavailable(listing: &Listing) -> String {
+    if let Some(minimum) = listing.needs_luft() {
+        return format!("{} needs Luft {minimum} or newer.", listing.name());
     }
+    let waiting = listing.needs_review();
+    if waiting.is_empty() {
+        return format!("{} isn't available for this computer.", listing.name());
+    }
+    format!(
+        "{} can be installed once schelf.store approves it to run inside Luft, which it needs to {}.",
+        listing.name(),
+        listing::sandbox_lacks(&waiting)
+    )
 }
 
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
@@ -218,13 +228,10 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
         return replace(id, &replacement.id, consent, task);
     }
-    let offer = listing.release().ok_or_else(|| unavailable(&listing))?;
-    if offer.format == Format::LuftExtension && !listing.runs_in_shell(offer.release) {
-        return Err(format!(
-            "schelf.store hasn't approved {} to run inside Luft, and Luft can't run extensions on their own yet.",
-            listing.name()
-        ));
-    }
+    let inside_luft = record::get(id).is_some_and(|installed| installed.inside_luft());
+    let offer = listing
+        .release(inside_luft)
+        .ok_or_else(|| unavailable(&listing))?;
     agreed(&listing, offer.release, consent)?;
     refuse_pulled(&listing, offer.release)?;
     let file = download::verified(&listing.id, offer.artifact, reason.query(), task)?;

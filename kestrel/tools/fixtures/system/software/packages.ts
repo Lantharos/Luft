@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type {Publish} from '../bus.js';
+import {storeExtensions} from './storeExtensions.js';
 import {unreviewedExtensions} from './unreviewedExtensions.js';
 
 const PACKAGES = `<node><interface name="com.lantharos.Packages1">
@@ -9,6 +10,10 @@ const PACKAGES = `<node><interface name="com.lantharos.Packages1">
   <method name="Update"/>
   <method name="DescribeRepository">
     <arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="a{ss}" direction="in"/><arg type="s" direction="out"/>
+  </method>
+  <method name="InstallExtension">
+    <arg name="id" type="s" direction="in"/><arg name="listing" type="ay" direction="in"/><arg name="listing_seal" type="ay" direction="in"/>
+    <arg name="keys" type="ay" direction="in"/><arg name="keys_seal" type="ay" direction="in"/><arg name="archive" type="h" direction="in"/>
   </method>
   <method name="InstallUnreviewedExtension"><arg name="id" type="s" direction="in"/><arg name="folder" type="h" direction="in"/></method>
   <method name="AllowExtensionFolder"><arg name="id" type="s" direction="in"/><arg name="path" type="s" direction="in"/></method>
@@ -51,6 +56,7 @@ function keyOf(armored: string) {
 
 export function publishPackages(publish: Publish, calls: string[], developerTools: () => boolean) {
   publish(PACKAGES, {
+    ...storeExtensions(calls),
     ...unreviewedExtensions(calls, developerTools),
     List: () => JSON.stringify({requested: [], packages: [], services: [], pending: false, repositories: []}),
     Update: () => {

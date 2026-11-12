@@ -59,7 +59,7 @@ Point `KESTREL_SESSION_DIR` and `KESTREL_CAPTURE_DIR` at empty scratch folders, 
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on |
 
-A development build of Kestrel also reads `KESTREL_STORE_EXTENSIONS`, `KESTREL_UNREVIEWED_EXTENSIONS` and `KESTREL_DEVELOPMENT_EXTENSIONS`, folders that stand in for the folders [extensions run from](/extensions/how-extensions-run/#where-an-extension-runs) without belonging to root. Headless sessions set all three. The installed Kestrel ignores them.
+A development build of Kestrel also reads `KESTREL_STORE_EXTENSIONS`, `KESTREL_SANDBOXED_STORE_EXTENSIONS`, `KESTREL_UNREVIEWED_EXTENSIONS` and `KESTREL_DEVELOPMENT_EXTENSIONS`, folders that stand in for the folders [extensions run from](/extensions/how-extensions-run/#where-an-extension-runs) without belonging to root. Headless sessions set all four. The installed Kestrel ignores them.
 
 ## Optional tools
 

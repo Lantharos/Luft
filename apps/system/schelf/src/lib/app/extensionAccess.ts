@@ -60,3 +60,10 @@ export function abilities(access: ExtensionAccess): Ability[] {
 	if (access.helper) listed.push({ icon: Cpu, title: 'Runs its own program' });
 	return listed.length ? listed : [{ icon: ShieldCheck, title: 'Nothing beyond the basics' }];
 }
+
+const lowered = (title: string) => title.charAt(0).toLowerCase() + title.slice(1);
+
+export function sandboxLacks(parts: string[]): string {
+	const phrases = parts.map((part) => (part === 'listen' ? 'take connections from devices on your network' : lowered(PERMISSIONS[part]?.title ?? part)));
+	return new Intl.ListFormat('en', { type: 'conjunction' }).format(phrases);
+}

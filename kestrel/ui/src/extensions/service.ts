@@ -6,6 +6,7 @@ import type { SettingValue } from './api/v1/types.js';
 import { API_VERSIONS } from './api/versions.js';
 import { listed } from './listing.js';
 import type { ExtensionManager } from './runtime/manager.js';
+import { SANDBOX_LEAVES_OUT } from './sandbox/leavesOut.js';
 
 const PATH = '/com/lantharos/Kestrel/Extensions';
 const INTERFACE = `<node>
@@ -39,6 +40,7 @@ const INTERFACE = `<node>
       <arg type="v" name="value" direction="in"/>
     </method>
     <property name="ApiVersions" type="au" access="read"/>
+    <property name="SandboxLeavesOut" type="as" access="read"/>
     <signal name="ExtensionsChanged"/>
     <signal name="PageChanged"><arg type="s" name="id"/></signal>
   </interface>
@@ -59,6 +61,10 @@ export class ExtensionsService {
 
   get ApiVersions(): number[] {
     return Object.keys(API_VERSIONS).map(Number);
+  }
+
+  get SandboxLeavesOut(): string[] {
+    return [...SANDBOX_LEAVES_OUT];
   }
 
   ListAsync(_parameters: [], invocation: Gio.DBusMethodInvocation): void {

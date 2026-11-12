@@ -129,7 +129,7 @@ fn refresh() -> Result<StoreState, String> {
 
 fn details(id: &str) -> Result<StoreDetails, String> {
     match listing::fetch(id, Age::Within(std::time::Duration::from_secs(60))) {
-        Ok(listing) => Ok(StoreDetails::from(listing)),
+        Ok(listing) => Ok(StoreDetails::new(listing, record::get(id).as_ref())),
         Err(error) if error == MISSING => record::get(id)
             .map(|installed| StoreDetails::gone(id, installed))
             .ok_or(error),

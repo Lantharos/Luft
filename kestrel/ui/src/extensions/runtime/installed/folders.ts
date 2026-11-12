@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import type { Manifest } from '../../api/v1/types.js';
 import { MANIFEST } from '../layout.js';
 import { parseManifest } from '../manifest.js';
-import { onlySystemCanChange, sources, unreviewed, type Origin, type Source } from './origins.js';
+import { onlySystemCanChange, sources, unreviewed, vouchedFor, type Origin, type Source } from './origins.js';
 import { approvedFolders } from './unreviewed.js';
 
 export interface Installed {
@@ -35,7 +35,7 @@ function read(id: string, source: Source, { folders, unreviewedInShell }: Lookin
   const path = GLib.build_filenamev([source.folder, id]);
   const systemOwned = source.heldBySystem && onlySystemCanChange(path);
   const origin = originOf(id, path, source, systemOwned, folders);
-  const inShell = unreviewed(origin) ? unreviewedInShell : origin !== 'own';
+  const inShell = unreviewed(origin) ? unreviewedInShell : vouchedFor(origin);
   const found: Installed = { id, path, origin, systemOwned, inShell, manifest: null, problem: null, ignored: [] };
   try {
     const [, contents] = GLib.file_get_contents(GLib.build_filenamev([path, MANIFEST]));

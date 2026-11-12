@@ -17,7 +17,7 @@ use super::device;
 use super::signed::{self, Age};
 use channel::Following;
 
-pub use access::{Declared, ExtensionAccess, ListenPort, widens};
+pub use access::{Declared, ExtensionAccess, ListenPort, permission_title, sandbox_lacks, widens};
 pub use details::StoreDetails;
 pub use release::{Artifact, Builder, Format, Provenance, Release};
 pub use version::newer;
@@ -129,25 +129,48 @@ impl Listing {
         }
     }
 
+    /// Whether this Luft can run `release`: an app always, an extension inside
+    /// Luft when schelf.store approved it to, otherwise in a sandbox when it
+    /// asks for nothing a sandbox leaves out.
+    fn runnable(&self, release: &Release) -> bool {
+        self.kind != Kind::Extension
+            || self.runs_in_shell(release)
+            || release.left_out_in_sandbox().is_empty()
+    }
+
     /// The highest version on `channel` that a device on `platforms`, at
-    /// `draw` in every rollout, installs. Other channels' releases never
-    /// count, however new they are.
-    fn newest(&self, channel: &str, platforms: &[&str], draw: f64) -> Option<Offer<'_>> {
+    /// `draw` in every rollout, installs, out of the releases approved to run
+    /// inside Luft when `inside_luft`. Other channels' releases never count,
+    /// however new they are.
+    fn newest(
+        &self,
+        channel: &str,
+        platforms: &[&str],
+        draw: f64,
+        inside_luft: bool,
+    ) -> Option<Offer<'_>> {
         self.releases
             .iter()
             .filter(|release| release.channel == channel && release.reaches(draw))
+            .filter(|release| !inside_luft || self.runs_in_shell(release))
             .filter_map(|release| Offer::of(release, platforms))
-            .filter(|offer| offer.release.supported())
+            .filter(|offer| offer.release.supported() && self.runnable(offer.release))
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
     }
 
     /// The highest version out of the channels `following` takes releases
     /// from.
-    fn followed(&self, following: &Following, platforms: &[&str], draw: f64) -> Option<Offer<'_>> {
+    fn followed(
+        &self,
+        following: &Following,
+        platforms: &[&str],
+        draw: f64,
+        inside_luft: bool,
+    ) -> Option<Offer<'_>> {
         following
             .sources()
             .into_iter()
-            .filter_map(|channel| self.newest(channel, platforms, draw))
+            .filter_map(|channel| self.newest(channel, platforms, draw, inside_luft))
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
     }
 
@@ -169,16 +192,41 @@ impl Listing {
             .map(str::to_owned)
     }
 
+    /// What the newest extension release you follow asks for that a sandbox
+    /// leaves out, when schelf.store hasn't approved it to run inside Luft.
+    pub fn needs_review(&self) -> Vec<String> {
+        let platforms = self.platforms();
+        self.waiting(&self.following(platforms), platforms, device::draw())
+    }
+
+    fn waiting(&self, following: &Following, platforms: &[&str], draw: f64) -> Vec<String> {
+        let sources = following.sources();
+        self.releases
+            .iter()
+            .filter(|release| sources.contains(&release.channel.as_str()) && release.reaches(draw))
+            .filter(|release| release.installable(platforms).is_some() && release.supported())
+            .max_by(|left, right| version::compare(&left.version, &right.version))
+            .filter(|release| self.kind == Kind::Extension && !self.runs_in_shell(release))
+            .map_or_else(Vec::new, Release::left_out_in_sandbox)
+    }
+
     /// Whether schelf.store vouches for the publisher and approved `release`
     /// to run inside Luft.
     pub fn runs_in_shell(&self, release: &Release) -> bool {
         self.kind == Kind::Extension && self.publisher.verified && release.runs_in_shell()
     }
 
-    /// The release this device may install, from the channel you follow.
-    pub fn release(&self) -> Option<Offer<'_>> {
+    /// The release this device may install, from the channel you follow. An
+    /// extension that runs inside Luft, `inside_luft`, only moves to another
+    /// release approved to run there, never into a sandbox.
+    pub fn release(&self, inside_luft: bool) -> Option<Offer<'_>> {
         let platforms = self.platforms();
-        self.followed(&self.following(platforms), platforms, device::draw())
+        self.followed(
+            &self.following(platforms),
+            platforms,
+            device::draw(),
+            inside_luft,
+        )
     }
 
     /// The release a listing shipped with the system holds, whatever its

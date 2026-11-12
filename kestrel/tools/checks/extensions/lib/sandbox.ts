@@ -23,8 +23,7 @@ function processes(): string[] {
 
 const parentOf = (pid: string) => read(`/proc/${pid}/status`)?.match(/^PPid:\s+(\d+)/m)?.[1] ?? null;
 
-export function hostsOf(id: string): string[] {
-  const folder = ownFolder(id);
+export function hostsOf(id: string, folder = ownFolder(id)): string[] {
   return processes().filter(pid => {
     if (read(`/proc/${pid}/cmdline`) !== '/usr/bin/gjs\0-m\0/host.js\0') return false;
     const parent = parentOf(pid);

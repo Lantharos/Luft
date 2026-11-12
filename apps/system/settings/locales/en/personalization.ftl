@@ -337,8 +337,9 @@ settings-extensions-crashed = Turned off because the desktop restarted twice whi
 settings-extensions-invalid = Can't run on this version of Luft
 # $version is the version of Luft the extension needs, such as "1.2"
 settings-extensions-needs-newer-luft = Needs Luft { $version } or newer. It turns on by itself once Luft is updated.
-settings-extensions-store-only = Only runs when it comes from schelf.store
+settings-extensions-store-only = Only runs once schelf.store approved it to run inside Luft
 settings-extensions-from-store = From schelf.store, approved to run inside Luft
+settings-extensions-from-store-sandboxed = From schelf.store. It runs in a sandbox and can only do what's listed
 settings-extensions-from-development = From a development folder, running inside this build of Luft
 settings-extensions-from-own = From your own folder. It runs in a sandbox and can only do what's listed
 settings-extensions-from-copy = A copy you installed from your own folder. Nobody reviewed it

@@ -10,5 +10,6 @@
       <arg type="s" direction="in"/>
     </method>
     <property name="ApiVersions" type="au" access="read"/>
+    <property name="SandboxLeavesOut" type="as" access="read"/>
   </interface>
 </node>

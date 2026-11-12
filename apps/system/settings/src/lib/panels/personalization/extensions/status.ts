@@ -11,6 +11,7 @@ const PROBLEMS: Record<string, string> = {
 
 const ORIGINS: Record<string, string> = {
 	store: 'settings-extensions-from-store',
+	'store-sandboxed': 'settings-extensions-from-store-sandboxed',
 	copy: 'settings-extensions-from-copy',
 	development: 'settings-extensions-from-development',
 	folder: 'settings-extensions-from-folder',

@@ -20,6 +20,17 @@ pub struct Installed {
     pub local: String,
     pub agreed: Option<Declared>,
     pub agreed_extension: Option<ExtensionAccess>,
+    /// Whether it's an extension Luft runs in a sandbox, since schelf.store
+    /// didn't approve the release installed to run inside Luft.
+    #[serde(default)]
+    pub sandboxed: bool,
+}
+
+impl Installed {
+    /// Whether it's an extension that runs inside Luft.
+    pub fn inside_luft(&self) -> bool {
+        self.format == Format::LuftExtension && !self.sandboxed
+    }
 }
 
 fn path() -> PathBuf {

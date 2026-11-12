@@ -12,6 +12,7 @@
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import { updateJob } from '#lib/app/jobs.js';
+	import { sandboxLacks } from '#lib/app/extensionAccess.js';
 	import StoreConsent from './StoreConsent.svelte';
 
 	interface Props {
@@ -90,8 +91,10 @@
 			<button type="button" class="button primary large" onclick={install}>Install</button>
 		{:else if store?.needsLuft}
 			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">Needs Luft {store.needsLuft} or newer. Update Luft in Settings to install it.</p>
-		{:else if store?.kind === 'extension' && store.version && !store.inShell}
-			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">Luft only runs extensions schelf.store approved to run inside it for now.</p>
+		{:else if store?.needsReview.length}
+			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">
+				Can be installed once schelf.store approves it to run inside Luft, which it needs to {sandboxLacks(store.needsReview)}.
+			</p>
 		{:else if store?.download}
 			{@const file = store.download}
 			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>Download</button>

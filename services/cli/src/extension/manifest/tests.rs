@@ -107,3 +107,20 @@ fn takes_settings_that_depend_on_others() {
     );
     assert!(parse(&manifest).is_ok());
 }
+
+#[test]
+fn leaves_out_what_the_desktop_says_a_sandbox_leaves_out() {
+    let source = include_str!("../../../../../kestrel/ui/src/extensions/sandbox/leavesOut.ts");
+    let list = source
+        .split_once("SANDBOX_LEAVES_OUT")
+        .and_then(|(_, rest)| rest.split_once("= ["))
+        .and_then(|(_, rest)| rest.split_once(']'))
+        .map(|(list, _)| list)
+        .unwrap();
+    let from_desktop: Vec<&str> = list
+        .split(',')
+        .map(|name| name.trim().trim_matches('\''))
+        .filter(|name| *name != "listen")
+        .collect();
+    assert_eq!(from_desktop, super::IN_DESKTOP_ONLY);
+}

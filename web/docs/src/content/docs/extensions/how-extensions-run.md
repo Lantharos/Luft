@@ -7,6 +7,12 @@ sidebar:
 
 An extension is a JavaScript module written against the versioned API object Kestrel hands it, never against Kestrel's own code. Where it runs decides what holds it. An extension inside Kestrel shares the compositor's process and JavaScript realm, so it can draw in the same scene as the desktop, and nothing walls it off. An extension in a sandbox reaches only what the API serves it across a process boundary. Luft runs an extension inside Kestrel only when someone vouched for it.
 
+There are three ways an extension runs:
+
+- **Inside Kestrel, from schelf.store**, when the store approved that exact release to run there.
+- **In a sandbox**, which is how every other extension runs: a release from schelf.store that isn't approved to run inside Kestrel, and anything in the account's own folder.
+- **Inside Kestrel without a review**, when the person approved an extension from their own folder while [Developer tools](/system/security/#developer-tools) is on.
+
 What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel. Extensions are for what's optional.
 
 ## Where an extension runs
@@ -15,13 +21,16 @@ Kestrel decides by the folder an extension is in, never by anything the extensio
 
 | Folder | Holds | Runs |
 | --- | --- | --- |
-| `/var/lib/luft/extensions/<uid>` | Releases from schelf.store, for that account | Inside Kestrel |
+| `/var/lib/luft/extensions/<uid>` | Releases schelf.store approved to run inside Kestrel, for that account | Inside Kestrel |
+| `/var/lib/luft/sandboxed-extensions/<uid>` | Other releases from schelf.store, for that account | In a sandbox |
 | `/var/lib/luft/unreviewed-extensions/<uid>` | Copies the person approved, and the record of folders they approved | Inside Kestrel while Developer tools is on, otherwise in a sandbox |
 | `~/.local/share/luft/extensions` | Anything else, such as an extension someone unpacked or is writing | In a sandbox |
 
-The first two count only when the folder and every folder above it belong to root and nobody else can write to them. Otherwise Kestrel treats what's there like an extension from the account's own folder. Only the system packages service, `com.lantharos.Packages1`, writes there. Before it unpacks a store release, it checks that schelf.store's root key vouches for the key that signed the listing, that the listing hasn't expired, that it marks the publisher verified and that exact release as approved to run inside Luft, and that the archive is that release. It unpacks with no links leading out and nothing anyone else can write.
+The first three count only when the folder and every folder above it belong to root and nobody else can write to them. Otherwise Kestrel treats what's there like an extension from the account's own folder. Only the system packages service, `com.lantharos.Packages1`, writes there. Before it unpacks a store release, it checks that schelf.store's root key vouches for the key that signed the listing, that the listing hasn't expired, and that the archive is a release the listing names. Only a release the listing marks approved to run inside Luft, from a publisher it marks verified, goes into the first folder; any other goes into the second, which Kestrel never runs inside itself. Either way it unpacks with no links leading out and nothing anyone else can write, so nothing the person runs can change what the sandbox runs, and the release keeps getting the store's updates.
 
-A copy in the account's own folder of an extension the store folder already has is ignored. Settings, stored values and data are keyed by id, so the copy that runs keeps them. `List` on the [D-Bus interface](/extensions/distributing/#the-d-bus-interface) gives each extension's `origin`, `store`, `copy`, `folder` or `own`, and the copies it ignored.
+An extension is in only one of the store's folders. An update the store approved to run inside Kestrel moves it from the second folder into the first. A release that isn't approved never replaces one that is: the service refuses it, and Schelf doesn't offer it as an update, so an extension running inside Kestrel keeps its approved release until a newer one is approved too.
+
+A copy in the account's own folder of an extension a store folder already has is ignored. Settings, stored values and data are keyed by id, so the copy that runs keeps them. `List` on the [D-Bus interface](/extensions/distributing/#the-d-bus-interface) gives each extension's `origin`, `store`, `store-sandboxed`, `copy`, `folder` or `own`, and the copies it ignored.
 
 ## Extensions nobody reviewed
 
@@ -38,7 +47,7 @@ The permission list in the manifest decides what the API object has. An extensio
 
 Inside Kestrel, the list describes the API and isn't a wall. Code in Kestrel's realm could `import` from `gi://` like Kestrel's own modules do, and an extension's helper runs as the person, outside any sandbox, with their files and network. That is why only vouched-for code gets there: schelf.store's review and approval of each release, the signed index Schelf and the packages service check before installing, the consent people give before installing and again when an update asks for more, and Schelf turning a pulled release off on every computer that has it. For an unreviewed extension, the person's own approval takes the store's place.
 
-In a sandbox, the list is the wall: the process can reach nothing but the parts of the API it was handed. The [manifest reference](/extensions/manifest/#in-a-sandbox) lists the parts a sandbox leaves out. An extension in the account's own folder that asks for one of them isn't started, and `List` gives its state as `store-only`.
+In a sandbox, the list is the wall: the process can reach nothing but the parts of the API it was handed. The [manifest reference](/extensions/manifest/#in-a-sandbox) lists the parts a sandbox leaves out, and Kestrel serves the same list as `SandboxLeavesOut`, which Schelf reads. A sandboxed extension that asks for one of them isn't started, and `List` gives its state as `store-only`. Schelf doesn't install a store release like that until the store approves it to run inside Kestrel.
 
 ## The sandbox
 

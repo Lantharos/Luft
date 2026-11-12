@@ -27,8 +27,6 @@ pub enum Part {
     Packages,
     /// Luft Keyring and its unlock service
     Keyring,
-    /// Luft Passkeys
-    Passkeys,
     /// The firewall
     Firewall,
     /// Secure Boot, the TPM and disk encryption
@@ -63,10 +61,6 @@ impl Part {
                 &[],
             ),
             Self::Keyring => (&["luft-keyring-unlock.service"], &["luft-keyring.service"]),
-            Self::Passkeys => (
-                &["luft-passkeys-relay@*.service"],
-                &["luft-passkeys.service"],
-            ),
             Self::Firewall => (
                 &["luft-firewall.service", "luft-firewall-base.service"],
                 &[],

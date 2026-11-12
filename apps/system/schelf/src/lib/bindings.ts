@@ -578,9 +578,15 @@ export type StoreDetails = {
 	needsLuft: string | null,
 	/**
 	 *  Whether schelf.store approved the extension's release to run inside
-	 *  Luft, the only extensions Luft runs for now.
+	 *  Luft. Any other runs in a sandbox.
 	 */
 	inShell: boolean,
+	/**
+	 *  What the newest extension release asks for that a sandbox leaves out,
+	 *  when nothing installs until schelf.store approves it to run inside
+	 *  Luft.
+	 */
+	needsReview: string[],
 };
 
 export type StoreState = {
@@ -607,6 +613,11 @@ export type StoreUpdate = {
 	 *  moves you to.
 	 */
 	replacement: string | null,
+	/**
+	 *  Whether it's an extension in a sandbox that schelf.store approved to
+	 *  run inside Luft, where the update moves it.
+	 */
+	movesInside: boolean,
 };
 
 export type Switch = "downloads" | "x11" | "microphone" | "camera";

@@ -26,6 +26,9 @@ trait Extensions {
 
     #[zbus(property)]
     fn api_versions(&self) -> zbus::Result<Vec<u32>>;
+
+    #[zbus(property)]
+    fn sandbox_leaves_out(&self) -> zbus::Result<Vec<String>>;
 }
 
 fn folder() -> PathBuf {
@@ -57,6 +60,16 @@ pub fn api_versions() -> &'static [u32] {
     })
 }
 
+/// The parts of the extension API the desktop leaves out of an extension it
+/// runs in a sandbox; none when it can't be asked.
+pub fn sandbox_leaves_out() -> &'static [String] {
+    static LEFT_OUT: OnceLock<Vec<String>> = OnceLock::new();
+    LEFT_OUT.get_or_init(|| {
+        block_on(async { desktop().await?.sandbox_leaves_out().await.map_err(failed) })
+            .unwrap_or_default()
+    })
+}
+
 fn signed_by_store(document: &Sealed) -> Signed<'_> {
     Signed {
         body: &document.body,
@@ -65,10 +78,11 @@ fn signed_by_store(document: &Sealed) -> Signed<'_> {
 }
 
 /// Has the system install the extension for this account, where the
-/// account's own programs can't change it, once it confirmed that
-/// schelf.store approved this release to run inside Luft, and has the
-/// desktop load it. A copy an earlier Luft unpacked into the account's own
-/// folder goes.
+/// account's own programs can't change it, once it confirmed schelf.store's
+/// signature: with the extensions that run inside Luft when the store
+/// approved this release to, otherwise with the ones that run in a sandbox.
+/// Then has the desktop load it. A copy an earlier Luft unpacked into the
+/// account's own folder goes.
 pub fn install(id: &str, archive: &Path, task: Task) -> Result<String, String> {
     task.progress(Stage::Installing, None);
     let listing = signed::sealed(&luft_store_seal::listing_document(id))?;

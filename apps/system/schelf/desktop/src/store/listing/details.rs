@@ -79,8 +79,12 @@ pub struct StoreDetails {
     /// The version of Luft the newest release needs, when this one is older.
     pub needs_luft: Option<String>,
     /// Whether schelf.store approved the extension's release to run inside
-    /// Luft, the only extensions Luft runs for now.
+    /// Luft. Any other runs in a sandbox.
     pub in_shell: bool,
+    /// What the newest extension release asks for that a sandbox leaves out,
+    /// when nothing installs until schelf.store approves it to run inside
+    /// Luft.
+    pub needs_review: Vec<String>,
 }
 
 impl StoreDetails {
@@ -119,15 +123,17 @@ impl StoreDetails {
             luft: None,
             needs_luft: None,
             in_shell: false,
+            needs_review: Vec::new(),
         }
     }
-}
 
-impl From<Listing> for StoreDetails {
-    fn from(listing: Listing) -> Self {
+    /// The page of `listing`, offering what `installed`, the copy you have,
+    /// would update to.
+    pub fn new(listing: Listing, installed: Option<&Installed>) -> Self {
         let (platforms, draw) = (listing.platforms(), device::draw());
         let following = listing.following(platforms);
-        let installable = listing.followed(&following, platforms, draw);
+        let inside_luft = installed.is_some_and(Installed::inside_luft);
+        let installable = listing.followed(&following, platforms, draw, inside_luft);
         let download = match installable {
             Some(_) => None,
             None => listing.download(&following, platforms, draw),
@@ -137,10 +143,12 @@ impl From<Listing> for StoreDetails {
             .or(download.map(|(release, _)| release))
             .cloned();
         let in_shell = installable.is_some_and(|offer| listing.runs_in_shell(offer.release));
-        let installer = installable
-            .map(|offer| offer.format)
-            .filter(|format| *format != Format::LuftExtension || in_shell);
+        let installer = installable.map(|offer| offer.format);
         let needs_luft = listing.held_back(&following, platforms, draw);
+        let needs_review = match installable {
+            Some(_) => Vec::new(),
+            None => listing.waiting(&following, platforms, draw),
+        };
         let size = installable.map(|offer| offer.artifact.size);
         let download = download.map(|(_, artifact)| Download {
             url: artifact.url.clone(),
@@ -198,6 +206,7 @@ impl From<Listing> for StoreDetails {
             replaced_by: listing.replaced_by.and_then(ReplacedBy::listed),
             needs_luft,
             in_shell,
+            needs_review,
         }
     }
 }

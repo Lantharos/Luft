@@ -64,12 +64,14 @@
     <method name="RemoveRepository">
       <arg name="file" type="s" direction="in"/>
     </method>
-    <!-- Installs a Luft extension release into /var/lib/luft/extensions/UID/ID for the caller, where
-         only root can change it, in place of any earlier version. The listing is schelf.store's signed
-         index/v1/apps/ID.json and the keys its trust/v1/store-keys.json, each with its .sig seal as
-         sent. The service checks the keys against schelf.store's root key and the listing against the
-         keys, that the listing hasn't expired, that its publisher is verified, and that the archive is
-         the file of a release it marks runs_in_shell. Anything else is refused. -->
+    <!-- Installs a Luft extension release for the caller where only root can change it, in place of
+         any earlier version. The listing is schelf.store's signed index/v1/apps/ID.json and the keys
+         its trust/v1/store-keys.json, each with its .sig seal as sent. The service checks the keys
+         against schelf.store's root key and the listing against the keys, that the listing hasn't
+         expired, and that the archive is the file of a release it lists. A release the listing marks
+         runs_in_shell, of a verified publisher, goes into /var/lib/luft/extensions/UID/ID, which
+         Kestrel runs inside the shell; any other into /var/lib/luft/sandboxed-extensions/UID/ID,
+         which it only runs in a sandbox, and never in place of one in the first. -->
     <method name="InstallExtension">
       <arg name="id" type="s" direction="in"/>
       <arg name="listing" type="ay" direction="in"/>
@@ -78,7 +80,7 @@
       <arg name="keys_seal" type="ay" direction="in"/>
       <arg name="archive" type="h" direction="in"/>
     </method>
-    <!-- Removes an extension InstallExtension installed for the caller. -->
+    <!-- Removes an extension InstallExtension installed for the caller, from either folder. -->
     <method name="RemoveExtension">
       <arg name="id" type="s" direction="in"/>
     </method>

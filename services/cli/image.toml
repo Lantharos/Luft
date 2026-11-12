@@ -1,6 +1,7 @@
 part = "services"
 sources = [
     "apps/system/settings/locales/en",
+    "kestrel/ui/src/extensions/sandbox/leavesOut.ts",
     "packages/web/settings-catalogue/catalogue.json",
     "packages/web/settings-pages/locales/en",
 ]

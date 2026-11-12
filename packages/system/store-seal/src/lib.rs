@@ -2,7 +2,7 @@ mod extension;
 mod stamp;
 mod trust;
 
-pub use extension::{InShell, in_shell};
+pub use extension::{Listed, listed};
 pub use stamp::{Expiry, Stamp};
 pub use trust::{Keys, Seal};
 

@@ -1,7 +1,7 @@
 [package]
 name = "luft-store-seal"
 version = "0.1.0"
-description = "Checks schelf.store's signatures on its documents and which extension releases may run inside the shell, shared by Schelf and the system packages service"
+description = "Checks schelf.store's signatures on its documents and which extension releases it lists and approved to run inside the shell, shared by Schelf and the system packages service"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true

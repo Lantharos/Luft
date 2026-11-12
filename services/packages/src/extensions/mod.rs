@@ -4,11 +4,11 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, anyhow, bail};
-use luft_store_seal::{Expiry, Keys, STORE_KEYS, Seal, Stamp, in_shell, listing_document};
+use luft_store_seal::{Expiry, Keys, Listed, STORE_KEYS, Seal, Stamp, listed, listing_document};
 use luft_unpack::{Rules, unpack_tar};
 use sha2::{Digest, Sha256};
+use store::Store;
 
-const FOLDER: &str = "/var/lib/luft/extensions";
 const MANIFEST: &str = "extension.toml";
 const RULES: Rules = Rules {
     max_bytes: 256 * 1024 * 1024,
@@ -40,10 +40,6 @@ fn checked(id: &str) -> Result<&str> {
     }
 }
 
-fn account(uid: u32) -> PathBuf {
-    Path::new(FOLDER).join(uid.to_string())
-}
-
 fn digest(archive: &mut File) -> Result<(u64, String)> {
     let mut hasher = Sha256::new();
     let mut buffer = vec![0u8; 256 * 1024];
@@ -66,9 +62,9 @@ fn digest(archive: &mut File) -> Result<(u64, String)> {
 }
 
 /// Checks that schelf.store signed `listing` with keys its root vouches for,
-/// that the listing still counts, and that `archive` is a release of `id`
-/// it approved to run inside the shell.
-fn approved(id: &str, listing: &Signed, keys: &Signed, archive: &mut File) -> Result<()> {
+/// that the listing still counts, and that `archive` is a release of `id` it
+/// lists, which says whether it approved the release to run inside the shell.
+fn release(id: &str, listing: &Signed, keys: &Signed, archive: &mut File) -> Result<Listed> {
     Stamp::read(&keys.body, STORE_KEYS, Expiry::WhenGiven)
         .and_then(|stamp| stamp.current())
         .map_err(untrusted)?;
@@ -83,8 +79,7 @@ fn approved(id: &str, listing: &Signed, keys: &Signed, archive: &mut File) -> Re
         .and_then(|stamp| stamp.current())
         .map_err(untrusted)?;
     let (size, sha256) = digest(archive)?;
-    in_shell(&listing.body, id, size, &sha256).map_err(untrusted)?;
-    Ok(())
+    listed(&listing.body, id, size, &sha256).map_err(untrusted)
 }
 
 /// Leaves only folders, files and links inside the folder, none of them
@@ -158,9 +153,9 @@ fn replace(folder: &Path, id: &str, fill: impl FnOnce(&Path) -> Result<PathBuf>)
     placed.with_context(|| format!("{id} couldn't be installed"))
 }
 
-/// Installs a release schelf.store approved to run inside the shell into
-/// the account's folder of `/var/lib/luft/extensions`, in place of any
-/// earlier version.
+/// Installs a release schelf.store lists for the account, into the folder
+/// Kestrel runs inside the shell when the store approved it to run there, and
+/// into the one it only ever runs in a sandbox otherwise.
 pub fn install(
     uid: u32,
     id: &str,
@@ -169,22 +164,16 @@ pub fn install(
     mut archive: File,
 ) -> Result<()> {
     let id = checked(id)?;
-    approved(id, listing, keys, &mut archive)?;
-    replace(&account(uid), id, |staging| {
-        unpack(archive, staging)?;
-        root(staging)
-    })
+    let listed = release(id, listing, keys, &mut archive)?;
+    Store::system().place(uid, id, &listed, archive)
 }
 
-/// Removes an extension from the account's folder.
+/// Removes an extension from the store's folders of the account.
 pub fn remove(uid: u32, id: &str) -> Result<()> {
-    let destination = account(uid).join(checked(id)?);
-    if fs::symlink_metadata(&destination).is_ok() {
-        fs::remove_dir_all(destination)?;
-    }
-    Ok(())
+    Store::system().remove(uid, checked(id)?)
 }
 
+mod store;
 pub mod unreviewed;
 
 #[cfg(test)]

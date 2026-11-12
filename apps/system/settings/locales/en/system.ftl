@@ -237,9 +237,9 @@ settings-updates-channel-stable = Stable
 settings-updates-channel-nightly = Nightly
 settings-updates-channel-stable-description = Tested builds, fewer changes.
 settings-updates-channel-nightly-description = A new build every day, less tested.
-settings-updates-channel-stable-none = No stable version has been released yet. You can choose it once one is.
+settings-updates-channel-stable-none = No stable version yet. This computer can move there when the first one is released.
 settings-updates-channel-stable-unknown = Couldn’t check whether a stable version is out. Try again when you’re online.
-settings-updates-channel-waiting-stable = This computer keeps its current build and moves to stable once a stable version at least as new is out.
+settings-updates-channel-waiting-stable = This computer keeps getting nightly updates and moves to stable at the next stable release.
 settings-updates-channel-waiting-nightly = This computer keeps its current build and moves to the nightly builds once one at least as new is out.
 # Shown on the channel this computer gets its updates from
 settings-updates-channel-in-use = In use
@@ -249,7 +249,7 @@ settings-updates-nightly-confirm-title = Switch to nightly builds?
 settings-updates-nightly-confirm-body = Nightly builds come out every day with the newest changes. They get less testing than the stable version, so you’ll see new things sooner and more things broken. You can switch back at any time.
 settings-updates-nightly-confirm = Switch to nightly
 settings-updates-stable-confirm-title = Switch to stable?
-settings-updates-stable-confirm-body = Stable versions are tested before they come out and change less often. This computer never goes back to an older build: it moves to the stable version as soon as one at least as new as this one is out, which may be right away or may take a while. You can switch back at any time.
+settings-updates-stable-confirm-body = Stable versions are tested before they come out and change less often. This computer keeps getting nightly updates until a stable version is as new as its build, which may already be the case, and then stays on stable. You can switch back at any time.
 settings-updates-stable-confirm = Switch to stable
 settings-updates-done = Done
 

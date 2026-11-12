@@ -1,3 +1,4 @@
+mod luft;
 mod mounts;
 mod reclaim;
 mod tree;
@@ -14,6 +15,8 @@ use parking_lot::Mutex;
 use serde::Serialize;
 
 use crate::events::SPACE_UPDATE;
+pub use luft::sysroot;
+use luft::{Part, Versions};
 pub use reclaim::Cleanup;
 use reclaim::{Places, Reclaim};
 use specta::Type;
@@ -34,6 +37,7 @@ struct Scan {
     unreadable: Arc<AtomicU64>,
     focus: Arc<Mutex<Vec<String>>>,
     places: Option<Arc<Places>>,
+    luft: Option<Arc<Versions>>,
     started: Instant,
     took: Arc<Mutex<Option<Duration>>>,
 }
@@ -50,6 +54,7 @@ pub struct SpaceUpdate {
     unreadable: u64,
     seconds: f64,
     reclaim: Option<Reclaim>,
+    parts: Option<Vec<Part>>,
 }
 
 impl Scan {
@@ -69,6 +74,10 @@ impl Scan {
                 .places
                 .as_ref()
                 .map(|places| places.reclaim(&self.root)),
+            parts: self
+                .luft
+                .as_ref()
+                .map(|versions| luft::parts(&self.root, versions)),
         }
     }
 
@@ -138,10 +147,23 @@ impl Explorer {
     }
 
     pub fn start(&self, events: &Events, path: &str) -> Result<SpaceUpdate, String> {
+        self.measure(events, Path::new(path), None)
+    }
+
+    /// Measures Luft's own drive by its parts: the state folder, walked like any other, and
+    /// Luft's versions, which the updater measures.
+    pub fn start_luft(&self, events: &Events) -> Result<SpaceUpdate, String> {
+        self.measure(events, &luft::state(), Some(Versions::measure()))
+    }
+
+    fn measure(
+        &self,
+        events: &Events,
+        path: &Path,
+        luft: Option<Arc<Versions>>,
+    ) -> Result<SpaceUpdate, String> {
         self.stop();
-        let path = Path::new(path)
-            .canonicalize()
-            .map_err(|error| error.to_string())?;
+        let path = path.canonicalize().map_err(|error| error.to_string())?;
         let metadata = std::fs::metadata(&path).map_err(|error| error.to_string())?;
         if !metadata.is_dir() {
             return Err("Only folders can be measured".to_owned());
@@ -152,6 +174,7 @@ impl Explorer {
             id: self.0.lock().as_ref().map_or(1, |scan| scan.id + 1),
             root: Node::root(&name, walk::allocated(&metadata)),
             places: Places::under(&path, &cancelled),
+            luft,
             path,
             cancelled,
             unreadable: Arc::default(),

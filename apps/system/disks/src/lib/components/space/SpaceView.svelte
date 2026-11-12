@@ -8,17 +8,20 @@
 	import type { Action } from '../actions';
 	import Reclaim from './Reclaim.svelte';
 	import SpaceList from './SpaceList.svelte';
+	import { partTiles } from './parts';
 	import { tilesOf, type Tile } from './tiles';
 	import Treemap from './Treemap.svelte';
 
 	let update = $derived(space.update);
 	let view = $derived(space.view);
-	let tiles = $derived(view ? tilesOf(view) : []);
-	let crumbs = $derived(space.path.length ? [space.name, ...space.path] : [update?.root ?? space.name]);
+	let parts = $derived(space.path.length ? null : (update?.parts ?? null));
+	let tiles = $derived(parts ? partTiles(parts) : view ? tilesOf(view) : []);
+	let crumbs = $derived(space.path.length || space.luft ? [space.name, ...space.path.map((name, depth) => space.label(name, depth))] : [update?.root ?? space.name]);
 	let status = $derived.by(() => {
 		if (!update) return '';
-		const unreadable = update.unreadable ? ` · ${update.unreadable.toLocaleString()} ${update.unreadable === 1 ? 'folder' : 'folders'} couldn't be read` : '';
+		const unreadable = update.unreadable && !parts ? ` · ${update.unreadable.toLocaleString()} ${update.unreadable === 1 ? 'folder' : 'folders'} couldn't be read` : '';
 		if (update.scanning) return `Measuring ${update.totalItems.toLocaleString()} items${unreadable}`;
+		if (parts) return bytes(parts.reduce((sum, part) => sum + part.size, 0));
 		return view ? `${bytes(view.size)} in ${view.items.toLocaleString()} items${unreadable}` : '';
 	});
 
@@ -29,6 +32,7 @@
 	function actions(tile: Tile): Action[][] {
 		const path = [...space.path, tile.name];
 		const show: Action = { label: 'Show in Rover', run: () => void showInRover(path).catch((caught) => disks.fail(caught)) };
+		if (tile.part) return [[show]];
 		const trash: Action = { label: 'Move to trash…', danger: true, run: () => dialogs.open({ kind: 'trash', path, name: tile.name, size: tile.size, folder: tile.kind === 'dir' }) };
 		return [[show], tile.done ? [trash] : []];
 	}
@@ -58,7 +62,7 @@
 			<RefreshCw size={17} />
 		</button>
 	</div>
-	{#if view && tiles.length}
+	{#if (view || parts) && tiles.length}
 		<Treemap {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} />
 		<SpaceList {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} {actions} />
 	{:else if view}

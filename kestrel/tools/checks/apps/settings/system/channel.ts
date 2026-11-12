@@ -40,28 +40,25 @@ async function onUpdates(followed: string, stable: Published, use: (app: LuftApp
   }, {LUFT_PCI_DEVICES: noGraphics});
 }
 
-async function checkNoStable() {
-  await onUpdates('nightly', 'no', async app => {
-    (await app.frame()).save('settings-channel-no-stable');
-    const shown = await app.frame(app.area(CHANNELS));
-    app.click(SWITCH_STABLE);
-    require((await app.settle(() => true, app.area(CHANNELS))).looksLike(shown), 'Stable can’t be chosen while no stable version is out');
-  });
+async function checkUnknown() {
   await onUpdates('nightly', 'unknown', async app => {
     (await app.frame()).save('settings-channel-unknown');
+    const shown = await app.frame(app.area(CHANNELS));
+    app.click(SWITCH_STABLE);
+    require((await app.settle(() => true, app.area(CHANNELS))).looksLike(shown), 'Stable can’t be chosen while it’s unknown whether one is out');
   });
   require((await switchesAsked()).length === 0, 'nothing asks the updater to switch while stable can’t be chosen');
 }
 
-async function checkToStable() {
-  await onUpdates('nightly', 'yes', async app => {
-    (await app.frame()).save('settings-channel-nightly');
-    (await changes(app, 'switching to stable asks to confirm first', () => app.click(SWITCH_STABLE))).save('settings-channel-confirm-stable');
+async function switchToStable(stable: Published, name: string) {
+  await onUpdates('nightly', stable, async app => {
+    (await app.frame()).save(`settings-channel-nightly-${name}`);
+    (await changes(app, 'switching to stable asks to confirm first', () => app.click(SWITCH_STABLE))).save(`settings-channel-confirm-stable-${name}`);
     require((await switchesAsked()).length === 0, 'the updater, which asks for an administrator, isn’t reached before confirming');
     app.click(CONFIRM_STABLE);
     await eventually(async () => (await switchesAsked()).includes('Updater SwitchChannel stable'), 'confirming asks the updater to switch to stable');
     await app.settle(() => true);
-    (await app.frame()).save('settings-channel-waiting-stable');
+    (await app.frame()).save(`settings-channel-waiting-stable-${name}`);
   });
 }
 
@@ -81,8 +78,9 @@ async function checkToNightly() {
 export async function checkChannel() {
   await switchesAsked();
   try {
-    await checkNoStable();
-    await checkToStable();
+    await checkUnknown();
+    await switchToStable('no', 'none-out');
+    await switchToStable('yes', 'out');
     await checkToNightly();
   } finally {
     await useChannel('', 'no');

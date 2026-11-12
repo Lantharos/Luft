@@ -12,18 +12,18 @@ import {checkEncrypted, checkEncryption, checkHealth, checkRemovable, copied} fr
 import {checkEditing} from './disks/editing.js';
 import {trashed, writeSpace} from './disks/space.js';
 import {checkMoveLuft} from './disks/moving.js';
-import {checkSystemVolume} from './disks/system.js';
+import {checkSystemVolume, LUFT_ROOT} from './disks/system.js';
 import {checkOtherSystems} from './disks/systems.js';
 
 const {require, eventually} = checks('Luft app');
 const COPY_TIMEOUT = 10000;
 
-async function withDriver<T>(args: string[], use: (driver: Driver) => T | Promise<T>): Promise<T> {
+async function withDriver<T>(args: string[], use: (driver: Driver) => T | Promise<T>, env: Record<string, string> = {}): Promise<T> {
   return withApp('disks', args, async app => {
     const driver = new Driver(app);
     await driver.take();
     return use(driver);
-  });
+  }, env);
 }
 
 async function checkDrives() {
@@ -80,7 +80,7 @@ export async function run() {
       await showDark(driver.app, palette);
       await checkEditing(driver, palette);
       await checkSystemVolume(driver, palette);
-    });
+    }, LUFT_ROOT);
     await checkWriteImage(await checkDrives());
     await checkSpace();
     await withDriver([], driver => checkOtherSystems(driver, palette));

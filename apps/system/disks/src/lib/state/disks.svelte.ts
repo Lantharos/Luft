@@ -5,6 +5,7 @@ import { commands, events } from '#lib/bindings.js';
 import type { Activation, Drive, ImageProgress, LuftRoom, Protection, Segment, Support, Volume } from '#lib/bindings.js';
 import { CANCELLED } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+import { inner, volumeName } from '#lib/format.js';
 import { space } from './space.svelte';
 import { systems } from './systems.svelte';
 
@@ -23,6 +24,7 @@ class Disks {
 	image = $state.raw<ImageProgress | null>(null);
 	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {}, systemResize: '' });
 	loaded = $state(false);
+	sysroot = $state('');
 	readonly busy = new SvelteSet<string>();
 	readonly notices = new Toasts(NOTICE_MS);
 	readonly #offered = new Set<string>();
@@ -42,7 +44,13 @@ class Disks {
 		space.listen();
 		events.disksTrust((protection) => (this.protection = protection));
 		sabineEvents.singleInstance((activation) => void this.#locate(activation));
-		const [{ drives }, formats, protection] = await Promise.all([commands.disksSnapshot(), commands.disksFormats(), commands.trustState().catch(() => this.protection)]);
+		const [{ drives }, formats, protection, sysroot] = await Promise.all([
+			commands.disksSnapshot(),
+			commands.disksFormats(),
+			commands.trustState().catch(() => this.protection),
+			commands.spaceLuftDrive()
+		]);
+		this.sysroot = sysroot;
 		this.drives = drives;
 		systems.follow(drives);
 		this.formats = formats;
@@ -61,6 +69,17 @@ class Disks {
 
 	explore(path: string, name: string) {
 		void space.open(path, name).catch((caught) => this.fail(caught));
+	}
+
+	holdsLuft(volume: Volume) {
+		return inner(volume).mountPoints.includes(this.sysroot);
+	}
+
+	exploreVolume(volume: Volume) {
+		const contents = inner(volume);
+		const name = volumeName(volume);
+		if (this.holdsLuft(volume)) void space.openLuft(this.sysroot, name).catch((caught) => this.fail(caught));
+		else this.explore(contents.mountPoints[0], name);
 	}
 
 	encryption(volume: Volume) {

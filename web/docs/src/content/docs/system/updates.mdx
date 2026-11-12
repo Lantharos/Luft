@@ -19,7 +19,7 @@ Luft looks for updates every day and downloads them in the background. When one 
 
 The version you had stays on the computer as the previous version.
 
-After a restart to install an update, the apps you had open come back once you sign in, with their windows where you left them. To have them come back after every restart and sign-out too, turn on **Reopen apps when I sign in** in Settings, under Apps.
+After a restart to install an update, the apps you had open come back once you sign in, with their windows where you left them. Luft's own apps also come back with what you had open in them, such as your folders in Rover or the page you were on in Settings. To have them come back after every restart and sign-out too, turn on **Reopen apps when I sign in** in Settings, under Apps.
 
 In **Automatic updates** you choose how often Luft looks (every day, every week, or only when you check) and whether it downloads in the background. Changing it asks for an administrator's password. The choice is the same for everyone on the computer, and Luft looks even when nobody is signed in. It waits while the computer runs on its battery or uses a metered connection, such as a phone's hotspot, and looks once it's plugged in or on another network.
 
@@ -45,9 +45,9 @@ Releases are numbered Luft 1.1, 1.2 and on, and the number before the dot change
 
 A computer follows the channel it was installed from: one installed from a nightly stick keeps getting nightly builds. To change it, choose **Stable** or **Nightly** under **Release channel** in Settings, under System. Luft asks you to confirm, then for an administrator's password, and keeps your choice of the standard or NVIDIA image.
 
-Switching never installs an older version than the one you have. When the other channel already has a version at least as new, Luft downloads it and it starts at the next restart. When it doesn't, which is usual right after a stable release when you're coming from the nightly builds, your computer keeps the version it has, gets no nightly updates in the meantime, and moves to the stable version as soon as one at least as new is out. Settings says when it's waiting.
+Switching never installs an older version than the one you have. A stable release is a nightly build that was tested and promoted, so when you move from the nightly builds to stable, your computer keeps getting nightly updates until the next stable release that's at least as new as the build it has, then stays on stable. When that release is the build you already have, nothing is downloaded. Moving to the nightly builds happens right away when they have a version at least as new as yours; otherwise your computer keeps its version until they do.
 
-**Stable** can only be chosen once a stable version has been released; until then Settings says so. When Luft can't reach the update server, it says it couldn't check.
+When Luft can't reach the update server, Settings says it couldn't check whether a stable version is out, and **Stable** can't be chosen until it can.
 
 Nightly builds get the least testing: nobody has used one for long before it reaches you. When something breaks or looks wrong, Settings › System › Report a problem opens a new issue with your version filled in.
 

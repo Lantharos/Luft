@@ -7,6 +7,7 @@ const UPDATER = `<node><interface name="com.lantharos.Updater1">
   <property name="Downloaded" type="t" access="read"/>
   <method name="Status"><arg type="s" direction="out"/></method>
   <method name="StableReleased"><arg type="s" direction="out"/></method>
+  <method name="Space"><arg type="s" direction="out"/></method>
   <method name="SwitchChannel"><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
   <method name="Apply"/>
   <method name="Download"/>
@@ -27,6 +28,7 @@ const CHANNEL_TAGS: Record<string, string> = {stable: '1', nightly: '1-nightly'}
 const VERSION = '1.2-nightly.21';
 const DIGEST = 'sha256:4c5f0f8a1b6e2d7c9a3e5b1f7d2c8a6e4b0f9d3c7a1e5b2f8d6c4a0e9b3f7d1c';
 const NEXT_VERSION = '1.2-nightly.22';
+const LUFT_SPACE = {running: 9_400_000_000, downloaded: 0, older: 3_100_000_000};
 const NEXT_DIGEST = 'sha256:9e1d3b7f5a2c8e4d6b0a9f3c7e1b5d2a8f4c6e0b9d3a7f1e5c2b8d4a6f0e9c3b';
 
 const configOf = (created: string, version: string) => ({created, config: {Labels: {'org.opencontainers.image.version': version}}});
@@ -76,6 +78,7 @@ export function publishUpdater(publish: Publish, calls: string[]) {
     get Downloaded() { return downloaded; },
     Status: () => status(staged, channels),
     StableReleased: () => channels.stable,
+    Space: () => JSON.stringify(LUFT_SPACE),
     SwitchChannel: (channel: string) => {
       calls.push(`Updater SwitchChannel ${channel}`);
       channels.waiting = channel === channels.followed ? null : channel;

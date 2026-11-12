@@ -20,6 +20,8 @@ export const FILESYSTEM_NAMES: Record<string, string> = {
 	squashfs: 'SquashFS'
 };
 
+const LUFT_LABEL = 'luft';
+
 export const LABEL_LIMITS: Record<Filesystem, number> = { ext4: 16, btrfs: 255, exfat: 15, ntfs: 32, vfat: 11 };
 
 export function filesystemName(volume: Volume) {
@@ -33,7 +35,9 @@ export function folderName(path: string) {
 
 export function volumeName(volume: Volume) {
 	const contents = inner(volume);
-	if (volume.label || contents.label) return volume.label || contents.label;
+	const label = volume.label || contents.label;
+	if (label === LUFT_LABEL) return 'Luft';
+	if (label) return label;
 	if (volume.partitionName) return volume.partitionName;
 	if (isEfiSystem(volume)) return 'EFI system';
 	if (contents.mountPoints[0]) return folderName(contents.mountPoints[0]);

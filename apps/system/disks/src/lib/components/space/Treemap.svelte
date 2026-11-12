@@ -62,7 +62,7 @@
 	}
 
 	function background(tile: Tile, colors: Palette, lit: boolean) {
-		if (tile.kind === 'dir') return mix(colors.tones[tile.tone], lit ? 0.24 : 0.16);
+		if (tile.kind === 'dir' || tile.kind === 'part') return mix(colors.tones[tile.tone], lit ? 0.24 : 0.16);
 		if (tile.kind === 'file') return mix(colors.ink, lit ? 0.15 : 0.1);
 		return mix(colors.ink, lit ? 0.09 : 0.05);
 	}
@@ -87,7 +87,7 @@
 		const size = bytes(tile.size);
 		context.font = '400 11.5px "Open Runde", sans-serif';
 		const sizeWidth = context.measureText(size).width;
-		const inline = tile.kind === 'dir';
+		const inline = tile.kind === 'dir' || tile.kind === 'part';
 		const room = box.w - 20 - (inline ? sizeWidth + 10 : 0);
 		if (inline && room > 24) {
 			context.fillStyle = colors.muted;

@@ -101,9 +101,10 @@ impl Deployments {
     /// channel to catch up with the running version before it moves there.
     pub fn channel_choice(&self) -> Option<ChannelChoice> {
         let followed = self.0.followed.as_ref()?.follows()?;
+        let waiting = self.waiting();
         Some(ChannelChoice {
-            chosen: self.0.waiting.unwrap_or(followed),
-            waiting: self.0.waiting.is_some_and(|waiting| waiting != followed),
+            chosen: waiting.unwrap_or(followed),
+            waiting: waiting.is_some(),
         })
     }
 
@@ -132,39 +133,64 @@ impl Deployments {
             .sum()
     }
 
-    /// The channel this system gets its updates from, or the one it waits to move to.
-    fn source(&self) -> Result<Reference, String> {
-        let followed = self.followed()?;
-        Ok(match self.0.waiting {
-            Some(channel) => followed.as_channel(channel).ok_or(NOT_FROM_AN_IMAGE)?,
-            None => followed.clone(),
-        })
+    /// The channel the system waits to move to, when it doesn't follow that one yet.
+    fn waiting(&self) -> Option<Channel> {
+        let followed = self.0.followed.as_ref()?.follows();
+        self.0.waiting.filter(|waiting| Some(*waiting) != followed)
     }
 
+    /// The update a system waiting for another channel takes next: the move there once that
+    /// channel has a version at least as new as the running one, and until then, while it waits
+    /// for stable, the nightlies it follows. A move to the running build under the other tag
+    /// downloads nothing, so it's no update to offer.
     pub fn check(&self) -> Result<Option<Update>, String> {
-        let source = self.source()?;
-        let location = source.location().ok_or(NOT_FROM_AN_IMAGE)?;
-        let image = registry::fetch(&location)?;
-        if image.config.layers() == self.0.booted.layers() {
-            return Ok(None);
+        let followed = self.followed()?;
+        if let Some(channel) = self.waiting() {
+            let target = followed.as_channel(channel).ok_or(NOT_FROM_AN_IMAGE)?;
+            let location = target.location().ok_or(NOT_FROM_AN_IMAGE)?;
+            match registry::fetch_published(&location)? {
+                Some(image) if self.retargets(&image) => return Ok(None),
+                Some(image) if self.moves_to(&image) => return Ok(self.offer(&target, &image)),
+                _ if channel == Channel::Nightly => return Ok(None),
+                _ => {}
+            }
+        }
+        let location = followed.location().ok_or(NOT_FROM_AN_IMAGE)?;
+        Ok(self.offer(followed, &registry::fetch(&location)?))
+    }
+
+    fn older_than_running(&self, image: &Image) -> bool {
+        let installed = self.0.booted.release().version;
+        let offered = image.config.release().version;
+        matches!((installed, offered), (Some(installed), Some(offered)) if Version::newer(&installed, &offered))
+    }
+
+    fn retargets(&self, image: &Image) -> bool {
+        image.config.layers() == self.0.booted.layers() && !self.older_than_running(image)
+    }
+
+    fn moves_to(&self, image: &Image) -> bool {
+        let staged = self.0.staged.as_ref().map(Deployment::layers);
+        !self.older_than_running(image) && staged != Some(image.config.layers())
+    }
+
+    fn offer(&self, source: &Reference, image: &Image) -> Option<Update> {
+        if image.config.layers() == self.0.booted.layers() || self.older_than_running(image) {
+            return None;
         }
         let mut release = image.config.release();
-        let installed = self.0.booted.release().version;
-        if let (Some(installed), Some(offered)) = (&installed, &release.version)
-            && Version::newer(installed, offered)
-        {
-            return Ok(None);
-        }
-        if let (Some(channel), Some(installed), Some(offered)) =
-            (source.channel(), installed, release.version.as_deref())
-        {
+        if let (Some(channel), Some(installed), Some(offered)) = (
+            source.channel(),
+            self.0.booted.release().version,
+            release.version.as_deref(),
+        ) {
             release.notes = notes::between(channel, &installed, offered).or(release.notes);
         }
-        Ok(Some(Update {
+        Some(Update {
             release,
-            size: self.new_bytes(&image),
+            size: self.new_bytes(image),
             layers: image.config.layers().to_vec(),
-        }))
+        })
     }
 
     /// Everything new since the version this system updated from, when that one was older.

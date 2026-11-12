@@ -29,7 +29,7 @@
 	let confirming = $state<Channel | null>(null);
 
 	const busy = $derived(activity.running !== null);
-	const unavailable = (channel: Channel) => channel === 'stable' && stable !== 'released';
+	const unavailable = (channel: Channel) => channel === 'stable' && (stable === null || stable === 'unknown');
 
 	function describe(channel: Channel) {
 		if (channel === choice.chosen) return t(choice.waiting ? WAITING[channel] : DESCRIPTIONS[channel]);

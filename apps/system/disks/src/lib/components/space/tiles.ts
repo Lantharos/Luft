@@ -1,6 +1,6 @@
-import type { SpaceView } from '#lib/bindings.js';
+import type { PartKind, SpaceView } from '#lib/bindings.js';
 
-export type TileKind = 'dir' | 'file' | 'other' | 'rest';
+export type TileKind = 'dir' | 'file' | 'other' | 'rest' | 'part';
 
 export interface Tile {
 	key: string;
@@ -12,6 +12,7 @@ export interface Tile {
 	inner: number[];
 	done: boolean;
 	tone: number;
+	part?: PartKind;
 }
 
 const count = (value: number, one: string, many: string) => `${value.toLocaleString()} ${value === 1 ? one : many}`;

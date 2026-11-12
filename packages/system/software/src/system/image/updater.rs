@@ -1,6 +1,6 @@
 use futures_util::{Stream, StreamExt};
-use luft_app::dbus::service::{Service, get};
-use luft_app::dbus::{self, failed};
+use luft_dbus::service::{Service, get};
+use luft_dbus::{self as dbus, failed};
 use luft_variant::{Channel, Variant};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -175,10 +175,11 @@ async fn cancellable(
     size: Option<u64>,
     task: Task<'_>,
 ) -> Result<(), String> {
+    let runtime = tokio::runtime::Handle::current();
     task.cancel
         .while_awaiting(
-            || {
-                luft_app::spawn(async {
+            move || {
+                runtime.spawn(async {
                     let _ = change("Cancel").await;
                 });
             },

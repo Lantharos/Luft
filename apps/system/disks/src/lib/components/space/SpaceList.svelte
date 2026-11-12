@@ -2,6 +2,7 @@
 	import FileIcon from '@lucide/svelte/icons/file';
 	import Files from '@lucide/svelte/icons/files';
 	import Folder from '@lucide/svelte/icons/folder';
+	import { PART_ICONS } from './parts';
 	import { bytes } from '@luft/ui';
 	import ActionMenu from '../ActionMenu.svelte';
 	import type { Action } from '../actions';
@@ -24,8 +25,11 @@
 	{#each tiles as tile (tile.key)}
 		<div class={['row', 'hover-row', hovered === tile.key && 'lit']} role="listitem" onpointerenter={() => onhover(tile.key)} onpointerleave={() => onhover(null)}>
 			<button type="button" class="main" disabled={tile.kind !== 'dir'} onclick={() => onopen(tile)}>
-				<span class="icon" style:color={tile.kind === 'dir' ? TONES[tile.tone] : undefined}>
-					{#if tile.kind === 'dir'}
+				<span class="icon" style:color={tile.kind === 'dir' || tile.kind === 'part' ? TONES[tile.tone] : undefined}>
+					{#if tile.part}
+						{@const Icon = PART_ICONS[tile.part]}
+						<Icon size={18} />
+					{:else if tile.kind === 'dir'}
 						<Folder size={18} />
 					{:else if tile.kind === 'file'}
 						<FileIcon size={18} />

@@ -18,11 +18,14 @@
 
 	let contents = $derived(inner(volume));
 	let mounted = $derived(contents.mountPoints.length > 0);
+	let luft = $derived(disks.holdsLuft(volume));
+	let mountedAt = $derived({ label: 'Mounted at', value: contents.mountPoints.map(folderName).join(', '), open: () => void openFolder(contents.mountPoints[0]) });
 	let facts = $derived(
 		[
 			{ label: 'Format', value: volume.encryption ? encryption() : filesystemName(volume) },
 			{ label: 'Size', value: bytes(volume.size) },
-			mounted && { label: 'Mounted at', value: contents.mountPoints.map(folderName).join(', '), open: () => void openFolder(contents.mountPoints[0]) },
+			luft && { label: 'Holds', value: 'Luft, your files and your apps' },
+			mounted && !luft && mountedAt,
 			contents.startup && { label: 'At startup', value: `Mounts at ${contents.startup.directory}` }
 		].filter((fact) => fact !== false && fact !== null)
 	);
@@ -33,7 +36,8 @@
 			contents !== volume && contents.uuid && { label: 'Contents UUID', value: contents.uuid, mono: true },
 			volume.partitionType && { label: 'Partition type', value: typeName(volume.partitionType) ?? '' },
 			volume.partitionName && { label: 'Partition name', value: volume.partitionName },
-			volume.number !== null && { label: 'Partition', value: `${volume.number} on ${drive.device}` }
+			volume.number !== null && { label: 'Partition', value: `${volume.number} on ${drive.device}` },
+			luft && mountedAt
 		].filter((fact) => fact !== false && fact !== '' && fact !== null)
 	);
 	let more = $state(false);
@@ -43,7 +47,7 @@
 	}
 
 	function explore() {
-		disks.explore(contents.mountPoints[0], volumeName(volume));
+		disks.exploreVolume(volume);
 		onclose();
 	}
 </script>

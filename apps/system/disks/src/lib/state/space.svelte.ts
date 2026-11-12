@@ -1,18 +1,24 @@
 import { commands, events } from '#lib/bindings.js';
 import type { Cleanup, SpaceUpdate } from '#lib/bindings.js';
 import { WAIT } from '#lib/bridge/index.js';
+import { PART_NAMES } from '#lib/components/space/parts.js';
 
 const same = (a: string[], b: string[]) => a.length === b.length && a.every((part, index) => part === b[index]);
 
 class Space {
 	root = $state<string | null>(null);
+	luft = $state(false);
 	name = $state('');
 	path = $state.raw<string[]>([]);
 	update = $state.raw<SpaceUpdate | null>(null);
 	hovered = $state<string | null>(null);
 
 	view = $derived(this.update?.view && same(this.update.view.path, this.path) ? this.update.view : null);
-	title = $derived(this.path.at(-1) ?? this.name);
+	title = $derived(this.path.length ? this.label(this.path.at(-1)!, this.path.length - 1) : this.name);
+
+	label(name: string, depth: number) {
+		return this.luft && depth === 0 && name === 'home' ? PART_NAMES.files : name;
+	}
 
 	listen() {
 		events.spaceUpdate((update) => {
@@ -20,18 +26,31 @@ class Space {
 		});
 	}
 
-	async open(root: string, name: string) {
+	open(root: string, name: string) {
+		return this.#start(root, name, false, () => commands.spaceScan({ path: root }));
+	}
+
+	openLuft(sysroot: string, name: string) {
+		return this.#start(sysroot, name, true, commands.spaceScanLuft);
+	}
+
+	async #start(root: string, name: string, luft: boolean, scan: () => Promise<SpaceUpdate>) {
 		this.root = root;
+		this.luft = luft;
 		this.name = name;
 		this.path = [];
 		this.hovered = null;
-		this.update = await commands.spaceScan({ path: root });
+		this.update = await scan();
+	}
+
+	#scan() {
+		return this.luft ? commands.spaceScanLuft() : commands.spaceScan({ path: this.root! });
 	}
 
 	refresh() {
 		if (!this.root) return;
 		const path = this.path;
-		void commands.spaceScan({ path: this.root }).then((update) => {
+		void this.#scan().then((update) => {
 			this.update = update;
 			this.path = [];
 			if (path.length) void this.go(path);

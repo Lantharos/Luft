@@ -161,3 +161,35 @@ fn the_release_channel_comes_from_the_followed_tag() {
     }
     assert_eq!(following(&format!("{LUFT}@sha256:abc")).channel(), None);
 }
+
+fn published(version: &str, layers: &[String]) -> Image {
+    let config = serde_json::json!({
+        "config": { "Labels": { "org.opencontainers.image.version": version } },
+        "rootfs": { "diff_ids": layers },
+    });
+    Image {
+        config: serde_json::from_value(config).unwrap(),
+        blobs: Vec::new(),
+    }
+}
+
+#[test]
+fn the_running_build_promoted_under_another_tag_only_retargets() {
+    let installed = deployments(include_str!("fixtures/installed.json"));
+    let promoted = published("1.1", installed.0.booted.layers());
+    assert!(installed.retargets(&promoted));
+    assert_eq!(
+        installed.offer(&installed.followed().unwrap().clone(), &promoted),
+        None
+    );
+}
+
+#[test]
+fn a_move_never_goes_to_an_older_version_or_the_one_already_staged() {
+    let staged = deployments(include_str!("fixtures/staged.json"));
+    let other = vec!["sha256:0d1e".to_owned()];
+    assert!(staged.moves_to(&published("1.2", &other)));
+    assert!(!staged.moves_to(&published("1.0", &other)));
+    let next = staged.0.staged.as_ref().unwrap().layers();
+    assert!(!staged.moves_to(&published("1.2", next)));
+}

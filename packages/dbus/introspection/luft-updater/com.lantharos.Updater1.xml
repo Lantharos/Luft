@@ -15,6 +15,9 @@
     <method name="Status">
       <arg type="s" direction="out"/>
     </method>
+    <method name="Space">
+      <arg type="s" direction="out"/>
+    </method>
     <method name="StableReleased">
       <arg type="s" direction="out"/>
     </method>

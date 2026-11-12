@@ -34,6 +34,25 @@ pub struct Updater {
     stable: Mutex<Option<(Instant, bool)>>,
 }
 
+/// What a download does to the system, which decides what follows once it's done.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Change {
+    Update,
+    Variant,
+    Move,
+    Retarget,
+}
+
+impl Change {
+    fn stages(self) -> bool {
+        self != Self::Retarget
+    }
+
+    fn moves(self) -> bool {
+        matches!(self, Self::Move | Self::Retarget)
+    }
+}
+
 impl Updater {
     pub fn new(idle: Arc<Idle>) -> Self {
         Self {
@@ -67,6 +86,19 @@ impl Updater {
         .await
     }
 
+    /// Stops waiting once the system follows the channel it waited for. A move can leave an
+    /// update from the old channel staged, which keeps the system waiting after the restart.
+    async fn arrive(&self) {
+        let Some(waiting) = self.planned().waiting else {
+            return;
+        };
+        if let Ok(Some(followed)) = self.blocking(bootc::followed_channel).await
+            && followed == waiting
+        {
+            let _ = self.wait_for(None).await;
+        }
+    }
+
     async fn fetch_next(
         &self,
         next: Next,
@@ -74,17 +106,18 @@ impl Updater {
         server: &ObjectServer,
         emitter: &SignalEmitter<'_>,
     ) -> Result<bool, Error> {
-        match next {
+        let (target, change) = match next {
             Next::Nothing => return Ok(false),
-            Next::Update => {
-                self.begin(Fetch::upgrade, scheduled, false, server, emitter)
-                    .await?
-            }
-            Next::Move(target) => {
-                self.begin(|| Fetch::switch(&target), scheduled, true, server, emitter)
-                    .await?
-            }
-        }
+            Next::Update => (None, Change::Update),
+            Next::Move(target) => (Some(target), Change::Move),
+            Next::Retarget(target) => (Some(target), Change::Retarget),
+        };
+        let fetch = || match &target {
+            Some(target) => Fetch::switch(target),
+            None => Fetch::upgrade(),
+        };
+        self.begin(fetch, scheduled, change, server, emitter)
+            .await?;
         Ok(true)
     }
 
@@ -105,7 +138,7 @@ impl Updater {
         &self,
         fetch: impl FnOnce() -> anyhow::Result<Fetch>,
         scheduled: bool,
-        moving: bool,
+        change: Change,
         server: &ObjectServer,
         emitter: &SignalEmitter<'_>,
     ) -> Result<(), Error> {
@@ -124,7 +157,7 @@ impl Updater {
         let _ = self.downloaded_changed(emitter).await;
         let _ = self.downloading_changed(emitter).await;
         let updater = server.interface::<_, Updater>(PATH).await?;
-        tokio::spawn(follow(updater, fetch, scheduled, moving, self.idle.clone()));
+        tokio::spawn(follow(updater, fetch, scheduled, change, self.idle.clone()));
         Ok(())
     }
 
@@ -151,7 +184,7 @@ async fn follow(
     updater: InterfaceRef<Updater>,
     fetch: Fetch,
     scheduled: bool,
-    moving: bool,
+    change: Change,
     idle: Arc<Idle>,
 ) {
     let _activity = idle.hold();
@@ -168,7 +201,7 @@ async fn follow(
         let _ = inner.downloaded_changed(emitter).await;
     }
     let result = work.await;
-    if matches!(result, Ok(Ok(()))) {
+    if matches!(result, Ok(Ok(()))) && change.stages() {
         build_system_packages(emitter.connection()).await;
     }
     let inner = updater.get().await;
@@ -176,10 +209,10 @@ async fn follow(
     let _ = inner.downloading_changed(emitter).await;
     let error = match result {
         Ok(Ok(())) => {
-            if moving {
-                let _ = inner.wait_for(None).await;
+            if change.moves() {
+                inner.arrive().await;
             }
-            if scheduled {
+            if scheduled && change.stages() {
                 let _ = Updater::update_found(emitter, true).await;
             }
             String::new()
@@ -299,7 +332,7 @@ impl Updater {
         .await?;
         let _ = self.last_checked_changed(&emitter).await;
         let available = !matches!(next, Next::Nothing);
-        if available && planned.download {
+        if matches!(next, Next::Retarget(_)) || (available && planned.download) {
             self.fetch_next(next, true, server, &emitter).await?;
             return Ok(());
         }
@@ -316,6 +349,13 @@ impl Updater {
     async fn status(&self) -> Result<String, Error> {
         let waiting = self.planned().waiting;
         self.blocking(move || bootc::status(waiting)).await
+    }
+
+    /// JSON: the bytes on the drive the running version of Luft, a downloaded update and the
+    /// older versions kept on the computer hold.
+    async fn space(&self) -> Result<String, Error> {
+        self.blocking(|| Ok(serde_json::to_string(&crate::space::measure()?)?))
+            .await
     }
 
     /// "yes" or "no" for whether a stable version is out, or "unknown" when the registry
@@ -351,22 +391,22 @@ impl Updater {
         self.authorize(connection, &header, DOWNLOAD).await?;
         let Some(channel) = self.planned().waiting else {
             return self
-                .begin(Fetch::upgrade, false, false, server, &emitter)
+                .begin(Fetch::upgrade, false, Change::Update, server, &emitter)
                 .await;
         };
         let next = self.blocking(move || bootc::next(Some(channel))).await?;
         if !self.fetch_next(next, false, server, &emitter).await? {
-            return Err(Error::Failed(format!(
-                "The {} channel has no version as new as this one yet.",
-                channel.name()
-            )));
+            return Err(Error::Failed(
+                "There's no update to download yet.".to_owned(),
+            ));
         }
         Ok(())
     }
 
     /// Has updates come from `channel` from now on. Returns whether the move started right away,
     /// which it does when the channel has a version at least as new as the running one;
-    /// otherwise the system keeps its version and moves once the channel catches up.
+    /// otherwise the system moves once the channel catches up, taking nightlies meanwhile when
+    /// it waits for stable.
     async fn switch_channel(
         &self,
         channel: &str,
@@ -384,8 +424,12 @@ impl Updater {
             return Ok(false);
         }
         self.wait_for(Some(channel)).await?;
-        let next = self.blocking(move || bootc::next(Some(channel))).await?;
-        self.fetch_next(next, false, server, &emitter).await
+        match self.blocking(move || bootc::next(Some(channel))).await? {
+            next @ (Next::Move(_) | Next::Retarget(_)) => {
+                self.fetch_next(next, false, server, &emitter).await
+            }
+            Next::Update | Next::Nothing => Ok(false),
+        }
     }
 
     async fn switch_variant(
@@ -405,8 +449,14 @@ impl Updater {
             )));
         }
         let target = self.blocking(move || bootc::switch_target(named)).await?;
-        self.begin(|| Fetch::switch(&target), false, false, server, &emitter)
-            .await
+        self.begin(
+            || Fetch::switch(&target),
+            false,
+            Change::Variant,
+            server,
+            &emitter,
+        )
+        .await
     }
 
     async fn cancel(

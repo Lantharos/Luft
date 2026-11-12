@@ -9,7 +9,8 @@ rust-version.workspace = true
 
 [features]
 default = ["system"]
-system = ["dep:futures-util", "dep:luft-app", "dep:tokio", "dep:zbus"]
+image = ["dep:futures-util", "dep:luft-dbus", "dep:tokio", "dep:zbus"]
+system = ["image", "dep:luft-app"]
 
 [dependencies]
 backhand = { workspace = true, features = ["gzip", "lz4", "xz", "zstd"] }
@@ -20,6 +21,7 @@ glob.workspace = true
 libc.workspace = true
 liblzma.workspace = true
 luft-app = { workspace = true, features = ["apps"], optional = true }
+luft-dbus = { workspace = true, optional = true }
 luft-variant.workspace = true
 rustix = { workspace = true, features = ["fs"] }
 sabine-service.workspace = true

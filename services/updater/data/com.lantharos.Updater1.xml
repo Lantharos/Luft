@@ -14,15 +14,17 @@
 
     Luft's images follow a channel by their tag: stable (":1") or nightly (":1-nightly"), each in the
     standard and NVIDIA image. SwitchChannel moves the system to the same image on the other channel
-    when that channel has a version at least as new as the running one, staged like SwitchVariant.
-    When it doesn't, the system keeps its version, the channel is kept as the one it waits for in
-    schedule.json, and Download and RunSchedule move it there once the channel has caught up, in
-    place of updates on the channel it still follows.
+    when that channel has a version at least as new as the running one, staged like SwitchVariant,
+    or, when that version is the running one under the other tag, by pointing the running
+    deployment at the new tag without downloading or staging anything. When the channel has
+    nothing as new, the channel is kept as the one the system waits for in schedule.json, and
+    Download and RunSchedule move it there once the channel has caught up. Until then a system
+    waiting for stable keeps taking nightly updates, and one waiting for nightly keeps its version.
 
     Download, Cancel and Apply need com.lantharos.updater.download, which administrators at the
     computer have without being asked; SwitchVariant needs com.lantharos.updater.variant,
     SwitchChannel com.lantharos.updater.channel, SetSchedule com.lantharos.updater.schedule and Rollback com.lantharos.updater.rollback, which
-    ask for a password. Status and StableReleased need nothing. Only root can call RunSchedule.
+    ask for a password. Status, Space and StableReleased need nothing. Only root can call RunSchedule.
 
     A version older than the running one is never staged or applied: its version is read from the
     image's configuration, which its signature covers. Only Rollback starts an older version, the
@@ -43,6 +45,13 @@
          has caught up, "stable" or "nightly", or null. -->
     <method name="Status">
       <arg name="status" type="s" direction="out"/>
+    </method>
+    <!-- JSON: {"running", "downloaded", "older"}, the bytes on the drive the running version, a
+         downloaded update and the older versions kept on the computer hold. What versions share
+         counts toward the running one, then the update, so the others say what removing them
+         frees; what no version refers to any more counts as older. -->
+    <method name="Space">
+      <arg name="space" type="s" direction="out"/>
     </method>
     <!-- Starts downloading the newest image and stages it, locked: it's only installed at a restart once
          Apply unlocks it. Finished says how it went. -->

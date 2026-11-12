@@ -23,7 +23,6 @@ const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloade
 const OLDER: &str =
     "This update is older than the version of Luft on this computer, so it wasn't installed.";
 const VERSION: &str = "/config/Labels/org.opencontainers.image.version";
-const STAGED: &str = "/status/staged/composefs/verity";
 const NOT_PUBLISHED: [&str; 2] = ["manifest unknown", "name unknown"];
 const KEPT_TO_GO_BACK_TO: &str = "same fs-verity digest as the existing Some(Rollback) deployment";
 const SIGNATURE_REFUSALS: [&str; 4] = [
@@ -44,11 +43,22 @@ fn bootc(arguments: &[&str]) -> Result<Vec<u8>> {
     run(Command::new(BOOTC).args(arguments))
 }
 
-fn host() -> Result<Value> {
+pub fn host() -> Result<Value> {
     Ok(serde_json::from_slice(&bootc(&[
         "status",
         "--format=json",
     ])?)?)
+}
+
+/// The composefs image a deployment runs, by its fs-verity digest.
+pub fn verity<'a>(host: &'a Value, slot: &str) -> Option<&'a str> {
+    host.pointer(&format!("/status/{slot}/composefs/verity"))
+        .and_then(Value::as_str)
+}
+
+/// The IDs of the file objects a composefs image refers to.
+pub fn image_objects(verity: &str) -> Result<Vec<u8>> {
+    bootc(&["internals", "cfs", "image-objects", verity])
 }
 
 fn inspect(digest: &str) -> Option<Value> {
@@ -111,7 +121,7 @@ fn older_than_running(host: &Value, config: Option<&Value>) -> bool {
 /// the version kept on the computer may start an older one.
 fn refuse_older() -> Result<()> {
     let host = host()?;
-    let Some(staged) = host.pointer(STAGED).and_then(Value::as_str) else {
+    let Some(staged) = verity(&host, "staged") else {
         return Ok(());
     };
     if !older_than_running(&host, slot_config(&host, "staged").as_ref()) {
@@ -162,31 +172,51 @@ fn available(host: &Value) -> Result<bool> {
     Ok(!present)
 }
 
-/// What to download next: an update on the channel this system follows, or, while it waits
-/// for another channel, the move there once that channel has a version at least as new as the
-/// running one. Nothing older than the running version is ever offered.
+/// What to do next: an update on the channel this system follows, or, while it waits for
+/// another channel, the move there once that channel has a version at least as new as the
+/// running one. A move to the running version under the other channel's tag only retargets the
+/// running deployment. Nothing older than the running version is ever offered.
 pub enum Next {
     Nothing,
     Update,
     Move(Reference),
+    Retarget(Reference),
 }
 
+fn update(host: &Value) -> Result<Next> {
+    Ok(if available(host)? {
+        Next::Update
+    } else {
+        Next::Nothing
+    })
+}
+
+fn has_root(host: &Value, slot: &str, config: &Value) -> bool {
+    slot_config(host, slot).is_some_and(|present| layers(&present) == layers(config))
+}
+
+/// While the system waits for stable it keeps taking nightlies, and moves at the first stable
+/// version at least as new as the running one.
 pub fn next(waiting: Option<Channel>) -> Result<Next> {
     let host = host()?;
     let Some(channel) = waiting else {
-        return Ok(if available(&host)? {
-            Next::Update
-        } else {
-            Next::Nothing
-        });
+        return update(&host);
     };
     let target = on_channel(&host, channel)?;
-    match offered(&target.image) {
-        Ok(config) if !older_than_running(&host, Some(&config)) => Ok(Next::Move(target)),
-        Ok(_) => Ok(Next::Nothing),
-        Err(error) if not_published(&error) => Ok(Next::Nothing),
-        Err(error) => Err(error),
-    }
+    let config = match offered(&target.image) {
+        Ok(config) => Some(config),
+        Err(error) if not_published(&error) => None,
+        Err(error) => return Err(error),
+    };
+    let reachable = config.filter(|config| {
+        !older_than_running(&host, Some(config)) && !has_root(&host, "staged", config)
+    });
+    Ok(match reachable {
+        Some(config) if has_root(&host, "booted", &config) => Next::Retarget(target),
+        Some(_) => Next::Move(target),
+        None if channel == Channel::Stable => update(&host)?,
+        None => Next::Nothing,
+    })
 }
 
 /// Whether the channel has a version out, or `None` when the registry couldn't be asked.

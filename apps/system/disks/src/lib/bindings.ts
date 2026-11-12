@@ -125,9 +125,11 @@ export const commands = {
 	spaceClean: (params: {
 		what: Cleanup,
 	}, options?: CallOptions) => invoke<null>("space_clean", params, options),
+	spaceLuftDrive: (options?: CallOptions) => invoke<string>("space_luft_drive", {}, options),
 	spaceScan: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<SpaceUpdate>("space_scan", params, options),
+	spaceScanLuft: (options?: CallOptions) => invoke<SpaceUpdate>("space_scan_luft", {}, options),
 	spaceShow: (params: {
 		path: string[],
 		token?: string | null,
@@ -490,6 +492,16 @@ export type Palette = {
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
+/**  A part of Luft's drive, named for people. Only `Files` can be opened, at `path` in the scan. */
+export type Part = {
+	kind: PartKind,
+	size: number,
+	measured: boolean,
+	path: string[],
+};
+
+export type PartKind = "files" | "apps" | "luft" | "olderLuft" | "update" | "other";
+
 export type PartRole = "system" | "reserved" | "recovery" | "meet";
 
 export type PartitionTable = "gpt" | "dos";
@@ -556,6 +568,7 @@ export type SpaceUpdate = {
 	unreadable: number,
 	seconds: number,
 	reclaim: Reclaim | null,
+	parts: Part[] | null,
 };
 
 export type SpaceView = {

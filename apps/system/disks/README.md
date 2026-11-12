@@ -26,6 +26,7 @@ Installing registers Disks for `.iso` and raw disk image files.
 | `disks disks-space:///path/to/folder` | What's using space in that folder, with what can be freed when your home folder is inside it |
 | `disks disks-system://ID` | Removing that other system, as Settings opens it |
 | `disks disks-luft:` | Giving Luft the free space next to it, as Meet Luft opens it on Luft |
+On the drive Luft runs from, measuring space walks `/var` and names its parts, and asks the updater's `Space` how much the running, downloaded and older versions of Luft hold, which only root can read. `LUFT_SYSTEM_ROOT` moves the folders that stand for `/sysroot` and `/var` into a test folder.
 
 ## Testing
 

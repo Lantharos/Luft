@@ -72,8 +72,8 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	const filesystem = contents.usage === 'filesystem';
 	const name = volumeName(volume);
 	const look: Action[] = [];
-	if (mounted && isProtected(volume)) look.push({ label: 'Open', run: () => void openFolder(contents.mountPoints[0]) });
-	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.explore(contents.mountPoints[0], name) });
+	if (mounted && isProtected(volume) && !disks.holdsLuft(volume)) look.push({ label: 'Open', run: () => void openFolder(contents.mountPoints[0]) });
+	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.exploreVolume(volume) });
 	look.push({ label: 'Details', run: () => dialogs.open({ kind: 'details', drive, volume }) });
 	if (luftVolume(drive)?.block === volume.block) return [look, [MOVE_LUFT]];
 	if (isProtected(volume) || drive.readOnly) return [look];

@@ -57,7 +57,7 @@ pub struct Schedule {
     pub download: bool,
     pub checked: u64,
     /// A channel chosen while it had nothing as new as the running version, which the system
-    /// moves to once it does.
+    /// moves to once it does. While it waits for stable it keeps taking nightlies.
     #[serde(default)]
     pub waiting: Option<Channel>,
 }

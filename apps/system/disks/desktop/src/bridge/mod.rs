@@ -125,6 +125,12 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
         .with("space_scan", state, |state, Folder { path }| {
             state.explorer.start(&state.events, &path)
         })
+        .with("space_scan_luft", state, |state, Empty {}| {
+            state.explorer.start_luft(&state.events)
+        })
+        .command("space_luft_drive", |Empty {}| {
+            Ok::<String, String>(crate::space::sysroot())
+        })
         .with("space_view", state, |state, Place { path }| {
             state.explorer.view(path)
         })

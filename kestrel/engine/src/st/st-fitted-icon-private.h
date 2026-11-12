@@ -21,4 +21,6 @@ void _st_fitted_icon_render_async (StFittedIcon        *icon,
 GdkPixbuf *_st_fitted_icon_render_finish (GAsyncResult  *result,
                                           GError       **error);
 
+float _st_fitted_icon_shape_extent (float coverage);
+
 G_END_DECLS

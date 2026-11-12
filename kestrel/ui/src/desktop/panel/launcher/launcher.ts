@@ -40,7 +40,7 @@ function markPaint(button: St.Button, surface: () => St.Widget, backdropOf: Back
   let painted = { key: '', fills: { shade: WHITE, ink: WHITE } };
   return () => {
     const foreground = button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
-    const paint = appIcons.taskbarPaint;
+    const paint = appIcons.markPaint;
     const backdrops = taskbarBackdrops(surface(), backdropOf(button));
     const key = [foreground, paint?.ink, paint?.shade, ...backdrops].join();
     if (key !== painted.key) painted = { key, fills: markFills(foreground, paint, backdrops) };

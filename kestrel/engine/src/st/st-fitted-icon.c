@@ -228,8 +228,8 @@ find_artwork (GdkPixbuf *pixbuf,
   return TRUE;
 }
 
-static float
-shape_extent (float coverage)
+float
+_st_fitted_icon_shape_extent (float coverage)
 {
   float squareness = CLAMP ((coverage - ROUND_COVERAGE) / (1.f - ROUND_COVERAGE), 0.f, 1.f);
 
@@ -263,7 +263,7 @@ fit (GdkPixbuf *source,
   if (!find_artwork (source, &artwork))
     artwork.coverage = 0.f;
 
-  scale = MIN (pixels * fill * shape_extent (artwork.coverage) / MAX (artwork.width, artwork.height),
+  scale = MIN (pixels * fill * _st_fitted_icon_shape_extent (artwork.coverage) / MAX (artwork.width, artwork.height),
                pixels * fill * MAX_GROWTH / canvas);
   center_x = artwork.x + artwork.width / 2. + 1;
   center_y = artwork.y + artwork.height / 2. + 1;

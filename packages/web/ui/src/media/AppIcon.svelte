@@ -2,6 +2,7 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import AppWindow from '@lucide/svelte/icons/app-window';
 	import { appearance, type AppIconStyle } from '../appearance.svelte';
+	import { appIconStyle, FITTED_PLATE } from './iconStyle';
 
 	interface Props {
 		icon: string | null;
@@ -16,7 +17,9 @@
 
 	const source = $derived(icon?.startsWith('http') ? icon : icon && fileUrl(icon));
 	const icons = $derived(appearance.appIcons);
-	const chosen = $derived(style ?? icons?.style ?? 'default');
+	const requested = $derived(style ?? icons?.style ?? 'default');
+	const chosen = $derived(appIconStyle(id, requested));
+	const plate = $derived(requested === chosen ? size : Math.round(size * FITTED_PLATE));
 	const paint = $derived(icons && id && chosen !== 'default' ? icons[chosen] : null);
 	const glyphUrl = $derived(paint && icons && id ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
 	const glyph = $derived(glyphUrl && glyphUrl !== missingGlyph ? `url("${glyphUrl}")` : null);
@@ -34,8 +37,9 @@
 	<span
 		class="styled"
 		class:rim={paint.rim > 0}
-		style:width="{size}px"
-		style:height="{size}px"
+		style:width="{plate}px"
+		style:height="{plate}px"
+		style:margin="{(size - plate) / 2}px"
 		style:--plate={paint.plate}
 		style:--ink={paint.ink}
 		style:--shade={paint.shade}

@@ -4,6 +4,7 @@
 #include <cairo.h>
 #include <math.h>
 
+#include "st-fitted-icon-private.h"
 #include "st-styled-icon-private.h"
 
 #define DERIVED_FILL 0.86
@@ -431,6 +432,18 @@ surface_to_pixbuf (cairo_surface_t *surface)
   return pixbuf;
 }
 
+static int
+plate_size (const StStyledIconPaint *paint,
+            int                      size)
+{
+  float coverage = 1.f - (4.f - G_PI) * paint->corner * paint->corner;
+  float side = size * paint->fill * _st_fitted_icon_shape_extent (coverage);
+
+  if (paint->fill == 0.f)
+    return size;
+  return size - 2 * (int) roundf ((size - side) / 2.f);
+}
+
 GdkPixbuf *
 _st_styled_icon_paint (const StStyledIconPaint *paint,
                        GdkPixbuf               *source,
@@ -448,12 +461,14 @@ _st_styled_icon_paint (const StStyledIconPaint *paint,
   cairo_rectangle_int_t bounds;
   cairo_surface_t *canvas = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
   cairo_surface_t *mask = glyph ? symbolic_mask (&pixels, &bounds) : derived_mask (&pixels, &bounds);
-  cairo_surface_t *placed = place_glyph (mask, &bounds, glyph, size);
+  int plate = plate_size (paint, size);
+  cairo_surface_t *placed = place_glyph (mask, &bounds, glyph, plate);
   cairo_t *cr = cairo_create (canvas);
   GdkPixbuf *pixbuf;
 
   colorize (placed, paint);
-  draw_plate (cr, paint, size, scale);
+  cairo_translate (cr, (size - plate) / 2, (size - plate) / 2);
+  draw_plate (cr, paint, plate, scale);
   cairo_set_source_surface (cr, placed, 0, 0);
   cairo_paint (cr);
   cairo_destroy (cr);

@@ -11,6 +11,8 @@ function isLuftProgram(path: string): boolean {
   return INSTALLED_APP.test(path) || (!!BUILT_APPS && path.startsWith(`${BUILT_APPS}/`));
 }
 
+export const isLuftApp = (appId: string | null) => !!appId?.startsWith(LUFT_APP);
+
 export function luftAppPrograms(appId: string): string[] {
   const built = BUILT_APPS ? [`${BUILT_APPS}/${appId.slice(LUFT_APP.length).toLowerCase()}`] : [];
   return [`/usr/lib/sabine/${appId}/`, ...built];

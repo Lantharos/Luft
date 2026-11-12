@@ -17,17 +17,16 @@ const CROP_ZOOM = 4;
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
-async function measure(label: string, style: typeof STYLES[number]) {
+async function measure(label: string) {
   await settled();
   const button = ofType(named('Start', named('kestrel-panel')!), St.Button);
   const area = areaOf(button);
   (await renderedFrame(area)).saveZoomed(`launcher-${label}`, CROP_ZOOM);
   const mark = await measureMark(button.child!.get_children().filter((layer): layer is St.Widget => layer instanceof St.Widget), area);
-  const painted = style !== 'default';
   const failures = [
     mark.secondary < MIN_BACKDROP_CONTRAST && `its back layer has ${mark.secondary.toFixed(2)}:1 against the taskbar`,
-    painted && mark.partners < MIN_PARTNER_CONTRAST && `its layers differ by only ${mark.partners.toFixed(2)}:1`,
-    painted && mark.darker !== mark.lightFront && 'its back layer is not the quieter one',
+    mark.partners < MIN_PARTNER_CONTRAST && `its layers differ by only ${mark.partners.toFixed(2)}:1`,
+    mark.darker !== mark.lightFront && 'its back layer is not the quieter one',
   ].filter(Boolean);
   console.log(`Start button ${label}: back ${mark.secondary.toFixed(2)}, front ${mark.primary.toFixed(2)}, between ${mark.partners.toFixed(2)}`);
   return failures.map(failure => `${label}: ${failure}`);
@@ -39,7 +38,7 @@ export async function run() {
     await sweepBackdrops(async label => {
       for (const style of STYLES) {
         settings.set_string('app-icon-style', style);
-        failures.push(...await measure(`${label}-${style}`, style));
+        failures.push(...await measure(`${label}-${style}`));
       }
     });
   } finally {

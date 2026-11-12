@@ -9,6 +9,7 @@ import St from 'gi://St';
 import { fromHex, seedFromColor, type Seed } from '../color.js';
 import { glyphNames } from './glyphs.js';
 import { paints, type IconStyle, type Paint, type PaintedStyle } from './paint.js';
+import { isLuftApp } from '../../shared/apps/luftApps.js';
 
 export interface IconApp {
   get_id(): string | null;
@@ -27,11 +28,11 @@ export function sourceIcon(app: IconApp): Gio.Icon {
   return (id ? appSystem.lookup_app(id)?.get_icon() : null) ?? app.get_icon() ?? FALLBACK;
 }
 
-export function styledIcon(app: IconApp, paint: Paint, square = false): St.StyledIcon {
+export function styledIcon(app: IconApp, paint: Paint, square = false, fill = 0): St.StyledIcon {
   const source = sourceIcon(app);
   return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
-    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim,
+    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim, fill,
     ...square ? { corner: 0 } : {},
   });
 }
@@ -68,21 +69,34 @@ class AppIcons {
     return () => this.listeners.delete(listener);
   }
 
-  get paint(): Paint | null {
-    return this.style === 'default' ? null : this.paints?.[this.style] ?? null;
+  private get luftStyle(): PaintedStyle {
+    return this.style === 'default' ? 'tinted' : this.style;
   }
 
-  get taskbarPaint(): Paint | null {
-    return this.style === 'default' ? null : this.taskbarPaints?.[this.style] ?? null;
+  private styleOf(app: IconApp): IconStyle {
+    return isLuftApp(app.get_id()) ? this.luftStyle : this.style;
   }
 
-  gicon(app: IconApp, paint = this.paint, fill = 1): Gio.Icon {
-    return paint ? styledIcon(app, paint, this.square) : new St.FittedIcon({ source: sourceIcon(app), fill });
+  get markPaint(): Paint | null {
+    return this.taskbarPaints?.[this.luftStyle] ?? null;
+  }
+
+  private paintOf(app: IconApp, paints = this.paints): Paint | null {
+    const style = this.styleOf(app);
+    return style === 'default' ? null : paints?.[style] ?? null;
+  }
+
+  gicon(app: IconApp, paint = this.paintOf(app), fill = 1): Gio.Icon {
+    if (!paint) return new St.FittedIcon({ source: sourceIcon(app), fill });
+    return styledIcon(app, paint, this.square, this.style === 'default' ? fill : 0);
+  }
+
+  paintFor(icon: St.Icon): Paint | null {
+    return this.paintOf(this.bound.get(icon)!, this.taskbarFills.has(icon) ? this.taskbarPaints : this.paints);
   }
 
   private iconOf(icon: St.Icon): Gio.Icon {
-    const fill = this.taskbarFills.get(icon);
-    return this.gicon(this.bound.get(icon)!, fill === undefined ? this.paint : this.taskbarPaint, fill);
+    return this.gicon(this.bound.get(icon)!, this.paintFor(icon), this.taskbarFills.get(icon));
   }
 
   fit(icon: St.Icon, fill: number): void {
@@ -95,7 +109,7 @@ class AppIcons {
     this.bound.set(icon, app);
     if (fill !== undefined) this.taskbarFills.set(icon, fill);
     icon.gicon = this.iconOf(icon);
-    if (this.paint && !icon.mapped) this.restyleHidden(icon);
+    if (icon.gicon instanceof St.StyledIcon && !icon.mapped) this.restyleHidden(icon);
     const iconChanged = app instanceof Shell.App ? app.connect('notify::icon', () => { icon.gicon = this.iconOf(icon); }) : 0;
     icon.connect('destroy', () => {
       this.bound.delete(icon);
@@ -113,15 +127,15 @@ class AppIcons {
     const taskbarPainted = seed ? paints(seed, this.accent?.taskbarDark ?? true) : null;
     const square = !this.settings.get_boolean('rounded-window-corners');
     if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
-    const restyle = style !== 'default' || this.style !== 'default';
+    const restyleAll = style !== 'default' || this.style !== 'default';
     this.style = style;
     this.square = square;
     this.paints = painted;
     this.taskbarPaints = taskbarPainted;
     for (const listener of this.listeners) listener();
-    if (!restyle) return;
     textureCache.evict_styled_icons();
-    for (const icon of this.bound.keys()) {
+    for (const [icon, app] of this.bound) {
+      if (!restyleAll && !isLuftApp(app.get_id())) continue;
       if (icon.mapped) icon.gicon = this.iconOf(icon);
       else this.restyleHidden(icon);
     }
@@ -134,7 +148,7 @@ class AppIcons {
       for (const icon of [...this.hidden].slice(0, RESTYLE_BATCH)) {
         this.hidden.delete(icon);
         icon.gicon = this.iconOf(icon);
-        if (this.paint && !icon.mapped)
+        if (icon.gicon instanceof St.StyledIcon && !icon.mapped)
           textureCache.load_gicon(null, icon.gicon, icon.icon_size, scale, 1);
       }
       if (this.hidden.size) return GLib.SOURCE_CONTINUE;

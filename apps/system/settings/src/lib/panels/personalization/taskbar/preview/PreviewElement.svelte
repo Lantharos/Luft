@@ -21,8 +21,9 @@
 
 	const RUNNING = 2;
 	const VERTICAL_APPS = 3;
+	let originals = $derived((appearance.appIcons?.style ?? 'default') === 'default');
 	let markSize = $derived(Math.round(button * MARK_SCALE));
-	let appIcon = $derived((appearance.appIcons?.style ?? 'default') === 'default' ? icon : plate);
+	let appIcon = $derived(originals ? icon : plate);
 	let shownApps = $derived(vertical ? apps.slice(0, VERTICAL_APPS) : apps);
 	let small = $derived(plate * 0.62);
 </script>

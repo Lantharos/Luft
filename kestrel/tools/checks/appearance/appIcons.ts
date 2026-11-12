@@ -3,6 +3,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {appIcons, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -18,8 +19,12 @@ const WALLPAPERS = [['lavender', 'Night lavender.jpg', [88, 52, 140]], ['forest'
 const STYLES = ['default', 'tinted', 'clear'] as const;
 const SCHEMES = [['dark', 'prefer-dark'], ['light', 'default']] as const;
 const PALETTE_TIMEOUT = 10000;
+const appSystem = Shell.AppSystem.get_default();
+const TASKBAR_APP = 'kestrel-app-';
+const APP_BUTTONS = [TASKBAR_APP, 'kestrel-start-item-'];
+const LUFT_APP = 'com.lantharos.';
 
-type Paint = typeof appIcons.paint;
+type Paint = ReturnType<typeof appIcons.paintFor>;
 type Inks = Partial<Record<typeof SCHEMES[number][0], string>>;
 
 const appearance = (name: string) => property<Record<string, string>>('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance', 'com.lantharos.Kestrel.Appearance', name);
@@ -38,21 +43,34 @@ function wallpaperFile(name: string, fallback: string, [red, green, blue]: reado
 
 function inAppButton(actor: Clutter.Actor) {
   for (let parent = actor.get_parent(); parent; parent = parent.get_parent())
-    if (parent.name?.startsWith('kestrel-app-') || parent.name?.startsWith('kestrel-start-item-')) return true;
+    if (APP_BUTTONS.some(prefix => parent.name?.startsWith(prefix))) return true;
   return false;
 }
 
 const appIconsIn = (root: Clutter.Actor) => descendants(root).filter((actor): actor is St.Icon => actor instanceof St.Icon).filter(icon => icon.mapped && inAppButton(icon));
 
-function shownIcons(): [St.Icon, () => Paint][] {
-  return [
-    ...appIconsIn(named('kestrel-panel')!).map((icon): [St.Icon, () => Paint] => [icon, () => appIcons.taskbarPaint]),
-    ...appIconsIn(named('kestrel-start')!).map((icon): [St.Icon, () => Paint] => [icon, () => appIcons.paint]),
-  ];
+const shownIcons = () => [...appIconsIn(named('kestrel-panel')!), ...appIconsIn(named('kestrel-start')!)];
+
+const inkOf = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon ? icon.gicon.ink.to_string() : null;
+
+function shownApps() {
+  return descendants(global.stage).flatMap(button => {
+    const prefix = APP_BUTTONS.find(prefix => button.mapped && button.name?.startsWith(prefix));
+    const id = prefix && button.name!.slice(prefix.length);
+    return id && appSystem.lookup_app(id) ? appIconsIn(button).map(icon => ({id, icon, onTaskbar: prefix === TASKBAR_APP})) : [];
+  });
+}
+
+function checkLuftApps(setting: string) {
+  const apps = shownApps();
+  const luft = ({id}: {id: string}) => id.startsWith(LUFT_APP);
+  const tinted = (onTaskbar: boolean) => (onTaskbar ? appIcons.taskbarPaints : appIcons.paints)?.tinted.ink;
+  require(apps.some(luft) && !apps.every(luft) && apps.every(app => inkOf(app.icon) === (luft(app) ? tinted(app.onTaskbar) : null)),
+    `Luft's own apps stay tinted beside original icons (${setting})`);
 }
 
 const loaded = (icon: St.Icon) => icon.get_children().some(child => child.content && child.opacity > 0);
-const painted = (icon: St.Icon, paint: Paint) => paint ? icon.gicon instanceof St.StyledIcon && icon.gicon.ink.to_string() === paint.ink : !(icon.gicon instanceof St.StyledIcon);
+const painted = (icon: St.Icon, paint: Paint) => inkOf(icon) === (paint?.ink ?? null);
 
 async function checkStyles(settings: Gio.Settings, slug: string, scheme: string) {
   const setting = `${slug}, ${scheme}`;
@@ -63,7 +81,8 @@ async function checkStyles(settings: Gio.Settings, slug: string, scheme: string)
     await eventually(() => appIcons.style === style, `${style} icons are chosen (${setting})`);
     const icons = shownIcons();
     require(icons.length > 0, `the taskbar and Start show app icons (${setting})`);
-    await eventually(() => icons.every(([icon, paint]) => loaded(icon) && painted(icon, paint())), `${style} reaches every taskbar and Start icon (${setting})`);
+    await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paintFor(icon))), `${style} reaches every taskbar and Start icon (${setting})`);
+    if (style === 'default') checkLuftApps(setting);
     await capture(`icons-${style}-${scheme}-${slug}`);
   }
   toggleSurface('start');

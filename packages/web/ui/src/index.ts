@@ -24,6 +24,7 @@ export { Curve, Gesture, motionPreference, projection, rubberband, Spring, Sprin
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
+export { appIconStyle } from './media/iconStyle';
 
 export { default as ContextMenu } from './menus/ContextMenu.svelte';
 export { default as MenuButton } from './menus/MenuButton.svelte';
@@ -83,6 +84,7 @@ export { dragFiles, fileDragStart } from './shell/fileDrag';
 export { droppedPaths, fileDrop } from './shell/fileDrop';
 export { default as GlassShell } from './shell/GlassShell.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
+export { keepWindowState } from './shell/windowState.svelte';
 
 export type { Rect as VirtualRect, VirtualHandle } from './virtual/layout';
 export { default as VirtualScroller } from './virtual/VirtualScroller.svelte';

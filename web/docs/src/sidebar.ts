@@ -18,11 +18,12 @@ export const sidebar: Sidebar = [
 			group('Make it yours', 'personalize')
 		]
 	},
-	group('Apps', 'apps'),
+	group('Apps', 'apps', true),
 	group('Files and accounts', 'files'),
 	group('System', 'system'),
 	{
 		label: 'For developers',
+		collapsed: true,
 		items: [
 			'developers/architecture',
 			'developers/building',
@@ -30,9 +31,9 @@ export const sidebar: Sidebar = [
 			'developers/testing-vms',
 			'developers/contributing',
 			'developers/translating',
-			group('Apps and the desktop', 'developers/desktop'),
-			group('The system', 'developers/system'),
-			group('Security', 'security')
+			group('Apps and the desktop', 'developers/desktop', true),
+			group('The system', 'developers/system', true),
+			group('Security', 'security', true)
 		]
 	},
 	group('Extensions', 'extensions')

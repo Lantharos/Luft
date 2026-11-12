@@ -39,8 +39,8 @@ fs = import('fs')
 gnome = import('gnome')
 
 luft_environment = {}
-foreach list : ['allowed', 'development', 'unsafe']
-  luft_environment += {list: ' '.join(fs.read('src/environment' / list + '.list').split())}
+foreach list, folder : {'allowed': 'src/environment', 'development': 'src/environment', 'unsafe': '../../packages/identity'}
+  luft_environment += {list: ' '.join(fs.read(folder / list + '.list').split())}
 endforeach
 luft_environment_cflags = []
 foreach list, names : luft_environment

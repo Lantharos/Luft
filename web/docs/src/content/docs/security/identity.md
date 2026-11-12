@@ -33,7 +33,7 @@ Kestrel, its helpers, Luft's services and the apps that come with the system are
 
 Your environment, from `~/.config/environment.d`, `systemctl --user set-environment` or your shell's profile, can point a program at libraries and modules of anyone's choosing: `LD_PRELOAD`, `GTK_MODULES`, `GIO_EXTRA_MODULES`, `GI_TYPELIB_PATH`, `GJS_PATH`, `PYTHONPATH` and many more. Luft's own programs don't start in it.
 
-- Kestrel's units take out every variable in `kestrel/engine/src/environment/unsafe.list`. A drop-in for every user unit named `kestrel-*` or `luft-*` takes out the same list, and systemd applies it last, so nothing your systemd holds reaches them.
+- Kestrel's units take out every variable in `packages/identity/unsafe.list`. A drop-in for every user unit named `kestrel-*` or `luft-*` takes out the same list, and systemd applies it last, so nothing your systemd holds reaches them.
 - Kestrel's helpers and Luft's user services then start through `luft-launch`, which keeps only the variables in `allowed.list` next to it and sets `PATH` to `/usr/local/bin:/usr/bin`. Helpers D-Bus starts on demand, such as notifications and Rover's file chooser for other apps, run as units of their own for this.
 - Kestrel starts Luft's apps with the same short list. An app is Luft's when its entry is named `com.lantharos.` or its program is under `/usr/lib/sabine/com.lantharos.`.
 - Every other app gets your whole environment, and so do programs Luft's apps start for you, such as a shell in Tern, which take it from your systemd.

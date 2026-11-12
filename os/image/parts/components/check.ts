@@ -1,4 +1,4 @@
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, join, normalize, relative, resolve } from 'node:path';
 
 import { MANIFEST } from './manifest';
 import { checkoutTree, components, partNames, partReach, within, workspacePackages } from './sources';
@@ -11,6 +11,7 @@ const IMPORTS = [
   /import\.meta\.dir(?:name)?,\s*['"]([^'"]+)['"]/g,
 ];
 const RUST_INCLUDES = /include(?:_str|_bytes)?!\(\s*"([^"]+)"/g;
+const RUST_CRATE_PATHS = /env!\("CARGO_MANIFEST_DIR"\),\s*"\/([^"]+)"/g;
 const MESON_PATHS = /'(\.\.\/[^']+)'/g;
 
 const listed = Bun.spawnSync(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], { cwd: root });
@@ -26,8 +27,15 @@ function existing(path: string) {
 
 const found = (file: string, pattern: RegExp) => [...tree.read(file).matchAll(pattern)].map((match) => match[1]);
 
+function crateOf(file: string): string {
+  const dir = dirname(file);
+  return tree.has(join(dir, 'Cargo.toml')) ? dir : crateOf(dir);
+}
+
+const fromCrate = (file: string) => found(file, RUST_CRATE_PATHS).map((path) => `./${relative(dirname(file), join(crateOf(file), path))}`);
+
 function specifiers(file: string, reached: ReturnType<typeof partReach>) {
-  if (file.endsWith('.rs')) return inside(file, reached.crates) ? found(file, RUST_INCLUDES) : [];
+  if (file.endsWith('.rs')) return inside(file, reached.crates) ? [...found(file, RUST_INCLUDES), ...fromCrate(file)] : [];
   if (!inside(file, reached.packages)) return [];
   if (file.endsWith('meson.build')) return found(file, MESON_PATHS);
   return CODE.test(file) ? IMPORTS.flatMap((pattern) => found(file, pattern)) : [];

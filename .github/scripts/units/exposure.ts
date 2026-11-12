@@ -4,7 +4,7 @@ import { basename, join } from 'node:path';
 
 import type { Unit } from './units';
 
-const UNSAFE_ENVIRONMENT = join(import.meta.dir, '../../../kestrel/engine/src/environment/unsafe.list');
+const UNSAFE_ENVIRONMENT = join(import.meta.dir, '../../../packages/identity/unsafe.list');
 const SUBSTITUTIONS: Record<string, string> = {
 	bindir: '/usr/bin',
 	gjs: '/usr/bin/gjs',

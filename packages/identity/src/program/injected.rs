@@ -17,10 +17,7 @@ const CMDLINE: &CStr = c"cmdline";
 const FIELDS_BEFORE_ENVIRONMENT: usize = 47;
 const DELETED: &str = " (deleted)";
 const SABINE_APPS: &str = "/usr/lib/sabine/";
-const UNSAFE: &str = include_str!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/../../kestrel/engine/src/environment/unsafe.list"
-));
+const UNSAFE: &str = include_str!("../../unsafe.list");
 const SABINE_DEVELOPMENT: [&str; 5] = [
     "SABINE_WEB_ENTRY",
     "SABINE_DEV_URL",

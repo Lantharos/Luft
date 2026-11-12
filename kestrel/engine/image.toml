@@ -4,6 +4,7 @@ sources = [
     "kestrel/tools/unicode",
     "kestrel/ui",
     "packages/extension-api",
+    "packages/identity/unsafe.list",
     "packages/i18n/tools",
     "packages/web/motion",
     "packages/web/settings-catalogue",

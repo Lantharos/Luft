@@ -90,24 +90,31 @@ pub async fn begin(app: &'static App) -> Result<Pending> {
     }
     let verifier = random(64);
     let state = random(24);
-    let challenge = URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()));
+    Ok(Pending {
+        url: authorization(app, &state, &verifier)?.into(),
+        app,
+        verifier,
+        state,
+        listeners,
+    })
+}
+
+fn challenge(verifier: &str) -> String {
+    URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()))
+}
+
+fn authorization(app: &App, state: &str, verifier: &str) -> Result<url::Url> {
     let mut url = url::Url::parse(app.authorize)?;
     url.query_pairs_mut()
         .append_pair("client_id", app.client_id)
         .append_pair("response_type", "code")
         .append_pair("redirect_uri", REDIRECT)
         .append_pair("scope", app.scope)
-        .append_pair("state", &state)
-        .append_pair("code_challenge", &challenge)
+        .append_pair("state", state)
+        .append_pair("code_challenge", &challenge(verifier))
         .append_pair("code_challenge_method", "S256")
         .extend_pairs(app.extra.iter().copied());
-    Ok(Pending {
-        url: url.into(),
-        app,
-        verifier,
-        state,
-        listeners,
-    })
+    Ok(url)
 }
 
 impl Pending {
@@ -118,20 +125,7 @@ impl Pending {
         let app = self.app;
         let verifier = self.verifier;
         let tokens = match code {
-            Ok(code) => {
-                tokio::task::spawn_blocking(move || {
-                    exchange(
-                        app,
-                        &[
-                            ("grant_type", "authorization_code"),
-                            ("code", &code),
-                            ("redirect_uri", REDIRECT),
-                            ("code_verifier", &verifier),
-                        ],
-                    )
-                })
-                .await?
-            }
+            Ok(code) => tokio::task::spawn_blocking(move || redeem(app, &code, &verifier)).await?,
             Err(error) => Err(error),
         };
         let page = if tokens.is_ok() { FINISHED } else { FAILED };
@@ -210,10 +204,22 @@ fn redirect_outcome(target: &str, state: &str) -> Option<Result<String>> {
     Some(Err(anyhow!("Signing in was stopped: {reason}")))
 }
 
-pub fn exchange(app: &App, form: &[(&str, &str)]) -> Result<Tokens> {
+fn redeem(app: &App, code: &str, verifier: &str) -> Result<Tokens> {
+    exchange(
+        app,
+        &[
+            ("grant_type", "authorization_code"),
+            ("code", code),
+            ("redirect_uri", REDIRECT),
+            ("code_verifier", verifier),
+        ],
+    )
+}
+
+fn exchange(app: &App, form: &[(&str, &str)]) -> Result<Tokens> {
     let mut form = form.to_vec();
     form.push(("client_id", app.client_id));
-    form.push(("client_secret", app.client_secret));
+    form.extend(app.client_secret.map(|secret| ("client_secret", secret)));
     let mut answer = http()
         .post(app.token)
         .config()
@@ -265,11 +271,64 @@ fn claims(id_token: Option<&str>) -> Claims {
 
 #[cfg(test)]
 mod tests {
-    use std::io::{BufRead, BufReader, Write};
+    use std::collections::BTreeMap;
+    use std::io::{BufRead, BufReader, Read, Write};
     use std::net::TcpListener;
-    use std::thread;
+    use std::thread::{self, JoinHandle};
 
-    use super::{App, exchange, redirect_outcome};
+    use super::super::apps::{DROPBOX, ONEDRIVE, REDIRECT};
+    use super::{App, authorization, challenge, redeem, redirect_outcome};
+
+    const VERIFIER: &str = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+    const CHALLENGE: &str = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+    fn token_endpoint() -> (&'static str, JoinHandle<BTreeMap<String, String>>) {
+        let server = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = format!("http://{}/token", server.local_addr().unwrap());
+        let serving = thread::spawn(move || {
+            let (mut stream, _) = server.accept().unwrap();
+            let mut reader = BufReader::new(stream.try_clone().unwrap());
+            let mut length = 0;
+            loop {
+                let mut line = String::new();
+                reader.read_line(&mut line).unwrap();
+                let lower = line.to_ascii_lowercase();
+                assert!(!lower.starts_with("authorization:"));
+                if let Some(value) = lower.strip_prefix("content-length:") {
+                    length = value.trim().parse().unwrap();
+                }
+                if line == "\r\n" {
+                    break;
+                }
+            }
+            let mut body = vec![0; length];
+            reader.read_exact(&mut body).unwrap();
+            let id_token = format!(
+                "x.{}.y",
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::URL_SAFE_NO_PAD,
+                    br#"{"email":"ada@example.com"}"#
+                )
+            );
+            let reply = format!(
+                r#"{{"access_token":"fake-access","refresh_token":"fake-refresh","expires_in":14400,"token_type":"bearer","id_token":"{id_token}"}}"#
+            );
+            write!(stream, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{reply}", reply.len()).unwrap();
+            url::form_urlencoded::parse(&body).into_owned().collect()
+        });
+        (Box::leak(address.into_boxed_str()), serving)
+    }
+
+    fn pointed_at(app: &App, token: &'static str) -> App {
+        App {
+            client_id: app.client_id,
+            client_secret: app.client_secret,
+            authorize: app.authorize,
+            token,
+            scope: app.scope,
+            extra: app.extra,
+        }
+    }
 
     #[test]
     fn only_the_matching_redirect_counts() {
@@ -295,57 +354,58 @@ mod tests {
     }
 
     #[test]
-    fn exchanged_tokens_become_an_rclone_token() {
-        let server = TcpListener::bind("127.0.0.1:0").unwrap();
-        let address = server.local_addr().unwrap();
-        let serving = thread::spawn(move || {
-            let (mut stream, _) = server.accept().unwrap();
-            let mut reader = BufReader::new(stream.try_clone().unwrap());
-            let mut length = 0;
-            loop {
-                let mut line = String::new();
-                reader.read_line(&mut line).unwrap();
-                if let Some(value) = line.to_ascii_lowercase().strip_prefix("content-length:") {
-                    length = value.trim().parse().unwrap();
-                }
-                if line == "\r\n" {
-                    break;
-                }
-            }
-            let mut body = vec![0; length];
-            std::io::Read::read_exact(&mut reader, &mut body).unwrap();
-            let body = String::from_utf8(body).unwrap();
-            assert!(body.contains("code=fake-code") && body.contains("client_id=test-client"));
-            let id_token = format!(
-                "x.{}.y",
-                base64::Engine::encode(
-                    &base64::engine::general_purpose::URL_SAFE_NO_PAD,
-                    br#"{"email":"ada@example.com"}"#
-                )
-            );
-            let reply = format!(
-                r#"{{"access_token":"fake-access","refresh_token":"fake-refresh","expires_in":3600,"token_type":"Bearer","id_token":"{id_token}"}}"#
-            );
-            write!(stream, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{reply}", reply.len()).unwrap();
-        });
-        let token = format!("http://{address}/token");
-        let app = App {
-            client_id: "test-client",
-            client_secret: "test-secret",
-            authorize: "http://localhost/authorize",
-            token: Box::leak(token.into_boxed_str()),
-            scope: "files",
-            extra: &[],
-        };
-        let tokens = exchange(
-            &app,
-            &[("grant_type", "authorization_code"), ("code", "fake-code")],
-        )
-        .unwrap();
-        serving.join().unwrap();
+    fn the_challenge_is_the_rfc_7636_s256_of_the_verifier() {
+        assert_eq!(challenge(VERIFIER), CHALLENGE);
+    }
+
+    #[test]
+    fn dropbox_is_asked_for_pkce_and_offline_access_without_a_secret() {
+        let url = authorization(&DROPBOX, "abc", VERIFIER).unwrap();
+        let query: BTreeMap<String, String> = url.query_pairs().into_owned().collect();
+        assert_eq!(url.host_str(), Some("www.dropbox.com"));
+        assert_eq!(query["client_id"], DROPBOX.client_id);
+        assert_eq!(query["response_type"], "code");
+        assert_eq!(query["redirect_uri"], REDIRECT);
+        assert_eq!(query["state"], "abc");
+        assert_eq!(query["code_challenge"], CHALLENGE);
+        assert_eq!(query["code_challenge_method"], "S256");
+        assert_eq!(query["token_access_type"], "offline");
+        assert!(!query.contains_key("code_verifier"));
+        assert!(!query.contains_key("client_secret"));
+        assert!(DROPBOX.client_secret.is_none());
+    }
+
+    #[test]
+    fn dropbox_redeems_the_code_with_the_verifier_and_no_secret() {
+        let (token, serving) = token_endpoint();
+        let tokens = redeem(&pointed_at(&DROPBOX, token), "fake-code", VERIFIER).unwrap();
+        let form = serving.join().unwrap();
+        assert_eq!(
+            form,
+            BTreeMap::from(
+                [
+                    ("client_id", DROPBOX.client_id),
+                    ("code", "fake-code"),
+                    ("code_verifier", VERIFIER),
+                    ("grant_type", "authorization_code"),
+                    ("redirect_uri", REDIRECT),
+                ]
+                .map(|(key, value)| (key.to_owned(), value.to_owned()))
+            )
+        );
         let rclone: serde_json::Value = serde_json::from_str(&tokens.rclone).unwrap();
+        assert_eq!(rclone["access_token"], "fake-access");
         assert_eq!(rclone["refresh_token"], "fake-refresh");
         assert!(rclone["expiry"].as_str().unwrap().ends_with('Z'));
+    }
+
+    #[test]
+    fn onedrive_still_redeems_with_rclones_secret() {
+        let (token, serving) = token_endpoint();
+        let tokens = redeem(&pointed_at(&ONEDRIVE, token), "fake-code", VERIFIER).unwrap();
+        let form = serving.join().unwrap();
+        assert_eq!(form["code_verifier"], VERIFIER);
+        assert_eq!(Some(form["client_secret"].as_str()), ONEDRIVE.client_secret);
         assert_eq!(tokens.claims.email.as_deref(), Some("ada@example.com"));
     }
 }

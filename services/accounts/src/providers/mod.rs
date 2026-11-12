@@ -51,7 +51,9 @@ pub fn parameters(record: &Record, secret: &Secret) -> Map<String, Value> {
     };
     if let Some(app) = app {
         parameters.insert("client_id".into(), app.client_id.into());
-        parameters.insert("client_secret".into(), app.client_secret.into());
+        if let Some(secret) = app.client_secret {
+            parameters.insert("client_secret".into(), secret.into());
+        }
     }
     parameters
 }
@@ -65,4 +67,34 @@ pub fn encode_path(path: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join("/")
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+    use zeroize::Zeroizing;
+
+    use super::{apps, parameters};
+    use crate::store::{Record, Secret};
+
+    fn remote(provider: &str) -> serde_json::Map<String, serde_json::Value> {
+        let record: Record = serde_json::from_value(
+            json!({"id": "a", "provider": provider, "name": "Drive", "user": "ada@example.com"}),
+        )
+        .unwrap();
+        let secret = Secret::Token {
+            token: Zeroizing::new("{}".into()),
+        };
+        parameters(&record, &secret)
+    }
+
+    #[test]
+    fn rclone_refreshes_dropbox_as_luft_without_a_secret() {
+        let dropbox = remote("dropbox");
+        assert_eq!(dropbox["client_id"], apps::DROPBOX.client_id);
+        assert!(!dropbox.contains_key("client_secret"));
+        let onedrive = remote("onedrive");
+        assert_eq!(onedrive["client_id"], apps::ONEDRIVE.client_id);
+        assert!(onedrive.contains_key("client_secret"));
+    }
 }

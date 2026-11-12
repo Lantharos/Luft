@@ -56,6 +56,9 @@ export async function run() {
       place(settings.window, 500, 190, 860, 620);
       await settled();
       await pictures();
+      rover.window.minimize();
+      place(settings.window, 192, 90, 1056, 720);
+      await settled();
       (await show(settings, `extensions/${PHOSPHOR.toLowerCase()}`)).save('store-settings');
     }));
   } finally {

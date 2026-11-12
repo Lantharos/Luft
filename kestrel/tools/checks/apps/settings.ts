@@ -9,9 +9,9 @@ import {checkTaskbarLooks, checkTaskbarLayouts} from './settings/look/taskbar.js
 import {checkWallpaper} from './settings/look/wallpaper.js';
 
 export async function run() {
+  await withApp('settings', [], checkExtensions);
   await withPalette(async palette => {
     await withApp('settings', [], async app => {
-      await checkExtensions(app);
       await checkPalette(app, palette);
       await checkPages(app);
       await checkTaskbarLooks(app);

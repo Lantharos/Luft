@@ -5,7 +5,6 @@ import St from 'gi://St';
 import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 import { t } from '../../shared/i18n/index.js';
-import { list } from '../../portal/core/rows.js';
 import type { Item } from './items.js';
 
 interface Answers {
@@ -31,17 +30,28 @@ function changeRow(item: Item): St.Widget {
   return row;
 }
 
+/** The changes, scrolling once they are taller than the dialog allows, with the scrollbar beside them. */
+function changeList(items: Item[]): St.ScrollView {
+  const rows = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-list', x_expand: true });
+  for (const item of items) rows.add_child(changeRow(item));
+  return new St.ScrollView({
+    child: rows, style_class: 'kestrel-portal-scroll kestrel-app-scroll kestrel-changes-scroll',
+    hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
+  });
+}
+
 /** Every change of a set, from what it is to what it becomes, approved or declined as one. */
 export class ReviewDialog {
   private answered = false;
   private readonly modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-changes-dialog', prompt: true, whileLocked: 'refuse' });
 
   constructor(items: Item[], requester: string | null, administrator: boolean, private readonly answers: Answers) {
-    const asked = requester ? t('changes-asked-by', { requester }) : t('changes-asked');
+    const count = items.length;
+    const asked = requester ? t('changes-asked-by', { requester, count }) : t('changes-asked', { count });
     const description = administrator ? `${asked} ${t('changes-administrator')}` : asked;
-    this.modal.contentLayout.add_child(new MessageDialogContent({ title: t('changes-title', { count: items.length }), description, icon_name: 'preferences-system-symbolic' }));
+    this.modal.contentLayout.add_child(new MessageDialogContent({ title: t('changes-title', { count }), description, icon_name: 'preferences-system-symbolic' }));
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });
-    content.add_child(list(items.map(changeRow), true));
+    content.add_child(changeList(items));
     this.modal.contentLayout.add_child(content);
     this.modal.addButton({ label: t('changes-decline'), action: () => this.answer(false), default: true });
     this.modal.addButton({ label: t('changes-approve'), action: () => this.answer(true) });

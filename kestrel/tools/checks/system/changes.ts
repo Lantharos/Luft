@@ -1,9 +1,13 @@
-import type Clutter from 'gi://Clutter';
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import {withApp} from '../apps/lib/apps.js';
+import {write} from '../apps/lib/files.js';
 import {answerable, descendants, labelled, shownStyled, textOf} from '../lib/actors.js';
+import {appBinary} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {click} from '../lib/input/input.js';
 import {repository, scratch, spawn} from '../lib/processes.js';
@@ -19,6 +23,8 @@ const APPROVE = 'Change';
 const DECLINED = 4;
 const UNAVAILABLE = 5;
 const NO_DIALOG_FOR = 1500;
+const SCROLLBAR_GAP = 4;
+const APP_CACHE_REFRESH = 3000;
 const ISOLATION = /[\u2068\u2069]/g;
 const DEVELOPER_TOOLS = 'Security · Developer tools';
 const USB = 'Security · Hold back new USB devices';
@@ -56,6 +62,22 @@ function rowOf(text: string, root: Clutter.Actor): Clutter.Actor {
   return row!;
 }
 
+const scrollOf = (dialog: Clutter.Actor) => descendants(dialog).find(actor => actor instanceof St.ScrollView) as St.ScrollView;
+const left = (actor: Clutter.Actor) => actor.get_transformed_position()[0];
+const right = (actor: Clutter.Actor) => left(actor) + actor.get_transformed_size()[0];
+
+function checkGutter(dialog: Clutter.Actor, row: Clutter.Actor, scrolls: boolean) {
+  const scroll = scrollOf(dialog);
+  if (scrolls) {
+    const thumb = descendants(scroll).find(actor => actor instanceof St.Widget && actor.has_style_class_name('vhandle'))!;
+    require(scroll.vscrollbar_visible && thumb.mapped && right(row) + SCROLLBAR_GAP <= left(thumb), 'the scrollbar thumb sits beside the rows, not over them');
+  } else {
+    require(!scroll.vscrollbar_visible && Math.abs(right(row) - right(scroll)) < 1, 'a list that fits has no scrollbar and no gutter');
+  }
+}
+
+const exitOf = (path: string) => GLib.file_test(path, GLib.FileTest.EXISTS) ? new TextDecoder().decode(GLib.file_get_contents(path)[1]).trim() : null;
+
 const desktop = () => new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
 const kestrel = () => new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const review = () => answerable(DIALOG);
@@ -74,9 +96,11 @@ async function checkOneReviewForTheWholeSet() {
   const dialog = await waitUntil(review, 'a set with a system setting opens one review');
   await settled();
   await capture('changes-review');
-  for (const text of ['Change these 4 settings?', 'Appearance · Style', 'Light → Dark', 'Taskbar and Start · Size', 'Medium → Large', 'administrator'])
+  for (const text of ['Change these 4 settings?', 'wants to change these settings.', 'Appearance · Style', 'Light → Dark', 'Taskbar and Start · Size', 'Medium → Large', 'administrator'])
     require(says(text, dialog), `the review shows ${text}`);
+  require(!says('luft', dialog), 'the review names who asked, not luft');
   const developer = rowOf(DEVELOPER_TOOLS, dialog);
+  checkGutter(dialog, developer, true);
   const usb = rowOf(USB, dialog);
   require(says('Off → On', developer) && says(DEVELOPER_WARNING, developer) && !says(USB_WARNING, developer), 'Developer tools keeps its own warning in its row');
   require(says('On → Off', usb) && says(USB_WARNING, usb) && !says(DEVELOPER_WARNING, usb), 'USB protection keeps its own warning in its row');
@@ -125,13 +149,37 @@ async function checkOnlyLuftGetsAReview() {
   require(applied().length === 0, 'the copy changes nothing');
 }
 
+async function installTernAsOnLuft() {
+  const entry = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.tern.desktop']);
+  write(entry, `[Desktop Entry]\nType=Application\nName=Tern\nExec=${appBinary('tern')} %U\nStartupWMClass=com.lantharos.tern\n`);
+  await eventually(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.tern.desktop')?.get_app_info().get_filename()?.startsWith(GLib.get_user_data_dir()),
+    'Kestrel knows Tern by its program, as on Luft', APP_CACHE_REFRESH);
+  return () => GLib.unlink(entry);
+}
+
 async function checkOneReviewAtATime() {
-  const first = luft(['set', 'security.usb-protection=off']);
-  await waitUntil(review, 'a review opens');
-  const second = await luft(['set', 'updates.channel=stable']);
-  require(second.status === UNAVAILABLE && second.stderr.includes('waiting for review'), 'a second set waits until the first is answered');
-  await answer(DECLINE, 'the first review is still open');
-  require((await first).status === DECLINED, 'the first set was declined');
+  const exit = scratch('changes', 'tern-exit');
+  GLib.mkdir_with_parents(GLib.path_get_dirname(exit), 0o755);
+  const uninstall = await installTernAsOnLuft();
+  try {
+    await reviewFromTern(exit);
+  } finally {
+    uninstall();
+  }
+}
+
+async function reviewFromTern(exit: string) {
+  await withApp('tern', ['-e', 'sh', '-c', `'${LUFT}' set security.usb-protection=off; echo $? > '${exit}'; sleep 60`], async () => {
+    const dialog = await waitUntil(review, 'luft run in Tern opens a review');
+    await settled();
+    await capture('changes-review-short');
+    require(says('Tern wants to change this setting.', dialog), 'the review names the terminal luft runs in');
+    checkGutter(dialog, rowOf(USB, dialog), false);
+    const second = await luft(['set', 'updates.channel=stable']);
+    require(second.status === UNAVAILABLE && second.stderr.includes('waiting for review'), 'a second set waits until the first is answered');
+    await answer(DECLINE, 'the first review is still open');
+    await eventually(() => exitOf(exit) === `${DECLINED}`, 'the first set was declined');
+  });
 }
 
 async function checkManyChangesFitTheScreen() {
@@ -147,7 +195,7 @@ async function checkManyChangesFitTheScreen() {
     const [, top] = shown.get_transformed_position();
     require(shown.mapped && top + shown.height <= global.stage.height, `${button} stays on the screen`);
   }
-  require(descendants(dialog).some(actor => actor instanceof St.ScrollView), 'the list scrolls');
+  checkGutter(dialog, rowOf(DEVELOPER_TOOLS, dialog), true);
   await answer(DECLINE, 'the long review waits');
   require((await asking).status === DECLINED, 'the long set was declined');
 }

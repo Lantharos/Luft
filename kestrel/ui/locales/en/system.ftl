@@ -780,9 +780,16 @@ changes-title = { $count ->
     [one] Change this setting?
    *[other] Change these { $count } settings?
 }
-# { $requester } is the program that ran luft, such as a terminal or an AI agent
-changes-asked-by = { $requester } asked luft to make these changes. Nothing changes unless you approve.
-changes-asked = A program asked luft to make these changes. Nothing changes unless you approve.
+# { $requester } is the app or program that asked, such as a terminal or an AI agent; { $count } is how many settings would change
+changes-asked-by = { $count ->
+    [one] { $requester } wants to change this setting.
+   *[other] { $requester } wants to change these settings.
+}
+# { $count } is how many settings would change
+changes-asked = { $count ->
+    [one] A program wants to change this setting.
+   *[other] A program wants to change these settings.
+}
 changes-administrator = Approving asks for an administrator’s password next.
 # A setting with the page of Settings it is on, as Settings' search shows it, such as "Taskbar and Start · Size"
 changes-setting = { $page } · { $setting }

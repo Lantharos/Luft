@@ -8,7 +8,7 @@
 	import { firmware, openApps, openInstalledApps } from './api';
 	import AutomaticRows from './AutomaticRows.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
-	import ChannelRows from './image/ChannelRows.svelte';
+	import ChannelRow from './image/ChannelRow.svelte';
 	import PendingImage from './image/PendingImage.svelte';
 	import VersionRows from './image/VersionRows.svelte';
 	import StatusCard from './StatusCard.svelte';
@@ -92,6 +92,6 @@
 
 {#if system?.channel}
 	<Section title={t('settings-updates-channel')}>
-		<ChannelRows choice={system.channel} {activity} {attempt} />
+		<ChannelRow choice={system.channel} {activity} {attempt} />
 	</Section>
 {/if}

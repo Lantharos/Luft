@@ -5,16 +5,18 @@ import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import {call} from '../../../lib/dbus.js';
 import type {Point} from '../../../lib/input/input.js';
+import type {Frame} from '../../../lib/screenshots.js';
 import {scratch} from '../../../lib/processes.js';
 import {changes, withApp} from '../../lib/apps.js';
 
 const {require, eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
-const SWITCH_STABLE: Point = [1151, 470];
-const SWITCH_NIGHTLY: Point = [1151, 539];
-const CHANNELS = {x: 507, y: 400, width: 700, height: 180};
+const SWITCH: Point = [1151, 470];
+const CHANNEL = {x: 507, y: 400, width: 600, height: 110};
 const CONFIRM_STABLE: Point = [844, 514];
+const CONFIRM_NIGHTLY: Point = [844, 503];
 const CANCEL_NIGHTLY: Point = [732, 503];
+const CONFIRM_STAY: Point = [844, 482];
 
 type Published = 'yes' | 'no' | 'unknown';
 
@@ -40,38 +42,53 @@ async function onUpdates(followed: string, stable: Published, use: (app: LuftApp
   }, {LUFT_PCI_DEVICES: noGraphics});
 }
 
+async function switchTo(app: LuftApp, channel: string, confirm: Point, name: string) {
+  (await changes(app, `switching to ${channel} asks to confirm first`, () => app.click(SWITCH))).save(`settings-channel-confirm-${name}`);
+  require((await switchesAsked()).length === 0, 'the updater, which asks for an administrator, isn’t reached before confirming');
+  app.click(confirm);
+  await eventually(async () => (await switchesAsked()).includes(`Updater SwitchChannel ${channel}`), `confirming asks the updater to switch to ${channel}`);
+  await app.settle(() => true);
+}
+
 async function checkUnknown() {
   await onUpdates('nightly', 'unknown', async app => {
     (await app.frame()).save('settings-channel-unknown');
-    const shown = await app.frame(app.area(CHANNELS));
-    app.click(SWITCH_STABLE);
-    require((await app.settle(() => true, app.area(CHANNELS))).looksLike(shown), 'Stable can’t be chosen while it’s unknown whether one is out');
+    const shown = await app.frame(app.area(CHANNEL));
+    app.click(SWITCH);
+    require((await app.settle(() => true, app.area(CHANNEL))).looksLike(shown), 'Switch can’t be pressed while it’s unknown whether a stable version is out');
   });
   require((await switchesAsked()).length === 0, 'nothing asks the updater to switch while stable can’t be chosen');
+}
+
+async function stays(app: LuftApp, channel: string, shown: Frame) {
+  await switchTo(app, channel, CONFIRM_STAY, `stay-${channel}`);
+  const after = await app.settle(frame => frame.looksLike(shown, 2), app.area(CHANNEL));
+  require(after.looksLike(shown, 2), `staying on ${channel} shows it as it was before the move`);
 }
 
 async function switchToStable(stable: Published, name: string) {
   await onUpdates('nightly', stable, async app => {
     (await app.frame()).save(`settings-channel-nightly-${name}`);
-    (await changes(app, 'switching to stable asks to confirm first', () => app.click(SWITCH_STABLE))).save(`settings-channel-confirm-stable-${name}`);
-    require((await switchesAsked()).length === 0, 'the updater, which asks for an administrator, isn’t reached before confirming');
-    app.click(CONFIRM_STABLE);
-    await eventually(async () => (await switchesAsked()).includes('Updater SwitchChannel stable'), 'confirming asks the updater to switch to stable');
-    await app.settle(() => true);
+    const nightly = await app.frame(app.area(CHANNEL));
+    await switchTo(app, 'stable', CONFIRM_STABLE, `stable-${name}`);
     (await app.frame()).save(`settings-channel-waiting-stable-${name}`);
+    if (stable === 'yes') await stays(app, 'nightly', nightly);
   });
 }
 
 async function checkToNightly() {
   await onUpdates('stable', 'yes', async app => {
     (await app.frame()).save('settings-channel-stable');
-    const before = await app.frame(app.area(CHANNELS));
-    (await changes(app, 'switching to nightly shows the confirmation first', () => app.click(SWITCH_NIGHTLY))).save('settings-channel-confirm-nightly');
+    const before = await app.frame(app.area(CHANNEL));
+    (await changes(app, 'switching to nightly shows the confirmation first', () => app.click(SWITCH))).save('settings-channel-confirm-nightly');
     require((await switchesAsked()).length === 0, 'the updater isn’t reached while the nightly confirmation is open');
     app.click(CANCEL_NIGHTLY);
-    const after = await app.settle(frame => frame.looksLike(before, 2), app.area(CHANNELS));
+    const after = await app.settle(frame => frame.looksLike(before, 2), app.area(CHANNEL));
     require(after.looksLike(before, 2), 'Cancel closes the confirmation and leaves the channel as it was');
     require((await switchesAsked()).length === 0, 'Cancel changes nothing');
+    await switchTo(app, 'nightly', CONFIRM_NIGHTLY, 'nightly-confirmed');
+    (await app.frame()).save('settings-channel-waiting-nightly');
+    await stays(app, 'stable', before);
   });
 }
 

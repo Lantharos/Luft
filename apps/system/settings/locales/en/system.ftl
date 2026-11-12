@@ -237,12 +237,10 @@ settings-updates-channel-stable = Stable
 settings-updates-channel-nightly = Nightly
 settings-updates-channel-stable-description = Tested builds, fewer changes.
 settings-updates-channel-nightly-description = A new build every day, less tested.
-settings-updates-channel-stable-none = No stable version yet. This computer can move there when the first one is released.
+settings-updates-channel-stable-none = A new build every day. There’s no stable version yet.
 settings-updates-channel-stable-unknown = Couldn’t check whether a stable version is out. Try again when you’re online.
-settings-updates-channel-waiting-stable = This computer keeps getting nightly updates and moves to stable at the next stable release.
-settings-updates-channel-waiting-nightly = This computer keeps its current build and moves to the nightly builds once one at least as new is out.
-# Shown on the channel this computer gets its updates from
-settings-updates-channel-in-use = In use
+settings-updates-channel-waiting-stable = Gets nightly updates until the next stable release, then moves to stable.
+settings-updates-channel-waiting-nightly = Moves to nightly once a nightly build is as new as this one.
 settings-updates-moving-stable = Moving to the stable version
 settings-updates-moving-nightly = Moving to the nightly builds
 settings-updates-nightly-confirm-title = Switch to nightly builds?
@@ -251,6 +249,12 @@ settings-updates-nightly-confirm = Switch to nightly
 settings-updates-stable-confirm-title = Switch to stable?
 settings-updates-stable-confirm-body = Stable versions are tested before they come out and change less often. This computer keeps getting nightly updates until a stable version is as new as its build, which may already be the case, and then stays on stable. You can switch back at any time.
 settings-updates-stable-confirm = Switch to stable
+settings-updates-stay-nightly-title = Stay on nightly?
+settings-updates-stay-nightly-body = This computer won’t move to stable and keeps getting a new build every day.
+settings-updates-stay-nightly = Stay on nightly
+settings-updates-stay-stable-title = Stay on stable?
+settings-updates-stay-stable-body = This computer won’t move to the nightly builds and keeps getting stable updates.
+settings-updates-stay-stable = Stay on stable
 settings-updates-done = Done
 
 ## About

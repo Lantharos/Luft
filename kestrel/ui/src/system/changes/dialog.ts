@@ -3,6 +3,7 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { dialogScroll } from '../../shared/dialogs/dialogScroll.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 import { t } from '../../shared/i18n/index.js';
 import type { Item } from './items.js';
@@ -34,10 +35,7 @@ function changeRow(item: Item): St.Widget {
 function changeList(items: Item[]): St.ScrollView {
   const rows = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-list', x_expand: true });
   for (const item of items) rows.add_child(changeRow(item));
-  return new St.ScrollView({
-    child: rows, style_class: 'kestrel-portal-scroll kestrel-app-scroll kestrel-changes-scroll',
-    hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
-  });
+  return dialogScroll(rows, 'kestrel-portal-scroll');
 }
 
 /** Every change of a set, from what it is to what it becomes, approved or declined as one. */

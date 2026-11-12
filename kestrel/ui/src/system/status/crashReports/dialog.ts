@@ -3,6 +3,7 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { MessageDialogContent } from '../../../shared/dialogs/dialog.js';
+import { dialogScroll } from '../../../shared/dialogs/dialogScroll.js';
 import { ModalDialog } from '../../../shared/dialogs/modalDialog.js';
 import { t } from '../../../shared/i18n/index.js';
 import { CheckBox } from '../../../shared/widgets/checkBox.js';
@@ -35,7 +36,7 @@ function openContents(body: string): void {
   text.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
   const lines = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
   lines.add_child(text);
-  modal.contentLayout.add_child(new St.ScrollView({ style_class: 'kestrel-crash-report-scroll', child: lines }));
+  modal.contentLayout.add_child(dialogScroll(lines, 'kestrel-crash-report-scroll'));
   modal.addButton({ label: t('crash-reports-close'), action: () => modal.close(), default: true });
   if (!modal.open()) modal.destroy();
 }

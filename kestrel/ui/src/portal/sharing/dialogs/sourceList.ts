@@ -3,6 +3,7 @@ import type Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import { windowIcon } from '../../../appearance/icons/appIcons.js';
+import { dialogScroll } from '../../../shared/dialogs/dialogScroll.js';
 import { t } from '../../../shared/i18n/index.js';
 import { choose, list, row, type RowSpec } from '../../core/rows.js';
 import { MONITOR, VIRTUAL, WINDOW, monitorSources, windowSources, type MonitorSource, type Selection, type Source, type WindowSource } from '../sources.js';
@@ -87,6 +88,6 @@ export function sourceList({ types, multiple }: Selection, changed: (count: numb
   if (screens.length) sections.add_child(section(labelled ? t('screen-share-screens') : null, buttons.slice(0, screens.length)));
   if (windows.length) sections.add_child(section(labelled ? t('screen-share-windows') : null, buttons.slice(screens.length)));
   if (!entries.length) sections.add_child(new St.Label({ text: t('screen-share-nothing-to-share'), style_class: 'kestrel-portal-note' }));
-  const actor = new St.ScrollView({ child: sections, style_class: 'kestrel-portal-scroll', hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC, overlay_scrollbars: true });
+  const actor = dialogScroll(sections, 'kestrel-portal-scroll');
   return { actor, selected };
 }

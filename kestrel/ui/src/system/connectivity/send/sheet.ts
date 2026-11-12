@@ -7,6 +7,7 @@ import { appIcon } from '../../../appearance/icons/appIcons.js';
 import { openDialog, type PortalDialog } from '../../../portal/core/dialog.js';
 import { SUCCESS } from '../../../portal/core/request.js';
 import { list, row } from '../../../portal/core/rows.js';
+import { dialogScroll } from '../../../shared/dialogs/dialogScroll.js';
 import { t } from '../../../shared/i18n/index.js';
 import { deviceIcon } from '../post/format.js';
 import { currentPost, type Post } from '../post/post.js';
@@ -117,10 +118,7 @@ export async function openSendSheet(files: Received[], from: Shell.App | null): 
     await openDialog(null, { ...heading(files), icon: ICON, styleClass: 'kestrel-send-sheet' }, dialog => {
       const sections = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-send-sections', x_expand: true });
       const sheet: Sheet = { dialog, files, apps: receivingApps(files, from), sections };
-      dialog.content.add_child(new St.ScrollView({
-        child: sections, style_class: 'kestrel-portal-scroll', hscrollbar_policy: St.PolicyType.NEVER,
-        vscrollbar_policy: St.PolicyType.AUTOMATIC, overlay_scrollbars: true,
-      }));
+      dialog.content.add_child(dialogScroll(sections, 'kestrel-portal-scroll'));
       if (post) {
         let shown = nearby(post);
         unwatch = post.client.onChanged(() => {

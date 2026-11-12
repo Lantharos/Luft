@@ -2,6 +2,8 @@ import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
+import { dialogScroll } from '../../shared/dialogs/dialogScroll.js';
+
 export interface RowSpec {
   icon?: Gio.Icon | string | St.Widget;
   title: string;
@@ -36,7 +38,7 @@ export function list(rows: St.Widget[], scrollable = false): St.Widget {
   const box = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-list', x_expand: true });
   for (const child of rows) box.add_child(child);
   if (!scrollable) return box;
-  return new St.ScrollView({ child: box, style_class: 'kestrel-portal-scroll', hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC, overlay_scrollbars: true });
+  return dialogScroll(box, 'kestrel-portal-scroll');
 }
 
 export function choose(rows: St.Button[], selected: (index: number) => void): void {

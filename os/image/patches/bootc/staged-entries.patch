@@ -1,37 +1,104 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Kristof Imeri <imeri@lanth.me>
-Date: Fri, 30 Oct 2026 21:40:00 +0100
-Subject: [PATCH] composefs: Replace a staged UKI's boot entries instead of
- adding to them
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 6 Nov 2026 16:00:03 +0100
+Subject: [PATCH] composefs: Replace a staged UKI's boot entries
 
-Staging a UKI deployment wrote its entries into loader/entries.staged
-next to whatever an earlier staged deployment left there. The entry's
-file name carries the version, so staging a newer image over a staged
-one of another version kept the old entry. Status then listed that
-deployment without counting it as staged or rollback, garbage
-collection dropped its image's tag and objects while its entry and
-state stayed, and every later status failed to open its manifest.
+Staging a UKI wrote its entries into loader/entries.staged next to
+whatever an earlier staged deployment left there. An entry's file name
+carries the version from the UKI's os-release, so staging an image of
+another version over a staged one kept the earlier entry. Status then
+found a deployment that was neither staged nor rollback, garbage
+collection removed its image while its entry and state directory
+stayed, and from then on status failed to open the manifest. Upgrade,
+switch and finalization all go through status, so the system was stuck
+on the booted deployment, and rebooting didn't help.
 
-Remove the staged entries before writing the new ones, as Type 1
-entries for a kernel and initrd already do.
+Remove the staged entries before writing the new ones, as
+setup_composefs_bls_boot() has done since #1861.
+
+Assisted-by: AI
+Signed-off-by: Kristof Imeri <kristof@lanth.me>
+(cherry picked from commit cf06a12bc6d76b2a5a8d464f7dafbf60ad64bfbd)
 ---
- crates/lib/src/bootc_composefs/boot.rs | 3 +++
- 1 file changed, 3 insertions(+)
+ crates/lib/src/bootc_composefs/boot.rs    |  6 ++++
+ tmt/tests/booted/test-composefs-gc-uki.nu | 35 +++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index e8aa73f..818f24e 100644
+index 1e41825b..d8facdc6 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -1897,6 +1897,9 @@ fn write_systemd_uki_config(
+@@ -1889,6 +1889,12 @@ fn write_systemd_uki_config(
          }
  
          BootSetupType::Upgrade((_, booted_cfs, ..)) => {
++            // An earlier staged deployment's entry may have another version in
++            // its file name, so writing ours wouldn't overwrite it
 +            esp_dir
 +                .remove_all_optional(TYPE1_ENT_PATH_STAGED)
 +                .with_context(|| format!("Removing {TYPE1_ENT_PATH_STAGED}"))?;
++
              esp_dir
                  .create_dir_all(TYPE1_ENT_PATH_STAGED)
                  .with_context(|| format!("Creating {TYPE1_ENT_PATH_STAGED}"))?;
+diff --git a/tmt/tests/booted/test-composefs-gc-uki.nu b/tmt/tests/booted/test-composefs-gc-uki.nu
+index 51d4f479..150b8212 100644
+--- a/tmt/tests/booted/test-composefs-gc-uki.nu
++++ b/tmt/tests/booted/test-composefs-gc-uki.nu
+@@ -15,11 +15,42 @@ let booted = $st.status.booted.image
+ let uki_prefix = "bootc_composefs-"
+ 
+ let is_uki = (($st.status.booted.composefs.bootType | str downcase) == "uki")
++let is_sdboot = (($st.status.booted.composefs.bootloader | str downcase) == "systemd")
+ 
+ if not $is_uki {
+     exit 0
+ }
+ 
++# Build an image with this VERSION_ID and stage it
++def stage_version [version: string] {
++    let containerfile = $"
++        FROM localhost/bootc as base
++        RUN sed -i 's/^VERSION_ID=.*/VERSION_ID=($version)/' /usr/lib/os-release
++    "
++
++    (tap make_uki_containerfile $containerfile) | podman build -t $"localhost/bootc-($version)" . -f -
++
++    bootc switch --transport containers-storage $"localhost/bootc-($version)"
++}
++
++# A UKI's boot entry has the version from its os-release in its file name, so
++# staging an image of another version doesn't overwrite the staged entry. Make
++# sure that entry goes away, along with the deployment it belongs to.
++def restage_another_version [] {
++    stage_version "restage1"
++    let replaced = (bootc status --json | from json).status.staged.composefs.verity
++
++    stage_version "restage2"
++
++    let staged = (glob /var/tmp/efi/loader/entries.staged/*.conf)
++    assert equal ($staged | length) 2 $"Expected the new and booted entries, found ($staged)"
++    assert (not ($staged | any { |f| $f | str contains "restage1" }))
++
++    let status = (bootc status --json | from json).status
++    assert ($status.staged.image.image.image | str ends-with "bootc-restage2")
++    assert (not ($"/sysroot/state/deploy/($replaced)" | path exists))
++}
++
+ # Create a large file in a new container image, then bootc switch to the image
+ def first_boot [] {
+     bootc image copy-to-storage
+@@ -171,6 +202,10 @@ def fourth_boot [] {
+     let path = cat /var/large-file-marker-objpath
+     assert (not ($path | path exists))
+ 
++    if $is_sdboot {
++        restage_another_version
++    }
++
+     tap ok
+ }
+ 
 -- 
 2.53.0
 

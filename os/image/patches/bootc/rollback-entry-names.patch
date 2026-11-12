@@ -1,67 +1,152 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Kristof Imeri <imeri@lanth.me>
-Date: Wed, 28 Oct 2026 02:13:13 +0100
-Subject: [PATCH] composefs: Keep the entries' os_id when rolling back
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 6 Nov 2026 16:00:04 +0100
+Subject: [PATCH] composefs: Keep the boot entries' os_id on rollback
 
 A rollback rewrote both Type 1 entries with "bootc" as the os_id, so
-entries named bootc_fedora-… came back as bootc_bootc-… with the sort
-keys bootc-bootc-0 and bootc-bootc-1, unlike every entry an install,
-update or switch writes.
+bootc_fedora-45-1.conf came back as bootc_bootc-45-1.conf with the
+sort key bootc-bootc-0, unlike every entry install, upgrade and switch
+write. Since the sort key changes too, the entries also move relative
+to anything else in the boot menu.
 
 Take the os_id from the sort keys the entries already have, so a
-rollback only swaps their priorities, and fall back to "bootc" for
-entries without one.
----
- crates/lib/src/bootc_composefs/rollback.rs | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+rollback only swaps which one comes first. Entries with a sort key bootc
+didn't write still fall back to "bootc".
 
-diff --git a/crates/lib/src/bootc_composefs/rollback.rs b/crates/lib/src/bootc_composefs/rollback.rs
-index 37d7ed4e..869cf324 100644
---- a/crates/lib/src/bootc_composefs/rollback.rs
-+++ b/crates/lib/src/bootc_composefs/rollback.rs
-@@ -17,6 +17,7 @@ use crate::composefs_consts::{
-     COMPOSEFS_STAGED_DEPLOYMENT_FNAME, COMPOSEFS_TRANSIENT_STATE_DIR, TYPE1_ENT_PATH_STAGED,
- };
- use crate::deploy::ROLLBACK_JOURNAL_ID;
-+use crate::parsers::bls_config::BLSConfig;
- use crate::spec::{Bootloader, BootloaderKind, Host};
- use crate::store::{BootedComposefs, Storage};
- use crate::{
-@@ -115,6 +116,19 @@ fn rollback_grub_uki_entries(boot_dir: &Dir) -> Result<()> {
-     rename_exchange_user_cfg(&entries_dir)
+Assisted-by: AI
+Signed-off-by: Kristof Imeri <kristof@lanth.me>
+(cherry picked from commit 27f1e64ea93639929ed0088cdc230c220dac0fe6)
+---
+ crates/lib/src/bootc_composefs/boot.rs     | 22 ++++++++++++++++++
+ crates/lib/src/bootc_composefs/rollback.rs | 14 ++++++++----
+ tmt/tests/booted/test-rollback.nu          | 26 ++++++++++++++++++++++
+ 3 files changed, 58 insertions(+), 4 deletions(-)
+
+diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
+index d8facdc6..5c314740 100644
+--- a/crates/lib/src/bootc_composefs/boot.rs
++++ b/crates/lib/src/bootc_composefs/boot.rs
+@@ -553,6 +553,13 @@ pub(crate) fn secondary_sort_key(os_id: &str) -> String {
+     format!("bootc-{os_id}-{SORTKEY_PRIORITY_SECONDARY}")
  }
  
-+/// The os_id the deployments' entries were written with, taken from their
-+/// sort keys (`bootc-{os_id}-{priority}`), so the rewritten entries keep
-+/// their names. Entries without one fall back to "bootc".
-+fn entries_os_id(configs: &[BLSConfig]) -> String {
-+    configs
-+        .iter()
-+        .find_map(|cfg| {
-+            let key = cfg.sort_key.as_deref()?.strip_prefix("bootc-")?;
-+            key.rsplit_once('-').map(|(os_id, _)| os_id.to_owned())
-+        })
-+        .unwrap_or_else(|| "bootc".to_owned())
++/// Returns the os_id in a sort key from [`primary_sort_key`] or
++/// [`secondary_sort_key`], or `None` if it isn't in their format.
++pub(crate) fn os_id_from_sort_key(sort_key: &str) -> Option<&str> {
++    let (os_id, _priority) = sort_key.strip_prefix("bootc-")?.rsplit_once('-')?;
++    Some(os_id)
 +}
 +
- /// Performs rollback for
- /// - Grub Type1 boot entries
- /// - Systemd Typ1 boot entries
-@@ -137,9 +151,8 @@ fn rollback_composefs_entries(host: &Host, boot_dir: &Dir, bootloader: Bootloade
+ /// Returns the name of the directory where we store Type1 boot entries
+ pub(crate) fn get_type1_dir_name(depl_verity: &str) -> String {
+     format!("{TYPE1_BOOT_DIR_PREFIX}{depl_verity}")
+@@ -3340,6 +3347,21 @@ mod tests {
+         assert_eq!(parts[2], "bootc_fedora_coreos"); // name
+     }
+ 
++    #[test]
++    fn test_os_id_from_sort_key() {
++        for (sort_key, expected) in [
++            (primary_sort_key("fedora"), Some("fedora")),
++            (secondary_sort_key("fedora"), Some("fedora")),
++            (primary_sort_key("fedora-coreos"), Some("fedora-coreos")),
++            (secondary_sort_key("bootc"), Some("bootc")),
++            ("1".to_owned(), None),
++            ("bootc".to_owned(), None),
++            ("other-fedora-0".to_owned(), None),
++        ] {
++            assert_eq!(os_id_from_sort_key(&sort_key), expected, "{sort_key}");
++        }
++    }
++
+     #[test]
+     fn test_sort_keys() {
+         // Test sort-key generation for systemd-boot
+diff --git a/crates/lib/src/bootc_composefs/rollback.rs b/crates/lib/src/bootc_composefs/rollback.rs
+index eccaf658..7c26fb39 100644
+--- a/crates/lib/src/bootc_composefs/rollback.rs
++++ b/crates/lib/src/bootc_composefs/rollback.rs
+@@ -10,7 +10,7 @@ use rustix::fs::{AtFlags, RenameFlags, fsync, renameat_with};
+ use crate::bootc_composefs::aboot;
+ use crate::bootc_composefs::boot::{
+     BootType, FILENAME_PRIORITY_PRIMARY, FILENAME_PRIORITY_SECONDARY, STAGED_GLOBAL_UKI_ADDONS_DIR,
+-    primary_sort_key, secondary_sort_key, type1_entry_conf_file_name,
++    os_id_from_sort_key, primary_sort_key, secondary_sort_key, type1_entry_conf_file_name,
+ };
+ use crate::bootc_composefs::status::{get_composefs_status, get_sorted_type1_boot_entries};
+ use crate::composefs_consts::{
+@@ -136,10 +136,16 @@ fn rollback_composefs_entries(host: &Host, boot_dir: &Dir, bootloader: Bootloade
+     // TODO(Johan-Liebert): Currently assuming there are only two deployments
      assert!(all_configs.len() == 2);
  
++    // Keep the os_id the entries were written with, so rolling back only swaps them.
++    // Use "bootc" as default os_id for entries with a sort-key we didn't write.
++    let os_id = all_configs
++        .iter()
++        .find_map(|cfg| os_id_from_sort_key(cfg.sort_key.as_deref()?))
++        .unwrap_or("bootc")
++        .to_owned();
++    let os_id = os_id.as_str();
++
      // For rollback: previous gets primary sort-key, booted gets secondary sort-key
 -    // Use "bootc" as default os_id for rollback scenarios
 -    // TODO: Extract actual os_id from deployment
 -    let os_id = "bootc";
-+    let os_id = entries_os_id(&all_configs);
-+    let os_id = os_id.as_str();
  
      // This is the currently booted deployment - it should become secondary
      // OR if rollback was queued, it would become primary
+diff --git a/tmt/tests/booted/test-rollback.nu b/tmt/tests/booted/test-rollback.nu
+index 9e628108..0e260e1f 100644
+--- a/tmt/tests/booted/test-rollback.nu
++++ b/tmt/tests/booted/test-rollback.nu
+@@ -19,6 +19,7 @@ journalctl --list-boots
+ 
+ let st = bootc status --json | from json
+ let booted = $st.status.booted.image
++let is_composefs = (tap is_composefs)
+ 
+ def imgsrc [] {
+     $env.BOOTC_upgrade_image? | default "localhost/bootc-derived-local"
+@@ -32,6 +33,29 @@ def assert_rollback_queued [expected: bool] {
+     assert equal $queued $expected
+ }
+ 
++# The name each boot entry starts with and its sort-key, which a rollback keeps
++# while swapping the versions they belong to. Only systemd-boot orders entries
++# by sort-key.
++def boot_entries [] {
++    if not $is_composefs or (($st.status.booted.composefs.bootloader | str downcase) != "systemd") {
++        return []
++    }
++
++    if not ("/var/tmp/efi/loader" | path exists) {
++        mkdir /var/tmp/efi
++        mount /dev/disk/by-partlabel/EFI-SYSTEM /var/tmp/efi
++    }
++
++    glob /var/tmp/efi/loader/entries/*.conf
++    | each { |f|
++        {
++            name: ($f | path basename | split row "-" | first),
++            sort_key: (open $f | lines | parse "sort-key {key}" | get 0.key),
++        }
++    }
++    | sort-by sort_key
++}
++
+ # Run on the first boot - capture initial state and switch to new image
+ def initial_switch [] {
+     tap begin "bootc rollback test"
+@@ -81,7 +105,9 @@ def second_boot_rollback [] {
+     assert_rollback_queued false
+ 
+     print "Performing bootc rollback..."
++    let entries = (boot_entries)
+     bootc rollback
++    assert equal (boot_entries) $entries
+ 
+     # ...and a real queued rollback must be reported as one
+     assert_rollback_queued true
 -- 
-2.56.0
+2.53.0
 

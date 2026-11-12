@@ -13,7 +13,7 @@ signer_issuer=https://token.actions.githubusercontent.com
 
 # shellcheck source=os/versions.env
 source "$luft/os/versions.env"
-bootc_minimum="1.17.3-1.fc$FEDORA"
+bootc_minimum="1.17.4-1.fc$FEDORA"
 
 # shellcheck source=os/image/throwaway-keys.sh
 source "$image/throwaway-keys.sh"

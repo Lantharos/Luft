@@ -1,6 +1,6 @@
 # Upstream pull requests
 
-Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. The two with a patch here are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.3, and the second builds on the first. The last two are branches on [krissedout/bootc](https://github.com/krissedout/bootc), against main at c3be524, independent of each other and of everything else here.
+Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. Both are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.4, and the second builds on the first.
 
 ## Boot entry version
 
@@ -442,51 +442,3 @@ index 038b744a..eaa259e4 100644
 2.56.0
 
 ```
-
-## Staging over a staged UKI
-
-Branch `composefs-staged-entries`.
-
-### Title
-
-composefs: Replace a staged UKI's boot entries
-
-### Description
-
-Staging an update over one that's already staged, with a different version, leaves bootc status failing with "Opening OCI image for manifest sha256:...: No such file or directory". bootc upgrade and bootc switch fail with the same error, and a reboot doesn't help: it comes back on the old deployment with status still failing, so the machine can't take any more updates. This happens with UKIs under systemd-boot, for example when a timer stages a new build before anyone has rebooted into the last one.
-
-A boot entry's file name carries the version from the UKI's os-release, and write_systemd_uki_config() adds to loader/entries.staged without clearing it, so the earlier staged entry stays next to the new one. Status then finds a deployment that's neither staged nor rollback, GC drops its image while the entry and state directory stay, and the next status can't open its manifest. #1857 reported the entries stacking up and #1861 fixed that for Type 1 entries with a kernel and initrd, but UKIs go through a different function. Images whose version doesn't change, like a stream of Fedora builds all with VERSION_ID=45, overwrite the same file name and never hit this.
-
-This removes the staged entries before writing the new ones, the same way setup_composefs_bls_boot() does.
-
-We hit this in Luft, a bootc-based desktop that boots sealed UKIs through shim and systemd-boot, and we've carried this as a patch on 1.17.3.
-
-On this branch cargo fmt --check, cargo check --workspace --all-targets, cargo test -p bootc-lib -p bootc-internal-blockdev and just validate pass. There's no unit test because the function needs a booted deployment and a real bootloader, so the coverage is a new tmt test, test-68-composefs-restage-uki. It stages two images with different VERSION_IDs, checks that loader/entries.staged has only the new and booted entries and that the replaced deployment's state is gone, then reboots into the second image. It skips itself on anything but UKIs with systemd-boot.
-
-I ran it with an image from just build on fedora-bootc:45 (composefs, systemd-boot, unsealed UKI, ext4), with SELinux enforcing. On main it fails with three entries in loader/entries.staged, and status, upgrade and switch all fail with the error above, also after rebooting. With this change it passes through the reboot, and status, GC and bootc upgrade behave normally afterwards. I don't have bcvk or libvirt on this machine, so rather than through just test-tmt I installed with bootc install to-disk from a helper VM and ran the script stage by stage in qemu, with the fixed bootc bind-mounted over /usr/bin/bootc. I didn't run it on centos-bootc stream10 or with a sealed UKI; the sealed CI runs don't include this test, since the derived images are built in the VM without keys to sign them.
-
-Assisted-by: AI
-I reviewed and tested the changes myself.
-
-## Rollback entry names
-
-Branch `composefs-rollback-entry-names`.
-
-### Title
-
-composefs: Keep the boot entries' os_id on rollback
-
-### Description
-
-After bootc rollback, both boot entries are renamed: bootc_fedora-45-1.conf with sort key bootc-fedora-0 comes back as bootc_bootc-45-1.conf with sort key bootc-bootc-0. Every install, upgrade and switch writes the distro's name, so the names change depending on whether the last operation was a rollback, and since the sort keys change too the entries can move relative to anything else in the boot menu, such as another OS's entries on the same ESP. They stay that way until the next upgrade rewrites them. The bootc_bootc entries in the table in #2224 look like this as well.
-
-rollback_composefs_entries() hardcoded "bootc" as the os_id, with a TODO to get the real one. The entries already have it, so this reads it from their sort keys and a rollback only swaps which one comes first. An entry with a sort key bootc didn't write still falls back to "bootc", so nothing changes for those.
-
-We noticed this in Luft, a bootc-based desktop that boots sealed UKIs through shim and systemd-boot, where the boot menu's entries changed name after a rollback, and we've carried this as a patch on 1.17.3.
-
-On this branch cargo fmt --check, cargo check --workspace --all-targets, cargo test -p bootc-lib -p bootc-internal-blockdev and just validate pass, including a table-driven test for reading the os_id out of a sort key. test-rollback now also checks on systemd-boot that the entries keep their name and sort keys across bootc rollback.
-
-I ran test-rollback with an image from just build on fedora-bootc:45 (composefs, systemd-boot, unsealed UKI, ext4), with SELinux enforcing. On main the new check fails with bootc_bootc and bootc-bootc-0 where it expected bootc_fedora and bootc-fedora-0. With this change the whole test passes through its reboots and the entries end up as bootc_fedora-45-0.conf and bootc_fedora-45-1.conf. I don't have bcvk or libvirt on this machine, so rather than through just test-tmt I installed with bootc install to-disk from a helper VM and ran the script stage by stage in qemu, with the fixed bootc bind-mounted over /usr/bin/bootc. I didn't run it with GRUB or with Type 1 entries with a kernel and initrd. They use the same function, but the new tmt check only runs on systemd-boot.
-
-Assisted-by: AI
-I reviewed and tested the changes myself.

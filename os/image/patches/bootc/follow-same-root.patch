@@ -20,17 +20,17 @@ in any staged for the next boot, keeping its sort key and the rest of its
 file name.
 ---
  crates/lib/src/bootc_composefs/boot.rs   | 33 +++++++++
- crates/lib/src/bootc_composefs/state.rs  | 88 ++++++++++++++++++++++--
+ crates/lib/src/bootc_composefs/state.rs  | 91 ++++++++++++++++++++++--
  crates/lib/src/bootc_composefs/switch.rs |  2 +-
- crates/lib/src/bootc_composefs/update.rs | 35 ++++++++--
- 4 files changed, 149 insertions(+), 9 deletions(-)
+ crates/lib/src/bootc_composefs/update.rs | 35 +++++++--
+ 4 files changed, 152 insertions(+), 9 deletions(-)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index 3bfda35d..12d6d18b 100644
+index 8ffb5b27..8cb8c352 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -560,6 +560,19 @@ pub(crate) fn secondary_sort_key(os_id: &str) -> String {
-     format!("bootc-{os_id}-{SORTKEY_PRIORITY_SECONDARY}")
+@@ -560,6 +560,19 @@ pub(crate) fn os_id_from_sort_key(sort_key: &str) -> Option<&str> {
+     Some(os_id)
  }
  
 +/// The Type 1 entry filename `file_name`, written for `old_version`, with
@@ -49,7 +49,7 @@ index 3bfda35d..12d6d18b 100644
  /// Returns the name of the directory where we store Type1 boot entries
  pub(crate) fn get_type1_dir_name(depl_verity: &str) -> String {
      format!("{TYPE1_BOOT_DIR_PREFIX}{depl_verity}")
-@@ -3346,6 +3359,26 @@ mod tests {
+@@ -3341,6 +3354,26 @@ mod tests {
          assert_eq!(filename, "bootc_rhel-9.3.0-0.conf");
      }
  
@@ -77,7 +77,7 @@ index 3bfda35d..12d6d18b 100644
      fn test_grub_filename_parsing() {
          // Verify our filename format works correctly with Grub's parsing logic
 diff --git a/crates/lib/src/bootc_composefs/state.rs b/crates/lib/src/bootc_composefs/state.rs
-index 57055a3d..8bc3de37 100644
+index 57055a3d..67a05063 100644
 --- a/crates/lib/src/bootc_composefs/state.rs
 +++ b/crates/lib/src/bootc_composefs/state.rs
 @@ -20,12 +20,12 @@ use linux_kernel_cmdline::utf8::Cmdline;
@@ -107,7 +107,7 @@ index 57055a3d..8bc3de37 100644
      spec::ImageReference,
      spec::{FilesystemOverlay, FilesystemOverlayAccessMode, FilesystemOverlayPersistence},
      utils::path_relative_to,
-@@ -212,6 +212,86 @@ fn add_update_in_origin(
+@@ -212,6 +212,89 @@ fn add_update_in_origin(
      Ok(())
  }
  
@@ -123,7 +123,10 @@ index 57055a3d..8bc3de37 100644
 +        storage,
 +        deployment_id,
 +        "origin",
-+        &[(ORIGIN_CONTAINER, &format!("ostree-unverified-image:{imgref}"))],
++        &[(
++            ORIGIN_CONTAINER,
++            &format!("ostree-unverified-image:{imgref}"),
++        )],
 +    )?;
 +    add_update_in_origin(
 +        storage,
@@ -303,5 +306,5 @@ index be525a19..d8ba0a68 100644
                  return Ok(());
              }
 -- 
-2.56.0
+2.53.0
 

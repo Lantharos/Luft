@@ -1,6 +1,6 @@
 # bootc patches
 
-The image build rebuilds Fedora's bootc package with these patches ([`parts/stages/rebuild.sh`](../../parts/stages/rebuild.sh)), from the source of the version in the base image, or of 1.17.3 while the base image has an older one. The source comes from Fedora's build system, which keeps every version after the repositories move on.
+The image build rebuilds Fedora's bootc package with these patches ([`parts/stages/rebuild.sh`](../../parts/stages/rebuild.sh)), from the source of the version in the base image, or of 1.17.4 while the base image has an older one. The source comes from Fedora's build system, which keeps every version after the repositories move on.
 
 | Patch | Why |
 | --- | --- |
@@ -14,24 +14,18 @@ The image build rebuilds Fedora's bootc package with these patches ([`parts/stag
 | `staged-entries.patch` | Staging an update over one that was already staged left the earlier version's boot entry next to the new one, since each entry is named after its version. Clean-up then took that version's image away while its entry stayed, and `bootc status` failed from then on, so no update could be staged. Staging now replaces the staged entries |
 | `xbootldr.patch` | The composefs backend puts startup images and boot entries on an XBOOTLDR partition next to the EFI system partition when there is one. Next to Windows the EFI system partition is often 100 MB, too small for even one startup image |
 
-The patches are against bootc 1.17.3. A change that a bootc release carries needs no patch, and without patches the stage isn't needed.
+The patches are against bootc 1.17.4, and the build applies them in reverse alphabetical order. A change that a bootc release carries needs no patch, and without patches the stage isn't needed.
 
 ## Upstream
 
-`follow-same-root.patch` and `image-version.patch` aren't upstream: bootc's main branch still refuses a switch to the running root and takes the entry's version from the startup image. [UPSTREAM.md](UPSTREAM.md) has the pull requests drafted for both.
+`rollback-entry-names.patch`, `staged-entries.patch` and `xbootldr.patch` are bootc's own commits from its main branch, from [bootc-dev/bootc#2631](https://github.com/bootc-dev/bootc/pull/2631), [#2630](https://github.com/bootc-dev/bootc/pull/2630) and [#2573](https://github.com/bootc-dev/bootc/pull/2573) (three commits). They were merged after 1.17.4, so the next release carries them; only the test lists in `xbootldr.patch` are fitted to 1.17.4. As upstream, only systemd-boot uses the XBOOTLDR partition, `loader/loader.conf` stays on the EFI system partition, and a running system keeps using the partition that holds the entry it started from, so a Luft installed onto a shared EFI system partition stays there even if another system adds an XBOOTLDR partition later.
 
-`grub-started.patch` isn't upstream: bootc 1.17.3 takes any `LoaderInfo` other than systemd-boot's or GRUB CC's for a GRUB system.
+`require-verity.patch` is bootc's own commit 2c6e47a from its main branch, which came after 1.17.4. Main has since moved the check into composefs-rs 0.10, which 1.17.4 can't take without new dependencies.
+
+`grub-started.patch` is [bootc-dev/bootc#2646](https://github.com/bootc-dev/bootc/pull/2646), which isn't merged yet: bootc 1.17.4 takes any `LoaderInfo` other than systemd-boot's or GRUB CC's for a GRUB system.
+
+`follow-same-root.patch` and `image-version.patch` aren't upstream: bootc's main branch still refuses a switch to the running root and takes the entry's version from the startup image. [UPSTREAM.md](UPSTREAM.md) has the pull requests drafted for both.
 
 `boot-counting.patch` isn't upstream: bootc's main branch writes its entries without a counter, though `kernel-install` gives new entries tries from `/etc/kernel/tries`.
 
 `root-partition.patch` isn't upstream: bootc's main branch still links `/run/systemd/volatile-root` to `/dev/gpt-auto-root` as it is.
-
-`staged-entries.patch` is [bootc-dev/bootc#2630](https://github.com/bootc-dev/bootc/pull/2630), which isn't merged yet: bootc's main branch still writes a staged UKI's entries next to those already staged.
-
-`rollback-entry-names.patch` is [bootc-dev/bootc#2631](https://github.com/bootc-dev/bootc/pull/2631), which isn't merged yet: bootc's main branch still rolls back with `bootc` as the name.
-
-`require-verity.patch` isn't upstream: bootc 1.17.3 and its main branch still let `meta.json` decide whether the initramfs checks fs-verity, even when the command line asks for it.
-
-`xbootldr.patch` is a backport of [bootc-dev/bootc#2573](https://github.com/bootc-dev/bootc/pull/2573), which isn't merged yet; 1.17 still lists a separate XBOOTLDR partition as unsupported. As in the pull request, only systemd-boot uses the XBOOTLDR partition, and `loader/loader.conf` stays on the EFI system partition. A running system keeps using the partition that holds the entry it started from, so a Luft installed onto a shared EFI system partition stays there even if another system adds an XBOOTLDR partition later.
-
-The pull request's documentation and tests aren't part of the patch, nor is moving the partition type list into the block device crate; the patch adds just the XBOOTLDR type there.

@@ -9,6 +9,7 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import AntiCheatRow from './AntiCheatRow.svelte';
 	import DeveloperToolsRow from './DeveloperToolsRow.svelte';
+	import FirewallRow from './FirewallRow.svelte';
 	import type { SecurityState } from '../state.svelte';
 	import HardwareDialog from './HardwareDialog.svelte';
 	import { levelSentence } from './hsi';
@@ -47,6 +48,7 @@
 			onclick={() => app.open('system')}
 		/>
 	{/if}
+	<FirewallRow />
 	{#if security.usb}
 		<UsbRow {security} usb={security.usb} />
 	{/if}

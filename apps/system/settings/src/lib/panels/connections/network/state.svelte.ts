@@ -32,12 +32,6 @@ export class NetworkState {
 		this.firewall = await commands.networkFirewall().catch(() => null);
 	}
 
-	firewallSummary(firewall: Firewall) {
-		const current = firewall.networks.find((network) => network.connected);
-		if (!current) return undefined;
-		return t(current.networkType === 'home' ? 'settings-network-firewall-summary-home' : 'settings-network-firewall-summary-public', { network: current.name });
-	}
-
 	wifiSummary(wifi: Wifi) {
 		if (!wifi.hardwareEnabled) return t('settings-network-wifi-hardware-off');
 		const connected = wifi.enabled && wifi.networks.find((candidate) => candidate.state === 'connected');

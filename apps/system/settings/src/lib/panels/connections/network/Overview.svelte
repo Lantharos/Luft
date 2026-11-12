@@ -9,6 +9,7 @@
 	import { ActionRow, Row, Section, Switch } from '@luft/ui';
 	import type { Network } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
+	import { firewallSummary } from './firewall/summary';
 	import { proxyLabel, type Proxy } from './proxy/proxy.svelte';
 	import type { NetworkState } from './state.svelte';
 
@@ -57,7 +58,7 @@
 	{/each}
 	<Row title={t('settings-network-vpn')} icon={Shield} description={vpnSummary} onclick={() => onopen('vpn')} />
 	{#if connections.firewall}
-		<Row title={t('settings-page-firewall')} icon={BrickWallShield} description={connections.firewallSummary(connections.firewall)} onclick={() => onopen('firewall')} />
+		<Row title={t('settings-page-firewall')} icon={BrickWallShield} description={firewallSummary(connections.firewall)} onclick={() => onopen('firewall')} />
 	{/if}
 	{#if network.airplane}
 		{@const airplane = network.airplane}

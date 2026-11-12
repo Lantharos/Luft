@@ -1,6 +1,6 @@
 [Unit]
 Description=Shell asked for on the screen that says the computer couldn't start
-Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md#opening-a-shell
+Documentation=https://docs.luft.computer/developers/system/recovery/#opening-a-shell
 DefaultDependencies=no
 IgnoreOnIsolate=yes
 

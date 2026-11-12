@@ -27,7 +27,7 @@ sidebar:
 
 Permissions say what your extension uses. The API object only has the parts you asked for, Settings and Schelf show each permission to people in plain words, and schelf.store reviews a release that asks for more than the one before.
 
-Inside the desktop they're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions.
+Inside the desktop they're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions. [How extensions run](/extensions/how-extensions-run/) explains what holds an extension in each place.
 
 Everywhere else they're the wall. An extension in your own folder runs in a sandbox, see [below](#in-a-sandbox).
 

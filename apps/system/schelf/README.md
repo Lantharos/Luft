@@ -9,7 +9,7 @@ Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://sche
 | AppImage | Your account, in `~/.local/share/luft/appimages`, with a menu entry, icon and automatic updates, running in a sandbox |
 | `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
-| System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](../../../docs/system-packages.md)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
+| System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](https://docs.luft.computer/developers/system/system-packages/)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
 
 ## Build and run
 
@@ -31,4 +31,4 @@ The same binary is the `schelf` command, with `sch` linked to it in Luft's image
 
 While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/system/software` while it changes anything.
 
-How Schelf reads schelf.store, adds the preinstalled apps and keeps apps updated in the background is in [the Schelf reference](../../../docs/components/schelf.md).
+How Schelf reads schelf.store, adds the preinstalled apps and keeps apps updated in the background is in [App permissions](https://docs.luft.computer/security/app-permissions/).

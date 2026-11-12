@@ -1,6 +1,6 @@
 [Unit]
 Description=Wait until the login screen or the desktop works
-Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md
+Documentation=https://docs.luft.computer/developers/system/boot/
 DefaultDependencies=no
 After=local-fs.target systemd-tmpfiles-setup.service
 Before=boot-complete.target shutdown.target

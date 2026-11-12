@@ -28,7 +28,7 @@ kestrel/compositor/build.sh
 
 With `KESTREL_MUTTER_CACHE` set to a folder, builds go there under the series' fingerprint and `kestrel/run/mutter-install` links to them, so several checkouts of the same series share one build.
 
-What the patches add, editing them, moving to a new Mutter release and the diagnostics logs are in [the compositor reference](../../docs/components/compositor.md). Where each patch stands upstream is in [Upstream patches](../../docs/upstream.md).
+What the patches add, editing them, moving to a new Mutter release and the diagnostics logs are in [The compositor](https://docs.luft.computer/developers/desktop/compositor/). Where each patch stands upstream is in its `Upstream-Status` trailer.
 
 ## License
 

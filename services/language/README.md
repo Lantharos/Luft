@@ -1,6 +1,6 @@
 # luft-language
 
-The session service that runs a language model on this computer for apps that ask it to write, such as Heft's notes of a recorded class, through the [luft-language crate](../../packages/system/language). What it writes and where its model comes from is in [Language model](../../docs/components/language.md).
+The session service that runs a language model on this computer for apps that ask it to write, such as Heft's notes of a recorded class, through the [luft-language crate](../../packages/system/language). What it writes and where its model comes from is in [Language model](https://docs.luft.computer/developers/desktop/models/#writing-notes).
 
 ## Build
 

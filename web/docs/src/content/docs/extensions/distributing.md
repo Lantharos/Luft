@@ -9,7 +9,7 @@ sidebar:
 
 Schelf carries extensions next to apps, with `kind = "extension"` and `format = "luft-extension"` in `schelf.toml`. The artifact is a `.tar.zst` of the extension's folder, one for every computer, or one per architecture when it ships a native helper. Schelf checks that the manifest's id matches the listing, that it targets an API version Luft has shipped, and that the permissions it lists are the ones the listing shows, and offers each computer the newest release whose API version it runs. Releases are checked and reviewed like apps, a native helper is scanned like any program, and a release that asks for a new permission, host or helper is reviewed again. Luft only installs releases named in the store's signed index, after checking the download against it.
 
-That review matters more for extensions than for apps: an extension that runs inside the desktop isn't in a sandbox, so its permissions describe what it does but don't confine it. Luft only runs a release there when the store's signed index says its publisher is verified and that release was approved to run inside Luft. Every other extension runs in a sandbox of its own.
+That review matters more for extensions than for apps: an extension that runs inside the desktop isn't in a sandbox, so Luft only runs a release there when the store approved it. [How extensions run](/extensions/how-extensions-run/) explains what holds an extension in each place.
 
 Every release also names the oldest version of Luft it runs on, in `extension.toml`:
 
@@ -22,9 +22,7 @@ Versions are ordered the way Luft releases them, every nightly before the releas
 
 ## Where Luft keeps them
 
-An extension from Schelf is installed by the system into `/var/lib/luft/extensions/<uid>/<id>/`, for that account only, where nothing but the system can change it. Luft doesn't ship extensions of its own; Seasons and the others come from Schelf too.
-
-An extension in `~/.local/share/luft/extensions/<id>/` is one you put there yourself. Since any program of yours could have changed it, Luft never runs it inside the desktop: it runs in a sandbox of its own, a separate process with no network, no files but its own folders and nothing else on the computer, reaching only the parts of the API the [manifest](/extensions/manifest/#in-a-sandbox) lists. One that asks for a part only the desktop itself can give, such as `wallpaper`, doesn't run from there. A copy there of an extension installed from Schelf is ignored.
+An extension from Schelf is installed by the system into `/var/lib/luft/extensions/<uid>/<id>/`, for that account only, where nothing but the system can change it. Luft doesn't ship extensions of its own; Seasons and the others come from Schelf too. An extension you put in `~/.local/share/luft/extensions/<id>/` yourself runs in a sandbox, and a copy there of one installed from Schelf is ignored.
 
 ## The D-Bus interface
 
@@ -32,7 +30,7 @@ Settings and Schelf manage extensions through `com.lantharos.Kestrel.Extensions`
 
 | Member | Does |
 | --- | --- |
-| `List() → aa{sv}` | Every installed extension: `id`, `name`, `description`, `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `listen` (the ports its helper takes connections on, each with `tcp` or `udp`), `enabled`, `origin` (`store`, `development` or `own`), `ignored` (copies left alone), `luft` (the oldest version of Luft it runs on), `state` (`running`, `off`, `failed`, `crashed`, `invalid`, `needs-newer-luft`, `store-only` for one in your own folder that asks for a part of the API a sandbox can't have), `problem`, `settings`, `shortcuts`, and `page`, whether it describes a page of its own |
+| `List() → aa{sv}` | Every installed extension: `id`, `name`, `description`, `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `listen` (the ports its helper takes connections on, each with `tcp` or `udp`), `enabled`, `origin` (`store`; `copy` or `folder` for one the person approved to run inside Luft from their own folder; `development` in a development build; `own` otherwise), `ignored` (copies left alone), `luft` (the oldest version of Luft it runs on), `state` (`running`, `off`, `failed`, `crashed`, `invalid`, `needs-newer-luft`, `store-only` for one in your own folder that asks for a part of the API a sandbox can't have), `problem`, `settings`, `shortcuts`, and `page`, whether it describes a page of its own |
 | `Enable(s id)`, `Disable(s id)` | Turns it on or off |
 | `Reload(s id)` | Reads its folder again. A new extension starts, an updated one restarts with its new code, a deleted one stops |
 | `Remove(s id)` | Deletes it and its settings |

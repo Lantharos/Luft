@@ -14,11 +14,11 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Installing registers the `kestrel-settings:` link scheme, which [opens a page](https://docs.luft.computer/developers/links/) from another app.
+Installing registers the `kestrel-settings:` link scheme, which [opens a page](https://docs.luft.computer/developers/desktop/links/) from another app.
 
 ## Automatic updates
 
-`luft-updater` keeps the schedule and checks on it by itself, also when nobody is signed in ([image updates](../../../docs/components/software.md#image-updates)). System shows the schedule and changes it through the updater.
+`luft-updater` keeps the schedule and checks on it by itself, also when nobody is signed in ([image updates](https://docs.luft.computer/developers/system/updates/#the-updater)). System shows the schedule and changes it through the updater.
 
 ## NVIDIA graphics
 

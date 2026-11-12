@@ -10,4 +10,4 @@ Add it to an app's `desktop/Cargo.toml`, with the features the app needs; the ro
 luft-app = { workspace = true, features = ["apps", "thumbnails"] }
 ```
 
-Opening the window, bridge commands, the exports and the optional features are in [the app shell reference](../../docs/components/app.md).
+Opening the window, bridge commands, the exports and the optional features are in [Writing a Luft app](https://docs.luft.computer/developers/desktop/writing-apps/).

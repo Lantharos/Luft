@@ -3,7 +3,6 @@ import type { Place } from './sections';
 
 const UNSEEN = [
 	/^\.github\//,
-	/^docs\//,
 	/^web\//,
 	/^os\/dev\//,
 	/^kestrel\/(tools|peek)\//,

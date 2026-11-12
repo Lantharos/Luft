@@ -14,7 +14,7 @@ Meet Luft is a small app for Windows and Linux. It checks your computer, puts Lu
 
 Both come from [schelf.store](https://schelf.store/apps/com.lantharos.meet), which also lists their [checksums](https://dl.schelf.store/lantharos/meet/latest/SHA256SUMS).
 
-Meet Luft isn't code-signed, so Windows SmartScreen asks before it first starts: choose **More info**, then **Run anyway**.
+Windows may ask once before it opens Meet Luft for the first time: choose **More info**, then **Run anyway**.
 
 Meet Luft downloads the newest Luft, which works with any graphics card and installs NVIDIA's driver when your computer needs it. If you already have a Luft ISO, **Use an ISO I already have** skips the download.
 

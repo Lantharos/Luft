@@ -25,8 +25,44 @@ Any layout, yours or Luft's, can be opened just to look at it. The desktop's **S
 
 An input method turns what you type into something else: replacements such as `cx` becoming `ĉ`, word choices offered while you type, and Compose-style sequences. Input methods are available as soon as you save them, without signing out, and can learn which choices you pick most.
 
+Each input method is a file in `~/.config/keys/input-methods`, which you can also write by hand:
+
+```toml
+name = "Esperanto"
+label = "EO"
+language = "eo"
+candidates = 9
+learn = true
+compose = "Multi_key"
+
+rules = [
+  { keys = "cx", text = "ĉ" },
+  { keys = "u", text = "ŭ", after = "[ae]" },
+]
+
+words = [
+  { keys = "saluton", text = "Saluton!" },
+]
+
+sequences = [
+  { keys = "ae", text = "æ" },
+]
+```
+
+| Key | Means |
+| --- | --- |
+| `label`, `language` | The short name on the panel, and the language code |
+| `candidates` | How many word choices to show, 9 when left out |
+| `learn` | Move often-picked words up; on when left out |
+| `compose` | The XKB name of the key that starts a sequence |
+| `rules` | Replacements. The longest match wins, and `after` limits one to follow certain characters |
+| `words` | Choices offered while typing. Space takes the highlighted one, a number any other |
+| `sequences` | What the keys typed after the `compose` key make |
+
 ## Importing and exporting
 
 Keys imports XKB symbols and keymaps, Windows `.klc` files, m17n `.mim` files and IBus tables. It exports layouts as XKB symbols, a keymap, a Compose file or a Windows `.klc`, and input methods as `.toml`.
 
 Every change can be undone, and everything is saved as you go.
+
+Your own dead keys type characters from the private use area starting at U+EC40, so their tables hold exactly what you put in them. Most apps pick up dead key changes at once; apps that compose characters themselves, such as many terminals, need reopening.

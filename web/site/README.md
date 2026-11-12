@@ -23,7 +23,7 @@ The ISO links go through the site's Worker ([`worker/index.ts`](worker/index.ts)
 
 ## Languages
 
-Every page is built once per language, from the Fluent files in `locales/`; English lives at the root and the others under `/de`, `/pt-br` and so on. Copy goes through `t()` from `src/i18n`, and how translations work is in [docs/translations.md](../../docs/translations.md).
+Every page is built once per language, from the Fluent files in `locales/`; English lives at the root and the others under `/de`, `/pt-br` and so on. Copy goes through `t()` from `src/i18n`, and how translations work is in [Translating Luft](https://docs.luft.computer/developers/translating/).
 
 ## Deploy
 

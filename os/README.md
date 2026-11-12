@@ -1,6 +1,6 @@
 # Building Luft
 
-How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, the USB stick that installs it, and VMs to try both. [How Luft fits together](https://docs.luft.computer/developers/architecture/) explains the design, and [docs/boot.md](../docs/boot.md) how a computer starts from it. The published images and sticks are described in [Images and downloads](../docs/releases.md).
+How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, the USB stick that installs it, and VMs to try both. [How Luft fits together](https://docs.luft.computer/developers/architecture/) explains the design, and [Boot and recovery](https://docs.luft.computer/developers/system/boot/) how a computer starts from it. The published images and sticks are described in [Updates and releases](https://docs.luft.computer/developers/system/updates/).
 
 ## Build the image
 
@@ -12,9 +12,9 @@ os/image/build.sh luft-nvidia        # localhost/luft:45-nvidia
 os/image/build.sh luft luft-nvidia   # both
 ```
 
-The image is put together from parts (Kestrel, the boot and security services, the apps, NVIDIA's driver and so on), each cached by a hash of its sources, so later builds only remake what changed. Each app, service and Kestrel piece lists its part, what it needs and what it installs in an `image.toml` next to it ([Image components](../docs/image-components.md)). For the Rust in a part, that's the workspace crates it copies in and the locked packages they build on, so a dependency one app adds doesn't remake Kestrel. The web runtime is also remade when a newer CEF build comes out, and the apps the image ships from schelf.store come in a part of their own, with the newest release of each that's out. `LUFT_REBUILD=1` makes them all again. The first build takes about an hour.
+The image is put together from parts (Kestrel, the boot and security services, the apps, NVIDIA's driver and so on), each cached by a hash of its sources, so later builds only remake what changed. Each app, service and Kestrel piece lists its part, what it needs and what it installs in an `image.toml` next to it ([Image components](https://docs.luft.computer/developers/building/#what-goes-into-a-part)). For the Rust in a part, that's the workspace crates it copies in and the locked packages they build on, so a dependency one app adds doesn't remake Kestrel. The web runtime is also remade when a newer CEF build comes out, and the apps the image ships from schelf.store come in a part of their own, with the newest release of each that's out. `LUFT_REBUILD=1` makes them all again. The first build takes about an hour.
 
-Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and, for the TPM policy, `LUFT_PCR_KEY_1`, `LUFT_PCR_KEY_2` and so on (PEM), one for each [generation](../docs/security.md#older-signed-startup-images) in `versions.env`. Without them they make throwaway keys that every local build and test VM shares. The public halves of the real keys are in `image/keys`.
+Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and, for the TPM policy, `LUFT_PCR_KEY_1`, `LUFT_PCR_KEY_2` and so on (PEM), one for each [generation](https://docs.luft.computer/security/encryption/#older-signed-startup-images) in `versions.env`. Without them they make throwaway keys that every local build and test VM shares. The public halves of the real keys are in `image/keys`.
 
 | Path | Holds |
 | --- | --- |
@@ -60,6 +60,5 @@ ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/qemu.sh         # as a DVD, Secur
 DISK=os/vm/state/target.qcow2 os/vm/qemu.sh                    # the installed drive afterwards
 ```
 
-`os/vm/qemu.sh --help` lists its other options, and [docs/testing.md](../docs/testing.md#vms) the checks that run in VMs.
+`os/vm/qemu.sh --help` lists its other options, and [Testing](https://docs.luft.computer/developers/testing-vms/#virtual-machines) the checks that run in VMs.
 
-[docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.

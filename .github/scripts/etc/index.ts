@@ -7,7 +7,7 @@ process.chdir(git('rev-parse', '--show-toplevel')!);
 
 const ALLOWED = relative(process.cwd(), join(import.meta.dir, 'allowed.json'));
 const CODE = /\.(rs|ts|sh|in|service|socket|timer|mount|path|rules|conf)$|\/libexec\/[^/]+$/;
-const ELSEWHERE = ['**/vm/**', '**/tests/**', '**/tools/**', '**/fixtures/**', '**/*.d.ts', 'os/image/**', 'os/iso/stages/**', '.github/**', 'web/**', 'docs/**'].map((pattern) => new Bun.Glob(pattern));
+const ELSEWHERE = ['**/vm/**', '**/tests/**', '**/tools/**', '**/fixtures/**', '**/*.d.ts', 'os/image/**', 'os/iso/stages/**', '.github/**', 'web/**'].map((pattern) => new Bun.Glob(pattern));
 const ETC = /(?<![\w.:/-])\/etc(?:\/[\w.@+*%{}$-]+)*\/?/g;
 const COMMENT = /^\s*(?:\/\/|#(?!!)|\*)/;
 const RUST_TESTS = '#[cfg(test)]';
@@ -43,7 +43,7 @@ if (problems.length > 0) {
 Luft keeps what its services write in /var/lib/<service>, since every version of the system has its own /etc
 and going back to an earlier one would lose it. Stock tools get their view from /run or a generator. When the
 code only reads the path, or it is configuration an administrator chooses, add it to ${ALLOWED} with the reason.
-See docs/state.md.`);
+See https://docs.luft.computer/developers/architecture/#where-state-lives.`);
 	process.exit(1);
 }
 console.log(`${seen.size} uses of /etc are all reads or configuration an administrator chooses`);

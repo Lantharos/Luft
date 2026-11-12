@@ -11,22 +11,24 @@ import Shot from '../../../components/Shot.astro';
 
 With Secure Boot on, your computer asks once whether to trust Luft, on a blue screen right after the restart. Install Luft shows you this screen before the restart, with an eight-digit code. When your computer already trusts Luft's key, from an earlier install, there's no blue screen and no code.
 
-1. Press a key within ten seconds.
-2. Choose **Enroll MOK**, then **Continue**, then **Yes**.
-3. Type the code and choose **Reboot**.
+1. At *Press any key to perform MOK management*, press any key within a minute.
+2. Choose **Enroll MOK**, then **Continue**.
+3. At *Enroll the key(s)?*, choose **Yes**. The screen picks No first.
+4. At *Password:*, type the eight digits and press <kbd>Enter</kbd>. Nothing shows while you type, and a wrong code says *Password doesn't match*.
+5. Choose **Reboot**.
 
-The blue screen only takes the arrow keys and <kbd>Enter</kbd>.
+The blue screen is in English and only takes the arrow keys, <kbd>Enter</kbd> and digits.
 
 <Shot name="setup-installed" alt="Install Luft showing the steps for the blue screen and the code to type" />
 
-If you miss it, nothing breaks. The firmware moves on to an entry called *Luft without its key*, which starts the same Luft through Fedora's signed boot loader. That way has no TPM unlock, so an encrypted disk asks for its recovery key or passphrase. Luft asks again with a new code at the next starts, up to three times, and shows the code before each restart. After that, you can ask again from Settings, under Security.
+If you miss it, nothing breaks. The firmware moves on to an entry called *Luft without its key*, which starts the same Luft through Fedora's signed boot loader. The first start that way can't use the TPM, so an encrypted disk asks for its recovery key or passphrase once. Luft asks again with the same code at the next starts, up to three times, and shows the code before each restart. After that, you can ask again from Settings, under Security. [Boot and recovery](/developers/system/boot/#before-lufts-key-is-trusted) explains how this works.
 
 ## Signing in
 
 Luft starts at the login screen with the account you made. Sign in with your password, and Install Luft opens over the blurred wallpaper for the last steps:
 
 1. **Your network**, when the computer is connected. Choose Home for a network you trust, so your other devices can find this computer, or Public for one like in a café. See [Home and public networks](/system/security/#home-and-public-networks).
-2. **Secure Boot**, only when the blue screen was skipped. Install Luft gets a new code and restarts to ask again.
+2. **Secure Boot**, only when the blue screen was skipped. Install Luft shows the code and restarts to ask again.
 3. **Fingerprint**, if the computer has a reader. Add a finger to sign in and unlock with it.
 4. **Done.** The desktop opens, or the computer restarts when a step needs it.
 

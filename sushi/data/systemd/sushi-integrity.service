@@ -1,6 +1,6 @@
 [Unit]
 Description=Stop before the login screen when a system file doesn't match this version
-Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md#when-luft-cant-start
+Documentation=https://docs.luft.computer/developers/system/recovery/
 DefaultDependencies=no
 After=sysinit.target
 Before=display-manager.service greetd.service

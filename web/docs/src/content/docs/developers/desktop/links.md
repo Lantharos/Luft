@@ -1,0 +1,43 @@
+---
+title: Opening Settings and Keys
+description: The kestrel-settings and kestrel-keys links that open a page in Settings or Keys from another app.
+sidebar:
+  order: 5.2
+---
+
+Apps and scripts can open Settings and Keys at a specific page with a link, through `xdg-open`, a portal or a launcher. If the app is already open, the link switches its window to that page.
+
+## Settings
+
+| Link | Opens |
+| --- | --- |
+| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `input`, `appearance`, `desktop`, `notifications`, `extensions`, `accessibility`, `apps`, `privacy`, `security`, `accounts`, `language`, `system` |
+| `kestrel-settings:network/wifi` | Wi-Fi |
+| `kestrel-settings:network/ethernet` | Ethernet |
+| `kestrel-settings:network/vpn` | VPN |
+| `kestrel-settings:network/firewall` | Firewall |
+| `kestrel-settings:network/proxy` | Proxy |
+| `kestrel-settings:sound/custom` | Your own sounds |
+| `kestrel-settings:input/shortcuts` | Keyboard shortcuts |
+| `kestrel-settings:input/dictation` | Dictation |
+| `kestrel-settings:appearance/fonts` | All fonts |
+| `kestrel-settings:appearance/cursors` | Cursor themes |
+| `kestrel-settings:security/encryption` | Device encryption |
+| `kestrel-settings:security/keyring` | Passwords and keys |
+| `kestrel-settings:accounts/login` | The login screen |
+| `kestrel-settings:accounts/add` | Adding an account |
+| `kestrel-settings:system/about` | About this computer |
+| `kestrel-settings:extensions/<id>` | One extension, such as `extensions/com.lantharos.Seasons` |
+
+A link to a page for missing hardware, such as Bluetooth without an adapter, explains that instead.
+
+## Keys
+
+| Link | Opens |
+| --- | --- |
+| `kestrel-keys:` | Keys |
+| `kestrel-keys:layout/new?from=de%2Bnodeadkeys` | A new layout starting from the given one |
+| `kestrel-keys:layout/<name>` | One of your layouts |
+| `kestrel-keys:view/<layout>` | Any layout, read-only, such as `kestrel-keys:view/us%2Bintl` |
+| `kestrel-keys:method/new` | A new input method |
+| `kestrel-keys:method/<name>` | One of your input methods |

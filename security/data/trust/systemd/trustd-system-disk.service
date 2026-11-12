@@ -1,6 +1,6 @@
 [Unit]
 Description=Carry on changing Luft's partition, and take back the space Meet Luft used
-Documentation=https://github.com/Lantharos/Luft/blob/main/docs/meet.md
+Documentation=https://docs.luft.computer/developers/system/resizing/
 ConditionKernelCommandLine=!rd.live.image
 After=local-fs.target dbus.service udisks2.service trustd-follow-up.service
 Wants=udisks2.service

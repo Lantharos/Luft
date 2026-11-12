@@ -2,7 +2,7 @@
 
 The shared look of Luft's Svelte apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome, controls and code highlighting. Components ship as Svelte source and compile with the app.
 
-Setting up an app with it, the components, helpers, classes and tokens are in [the UI kit reference](../../../docs/components/ui.md).
+Setting up an app with it is in [Writing a Luft app](https://docs.luft.computer/developers/desktop/writing-apps/#the-page).
 
 ## Checks
 

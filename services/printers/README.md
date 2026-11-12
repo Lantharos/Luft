@@ -1,6 +1,6 @@
 # luft-printers
 
-The system side of printing: it sets up printers plugged in by USB and lets Settings add, change and remove printers. How printing fits together is in [printing](../../docs/printing.md).
+The system side of printing: it sets up printers plugged in by USB and lets Settings add, change and remove printers. How printing fits together is in [printing](https://docs.luft.computer/desktop/printing/).
 
 | Command | Use |
 | --- | --- |

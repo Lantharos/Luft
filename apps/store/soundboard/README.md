@@ -1,6 +1,6 @@
 # Soundboard
 
-Soundboard plays sounds into games and calls. It gives the computer a second microphone called Soundboard, which carries your voice and your sounds together, and it plays them from a grid of tiles or with global hotkeys. Using it is described in [the docs](https://docs.luft.computer/apps/soundboard/), and how it works in [docs/components/soundboard.md](../../../docs/components/soundboard.md).
+Soundboard plays sounds into games and calls. It gives the computer a second microphone called Soundboard, which carries your voice and your sounds together, and it plays them from a grid of tiles or with global hotkeys. Using it is described in [the docs](https://docs.luft.computer/apps/soundboard/).
 
 ## Build and run
 

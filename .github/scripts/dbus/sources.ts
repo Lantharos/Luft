@@ -13,7 +13,7 @@ export const INTROSPECTION = 'packages/dbus/introspection';
 const KESTREL_INTERFACES = 'kestrel/engine/data/dbus-interfaces/';
 
 const SCANNED = /\.(xml|ts|js|py|c|rs|sh|patch)$/;
-const SKIPPED = ['**/node_modules/**', 'kestrel/types/**', 'web/**', 'docs/**', '.github/**', '**/*.gschema.xml', '**/*.metainfo.xml', '**/*.d.ts'].map((pattern) => new Glob(pattern));
+const SKIPPED = ['**/node_modules/**', 'kestrel/types/**', 'web/**', '.github/**', '**/*.gschema.xml', '**/*.metainfo.xml', '**/*.d.ts'].map((pattern) => new Glob(pattern));
 const TOOLING = ['**/fixtures/**', '**/tools/**', '**/vm/**', '**/tests/**'].map((pattern) => new Glob(pattern));
 const DOCUMENT = new Glob('**/data/**/com.lantharos.*.xml');
 const EXPORTS = /wrapJSObject|register_object|serve_at|object_server/;

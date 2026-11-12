@@ -33,7 +33,7 @@ When something stops Luft from starting, such as a disk that won't unlock or a d
 - **Show details**, what didn't start and the errors behind it, handy when asking for help
 - **Open a shell**, to fix things by hand. It asks for the disk's recovery key or passphrase first, or for root's password if you gave root one
 
-Choose with the arrow keys and <kbd>Enter</kbd>. None of them change your files.
+Choose with the arrow keys and <kbd>Enter</kbd>. None of them change your files. [When Luft can't start](/developers/system/recovery/) explains why a shell asks first and what it locks afterwards.
 
 ## Rescue
 

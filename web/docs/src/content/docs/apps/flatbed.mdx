@@ -54,3 +54,7 @@ Once it's saved, **Send** sends it to a phone or computer nearby with [Post](/de
 ## Privacy
 
 Everything happens on your computer: text is read without going online, and the camera is only on while its window is open. Flatbed runs in a sandbox that can reach your network, for network scanners, and USB devices, for scanners plugged in, and reads your Pictures and Downloads for pictures you drop in.
+
+Scanners on a home network have certificates nobody signed, so no authority can vouch for one. Flatbed remembers the certificate a scanner shows the first time and from then on only talks to whoever shows that certificate and holds its key. When a scanner shows another one, or stops answering over HTTPS, Flatbed sends it nothing and says **This scanner's identity changed**. That's expected after a scanner is reset or replaced, and **Trust this scanner** takes the new certificate once the scanner answers. It can also mean something else on the network is posing as your scanner, and **Don't use it** leaves it alone. A scanner announced without HTTPS under the name of one Flatbed knows doesn't show, so nothing can slip in next to it.
+
+Scanner drivers are code that talks to hardware, and some hang or crash on a scanner they don't understand. Flatbed runs them in a second copy of itself, in the same sandbox, and stops that copy when a driver doesn't let go of a cancelled scan within a few seconds, so a driver can't take the app down with it.

@@ -1,6 +1,6 @@
 //! Panics of Luft's programs, kept in the journal in the shape Luft's crash
 //! collector reads, which it is told about right away. See
-//! [docs/crash-reports.md](../../../../docs/crash-reports.md).
+//! [Crash reports](https://docs.luft.computer/security/crash-reports/).
 
 mod frames;
 mod journal;

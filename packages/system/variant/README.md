@@ -13,8 +13,8 @@ let suited = Variant::for_this_computer();
 let target = suited.reference("ghcr.io/lantharos/luft:1-nightly"); // Some("…:1-nightly-nvidia") with NVIDIA graphics
 ```
 
-- `nvidia_cards()` lists the NVIDIA display and 3D controllers as `10de:DEVICE`, from `/sys/bus/pci/devices`, or from the folder `LUFT_PCI_DEVICES` names (see [Testing](../../../docs/testing.md#nvidia-graphics)).
+- `nvidia_cards()` lists the NVIDIA display and 3D controllers as `10de:DEVICE`, from `/sys/bus/pci/devices`, or from the folder `LUFT_PCI_DEVICES` names (see [Testing](https://docs.luft.computer/developers/testing-vms/#nvidia-graphics)).
 - `Variant::for_vendors` picks the image from the PCI vendor IDs of a computer's graphics, for when they come from somewhere else, such as Windows.
 - `Variant::of` tells an image reference's variant from its tag, and `Variant::reference` gives the same channel and version in another variant. A reference without a tag has no other variant.
-- `ReleaseFacts::of_this_system()` reads what the image's build wrote in `/usr/share/luft/release`: whether Luft is still early, and whether a stable version was out when the image was built ([Images and downloads](../../../docs/releases.md#early-builds)).
+- `ReleaseFacts::of_this_system()` reads what the image's build wrote in `/usr/share/luft/release`: whether Luft is still early, and whether a stable version was out when the image was built ([Images and downloads](https://docs.luft.computer/developers/system/updates/#versions)).
 - `Version` reads a version of Luft, such as `1.2` or `1.2-nightly.21`, and orders it the way versions are released: every nightly comes before the release it leads to. `Version::newer` compares two as text.

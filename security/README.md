@@ -2,7 +2,7 @@
 
 Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except plain keyboards and mice. **luft-firewall** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **luft-remote-login** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
 
-How the pieces protect the computer is in [docs/security.md](../docs/security.md), boot and recovery in [docs/boot.md](../docs/boot.md), and what people see in [Security](https://docs.luft.computer/system/security/).
+How the pieces protect the computer is in [Security](https://docs.luft.computer/security/keys/), boot and recovery in [Boot and recovery](https://docs.luft.computer/developers/system/boot/), and what people see on [the Security page](https://docs.luft.computer/system/security/).
 
 | Crate | Builds |
 | --- | --- |
@@ -24,14 +24,14 @@ All commands need root.
 | `trustctl status` | Shows Secure Boot, the TPM, the key, the startup and the disk |
 | `trustctl secure-boot enroll [--state DIR]` / `cancel` | Asks shim to trust Luft's key at the next restart, or withdraws that. `--state` keeps the request in a system that hasn't started yet, as Install Luft does |
 | `trustctl secure-boot remove-others` / `keep-others` | Asks shim to remove keys added from elsewhere at the next restart, or withdraws that |
-| `trustctl anti-cheat` | Checks what games with anti-cheat look for ([details](../docs/security.md#games-with-anti-cheat)) |
+| `trustctl anti-cheat` | Checks what games with anti-cheat look for ([details](https://docs.luft.computer/security/hardening/#games-with-anti-cheat)) |
 | `trustctl startup install [--esp DIR]` | Puts shim and SushiBoot on the EFI system partition and makes Luft the firmware's boot entry |
 | `trustctl tpm enroll [--pin]` / `remove` | Lets the TPM unlock the encrypted disk, optionally with a PIN, or removes that |
 | `trustctl recovery-key show` / `replace` | Shows or replaces the disk's recovery key |
 | `trustctl recovery-key check` | Checks that the recovery key still opens the disk |
 | `trustctl encryption format` / `seal` | What Install Luft uses to encrypt Luft's partition and link the TPM before the first start |
-| `trustctl system-disk continue` | Carries on with the plan in `/var/lib/trustd/system-disk.json`, or makes one from what Meet Luft asked for ([details](../docs/meet.md#changing-lufts-size)) |
-| `trustctl system-disk move` | The startup step that copies Luft to the drive Disks asked it to move to ([details](../docs/boot.md#moving-to-another-drive)) |
+| `trustctl system-disk continue` | Carries on with the plan in `/var/lib/trustd/system-disk.json`, or makes one from what Meet Luft asked for ([details](https://docs.luft.computer/developers/system/resizing/)) |
+| `trustctl system-disk move` | The startup step that copies Luft to the drive Disks asked it to move to ([details](https://docs.luft.computer/developers/system/boot/#moving-to-another-drive)) |
 
 ## D-Bus
 

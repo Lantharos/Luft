@@ -1,6 +1,6 @@
 # luft-meet
 
-What Meet Luft leaves on the drive for Install Luft, shared by both: the partitions or folder it made, why the computer restarted, the settings to start with and the moving box. How Meet Luft uses them is in [docs/meet.md](../../../docs/meet.md).
+What Meet Luft leaves on the drive for Install Luft, shared by both: the partitions or folder it made, why the computer restarted, the settings to start with and the moving box. How Meet Luft uses them is in [Meet Luft](https://docs.luft.computer/developers/system/meet-luft/).
 
 ```toml
 luft-meet.workspace = true

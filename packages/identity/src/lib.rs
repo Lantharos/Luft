@@ -4,7 +4,7 @@
 //! told apart only by what its sandbox says about it from outside: the app ID
 //! in the `.flatpak-info` that Flatpak, or Luft's AppImage sandbox, puts at
 //! the root of every process it starts, read through a pidfd the kernel gave
-//! for the caller. The rules are in [docs/security.md](../../docs/security.md#who-an-app-is).
+//! for the caller. The rules are in [Who an app is](https://docs.luft.computer/security/identity/).
 //! Which of Luft's own programs runs a process is told from the file it
 //! runs, the way [`program`] describes.
 

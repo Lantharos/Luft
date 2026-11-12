@@ -1,6 +1,6 @@
 # luft-shield
 
-Keeps Luft's small helpers, such as Luft Keyring and Luft Passkeys, out of reach of your other programs, and lets services tell such a helper apart from them. How it works is in [Shielded helpers](../../docs/security.md#shielded-helpers).
+Keeps Luft's small helpers, such as Luft Keyring and Luft Passkeys, out of reach of your other programs, and lets services tell such a helper apart from them. How it works is in [Shielded helpers](https://docs.luft.computer/security/identity/#shielded-helpers).
 
 | Item | Use |
 | --- | --- |

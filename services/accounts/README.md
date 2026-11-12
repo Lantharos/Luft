@@ -9,6 +9,6 @@ The session service behind online accounts and their cloud drives. Apps talk to 
 | `com.lantharos.Accounts1.service` | `/usr/share/dbus-1/services/` |
 | `luft-accounts.service` | `/usr/lib/systemd/user/` |
 
-It needs `rclone` 1.75.2 or newer and `fusermount3`. OneDrive and Dropbox sign in with the app registrations in `data/apps.json`; see [cloud drives](../../docs/cloud.md#app-registrations).
+It needs `rclone` 1.75.2 or newer and `fusermount3`. OneDrive and Dropbox sign in with the app registrations in `data/apps.json`.
 
-`cargo test` here covers token handling, filters, conflict names and error messages. [docs/cloud.md](../../docs/cloud.md#testing) has the end-to-end checks.
+`cargo test` here covers token handling, filters, conflict names and error messages.

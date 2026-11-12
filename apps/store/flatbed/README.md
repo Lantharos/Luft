@@ -1,6 +1,6 @@
 # Flatbed
 
-Flatbed scans documents on Luft, with scanners on the network or plugged in and with the camera, straightens and cleans up every page, and saves searchable PDFs or pictures. Using it is described in [the docs](https://docs.luft.computer/apps/flatbed/), and how scanning, cleaning up and text recognition work in [docs/scanning.md](../../../docs/scanning.md).
+Flatbed scans documents on Luft, with scanners on the network or plugged in and with the camera, straightens and cleans up every page, and saves searchable PDFs or pictures. Using it is described in [the docs](https://docs.luft.computer/apps/flatbed/).
 
 ## Build and run
 

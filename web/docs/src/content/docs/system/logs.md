@@ -38,6 +38,18 @@ Right after something goes wrong, `luft report` saves most of this in one file, 
 
 Settings, under System, **About**, lists the last ten times the graphics driver stopped responding, with what happened and what can help. On NVIDIA graphics, NVIDIA's own `nvidia-bug-report.sh` collects a full report.
 
+## No sound from the jacks
+
+When headphones or speakers stay silent in Luft but work in Windows, download [`try-hda-fixups.sh`](https://raw.githubusercontent.com/Lantharos/Luft/main/os/tools/audio/try-hda-fixups.sh) and run `bash try-hda-fixups.sh` in Tern. It asks for your password, tries a few known fixes for Realtek sound chips one after another, plays a tone after each and asks whether you heard it, and puts everything back at the end. Attach the `hda-fixups.txt` it leaves in your home folder to your report.
+
+If Windows is on the same computer, a dump of how its driver sets up the chip helps too. In Windows, plug the headphones in, open PowerShell as administrator and run:
+
+```powershell
+cd $env:USERPROFILE\Desktop; iwr https://github.com/ChimeraOS/reverse-engineering-tools/raw/main/RtHDDump_V236.zip -OutFile RtHDDump.zip; Expand-Archive RtHDDump.zip RtHDDump -Force; cd RtHDDump; & (Get-ChildItem -Recurse RtHDDump.exe)[0].FullName; Get-ChildItem -Recurse RtHDDump.txt
+```
+
+Attach the `RtHDDump.txt` it lists. A fix that works becomes part of Luft for that model of computer only.
+
 ## Logs from Try Luft
 
 When Luft runs from [Meet Luft](/start/meet-luft/), it saves its logs where Meet Luft keeps it, so a problem on your hardware can be looked at from Windows or your other Linux afterwards. It saves a minute after starting, every five minutes after that, right after an app crashes, and when it shuts down, so pulling the plug loses a few minutes at most. Luft started from a USB stick saves nothing.
@@ -53,4 +65,4 @@ $luft = (Get-Volume -FileSystemLabel Luft).Path
 Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Recurse
 ```
 
-A zip holds the whole journal, the desktop's own messages, crashes with backtraces, kernel messages, the hardware and its drivers, the graphics and video decoding drivers, and the boot splash's state. [Meet Luft's reference](/reference/meet/#logs-from-try-luft) lists every file.
+A zip holds the whole journal, the desktop's own messages, crashes with backtraces, kernel messages, the hardware and its drivers, and the boot splash's state. [Meet Luft](/developers/system/meet-luft/#logs-from-try-luft) lists every file.

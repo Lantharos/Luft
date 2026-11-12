@@ -1,5 +1,5 @@
 //! What makes two crashes the same crash: the program, how it failed and
-//! where. See [Grouping](../../../../docs/crash-reports.md#grouping).
+//! where. See [Grouping](https://docs.luft.computer/security/crash-reports/#grouping).
 
 use sha2::{Digest, Sha256};
 

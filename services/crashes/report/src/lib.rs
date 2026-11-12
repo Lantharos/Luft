@@ -1,6 +1,6 @@
 //! Crash reports of Luft's own programs: what one says, how it is kept free
 //! of anything that says who sent it, and how the same crash is recognised.
-//! See [docs/crash-reports.md](../../../../docs/crash-reports.md).
+//! See [Crash reports](https://docs.luft.computer/security/crash-reports/).
 
 mod assemble;
 mod names;

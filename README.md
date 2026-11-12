@@ -45,13 +45,12 @@ Luft is young. There's no stable release yet: the downloads are nightly builds o
 | [`os`](os/README.md) | The system image, the USB stick and VMs to try them in |
 | [`kestrel`](kestrel/README.md) | The desktop, login screen, keyring, passkeys and session services |
 | [`apps`](apps) | Luft's apps: `system` for the ones in the image, Install Luft among them, and `store` for the ones on schelf.store, Meet Luft among them |
-| [`extensions`](docs/extensions.md) | Luft's own desktop extensions, such as Seasons |
+| [`extensions`](extensions) | Luft's own desktop extensions, such as Seasons |
 | [`packages`](packages) | Code the apps and services share: the native app shell, D-Bus and translations, libraries for the system's parts in `system` and the UI kit in `web` |
 | [`services`](services) | Luft's own system and session services: updates, sleep, online accounts, dictation, Windows next to Luft and app thumbnails |
 | [`sushi`](sushi/README.md) | The Sushi boot splash and the SushiBoot boot menu |
 | [`security`](security/README.md) | Secure Boot, TPM unlock, disk encryption and USB protection |
 | [`web`](web) | The [website](web/site/README.md), the [docs](web/docs/README.md) and what they [share](web/shared/README.md) |
-| [`docs`](docs) | Notes on how things work underneath, also published on the docs site under Reference |
 
 Each folder's README says what it is and how to build it.
 
@@ -61,7 +60,7 @@ Each folder's README says what it is and how to build it.
 
 ## Translating
 
-Luft is translated on [Hosted Weblate](https://hosted.weblate.org/projects/luft/), in the browser, with no programming needed. Weblate sends the work back here as pull requests, and it reaches the nightlies once merged. [Translating Luft](https://docs.luft.computer/developers/translating/) covers getting started and the style guide for each language.
+Luft is translated on [Babblebird](https://babblebird.dev), in the browser, with no programming needed: sign in, pick Luft and your language, and translate with checks, the glossary and earlier translations at hand. The work comes back here as one pull request, and Serbian in Latin script is made from the Cyrillic automatically. [Translating Luft](https://docs.luft.computer/developers/translating/) covers the rest.
 
 ## License and credits
 

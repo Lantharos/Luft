@@ -1,6 +1,6 @@
 //! Which of Luft's own programs a process runs: a program installed with the
 //! system, from the read-only image, with nothing of anyone else's slipped
-//! into it. See [docs/security.md](../../../../docs/security.md#lufts-own-programs)
+//! into it. See [Luft's own programs](https://docs.luft.computer/security/identity/#lufts-own-programs)
 //! for what this does and doesn't tell apart.
 
 mod development;

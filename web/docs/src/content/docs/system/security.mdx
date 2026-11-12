@@ -95,8 +95,6 @@ Epic's list of well-known keys doesn't include Luft's key, and nothing on your c
 
 Hibernation isn't available while the kernel is locked down. Sleep works as usual.
 
-## Further reading
+## From the command line
 
-[Security model](/reference/security/) and [Boot and recovery](/reference/boot/) go into the details: which keys sign what, what the TPM measures, and what each protection does and doesn't guard against.
-
-From the command line, `sudo trustctl status` shows Secure Boot, the keys, the TPM and the disk, and `sudo trustctl anti-cheat` lists each anti-cheat requirement.
+`sudo trustctl status` shows Secure Boot, the keys, the TPM and the disk, and `sudo trustctl anti-cheat` lists each anti-cheat requirement. [Keys, signatures and the build](/security/keys/) and the pages after it explain how each protection works and what it doesn't guard against.

@@ -14,9 +14,9 @@ bun run desktop:bundle   # release bundle
 sabine install --bundle .
 ```
 
-Installing registers the `kestrel-keys:` link scheme, which Settings and Kestrel [open Keys with](https://docs.luft.computer/developers/links/#keys).
+Installing registers the `kestrel-keys:` link scheme, which Settings and Kestrel [open Keys with](https://docs.luft.computer/developers/desktop/links/#keys).
 
-Where your layouts and input methods are kept, and the input method format, are in [the Keys reference](../../../docs/components/keys.md). Opening a layout or input method file with Keys imports it.
+Where your layouts and input methods are kept, and the input method format, are in [Keys](https://docs.luft.computer/apps/keys/#input-methods). Opening a layout or input method file with Keys imports it.
 
 ## License
 

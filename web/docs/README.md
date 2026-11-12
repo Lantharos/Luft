@@ -5,7 +5,6 @@ The documentation site at [docs.luft.computer](https://docs.luft.computer), buil
 | Path | Holds |
 | --- | --- |
 | `src/content/docs` | The pages, one folder per sidebar group |
-| `src/repo-docs.ts` | Notes from the repository's [`docs`](../../docs) folder shown under Reference, edited there |
 | `src/assets/shots` | Screenshots, with a `-light` twin where there is one |
 | `src/components` | The screenshot component, the home page's index and Starlight overrides |
 | `src/styles` | Luft's palette mapped onto Starlight |

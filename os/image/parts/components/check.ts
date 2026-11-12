@@ -67,7 +67,7 @@ if (problems.length > 0) {
   console.error(`
 Each part of the image is built from only the sources its components' ${MANIFEST} files name, with the
 crates and workspace packages they depend on. Add what the build reads to \`sources\` in the component's ${MANIFEST}.
-See docs/image-components.md.`);
+See https://docs.luft.computer/developers/building/#what-goes-into-a-part.`);
   process.exit(1);
 }
 console.log(`The ${partNames(tree).length} parts read only the sources their components list`);

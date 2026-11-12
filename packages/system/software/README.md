@@ -10,7 +10,7 @@ Add it to an app's `desktop/Cargo.toml`; the root `Cargo.toml` says where it liv
 luft-software.workspace = true
 ```
 
-Its modules, image updates, thumbnails, Toolbox tools and system packages are in [the software library reference](../../../docs/components/software.md).
+How image updates work is in [Updates and releases](https://docs.luft.computer/developers/system/updates/).
 
 ## Checks
 

@@ -2,7 +2,7 @@
 
 Luft Keyring keeps your passwords, tokens and keys. Apps use it through the Secret Service and the Secret portal, so they work without changes. Signing in, with a password or a fingerprint, unlocks it. It is also your SSH agent and GnuPG's pinentry.
 
-How secrets are encrypted, unlocked and what that protects against is in [docs/security.md](../../docs/security.md#luft-keyring).
+How secrets are encrypted, unlocked and what that protects against is in [Luft Keyring and passkeys](https://docs.luft.computer/security/keyring/).
 
 | Part | What it is |
 | --- | --- |
@@ -25,4 +25,4 @@ Run from `kestrel/keyring`:
 | `python3 tools/session/session.py ../../target/debug/luft-keyring` | The daemon installed as on Luft, setgid to a group of its own, in a user namespace with a private bus and a scratch home: items, app access from sandboxed apps and from programs of yours, portal, SSH agent |
 | `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in with a password or a fingerprint, switching to the password while the reader waits, lock screen, `sudo`, Secure Boot changes and PINs in a VM of `localhost/luft-system:45` with a stand-in fingerprint reader: with a software TPM, after the TPM is removed, and without one |
 
-Where it keeps its files, how apps are given access, app secrets, the SSH agent and GnuPG are in [the keyring reference](../../docs/components/keyring.md).
+Its D-Bus interfaces are in [D-Bus interfaces](https://docs.luft.computer/developers/desktop/dbus/#keyring), and the SSH agent and GnuPG for people in [Keyring and passkeys](https://docs.luft.computer/files/keyring-and-passkeys/).

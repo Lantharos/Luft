@@ -1,6 +1,6 @@
 # luft-handwriting
 
-The session service that reads handwriting as text for apps that keep handwritten notes, such as Heft's search, through the [luft-handwriting crate](../../packages/system/handwriting). How it reads and where its model comes from is in [Handwriting](../../docs/components/handwriting.md).
+The session service that reads handwriting as text for apps that keep handwritten notes, such as Heft's search, through the [luft-handwriting crate](../../packages/system/handwriting). How it reads and where its model comes from is in [Handwriting](https://docs.luft.computer/developers/desktop/models/#handwriting).
 
 ## Build
 

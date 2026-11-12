@@ -1,6 +1,6 @@
 # Heft
 
-Heft is a notebook for writing with a pen: subjects, notebooks and PDF textbooks you can write and highlight in, side by side, searchable, with classes recorded and turned into notes on the computer. Using it is described in [the docs](https://docs.luft.computer/apps/heft/), its file format in [docs/components/heft.md](../../../docs/components/heft.md), and how it's built in [NOTES.md](NOTES.md).
+Heft is a notebook for writing with a pen: subjects, notebooks and PDF textbooks you can write and highlight in, side by side, searchable, with classes recorded and turned into notes on the computer. Using it is described in [the docs](https://docs.luft.computer/apps/heft/), and its files in [Heft's files](https://docs.luft.computer/developers/desktop/file-formats/).
 
 ## Build and run
 

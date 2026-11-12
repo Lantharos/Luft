@@ -21,7 +21,19 @@ export const sidebar: Sidebar = [
 	group('Apps', 'apps'),
 	group('Files and accounts', 'files'),
 	group('System', 'system'),
-	group('For developers', 'developers'),
-	group('Extensions', 'extensions'),
-	group('Reference', 'reference', true)
+	{
+		label: 'For developers',
+		items: [
+			'developers/architecture',
+			'developers/building',
+			'developers/testing',
+			'developers/testing-vms',
+			'developers/contributing',
+			'developers/translating',
+			group('Apps and the desktop', 'developers/desktop'),
+			group('The system', 'developers/system'),
+			group('Security', 'security')
+		]
+	},
+	group('Extensions', 'extensions')
 ];

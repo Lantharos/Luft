@@ -35,7 +35,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 kestrel/tools/session.sh nested
 ```
 
-`kestrel/tools/session.sh capture` runs every check headless and saves a screenshot of every surface. The other modes and options are in [docs/testing.md](../docs/testing.md).
+`kestrel/tools/session.sh capture` runs every check headless and saves a screenshot of every surface. The other modes and options are in [Testing](https://docs.luft.computer/developers/testing/).
 
 To run your build as the real session on an installed Luft, lay it over the signed image:
 
@@ -47,4 +47,4 @@ os/dev/layer.sh reset      # back to the signed image
 
 Log out and back in after `apply` to run it. It stays across restarts and is taken off when Luft updates. [Building Luft](https://docs.luft.computer/developers/building/#on-an-installed-luft) has the details.
 
-Its session services, settings schemas and `peek`, which lets programs see and use windows, are in [the Kestrel reference](../docs/components/kestrel.md).
+Its session services, settings schemas and `peek`, which lets programs see and use windows, are in [Kestrel](https://docs.luft.computer/developers/desktop/kestrel/).

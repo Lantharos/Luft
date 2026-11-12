@@ -1,6 +1,6 @@
 [Unit]
 Description=Keep the TPM unlocking the disk after the Secure Boot settings change
-Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md
+Documentation=https://docs.luft.computer/developers/system/boot/
 ConditionSecurity=measured-uki
 After=local-fs.target tpm2.target cryptsetup.target
 

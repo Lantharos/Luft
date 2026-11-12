@@ -46,7 +46,7 @@ if (problems.length > 0) {
 	console.error(`
 Every D-Bus interface has one source of truth: the XML its Fedora package ships, the introspection of the
 Rust service kept in packages/dbus/introspection, or the XML Kestrel serves. Interface files, clients,
-policies and the stand-ins in kestrel/tools/fixtures must match it. See docs/testing.md.`);
+policies and the stand-ins in kestrel/tools/fixtures must match it. See https://docs.luft.computer/developers/testing-vms/#d-bus-interfaces.`);
 	process.exit(1);
 }
 console.log(`${compared} interface definitions match ${truths.size} sources of truth`);

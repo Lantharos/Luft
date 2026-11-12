@@ -1,6 +1,6 @@
 # Crash reports
 
-Reports of crashes of Luft's own programs, sent to Luft's inbox on Pult when the person agrees. What is collected, when people are asked and how it works is in [docs/crash-reports.md](../../docs/crash-reports.md).
+Reports of crashes of Luft's own programs, sent to Luft's inbox on Pult when the person agrees. What is collected, when people are asked and how it works is in [Crash reports](https://docs.luft.computer/security/crash-reports/).
 
 | Crate | Use |
 | --- | --- |

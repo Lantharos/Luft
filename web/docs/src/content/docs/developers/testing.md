@@ -81,6 +81,25 @@ The capture covers more when these are there:
 
 Some checks need more of the tree built, such as Heft and Settings for the tablet and Phosphor groups, or `services/speech` for dictation, and say so when it's missing.
 
+## Store pictures
+
+The pictures in each app's and extension's `store` folder are captures from these groups, taken over Fog, Luft's default wallpaper, so they show its gold accent:
+
+```sh
+KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg kestrel/tools/session.sh capture --only apps:convertible,apps:flatbed,apps:settings
+KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg KESTREL_CAPTURE_SIZE=2880x1800:332x208mm kestrel/tools/session.sh capture --only apps:heft
+```
+
+| Pictures | Captures |
+| --- | --- |
+| Convertible | `convertible-format-light` and `-dark` |
+| Flatbed | `flatbed-scans-light` and `-dark`, scanning a contract from a stand-in scanner |
+| Heft | `heft-split-light` and `-dark`, a textbook beside handwritten notes, at 200% |
+| Keystrokes, Soundscapes, Strays and Tailor settings | `settings-extension-<name>`, with Tailor dressing stand-ins for Spotify, Steam and Vesktop |
+| Phosphor settings | `store-settings` from `desktop:phosphorStore` |
+
+Each is turned into the store's WebP with `cwebp -q 80`, keeping the file's name.
+
 ## Frame timing
 
 `frames` opens Start, Gust, quick settings, the notification center, the overview, the emoji picker and the lock screen's prompt once, as they first open after signing in, and then again. It types into Start and Gust, moves, opens and closes windows under glass, enters and zooms a board, tiles windows, steps through a scrolling strip, locks and unlocks, and turns on Phosphor's main effects. Each interaction runs three times for timing and twice more to time the GPU. For each it prints the time to the first frame, missed refreshes, slow frames, CPU, update, layout and GPU time a frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.

@@ -7,7 +7,8 @@ import {pause} from '../../../lib/wait.js';
 import type {Point} from '../../../lib/input/input.js';
 import {installBuilt, listed, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
 import {installOwn} from '../../../extensions/lib/sandbox.js';
-import {placeApps, TAILOR} from '../../../extensions/lib/tailor.js';
+import {page, placeApps, placeSpotify, removeSpotify, TAILOR} from '../../../extensions/lib/tailor.js';
+import {withScheme} from '../../lib/palette.js';
 import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 import {checkUnreviewed} from './unreviewed.js';
 
@@ -24,6 +25,9 @@ const PLAYTHINGS = 'com.lantharos.Playthings';
 const KEYSTROKES = 'com.lantharos.Keystrokes';
 const PRIVACY_SCROLL_STEPS = 4;
 const SANDBOXED = 'com.example.Sandboxed';
+const SPOTIFY_RESTART = 'Restart Spotify to see its new look.';
+const SPOTIFY_READY = 'Spotify follows the desktop whenever it\'s open.';
+const SPICETIFY_TIMEOUT = 20000;
 
 async function checkOwnPages(app: LuftApp) {
   await installBuilt(VISUALIZER);
@@ -89,12 +93,15 @@ async function checkOwnPages(app: LuftApp) {
     await request('Remove', PLAYTHINGS);
   }
   placeApps();
-  GLib.mkdir_with_parents(GLib.build_filenamev([GLib.get_user_data_dir(), 'flatpak', 'app', 'com.spotify.Client']), 0o755);
+  placeSpotify();
   await installBuilt(TAILOR);
   try {
+    await eventually(async () => (await page()).includes(SPOTIFY_RESTART), 'Spicetify dresses Spotify', SPICETIFY_TIMEOUT);
+    await withScheme('light', () => eventually(async () => (await page()).includes(SPOTIFY_READY), 'and Spotify follows the desktop from then on'));
     (await show(app, `extensions/${TAILOR.toLowerCase()}`, 'it lists the apps it found, each with its switch')).save('settings-extension-tailor');
   } finally {
     await request('Remove', TAILOR);
+    removeSpotify();
   }
   await installBuilt(KEYSTROKES);
   try {

@@ -2,20 +2,11 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {call} from '../lib/dbus.js';
 import {installBuilt, listed, request, setSetting, setting} from './lib/extensions.js';
-import {exists, LIBRARY, ORIGINAL_SETTINGS, placeApps, read, STEAM, STEAM_STYLES, TAILOR, VESKTOP_SETTINGS, VESKTOP_THEME, write} from './lib/tailor.js';
+import {exists, LIBRARY, ORIGINAL_SETTINGS, page, placeApps, read, STEAM, STEAM_STYLES, TAILOR, VESKTOP_SETTINGS, VESKTOP_THEME, write} from './lib/tailor.js';
 
 const {eventually, require} = checks('Tailor');
-const NAME = 'com.lantharos.Kestrel';
-const PATH = '/com/lantharos/Kestrel/Extensions';
-const IFACE = 'com.lantharos.Kestrel.Extensions';
 const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-
-async function page(): Promise<string> {
-  const [json] = (await call(NAME, PATH, IFACE, 'Page', new GLib.Variant('(s)', [TAILOR]), '(s)')).deepUnpack<[string]>();
-  return json;
-}
 
 async function followsTheDesktop() {
   const dark = /--kestrel-surface: (#[0-9a-f]{6});/.exec(read(VESKTOP_THEME))?.[1];

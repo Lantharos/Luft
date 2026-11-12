@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+config="${XDG_CONFIG_HOME:-$HOME/.config}/spicetify"
+settings="$config/config-xpui.ini"
+mkdir -p "$config/Themes"
+touch "$settings"
+
+setting() {
+  sed -n "s/^$1 *= *//p" "$settings"
+}
+
+set_setting() {
+  grep -v "^$1 *=" "$settings" > "$settings.new" || true
+  printf '%s = %s\n' "$1" "$2" >> "$settings.new"
+  mv "$settings.new" "$settings"
+}
+
+[ "${1:-}" = -n ] && shift
+case "${1:-}" in
+  -c) echo "$settings" ;;
+  config)
+    shift
+    while [ $# -ge 2 ]; do
+      set_setting "$1" "$2"
+      shift 2
+    done
+    ;;
+  *)
+    spotify="$(setting spotify_path)"
+    rm -f "$spotify/Apps/xpui.spa"
+    mkdir -p "$spotify/Apps/xpui/extensions"
+    touch "$spotify/Apps/xpui/extensions/theme.js"
+    ;;
+esac

@@ -143,6 +143,7 @@ pub async fn idle_monitor(connection: &Connection) -> zbus::Result<IdleMonitorPr
 struct Watches {
     idle: u32,
     active: u32,
+    idle_after: u64,
 }
 
 impl Watches {
@@ -168,8 +169,9 @@ impl Watches {
             return Ok(());
         }
         self.clear(monitor).await;
+        self.idle_after = u64::from(delay) * 1000;
         if delay != 0 {
-            self.idle = monitor.add_idle_watch(u64::from(delay) * 1000).await?;
+            self.idle = monitor.add_idle_watch(self.idle_after).await?;
         }
         Ok(())
     }
@@ -183,12 +185,18 @@ impl Watches {
         let id = signal.args()?.id;
         let emitter = presence.signal_emitter();
         if id == self.idle {
+            self.active = monitor.add_user_active_watch().await?;
+            if monitor.get_idletime().await? < self.idle_after {
+                monitor
+                    .remove_watch(std::mem::take(&mut self.active))
+                    .await?;
+                return Ok(());
+            }
             presence
                 .get_mut()
                 .await
                 .change_status(IDLE, emitter)
                 .await?;
-            self.active = monitor.add_user_active_watch().await?;
         } else if id == self.active {
             self.active = 0;
             presence

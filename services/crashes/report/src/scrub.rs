@@ -10,25 +10,59 @@ const SHORTEST_NAME: usize = 3;
 
 const QUOTES: &str = "\"'`";
 
-/// Where a path ends: at its closing quote when it is quoted, which lets it
-/// hold spaces, otherwise at a space, a bracket around it, or the colon
-/// before a message or a line number.
-fn path_length(path: &str, quote: Option<char>) -> usize {
+fn ends_clause(bytes: &[u8], at: usize, character: char) -> bool {
+    match character {
+        '\n' | ')' | ']' | '>' | ',' | ';' => true,
+        ':' => bytes
+            .get(at + 1)
+            .is_some_and(|next| *next == b' ' || next.is_ascii_digit()),
+        character if QUOTES.contains(character) => true,
+        _ => false,
+    }
+}
+
+fn has_extension(word: &str) -> bool {
+    word.rsplit_once('.').is_some_and(|(name, extension)| {
+        !name.is_empty()
+            && (1..=5).contains(&extension.len())
+            && extension.chars().all(|c| c.is_ascii_alphanumeric())
+            && extension.chars().any(|c| c.is_ascii_alphabetic())
+    })
+}
+
+/// Where an unquoted path ends. Folder and file names may hold spaces, so it
+/// runs to the end of the clause, minus what follows the last folder when
+/// that is plainly a file name followed by more sentence, or another path.
+fn unquoted_length(path: &str) -> usize {
     let bytes = path.as_bytes();
-    path.char_indices()
-        .find(|&(at, character)| match quote {
-            Some(quote) => character == quote || character == '\n',
-            None => {
-                character.is_whitespace()
-                    || QUOTES.contains(character)
-                    || ")]>,;".contains(character)
-                    || (character == ':'
-                        && bytes
-                            .get(at + 1)
-                            .is_some_and(|next| *next == b' ' || next.is_ascii_digit()))
-            }
-        })
-        .map_or(path.len(), |(at, _)| at)
+    let mut clause = path.len();
+    for (at, character) in path.char_indices() {
+        let next_is_path = character == ' ' && bytes.get(at + 1) == Some(&b'/');
+        if ends_clause(bytes, at, character) || next_is_path {
+            clause = at;
+            break;
+        }
+    }
+    let clause_text = &path[..clause];
+    let name_start = clause_text.rfind('/').map_or(0, |slash| slash + 1);
+    let name = &clause_text[name_start..];
+    let mut offset = 0;
+    for (index, word) in name.split(' ').enumerate() {
+        offset += word.len();
+        if has_extension(word) {
+            return name_start + offset + index;
+        }
+    }
+    clause
+}
+
+/// Where a path ends: at its closing quote when it is quoted, which lets it
+/// hold spaces, otherwise where `unquoted_length` says.
+fn path_length(path: &str, quote: Option<char>) -> usize {
+    match quote {
+        Some(quote) => path.find([quote, '\n']).unwrap_or(path.len()),
+        None => unquoted_length(path),
+    }
 }
 
 /// A path in a home folder becomes `~/…`, except a crate's source in
@@ -159,6 +193,26 @@ mod tests {
         assert_eq!(
             scrub("at file:///home/someone/x.js:3:1"),
             "at file://~/…:3:1"
+        );
+    }
+
+    #[test]
+    fn hides_home_folders_with_spaces() {
+        assert_eq!(
+            scrub("panicked: cannot read /home/anna/My Documents/Tax 2025.pdf: denied"),
+            "panicked: cannot read ~/…: denied"
+        );
+        assert_eq!(
+            scrub("no such file /var/home/anna/Some Folder/x"),
+            "no such file ~/…"
+        );
+        assert_eq!(
+            scrub("opened '/home/anna/Some Folder/x y' fine"),
+            "opened '~/…' fine"
+        );
+        assert_eq!(
+            scrub("failed on /home/anna/My Files/a.txt and gave up"),
+            "failed on ~/… and gave up"
         );
     }
 

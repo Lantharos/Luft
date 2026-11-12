@@ -10,6 +10,4 @@ A cursor rectangle from set_cursor_rectangle waits for the surface's next pre-st
 
 This disconnects the pending update when focus leaves the surface.
 
-The second commit adds a Wayland text input test: a client closes a window while its cursor rectangle update is pending, and the cursor rectangle of the next window has to reach the input method. It fails without the fix. !5360 adds a test and test client with the same file names, so whichever lands second has to merge the two.
-
 gnome-50 and gnome-51 have the same code, through 6bdf56c92 and f1570318e.

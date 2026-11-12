@@ -28,7 +28,7 @@ const CHANNEL_TAGS: Record<string, string> = {stable: '1', nightly: '1-nightly'}
 const VERSION = '1.2-nightly.21';
 const DIGEST = 'sha256:4c5f0f8a1b6e2d7c9a3e5b1f7d2c8a6e4b0f9d3c7a1e5b2f8d6c4a0e9b3f7d1c';
 const NEXT_VERSION = '1.2-nightly.22';
-const LUFT_SPACE = {running: 9_400_000_000, downloaded: 0, older: 3_100_000_000};
+const LUFT_SPACE = {version: VERSION, running: 9_400_000_000, downloaded: 0, older: 3_100_000_000};
 const NEXT_DIGEST = 'sha256:9e1d3b7f5a2c8e4d6b0a9f3c7e1b5d2a8f4c6e0b9d3a7f1e5c2b8d4a6f0e9c3b';
 
 const configOf = (created: string, version: string) => ({created, config: {Labels: {'org.opencontainers.image.version': version}}});

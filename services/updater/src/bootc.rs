@@ -103,6 +103,14 @@ fn version(config: &Value) -> Option<Version> {
     Version::parse(config.pointer(VERSION)?.as_str()?)
 }
 
+/// The running version's own name for it, such as 1.2-nightly.27.
+pub fn running_version(host: &Value) -> Option<String> {
+    slot_config(host, "booted")?
+        .pointer(VERSION)?
+        .as_str()
+        .map(str::to_owned)
+}
+
 /// Whether an image is older than the running one, going by the version in its configuration,
 /// which the image's signature covers. A running system without a version of Luft's, such as
 /// a development build, has nothing to be older than.

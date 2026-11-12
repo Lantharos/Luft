@@ -20,7 +20,7 @@ export const PART_ICONS: Record<PartKind, Component<{ size?: number }>> = {
 export const PART_NAMES: Record<PartKind, string> = {
 	files: 'Your files',
 	apps: 'Apps',
-	luft: 'Luft',
+	luft: 'This version of Luft',
 	olderLuft: 'Older versions of Luft',
 	update: 'Downloaded update',
 	other: 'System files'
@@ -35,12 +35,19 @@ const PART_DETAILS: Record<PartKind, string> = {
 	other: 'Logs, caches and system settings'
 };
 
+const NIGHTLY = '-nightly.';
+
+function versionName(version: string) {
+	const [release, number] = version.split(NIGHTLY);
+	return `Luft ${number ? `${release} Nightly ${number}` : release}`;
+}
+
 export function partTiles(parts: Part[]): Tile[] {
 	return parts.map((part, index) => ({
 		key: `part:${part.kind}`,
 		kind: part.path.length ? 'dir' : 'part',
 		name: part.path.at(-1) ?? '',
-		label: PART_NAMES[part.kind],
+		label: part.version ? versionName(part.version) : PART_NAMES[part.kind],
 		size: part.size,
 		detail: part.measured ? PART_DETAILS[part.kind] : 'Measuring…',
 		inner: [],

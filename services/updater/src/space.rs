@@ -24,9 +24,11 @@ enum Holder {
 /// toward the running one first, then the downloaded update, so each of the others is what
 /// removing it would free. The repository's own records, such as the layers images were made
 /// from, count toward the running version, and anything nothing refers to any more is left over
-/// from older ones.
+/// from older ones. `version` is the running version's, such as 1.2-nightly.27, when its image
+/// has one.
 #[derive(Serialize, Default)]
 pub struct Space {
+    version: Option<String>,
     running: u64,
     downloaded: u64,
     older: u64,
@@ -47,6 +49,7 @@ fn key(id: &str) -> Option<u128> {
 }
 
 struct Versions {
+    running: Option<String>,
     images: HashMap<String, Holder>,
     objects: HashMap<u128, Holder>,
 }
@@ -55,6 +58,7 @@ impl Versions {
     fn of_this_system() -> Result<Self> {
         let host = bootc::host()?;
         let mut versions = Self {
+            running: bootc::running_version(&host),
             images: HashMap::new(),
             objects: HashMap::new(),
         };
@@ -142,7 +146,10 @@ fn allocated_alone(path: &Path) -> u64 {
 
 pub fn measure() -> Result<Space> {
     let versions = Versions::of_this_system()?;
-    let mut space = Space::default();
+    let mut space = Space {
+        version: versions.running.clone(),
+        ..Space::default()
+    };
     for entry in entries(Path::new(REPOSITORY)) {
         match name(&entry) {
             OBJECTS => measure_objects(&versions, &entry, &mut space),

@@ -351,8 +351,8 @@ impl Updater {
         self.blocking(move || bootc::status(waiting)).await
     }
 
-    /// JSON: the bytes on the drive the running version of Luft, a downloaded update and the
-    /// older versions kept on the computer hold.
+    /// JSON: the running version of Luft, and the bytes on the drive that it, a downloaded update
+    /// and the older versions kept on the computer hold.
     async fn space(&self) -> Result<String, Error> {
         self.blocking(|| Ok(serde_json::to_string(&crate::space::measure()?)?))
             .await

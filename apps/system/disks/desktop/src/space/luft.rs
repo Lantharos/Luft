@@ -46,6 +46,7 @@ pub enum PartKind {
 }
 
 /// A part of Luft's drive, named for people. Only `Files` can be opened, at `path` in the scan.
+/// `Luft` has the running version, such as 1.2-nightly.27, when the updater knows it.
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Part {
@@ -53,10 +54,12 @@ pub struct Part {
     size: u64,
     measured: bool,
     path: Vec<String>,
+    version: Option<String>,
 }
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize)]
 struct Space {
+    version: Option<String>,
     running: u64,
     downloaded: u64,
     older: u64,
@@ -99,15 +102,19 @@ impl Versions {
             size,
             measured: true,
             path: Vec::new(),
+            version: None,
         };
-        match *self.0.lock() {
+        match &*self.0.lock() {
             None => vec![Part {
                 measured: false,
                 ..part(PartKind::Luft, 0)
             }],
             Some(None) => Vec::new(),
             Some(Some(space)) => vec![
-                part(PartKind::Luft, space.running),
+                Part {
+                    version: space.version.clone(),
+                    ..part(PartKind::Luft, space.running)
+                },
                 part(PartKind::OlderLuft, space.older),
                 part(PartKind::Update, space.downloaded),
             ],
@@ -135,18 +142,21 @@ pub fn parts(state: &Arc<Node>, versions: &Versions) -> Vec<Part> {
             size: files_size,
             measured: files.as_ref().is_none_or(|node| node.done()),
             path: components(FILES),
+            version: None,
         },
         Part {
             kind: PartKind::Apps,
             size: apps_size,
             measured: apps.iter().all(|node| node.done()),
             path: Vec::new(),
+            version: None,
         },
         Part {
             kind: PartKind::Other,
             size: state.size().saturating_sub(files_size + apps_size),
             measured: state.done(),
             path: Vec::new(),
+            version: None,
         },
     ];
     parts.extend(versions.parts());
@@ -186,6 +196,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(5));
         }
         let versions = Versions(Mutex::new(Some(Some(Space {
+            version: Some("1.2-nightly.27".to_owned()),
             running: 9 << 30,
             downloaded: 0,
             older: 3 << 30,
@@ -220,5 +231,6 @@ mod tests {
             scan.root.size()
         );
         assert!(parts.iter().all(|part| part.measured));
+        assert_eq!(parts[0].version.as_deref(), Some("1.2-nightly.27"));
     }
 }

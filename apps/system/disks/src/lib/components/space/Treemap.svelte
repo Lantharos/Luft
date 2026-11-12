@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { appearance, bytes } from '@luft/ui';
+	import { appearance } from '@luft/ui';
 	import { mix, readPalette, type Palette } from './colors';
+	import { FIRST_LINE, layoutLabel, LINE, NAME_FONT, PADDING, SIZE_FONT, type Label } from './labels';
 	import { squarify, type Rect } from './squarify';
 	import type { Tile } from './tiles';
 
@@ -15,7 +16,6 @@
 
 	const HEIGHT = 300;
 	const GAP = 1.5;
-	const LABEL = 30;
 
 	let host = $state<HTMLDivElement>();
 	let canvas = $state<HTMLCanvasElement>();
@@ -24,6 +24,13 @@
 	let fonts = $state(0);
 
 	let rects = $derived(squarify(tiles.map((tile) => tile.size), { x: 0, y: 0, w: width, h: HEIGHT }));
+	let labels = $derived.by(() => {
+		void fonts;
+		return tiles.map((tile, index) => {
+			const rect = rects[index];
+			return rect ? layoutLabel(tile, inset(rect, GAP)) : null;
+		});
+	});
 
 	$effect(() => {
 		void appearance.scheme;
@@ -54,51 +61,34 @@
 		context.fill();
 	}
 
-	function fitted(context: CanvasRenderingContext2D, text: string, room: number) {
-		if (context.measureText(text).width <= room) return text;
-		let end = text.length;
-		while (end > 1 && context.measureText(`${text.slice(0, end)}…`).width > room) end -= 1;
-		return `${text.slice(0, end)}…`;
-	}
-
 	function background(tile: Tile, colors: Palette, lit: boolean) {
 		if (tile.kind === 'dir' || tile.kind === 'part') return mix(colors.tones[tile.tone], lit ? 0.24 : 0.16);
 		if (tile.kind === 'file') return mix(colors.ink, lit ? 0.15 : 0.1);
 		return mix(colors.ink, lit ? 0.09 : 0.05);
 	}
 
-	function drawTile(context: CanvasRenderingContext2D, tile: Tile, rect: Rect, colors: Palette) {
+	function drawTile(context: CanvasRenderingContext2D, tile: Tile, rect: Rect, label: Label | null, colors: Palette) {
 		const box = inset(rect, GAP);
 		const lit = hovered === tile.key;
 		fill(context, box, background(tile, colors, lit), 7);
-		const labelled = box.w > 64 && box.h > 40;
 		if (tile.kind === 'dir' && tile.inner.length) {
-			const area = labelled ? { x: box.x + 6, y: box.y + LABEL, w: box.w - 12, h: box.h - LABEL - 6 } : inset(box, 4);
+			const area = label ? { x: box.x + 6, y: box.y + label.height, w: box.w - 12, h: Math.max(0, box.h - label.height - 6) } : inset(box, 4);
 			const shown = tile.inner.reduce((sum, size) => sum + size, 0);
 			const sizes = [...tile.inner, Math.max(0, tile.size - shown)];
 			const inner = squarify(sizes, area);
 			inner.slice(0, tile.inner.length).forEach((rect) => rect && fill(context, inset(rect, 1), mix(colors.tones[tile.tone], lit ? 0.42 : 0.32), 4));
 		}
-		if (!labelled) return;
+		if (!label) return;
 		context.save();
 		context.beginPath();
 		context.rect(box.x, box.y, box.w, box.h);
 		context.clip();
-		const size = bytes(tile.size);
-		context.font = '400 11.5px "Open Runde", sans-serif';
-		const sizeWidth = context.measureText(size).width;
-		const inline = tile.kind === 'dir' || tile.kind === 'part';
-		const room = box.w - 20 - (inline ? sizeWidth + 10 : 0);
-		if (inline && room > 24) {
-			context.fillStyle = colors.muted;
-			context.fillText(size, box.x + box.w - 10 - sizeWidth, box.y + 19);
-		} else if (!inline && box.h >= 56) {
-			context.fillStyle = colors.muted;
-			context.fillText(fitted(context, size, box.w - 20), box.x + 10, box.y + 36);
-		}
-		context.font = '500 12.5px "Open Runde", sans-serif';
+		context.font = SIZE_FONT;
+		context.fillStyle = colors.muted;
+		if (label.size) context.fillText(label.size.text, box.x + label.size.x, box.y + label.size.y);
+		context.font = NAME_FONT;
 		context.fillStyle = colors.text;
-		context.fillText(fitted(context, tile.label, inline && room > 24 ? room : box.w - 20), box.x + 10, box.y + 19);
+		label.lines.forEach((line, index) => context.fillText(line, box.x + PADDING, box.y + FIRST_LINE + index * LINE));
 		context.restore();
 	}
 
@@ -112,7 +102,7 @@
 		context.clearRect(0, 0, width, HEIGHT);
 		tiles.forEach((tile, index) => {
 			const rect = rects[index];
-			if (rect) drawTile(context, tile, rect, colors);
+			if (rect) drawTile(context, tile, rect, labels[index], colors);
 		});
 	}
 

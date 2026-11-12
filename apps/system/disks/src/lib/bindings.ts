@@ -492,12 +492,16 @@ export type Palette = {
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
-/**  A part of Luft's drive, named for people. Only `Files` can be opened, at `path` in the scan. */
+/**
+ *  A part of Luft's drive, named for people. Only `Files` can be opened, at `path` in the scan.
+ *  `Luft` has the running version, such as 1.2-nightly.27, when the updater knows it.
+ */
 export type Part = {
 	kind: PartKind,
 	size: number,
 	measured: boolean,
 	path: string[],
+	version: string | null,
 };
 
 export type PartKind = "files" | "apps" | "luft" | "olderLuft" | "update" | "other";

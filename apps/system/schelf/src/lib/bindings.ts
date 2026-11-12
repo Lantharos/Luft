@@ -606,7 +606,10 @@ export type StoreUpdate = {
 	to: string,
 	size: number,
 	consent: Consent,
-	/**  Whether it asks for more than you agreed to, so it waits for you. */
+	/**
+	 *  Whether it asks for more than you agreed to, so it waits for you.
+	 *  Moving an extension inside Luft always does.
+	 */
 	widens: boolean,
 	/**
 	 *  The name of the app that took this one's place, which the update

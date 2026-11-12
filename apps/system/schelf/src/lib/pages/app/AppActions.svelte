@@ -117,7 +117,7 @@
 {/if}
 
 {#if consenting && store}
-	<StoreConsent {store} updating={consenting === 'update'} onconfirm={agreed} onclose={() => (consenting = null)} />
+	<StoreConsent {store} updating={consenting === 'update'} movesInside={consenting === 'update' && !!update?.store?.movesInside} onconfirm={agreed} onclose={() => (consenting = null)} />
 {/if}
 
 {#if flathubAccess}

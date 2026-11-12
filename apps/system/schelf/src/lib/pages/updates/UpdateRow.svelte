@@ -14,7 +14,7 @@
 	const active = $derived(operation && operation.state !== 'failed' ? operation : null);
 	const versions = $derived(update.from && update.to && update.from !== update.to ? `${update.from} → ${update.to}` : (update.to ?? update.from));
 	const detail = $derived(
-		operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null, update.store?.widens ? 'Asks for more access' : null, update.store?.movesInside ? 'Approved to run inside Luft' : null].filter(Boolean).join(' · ')
+		operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null, update.store?.movesInside ? 'Approved to run inside Luft' : update.store?.widens ? 'Asks for more access' : null].filter(Boolean).join(' · ')
 	);
 
 	function open() {

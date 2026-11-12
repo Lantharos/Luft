@@ -61,6 +61,8 @@ export function abilities(access: ExtensionAccess): Ability[] {
 	return listed.length ? listed : [{ icon: ShieldCheck, title: 'Nothing beyond the basics' }];
 }
 
+export const INSIDE_LUFT_ABILITIES = ["See what you type and what's on the screen", 'Do anything Luft itself can'];
+
 const lowered = (title: string) => title.charAt(0).toLowerCase() + title.slice(1);
 
 export function sandboxLacks(parts: string[]): string {

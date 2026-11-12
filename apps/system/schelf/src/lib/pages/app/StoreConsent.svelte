@@ -2,18 +2,19 @@
 	import { bytes } from '@luft/ui';
 	import type { StoreDetails } from '#lib/bindings.js';
 	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
-	import { abilities } from '#lib/app/extensionAccess.js';
+	import { abilities, INSIDE_LUFT_ABILITIES } from '#lib/app/extensionAccess.js';
 	import { describe } from '#lib/app/permissions.js';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 
 	interface Props {
 		store: StoreDetails;
 		updating?: boolean;
+		movesInside?: boolean;
 		onconfirm: (fullAccess: boolean) => void;
 		onclose: () => void;
 	}
 
-	let { store, updating = false, onconfirm, onclose }: Props = $props();
+	let { store, updating = false, movesInside = false, onconfirm, onclose }: Props = $props();
 
 	const access = $derived(
 		store.extension ? abilities(store.extension).map((ability) => ({ ...ability, description: '', notable: false })) : store.access ? describe(store.access) : null
@@ -24,7 +25,17 @@
 	const note = $derived(size ? `${bytes(size)} to download` : undefined);
 </script>
 
-{#if access}
+{#if movesInside}
+	<ConsentDialog
+		title="Let {store.name} run inside Luft?"
+		description="schelf.store approved {store.name} to run inside Luft instead of in its sandbox. There it can:"
+		facts={INSIDE_LUFT_ABILITIES}
+		{note}
+		confirm="Run inside Luft"
+		onconfirm={() => onconfirm(false)}
+		{onclose}
+	/>
+{:else if access}
 	<ConsentDialog
 		title="{verb} {store.name}?"
 		description={updating

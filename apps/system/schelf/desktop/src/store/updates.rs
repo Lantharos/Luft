@@ -26,6 +26,7 @@ pub struct StoreUpdate {
     pub size: u64,
     pub consent: Consent,
     /// Whether it asks for more than you agreed to, so it waits for you.
+    /// Moving an extension inside Luft always does.
     pub widens: bool,
     /// The name of the app that took this one's place, which the update
     /// moves you to.
@@ -98,6 +99,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
     let full_access = block_on(full_access(&installed));
     Ok(Some(StoreUpdate {
         widens: match (installed.format, format) {
+            _ if moves_inside => true,
             _ if replacement_installed => false,
             (from, to) if from != to => true,
             (Format::LuftExtension, _) => widens_extension(

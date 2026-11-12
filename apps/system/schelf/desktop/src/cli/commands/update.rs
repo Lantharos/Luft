@@ -208,12 +208,17 @@ pub fn run(arguments: &Arguments) -> Exit {
         return Exit::Done;
     }
     show(&updates);
-    for update in updates
+    for (update, store) in updates
         .iter()
-        .filter(|update| update.store.as_ref().is_some_and(|store| store.widens))
+        .filter_map(|update| Some((update, update.store.as_ref().filter(|store| store.widens)?)))
     {
+        let change = if store.moves_inside {
+            "was approved to run inside Luft"
+        } else {
+            "asks for more access than you agreed to"
+        };
         println!(
-            "{} asks for more access than you agreed to, so it waits until you look at it in Schelf.",
+            "{} {change}, so it waits until you look at it in Schelf.",
             Ink::stdout().bold(&update.name)
         );
     }

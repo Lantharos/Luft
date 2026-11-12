@@ -7,3 +7,4 @@ color = Värv
 wallpaper = Taustapilt
 accent = Aktsentvärv
 warm-white = Soe valge
+look = Välimus

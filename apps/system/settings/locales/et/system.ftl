@@ -402,3 +402,4 @@ settings-apps-services-count =
     }
 settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
 settings-apps-full-access-give = Anna täielik ligipääs
+settings-about-earlier-luft = Jäänud andmekandjale, kust Luft teisaldati · { $size }

@@ -23,12 +23,13 @@ settings-bluetooth-missing = Selles arvutis pole Bluetoothi adapterit
 
 settings-navigate-back = Tagasi
 settings-navigate-forward = Edasi
-settings-more-show = { $count ->
+settings-more-show =
+    { $count ->
         [one] Kuva veel { $count }
        *[other] Kuva veel { $count }
     }
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Tund
 settings-time-picker-minute = Minut
-
 settings-color-lightness = Heledus
+settings-pen-missing = Ühtegi graafikalauda ega selle pliiatsit pole ühendatud

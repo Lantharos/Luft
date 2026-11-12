@@ -25,3 +25,15 @@ before-held = Teavitused on ootel, kuni oled lõpetanud
 before-soundscapes = Kuuled oma töötamise ajal helimaastikke
 extension-description = Tegumiriba taimer töösessioonide jaoks, teavitused on piiratud seni, kuni sa pole lõpetanud
 again = Muu sessioon
+waiting =
+    { $count ->
+        [one] Üks teavitus on ootel
+       *[other] { $count } teavitust on ootel
+    }
+minutes-left = { $minutes } min
+done-held =
+    { $count ->
+        [one] Üks teavitus rakendusest { $apps }
+       *[other] { $count } teavitust rakendusest { $apps }
+    }
+done-quiet = Ühtegi teavitust pole olnud

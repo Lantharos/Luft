@@ -63,3 +63,5 @@ custom-change = Muuda
 custom-no-impact = Maandumisel heli pole
 custom-delete = Kustuta see komplekt
 custom-delete-button = Kustuta
+part = Tee ruumi kursorile
+    .description = Vihm, lumi, lehed ja pildid hajuvad tühjal töölaual õrnalt kursori ja sinu sõrmede ümber

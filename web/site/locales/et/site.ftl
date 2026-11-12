@@ -18,3 +18,4 @@ site-not-found-description = Seda lehte pole olemas.
 site-not-found-heading = Siin pole midagi
 site-not-found-text = Seda lehte pole olemas või on see kuhugi mujale kolinud.
 site-not-found-back = Tagasi Lufti juurde
+site-nav-brand = Kaubamärk

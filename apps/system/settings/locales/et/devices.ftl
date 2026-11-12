@@ -475,3 +475,44 @@ settings-shortcuts-extensions = Lisamoodulid
 settings-sound-kind-feedback = Igapäevased helid
 settings-sound-custom = Sinu omad helid
 settings-sound-custom-description = Kasuta oma helifaile ükspuha mis helide jaoks
+settings-sound-custom-count =
+    { $count ->
+        [one] { $count } heli on asendatud
+       *[other] { $count } heli on asendatud
+    }
+settings-sound-kind-alerts = Teavitushelid
+settings-sound-set = Heli on seadistatud
+settings-sound-set-folder = Kasuta helide kausta
+settings-sound-set-folder-description = Heli järgi nimetatud failid asendavad ta, näiteks message-new-instant.ogg. Kõik muud helid jäävad Lufti omadeks.
+settings-sound-set-choose = Vali kaust
+settings-sound-set-used =
+    { $count ->
+        [one] Using { $count } heli sellest kaustast.
+       *[other] Using { $count } heli sellest kaustast.
+    }
+settings-sound-set-skipped = Failide kasutamine ei õnnestunud: { $files }.
+settings-sound-reset-all = Lähtesta kõik
+settings-sound-choose = Vali
+settings-sound-default = Lufti helid
+settings-sound-name-notification = Teavitus
+settings-sound-name-quiet-notification = Vaikne teavitus
+settings-sound-name-new-mail = Uus e-kiri
+settings-sound-name-device-added = Seade on ühendatud
+settings-sound-name-device-removed = Seade on lahti ühendatud
+settings-sound-name-charger = Laadija on ühendatud
+settings-sound-name-volume = Helivaljuse muudatus
+settings-sound-name-low-battery = Aku on tühjapoolne
+settings-sound-name-screenshot = Ekraanitõmmis
+settings-sound-name-sign-in = Sisselogimine
+settings-sound-name-mail-sent = E-kiri on saadetud
+settings-sound-name-recording-started = Salvestamine algas
+settings-sound-name-recording-stopped = Salvestamine lõppes
+settings-sound-name-error = Viga
+settings-sound-name-warning = Hoiatus
+settings-sound-name-question = Küsimus
+settings-sound-name-key = Võti
+settings-sound-name-delete-key = Kustuta võti
+settings-sound-name-space-key = Tühikuklahv
+settings-sound-choose-label = Vali fail heli jaoks: { $sound }
+settings-sound-play = Esita heli: { $sound }
+settings-sound-reset = Kasuta selle heliteate jaoks Lufti vaikimisi valikut: { $sound }

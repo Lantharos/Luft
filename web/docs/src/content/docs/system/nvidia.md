@@ -3,6 +3,16 @@ title: NVIDIA graphics
 description: The standard and NVIDIA images, and switching between them.
 sidebar:
   order: 2
+asks:
+  - nvidia driver
+  - gpu driver
+  - graphics driver
+  - proprietary driver
+  - nouveau
+  - { ask: install nvidia driver, to: adding-or-removing-nvidias-driver }
+  - { ask: new graphics card, to: adding-or-removing-nvidias-driver }
+  - { ask: nvidia freezes, to: when-the-graphics-driver-stops-responding }
+  - { ask: resizable bar, to: when-the-graphics-driver-stops-responding }
 ---
 
 Luft comes as two images that are otherwise the same:
@@ -18,7 +28,7 @@ NVIDIA's driver is built for each image's kernel and signed with Luft's key, so 
 
 Install Luft picks the NVIDIA image when the computer has an NVIDIA card, and [Meet Luft](/start/meet-luft/) downloads only the one your computer needs.
 
-## Switching
+## Adding or removing NVIDIA's driver
 
 If you add an NVIDIA card later, or installed the standard image on a computer with one, Luft notices. It offers NVIDIA's driver in Settings, under System, and once in a notification after you sign in. It offers again only if a different NVIDIA card turns up.
 

@@ -3,6 +3,19 @@ title: Flatbed
 description: Scan documents with a scanner or your camera, and save them as searchable PDFs.
 sidebar:
   order: 10
+asks:
+  - scan document
+  - scanner
+  - scan to pdf
+  - ocr
+  - { ask: scanner not found, to: scanning }
+  - { ask: document feeder, to: scanning }
+  - { ask: scan both sides, to: scanning }
+  - { ask: scanner identity changed, to: scanning }
+  - { ask: scan with camera, to: scanning-with-the-camera }
+  - { ask: scan with webcam, to: scanning-with-the-camera }
+  - { ask: straighten scan, to: straightening-and-editing-pages }
+  - { ask: searchable pdf, to: saving }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -21,13 +34,13 @@ If the scanner has a document feeder, choose **Feeder** next to the Scan button 
 
 A scanner that doesn't show up can be added by its address with **Add a scanner** in the sidebar. You'll find the address on the printer's own screen or in your router.
 
-## The camera
+## Scanning with the camera
 
 Choose **Camera** in the sidebar and press **Take a photo**. Lay the page flat in good light and hold the camera over it; an outline follows the edges of the paper, and the photo you take is turned into a flat, even page. Take as many pages as you like before closing the window.
 
 Photos of pages you took before work the same way: drop them onto the window or use **Open pictures**.
 
-## Pages
+## Straightening and editing pages
 
 Every page is straightened and cut out along the edges of the paper, and its light is evened out, so shadows and the colour of a lamp go away. A smaller paper on a scanner's glass, such as a receipt, is cut out of the scan, and a page that went in slightly turned comes out straight.
 

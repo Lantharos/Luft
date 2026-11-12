@@ -3,6 +3,20 @@ title: Keyring
 description: Where your passwords, tokens and SSH keys are kept, and which apps can use them.
 sidebar:
   order: 2
+asks:
+  - saved passwords
+  - keychain
+  - credential manager
+  - gnome keyring
+  - kwallet
+  - { ask: keyring locked, to: unlocking }
+  - { ask: keyring password, to: unlocking }
+  - { ask: app wants keyring access, to: which-apps-get-what }
+  - { ask: ssh agent, to: ssh-keys }
+  - { ask: ssh-add, to: ssh-keys }
+  - { ask: create ssh key, to: ssh-keys }
+  - { ask: gpg passphrase, to: gnupg }
+  - { ask: passkeys, to: passkeys }
 ---
 
 Luft Keyring keeps your passwords, sign-in tokens and keys. Apps use it the standard way, so browsers, mail apps and tools that save passwords on Linux work without changes. It is also your SSH agent and GnuPG's passphrase prompt.

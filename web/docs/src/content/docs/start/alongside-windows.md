@@ -3,6 +3,22 @@ title: Installing alongside Windows
 description: Share a drive with Windows, and what Luft changes in Windows to make that smooth.
 sidebar:
   order: 5
+asks:
+  - dual boot
+  - dual boot windows
+  - install next to windows
+  - keep windows
+  - choose windows at startup
+  - { ask: bitlocker, to: when-windows-cant-be-made-smaller }
+  - { ask: can't shrink windows, to: when-windows-cant-be-made-smaller }
+  - { ask: fast startup, to: what-luft-changes-in-windows }
+  - { ask: time wrong after switching from windows, to: what-luft-changes-in-windows }
+  - { ask: clock wrong dual boot, to: what-luft-changes-in-windows }
+  - { ask: bluetooth devices from windows, to: what-luft-changes-in-windows }
+  - { ask: windows update fast startup, to: after-a-windows-update }
+  - { ask: open windows files, to: opening-windows-files }
+  - { ask: access c drive, to: opening-windows-files }
+  - { ask: windows drive read only, to: opening-windows-files, shared: true }
 ---
 
 Luft can share a drive with Windows. Install Luft makes Windows' partition smaller and puts Luft in the space it frees, and Luft's boot menu lets you choose which system to start each time the computer starts. When you don't choose, it starts the one you started last. Choosing Windows restarts the computer straight into Windows, so BitLocker unlocks Windows by itself rather than asking for its recovery key.
@@ -23,7 +39,7 @@ Install Luft won't touch Windows when changing it could lose data. It says why, 
 | Windows' drive needs a check | Restart Windows once |
 | Windows needs almost all of its drive | Free up space in Windows |
 
-## Three things Luft offers
+## What Luft changes in Windows
 
 Each has its own switch in the installer:
 
@@ -37,9 +53,11 @@ Windows' settings are only changed when Windows was shut down fully and isn't lo
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
 ```
 
-## Living with both
+## After a Windows update
 
 Windows updates sometimes turn Fast Startup back on. When Luft starts after Windows was hibernated or fast-started, it resets the sound chips before anything uses them and, once, explains Fast Startup in a notification that can turn it off when Windows is next fully shut down.
+
+## Opening Windows' files
 
 Windows' drive shows up in [Rover](/apps/rover/). While Windows is asleep it opens read-only, so nothing Windows still has open gets changed.
 

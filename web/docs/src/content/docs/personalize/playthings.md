@@ -3,6 +3,13 @@ title: Playthings
 description: Lanterns, clouds, a campfire and stars on your wallpaper that react to the pointer and your fingers, and how to put them where you like.
 sidebar:
   order: 8
+asks:
+  - desktop toys
+  - interactive wallpaper
+  - lanterns
+  - campfire on desktop
+  - { ask: drag lanterns, to: put-them-where-you-like }
+  - { ask: playthings stopped moving, to: when-they-rest }
 ---
 
 Playthings is an extension from [Schelf](/apps/schelf/). It puts a few things on your wallpaper, behind your windows, that respond when you brush past them with the pointer or a finger. Windows always stay in front, and clicking anywhere else on the desktop works as it always does.

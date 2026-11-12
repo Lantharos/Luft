@@ -3,6 +3,17 @@ title: Tablet mode
 description: How the taskbar and the screen behave when a convertible folds into a tablet, and on pen displays and touch monitors.
 sidebar:
   order: 2.5
+asks:
+  - 2-in-1 laptop
+  - convertible laptop
+  - { ask: touch screen taskbar, to: the-taskbar }
+  - { ask: bring up taskbar on tablet, to: the-taskbar }
+  - { ask: on screen keyboard, to: the-on-screen-keyboard, shared: true }
+  - { ask: virtual keyboard, to: the-on-screen-keyboard }
+  - { ask: screen rotation, to: turning-the-screen }
+  - { ask: rotation lock, to: turning-the-screen }
+  - { ask: auto rotate, to: turning-the-screen }
+  - { ask: tablet mode not working, to: when-luft-switches-to-tablet-mode }
 ---
 
 When you fold a convertible laptop back into a tablet, or take the keyboard off a detachable, Luft makes room for your fingers. Unfold it or reattach the keyboard and everything goes back to how it was.
@@ -39,7 +50,7 @@ The on-screen keyboard appears when you tap into a text field, in browsers and o
 
 The screen follows the way you hold the tablet. When it turns, the picture rotates smoothly into place while apps rearrange themselves underneath. Press <kbd>Super</kbd>+<kbd>O</kbd> to keep the screen as it is, and again to let it turn. For a switch, add **Auto Rotate** to [Quick settings](/desktop/quick-settings/#making-it-yours): touch and hold an empty spot there and pick it under **Add**. It only shows up on computers that can tell which way they're held.
 
-## When does Luft switch?
+## When Luft switches to tablet mode
 
 Luft follows the tablet switch that convertibles report when they fold past a certain angle or lose their keyboard, as long as the computer has a touchscreen. Most convertibles have one. A computer with a touchscreen but no such switch is treated as a tablet whenever no mouse or touchpad is connected.
 

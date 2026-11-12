@@ -3,6 +3,9 @@ title: Meet Luft
 description: The app for Windows and Linux that gets a computer ready for Luft.
 sidebar:
   order: 12
+asks:
+  - { ask: meet luft log file, to: when-a-step-fails }
+  - { ask: meet luft error, to: when-a-step-fails }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -29,5 +32,7 @@ Meet Luft runs on Windows and Linux, not on Luft itself. It checks a computer, p
 | --- | --- |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> | Switch between releases and nightly builds |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Save the newest logs from Try Luft to the desktop |
+
+## When a step fails
 
 When a step doesn't finish, Meet Luft says which one and offers to try again. On Windows it also keeps a log of what went wrong, to attach when you [report a problem](https://github.com/Lantharos/Luft/issues): type `%LOCALAPPDATA%\Sabine\logs` into File Explorer's address bar and it's the file called `meet`.

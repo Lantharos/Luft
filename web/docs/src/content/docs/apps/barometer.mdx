@@ -3,16 +3,28 @@ title: Barometer
 description: See what's running and how hard the computer is working, and stop what misbehaves.
 sidebar:
   order: 8
+asks:
+  - task manager
+  - activity monitor
+  - ctrl shift esc
+  - { ask: force quit, to: stopping-apps-and-processes }
+  - { ask: end task, to: stopping-apps-and-processes }
+  - { ask: kill process, to: stopping-apps-and-processes }
+  - { ask: app not responding, to: stopping-apps-and-processes }
+  - { ask: app frozen, to: stopping-apps-and-processes }
+  - { ask: cpu usage, to: performance }
+  - { ask: ram usage, to: performance }
+  - { ask: gpu usage, to: performance }
+  - { ask: network speed, to: performance }
 ---
 
 Barometer is the system monitor. Open it with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd>, or from the taskbar's right-click menu.
 
+## Stopping apps and processes
 
-## Apps and processes
-
+- **End**, **Force quit**, pause, resume and change the priority of apps and processes. Processes of other users and of the system ask for an administrator's password first. When an app isn't closing, Barometer offers to wait or force it.
 - Apps are grouped the way the desktop started them, with their processor, memory, disk and graphics use. Expand an app to see its processes.
 - Apps that keep running after you close their last window, such as Mailman checking for new mail, are listed under **Running in the background**. **Open** brings their window back, and **Stop** quits them, forcing them if they haven't quit after five seconds.
-- **End**, **Force quit**, pause, resume and change the priority of apps and processes. Processes of other users and of the system ask for an administrator's password first. When an app isn't closing, Barometer offers to wait or force it.
 - The process table can be sorted and searched, and its columns chosen from the header's right-click menu.
 - Process details show the command line, working folder, user, parent, threads, open files, control group and a breakdown of memory.
 

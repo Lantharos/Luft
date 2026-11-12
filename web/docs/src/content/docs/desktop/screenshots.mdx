@@ -3,6 +3,19 @@ title: Screenshots and recording
 description: Take screenshots of an area, a window or the screen, draw on them, and record the screen.
 sidebar:
   order: 7
+asks:
+  - print screen
+  - snipping tool
+  - snip and sketch
+  - { ask: screenshot of one window, to: the-screenshot-tool }
+  - { ask: where are screenshots saved, to: the-screenshot-tool }
+  - { ask: screenshots disappeared, to: the-screenshot-tool }
+  - { ask: screenshot an area, to: the-screenshot-tool }
+  - { ask: annotate screenshot, to: drawing-on-a-screenshot }
+  - { ask: crop screenshot, to: drawing-on-a-screenshot }
+  - { ask: record my screen, to: recording }
+  - { ask: screen recording sound, to: recording }
+  - { ask: where are recordings saved, to: recording }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -34,6 +47,8 @@ Choose an area, the whole screen or a window, decide whether to include the poin
 
 Screenshots are saved in `~/Pictures/Screenshots` and copied to the clipboard at the same time, ready to paste. A notification offers to show the file.
 
+Screenshots older than 30 days go to the trash by themselves, so the folder doesn't fill up; move one to another folder to keep it. Settings, under Privacy, turns this off or changes how long they stay.
+
 ## Drawing on a screenshot
 
 Turn on the pen button next to **Show pointer**, and capturing opens the screenshot for drawing instead of saving it straight away. It turns on by itself when you open the screenshot tool with a pen, such as with the pen's button.
@@ -57,8 +72,6 @@ Pick a colour for the pen or the highlighter below the tools. The mouse and a fi
 | <kbd>Esc</kbd> | Close without saving |
 
 The tick copies the finished screenshot and saves it in `~/Pictures/Screenshots`, like any other.
-
-Screenshots older than 30 days go to the trash by themselves, so the folder doesn't fill up; move one to another folder to keep it. Settings, under Privacy, turns this off or changes how long they stay.
 
 ## Recording
 

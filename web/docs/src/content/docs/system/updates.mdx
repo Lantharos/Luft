@@ -3,6 +3,24 @@ title: How updates work
 description: Luft updates as one sealed image, installs at the next restart, and can always go back.
 sidebar:
   order: 1
+asks:
+  - update luft
+  - system update
+  - windows update
+  - check for updates
+  - { ask: install update, to: getting-an-update }
+  - { ask: turn off automatic updates, to: getting-an-update }
+  - { ask: reopen apps after restart, to: getting-an-update }
+  - { ask: go back to previous version, to: going-back }
+  - { ask: rollback update, to: going-back }
+  - { ask: downgrade, to: going-back }
+  - { ask: update failed, to: when-an-update-doesnt-start }
+  - { ask: nightly updates, to: releases-and-nightly-builds }
+  - { ask: switch to stable, to: releases-and-nightly-builds }
+  - { ask: which version do i have, to: releases-and-nightly-builds }
+  - { ask: bios update, to: updating-firmware-and-apps }
+  - { ask: firmware update, to: updating-firmware-and-apps }
+  - { ask: bootc, to: from-the-command-line }
 ---
 
 Luft isn't a collection of packages that update one by one. Each version of the system is one sealed image, built and signed in one go, and an update swaps the whole system for the next version. Your files, settings and apps live apart from it and stay as they are.
@@ -52,7 +70,7 @@ Nightly builds get the least testing: nobody has used one for long before it rea
 
 Every image is signed with Luft's key, and Luft refuses an update that isn't. It also refuses one that's older than the version you have, so nobody can hand your computer an old version with holes that were fixed since. Going back to the previous version is always your choice. [Keys, signatures and the build](/security/keys/) shows how to check an image's signatures yourself, and [Updates and releases](/developers/system/updates/) how the updater works.
 
-## Firmware and apps
+## Updating firmware and apps
 
 - **Firmware** for the computer and its devices also comes through Settings, under System, when the maker publishes it. Most firmware updates finish at the next restart.
 - **Apps** aren't part of the system image. Settings points to [Schelf](/apps/schelf/), which updates them.

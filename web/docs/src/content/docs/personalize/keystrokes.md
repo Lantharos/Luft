@@ -3,6 +3,14 @@ title: Keystrokes
 description: Soft sounds as you type and click, what the extension can and can't see, and how to make your own sounds.
 sidebar:
   order: 7
+asks:
+  - typing sounds
+  - keyboard sounds
+  - mechanical keyboard sound
+  - typewriter sound
+  - mouse click sound
+  - { ask: can keystrokes see what i type, to: what-it-can-see }
+  - { ask: custom key sounds, to: make-your-own }
 ---
 
 Keystrokes is an extension from [Schelf](/apps/schelf/). It plays a soft sound on every key press and mouse click, the moment you press. Space, Enter and Backspace each sound like themselves, and every press varies a little in pitch and level, so it sounds like a keyboard rather than a machine gun.

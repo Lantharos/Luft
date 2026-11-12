@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 import { urls } from '@luft/web';
+import { asks } from './src/asks/integration';
 import { starlightScriptHashes } from './src/inline-scripts';
 import { sidebar } from './src/sidebar';
 
@@ -52,7 +53,9 @@ export default defineConfig({
 					}
 				}
 			},
+			pagefind: { ranking: { metaWeights: { title: 10, asks: 10 } } },
 			plugins: [starlightLinksValidator({ errorOnLocalLinks: false })]
-		})
+		}),
+		asks()
 	]
 });

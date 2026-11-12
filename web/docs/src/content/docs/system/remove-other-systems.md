@@ -3,6 +3,14 @@ title: Removing Windows or the old system
 description: Give the space of Windows, or of the Linux Luft replaced, to Luft.
 sidebar:
   order: 5
+asks:
+  - uninstall windows
+  - delete windows
+  - remove dual boot
+  - delete windows partition
+  - remove old system
+  - { ask: removal interrupted, to: if-its-interrupted }
+  - { ask: use windows space for luft, to: where-the-space-goes }
 ---
 
 Once Luft starts the computer, you can remove the other systems on it and give their space to Luft. Disks shows them on each drive, below its partitions, and Settings lists them under System, About, **Other systems**.

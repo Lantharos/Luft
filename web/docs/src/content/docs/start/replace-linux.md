@@ -3,6 +3,13 @@ title: Replacing another Linux
 description: Put Luft in place of a Linux system and keep your files, accounts, network and command-line tools.
 sidebar:
   order: 6
+asks:
+  - replace ubuntu
+  - replace my linux
+  - separate home partition
+  - { ask: keep home folder, to: what-comes-along }
+  - { ask: arch linux pacman packages, to: what-comes-along }
+  - { ask: old system still there, to: what-happens-to-the-old-system }
 ---
 
 Install Luft finds Linux systems on the computer's drives and offers **Replace** for those whose home folders live apart from the system:
@@ -12,7 +19,7 @@ Install Luft finds Linux systems on the computer's drives and offers **Replace**
 
 A system with everything on one partition, as Ubuntu installs by default, is listed but can't be replaced.
 
-You can start from a [USB stick](/start/usb-stick/), or from the running system with [Meet Luft](/start/meet-luft/#on-linux), which restarts straight into **Replace**. Either way, the installer explains what stays and what changes before anything happens.
+You can start from a [USB stick](/start/usb-stick/), or from the running system with [Meet Luft](/start/meet-luft/#trying-luft-from-linux), which restarts straight into **Replace**. Either way, the installer explains what stays and what changes before anything happens.
 
 ## What comes along
 

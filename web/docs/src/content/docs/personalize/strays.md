@@ -3,6 +3,12 @@ title: Strays
 description: Small creatures who live on your desktop, and how to make your own.
 sidebar:
   order: 6
+asks:
+  - desktop pets
+  - shimeji
+  - pixel creatures
+  - { ask: custom desktop pet, to: make-your-own }
+  - { ask: sprite sheet, to: the-sheet }
 ---
 
 Strays is an extension from [Schelf](/apps/schelf/). It puts a few small creatures on your desktop: Tuft, who walks, climbs and jumps, Pip, who flies, and slow, round Dollop. They wander on their own between the taskbar, its islands, the tops of windows and the screen's edges, wherever they like best, stopping for a sit or a nap along the way. When they meet they might say hello, play or chase each other, Tuft stalks Pip until Pip flies off, and Dollop gets bumped and likes company for a nap.

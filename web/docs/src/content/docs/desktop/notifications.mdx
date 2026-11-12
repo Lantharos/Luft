@@ -3,6 +3,23 @@ title: Notifications
 description: The notification center, replies, media controls, the calendar and Do Not Disturb.
 sidebar:
   order: 5
+asks:
+  - notification center
+  - { ask: dismiss notification, to: clearing-and-answering-notifications }
+  - { ask: clear all notifications, to: clearing-and-answering-notifications }
+  - { ask: reply from notification, to: clearing-and-answering-notifications }
+  - { ask: turn off notifications for an app, to: clearing-and-answering-notifications }
+  - { ask: media controls, to: whats-playing }
+  - { ask: pause music, to: whats-playing }
+  - { ask: calendar, to: the-calendar }
+  - { ask: week numbers, to: the-calendar }
+  - { ask: focus assist, to: do-not-disturb }
+  - { ask: silence notifications, to: do-not-disturb }
+  - { ask: mute notifications, to: do-not-disturb }
+  - { ask: dnd, to: do-not-disturb }
+  - { ask: turn on do not disturb, to: do-not-disturb }
+  - { ask: notifications on lock screen, to: on-the-lock-screen }
+  - { ask: hide notification content, to: on-the-lock-screen }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -11,7 +28,7 @@ Click the clock on the taskbar, or press <kbd>Super</kbd>+<kbd>N</kbd>, to open 
 
 <Shot name="notification-center" alt="The notification center with a media player, notifications and the calendar" />
 
-## Notifications
+## Clearing and answering notifications
 
 - Notifications are grouped by app, newest first. Each group shows two and folds the rest behind **N more**.
 - Click one to open it, or press <kbd>Delete</kbd> or its close button to dismiss it. **Clear all** empties the list.

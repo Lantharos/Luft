@@ -3,11 +3,19 @@ title: Workspaces
 description: Spread your windows over up to ten workspaces.
 sidebar:
   order: 5
+asks:
+  - virtual desktops
+  - multiple desktops
+  - macos spaces
+  - new desktop
+  - { ask: move window to another desktop, to: moving-a-window-to-another-workspace }
+  - { ask: show window on all workspaces, to: moving-a-window-to-another-workspace }
+  - { ask: workspaces on second monitor, to: with-several-displays }
 ---
 
 Workspaces are separate desktops, each with its own windows. You never have to make one: there's always an empty workspace after the last one in use, and workspaces you empty disappear, up to ten in all.
 
-## Switching
+## Switching workspaces
 
 | | |
 | --- | --- |
@@ -18,7 +26,7 @@ Workspaces are separate desktops, each with its own windows. You never have to m
 
 Past the first and last workspace, the desktop resists and springs back.
 
-## Moving windows
+## Moving a window to another workspace
 
 - Drag a window onto a workspace in [All windows](/windows/task-view/).
 - <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>Page Up</kbd> and <kbd>Page Down</kbd> move the window you're using to the workspace before or after.

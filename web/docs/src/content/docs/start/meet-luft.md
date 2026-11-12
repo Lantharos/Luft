@@ -3,6 +3,23 @@ title: Try Luft with Meet Luft
 description: Get a Windows or Linux computer ready for Luft without a USB stick, then try it, install it, or replace the old system.
 sidebar:
   order: 3
+asks:
+  - install without usb
+  - { ask: try luft without installing, shared: true }
+  - windows protected your pc
+  - smartscreen
+  - { ask: turn on secure boot, to: trying-luft-from-windows }
+  - { ask: shrink windows partition, to: trying-luft-from-windows }
+  - { ask: move files from windows, to: trying-luft-from-windows }
+  - { ask: transfer wifi passwords from windows, to: trying-luft-from-windows }
+  - { ask: lost moving box code, to: trying-luft-from-windows }
+  - { ask: lvm, to: trying-luft-from-linux }
+  - { ask: give space back to windows, to: resizing-or-removing-luft-from-windows }
+  - { ask: uninstall luft, to: resizing-or-removing-luft-from-windows }
+  - { ask: give luft more space, to: resizing-or-removing-luft-from-windows, shared: true }
+  - { ask: meet luft nightly, to: getting-a-newer-luft }
+  - { ask: make usb on windows, to: making-a-usb-stick }
+  - { ask: ventoy, to: ventoy-sticks }
 ---
 
 Meet Luft is a small app for Windows and Linux. It checks your computer, puts Luft next to the system you already have, and restarts into Luft once. From there you can try the desktop, install Luft, or on Linux let it take the old system's place. Until you decide in the installer, your computer keeps starting the way it always has.
@@ -18,7 +35,7 @@ Windows may ask once before it opens Meet Luft for the first time: choose **More
 
 Meet Luft downloads the newest Luft, which works with any graphics card and installs NVIDIA's driver when your computer needs it. If you already have a Luft ISO, **Use an ISO I already have** skips the download.
 
-## On Windows
+## Trying Luft from Windows
 
 1. **It checks the PC.** Luft needs a 64-bit Intel or AMD processor, UEFI and a GPT drive. Meet Luft also looks at Secure Boot, the TPM, BitLocker, Fast Startup, free space, the graphics card and the Wi-Fi chip, and says what each means for you. When Secure Boot is off, it explains where to turn it on for your PC's maker and can restart straight into the firmware settings. Start entries left behind by systems you removed long ago, such as an old Ubuntu, can be tidied away here too.
 2. **It makes room.** Windows makes its own partition smaller, the same way Disk Management does, so this works with BitLocker on. Free space right after Windows counts first, so Windows only gives up what's missing. Then Meet Luft downloads Luft, checks it against its checksum, and unpacks it as it arrives.
@@ -37,7 +54,7 @@ Before restarting, Meet Luft offers to keep the clock right in both systems and,
 
 Meet Luft asks Windows for administrator rights once, when it first looks at the drive. It needs an internet connection unless you pick an ISO.
 
-## On Linux
+## Trying Luft from Linux
 
 Meet Luft for Linux repartitions nothing. It keeps Luft as files in a folder, `/home/.luft-meet` on the drive with your home folder, and adds a small start entry called *Meet Luft* next to your system's own boot files. The folder has to be on ext4, btrfs or XFS on a plain partition: Luft can't start from an encrypted drive, LVM or RAID yet, and Meet Luft tells you when that's the case.
 
@@ -49,7 +66,7 @@ It asks for your password once, when it first looks at the computer. When Luft i
 - **Replace** opens the installer with your current system chosen, explains what stays and what changes, and does nothing until you confirm. See [Replacing another Linux](/start/replace-linux/).
 - **Install Luft** opens the installer to put Luft on another drive or in free space.
 
-## Once Luft is installed
+## Resizing or removing Luft from Windows
 
 When you open Meet Luft on a PC that has Luft, it shows **Your Luft**:
 
@@ -81,6 +98,6 @@ Luft starts from Ventoy's normal mode with nothing to configure. With Secure Boo
 
 When Luft runs from Meet Luft, it saves its logs where Meet Luft keeps it, so a problem on your hardware can be looked at afterwards. **Ctrl+Shift+L** in Meet Luft copies the newest logs to your desktop as a zip. [Logs and reporting problems](/system/logs/) has the details.
 
-## Taking it back out
+## Removing what Meet Luft added
 
-**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed, its first start removes Meet Luft's leftovers in the background and grows into their space. To take out an installed Luft, see [Once Luft is installed](#once-luft-is-installed).
+**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed, its first start removes Meet Luft's leftovers in the background and grows into their space. To take out an installed Luft, see [Resizing or removing Luft from Windows](#resizing-or-removing-luft-from-windows).

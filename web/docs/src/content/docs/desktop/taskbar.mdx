@@ -3,6 +3,32 @@ title: The taskbar
 description: Pinned and running apps, previews, the tray, status icons, the clock, and the taskbar's options.
 sidebar:
   order: 2
+asks:
+  - { ask: window previews, to: switching-between-apps }
+  - { ask: hover preview, to: switching-between-apps }
+  - { ask: steam games on taskbar, to: switching-between-apps }
+  - { ask: unread badge, to: dots-badges-and-flashes }
+  - { ask: app icon flashing, to: dots-badges-and-flashes }
+  - { ask: dots under icons, to: dots-badges-and-flashes }
+  - { ask: pin app to taskbar, to: pinning-apps, shared: true }
+  - { ask: unpin app, to: pinning-apps }
+  - { ask: system tray, to: the-tray }
+  - { ask: notification area icons, to: the-tray }
+  - { ask: hidden tray icons, to: the-tray }
+  - { ask: minimize all windows, to: show-desktop }
+  - { ask: peek at desktop, to: show-desktop }
+  - { ask: move taskbar to top, to: arranging-the-taskbar }
+  - { ask: taskbar on the left, to: arranging-the-taskbar }
+  - { ask: dock, to: arranging-the-taskbar }
+  - { ask: macos dock, to: arranging-the-taskbar }
+  - { ask: center taskbar icons, to: arranging-the-taskbar }
+  - { ask: top bar like macos, to: arranging-the-taskbar }
+  - { ask: auto hide taskbar, to: options }
+  - { ask: taskbar size, to: options }
+  - { ask: transparent taskbar, to: options }
+  - { ask: taskbar on every monitor, to: options }
+  - { ask: change search engine, to: options }
+  - { ask: remove start button, to: options }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -11,22 +37,24 @@ The taskbar sits along the bottom of the screen, or wherever you [arrange it](#a
 
 <Shot name="taskbar" alt="The taskbar with pinned apps, status icons and the clock" />
 
-## Apps
+## Switching between apps
+
+Clicking an app opens it, switches to its window, or minimizes the window if it's already in front. When an app has several windows, clicking shows them all to choose from.
 
 Pinned apps come first, then any other app that's running. While the pointer is on the taskbar, nothing on it moves: an app that opens joins once the pointer leaves, and one that closes leaves its space empty until then, so what you're about to click stays under the pointer.
+
+Hover over an app, or press the arrow key that points away from the taskbar's edge, such as <kbd>Up</kbd> on the bottom, to see **live previews** of its windows, each with a close button.
+
+Games you start from Steam get a button of their own, with the game's name and icon, rather than sitting under Steam. Pin one and clicking it starts the game through Steam.
+
+## Dots, badges and flashes
 
 - **Dots** under an app show how many windows it has, up to four. The app you're using has wider dots.
 - **A badge** counts unread messages, for apps that report them.
 - **A progress bar** replaces the dots while an app reports progress, such as a download.
 - **A flash** means an app wants your attention. It flashes three times, then stays lit until you look.
 
-Clicking an app opens it, switches to its window, or minimizes the window if it's already in front. When an app has several windows, clicking shows them all to choose from.
-
-Games you start from Steam get a button of their own, with the game's name and icon, rather than sitting under Steam. Pin one and clicking it starts the game through Steam.
-
-Hover over an app, or press the arrow key that points away from the taskbar's edge, such as <kbd>Up</kbd> on the bottom, to see **live previews** of its windows, each with a close button.
-
-## Pinning
+## Pinning apps
 
 - Drag an app from Start onto the taskbar to pin it.
 - Drag pinned apps along the taskbar to reorder them.

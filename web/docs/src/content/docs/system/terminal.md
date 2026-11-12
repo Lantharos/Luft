@@ -3,6 +3,13 @@ title: The luft command
 description: Change settings, look after updates, read logs and build extensions from a terminal, or let an AI agent do it with your approval.
 sidebar:
   order: 9
+asks:
+  - luft command
+  - change settings from terminal
+  - { ask: undo a setting change, to: putting-changes-back }
+  - { ask: luft report, to: logs-and-bug-reports, shared: true }
+  - { ask: mcp server, to: ai-agents }
+  - { ask: ai agent, to: ai-agents }
 ---
 
 `luft` is Luft's command line. It reads and changes the settings Settings has, by the same names, looks after updates, shows logs, gathers a bug report and helps you build extensions. Run it in [Tern](/apps/tern/) or any terminal; `luft --help` and `luft <command> --help` explain every part.

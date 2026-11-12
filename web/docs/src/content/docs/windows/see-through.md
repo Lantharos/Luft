@@ -3,6 +3,12 @@ title: See-through windows
 description: Let the desktop show through an app's windows, with its text kept solid.
 sidebar:
   order: 6
+asks:
+  - transparent windows
+  - translucent windows
+  - frosted glass
+  - window opacity
+  - blur behind windows
 ---
 
 Any app can have see-through windows: the window's background lets what's behind it show, blurred like frosted glass, while its text, icons and pictures stay solid.

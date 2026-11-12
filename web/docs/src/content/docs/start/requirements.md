@@ -3,6 +3,22 @@ title: System requirements
 description: What a computer needs to run Luft.
 sidebar:
   order: 2
+asks:
+  - minimum specs
+  - can my pc run luft
+  - arm laptop
+  - raspberry pi
+  - legacy bios
+  - 32 bit
+  - how much disk space do i need
+  - usb stick size
+  - { ask: do i need secure boot, to: optional }
+  - { ask: do i need a tpm, to: optional }
+  - { ask: do i need internet to install, to: optional }
+  - { ask: amd graphics, to: graphics }
+  - { ask: hardware video decoding, to: graphics }
+  - { ask: wifi not detected, to: wi-fi }
+  - { ask: broadcom wifi, to: wi-fi }
 ---
 
 | | Needs |

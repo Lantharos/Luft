@@ -3,11 +3,22 @@ title: Moving to Luft from Fedora
 description: Replace a Fedora installation with Luft and keep your home folder, accounts, network and command-line tools.
 sidebar:
   order: 8
+asks:
+  - switch from fedora
+  - upgrade fedora to luft
+  - { ask: keep my files from fedora, to: what-stays }
+  - { ask: toolbox enter fedora, to: what-stays }
+  - { ask: where did my dnf packages go, to: what-stays }
+  - { ask: dnf install, to: whats-different, shared: true }
+  - { ask: sudo dnf upgrade, to: whats-different }
+  - { ask: rpm fusion, to: whats-different }
+  - { ask: man pages, to: whats-different }
+  - { ask: no grub, to: whats-different }
 ---
 
 Luft is built on Fedora, so moving over keeps most of what you're used to: the same kernel, drivers and command-line tools. What changes is how the system is put together. Fedora installs and updates packages one by one; Luft is one sealed image that updates as a whole, with your apps and tools kept apart from it.
 
-## The quickest way
+## Moving over with Meet Luft
 
 1. Download [Meet Luft for Linux](https://dl.schelf.store/lantharos/meet/latest/linux-x86_64/app-image), make it executable and start it.
 2. It checks your computer and copies Luft into a folder, without touching your partitions.

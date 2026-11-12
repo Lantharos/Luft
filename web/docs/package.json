@@ -6,7 +6,7 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"preview": "astro build && wrangler dev",
-		"check": "astro check",
+		"check": "astro check && bun src/asks/check.ts",
 		"deploy": "astro build && wrangler deploy"
 	},
 	"dependencies": {
@@ -20,6 +20,8 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
+		"@types/bun": "^1.4.3",
+		"github-slugger": "^2.0.0",
 		"starlight-links-validator": "^0.27.0",
 		"typescript": "^6",
 		"wrangler": "^4.151.1"

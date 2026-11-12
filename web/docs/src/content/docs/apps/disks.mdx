@@ -3,6 +3,28 @@ title: Disks
 description: Drives, partitions, formatting, encryption, health and disk images.
 sidebar:
   order: 6
+asks:
+  - disk management
+  - gparted
+  - partition manager
+  - { ask: eject usb, to: what-it-does }
+  - { ask: mount drive at startup, to: what-it-does }
+  - { ask: drive health, to: what-it-does }
+  - { ask: smart status, to: what-it-does }
+  - { ask: write iso to usb, to: what-it-does }
+  - { ask: disk image, to: what-it-does }
+  - { ask: format usb, to: formatting-and-partitioning }
+  - { ask: format sd card, to: formatting-and-partitioning }
+  - { ask: exfat, to: formatting-and-partitioning }
+  - { ask: resize partition, to: formatting-and-partitioning }
+  - { ask: create partition, to: formatting-and-partitioning }
+  - { ask: disk full, to: freeing-up-space }
+  - { ask: free up space, to: freeing-up-space }
+  - { ask: what's taking up space, to: freeing-up-space }
+  - { ask: storage full, to: freeing-up-space }
+  - { ask: give luft more space, to: giving-luft-more-space, shared: true }
+  - { ask: use free space, to: giving-luft-more-space }
+  - { ask: make luft partition bigger, to: giving-luft-more-space }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -14,21 +36,27 @@ Disks shows the drives in your computer and the ones you plug in. Each drive is 
 ## What it does
 
 - **Mount and unmount**, rename, open in [Rover](/apps/rover/), and choose whether a partition mounts at startup, at a folder you pick. Data drives inside the computer [open on their own](/apps/rover/#drives) when you sign in.
-- **See what's using space** on a partition or in any folder, as a map and a sorted list, and move things to the trash from there.
-- **What's on Luft's drive**: on the drive Luft runs from, See what's using space shows it in parts: your files, the apps you installed, Luft itself, the older versions of Luft it keeps so you can go back, a downloaded update waiting for a restart, and the system's own files such as logs and caches. Your files open like any folder; the other parts only show how much room they take.
-- **Free up space** below that map, when the folder you're looking at holds your home folder: the trash, downloads that haven't changed in 30 days, app caches and your largest files, each with its size and one button. Every one asks before it does anything. Emptying the trash and clearing caches delete for good; old downloads and large files only go to the trash.
-- **Format by purpose**: *All computers* (exFAT), *Linux only* (ext4), or *Other* for Btrfs, NTFS and FAT32. Optionally encrypt it with a passphrase, or overwrite old data.
-- **Edit partitions**: create, delete, grow, shrink and move them. Changes collect as a plan you can undo, and apply in one step.
-- **Encryption**: unlock, lock, change the passphrase, and turn encryption on in place without losing data, with a recovery key. Encrypting runs in the background and can be paused. See [Security](/system/security/#other-drives).
+- **Encryption**: unlock, lock, change the passphrase, and turn encryption on in place without losing data, with a recovery key. Encrypting runs in the background and can be paused. See [Security](/system/security/#encrypting-other-drives).
 - **Health** and self-tests for SATA and NVMe drives.
 - **Disk images**: save a drive or partition as an image, write one back, and make a bootable USB stick from an `.iso` file. Opening an `.iso` in Rover offers this.
 - **Safely remove** USB drives.
 - **Other systems**: Windows and other Linux systems show up below their drive's partitions, and can be removed to give Luft their space. See [Removing Windows or the old system](/system/remove-other-systems/).
 - **Move Luft to another drive**, such as a faster one, with your files, apps and settings, from the menu of the drive Luft runs from. See [Moving Luft to another drive](/system/move-to-another-drive/).
 
+## Formatting and partitioning
+
+- **Format by purpose**: *All computers* (exFAT), *Linux only* (ext4), or *Other* for Btrfs, NTFS and FAT32. Optionally encrypt it with a passphrase, or overwrite old data.
+- **Edit partitions**: create, delete, grow, shrink and move them. Changes collect as a plan you can undo, and apply in one step.
+
 Anything that erases data asks first, and erasing a whole drive built into the computer asks you to type the drive's name. You can look at the drive Luft runs from, but the partitions it uses can't be changed, except that Luft itself can grow, shrink and move. Changes that need an administrator ask for your password.
 
 While Disks is formatting, moving partitions or copying a disk image, the computer doesn't go to sleep, turning it off asks first, and Disks stays open until it's done. Moving a partition keeps track of how far it got: if the power goes out or the drive is unplugged partway, Disks offers to finish the move the next time it opens with that drive connected. Until then the partition can't be opened and the drive can't be changed, but nothing on it is lost.
+
+## Freeing up space
+
+- **See what's using space** on a partition or in any folder, as a map and a sorted list, and move things to the trash from there.
+- **What's on Luft's drive**: on the drive Luft runs from, See what's using space shows it in parts: your files, the apps you installed, Luft itself, the older versions of Luft it keeps so you can go back, a downloaded update waiting for a restart, and the system's own files such as logs and caches. Your files open like any folder; the other parts only show how much room they take.
+- **Free up space** below that map, when the folder you're looking at holds your home folder: the trash, downloads that haven't changed in 30 days, app caches and your largest files, each with its size and one button. Every one asks before it does anything. Emptying the trash and clearing caches delete for good; old downloads and large files only go to the trash.
 
 ## Giving Luft more space
 

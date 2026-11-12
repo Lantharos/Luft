@@ -3,11 +3,42 @@ title: Extensions
 description: Seasons, Strays, Playthings, Keystrokes, Soundscapes, Focus, Reminders, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
+asks:
+  - add-ons
+  - plugins
+  - gnome extensions
+  - turn off an extension
+  - remove extension
+  - { ask: is an extension safe, to: what-an-extension-can-reach }
+  - { ask: extension sandbox, to: what-an-extension-can-reach }
+  - { ask: install extension from folder, to: extensions-nobody-reviewed }
+  - { ask: unreviewed extension, to: extensions-nobody-reviewed }
+  - { ask: extension stopped working, to: when-an-extension-stops-working }
+  - { ask: extension turned off by itself, to: when-an-extension-stops-working }
+  - { ask: snow on desktop, to: seasons }
+  - { ask: rain on wallpaper, to: seasons }
+  - { ask: falling leaves, to: seasons }
+  - { ask: weather on wallpaper, to: seasons }
+  - { ask: spicetify, to: tailor }
+  - { ask: spotify theme, to: tailor }
+  - { ask: vesktop theme, to: tailor }
+  - { ask: discord theme, to: tailor }
+  - { ask: steam theme, to: tailor }
+  - { ask: white noise, to: soundscapes }
+  - { ask: brown noise, to: soundscapes }
+  - { ask: rain sounds, to: soundscapes }
+  - { ask: background noise for focus, to: soundscapes }
+  - { ask: sleep timer, to: soundscapes }
+  - { ask: pomodoro, to: focus }
+  - { ask: focus timer, to: focus }
+  - { ask: work timer, to: focus }
 ---
 
 Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. You find them in [Schelf](/apps/schelf/), such as Seasons, [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult.
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**.
+
+## What an extension can reach
 
 The list under **What it can do** is what the extension says it uses, and what [Schelf](/apps/schelf/) showed you before installing it. Extensions that run inside the desktop become part of it, so unlike apps they don't run in a sandbox. That's why Luft only runs an extension there when Schelf's store approved that release, from a publisher it verified. Any other extension runs in a sandbox, like an app, limited to exactly what's listed: one from Schelf the store hasn't approved yet, and one you put in your own folder yourself. There it can't read your files, reach the internet or see your other programs. Schelf says on an extension's page which way it runs, and Luft keeps what Schelf installed where your own programs can't change it. A few things, such as drawing over the wallpaper or typing into apps, only work inside the desktop: Schelf installs an extension that needs them once the store approved it, and one from your own folder that asks for them is listed but doesn't run. When the store approves an extension you already have in its sandbox, Schelf asks under **Updates** before it moves it inside the desktop; until you agree, it stays in its sandbox.
 
@@ -19,6 +50,8 @@ With [Developer tools](/system/security/#developer-tools) on, you can run an ext
 - **Run from its folder** runs it straight from your folder, so your changes run when you choose **Run your latest changes**. Any program that can change that folder can then run inside the desktop too, so only do this for an extension you're making.
 
 Either way, Luft first tells you what it means and then asks for an administrator's password, every time. Inside the desktop an extension can see everything you type, read what's on your screen and do anything you can do. Settings marks these extensions **Not reviewed** wherever it lists them, with how they run. **Stop running inside Luft** puts one back in its sandbox right away, without a password. Turning Developer tools off does that for all of them at once, and they only run inside the desktop again when you turn it back on.
+
+## When an extension stops working
 
 If an extension stops working, Luft turns it off by itself and tells you. The same happens to the extensions that were running when the desktop restarted twice in a row after a problem. Turn it back on in Settings once you've updated it, or leave it off.
 

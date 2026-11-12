@@ -3,10 +3,25 @@ title: Accounts and cloud drives
 description: Sign in to iCloud Drive, OneDrive, Dropbox, Nextcloud or WebDAV and use their files like any other folder.
 sidebar:
   order: 1
+asks:
+  - onedrive
+  - dropbox
+  - icloud
+  - nextcloud
+  - webdav
+  - cloud storage
+  - sync files
+  - { ask: offline files, to: files-on-demand }
+  - { ask: always keep offline, to: files-on-demand }
+  - { ask: restore deleted cloud file, to: files-on-demand }
+  - { ask: sync conflict, to: when-the-same-file-changes-in-two-places }
+  - { ask: sync paused, to: when-syncing-pauses }
+  - { ask: share link, to: sharing }
+  - { ask: icloud advanced data protection, to: icloud-drive }
+  - { ask: icloud app specific password, to: icloud-drive }
 ---
 
 Sign in to a cloud service once in Settings, under **Accounts**, and its files appear as a folder in `~/Cloud`, next to your other drives in [Rover](/apps/rover/). Every app and every file dialog sees it like any other folder.
-
 
 | Service | How you sign in |
 | --- | --- |
@@ -42,7 +57,7 @@ Deleting something in a cloud drive sends it to the service's own trash, such as
 
 If a kept file changes on this computer and in the cloud before they meet, both versions are kept. The newer one keeps the name, and the other gets one like `Report (copy from OneDrive).docx` or `Report (copy from this device).docx`. A notification says so, and Rover shows a note in the drive until you dismiss it or remove the copy.
 
-## Pausing
+## When syncing pauses
 
 Syncing in the background pauses on a metered connection, such as a phone's hotspot, and when the battery is at 20% or lower and not charging. Opening a file still downloads it, and changes made meanwhile go up once the pause ends. Settings shows why a drive is paused.
 

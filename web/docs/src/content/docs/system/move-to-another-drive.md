@@ -3,6 +3,14 @@ title: Moving Luft to another drive
 description: Move Luft to a faster or bigger drive with your files, apps and settings, without installing it again.
 sidebar:
   order: 6
+asks:
+  - new ssd
+  - move to nvme
+  - clone drive
+  - migrate to new drive
+  - { ask: move luft failed, to: nothing-is-lost-along-the-way }
+  - { ask: recovery key after moving, to: encryption }
+  - { ask: delete old copy, to: removing-the-old-copy }
 ---
 
 Luft can move itself to another drive in your computer, such as a fast NVMe drive next to the SATA drive it was installed on. Your files, apps, Flatpaks, settings, Wi-Fi networks and the version of Luft you run all come along, so there's nothing to install or set up again.

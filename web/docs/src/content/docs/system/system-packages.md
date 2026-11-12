@@ -3,6 +3,20 @@ title: System packages
 description: Add services, device rules and vendors' apps to the system from Fedora or a software source, without changing the sealed image.
 sidebar:
   order: 3.5
+asks:
+  - docker
+  - tailscale
+  - 1password
+  - virtual machine
+  - virt-manager
+  - libvirt
+  - install a service
+  - { ask: install rpm, shared: true }
+  - { ask: add repository, to: software-sources }
+  - { ask: copr, to: software-sources }
+  - { ask: install vscode, to: software-sources }
+  - { ask: install google chrome, to: software-sources }
+  - { ask: third party repo, to: software-sources }
 ---
 
 Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, udev rules for devices, and apps their vendors only ship as system packages, such as 1Password. These come from Fedora or from [software sources you add](#software-sources). A Fedora package that brings a service, device rules or a driver goes into the system after Schelf says so, so `schelf install tailscale` is enough. `--system` puts any package there, and `--fedora` keeps a command-line tool in your toolbox instead.

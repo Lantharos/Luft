@@ -3,6 +3,26 @@ title: Accessibility
 description: Screen reader, zoom, contrast, reduced motion, typing and pointing aids.
 sidebar:
   order: 2
+asks:
+  - { ask: screen reader, to: seeing }
+  - { ask: narrator, to: seeing }
+  - { ask: voiceover, to: seeing }
+  - { ask: orca, to: seeing }
+  - { ask: magnifier, to: seeing }
+  - { ask: high contrast, to: seeing }
+  - { ask: bigger mouse pointer, to: seeing }
+  - { ask: large text, to: seeing }
+  - { ask: reduce motion, to: motion }
+  - { ask: turn off animations, to: motion }
+  - { ask: sticky keys, to: typing }
+  - { ask: slow keys, to: typing }
+  - { ask: on screen keyboard, to: typing, shared: true }
+  - { ask: mouse keys, to: pointing }
+  - { ask: dwell click, to: pointing }
+  - { ask: find my cursor, to: pointing }
+  - { ask: flash screen for sounds, to: hearing }
+  - { ask: use without mouse, to: using-the-keyboard }
+  - { ask: keyboard navigation, to: using-the-keyboard }
 ---
 
 Everything here is in Settings, under **Accessibility**. The lock and login screens have an accessibility menu too, so you can turn things on before signing in.

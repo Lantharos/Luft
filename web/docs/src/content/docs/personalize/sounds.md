@@ -3,6 +3,21 @@ title: Sounds
 description: The sounds Luft plays for notifications, devices, the volume, screenshots and recording, how to quiet them and how to use your own.
 sidebar:
   order: 4
+asks:
+  - system sounds
+  - notification sound
+  - { ask: no sound, to: when-theres-no-sound }
+  - { ask: sound not working, to: when-theres-no-sound }
+  - { ask: no audio, to: when-theres-no-sound }
+  - { ask: hdmi audio, to: when-theres-no-sound }
+  - { ask: speakers not working, to: when-theres-no-sound }
+  - { ask: headphones not working, to: when-theres-no-sound }
+  - { ask: front jack, to: when-theres-no-sound }
+  - { ask: turn off system sounds, to: turning-them-down-or-off }
+  - { ask: volume tick sound, to: turning-them-down-or-off }
+  - { ask: usb connect sound, to: what-plays-when }
+  - { ask: custom notification sound, to: using-your-own-sounds }
+  - { ask: login sound, to: using-your-own-sounds }
 ---
 
 Luft plays short, soft sounds when something happens that you might not be looking at. Everything here is in Settings, under **Sound**, in **System sounds**. For a sound on every key and click, there's [Keystrokes](/personalize/keystrokes/).
@@ -67,7 +82,7 @@ To replace many sounds at once, choose **Use a folder of sounds**. Luft looks in
 | Delete key | `keyboard-tap-delete` |
 | Space bar | `keyboard-tap-space` |
 
-## When nothing plays
+## When there's no sound
 
 1. Check that the volume in [quick settings](/desktop/quick-settings/) isn't at zero or muted.
 2. In Settings, under **Sound**, look at **Device** under Output. A monitor or TV connected over HDMI or DisplayPort is a device of its own, and many monitors have no speakers.

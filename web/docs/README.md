@@ -6,6 +6,7 @@ The documentation site at [docs.luft.computer](https://docs.luft.computer), buil
 | --- | --- |
 | `src/content/docs` | The pages, one folder per sidebar group |
 | `src/assets/shots` | Screenshots, with a `-light` twin where there is one |
+| `src/asks` | The `asks` frontmatter of user pages, how search indexes it, and its check |
 | `src/components` | The screenshot component, the home page's index and Starlight overrides |
 | `src/styles` | Luft's palette mapped onto Starlight |
 

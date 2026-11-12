@@ -3,6 +3,20 @@ title: Keyboard shortcuts and gestures
 description: Every keyboard shortcut and touchpad gesture on the Luft desktop.
 sidebar:
   order: 8
+asks:
+  - windows key
+  - super key
+  - change keyboard shortcuts
+  - custom shortcut
+  - { ask: ctrl alt delete, to: the-desktop }
+  - { ask: lock screen shortcut, to: the-desktop }
+  - { ask: switch keyboard layout, to: the-desktop }
+  - { ask: close window shortcut, to: windows }
+  - { ask: minimize window, to: windows }
+  - { ask: maximize window, to: windows }
+  - { ask: three finger swipe, to: touchpad-gestures }
+  - { ask: power button action, to: media-and-hardware-keys }
+  - { ask: media keys, to: media-and-hardware-keys }
 ---
 
 <kbd>Super</kbd> is the key with the Windows logo on most keyboards. Settings, under Input, **Keyboard shortcuts**, changes any of these and adds your own.

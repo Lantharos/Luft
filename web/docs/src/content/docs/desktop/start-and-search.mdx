@@ -3,11 +3,33 @@ title: Start and search
 description: Your apps and folders, and a search that finds apps, windows, settings, files, answers, conversions and actions.
 sidebar:
   order: 3
+asks:
+  - start menu
+  - app launcher
+  - all apps
+  - { ask: find an app, to: apps-and-folders }
+  - { ask: app folders, to: apps-and-folders }
+  - { ask: rearrange apps, to: apps-and-folders }
+  - { ask: pin app to taskbar, to: apps-and-folders, shared: true }
+  - { ask: shut down, to: shutting-down-restarting-and-signing-out }
+  - { ask: turn off computer, to: shutting-down-restarting-and-signing-out }
+  - { ask: restart computer, to: shutting-down-restarting-and-signing-out }
+  - { ask: log out, to: shutting-down-restarting-and-signing-out }
+  - { ask: sleep mode, to: shutting-down-restarting-and-signing-out }
+  - { ask: calculator, to: search }
+  - { ask: convert units, to: search }
+  - { ask: km to miles, to: search }
+  - { ask: spotlight, to: search, shared: true }
+  - { ask: search files, to: search }
+  - { ask: search inside files, to: search }
+  - { ask: file not found in search, to: when-a-file-doesnt-show-up }
+  - { ask: search index, to: when-a-file-doesnt-show-up }
+  - { ask: reindex files, to: when-a-file-doesnt-show-up }
 ---
 
 import Shot from '../../../components/Shot.astro';
 
-Press <kbd>Super</kbd> or click the Luft mark on the taskbar to open Start. It has a search field at the top, your apps below it, and your account and power buttons at the bottom. If you'd rather have only a search bar in the middle of the screen, choose [Gust](/desktop/gust/) instead. Settings, under Input, **Keyboard shortcuts** can add a shortcut for **Open Start** next to <kbd>Super</kbd>.
+Press <kbd>Super</kbd> or click the Luft mark on the taskbar to open Start, the menu with your apps. It has a search field at the top, the apps below it, and your account and power buttons at the bottom. If you'd rather have only a search bar in the middle of the screen, choose [Gust](/desktop/gust/) instead. Settings, under Input, **Keyboard shortcuts** can add a shortcut for **Open Start** next to <kbd>Super</kbd>.
 
 <Shot name="start" alt="Start with your apps" />
 
@@ -20,7 +42,9 @@ Start lists every app that isn't pinned to the taskbar, from A to Z until you re
 - **Take an app out** of a folder by dragging it onto **Apps** at the top, or with **Move to Apps** in its right-click menu. A folder that's empty disappears.
 - **Pin an app** to the taskbar by dragging it there, or with **Pin to taskbar** in its menu. It leaves Start and comes back when you unpin it. Search still finds pinned apps.
 
-The power button at the bottom shows Lock, Sleep, Sign out, Restart and Power off. Restart, Power off and Sign out ask once before they go ahead, say that open apps will close, and go ahead by themselves after a minute unless you cancel.
+## Shutting down, restarting and signing out
+
+The power button at the bottom of Start shows Lock, Sleep, Sign out, Restart and Power off. Restart, Power off and Sign out ask once before they go ahead, say that open apps will close, and go ahead by themselves after a minute unless you cancel.
 
 ## Search
 
@@ -55,7 +79,7 @@ Conversions cover length, mass, temperature, data sizes, time, volume, speed and
 | <kbd>Menu</kbd> or right-click | More for a result, such as **Show in Rover** or **Copy path** |
 | <kbd>Esc</kbd> | Clears the search, then leaves a folder, then closes Start |
 
-## How files are found
+## When a file doesn't show up
 
 Luft keeps an index of the names and text of files in your home folder. It works at the lowest priority and notes which folders change as you work, then catches up on them every five minutes (fifteen on battery), and when you open Start or plug in. A file saved a moment ago can take until then to appear. File contents are only read while plugged in; on battery, names stay current and contents wait.
 

@@ -3,6 +3,20 @@ title: The desktop
 description: Kestrel, Luft's desktop, and how its parts fit together.
 sidebar:
   order: 1
+asks:
+  - desktop environment
+  - is this gnome
+  - { ask: camera in use icon, to: privacy-indicator }
+  - { ask: who is using my microphone, to: privacy-indicator }
+  - { ask: stop screen sharing, to: privacy-indicator }
+  - { ask: unlock screen, to: the-lock-screen }
+  - { ask: screen turns off after locking, to: the-lock-screen }
+  - { ask: switch user, to: the-login-screen }
+  - { ask: login screen wallpaper, to: the-login-screen }
+  - { ask: hide user on login screen, to: the-login-screen }
+  - { ask: default session, to: the-login-screen }
+  - { ask: window opens in background, to: how-windows-open }
+  - { ask: focus stealing, to: how-windows-open }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -35,16 +49,22 @@ Kestrel takes an accent colour from your wallpaper and builds a full palette fro
 
 When an app uses the camera, the microphone, your location, or shares or records the screen, an icon appears on the taskbar. Click it to see who's using what, mute a microphone, close the app, stop sharing or recording, or turn off location. It's hidden when nothing is in use.
 
-## The lock and login screens
-
-<Shot name="login" alt="The login screen listing three people" />
+## The lock screen
 
 The lock screen shows the time, your notifications if you allow it, and what's playing. Swipe up, click or press a key to unlock with your password or fingerprint; the lock and login screens say so at the top while they rest. Locking the screen yourself leaves the display on: it dims after 15 seconds without input and turns off after 30, while a screen that locks because you were away turns off right away. Its controls include the battery, the keyboard layout, accessibility options and power. Pressing the computer's power button opens the same power menu here and on the login screen.
 
+## The login screen
+
+<Shot name="login" alt="The login screen listing three people" />
+
 The login screen lists the people on the computer, remembers who signed in last, and shows each person's own wallpaper. Settings, under Accounts, **Login screen**, chooses who is listed, the wallpaper, the default session and automatic login.
 
-## Windows and apps
+## How windows open
 
-Windows open once their first frame is drawn, so you never see an empty frame. They have rounded corners. Maximized and snapped windows keep the ones that face open space, such as the gap above a floating taskbar, and are square where they meet the edge of the screen or another window. Full-screen windows are square. To make everything square, set **Corners** to Square in Settings > Appearance: windows, the taskbar, Quick Settings, Start, notifications, menus and the Luft apps all follow, and so do GTK and Chromium apps that draw their own corners. A window that turns up late, while you're already doing something else, opens behind the one you're using and asks for attention instead of taking focus.
+Windows open once their first frame is drawn, so you never see an empty frame. A window that turns up late, while you're already doing something else, opens behind the one you're using and asks for attention instead of taking focus.
 
 GNOME and KDE apps work as they do elsewhere, and Kestrel shares its colours with them if you like; see [Matching other apps](/personalize/appearance/#matching-other-apps).
+
+## Window corners
+
+Windows have rounded corners. Maximized and snapped windows keep the ones that face open space, such as the gap above a floating taskbar, and are square where they meet the edge of the screen or another window. Full-screen windows are square. To make everything square, set **Corners** to Square in Settings > Appearance: windows, the taskbar, Quick Settings, Start, notifications, menus and the Luft apps all follow, and so do GTK and Chromium apps that draw their own corners.

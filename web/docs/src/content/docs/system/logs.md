@@ -3,6 +3,19 @@ title: Logs and reporting problems
 description: Where Luft keeps its logs, what to collect, and how to report a problem.
 sidebar:
   order: 8
+asks:
+  - report a bug
+  - bug report
+  - file an issue
+  - { ask: send crash report, to: crash-reports }
+  - { ask: turn off crash reports, to: crash-reports }
+  - { ask: journalctl, to: collecting-logs }
+  - { ask: luft report, to: collecting-logs, shared: true }
+  - { ask: system logs, to: collecting-logs }
+  - { ask: event viewer, to: collecting-logs }
+  - { ask: headphones work in windows not luft, to: no-sound-from-the-jacks }
+  - { ask: realtek sound, to: no-sound-from-the-jacks }
+  - { ask: try luft logs, to: logs-from-try-luft }
 ---
 
 ## Reporting a problem
@@ -17,7 +30,7 @@ A report says which program closed and how, where in its code it was, which vers
 
 You're asked about the same problem once per version of Luft. To change your answer, open Settings, then **Privacy**, and choose under **Crash reports** whether to be asked each time, to send without asking or never to send. **Reset** there gives your computer a new random number, so later reports can't be linked to earlier ones. Reports wait while you're offline or on a metered connection.
 
-## What to collect
+## Collecting logs
 
 Right after something goes wrong, `luft report` saves most of this in one file, with your name, your computer's name and paths in your home folder taken out ([the luft command](/system/terminal/#logs-and-bug-reports)). These show more. Run them in [Tern](/apps/tern/):
 

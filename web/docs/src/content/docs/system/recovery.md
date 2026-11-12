@@ -3,6 +3,27 @@ title: Recovery and troubleshooting
 description: The boot menu, going back to an earlier version, what Luft offers when it can't start, Rescue, and other problems.
 sidebar:
   order: 7
+asks:
+  - won't boot
+  - troubleshooting
+  - { ask: boot menu not showing, to: the-boot-menu }
+  - { ask: grub menu, to: the-boot-menu }
+  - { ask: boot into windows, to: the-boot-menu }
+  - { ask: bios settings, to: the-boot-menu }
+  - { ask: update broke something, to: something-broke-after-an-update }
+  - { ask: undo update, to: something-broke-after-an-update }
+  - { ask: emergency shell, to: luft-couldnt-start }
+  - { ask: damaged system, to: luft-couldnt-start }
+  - { ask: safe mode, to: rescue }
+  - { ask: recovery mode, to: rescue }
+  - { ask: asks for recovery key, to: the-disk-asks-for-its-recovery-key }
+  - { ask: enter recovery key, to: the-disk-asks-for-its-recovery-key }
+  - { ask: black screen booting usb, to: the-screen-stays-dark-from-a-usb-stick, shared: true }
+  - { ask: basic graphics mode, to: the-screen-stays-dark-from-a-usb-stick }
+  - { ask: security violation, to: the-firmware-forgot-its-settings }
+  - { ask: boot entry missing, to: the-firmware-forgot-its-settings }
+  - { ask: graphics driver crashed, to: the-graphics-stopped-responding }
+  - { ask: screen froze, to: the-graphics-stopped-responding }
 ---
 
 ## The boot menu
@@ -60,6 +81,6 @@ Hold <kbd>Esc</kbd> while the stick starts and choose **Luft with basic graphics
 
 When the graphics card hangs entirely, Luft restarts cleanly and explains what happened at the next start, with suggestions for the computer. Settings lists these under System, About, **Recent problems**. See [NVIDIA graphics](/system/nvidia/#when-the-graphics-driver-stops-responding) for a common cause on NVIDIA cards.
 
-## An app misbehaves
+## When an app stops responding
 
 [Barometer](/apps/barometer/) (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd>) ends or force quits it.

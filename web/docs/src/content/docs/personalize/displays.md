@@ -3,6 +3,27 @@ title: Displays
 description: Scaling, resolution, refresh rate, Night Light and working with several displays.
 sidebar:
   order: 3
+asks:
+  - { ask: screen too small, to: scaling }
+  - { ask: everything too big, to: scaling }
+  - { ask: hidpi, to: scaling }
+  - { ask: fractional scaling, to: scaling }
+  - { ask: change resolution, to: resolution-and-refresh-rate }
+  - { ask: 144hz, to: resolution-and-refresh-rate }
+  - { ask: freesync, to: resolution-and-refresh-rate }
+  - { ask: g-sync, to: resolution-and-refresh-rate }
+  - { ask: portrait monitor, to: resolution-and-refresh-rate }
+  - { ask: external monitor brightness, to: brightness }
+  - { ask: ddc ci, to: brightness }
+  - { ask: blue light filter, to: night-light }
+  - { ask: night shift, to: night-light }
+  - { ask: f.lux, to: night-light }
+  - { ask: second monitor, to: using-more-than-one-display }
+  - { ask: dual monitors, to: using-more-than-one-display }
+  - { ask: external monitor, to: using-more-than-one-display }
+  - { ask: projector, to: using-more-than-one-display }
+  - { ask: mirror screen, to: using-more-than-one-display }
+  - { ask: extend display, to: using-more-than-one-display }
 ---
 
 Everything here is in Settings, under **Displays**. Changes wait in a bar at the bottom until you choose **Apply**.
@@ -34,7 +55,7 @@ Sliders change the brightness of the built-in screen and of external monitors th
 
 Night Light makes colours warmer in the evening, which is easier on the eyes. It follows sunset and sunrise, or times you choose, with a warmth slider.
 
-## Several displays
+## Using more than one display
 
 - **Arrange** displays by dragging them on the map, so the pointer moves between them where you expect.
 - **Mirror displays** shows the same picture on all of them.

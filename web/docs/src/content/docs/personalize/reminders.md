@@ -3,6 +3,19 @@ title: Reminders
 description: Birthdays, to-dos and goals in the taskbar, how to add them in plain words, and what happens when you don't answer.
 sidebar:
   order: 8
+asks:
+  - to-do list
+  - todo
+  - remind me
+  - set a reminder
+  - { ask: birthday reminder, to: birthdays-and-anniversaries }
+  - { ask: anniversary, to: birthdays-and-anniversaries }
+  - { ask: recurring reminder, to: adding-a-reminder }
+  - { ask: snooze reminder, to: when-it-comes-due }
+  - { ask: missed reminder, to: when-it-comes-due }
+  - { ask: deadline, to: goals }
+  - { ask: import ics, to: calendars }
+  - { ask: export reminders, to: calendars }
 ---
 
 Reminders is an extension from [Schelf](/apps/schelf/). It sits in the taskbar and shows what's next, or how many things are due. Click it, or press Super+Alt+R, to see everything: what's overdue, what's on today, what's coming up, and to-dos with no date.

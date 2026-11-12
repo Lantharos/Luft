@@ -3,6 +3,32 @@ title: Security
 description: Secure Boot, the signed startup, TPM unlock, encryption, the keyring, USB protection, and games with anti-cheat.
 sidebar:
   order: 4
+asks:
+  - secure boot
+  - { ask: secure boot off, to: a-signed-startup }
+  - { ask: encrypt disk, to: device-encryption }
+  - { ask: full disk encryption, to: device-encryption }
+  - { ask: lost recovery key, to: device-encryption }
+  - { ask: show recovery key, to: device-encryption }
+  - { ask: tpm pin, to: device-encryption }
+  - { ask: encrypt usb drive, to: encrypting-other-drives }
+  - { ask: auto login, to: signing-in-automatically }
+  - { ask: login without password, to: signing-in-automatically }
+  - { ask: usb not working when locked, to: usb-protection }
+  - { ask: badusb, to: usb-protection }
+  - { ask: firewall, to: home-and-public-networks }
+  - { ask: allow app through firewall, to: home-and-public-networks }
+  - { ask: open port, to: home-and-public-networks }
+  - { ask: public wifi, to: home-and-public-networks }
+  - { ask: home or public network, to: home-and-public-networks }
+  - { ask: ssh into my computer, to: remote-login }
+  - { ask: ssh server, to: remote-login }
+  - { ask: developer mode, to: developer-tools }
+  - { ask: ctrl alt f3, to: developer-tools }
+  - { ask: tty, to: developer-tools }
+  - { ask: anti cheat, to: games-with-anti-cheat }
+  - { ask: easy anti-cheat, to: games-with-anti-cheat }
+  - { ask: trustctl, to: from-the-command-line }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -32,7 +58,7 @@ With a TPM, the disk unlocks by itself when the computer started the way it shou
 
 The TPM keeps unlocking through Luft's updates and ordinary firmware updates. If Secure Boot is turned off or its keys change, the computer asks for the recovery key and says why. When the keys changed, Settings then says the computer starts differently now: if you made the change, confirm it with your password and the disk unlocks by itself again, and until then every start asks for the recovery key. With Secure Boot off, the TPM doesn't unlock the disk, because nothing then checks what starts the computer: Settings says so, and every start asks for your passphrase or recovery key until Secure Boot is on again. Settings can show the recovery key again, after your password, and replace it.
 
-### Other drives
+### Encrypting other drives
 
 [Disks](/apps/disks/) can encrypt other drives in place, with a recovery key and an optional passphrase. **Unlock automatically on this computer** opens them without asking when Luft itself is encrypted, like BitLocker's automatic unlock.
 

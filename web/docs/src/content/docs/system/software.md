@@ -3,6 +3,29 @@ title: Installing software
 description: Apps from schelf.store and Flathub, AppImages, command-line tools in a Toolbox container, and system packages for services and vendors' apps.
 sidebar:
   order: 3
+asks:
+  - { ask: flatpak install, to: flatpak }
+  - { ask: app can't see my files, to: full-access }
+  - { ask: give app full access, to: full-access }
+  - { ask: flatseal, to: full-access }
+  - { ask: install appimage, to: appimages }
+  - { ask: gear lever, to: appimages }
+  - { ask: install deb, to: apps-from-deb-files }
+  - { ask: ubuntu app, to: apps-from-deb-files }
+  - { ask: install command line tool, to: command-line-tools }
+  - { ask: toolbox, to: command-line-tools }
+  - { ask: gcc, to: command-line-tools }
+  - { ask: install rpm, to: command-line-tools, shared: true }
+  - { ask: install an app, shared: true }
+  - { ask: schelf command, to: in-the-terminal }
+  - { ask: uninstall an app, to: in-the-terminal }
+  - { ask: apt install, to: dnf-and-other-package-managers }
+  - { ask: dnf install, to: dnf-and-other-package-managers, shared: true }
+  - { ask: pacman, to: dnf-and-other-package-managers }
+  - { ask: rename an app, to: app-names-and-icons }
+  - { ask: change an app's icon, to: app-names-and-icons }
+  - { ask: read only file system, to: what-doesnt-work }
+  - { ask: why can't i change system files, to: what-doesnt-work }
 ---
 
 Luft's system is a sealed image, so apps and tools live next to it, in your account, where updates to the system can't break them and they can't break the system. The few things that have to be part of the system, such as Tailscale, Docker's daemon or a vendor's app like 1Password, are added as system packages. [Schelf](/apps/schelf/) handles all of them.

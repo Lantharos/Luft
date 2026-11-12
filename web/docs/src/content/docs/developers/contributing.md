@@ -34,7 +34,7 @@ Every patch in `kestrel/compositor` carries an `Upstream-Status` trailer saying 
 
 ## New apps and extensions
 
-A new app goes in `apps/store` and a new extension in `extensions`, each with a `schelf.toml` that has `listing = "store/"`. `store/listing.toml` holds its `summary`, `description`, `categories` (the first is its primary one), `homepage`, `support` and `brand_color`, with the `screenshots` in `store/` in the order the store shows them; extensions add search `keywords` too. Each nightly publishes it to [schelf.store](https://schelf.store) with the listing. Apps that update from the store say `provider = "schelf"` under `[updates]` in `Sabine.toml`, and its `[sandbox]` table says what they need.
+A new app goes in `apps/store` and a new extension in `extensions`, each with a `schelf.toml` that has `listing = "store/"`, `licence = "GPL-3.0-or-later"` and `repository = "Lantharos/Luft"`. `store/listing.toml` holds its `name`, `summary`, `description`, search `keywords`, `categories` (the first is its primary one), `homepage`, `support`, `brand_color` and `listed = true`, with a copy of its `icon` and the `screenshots` (at least 640 pixels on each side) in `store/`, in the order the store shows them. Each nightly publishes it to [schelf.store](https://schelf.store), and the store page becomes exactly what these files say. Apps that update from the store say `provider = "schelf"` under `[updates]` in `Sabine.toml`, and its `[sandbox]` table says what they need.
 
 The version in `Sabine.toml` or `extension.toml` is the lowest the next release can have. Each release takes that or the next patch after the newest release, so nobody bumps a version for a fix; raise it in the manifest to start a new minor or major version.
 
@@ -53,5 +53,21 @@ These pages are Luft's documentation, written in Markdown in `web/docs`. User pa
 ```sh
 cd web/docs
 bun run dev        # http://localhost:4321
+bun run check      # types, frontmatter and asks
 bun run build      # checks every link
 ```
+
+### Writing user pages
+
+Each section answers one thing, and says it in its first two sentences: the steps or the fact, then the detail. Headings name the task or the problem, such as *Adding a printer* or *When there's no sound*, not the feature.
+
+The pages under Getting started, the desktop, windows, Make it yours, Apps, Files and accounts, and System list under `asks` what people type when they look for what the page answers. Search finds a page by these words, and a phrase with `to` leads to that section:
+
+```yaml
+asks:
+  - task manager
+  - { ask: force quit, to: stopping-apps-and-processes }
+  - { ask: install an app, shared: true }
+```
+
+Write them the way someone would type them into a search box: lowercase, short, no question marks, with the words people bring from Windows and macOS, such as *file explorer*, *snipping tool* or *spotlight*. Leave out what the title already says, and only list what the page answers. Each phrase belongs to one page; when two pages answer it equally, mark it `shared: true` on both. `bun run check` fails when a user page has no `asks`, when `to` names a heading that isn't there, or when two pages claim the same phrase without sharing it. Renaming a heading changes its anchor, so update the `to` that points at it and every link to it.

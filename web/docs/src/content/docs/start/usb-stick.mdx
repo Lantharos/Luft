@@ -3,11 +3,30 @@ title: Install from a USB stick
 description: Download Luft, write it to a stick, and install it next to Windows, on a whole drive, or in free space.
 sidebar:
   order: 4
+asks:
+  - { ask: download luft iso, to: downloading-luft }
+  - { ask: verify iso, to: downloading-luft }
+  - { ask: sha256 checksum, to: downloading-luft }
+  - { ask: minisign, to: downloading-luft }
+  - { ask: create bootable usb, to: writing-the-stick }
+  - { ask: rufus, to: writing-the-stick }
+  - { ask: balena etcher, to: writing-the-stick }
+  - { ask: dd command, to: writing-the-stick }
+  - { ask: boot from usb, to: starting-from-the-stick }
+  - { ask: boot menu key, to: starting-from-the-stick }
+  - { ask: f12 boot, to: starting-from-the-stick }
+  - { ask: black screen booting usb, to: starting-from-the-stick, shared: true }
+  - { ask: installation steps, to: install-luft }
+  - { ask: erase whole drive, to: install-luft }
+  - { ask: try luft without installing, to: install-luft, shared: true }
+  - { ask: encrypt during install, to: install-luft }
+  - { ask: luft partition layout, to: what-goes-on-the-drive }
+  - { ask: efi partition size, to: what-goes-on-the-drive }
 ---
 
 import Shot from '../../../components/Shot.astro';
 
-## Download
+## Downloading Luft
 
 Get the ISO from [the download page](https://luft.computer/download#iso). There is one ISO for every computer: it carries both of Luft's images, the one with NVIDIA's driver included, and installs offline.
 
@@ -22,7 +41,7 @@ sha256sum -c luft-1.1-nightly.21.iso.sha256
 
 The signature's trusted comment is the ISO's file name, so a checksum can't pass for another version.
 
-## Write the stick
+## Writing the stick
 
 Use a stick of 4 GB or more. Everything on it is erased.
 
@@ -30,7 +49,7 @@ Use a stick of 4 GB or more. Everything on it is erased.
 - Fedora Media Writer, balenaEtcher, or Rufus in DD mode work too.
 - On Linux: `sudo dd if=luft-1.1-nightly.21.iso of=/dev/sdX bs=4M oflag=direct status=progress`, with the stick's device in place of `/dev/sdX`.
 
-## Start from it
+## Starting from the stick
 
 Start the computer from the stick with the firmware's boot menu, usually <kbd>F12</kbd>, <kbd>F11</kbd> or <kbd>Esc</kbd> while the maker's logo shows. Secure Boot can stay on.
 

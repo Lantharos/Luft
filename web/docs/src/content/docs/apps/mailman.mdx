@@ -3,6 +3,26 @@ title: Mailman
 description: Mail for every account in one place, kept on your computer so it never waits on the network.
 sidebar:
   order: 4
+asks:
+  - email
+  - mail app
+  - outlook
+  - thunderbird
+  - { ask: add email account, to: adding-an-account }
+  - { ask: gmail, to: adding-an-account }
+  - { ask: imap, to: adding-an-account }
+  - { ask: send from another address, to: adding-an-account }
+  - { ask: signature, to: adding-an-account }
+  - { ask: unsubscribe, to: a-calmer-inbox }
+  - { ask: snooze email, to: a-calmer-inbox }
+  - { ask: block new senders, to: a-calmer-inbox }
+  - { ask: undo send, to: writing }
+  - { ask: schedule email, to: writing }
+  - { ask: remote images, to: reading-safely }
+  - { ask: tracking pixels, to: reading-safely }
+  - { ask: search email, to: search }
+  - { ask: quit mailman, to: in-the-background }
+  - { ask: mail keeps running, to: in-the-background }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -11,7 +31,7 @@ Mailman keeps a local copy of every account, so opening, searching and sorting m
 
 <Shot name="mailman" alt="Mailman showing a message" />
 
-## Accounts
+## Adding an account
 
 Type your address and Mailman finds the settings for most providers by itself. IMAP and SMTP accounts work, and so do JMAP accounts. Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring/), where only Mailman can read them. Mailman runs in a sandbox that can go online and nothing more: it sees none of your folders, files you attach or save go through the file dialog, and attachments and links open in your other apps, outside the sandbox.
 

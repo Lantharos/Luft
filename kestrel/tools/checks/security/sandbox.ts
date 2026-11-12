@@ -9,13 +9,14 @@ import {descendants, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {failureOf} from '../lib/errors.js';
 import {withFullAccess} from '../lib/access/permissions.js';
-import {call, ownName, privateConnection, subscribe} from '../lib/dbus.js';
+import {call, ownName, subscribe} from '../lib/dbus.js';
 import {press} from '../lib/input/input.js';
-import {fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
+import {builtFixture, fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {SANDBOXED_APP, bubblewrapped, inAppScope, onSessionBus, sandboxedApp} from '../lib/access/sandbox.js';
-import {openApp} from '../apps/lib/apps.js';
+import {appBinary} from '../lib/apps/luftApp.js';
+import {openApp, withApp} from '../apps/lib/apps.js';
 
 const {require, eventually} = checks('sandbox');
 const MANAGER = ['/org/gnome/SessionManager', 'org.gnome.SessionManager'] as const;
@@ -34,6 +35,10 @@ const PASSKEYS_AGENT = 'com.lantharos.Passkeys';
 const SETTINGS_APP = 'com.lantharos.settings';
 const PRELOADED = 'libm.so.6';
 const NAMED_CLIENT = fixture('clients', 'wayland', 'blurClient.py');
+const PASSKEYS_IMPOSTOR = builtFixture('clients', 'apps', 'passkeysImpostor.js');
+const DECLARED_FILE = 'Downloads/release-notes.txt';
+const UNHANDED_FILE = 'Projects/garden-planner/README.md';
+const USER_FOLDERS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.dirs']);
 
 type SandboxedApp = Awaited<ReturnType<typeof sandboxedApp>>;
 type ShortcutsDialog = Meta.InhibitShortcutsDialog & GObject.SignalMethods<Meta.InhibitShortcutsDialog, Meta.InhibitShortcutsDialog.SignalSignatures>;
@@ -248,14 +253,9 @@ async function checkHostImpostors() {
 
   const preloaded = await outcome(inAppScope(PASSKEYS_AGENT, gdbus('com.lantharos.Kestrel.Passkeys', PASSKEYS, 'Open', '{}')), {env: {LD_PRELOAD: PRELOADED}});
   require(preloaded.stderr.includes('Only Luft Passkeys'), 'a scope named after Luft Passkeys and a preloaded library do not pass as Luft Passkeys');
-  const agent = privateConnection();
-  try {
-    require(await ownName(agent, PASSKEYS_AGENT), 'a program outside a sandbox can take Luft Passkeys\' name while it is free');
-    const asked = await failure(call('com.lantharos.Kestrel.Passkeys', ...PASSKEYS, 'Open', new GLib.Variant('(a{sv})', [{}]), null, {connection: agent}));
-    require(asked === 'org.freedesktop.DBus.Error.InvalidArgs', 'the owner of Luft Passkeys\' name may ask about passkeys');
-  } finally {
-    agent.close_sync(null);
-  }
+  const impostor = await outcome(['gjs', '-m', PASSKEYS_IMPOSTOR]);
+  require(impostor.stderr === ACCESS_DENIED, 'a program that takes Luft Passkeys\' name while it is free cannot ask about passkeys');
+  require(Main.modalCount === 0, 'no passkey prompt opens for a program that only holds Luft Passkeys\' name');
 }
 
 async function checkFullAccess() {
@@ -318,6 +318,36 @@ async function checkWindowImpostors() {
   }
 }
 
+function plantReader(folder: string, reached: string) {
+  GLib.mkdir_with_parents(folder, 0o700);
+  const reader = GLib.build_filenamev([folder, 'tesseract']);
+  const out = GLib.shell_quote(reached);
+  GLib.file_set_contents(reader, `#!/bin/sh\nfor file in ${DECLARED_FILE} ${UNHANDED_FILE}; do\n` +
+    `  cat "$HOME/$file" > /dev/null 2>&1 && echo "$file"\ndone > ${out}.part\nmv ${out}.part ${out}\n`);
+  GLib.chmod(reader, 0o755);
+}
+
+async function checkUnhandedFiles() {
+  if (!GLib.file_test(appBinary('flatbed'), GLib.FileTest.IS_EXECUTABLE)) {
+    console.log('Kestrel sandbox: files a Luft app was never handed skipped while Flatbed isn\'t built');
+    return;
+  }
+  const folder = GLib.build_filenamev([GLib.getenv('KESTREL_APP_RUNTIME_DIR')!, 'reach-probe']);
+  const reached = GLib.build_filenamev([folder, 'reached']);
+  plantReader(folder, reached);
+  GLib.file_set_contents(USER_FOLDERS, 'XDG_DOWNLOAD_DIR="$HOME/Downloads"\n');
+  try {
+    const lines = await withApp('flatbed', [], () => eventually(() => GLib.file_test(reached, GLib.FileTest.EXISTS) &&
+      new TextDecoder().decode(GLib.file_get_contents(reached)[1]).split('\n'), 'Flatbed starts the text reader it finds', 15000),
+    {PATH: `${folder}:${GLib.getenv('PATH')}`});
+    require(lines.includes(DECLARED_FILE), 'a program a Luft app starts reads the folders the app declared');
+    require(!lines.includes(UNHANDED_FILE), 'but not a file in the home folder the app was never handed');
+  } finally {
+    GLib.unlink(USER_FOLDERS);
+    await outcome(['rm', '-rf', folder]);
+  }
+}
+
 export async function run() {
   await checkSessionManager();
   await checkShellConnection();
@@ -329,4 +359,5 @@ export async function run() {
   await checkHostImpostors();
   await checkWindowImpostors();
   await checkScreencastImpostor();
+  await checkUnhandedFiles();
 }

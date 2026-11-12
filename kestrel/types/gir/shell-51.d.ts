@@ -134,6 +134,8 @@ export namespace Shell {
 
     function fonts_refresh(stage: Clutter.Actor, datadir: string): boolean;
 
+    function sandbox_filter(): number;
+
     function systemd_get_oui_vendor(address: string): string | null;
 
     function systemd_start_app_scope(name: string | null, pid: number): void;
@@ -302,6 +304,8 @@ export namespace Shell {
         launch(timestamp: number, workspace: number, gpu_pref: AppLaunchGpu): boolean;
 
         launch_action(action_name: string, timestamp: number, workspace: number): void;
+
+        launch_with_environment(timestamp: number, workspace: number, gpu_pref: AppLaunchGpu, environment: string[] | null): boolean;
 
         open_new_window(workspace: number): void;
 

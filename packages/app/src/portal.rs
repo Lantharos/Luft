@@ -1,17 +1,15 @@
-mod documents;
-
 use std::collections::HashMap;
 use std::os::unix::ffi::{OsStrExt, OsStringExt};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use futures_util::StreamExt;
+use sabine::documents::{self, Handed};
 use serde::Serialize;
 use zbus::zvariant::DynamicType;
 use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use crate::dbus::{self, failed};
-use documents::Picked;
 
 pub(crate) const PORTAL: &str = "org.freedesktop.portal.Desktop";
 pub(crate) const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
@@ -63,20 +61,12 @@ pub struct FileChooser<'a> {
 
 impl FileChooser<'_> {
     pub async fn open(&self) -> Result<Vec<String>, String> {
-        let picked = if self.directory {
-            Picked::Folder
-        } else {
-            Picked::File
-        };
-        documents::within_reach(self.request("OpenFile").await?, picked).await
+        within_reach(self.request("OpenFile").await?, Handed::Existing).await
     }
 
     pub async fn save(&self) -> Result<Option<String>, String> {
         let chosen = self.request("SaveFile").await?;
-        Ok(documents::within_reach(chosen, Picked::NewFile)
-            .await?
-            .into_iter()
-            .next())
+        Ok(within_reach(chosen, Handed::New).await?.into_iter().next())
     }
 
     fn options(&self, token: &str) -> HashMap<&'static str, Variant<'_>> {
@@ -126,6 +116,17 @@ impl FileChooser<'_> {
             .map_err(failed)?
             .unwrap_or_default())
     }
+}
+
+/// The picked `uris`, with every one an app Sabine holds to its declaration
+/// can't use itself replaced by where the document portal shows it.
+async fn within_reach(uris: Vec<String>, handed: Handed) -> Result<Vec<String>, String> {
+    let paths = uris.iter().filter_map(|uri| uri_path(uri)).collect();
+    Ok(documents::within_reach(paths, handed)
+        .await?
+        .iter()
+        .map(|path| path_uri(path))
+        .collect())
 }
 
 pub(crate) async fn request<B>(

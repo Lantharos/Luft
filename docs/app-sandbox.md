@@ -27,7 +27,7 @@ camera = false
 | Key | Default | Means |
 | --- | --- | --- |
 | `network` | `true` | It can go online |
-| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app's own files are in `~/.var/app/APP-ID` |
+| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog, drop on it or open with it always reach it. An app's own files are in `~/.var/app/APP-ID` |
 | `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing; recording and cameras are `microphone` and `camera`, with `all` too |
 | `microphone` | `false` | It records sound: from a microphone, or what the computer plays |
 | `camera` | `false` | It uses cameras. An app that only asks through the camera portal can leave this out and is asked about the first time |
@@ -85,9 +85,19 @@ An app's own folder, `~/.var/app/APP-ID`, shows in the sandbox at that same path
 
 The system call filter is Flatpak's: no kernel log, accounting, kernel keyrings, memory placement, `ptrace`, `perf_event_open`, mounting or namespaces of its own (`clone3` and the newer mount calls answer as if the kernel lacked them, so programs fall back to the calls the filter can inspect), no `personality` other than Linux's, no typing into the terminal, and only local, internet and netlink sockets. Its launcher keeps only the name, description, categories, file types and actions from the AppImage's own desktop entry, so an AppImage can't mark itself as something else there. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
 
-## Files you pick
+## Files you hand an app
 
-A file or folder you pick in a file dialog reaches the app whatever it declared. For an app in a sandbox, the desktop portal hands the app the file through the document portal, at a path below `$XDG_RUNTIME_DIR/doc`, which the sandbox shows the app's own share of. An app that holds itself to its declaration, such as one of Luft's own apps started from the image, gets the real path from the portal, since the portal takes it for an unsandboxed app. `luft_app::portal::FileChooser` then asks the document portal itself for whatever the app can't open, a file outside its folders, a new file to save or a folder to save into, and gives the app the path below `$XDG_RUNTIME_DIR/doc` instead. Paths the app can already use stay as they are, so an app keeps real paths to what's in its own folders.
+A file or folder you pick in a file dialog, drop on an app's window, open with the app from Rover or send to it reaches the app whatever it declared, and nothing else outside its folders does. For an app in a sandbox, the desktop portal and the sandbox's launcher hand it the file through the document portal, at a path below `$XDG_RUNTIME_DIR/doc`, which the sandbox shows the app's own share of.
+
+An app that holds itself to its declaration, such as one of Luft's own apps started from the image, gets real paths, since the portals and launchers take it for an unsandboxed app. It brings each one it can't open itself within reach through the document portal and uses the path below `$XDG_RUNTIME_DIR/doc` instead:
+
+| Handed over | Who asks the document portal |
+| --- | --- |
+| Picked in a file dialog, including a new file to save or a folder to save into | `luft_app::portal::FileChooser` |
+| Dropped on a window | Sabine, before the page sees the drop |
+| Opened with the app, or sent to it from the Send sheet | Sabine for what `app.takeOpenUrls` returns, and `luft_app::Activation::paths_within_reach` for an app that reads its command line |
+
+Paths the app can already use stay as they are, so an app keeps real paths to what's in its own folders. A folder always goes through the portal, since nothing shows whether the app may change it.
 
 ## One Chromium for Luft, one each for everyone else
 

@@ -9,7 +9,7 @@
       "name": "convertible",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -35,7 +35,7 @@
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.6",
         "@codemirror/view": "^6.43.13",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -54,7 +54,7 @@
       "name": "flatbed",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -74,7 +74,7 @@
       "name": "heft",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
@@ -95,7 +95,7 @@
       "name": "magpie",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
@@ -115,7 +115,7 @@
       "name": "mailman",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -134,7 +134,7 @@
       "name": "meet",
       "version": "0.1.2",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -154,7 +154,7 @@
       "name": "soundboard",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -174,7 +174,7 @@
       "name": "barometer",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -193,7 +193,7 @@
       "name": "disks",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -212,7 +212,7 @@
       "name": "keys",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -231,7 +231,7 @@
       "name": "rover",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -250,7 +250,7 @@
       "name": "schelf",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -269,7 +269,7 @@
       "name": "settings",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -291,7 +291,7 @@
       "name": "setup",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -312,7 +312,7 @@
       "name": "signin",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -331,7 +331,7 @@
       "name": "tern",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
         "@xterm/addon-clipboard": "^0.2.0",
         "@xterm/addon-fit": "^0.11.0",
         "@xterm/addon-search": "^0.16.0",
@@ -421,10 +421,20 @@
       "name": "@luft/network",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
       },
       "devDependencies": {
         "typescript": "~6.0.3",
+      },
+    },
+    "packages/web/settings-catalogue": {
+      "name": "@luft/settings-catalogue",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@fluent/syntax": "0.19.0",
+        "@luft/settings-pages": "workspace:*",
+        "@types/bun": "^1.4.3",
+        "typescript": "7.0.2",
       },
     },
     "packages/web/settings-pages": {
@@ -439,7 +449,7 @@
         "@codemirror/lang-markdown": "^6.5.2",
         "@codemirror/language": "^6.12.4",
         "@codemirror/language-data": "^6.5.2",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.85",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.87",
         "@lezer/highlight": "^1.2.5",
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
@@ -857,7 +867,7 @@
 
     "@lantharos/pult": ["@lantharos/pult@0.14.0", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "croner": "11.0.0", "jiti": "2.7.0" }, "bin": { "pult": "cli.mjs" } }, "sha512-SASidAb5cuKhg6DDUhpzRjuN/HB0oamTuFUrXFZG08wovDwc0xIo+kTq2BtHj8ZJfxai9hMzw09Fk+E3bgqpXw=="],
 
-    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#c58d69c", {}, "Lantharos-Sabine-c58d69c", "sha512-7elw6hed1BU4jsUYDptJ/M/Y0OpPb5MQ0NiW9g23ScGuuWY2C90E5INbmU/iKw4mYFboxrroYxjdDGhUKs1r/A=="],
+    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#82453e2", {}, "Lantharos-Sabine-82453e2", "sha512-7lbxmdMwVnr5AkeOnXEZBOlXFbcFfyAt3WdVppJ88P8Q6sPqKlH+/YydZJkQFyisZe09lcaoJ/GA1lpvIk7fxg=="],
 
     "@lezer/common": ["@lezer/common@1.5.3", "", {}, "sha512-H0iErY4e43LpXbYDyBci5W4v/RwTgGV3YzYOlJPiGZ8RY8w51kVE+xLn1tg3Z6UmSfyETvtsUK3r7YsgDQEI7Q=="],
 
@@ -916,6 +926,8 @@
     "@luft/pult": ["@luft/pult@workspace:web/pult"],
 
     "@luft/recovery-key": ["@luft/recovery-key@workspace:packages/system/recovery-key"],
+
+    "@luft/settings-catalogue": ["@luft/settings-catalogue@workspace:packages/web/settings-catalogue"],
 
     "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/web/settings-pages"],
 
@@ -1928,6 +1940,8 @@
     "@luft/kestrel-tools/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
 
     "@luft/kestrel-ui/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
+
+    "@luft/settings-catalogue/typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
 
     "@sveltejs/vite-plugin-svelte/obug": ["obug@2.2.1", "", {}, "sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q=="],
 

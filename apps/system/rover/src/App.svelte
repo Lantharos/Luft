@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { events as sabineEvents } from '@lantharos/sabine';
-	import { appearance, GlassShell } from '@luft/ui';
+	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+	import { appearance, GlassShell, keepWindowState } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import DetailsPane from '#lib/components/details/DetailsPane.svelte';
 	import DialogHost from '#lib/components/dialogs/DialogHost.svelte';
@@ -29,6 +29,7 @@
 	import { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { setEntryContext } from '#lib/file-manager/view/entry-props.js';
 	import { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import type { KeptTabs } from '#lib/types/index.js';
 	import { VcsState } from '#lib/vcs/state.svelte.js';
 
 	const request = chooserRequest();
@@ -86,10 +87,13 @@
 	});
 
 	async function start() {
-		const state = await commands.appState();
+		const [state, kept] = await Promise.all([commands.appState(), request === null ? appWindow.restoredState<KeptTabs>() : null]);
 		if (request !== null) chooser = new ChooserState(request, await commands.chooserConfig({ request }), manager);
-		await manager.start(state, chooser?.config.currentFolder ?? undefined);
-		if (!chooser) await openLaunch(manager, state.launch);
+		await manager.start(state, chooser?.config.currentFolder ?? undefined, kept);
+		if (!chooser) {
+			keepWindowState(manager.keptTabs);
+			await openLaunch(manager, state.launch);
+		}
 		void manager.actions.watchClipboard();
 		const operations = await commands.listOperations();
 		manager.receiveOperations(operations);

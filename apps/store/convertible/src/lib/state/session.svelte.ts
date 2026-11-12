@@ -13,6 +13,13 @@ export interface Pending {
 
 const COMBINES: readonly string[] = ['pdf'];
 
+export interface Opened {
+	paths: string[];
+	selected: string | null;
+	single: boolean;
+	choices: Partial<Record<Family, string>>;
+}
+
 class Session {
 	files = $state.raw<FileEntry[]>([]);
 	roots = $state.raw<string[]>([]);
@@ -58,6 +65,15 @@ class Session {
 		this.pdfTarget = state.pdfTarget;
 		if (state.launchPaths.length) void this.open(state.launchPaths, true);
 	}
+
+	async reopen({ paths, selected, single, choices }: Opened) {
+		const found = await this.open(paths, single);
+		if (!found?.length) return;
+		this.choices = choices;
+		if (this.files.some((file) => file.path === selected)) this.selected = selected;
+	}
+
+	kept = (): Opened => ({ paths: this.roots, selected: this.selected, single: this.single, choices: this.choices });
 
 	async open(paths: string[], fromFileManager = false) {
 		if (!paths.length) return;

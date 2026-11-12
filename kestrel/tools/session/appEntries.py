@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write launchers, desktop entries, D-Bus services and icons that start the Luft apps built in this tree."""
+"""Write launchers, desktop entries, D-Bus services and icons that start the Luft apps built in this tree, in the session's own runtime folder for apps."""
 
 import shutil
 import sys
@@ -12,7 +12,12 @@ def values(items: list[str]) -> str:
 
 
 def launcher(path: Path, manifest: Path, binary: Path) -> Path:
-    path.write_text(f'#!/bin/sh\nSABINE_MANIFEST_PATH="{manifest}" exec "{binary}" "$@"\n')
+    path.write_text(
+        '#!/bin/sh\n'
+        'case "$WAYLAND_DISPLAY" in /*) ;; *) WAYLAND_DISPLAY="$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ;; esac\n'
+        'export WAYLAND_DISPLAY XDG_RUNTIME_DIR="${KESTREL_APP_RUNTIME_DIR:-$XDG_RUNTIME_DIR}"\n'
+        f'SABINE_MANIFEST_PATH="{manifest}" exec "{binary}" "$@"\n'
+    )
     path.chmod(0o755)
     return path
 

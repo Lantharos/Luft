@@ -29,6 +29,11 @@ export interface Arrival {
 	memory: ViewMemory | null;
 }
 
+export interface KeptTabs {
+	tabs: TabPlace[];
+	active: number;
+}
+
 export interface Tab extends TabPlace {
 	id: string;
 	history: TabHistoryEntry[];

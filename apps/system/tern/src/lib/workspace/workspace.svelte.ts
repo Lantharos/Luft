@@ -28,6 +28,11 @@ export interface CloseReview {
 	close: () => void;
 }
 
+export interface Folders {
+	tabs: (string | null)[];
+	active: number;
+}
+
 export class Workspace {
 	tabs = $state<Tab[]>([]);
 	active = $state<Tab | null>(null);
@@ -74,6 +79,16 @@ export class Workspace {
 		this.tabs.splice(index, 0, tab);
 		this.select(tab);
 	}
+
+	reopen({ tabs, active }: Folders) {
+		for (const directory of tabs) this.openTab({ directory, command: null });
+		this.select(this.tabs[active] ?? this.tabs[0]);
+	}
+
+	folders = (): Folders => ({
+		tabs: this.tabs.map((tab) => tab.focused.cwd),
+		active: this.active ? this.tabs.indexOf(this.active) : 0
+	});
 
 	select(tab: Tab) {
 		this.active = tab;

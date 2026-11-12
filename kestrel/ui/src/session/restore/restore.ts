@@ -14,6 +14,7 @@ import type { SessionRecorder } from './recorder.js';
 const FIRST_LAUNCH_MS = 300;
 const LAUNCH_GAP_MS = 600;
 const WAIT_AFTER_LAST_LAUNCH_MS = 30000;
+const RESTORE_WINDOWS = 'SABINE_RESTORE_WINDOWS';
 const INTERACTIONS = [Clutter.EventType.KEY_PRESS, Clutter.EventType.BUTTON_PRESS, Clutter.EventType.TOUCH_BEGIN];
 
 interface Restored {
@@ -78,12 +79,17 @@ export class SessionRestore {
       return;
     }
     try {
-      app.launch(this.timestamp, -1, Shell.AppLaunchGpu.APP_PREF);
+      app.launch_with_environment(this.timestamp, -1, Shell.AppLaunchGpu.APP_PREF, this.restoring(app.get_id()));
     } catch {
       this.awaited = this.awaited.filter(saved => saved.app !== app.get_id());
       this.finishWhenDone();
     }
     if (this.awaited.length) this.later(LAUNCH_GAP_MS, () => this.launchNext());
+  }
+
+  private restoring(app: string): string[] | null {
+    const tags = this.awaited.filter(saved => saved.app === app && saved.tag).map(saved => saved.tag);
+    return tags.length ? [`${RESTORE_WINDOWS}=${tags.join(' ')}`] : null;
   }
 
   private watch(window: Meta.Window): void {
@@ -111,7 +117,9 @@ export class SessionRestore {
   private claim(window: Meta.Window, config: Meta.WindowConfig | null): void {
     this.stopWaiting(window);
     const app = appIdOf(window);
-    const index = this.awaited.findIndex(saved => saved.app === app);
+    const tag = window.get_tag() ?? '';
+    const tagged = this.awaited.findIndex(saved => saved.app === app && saved.tag === tag);
+    const index = tagged >= 0 ? tagged : this.awaited.findIndex(saved => saved.app === app);
     if (index < 0) return;
     const saved = fitted(this.awaited.splice(index, 1)[0]);
     place(window, saved, config);

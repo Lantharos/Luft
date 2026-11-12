@@ -247,12 +247,23 @@ export const commands = {
 	extensionsEnable: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("extensions_enable", params, options),
+	extensionsInstallCopy: (params: {
+		id: string,
+		path: string,
+	}, options?: CallOptions) => invoke<null>("extensions_install_copy", params, options),
 	extensionsPage: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<PageSection[]>("extensions_page", params, options),
+	extensionsReload: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("extensions_reload", params, options),
 	extensionsRemove: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("extensions_remove", params, options),
+	extensionsRunFromFolder: (params: {
+		id: string,
+		path: string,
+	}, options?: CallOptions) => invoke<null>("extensions_run_from_folder", params, options),
 	extensionsSet: (params: {
 		id: string,
 		key: string,
@@ -263,6 +274,9 @@ export const commands = {
 		key: string,
 		accelerators?: string[] | null,
 	}, options?: CallOptions) => invoke<null>("extensions_set_shortcut", params, options),
+	extensionsStopUnreviewed: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("extensions_stop_unreviewed", params, options),
 	fingerprintDelete: (params: {
 		finger: string,
 	}, options?: CallOptions) => invoke<null>("fingerprint_delete", params, options),
@@ -1083,7 +1097,8 @@ export type Extension = {
 	name: string,
 	description: string,
 	version: string,
-	/**  Where it comes from: `store`, `development` or `own`. */
+	path: string,
+	/**  Where it comes from: `store`, `copy`, `development`, `folder` or `own`. */
 	origin: string,
 	/**  Copies of it elsewhere that are left alone. */
 	ignored: string[],

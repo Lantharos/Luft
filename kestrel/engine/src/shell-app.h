@@ -62,6 +62,13 @@ gboolean shell_app_launch (ShellApp           *app,
                            ShellAppLaunchGpu   gpu_pref,
                            GError            **error);
 
+gboolean shell_app_launch_with_environment (ShellApp            *app,
+                                            guint                timestamp,
+                                            int                  workspace,
+                                            ShellAppLaunchGpu    gpu_pref,
+                                            const char * const  *environment,
+                                            GError             **error);
+
 void shell_app_launch_action (ShellApp        *app,
                               const char      *action_name,
                               guint            timestamp,

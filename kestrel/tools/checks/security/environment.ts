@@ -7,7 +7,7 @@ import {waitUntil} from '../lib/wait.js';
 
 const {require} = checks('launch environment');
 const SLIPPED_IN = {LD_PRELOAD: 'libm.so.6', GTK_MODULES: 'payload', GJS_PATH: '/nowhere', PYTHONPATH: '/nowhere'};
-const NEEDED = ['HOME', 'XDG_RUNTIME_DIR', 'WAYLAND_DISPLAY', 'DBUS_SESSION_BUS_ADDRESS'];
+const NEEDED = ['HOME', 'DBUS_SESSION_BUS_ADDRESS'];
 const LUFT_APP = 'com.lantharos.settings.desktop';
 const OTHER_APP = '[Desktop Entry]\nType=Application\nName=Stand-in\nExec=sleep 30\n';
 
@@ -17,14 +17,15 @@ function environmentOf(pid: number): Map<string, string> {
     .map(entry => [entry.slice(0, entry.indexOf('=')), entry.slice(entry.indexOf('=') + 1)]));
 }
 
-const LAUNCHER = '/usr/libexec/gio-launch-desktop';
+const realPath = (path: string) => new TextDecoder().decode(GLib.spawn_command_line_sync(`realpath ${path}`)[1]!).trim();
+const LAUNCHERS = ['/usr/libexec/gio-launch-desktop', realPath('/bin/sh')];
 
 const program = (pid: number | 'self') => GLib.file_read_link(`/proc/${pid}/exe`);
 
 function startedWith(pid: number): Map<string, string> | null {
   try {
     const environment = environmentOf(pid);
-    return ![program('self'), LAUNCHER].includes(program(pid)) && environment.size > 0 ? environment : null;
+    return ![program('self'), ...LAUNCHERS].includes(program(pid)) && environment.size > 0 ? environment : null;
   } catch {
     return null;
   }
@@ -49,6 +50,8 @@ export async function run() {
       require(!luft.has(name), `${name} in the session doesn't reach Settings`);
     for (const name of NEEDED)
       require(luft.get(name) === GLib.getenv(name), `Settings gets ${name}`);
+    require(luft.get('XDG_RUNTIME_DIR') === GLib.getenv('KESTREL_APP_RUNTIME_DIR'), 'Settings runs in the session\'s runtime folder for apps');
+    require(luft.get('WAYLAND_DISPLAY') === GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')!]), 'Settings reaches the session\'s display');
     const other = await startedEnvironment(GioUnix.DesktopAppInfo.new_from_keyfile(keyFile(OTHER_APP))!);
     for (const [name, value] of Object.entries(SLIPPED_IN))
       require(other.get(name) === value, `an app that isn't Luft's still gets ${name} from the session`);

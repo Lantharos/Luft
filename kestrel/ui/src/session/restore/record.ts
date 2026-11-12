@@ -8,6 +8,7 @@ export type Ending = 'running' | 'update' | 'ordinary';
 
 export interface RecordedWindow extends Placement {
   app: string;
+  tag: string;
   monitor: number;
   stack: number;
   focused: boolean;
@@ -21,8 +22,8 @@ export interface SessionRecord {
 const PRIVATE = Gio.FileCreateFlags.PRIVATE | Gio.FileCreateFlags.REPLACE_DESTINATION;
 const file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'session.json']));
 
-function recorded({ appId, monitor, focused, frame, workspace, maximized, fullscreen, minimized, above, edges }: SavedWindow, stack: number): RecordedWindow {
-  return { app: appId, monitor, stack, focused, frame, workspace, maximized, fullscreen, minimized, above, edges };
+function recorded({ appId, tag, monitor, focused, frame, workspace, maximized, fullscreen, minimized, above, edges }: SavedWindow, stack: number): RecordedWindow {
+  return { app: appId, tag, monitor, stack, focused, frame, workspace, maximized, fullscreen, minimized, above, edges };
 }
 
 export function recordedWindows(stacked: SavedWindow[]): RecordedWindow[] {

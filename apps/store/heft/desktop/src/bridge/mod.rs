@@ -3,7 +3,7 @@ mod hand;
 mod params;
 
 use luft_app::portal::{self, FileChooser, Filter, uri_path};
-use luft_app::{Activation, Commands, Empty, settings};
+use luft_app::{Commands, Empty, settings};
 use sabine::SabineWindow;
 use serde_json::Value;
 
@@ -93,9 +93,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         crate::camera::register(files::register(window)),
     )))
     .command_async("app_state", |Empty {}| state::app_state())
-    .command("resolve_arguments", |activation: Activation| {
-        Ok(state::launch_paths(&activation))
-    })
+    .command_async("resolve_arguments", state::launch_paths)
     .command("library", |Empty {}| scan::library())
     .command("remove", |Path { path }| {
         disk::remove(&library::resolve(&path)?)

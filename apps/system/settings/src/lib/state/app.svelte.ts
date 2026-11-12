@@ -1,7 +1,7 @@
 import { untrack, type Component, type Snippet } from 'svelte';
-import { events as sabineEvents } from '@lantharos/sabine';
+import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
-import { appearance } from '@luft/ui';
+import { appearance, keepWindowState } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import { DEFAULT_PANEL, PANELS, resolveLink, type Panel, type PanelId } from '#lib/panels/registry.js';
 import { hardware } from './hardware.svelte';
@@ -80,16 +80,17 @@ class AppStore {
 	}
 
 	async start() {
-		const [state] = await Promise.all([commands.appState(), hardware.start(), updates.start()]);
+		const [state, restored] = await Promise.all([commands.appState(), appWindow.restoredState<Place>(), hardware.start(), updates.start()]);
 		appearance.start(state);
 		await i18n.ready;
 		sabineEvents.singleInstance(({ arguments: args }) => {
 			const page = args.find((argument) => argument.startsWith('kestrel-settings:'));
 			if (page) this.open(page);
 		});
-		const opened = state.page ? this.open(state.page) : undefined;
+		const opened = state.page ? this.open(state.page) : restored && this.reopen(restored);
 		if (!opened) this.remember();
-		await (opened ?? this.show(this.panel));
+		keepWindowState((): Place => ({ panel: this.panel, section: this.#section }));
+		await (opened || this.show(this.panel));
 		requestIdleCallback(() => PANELS.forEach((panel) => void panel.load()));
 	}
 
@@ -100,6 +101,13 @@ class AppStore {
 		this.query = '';
 		this.section = link.section;
 		return this.show(link.panel);
+	}
+
+	private reopen(place: Place) {
+		if (!PANELS.some((panel) => panel.id === place.panel)) return;
+		this.panel = place.panel;
+		this.section = place.section;
+		return this.show(place.panel);
 	}
 
 	private remember() {

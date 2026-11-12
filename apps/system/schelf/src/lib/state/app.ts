@@ -1,5 +1,5 @@
-import { events as sabineEvents } from '@lantharos/sabine';
-import { appearance } from '@luft/ui';
+import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { appearance, keepWindowState } from '@luft/ui';
 import { commands, type CatalogApp } from '#lib/bindings.js';
 import * as store from '#lib/catalog/store.js';
 import { catalog } from './catalog.svelte';
@@ -94,10 +94,12 @@ function openPage(argumentsList: (string | null)[]) {
 }
 
 export async function start() {
-	const state = await commands.appState();
+	const [state, kept] = await Promise.all([commands.appState(), appWindow.restoredState<Route[]>()]);
 	appearance.start(state);
+	if (kept && !state.page && !state.files.length) navigation.reopen(kept);
 	openPage([state.page]);
 	openFiles(state.files);
+	keepWindowState(navigation.kept);
 	sabineEvents.singleInstance(async ({ arguments: list, workingDirectory }) => {
 		openPage(list);
 		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));

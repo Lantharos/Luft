@@ -1,5 +1,5 @@
-import { events as sabineEvents } from '@lantharos/sabine';
-import { appearance } from '@luft/ui';
+import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { appearance, keepWindowState } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Launch, LayoutEntry, Summary, Targets } from '#lib/bindings.js';
 import { toast } from './toast.svelte';
@@ -19,10 +19,11 @@ class AppStore {
 	focused = $state(false);
 
 	async start() {
-		const [state] = await Promise.all([commands.appState(), this.refresh()]);
+		const [state, restored] = await Promise.all([commands.appState(), appWindow.restoredState<Selection>(), this.refresh()]);
 		appearance.start(state);
 		if (state.opened.length) await this.refresh();
-		this.selection ??= this.first();
+		this.selection ??= (restored && this.exists(restored) ? restored : null) ?? this.first();
+		keepWindowState(() => this.selection);
 		this.launched(state);
 		this.focused = this.selection?.kind === 'view';
 		sabineEvents.singleInstance(async (activation) => void this.arrive(await commands.activationTargets(activation)));
@@ -46,6 +47,12 @@ class AppStore {
 	select(selection: Selection | null) {
 		this.selection = selection;
 		this.focused &&= selection?.kind === 'view';
+	}
+
+	exists({ kind, id }: Selection) {
+		if (kind === 'layout') return this.layouts.some((layout) => layout.id === id);
+		if (kind === 'method') return this.methods.some((method) => method.id === id);
+		return true;
 	}
 
 	first(): Selection | null {

@@ -1,5 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
-import { appearance } from '@luft/ui';
+import { appearance, keepWindowState } from '@luft/ui';
 import type { Devices } from '#lib/bindings.js';
 import { connect } from '#lib/bridge/index.js';
 import type { Backend } from '#lib/bridge/types.js';
@@ -22,8 +22,11 @@ class AppStore {
 	visible = $derived(this.#shown && this.backend !== null);
 
 	async start() {
+		const restored = appWindow.restoredState<string>();
 		const backend = await connect();
 		const state = await backend.appState();
+		this.page = (await restored) ?? this.page;
+		keepWindowState(() => this.page);
 		appearance.start(state);
 		settings.load(backend, state.settings);
 		processes.start(backend);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { events as sabineEvents } from '@lantharos/sabine';
+	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { commands, events } from '#lib/bindings.js';
@@ -10,7 +10,7 @@
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
 	import { followSidebarRegions, layout } from '#lib/app/layout.svelte.js';
-	import { navigate, openThread } from '#lib/app/navigation.js';
+	import { keepReading, navigate, openThread, reopen, type Reading } from '#lib/app/navigation.js';
 	import Composer from '#lib/compose/Composer.svelte';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import ThreadList from '#lib/list/ThreadList.svelte';
@@ -90,11 +90,12 @@
 	});
 
 	async function start() {
-		const state = await commands.appState();
+		const [state, reading] = await Promise.all([commands.appState(), appWindow.restoredState<Reading>()]);
 		appearance.start(state);
 		mail.start(state);
 		opened.handle(await api.takeLaunches(), true);
-		await list.open('inbox');
+		await reopen(reading ?? undefined);
+		keepReading();
 		await takeOpening();
 	}
 

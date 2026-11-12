@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
+	import { appWindow, events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
 	import { appearance, fileDrop, GlassShell, plural, Toast } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import { openPaths } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
+	import { keepShown, reopen, type Shown } from '#lib/app/reopen.js';
 	import Gallery from '#lib/browse/Gallery.svelte';
 	import Sidebar from '#lib/browse/Sidebar.svelte';
 	import DocumentActions from '#lib/document/DocumentActions.svelte';
@@ -73,10 +74,11 @@
 	});
 
 	async function start() {
-		const state = await commands.appState();
+		const [state, shown] = await Promise.all([commands.appState(), appWindow.restoredState<Shown>()]);
 		appearance.start(state);
 		chrome.start();
-		await show(state.launchPaths);
+		await (shown && !state.launchPaths.length ? reopen(shown) : show(state.launchPaths));
+		keepShown();
 	}
 
 	async function show(paths: string[]) {

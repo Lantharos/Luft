@@ -1,6 +1,7 @@
 use std::env;
 use std::path::{Component, Path, PathBuf};
 
+use sabine::documents::{self, Handed};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -41,6 +42,13 @@ impl Activation {
         self.arguments()
             .iter()
             .filter_map(|argument| self.path(argument))
+    }
+
+    /// The files and folders the app was opened with, as [`Self::paths`],
+    /// with the ones an app Sabine holds to its declaration can't open
+    /// itself shown to it through the document portal.
+    pub async fn paths_within_reach(&self) -> Result<Vec<PathBuf>, String> {
+        documents::within_reach(self.paths().collect(), Handed::Existing).await
     }
 
     pub fn path(&self, argument: &str) -> Option<PathBuf> {

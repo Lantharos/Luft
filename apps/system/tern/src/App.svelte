@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { activity, events } from '@lantharos/sabine';
-	import { GlassShell, appearance } from '@luft/ui';
+	import { activity, appWindow, events } from '@lantharos/sabine';
+	import { GlassShell, appearance, keepWindowState } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
 	import PasteDialog from '#lib/components/dialogs/PasteDialog.svelte';
@@ -12,7 +12,7 @@
 	import { settings } from '#lib/state/settings.svelte.js';
 	import { loadFonts } from '#lib/terminal/fonts.js';
 	import { handleShortcut } from '#lib/workspace/shortcuts.js';
-	import { Workspace } from '#lib/workspace/workspace.svelte.js';
+	import { Workspace, type Folders } from '#lib/workspace/workspace.svelte.js';
 
 	const workspace = new Workspace();
 	let dialogOpen = $derived(Boolean(workspace.pasteReview || workspace.closeReview || workspace.preferencesOpen));
@@ -26,10 +26,13 @@
 	});
 
 	async function start(stops: (() => void)[]) {
-		const [state] = await Promise.all([commands.appState(), loadFonts()]);
+		const [state, folders] = await Promise.all([commands.appState(), appWindow.restoredState<Folders>(), loadFonts()]);
 		settings.start(state);
 		stops.push(appearance.start(state));
-		workspace.openTab(state.launch);
+		const launched = state.launch.directory !== null || state.launch.command !== null;
+		if (folders?.tabs.length && !launched) workspace.reopen(folders);
+		else workspace.openTab(state.launch);
+		keepWindowState(workspace.folders);
 	}
 
 	$effect(() => {

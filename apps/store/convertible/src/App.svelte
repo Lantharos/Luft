@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
-	import { appearance, ConfirmDialog, droppedPaths, GlassShell } from '@luft/ui';
+	import { appearance, ConfirmDialog, droppedPaths, GlassShell, keepWindowState } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import ConflictDialog from '#lib/shell/ConflictDialog.svelte';
 	import Header from '#lib/shell/Header.svelte';
@@ -12,7 +12,7 @@
 	import Unsupported from '#lib/shell/Unsupported.svelte';
 	import Workspace from '#lib/shell/Workspace.svelte';
 	import { queue } from '#lib/state/queue.svelte.js';
-	import { session } from '#lib/state/session.svelte.js';
+	import { session, type Opened } from '#lib/state/session.svelte.js';
 
 	let dragging = $state(false);
 
@@ -27,9 +27,11 @@
 	});
 
 	async function start() {
-		const state = await commands.appState();
+		const [state, opened] = await Promise.all([commands.appState(), appWindow.restoredState<Opened>()]);
 		appearance.start(state);
 		session.start(state);
+		if (opened && !state.launchPaths.length) await session.reopen(opened);
+		keepWindowState(session.kept);
 	}
 
 	async function activate(activation: { arguments: string[]; workingDirectory?: string | null }) {

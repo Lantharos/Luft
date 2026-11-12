@@ -13,17 +13,19 @@ pub struct AppState {
     launch_paths: Vec<String>,
 }
 
-pub fn launch_paths(activation: &Activation) -> Vec<String> {
-    activation
-        .paths()
+pub async fn launch_paths(activation: Activation) -> Result<Vec<String>, String> {
+    Ok(activation
+        .paths_within_reach()
+        .await?
+        .into_iter()
         .map(|path| path.to_string_lossy().into_owned())
-        .collect()
+        .collect())
 }
 
 pub async fn app_state() -> Result<AppState, String> {
     Ok(AppState {
         appearance: Appearance::current().await,
         library: library::root()?.to_string_lossy().into_owned(),
-        launch_paths: launch_paths(&Activation::current_process()),
+        launch_paths: launch_paths(Activation::current_process()).await?,
     })
 }

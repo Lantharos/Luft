@@ -68,7 +68,7 @@ build_helpers() {
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio \
-    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture)
+    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture -p luft-cli)
 }
 
 dbus_service() {
@@ -153,15 +153,15 @@ use_luft_defaults() {
 }
 
 place_extensions() {
-  local development="$session/extensions/development" store="$session/extensions/store" record="$session/extensions/installed" id
-  mkdir -p "$development" "$store"
+  local development="$session/extensions/development" store="$session/extensions/store" unreviewed="$session/extensions/unreviewed" record="$session/extensions/installed" id
+  mkdir -p "$development" "$store" "$unreviewed"
   touch "$record"
   for id in com.lantharos.Seasons ${KESTREL_EXTENSIONS:-}; do
     grep -qxF "$id" "$record" && continue
     cp -r "$built_extensions/$id" "$development/"
     echo "$id" >> "$record"
   done
-  export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store"
+  export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store" KESTREL_UNREVIEWED_EXTENSIONS="$unreviewed"
 }
 
 prepare_session() {

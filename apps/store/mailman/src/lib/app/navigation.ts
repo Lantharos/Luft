@@ -1,3 +1,4 @@
+import { keepWindowState } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import { setRead } from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';
@@ -15,4 +16,18 @@ export async function openThread(thread: number | null) {
 	list.select(thread);
 	await reader.open(thread);
 	if (thread !== null && reader.thread === thread && reader.messages.some((message) => !message.seen)) await setRead([thread], true);
+}
+
+export interface Reading {
+	view: string;
+	thread: number | null;
+}
+
+export async function reopen({ view, thread }: Reading = { view: 'inbox', thread: null }) {
+	await list.open(view);
+	if (thread !== null) await openThread(thread);
+}
+
+export function keepReading() {
+	keepWindowState((): Reading => ({ view: list.view, thread: list.selected }));
 }

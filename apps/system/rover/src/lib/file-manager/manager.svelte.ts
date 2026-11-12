@@ -7,7 +7,7 @@ import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 import { FileActionsState } from '#lib/features/fileActions.svelte.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
-import type { Arrival, ClipboardState, InlineDraft, SidebarView, TabHistoryEntry, ViewMemory } from '#lib/types/index.js';
+import type { Arrival, ClipboardState, InlineDraft, KeptTabs, SidebarView, TabHistoryEntry, ViewMemory } from '#lib/types/index.js';
 import { pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { CloudState } from './places/cloud.svelte';
@@ -182,7 +182,7 @@ export class FileManager {
 		return this.entries.filter((entry) => this.selection.has(entry.path));
 	}
 
-	start = async (state: AppState, startPath?: string) => {
+	start = async (state: AppState, startPath?: string, kept: KeptTabs | null = null) => {
 		void this.#findConverter();
 		settings.value = state.settings;
 		this.userDirs = state.userDirs;
@@ -193,10 +193,16 @@ export class FileManager {
 		void this.network.load();
 		void this.cloud.load();
 		void this.fileActions.load();
-		const path = startPath ?? this.homePath;
-		this.tabs.open(this.#homeEntry(path));
-		await this.loadDirectory(path);
+		const tabs = !startPath && kept?.tabs.length ? kept.tabs : [this.#homeEntry(startPath ?? this.homePath)];
+		for (const tab of tabs) this.tabs.open(tab);
+		this.tabs.activeId = (this.tabs.list[kept?.active ?? 0] ?? this.tabs.list[0]).id;
+		await this.#restore(this.tabs.current!);
 	};
+
+	keptTabs = (): KeptTabs => ({
+		tabs: this.tabs.list.map(({ path, title, view }) => ({ path, title, view })),
+		active: this.tabs.list.findIndex((tab) => tab.id === this.tabs.activeId)
+	});
 
 	loadDirectory = async (path: string) => {
 		const token = this.loading.start();

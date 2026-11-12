@@ -36,6 +36,12 @@ class Navigation {
 		this.stack = [...this.stack, route];
 	}
 
+	reopen(stack: Route[]) {
+		if (stack.length) this.stack = stack;
+	}
+
+	kept = (): Route[] => this.stack.map((route) => (route.page === 'app' ? { page: 'app', target: route.target, name: route.name } : route));
+
 	back() {
 		if (this.stack.length > 1) this.stack = this.stack.slice(0, -1);
 	}

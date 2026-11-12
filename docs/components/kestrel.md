@@ -197,3 +197,18 @@ Every Luft update needs a restart, so Kestrel brings back what was open. It keep
 | With an ordinary sign-out, restart or power off | The apps open again only with **Reopen apps when I sign in** on, in Settings → Apps (`reopen-apps` in `com.lantharos.kestrel`, off by default) |
 
 Nothing opens before the session is unlocked. Kestrel then starts each app once through its launcher, a little apart so the desktop can be used at once, and puts its windows back in the order the app opens them: on their workspace, where they were, as they were. Windows of Wayland apps are placed before they first show; those of X11 apps right after. A window whose display is gone opens centered on the main one, and one that no longer fits its display is moved and shrunk until it does. Apps that were removed are left out, apps that open by themselves at sign-in aren't started again, and an app that opens fewer windows, more, or none is left as it is. Half a minute after the last app starts at the latest, the windows are stacked as they were and the one that had focus gets it back, unless you have started using another window by then.
+
+Luft's own apps come back with what their windows showed too. Every window of a Sabine app carries a key of its own as its Wayland toplevel tag, which the record keeps. Kestrel starts such an app with the keys of its windows in `SABINE_RESTORE_WINDOWS` and puts each window back where the window with the same tag was; windows without a tag go back in the order they open. While a window is open, the app keeps what it shows in `~/.local/state/<app id>/windows`, readable only by the account, written a moment after it changes. It holds paths, page names and ids, never passwords, tokens or anything unlocked, and closing the window or quitting the app removes it, so a window you closed never comes back. Something the app was asked to open, such as a file it was started with, goes before what it showed.
+
+| App | Comes back with |
+| --- | --- |
+| Rover | Its tabs and their folders, Recent or Trash, and the tab you were in |
+| Settings | The page and the part of it that was open |
+| Schelf | The pages you went through, back to the first; a question about full access isn't asked again |
+| Tern | A tab for each one you had, in the folder its shell was in; no command runs again |
+| Magpie | The picture, PDF or font you were looking at, or the folder you were browsing; a song or video comes back as its folder, so nothing starts playing |
+| Mailman | The mailbox and the conversation you were reading; nothing you were writing comes back |
+| Convertible | The files you added, the one you had selected and the formats you chose; edits and conversions that were running don't |
+| Keys | The layout, input method or view you had open |
+| Barometer | The page you were on |
+| Draft, Heft, Flatbed | Already open what you were working on every time they start, unsaved Draft changes included |

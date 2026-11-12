@@ -1222,6 +1222,26 @@ shell_app_launch (ShellApp           *app,
                   ShellAppLaunchGpu   gpu_pref,
                   GError            **error)
 {
+  return shell_app_launch_with_environment (app, timestamp, workspace, gpu_pref, NULL, error);
+}
+
+/**
+ * shell_app_launch_with_environment:
+ * @timestamp: Event timestamp, or 0 for current event timestamp
+ * @workspace: Start on this workspace, or -1 for default
+ * @gpu_pref: the GPU to prefer launching on
+ * @environment: (array zero-terminated=1) (nullable): `NAME=value` entries
+ *   the app starts with on top of the environment it gets anyway
+ * @error: A #GError
+ */
+gboolean
+shell_app_launch_with_environment (ShellApp            *app,
+                                   guint                timestamp,
+                                   int                  workspace,
+                                   ShellAppLaunchGpu    gpu_pref,
+                                   const char * const  *environment,
+                                   GError             **error)
+{
   ShellGlobal *global;
   GAppLaunchContext *context;
   gboolean ret;
@@ -1251,6 +1271,17 @@ shell_app_launch (ShellApp           *app,
 
   if (discrete_gpu)
     apply_discrete_gpu_env (context, global);
+
+  for (const char * const *entry = environment; entry && *entry; entry++)
+    {
+      const char *value = strchr (*entry, '=');
+      g_autofree char *name = NULL;
+
+      if (!value)
+        continue;
+      name = g_strndup (*entry, value - *entry);
+      g_app_launch_context_setenv (context, name, value + 1);
+    }
 
   /* Set LEAVE_DESCRIPTORS_OPEN in order to use an optimized gspawn
    * codepath. The shell's open file descriptors should be marked CLOEXEC

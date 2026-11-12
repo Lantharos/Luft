@@ -11,6 +11,7 @@ export interface SavedWindow extends Placement {
   app: string;
   appId: string;
   title: string;
+  tag: string;
   monitor: number;
   sequence: number;
   focused: boolean;
@@ -35,6 +36,7 @@ function save(window: Meta.Window, lastFocused: Meta.Window | undefined): SavedW
     app: appOf(window),
     appId: appIdOf(window),
     title: window.get_title() ?? '',
+    tag: window.get_tag() ?? '',
     frame: boxOf(window.get_frame_rect()),
     monitor: window.get_monitor(),
     sequence: window.get_stable_sequence(),

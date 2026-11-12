@@ -1,5 +1,6 @@
 mod listing;
 mod page;
+mod unreviewed;
 
 use std::sync::Once;
 
@@ -161,8 +162,12 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("extensions_enable", |target| request("Enable", target))
         .command_async("extensions_disable", |target| request("Disable", target))
         .command_async("extensions_remove", |target| request("Remove", target))
+        .command_async("extensions_reload", |target| request("Reload", target))
         .command_async("extensions_set", set)
         .command_async("extensions_set_shortcut", set_shortcut)
         .command_async("extensions_page", page)
         .command_async("extensions_act", act)
+        .command_async("extensions_install_copy", unreviewed::install_copy)
+        .command_async("extensions_run_from_folder", unreviewed::run_from_folder)
+        .command_async("extensions_stop_unreviewed", unreviewed::stop)
 }

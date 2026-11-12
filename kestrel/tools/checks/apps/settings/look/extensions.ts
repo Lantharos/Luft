@@ -5,9 +5,11 @@ import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import {pause} from '../../../lib/wait.js';
 import type {Point} from '../../../lib/input/input.js';
-import {installBuilt, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
+import {installBuilt, listed, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
+import {installOwn} from '../../../extensions/lib/sandbox.js';
 import {placeApps, TAILOR} from '../../../extensions/lib/tailor.js';
 import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
+import {checkUnreviewed} from './unreviewed.js';
 
 const {eventually, require} = checks('Luft app');
 const HEAVY: Point = [955, 318];
@@ -21,6 +23,7 @@ const STRAYS = 'com.lantharos.Strays';
 const PLAYTHINGS = 'com.lantharos.Playthings';
 const KEYSTROKES = 'com.lantharos.Keystrokes';
 const PRIVACY_SCROLL_STEPS = 4;
+const SANDBOXED = 'com.example.Sandboxed';
 
 async function checkOwnPages(app: LuftApp) {
   await installBuilt(VISUALIZER);
@@ -106,6 +109,17 @@ async function checkOwnPages(app: LuftApp) {
   }
 }
 
+async function checkSandboxedPage(app: LuftApp) {
+  installOwn('sandboxed', SANDBOXED);
+  await request('Reload', SANDBOXED);
+  try {
+    await eventually(async () => (await listed(SANDBOXED))?.state === 'running', 'an extension from the account’s own folder runs in its sandbox', 20000);
+    (await show(app, `extensions/${SANDBOXED.toLowerCase()}`)).save('settings-extension-sandboxed');
+  } finally {
+    await request('Remove', SANDBOXED);
+  }
+}
+
 export async function checkExtensions(app: LuftApp) {
   try {
     (await show(app, 'extensions')).save('settings-extensions');
@@ -124,4 +138,6 @@ export async function checkExtensions(app: LuftApp) {
     kestrel.reset('extension-settings');
   }
   await checkOwnPages(app);
+  await checkSandboxedPage(app);
+  await checkUnreviewed(app);
 }

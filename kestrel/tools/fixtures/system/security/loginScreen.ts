@@ -49,4 +49,5 @@ export function publishLoginScreen(publish: Publish, calls: string[]) {
       greeter.emit_property_changed('DeveloperTools', new GLib.Variant('b', on));
     },
   }, '/com/lantharos/Greeter1');
+  return () => developerTools;
 }

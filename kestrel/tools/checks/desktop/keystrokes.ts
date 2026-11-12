@@ -17,7 +17,7 @@ import {threads} from '../lib/threads.js';
 import {builtFixture, repository, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {promptEntry, showPrompt, unlock, wake} from '../lockScreen/lib/shield.js';
-import {installBuilt, listed, request, setSetting, developmentFolder} from '../extensions/lib/extensions.js';
+import {builtFolder, installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Keystrokes');
 const KEYSTROKES = 'com.lantharos.Keystrokes';
@@ -316,7 +316,7 @@ async function answerFolder(path: string) {
 function packFolder(name: string, change: (manifest: {name?: string; sounds: Record<string, unknown>}) => void) {
   const folder = scratch(`keystrokes-${name}-${GLib.uuid_string_random()}`);
   GLib.mkdir_with_parents(folder, 0o755);
-  const template = GLib.build_filenamev([developmentFolder(KEYSTROKES), 'template']);
+  const template = GLib.build_filenamev([builtFolder(KEYSTROKES), 'template']);
   const children = Gio.File.new_for_path(template).enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
   for (let info: Gio.FileInfo | null; (info = children.next_file(null));)
     Gio.File.new_for_path(`${template}/${info.get_name()}`).copy(Gio.File.new_for_path(`${folder}/${info.get_name()}`), Gio.FileCopyFlags.NONE, null, null);

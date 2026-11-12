@@ -7,7 +7,7 @@ import { t } from '../../../shared/i18n/index.js';
 import { sandboxed } from '../../../shared/dbus/sandbox.js';
 import { PidFd, stealFd } from '../../../shared/dbus/processes.js';
 import { identifiedProcess, type Caller } from './access/callers.js';
-import { DeveloperTools } from './access/developerTools.js';
+import { DeveloperTools } from '../../../shared/dbus/developerTools.js';
 import type { Level } from './access/prompt.js';
 import { captureScreen, captureWindow } from './control/capture.js';
 import { requireOpenScreen, screenGuarded, type Screen } from './control/guard.js';

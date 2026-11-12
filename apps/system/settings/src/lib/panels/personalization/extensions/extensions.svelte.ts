@@ -1,9 +1,14 @@
 import { commands, events } from '#lib/bindings.js';
 import type { Extension, ExtensionSetting, ExtensionSettingValue, PageItem, PageSection } from '#lib/bindings.js';
 
+export type Unreviewed = 'copy' | 'folder';
+
+const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
+
 class Extensions {
 	list = $state<Extension[] | null>(null);
 	unavailable = $state(false);
+	developerTools = $state(false);
 	pages = $state<Record<string, PageSection[]>>({});
 	#watching = false;
 	#shownPages = new Set<string>();
@@ -13,17 +18,23 @@ class Extensions {
 			this.#watching = true;
 			events.extensionsChanged((list) => {
 				this.list = list;
+				void this.readDeveloperTools();
 				for (const id of this.#shownPages) void this.loadPage(id);
 			});
 			events.extensionsPageChanged((id) => {
 				if (this.#shownPages.has(id)) void this.loadPage(id);
 			});
 		}
+		void this.readDeveloperTools();
 		try {
 			this.list = await commands.extensions();
 		} catch {
 			this.unavailable = true;
 		}
+	}
+
+	async readDeveloperTools() {
+		this.developerTools = (await commands.developerTools().catch(() => null)) ?? false;
 	}
 
 	find(id: string) {
@@ -42,6 +53,20 @@ class Extensions {
 
 	remove(extension: Extension) {
 		return commands.extensionsRemove({ id: extension.id });
+	}
+
+	runUnreviewed({ id, path }: Extension, how: Unreviewed) {
+		return how === 'copy'
+			? commands.extensionsInstallCopy({ id, path }, WAIT_FOR_PERMISSION)
+			: commands.extensionsRunFromFolder({ id, path }, WAIT_FOR_PERMISSION);
+	}
+
+	stopUnreviewed(extension: Extension) {
+		return commands.extensionsStopUnreviewed({ id: extension.id });
+	}
+
+	reload(extension: Extension) {
+		return commands.extensionsReload({ id: extension.id });
 	}
 
 	showPage(id: string) {

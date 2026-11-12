@@ -1,5 +1,6 @@
 mod error;
 mod interface;
+mod unreviewed;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -31,3 +32,6 @@ async fn serve() -> zbus::Result<()> {
     connection.release_name(NAME).await?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests;

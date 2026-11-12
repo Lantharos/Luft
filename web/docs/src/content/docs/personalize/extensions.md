@@ -9,7 +9,16 @@ Extensions add to the desktop: something on the wallpaper, a tile in quick setti
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**.
 
-The list under **What it can do** is what the extension says it uses, and what [Schelf](/apps/schelf/) showed you before installing it. Extensions that run inside the desktop become part of it, so unlike apps they don't run in a sandbox. That's why Luft only runs an extension there when Schelf's store approved that release for it, from a publisher it verified, and keeps it where your own programs can't change it. An extension you put in your own folder yourself is meant to run on its own instead, limited to exactly what's listed; until Luft can do that, it's listed but doesn't run.
+The list under **What it can do** is what the extension says it uses, and what [Schelf](/apps/schelf/) showed you before installing it. Extensions that run inside the desktop become part of it, so unlike apps they don't run in a sandbox. That's why Luft only runs an extension there when Schelf's store approved that release for it, from a publisher it verified, and keeps it where your own programs can't change it. An extension you put in your own folder yourself runs in a sandbox instead, like an app, limited to exactly what's listed: it can't read your files, reach the internet or see your other programs. A few things, such as drawing over the wallpaper or typing into apps, only extensions from Schelf can do; one from your own folder that asks for them is listed but doesn't run.
+
+## Extensions nobody reviewed
+
+With [Developer tools](/system/security/#developer-tools) on, you can run an extension from your own folder inside the desktop even though Schelf's store never reviewed it: one you trust that isn't in Schelf, or one you're making. Open it in **Settings → Extensions** and choose one of these under **Inside Luft**:
+
+- **Install a copy** keeps a copy of the extension as it is now, where no program can change it, and runs that copy. Changes to your folder don't reach it. To update it, choose **Stop running inside Luft** and install a copy again.
+- **Run from its folder** runs it straight from your folder, so your changes run when you choose **Run your latest changes**. Any program that can change that folder can then run inside the desktop too, so only do this for an extension you're making.
+
+Either way, Luft first tells you what it means and then asks for an administrator's password, every time. Inside the desktop an extension can see everything you type, read what's on your screen and do anything you can do. Settings marks these extensions **Not reviewed** wherever it lists them, with how they run. **Stop running inside Luft** puts one back in its sandbox right away, without a password. Turning Developer tools off does that for all of them at once, and they only run inside the desktop again when you turn it back on.
 
 If an extension stops working, Luft turns it off by itself and tells you. The same happens to the extensions that were running when the desktop restarted twice in a row after a problem. Turn it back on in Settings once you've updated it, or leave it off.
 

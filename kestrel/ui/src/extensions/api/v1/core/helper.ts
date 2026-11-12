@@ -6,11 +6,14 @@ import type { ApiContext } from './context.js';
 import type { Disposable, Helper, HelperProcess, Manifest } from '../types.js';
 
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
+Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
+
+type HelperContext = Pick<ApiContext, 'path' | 'manifest' | 'scope' | 'helpers'>;
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-function listeners<Arg>(context: ApiContext, owned: Disposable[]) {
+function listeners<Arg>(context: HelperContext, owned: Disposable[]) {
   const callbacks = new Set<(arg: Arg) => void>();
   return {
     emit: (arg: Arg) => callbacks.forEach(callback => callback(arg)),
@@ -31,7 +34,7 @@ function spawn(folder: string, { helper }: Manifest, args: string[], flags: Gio.
   return launcher.spawnv([confinedPath([folder], helper!.path), ...args]);
 }
 
-function start(context: ApiContext, args: string[]): HelperProcess {
+function start(context: HelperContext, args: string[]): HelperProcess {
   const process = spawn(context.path, context.manifest, args, Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE);
   const running = new Gio.Cancellable();
   const owned: Disposable[] = [];
@@ -82,6 +85,6 @@ export function runTurnedOffHelper(path: string, manifest: Manifest): void {
   if (manifest.helper?.turnedOff) spawn(path, manifest, manifest.helper.turnedOff, Gio.SubprocessFlags.NONE);
 }
 
-export function helperApi(context: ApiContext): Helper {
+export function helperApi(context: HelperContext): Helper {
   return { start: (args = []) => start(context, args) };
 }

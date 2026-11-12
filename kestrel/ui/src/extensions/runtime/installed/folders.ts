@@ -2,14 +2,17 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { Manifest } from '../../api/v1/types.js';
-import { MANIFEST, parseManifest } from '../manifest.js';
-import { onlySystemCanChange, sources, type Origin, type Source } from './origins.js';
+import { MANIFEST } from '../layout.js';
+import { parseManifest } from '../manifest.js';
+import { onlySystemCanChange, sources, unreviewed, type Origin, type Source } from './origins.js';
+import { approvedFolders } from './unreviewed.js';
 
 export interface Installed {
   id: string;
   path: string;
   origin: Origin;
   systemOwned: boolean;
+  inShell: boolean;
   manifest: Manifest | null;
   problem: string | null;
   ignored: string[];
@@ -17,11 +20,23 @@ export interface Installed {
 
 const decoder = new TextDecoder();
 
-function read(id: string, source: Source): Installed {
+interface Looking {
+  folders: Map<string, string>;
+  unreviewedInShell: boolean;
+}
+
+function originOf(id: string, path: string, source: Source, systemOwned: boolean, folders: Map<string, string>): Origin {
+  if (source.heldBySystem && !systemOwned) return 'own';
+  if (source.origin === 'own' && folders.get(id) === path) return 'folder';
+  return source.origin;
+}
+
+function read(id: string, source: Source, { folders, unreviewedInShell }: Looking): Installed {
   const path = GLib.build_filenamev([source.folder, id]);
   const systemOwned = source.heldBySystem && onlySystemCanChange(path);
-  const origin = source.heldBySystem && !systemOwned ? 'own' : source.origin;
-  const found: Installed = { id, path, origin, systemOwned, manifest: null, problem: null, ignored: [] };
+  const origin = originOf(id, path, source, systemOwned, folders);
+  const inShell = unreviewed(origin) ? unreviewedInShell : origin !== 'own';
+  const found: Installed = { id, path, origin, systemOwned, inShell, manifest: null, problem: null, ignored: [] };
   try {
     const [, contents] = GLib.file_get_contents(GLib.build_filenamev([path, MANIFEST]));
     const manifest = parseManifest(decoder.decode(contents));
@@ -45,25 +60,27 @@ function children(folder: string): string[] {
   }
 }
 
-function collect(found: Map<string, Installed>, id: string, source: Source): void {
+function collect(found: Map<string, Installed>, id: string, source: Source, looking: Looking): void {
   const earlier = found.get(id);
   if (earlier) earlier.ignored.push(GLib.build_filenamev([source.folder, id]));
-  else found.set(id, read(id, source));
+  else found.set(id, read(id, source, looking));
 }
 
-export function findOne(id: string): Installed | null {
+export function findOne(id: string, unreviewedInShell: boolean): Installed | null {
   const found = new Map<string, Installed>();
+  const looking = { folders: approvedFolders(), unreviewedInShell };
   for (const source of sources()) {
     const folder = Gio.File.new_for_path(GLib.build_filenamev([source.folder, id]));
-    if (folder.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) collect(found, id, source);
+    if (folder.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) collect(found, id, source, looking);
   }
   return found.get(id) ?? null;
 }
 
-export function discover(): Installed[] {
+export function discover(unreviewedInShell: boolean): Installed[] {
   const found = new Map<string, Installed>();
+  const looking = { folders: approvedFolders(), unreviewedInShell };
   for (const source of sources())
-    for (const id of children(source.folder)) collect(found, id, source);
+    for (const id of children(source.folder)) collect(found, id, source, looking);
   return [...found.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 
@@ -73,12 +90,4 @@ export function dataFolder(id: string): string {
 
 export function storageFile(id: string): string {
   return GLib.build_filenamev([GLib.get_user_state_dir(), 'luft', 'extension-storage', `${id}.json`]);
-}
-
-export function removeTree(file: Gio.File): void {
-  if (file.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
-    const children = file.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
-    for (let info = children.next_file(null); info; info = children.next_file(null)) removeTree(file.get_child(info.get_name()));
-  }
-  file.delete(null);
 }

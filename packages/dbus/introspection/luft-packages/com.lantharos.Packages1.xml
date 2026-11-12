@@ -45,6 +45,17 @@
     <method name="RemoveExtension">
       <arg name="id" type="s" direction="in"/>
     </method>
+    <method name="InstallUnreviewedExtension">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="folder" type="h" direction="in"/>
+    </method>
+    <method name="AllowExtensionFolder">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="path" type="s" direction="in"/>
+    </method>
+    <method name="RemoveUnreviewedExtension">
+      <arg name="id" type="s" direction="in"/>
+    </method>
     <method name="RemoveRepository">
       <arg name="file" type="s" direction="in"/>
     </method>

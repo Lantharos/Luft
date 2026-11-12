@@ -14,6 +14,7 @@ export class Extensions {
   private readonly service: ExtensionsService;
   private readonly ports: ExtensionPorts;
   private readonly fileActions = new FileActionsService();
+  private markReady: () => void = () => {};
 
   constructor(parts: HostParts) {
     this.host = {
@@ -24,9 +25,13 @@ export class Extensions {
         return () => this.monitorListeners.delete(changed);
       },
     };
-    this.manager = new ExtensionManager(this.host);
+    this.manager = new ExtensionManager(this.host, new Promise(resolve => (this.markReady = resolve)));
     this.service = new ExtensionsService(this.manager);
     this.ports = new ExtensionPorts(this.manager);
+  }
+
+  desktopReady(): void {
+    this.markReady();
   }
 
   syncDesktop(wallpaperShown: boolean, active: boolean, locked: boolean): void {

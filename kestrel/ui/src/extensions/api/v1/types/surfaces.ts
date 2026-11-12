@@ -86,7 +86,8 @@ export interface TaskbarElementOptions {
   menu?: ActionItem[];
   /**
    * Lets people drop files on the element, from Rover or any other app, and gets their full paths. The element lights
-   * up while files are dragged over it.
+   * up while files are dragged over it. An extension from the person's own folder, which runs in a sandbox, doesn't
+   * get it.
    */
   onDrop?(paths: string[]): void;
 }

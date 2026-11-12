@@ -2,9 +2,9 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 
-import { confinedFile, realPath } from '../core/confined.js';
-import { removeTree } from '../../../runtime/installed/folders.js';
+import { realPath } from '../core/confined.js';
 import type { ApiContext } from '../core/context.js';
+import { replaceFile } from '../core/files.js';
 import type { ChooseOptions, PickOptions, SaveOptions } from '../types.js';
 
 const PORTAL = 'org.freedesktop.portal.Desktop';
@@ -22,7 +22,6 @@ const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
   calendars: ['text/calendar'],
 };
 
-Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
 Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
 
@@ -105,18 +104,6 @@ async function copyFolderIn(uri: string, folder: string): Promise<string> {
   return target.get_path()!;
 }
 
-export function deleteFile(context: ApiContext, path: string): void {
-  const file = confinedFile([context.dataPath], path);
-  if (file.get_path() === realPath(context.dataPath)) throw new Error("The data folder itself can't be deleted");
-  removeTree(file);
-}
-
-export function readText(context: ApiContext, path: string): string | null {
-  const file = confinedFile([context.path, context.dataPath], path);
-  if (!file.query_exists(null)) return null;
-  return new TextDecoder().decode(file.load_contents(null)[1]);
-}
-
 export async function pickFiles(context: ApiContext, options: PickOptions): Promise<string[]> {
   if (!context.gestures.recent) throw new Error('Files can only be picked right after people use the extension');
   const uris = await chosen(options);
@@ -137,16 +124,6 @@ export async function chooseFiles(context: ApiContext, options: ChooseOptions): 
   const paths = uris.map(uri => Gio.File.new_for_uri(uri).get_path()).filter((path): path is string => path !== null).map(realPath);
   for (const path of paths) context.chosen.add(path);
   return paths;
-}
-
-function replaceFile(file: Gio.File, text: string): Promise<unknown> {
-  const contents = new GLib.Bytes(new TextEncoder().encode(text));
-  return file.replace_contents_bytes_async(contents, null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-}
-
-export function writeText(context: ApiContext, path: string, text: string): Promise<unknown> {
-  GLib.mkdir_with_parents(context.dataPath, 0o700);
-  return replaceFile(confinedFile([context.dataPath], path), text);
 }
 
 export async function saveFile(context: ApiContext, options: SaveOptions): Promise<boolean> {

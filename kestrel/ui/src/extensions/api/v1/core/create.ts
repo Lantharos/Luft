@@ -27,34 +27,36 @@ import { shortcutsApi } from '../desktop/shortcuts.js';
 import { desktopApi, powerApi } from '../desktop/system.js';
 import { taskbarApi } from '../ui/taskbar/taskbar.js';
 import type { Basics, Capabilities, Capability } from '../types.js';
-import { chooseFiles, deleteFile, pickFiles, readText, saveFile, writeText } from '../desktop/picking.js';
+import { capabilityProperty, grantedCapabilities } from './granted.js';
+import { chooseFiles, pickFiles, saveFile } from '../desktop/picking.js';
+import { deleteFile, readText, writeText } from './files.js';
 import { typingApi } from '../desktop/typing.js';
 import { wallpaperApi } from '../visuals/wallpaper/wallpaper.js';
 import { weatherApi } from '../services/weather.js';
 
-const PARTS: { [Name in Capability]: { property: string; create(context: ApiContext): Capabilities[Name] } } = {
-  'wallpaper': { property: 'wallpaper', create: wallpaperApi },
-  'quick-settings': { property: 'quickSettings', create: quickSettingsApi },
-  'taskbar': { property: 'taskbar', create: taskbarApi },
-  'search': { property: 'search', create: searchApi },
-  'notifications': { property: 'notifications', create: notificationsApi },
-  'weather': { property: 'weather', create: weatherApi },
-  'location': { property: 'location', create: locationApi },
-  'media': { property: 'media', create: mediaApi },
-  'popups': { property: 'popups', create: popupsApi },
-  'typing': { property: 'typing', create: typingApi },
-  'sounds': { property: 'sounds', create: soundsApi },
-  'audio-levels': { property: 'audioLevels', create: audioLevelsApi },
-  'calls': { property: 'calls', create: callsApi },
-  'locked-sounds': { property: 'lockedSounds', create: lockedSoundsApi },
-  'input-sounds': { property: 'inputSounds', create: inputSoundsApi },
-  'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
-  'screen-effects': { property: 'screenEffects', create: screenEffectsApi },
-  'clipboard': { property: 'clipboard', create: clipboardApi },
-  'file-actions': { property: 'fileActions', create: fileActionsApi },
-  'helper': { property: 'helper', create: helperApi },
-  'shortcuts': { property: 'shortcuts', create: shortcutsApi },
-  'network': { property: 'network', create: networkApi },
+const PARTS: { [Name in Capability]: (context: ApiContext) => Capabilities[Name] } = {
+  'wallpaper': wallpaperApi,
+  'quick-settings': quickSettingsApi,
+  'taskbar': taskbarApi,
+  'search': searchApi,
+  'notifications': notificationsApi,
+  'weather': weatherApi,
+  'location': locationApi,
+  'media': mediaApi,
+  'popups': popupsApi,
+  'typing': typingApi,
+  'sounds': soundsApi,
+  'audio-levels': audioLevelsApi,
+  'calls': callsApi,
+  'locked-sounds': lockedSoundsApi,
+  'input-sounds': inputSoundsApi,
+  'do-not-disturb': doNotDisturbApi,
+  'screen-effects': screenEffectsApi,
+  'clipboard': clipboardApi,
+  'file-actions': fileActionsApi,
+  'helper': helperApi,
+  'shortcuts': shortcutsApi,
+  'network': networkApi,
 };
 
 export function createApi(context: ApiContext): Readonly<Basics & Record<string, unknown>> {
@@ -90,11 +92,7 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
     saveFile: options => saveFile(context, options),
     onDisable: cleanup => scope.onDisable(cleanup),
   };
-  const granted: Capability[] = [
-    ...manifest.permissions ?? [], ...manifest.helper ? ['helper' as const] : [], ...manifest.shortcuts?.length ? ['shortcuts' as const] : [],
-    ...manifest.network?.hosts.length ? ['network' as const] : [],
-  ];
   const extension = Object.defineProperties({}, Object.getOwnPropertyDescriptors(basics)) as Basics & Record<string, unknown>;
-  for (const capability of granted) extension[PARTS[capability].property] = PARTS[capability].create(context);
+  for (const capability of grantedCapabilities(manifest)) extension[capabilityProperty(capability)] = PARTS[capability](context);
   return Object.freeze(extension);
 }

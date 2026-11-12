@@ -1,17 +1,25 @@
 import { t } from '@luft/i18n';
 import type { Extension } from '#lib/bindings.js';
+import { extensions } from './extensions.svelte';
 
 const PROBLEMS: Record<string, string> = {
 	failed: 'settings-extensions-failed',
 	crashed: 'settings-extensions-crashed',
 	invalid: 'settings-extensions-invalid',
-	'runs-separately': 'settings-extensions-runs-separately'
+	'store-only': 'settings-extensions-store-only'
 };
 
 const ORIGINS: Record<string, string> = {
 	store: 'settings-extensions-from-store',
+	copy: 'settings-extensions-from-copy',
 	development: 'settings-extensions-from-development',
+	folder: 'settings-extensions-from-folder',
 	own: 'settings-extensions-from-own'
+};
+
+const UNREVIEWED: Record<string, { inside: string; sandboxed: string }> = {
+	copy: { inside: 'settings-extensions-unreviewed-copy', sandboxed: 'settings-extensions-unreviewed-copy-sandboxed' },
+	folder: { inside: 'settings-extensions-unreviewed-folder', sandboxed: 'settings-extensions-unreviewed-folder-sandboxed' }
 };
 
 export const PERMISSIONS: Record<string, string> = {
@@ -36,10 +44,23 @@ export const PERMISSIONS: Record<string, string> = {
 	'file-actions': 'settings-extensions-permission-file-actions'
 };
 
-export function summary(extension: Extension): string {
+function detail(extension: Extension, unreviewed: boolean): string {
 	if (extension.state === 'needs-newer-luft') return t('settings-extensions-needs-newer-luft', { version: extension.luft });
+	if (unreviewed && extension.state === 'store-only') return t('settings-extensions-store-only-unreviewed');
 	const problem = PROBLEMS[extension.state];
 	return problem ? t(problem) : extension.description;
+}
+
+export function unreviewedNote(extension: Extension): string | null {
+	const note = UNREVIEWED[extension.origin];
+	return note ? t(extensions.developerTools ? note.inside : note.sandboxed) : null;
+}
+
+export function summary(extension: Extension): string {
+	const note = unreviewedNote(extension);
+	const rest = detail(extension, !!note);
+	if (!note || !rest) return note ?? rest;
+	return t('settings-extensions-unreviewed-summary', { note, rest });
 }
 
 export const origin = (extension: Extension) => t(ORIGINS[extension.origin] ?? ORIGINS.own);

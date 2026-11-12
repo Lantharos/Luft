@@ -7,6 +7,7 @@
 	import PageView from './PageView.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import { origin, PERMISSIONS, summary } from './status';
+	import UnreviewedSection from './unreviewed/UnreviewedSection.svelte';
 
 	let { extension, onclose }: { extension: Extension; onclose: () => void } = $props();
 
@@ -54,6 +55,8 @@
 			{/if}
 		</Section>
 	{/if}
+
+	<UnreviewedSection {extension} />
 
 	<Section>
 		<Row title={origin(extension)} description={t('settings-extensions-installed', { version: extension.version })} />

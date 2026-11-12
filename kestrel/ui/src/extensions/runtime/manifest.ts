@@ -3,9 +3,7 @@ import { parse } from 'smol-toml';
 import type { ChoiceOption, ListenPort, Manifest, Permission, SettingCondition, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription, SliderRange } from '../api/v1/types.js';
 import { API_VERSIONS } from '../api/versions.js';
 import { parseLuftVersion } from './installed/luftVersion.js';
-
-export const MANIFEST = 'extension.toml';
-export const MODULE = 'extension.js';
+import { MANIFEST } from './layout.js';
 
 const ID = /^[A-Za-z][A-Za-z0-9_-]*(\.[A-Za-z][A-Za-z0-9_-]*){2,}$/;
 const KEY = /^[a-z][a-z0-9-]*$/;

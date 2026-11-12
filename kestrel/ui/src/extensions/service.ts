@@ -95,7 +95,7 @@ export class ExtensionsService {
   }
 
   PageAsync([id]: [string], invocation: Gio.DBusMethodInvocation): void {
-    this.answer(invocation, 'see extension settings', () => new GLib.Variant('(s)', [this.manager.instance(id)?.page.json() ?? '']));
+    this.answer(invocation, 'see extension settings', async () => new GLib.Variant('(s)', [await this.manager.instance(id)?.page.json() ?? '']));
   }
 
   ActAsync([id, control, value]: [string, string, GLib.Variant], invocation: Gio.DBusMethodInvocation): void {
@@ -106,7 +106,7 @@ export class ExtensionsService {
     });
   }
 
-  private answer(invocation: Gio.DBusMethodInvocation, action: string, act: () => GLib.Variant | void | Promise<void>): void {
+  private answer(invocation: Gio.DBusMethodInvocation, action: string, act: () => GLib.Variant | void | Promise<GLib.Variant | void>): void {
     void refuseSandboxed(invocation, action).then(async refused => {
       if (refused) return;
       try {

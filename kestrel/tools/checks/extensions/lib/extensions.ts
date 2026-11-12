@@ -64,8 +64,10 @@ export function install(name: string, id: string, folder = developmentFolder) {
   copyFolder(Gio.File.new_for_path(fixture('extensions', name)), Gio.File.new_for_path(folder(id)));
 }
 
+export const builtFolder = (id: string) => GLib.getenv('KESTREL_SANDBOXED_EXTENSIONS') ? ownFolder(id) : developmentFolder(id);
+
 export async function installBuilt(id: string) {
-  copyFolder(Gio.File.new_for_path(builtExtension(id)), Gio.File.new_for_path(developmentFolder(id)));
+  copyFolder(Gio.File.new_for_path(builtExtension(id)), Gio.File.new_for_path(builtFolder(id)));
   await request('Reload', id);
 }
 

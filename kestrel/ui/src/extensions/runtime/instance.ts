@@ -1,16 +1,21 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { locale } from '../../shared/i18n/index.js';
 import type { ExtensionHost } from '../host.js';
 import { API_VERSIONS } from '../api/versions.js';
+import type { ApiContext } from '../api/v1/core/context.js';
+import { grantedCapabilities } from '../api/v1/core/granted.js';
 import type { Manifest } from '../api/v1/types.js';
 import { OpenPopups } from '../api/v1/ui/popups/popups.js';
 import type { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
 import type { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
+import { HostConnection } from '../sandbox/shell/connection.js';
+import type { Api } from '../sandbox/shell/served.js';
 import { dataFolder, type Installed } from './installed/folders.js';
 import { Gestures } from './gestures.js';
 import { ExtensionPage } from './page.js';
-import { MODULE } from './manifest.js';
+import { MODULE } from './layout.js';
 import { Scope } from './scope.js';
 import type { GrabbedShortcuts } from './shortcuts.js';
 import { StoredValues } from './storage.js';
@@ -25,6 +30,7 @@ export interface RuntimeServices {
   readonly screenEffects: EffectsStage;
   snapshotPath(id: string): string;
   failed(id: string, error: unknown): void;
+  readonly desktopReady: Promise<void>;
   openSettings(id: string): void;
   pageChanged(id: string): void;
 }
@@ -43,7 +49,7 @@ export class ExtensionInstance {
 
   constructor(readonly installed: Installed & { manifest: Manifest }, private readonly services: RuntimeServices) {
     this.values = new SettingValues(installed.id, installed.manifest.settings ?? [], services.store);
-    this.translations = new Translations(installed.path);
+    this.translations = new Translations(installed.path, locale());
     this.stored = new StoredValues(installed.id);
     this.page = new ExtensionPage(() => services.pageChanged(installed.id));
   }
@@ -72,23 +78,42 @@ export class ExtensionInstance {
     if (this.scope) return;
     const scope = this.scope = new Scope(error => this.services.failed(this.id, error));
     try {
-      const enable = await this.load();
-      if (this.scope !== scope) return;
-      const gestures = this.gestures;
-      const api = API_VERSIONS[this.manifest.api]({
-        manifest: this.manifest, name: this.name, path: this.installed.path, dataPath: dataFolder(this.id), host: this.services.host, scope,
-        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, popups: new OpenPopups(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers, chosen: new Set(),
-        openSettings: () => this.services.openSettings(this.id),
-        fromPerson: callback => (...args) => scope.run(() => {
-          gestures.used();
-          return callback(...args);
-        }),
-      });
-      await enable(api);
+      if (this.installed.inShell) await this.runInShell(scope);
+      else await this.runSandboxed(scope);
     } catch (error) {
-      if (this.scope === scope) this.stop();
+      if (this.scope !== scope) return;
+      this.stop();
       throw error;
     }
+  }
+
+  private async runInShell(scope: Scope): Promise<void> {
+    const enable = await this.load();
+    if (this.scope !== scope) return;
+    await enable(API_VERSIONS[this.manifest.api](this.context(scope)));
+  }
+
+  private async runSandboxed(scope: Scope): Promise<void> {
+    await this.services.desktopReady;
+    if (this.scope !== scope) return;
+    const context = this.context(scope);
+    const api = API_VERSIONS[this.manifest.api](context) as Api;
+    const host = new HostConnection(api, context, new Set(grantedCapabilities(this.manifest)), error => this.services.failed(this.id, error));
+    scope.disposable(() => host.stop());
+    await host.start();
+  }
+
+  private context(scope: Scope): ApiContext {
+    const gestures = this.gestures;
+    return {
+      manifest: this.manifest, name: this.name, path: this.installed.path, dataPath: dataFolder(this.id), host: this.services.host, scope,
+      translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, popups: new OpenPopups(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers, chosen: new Set(),
+      openSettings: () => this.services.openSettings(this.id),
+      fromPerson: callback => (...args) => scope.run(() => {
+        gestures.used();
+        return callback(...args);
+      }),
+    };
   }
 
   private async load(): Promise<Enable> {

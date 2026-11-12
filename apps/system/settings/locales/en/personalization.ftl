@@ -337,10 +337,41 @@ settings-extensions-crashed = Turned off because the desktop restarted twice whi
 settings-extensions-invalid = Can't run on this version of Luft
 # $version is the version of Luft the extension needs, such as "1.2"
 settings-extensions-needs-newer-luft = Needs Luft { $version } or newer. It turns on by itself once Luft is updated.
-settings-extensions-runs-separately = Waits for a Luft that can run extensions from your own folder on their own
+settings-extensions-store-only = Only runs when it comes from schelf.store
 settings-extensions-from-store = From schelf.store, approved to run inside Luft
 settings-extensions-from-development = From a development folder, running inside this build of Luft
-settings-extensions-from-own = From your own folder. It runs on its own and can only do what's listed
+settings-extensions-from-own = From your own folder. It runs in a sandbox and can only do what's listed
+settings-extensions-from-copy = A copy you installed from your own folder. Nobody reviewed it
+settings-extensions-from-folder = From your own folder, approved to run inside Luft. Nobody reviewed it
+settings-extensions-store-only-unreviewed = Only runs inside Luft, which needs Developer tools to be on
+settings-extensions-unreviewed-copy = Not reviewed, runs inside Luft as a copy
+settings-extensions-unreviewed-copy-sandboxed = Not reviewed, a copy that runs in a sandbox while Developer tools is off
+settings-extensions-unreviewed-folder = Not reviewed, runs inside Luft from its folder
+settings-extensions-unreviewed-folder-sandboxed = Not reviewed, runs in a sandbox while Developer tools is off
+# $note says the extension wasn't reviewed and how it runs, $rest is its description or what's wrong with it
+settings-extensions-unreviewed-summary = { $note } · { $rest }
+settings-extensions-inside = Inside Luft
+settings-extensions-inside-description = Developer tools is on, so you can run this extension inside Luft even though nobody reviewed it.
+settings-extensions-copy = Install a copy
+settings-extensions-copy-description = For an extension you trust. The copy keeps running as it is now
+settings-extensions-folder = Run from its folder
+settings-extensions-folder-description = For an extension you're making. Your changes run when you reload it
+settings-extensions-copy-title = Install a copy of { $name }?
+settings-extensions-folder-title = Run { $name } from its folder?
+settings-extensions-unreviewed-warning = Nobody has reviewed { $name }. Inside Luft it can see everything you type, read what's on your screen and do anything you can do.
+settings-extensions-copy-explained = Luft keeps a copy of it as it is now, where no program can change it. Later changes to its folder don't reach that copy.
+settings-extensions-folder-explained = It runs from this folder, so your changes run each time you reload it:
+settings-extensions-folder-only-yours = Any program that can change this folder can then run inside Luft too. Only do this for an extension you're making yourself.
+settings-extensions-reload = Run your latest changes
+settings-extensions-reload-description = Starts it again with what's in its folder now
+settings-extensions-reload-action = Reload
+settings-extensions-stop-inside = Stop running inside Luft
+settings-extensions-stop-copy-description = Removes the copy. The extension in your own folder runs in its sandbox again
+settings-extensions-stop-folder-description = It goes back to running in its sandbox
+settings-extensions-stop = Stop
+settings-extensions-forget = Take back the approval
+settings-extensions-forget-description = It stays in its sandbox when Developer tools is on again
+settings-extensions-forget-action = Take back
 # $count is how many other copies of the extension there are
 settings-extensions-ignored = { $count ->
     [one] A copy in your own folder is ignored

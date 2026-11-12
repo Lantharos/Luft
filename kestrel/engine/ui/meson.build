@@ -79,6 +79,15 @@ foreach service, entry : dbus_services
 
 endforeach
 
+custom_target('kestrel-extension-host',
+  input: files('../../ui/src/extensions/sandbox/host/main.ts'),
+  output: 'kestrel-extension-host.js',
+  depfile: 'kestrel-extension-host.js.d',
+  command: [bun, build_ts, 'extensions/sandbox/host/main.ts', '@OUTPUT@', build_config],
+  install: true,
+  install_dir: pkgdatadir,
+)
+
 activated_names = {
   'com.lantharos.Kestrel.Notifications': 'com.lantharos.Kestrel.Notifications',
   'org.freedesktop.Notifications': 'com.lantharos.Kestrel.Notifications',

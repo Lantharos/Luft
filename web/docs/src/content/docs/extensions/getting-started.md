@@ -18,7 +18,7 @@ com.example.Hello/
     de/hello.ftl
 ```
 
-The folder's name is the extension's id, in reverse DNS. Luft lists an extension in `~/.local/share/luft/extensions/`, but only runs the ones it installed from Schelf inside the desktop, so for now try yours in a development build of Luft's desktop, started from its build folder with `KESTREL_DEVELOPMENT_EXTENSIONS` naming the folder that holds it.
+The folder's name is the extension's id, in reverse DNS. Put it in `~/.local/share/luft/extensions/` and it runs: Luft starts it in a sandbox of its own and lists it in **Settings → Extensions**, where you can turn it off and on again after a change. In your folder it gets the API object with every part but the few that draw inside the desktop itself, listed in the [manifest reference](/extensions/manifest/#in-a-sandbox). What it prints goes to the desktop's log, `journalctl --user -u kestrel -f`.
 
 ## The manifest
 
@@ -40,7 +40,7 @@ label = "loud"
 default = false
 ```
 
-`api` is the version of the extension API it's written for, and `[luft] minimum` the oldest version of Luft it runs on. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for, and people see the list before they install it. It's a declaration rather than a sandbox, as the [manifest reference](/extensions/manifest/#permissions) explains. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
+`api` is the version of the extension API it's written for, and `[luft] minimum` the oldest version of Luft it runs on. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for, and people see the list before they install it. From your own folder that list is all it can do; inside the desktop it's a declaration, as the [manifest reference](/extensions/manifest/#permissions) explains. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
 
 ## The code
 
@@ -99,6 +99,12 @@ gdbus call --session --dest com.lantharos.Kestrel --object-path /com/lantharos/K
 ```
 
 It shows up in Settings → Extensions. If it throws while it turns on, or later from something Kestrel calls, Kestrel turns it off, says so in a notification, and Settings shows the error.
+
+## Trying it inside the desktop
+
+From your folder, an extension runs in a sandbox, without the parts that draw inside the desktop itself, such as `wallpaper`, `screen-effects` and `typing`. To try those before you share it, turn on [Developer tools](/system/security/#developer-tools), open the extension in Settings → Extensions and choose **Run from its folder**. After an administrator's password, Luft runs it inside the desktop straight from `~/.local/share/luft/extensions/com.example.Hello`, and **Run your latest changes** on the same page, or the `Reload` call above, starts it again with your edits. **Stop running inside Luft** puts it back in its sandbox, and so does turning Developer tools off.
+
+Anything that can write to that folder can then run code inside the desktop, so keep this to extensions you're writing. Someone who wants to use yours before it's in Schelf can choose **Install a copy** instead: Luft keeps a copy no program can change, and they update it by installing a copy again.
 
 ## Next
 

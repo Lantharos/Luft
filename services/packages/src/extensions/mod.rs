@@ -130,11 +130,32 @@ fn root(unpacked: &Path) -> Result<PathBuf> {
 }
 
 fn unpack(archive: File, into: &Path) -> Result<()> {
-    let _ = fs::remove_dir_all(into);
     fs::create_dir_all(into)?;
     let decoder = zstd::Decoder::new(archive)?;
     unpack_tar(decoder, into, RULES, |_| {}).map_err(std::io::Error::from)?;
     settle(into)
+}
+
+/// Puts what `fill` makes from an empty staging folder in place of
+/// `folder/id`, leaving any earlier version there when it fails.
+fn replace(folder: &Path, id: &str, fill: impl FnOnce(&Path) -> Result<PathBuf>) -> Result<()> {
+    fs::create_dir_all(folder)?;
+    fs::set_permissions(folder, Permissions::from_mode(0o755))?;
+    let staging = folder.join(format!(".{id}.unpacking"));
+    let previous = folder.join(format!(".{id}.previous"));
+    let destination = folder.join(id);
+    let _ = fs::remove_dir_all(&staging);
+    let placed = fill(&staging).and_then(|made| {
+        let _ = fs::remove_dir_all(&previous);
+        if fs::symlink_metadata(&destination).is_ok() {
+            fs::rename(&destination, &previous)?;
+        }
+        fs::rename(made, &destination)?;
+        Ok(())
+    });
+    let _ = fs::remove_dir_all(&staging);
+    let _ = fs::remove_dir_all(&previous);
+    placed.with_context(|| format!("{id} couldn't be installed"))
 }
 
 /// Installs a release schelf.store approved to run inside the shell into
@@ -149,24 +170,10 @@ pub fn install(
 ) -> Result<()> {
     let id = checked(id)?;
     approved(id, listing, keys, &mut archive)?;
-    let folder = account(uid);
-    fs::create_dir_all(&folder)?;
-    fs::set_permissions(&folder, Permissions::from_mode(0o755))?;
-    let staging = folder.join(format!(".{id}.unpacking"));
-    let previous = folder.join(format!(".{id}.previous"));
-    let destination = folder.join(id);
-    let placed = unpack(archive, &staging).and_then(|()| {
-        let unpacked = root(&staging)?;
-        let _ = fs::remove_dir_all(&previous);
-        if fs::symlink_metadata(&destination).is_ok() {
-            fs::rename(&destination, &previous)?;
-        }
-        fs::rename(unpacked, &destination)?;
-        Ok(())
-    });
-    let _ = fs::remove_dir_all(&staging);
-    let _ = fs::remove_dir_all(&previous);
-    placed.with_context(|| format!("{id} couldn't be installed"))
+    replace(&account(uid), id, |staging| {
+        unpack(archive, staging)?;
+        root(staging)
+    })
 }
 
 /// Removes an extension from the account's folder.
@@ -177,6 +184,8 @@ pub fn remove(uid: u32, id: &str) -> Result<()> {
     }
     Ok(())
 }
+
+pub mod unreviewed;
 
 #[cfg(test)]
 mod tests;

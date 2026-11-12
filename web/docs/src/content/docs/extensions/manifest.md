@@ -27,7 +27,9 @@ sidebar:
 
 Permissions say what your extension uses. The API object only has the parts you asked for, Settings and Schelf show each permission to people in plain words, and schelf.store reviews a release that asks for more than the one before.
 
-They're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions.
+Inside the desktop they're a declaration, not a sandbox. Extensions Schelf's store approved run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review and its approval of each release are what stand behind that trust. Use only the API object: it's what stays stable between versions.
+
+Everywhere else they're the wall. An extension in your own folder runs in a sandbox, see [below](#in-a-sandbox).
 
 | Permission | Shown as | Gives |
 | --- | --- | --- |
@@ -54,6 +56,22 @@ They're a declaration, not a sandbox. Extensions Schelf's store approved run ins
 `locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` with `hosts` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. Ports under `listen` show in Settings as "Take connections from devices on your network". Luft's firewall lets devices on networks people marked as home reach those ports on the extension's helper, without asking again, and keeps them closed on public networks. `[[shortcuts]]` gives `shortcuts`.
 
 `typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
+
+### In a sandbox
+
+An extension in your own folder, `~/.local/share/luft/extensions/<id>/`, runs in a process of its own: it sees its own folder, read-only, and its data folder, and nothing else of the computer, with no network, no other programs and no session bus. Its `[helper]` runs in the same sandbox. Everything it does on the desktop goes through the API object, which works the same way there, with these parts left out:
+
+| Not in a sandbox | Why |
+| --- | --- |
+| `wallpaper`, `screen-effects` | They draw inside the desktop itself |
+| `audio-levels` | It's read for every frame something draws |
+| `typing` | Typing into other apps stays with extensions from Schelf |
+| `file-actions`, `chooseFiles` and a taskbar element's `onDrop` | They hand over your own files, which the sandbox can't open. `pickFiles` copies what people pick into the data folder instead |
+| `listen` under `[network]` | The sandbox has no network to listen on |
+
+An extension that asks for one of these permissions, or for `listen`, doesn't run from your own folder, and Settings says which it asked for. `chooseFiles` rejects there. Ask only for what the sandbox has, and the same extension runs from your folder and, once Schelf's store approved it, from Schelf.
+
+Kestrel answers what an extension reads at once, such as `session.active` or a setting, from a copy kept next to it, and does everything else a moment later. A call that returns nothing can't throw where it was made, so when Kestrel refuses it, such as `open` with a plain `http:` link, the reason goes to the desktop's log instead; one that returns a promise rejects it as it does inside the desktop. Arguments of the wrong kind turn the extension off with the reason. A callback that takes longer than ten seconds to return, or a stream of calls far faster than any desktop needs, turns it off too.
 
 ## Settings
 

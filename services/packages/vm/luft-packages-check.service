@@ -1,0 +1,10 @@
+[Unit]
+Description=Check how Luft's packages service lets extensions nobody reviewed run inside the desktop
+After=dbus.service polkit.service local-fs.target usr.mount
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-packages-check
+
+[Install]
+WantedBy=multi-user.target

@@ -2,6 +2,7 @@
 	import { Section } from '@luft/ui';
 	import { extensions } from './extensions.svelte';
 	import SettingRow from './SettingRow.svelte';
+	import { unreviewedNote } from './status';
 
 	let { page }: { page: string } = $props();
 
@@ -11,7 +12,7 @@
 </script>
 
 {#each contributions as { extension, settings } (extension.id)}
-	<Section title={extension.name}>
+	<Section title={extension.name} description={unreviewedNote(extension) ?? undefined}>
 		{#each settings as setting (setting.key)}
 			<SettingRow {extension} {setting} />
 		{/each}

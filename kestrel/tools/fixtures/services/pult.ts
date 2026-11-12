@@ -3,12 +3,13 @@ import Soup from 'gi://Soup?version=3.0';
 
 const TOKEN = 'pult_device_standin';
 const CODE = 'BCDF-GHJK';
+const PAGES = 'https://pult.test';
 
-const place = (base: string, project: string, environment: string) => ({
+const place = (project: string, environment: string) => ({
   organization: {slug: 'harbor', name: 'Harbor'},
   project: {slug: project.toLowerCase(), name: project},
   environment: {id: `${project}-${environment}`.toLowerCase(), name: environment},
-  url: `${base}/harbor/${project.toLowerCase()}/${environment}`,
+  url: `${PAGES}/harbor/${project.toLowerCase()}/${environment}`,
 });
 
 export class StandInPult {
@@ -47,7 +48,7 @@ export class StandInPult {
       if (body !== undefined) message.set_response('application/json', Soup.MemoryUse.COPY, new TextEncoder().encode(JSON.stringify(body)));
     };
     if (method === 'POST' && path === '/api/devices/code')
-      return reply(200, {deviceCode: 'device', userCode: CODE, verificationUri: `${this.base}/device`, verificationUriComplete: `${this.base}/device?code=${CODE}`, expiresIn: 900, interval: 1});
+      return reply(200, {deviceCode: 'device', userCode: CODE, verificationUri: `${PAGES}/device`, verificationUriComplete: `${PAGES}/device?code=${CODE}`, expiresIn: 900, interval: 1});
     if (method === 'POST' && path === '/api/devices/token') {
       if (!this.approved) return reply(202, {status: 'pending'});
       this.signedIn = true;
@@ -69,8 +70,8 @@ export class StandInPult {
   }
 
   private places() {
-    const shop = place(this.base, 'Shop', 'production');
-    const app = place(this.base, 'Marl', 'production');
+    const shop = place('Shop', 'production');
+    const app = place('Marl', 'production');
     return [
       {
         ...shop,

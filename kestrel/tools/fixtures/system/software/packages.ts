@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type {Publish} from '../bus.js';
+import {unreviewedExtensions} from './unreviewedExtensions.js';
 
 const PACKAGES = `<node><interface name="com.lantharos.Packages1">
   <method name="List"><arg type="s" direction="out"/></method>
@@ -9,6 +10,9 @@ const PACKAGES = `<node><interface name="com.lantharos.Packages1">
   <method name="DescribeRepository">
     <arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="a{ss}" direction="in"/><arg type="s" direction="out"/>
   </method>
+  <method name="InstallUnreviewedExtension"><arg name="id" type="s" direction="in"/><arg name="folder" type="h" direction="in"/></method>
+  <method name="AllowExtensionFolder"><arg name="id" type="s" direction="in"/><arg name="path" type="s" direction="in"/></method>
+  <method name="RemoveUnreviewedExtension"><arg name="id" type="s" direction="in"/></method>
 </interface></node>`;
 
 export const PACKAGES_NAME = 'com.lantharos.Packages1';
@@ -45,8 +49,9 @@ function keyOf(armored: string) {
   return {fingerprint: lines.find(fields => fields[0] === 'fpr')?.[9] ?? '', user: lines.find(fields => fields[0] === 'uid')?.[9] ?? ''};
 }
 
-export function publishPackages(publish: Publish, calls: string[]) {
+export function publishPackages(publish: Publish, calls: string[], developerTools: () => boolean) {
   publish(PACKAGES, {
+    ...unreviewedExtensions(calls, developerTools),
     List: () => JSON.stringify({requested: [], packages: [], services: [], pending: false, repositories: []}),
     Update: () => {
       calls.push('Packages Update');

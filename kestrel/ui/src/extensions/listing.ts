@@ -4,9 +4,9 @@ import type { SettingDescription, SliderRange } from './api/v1/types.js';
 import type { Installed } from './runtime/installed/folders.js';
 import type { ExtensionInstance } from './runtime/instance.js';
 import type { ExtensionManager } from './runtime/manager.js';
-import { runsInShell } from './runtime/installed/origins.js';
 import { chosenShortcuts } from './runtime/shortcuts.js';
 import { variant } from './runtime/store.js';
+import { unsupportedInSandbox } from './sandbox/shell/support.js';
 
 type Fields = Record<string, GLib.Variant>;
 
@@ -68,11 +68,13 @@ function state(installed: Installed, manager: ExtensionManager): string {
   if (!instance) return 'invalid';
   if (instance.running) return 'running';
   if (!manager.fitsLuft(installed)) return 'needs-newer-luft';
-  if (!runsInShell(installed.origin)) return 'runs-separately';
+  if (!installed.inShell && unsupportedInSandbox(instance.manifest)) return 'store-only';
   const problem = manager.store.problem(installed.id);
   if (problem) return problem.kind === 'crash' ? 'crashed' : 'failed';
   return 'off';
 }
+
+const sandboxProblem = ({ inShell, manifest }: Installed) => !inShell && manifest ? unsupportedInSandbox(manifest) : null;
 
 export function listed(installed: Installed, manager: ExtensionManager): Fields {
   const instance = manager.instance(installed.id);
@@ -83,7 +85,7 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
     ignored: GLib.Variant.new_strv(installed.ignored),
     enabled: GLib.Variant.new_boolean(!manager.store.disabled.has(installed.id)),
     state: text(state(installed, manager)),
-    problem: text(installed.problem ?? manager.store.problem(installed.id)?.detail ?? ''),
+    problem: text(installed.problem ?? sandboxProblem(installed) ?? manager.store.problem(installed.id)?.detail ?? ''),
   };
   if (!instance) return { ...fields, name: text(installed.id) };
   const { manifest } = instance;

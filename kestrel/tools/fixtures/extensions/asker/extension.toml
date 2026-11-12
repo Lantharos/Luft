@@ -1,0 +1,5 @@
+id = "com.example.Asker"
+name = "Asker"
+description = "Asks other extensions from inside the desktop."
+version = "1.0.0"
+api = 1

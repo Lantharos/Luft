@@ -10,11 +10,15 @@ import { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
 import { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
-import { dataFolder, discover, findOne, removeTree, type Installed } from './installed/folders.js';
+import { removeTree } from '../api/v1/core/files.js';
+import { dataFolder, discover, findOne, type Installed } from './installed/folders.js';
 import { luftVersionAtLeast } from './installed/luftVersion.js';
-import { runsInShell } from './installed/origins.js';
+import { unreviewed } from './installed/origins.js';
 import { askLuftVersion, rememberedLuftVersion } from './installed/runningLuft.js';
 import { removeFromStoreFolder } from './installed/storeFolder.js';
+import { removeUnreviewed } from './installed/unreviewed.js';
+import { DeveloperTools } from '../../shared/dbus/developerTools.js';
+import { runSandboxedTurnedOffHelper, unsupportedInSandbox } from '../sandbox/shell/support.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
 import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
@@ -24,6 +28,7 @@ const hasManifest = (installed: Installed): installed is Installed & { manifest:
 export class ExtensionManager {
   readonly store = new ExtensionStore();
   private readonly crashes = new CrashGuard();
+  private readonly developerTools = new DeveloperTools();
   private readonly services: RuntimeServices;
   private installed: Installed[] = [];
   private readonly instances = new Map<string, ExtensionInstance>();
@@ -34,9 +39,10 @@ export class ExtensionManager {
   private loads = 0;
   private luft = rememberedLuftVersion();
 
-  constructor(host: ExtensionHost) {
+  constructor(host: ExtensionHost, desktopReady: Promise<void>) {
     this.services = {
       host,
+      desktopReady,
       store: this.store,
       layers: new LayerStage(host),
       screenEffects: new EffectsStage(host),
@@ -55,6 +61,7 @@ export class ExtensionManager {
       this.store.watchStates(() => this.sync()),
       this.store.watchShortcuts(() => this.changed()),
       onLocaleChanged(() => this.restartAll()),
+      this.developerTools.watch(() => this.rescan()),
     ];
     this.rescan();
     for (const id of culprits) this.notice(id, 'crash');
@@ -70,8 +77,13 @@ export class ExtensionManager {
     return !minimum || (!!this.luft && luftVersionAtLeast(this.luft, minimum));
   }
 
+  private get unreviewedInShell(): boolean {
+    return this.developerTools.known === true;
+  }
+
   private runs(installed: Installed): boolean {
-    return runsInShell(installed.origin) && this.fitsLuft(installed);
+    if (unreviewed(installed.origin) && this.developerTools.known === null) return false;
+    return this.fitsLuft(installed) && (installed.inShell || !unsupportedInSandbox(installed.manifest!));
   }
 
   get all(): readonly Installed[] {
@@ -97,18 +109,19 @@ export class ExtensionManager {
   }
 
   rescan(): void {
-    this.installed = discover();
+    this.installed = discover(this.unreviewedInShell);
     for (const id of [...this.instances.keys()].filter(id => !this.installed.some(installed => installed.id === id))) this.drop(id);
     for (const installed of this.installed.filter(hasManifest)) {
       const instance = this.instances.get(installed.id);
-      if (instance?.installed.path === installed.path && instance.installed.origin === installed.origin && instance.manifest.version === installed.manifest.version) continue;
+      const { path, origin, inShell } = installed;
+      if (instance?.installed.path === path && instance.installed.origin === origin && instance.installed.inShell === inShell && instance.manifest.version === installed.manifest.version) continue;
       this.replace(installed);
     }
     this.sync();
   }
 
   reload(id: string): void {
-    const found = findOne(id);
+    const found = findOne(id, this.unreviewedInShell);
     const previous = this.instances.get(id);
     if (found?.manifest && previous && this.store.problem(id) && previous.manifest.version !== found.manifest.version) {
       this.store.setProblem(id, null);
@@ -137,15 +150,19 @@ export class ExtensionManager {
     this.undoElsewhere(id);
     this.instances.get(id)?.stored.forget();
     this.drop(id);
-    if (installed.systemOwned) await removeFromStoreFolder(id);
+    if (installed.origin === 'copy') await removeUnreviewed(id);
+    else if (installed.systemOwned) await removeFromStoreFolder(id);
     else removeTree(Gio.File.new_for_path(installed.path));
+    if (installed.origin === 'folder') await removeUnreviewed(id);
     this.erase(id);
     this.rescan();
   }
 
   private undoElsewhere(id: string): void {
     const installed = this.installed.find(candidate => candidate.id === id);
-    if (installed && hasManifest(installed) && this.runs(installed)) runTurnedOffHelper(installed.path, installed.manifest);
+    if (!installed || !hasManifest(installed) || !this.runs(installed)) return;
+    if (installed.inShell) runTurnedOffHelper(installed.path, installed.manifest);
+    else runSandboxedTurnedOffHelper(installed.path, installed.manifest);
   }
 
   private erase(id: string): void {
@@ -222,6 +239,7 @@ export class ExtensionManager {
 
   shutdown(): void {
     for (const disconnect of this.disconnectors) disconnect();
+    this.developerTools.destroy();
     for (const id of [...this.instances.keys()]) this.drop(id);
     if (this.snapshots) GLib.rmdir(this.snapshots);
   }

@@ -3,7 +3,7 @@ import type { BuiltPage } from '../api/v1/ui/settingsPage/serialize.js';
 type Wrap = <Args extends unknown[], Result>(callback: (...args: Args) => Result) => (...args: Args) => Result | undefined;
 
 export class ExtensionPage {
-  private build: (() => BuiltPage | null) | null = null;
+  private build: (() => Promise<BuiltPage | null>) | null = null;
   private wrap: Wrap | null = null;
   private callbacks = new Map<string, (value: unknown) => void>();
 
@@ -13,7 +13,7 @@ export class ExtensionPage {
     return !!this.build;
   }
 
-  describe(build: (() => BuiltPage | null) | null, wrap: Wrap): void {
+  describe(build: (() => Promise<BuiltPage | null>) | null, wrap: Wrap): void {
     this.build = build;
     this.wrap = wrap;
     this.callbacks.clear();
@@ -24,8 +24,8 @@ export class ExtensionPage {
     if (this.build) this.announce();
   }
 
-  json(): string {
-    const built = this.build?.();
+  async json(): Promise<string> {
+    const built = await this.build?.();
     this.callbacks = built?.callbacks ?? new Map();
     return built?.json ?? '';
   }

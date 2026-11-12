@@ -316,6 +316,7 @@ export class DesktopUi {
       () => this.surfaces.emoji.prewarm(),
       () => warmHidden(this.surfaces.emoji.actor, { place }),
       () => this.taskView.prewarm(context.layoutManager.primaryMonitor!),
+      () => this.extensions.desktopReady(),
     ]));
   }
 

@@ -7,6 +7,8 @@ const answering = new Map<string, Map<string, Answer>>();
 const listeners = new Set<() => void>();
 
 const changed = () => [...listeners].forEach(listener => listener());
+
+export const answeredRequests = (): [id: string, name: string][] => [...answering].flatMap(([id, names]) => [...names.keys()].map((name): [string, string] => [id, name]));
 const copy = (value: unknown): Stored | undefined => value === undefined ? undefined : JSON.parse(JSON.stringify(value)) as Stored;
 
 export function peersApi({ manifest, scope }: ApiContext): Peers {

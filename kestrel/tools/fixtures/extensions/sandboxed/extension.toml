@@ -1,0 +1,15 @@
+id = "com.example.Sandboxed"
+name = "Sandboxed"
+description = "Runs from the account's own folder, in a sandbox, and uses the API from there."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "quick-settings", "search", "notifications"]
+
+[helper]
+path = "helper.sh"
+
+[[settings]]
+key = "on"
+type = "switch"
+label = "on"
+default = false

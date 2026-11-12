@@ -9,6 +9,8 @@ The default export of `extension.js` gets one object. The basics are always ther
 
 Everything an extension adds returns a `Disposable` with `dispose()`, to take it away early. When the extension is turned off, Kestrel disposes whatever is left. A callback that throws turns the extension off.
 
+An extension in your own folder runs in a sandbox and gets this same object, without the parts that only work inside the desktop; the [manifest reference](/extensions/manifest/#in-a-sandbox) lists them.
+
 ## Basics
 
 | Member | Is |
@@ -20,7 +22,7 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `open(uri)` | Opens a web link in the browser, or a file or folder in the app that opens it |
 | `openSettings()` | Opens the extension's page in Settings |
 | `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`), sounds (`sounds`), calendars (`calendars`) or a `folder` with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel. A folder comes with the files directly inside it, up to 32 of up to 8 MB each |
-| `chooseFiles({ title, folder?, multiple? })` | Lets people choose files, or a folder, with the file chooser, right after they used the extension. Resolves to their full paths where they are, or none when they cancel, for what its helper reads or a folder it saves into |
+| `chooseFiles({ title, folder?, multiple? })` | Lets people choose files, or a folder, with the file chooser, right after they used the extension. Resolves to their full paths where they are, or none when they cancel, for what its helper reads or a folder it saves into. Rejects in a sandbox, which can't reach them |
 | `deleteFile(path)` | Deletes a file or folder in `dataPath`, such as a picked picture no longer used |
 | `readText(path)` | A text file in the extension's folder or `dataPath`, or `null` when it isn't there |
 | `writeText(path, text)` | Writes a text file in `dataPath`, without holding up the desktop and in one go: a crash or a power cut leaves the old contents or the new ones, never a part. Resolves once it's on disk |
@@ -130,7 +132,7 @@ The toggle has `update(changes)`.
 | `shown` | Whether it shows; a hidden element takes no room, and comes and goes smoothly |
 | `onClick()`, `menu` | A click outside its controls, and a menu on a right click |
 | `onExpandedChanged(expanded)` | It grew under the pointer or shrank back, for what only needs updating while it's grown |
-| `onDrop(paths)` | Files were dropped on it from Rover or another app, by their full paths. It lights up while files are dragged over it |
+| `onDrop(paths)` | Files were dropped on it from Rover or another app, by their full paths. It lights up while files are dragged over it. Not in a sandbox |
 
 The element has `update(changes)`, `refresh()` to ask for its views again, and `dispose()`. Pop-ups can be anchored to it. Make every `content` fit both directions and a narrow island; to let people choose where it sits on a one-bar taskbar, put a `taskbar-place` item on the extension's Settings page.
 

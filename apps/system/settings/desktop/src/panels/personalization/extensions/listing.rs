@@ -76,6 +76,7 @@ pub(super) struct Listed {
     name: String,
     description: Option<String>,
     version: Option<String>,
+    path: String,
     origin: String,
     ignored: Vec<String>,
     luft: Option<String>,
@@ -136,7 +137,8 @@ pub struct Extension {
     name: String,
     description: String,
     version: String,
-    /// Where it comes from: `store`, `development` or `own`.
+    path: String,
+    /// Where it comes from: `store`, `copy`, `development`, `folder` or `own`.
     origin: String,
     /// Copies of it elsewhere that are left alone.
     ignored: Vec<String>,
@@ -213,6 +215,7 @@ impl From<Listed> for Extension {
             name: listed.name,
             description: listed.description.unwrap_or_default(),
             version: listed.version.unwrap_or_default(),
+            path: listed.path,
             origin: listed.origin,
             ignored: listed.ignored,
             luft: listed.luft.unwrap_or_default(),

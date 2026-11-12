@@ -8,8 +8,8 @@ export function settingsPageApi(context: ApiContext): SettingsPage {
   return {
     describe: build => {
       const guarded = scope.guard(build);
-      page.describe(() => {
-        const sections = guarded();
+      page.describe(async () => {
+        const sections = await guarded();
         return sections ? pageBuilder([path, dataPath], settings, context.manifest.id)(sections) : null;
       }, context.fromPerson);
       return scope.disposable(() => page.describe(null, context.fromPerson));

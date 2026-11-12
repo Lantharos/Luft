@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::fs::File;
+use std::os::fd::AsFd;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -12,7 +13,9 @@ use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
 use super::error::Error;
+use super::unreviewed::approver;
 use crate::changes::{self, Report, Step};
+use crate::extensions::unreviewed::Unreviewed;
 use crate::extensions::{self, Signed};
 
 const CHANGE: &str = "com.lantharos.packages.change";
@@ -236,6 +239,47 @@ impl Packages {
     ) -> Result<(), Error> {
         let uid = Self::extension_caller(connection, &header).await?;
         self.blocking(move || extensions::remove(uid, &id)).await
+    }
+
+    async fn install_unreviewed_extension(
+        &self,
+        id: String,
+        folder: OwnedFd,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        let question =
+            format!("Install a copy of {id} that runs inside Luft without being reviewed");
+        let uid = approver(connection, &header, &question).await?;
+        let folder = std::os::fd::OwnedFd::from(folder);
+        self.blocking(move || Unreviewed::system().install_copy(uid, &id, folder.as_fd()))
+            .await
+    }
+
+    async fn allow_extension_folder(
+        &self,
+        id: String,
+        path: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        let question = format!("Run {id} inside Luft from {path} without it being reviewed");
+        let uid = approver(connection, &header, &question).await?;
+        self.blocking(move || Unreviewed::system().allow_folder(uid, &id, &path))
+            .await
+    }
+
+    async fn remove_unreviewed_extension(
+        &self,
+        id: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        let uid = luft_identity::caller::uid(connection, &header)
+            .await?
+            .ok_or_else(Error::not_authorized)?;
+        self.blocking(move || Unreviewed::system().remove(uid, &id))
+            .await
     }
 
     async fn remove_repository(

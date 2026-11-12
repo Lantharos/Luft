@@ -291,7 +291,8 @@ export interface Basics {
   /**
    * Asks people to choose files, or a folder, with the file chooser, right after they used the extension. Returns their
    * full paths where they are, or none when they cancel, for what the extension hands to its helper or saves into,
-   * such as a folder to keep what it receives in.
+   * such as a folder to keep what it receives in. An extension from the person's own folder runs in a sandbox that
+   * can't reach them, so there it rejects; use {@link pickFiles} instead.
    */
   chooseFiles(options: ChooseOptions): Promise<string[]>;
   /** Deletes a file or folder in {@link dataPath}, such as something picked that people no longer use. */
@@ -869,7 +870,8 @@ export interface TaskbarElementOptions {
   menu?: ActionItem[];
   /**
    * Lets people drop files on the element, from Rover or any other app, and gets their full paths. The element lights
-   * up while files are dragged over it.
+   * up while files are dragged over it. An extension from the person's own folder, which runs in a sandbox, doesn't
+   * get it.
    */
   onDrop?(paths: string[]): void;
 }

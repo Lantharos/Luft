@@ -11,6 +11,9 @@
     the running system uses the new set; Step tells how far they are. List, Provider and
     DescribeRepository need nothing. Only root can call Rebuild and Update. InstallExtension and
     RemoveExtension need com.lantharos.packages.extensions and only change the caller's own folder.
+    InstallUnreviewedExtension and AllowExtensionFolder are refused while Developer tools is off and to
+    any program but Luft's Settings, and need com.lantharos.packages.unreviewed-extensions every time.
+    RemoveUnreviewedExtension needs nothing. All three only change the caller's own records.
   -->
   <interface name="com.lantharos.Packages1">
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
@@ -77,6 +80,24 @@
     </method>
     <!-- Removes an extension InstallExtension installed for the caller. -->
     <method name="RemoveExtension">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <!-- Copies the extension folder, which has to be the caller's own entirely, with no links and
+         nothing on another drive, into /var/lib/luft/unreviewed-extensions/UID/ID, where only root
+         can change it, in place of an earlier copy. Kestrel runs it inside the shell while Developer
+         tools is on. -->
+    <method name="InstallUnreviewedExtension">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="folder" type="h" direction="in"/>
+    </method>
+    <!-- Records in /var/lib/luft/unreviewed-extensions/UID/.folders.json that the caller's extension
+         ID runs inside the shell from PATH, a full path ending in ID, while Developer tools is on. -->
+    <method name="AllowExtensionFolder">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="path" type="s" direction="in"/>
+    </method>
+    <!-- Removes the caller's copy of ID and the approval of its folder. -->
+    <method name="RemoveUnreviewedExtension">
       <arg name="id" type="s" direction="in"/>
     </method>
     <!-- Builds the packages for the running version when it has none for the current list, and

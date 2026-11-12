@@ -4,11 +4,13 @@ import GLib from 'gi://GLib';
 import {checks} from '../lib/check.js';
 import {pause} from '../lib/wait.js';
 import {developmentFolder, install, listed, ownFolder, removeFolder, request, rewrite, storeFolder} from './lib/extensions.js';
+import {hostsOf, installOwn} from './lib/sandbox.js';
 
 const {require, eventually} = checks('extensions');
 const STORE = 'com.example.Marker';
 const OWN = 'com.example.Own';
 const NEWER = 'com.example.Newer';
+const OWN_NEWER = 'com.example.OwnNewer';
 const RUNNING_LUFT = '1.2-nightly.21';
 
 const markers = () => (globalThis as {markers?: string[]}).markers ?? [];
@@ -42,11 +44,19 @@ async function checkIgnoredCopy() {
 async function checkOwnFolder() {
   installAs(OWN, ownFolder);
   await request('Reload', OWN);
-  const own = await eventually(() => listed(OWN), 'an extension only in the account’s own folder is listed');
-  require(own.origin === 'own' && own.state === 'runs-separately', `it is shown as one that can’t run inside the desktop (${own.state})`);
-  await request('Enable', OWN);
+  const own = await eventually(async () => {
+    const found = await listed(OWN);
+    return found?.state === 'running' ? found : null;
+  }, 'an extension only in the account’s own folder runs', 20000);
+  require(own.origin === 'own' && !markers().includes(OWN), 'it runs in its sandbox, never inside the desktop');
+}
+
+async function checkOwnNewerLuft() {
+  installOwn('newer', OWN_NEWER);
+  await request('Reload', OWN_NEWER);
+  await eventually(async () => await state(OWN_NEWER) === 'needs-newer-luft', 'one in the own folder asking for a newer Luft waits too');
   await pause(300);
-  require(!markers().includes(OWN), 'turning it on still never runs its code inside the desktop');
+  require(!hostsOf(OWN_NEWER).length, 'and no sandbox starts for it');
 }
 
 async function checkNewerLuft() {
@@ -69,9 +79,10 @@ export async function run() {
     await checkStoreFolder();
     await checkIgnoredCopy();
     await checkOwnFolder();
+    await checkOwnNewerLuft();
     await checkNewerLuft();
   } finally {
-    for (const id of [STORE, OWN, NEWER]) await request('Remove', id);
+    for (const id of [STORE, OWN, OWN_NEWER, NEWER]) await request('Remove', id);
     if (GLib.file_test(ownFolder(STORE), GLib.FileTest.IS_DIR)) removeFolder(Gio.File.new_for_path(ownFolder(STORE)));
     await request('Reload', STORE);
   }

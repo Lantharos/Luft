@@ -2,7 +2,6 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { type Args, Catalog, SOURCE_LOCALE, sourceLocaleOf } from '../../../../../packages/i18n/src/core.js';
-import { locale } from '../../shared/i18n/index.js';
 
 const decoder = new TextDecoder();
 
@@ -22,10 +21,10 @@ export class Translations {
   private readonly chosen: Catalog;
   private readonly english: Catalog;
 
-  constructor(folder: string) {
-    const load = (language: string) => new Catalog(language, messages(GLib.build_filenamev([folder, 'locales', sourceLocaleOf(language)])));
+  constructor(folder: string, language: string) {
+    const load = (chosen: string) => new Catalog(chosen, messages(GLib.build_filenamev([folder, 'locales', sourceLocaleOf(chosen)])));
     this.english = load(SOURCE_LOCALE);
-    this.chosen = locale() === SOURCE_LOCALE ? this.english : load(locale());
+    this.chosen = language === SOURCE_LOCALE ? this.english : load(language);
   }
 
   has(id: string): boolean {

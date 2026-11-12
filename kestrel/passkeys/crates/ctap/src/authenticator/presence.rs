@@ -4,6 +4,7 @@ use super::Authenticator;
 use crate::auth_data::{USER_PRESENT, USER_VERIFIED};
 use crate::cbor;
 use crate::pin::protocol::Protocol;
+use crate::pin::token::Token;
 use crate::platform::{Consent, Platform, Prompt};
 use crate::status::{Result, Status};
 
@@ -26,6 +27,9 @@ impl<P: Platform> Authenticator<P> {
         };
         let param = cbor::bytes(param)?;
         if param.is_empty() {
+            if self.found_nothing {
+                return Err(Status::OperationDenied);
+            }
             self.choose().await?;
             return Err(Status::PinNotSet);
         }
@@ -44,11 +48,8 @@ impl<P: Platform> Authenticator<P> {
     ) -> Result<Approval> {
         let presence_flag = if presence { USER_PRESENT } else { 0 };
         if by_token {
-            let token = self
-                .token
-                .as_mut()
-                .expect("a token authorized this request");
-            if !presence || token.take_presence() {
+            let token = self.token();
+            if token.verified() && (!presence || token.take_presence()) {
                 return Ok(Approval {
                     flags: USER_VERIFIED | presence_flag,
                     account: None,
@@ -56,10 +57,15 @@ impl<P: Platform> Authenticator<P> {
             }
         }
         Ok(match self.platform.ask(prompt).await? {
-            Consent::Verified { account } => Approval {
-                flags: USER_VERIFIED | presence_flag,
-                account: Some(account),
-            },
+            Consent::Verified { account } => {
+                if by_token {
+                    self.token().verify();
+                }
+                Approval {
+                    flags: USER_VERIFIED | presence_flag,
+                    account: Some(account),
+                }
+            }
             Consent::Confirmed => Approval {
                 flags: USER_PRESENT,
                 account: None,
@@ -67,12 +73,13 @@ impl<P: Platform> Authenticator<P> {
         })
     }
 
-    pub(super) fn spend_token(&mut self, by_token: bool) {
-        if by_token {
-            self.token
-                .as_mut()
-                .expect("a token authorized this request")
-                .spend();
-        }
+    pub(super) fn spend_token(&mut self) {
+        self.token().spend();
+    }
+
+    fn token(&mut self) -> &mut Token {
+        self.token
+            .as_mut()
+            .expect("a token authorized this request")
     }
 }

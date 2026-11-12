@@ -48,6 +48,7 @@ pub struct Authenticator<P> {
     token: Option<Token>,
     pending: Option<PendingAssertions>,
     listing: Option<Listing>,
+    found_nothing: bool,
 }
 
 impl<P: Platform> Authenticator<P> {
@@ -58,6 +59,7 @@ impl<P: Platform> Authenticator<P> {
             token: None,
             pending: None,
             listing: None,
+            found_nothing: false,
         }
     }
 
@@ -86,6 +88,8 @@ impl<P: Platform> Authenticator<P> {
             SELECTION => self.choose().await.map(|()| None),
             _ => Err(Status::InvalidCommand),
         };
+        self.found_nothing =
+            command == GET_ASSERTION && matches!(result, Err(Status::NoCredentials));
         match result {
             Ok(Some(value)) => [vec![0], cbor::encode(&value)].concat(),
             Ok(None) => vec![0],

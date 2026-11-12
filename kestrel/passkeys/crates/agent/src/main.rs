@@ -44,6 +44,10 @@ async fn start() -> zbus::Result<(Agent, Notifier)> {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    if let Err(error) = luft_shield::lock_down() {
+        eprintln!("Passkeys couldn't lock itself down: {error}");
+        return ExitCode::FAILURE;
+    }
     match start().await {
         Ok((agent, notifier)) => device::run(agent, notifier).await,
         Err(error) => {

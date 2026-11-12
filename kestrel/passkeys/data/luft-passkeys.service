@@ -9,15 +9,7 @@ BusName=com.lantharos.Passkeys
 ExecStart=@libexecdir@/luft-launch @libexecdir@/luft-passkeys
 Restart=on-failure
 Slice=session.slice
-NoNewPrivileges=yes
-RestrictAddressFamilies=AF_UNIX
-RestrictNamespaces=yes
-RestrictRealtime=yes
-RestrictSUIDSGID=yes
-LockPersonality=yes
-MemoryDenyWriteExecute=yes
-SystemCallArchitectures=native
-SystemCallFilter=@system-service
+LimitCORE=0
 
 [Install]
 WantedBy=graphical-session.target

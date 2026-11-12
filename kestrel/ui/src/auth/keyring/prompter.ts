@@ -2,7 +2,9 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
+import { STARTED_FROM_BUILD } from '../../shared/apps/development.js';
 import { callerOwns, stealFd } from '../../shared/dbus/processes.js';
+import { callerIsShielded } from '../../shared/dbus/shielded.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 
@@ -29,12 +31,17 @@ const PROMPTER_XML = `<node>
 </node>`;
 const PROMPTER_PATH = '/com/lantharos/Kestrel/KeyringPrompter';
 const SECRET_SERVICE = 'org.freedesktop.secrets';
+const KEYRING_PROGRAM = '/usr/libexec/luft-keyring';
 
 type Invocation = Gio.DBusMethodInvocation;
 
 export function promptKey(invocation: Invocation, handle: string): string {
   return `${invocation.get_sender()} ${handle}`;
 }
+
+const fromKeyring = (invocation: Invocation) => STARTED_FROM_BUILD
+  ? callerOwns(invocation, SECRET_SERVICE)
+  : callerIsShielded(invocation, SECRET_SERVICE, KEYRING_PROGRAM);
 
 function refuse(invocation: Invocation): void {
   invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The secret needs a file descriptor to be written to');
@@ -88,7 +95,7 @@ export class KeyringPrompter {
 
   private serialize(invocation: Invocation, step: () => void): void {
     this.incoming = this.incoming.then(async () => {
-      if (global.context.unsafe_mode || await callerOwns(invocation, SECRET_SERVICE)) step();
+      if (global.context.unsafe_mode || await fromKeyring(invocation)) step();
       else invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only the keyring can ask for passwords');
     }).catch(error => console.error('Kestrel could not show a keyring prompt', error));
   }

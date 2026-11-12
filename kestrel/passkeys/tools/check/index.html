@@ -36,23 +36,27 @@ async function create() {
   return { ok: true, id: credential.id, publicKey: btoa(String.fromCharCode(...new Uint8Array(credential.response.getPublicKey()))), flags: data[32], transports: credential.response.getTransports(), discoverable: extensions.credProps?.rk ?? null, prf: extensions.prf?.enabled ?? null };
 }
 
+const fromBase64Url = (text) => Uint8Array.from(atob(text.replace(/-/g, '+').replace(/_/g, '/')), (character) => character.charCodeAt(0));
+
 async function get() {
   const challenge = random(32);
+  const creations = (await (await fetch('/results')).text()).split('\n').filter(Boolean).map((line) => JSON.parse(line))
+    .filter((result) => result.step === 'create' && result.ok);
+  const allowCredentials = step === 'listed' ? [{ type: 'public-key', id: fromBase64Url(creations.at(-1).id) }] : [];
   const credential = await navigator.credentials.get({ publicKey: {
-    rpId: location.hostname, challenge, userVerification: 'required', timeout: 180000,
+    rpId: location.hostname, challenge, allowCredentials, userVerification: 'required', timeout: 180000,
     extensions: { prf: { eval: { first: new Uint8Array(32) } } },
   } });
   const response = credential.response;
   const data = new Uint8Array(response.authenticatorData);
-  const created = (await (await fetch('/results')).text()).split('\n').filter(Boolean).map((line) => JSON.parse(line))
-    .find((result) => result.step === 'create' && result.id === credential.id);
+  const created = creations.find((result) => result.id === credential.id);
   const spki = Uint8Array.from(atob(created?.publicKey ?? ''), (character) => character.charCodeAt(0));
   const key = await crypto.subtle.importKey('spki', spki, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
   const clientHash = new Uint8Array(await crypto.subtle.digest('SHA-256', response.clientDataJSON));
   const verified = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, rawSignature(response.signature), new Uint8Array([...data, ...clientHash]));
   return {
     ok: true, id: credential.id, flags: data[32], counter: new DataView(data.buffer).getUint32(33), verified,
-    user: new TextDecoder().decode(response.userHandle), prf: Boolean(credential.getClientExtensionResults().prf?.results?.first),
+    user: response.userHandle && new TextDecoder().decode(response.userHandle), prf: Boolean(credential.getClientExtensionResults().prf?.results?.first),
   };
 }
 

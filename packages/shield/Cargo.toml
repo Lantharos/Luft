@@ -1,0 +1,15 @@
+[package]
+name = "luft-shield"
+version = "0.1.0"
+description = "Keeps Luft's small helpers out of reach of your other programs, and tells services a helper started that way"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+libc.workspace = true
+seccompiler.workspace = true
+
+[lints]
+workspace = true

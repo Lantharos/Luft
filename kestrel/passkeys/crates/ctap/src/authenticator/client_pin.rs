@@ -4,7 +4,7 @@ use super::{Authenticator, response};
 use crate::cbor::{self, Fields};
 use crate::model::{ECDH_ES_HKDF_256, PublicKey};
 use crate::pin::protocol::Protocol;
-use crate::pin::token::{GET_ASSERTION, MAKE_CREDENTIAL, SUPPORTED, Token};
+use crate::pin::token::{CREDENTIAL_MANAGEMENT, GET_ASSERTION, MAKE_CREDENTIAL, SUPPORTED, Token};
 use crate::platform::{Consent, Platform, Prompt, Purpose};
 use crate::status::{Result, Status};
 
@@ -14,13 +14,15 @@ const GET_UV_RETRIES: i64 = 0x07;
 const UV_RETRIES: i64 = 8;
 
 fn purpose(permissions: u8) -> Purpose {
-    if permissions & MAKE_CREDENTIAL != 0 {
-        Purpose::Register
-    } else if permissions & GET_ASSERTION != 0 {
-        Purpose::SignIn
-    } else {
+    if permissions & CREDENTIAL_MANAGEMENT != 0 {
         Purpose::Manage
+    } else {
+        Purpose::Register
     }
+}
+
+fn verifies_upfront(permissions: u8) -> bool {
+    permissions != GET_ASSERTION
 }
 
 impl<P: Platform> Authenticator<P> {
@@ -58,16 +60,19 @@ impl<P: Platform> Authenticator<P> {
         }
         let shared = self.key_agreement.shared_secret(protocol, &peer)?;
         self.token = None;
-        let prompt = Prompt {
-            purpose: purpose(permissions),
-            rp_id,
-            rp_name: None,
-            accounts: &[],
-        };
-        let Consent::Verified { .. } = self.platform.ask(prompt).await? else {
-            return Err(Status::OperationDenied);
-        };
-        let token = Token::issue(protocol, permissions, rp_id.map(str::to_owned));
+        let mut token = Token::issue(protocol, permissions, rp_id.map(str::to_owned));
+        if verifies_upfront(permissions) {
+            let prompt = Prompt {
+                purpose: purpose(permissions),
+                rp_id,
+                rp_name: None,
+                accounts: &[],
+            };
+            let Consent::Verified { .. } = self.platform.ask(prompt).await? else {
+                return Err(Status::OperationDenied);
+            };
+            token.verify();
+        }
         let encrypted = shared.encrypt(token.key());
         self.token = Some(token);
         Ok(response([(0x02, Value::Bytes(encrypted))]))

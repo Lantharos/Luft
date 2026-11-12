@@ -133,12 +133,30 @@ def results(machine: Check) -> list[dict]:
     return [json.loads(line) for line in lines.splitlines() if line.startswith("{")]
 
 
+def open_page(machine: Check, browser: str, step: str) -> str:
+    return machine.as_user(
+        f"sh -c '{BROWSERS[browser]} \"{PAGE}?step={step}\" >/tmp/{browser}-{step}.log 2>&1 & echo $!'"
+    ).splitlines()[-1]
+
+
+def outcome(machine: Check, browser: str, step: str, pid: str, before: int, shots: Path | None) -> dict:
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        found = results(machine)
+        if len(found) > before:
+            machine.run(f"kill {pid}; while kill -0 {pid} 2>/dev/null; do sleep 0.2; done", 30)
+            return {key: value for key, value in found[-1].items() if key != "publicKey"}
+        time.sleep(1)
+    if shots:
+        machine.screenshot(shots / f"{browser}-{step}-stuck.png")
+    machine.run(f"kill {pid}")
+    return {"step": step, "ok": False, "error": "no result"}
+
+
 def ceremony(machine: Check, browser: str, step: str, verify: str, shots: Path | None) -> dict:
     before = len(results(machine))
     shown = prompts(machine)
-    pid = machine.as_user(
-        f"sh -c '{BROWSERS[browser]} \"{PAGE}?step={step}\" >/tmp/{browser}.log 2>&1 & echo $!'"
-    ).splitlines()[-1]
+    pid = open_page(machine, browser, step)
     wait_for_prompt(machine, shown)
     if shots:
         machine.screenshot(shots / f"{browser}-{step}.png")
@@ -151,17 +169,23 @@ def ceremony(machine: Check, browser: str, step: str, verify: str, shots: Path |
         if shots:
             machine.screenshot(shots / "chromium-choose.png")
         machine.type("\n")
-    deadline = time.monotonic() + 60
+    return outcome(machine, browser, step, pid, before, shots)
+
+
+def missing(machine: Check, browser: str, shots: Path | None) -> dict:
+    before = len(results(machine))
+    shown = prompts(machine)
+    pid = open_page(machine, browser, "missing")
+    deadline = time.monotonic() + 25
     while time.monotonic() < deadline:
-        found = results(machine)
-        if len(found) > before:
-            machine.run(f"kill {pid}; while kill -0 {pid} 2>/dev/null; do sleep 0.2; done", 30)
-            return {key: value for key, value in found[-1].items() if key != "publicKey"}
-        time.sleep(1)
+        if prompts(machine) - shown:
+            machine.run(f"kill {pid}")
+            return {"step": "missing", "ok": False, "error": "Luft asked for a passkey it doesn't have"}
+        time.sleep(0.3)
     if shots:
-        machine.screenshot(shots / f"{browser}-{step}-stuck.png")
-    machine.run(f"kill {pid}")
-    return {"step": step, "ok": False, "error": "no result"}
+        machine.screenshot(shots / f"{browser}-missing.png")
+    machine.machine.press("esc")
+    return outcome(machine, browser, "missing", pid, before, shots)
 
 
 def main():
@@ -187,8 +211,11 @@ def main():
         machine.as_user(f"sh -c 'python3 /usr/share/passkeys-check/serve.py {RESULTS} >/tmp/serve.log 2>&1 &'")
         print(json.dumps(report(machine), indent=2))
         verify = "password" if arguments.password else "fingerprint"
-        for browser in arguments.browsers.split(","):
-            for step in ("create", "get"):
+        browsers = arguments.browsers.split(",")
+        for browser in browsers:
+            print(browser, json.dumps(missing(machine, browser, arguments.shots)), flush=True)
+        for browser in browsers:
+            for step in ("create", "get", "listed"):
                 print(browser, json.dumps(ceremony(machine, browser, step, verify, arguments.shots)), flush=True)
         print(
             machine.as_user(

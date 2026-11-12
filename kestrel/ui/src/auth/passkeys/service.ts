@@ -2,14 +2,15 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { verifiedName } from '../../shared/apps/identity.js';
-import { callerOwns } from '../../shared/dbus/processes.js';
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
+import { callerIsShielded } from '../../shared/dbus/shielded.js';
 import type { Account, Purpose, Request } from './copy.js';
 import { PasskeyPrompt } from './prompt.js';
 
 const BUS_NAME = 'com.lantharos.Kestrel.Passkeys';
 const PATH = '/com/lantharos/Kestrel/Passkeys';
 const AGENT = 'com.lantharos.Passkeys';
+const AGENT_PROGRAM = '/usr/libexec/luft-passkeys';
 const PURPOSES: Purpose[] = ['register', 'sign-in', 'manage', 'registered', 'choose'];
 
 const SERVICE_XML = `<node><interface name="com.lantharos.Kestrel.Passkeys1">
@@ -39,7 +40,7 @@ export class PasskeyPrompts {
   async OpenAsync([details]: [Record<string, GLib.Variant>], invocation: Gio.DBusMethodInvocation): Promise<void> {
     const sender = invocation.get_sender()!;
     if (await refuseSandboxed(invocation, 'ask about passkeys')) return;
-    if (!await callerOwns(invocation, AGENT)) {
+    if (!await callerIsShielded(invocation, AGENT, AGENT_PROGRAM)) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Luft Passkeys can ask about passkeys');
       return;
     }

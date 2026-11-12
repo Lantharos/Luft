@@ -1,9 +1,9 @@
-use std::ffi::CStr;
 use std::fs::{self, File};
-use std::io::Read;
-use std::os::fd::{AsRawFd, FromRawFd, OwnedFd, RawFd};
-use std::os::unix::fs::{MetadataExt, PermissionsExt};
+use std::os::fd::{AsFd, FromRawFd, OwnedFd, RawFd};
+use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
+
+use luft_shield::Process;
 
 const UNIT: &str = "luft-keyring.service";
 
@@ -25,7 +25,9 @@ fn identity(metadata: &fs::Metadata) -> (u64, u64) {
 
 impl Verifier {
     pub fn new(daemon: PathBuf) -> Self {
-        let at_start = fs::metadata(&daemon).ok().map(|metadata| identity(&metadata));
+        let at_start = fs::metadata(&daemon)
+            .ok()
+            .map(|metadata| identity(&metadata));
         Self { daemon, at_start }
     }
 
@@ -45,51 +47,12 @@ impl Verifier {
 
     fn is_keyring(&self, socket: RawFd, user: u32) -> Result<(), &'static str> {
         let pidfd = peer_pidfd(socket).ok_or("its process can't be identified")?;
-        let pid = pid_of(&pidfd).ok_or("its process has no ID")?;
-        let process = open_at(
-            None,
-            &format!("/proc/{pid}"),
-            libc::O_PATH | libc::O_DIRECTORY,
-        )
-        .ok_or("its process can't be opened")?;
-        alive(&pidfd, pid).ok_or("its process ended")?;
-
-        let status = read_at(&process, c"status").ok_or("its status can't be read")?;
-        let status = String::from_utf8_lossy(&status);
-        let field = |name: &str| {
-            status
-                .lines()
-                .find_map(|line| line.strip_prefix(name))
-                .map(str::split_whitespace)
-        };
-        let same_user = field("Uid:").is_some_and(|mut ids| ids.all(|id| id.parse() == Ok(user)));
-        check(same_user, "it changed its user IDs")?;
-        check(
-            field("TracerPid:").is_some_and(|tracer| tracer.eq(["0"])),
-            "it is being traced",
-        )?;
-
+        let process = Process::pinned(pidfd.as_fd())?;
+        process.started_shielded(&self.daemon, user)?;
         let binary =
             fs::metadata(&self.daemon).map_err(|_| "the keyring program isn't installed")?;
-        let mode = binary.permissions().mode();
-        check(
-            binary.uid() == 0 && mode & 0o022 == 0,
-            "the keyring program isn't protected by root",
-        )?;
-        check(
-            mode & libc::S_ISGID != 0 && binary.gid() != 0,
-            "the keyring program isn't installed with its own group",
-        )?;
-        let raised = field("Gid:").and_then(|mut ids| {
-            let real = ids.next()?.parse::<u32>().ok()?;
-            let effective = ids.next()?.parse::<u32>().ok()?;
-            Some(real != effective && effective == binary.gid())
-        });
-        check(
-            raised == Some(true),
-            "it didn't start with the keyring's group, so it may be watched",
-        )?;
-        let running = open_at(Some(&process), "exe", libc::O_PATH)
+        let running = process
+            .open("exe", libc::O_PATH)
             .and_then(|exe| File::from(exe).metadata().ok())
             .ok_or("its program can't be read")?;
         let running = identity(&running);
@@ -98,7 +61,8 @@ impl Verifier {
             "it isn't the keyring program",
         )?;
 
-        let cgroup = read_at(&process, c"cgroup")
+        let cgroup = process
+            .read("cgroup")
             .and_then(|cgroup| String::from_utf8(cgroup).ok())
             .unwrap_or_default();
         let path = cgroup
@@ -111,7 +75,7 @@ impl Verifier {
             "it doesn't run as the keyring service",
         )?;
 
-        alive(&pidfd, pid).ok_or("its process ended")
+        process.still_running()
     }
 }
 
@@ -151,41 +115,4 @@ fn peer_pidfd(socket: RawFd) -> Option<OwnedFd> {
         )
     };
     (result == 0 && pidfd >= 0).then(|| unsafe { OwnedFd::from_raw_fd(pidfd) })
-}
-
-fn pid_of(pidfd: &OwnedFd) -> Option<u32> {
-    let info = fs::read_to_string(format!("/proc/self/fdinfo/{}", pidfd.as_raw_fd())).ok()?;
-    info.lines()
-        .find_map(|line| line.strip_prefix("Pid:"))
-        .and_then(|pid| pid.trim().parse().ok())
-        .filter(|pid| *pid > 0)
-}
-
-fn alive(pidfd: &OwnedFd, pid: u32) -> Option<()> {
-    (pid_of(pidfd) == Some(pid)).then_some(())
-}
-
-fn open_at(directory: Option<&OwnedFd>, path: &str, flags: libc::c_int) -> Option<OwnedFd> {
-    let path = std::ffi::CString::new(path).ok()?;
-    let directory = directory.map_or(libc::AT_FDCWD, AsRawFd::as_raw_fd);
-    let fd = unsafe { libc::openat(directory, path.as_ptr(), flags | libc::O_CLOEXEC) };
-    (fd >= 0).then(|| unsafe { OwnedFd::from_raw_fd(fd) })
-}
-
-fn read_at(directory: &OwnedFd, name: &CStr) -> Option<Vec<u8>> {
-    let fd = unsafe {
-        libc::openat(
-            directory.as_raw_fd(),
-            name.as_ptr(),
-            libc::O_RDONLY | libc::O_CLOEXEC,
-        )
-    };
-    if fd < 0 {
-        return None;
-    }
-    let mut contents = Vec::new();
-    unsafe { File::from_raw_fd(fd) }
-        .read_to_end(&mut contents)
-        .ok()?;
-    Some(contents)
 }

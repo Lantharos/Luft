@@ -61,17 +61,22 @@ configure_security() {
   done
   semodule "${modules[@]}"
   authselect enable-feature with-fingerprint
-  systemd-sysusers /usr/lib/sysusers.d/luft-keyring.conf
-  give_keyring_its_group
+  shield_helpers /
 }
 
-give_keyring_its_group() {
-  local fixed
-  fixed="$(awk '$1 == "g" {print $3}' /usr/lib/sysusers.d/luft-keyring.conf)"
-  [[ "$(getent group luft-keyring | cut -d: -f3)" == "$fixed" ]] ||
-    { echo "luft-keyring didn't get its fixed group ID $fixed" >&2; exit 1; }
-  chgrp "$fixed" /usr/libexec/luft-keyring
-  chmod 2755 /usr/libexec/luft-keyring
+shielded=(luft-keyring luft-passkeys)
+
+shield_helpers() {
+  local tree="$1" helper fixed
+  for helper in "${shielded[@]}"; do
+    [[ -f "$tree/usr/libexec/$helper" ]] || continue
+    systemd-sysusers "/usr/lib/sysusers.d/$helper.conf"
+    fixed="$(awk '$1 == "g" {print $3}' "/usr/lib/sysusers.d/$helper.conf")"
+    [[ "$(getent group "$helper" | cut -d: -f3)" == "$fixed" ]] ||
+      { echo "$helper didn't get its fixed group ID $fixed" >&2; exit 1; }
+    chgrp "$fixed" "/usr/libexec/$helper"
+    chmod 2755 "/usr/libexec/$helper"
+  done
 }
 
 check_sabine_apps() {

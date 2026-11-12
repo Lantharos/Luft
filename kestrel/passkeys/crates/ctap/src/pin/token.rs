@@ -18,6 +18,7 @@ pub struct Token {
     protocol: Protocol,
     permissions: u8,
     rp_id: Option<String>,
+    user_verified: bool,
     user_present: bool,
     issued: Instant,
     last_used: Instant,
@@ -30,6 +31,7 @@ impl Token {
             protocol,
             permissions,
             rp_id,
+            user_verified: false,
             user_present: true,
             issued: Instant::now(),
             last_used: Instant::now(),
@@ -67,6 +69,14 @@ impl Token {
         }
         self.last_used = Instant::now();
         Ok(())
+    }
+
+    pub fn verified(&self) -> bool {
+        self.user_verified
+    }
+
+    pub fn verify(&mut self) {
+        self.user_verified = true;
     }
 
     pub fn take_presence(&mut self) -> bool {

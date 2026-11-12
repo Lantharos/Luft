@@ -4,7 +4,7 @@ Interfaces that let Luft Keyring and GnuPG ask through Kestrel's own dialogs. Bo
 
 ## Keyring prompter
 
-`com.lantharos.Kestrel.KeyringPrompter` at `/com/lantharos/Kestrel/KeyringPrompter`. Only the owner of `org.freedesktop.secrets` may call it.
+`com.lantharos.Kestrel.KeyringPrompter` at `/com/lantharos/Kestrel/KeyringPrompter`. Only `luft-keyring` may call it: the owner of `org.freedesktop.secrets`, running `/usr/libexec/luft-keyring` with the group that program is installed setgid to ([Shielded helpers](security.md#shielded-helpers)). A Kestrel started from a build only checks the bus name, so the keyring checks can stand in for the keyring.
 
 | Method | Arguments | Returns | Asks |
 | --- | --- | --- | --- |

@@ -4,6 +4,7 @@ mod seat;
 use std::io::{self, Read, Write};
 use std::os::fd::{AsFd, FromRawFd, OwnedFd};
 use std::os::unix::net::UnixStream;
+use std::path::Path;
 use std::process::ExitCode;
 
 use rustix::event::{PollFd, PollFlags, poll};
@@ -12,6 +13,7 @@ use rustix::net::sockopt::socket_peercred;
 use device::{Device, Event, REPORT};
 use seat::Seat;
 
+const AGENT: &str = "/usr/libexec/luft-passkeys";
 const REPORT_FRAME: u8 = 0;
 const ATTACHED_FRAME: u8 = 1;
 const DETACHED_FRAME: u8 = 2;
@@ -89,15 +91,28 @@ fn relay(mut agent: UnixStream, seat: &Seat) -> io::Result<()> {
     }
 }
 
+fn started_as_luft_passkeys(group: u32) -> Result<(), &'static str> {
+    if group == luft_shield::group_of(Path::new(AGENT))? {
+        Ok(())
+    } else {
+        Err("it didn't start Luft Passkeys with its group")
+    }
+}
+
 fn main() -> ExitCode {
     let agent = UnixStream::from(unsafe { OwnedFd::from_raw_fd(0) });
-    let uid = match socket_peercred(agent.as_fd()) {
-        Ok(credentials) => credentials.uid.as_raw(),
+    let credentials = match socket_peercred(agent.as_fd()) {
+        Ok(credentials) => credentials,
         Err(error) => {
             eprintln!("Couldn't identify who connected: {error}");
             return ExitCode::FAILURE;
         }
     };
+    let uid = credentials.uid.as_raw();
+    if let Err(reason) = started_as_luft_passkeys(credentials.gid.as_raw()) {
+        eprintln!("Refused user {uid}: {reason}");
+        return ExitCode::FAILURE;
+    }
     let seat = match Seat::watch(uid) {
         Ok(seat) => seat,
         Err(error) => {

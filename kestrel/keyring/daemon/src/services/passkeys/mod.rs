@@ -1,3 +1,4 @@
+mod agent;
 mod key;
 mod record;
 
@@ -17,8 +18,6 @@ use crate::unlocking::link;
 use record::{Passkey, collection, find};
 
 pub use record::{COLLECTION, SCHEMA};
-
-const AGENT: &str = "com.lantharos.Passkeys";
 
 #[derive(Debug, DBusError)]
 #[zbus(prefix = "com.lantharos.Keyring1.Error")]
@@ -68,7 +67,7 @@ pub struct Passkeys {
 impl Passkeys {
     async fn caller(&self, header: &Header<'_>) -> Result<Requester, PasskeyError> {
         let requester = self.daemon.requester(header).await;
-        if !requester.is_you() || !self.daemon.sent_by_owner_of(header, AGENT).await {
+        if !requester.is_you() || !agent::is_luft_passkeys(&self.daemon, header).await {
             return Err(PasskeyError::NotAllowed(
                 "Only Luft Passkeys can use passkeys".into(),
             ));

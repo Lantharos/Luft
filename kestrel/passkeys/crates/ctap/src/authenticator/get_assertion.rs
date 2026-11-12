@@ -111,7 +111,9 @@ impl<P: Platform> Authenticator<P> {
         } else {
             (0, None)
         };
-        self.spend_token(by_token);
+        if by_token && options.presence {
+            self.spend_token();
+        }
 
         if let Some(account) = account {
             let credential = candidates.get(account).ok_or(Status::Other)?;

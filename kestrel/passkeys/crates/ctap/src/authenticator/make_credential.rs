@@ -140,7 +140,9 @@ impl<P: Platform> Authenticator<P> {
                 self.platform.delete(&replaced.id).await?;
             }
         }
-        self.spend_token(by_token);
+        if by_token {
+            self.spend_token();
+        }
 
         let mut outputs = Vec::new();
         outputs.extend(

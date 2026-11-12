@@ -182,3 +182,119 @@ fn derives_hmac_secrets_bound_to_verification() {
         Protocol::Two.authenticate(&random, &salt).as_slice()
     );
 }
+
+fn sign_in_with_token(
+    authenticator: &mut Authenticator<Mock>,
+    token: &[u8; 32],
+    rp_id: &str,
+    allowed: &[&[u8]],
+    presence: bool,
+) -> std::result::Result<Value, u8> {
+    let client_data_hash = vec![7; 32];
+    let mut body = vec![
+        (0x01, Value::from(rp_id)),
+        (0x02, Value::Bytes(client_data_hash.clone())),
+        (
+            0x06,
+            Value::Bytes(Protocol::Two.authenticate(token, &client_data_hash)),
+        ),
+        (0x07, Value::from(2)),
+    ];
+    if !allowed.is_empty() {
+        let descriptors = allowed
+            .iter()
+            .map(|id| crate::model::descriptor(id))
+            .collect();
+        body.push((0x03, Value::Array(descriptors)));
+    }
+    if !presence {
+        body.push((0x05, cbor::map([("up", Value::from(false))])));
+    }
+    command(authenticator, 0x02, cbor::map(body))
+}
+
+#[test]
+fn signing_in_where_nothing_is_stored_never_asks() {
+    let mut authenticator = Authenticator::new(Mock::default());
+    resident(&mut authenticator, "gitlab.com", "mara");
+    let token = token(&mut authenticator, 0x02, Some("github.com"));
+    assert_eq!(
+        sign_in_with_token(&mut authenticator, &token, "github.com", &[], true),
+        Err(Status::NoCredentials.code())
+    );
+    assert_eq!(
+        sign_in_with_token(&mut authenticator, &token, "github.com", &[&[3; 16]], false),
+        Err(Status::NoCredentials.code())
+    );
+    let touch = cbor::map([
+        (0x01, Value::Bytes(vec![0; 32])),
+        (0x02, cbor::map([("id", Value::from("make.me.blink"))])),
+        (0x03, cbor::map([("id", Value::Bytes(vec![0]))])),
+        (
+            0x04,
+            Value::Array(vec![cbor::map([
+                ("alg", Value::from(-7)),
+                ("type", Value::from("public-key")),
+            ])]),
+        ),
+        (0x08, Value::Bytes(Vec::new())),
+        (0x09, Value::from(1)),
+    ]);
+    assert_eq!(
+        command(&mut authenticator, 0x01, touch.clone()),
+        Err(Status::OperationDenied.code())
+    );
+    assert_eq!(authenticator.platform().purposes(), [Purpose::Register]);
+
+    assert_eq!(
+        command(&mut authenticator, 0x01, touch),
+        Err(Status::PinNotSet.code())
+    );
+    assert_eq!(
+        authenticator.platform().purposes(),
+        [Purpose::Register, Purpose::Choose]
+    );
+}
+
+#[test]
+fn signing_in_with_a_stored_passkey_asks_once() {
+    let mut authenticator = Authenticator::new(Mock::default());
+    let id = resident(&mut authenticator, "github.com", "mara");
+    let token = token(&mut authenticator, 0x02, Some("github.com"));
+    assert_eq!(authenticator.platform().purposes(), [Purpose::Register]);
+    let response = sign_in_with_token(&mut authenticator, &token, "github.com", &[], true).unwrap();
+    let fields = entries(&response);
+    assert_eq!(
+        bytes(&entries(fields.required(0x01).unwrap()), "id"),
+        id.as_slice()
+    );
+    assert_eq!(parse_auth_data(bytes(&fields, 0x02)).flags, UP | UV);
+    assert_eq!(
+        authenticator.platform().purposes(),
+        [Purpose::Register, Purpose::SignIn]
+    );
+    assert_eq!(
+        sign_in_with_token(&mut authenticator, &token, "github.com", &[], true),
+        Err(Status::PinAuthInvalid.code())
+    );
+}
+
+#[test]
+fn a_silent_check_before_signing_in_keeps_the_token_and_asks_once() {
+    let mut authenticator = Authenticator::new(Mock::default());
+    let id = resident(&mut authenticator, "github.com", "mara");
+    let token = token(&mut authenticator, 0x02, Some("github.com"));
+    let checked =
+        sign_in_with_token(&mut authenticator, &token, "github.com", &[&id], false).unwrap();
+    assert_eq!(parse_auth_data(bytes(&entries(&checked), 0x02)).flags, UV);
+    let response =
+        sign_in_with_token(&mut authenticator, &token, "github.com", &[&id], true).unwrap();
+    assert_eq!(
+        parse_auth_data(bytes(&entries(&response), 0x02)).flags,
+        UP | UV
+    );
+    assert_eq!(
+        authenticator.platform().purposes(),
+        [Purpose::Register, Purpose::SignIn]
+    );
+}

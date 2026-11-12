@@ -78,6 +78,7 @@ const NEW_NAMESPACES: [libc::c_int; 8] = [
     libc::CLONE_NEWUSER,
     libc::CLONE_NEWUTS,
 ];
+const RUNNING_ANOTHER_PROGRAM: [libc::c_long; 2] = [libc::SYS_execve, libc::SYS_execveat];
 const REALTIME: [libc::c_int; 3] = [libc::SCHED_FIFO, libc::SCHED_RR, libc::SCHED_DEADLINE];
 const LINUX_PERSONALITY: u64 = 0;
 const PERSONALITY_QUERY: u64 = 0xffff_ffff;
@@ -94,7 +95,11 @@ fn rule(conditions: Vec<SeccompCondition>) -> SeccompRule {
 }
 
 fn refused() -> Rules {
-    let mut rules: Rules = PRIVILEGED.iter().map(|call| (*call, Vec::new())).collect();
+    let mut rules: Rules = PRIVILEGED
+        .iter()
+        .chain(&RUNNING_ANOTHER_PROGRAM)
+        .map(|call| (*call, Vec::new()))
+        .collect();
     let namespaces = NEW_NAMESPACES.map(|flag| {
         let flag = flag as u64;
         rule(vec![condition(0, SeccompCmpOp::MaskedEq(flag), flag)])

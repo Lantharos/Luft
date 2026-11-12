@@ -21,6 +21,6 @@ function startedFromBuild(): boolean {
   return running !== null && running !== fileId(`${Config.BINDIR}/kestrel`) && running === fileId(GLib.build_filenamev([build, 'kestrel']));
 }
 
-const STARTED_FROM_BUILD = startedFromBuild();
+export const STARTED_FROM_BUILD = startedFromBuild();
 
 export const developmentPath = (variable: string) => STARTED_FROM_BUILD ? GLib.getenv(variable) : null;

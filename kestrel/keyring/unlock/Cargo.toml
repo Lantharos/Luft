@@ -10,6 +10,7 @@ license.workspace = true
 getrandom.workspace = true
 libc.workspace = true
 luft-keyring-wire = { workspace = true, features = ["tokio"] }
+luft-shield.workspace = true
 postcard.workspace = true
 serde.workspace = true
 sha2.workspace = true

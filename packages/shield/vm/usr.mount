@@ -1,0 +1,11 @@
+[Unit]
+Description=The system's programs, read-only as on an installed Luft
+Before=luft-shield-check.service
+
+[Mount]
+What=/usr
+Where=/usr
+Options=bind,ro
+
+[Install]
+RequiredBy=luft-shield-check.service

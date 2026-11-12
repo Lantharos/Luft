@@ -46,9 +46,10 @@ pub async fn set(Change { id, source, on }: Change) -> Result<bool, String> {
 }
 
 pub async fn restart(Restart { id, desktop, token }: Restart) -> Result<(), String> {
-    let quitting = id.clone();
-    tokio::task::spawn_blocking(move || luft_sandbox::quit(&quitting))
-        .await
-        .map_err(|error| error.to_string())??;
-    super::launch_desktop(&desktop, token.as_deref())
+    tokio::task::spawn_blocking(move || {
+        luft_sandbox::quit(&id)?;
+        super::launch_desktop(&desktop, token.as_deref())
+    })
+    .await
+    .map_err(|error| error.to_string())?
 }

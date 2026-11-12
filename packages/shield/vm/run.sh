@@ -10,8 +10,9 @@ serial="$vm/serial.log"
 environment="$luft/kestrel/engine/src/environment"
 
 launch_flags=()
-for list in allowed development unsafe; do
-  launch_flags+=("-DLUFT_${list^^}_ENVIRONMENT=\"$(tr -s '[:space:]' ' ' <"$environment/$list.list" | sed 's/ $//')\"")
+for list in "$environment/allowed.list" "$environment/development.list" "$luft/packages/identity/unsafe.list"; do
+  name=$(basename "$list" .list)
+  launch_flags+=("-DLUFT_${name^^}_ENVIRONMENT=\"$(tr -s '[:space:]' ' ' <"$list" | sed 's/ $//')\"")
 done
 cc -O2 -o "$vm/luft-launch" "${launch_flags[@]}" "$environment/environment.c" "$environment/luft-launch.c"
 

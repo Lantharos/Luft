@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use luft_app::{Activation, Appearance, Events};
-use parking_lot::RwLock;
+use parking_lot::{Mutex, RwLock};
 use serde::Serialize;
 use specta::Type;
 
@@ -17,7 +17,7 @@ pub struct TernState {
     pub sessions: Sessions,
     pub settings: Arc<RwLock<Settings>>,
     pub glass: bool,
-    launch: Arc<LaunchRequest>,
+    launch: Arc<Mutex<LaunchRequest>>,
 }
 
 #[derive(Serialize, Type)]
@@ -25,6 +25,7 @@ pub struct TernState {
 pub struct AppState {
     settings: Settings,
     launch: LaunchRequest,
+    sessions: Vec<u32>,
     default_shell: String,
     shells: Vec<String>,
     glass: bool,
@@ -40,7 +41,9 @@ impl TernState {
             events: Events::default(),
             sessions: Sessions::default(),
             settings: Arc::new(RwLock::new(settings)),
-            launch: Arc::new(LaunchRequest::parse(&Activation::current_process())),
+            launch: Arc::new(Mutex::new(LaunchRequest::parse(
+                &Activation::current_process(),
+            ))),
         }
     }
 
@@ -48,7 +51,8 @@ impl TernState {
         let appearance = Appearance::current().await;
         AppState {
             settings: self.settings.read().clone(),
-            launch: self.launch.as_ref().clone(),
+            launch: std::mem::take(&mut *self.launch.lock()),
+            sessions: self.sessions.ids(),
             default_shell: shell::default_shell().to_string_lossy().into_owned(),
             shells: shell::available_shells(),
             glass: self.glass,

@@ -64,6 +64,7 @@ export type AppIcons = {
 export type AppState = {
 	settings: Settings,
 	launch: LaunchRequest,
+	sessions: number[],
 	defaultShell: string,
 	shells: string[],
 	glass: boolean,

@@ -38,6 +38,12 @@ impl Sessions {
         Ok(id)
     }
 
+    pub fn ids(&self) -> Vec<u32> {
+        let mut ids: Vec<u32> = self.open.read().keys().copied().collect();
+        ids.sort_unstable();
+        ids
+    }
+
     pub fn attach(&self, id: u32) {
         if let Some(session) = self.get(id) {
             session.output().attach();

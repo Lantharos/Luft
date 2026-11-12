@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::sync::{Arc, Weak};
 
 use base64::Engine;
@@ -13,6 +14,7 @@ use crate::events::{EXITED, OUTPUT};
 const CHUNK_BYTES: usize = 256 * 1024;
 const MAX_CHUNKS_IN_FLIGHT: usize = 16;
 const PENDING_LIMIT: usize = 1024 * 1024;
+const REPLAY_LIMIT: usize = 256 * 1024;
 
 #[derive(Serialize, Type)]
 pub struct TerminalOutput {
@@ -38,6 +40,7 @@ pub struct Output {
 #[derive(Default)]
 pub struct State {
     pending: Vec<u8>,
+    replay: VecDeque<u8>,
     in_flight: usize,
     exit_code: Option<i32>,
     drained: bool,
@@ -53,6 +56,12 @@ impl State {
 
     pub fn has_room(&self) -> bool {
         self.pending.len() < PENDING_LIMIT
+    }
+
+    fn sent(&mut self, length: usize) {
+        self.replay.extend(self.pending.drain(..length));
+        let excess = self.replay.len().saturating_sub(REPLAY_LIMIT);
+        self.replay.drain(..excess);
     }
 
     fn ready(&self) -> bool {
@@ -106,9 +115,20 @@ impl Output {
     }
 
     pub fn attach(&self) {
-        let mut state = self.state.lock();
-        state.attached = true;
-        self.flush(&mut state);
+        let released = {
+            let mut state = self.state.lock();
+            state.attached = true;
+            state.exit_sent = false;
+            let mut shown = Vec::from(std::mem::take(&mut state.replay));
+            shown.append(&mut state.pending);
+            state.pending = shown;
+            let released = std::mem::take(&mut state.in_flight);
+            self.flush(&mut state);
+            released
+        };
+        for _ in 0..released {
+            self.budget.give_back();
+        }
     }
 
     pub fn resume(&self) {
@@ -157,7 +177,7 @@ impl Output {
                 self.budget.refund();
                 return;
             }
-            state.pending.drain(..length);
+            state.sent(length);
             state.in_flight += 1;
         }
         if let (Some(code), true, true, false) = (

@@ -30,7 +30,8 @@
 		settings.start(state);
 		stops.push(appearance.start(state));
 		const launched = state.launch.directory !== null || state.launch.command !== null;
-		if (folders?.tabs.length && !launched) workspace.reopen(folders);
+		if (state.sessions.length) workspace.adopt(state.sessions);
+		else if (folders?.tabs.length && !launched) workspace.reopen(folders);
 		else workspace.openTab(state.launch);
 		keepWindowState(workspace.folders);
 	}

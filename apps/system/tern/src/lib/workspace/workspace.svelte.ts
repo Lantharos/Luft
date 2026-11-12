@@ -65,19 +65,23 @@ export class Workspace {
 		return this.tabs.find((tab) => tab.sessions.includes(session));
 	}
 
-	#session(request: LaunchRequest) {
-		return new TerminalSession(settings.options, request, this.#events);
+	#session(request: LaunchRequest, adopted: number | null = null) {
+		return new TerminalSession(settings.options, request, this.#events, adopted);
 	}
 
 	#here(): LaunchRequest {
 		return { directory: this.focused?.cwd ?? null, command: null };
 	}
 
-	openTab(request = this.#here()) {
-		const tab = new Tab(this.#session(request));
+	openTab(request = this.#here(), adopted: number | null = null) {
+		const tab = new Tab(this.#session(request, adopted));
 		const index = this.active ? this.tabs.indexOf(this.active) + 1 : this.tabs.length;
 		this.tabs.splice(index, 0, tab);
 		this.select(tab);
+	}
+
+	adopt(ids: number[]) {
+		for (const id of ids) this.openTab({ directory: null, command: null }, id);
 	}
 
 	reopen({ tabs, active }: Folders) {

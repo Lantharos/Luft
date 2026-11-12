@@ -57,6 +57,7 @@ export class TerminalSession {
 	#integration: ShellIntegration;
 	#events: SessionEvents;
 	#request: LaunchRequest;
+	#adopted: number | null;
 	#id: number | null = null;
 	#input: InputQueue | null = null;
 	#disconnect: (() => void) | null = null;
@@ -64,9 +65,10 @@ export class TerminalSession {
 	#visible = false;
 	#disposed = false;
 
-	constructor(options: TerminalOptions, request: LaunchRequest, events: SessionEvents) {
+	constructor(options: TerminalOptions, request: LaunchRequest, events: SessionEvents, adopted: number | null = null) {
 		this.#events = events;
 		this.#request = request;
+		this.#adopted = adopted;
 		this.cwd = request.directory;
 		this.host.className = 'terminal-host';
 		this.terminal = new Terminal({
@@ -142,12 +144,14 @@ export class TerminalSession {
 
 	async #start() {
 		const { cols, rows } = this.terminal;
-		let id: number;
-		try {
-			id = await commands.ptySpawn({ cols, rows, ...this.#request });
-		} catch (error) {
-			this.terminal.write(`\x1b[2m${error}\x1b[0m\r\n`);
-			return;
+		let id = this.#adopted;
+		if (id === null) {
+			try {
+				id = await commands.ptySpawn({ cols, rows, ...this.#request });
+			} catch (error) {
+				this.terminal.write(`\x1b[2m${error}\x1b[0m\r\n`);
+				return;
+			}
 		}
 		if (this.#disposed) return void commands.ptyClose({ id });
 		this.#id = id;
@@ -157,7 +161,7 @@ export class TerminalSession {
 			exited: () => this.#events.exited(this)
 		});
 		const size = { cols: this.terminal.cols, rows: this.terminal.rows };
-		if (size.cols !== cols || size.rows !== rows) this.#input.resize(size);
+		if (this.#adopted !== null || size.cols !== cols || size.rows !== rows) this.#input.resize(size);
 	}
 
 	setVisible(visible: boolean) {

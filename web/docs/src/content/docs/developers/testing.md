@@ -71,7 +71,7 @@ The capture covers more when these are there:
 | --- | --- |
 | `rclone` | Rover and Settings sign in to local WebDAV and FTP servers |
 | `stalwart` 0.15 | Mailman signs in to a local mail server and sends over SMTP and JMAP. Later versions lack the in-memory directory the checks configure |
-| `squashfuse_ll` and `mksquashfs` | Sabine AppImages installed in their sandbox, with files handed to them through the portals |
+| `squashfuse_ll` and `mksquashfs` | Sabine AppImages installed in their sandbox by the `schelf` command through the open Schelf app, with files handed to them through the portals. Build both with `cargo build --release -p schelf -p schelf-cli` |
 | `KESTREL_APPIMAGES` | Each AppImage in that folder installed through Schelf and started in its sandbox |
 | `KESTREL_ELECTRON` | An `electron` binary, for scrolling, the on-screen keyboard, frameless windows and Electron's own sandbox inside the AppImage sandbox |
 | `KESTREL_HELIUM` | A Helium AppImage or binary, for scrolling, the on-screen keyboard, links handed over from other apps and files dropped into a page |

@@ -4,9 +4,11 @@ import GLib from 'gi://GLib';
 import {runtime} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {fixture, outcome, repository, scratch} from '../../lib/processes.js';
+import {withApp} from './apps.js';
 
 const {require} = checks('AppImage sandbox');
 const SCHELF = repository('target', 'release', 'schelf');
+const COMMAND = repository('target', 'release', 'schelf-cli');
 const SANDBOX = '--sandbox';
 
 export const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
@@ -37,10 +39,13 @@ export function launchLine(id: string) {
 export async function install(path: string) {
   const copy = scratch(`appimage-${GLib.path_get_basename(path)}`);
   Gio.File.new_for_path(path).copy(Gio.File.new_for_path(copy), Gio.FileCopyFlags.OVERWRITE, null, null);
-  const before = entries();
-  const installed = await outcome([SCHELF, 'install', '--yes', copy]);
-  require(installed.ok, `Schelf installs ${GLib.path_get_basename(path)}`);
-  const [id] = [...entries()].filter(name => !before.has(name));
+  const {installed, added} = await withApp('schelf', [], async () => {
+    const before = entries();
+    const installed = await outcome([COMMAND, 'install', '--yes', copy]);
+    return {installed, added: [...entries()].filter(name => !before.has(name))};
+  });
+  require(installed.ok, `Schelf installs ${GLib.path_get_basename(path)} from the terminal (${installed.stderr})`);
+  const [id] = added;
   require(id, `${GLib.path_get_basename(path)} gets a menu entry`);
   const {program, rest} = launchLine(id);
   require(sameFile(program, SCHELF) && rest[0] === SANDBOX && rest[1] === id, `the menu entry of ${id} starts it in its sandbox (${[program, ...rest].join(' ')})`);

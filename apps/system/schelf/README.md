@@ -23,6 +23,8 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
+The developer view reads schelf.store's publisher API through `publish`. The `store` example of the desktop crate serves a stand-in publisher with someone signed in, on a session bus and home of its own; how to start a debug build against it is at the top of `desktop/examples/store/main.rs`.
+
 Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:app/<id>`, `schelf:updates`, `schelf:installed`, `schelf:extensions`, `schelf:search?<query>`).
 
 ## Command line

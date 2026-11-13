@@ -70,7 +70,7 @@ export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint,
 
 export { default as Spinner } from './notices/Spinner.svelte';
 export { default as Toast } from './notices/Toast.svelte';
-export { Toasts, type ToastMessage } from './notices/toasts.svelte';
+export { Toasts, type ToastAction, type ToastMessage } from './notices/toasts.svelte';
 
 export { errorText } from './text/errors';
 export { ago, bytes, date, dateTime, duration, longDateTime, longDuration, memoryBytes, month, plural, relativeDay, time, watts, weekdayTime } from './text/format';

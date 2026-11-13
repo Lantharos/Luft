@@ -1,4 +1,4 @@
-import { longDateTime } from '@luft/ui';
+import { longDateTime, type ToastAction } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Address, Attached, ConversationMessage, Draft, OutboxEvent, Rendered } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
@@ -223,15 +223,21 @@ class Composer {
 			if (!this.failureShowing()) toasts.show('Sent');
 			return;
 		}
+		if (event.state === 'refused') {
+			const { draft } = event;
+			this.kept.delete(event.id);
+			this.failed.delete(event.id);
+			return this.showFailure(event.id, 'Not sent. Saved to Drafts.', event.reason, draft === null ? null : { label: 'Open draft', run: () => void this.reopen(draft) });
+		}
 		if (!watched && this.failed.has(event.id)) return;
 		this.failed.add(event.id);
-		toasts.show(`Couldn't send: ${event.error}. Mailman will try again.`, {
-			failed: true,
-			duration: null,
-			action: { label: 'Open draft', run: () => void this.takeBack(event.id) }
-		});
-		this.failure = { id: event.id, toast: toasts.current!.id };
+		this.showFailure(event.id, 'Not sent yet. Trying again in a minute.', event.reason, { label: 'Open draft', run: () => void this.takeBack(event.id) });
 	};
+
+	private showFailure(id: number, message: string, reason: string, action: ToastAction | null) {
+		toasts.show(message, { failed: true, duration: null, action, detail: { title: "Why it wasn't sent", text: reason } });
+		this.failure = { id, toast: toasts.current!.id };
+	}
 
 	private failureShowing() {
 		return this.failure !== null && this.failure.toast === toasts.current?.id;

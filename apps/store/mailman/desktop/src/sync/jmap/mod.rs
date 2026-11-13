@@ -13,7 +13,7 @@ use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
 use crate::accounts::{Login, SignInError};
 use crate::protocols::jmap::{CORE, Client, MAIL, SUBMISSION};
-use crate::store::{Flag, Mailbox, Outgoing, RemoteFolder, Role};
+use crate::store::{Delivery, Flag, Mailbox, Outgoing, RemoteFolder, Role};
 use mail::Changes;
 
 const STATE_LIFETIME: Duration = Duration::from_secs(5);
@@ -285,7 +285,7 @@ impl Remote for JmapRemote {
         }
     }
 
-    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<(), String> {
+    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String> {
         let sent = context
             .store
             .mailbox_with_role(context.account.id, Role::Sent)?
@@ -308,15 +308,18 @@ impl Remote for JmapRemote {
             )],
         )?;
         let failure = &responses[0]["notCreated"]["send"];
-        if failure.is_object() {
-            self.destroy(&[email])?;
-            return Err(format!(
-                "Sending failed: {}",
-                failure["description"]
-                    .as_str()
-                    .unwrap_or("the server refused it")
-            ));
+        if !failure.is_object() {
+            return Ok(Delivery::Sent);
         }
-        Ok(())
+        self.destroy(&[email])?;
+        let reason = failure["description"]
+            .as_str()
+            .or(failure["type"].as_str())
+            .unwrap_or("The server refused it")
+            .to_owned();
+        match failure["type"].as_str() {
+            Some("serverFail" | "serverUnavailable" | "forbiddenToSend") => Err(reason),
+            _ => Ok(Delivery::Refused(reason)),
+        }
     }
 }

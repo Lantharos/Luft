@@ -14,6 +14,11 @@ pub struct Outgoing {
     pub remind_at: Option<i64>,
 }
 
+pub enum Delivery {
+    Sent,
+    Refused(String),
+}
+
 pub struct Reminder {
     pub message_id: String,
     pub account: i64,
@@ -94,6 +99,18 @@ impl Store {
     pub fn finish_outgoing(&self, id: i64) -> Result<(), String> {
         self.writing(|connection| connection.execute("DELETE FROM outbox WHERE id = ?1", [id]))
             .map(drop)
+    }
+
+    pub fn shelve_outgoing(&self, id: i64, account: i64, operation: &str) -> Result<(), String> {
+        self.writing(|connection| {
+            let transaction = connection.transaction()?;
+            transaction.execute(
+                "INSERT INTO operations (account, operation) VALUES (?1, ?2)",
+                params![account, operation],
+            )?;
+            transaction.execute("DELETE FROM outbox WHERE id = ?1", [id])?;
+            transaction.commit()
+        })
     }
 
     pub fn retry_outgoing(&self, id: i64, error: &str) -> Result<(), String> {

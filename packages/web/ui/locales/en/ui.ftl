@@ -21,6 +21,8 @@ ui-password-show = Show password
 ui-password-hide = Hide password
 # Button that closes a notification bubble (screen-reader label)
 ui-toast-dismiss = Dismiss
+# Button on a notification bubble that opens the full explanation
+ui-toast-details = Details
 
 ## Media playback controls
 

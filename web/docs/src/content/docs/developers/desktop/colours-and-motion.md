@@ -112,7 +112,7 @@ offset.set(fingerX);
 offset.to(0, { velocity: releaseSpeed, spring: Spring.thrown });
 ```
 
-The Svelte transitions `page`, `dialog`, `fade`, `toast`, `item` and `menu` make things enter and leave the same way in every app, and `reorder` slides list items to their new places as others come and go; inside a `Section`, wrap each row in a `row-slot` so the dividers stay between rows. `selectionPill()` slides one highlight to a sidebar's item marked `aria-current="page"`, and `Toasts` shows one toast at a time that pauses under the pointer and can be swiped away.
+The Svelte transitions `page`, `dialog`, `fade`, `toast`, `item` and `menu` make things enter and leave the same way in every app, and `reorder` slides list items to their new places as others come and go; inside a `Section`, wrap each row in a `row-slot` so the dividers stay between rows. `selectionPill()` slides one highlight to a sidebar's item marked `aria-current="page"`, and `Toasts` shows one toast at a time that pauses under the pointer and can be swiped away. A toast shown with `duration: null` stays until it's closed, and one with a `detail` opens the full text in a dialog.
 
 ```svelte
 {#each devices as device (device.id)}

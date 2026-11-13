@@ -241,6 +241,17 @@ impl Store {
         })
     }
 
+    pub fn find_message(&self, mailbox: i64, message_id: &str) -> Result<Option<i64>, String> {
+        self.reading(|connection| {
+            connection
+                .prepare_cached(
+                    "SELECT id FROM messages WHERE mailbox = ?1 AND message_id = ?2 ORDER BY id DESC LIMIT 1",
+                )?
+                .query_row(params![mailbox, message_id], |row| row.get(0))
+                .optional()
+        })
+    }
+
     pub fn forget(&self, ids: &[i64]) -> Result<(), String> {
         self.writing(|connection| {
             let transaction = connection.transaction()?;

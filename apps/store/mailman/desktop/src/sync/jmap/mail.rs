@@ -164,7 +164,13 @@ impl JmapRemote {
         mailbox: &Mailbox,
         wanted: &[String],
     ) -> Result<Vec<Inserted>, String> {
-        let emails = self.get_many(wanted, &header_properties())?;
+        let departing: HashSet<String> = context.store.departed(mailbox.id)?.into_iter().collect();
+        let arriving: Vec<String> = wanted
+            .iter()
+            .filter(|id| !departing.contains(*id))
+            .cloned()
+            .collect();
+        let emails = self.get_many(&arriving, &header_properties())?;
         self.insert(context, mailbox, &emails)
     }
 

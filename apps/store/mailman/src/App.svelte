@@ -213,7 +213,7 @@
 			<Composer bind:composition={composer.current} />
 		{/if}
 		<Toast
-			class="bottom-6 left-[calc(var(--sidebar-width)_+_24px)] translate-x-0"
+			class="bottom-6 left-[calc(var(--sidebar-width)_+_24px)] translate-x-0 [--toast-room:calc(100vw_-_var(--sidebar-width)_-_48px)]"
 			toast={toasts.current}
 			ondismiss={toasts.dismiss}
 			onhold={toasts.hold}

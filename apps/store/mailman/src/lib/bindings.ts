@@ -353,7 +353,7 @@ export type Opening = {
 	thread: number | null,
 };
 
-export type OutboxEvent = { state: "sending"; id: number } | { state: "sent"; id: number } | { state: "failed"; id: number; error: string };
+export type OutboxEvent = { state: "sending"; id: number } | { state: "sent"; id: number } | { state: "failed"; id: number; reason: string } | { state: "refused"; id: number; reason: string; draft: number | null };
 
 export type Palette = {
 	accent: string,

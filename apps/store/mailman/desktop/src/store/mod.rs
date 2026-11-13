@@ -19,7 +19,7 @@ use specta::Type;
 pub use accounts::Identity;
 pub use mail::{Cursor, Fetched, Flag, Flags, Inserted, Located, NewMessage, Notable, View};
 pub use mailboxes::{Mailbox, RemoteFolder};
-pub use outbox::Outgoing;
+pub use outbox::{Delivery, Outgoing};
 pub use senders::Verdict;
 pub use settings::Settings;
 

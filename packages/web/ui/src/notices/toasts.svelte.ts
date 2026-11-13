@@ -5,16 +5,24 @@ export interface ToastAction {
 	run: () => unknown;
 }
 
+export interface ToastDetail {
+	title: string;
+	text: string;
+}
+
 export interface ToastMessage {
 	id: number;
 	message: string;
 	action?: ToastAction | null;
+	detail?: ToastDetail | null;
 	failed?: boolean;
 	busy?: boolean;
+	lasting?: boolean;
 }
 
 interface ShowOptions {
 	action?: ToastAction | null;
+	detail?: ToastDetail | null;
 	failed?: boolean;
 	busy?: boolean;
 	duration?: number | null;
@@ -29,14 +37,12 @@ export class Toasts {
 	#timer: ReturnType<typeof setTimeout> | undefined;
 	#next = 0;
 	#held = false;
-	#lasting = false;
 
 	constructor(private readonly shownMs = SHOWN_MS) {}
 
-	show(message: string, { action = null, failed = false, busy = false, duration = this.shownMs }: ShowOptions = {}) {
+	show(message: string, { action = null, detail = null, failed = false, busy = false, duration = this.shownMs }: ShowOptions = {}) {
 		clearTimeout(this.#timer);
-		this.current = { id: ++this.#next, message, action, failed, busy };
-		this.#lasting = duration === null;
+		this.current = { id: ++this.#next, message, action, detail, failed, busy, lasting: duration === null };
 		if (!this.#held && duration !== null) this.#timer = setTimeout(this.dismiss, duration);
 	}
 
@@ -61,6 +67,6 @@ export class Toasts {
 
 	release = () => {
 		this.#held = false;
-		if (this.current && !this.#lasting) this.#timer = setTimeout(this.dismiss, AFTER_HOVER_MS);
+		if (this.current && !this.current.lasting) this.#timer = setTimeout(this.dismiss, AFTER_HOVER_MS);
 	};
 }

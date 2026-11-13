@@ -28,12 +28,12 @@
 		grid-area: 1 / 1;
 		justify-self: center;
 		display: flex;
-		max-width: min(520px, calc(100vw - 48px));
+		max-width: min(520px, var(--toast-room, calc(100vw - 48px)));
 		min-height: 42px;
 		align-items: center;
 		gap: 14px;
 		padding: 6px 6px 6px 16px;
-		border-radius: var(--radius-pill);
+		border-radius: 21px;
 		background: color-mix(in oklab, var(--popover) 92%, transparent);
 		box-shadow:
 			0 16px 48px var(--shadow-soft),

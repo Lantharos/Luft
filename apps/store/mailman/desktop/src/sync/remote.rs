@@ -5,7 +5,7 @@ use std::time::Duration;
 use parking_lot::{Condvar, Mutex};
 
 use crate::accounts::{Account, Credentials, Login, Protocol, SignInError};
-use crate::store::{Inserted, Mailbox, Outgoing, Store, now};
+use crate::store::{Delivery, Inserted, Mailbox, Outgoing, Store, now};
 
 use super::ops::Operation;
 
@@ -31,7 +31,7 @@ pub trait Remote: Send {
         wanted: &[(i64, String)],
     ) -> Result<Vec<(i64, Vec<u8>)>, String>;
     fn apply(&mut self, context: &Context, operation: &Operation) -> Result<(), String>;
-    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<(), String>;
+    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String>;
 }
 
 pub struct Connection {

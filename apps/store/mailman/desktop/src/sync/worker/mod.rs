@@ -7,12 +7,16 @@ use crossbeam_channel::{Receiver, Sender, TryRecvError, select};
 use serde::Serialize;
 use specta::Type;
 
+mod send;
+
+pub use send::OutboxEvent;
+
 use super::Shared;
 use super::ops::{self, Operation};
 use super::remote::{self, Connection, Context, Remote};
 use crate::accounts::{Account, Protocol, SignInError};
-use crate::events::{CHANGED, IDENTITIES, OUTBOX, RETURNED, STATUS};
-use crate::mail::{envelope, render};
+use crate::events::{CHANGED, IDENTITIES, RETURNED, STATUS};
+use crate::mail::render;
 use crate::store::Store;
 use crate::store::{Fetched, Inserted, Mailbox, Outgoing, Role, now};
 
@@ -31,12 +35,6 @@ pub enum Job {
     Mailbox(i64),
     Flush,
     Send(Outgoing),
-}
-
-impl Job {
-    fn repeatable(&self) -> bool {
-        !matches!(self, Self::Send(_))
-    }
 }
 
 #[derive(Clone)]
@@ -80,14 +78,6 @@ pub struct SyncStatus {
     state: SyncState,
     message: Option<String>,
     signed_out: bool,
-}
-
-#[derive(Serialize, Type)]
-#[serde(tag = "state", rename_all = "camelCase")]
-pub enum OutboxEvent {
-    Sending { id: i64 },
-    Sent { id: i64 },
-    Failed { id: i64, error: String },
 }
 
 pub fn spawn(account: Account, shared: Shared) -> Queue {
@@ -215,15 +205,26 @@ impl Worker {
     }
 
     fn handle(&mut self, job: Job) {
-        if matches!(job, Job::Refresh) {
-            self.refreshing.store(false, Ordering::Release);
-            self.connection = None;
+        match job {
+            Job::Sync => self.syncing(Self::sync_all),
+            Job::Refresh => {
+                self.refreshing.store(false, Ordering::Release);
+                self.connection = None;
+                self.syncing(Self::sync_all);
+            }
+            Job::Arrived => self.syncing(Self::sync_arrivals),
+            Job::Mailbox(id) => self.syncing(|worker| worker.sync_one(id)),
+            Job::Flush => self.syncing(Self::flush),
+            Job::Send(outgoing) => self.send(&outgoing),
         }
+    }
+
+    fn syncing(&mut self, work: impl Fn(&mut Self) -> Result<(), String>) {
         let reused = self.connection.is_some();
-        let mut result = self.perform(&job);
-        if result.is_err() && reused && job.repeatable() {
+        let mut result = work(self);
+        if result.is_err() && reused {
             self.connection = None;
-            result = self.perform(&job);
+            result = work(self);
         }
         match result {
             Ok(()) => {
@@ -231,16 +232,6 @@ impl Worker {
                 self.status(SyncState::Ready, None);
             }
             Err(error) => self.fail(error),
-        }
-    }
-
-    fn perform(&mut self, job: &Job) -> Result<(), String> {
-        match job {
-            Job::Sync | Job::Refresh => self.sync_all(),
-            Job::Arrived => self.sync_arrivals(),
-            Job::Mailbox(id) => self.sync_one(*id),
-            Job::Flush => self.flush(),
-            Job::Send(outgoing) => self.send(outgoing),
         }
     }
 
@@ -443,56 +434,6 @@ impl Worker {
             Err(_) => {
                 self.connection = None;
                 self.prefetch.clear();
-            }
-        }
-    }
-
-    fn send(&mut self, outgoing: &Outgoing) -> Result<(), String> {
-        let id = outgoing.id;
-        self.shared.events.emit(OUTBOX, OutboxEvent::Sending { id });
-        let sent = self.with_remote(|remote, context| remote.send(context, outgoing));
-        let settled = self.settle(outgoing, sent);
-        self.shared.sending.lock().remove(&id);
-        settled
-    }
-
-    fn settle(&mut self, outgoing: &Outgoing, sent: Result<(), String>) -> Result<(), String> {
-        let id = outgoing.id;
-        match sent {
-            Ok(()) => {
-                self.shared.store.finish_outgoing(id)?;
-                self.shared.events.emit(OUTBOX, OutboxEvent::Sent { id });
-                self.shared.notifier.sent();
-                if let Some(at) = outgoing.remind_at {
-                    let sent = envelope::parse(&outgoing.raw);
-                    if let Some(message_id) = sent.message_id {
-                        self.shared.store.add_reminder(
-                            &message_id,
-                            self.account.id,
-                            &sent.subject,
-                            at,
-                        )?;
-                    }
-                }
-                if let Some(sent) = self
-                    .shared
-                    .store
-                    .mailbox_with_role(self.account.id, Role::Sent)?
-                {
-                    self.sync_mailbox(&sent)?;
-                }
-                Ok(())
-            }
-            Err(error) => {
-                self.shared.store.retry_outgoing(id, &error)?;
-                self.shared.events.emit(
-                    OUTBOX,
-                    OutboxEvent::Failed {
-                        id,
-                        error: error.clone(),
-                    },
-                );
-                Err(error)
             }
         }
     }

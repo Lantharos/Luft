@@ -5,6 +5,7 @@ use base64::engine::general_purpose::STANDARD;
 
 mod gmail;
 pub mod idle;
+mod moves;
 
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
@@ -13,7 +14,9 @@ use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
 use crate::protocols::smtp;
-use crate::store::{Flags, Inserted, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now};
+use crate::store::{
+    Delivery, Flags, Inserted, Mailbox, NewMessage, Outgoing, RemoteFolder, Role, now,
+};
 
 const WINDOW: usize = 2000;
 const HEADER_BATCH: usize = 200;
@@ -67,8 +70,19 @@ impl ImapRemote {
         mailbox: &Mailbox,
         uids: &[u32],
     ) -> Result<Vec<Inserted>, String> {
+        let departing: HashSet<u32> = context
+            .store
+            .departed(mailbox.id)?
+            .iter()
+            .filter_map(|remote| remote.parse().ok())
+            .collect();
+        let arriving: Vec<u32> = uids
+            .iter()
+            .copied()
+            .filter(|uid| !departing.contains(uid))
+            .collect();
         let mut inserted = Vec::new();
-        for batch in uids.chunks(HEADER_BATCH) {
+        for batch in arriving.chunks(HEADER_BATCH) {
             let headers = self.client.fetch_headers(&uid_set(batch))?;
             let messages: Vec<NewMessage> = headers.into_iter().map(new_message).collect();
             inserted.extend(context.store.insert_messages(
@@ -378,15 +392,8 @@ impl Remote for ImapRemote {
                 if pairs.is_empty() {
                     return Ok(());
                 }
-                self.select(&source)?;
-                let copied: HashMap<u32, u32> = self
-                    .client
-                    .move_messages(
-                        &pairs.iter().map(|(_, uid)| *uid).collect::<Vec<_>>(),
-                        &target,
-                    )?
-                    .into_iter()
-                    .collect();
+                let uids: Vec<u32> = pairs.iter().map(|(_, uid)| *uid).collect();
+                let copied = self.move_messages(&source, &target, &uids)?;
                 for (id, uid) in pairs {
                     let settled = copied.get(&uid).map(u32::to_string);
                     context.store.settle_remote(id, *to, settled.as_deref())?;
@@ -419,10 +426,10 @@ impl Remote for ImapRemote {
         }
     }
 
-    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<(), String> {
-        smtp::send(&self.smtp, &self.login, outgoing)?;
-        if self.saves_sent_itself() {
-            return Ok(());
+    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String> {
+        let delivery = smtp::send(&self.smtp, &self.login, outgoing)?;
+        if matches!(delivery, Delivery::Refused(_)) || self.saves_sent_itself() {
+            return Ok(delivery);
         }
         if let Some(sent) = context
             .store
@@ -430,7 +437,7 @@ impl Remote for ImapRemote {
         {
             self.client.append(&sent.remote, "\\Seen", &outgoing.raw)?;
         }
-        Ok(())
+        Ok(delivery)
     }
 }
 

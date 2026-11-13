@@ -13,6 +13,13 @@ use crate::ui::OK;
 use crate::ui::output::{blank, emit, field, field_in, note, title};
 use crate::ui::style::{link, muted};
 
+const PROJECT_GROUPS: [(&str, &str); 4] = [
+    ("app", "Apps"),
+    ("extension", "Extensions"),
+    ("tool", "Command-line tools"),
+    ("files", "Files"),
+];
+
 #[derive(Serialize)]
 struct Projects<'a> {
     apps: &'a RawValue,
@@ -33,21 +40,31 @@ fn list(args: &mut Args) -> Result<i32> {
     if items(&apps.value).is_empty() {
         note("None yet. schelf init sets one up.");
     }
-    for app in items(&apps.value) {
-        let version = app["version"].as_str().unwrap_or("no release");
-        field_in(
-            text(app, "id"),
-            &format!(
-                "{} {}",
-                text(app, "name"),
-                muted(&format!(
-                    "{} · {version} · {} installs this week",
-                    text(app, "visibility"),
-                    app["installs_7d"]
-                ))
-            ),
-            32,
-        );
+    for (group, label) in PROJECT_GROUPS {
+        let listed: Vec<&Value> = items(&apps.value)
+            .iter()
+            .filter(|app| text(app, "group") == group)
+            .collect();
+        if listed.is_empty() {
+            continue;
+        }
+        title(label);
+        for app in listed {
+            let version = app["version"].as_str().unwrap_or("no release");
+            field_in(
+                text(app, "id"),
+                &format!(
+                    "{} {}",
+                    text(app, "name"),
+                    muted(&format!(
+                        "{} · {version} · {} installs this week",
+                        text(app, "visibility"),
+                        app["installs_7d"]
+                    ))
+                ),
+                32,
+            );
+        }
     }
     for app in items(&deleted.value) {
         field_in(

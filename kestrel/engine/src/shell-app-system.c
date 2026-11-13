@@ -225,11 +225,23 @@ app_is_stale (ShellApp *app)
 }
 
 static gboolean
-stale_app_remove_func (gpointer key,
+refresh_app_or_remove (gpointer key,
                        gpointer value,
                        gpointer user_data)
 {
-  return app_is_stale (value);
+  ShellApp *app = value;
+  GDesktopAppInfo *info;
+
+  if (!app_is_stale (app))
+    return FALSE;
+
+  info = shell_app_cache_get_info (shell_app_cache_get_default (),
+                                   shell_app_get_id (app));
+  if (info == NULL)
+    return TRUE;
+
+  _shell_app_set_app_info (app, info);
+  return FALSE;
 }
 
 static void
@@ -316,7 +328,7 @@ installed_changed (ShellAppCache  *cache,
   scan_startup_wm_class_to_id (self);
   scan_steam_game_to_id (self);
 
-  g_hash_table_foreach_remove (self->id_to_app, stale_app_remove_func, NULL);
+  g_hash_table_foreach_remove (self->id_to_app, refresh_app_or_remove, NULL);
   g_hash_table_foreach (self->running_apps, collect_stale_windows, windows);
 
   g_ptr_array_foreach (windows, retrack_window, NULL);
@@ -332,7 +344,7 @@ shell_app_system_init (ShellAppSystem *self)
 
   self->running_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
   self->id_to_app = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                           NULL,
+                                           g_free,
                                            (GDestroyNotify)g_object_unref);
 
   self->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
@@ -392,7 +404,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
     return NULL;
 
   app = _shell_app_new (info);
-  g_hash_table_insert (self->id_to_app, (char *) shell_app_get_id (app), app);
+  g_hash_table_insert (self->id_to_app, g_strdup (shell_app_get_id (app)), app);
   return app;
 }
 

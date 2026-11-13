@@ -214,11 +214,20 @@ part_sources() {
   git -C "$luft" archive --format=tar "$tree" -- "${paths[@]}" | tar -x -C "$dir"
 }
 
+signed_by_workflow() {
+  local attempt
+  for attempt in 1 2 3; do
+    cosign verify --certificate-identity "${LUFT_PARTS_SIGNER:?}" --certificate-oidc-issuer "$signer_issuer" \
+      "$1" >/dev/null 2>&1 && return
+    sleep $((attempt * 5))
+  done
+  return 1
+}
+
 signed_digest() {
   local digest
   digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$1" 2>/dev/null)" || return
-  cosign verify --certificate-identity "${LUFT_PARTS_SIGNER:?}" --certificate-oidc-issuer "$signer_issuer" \
-    "${1%:*}@$digest" >/dev/null 2>&1 || return
+  signed_by_workflow "${1%:*}@$digest" || return
   echo "$digest"
 }
 

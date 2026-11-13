@@ -1,11 +1,11 @@
 ---
 title: Kestrel's prompts
-description: The D-Bus interfaces through which Luft Keyring, GnuPG and the luft command ask through Kestrel's own dialogs.
+description: The D-Bus interfaces through which Luft Keyring, GnuPG, the luft command and Schelf ask through Kestrel's own dialogs.
 sidebar:
   order: 6.5
 ---
 
-Luft Keyring, GnuPG's pinentry and the `luft` command never draw their own dialogs. They ask Kestrel, whose prompts never show on the lock screen. Each interface answers exactly one program, judged by the executable it runs rather than its bus name, since whoever calls chooses the dialog's words and gets what's typed. Secrets never cross the bus: they travel through file descriptors. [Who an app is](/security/identity/) explains how Kestrel tells these programs apart from everything else running as you.
+Luft Keyring, GnuPG's pinentry, the `luft` command and Schelf's app sandboxes never draw their own dialogs. They ask Kestrel, whose prompts never show on the lock screen. Each interface answers exactly one program, judged by the executable it runs rather than its bus name, since whoever calls chooses the dialog's words and gets what's typed. Secrets never cross the bus: they travel through file descriptors. [Who an app is](/security/identity/) explains how Kestrel tells these programs apart from everything else running as you.
 
 ## Keyring prompter
 
@@ -51,3 +51,26 @@ Review(a(sv) changes) → (b approved, aa{sv} restore, s requester, s error)
 ```
 
 It answers only `/usr/bin/luft` from the system image, and refuses with `NotLuft`, `Locked`, `Busy` (another review is open) or `TooMany` (more than five a minute). Kestrel checks every value again against the settings catalogue and reads every current value itself. On approval it makes the system settings in one call to `com.lantharos.Changes1.Apply` on the system bus, which answers only Kestrel and asks polkit for an administrator's password, then the rest with GSettings. `restore` holds what undo puts back. [Who an app is](/security/identity/) explains why a review is shaped this way.
+
+## Drives
+
+`com.lantharos.Kestrel.DriveAccess` at `/com/lantharos/Kestrel/DriveAccess` asks whether a sandboxed app may use a drive it looked for, as [App permissions](/security/app-permissions/#drives-and-folders) describes:
+
+```
+Ask(h app, s drive) → (b allowed)
+```
+
+`app` is a pidfd of a process in the app's sandbox and `drive` a filesystem UUID. Kestrel judges the app by the sandbox that process is in, while the pidfd holds it, and looks the drive up in UDisks itself, so the asker picks neither the name nor the drive's label and size the prompt shows. It answers only Schelf from the system image running outside a sandbox: `schelf --sandbox` for AppImages and `schelf --watch-drives` for Flatpak apps.
+
+| Error | When |
+| --- | --- |
+| `NotSchelf` | Something other than Schelf asked |
+| `NotSandboxed` | The process isn't in a sandbox |
+| `NotInFront` | None of the app's windows is in front, or was in the last ten seconds |
+| `Locked` | The screen is locked, or the prompt couldn't be shown |
+| `Busy` | Another drive is being asked about |
+| `TooMany` | The app was asked about three times in the last minute |
+| `Unknown` | No mounted filesystem, or more than one, has that UUID |
+| `Closed` | The asker left before an answer |
+
+**Don't allow** is what Enter picks. The answer only says what the person chose; the asker keeps it in the permission store.

@@ -22,7 +22,7 @@ Nothing from the AppImage runs before the sandbox is up: `squashfuse` mounts the
 
 - The app sees `/usr` read-only and, from `/etc`, only what programs and their libraries read to work: name lookup, certificates, fonts, the time zone, graphics and sound settings. Who else has an account, which disks and printers exist and how the computer is set up stay outside. Its `/etc/passwd` holds just you and `nobody`.
 - Its own folder, `~/.var/app/APP-ID`, appears at the same path inside and out, and the `XDG_*_HOME` variables point into it. Unless the app was given your home folder, that folder also stands in for home.
-- It gets your Downloads folder unless you turned that off, the folders it was given, a private `/tmp` shared by its windows, and fresh `/proc` and `/dev`.
+- It gets your Downloads folder unless you turned that off, the folders and drives it was given, a private `/tmp` shared by its windows, and fresh `/proc` and `/dev`. A drive it was given shows where it's mounted now; each one it wasn't asked about yet has an empty folder there that tells Luft when the app looks inside, as [App permissions](/security/app-permissions/#when-an-app-looks-for-a-drive) describes.
 - Landlock holds the app to what bubblewrap mounted, read-only where the mount is, so a folder that reaches it some other way, such as through a file descriptor, stays closed.
 
 ## Files you hand an app

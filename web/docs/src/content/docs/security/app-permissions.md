@@ -49,7 +49,7 @@ reason = "It manages the containers Podman runs for you."
 Schelf reads the declaration before it installs an AppImage and shows it in plain words, as it does for Flatpaks. What the person installs with is written to the permission store, and the sandbox reads only the store when the app starts, never the app's own files, so an update can't widen what an app was given.
 
 - An update that asks for more waits until the person agrees. Any other update keeps what the app still asks for among what it has, plus folders the person added; what was taken away stays away.
-- Removing an app clears everything the store holds for it, so another app that takes the same ID later starts from its own declaration.
+- Removing an app clears everything the store holds for it, so another app that takes the same ID later starts from its own declaration. The same goes for a Flatpak: the drives and folders it was given are taken out of its overrides. Installing it again, from the same place or not, starts it without them, and Schelf says so before it removes the app.
 - An app that asks to run unsandboxed gets the full access confirmation, with its reason, before it installs. Cancelling installs nothing. `schelf install` installs it in its sandbox instead, and `schelf trust` gives it full access. With full access it starts in your environment from systemd, not in Schelf's, and a Sabine app started that way is told with `SABINE_FULL_ACCESS` not to hold itself to its declaration.
 - An app that closes within a few seconds of starting, or opens one of the stand-ins the sandbox puts where USB, HID and serial devices would be, makes Luft offer to review its access, which opens the full access confirmation.
 
@@ -64,13 +64,33 @@ Every permission lives in the desktop portal's permission store, one table per k
 | `full-access` | Sandboxed apps that count as you; an AppImage given full access runs without its sandbox |
 | `background-clipboard` | Apps that may use the clipboard in the background. 1Password, KeePassXC and Bitwarden get yes unless answered no |
 | `keyring-items` | Which saved items a sandboxed app may use, one entry per item |
-| `sandbox` | An AppImage's `folders`, `read-only-folders`, `devices`, extra `bus` names, and `network`, `downloads` and `x11` switches |
+| `sandbox` | The `folders` and `read-only-folders` of any sandboxed app, an AppImage's `devices`, extra `bus` names, and `network`, `downloads` and `x11` switches, and `flatpak-places`, what Luft last wrote into a Flatpak's overrides |
+| `drives` | One entry per drive an app was given or refused, named after its filesystem's UUID and the drive it's on, with `read-write`, `read-only` or `no` for each app |
 | `devices` | `microphone` and `camera`, which the camera portal shares |
 | `location`, `background`, `notifications` and others | What apps asked for through the desktop portal |
 
 Kestrel reads `full-access` and `background-clipboard` before it starts, follows every change, and hands the compositor the apps each covers with `meta_context_set_permitted_apps()`. An app with full access counts as unsandboxed in the Wayland protocols kept from sandboxes, in screen recording and display services, and in the shell's D-Bus services. Connections already made keep how they were sorted, so a change applies the next time the app starts.
 
-Settings, under Apps, shows every table and takes any permission away. An app the portal allowed to start at sign-in gets an entry in `~/.config/autostart` named after its app ID, listed with the other startup apps.
+Settings, under Apps, shows every table, lists every Flatpak and AppImage, and takes any permission away. An app the portal allowed to start at sign-in gets an entry in `~/.config/autostart` named after its app ID, listed with the other startup apps.
+
+## Drives and folders
+
+Full access opens everything at once. A sandboxed app that needs one place, such as a game library on a second drive, can be given just that: a drive or a folder, to read and change or only to read, in Settings under Apps, on its page in Schelf, or with `schelf give`. It reaches the app as the real mount at the same path as outside, so files on it are as fast as anywhere else, from the next time the app opens.
+
+- A folder is kept by its path. AppImages get it from their sandbox, Flatpak apps through their overrides.
+- A drive is kept by its filesystem's UUID and the drive UDisks says it's on, built from its maker, model and serial number, never by its label or where it's mounted. A stick with the same name, or a copy of the filesystem on another drive, gets nothing. When the drive is mounted somewhere else, it follows: the AppImage sandbox looks up where it's mounted at every start, and `luft-app-drives.service` rewrites a Flatpak's overrides as drives come and go, so the old place is never left open to whatever is mounted there next.
+- Only drives mounted outside the system's own filesystems count, wherever they are: under `/run/media`, `/var/mnt` or a folder Disks mounts them at.
+
+### When an app looks for a drive
+
+Inside a sandbox a drive the app wasn't given doesn't exist, so there's nothing to refuse and nothing to notice. Luft puts an empty folder where each such drive is mounted instead, which tells it when the app looks inside: Schelf's AppImage sandbox binds one in when it starts, and `schelf --watch-drives` makes one in each running Flatpak sandbox, in the folders Flatpak made for that sandbox alone, through its first process, without following anything the app could have put there. The folder never holds anything. Opening it raises Kestrel's prompt, which names the app by its sandbox and the drive by what UDisks says, its label and size; [Kestrel's prompts](/developers/desktop/prompts/#drives) has the interface.
+
+- Only an app in front, or one used in the last ten seconds, is asked, so an app that scans drives in the background never interrupts. Each drive is asked about once for each run of the app.
+- **Don't allow** is the default and is kept, so the app isn't asked again and the folder isn't put there again. Giving it the drive in Settings or Schelf overrides that.
+- **Allow** gives the drive to read and change, from the next time the app opens. An AppImage then offers to restart.
+- Folders in your home aren't watched: the app reaches them through the file chooser, or you give one in Settings or Schelf.
+
+Opening the folder can be noticed, a glance at the folder holding it can't, and nothing an app does through its own code can be told apart from someone choosing the drive in it. That's why the prompt waits for the app to be in front.
 
 ## Trusting the catalog
 

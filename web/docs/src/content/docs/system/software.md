@@ -5,7 +5,9 @@ sidebar:
   order: 3
 asks:
   - { ask: flatpak install, to: flatpak }
-  - { ask: app can't see my files, to: full-access }
+  - { ask: app can't see my drive, to: drives-and-folders }
+  - { ask: steam library on another drive, to: drives-and-folders }
+  - { ask: app can't see my files, to: drives-and-folders }
   - { ask: give app full access, to: full-access }
   - { ask: flatseal, to: full-access }
   - { ask: install appimage, to: appimages }
@@ -46,9 +48,19 @@ Most desktop apps come from [Flathub](https://flathub.org), and Schelf lists the
 
 The `flatpak` command works too: `flatpak install --user flathub org.example.App`.
 
+### Drives and folders
+
+Flatpak apps and AppImages run in a sandbox: they only see their own files and the ones you pick for them, can't read the clipboard while you're using another app, can't control other apps' windows, and can't read what other apps saved in your keyring. An app that needs one more place, such as Steam with a game library on a second drive, can be given just that place:
+
+- When an app you're using looks inside a drive it can't use, Luft asks whether it may. Choose **Allow**, and the app sees the drive the next time it opens. **Don't allow** is remembered, so it doesn't ask again.
+- On the app's page in Schelf, **Drives and folders** gives it a drive or a folder, or takes one away. Settings → Apps does the same.
+- In the terminal, `schelf give steam Games` gives Steam the drive called Games, and `--read-only` lets it only read.
+
+A drive is given as the drive itself, not its name, so another stick called Games doesn't get it, and it keeps working wherever the drive is mounted. The app reaches it directly, as fast as any other app.
+
 ### Full access
 
-Flatpak apps and AppImages run in a sandbox: they only see their own files and the ones you pick for them, can't read the clipboard while you're using another app, can't control other apps' windows, and can't read what other apps saved in your keyring. A few apps need more than that to work well, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
+A few apps need much more than a drive or a folder, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
 
 - read, change and delete all your files
 - use every device, such as USB drives, cameras and game controllers
@@ -69,7 +81,7 @@ AppImages run in a sandbox, like Flatpak apps:
 - They get the internet, your Downloads folder, the graphics card, sound, notifications and windows, and keep their settings and data in a folder of their own, `~/.var/app/` followed by the app's ID.
 - Your files reach them through the file chooser: what you pick is shared with the app, nothing else. Files you open with the app from Rover, drag onto it or copy and paste into it are shared the same way, in apps made with GTK, Qt 6.12 or later, Chromium or Electron 41 or later.
 - Secrets they save, such as an app's sign-in, are theirs. Other sandboxed apps can't read them without you confirming.
-- In Settings → Apps you can give one a folder, or USB or serial devices, or take away its Downloads folder or the internet, from the next time it opens.
+- In Settings → Apps you can give one a drive or a folder, or USB or serial devices, or take away its Downloads folder or the internet, from the next time it opens.
 
 An AppImage that closes right after it starts, or looks for a USB or serial device, may need more. Luft then tells you, and **Review access** opens Schelf, where you can give it full access. With full access it runs as it would without Luft, with the same settings and data it had in its sandbox.
 
@@ -120,6 +132,8 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf info gimp` | Shows the details from every place that has it |
 | `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
 | `schelf untrust 1password` | Puts it back in its sandbox |
+| `schelf give steam Games` | Lets a Flatpak app or an AppImage use one [drive or folder](#drives-and-folders), named as Schelf shows it or by its path; `--read-only` only to read. Without a drive or folder, shows what the app has and the drives you can give it |
+| `schelf take steam Games` | Takes a drive or folder away again |
 | `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
 A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.

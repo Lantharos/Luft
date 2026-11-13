@@ -8,6 +8,7 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+base64.workspace = true
 drm.workspace = true
 drm-ffi.workspace = true
 libc.workspace = true
@@ -15,6 +16,7 @@ luft-recovery-key.workspace = true
 rustix = { workspace = true, features = ["event", "fs", "mm", "net", "process", "termios", "time"] }
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
 sushi-scene.workspace = true
 tiny-skia = { workspace = true, features = ["simd", "std"] }
 

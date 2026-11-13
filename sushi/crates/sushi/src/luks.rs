@@ -4,6 +4,8 @@ use std::path::Path;
 
 use serde::Deserialize;
 
+use crate::policy_key;
+
 const MAGIC: &[u8; 6] = b"LUKS\xba\xbe";
 const BINARY_HEADER: usize = 4096;
 const LARGEST_HEADER: usize = 4 << 20;
@@ -29,11 +31,13 @@ struct Token {
     kind: String,
     #[serde(default)]
     keyslots: Vec<String>,
+    tpm2_pubkey: Option<String>,
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Unlocking {
     pub tpm: bool,
+    pub tpm_policy_keys: Vec<String>,
     pub security_key: bool,
     pub recovery_key: bool,
     pub passphrase: bool,
@@ -76,8 +80,15 @@ fn parse(json: &[u8]) -> Option<Unlocking> {
         .keyslots
         .values()
         .any(|keyslot| keyslot.kind == "reencrypt" && keyslot.mode.as_deref() != Some("decrypt"));
+    let tpm_policy_keys = metadata
+        .tokens
+        .values()
+        .filter(|token| token.kind == "systemd-tpm2")
+        .filter_map(|token| policy_key::fingerprint(token.tpm2_pubkey.as_deref()?))
+        .collect();
     Some(Unlocking {
         tpm: has("systemd-tpm2"),
+        tpm_policy_keys,
         security_key: has("systemd-fido2"),
         recovery_key: recovery_key || (being_encrypted && unclaimed),
         passphrase: unclaimed,
@@ -96,6 +107,7 @@ mod tests {
             parse(json),
             Some(Unlocking {
                 tpm: true,
+                tpm_policy_keys: Vec::new(),
                 security_key: false,
                 recovery_key: true,
                 passphrase: true,
@@ -110,6 +122,7 @@ mod tests {
             parse(json),
             Some(Unlocking {
                 tpm: false,
+                tpm_policy_keys: Vec::new(),
                 security_key: false,
                 recovery_key: true,
                 passphrase: true,

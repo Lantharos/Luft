@@ -4,6 +4,7 @@ pub mod failure_file;
 pub mod ipc;
 pub mod luks;
 pub mod notice_file;
+pub mod policy_key;
 pub mod render;
 pub mod started;
 pub mod system;

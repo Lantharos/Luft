@@ -2,11 +2,12 @@ use std::path::Path;
 
 use sushi::ipc::password::{Request, SHELL};
 use sushi::luks::{self, Unlocking};
-use sushi::started;
+use sushi::{policy_key, started};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Why {
     WithoutKey,
+    NewerKey,
     Changed,
     NoTpm,
     PinFailed,
@@ -59,7 +60,7 @@ fn disk_name(message: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
-fn accepts(unlocking: Unlocking) -> Accepts {
+fn accepts(unlocking: &Unlocking) -> Accepts {
     match (unlocking.recovery_key, unlocking.passphrase) {
         (true, false) => Accepts::RecoveryKey,
         (true, true) => Accepts::RecoveryKeyOrPassphrase,
@@ -103,16 +104,19 @@ impl Ask {
                     Why::PinFailed
                 } else if started::without_key() {
                     Why::WithoutKey
+                } else if policy_key::this_start_is_signed_with_none_of(&unlocking.tpm_policy_keys)
+                {
+                    Why::NewerKey
                 } else if has_tpm() {
                     Why::Changed
                 } else {
                     Why::NoTpm
                 },
-                accepts: accepts(unlocking),
+                accepts: accepts(&unlocking),
             },
             _ => Self::Disk {
                 name: disk_name(message),
-                accepts: unlocking.map_or(Accepts::Passphrase, accepts),
+                accepts: unlocking.as_ref().map_or(Accepts::Passphrase, accepts),
             },
         }
     }
@@ -227,6 +231,11 @@ impl Ask {
                         "Secure Boot isn't set up for Luft yet, so this",
                         "computer couldn't unlock by itself. Once you're",
                         "signed in, Luft shows how to finish setting it up.",
+                    ],
+                    Why::NewerKey => vec![
+                        "This version of Luft uses a newer key to unlock,",
+                        "so it couldn't unlock by itself this time.",
+                        "Unlock it once and it won't ask again.",
                     ],
                     Why::Changed => vec![
                         "Something about how this computer starts has changed,",

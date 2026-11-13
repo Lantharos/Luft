@@ -5,6 +5,7 @@ mod api;
 mod args;
 mod artifacts;
 mod check;
+pub mod client;
 mod commands;
 mod error;
 mod project;
@@ -89,20 +90,17 @@ fn report(error: Error) -> i32 {
             failure(&detail);
             if api.status == 401 { SIGN_IN } else { FAILED }
         }
-        Error::Schema(issues) => {
-            let message = issues
-                .iter()
-                .map(|(key, message)| format!("{key}: {message}"))
-                .collect::<Vec<_>>()
-                .join("\n");
-            emit(&Failed { error: &message });
-            for (key, message) in &issues {
+        Error::Schema(ref issues) => {
+            emit(&Failed {
+                error: &error.message(),
+            });
+            for (key, message) in issues {
                 let place = if key.is_empty() { "schelf.toml" } else { key };
                 failure(&format!("{place}: {message}"));
             }
             FAILED
         }
-        Error::Other(message) => {
+        Error::Unreachable(message) | Error::Other(message) => {
             emit(&Failed { error: &message });
             failure(&message);
             FAILED

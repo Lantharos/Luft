@@ -28,6 +28,16 @@ pub fn approval_of(api: &str, token: &str, id: &str) -> Result<Json> {
     )
 }
 
+/// Takes back a request for approval nobody decided yet.
+pub fn cancel_approval(api: &str, token: &str, id: &str) -> Result<Json> {
+    request(
+        "POST",
+        &format!("{}/{}/cancel", base(api), encode(id)),
+        Some(token),
+        Body::Empty,
+    )
+}
+
 pub fn print_approval(approval: &Value) {
     for (index, entry) in items(&approval["steps"]).iter().enumerate() {
         let mark = match entry["outcome"].as_str() {
@@ -124,15 +134,21 @@ struct Ask<'a> {
     host: String,
 }
 
-/// Asks for `actions` to be approved in the browser and waits for it when
-/// someone is there to.
-pub fn ask_approval(api: &str, token: &str, actions: &[Value], args: &Args) -> Result<Decided> {
+/// Asks the store for `actions` to be approved in the browser, for the page
+/// the approval it answers with names.
+pub fn request_approval(api: &str, token: &str, actions: &[Value]) -> Result<Json> {
     let body = serde_json::to_string(&Ask {
         actions,
         host: hostname(),
     })
     .expect("the request serialises");
-    let approval: Json = request("POST", &base(api), Some(token), Body::Json(body))?;
+    request("POST", &base(api), Some(token), Body::Json(body))
+}
+
+/// Asks for `actions` to be approved in the browser and waits for it when
+/// someone is there to.
+pub fn ask_approval(api: &str, token: &str, actions: &[Value], args: &Args) -> Result<Decided> {
+    let approval = request_approval(api, token, actions)?;
     blank();
     line("This needs you to approve it:");
     print_approval(&approval.value);

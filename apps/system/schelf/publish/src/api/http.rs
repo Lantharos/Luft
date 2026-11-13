@@ -167,7 +167,7 @@ pub fn request<T: DeserializeOwned>(
                 attempt += 1;
                 continue;
             }
-            Err(error) => return Err(Error::Other(error.to_string())),
+            Err(error) => return Err(Error::Unreachable(error.to_string())),
         };
         let status = response.status();
         let text = response

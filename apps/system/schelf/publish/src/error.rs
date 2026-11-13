@@ -16,6 +16,8 @@ pub enum Error {
     Api(ApiFailure),
     /// A file failed its schema outside `schelf check`, with each problem's key.
     Schema(Vec<(String, String)>),
+    /// The store couldn't be reached at all.
+    Unreachable(String),
     Other(String),
 }
 
@@ -51,6 +53,22 @@ impl Error {
             message: message.into(),
             hint: None,
             code,
+        }
+    }
+
+    /// What went wrong, in one message.
+    pub fn message(&self) -> String {
+        match self {
+            Self::Failure { message, .. } | Self::Unreachable(message) | Self::Other(message) => {
+                message.clone()
+            }
+            Self::Config(issues) => config_message(issues.len()),
+            Self::Api(failure) => failure.detail(),
+            Self::Schema(issues) => issues
+                .iter()
+                .map(|(key, message)| format!("{key}: {message}"))
+                .collect::<Vec<_>>()
+                .join("\n"),
         }
     }
 

@@ -152,6 +152,10 @@ fn update_drivers() -> Result<(), String> {
 }
 
 fn update_apps() -> Result<(), String> {
+    if block_on(metered()) {
+        eprintln!("Not updating apps over a metered connection.");
+        return Ok(());
+    }
     let mut failures = Vec::new();
     update_store_apps(&mut failures);
     if let Err(error) = quietly(|task| flatpak::drivers::apply(&flatpak::drivers::changes(), task))
@@ -179,6 +183,13 @@ fn update_apps() -> Result<(), String> {
         Ok(())
     } else {
         Err(failures.join("\n"))
+    }
+}
+
+async fn metered() -> bool {
+    match luft_app::dbus::system().await {
+        Ok(system) => luft_app::dbus::network::metered(system).await,
+        Err(_) => false,
     }
 }
 

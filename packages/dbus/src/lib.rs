@@ -1,6 +1,7 @@
 pub mod environment;
 pub mod error;
 pub mod idle;
+pub mod network;
 pub mod objects;
 pub mod panics;
 pub mod polkit;

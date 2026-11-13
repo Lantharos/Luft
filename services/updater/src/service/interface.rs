@@ -317,7 +317,7 @@ impl Updater {
         if !planned.due(schedule::now()) || self.fetching().is_some() {
             return Ok(());
         }
-        if schedule::metered(connection).await {
+        if luft_dbus::network::metered(connection).await {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
         }

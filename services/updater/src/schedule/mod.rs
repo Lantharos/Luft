@@ -1,5 +1,3 @@
-mod conditions;
-
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
@@ -8,8 +6,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result, bail};
 use luft_variant::Channel;
 use serde::{Deserialize, Serialize};
-
-pub use conditions::metered;
 
 const FILE: &str = "/var/lib/luft-updater/schedule.json";
 const DAY: u64 = 24 * 60 * 60;

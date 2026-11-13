@@ -35,7 +35,7 @@ keep_driver() {
   version="$(rpm -q --qf '%{VERSION}' akmod-nvidia)"
   while read -r name nevra repo; do
     case "$name" in
-      akmod-* | kmod-* | *-kmodsrc) continue ;;
+      akmod-* | kmod-* | *-kmodsrc | nvidia-settings) continue ;;
     esac
     if [[ "$repo" == rpmfusion-nonfree* && "$nevra" == *:"$version"-* ]]; then
       driver+=("$nevra")

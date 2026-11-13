@@ -77,7 +77,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
-      packages: read
+      packages: write
       id-token: write
     outputs:
       skip: ${{ steps.version.outputs.skip }}
@@ -117,7 +117,9 @@ jobs:
         run: |
           nightly="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$MAJOR-nightly")"
           built="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$nightly")"
-          base="$(os/image/build.sh base)"
+          fedora="$(os/image/build.sh base)"
+          skopeo copy --retry-times 3 --digestfile "$RUNNER_TEMP/base" "docker://$fedora" "docker://$CACHE:fedora-bootc-${fedora#*@sha256:}"
+          base="$CACHE@$(<"$RUNNER_TEMP/base")"
           cef="$(os/image/build.sh cef)"
           store="$(os/image/build.sh store)"
           {

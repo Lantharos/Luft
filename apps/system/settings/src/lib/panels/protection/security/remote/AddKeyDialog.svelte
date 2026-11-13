@@ -28,13 +28,14 @@
 			if (chosen) key = chosen;
 		});
 
-	const add = () =>
-		attempt(async () => {
-			if (!ready) return;
+	function add() {
+		if (!ready) return;
+		void attempt(async () => {
 			await commands.remoteLoginAddKey({ key });
 			await refresh();
 			onclose();
 		});
+	}
 </script>
 
 <Dialog title={t('settings-remote-login-key-add-title')} description={t('settings-remote-login-key-add-description')} wide onclose={() => !busy && onclose()}>

@@ -37,5 +37,7 @@ pub async fn report(Token { token }: Token) -> Result<(), String> {
         .await
         .map(|deployments| described(deployments.running()))
         .unwrap_or_default();
-    launch::open(&address(&version), token.as_deref()).map_err(|error| error.to_string())
+    launch::open_async(&address(&version), token.as_deref())
+        .await
+        .map_err(|error| error.to_string())
 }

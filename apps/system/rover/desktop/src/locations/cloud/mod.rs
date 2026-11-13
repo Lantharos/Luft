@@ -78,7 +78,9 @@ async fn states(Folder { path }: Folder) -> Result<BTreeMap<String, FileState>, 
 }
 
 async fn open_in_browser(Handoff { path, token }: Handoff) -> Result<(), String> {
-    open(&client::web_address(&path).await?, token.as_deref())
+    launch::open_async(&client::web_address(&path).await?, token.as_deref())
+        .await
+        .map_err(|error| error.to_string())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {

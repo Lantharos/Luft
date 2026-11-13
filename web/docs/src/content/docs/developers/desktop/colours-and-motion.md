@@ -46,7 +46,7 @@ Luft's apps get the palette through [their startup state](/developers/desktop/wr
 | `WallpaperAccentColor` | `s` | The wallpaper's accent, also while White is chosen |
 | `PureBlack` | `b` | Whether the dark style uses pure black |
 | `LightColors`, `DarkColors`, `LightTerminalColors`, `DarkTerminalColors` | `a{ss}` | Roles and terminal colours for each style |
-| `AppIcons` | `a{ss}` | The app icon style, the glyph folder, and the plate, ink, shade and rim colours (`#rrggbbaa`) |
+| `AppIcons` | `a{ss}` | The app icon style, the glyph folder, and the plate, ink, shade and rim colours (`#rrggbbaa`) of tinted and clear icons, as `tinted-ink` and so on. With the original style, Luft's own apps draw their glyph without a plate in the surrounding text colour, with the shade at half its strength |
 | `Taskbar` | `s` | JSON describing each taskbar look on the current wallpaper and style |
 
 The same data is written to files shortly after each change:
@@ -55,7 +55,7 @@ The same data is written to files shortly after each change:
 | --- | --- |
 | `~/.config/kestrel/appearance.json` | `accentColor`, `accentName`, `dark`, `pureBlack`, `colors`, `terminal`, and `schemes.light` and `schemes.dark` |
 | `~/.config/kestrel/appearance.css` | `--kestrel-accent` and every role as a custom property, such as `--kestrel-on-surface-variant`, with dark values under `prefers-color-scheme: dark` |
-| `~/.cache/kestrel/app-glyphs` | A two-tone glyph per installed app, named by desktop ID, for drawing tinted and clear icons |
+| `~/.cache/kestrel/app-glyphs` | A two-tone glyph per installed app, named by desktop ID and filling the picture: white where it takes the ink, black where it takes the shade. On a plate it fills 64% of the plate |
 
 With `theme-apps` in `com.lantharos.kestrel` on, Kestrel also writes colours for apps it doesn't draw: a marked block at the top of `~/.config/gtk-4.0/gtk.css` and `~/.config/gtk-3.0/gtk.css`, `Kestrel.conf` in `~/.config/qt6ct/colors` and `Kestrel.colors` in `~/.local/share/color-schemes` for Qt and KDE, and `Kestrel Light` and `Kestrel Dark` themes for Ghostty. It only touches blocks marked with a `Kestrel wallpaper colors` comment or files named Kestrel, and removes them when it's turned off. Either way, a block marked `Kestrel window edges` in both GTK files takes the line GTK draws along its windows' edges off floating windows, since Kestrel already outlines every window.
 

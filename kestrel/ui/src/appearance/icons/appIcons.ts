@@ -6,10 +6,11 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { fromHex, seedFromColor, type Seed } from '../color.js';
+import { fromHex, seedFromColor, toHex, type Seed } from '../color.js';
 import { glyphNames } from './glyphs.js';
 import { paints, type IconStyle, type Paint, type PaintedStyle } from './paint.js';
 import { isLuftApp } from '../../shared/apps/luftApps.js';
+import { schemeThemes } from '../../desktop/panel/ink/schemeThemes.js';
 
 export interface IconApp {
   get_id(): string | null;
@@ -22,6 +23,7 @@ const FALLBACK = new Gio.ThemedIcon({ name: 'application-x-executable' });
 const RESTYLE_BATCH = 12;
 
 const color = (hex: string) => Cogl.Color.from_string(hex)[1];
+const foreground = (dark: boolean) => toHex(schemeThemes()[dark ? 'dark' : 'light'].ink);
 
 export function sourceIcon(app: IconApp): Gio.Icon {
   const id = app.get_id();
@@ -32,8 +34,8 @@ export function styledIcon(app: IconApp, paint: Paint, square = false, fill = 0)
   const source = sourceIcon(app);
   return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
-    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim, fill,
-    ...square ? { corner: 0 } : {},
+    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim, fill, bare: paint.bare,
+    ...square && !paint.bare ? { corner: 0 } : {},
   });
 }
 
@@ -70,10 +72,10 @@ class AppIcons {
   }
 
   private get luftStyle(): PaintedStyle {
-    return this.style === 'default' ? 'tinted' : this.style;
+    return this.style === 'default' ? 'plain' : this.style;
   }
 
-  private styleOf(app: IconApp): IconStyle {
+  private styleOf(app: IconApp): PaintedStyle | 'default' {
     return isLuftApp(app.get_id()) ? this.luftStyle : this.style;
   }
 
@@ -123,8 +125,10 @@ class AppIcons {
     const style = this.settings.get_string('app-icon-style') as IconStyle;
     const tint = this.settings.get_string('app-icon-tint');
     const seed = tint ? seedFromColor(fromHex(tint)) : this.accent?.seed;
-    const painted = seed ? paints(seed, this.accent?.dark ?? true) : null;
-    const taskbarPainted = seed ? paints(seed, this.accent?.taskbarDark ?? true) : null;
+    const dark = this.accent?.dark ?? true;
+    const taskbarDark = this.accent?.taskbarDark ?? true;
+    const painted = seed ? paints(seed, dark, foreground(dark)) : null;
+    const taskbarPainted = seed ? paints(seed, taskbarDark, foreground(taskbarDark)) : null;
     const square = !this.settings.get_boolean('rounded-window-corners');
     if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
     const restyleAll = style !== 'default' || this.style !== 'default';

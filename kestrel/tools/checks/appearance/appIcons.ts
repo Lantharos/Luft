@@ -61,12 +61,14 @@ function shownApps() {
   });
 }
 
+const bare = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon && icon.gicon.bare;
+
 function checkLuftApps(setting: string) {
   const apps = shownApps();
   const luft = ({id}: {id: string}) => id.startsWith(LUFT_APP);
-  const tinted = (onTaskbar: boolean) => (onTaskbar ? appIcons.taskbarPaints : appIcons.paints)?.tinted.ink;
-  require(apps.some(luft) && !apps.every(luft) && apps.every(app => inkOf(app.icon) === (luft(app) ? tinted(app.onTaskbar) : null)),
-    `Luft's own apps stay tinted beside original icons (${setting})`);
+  const plain = (onTaskbar: boolean) => (onTaskbar ? appIcons.taskbarPaints : appIcons.paints)?.plain.ink;
+  require(apps.some(luft) && !apps.every(luft) && apps.every(app => luft(app) ? bare(app.icon) && inkOf(app.icon) === plain(app.onTaskbar) : inkOf(app.icon) === null),
+    `Luft's own apps draw bare glyphs in the plain foreground beside original icons (${setting})`);
 }
 
 const loaded = (icon: St.Icon) => icon.get_children().some(child => child.content && child.opacity > 0);

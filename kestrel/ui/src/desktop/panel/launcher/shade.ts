@@ -1,6 +1,6 @@
 import type { MarkFills } from '../../../../../../packages/web/ui/src/taskbar/mark';
 import { atTone, contrast, fromHex, seedFromColor, toHex, toneOf, type Rgb } from '../../../appearance/color.js';
-import type { Paint } from '../../../appearance/icons/paint.js';
+import { plain, type Paint } from '../../../appearance/icons/paint.js';
 
 const MIN_BACKDROP_CONTRAST = 2.2;
 const MIN_INK_CONTRAST = 1.6;
@@ -42,7 +42,8 @@ function markShade(inkHex: string, shadeHex: string, backdrops: Rgb[]): string {
 const monochromeShade = (inkHex: string, backdrops: Rgb[]): string =>
   backdrops.every(backdrop => contrast(over(inkHex, backdrop), backdrop) >= MIN_BACKDROP_CONTRAST) ? inkHex : markShade(inkHex, inkHex, backdrops);
 
-export function markFills(foreground: string, paint: Paint | null, backdrops: Rgb[]): MarkFills {
+export function markFills(foreground: string, chosen: Paint | null, backdrops: Rgb[]): MarkFills {
+  const paint = chosen?.bare ? plain(foreground) : chosen;
   const ink = paint?.ink ?? foreground;
   if (!backdrops.length) return { shade: paint?.shade ?? ink, ink };
   return { shade: paint ? markShade(ink, paint.shade, backdrops) : monochromeShade(ink, backdrops), ink };

@@ -38,6 +38,8 @@ const PROPERTIES: [string, string][] = [
 ];
 const PERSIST_DELAY = 400;
 const CUSTOM_COLOR = /^#[0-9a-f]{6}$/i;
+const PLATED_STYLES = ['tinted', 'clear'] as const;
+const PLATE_PARTS = ['plate', 'ink', 'shade', 'rim'] as const;
 
 export class AppearanceService {
   private readonly stylesheet = new AccentStylesheet('accent', (seed, palette, variant) =>
@@ -92,8 +94,10 @@ export class AppearanceService {
   get DarkTerminalColors(): Record<string, string> { return this.palette?.dark.terminal ?? {}; }
   get AppIcons(): Record<string, string> {
     const icons: Record<string, string> = { style: appIcons.style, glyphs: this.glyphFiles.directory };
-    for (const [style, paint] of Object.entries(appIcons.paints ?? {}))
-      for (const [part, value] of Object.entries(paint)) icons[`${style}-${part}`] = String(value);
+    for (const style of PLATED_STYLES) {
+      const paint = appIcons.paints?.[style];
+      if (paint) for (const part of PLATE_PARTS) icons[`${style}-${part}`] = String(paint[part]);
+    }
     return icons;
   }
 

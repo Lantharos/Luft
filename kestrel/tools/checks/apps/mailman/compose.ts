@@ -5,7 +5,7 @@ import {checks} from '../../lib/check.js';
 import {press, type, type Point} from '../../lib/input/input.js';
 import {settled} from '../../lib/wait.js';
 import {changes, type Region} from '../lib/apps.js';
-import {useScheme} from '../lib/palette.js';
+import {withScheme} from '../lib/palette.js';
 import {address, ALIASES, type MailServer} from './stalwart.js';
 
 const {require, eventually} = checks('Luft app');
@@ -39,11 +39,11 @@ function menuItem(area: Composer, accounts: number[], account: number, item: num
 
 async function saveBoth(app: LuftApp, area: Region, name: string) {
   for (const scheme of ['light', 'dark'] as const) {
-    useScheme(scheme);
-    await settled();
-    (await app.settle(() => true, app.area(area))).save(`${name}-${scheme}`);
+    await withScheme(scheme, async () => {
+      await settled();
+      (await app.settle(() => true, app.area(area))).save(`${name}-${scheme}`);
+    });
   }
-  useScheme('light');
 }
 
 async function openComposer(app: LuftApp) {

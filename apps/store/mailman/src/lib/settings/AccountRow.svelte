@@ -37,22 +37,20 @@
 	}
 </script>
 
-<Row title={account.name || account.email} description="{account.email} · {kind}" expanded={open} onclick={toggle}>
-	{#snippet below()}
-		{#if open}
-			<div class="flex flex-col gap-3 pt-1">
-				<TextField bind:value={name} label="Account name" showLabel onkeydown={(event) => event.key === 'Enter' && void rename()} />
-				<Identities {account} />
-				<div class="flex gap-2">
-					<span class="flex-1"></span>
-					{#if confirming}
-						<button type="button" class="button" onclick={() => (confirming = false)}>Keep</button>
-						<button type="button" class="button danger" onclick={() => void remove()}>Remove and forget its mail</button>
-					{:else}
-						<button type="button" class="button danger" onclick={() => (confirming = true)}>Remove</button>
-					{/if}
-				</div>
-			</div>
-		{/if}
-	{/snippet}
-</Row>
+{#snippet details()}
+	<div class="flex flex-col gap-3 pt-1">
+		<TextField bind:value={name} label="Account name" showLabel onkeydown={(event) => event.key === 'Enter' && void rename()} />
+		<Identities {account} />
+		<div class="flex gap-2">
+			<span class="flex-1"></span>
+			{#if confirming}
+				<button type="button" class="button" onclick={() => (confirming = false)}>Keep</button>
+				<button type="button" class="button danger" onclick={() => void remove()}>Remove and forget its mail</button>
+			{:else}
+				<button type="button" class="button danger" onclick={() => (confirming = true)}>Remove</button>
+			{/if}
+		</div>
+	</div>
+{/snippet}
+
+<Row title={account.name || account.email} description="{account.email} · {kind}" expanded={open} onclick={toggle} below={open ? details : undefined} />

@@ -26,7 +26,7 @@ function seedAccount() {
 }
 
 async function addAddress(app: LuftApp) {
-  await changes(app, 'Ctrl+, opens the settings', () => press(Clutter.KEY_Control_L, Clutter.KEY_comma));
+  (await changes(app, 'Ctrl+, opens the settings', () => press(Clutter.KEY_Control_L, Clutter.KEY_comma))).save('mailman-settings');
   await changes(app, 'clicking an account opens its settings', () => app.click(ACCOUNT_ROW));
   await changes(app, 'Add an address opens the address editor', () => app.click(ADD_ADDRESS));
   await changes(app, 'typing a name with a space keeps the editor open', () => {

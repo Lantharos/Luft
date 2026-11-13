@@ -1,0 +1,17 @@
+[connection]
+id=iPhone
+uuid=4f6c2e1a-9b3d-4a57-8e20-6d1f3c5b7a91
+type=ethernet
+autoconnect-priority=10
+metered=1
+
+[match]
+driver=ipheth
+
+[ipv4]
+method=auto
+route-metric=50
+
+[ipv6]
+method=auto
+route-metric=50

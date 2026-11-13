@@ -112,6 +112,10 @@ let_line_out_play_beside_headphones() {
   grep -q '^\[Option Auto-Mute Mode:Disabled\]$' "$path" || { echo "$path no longer ends with the common include" >&2; exit 1; }
 }
 
+keep_network_profiles_private() {
+  chmod 600 /usr/lib/NetworkManager/system-connections/*.nmconnection
+}
+
 make_efi_mountpoint() {
   install -d -m 0755 /efi
 }
@@ -152,6 +156,7 @@ write_default_apps
 leave_out_other_languages
 refresh_caches
 let_line_out_play_beside_headphones
+keep_network_profiles_private
 make_efi_mountpoint
 leave_greetd_config_to_the_greeter
 clean_build_state

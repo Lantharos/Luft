@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use std::os::fd::AsFd;
 use std::sync::Mutex;
 
+use luft_dbus_macros::introspect;
 use zbus::fdo::{self, RequestNameFlags};
 use zbus::{Connection, Fd, interface};
 
@@ -25,6 +26,7 @@ fn file(fd: &Fd<'_>) -> fdo::Result<std::fs::File> {
         .map_err(|error| fdo::Error::Failed(error.to_string()))
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1.AppSecrets")]
 impl AppSecrets {
     fn store(&self, app: &str, name: &str, secret: Fd<'_>) -> fdo::Result<()> {

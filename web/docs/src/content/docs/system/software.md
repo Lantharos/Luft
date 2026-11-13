@@ -126,7 +126,7 @@ A name schelf.store has comes from there, and when it has both an app and a tool
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
 
-The same command runs on other Linux systems too. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, system packages, extensions and full access say they need Luft.
+The same command runs on other Linux systems too, where `curl -fsSL https://schelf.store/install | sh` puts it in `~/.local/bin` and it keeps itself up to date. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, system packages, extensions and full access say they need Luft.
 
 When its output goes to another program instead of a terminal, `search` and `list` print one line per entry with the fields separated by tabs, and nothing is coloured. `NO_COLOR` turns colours off in a terminal too.
 

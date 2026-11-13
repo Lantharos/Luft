@@ -1,10 +1,9 @@
 export type Status = 'uploading' | 'checking' | 'failed' | 'in-review' | 'changes-requested' | 'rejected' | 'rolling-out' | 'live' | 'withdrawn' | 'pulled';
 export type Release = { release: string; version: string; channel: string; status: Status; commit: string | null; created: string };
-export type Artifact = { platform: string; kind: string; url: string; sha256: string };
-type IndexRelease = { version: string; channel: string; artifacts: Artifact[] };
+type IndexRelease = { version: string; channel: string };
 
 const API = 'https://schelf.store/api/v1/publish/apps';
-const INDEX = 'https://dl.schelf.store/index/v1/apps';
+const INDEX = 'https://dl.schelf.store/index/v1';
 const RETRYABLE: Status[] = ['uploading', 'failed'];
 const SETTLING: Status[] = ['uploading', 'checking'];
 const OUT: Status[] = ['rolling-out', 'live'];
@@ -44,9 +43,9 @@ export async function promote(id: string, version: string, channel: string, note
   return read<Release>(await request(`${id}/promote`, { method: 'POST', body: JSON.stringify({ version, channel, notes }) }));
 }
 
-export async function listed(id: string) {
-  const response = await fetch(`${INDEX}/${id}.json`);
+export async function listed(index: string) {
+  const response = await fetch(`${INDEX}/${index}.json`);
   if (response.status === 404) return [];
-  if (!response.ok) throw new Error(`schelf.store answered ${response.status} for ${id}`);
+  if (!response.ok) throw new Error(`schelf.store answered ${response.status} for ${index}`);
   return ((await response.json()) as { releases: IndexRelease[] }).releases;
 }

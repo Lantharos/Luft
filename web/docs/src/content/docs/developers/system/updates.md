@@ -62,6 +62,8 @@ Luft's apps run on Sabine's system-wide runtime. Sabine has its own releases, wh
 
 The Image workflow runs on `main` every night. It builds when there are new commits, Fedora published a new base image, a package Luft adds to Fedora's has an update, a newer CEF build is pinned, or an app the image ships from schelf.store has a newer release. When the commit, base image, CEF build and store releases recorded in the last nightly's labels all match and `os/image/build.sh updates` finds no package updates, the night is skipped.
 
+The same run publishes every app, extension and command-line tool with a `schelf.toml` whose sources changed since its newest release on schelf.store, to the store's nightly channel, at the version in its manifest or the patch version after its newest release. One of them is the `schelf` command in `apps/system/schelf/cli`, the tool `lantharos/schelf`, built as one static program for Intel and one for ARM computers, each on a runner of that kind. Promoting a nightly to stable promotes the store releases it shipped with, so `schelf.store/install` hands out the `schelf` of the newest stable Luft.
+
 Before `:1-nightly` moves, each new image is installed in a VM on the runner the way Install Luft does, started with Secure Boot, signed in to, and checked until the desktop and Settings work ([Testing](/developers/testing/)). When that fails, the nightly isn't published and `:1-nightly` stays on the last one that passed. A new major version lands on the nightlies first, and stable releases are only ever promoted from a nightly.
 
 How the images are signed, and what the build trusts, is in [Keys, signatures and the build](/security/keys/).

@@ -1,10 +1,10 @@
-import { type Item, sabineTag, storeItems } from './items';
+import { type Item, platformRunner, sabineTag, storeItems } from './items';
 import { isOut, listed, promote, type Release, releases, settling, taken } from './schelf';
 import { changesBetween, head, sourceKey } from './sources';
 import { compareVersions, newest, nextVersion } from './versions';
 
 type Planned = Item & { version: string; notes: string };
-type Published = Pick<Planned, 'id' | 'version'>;
+type Published = Pick<Planned, 'id' | 'index' | 'version'>;
 
 const NIGHTLY = 'nightly';
 const STABLE = 'stable';
@@ -20,7 +20,7 @@ const print = (outputs: Record<string, string>) =>
 async function planItem(item: Item, commit: string): Promise<Planned | undefined> {
   const all = await releases(item.id);
   if (!all) {
-    console.error(`::warning::${item.id} has no listing on schelf.store yet, so it waits until seed-lantharos.ts adds it`);
+    console.error(`::warning::${item.id} isn't on schelf.store yet, so it waits until it's registered there`);
     return undefined;
   }
   const history = all.filter(taken);
@@ -42,18 +42,19 @@ async function plan() {
   print({
     sabine: sabineTag(),
     apps: pick('app', ['name', 'folder', 'platforms', 'version']),
+    tools: JSON.stringify(planned.filter((item) => item.kind === 'tool').flatMap(({ name, folder, version, platforms }) => platforms.split(' ').map((platform) => ({ name, folder, version, platform, runner: platformRunner(platform) })))),
     extensions: JSON.stringify(planned.filter((item) => item.kind === 'extension').flatMap(({ name, folder, version, runners }) => runners.map((runner) => ({ name, folder, version, runner })))),
-    publish: JSON.stringify(planned.map(({ name, id, kind, folder, version, notes }) => ({ name, id, kind, folder, version, notes }))),
+    publish: JSON.stringify(planned.map(({ name, id, index, kind, folder, version, notes }) => ({ name, id, index, kind, folder, version, notes }))),
   });
 }
 
-async function settled({ id, version }: Published, deadline: number): Promise<Release | undefined> {
-  const release = (await releases(id))!.find((candidate) => candidate.version === version && candidate.channel === NIGHTLY);
-  const listedNow = async () => (await listed(id)).some((candidate) => candidate.version === version);
+async function settled(item: Published, deadline: number): Promise<Release | undefined> {
+  const release = (await releases(item.id))!.find((candidate) => candidate.version === item.version && candidate.channel === NIGHTLY);
+  const listedNow = async () => (await listed(item.index)).some((candidate) => candidate.version === item.version);
   if (release && !settling(release) && (!isOut(release) || (await listedNow()))) return release;
   if (Date.now() > deadline) return release;
   await Bun.sleep(30_000);
-  return settled({ id, version }, deadline);
+  return settled(item, deadline);
 }
 
 async function settle(published: Published[]) {
@@ -68,7 +69,7 @@ async function settle(published: Published[]) {
 async function catalog() {
   const versions = await Promise.all(
     storeItems().map(async (item) => {
-      const version = newest((await listed(item.id)).map((release) => release.version));
+      const version = newest((await listed(item.index)).map((release) => release.version));
       return version && `${item.id}=${version}`;
     }),
   );

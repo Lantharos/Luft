@@ -1,0 +1,9 @@
+project = "lantharos/schelf"
+format = "files"
+tool = "schelf"
+platforms = ["linux-x86_64", "linux-aarch64"]
+licence = "GPL-3.0-or-later"
+repository = "Lantharos/Luft"
+
+[channels.nightly]
+keep = 3

@@ -92,6 +92,7 @@ jobs:
       details: ${{ steps.parts.outputs.details }}
       sabine: ${{ steps.store.outputs.sabine }}
       apps: ${{ steps.store.outputs.apps }}
+      tools: ${{ steps.store.outputs.tools }}
       extensions: ${{ steps.store.outputs.extensions }}
       publish: ${{ steps.store.outputs.publish }}
     steps:
@@ -202,6 +203,55 @@ jobs:
       WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
       WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
 
+  store-tools:
+    name: Tool (${{ matrix.tool.name }} for ${{ matrix.tool.platform }})
+    needs: plan
+    if: needs.plan.outputs.tools != '' && needs.plan.outputs.tools != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: ${{ fromJSON(needs.plan.outputs.tools) }}
+    runs-on: ${{ matrix.tool.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Rust and musl
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends musl-tools
+          rustup update stable && rustup default stable
+          rustup target add "$(uname -m)-unknown-linux-musl"
+
+      - name: Use the version being released
+        env:
+          VERSION: ${{ matrix.tool.version }}
+          FOLDER: ${{ matrix.tool.folder }}
+        run: sed -i "s/^version = \".*\"$/version = \"$VERSION\"/" "$FOLDER/Cargo.toml"
+
+      - name: Build one static program
+        env:
+          NAME: ${{ matrix.tool.name }}
+          FOLDER: ${{ matrix.tool.folder }}
+          VERSION: ${{ matrix.tool.version }}
+          PLATFORM: ${{ matrix.tool.platform }}
+        run: |
+          target="$(uname -m)-unknown-linux-musl"
+          manifest="$PWD/$FOLDER/Cargo.toml"
+          program="$(cargo metadata --no-deps --format-version 1 |
+            jq -r --arg manifest "$manifest" '.packages[] | select(.manifest_path == $manifest) | .targets[] | select(.kind == ["bin"]) | .name')"
+          export "CC_${target//-/_}=musl-gcc"
+          cargo build --release --manifest-path "$manifest" --target "$target"
+          install -D --mode 755 "target/$target/release/$program" "dist/$NAME-$PLATFORM"
+          file --brief "dist/$NAME-$PLATFORM" | grep --quiet "static"
+          [[ "$("dist/$NAME-$PLATFORM" --version)" == "$VERSION" ]]
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tool-${{ matrix.tool.name }}-${{ matrix.tool.platform }}
+          path: dist
+          if-no-files-found: error
+
   store-extensions:
     name: Extension (${{ matrix.extension.name }} on ${{ matrix.extension.runner }})
     needs: plan
@@ -241,7 +291,7 @@ jobs:
 
   store-publish:
     name: Publish (${{ matrix.item.name }} ${{ matrix.item.version }})
-    needs: [plan, store-apps, store-extensions]
+    needs: [plan, store-apps, store-tools, store-extensions]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.publish != '[]' }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30

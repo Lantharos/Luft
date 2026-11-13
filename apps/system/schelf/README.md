@@ -27,7 +27,7 @@ Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpak
 
 ## Command line
 
-The `schelf` command, with `sch` linked to it in Luft's image, is its own program in `cli`: `install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal), and the publishing commands from `publish`, such as `login`, `check` and `publish`. It hands anything else, such as a file or a `schelf:` link, to the app. What both install, update and remove is in `core`. The command has no Sabine or GTK in it, so it builds as one static program that also runs on other Linux systems, where it installs schelf.store apps as AppImages, Flathub apps when Flatpak is there, and says what needs Luft.
+The `schelf` command, with `sch` linked to it in Luft's image, is its own program in `cli`: `install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal), and the publishing commands from `publish`, such as `login`, `check` and `publish`. It hands anything else, such as a file or a `schelf:` link, to the app. What both install, update and remove is in `core`. The command has no Sabine or GTK in it, so it builds as one static program that also runs on other Linux systems, where it installs schelf.store apps as AppImages, Flathub apps when Flatpak is there, and says what needs Luft. Each nightly publishes it on schelf.store as the tool `lantharos/schelf`, from `cli/schelf.toml`.
 
 ```sh
 cargo run -p schelf-cli -- search notes

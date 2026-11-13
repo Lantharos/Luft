@@ -16,7 +16,8 @@ Usage: .github/scripts/kestrel/container.sh run COMMAND...
 run starts COMMAND as this user in a Fedora container with Kestrel's build
 and session dependencies (LUFT_CI_KESTREL, default ghcr.io/lantharos/luft-ci-kestrel),
 booted with systemd so the user has a systemd user instance and a session
-bus, as in a login session. The repository is mounted at the same path, the
+bus, as in a login session, and with /proc unmasked so bubblewrap can mount
+its own for the sandboxes. The repository is mounted at the same path, the
 user's home is kestrel/run/home, and variables starting with KESTREL_,
 CCACHE_ or CARGO_ are passed on. stop removes the container.
 USAGE
@@ -41,7 +42,7 @@ session_ready() {
 start() {
   mkdir -p "$home"
   podman run --detach --quiet --name "$name" --systemd=always --userns=keep-id --user root \
-    --security-opt label=disable --volume "$luft:$luft" "$image" /sbin/init >/dev/null
+    --security-opt label=disable --security-opt unmask=ALL --pids-limit=0 --volume "$luft:$luft" "$image" /sbin/init >/dev/null
   wait_for system_ready
   podman exec "$name" loginctl enable-linger "$user"
   wait_for session_ready

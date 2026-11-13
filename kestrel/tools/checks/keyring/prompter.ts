@@ -11,9 +11,9 @@ import {capture} from '../lib/screenshots.js';
 import {KeyringClient, SecretPipe, focusedEntry, handle, keyringDialog, openedDialog} from './lib/client.js';
 
 const {require, eventually} = checks('keyring');
-const APP = 'com.lantharos.draft';
-const GITHUB = {title: 'Allow Draft to use your password for github.com?', body: 'It’s saved in your Login keyring.', app: APP};
-const UNLOCK = {title: 'Unlock your Login keyring', body: 'Draft wants to use a saved password.', app: APP};
+const APP = 'spotify';
+const GITHUB = {title: 'Allow Spotify to use your password for github.com?', body: 'It’s saved in your Login keyring.', app: APP};
+const UNLOCK = {title: 'Unlock your Login keyring', body: 'Spotify wants to use a saved password.', app: APP};
 const WRONG = 'That password didn’t work';
 const DISMISSED = 2;
 

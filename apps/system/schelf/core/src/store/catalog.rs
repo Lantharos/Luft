@@ -1,5 +1,5 @@
 use std::collections::{BTreeMap, HashSet};
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::Duration;
 
 use luft_software::http::MISSING;
@@ -18,6 +18,7 @@ const FRESH: Duration = Duration::from_secs(6 * 60 * 60);
 const SHORTEST_QUERY: usize = 2;
 
 static CURRENT: RwLock<Option<Arc<Catalog>>> = RwLock::new(None);
+static LOADING: Mutex<()> = Mutex::new(());
 
 #[derive(
     Deserialize, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Type,
@@ -299,7 +300,16 @@ fn mirror(document: &str, age: Age) -> Result<Vec<Entry>, String> {
     }
 }
 
+/// Loads the catalog one at a time, so searches that start together don't
+/// each fetch it and write it to disk over each other.
 fn load(age: Age) -> Result<Arc<Catalog>, String> {
+    let _loading = LOADING
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    fetch(age)
+}
+
+fn fetch(age: Age) -> Result<Arc<Catalog>, String> {
     let (store, flathub, fedora) = std::thread::scope(|scope| {
         let flathub = scope.spawn(|| mirror(FLATHUB, age));
         let fedora = scope.spawn(|| mirror(FEDORA, age));
@@ -320,14 +330,22 @@ fn load(age: Age) -> Result<Arc<Catalog>, String> {
 
 /// The catalog as last loaded, read from disk or schelf.store when there's none yet.
 pub fn current() -> Result<Arc<Catalog>, String> {
-    if let Some(catalog) = CURRENT
-        .read()
-        .unwrap_or_else(|poisoned| poisoned.into_inner())
-        .clone()
-    {
+    let loaded = || {
+        CURRENT
+            .read()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone()
+    };
+    if let Some(catalog) = loaded() {
         return Ok(catalog);
     }
-    load(Age::Within(FRESH))
+    let _loading = LOADING
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    match loaded() {
+        Some(catalog) => Ok(catalog),
+        None => fetch(Age::Within(FRESH)),
+    }
 }
 
 /// Asks schelf.store whether the catalog changed, as Schelf does when it opens

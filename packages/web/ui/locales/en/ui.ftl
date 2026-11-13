@@ -69,7 +69,7 @@ ui-recovery-key-copy-failed = The key couldn’t be copied
 # Button, verb: opens a dialog for writing the recovery key down on paper
 ui-recovery-key-write = Write it down
 ui-recovery-key-write-title = Write down your recovery key
-ui-recovery-key-write-description = Write the 12 words on paper, in this order. Keep the paper somewhere safe, away from this computer.
+ui-recovery-key-write-description = Write the 12 words in order, and keep the paper safe, away from this computer.
 # Button: the 12 words are on paper, go on to check three of them
 ui-recovery-key-written = I’ve written them down
 ui-recovery-key-check-title = Check what you wrote

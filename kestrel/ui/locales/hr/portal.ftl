@@ -35,7 +35,6 @@ portal-screenshot-file-name = Snimka zaslona { $date }
 ## Account details
 
 portal-account-title = Dopustiti da { $appName } vidi vaše ime i sliku?
-portal-account-description = { $appName } će vidjeti ime i sliku vašeg računa.
 
 ## Wallpaper
 

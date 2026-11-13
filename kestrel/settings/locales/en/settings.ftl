@@ -1,6 +1,6 @@
 # Notification after Luft opened Windows' drive read-only, because Windows was hibernated or shut down with Fast Startup
 drives-windows-read-only-title = Windows’ drive is read-only
-drives-windows-read-only = Windows wasn’t fully shut down, so its drive is read-only. Shut Windows down fully to write to it.
+drives-windows-read-only = Windows wasn’t fully shut down. Shut it down fully to write to its drive.
 
 ## Battery notifications
 
@@ -29,7 +29,7 @@ battery-saver-turn-off = Turn off
 
 # $network is the name of the Wi-Fi or wired network just joined
 network-type-title = Is { $network } a home network?
-network-type-body = On a home network, your other devices can find this computer for casting, games and sharing files. On a public one, like in a café or hotel, nothing on the network can reach it.
+network-type-body = On a home network, your other devices can find this computer. On a public one, like a café’s, nothing can reach it.
 # Button on the network-type-title notification
 network-type-home = Home
 # Button on the network-type-title notification
@@ -40,7 +40,7 @@ network-type-public = Public
 # $address is the other device's address, such as 192.168.1.20
 remote-login-signed-in-title = Signed in over SSH from { $address }
 # $account is the name of the account that signed in
-remote-login-signed-in = { $account } signed in to this computer from another device. If you don’t know who that is, disconnect them in Settings.
+remote-login-signed-in = { $account } signed in. If you don’t know who that is, disconnect them in Settings.
 # Button on the remote-login-signed-in-title notification
 remote-login-settings = Settings
 
@@ -51,7 +51,7 @@ remote-login-settings = Settings
 # Shown as the source of the notification
 secure-boot-source = Device Security
 secure-boot-unfinished-title = Finish setting up Secure Boot
-secure-boot-missed = The blue screen was missed. It shows again when you restart, with the same code, which Settings shows too.
+secure-boot-missed = The blue screen shows again when you restart, with the same code Settings shows.
 secure-boot-waiting = A blue screen asks for a code the next time you restart. Open Settings to see it.
 secure-boot-gave-up = It wasn’t finished after a few restarts. You can set it up in Settings whenever you’re ready.
 # Button that opens the steps in Settings

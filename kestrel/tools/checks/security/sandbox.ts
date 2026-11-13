@@ -266,7 +266,7 @@ async function checkFullAccess() {
   }
 }
 
-const shortcutsPrompt = () => descendants(global.stage).filter(actor => actor.mapped).map(textOf).find(text => text?.includes('wants to handle keyboard shortcuts itself'))?.replace(/[\u2068\u2069]/g, '') ?? null;
+const shortcutsPrompt = () => descendants(global.stage).filter(actor => actor.mapped).map(textOf).find(text => text?.includes('Luft’s own shortcuts won’t work while'))?.replace(/[\u2068\u2069]/g, '') ?? null;
 
 async function shortcutsAnswer(window: Meta.Window) {
   const dialog = shortcutsDialogFor(window);
@@ -289,11 +289,11 @@ async function checkWindowImpostors() {
     require(x11Window.get_wm_class() === SETTINGS_APP, 'an X11 window can name itself after Settings');
     const x11Prompt = await shortcutsAnswer(x11Window);
     require(typeof x11Prompt === 'string', 'an X11 window named after Settings asks before it inhibits shortcuts');
-    require(x11Prompt === 'gjs-console wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
+    require(x11Prompt === 'Luft’s own shortcuts won’t work while gjs-console has them.', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
     const waylandPrompt = await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland'));
     require(typeof waylandPrompt === 'string', 'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
-    require(typeof waylandPrompt === 'string' && waylandPrompt.startsWith('python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
-    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `${SANDBOXED_APP} wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.`,
+    require(typeof waylandPrompt === 'string' && waylandPrompt.includes('while python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
+    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `Luft’s own shortcuts won’t work while ${SANDBOXED_APP} has them.`,
       'a sandboxed app with a Luft app ID asks before it inhibits shortcuts, named by its sandbox');
   } finally {
     await Promise.all([stop(x11), stop(unsandboxed), stop(sandboxed)]);

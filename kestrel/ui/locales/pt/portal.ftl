@@ -35,7 +35,6 @@ portal-screenshot-file-name = Captura de ecrã { $date }
 ## Account details
 
 portal-account-title = Partilhar o seu nome e imagem com { $appName }?
-portal-account-description = { $appName } vai ver o nome e a imagem da sua conta.
 
 ## Wallpaper
 

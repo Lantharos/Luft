@@ -45,7 +45,7 @@ lock-screen-power-off = Power off…
 lock-inhibit-reason = Kestrel needs to lock the screen
 # Shown when USB protection couldn't confirm that the desktop unlocking it is Kestrel itself, so new USB devices keep waiting
 usb-protection-refused-title = New USB devices are waiting
-usb-protection-refused-body = Luft couldn't confirm that it's your desktop that was unlocked, so USB devices you plug in won't connect yet. Keyboards and mice still work. Turning off USB protection in Settings lets them in.
+usb-protection-refused-body = Luft couldn’t confirm it was your desktop that unlocked. Keyboards and mice still work.
 usb-protection-refused-settings = Settings
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
@@ -120,12 +120,12 @@ end-session-log-out-user = Sign out { $userName }?
 end-session-log-out-title = Sign out?
 # $userName is the person's full name
 end-session-log-out-user-countdown = { $seconds ->
-    [one] Open apps close and { $userName } goes back to the login screen. This happens by itself in { $seconds } second unless you cancel.
-   *[other] Open apps close and { $userName } goes back to the login screen. This happens by itself in { $seconds } seconds unless you cancel.
+    [one] In { $seconds } second, open apps close and { $userName } goes back to the login screen.
+   *[other] In { $seconds } seconds, open apps close and { $userName } goes back to the login screen.
 }
 end-session-log-out-countdown = { $seconds ->
-    [one] Open apps close and you go back to the login screen. This happens by itself in { $seconds } second unless you cancel.
-   *[other] Open apps close and you go back to the login screen. This happens by itself in { $seconds } seconds unless you cancel.
+    [one] In { $seconds } second, open apps close and you go back to the login screen.
+   *[other] In { $seconds } seconds, open apps close and you go back to the login screen.
 }
 # Button
 end-session-log-out-button = Sign out
@@ -136,8 +136,8 @@ end-session-power-off-title = Turn off the computer?
 # Dialog title when updates are installed before powering off
 end-session-power-off-updates-title = Install the update and turn off the computer?
 end-session-power-off-countdown = { $seconds ->
-    [one] Open apps close and the computer turns off. This happens by itself in { $seconds } second unless you cancel.
-   *[other] Open apps close and the computer turns off. This happens by itself in { $seconds } seconds unless you cancel.
+    [one] In { $seconds } second, open apps close and the computer turns off.
+   *[other] In { $seconds } seconds, open apps close and the computer turns off.
 }
 # Button
 end-session-power-off-button = Power off
@@ -146,16 +146,16 @@ end-session-restart-title = Restart the computer?
 # Dialog title when updates are installed before restarting
 end-session-restart-updates-title = Install the update and restart?
 end-session-restart-countdown = { $seconds ->
-    [one] Open apps close and the computer starts again. This happens by itself in { $seconds } second unless you cancel.
-   *[other] Open apps close and the computer starts again. This happens by itself in { $seconds } seconds unless you cancel.
+    [one] In { $seconds } second, open apps close and the computer restarts.
+   *[other] In { $seconds } seconds, open apps close and the computer restarts.
 }
 # Button
 end-session-restart-button = Restart
 # Dialog title
 end-session-update-restart-title = Restart and install the update?
 end-session-update-restart-countdown = { $seconds ->
-    [one] Open apps close and the update installs as the computer starts again. This happens by itself in { $seconds } second unless you cancel.
-   *[other] Open apps close and the update installs as the computer starts again. This happens by itself in { $seconds } seconds unless you cancel.
+    [one] In { $seconds } second, open apps close and the computer restarts to install the update.
+   *[other] In { $seconds } seconds, open apps close and the computer restarts to install the update.
 }
 # Button
 end-session-update-restart-button = Restart and install

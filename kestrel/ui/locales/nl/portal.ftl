@@ -35,7 +35,6 @@ portal-screenshot-file-name = Schermafbeelding { $date }
 ## Account details
 
 portal-account-title = Je naam en afbeelding delen met { $appName }?
-portal-account-description = { $appName } ziet de naam en afbeelding van je account.
 
 ## Wallpaper
 

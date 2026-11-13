@@ -35,7 +35,6 @@ portal-screenshot-file-name = Képernyőkép { $date }
 ## Account details
 
 portal-account-title = Megosztja a nevét és a képét ezzel az alkalmazással: { $appName }?
-portal-account-description = { $appName } látni fogja a fiókja nevét és képét.
 
 ## Wallpaper
 

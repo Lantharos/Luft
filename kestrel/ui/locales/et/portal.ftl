@@ -34,7 +34,6 @@ portal-screenshot-file-name = Kuvatõmmis { $date }
 ## Account details
 
 portal-account-title = Kas { $appName } võib näha sinu nime ja pilti?
-portal-account-description = { $appName } näeb sinu konto nime ja pilti.
 
 ## Wallpaper
 

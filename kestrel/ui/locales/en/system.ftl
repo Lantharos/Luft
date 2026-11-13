@@ -6,7 +6,7 @@ system-cancel = Cancel
 ## Dictation notifications
 
 dictation-setup-title = Type by speaking
-dictation-setup-body = Talk to type what you say, in any app. It listens on this computer, so it needs its speech model first.
+dictation-setup-body = Works in any app, and what you say never leaves this computer. It needs its speech model first.
 # Notification button that opens the dictation settings so the speech model can be installed
 dictation-setup-action = Set up dictation
 # $language is the name of the spoken language, for example "Japanese". It currently arrives in English from the speech service.
@@ -30,10 +30,9 @@ health-gpu-reset-details = Details
 # $app is the name of the app that was closed
 oom-app-closed-title = { $app } was closed to free memory
 oom-container-closed-title = A container was closed to free memory
-# "it" is the app or container named in the title
-oom-closed-body = The computer was running out of memory, so it was closed to keep everything else responsive.
+oom-closed-body = This kept everything else responsive.
 # "it" is the app or container named in the title. $size is a formatted amount of memory, for example "1.5 GB"
-oom-closed-body-with-size = The computer was running out of memory, so it was closed to keep everything else responsive. It was using { $size }.
+oom-closed-body-with-size = It was using { $size }. Closing it kept everything else responsive.
 # Shown while the computer is about to run out of memory
 memory-low-title = Luft is low on memory
 # $app is the name of the app using the most memory. $size is a formatted amount of memory, for example "6.2 GB"
@@ -179,9 +178,9 @@ post-send-to-device = Send to device
 post-devices-nearby = Devices nearby
 post-looking = Looking for devices
 post-nobody = No devices nearby
-post-nobody-hint = Open LocalSend on your phone or other computer, on the same network as this one.
+post-nobody-hint = Open LocalSend on a device on the same network.
 post-look-again = Look again
-post-public-network = This network is public, so devices nearby can’t find this computer here.
+post-public-network = On a public network, devices nearby can’t find this computer.
 post-port-taken = Another app is using LocalSend’s port, so devices can’t send here.
 post-back = Back
 post-gone = That device isn’t nearby anymore
@@ -491,7 +490,7 @@ network-device-named = { $kind } ({ $name })
 # Notification title shown when a network needs signing in on a web page
 network-menu-sign-in = Sign in to the network
 network-menu-failed-title = Connection failed
-network-menu-failed-body = The network connection couldn’t be set up. Try again.
+network-menu-failed-body = Try again.
 
 ## Location access dialog
 
@@ -507,9 +506,9 @@ location-dialog-grant = Allow
 ## Thunderbolt notifications
 
 thunderbolt-unknown-title = Unknown Thunderbolt device
-thunderbolt-unknown-body = A new device was connected while you were away. Unplug it and plug it in again to start using it.
+thunderbolt-unknown-body = It was connected while you were away. Plug it in again to use it.
 thunderbolt-unauthorized-title = Thunderbolt device needs approval
-thunderbolt-unauthorized-body = A new device was connected. An administrator has to approve it before it can be used.
+thunderbolt-unauthorized-body = An administrator has to approve it first.
 thunderbolt-error-title = The Thunderbolt device couldn’t be approved
 # $reason is the system's error message, usually in English
 thunderbolt-error-body = Unplug it and plug it in again to retry. Details: { $reason }
@@ -525,7 +524,7 @@ access-dialog-allow = Allow
 
 # Dialog title. $app is the app's name, or a program's name such as python3
 firewall-app-title = { $app } wants to accept connections from other devices
-firewall-app-body = Allowing it lets phones, computers and other devices on your home networks, VPNs and virtual machines connect to { $app }. If you’re not sure, choose Don’t allow: it’s safe, { $app } keeps working on this computer, and you can change your mind in Settings.
+firewall-app-body = Devices on your home networks, VPNs and virtual machines could connect to it. If you’re not sure, don’t allow it: { $app } keeps working on this computer.
 firewall-app-deny = Don’t allow
 firewall-app-allow = Allow
 
@@ -554,11 +553,11 @@ autorun-open-with = Open with { $appName }
 
 kbd-a11y-slow-keys-on = Slow keys turned on
 kbd-a11y-slow-keys-off = Slow keys turned off
-kbd-a11y-slow-keys-description = You just held down the Shift key for 8 seconds. This is the shortcut for slow keys, which changes the way your keyboard works.
+kbd-a11y-slow-keys-description = Holding Shift for 8 seconds is the shortcut for slow keys.
 kbd-a11y-sticky-keys-on = Sticky keys turned on
 kbd-a11y-sticky-keys-off = Sticky keys turned off
-kbd-a11y-sticky-keys-on-description = You just pressed the Shift key 5 times in a row. This is the shortcut for sticky keys, which changes the way your keyboard works.
-kbd-a11y-sticky-keys-off-description = You just pressed two keys at once, or pressed the Shift key 5 times in a row. This turns off sticky keys, which changes the way your keyboard works.
+kbd-a11y-sticky-keys-on-description = Pressing Shift 5 times in a row is the shortcut for sticky keys.
+kbd-a11y-sticky-keys-off-description = Pressing two keys at once, or Shift 5 times in a row, turns off sticky keys.
 # Button that keeps the feature that was just turned on
 kbd-a11y-leave-on = Leave on
 # Button that turns the feature back on after it was just turned off
@@ -581,10 +580,10 @@ audio-device-microphone = Microphone
 
 inhibit-shortcuts-title = Send all keyboard shortcuts to this app?
 # $appName is an app name like "Settings"
-inhibit-shortcuts-app = { $appName } wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
-inhibit-shortcuts-unknown-app = An app wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
+inhibit-shortcuts-app = Luft’s own shortcuts won’t work while { $appName } has them.
+inhibit-shortcuts-unknown-app = Luft’s own shortcuts won’t work while the app has them.
 # $title is the title an app gave its window
-inhibit-shortcuts-titled-app = An app showing “{ $title }” wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
+inhibit-shortcuts-titled-app = Luft’s own shortcuts won’t work while the app showing “{ $title }” has them.
 # $shortcut is a keyboard shortcut like "Super+Escape"
 inhibit-shortcuts-restore = Press { $shortcut } to get your shortcuts back.
 inhibit-shortcuts-deny = Don’t allow
@@ -698,7 +697,7 @@ screenshot-screencast-view = Click to watch it
 # Notification button that opens the file manager at the saved file
 screenshot-show-in-rover = Show in Rover
 screenshot-captured = Screenshot taken
-screenshot-captured-body = You can paste the image from the clipboard
+screenshot-captured-body = Copied to the clipboard
 
 ## System updates
 # Notification shown when the system found updates by itself
@@ -732,7 +731,7 @@ crash-reports-name-peek = Peek
 crash-reports-name-encryption = Device encryption
 # Title when one of Luft's background services or helpers closed and it has no name of its own
 crash-reports-title-part = A part of Luft closed unexpectedly
-crash-reports-body = Luft can send a report to help fix this. It says what closed, how and where in its code, which version of Luft you have and who made your graphics card. It never includes your files, what was on the screen, or anything that says who you are.
+crash-reports-body = A report can help fix this. It never includes your files, what was on the screen, or anything that says who you are.
 # Check box: sending now means always sending, not sending means never asking again
 crash-reports-remember = Do the same next time without asking
 # Button that shows the report itself

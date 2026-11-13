@@ -51,12 +51,11 @@ portal-screenshot-file-name = Screenshot { $date }
 ## Account details
 
 portal-account-title = Let { $appName } see your name and picture?
-portal-account-description = { $appName } will see the name and picture of your account.
 
 ## Wallpaper
 
 portal-wallpaper-title = Set as your wallpaper?
-portal-wallpaper-description = { $appName } wants to change your wallpaper. It’s used in light and dark style and on the lock screen.
+portal-wallpaper-description = { $appName } wants to set it for light and dark style and the lock screen.
 # Button
 portal-wallpaper-set = Set wallpaper
 
@@ -130,7 +129,7 @@ print-title = Print
 print-title-from-app = Print from { $appName }
 # Default label of the button that starts printing
 print-accept = Print
-print-no-printers = No printers were found. Printers on your network and ones plugged in by USB show up by themselves, and others can be added in Settings.
+print-no-printers = No printers were found. You can add one in Settings.
 # Button that opens the Printers page in Settings
 print-open-settings = Printer settings
 

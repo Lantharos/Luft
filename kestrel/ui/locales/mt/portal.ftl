@@ -35,7 +35,6 @@ portal-screenshot-file-name = Screenshot { $date }
 ## Account details
 
 portal-account-title = Tippermetti li { $appName } tara l-isem u l-istampa tal-kont?
-portal-account-description = { $appName } tkun tista’ tara l-isem u l-istampa tal-kont.
 
 ## Wallpaper
 

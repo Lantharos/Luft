@@ -35,7 +35,6 @@ portal-screenshot-file-name = Ekrano kopija { $date }
 ## Account details
 
 portal-account-title = Leisti, kad { $appName } matytų jūsų vardą ir nuotrauką?
-portal-account-description = { $appName } matys jūsų paskyros vardą ir nuotrauką.
 
 ## Wallpaper
 

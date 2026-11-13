@@ -103,7 +103,7 @@ window-resize-size = { $width } × { $height }
 
 # $appName is the name of the app that stopped responding
 close-dialog-title = “{ $appName }” isn’t responding
-close-dialog-description = You can wait a little longer for it, or force it to quit. Unsaved work may be lost.
+close-dialog-description = Force quitting it may lose unsaved work.
 # Button
 close-dialog-force-quit = Force quit
 # Button

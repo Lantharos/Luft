@@ -35,7 +35,6 @@ portal-screenshot-file-name = Captură de ecran { $date }
 ## Account details
 
 portal-account-title = Partajați numele și imaginea cu { $appName }?
-portal-account-description = { $appName } va vedea numele și imaginea contului.
 
 ## Wallpaper
 

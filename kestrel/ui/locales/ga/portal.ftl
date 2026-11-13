@@ -35,7 +35,6 @@ portal-screenshot-file-name = Gabháil scáileáin { $date }
 ## Account details
 
 portal-account-title = An bhféadfaidh { $appName } d’ainm agus do phictiúr a fheiceáil?
-portal-account-description = Feicfidh { $appName } ainm agus pictiúr do chuntais.
 
 ## Wallpaper
 

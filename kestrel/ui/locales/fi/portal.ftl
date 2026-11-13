@@ -35,7 +35,6 @@ portal-screenshot-file-name = Kuvakaappaus { $date }
 ## Account details
 
 portal-account-title = Saako { $appName } käyttää nimeäsi ja kuvaasi?
-portal-account-description = { $appName } näkee tilisi nimen ja kuvan.
 
 ## Wallpaper
 

@@ -35,7 +35,6 @@ portal-screenshot-file-name = Ekrānuzņēmums { $date }
 ## Account details
 
 portal-account-title = Vai { $appName } drīkst redzēt jūsu vārdu un attēlu?
-portal-account-description = { $appName } redzēs jūsu konta vārdu un attēlu.
 
 ## Wallpaper
 

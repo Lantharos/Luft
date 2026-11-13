@@ -23,7 +23,7 @@ export async function shareAccount(dismissal: Dismissal, appId: string, reason: 
   const app = appNames(appId);
   const [response] = await openDialog(dismissal, {
     title: t('portal-account-title', { appName: app.object }),
-    description: reason || t('portal-account-description', { appName: app.subject }),
+    description: reason,
     icon: 'avatar-default-symbolic',
     askedBy: appId,
   }, dialog => {

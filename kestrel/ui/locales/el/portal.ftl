@@ -35,7 +35,6 @@ portal-screenshot-file-name = Στιγμιότυπο οθόνης { $date }
 ## Account details
 
 portal-account-title = Κοινή χρήση του ονόματος και της εικόνας σας με { $appName };
-portal-account-description = { $appName } θα βλέπει το όνομα και την εικόνα του λογαριασμού σας.
 
 ## Wallpaper
 

@@ -1,7 +1,7 @@
 [package]
 name = "luft-recovery-key"
 version = "0.1.0"
-description = "Disk recovery keys as twelve words, and the older keys of 64 letters, shared by trustd and Sushi"
+description = "Disk recovery keys as twelve words, shared by trustd and Sushi"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true

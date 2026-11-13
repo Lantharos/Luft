@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Permitir que os apps usem o microfone
 
 settings-privacy-file-history = Histórico de arquivos
 settings-privacy-remember-files = Lembrar arquivos usados recentemente
-settings-privacy-remember-files-hint = Os apps podem mostrar os últimos arquivos que você abriu
 settings-privacy-keep-history = Manter o histórico por
 settings-privacy-keep-forever = Para sempre
 settings-privacy-clear-history = Limpar histórico
-settings-privacy-clear-history-hint = Esquecer agora todos os arquivos da lista
 settings-privacy-clear = Limpar
 settings-privacy-clear-title = Limpar o histórico de arquivos?
 settings-privacy-clear-description = Os apps não vão mais mostrar os arquivos que você abriu recentemente. Os arquivos continuam onde estão.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Esvaziar a Lixeira automaticamente
 settings-privacy-delete-temp = Excluir arquivos temporários automaticamente
 settings-privacy-delete-temp-hint = Seus arquivos em pastas temporárias que nada usou nos últimos tempos
 settings-privacy-delete-after = Excluir após
-settings-privacy-delete-after-hint = Quanto tempo os arquivos ficam antes de serem removidos
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Desbloquear com o chip de segurança
 settings-encryption-chip-unlock-on = Desde que nada mude a forma como este computador inicia
 settings-encryption-chip-unlock-off = Para não precisar digitar uma frase secreta na inicialização
 settings-encryption-pin = PIN na inicialização
-settings-encryption-pin-description = Você o digita antes de o disco ser desbloqueado
 settings-encryption-change = Alterar
 settings-encryption-add-pin-row = Adicionar um PIN na inicialização
 settings-encryption-add-pin-row-description = Mantém o disco bloqueado mesmo se alguém levar o computador
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = A chave anterior não funciona mais. Guard
 
 settings-passwords-title = Senhas e chaves
 settings-passwords-not-running = O Chaveiro não está em execução
-settings-passwords-not-running-description = Suas senhas e chaves aparecem aqui assim que ele iniciar
 settings-passwords-locked = Bloqueado
 settings-passwords-contents = { $count ->
     [0] Nada salvo ainda
@@ -290,7 +285,6 @@ settings-passwords-pin = Pedir um PIN depois da impressão digital
 settings-passwords-pin-locked = Desbloqueie o Chaveiro para alterar isto
 settings-passwords-pin-description = Assim, só a impressão digital não basta para desbloqueá-las
 settings-passwords-lock-with-screen = Bloquear junto com a tela
-settings-passwords-lock-with-screen-description = Elas são bloqueadas e desbloqueadas junto com a tela
 settings-passwords-apps = Logins e atividade de apps
 settings-passwords-apps-locked = Desbloqueie o Chaveiro para vê-los
 settings-passwords-apps-description = O que os apps guardam aqui e quando usaram
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } não teve permissão para u
 settings-passwords-history-signed = { $app } assinou com “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } assinou com uma senha salva
 settings-passwords-history-clear = Limpar histórico
-settings-passwords-history-clear-description = Esquecer quais apps usaram o Chaveiro e quando
 settings-passwords-history-clear-button = Limpar
 settings-passwords-history-clear-title = Limpar os acessos recentes?
 settings-passwords-history-clear-confirm = A lista de quais apps usaram o Chaveiro e quando será apagada. Suas senhas e chaves salvas continuam como estão.

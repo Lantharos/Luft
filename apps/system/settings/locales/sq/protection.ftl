@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Lejo aplikacionet të përdorin mikrofonin
 
 settings-privacy-file-history = Historiku i skedarëve
 settings-privacy-remember-files = Mbaj mend skedarët e përdorur së fundi
-settings-privacy-remember-files-hint = Aplikacionet mund të shfaqin skedarët që hape së fundi
 settings-privacy-keep-history = Mbaje historikun për
 settings-privacy-keep-forever = Përgjithmonë
 settings-privacy-clear-history = Pastro historikun
-settings-privacy-clear-history-hint = Harro menjëherë çdo skedar në listë
 settings-privacy-clear = Pastro
 settings-privacy-clear-title = Të pastrohet historiku i skedarëve?
 settings-privacy-clear-description = Aplikacionet nuk do t’i shfaqin më skedarët që hape së fundi. Skedarët mbeten aty ku janë.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Zbraz koshin automatikisht
 settings-privacy-delete-temp = Fshi automatikisht skedarët e përkohshëm
 settings-privacy-delete-temp-hint = Skedarët e tu në dosjet e përkohshme që nuk i ka përdorur asgjë së fundi
 settings-privacy-delete-after = Fshi pas
-settings-privacy-delete-after-hint = Sa qëndrojnë skedarët para se të hiqen
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Zhblloko me çipin e sigurisë
 settings-encryption-chip-unlock-on = Për sa kohë asgjë nuk ndryshon mënyrën si niset ky kompjuter
 settings-encryption-chip-unlock-off = Që të mos shkruash frazëkalim në nisje
 settings-encryption-pin = PIN në nisje
-settings-encryption-pin-description = E shkruan para se të zhbllokohet disku
 settings-encryption-change = Ndrysho
 settings-encryption-add-pin-row = Shto një PIN në nisje
 settings-encryption-add-pin-row-description = E mban diskun të bllokuar edhe nëse kompjuteri merret
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Çelësi yt i mëparshëm nuk funksionon m
 
 settings-passwords-title = Fjalëkalimet dhe çelësat
 settings-passwords-not-running = Vargu yt i çelësave nuk është në punë
-settings-passwords-not-running-description = Fjalëkalimet dhe çelësat e tu shfaqen këtu sapo të niset
 settings-passwords-locked = I bllokuar
 settings-passwords-contents = { $count ->
     [0] Ende asgjë e ruajtur
@@ -290,7 +285,6 @@ settings-passwords-pin = Kërko një PIN pas gjurmës së gishtit
 settings-passwords-pin-locked = Zhblloko vargun e çelësave për ta ndryshuar këtë
 settings-passwords-pin-description = Që vetëm gjurma e gishtit të mos mjaftojë për t’i zhbllokuar
 settings-passwords-lock-with-screen = Blloko bashkë me ekranin
-settings-passwords-lock-with-screen-description = Bllokohen dhe zhbllokohen bashkë me ekranin
 settings-passwords-apps = Hyrjet dhe veprimtaria e aplikacioneve
 settings-passwords-apps-locked = Zhblloko vargun e çelësave për t’i parë
 settings-passwords-apps-description = Çfarë ruajnë aplikacionet këtu dhe kur e përdorën
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } nuk u lejua të përdorë n
 settings-passwords-history-signed = { $app } nënshkroi me “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } nënshkroi me një fjalëkalim të ruajtur
 settings-passwords-history-clear = Pastro historikun
-settings-passwords-history-clear-description = Harro cilat aplikacione e përdorën vargun e çelësave dhe kur
 settings-passwords-history-clear-button = Pastro
 settings-passwords-history-clear-title = Të pastrohen qasjet e fundit?
 settings-passwords-history-clear-confirm = Lista se cilat aplikacione e përdorën vargun e çelësave dhe kur fshihet. Fjalëkalimet dhe çelësat e ruajtur mbeten siç janë.

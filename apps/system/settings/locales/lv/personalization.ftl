@@ -71,7 +71,6 @@ settings-appearance-tint-slate = Šīferpelēka
 ## Appearance: text and motion
 
 settings-appearance-text-size = Teksta lielums
-settings-appearance-text-size-description = Palielina vai samazina tekstu visās lietotnēs
 
 ## Taskbar
 
@@ -213,7 +212,6 @@ settings-see-through-description = Darbvirsma redzama cauri šo lietotņu logiem
 settings-see-through-app = Caurspīdīgs: { $app }
 settings-see-through-add = Pievienot lietotni
 settings-see-through-add-title = Padarīt lietotni caurspīdīgu
-settings-see-through-add-description = Tās logi ļauj redzēt to, kas aiz tiem.
 settings-see-through-shows = Kas redzams cauri
 settings-see-through-shows-everything = Viss aizmugurē
 settings-see-through-shows-wallpaper = Tikai fona attēls

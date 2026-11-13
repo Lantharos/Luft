@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Apps das Mikrofon verwenden lassen
 
 settings-privacy-file-history = Dateiverlauf
 settings-privacy-remember-files = Zuletzt verwendete Dateien merken
-settings-privacy-remember-files-hint = Apps können die Dateien zeigen, die du zuletzt geöffnet hast
 settings-privacy-keep-history = Verlauf behalten für
 settings-privacy-keep-forever = Unbegrenzt
 settings-privacy-clear-history = Verlauf löschen
-settings-privacy-clear-history-hint = Jede Datei in der Liste sofort vergessen
 settings-privacy-clear = Löschen
 settings-privacy-clear-title = Dateiverlauf löschen?
 settings-privacy-clear-description = Apps zeigen die zuletzt geöffneten Dateien nicht mehr an. Die Dateien selbst bleiben, wo sie sind.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Papierkorb automatisch leeren
 settings-privacy-delete-temp = Temporäre Dateien automatisch löschen
 settings-privacy-delete-temp-hint = Deine Dateien in temporären Ordnern, die zuletzt nichts verwendet hat
 settings-privacy-delete-after = Löschen nach
-settings-privacy-delete-after-hint = Wie lange Dateien bleiben, bevor sie entfernt werden
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Mit dem Sicherheitschip entsperren
 settings-encryption-chip-unlock-on = Solange sich nichts daran ändert, wie dieser Computer startet
 settings-encryption-chip-unlock-off = Damit du beim Start keine Passphrase eingeben musst
 settings-encryption-pin = PIN beim Start
-settings-encryption-pin-description = Du gibst sie ein, bevor der Datenträger entsperrt wird
 settings-encryption-change = Ändern
 settings-encryption-add-pin-row = PIN beim Start hinzufügen
 settings-encryption-add-pin-row-description = Hält den Datenträger gesperrt, selbst wenn der Computer mitgenommen wird
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Dein bisheriger Schlüssel funktioniert ni
 
 settings-passwords-title = Passwörter und Schlüssel
 settings-passwords-not-running = Dein Schlüsselbund läuft nicht
-settings-passwords-not-running-description = Deine Passwörter und Schlüssel erscheinen hier, sobald er startet
 settings-passwords-locked = Gesperrt
 settings-passwords-contents = { $count ->
     [0] Noch nichts gespeichert
@@ -290,7 +285,6 @@ settings-passwords-pin = Nach dem Fingerabdruck nach einer PIN fragen
 settings-passwords-pin-locked = Entsperr deinen Schlüsselbund, um das zu ändern
 settings-passwords-pin-description = Damit ein Fingerabdruck allein sie nicht entsperren kann
 settings-passwords-lock-with-screen = Mit dem Bildschirm sperren
-settings-passwords-lock-with-screen-description = Sie werden zusammen mit dem Bildschirm gesperrt und entsperrt
 settings-passwords-apps = App-Anmeldedaten und Aktivität
 settings-passwords-apps-locked = Entsperr deinen Schlüsselbund, um sie zu sehen
 settings-passwords-apps-description = Was Apps hier aufbewahren und wann sie es verwendet haben
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } durfte ein gespeichertes Pa
 settings-passwords-history-signed = { $app } hat mit „{ $item }“ signiert
 settings-passwords-history-signed-unnamed = { $app } hat mit einem gespeicherten Passwort signiert
 settings-passwords-history-clear = Verlauf löschen
-settings-passwords-history-clear-description = Vergessen, welche Apps deinen Schlüsselbund wann verwendet haben
 settings-passwords-history-clear-button = Löschen
 settings-passwords-history-clear-title = Letzte Zugriffe löschen?
 settings-passwords-history-clear-confirm = Die Liste, welche Apps deinen Schlüsselbund wann verwendet haben, wird gelöscht. Deine gespeicherten Passwörter und Schlüssel bleiben, wie sie sind.

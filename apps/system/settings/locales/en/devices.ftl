@@ -25,12 +25,11 @@ settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
 settings-display-touch-taskbar = Touch taskbar
 settings-display-touch-taskbar-description = Shows a taskbar sized for fingers and pens on this screen
 settings-display-variable-refresh = Variable refresh rate
-settings-display-variable-refresh-description = Lets the display follow the frame rate of fullscreen games for smoother motion
+settings-display-variable-refresh-description = Smoother motion in fullscreen games
 settings-display-variable-refresh-off = Off
 settings-display-variable-refresh-games = In games
 settings-display-variable-refresh-fullscreen = In all fullscreen apps
 settings-display-scale = Scale
-settings-display-scale-description = Makes text, apps, and everything else bigger or smaller
 settings-display-orientation = Orientation
 settings-display-orientation-landscape = Landscape
 settings-display-orientation-portrait-right = Portrait right
@@ -55,7 +54,7 @@ settings-display-brightness-no-access = Sign out and back in to change their bri
 ## Night light
 
 settings-display-night-light = Night light
-settings-display-night-light-description = Warmer colors in the evening, easier on your eyes
+settings-display-night-light-description = Warmer colors in the evening
 settings-display-night-light-schedule = Schedule
 settings-display-night-light-automatic = Sunset to sunrise
 settings-display-night-light-custom = Custom
@@ -286,7 +285,6 @@ settings-power-limited-lap = Performance is limited because the computer is on y
 settings-power-limited-hot = Performance is limited because the computer is too hot
 settings-power-limited-lap-hot = Performance is limited because the computer is on your lap and too hot
 settings-power-saver-low-battery = Power saver on low battery
-settings-power-saver-low-battery-description = Switches to power saver when the battery runs low
 settings-power-saver-level = Battery level for power saver
 
 ## Keyboard backlight
@@ -309,7 +307,7 @@ settings-power-sleep = Sleep
 settings-power-suspend-plugged-in = Sleep when plugged in
 # Shown on computers without a battery
 settings-power-suspend-inactive = Sleep when inactive
-settings-power-suspend-description = Puts the computer to sleep after a while without use
+settings-power-suspend-description = After a while without use
 settings-power-suspend-battery = Sleep on battery
 settings-power-button = Power button
 # What pressing the power button does
@@ -338,7 +336,6 @@ settings-keyboard-own-open = Open Keys
 settings-keyboard-own-open-description = Edit the layouts and input methods you've made
 settings-keyboard-switch-source = Switch input source
 settings-keyboard-add-source = Add an input source
-settings-keyboard-add-source-description = Pick the keyboard layout or input method you want to type with.
 settings-keyboard-add-source-search = Search languages, layouts and input methods
 # Tag next to an input source that is an input method rather than a layout
 settings-keyboard-input-method = Input method
@@ -559,7 +556,6 @@ settings-mouse-touchpad-speed = Touchpad pointer speed
 settings-mouse-touchpad-scroll-speed = Scrolling speed
 settings-mouse-touchpad-scroll-speed-label = Touchpad scrolling speed
 settings-mouse-touchpad-tap = Tap to click
-settings-mouse-touchpad-tap-description = Tap the touchpad instead of pressing it down
 settings-mouse-touchpad-natural-scrolling = Touchpad natural scrolling
 settings-mouse-touchpad-natural-scrolling-description = Content moves in the same direction as your fingers
 settings-mouse-touchpad-scroll-with = Scroll with
@@ -576,7 +572,7 @@ settings-mouse-touchpad-disable-typing-description = So the pointer doesn’t ju
 ## Pen
 
 settings-pen-hand = Writing hand
-settings-pen-hand-description = Touches from the side of your hand resting on the screen are ignored for a moment after you lift the pen
+settings-pen-hand-description = Ignores your hand on the screen for a moment after you lift the pen
 settings-pen-hand-left = Left
 settings-pen-hand-right = Right
 settings-pen-tip-feel = Tip feel
@@ -623,7 +619,7 @@ settings-pen-tablet-choose-description = Choose the display this tablet draws on
 ## Printers
 
 settings-printers-none = No printers yet
-settings-printers-none-description = Printers on your network and printers plugged in by USB show up here by themselves
+settings-printers-none-description = Printers on your network or plugged in by USB show up here by themselves
 settings-printers-add = Add a printer
 settings-printers-add-description = Choose one that didn't show up by itself, or type its address
 settings-printers-available = On this network
@@ -691,7 +687,7 @@ settings-printers-none-found = No other printers were found. Check that the prin
 settings-printers-by-address = Type an address
 settings-printers-by-address-detail = For a printer on another network, or one that can't be found
 settings-printers-address = Address
-settings-printers-address-description = The printer's IP address or host name, or a full ipp:// address. It needs to print without a driver, which most printers made since 2012 do.
+settings-printers-address-description = Its IP address or host name, or a full ipp:// address. It needs to print without a driver, as most printers since 2012 do.
 settings-printers-add-button = Add
 settings-printers-adding = Setting up the printer…
 # $name is the printer's name

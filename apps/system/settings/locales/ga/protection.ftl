@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Lig d’aipeanna an micreafón a úsáid
 
 settings-privacy-file-history = Stair comhad
 settings-privacy-remember-files = Cuimhnigh ar chomhaid a úsáideadh le déanaí
-settings-privacy-remember-files-hint = Is féidir le haipeanna na comhaid a d’oscail tú le déanaí a thaispeáint
 settings-privacy-keep-history = Coinnigh an stair ar feadh
 settings-privacy-keep-forever = Go deo
 settings-privacy-clear-history = Glan an stair
-settings-privacy-clear-history-hint = Déan dearmad anois ar gach comhad sa liosta
 settings-privacy-clear = Glan
 settings-privacy-clear-title = Glan stair na gcomhad?
 settings-privacy-clear-description = Ní thaispeánfaidh aipeanna na comhaid a d’oscail tú le déanaí a thuilleadh. Fanfaidh na comhaid féin san áit a bhfuil siad.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Folmhaigh an bruscar go huathoibríoch
 settings-privacy-delete-temp = Scrios comhaid shealadacha go huathoibríoch
 settings-privacy-delete-temp-hint = Do chomhaid i bhfillteáin shealadacha nár úsáid aon rud le déanaí
 settings-privacy-delete-after = Scrios tar éis
-settings-privacy-delete-after-hint = Cé chomh fada a fhanann comhaid sula mbaintear iad
 
 ## Security: summary at the top of the page
 
@@ -223,7 +220,6 @@ settings-encryption-chip-unlock = Díghlasáil leis an tslis slándála
 settings-encryption-chip-unlock-on = Fad is nach n-athraíonn aon rud conas a thosaíonn an ríomhaire seo
 settings-encryption-chip-unlock-off = Ionas nach gá duit frása faire a chlóscríobh ag an tosú
 settings-encryption-pin = UAP ag an tosú
-settings-encryption-pin-description = Clóscríobhann tú é sula ndíghlasáiltear an diosca
 settings-encryption-change = Athraigh
 settings-encryption-add-pin-row = Cuir UAP leis ag an tosú
 settings-encryption-add-pin-row-description = Coinníonn sé an diosca faoi ghlas fiú má thógtar an ríomhaire
@@ -292,7 +288,6 @@ settings-recovery-fresh-description = Ní oibríonn d’eochair roimhe seo a thu
 
 settings-passwords-title = Pasfhocail agus eochracha
 settings-passwords-not-running = Níl d’fháinne eochrach ag rith
-settings-passwords-not-running-description = Taispeánfar do phasfhocail agus d’eochracha anseo nuair a thosóidh sé
 settings-passwords-locked = Faoi ghlas
 settings-passwords-contents = { $count ->
     [0] Níl aon rud sábháilte fós
@@ -317,7 +312,6 @@ settings-passwords-pin = Iarr UAP i ndiaidh an mhéarloirg
 settings-passwords-pin-locked = Díghlasáil d’fháinne eochrach chun é seo a athrú
 settings-passwords-pin-description = Ionas nach féidir le méarlorg leis féin iad a dhíghlasáil
 settings-passwords-lock-with-screen = Glasáil leis an scáileán
-settings-passwords-lock-with-screen-description = Glasálann agus díghlasálann siad in éineacht leis an scáileán
 settings-passwords-apps = Sínithe isteach agus gníomhaíocht aipeanna
 settings-passwords-apps-locked = Díghlasáil d’fháinne eochrach chun iad a fheiceáil
 settings-passwords-apps-description = An méid a choinníonn aipeanna anseo agus cathain a d’úsáid siad é
@@ -353,7 +347,6 @@ settings-passwords-history-denied-unnamed = Ní raibh cead ag { $app } pasfhocal
 settings-passwords-history-signed = Shínigh { $app } le “{ $item }”
 settings-passwords-history-signed-unnamed = Shínigh { $app } le pasfhocal sábháilte
 settings-passwords-history-clear = Glan an stair
-settings-passwords-history-clear-description = Déan dearmad ar na haipeanna a d’úsáid d’fháinne eochrach agus cathain
 settings-passwords-history-clear-button = Glan
 settings-passwords-history-clear-title = Glan an rochtain le déanaí?
 settings-passwords-history-clear-confirm = Scriosfar an liosta de na haipeanna a d’úsáid d’fháinne eochrach agus cathain. Fanfaidh do phasfhocail agus d’eochracha sábháilte mar atá siad.

@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Skifergrå
 ## Appearance: text and motion
 
 settings-appearance-text-size = Tekststørrelse
-settings-appearance-text-size-description = Gjør teksten større eller mindre i alle apper
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = La skrivebordet synes gjennom vinduene til di
 settings-see-through-app = Gjennomsiktig { $app }
 settings-see-through-add = Legg til en app
 settings-see-through-add-title = Gjør en app gjennomsiktig
-settings-see-through-add-description = Vinduene slipper gjennom det som er bak dem.
 settings-see-through-shows = Vis gjennom
 settings-see-through-shows-everything = Alt bak
 settings-see-through-shows-wallpaper = Bare bakgrunnsbildet

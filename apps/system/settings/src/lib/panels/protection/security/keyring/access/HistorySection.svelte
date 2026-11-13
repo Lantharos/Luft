@@ -37,7 +37,7 @@
 			{/snippet}
 		</MoreRow>
 	{/if}
-	<Row title={t('settings-passwords-history-clear')} description={t('settings-passwords-history-clear-description')}>
+	<Row title={t('settings-passwords-history-clear')}>
 		<button type="button" class="button" onclick={() => (clearing = true)}>{t('settings-passwords-history-clear-button')}</button>
 	</Row>
 </Section>

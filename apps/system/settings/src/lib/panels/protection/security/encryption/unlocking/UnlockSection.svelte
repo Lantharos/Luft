@@ -72,7 +72,7 @@
 			<Switch label={t('settings-encryption-chip-unlock')} checked disabled={busy} onchange={() => (open = { kind: 'removeTpm' })} />
 		</Row>
 		{#if pinSet}
-			<Row title={t('settings-encryption-pin')} description={t('settings-encryption-pin-description')}>
+			<Row title={t('settings-encryption-pin')}>
 				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'change' })}>{t('settings-encryption-change')}</button>
 				<button type="button" class="button" onclick={() => (open = { kind: 'removePin' })}>{t('settings-protection-remove')}</button>
 			</Row>
@@ -95,7 +95,7 @@
 		{/if}
 		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'replaceKey' })}>{t('settings-recovery-replace')}</button>
 	</Row>
-	<Row title={t('settings-recovery-check-row')} description={t('settings-recovery-check-row-description')}>
+	<Row title={t('settings-recovery-check-row')}>
 		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'checkKey' })}>{t('settings-recovery-check')}</button>
 	</Row>
 </Section>

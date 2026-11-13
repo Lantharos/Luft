@@ -81,7 +81,6 @@ settings-network-airplane = Airplane mode
     .description = Turns off every wireless connection
 settings-network-airplane-hardware = Turned on by a hardware switch
 settings-network-known = Known networks
-    .description = Networks this computer has joined before, nearby or not
 settings-network-known-count = { $count ->
         [one] { $count } saved network
        *[other] { $count } saved networks
@@ -110,7 +109,6 @@ settings-network-wifi-saved-password-failed = The saved password didn't work. En
 settings-network-wifi-settings = Network settings
 settings-network-wifi-searching = Looking for networks
 settings-network-hidden = Connect to a hidden network
-    .description = Enter the network's name and how it's secured.
 settings-network-hidden-name = Network name
 
 ## Network: joining a Wi‑Fi network
@@ -286,15 +284,15 @@ settings-network-firewall = Firewall
 settings-network-firewall-how = How this works
 settings-network-firewall-how-done = Done
 settings-network-firewall-how-networks = Home and public networks
-    .description = Every Wi‑Fi and wired network is home or public, and counts as public until you choose. On home networks, devices can find this computer and reach the apps you allowed there. On public networks, such as in a café or a hotel, they reach only the apps you allowed on every network, and this computer doesn't answer when they look for it.
+    .description = Every network counts as public until you choose. On home networks, devices can find this computer and reach the apps you allowed there. On public networks, such as in a café or a hotel, they reach only the apps you allowed everywhere, and this computer stays hidden.
 settings-network-firewall-how-apps = Apps
-    .description = The first time an app waits for connections from other devices, Luft asks whether to let them in. Casting, games, music speakers and sharing files need this. Forgetting an app's answer asks again the next time it waits for connections.
+    .description = The first time an app waits for connections from other devices, Luft asks whether to let them in. Forget an app’s answer to be asked again.
 settings-network-firewall-how-post = Post
-    .description = Post, which sends files to phones and computers nearby, is let in on home networks while someone can find this computer. Choosing No one in Post's settings closes it.
+    .description = Post is let in on home networks while someone can find this computer. Choosing No one in Post’s settings closes it.
 settings-network-firewall-how-extensions = Extensions
     .description = Extensions that take connections from devices on your network are let in on home networks while they're on.
 settings-network-firewall-how-services = Services
-    .description = Services that run without an app, such as a web or file server, need a port opened for them here. That takes an administrator.
+    .description = Services that run without an app, such as a web or file server, need a port opened for them here.
 settings-network-firewall-home = Home
 settings-network-firewall-public = Public
 settings-network-firewall-connected = Connected
@@ -380,7 +378,6 @@ settings-network-vpn-import = Import from a file
     .description = WireGuard, OpenVPN and other VPN configuration files
 settings-network-vpn-importing = Importing
 settings-network-wireguard = Set up WireGuard
-    .description = Enter the details from your VPN provider or server
 settings-network-wireguard-dialog = Your VPN provider or the server’s owner can give you these details.
 # Example name for a new VPN, shown as a placeholder
 settings-network-wireguard-name-example = Home VPN
@@ -486,7 +483,7 @@ settings-bluetooth-request-confirm = Pair with { $name }?
 settings-bluetooth-request-authorize = Allow { $name } to pair?
     .description = { $name } will be able to connect to this computer.
 settings-bluetooth-request-pin = Enter the PIN for { $name }
-    .description = It's often 0000 or 1234. The device's manual will have it if neither works.
+    .description = It’s often 0000 or 1234.
 settings-bluetooth-request-passkey = Enter the code shown on { $name }
     .description = Type the six digits exactly as they appear.
 settings-bluetooth-request-display = Pair with { $name }

@@ -66,7 +66,6 @@ settings-network-airplane = Način rada u zrakoplovu
     .description = Isključuje sve bežične veze
 settings-network-airplane-hardware = Uključeno hardverskim prekidačem
 settings-network-known = Poznate mreže
-    .description = Mreže na koje se ovo računalo već spajalo, bile u blizini ili ne
 settings-network-known-count = { $count ->
         [one] { $count } spremljena mreža
         [few] { $count } spremljene mreže
@@ -91,7 +90,6 @@ settings-network-wifi-saved-password-failed = Spremljena lozinka nije prihvaćen
 settings-network-wifi-settings = Postavke mreže
 settings-network-wifi-searching = Traženje mreža
 settings-network-hidden = Poveži se sa skrivenom mrežom
-    .description = Unesite naziv mreže i način zaštite.
 settings-network-hidden-name = Naziv mreže
 
 ## Network: joining a Wi‑Fi network
@@ -251,7 +249,6 @@ settings-network-vpn-import = Uvezi iz datoteke
     .description = WireGuard, OpenVPN i druge konfiguracijske datoteke za VPN
 settings-network-vpn-importing = Uvoz
 settings-network-wireguard = Postavi WireGuard
-    .description = Unesite podatke od svojeg pružatelja VPN-a ili poslužitelja
 settings-network-wireguard-dialog = Ove podatke može vam dati pružatelj VPN-a ili vlasnik poslužitelja.
 settings-network-wireguard-name-example = Kućni VPN
 settings-network-wireguard-public-key = Javni ključ { $key }

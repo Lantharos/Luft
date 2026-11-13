@@ -66,7 +66,6 @@ settings-network-airplane = Режим польоту
     .description = Вимикає всі бездротові з’єднання
 settings-network-airplane-hardware = Увімкнено апаратним перемикачем
 settings-network-known = Відомі мережі
-    .description = Мережі, до яких цей комп’ютер уже під’єднувався, поруч чи ні
 settings-network-known-count = { $count ->
         [one] { $count } збережена мережа
         [few] { $count } збережені мережі
@@ -92,7 +91,6 @@ settings-network-wifi-saved-password-failed = Збережений пароль 
 settings-network-wifi-settings = Параметри мережі
 settings-network-wifi-searching = Пошук мереж
 settings-network-hidden = Під’єднатися до прихованої мережі
-    .description = Введіть назву мережі та тип її захисту.
 settings-network-hidden-name = Назва мережі
 
 ## Network: joining a Wi‑Fi network
@@ -253,7 +251,6 @@ settings-network-vpn-import = Імпортувати з файлу
     .description = Файли конфігурації WireGuard, OpenVPN та інших VPN
 settings-network-vpn-importing = Імпорт
 settings-network-wireguard = Налаштувати WireGuard
-    .description = Введіть дані від свого постачальника VPN або з сервера
 settings-network-wireguard-dialog = Ці дані може надати ваш постачальник VPN або власник сервера.
 settings-network-wireguard-name-example = Домашня VPN
 settings-network-wireguard-public-key = Відкритий ключ { $key }

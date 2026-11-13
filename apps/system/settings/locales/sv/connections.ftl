@@ -66,7 +66,6 @@ settings-network-airplane = Flygplansläge
     .description = Stänger av alla trådlösa anslutningar
 settings-network-airplane-hardware = Påslaget med en maskinvaruknapp
 settings-network-known = Kända nätverk
-    .description = Nätverk som den här datorn har anslutit till tidigare, i närheten eller inte
 settings-network-known-count = { $count ->
         [one] { $count } sparat nätverk
        *[other] { $count } sparade nätverk
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Det sparade lösenordet fungerade 
 settings-network-wifi-settings = Nätverksinställningar
 settings-network-wifi-searching = Söker efter nätverk
 settings-network-hidden = Anslut till ett dolt nätverk
-    .description = Ange nätverkets namn och hur det är skyddat.
 settings-network-hidden-name = Nätverksnamn
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importera från en fil
     .description = WireGuard, OpenVPN och andra VPN-konfigurationsfiler
 settings-network-vpn-importing = Importerar
 settings-network-wireguard = Konfigurera WireGuard
-    .description = Ange uppgifterna från din VPN-leverantör eller server
 settings-network-wireguard-dialog = Du får uppgifterna från din VPN-leverantör eller av den som äger servern.
 settings-network-wireguard-name-example = Hemma-VPN
 settings-network-wireguard-public-key = Offentlig nyckel { $key }

@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Tillad apps at bruge mikrofonen
 
 settings-privacy-file-history = Filhistorik
 settings-privacy-remember-files = Husk senest brugte filer
-settings-privacy-remember-files-hint = Apps kan vise de filer, du åbnede sidst
 settings-privacy-keep-history = Behold historik i
 settings-privacy-keep-forever = Altid
 settings-privacy-clear-history = Ryd historik
-settings-privacy-clear-history-hint = Glem alle filer på listen med det samme
 settings-privacy-clear = Ryd
 settings-privacy-clear-title = Vil du rydde filhistorikken?
 settings-privacy-clear-description = Apps viser ikke længere de filer, du har åbnet for nylig. Selve filerne bliver, hvor de er.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Tøm papirkurven automatisk
 settings-privacy-delete-temp = Slet midlertidige filer automatisk
 settings-privacy-delete-temp-hint = Dine filer i midlertidige mapper, som intet har brugt for nylig
 settings-privacy-delete-after = Slet efter
-settings-privacy-delete-after-hint = Hvor længe filer bliver liggende, før de fjernes
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Lås op med sikkerhedschippen
 settings-encryption-chip-unlock-on = Så længe intet ændrer, hvordan computeren starter
 settings-encryption-chip-unlock-off = Så du ikke skal skrive en adgangsfrase ved opstart
 settings-encryption-pin = Pinkode ved opstart
-settings-encryption-pin-description = Du skriver den, før disken låses op
 settings-encryption-change = Skift
 settings-encryption-add-pin-row = Tilføj en pinkode ved opstart
 settings-encryption-add-pin-row-description = Holder disken låst, selv hvis computeren bliver taget
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Din tidligere nøgle virker ikke længere.
 
 settings-passwords-title = Adgangskoder og nøgler
 settings-passwords-not-running = Din nøglering kører ikke
-settings-passwords-not-running-description = Dine adgangskoder og nøgler vises her, når den starter
 settings-passwords-locked = Låst
 settings-passwords-contents = { $count ->
     [0] Intet gemt endnu
@@ -290,7 +285,6 @@ settings-passwords-pin = Bed om en pinkode efter fingeraftrykket
 settings-passwords-pin-locked = Lås din nøglering op for at ændre dette
 settings-passwords-pin-description = Så et fingeraftryk alene ikke kan låse dem op
 settings-passwords-lock-with-screen = Lås sammen med skærmen
-settings-passwords-lock-with-screen-description = De låses og låses op sammen med skærmen
 settings-passwords-apps = Applogins og aktivitet
 settings-passwords-apps-locked = Lås din nøglering op for at se dem
 settings-passwords-apps-description = Hvad apps gemmer her, og hvornår de brugte det
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } fik ikke lov til at bruge e
 settings-passwords-history-signed = { $app } signerede med »{ $item }«
 settings-passwords-history-signed-unnamed = { $app } signerede med en gemt adgangskode
 settings-passwords-history-clear = Ryd historik
-settings-passwords-history-clear-description = Glem, hvilke apps der har brugt din nøglering, og hvornår
 settings-passwords-history-clear-button = Ryd
 settings-passwords-history-clear-title = Vil du rydde seneste adgang?
 settings-passwords-history-clear-confirm = Listen over, hvilke apps der har brugt din nøglering, og hvornår, slettes. Dine gemte adgangskoder og nøgler forbliver, som de er.

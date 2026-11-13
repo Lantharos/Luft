@@ -73,7 +73,6 @@ settings-appearance-tint-slate = Slinn
 ## Appearance: text and motion
 
 settings-appearance-text-size = Méid an téacs
-settings-appearance-text-size-description = Déanann sé an téacs níos mó nó níos lú sna haipeanna go léir
 
 ## Taskbar
 
@@ -219,7 +218,6 @@ settings-see-through-description = Lig don deasc taispeáint trí fhuinneoga na 
 settings-see-through-app = { $app } tréshoilseach
 settings-see-through-add = Cuir aip leis
 settings-see-through-add-title = Déan aip tréshoilseach
-settings-see-through-add-description = Ligeann a fuinneoga don rud atá taobh thiar díobh taispeáint tríd.
 settings-see-through-shows = Cad a fheictear tríd
 settings-see-through-shows-everything = Gach a bhfuil taobh thiar
 settings-see-through-shows-wallpaper = An cúlbhrat amháin

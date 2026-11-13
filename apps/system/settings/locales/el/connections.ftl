@@ -66,7 +66,6 @@ settings-network-airplane = Λειτουργία πτήσης
     .description = Απενεργοποιεί όλες τις ασύρματες συνδέσεις
 settings-network-airplane-hardware = Ενεργοποιήθηκε από διακόπτη υλικού
 settings-network-known = Γνωστά δίκτυα
-    .description = Δίκτυα στα οποία έχει συνδεθεί αυτός ο υπολογιστής, κοντά ή όχι
 settings-network-known-count = { $count ->
         [one] { $count } αποθηκευμένο δίκτυο
        *[other] { $count } αποθηκευμένα δίκτυα
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Ο αποθηκευμένος κω
 settings-network-wifi-settings = Ρυθμίσεις δικτύου
 settings-network-wifi-searching = Αναζήτηση δικτύων
 settings-network-hidden = Σύνδεση σε κρυφό δίκτυο
-    .description = Εισαγάγετε το όνομα του δικτύου και τον τύπο ασφάλειάς του.
 settings-network-hidden-name = Όνομα δικτύου
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Εισαγωγή από αρχείο
     .description = Αρχεία ρυθμίσεων WireGuard, OpenVPN και άλλων VPN
 settings-network-vpn-importing = Εισαγωγή
 settings-network-wireguard = Ρύθμιση WireGuard
-    .description = Εισαγάγετε τα στοιχεία από τον πάροχο ή τον διακομιστή VPN σας
 settings-network-wireguard-dialog = Αυτά τα στοιχεία μπορεί να σας τα δώσει ο πάροχος VPN ή ο διαχειριστής του διακομιστή.
 settings-network-wireguard-name-example = VPN σπιτιού
 settings-network-wireguard-public-key = Δημόσιο κλειδί { $key }

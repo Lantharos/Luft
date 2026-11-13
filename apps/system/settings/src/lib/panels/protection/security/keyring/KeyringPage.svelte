@@ -43,7 +43,7 @@
 	<SubPage title={t('settings-passwords-title')} {onclose}>
 		{#if keyring.current === null}
 			<Section>
-				<Row title={t('settings-passwords-not-running')} description={t('settings-passwords-not-running-description')} />
+				<Row title={t('settings-passwords-not-running')} />
 			</Section>
 		{:else if keyring.current}
 			<StatusSection keyring={keyring.current} {fingerprintReader} refresh={keyring.load} onaccess={loadAccess} />

@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Uygulamaların mikrofonu kullanmasına izin 
 
 settings-privacy-file-history = Dosya geçmişi
 settings-privacy-remember-files = Son kullanılan dosyaları hatırla
-settings-privacy-remember-files-hint = Uygulamalar en son açtığınız dosyaları gösterebilir
 settings-privacy-keep-history = Geçmişin tutulma süresi
 settings-privacy-keep-forever = Süresiz
 settings-privacy-clear-history = Geçmişi temizle
-settings-privacy-clear-history-hint = Listedeki tüm dosyaları hemen unut
 settings-privacy-clear = Temizle
 settings-privacy-clear-title = Dosya geçmişi temizlensin mi?
 settings-privacy-clear-description = Uygulamalar son açtığınız dosyaları artık göstermez. Dosyalar oldukları yerde kalır.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Çöp kutusunu otomatik olarak boşalt
 settings-privacy-delete-temp = Geçici dosyaları otomatik olarak sil
 settings-privacy-delete-temp-hint = Geçici klasörlerdeki, son zamanlarda hiçbir şeyin kullanmadığı dosyalarınız
 settings-privacy-delete-after = Silme süresi
-settings-privacy-delete-after-hint = Dosyaların kaldırılmadan önce ne kadar kalacağı
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Güvenlik çipiyle kilidi aç
 settings-encryption-chip-unlock-on = Bilgisayarın başlama biçimini hiçbir şey değiştirmediği sürece
 settings-encryption-chip-unlock-off = Başlangıçta disk parolası yazmamak için
 settings-encryption-pin = Başlangıçta PIN
-settings-encryption-pin-description = Disk açılmadan önce yazarsınız
 settings-encryption-change = Değiştir
 settings-encryption-add-pin-row = Başlangıçta PIN ekle
 settings-encryption-add-pin-row-description = Bilgisayar alınsa bile disk kilitli kalır
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Önceki anahtarınız artık çalışmıyo
 
 settings-passwords-title = Parolalar ve anahtarlar
 settings-passwords-not-running = Anahtarlığınız çalışmıyor
-settings-passwords-not-running-description = Anahtarlık başladığında parolalarınız ve anahtarlarınız burada görünür
 settings-passwords-locked = Kilitli
 settings-passwords-contents = { $count ->
     [0] Henüz kayıtlı bir şey yok
@@ -290,7 +285,6 @@ settings-passwords-pin = Parmak izinden sonra PIN iste
 settings-passwords-pin-locked = Bunu değiştirmek için anahtarlığınızın kilidini açın
 settings-passwords-pin-description = Böylece yalnızca parmak iziyle kilit açılamaz
 settings-passwords-lock-with-screen = Ekranla birlikte kilitle
-settings-passwords-lock-with-screen-description = Ekranla birlikte kilitlenir ve kilidi açılır
 settings-passwords-apps = Uygulama oturumları ve etkinliği
 settings-passwords-apps-locked = Görmek için anahtarlığınızın kilidini açın
 settings-passwords-apps-description = Uygulamaların burada sakladıkları ve bunları ne zaman kullandıkları
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } uygulamasının kayıtlı b
 settings-passwords-history-signed = { $app } uygulaması “{ $item }” ile imzaladı
 settings-passwords-history-signed-unnamed = { $app } uygulaması kayıtlı bir parolayla imzaladı
 settings-passwords-history-clear = Geçmişi temizle
-settings-passwords-history-clear-description = Anahtarlığınızı hangi uygulamaların ne zaman kullandığını unut
 settings-passwords-history-clear-button = Temizle
 settings-passwords-history-clear-title = Son erişimler temizlensin mi?
 settings-passwords-history-clear-confirm = Anahtarlığınızı hangi uygulamaların ne zaman kullandığını gösteren liste silinir. Kayıtlı parolalarınız ve anahtarlarınız olduğu gibi kalır.

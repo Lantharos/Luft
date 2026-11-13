@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Zezwalaj aplikacjom na używanie mikrofonu
 
 settings-privacy-file-history = Historia plików
 settings-privacy-remember-files = Zapamiętuj ostatnio używane pliki
-settings-privacy-remember-files-hint = Aplikacje mogą pokazywać ostatnio otwierane pliki
 settings-privacy-keep-history = Przechowuj historię przez
 settings-privacy-keep-forever = Bez ograniczeń
 settings-privacy-clear-history = Wyczyść historię
-settings-privacy-clear-history-hint = Od razu zapomnij wszystkie pliki z listy
 settings-privacy-clear = Wyczyść
 settings-privacy-clear-title = Wyczyścić historię plików?
 settings-privacy-clear-description = Aplikacje nie będą już pokazywać ostatnio otwieranych plików. Same pliki pozostaną na swoim miejscu.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Opróżniaj kosz automatycznie
 settings-privacy-delete-temp = Usuwaj pliki tymczasowe automatycznie
 settings-privacy-delete-temp-hint = Twoje pliki w folderach tymczasowych, których ostatnio nic nie używało
 settings-privacy-delete-after = Usuwaj po
-settings-privacy-delete-after-hint = Jak długo pliki pozostają przed usunięciem
 
 ## Security: summary at the top of the page
 
@@ -217,7 +214,6 @@ settings-encryption-chip-unlock = Odblokowuj procesorem zabezpieczeń
 settings-encryption-chip-unlock-on = O ile nic nie zmieni sposobu uruchamiania tego komputera
 settings-encryption-chip-unlock-off = Aby nie wpisywać frazy hasła przy uruchamianiu
 settings-encryption-pin = PIN przy uruchamianiu
-settings-encryption-pin-description = Wpisujesz go, zanim dysk się odblokuje
 settings-encryption-change = Zmień
 settings-encryption-add-pin-row = Dodaj kod PIN przy uruchamianiu
 settings-encryption-add-pin-row-description = Dysk pozostaje zablokowany, nawet jeśli ktoś zabierze komputer
@@ -284,7 +280,6 @@ settings-recovery-fresh-description = Poprzedni klucz już nie działa. Przechow
 
 settings-passwords-title = Hasła i klucze
 settings-passwords-not-running = Pęk kluczy nie działa
-settings-passwords-not-running-description = Hasła i klucze pojawią się tutaj, gdy zostanie uruchomiony
 settings-passwords-locked = Zablokowany
 settings-passwords-contents = { $count ->
     [0] Nic jeszcze nie zapisano
@@ -308,7 +303,6 @@ settings-passwords-pin = Pytaj o kod PIN po odcisku palca
 settings-passwords-pin-locked = Odblokuj pęk kluczy, aby to zmienić
 settings-passwords-pin-description = Aby sam odcisk palca nie wystarczył do ich odblokowania
 settings-passwords-lock-with-screen = Blokuj razem z ekranem
-settings-passwords-lock-with-screen-description = Blokują się i odblokowują razem z ekranem
 settings-passwords-apps = Dane logowania i aktywność aplikacji
 settings-passwords-apps-locked = Odblokuj pęk kluczy, aby je zobaczyć
 settings-passwords-apps-description = Co aplikacje tu przechowują i kiedy z tego korzystały
@@ -343,7 +337,6 @@ settings-passwords-history-denied-unnamed = Aplikacja { $app } nie uzyskała zgo
 settings-passwords-history-signed = Aplikacja { $app } podpisała za pomocą „{ $item }”
 settings-passwords-history-signed-unnamed = Aplikacja { $app } podpisała za pomocą zapisanego hasła
 settings-passwords-history-clear = Wyczyść historię
-settings-passwords-history-clear-description = Zapomnij, które aplikacje i kiedy używały pęku kluczy
 settings-passwords-history-clear-button = Wyczyść
 settings-passwords-history-clear-title = Wyczyścić historię dostępu?
 settings-passwords-history-clear-confirm = Lista aplikacji, które używały pęku kluczy, wraz z datami zostanie usunięta. Zapisane hasła i klucze pozostaną bez zmian.

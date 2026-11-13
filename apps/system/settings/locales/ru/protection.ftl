@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Разрешить приложениям и
 
 settings-privacy-file-history = История файлов
 settings-privacy-remember-files = Запоминать недавние файлы
-settings-privacy-remember-files-hint = Приложения могут показывать последние открытые файлы
 settings-privacy-keep-history = Хранить историю
 settings-privacy-keep-forever = Всегда
 settings-privacy-clear-history = Очистить историю
-settings-privacy-clear-history-hint = Сразу забыть все файлы из списка
 settings-privacy-clear = Очистить
 settings-privacy-clear-title = Очистить историю файлов?
 settings-privacy-clear-description = Приложения больше не будут показывать недавно открытые файлы. Сами файлы останутся на месте.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Автоматически очищать кор�
 settings-privacy-delete-temp = Автоматически удалять временные файлы
 settings-privacy-delete-temp-hint = Ваши файлы во временных папках, которые давно не использовались
 settings-privacy-delete-after = Удалять через
-settings-privacy-delete-after-hint = Сколько файлы хранятся до удаления
 
 ## Security: summary at the top of the page
 
@@ -217,7 +214,6 @@ settings-encryption-chip-unlock = Разблокировка чипом безо
 settings-encryption-chip-unlock-on = Пока ничто не меняет способ запуска компьютера
 settings-encryption-chip-unlock-off = Чтобы не вводить парольную фразу при запуске
 settings-encryption-pin = PIN-код при запуске
-settings-encryption-pin-description = Вводится до разблокировки диска
 settings-encryption-change = Изменить
 settings-encryption-add-pin-row = Добавить PIN-код при запуске
 settings-encryption-add-pin-row-description = Диск останется заблокированным, даже если компьютер украдут
@@ -284,7 +280,6 @@ settings-recovery-fresh-description = Прежний ключ больше не 
 
 settings-passwords-title = Пароли и ключи
 settings-passwords-not-running = Связка ключей не запущена
-settings-passwords-not-running-description = Пароли и ключи появятся здесь после её запуска
 settings-passwords-locked = Заблокировано
 settings-passwords-contents = { $count ->
     [0] Пока ничего не сохранено
@@ -308,7 +303,6 @@ settings-passwords-pin = Запрашивать PIN-код после отпеч
 settings-passwords-pin-locked = Разблокируйте связку ключей, чтобы изменить это
 settings-passwords-pin-description = Чтобы одного отпечатка было недостаточно для разблокировки
 settings-passwords-lock-with-screen = Блокировать вместе с экраном
-settings-passwords-lock-with-screen-description = Блокируются и разблокируются вместе с экраном
 settings-passwords-apps = Данные входа и активность приложений
 settings-passwords-apps-locked = Разблокируйте связку ключей, чтобы их увидеть
 settings-passwords-apps-description = Что приложения хранят здесь и когда это использовали
@@ -343,7 +337,6 @@ settings-passwords-history-denied-unnamed = Приложению { $app } не �
 settings-passwords-history-signed = Приложение { $app } подписало данные ключом «{ $item }»
 settings-passwords-history-signed-unnamed = Приложение { $app } подписало данные сохранённым паролем
 settings-passwords-history-clear = Очистить историю
-settings-passwords-history-clear-description = Забыть, какие приложения и когда использовали связку ключей
 settings-passwords-history-clear-button = Очистить
 settings-passwords-history-clear-title = Очистить недавний доступ?
 settings-passwords-history-clear-confirm = Список того, какие приложения и когда использовали связку ключей, будет удалён. Сохранённые пароли и ключи останутся без изменений.

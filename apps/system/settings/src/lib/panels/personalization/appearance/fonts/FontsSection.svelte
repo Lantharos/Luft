@@ -26,7 +26,7 @@
 	<Row title={t('settings-fonts-monospace')} description={t('settings-fonts-monospace-description')}>
 		<FontPicker role="monospace" label={t('settings-fonts-monospace-label')} family={appearance.typography.monospace ?? fontLibrary.defaults?.monospace ?? ''} onerror={(message) => (problem = message)} />
 	</Row>
-	<Row title={t('settings-appearance-text-size')} description={t('settings-appearance-text-size-description')}>
+	<Row title={t('settings-appearance-text-size')}>
 		<span class="w-12 text-right tabular-nums">{percent(desktop.values['text-scaling-factor'] ?? 1)}</span>
 		{#snippet below()}
 			<Slider

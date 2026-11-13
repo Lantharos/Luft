@@ -66,7 +66,6 @@ settings-network-airplane = Lentokonetila
     .description = Katkaisee kaikki langattomat yhteydet
 settings-network-airplane-hardware = Otettu käyttöön laitekytkimellä
 settings-network-known = Tunnetut verkot
-    .description = Verkot, joihin tämä tietokone on liittynyt aiemmin, myös kantaman ulkopuolella olevat
 settings-network-known-count = { $count ->
         [one] { $count } tallennettu verkko
        *[other] { $count } tallennettua verkkoa
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Tallennettu salasana ei toiminut. 
 settings-network-wifi-settings = Verkon asetukset
 settings-network-wifi-searching = Etsitään verkkoja
 settings-network-hidden = Yhdistä piilotettuun verkkoon
-    .description = Anna verkon nimi ja suojaustapa.
 settings-network-hidden-name = Verkon nimi
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Tuo tiedostosta
     .description = WireGuard-, OpenVPN- ja muut VPN-määritystiedostot
 settings-network-vpn-importing = Tuodaan
 settings-network-wireguard = Määritä WireGuard
-    .description = Anna VPN-palveluntarjoajalta tai palvelimelta saamasi tiedot
 settings-network-wireguard-dialog = Saat nämä tiedot VPN-palveluntarjoajaltasi tai palvelimen omistajalta.
 settings-network-wireguard-name-example = Koti-VPN
 settings-network-wireguard-public-key = Julkinen avain { $key }

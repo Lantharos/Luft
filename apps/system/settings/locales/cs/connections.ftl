@@ -66,7 +66,6 @@ settings-network-airplane = Režim v letadle
     .description = Vypne všechna bezdrátová připojení
 settings-network-airplane-hardware = Zapnuto hardwarovým vypínačem
 settings-network-known = Známé sítě
-    .description = Sítě, ke kterým se tento počítač už připojil, ať jsou poblíž, nebo ne
 settings-network-known-count = { $count ->
         [one] { $count } uložená síť
         [few] { $count } uložené sítě
@@ -92,7 +91,6 @@ settings-network-wifi-saved-password-failed = Uložené heslo nefungovalo. Zadej
 settings-network-wifi-settings = Nastavení sítě
 settings-network-wifi-searching = Hledání sítí
 settings-network-hidden = Připojit ke skryté síti
-    .description = Zadejte název sítě a způsob jejího zabezpečení.
 settings-network-hidden-name = Název sítě
 
 ## Network: joining a Wi‑Fi network
@@ -253,7 +251,6 @@ settings-network-vpn-import = Importovat ze souboru
     .description = Konfigurační soubory WireGuard, OpenVPN a dalších VPN
 settings-network-vpn-importing = Importování
 settings-network-wireguard = Nastavit WireGuard
-    .description = Zadejte údaje od poskytovatele VPN nebo ze serveru
 settings-network-wireguard-dialog = Tyto údaje vám poskytne poskytovatel VPN nebo správce serveru.
 settings-network-wireguard-name-example = Domácí VPN
 settings-network-wireguard-public-key = Veřejný klíč { $key }

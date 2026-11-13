@@ -64,12 +64,7 @@
 		>
 			{#if importing}<Spinner />{/if}
 		</Row>
-		<Row
-			title={t('settings-network-wireguard')}
-			icon={KeyRound}
-			description={t('settings-network-wireguard.description')}
-			onclick={() => (creating = true)}
-		/>
+		<Row title={t('settings-network-wireguard')} icon={KeyRound} onclick={() => (creating = true)} />
 	</Section>
 </SubPage>
 

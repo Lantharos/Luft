@@ -66,7 +66,6 @@ settings-network-airplane = Modalità tal-ajruplan
     .description = Titfi l-konnessjonijiet mingħajr fili kollha
 settings-network-airplane-hardware = Mixgħula minn swiċċ tal-hardware
 settings-network-known = Netwerks magħrufa
-    .description = Netwerks li dan il-kompjuter ingħaqad magħhom qabel, kemm jekk qrib u kemm jekk le
 settings-network-known-count = { $count ->
         [one] { $count } netwerk issejvjat
         [two] { $count } netwerks issejvjati
@@ -93,7 +92,6 @@ settings-network-wifi-saved-password-failed = Il-password issejvjata ma ħadmitx
 settings-network-wifi-settings = Settings tan-netwerk
 settings-network-wifi-searching = Qed jitfittxew netwerks
 settings-network-hidden = Ikkonnettja ma’ netwerk moħbi
-    .description = Daħħal l-isem tan-netwerk u kif inhu protett.
 settings-network-hidden-name = Isem tan-netwerk
 
 ## Network: joining a Wi‑Fi network
@@ -255,7 +253,6 @@ settings-network-vpn-import = Importa minn fajl
     .description = Fajls tal-konfigurazzjoni ta’ WireGuard, OpenVPN u VPNs oħra
 settings-network-vpn-importing = Qed jimporta
 settings-network-wireguard = Issettja WireGuard
-    .description = Daħħal id-dettalji mill-fornitur jew mis-server tal-VPN
 settings-network-wireguard-dialog = Il-fornitur tal-VPN jew is-sid tas-server jista’ jagħtik dawn id-dettalji.
 settings-network-wireguard-name-example = VPN tad-dar
 settings-network-wireguard-public-key = Ċavetta pubblika { $key }

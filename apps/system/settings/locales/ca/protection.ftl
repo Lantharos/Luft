@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Permet que les aplicacions facin servir el m
 
 settings-privacy-file-history = Historial de fitxers
 settings-privacy-remember-files = Recorda els fitxers usats recentment
-settings-privacy-remember-files-hint = Les aplicacions poden mostrar els darrers fitxers que heu obert
 settings-privacy-keep-history = Conserva l’historial durant
 settings-privacy-keep-forever = Per sempre
 settings-privacy-clear-history = Esborra l’historial
-settings-privacy-clear-history-hint = Oblida ara mateix tots els fitxers de la llista
 settings-privacy-clear = Esborra
 settings-privacy-clear-title = Voleu esborrar l’historial de fitxers?
 settings-privacy-clear-description = Les aplicacions deixaran de mostrar els fitxers que heu obert recentment. Els fitxers es queden on són.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Buida la paperera automàticament
 settings-privacy-delete-temp = Suprimeix els fitxers temporals automàticament
 settings-privacy-delete-temp-hint = Els vostres fitxers de les carpetes temporals que fa temps que no es fan servir
 settings-privacy-delete-after = Suprimeix després de
-settings-privacy-delete-after-hint = Quant de temps es conserven els fitxers abans de suprimir-los
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Desbloqueja amb el xip de seguretat
 settings-encryption-chip-unlock-on = Mentre no canviï res de com s’inicia aquest ordinador
 settings-encryption-chip-unlock-off = Perquè no hàgiu d’escriure una frase de pas en arrencar
 settings-encryption-pin = PIN en arrencar
-settings-encryption-pin-description = L’escriviu abans que es desbloquegi el disc
 settings-encryption-change = Canvia
 settings-encryption-add-pin-row = Afegeix un PIN en arrencar
 settings-encryption-add-pin-row-description = Manté el disc bloquejat encara que algú s’endugui l’ordinador
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = La clau anterior ja no funciona. Guardeu a
 
 settings-passwords-title = Contrasenyes i claus
 settings-passwords-not-running = El clauer no s’està executant
-settings-passwords-not-running-description = Les contrasenyes i les claus apareixeran aquí quan s’iniciï
 settings-passwords-locked = Bloquejat
 settings-passwords-contents = { $count ->
     [0] Encara no hi ha res desat
@@ -290,7 +285,6 @@ settings-passwords-pin = Demana un PIN després de l’empremta
 settings-passwords-pin-locked = Desbloquegeu el clauer per canviar-ho
 settings-passwords-pin-description = Perquè una empremta sola no les pugui desbloquejar
 settings-passwords-lock-with-screen = Bloqueja amb la pantalla
-settings-passwords-lock-with-screen-description = Es bloquegen i es desbloquegen alhora que la pantalla
 settings-passwords-apps = Inicis de sessió i activitat de les aplicacions
 settings-passwords-apps-locked = Desbloquegeu el clauer per veure-les
 settings-passwords-apps-description = Què hi guarden les aplicacions i quan ho han fet servir
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } no ha tingut permís per fe
 settings-passwords-history-signed = { $app } ha signat amb «{ $item }»
 settings-passwords-history-signed-unnamed = { $app } ha signat amb una contrasenya desada
 settings-passwords-history-clear = Esborra l’historial
-settings-passwords-history-clear-description = Oblida quines aplicacions han fet servir el clauer i quan
 settings-passwords-history-clear-button = Esborra
 settings-passwords-history-clear-title = Voleu esborrar l’accés recent?
 settings-passwords-history-clear-confirm = S’esborra la llista de quines aplicacions han fet servir el clauer i quan. Les contrasenyes i les claus desades es queden com estan.

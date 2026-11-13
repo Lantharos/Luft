@@ -82,7 +82,6 @@ settings-appearance-tint-slate = Slate
 ## Appearance: text and motion
 
 settings-appearance-text-size = Text size
-settings-appearance-text-size-description = Makes text larger or smaller across apps
 
 ## Taskbar
 
@@ -263,11 +262,10 @@ settings-tiling-shortcuts-description = Focus, move and resize tiled windows fro
 settings-board = Board
 settings-board-description = Press Super twice or swipe up with four fingers to lay out a workspace's windows side by side
 settings-see-through = See-through windows
-settings-see-through-description = Let the desktop show through these apps' windows. You can also turn it on from a window's title bar menu.
+settings-see-through-description = Let the desktop show through these apps’ windows.
 settings-see-through-app = See-through { $app }
 settings-see-through-add = Add an app
 settings-see-through-add-title = Make an app see-through
-settings-see-through-add-description = Its windows let what's behind them show through.
 settings-see-through-shows = Show through
 settings-see-through-shows-everything = Everything behind
 settings-see-through-shows-wallpaper = Only the wallpaper
@@ -325,7 +323,6 @@ settings-accessibility-flash-screen = Screen
 
 ## Extensions
 
-settings-extensions-description = Extensions add to the desktop. Turn them off here, change how they work, or remove them.
 settings-extensions-none = No extensions are installed
 settings-extensions-unavailable = Extensions can't be shown while the desktop isn't running.
 # Screen-reader label of the switch that turns an extension on; $name is the extension's name
@@ -360,7 +357,7 @@ settings-extensions-folder-description = For an extension you're making. Your ch
 settings-extensions-copy-title = Install a copy of { $name }?
 settings-extensions-folder-title = Run { $name } from its folder?
 settings-extensions-unreviewed-warning = Nobody has reviewed { $name }. Inside Luft it can see everything you type, read what's on your screen and do anything you can do.
-settings-extensions-copy-explained = Luft keeps a copy of it as it is now, where no program can change it. Later changes to its folder don't reach that copy.
+settings-extensions-copy-explained = Luft keeps a copy of it as it is now, where no program can change it.
 settings-extensions-folder-explained = It runs from this folder, so your changes run each time you reload it:
 settings-extensions-folder-only-yours = Any program that can change this folder can then run inside Luft too. Only do this for an extension you're making yourself.
 settings-extensions-reload = Run your latest changes

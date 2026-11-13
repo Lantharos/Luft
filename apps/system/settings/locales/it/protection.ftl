@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Consenti alle app di usare il microfono
 
 settings-privacy-file-history = Cronologia dei file
 settings-privacy-remember-files = Ricorda i file usati di recente
-settings-privacy-remember-files-hint = Le app possono mostrare gli ultimi file che hai aperto
 settings-privacy-keep-history = Conserva la cronologia per
 settings-privacy-keep-forever = Sempre
 settings-privacy-clear-history = Cancella la cronologia
-settings-privacy-clear-history-hint = Dimentica subito tutti i file dell’elenco
 settings-privacy-clear = Cancella
 settings-privacy-clear-title = Cancellare la cronologia dei file?
 settings-privacy-clear-description = Le app non mostreranno più i file che hai aperto di recente. I file restano dove sono.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Svuota automaticamente il Cestino
 settings-privacy-delete-temp = Elimina automaticamente i file temporanei
 settings-privacy-delete-temp-hint = I tuoi file nelle cartelle temporanee che nessuno ha usato di recente
 settings-privacy-delete-after = Elimina dopo
-settings-privacy-delete-after-hint = Quanto restano i file prima di essere rimossi
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Sblocca con il chip di sicurezza
 settings-encryption-chip-unlock-on = Finché non cambia nulla nel modo in cui si avvia questo computer
 settings-encryption-chip-unlock-off = Così non devi digitare una passphrase all’avvio
 settings-encryption-pin = PIN all’avvio
-settings-encryption-pin-description = Lo digiti prima che il disco si sblocchi
 settings-encryption-change = Cambia
 settings-encryption-add-pin-row = Aggiungi un PIN all’avvio
 settings-encryption-add-pin-row-description = Tiene il disco bloccato anche se qualcuno prende il computer
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = La chiave precedente non funziona più. Co
 
 settings-passwords-title = Password e chiavi
 settings-passwords-not-running = Il Portachiavi non è in esecuzione
-settings-passwords-not-running-description = Le tue password e chiavi compaiono qui appena si avvia
 settings-passwords-locked = Bloccato
 settings-passwords-contents = { $count ->
     [0] Ancora niente di salvato
@@ -290,7 +285,6 @@ settings-passwords-pin = Chiedi un PIN dopo l’impronta
 settings-passwords-pin-locked = Sblocca il Portachiavi per cambiare questa opzione
 settings-passwords-pin-description = Così l’impronta da sola non basta a sbloccarle
 settings-passwords-lock-with-screen = Blocca insieme allo schermo
-settings-passwords-lock-with-screen-description = Si bloccano e si sbloccano insieme allo schermo
 settings-passwords-apps = Credenziali e attività delle app
 settings-passwords-apps-locked = Sblocca il Portachiavi per vederle
 settings-passwords-apps-description = Cosa conservano qui le app e quando l’hanno usato
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } non ha avuto il permesso di
 settings-passwords-history-signed = { $app } ha firmato con “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } ha firmato con una password salvata
 settings-passwords-history-clear = Cancella la cronologia
-settings-passwords-history-clear-description = Dimentica quali app hanno usato il Portachiavi e quando
 settings-passwords-history-clear-button = Cancella
 settings-passwords-history-clear-title = Cancellare gli accessi recenti?
 settings-passwords-history-clear-confirm = L’elenco delle app che hanno usato il Portachiavi, e di quando, viene cancellato. Le password e le chiavi salvate restano come sono.

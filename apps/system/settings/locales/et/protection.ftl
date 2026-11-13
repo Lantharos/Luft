@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Luba rakendustel mikrofoni kasutada
 
 settings-privacy-file-history = Failiajalugu
 settings-privacy-remember-files = Jäta hiljuti kasutatud failid meelde
-settings-privacy-remember-files-hint = Rakendused saavad näidata viimati avatud faile
 settings-privacy-keep-history = Säilita ajalugu
 settings-privacy-keep-forever = Alatiseks
 settings-privacy-clear-history = Tühjenda ajalugu
-settings-privacy-clear-history-hint = Unusta kohe kõik loendis olevad failid
 settings-privacy-clear = Tühjenda
 settings-privacy-clear-title = Kas tühjendada failiajalugu?
 settings-privacy-clear-description = Rakendused ei näita enam hiljuti avatud faile. Failid ise jäävad oma kohale.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Tühjenda prügikast automaatselt
 settings-privacy-delete-temp = Kustuta ajutised failid automaatselt
 settings-privacy-delete-temp-hint = Sinu failid ajutistes kaustades, mida pole viimasel ajal kasutatud
 settings-privacy-delete-after = Kustuta pärast
-settings-privacy-delete-after-hint = Kui kaua faile hoitakse enne eemaldamist
 
 ## Security: summary at the top of the page
 
@@ -211,7 +208,6 @@ settings-encryption-chip-unlock = Ava turvakiibiga
 settings-encryption-chip-unlock-on = Kuni miski ei muuda seda, kuidas arvuti käivitub
 settings-encryption-chip-unlock-off = Et käivitamisel ei peaks paroolifraasi tippima
 settings-encryption-pin = PIN-kood käivitamisel
-settings-encryption-pin-description = Tipi see enne ketta avanemist
 settings-encryption-change = Muuda
 settings-encryption-add-pin-row = Lisa PIN-kood käivitamiseks
 settings-encryption-add-pin-row-description = Hoiab ketta lukus ka siis, kui arvuti ära viiakse
@@ -276,7 +272,6 @@ settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoia see uu
 
 settings-passwords-title = Salasõnad ja võtmed
 settings-passwords-not-running = Võtmerõngas ei tööta
-settings-passwords-not-running-description = Sinu salasõnad ja võtmed kuvatakse siin, kui see käivitub
 settings-passwords-locked = Lukus
 settings-passwords-contents =
     { $count ->
@@ -299,7 +294,6 @@ settings-passwords-pin = Küsi pärast sõrmejälge PIN-koodi
 settings-passwords-pin-locked = Selle muutmiseks ava võtmerõngas
 settings-passwords-pin-description = Et ainult sõrmejäljega neid avada ei saaks
 settings-passwords-lock-with-screen = Lukusta koos ekraaniga
-settings-passwords-lock-with-screen-description = Need lukustuvad ja avanevad koos ekraaniga
 settings-passwords-apps = Rakenduste sisselogimisandmed ja tegevus
 settings-passwords-apps-locked = Nende nägemiseks ava võtmerõngas
 settings-passwords-apps-description = Mida rakendused siin hoiavad ja millal nad seda kasutasid
@@ -333,7 +327,6 @@ settings-passwords-history-denied-unnamed = { $app } ei saanud luba kasutada sal
 settings-passwords-history-signed = { $app } allkirjastas võtmega „{ $item }“
 settings-passwords-history-signed-unnamed = { $app } allkirjastas salvestatud salasõnaga
 settings-passwords-history-clear = Tühjenda ajalugu
-settings-passwords-history-clear-description = Unusta, millised rakendused ja millal võtmerõngast kasutasid
 settings-passwords-history-clear-button = Tühjenda
 settings-passwords-history-clear-title = Kas kustutame hiljutise juurdepääsu andmed?
 settings-passwords-history-clear-confirm = Loend sellest, millised rakendused ja millal võtmerõngast kasutasid, kustutatakse. Salvestatud salasõnad ja võtmed jäävad alles.

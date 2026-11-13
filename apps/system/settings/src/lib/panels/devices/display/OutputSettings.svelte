@@ -119,7 +119,7 @@
 		</Row>
 	{/if}
 	{#if scales.length > 1}
-		<Row title={t('settings-display-scale')} description={t('settings-display-scale-description')}>
+		<Row title={t('settings-display-scale')}>
 			<Select label={t('settings-display-scale')} options={scales} value={output.scale} onchange={(scale) => setScale(displays, draft, output, scale)} />
 		</Row>
 	{/if}

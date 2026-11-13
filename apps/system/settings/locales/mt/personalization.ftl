@@ -73,7 +73,6 @@ settings-appearance-tint-slate = Griż blu
 ## Appearance: text and motion
 
 settings-appearance-text-size = Daqs tat-test
-settings-appearance-text-size-description = Ikabbar jew iċekken it-test fl-apps kollha
 
 ## Taskbar
 
@@ -219,7 +218,6 @@ settings-see-through-description = Ħalli d-desktop jidher minn ġot-twieqi ta�
 settings-see-through-app = { $app } trasparenti
 settings-see-through-add = Żid app
 settings-see-through-add-title = Agħmel app trasparenti
-settings-see-through-add-description = It-twieqi tagħha jħallu dak li hemm warajhom jidher.
 settings-see-through-shows = X’jidher minn ġo fih
 settings-see-through-shows-everything = Kollox li hemm wara
 settings-see-through-shows-wallpaper = L-isfond biss

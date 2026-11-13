@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Skifergrå
 ## Appearance: text and motion
 
 settings-appearance-text-size = Tekststorleik
-settings-appearance-text-size-description = Gjer teksten større eller mindre i alle appar
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = La skrivebordet synast gjennom vindauga til d
 settings-see-through-app = Gjennomsiktig { $app }
 settings-see-through-add = Legg til ein app
 settings-see-through-add-title = Gjer ein app gjennomsiktig
-settings-see-through-add-description = Vindauga slepper gjennom det som er bak dei.
 settings-see-through-shows = Vis gjennom
 settings-see-through-shows-everything = Alt bak
 settings-see-through-shows-wallpaper = Berre bakgrunnsbiletet

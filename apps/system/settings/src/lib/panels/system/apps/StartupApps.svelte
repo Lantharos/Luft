@@ -55,7 +55,6 @@
 {#if adding}
 	<ChooseAppDialog
 		title={t('settings-apps-startup-add-title')}
-		description={t('settings-apps-startup-add-description')}
 		exclude={apps.filter((app) => app.enabled).map((app) => app.id)}
 		onchoose={add}
 		onclose={() => (adding = false)}

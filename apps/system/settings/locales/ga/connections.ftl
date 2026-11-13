@@ -66,7 +66,6 @@ settings-network-airplane = Mód eitleáin
     .description = Casann sé as gach ceangal gan sreang
 settings-network-airplane-hardware = Casta air le lasc crua-earraí
 settings-network-known = Líonraí aitheanta
-    .description = Líonraí ar cheangail an ríomhaire seo leo cheana, cibé acu atá siad in aice láimhe nó nach bhfuil
 settings-network-known-count = { $count ->
         [one] { $count } líonra sábháilte
         [two] { $count } líonra shábháilte
@@ -93,7 +92,6 @@ settings-network-wifi-saved-password-failed = Níor oibrigh an pasfhocal sábhá
 settings-network-wifi-settings = Socruithe an líonra
 settings-network-wifi-searching = Ag cuardach líonraí
 settings-network-hidden = Ceangail le líonra folaithe
-    .description = Cuir isteach ainm an líonra agus an cineál slándála atá air.
 settings-network-hidden-name = Ainm an líonra
 
 ## Network: joining a Wi‑Fi network
@@ -255,7 +253,6 @@ settings-network-vpn-import = Iompórtáil ó chomhad
     .description = Comhaid chumraíochta WireGuard, OpenVPN agus VPN eile
 settings-network-vpn-importing = Á iompórtáil
 settings-network-wireguard = Socraigh WireGuard
-    .description = Cuir isteach na sonraí ó do sholáthraí VPN nó ó d’fhreastalaí
 settings-network-wireguard-dialog = Is féidir le do sholáthraí VPN nó le húinéir an fhreastalaí na sonraí seo a thabhairt duit.
 settings-network-wireguard-name-example = VPN baile
 settings-network-wireguard-public-key = Eochair phoiblí { $key }

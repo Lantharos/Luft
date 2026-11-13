@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Pizarra
 ## Appearance: text and motion
 
 settings-appearance-text-size = Tamaño del texto
-settings-appearance-text-size-description = Agranda o reduce el texto en todas las aplicaciones
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Deja ver el escritorio a través de las venta
 settings-see-through-app = { $app } translúcida
 settings-see-through-add = Añadir una aplicación
 settings-see-through-add-title = Hacer translúcida una aplicación
-settings-see-through-add-description = Sus ventanas dejan ver lo que hay detrás.
 settings-see-through-shows = Qué se ve
 settings-see-through-shows-everything = Todo lo de detrás
 settings-see-through-shows-wallpaper = Solo el fondo de pantalla

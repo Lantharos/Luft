@@ -44,7 +44,7 @@
 </Section>
 
 {#if explaining}
-	<Dialog title={t('settings-crash-reports-contents')} description={t('settings-crash-reports-contents-description')} onclose={() => (explaining = false)}>
+	<Dialog title={t('settings-crash-reports-contents')} onclose={() => (explaining = false)}>
 		<ul class="flex list-disc flex-col gap-1.5 pl-5 text-[13px] text-[var(--text-soft)]">
 			<li>{t('settings-crash-reports-holds-program')}</li>
 			<li>{t('settings-crash-reports-holds-failure')}</li>

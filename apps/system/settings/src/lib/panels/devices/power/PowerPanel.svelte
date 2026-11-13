@@ -120,7 +120,7 @@
 			<Segmented label={t('settings-power-mode')} options={profileOptions} value={profiles.active} onchange={chooseProfile} />
 		</Row>
 		{#if state?.battery}
-			<Row title={t('settings-power-saver-low-battery')} description={t('settings-power-saver-low-battery-description')}>
+			<Row title={t('settings-power-saver-low-battery')}>
 				{#if power.values['power-saver-profile-on-low-battery'] ?? true}
 					<Segmented
 						label={t('settings-power-saver-level')}

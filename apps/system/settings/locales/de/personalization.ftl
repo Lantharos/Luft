@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Schiefer
 ## Appearance: text and motion
 
 settings-appearance-text-size = Textgröße
-settings-appearance-text-size-description = Macht Text in allen Apps größer oder kleiner
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Lässt den Schreibtisch durch die Fenster die
 settings-see-through-app = { $app } durchscheinend
 settings-see-through-add = App hinzufügen
 settings-see-through-add-title = App durchscheinend machen
-settings-see-through-add-description = Ihre Fenster lassen durchscheinen, was dahinter liegt.
 settings-see-through-shows = Durchscheinen lassen
 settings-see-through-shows-everything = Alles dahinter
 settings-see-through-shows-wallpaper = Nur das Hintergrundbild

@@ -72,7 +72,6 @@ settings-appearance-tint-slate = Сланцевый
 ## Appearance: text and motion
 
 settings-appearance-text-size = Размер текста
-settings-appearance-text-size-description = Увеличивает или уменьшает текст во всех приложениях
 
 ## Taskbar
 
@@ -216,7 +215,6 @@ settings-see-through-description = Рабочий стол просвечива�
 settings-see-through-app = Полупрозрачное: { $app }
 settings-see-through-add = Добавить приложение
 settings-see-through-add-title = Сделать приложение полупрозрачным
-settings-see-through-add-description = Его окна пропускают то, что за ними.
 settings-see-through-shows = Что видно
 settings-see-through-shows-everything = Всё, что позади
 settings-see-through-shows-wallpaper = Только обои

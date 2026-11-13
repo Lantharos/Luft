@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Γκρι
 ## Appearance: text and motion
 
 settings-appearance-text-size = Μέγεθος κειμένου
-settings-appearance-text-size-description = Μεγαλώνει ή μικραίνει το κείμενο σε όλες τις εφαρμογές
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Η επιφάνεια εργασίας φαί
 settings-see-through-app = Διαφανές { $app }
 settings-see-through-add = Προσθήκη εφαρμογής
 settings-see-through-add-title = Διαφανής εφαρμογή
-settings-see-through-add-description = Τα παράθυρά της αφήνουν να φαίνεται ό,τι είναι πίσω τους.
 settings-see-through-shows = Τι φαίνεται
 settings-see-through-shows-everything = Ό,τι είναι πίσω
 settings-see-through-shows-wallpaper = Μόνο η ταπετσαρία

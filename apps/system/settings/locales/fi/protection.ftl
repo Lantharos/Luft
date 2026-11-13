@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Salli sovellusten käyttää mikrofonia
 
 settings-privacy-file-history = Tiedostohistoria
 settings-privacy-remember-files = Muista viimeksi käytetyt tiedostot
-settings-privacy-remember-files-hint = Sovellukset voivat näyttää viimeksi avaamasi tiedostot
 settings-privacy-keep-history = Historian säilytysaika
 settings-privacy-keep-forever = Aina
 settings-privacy-clear-history = Tyhjennä historia
-settings-privacy-clear-history-hint = Unohda heti kaikki luettelon tiedostot
 settings-privacy-clear = Tyhjennä
 settings-privacy-clear-title = Tyhjennetäänkö tiedostohistoria?
 settings-privacy-clear-description = Sovellukset eivät enää näytä viimeksi avaamiasi tiedostoja. Itse tiedostot pysyvät paikallaan.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Tyhjennä roskakori automaattisesti
 settings-privacy-delete-temp = Poista väliaikaiset tiedostot automaattisesti
 settings-privacy-delete-temp-hint = Väliaikaiskansioissa olevat tiedostosi, joita mikään ei ole viime aikoina käyttänyt
 settings-privacy-delete-after = Poistoviive
-settings-privacy-delete-after-hint = Kuinka kauan tiedostot säilyvät ennen poistamista
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Avaa lukitus suojaussirulla
 settings-encryption-chip-unlock-on = Kunhan mikään ei muuta tietokoneen käynnistystapaa
 settings-encryption-chip-unlock-off = Tunnuslausetta ei tarvitse kirjoittaa käynnistyksessä
 settings-encryption-pin = PIN-koodi käynnistyksessä
-settings-encryption-pin-description = Kirjoitat sen ennen kuin levyn lukitus avautuu
 settings-encryption-change = Vaihda
 settings-encryption-add-pin-row = Lisää PIN-koodi käynnistykseen
 settings-encryption-add-pin-row-description = Pitää levyn lukittuna, vaikka tietokone vietäisiin
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Edellinen avaimesi ei enää toimi. Säily
 
 settings-passwords-title = Salasanat ja avaimet
 settings-passwords-not-running = Avainnippu ei ole käynnissä
-settings-passwords-not-running-description = Salasanasi ja avaimesi näkyvät tässä, kun se käynnistyy
 settings-passwords-locked = Lukittu
 settings-passwords-contents = { $count ->
     [0] Ei vielä mitään tallennettuna
@@ -290,7 +285,6 @@ settings-passwords-pin = Kysy PIN-koodia sormenjäljen jälkeen
 settings-passwords-pin-locked = Avaa avainnipun lukitus muuttaaksesi tätä
 settings-passwords-pin-description = Pelkkä sormenjälki ei silloin avaa niiden lukitusta
 settings-passwords-lock-with-screen = Lukitse näytön mukana
-settings-passwords-lock-with-screen-description = Ne lukitaan ja avataan yhdessä näytön kanssa
 settings-passwords-apps = Sovellusten kirjautumistiedot ja toiminta
 settings-passwords-apps-locked = Avaa avainnipun lukitus nähdäksesi ne
 settings-passwords-apps-description = Mitä sovellukset säilyttävät täällä ja milloin ne käyttivät sitä
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } ei saanut käyttää tallen
 settings-passwords-history-signed = { $app } allekirjoitti kohteella ”{ $item }”
 settings-passwords-history-signed-unnamed = { $app } allekirjoitti tallennetulla salasanalla
 settings-passwords-history-clear = Tyhjennä historia
-settings-passwords-history-clear-description = Unohda, mitkä sovellukset käyttivät avainnippuasi ja milloin
 settings-passwords-history-clear-button = Tyhjennä
 settings-passwords-history-clear-title = Tyhjennetäänkö viimeaikainen käyttö?
 settings-passwords-history-clear-confirm = Luettelo siitä, mitkä sovellukset käyttivät avainnippuasi ja milloin, poistetaan. Tallennetut salasanasi ja avaimesi säilyvät ennallaan.

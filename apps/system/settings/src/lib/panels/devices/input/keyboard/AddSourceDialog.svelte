@@ -38,7 +38,7 @@
 	}
 </script>
 
-<Dialog title={t('settings-keyboard-add-source')} description={t('settings-keyboard-add-source-description')} {onclose}>
+<Dialog title={t('settings-keyboard-add-source')} {onclose}>
 	<SearchField label={t('settings-keyboard-add-source-search')} bind:value={query} onkeydown={keydown} />
 	<div bind:this={list} class="hidden-scroll scroll-fade -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label={t('settings-keyboard-sources')}>
 		{#each results as source (`${source.type}:${source.id}`)}

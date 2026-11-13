@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Povoliť aplikáciám používať mikrofón
 
 settings-privacy-file-history = História súborov
 settings-privacy-remember-files = Pamätať si nedávno použité súbory
-settings-privacy-remember-files-hint = Aplikácie môžu zobraziť súbory, ktoré ste naposledy otvorili
 settings-privacy-keep-history = Uchovávať históriu
 settings-privacy-keep-forever = Navždy
 settings-privacy-clear-history = Vymazať históriu
-settings-privacy-clear-history-hint = Ihneď zabudnúť všetky súbory v zozname
 settings-privacy-clear = Vymazať
 settings-privacy-clear-title = Vymazať históriu súborov?
 settings-privacy-clear-description = Aplikácie už nebudú zobrazovať súbory, ktoré ste nedávno otvorili. Súbory zostanú tam, kde sú.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Automaticky vyprázdňovať kôš
 settings-privacy-delete-temp = Automaticky vymazávať dočasné súbory
 settings-privacy-delete-temp-hint = Vaše súbory v dočasných priečinkoch, ktoré nič v poslednom čase nepoužilo
 settings-privacy-delete-after = Vymazať po
-settings-privacy-delete-after-hint = Ako dlho súbory zostanú, kým sa odstránia
 
 ## Security: summary at the top of the page
 
@@ -217,7 +214,6 @@ settings-encryption-chip-unlock = Odomykať bezpečnostným čipom
 settings-encryption-chip-unlock-on = Pokiaľ sa nič nezmení na tom, ako sa počítač spúšťa
 settings-encryption-chip-unlock-off = Aby ste pri spustení nemuseli zadávať prístupovú frázu
 settings-encryption-pin = PIN pri spustení
-settings-encryption-pin-description = Zadáte ho pred odomknutím disku
 settings-encryption-change = Zmeniť
 settings-encryption-add-pin-row = Pridať PIN pri spustení
 settings-encryption-add-pin-row-description = Disk zostane zamknutý, aj keď niekto vezme počítač
@@ -284,7 +280,6 @@ settings-recovery-fresh-description = Predchádzajúci kľúč už nefunguje. Te
 
 settings-passwords-title = Heslá a kľúče
 settings-passwords-not-running = Zväzok kľúčov nie je spustený
-settings-passwords-not-running-description = Vaše heslá a kľúče sa tu zobrazia, keď sa spustí
 settings-passwords-locked = Zamknutý
 settings-passwords-contents = { $count ->
     [0] Zatiaľ nič uložené
@@ -308,7 +303,6 @@ settings-passwords-pin = Po odtlačku prsta vyžadovať kód PIN
 settings-passwords-pin-locked = Ak to chcete zmeniť, odomknite zväzok kľúčov
 settings-passwords-pin-description = Aby ich samotný odtlačok prsta nemohol odomknúť
 settings-passwords-lock-with-screen = Zamykať spolu s obrazovkou
-settings-passwords-lock-with-screen-description = Zamykajú a odomykajú sa spolu s obrazovkou
 settings-passwords-apps = Prihlásenia a aktivita aplikácií
 settings-passwords-apps-locked = Ak ich chcete vidieť, odomknite zväzok kľúčov
 settings-passwords-apps-description = Čo si tu aplikácie ukladajú a kedy to použili
@@ -343,7 +337,6 @@ settings-passwords-history-denied-unnamed = Aplikácia { $app } nemala povolené
 settings-passwords-history-signed = Aplikácia { $app } podpisovala pomocou „{ $item }“
 settings-passwords-history-signed-unnamed = Aplikácia { $app } podpisovala pomocou uloženého hesla
 settings-passwords-history-clear = Vymazať históriu
-settings-passwords-history-clear-description = Zabudnúť, ktoré aplikácie a kedy použili zväzok kľúčov
 settings-passwords-history-clear-button = Vymazať
 settings-passwords-history-clear-title = Vymazať nedávny prístup?
 settings-passwords-history-clear-confirm = Zoznam aplikácií, ktoré použili zväzok kľúčov, a časov použitia sa vymaže. Uložené heslá a kľúče zostanú tak, ako sú.

@@ -66,7 +66,6 @@ settings-network-airplane = Flymodus
     .description = Slår av alle trådlause tilkoplingar
 settings-network-airplane-hardware = Slått på med ein maskinvarebrytar
 settings-network-known = Kjende nettverk
-    .description = Nettverk denne datamaskinen har vore kopla til før, anten dei er i nærleiken eller ikkje
 settings-network-known-count = { $count ->
         [one] { $count } lagra nettverk
        *[other] { $count } lagra nettverk
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Det lagra passordet fungerte ikkje
 settings-network-wifi-settings = Nettverksinnstillingar
 settings-network-wifi-searching = Leitar etter nettverk
 settings-network-hidden = Kople til eit gøymt nettverk
-    .description = Skriv inn namnet på nettverket og kva tryggleik det brukar.
 settings-network-hidden-name = Nettverksnamn
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importer frå ei fil
     .description = Konfigurasjonsfiler for WireGuard, OpenVPN og andre VPN-ar
 settings-network-vpn-importing = Importerer
 settings-network-wireguard = Set opp WireGuard
-    .description = Skriv inn opplysningane frå VPN-leverandøren eller tenaren din
 settings-network-wireguard-dialog = VPN-leverandøren eller eigaren av tenaren kan gje deg desse opplysningane.
 settings-network-wireguard-name-example = VPN heime
 settings-network-wireguard-public-key = Offentleg nøkkel { $key }

@@ -66,7 +66,6 @@ settings-network-airplane = Lidojuma režīms
     .description = Izslēdz visus bezvadu savienojumus
 settings-network-airplane-hardware = Ieslēgts ar aparatūras slēdzi
 settings-network-known = Zināmie tīkli
-    .description = Tīkli, kuriem šis dators jau ir pievienojies, gan tuvumā esošie, gan pārējie
 settings-network-known-count = { $count ->
         [zero] { $count } saglabāti tīkli
         [one] { $count } saglabāts tīkls
@@ -91,7 +90,6 @@ settings-network-wifi-saved-password-failed = Saglabātā parole nederēja. Ieva
 settings-network-wifi-settings = Tīkla iestatījumi
 settings-network-wifi-searching = Notiek tīklu meklēšana
 settings-network-hidden = Savienot ar slēptu tīklu
-    .description = Ievadiet tīkla nosaukumu un drošības veidu.
 settings-network-hidden-name = Tīkla nosaukums
 
 ## Network: joining a Wi‑Fi network
@@ -251,7 +249,6 @@ settings-network-vpn-import = Importēt no faila
     .description = WireGuard, OpenVPN un citi VPN konfigurācijas faili
 settings-network-vpn-importing = Importē
 settings-network-wireguard = Iestatīt WireGuard
-    .description = Ievadiet datus no sava VPN pakalpojuma sniedzēja vai servera
 settings-network-wireguard-dialog = Šos datus jums var sniegt VPN pakalpojuma sniedzējs vai servera īpašnieks.
 settings-network-wireguard-name-example = Mājas VPN
 settings-network-wireguard-public-key = Publiskā atslēga { $key }

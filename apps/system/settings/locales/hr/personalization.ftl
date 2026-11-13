@@ -71,7 +71,6 @@ settings-appearance-tint-slate = Škriljevac
 ## Appearance: text and motion
 
 settings-appearance-text-size = Veličina teksta
-settings-appearance-text-size-description = Povećava ili smanjuje tekst u svim aplikacijama
 
 ## Taskbar
 
@@ -213,7 +212,6 @@ settings-see-through-description = Radna površina vidi se kroz prozore ovih apl
 settings-see-through-app = Prozirno: { $app }
 settings-see-through-add = Dodaj aplikaciju
 settings-see-through-add-title = Učini aplikaciju prozirnom
-settings-see-through-add-description = Njezini prozori propuštaju ono što je iza njih.
 settings-see-through-shows = Što se vidi
 settings-see-through-shows-everything = Sve iza
 settings-see-through-shows-wallpaper = Samo pozadina

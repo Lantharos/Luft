@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Gri plumbi
 ## Appearance: text and motion
 
 settings-appearance-text-size = Madhësia e tekstit
-settings-appearance-text-size-description = Zmadhon ose zvogëlon tekstin në të gjitha aplikacionet
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Lëre desktopin të duket përmes dritareve t
 settings-see-through-app = { $app } e tejdukshme
 settings-see-through-add = Shto një aplikacion
 settings-see-through-add-title = Bëje një aplikacion të tejdukshëm
-settings-see-through-add-description = Dritaret e tij lënë të duket ajo që është pas tyre.
 settings-see-through-shows = Çfarë duket
 settings-see-through-shows-everything = Gjithçka pas
 settings-see-through-shows-wallpaper = Vetëm sfondi

@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Apps toegang geven tot de microfoon
 
 settings-privacy-file-history = Bestandsgeschiedenis
 settings-privacy-remember-files = Onlangs gebruikte bestanden onthouden
-settings-privacy-remember-files-hint = Apps kunnen de bestanden tonen die je het laatst hebt geopend
 settings-privacy-keep-history = Geschiedenis bewaren
 settings-privacy-keep-forever = Altijd
 settings-privacy-clear-history = Geschiedenis wissen
-settings-privacy-clear-history-hint = Elk bestand in de lijst nu meteen vergeten
 settings-privacy-clear = Wissen
 settings-privacy-clear-title = Bestandsgeschiedenis wissen?
 settings-privacy-clear-description = Apps tonen de bestanden die je onlangs hebt geopend niet meer. De bestanden zelf blijven waar ze zijn.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Prullenbak automatisch legen
 settings-privacy-delete-temp = Tijdelijke bestanden automatisch verwijderen
 settings-privacy-delete-temp-hint = Je bestanden in tijdelijke mappen die al een tijd niet zijn gebruikt
 settings-privacy-delete-after = Verwijderen na
-settings-privacy-delete-after-hint = Hoelang bestanden blijven voordat ze worden verwijderd
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Ontgrendelen met de beveiligingschip
 settings-encryption-chip-unlock-on = Zolang er niets verandert aan hoe deze computer opstart
 settings-encryption-chip-unlock-off = Zodat je bij het opstarten geen wachtwoordzin hoeft te typen
 settings-encryption-pin = Pincode bij opstarten
-settings-encryption-pin-description = Je typt hem voordat de schijf ontgrendelt
 settings-encryption-change = Wijzigen
 settings-encryption-add-pin-row = Pincode bij opstarten toevoegen
 settings-encryption-add-pin-row-description = Houdt de schijf vergrendeld, zelfs als de computer wordt meegenomen
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Je vorige sleutel werkt niet meer. Bewaar 
 
 settings-passwords-title = Wachtwoorden en sleutels
 settings-passwords-not-running = Je sleutelbos is niet actief
-settings-passwords-not-running-description = Je wachtwoorden en sleutels verschijnen hier zodra hij start
 settings-passwords-locked = Vergrendeld
 settings-passwords-contents = { $count ->
     [0] Nog niets bewaard
@@ -290,7 +285,6 @@ settings-passwords-pin = Na de vingerafdruk om een pincode vragen
 settings-passwords-pin-locked = Ontgrendel je sleutelbos om dit te wijzigen
 settings-passwords-pin-description = Zodat een vingerafdruk alleen ze niet kan ontgrendelen
 settings-passwords-lock-with-screen = Vergrendelen met het scherm
-settings-passwords-lock-with-screen-description = Ze worden samen met het scherm vergrendeld en ontgrendeld
 settings-passwords-apps = Aanmeldgegevens en activiteit van apps
 settings-passwords-apps-locked = Ontgrendel je sleutelbos om ze te zien
 settings-passwords-apps-description = Wat apps hier bewaren en wanneer ze het gebruikten
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } mocht een bewaard wachtwoor
 settings-passwords-history-signed = { $app } heeft ondertekend met “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } heeft ondertekend met een bewaard wachtwoord
 settings-passwords-history-clear = Geschiedenis wissen
-settings-passwords-history-clear-description = Vergeten welke apps je sleutelbos hebben gebruikt en wanneer
 settings-passwords-history-clear-button = Wissen
 settings-passwords-history-clear-title = Recente toegang wissen?
 settings-passwords-history-clear-confirm = De lijst met welke apps je sleutelbos hebben gebruikt en wanneer, wordt gewist. Je bewaarde wachtwoorden en sleutels blijven zoals ze zijn.

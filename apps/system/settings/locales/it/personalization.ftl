@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Ardesia
 ## Appearance: text and motion
 
 settings-appearance-text-size = Dimensione del testo
-settings-appearance-text-size-description = Ingrandisce o rimpicciolisce il testo in tutte le app
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Lascia intravedere la scrivania attraverso le
 settings-see-through-app = { $app } traslucida
 settings-see-through-add = Aggiungi un’app
 settings-see-through-add-title = Rendi traslucida un’app
-settings-see-through-add-description = Le sue finestre lasciano intravedere ciò che c’è dietro.
 settings-see-through-shows = Cosa traspare
 settings-see-through-shows-everything = Tutto ciò che c’è dietro
 settings-see-through-shows-wallpaper = Solo lo sfondo

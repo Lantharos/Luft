@@ -72,7 +72,6 @@ settings-appearance-tint-slate = Břidlicová
 ## Appearance: text and motion
 
 settings-appearance-text-size = Velikost textu
-settings-appearance-text-size-description = Zvětší nebo zmenší text ve všech aplikacích
 
 ## Taskbar
 
@@ -216,7 +215,6 @@ settings-see-through-description = Plocha prosvítá okny těchto aplikací. Zap
 settings-see-through-app = Průhledné: { $app }
 settings-see-through-add = Přidat aplikaci
 settings-see-through-add-title = Zprůhlednit aplikaci
-settings-see-through-add-description = Její okna nechají prosvítat to, co je za nimi.
 settings-see-through-shows = Co prosvítá
 settings-see-through-shows-everything = Vše za oknem
 settings-see-through-shows-wallpaper = Jen tapeta

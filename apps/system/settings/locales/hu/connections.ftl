@@ -66,7 +66,6 @@ settings-network-airplane = Repülőgép mód
     .description = Minden vezeték nélküli kapcsolatot kikapcsol
 settings-network-airplane-hardware = Hardveres kapcsoló bekapcsolta
 settings-network-known = Ismert hálózatok
-    .description = Hálózatok, amelyekhez ez a számítógép már csatlakozott, akár a közelben vannak, akár nem
 settings-network-known-count = { $count ->
         [one] { $count } mentett hálózat
        *[other] { $count } mentett hálózat
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = A mentett jelszó nem működött.
 settings-network-wifi-settings = Hálózat beállításai
 settings-network-wifi-searching = Hálózatok keresése
 settings-network-hidden = Csatlakozás rejtett hálózathoz
-    .description = Adja meg a hálózat nevét és a biztonság típusát.
 settings-network-hidden-name = Hálózat neve
 
 ## Network: joining a Wi-Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importálás fájlból
     .description = WireGuard-, OpenVPN- és egyéb VPN-konfigurációs fájlok
 settings-network-vpn-importing = Importálás
 settings-network-wireguard = WireGuard beállítása
-    .description = Adja meg a VPN-szolgáltatótól vagy a kiszolgálóról kapott adatokat
 settings-network-wireguard-dialog = Ezeket az adatokat a VPN-szolgáltatótól vagy a kiszolgáló tulajdonosától kaphatja meg.
 settings-network-wireguard-name-example = Otthoni VPN
 settings-network-wireguard-public-key = Nyilvános kulcs: { $key }

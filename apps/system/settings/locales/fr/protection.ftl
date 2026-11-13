@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Autoriser les applications à utiliser le mi
 
 settings-privacy-file-history = Historique des fichiers
 settings-privacy-remember-files = Mémoriser les fichiers récents
-settings-privacy-remember-files-hint = Les applications peuvent afficher les derniers fichiers ouverts
 settings-privacy-keep-history = Conserver l’historique
 settings-privacy-keep-forever = Toujours
 settings-privacy-clear-history = Effacer l’historique
-settings-privacy-clear-history-hint = Oublier immédiatement tous les fichiers de la liste
 settings-privacy-clear = Effacer
 settings-privacy-clear-title = Effacer l’historique des fichiers ?
 settings-privacy-clear-description = Les applications n’afficheront plus les fichiers ouverts récemment. Les fichiers eux-mêmes restent où ils sont.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Vider la Corbeille automatiquement
 settings-privacy-delete-temp = Supprimer automatiquement les fichiers temporaires
 settings-privacy-delete-temp-hint = Vos fichiers des dossiers temporaires qui n’ont pas servi récemment
 settings-privacy-delete-after = Supprimer après
-settings-privacy-delete-after-hint = Durée de conservation des fichiers avant leur suppression
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Déverrouiller avec la puce de sécurité
 settings-encryption-chip-unlock-on = Tant que rien ne change dans le démarrage de cet ordinateur
 settings-encryption-chip-unlock-off = Pour ne pas taper de phrase secrète au démarrage
 settings-encryption-pin = Code PIN au démarrage
-settings-encryption-pin-description = À taper avant le déverrouillage du disque
 settings-encryption-change = Modifier
 settings-encryption-add-pin-row = Ajouter un code PIN au démarrage
 settings-encryption-add-pin-row-description = Le disque reste verrouillé même si l’ordinateur est volé
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Votre ancienne clé ne fonctionne plus. Co
 
 settings-passwords-title = Mots de passe et clés
 settings-passwords-not-running = Votre trousseau n’est pas lancé
-settings-passwords-not-running-description = Vos mots de passe et vos clés apparaîtront ici dès son démarrage
 settings-passwords-locked = Verrouillé
 settings-passwords-contents = { $count ->
     [0] Rien d’enregistré pour l’instant
@@ -290,7 +285,6 @@ settings-passwords-pin = Demander un code PIN après l’empreinte
 settings-passwords-pin-locked = Déverrouillez votre trousseau pour modifier ce paramètre
 settings-passwords-pin-description = Pour qu’une empreinte seule ne suffise pas à les déverrouiller
 settings-passwords-lock-with-screen = Verrouiller avec l’écran
-settings-passwords-lock-with-screen-description = Ils se verrouillent et se déverrouillent en même temps que l’écran
 settings-passwords-apps = Identifiants et activité des applications
 settings-passwords-apps-locked = Déverrouillez votre trousseau pour les afficher
 settings-passwords-apps-description = Ce que les applications conservent ici et quand elles l’ont utilisé
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = Accès à un mot de passe enregistr�
 settings-passwords-history-signed = { $app } a signé avec « { $item } »
 settings-passwords-history-signed-unnamed = { $app } a signé avec un mot de passe enregistré
 settings-passwords-history-clear = Effacer l’historique
-settings-passwords-history-clear-description = Oublier quelles applications ont utilisé votre trousseau et quand
 settings-passwords-history-clear-button = Effacer
 settings-passwords-history-clear-title = Effacer les accès récents ?
 settings-passwords-history-clear-confirm = La liste des applications ayant utilisé votre trousseau, avec les dates, sera effacée. Vos mots de passe et clés enregistrés ne changent pas.

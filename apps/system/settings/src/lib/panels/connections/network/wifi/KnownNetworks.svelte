@@ -49,7 +49,7 @@
 		<p class="-my-3 px-2 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
 
-	<Section description={t('settings-network-known.description')}>
+	<Section>
 		{#each network.known as known (known.connection)}
 			<Row title={known.ssid} description={describe(known)}>
 				{#if nearby.get(known.ssid)?.state === 'connecting'}<Spinner />{/if}

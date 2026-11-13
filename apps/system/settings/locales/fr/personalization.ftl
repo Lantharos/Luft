@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Ardoise
 ## Appearance: text and motion
 
 settings-appearance-text-size = Taille du texte
-settings-appearance-text-size-description = Agrandit ou réduit le texte dans les applications
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Laisse voir le bureau à travers les fenêtre
 settings-see-through-app = { $app } translucide
 settings-see-through-add = Ajouter une application
 settings-see-through-add-title = Rendre une application translucide
-settings-see-through-add-description = Ses fenêtres laissent voir ce qui se trouve derrière.
 settings-see-through-shows = Ce qui transparaît
 settings-see-through-shows-everything = Tout ce qui est derrière
 settings-see-through-shows-wallpaper = Seulement le fond d’écran

@@ -55,7 +55,7 @@
 			/>
 		</Row>
 	{/if}
-	<Row title={t('settings-passwords-lock-with-screen')} description={t('settings-passwords-lock-with-screen-description')}>
+	<Row title={t('settings-passwords-lock-with-screen')}>
 		<Switch
 			label={t('settings-passwords-lock-with-screen')}
 			checked={keyring.lockWithScreen}

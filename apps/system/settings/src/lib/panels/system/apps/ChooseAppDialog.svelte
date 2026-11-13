@@ -7,7 +7,7 @@
 
 	interface Props {
 		title: string;
-		description: string;
+		description?: string;
 		exclude?: string[];
 		onchoose: (id: string) => void;
 		onclose: () => void;

@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Arduvaz
 ## Appearance: text and motion
 
 settings-appearance-text-size = Metin boyutu
-settings-appearance-text-size-description = Uygulamalardaki metni büyütür ya da küçültür
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Masaüstünün bu uygulamaların pencerelerin
 settings-see-through-app = { $app } yarı saydam
 settings-see-through-add = Uygulama ekle
 settings-see-through-add-title = Bir uygulamayı yarı saydam yap
-settings-see-through-add-description = Pencereleri arkalarındakini gösterir.
 settings-see-through-shows = Arkada görünen
 settings-see-through-shows-everything = Arkadaki her şey
 settings-see-through-shows-wallpaper = Yalnızca duvar kâğıdı

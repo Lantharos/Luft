@@ -85,7 +85,6 @@
 {#if adding}
 	<ChooseAppDialog
 		title={t('settings-see-through-add-title')}
-		description={t('settings-see-through-add-description')}
 		exclude={ids}
 		onchoose={add}
 		onclose={() => (adding = false)}

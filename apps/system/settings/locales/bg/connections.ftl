@@ -66,7 +66,6 @@ settings-network-airplane = Самолетен режим
     .description = Изключва всички безжични връзки
 settings-network-airplane-hardware = Включен с хардуерен превключвател
 settings-network-known = Известни мрежи
-    .description = Мрежи, към които компютърът се е свързвал, независимо дали са наблизо
 settings-network-known-count = { $count ->
         [one] { $count } запазена мрежа
        *[other] { $count } запазени мрежи
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Запазената парола 
 settings-network-wifi-settings = Настройки на мрежата
 settings-network-wifi-searching = Търсене на мрежи
 settings-network-hidden = Свързване със скрита мрежа
-    .description = Въведете името на мрежата и вида на защитата ѝ.
 settings-network-hidden-name = Име на мрежата
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Импортиране от файл
     .description = Конфигурационни файлове за WireGuard, OpenVPN и други VPN
 settings-network-vpn-importing = Импортиране
 settings-network-wireguard = Настройване на WireGuard
-    .description = Въведете данните от доставчика на VPN или от сървъра
 settings-network-wireguard-dialog = Доставчикът на VPN или собственикът на сървъра може да ви даде тези данни.
 settings-network-wireguard-name-example = Домашна VPN
 settings-network-wireguard-public-key = Публичен ключ { $key }

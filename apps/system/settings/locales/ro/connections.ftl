@@ -66,7 +66,6 @@ settings-network-airplane = Mod avion
     .description = Dezactivează toate conexiunile fără fir
 settings-network-airplane-hardware = Activat de un comutator hardware
 settings-network-known = Rețele cunoscute
-    .description = Rețelele la care s-a conectat acest computer, aflate în apropiere sau nu
 settings-network-known-count = { $count ->
         [one] { $count } rețea salvată
         [few] { $count } rețele salvate
@@ -91,7 +90,6 @@ settings-network-wifi-saved-password-failed = Parola salvată nu a funcționat. 
 settings-network-wifi-settings = Setările rețelei
 settings-network-wifi-searching = Se caută rețele
 settings-network-hidden = Conectare la o rețea ascunsă
-    .description = Introduceți numele rețelei și tipul de securitate.
 settings-network-hidden-name = Numele rețelei
 
 ## Network: joining a Wi‑Fi network
@@ -251,7 +249,6 @@ settings-network-vpn-import = Importă dintr-un fișier
     .description = Fișiere de configurare WireGuard, OpenVPN și alte fișiere VPN
 settings-network-vpn-importing = Se importă
 settings-network-wireguard = Configurează WireGuard
-    .description = Introduceți datele primite de la furnizorul VPN sau de pe server
 settings-network-wireguard-dialog = Aceste date le puteți primi de la furnizorul VPN sau de la administratorul serverului.
 settings-network-wireguard-name-example = VPN acasă
 settings-network-wireguard-public-key = Cheie publică { $key }

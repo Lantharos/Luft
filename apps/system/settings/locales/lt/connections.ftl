@@ -66,7 +66,6 @@ settings-network-airplane = Lėktuvo režimas
     .description = Išjungia visus belaidžius ryšius
 settings-network-airplane-hardware = Įjungta aparatiniu jungikliu
 settings-network-known = Žinomi tinklai
-    .description = Tinklai, prie kurių šis kompiuteris yra jungęsis, nesvarbu, ar jie netoliese
 settings-network-known-count = { $count ->
         [one] { $count } įrašytas tinklas
         [few] { $count } įrašyti tinklai
@@ -92,7 +91,6 @@ settings-network-wifi-saved-password-failed = Įrašytas slaptažodis netinka. �
 settings-network-wifi-settings = Tinklo nustatymai
 settings-network-wifi-searching = Ieškoma tinklų
 settings-network-hidden = Prisijungti prie paslėpto tinklo
-    .description = Įveskite tinklo pavadinimą ir saugos tipą.
 settings-network-hidden-name = Tinklo pavadinimas
 
 ## Network: joining a Wi‑Fi network
@@ -253,7 +251,6 @@ settings-network-vpn-import = Importuoti iš failo
     .description = WireGuard, OpenVPN ir kiti VPN konfigūracijos failai
 settings-network-vpn-importing = Importuojama
 settings-network-wireguard = Nustatyti WireGuard
-    .description = Įveskite duomenis, gautus iš VPN teikėjo arba serverio
 settings-network-wireguard-dialog = Šiuos duomenis jums gali pateikti VPN teikėjas arba serverio savininkas.
 settings-network-wireguard-name-example = Namų VPN
 settings-network-wireguard-public-key = Viešasis raktas { $key }

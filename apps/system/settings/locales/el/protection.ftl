@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Να επιτρέπεται στις εφα�
 
 settings-privacy-file-history = Ιστορικό αρχείων
 settings-privacy-remember-files = Απομνημόνευση πρόσφατων αρχείων
-settings-privacy-remember-files-hint = Οι εφαρμογές μπορούν να εμφανίζουν τα αρχεία που ανοίξατε τελευταία
 settings-privacy-keep-history = Διατήρηση ιστορικού για
 settings-privacy-keep-forever = Πάντα
 settings-privacy-clear-history = Διαγραφή ιστορικού
-settings-privacy-clear-history-hint = Αφαίρεση όλων των αρχείων της λίστας τώρα
 settings-privacy-clear = Διαγραφή
 settings-privacy-clear-title = Διαγραφή ιστορικού αρχείων;
 settings-privacy-clear-description = Οι εφαρμογές δεν θα εμφανίζουν πια τα αρχεία που ανοίξατε πρόσφατα. Τα ίδια τα αρχεία μένουν εκεί που είναι.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Αυτόματο άδειασμα κάδου
 settings-privacy-delete-temp = Αυτόματη διαγραφή προσωρινών αρχείων
 settings-privacy-delete-temp-hint = Αρχεία σας σε προσωρινούς φακέλους που δεν έχουν χρησιμοποιηθεί πρόσφατα
 settings-privacy-delete-after = Διαγραφή μετά από
-settings-privacy-delete-after-hint = Πόσο μένουν τα αρχεία πριν αφαιρεθούν
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Ξεκλείδωμα με το τσιπ ασφ
 settings-encryption-chip-unlock-on = Εφόσον δεν αλλάξει τίποτα στον τρόπο εκκίνησης του υπολογιστή
 settings-encryption-chip-unlock-off = Για να μην πληκτρολογείτε φράση πρόσβασης κατά την εκκίνηση
 settings-encryption-pin = PIN κατά την εκκίνηση
-settings-encryption-pin-description = Το πληκτρολογείτε πριν ξεκλειδώσει ο δίσκος
 settings-encryption-change = Αλλαγή
 settings-encryption-add-pin-row = Προσθήκη PIN κατά την εκκίνηση
 settings-encryption-add-pin-row-description = Ο δίσκος μένει κλειδωμένος ακόμη κι αν κάποιος πάρει τον υπολογιστή
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Το προηγούμενο κλειδί �
 
 settings-passwords-title = Κωδικοί πρόσβασης και κλειδιά
 settings-passwords-not-running = Η κλειδοθήκη σας δεν εκτελείται
-settings-passwords-not-running-description = Οι κωδικοί πρόσβασης και τα κλειδιά σας εμφανίζονται εδώ μόλις ξεκινήσει
 settings-passwords-locked = Κλειδωμένη
 settings-passwords-contents = { $count ->
     [0] Δεν έχει αποθηκευτεί τίποτα ακόμη
@@ -290,7 +285,6 @@ settings-passwords-pin = PIN μετά το δακτυλικό αποτύπωμα
 settings-passwords-pin-locked = Ξεκλειδώστε την κλειδοθήκη σας για να το αλλάξετε
 settings-passwords-pin-description = Ώστε να μην αρκεί μόνο το δακτυλικό αποτύπωμα για να ξεκλειδώσουν
 settings-passwords-lock-with-screen = Κλείδωμα μαζί με την οθόνη
-settings-passwords-lock-with-screen-description = Κλειδώνουν και ξεκλειδώνουν μαζί με την οθόνη
 settings-passwords-apps = Συνδέσεις και δραστηριότητα εφαρμογών
 settings-passwords-apps-locked = Ξεκλειδώστε την κλειδοθήκη σας για να τις δείτε
 settings-passwords-apps-description = Τι κρατούν εδώ οι εφαρμογές και πότε το χρησιμοποίησαν
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = Δεν επιτράπηκε στην
 settings-passwords-history-signed = Η εφαρμογή { $app } υπέγραψε με το «{ $item }»
 settings-passwords-history-signed-unnamed = Η εφαρμογή { $app } υπέγραψε με έναν αποθηκευμένο κωδικό πρόσβασης
 settings-passwords-history-clear = Διαγραφή ιστορικού
-settings-passwords-history-clear-description = Διαγραφή του ποιες εφαρμογές χρησιμοποίησαν την κλειδοθήκη σας και πότε
 settings-passwords-history-clear-button = Διαγραφή
 settings-passwords-history-clear-title = Διαγραφή πρόσφατης πρόσβασης;
 settings-passwords-history-clear-confirm = Η λίστα με τις εφαρμογές που χρησιμοποίησαν την κλειδοθήκη σας και πότε διαγράφεται. Οι αποθηκευμένοι κωδικοί πρόσβασης και τα κλειδιά σας μένουν όπως είναι.

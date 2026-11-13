@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Ħalli l-apps jużaw il-mikrofonu
 
 settings-privacy-file-history = Storja tal-fajls
 settings-privacy-remember-files = Ftakar il-fajls użati riċentement
-settings-privacy-remember-files-hint = L-apps jistgħu juru l-aħħar fajls li ftaħt
 settings-privacy-keep-history = Żomm l-istorja għal
 settings-privacy-keep-forever = Dejjem
 settings-privacy-clear-history = Ħassar l-istorja
-settings-privacy-clear-history-hint = Insa kull fajl fil-lista issa stess
 settings-privacy-clear = Ħassar
 settings-privacy-clear-title = Tħassar l-istorja tal-fajls?
 settings-privacy-clear-description = L-apps ma jibqgħux juru l-fajls li ftaħt riċentement. Il-fajls jibqgħu fejn huma.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Battal il-barmil awtomatikament
 settings-privacy-delete-temp = Ħassar il-fajls temporanji awtomatikament
 settings-privacy-delete-temp-hint = Il-fajls tiegħek f’fowlders temporanji li xejn ma użahom dan l-aħħar
 settings-privacy-delete-after = Ħassar wara
-settings-privacy-delete-after-hint = Kemm jibqgħu l-fajls qabel jitneħħew
 
 ## Security: summary at the top of the page
 
@@ -223,7 +220,6 @@ settings-encryption-chip-unlock = Żblokka biċ-ċippa tas-sigurtà
 settings-encryption-chip-unlock-on = Sakemm xejn ma jibdel kif jistartja dan il-kompjuter
 settings-encryption-chip-unlock-off = Biex ma tittajpjax passphrase meta jistartja
 settings-encryption-pin = PIN meta jistartja
-settings-encryption-pin-description = Tittajpjah qabel ma tiżblokka d-diska
 settings-encryption-change = Ibdel
 settings-encryption-add-pin-row = Żid PIN meta jistartja
 settings-encryption-add-pin-row-description = Iżżomm id-diska msakkra anke jekk il-kompjuter jittieħed
@@ -292,7 +288,6 @@ settings-recovery-fresh-description = Iċ-ċavetta ta’ qabel ma tibqax taħdem
 
 settings-passwords-title = Passwords u ċwievet
 settings-passwords-not-running = Iċ-ċurkett taċ-ċwievet mhux qed jaħdem
-settings-passwords-not-running-description = Il-passwords u ċ-ċwievet jidhru hawn ladarba jibda
 settings-passwords-locked = Imsakkar
 settings-passwords-contents = { $count ->
     [0] Għadu ma ġie ssejvjat xejn
@@ -317,7 +312,6 @@ settings-passwords-pin = Itlob PIN wara l-marka tas-saba’
 settings-passwords-pin-locked = Żblokka ċ-ċurkett taċ-ċwievet biex tibdel dan
 settings-passwords-pin-description = Biex marka tas-saba’ waħedha ma tkunx tista’ tiżblokkahom
 settings-passwords-lock-with-screen = Sakkar mal-iskrin
-settings-passwords-lock-with-screen-description = Jissakkru u jiżblokkaw flimkien mal-iskrin
 settings-passwords-apps = Dħul u attività tal-apps
 settings-passwords-apps-locked = Żblokka ċ-ċurkett taċ-ċwievet biex tarahom
 settings-passwords-apps-description = X’iżommu l-apps hawn u meta użawh
@@ -353,7 +347,6 @@ settings-passwords-history-denied-unnamed = { $app } ma tħalliex juża password
 settings-passwords-history-signed = { $app } iffirma b’“{ $item }”
 settings-passwords-history-signed-unnamed = { $app } iffirma b’password issejvjata
 settings-passwords-history-clear = Ħassar l-istorja
-settings-passwords-history-clear-description = Insa liema apps użaw iċ-ċurkett taċ-ċwievet u meta
 settings-passwords-history-clear-button = Ħassar
 settings-passwords-history-clear-title = Tħassar l-aċċess riċenti?
 settings-passwords-history-clear-confirm = Il-lista ta’ liema apps użaw iċ-ċurkett taċ-ċwievet u meta titħassar. Il-passwords u ċ-ċwievet issejvjati jibqgħu kif inhuma.

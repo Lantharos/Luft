@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Permitir que las aplicaciones usen el micró
 
 settings-privacy-file-history = Historial de archivos
 settings-privacy-remember-files = Recordar los archivos usados recientemente
-settings-privacy-remember-files-hint = Las aplicaciones pueden mostrar los últimos archivos que has abierto
 settings-privacy-keep-history = Conservar el historial durante
 settings-privacy-keep-forever = Siempre
 settings-privacy-clear-history = Borrar el historial
-settings-privacy-clear-history-hint = Olvida ahora mismo todos los archivos de la lista
 settings-privacy-clear = Borrar
 settings-privacy-clear-title = ¿Borrar el historial de archivos?
 settings-privacy-clear-description = Las aplicaciones dejarán de mostrar los archivos que has abierto recientemente. Los archivos se quedan donde están.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Vaciar la papelera automáticamente
 settings-privacy-delete-temp = Eliminar archivos temporales automáticamente
 settings-privacy-delete-temp-hint = Tus archivos de carpetas temporales que nada ha usado últimamente
 settings-privacy-delete-after = Eliminar tras
-settings-privacy-delete-after-hint = Cuánto tiempo se guardan los archivos antes de quitarlos
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Desbloquear con el chip de seguridad
 settings-encryption-chip-unlock-on = Mientras nada cambie la forma en que arranca este ordenador
 settings-encryption-chip-unlock-off = Para no tener que escribir una frase de contraseña al arrancar
 settings-encryption-pin = PIN al arrancar
-settings-encryption-pin-description = Lo escribes antes de que se desbloquee el disco
 settings-encryption-change = Cambiar
 settings-encryption-add-pin-row = Añadir un PIN al arrancar
 settings-encryption-add-pin-row-description = Mantiene el disco bloqueado aunque alguien se lleve el ordenador
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Tu clave anterior ya no funciona. Guarda e
 
 settings-passwords-title = Contraseñas y claves
 settings-passwords-not-running = Tu llavero no está en marcha
-settings-passwords-not-running-description = Tus contraseñas y claves aparecerán aquí en cuanto se inicie
 settings-passwords-locked = Bloqueado
 settings-passwords-contents = { $count ->
     [0] Aún no hay nada guardado
@@ -290,7 +285,6 @@ settings-passwords-pin = Pedir un PIN después de la huella
 settings-passwords-pin-locked = Desbloquea tu llavero para cambiar esto
 settings-passwords-pin-description = Así una huella sola no puede desbloquearlas
 settings-passwords-lock-with-screen = Bloquear con la pantalla
-settings-passwords-lock-with-screen-description = Se bloquean y desbloquean junto con la pantalla
 settings-passwords-apps = Inicios de sesión y actividad de aplicaciones
 settings-passwords-apps-locked = Desbloquea tu llavero para verlas
 settings-passwords-apps-description = Lo que las aplicaciones guardan aquí y cuándo lo usaron
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } no ha tenido permiso para u
 settings-passwords-history-signed = { $app } ha firmado con «{ $item }»
 settings-passwords-history-signed-unnamed = { $app } ha firmado con una contraseña guardada
 settings-passwords-history-clear = Borrar el historial
-settings-passwords-history-clear-description = Olvida qué aplicaciones han usado tu llavero y cuándo
 settings-passwords-history-clear-button = Borrar
 settings-passwords-history-clear-title = ¿Borrar los accesos recientes?
 settings-passwords-history-clear-confirm = Se borrará la lista de qué aplicaciones han usado tu llavero y cuándo. Tus contraseñas y claves guardadas no cambian.

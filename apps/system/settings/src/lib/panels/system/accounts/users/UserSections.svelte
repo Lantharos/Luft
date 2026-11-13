@@ -68,7 +68,7 @@
 			<span class="max-w-[220px] truncate">{me.realName}</span>
 			<button type="button" class="button" onclick={startRename}>{t('settings-users-change')}</button>
 		</Row>
-		<Row title={t('settings-users-password')} description={t('settings-users-password-description')}>
+		<Row title={t('settings-users-password')}>
 			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? t('settings-users-change') : t('settings-users-password-set')}</button>
 		</Row>
 	</Section>
@@ -93,7 +93,7 @@
 {/if}
 
 {#if renaming}
-	<Dialog title={t('settings-users-name-title')} description={t('settings-users-name-dialog-description')} onclose={() => (renaming = false)}>
+	<Dialog title={t('settings-users-name-title')} onclose={() => (renaming = false)}>
 		<TextField label={t('settings-users-name')} bind:value={draft} error={renameError} live onkeydown={(event) => event.key === 'Enter' && draft.trim() && saveName()} />
 		{#snippet actions()}
 			<button type="button" class="button" onclick={() => (renaming = false)}>{t('settings-users-cancel')}</button>

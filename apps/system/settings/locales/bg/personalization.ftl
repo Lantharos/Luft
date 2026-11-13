@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Сивосин
 ## Appearance: text and motion
 
 settings-appearance-text-size = Размер на текста
-settings-appearance-text-size-description = Увеличава или намалява текста във всички приложения
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Работният плот прозира п
 settings-see-through-app = Прозрачно { $app }
 settings-see-through-add = Добавяне на приложение
 settings-see-through-add-title = Прозрачно приложение
-settings-see-through-add-description = Прозорците му пропускат това, което е зад тях.
 settings-see-through-shows = Какво прозира
 settings-see-through-shows-everything = Всичко отзад
 settings-see-through-shows-wallpaper = Само тапета

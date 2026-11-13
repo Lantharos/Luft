@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Дозволити програмам вик
 
 settings-privacy-file-history = Журнал файлів
 settings-privacy-remember-files = Запам’ятовувати нещодавно використані файли
-settings-privacy-remember-files-hint = Програми можуть показувати файли, які ви відкривали останніми
 settings-privacy-keep-history = Зберігати журнал
 settings-privacy-keep-forever = Завжди
 settings-privacy-clear-history = Очистити журнал
-settings-privacy-clear-history-hint = Одразу забути всі файли зі списку
 settings-privacy-clear = Очистити
 settings-privacy-clear-title = Очистити журнал файлів?
 settings-privacy-clear-description = Програми більше не показуватимуть нещодавно відкриті файли. Самі файли залишаться на своїх місцях.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Автоматично очищати кошик
 settings-privacy-delete-temp = Автоматично видаляти тимчасові файли
 settings-privacy-delete-temp-hint = Ваші файли в тимчасових папках, які останнім часом не використовувалися
 settings-privacy-delete-after = Видаляти через
-settings-privacy-delete-after-hint = Скільки файли зберігаються, перш ніж їх буде видалено
 
 ## Security: summary at the top of the page
 
@@ -217,7 +214,6 @@ settings-encryption-chip-unlock = Розблоковувати процесор�
 settings-encryption-chip-unlock-on = Доки ніщо не змінює спосіб запуску цього комп’ютера
 settings-encryption-chip-unlock-off = Щоб не вводити парольну фразу під час запуску
 settings-encryption-pin = PIN-код під час запуску
-settings-encryption-pin-description = Ви вводите його, перш ніж диск розблокується
 settings-encryption-change = Змінити
 settings-encryption-add-pin-row = Додати PIN-код під час запуску
 settings-encryption-add-pin-row-description = Диск залишається заблокованим, навіть якщо комп’ютер заберуть
@@ -284,7 +280,6 @@ settings-recovery-fresh-description = Попередній ключ більше
 
 settings-passwords-title = Паролі й ключі
 settings-passwords-not-running = В’язка ключів не працює
-settings-passwords-not-running-description = Ваші паролі й ключі з’являться тут, щойно вона запуститься
 settings-passwords-locked = Заблоковано
 settings-passwords-contents = { $count ->
     [0] Ще нічого не збережено
@@ -308,7 +303,6 @@ settings-passwords-pin = Запитувати PIN-код після відбит
 settings-passwords-pin-locked = Розблокуйте в’язку ключів, щоб змінити це
 settings-passwords-pin-description = Щоб самого відбитка не було досить для розблокування
 settings-passwords-lock-with-screen = Блокувати разом з екраном
-settings-passwords-lock-with-screen-description = Блокуються й розблоковуються разом з екраном
 settings-passwords-apps = Облікові дані та активність програм
 settings-passwords-apps-locked = Розблокуйте в’язку ключів, щоб їх побачити
 settings-passwords-apps-description = Що програми зберігають тут і коли це використовували
@@ -343,7 +337,6 @@ settings-passwords-history-denied-unnamed = Програмі { $app } не до�
 settings-passwords-history-signed = Програма { $app } підписала за допомогою «{ $item }»
 settings-passwords-history-signed-unnamed = Програма { $app } підписала за допомогою збереженого пароля
 settings-passwords-history-clear = Очистити журнал
-settings-passwords-history-clear-description = Забути, які програми й коли користувалися в’язкою ключів
 settings-passwords-history-clear-button = Очистити
 settings-passwords-history-clear-title = Очистити нещодавній доступ?
 settings-passwords-history-clear-confirm = Список програм, що користувалися в’язкою ключів, і часу доступу буде стерто. Збережені паролі й ключі залишаться без змін.

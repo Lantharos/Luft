@@ -67,7 +67,6 @@ settings-network-airplane = Lennukirežiim
     .description = Lülitab välja kõik traadita ühendused
 settings-network-airplane-hardware = Sisse lülitatud riistvaralülitiga
 settings-network-known = Tuntud võrgud
-    .description = Võrgud, millega see arvuti on varem ühendunud, olgu need läheduses või mitte
 settings-network-known-count =
     { $count ->
         [one] { $count } salvestatud võrk
@@ -92,7 +91,6 @@ settings-network-wifi-saved-password-failed = Salvestatud salasõna ei sobinud. 
 settings-network-wifi-settings = Võrgu seadistused
 settings-network-wifi-searching = Võrkude otsimine
 settings-network-hidden = Ühenda peidetud võrguga
-    .description = Sisesta võrgu nimi ja turbe tüüp.
 settings-network-hidden-name = Võrgu nimi
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Impordi failist
     .description = WireGuardi, OpenVPN-i ja muud VPN-i konfiguratsioonifailid
 settings-network-vpn-importing = Importimine
 settings-network-wireguard = Seadista WireGuard
-    .description = Sisesta andmed, mille said VPN-i pakkujalt või serverist
 settings-network-wireguard-dialog = Need andmed saad oma VPN-i pakkujalt või serveri omanikult.
 settings-network-wireguard-name-example = Kodu VPN
 settings-network-wireguard-public-key = Avalik võti { $key }

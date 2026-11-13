@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Tillat at apper bruker mikrofonen
 
 settings-privacy-file-history = Filhistorikk
 settings-privacy-remember-files = Husk nylig brukte filer
-settings-privacy-remember-files-hint = Apper kan vise filene du åpnet sist
 settings-privacy-keep-history = Behold historikk i
 settings-privacy-keep-forever = For alltid
 settings-privacy-clear-history = Tøm historikk
-settings-privacy-clear-history-hint = Glem alle filene i listen nå
 settings-privacy-clear = Tøm
 settings-privacy-clear-title = Vil du tømme filhistorikken?
 settings-privacy-clear-description = Apper viser ikke lenger filene du har åpnet nylig. Selve filene blir der de er.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Tøm papirkurven automatisk
 settings-privacy-delete-temp = Slett midlertidige filer automatisk
 settings-privacy-delete-temp-hint = Filene dine i midlertidige mapper som ikke har vært brukt på en stund
 settings-privacy-delete-after = Slett etter
-settings-privacy-delete-after-hint = Hvor lenge filene blir liggende før de fjernes
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Lås opp med sikkerhetsbrikken
 settings-encryption-chip-unlock-on = Så lenge ingenting endrer hvordan denne datamaskinen starter
 settings-encryption-chip-unlock-off = Så du slipper å skrive inn en passfrase ved oppstart
 settings-encryption-pin = PIN-kode ved oppstart
-settings-encryption-pin-description = Du skriver den inn før disken låses opp
 settings-encryption-change = Endre
 settings-encryption-add-pin-row = Legg til en PIN-kode ved oppstart
 settings-encryption-add-pin-row-description = Holder disken låst selv om noen tar datamaskinen
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Den forrige nøkkelen virker ikke lenger. 
 
 settings-passwords-title = Passord og nøkler
 settings-passwords-not-running = Nøkkelringen kjører ikke
-settings-passwords-not-running-description = Passordene og nøklene dine vises her når den starter
 settings-passwords-locked = Låst
 settings-passwords-contents = { $count ->
     [0] Ingenting lagret ennå
@@ -290,7 +285,6 @@ settings-passwords-pin = Be om PIN-kode etter fingeravtrykket
 settings-passwords-pin-locked = Lås opp nøkkelringen for å endre dette
 settings-passwords-pin-description = Så et fingeravtrykk alene ikke kan låse dem opp
 settings-passwords-lock-with-screen = Lås sammen med skjermen
-settings-passwords-lock-with-screen-description = De låses og låses opp sammen med skjermen
 settings-passwords-apps = Pålogginger og aktivitet i apper
 settings-passwords-apps-locked = Lås opp nøkkelringen for å se dem
 settings-passwords-apps-description = Hva apper lagrer her, og når de brukte det
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } fikk ikke bruke et lagret p
 settings-passwords-history-signed = { $app } signerte med «{ $item }»
 settings-passwords-history-signed-unnamed = { $app } signerte med et lagret passord
 settings-passwords-history-clear = Tøm historikk
-settings-passwords-history-clear-description = Glem hvilke apper som har brukt nøkkelringen, og når
 settings-passwords-history-clear-button = Tøm
 settings-passwords-history-clear-title = Vil du tømme nylig tilgang?
 settings-passwords-history-clear-confirm = Listen over hvilke apper som har brukt nøkkelringen, og når, slettes. De lagrede passordene og nøklene dine blir som de er.

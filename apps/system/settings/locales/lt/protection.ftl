@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Leisti programoms naudoti mikrofoną
 
 settings-privacy-file-history = Failų istorija
 settings-privacy-remember-files = Įsiminti neseniai naudotus failus
-settings-privacy-remember-files-hint = Programos gali rodyti paskutinius jūsų atidarytus failus
 settings-privacy-keep-history = Istoriją laikyti
 settings-privacy-keep-forever = Visada
 settings-privacy-clear-history = Valyti istoriją
-settings-privacy-clear-history-hint = Iš karto pamiršti visus sąrašo failus
 settings-privacy-clear = Valyti
 settings-privacy-clear-title = Valyti failų istoriją?
 settings-privacy-clear-description = Programos neberodys neseniai atidarytų failų. Patys failai liks savo vietose.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Automatiškai išvalyti šiukšlinę
 settings-privacy-delete-temp = Automatiškai naikinti laikinuosius failus
 settings-privacy-delete-temp-hint = Jūsų failai laikinuosiuose aplankuose, kurių pastaruoju metu niekas nenaudojo
 settings-privacy-delete-after = Naikinti po
-settings-privacy-delete-after-hint = Kiek laiko failai laikomi, kol bus pašalinti
 
 ## Security: summary at the top of the page
 
@@ -217,7 +214,6 @@ settings-encryption-chip-unlock = Atrakinti saugos lustu
 settings-encryption-chip-unlock-on = Kol niekas nepakeičia, kaip šis kompiuteris paleidžiamas
 settings-encryption-chip-unlock-off = Kad paleidžiant nereikėtų įvesti slaptafrazės
 settings-encryption-pin = PIN kodas paleidžiant
-settings-encryption-pin-description = Įvedamas prieš atrakinant diską
 settings-encryption-change = Keisti
 settings-encryption-add-pin-row = Pridėti PIN kodą paleidžiant
 settings-encryption-add-pin-row-description = Diskas lieka užrakintas, net jei kompiuteris paimamas
@@ -284,7 +280,6 @@ settings-recovery-fresh-description = Ankstesnis raktas nebeveikia. Šį laikyki
 
 settings-passwords-title = Slaptažodžiai ir raktai
 settings-passwords-not-running = Raktinė neveikia
-settings-passwords-not-running-description = Jūsų slaptažodžiai ir raktai bus rodomi čia, kai ji pasileis
 settings-passwords-locked = Užrakinta
 settings-passwords-contents = { $count ->
     [0] Kol kas nieko neįrašyta
@@ -308,7 +303,6 @@ settings-passwords-pin = Po piršto atspaudo prašyti PIN kodo
 settings-passwords-pin-locked = Atrakinkite raktinę, kad tai pakeistumėte
 settings-passwords-pin-description = Kad vien piršto atspaudu jų nebūtų galima atrakinti
 settings-passwords-lock-with-screen = Užrakinti kartu su ekranu
-settings-passwords-lock-with-screen-description = Jie užrakinami ir atrakinami kartu su ekranu
 settings-passwords-apps = Programų prisijungimai ir veikla
 settings-passwords-apps-locked = Atrakinkite raktinę, kad jas pamatytumėte
 settings-passwords-apps-description = Ką programos čia laiko ir kada tuo naudojosi
@@ -343,7 +337,6 @@ settings-passwords-history-denied-unnamed = Programai { $app } nebuvo leista pan
 settings-passwords-history-signed = { $app } panaudojo „{ $item }“ pasirašyti
 settings-passwords-history-signed-unnamed = { $app } panaudojo įrašytą slaptažodį pasirašyti
 settings-passwords-history-clear = Valyti istoriją
-settings-passwords-history-clear-description = Pamiršti, kurios programos ir kada naudojo jūsų raktinę
 settings-passwords-history-clear-button = Valyti
 settings-passwords-history-clear-title = Valyti naujausią prieigą?
 settings-passwords-history-clear-confirm = Sąrašas, kurios programos ir kada naudojo jūsų raktinę, bus ištrintas. Įrašyti slaptažodžiai ir raktai liks nepakeisti.

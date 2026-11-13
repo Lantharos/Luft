@@ -72,7 +72,6 @@ settings-appearance-tint-slate = Skrilasta
 ## Appearance: text and motion
 
 settings-appearance-text-size = Velikost besedila
-settings-appearance-text-size-description = Poveča ali pomanjša besedilo v vseh aplikacijah
 
 ## Taskbar
 
@@ -216,7 +215,6 @@ settings-see-through-description = Namizje se vidi skozi okna teh aplikacij. Vkl
 settings-see-through-app = Prosojno: { $app }
 settings-see-through-add = Dodaj aplikacijo
 settings-see-through-add-title = Naredi aplikacijo prosojno
-settings-see-through-add-description = Njena okna prepuščajo tisto, kar je za njimi.
 settings-see-through-shows = Kaj se vidi
 settings-see-through-shows-everything = Vse zadaj
 settings-see-through-shows-wallpaper = Samo ozadje

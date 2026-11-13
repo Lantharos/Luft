@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Pissarra
 ## Appearance: text and motion
 
 settings-appearance-text-size = Mida del text
-settings-appearance-text-size-description = Fa el text més gran o més petit a totes les aplicacions
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Deixa veure l'escriptori a través de les fin
 settings-see-through-app = { $app } translúcida
 settings-see-through-add = Afegeix una aplicació
 settings-see-through-add-title = Fes translúcida una aplicació
-settings-see-through-add-description = Les seves finestres deixen veure el que hi ha al darrere.
 settings-see-through-shows = Què es veu
 settings-see-through-shows-everything = Tot el que hi ha darrere
 settings-see-through-shows-wallpaper = Només el fons de pantalla

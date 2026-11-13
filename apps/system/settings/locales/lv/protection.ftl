@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Atļaut lietotnēm izmantot mikrofonu
 
 settings-privacy-file-history = Failu vēsture
 settings-privacy-remember-files = Atcerēties nesen izmantotos failus
-settings-privacy-remember-files-hint = Lietotnes var rādīt pēdējos atvērtos failus
 settings-privacy-keep-history = Glabāt vēsturi
 settings-privacy-keep-forever = Bez termiņa
 settings-privacy-clear-history = Notīrīt vēsturi
-settings-privacy-clear-history-hint = Nekavējoties aizmirst visus saraksta failus
 settings-privacy-clear = Notīrīt
 settings-privacy-clear-title = Notīrīt failu vēsturi?
 settings-privacy-clear-description = Lietotnes vairs nerādīs nesen atvērtos failus. Paši faili paliek savās vietās.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Automātiski iztukšot atkritni
 settings-privacy-delete-temp = Automātiski dzēst pagaidu failus
 settings-privacy-delete-temp-hint = Jūsu faili pagaidu mapēs, kas pēdējā laikā nav izmantoti
 settings-privacy-delete-after = Dzēšanas termiņš
-settings-privacy-delete-after-hint = Cik ilgi faili tiek glabāti, pirms tos noņem
 
 ## Security: summary at the top of the page
 
@@ -211,7 +208,6 @@ settings-encryption-chip-unlock = Atbloķēt ar drošības mikroshēmu
 settings-encryption-chip-unlock-on = Ja vien nekas nemaina to, kā šis dators startē
 settings-encryption-chip-unlock-off = Lai startējot nebūtu jāievada paroles frāze
 settings-encryption-pin = PIN startējot
-settings-encryption-pin-description = To ievadāt, pirms disks tiek atbloķēts
 settings-encryption-change = Mainīt
 settings-encryption-add-pin-row = Pievienot PIN startēšanai
 settings-encryption-add-pin-row-description = Disks paliek bloķēts, pat ja dators tiek paņemts
@@ -276,7 +272,6 @@ settings-recovery-fresh-description = Iepriekšējā atslēga vairs nedarbojas. 
 
 settings-passwords-title = Paroles un atslēgas
 settings-passwords-not-running = Atslēgu saišķis nedarbojas
-settings-passwords-not-running-description = Kad tas startēs, šeit parādīsies jūsu paroles un atslēgas
 settings-passwords-locked = Bloķēts
 settings-passwords-contents = { $count ->
     [0] Vēl nekas nav saglabāts
@@ -299,7 +294,6 @@ settings-passwords-pin = Pēc pirksta nospieduma prasīt PIN
 settings-passwords-pin-locked = Atbloķējiet atslēgu saišķi, lai to mainītu
 settings-passwords-pin-description = Lai tikai ar pirksta nospiedumu tās nevarētu atbloķēt
 settings-passwords-lock-with-screen = Bloķēt kopā ar ekrānu
-settings-passwords-lock-with-screen-description = Tās tiek bloķētas un atbloķētas kopā ar ekrānu
 settings-passwords-apps = Lietotņu pierakstīšanās dati un darbības
 settings-passwords-apps-locked = Atbloķējiet atslēgu saišķi, lai tās redzētu
 settings-passwords-apps-description = Ko lietotnes šeit glabā un kad tās to izmantoja
@@ -333,7 +327,6 @@ settings-passwords-history-denied-unnamed = Lietotnei { $app } netika atļauts i
 settings-passwords-history-signed = Lietotne { $app } parakstīja ar „{ $item }“
 settings-passwords-history-signed-unnamed = Lietotne { $app } parakstīja ar saglabātu paroli
 settings-passwords-history-clear = Notīrīt vēsturi
-settings-passwords-history-clear-description = Aizmirst, kuras lietotnes un kad izmantoja atslēgu saišķi
 settings-passwords-history-clear-button = Notīrīt
 settings-passwords-history-clear-title = Notīrīt neseno piekļuvi?
 settings-passwords-history-clear-confirm = Saraksts ar to, kuras lietotnes un kad izmantoja atslēgu saišķi, tiks izdzēsts. Saglabātās paroles un atslēgas paliek nemainītas.

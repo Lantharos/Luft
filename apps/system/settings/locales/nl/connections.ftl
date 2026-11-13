@@ -66,7 +66,6 @@ settings-network-airplane = Vliegtuigmodus
     .description = Schakelt alle draadloze verbindingen uit
 settings-network-airplane-hardware = Ingeschakeld met een hardwareschakelaar
 settings-network-known = Bekende netwerken
-    .description = Netwerken waarmee deze computer eerder verbonden was, in de buurt of niet
 settings-network-known-count = { $count ->
         [one] { $count } opgeslagen netwerk
        *[other] { $count } opgeslagen netwerken
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Het opgeslagen wachtwoord werkte n
 settings-network-wifi-settings = Netwerkinstellingen
 settings-network-wifi-searching = Netwerken zoeken
 settings-network-hidden = Verbinden met een verborgen netwerk
-    .description = Voer de naam van het netwerk in en hoe het beveiligd is.
 settings-network-hidden-name = Netwerknaam
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importeren uit een bestand
     .description = Configuratiebestanden van WireGuard, OpenVPN en andere VPN’s
 settings-network-vpn-importing = Importeren
 settings-network-wireguard = WireGuard instellen
-    .description = Voer de gegevens van je VPN-aanbieder of server in
 settings-network-wireguard-dialog = Je VPN-aanbieder of de eigenaar van de server kan je deze gegevens geven.
 settings-network-wireguard-name-example = VPN thuis
 settings-network-wireguard-public-key = Openbare sleutel { $key }

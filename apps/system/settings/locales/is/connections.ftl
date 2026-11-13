@@ -66,7 +66,6 @@ settings-network-airplane = Flugstilling
     .description = Slekkur á öllum þráðlausum tengingum
 settings-network-airplane-hardware = Kveikt með vélbúnaðarrofa
 settings-network-known = Þekkt net
-    .description = Net sem þessi tölva hefur tengst áður, hvort sem þau eru nálæg eða ekki
 settings-network-known-count = { $count ->
         [one] { $count } vistað net
        *[other] { $count } vistuð net
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Vistaða lykilorðið virkaði ekk
 settings-network-wifi-settings = Netstillingar
 settings-network-wifi-searching = Leitar að netum
 settings-network-hidden = Tengjast földu neti
-    .description = Sláðu inn heiti netsins og veldu hvernig það er varið.
 settings-network-hidden-name = Heiti nets
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Flytja inn úr skrá
     .description = WireGuard, OpenVPN og aðrar VPN-stillingaskrár
 settings-network-vpn-importing = Flytur inn
 settings-network-wireguard = Setja upp WireGuard
-    .description = Sláðu inn upplýsingarnar frá VPN-þjónustunni þinni eða netþjóninum
 settings-network-wireguard-dialog = VPN-þjónustan þín eða eigandi netþjónsins getur gefið þér þessar upplýsingar.
 settings-network-wireguard-name-example = VPN heima
 settings-network-wireguard-public-key = Dreifilykill { $key }

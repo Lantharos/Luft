@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Сиво-сина
 ## Appearance: text and motion
 
 settings-appearance-text-size = Големина на текстот
-settings-appearance-text-size-description = Го зголемува или намалува текстот во сите апликации
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Работната површина се гл
 settings-see-through-app = Проѕирно: { $app }
 settings-see-through-add = Додај апликација
 settings-see-through-add-title = Направи ја апликацијата проѕирна
-settings-see-through-add-description = Нејзините прозорци го пропуштаат она што е зад нив.
 settings-see-through-shows = Што се гледа
 settings-see-through-shows-everything = Сè што е зад
 settings-see-through-shows-wallpaper = Само позадината

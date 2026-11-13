@@ -66,7 +66,6 @@ settings-network-airplane = Regjimi i aeroplanit
     .description = Çaktivizon çdo lidhje pa tel
 settings-network-airplane-hardware = Aktivizuar nga një çelës fizik
 settings-network-known = Rrjetet e njohura
-    .description = Rrjetet ku është lidhur më parë ky kompjuter, afër apo jo
 settings-network-known-count = { $count ->
         [one] { $count } rrjet i ruajtur
        *[other] { $count } rrjete të ruajtura
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Fjalëkalimi i ruajtur nuk funksio
 settings-network-wifi-settings = Cilësimet e rrjetit
 settings-network-wifi-searching = Po kërkohen rrjete
 settings-network-hidden = Lidhu me një rrjet të fshehur
-    .description = Shkruaj emrin e rrjetit dhe si është mbrojtur.
 settings-network-hidden-name = Emri i rrjetit
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importo nga një skedar
     .description = WireGuard, OpenVPN dhe skedarë të tjerë konfigurimi VPN
 settings-network-vpn-importing = Po importohet
 settings-network-wireguard = Konfiguro WireGuard
-    .description = Shkruaj të dhënat nga ofruesi ose serveri yt VPN
 settings-network-wireguard-dialog = Këto të dhëna mund të t’i japë ofruesi yt VPN ose pronari i serverit.
 settings-network-wireguard-name-example = VPN-ja e shtëpisë
 settings-network-wireguard-public-key = Çelësi publik { $key }

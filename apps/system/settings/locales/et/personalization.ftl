@@ -71,7 +71,6 @@ settings-appearance-tint-slate = Hallikassinine
 ## Appearance: text and motion
 
 settings-appearance-text-size = Teksti suurus
-settings-appearance-text-size-description = Muudab teksti rakendustes suuremaks või väiksemaks
 
 ## Taskbar
 
@@ -213,7 +212,6 @@ settings-see-through-description = Töölaud paistab nende rakenduste akende kau
 settings-see-through-app = Läbipaistev { $app }
 settings-see-through-add = Lisa rakendus
 settings-see-through-add-title = Muuda rakendus läbipaistvaks
-settings-see-through-add-description = Selle aknad lasevad tagapoolse läbi paista.
 settings-see-through-shows = Mis paistab läbi
 settings-see-through-shows-everything = Kõik tagapool
 settings-see-through-shows-wallpaper = Ainult taustapilt
@@ -267,7 +265,6 @@ settings-accessibility-flash-screen = Ekraan
 ## Extensions
 
 settings-extensions-custom-color = Kohandatud
-settings-extensions-description = Lisamoodulid täiendavad töölaua funktsionaalsust. Saad neid siin lülitada välja, muuda nende toimimist või ka neid eemaldada.
 settings-extensions-none = Ühtegi lisamoodulit pole paigaldatud
 settings-extensions-unavailable = Kui töölaud ei tööta, siis lisamooduli ei saa kuvada.
 settings-extensions-on = Lülita „{ $name }“ sisse

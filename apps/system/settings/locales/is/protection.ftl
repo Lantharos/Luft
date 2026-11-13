@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Leyfa forritum að nota hljóðnemann
 
 settings-privacy-file-history = Skráaferill
 settings-privacy-remember-files = Muna nýlega notaðar skrár
-settings-privacy-remember-files-hint = Forrit geta sýnt skrárnar sem þú opnaðir síðast
 settings-privacy-keep-history = Geyma feril í
 settings-privacy-keep-forever = Alltaf
 settings-privacy-clear-history = Hreinsa feril
-settings-privacy-clear-history-hint = Gleyma öllum skrám á listanum strax
 settings-privacy-clear = Hreinsa
 settings-privacy-clear-title = Hreinsa skráaferil?
 settings-privacy-clear-description = Forrit sýna ekki lengur skrárnar sem þú opnaðir nýlega. Skrárnar sjálfar eru áfram þar sem þær eru.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Tæma ruslafötuna sjálfkrafa
 settings-privacy-delete-temp = Eyða bráðabirgðaskrám sjálfkrafa
 settings-privacy-delete-temp-hint = Skrárnar þínar í bráðabirgðamöppum sem ekkert hefur notað nýlega
 settings-privacy-delete-after = Eyða eftir
-settings-privacy-delete-after-hint = Hve lengi skrár eru geymdar áður en þær eru fjarlægðar
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Opna með öryggiskubbnum
 settings-encryption-chip-unlock-on = Svo lengi sem ekkert breytir því hvernig tölvan ræsist
 settings-encryption-chip-unlock-off = Svo þú þurfir ekki að slá inn lykilsetningu við ræsingu
 settings-encryption-pin = PIN-númer við ræsingu
-settings-encryption-pin-description = Þú slærð það inn áður en diskurinn opnast
 settings-encryption-change = Breyta
 settings-encryption-add-pin-row = Bæta við PIN-númeri við ræsingu
 settings-encryption-add-pin-row-description = Heldur diskinum læstum jafnvel þótt tölvunni sé stolið
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Fyrri lykillinn virkar ekki lengur. Geymdu
 
 settings-passwords-title = Lykilorð og lyklar
 settings-passwords-not-running = Lyklakippan er ekki í gangi
-settings-passwords-not-running-description = Lykilorðin þín og lyklar birtast hér þegar hún fer í gang
 settings-passwords-locked = Læst
 settings-passwords-contents = { $count ->
     [0] Ekkert vistað enn
@@ -290,7 +285,6 @@ settings-passwords-pin = Biðja um PIN-númer á eftir fingrafarinu
 settings-passwords-pin-locked = Taktu lyklakippuna úr lás til að breyta þessu
 settings-passwords-pin-description = Svo fingrafar eitt og sér geti ekki opnað þau
 settings-passwords-lock-with-screen = Læsa með skjánum
-settings-passwords-lock-with-screen-description = Þau læsast og opnast með skjánum
 settings-passwords-apps = Innskráningar og virkni forrita
 settings-passwords-apps-locked = Taktu lyklakippuna úr lás til að sjá þau
 settings-passwords-apps-description = Hvað forrit geyma hér og hvenær þau notuðu það
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } fékk ekki að nota vistað
 settings-passwords-history-signed = { $app } undirritaði með „{ $item }“
 settings-passwords-history-signed-unnamed = { $app } undirritaði með vistuðu lykilorði
 settings-passwords-history-clear = Hreinsa feril
-settings-passwords-history-clear-description = Gleyma hvaða forrit notuðu lyklakippuna og hvenær
 settings-passwords-history-clear-button = Hreinsa
 settings-passwords-history-clear-title = Hreinsa nýlegan aðgang?
 settings-passwords-history-clear-confirm = Listanum yfir hvaða forrit notuðu lyklakippuna og hvenær er eytt. Vistuð lykilorð og lyklar haldast óbreytt.

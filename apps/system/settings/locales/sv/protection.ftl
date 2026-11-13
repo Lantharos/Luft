@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Tillåt att appar använder mikrofonen
 
 settings-privacy-file-history = Filhistorik
 settings-privacy-remember-files = Kom ihåg senast använda filer
-settings-privacy-remember-files-hint = Appar kan visa filerna du öppnade senast
 settings-privacy-keep-history = Spara historik i
 settings-privacy-keep-forever = För alltid
 settings-privacy-clear-history = Rensa historik
-settings-privacy-clear-history-hint = Glöm alla filer i listan nu
 settings-privacy-clear = Rensa
 settings-privacy-clear-title = Vill du rensa filhistoriken?
 settings-privacy-clear-description = Appar visar inte längre filerna du öppnade nyligen. Själva filerna ligger kvar där de är.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Töm papperskorgen automatiskt
 settings-privacy-delete-temp = Radera tillfälliga filer automatiskt
 settings-privacy-delete-temp-hint = Dina filer i tillfälliga mappar som inget har använt på sistone
 settings-privacy-delete-after = Radera efter
-settings-privacy-delete-after-hint = Hur länge filerna ligger kvar innan de tas bort
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Lås upp med säkerhetschippet
 settings-encryption-chip-unlock-on = Så länge inget ändrar hur datorn startar
 settings-encryption-chip-unlock-off = Så att du slipper skriva en lösenfras vid start
 settings-encryption-pin = PIN-kod vid start
-settings-encryption-pin-description = Du skriver den innan disken låses upp
 settings-encryption-change = Ändra
 settings-encryption-add-pin-row = Lägg till en PIN-kod vid start
 settings-encryption-add-pin-row-description = Håller disken låst även om någon tar datorn
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Den tidigare nyckeln fungerar inte längre
 
 settings-passwords-title = Lösenord och nycklar
 settings-passwords-not-running = Nyckelringen körs inte
-settings-passwords-not-running-description = Dina lösenord och nycklar visas här när den har startat
 settings-passwords-locked = Låst
 settings-passwords-contents = { $count ->
     [0] Inget sparat än
@@ -290,7 +285,6 @@ settings-passwords-pin = Fråga efter en PIN-kod efter fingeravtrycket
 settings-passwords-pin-locked = Lås upp nyckelringen för att ändra det här
 settings-passwords-pin-description = Så att ett fingeravtryck inte ensamt kan låsa upp dem
 settings-passwords-lock-with-screen = Lås tillsammans med skärmen
-settings-passwords-lock-with-screen-description = De låses och låses upp samtidigt som skärmen
 settings-passwords-apps = Inloggningar och aktivitet i appar
 settings-passwords-apps-locked = Lås upp nyckelringen för att se dem
 settings-passwords-apps-description = Vad appar sparar här och när de använde det
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } fick inte använda ett spar
 settings-passwords-history-signed = { $app } signerade med ”{ $item }”
 settings-passwords-history-signed-unnamed = { $app } signerade med ett sparat lösenord
 settings-passwords-history-clear = Rensa historik
-settings-passwords-history-clear-description = Glöm vilka appar som har använt nyckelringen och när
 settings-passwords-history-clear-button = Rensa
 settings-passwords-history-clear-title = Vill du rensa senaste åtkomst?
 settings-passwords-history-clear-confirm = Listan över vilka appar som har använt nyckelringen och när raderas. Dina sparade lösenord och nycklar finns kvar som de är.

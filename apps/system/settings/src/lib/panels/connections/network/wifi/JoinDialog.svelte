@@ -91,7 +91,7 @@
 
 <Dialog
 	title={hidden ? t('settings-network-hidden') : t('settings-network-join', { network: ssid ?? '' })}
-	description={hidden ? t('settings-network-hidden.description') : corporate ? t('settings-network-join-enterprise') : t('settings-network-join-password')}
+	description={hidden ? undefined : corporate ? t('settings-network-join-enterprise') : t('settings-network-join-password')}
 	wide={corporate}
 	{onclose}
 >

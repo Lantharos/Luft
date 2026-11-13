@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Dozvoli aplikacijama da koriste mikrofon
 
 settings-privacy-file-history = Istorija datoteka
 settings-privacy-remember-files = Pamti nedavno korišćene datoteke
-settings-privacy-remember-files-hint = Aplikacije mogu da prikažu datoteke koje ste poslednje otvarali
 settings-privacy-keep-history = Čuvaj istoriju
 settings-privacy-keep-forever = Zauvek
 settings-privacy-clear-history = Obriši istoriju
-settings-privacy-clear-history-hint = Odmah zaboravi sve datoteke sa liste
 settings-privacy-clear = Obriši
 settings-privacy-clear-title = Obrisati istoriju datoteka?
 settings-privacy-clear-description = Aplikacije više neće prikazivati datoteke koje ste nedavno otvarali. Same datoteke ostaju gde jesu.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Automatski isprazni smeće
 settings-privacy-delete-temp = Automatski briši privremene datoteke
 settings-privacy-delete-temp-hint = Vaše datoteke u privremenim fasciklama koje ništa nije skoro koristilo
 settings-privacy-delete-after = Izbriši posle
-settings-privacy-delete-after-hint = Koliko dugo datoteke ostaju pre nego što se uklone
 
 ## Security: summary at the top of the page
 
@@ -207,7 +204,6 @@ settings-encryption-chip-unlock = Otključavanje bezbednosnim čipom
 settings-encryption-chip-unlock-on = Sve dok se ništa ne promeni u načinu pokretanja ovog računara
 settings-encryption-chip-unlock-off = Da ne biste unosili pristupnu frazu pri pokretanju
 settings-encryption-pin = PIN pri pokretanju
-settings-encryption-pin-description = Unosite ga pre nego što se disk otključa
 settings-encryption-change = Promeni
 settings-encryption-add-pin-row = Dodaj PIN pri pokretanju
 settings-encryption-add-pin-row-description = Disk ostaje zaključan čak i ako neko odnese računar
@@ -272,7 +268,6 @@ settings-recovery-fresh-description = Prethodni ključ više ne radi. Čuvajte o
 
 settings-passwords-title = Lozinke i ključevi
 settings-passwords-not-running = Privezak ključeva nije pokrenut
-settings-passwords-not-running-description = Vaše lozinke i ključevi prikazuju se ovde čim se pokrene
 settings-passwords-locked = Zaključano
 settings-passwords-contents = { $count ->
     [0] Još ništa nije sačuvano
@@ -295,7 +290,6 @@ settings-passwords-pin = Traži PIN posle otiska prsta
 settings-passwords-pin-locked = Otključajte privezak ključeva da biste ovo promenili
 settings-passwords-pin-description = Da ih sam otisak prsta ne bi mogao otključati
 settings-passwords-lock-with-screen = Zaključavaj zajedno sa ekranom
-settings-passwords-lock-with-screen-description = Zaključavaju se i otključavaju zajedno sa ekranom
 settings-passwords-apps = Prijave i aktivnost aplikacija
 settings-passwords-apps-locked = Otključajte privezak ključeva da biste ih videli
 settings-passwords-apps-description = Šta aplikacije ovde čuvaju i kada su to koristile
@@ -329,7 +323,6 @@ settings-passwords-history-denied-unnamed = Aplikaciji { $app } nije dozvoljeno 
 settings-passwords-history-signed = Aplikacija { $app } je potpisala pomoću „{ $item }“
 settings-passwords-history-signed-unnamed = Aplikacija { $app } je potpisala pomoću sačuvane lozinke
 settings-passwords-history-clear = Obriši istoriju
-settings-passwords-history-clear-description = Zaboravi koje su aplikacije koristile privezak ključeva i kada
 settings-passwords-history-clear-button = Obriši
 settings-passwords-history-clear-title = Obrisati nedavni pristup?
 settings-passwords-history-clear-confirm = Lista aplikacija koje su koristile privezak ključeva i kada se briše. Sačuvane lozinke i ključevi ostaju kakvi jesu.

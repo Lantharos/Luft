@@ -53,13 +53,11 @@ settings-users-name-description = Shown when you sign in and on the lock screen
 # Button, verb
 settings-users-change = Change
 settings-users-password = Password
-settings-users-password-description = Used to sign in and unlock this computer
 settings-users-password-set = Set password
 settings-users-administrator = Administrator
 settings-users-standard = Standard account
 settings-users-others = Other people on this computer
 settings-users-name-title = Change your name
-settings-users-name-dialog-description = This is how you appear when you sign in.
 settings-users-save = Save
 settings-users-cancel = Cancel
 settings-users-close = Close
@@ -69,7 +67,6 @@ settings-users-try-again = Try again
 settings-users-remove = Remove
 settings-users-password-change-title = Change your password
 settings-users-password-set-title = Set a password
-settings-users-password-dialog-description = You’ll use it to sign in and unlock this computer.
 settings-users-password-current = Current password
 settings-users-password-new = New password
 settings-users-password-new-placeholder = { $count ->
@@ -98,7 +95,7 @@ settings-users-password-fair = Fair. Adding a few more characters makes it stron
 settings-users-password-strong = Strong
 settings-users-fingerprints = Fingerprints
 settings-users-fingerprint-add = Add a fingerprint
-settings-users-fingerprint-add-description = Sign in and unlock with your finger instead of typing your password
+settings-users-fingerprint-add-description = Sign in and unlock without typing your password
 settings-users-fingerprint-choose = Choose which finger to add.
 settings-users-finger = Finger
 # Button, verb: begin scanning the finger
@@ -141,7 +138,7 @@ settings-login-automatic-description = Signs in without a password at startup
 settings-login-automatic-off = Off
 # $name is the person who would be signed in
 settings-login-automatic-title = Sign { $name } in automatically?
-settings-login-automatic-warning = Nothing asks for a password while this computer starts, so anyone who can switch it on will reach { $name }’s desktop and files without typing anything. Passwords in Luft Keyring stay locked until the password is typed. The lock screen still asks for the password after the computer sleeps or the screen locks, while Lock the screen when it turns off is on under Privacy, but restarting the computer gets past it.
+settings-login-automatic-warning = Anyone who can switch this computer on will reach { $name }’s desktop and files without a password. Saved passwords and keys stay locked until the password is typed. The lock screen still asks for it after sleep, but restarting gets past it.
 settings-login-automatic-confirm = Sign in automatically
 
 ## Updates
@@ -244,10 +241,10 @@ settings-updates-channel-waiting-nightly = Moves to nightly once a nightly build
 settings-updates-moving-stable = Moving to the stable version
 settings-updates-moving-nightly = Moving to the nightly builds
 settings-updates-nightly-confirm-title = Switch to nightly builds?
-settings-updates-nightly-confirm-body = Nightly builds come out every day with the newest changes. They get less testing than the stable version, so you’ll see new things sooner and more things broken. You can switch back at any time.
+settings-updates-nightly-confirm-body = Nightly builds come out every day and get less testing, so you’ll see new things sooner and more things broken. You can switch back at any time.
 settings-updates-nightly-confirm = Switch to nightly
 settings-updates-stable-confirm-title = Switch to stable?
-settings-updates-stable-confirm-body = Stable versions are tested before they come out and change less often. This computer keeps getting nightly updates until a stable version is as new as its build, which may already be the case, and then stays on stable. You can switch back at any time.
+settings-updates-stable-confirm-body = Stable versions are tested and change less often. This computer keeps getting nightly updates until a stable version catches up with its build. You can switch back at any time.
 settings-updates-stable-confirm = Switch to stable
 settings-updates-stay-nightly-title = Stay on nightly?
 settings-updates-stay-nightly-body = This computer won’t move to stable and keeps getting a new build every day.
@@ -260,7 +257,7 @@ settings-updates-done = Done
 ## About
 
 settings-about-report = Report a problem
-settings-about-report-description = Tell us what went wrong, however small. Opens Luft’s issue tracker with your version filled in.
+settings-about-report-description = Opens Luft’s issue tracker with your version filled in.
 
 settings-about-device-name = Device name
 # Button, verb
@@ -312,7 +309,7 @@ settings-about-done = Done
 ## Language & Region
 
 settings-region-language = Language
-settings-region-language-description = Kestrel and Luft’s apps use it right away
+settings-region-language-description = The desktop and Luft’s apps switch right away
 settings-region-language-next-sign-in = Apps that are already open switch after they restart, the login screen after you sign out
 # Choice in the Formats list that follows the chosen language
 settings-region-formats-language = Same as the language
@@ -411,7 +408,7 @@ settings-accounts-continue = Continue
 # $provider is the service's name, like "iCloud Drive"
 settings-accounts-working = Talking to { $provider }
 # $provider is the service's name, like "OneDrive"
-settings-accounts-finish-in-browser = Finish signing in with { $provider } in your browser. Luft never sees your password, and this updates on its own once you’re done.
+settings-accounts-finish-in-browser = Finish signing in with { $provider } in your browser. Luft never sees your password.
 settings-accounts-no-browser = No browser opened. Copy the link and open it in a browser.
 settings-accounts-open-again = Open the page again
 settings-accounts-copy-link = Copy the link
@@ -445,9 +442,8 @@ settings-apps-startup-app = Open { $app } when you sign in
 settings-apps-startup-remove = Remove { $app } from startup
 settings-apps-startup-add = Add app
 settings-apps-startup-add-title = Add a startup app
-settings-apps-startup-add-description = Choose an app to open every time you sign in.
 settings-apps-reopen = Reopen apps when I sign in
-settings-apps-reopen-description = Apps open again where you left them after you sign out or turn off the computer, as they always do after an update
+settings-apps-reopen-description = Apps open again where you left them after you sign out or turn off the computer
 settings-apps-search = Search apps
 settings-apps-no-match = No apps match your search
 settings-apps-cancel = Cancel

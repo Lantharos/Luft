@@ -58,7 +58,6 @@
 
 <Dialog
 	title={user.hasPassword ? t('settings-users-password-change-title') : t('settings-users-password-set-title')}
-	description={t('settings-users-password-dialog-description')}
 	{onclose}
 >
 	{#if user.hasPassword}

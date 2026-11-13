@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Siniharmaa
 ## Appearance: text and motion
 
 settings-appearance-text-size = Tekstin koko
-settings-appearance-text-size-description = Suurentaa tai pienentää tekstiä kaikissa sovelluksissa
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Työpöytä näkyy näiden sovellusten ikkuno
 settings-see-through-app = Läpikuultava { $app }
 settings-see-through-add = Lisää sovellus
 settings-see-through-add-title = Tee sovelluksesta läpikuultava
-settings-see-through-add-description = Sen ikkunoiden läpi näkyy, mitä niiden takana on.
 settings-see-through-shows = Mitä näkyy läpi
 settings-see-through-shows-everything = Kaikki taustalla oleva
 settings-see-through-shows-wallpaper = Vain taustakuva

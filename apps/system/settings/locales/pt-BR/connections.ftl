@@ -66,7 +66,6 @@ settings-network-airplane = Modo avião
     .description = Desativa todas as conexões sem fio
 settings-network-airplane-hardware = Ativado por um botão físico
 settings-network-known = Redes conhecidas
-    .description = Redes às quais este computador já se conectou, próximas ou não
 settings-network-known-count = { $count ->
         [one] { $count } rede salva
        *[other] { $count } redes salvas
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = A senha salva não funcionou. Digi
 settings-network-wifi-settings = Configurações da rede
 settings-network-wifi-searching = Procurando redes
 settings-network-hidden = Conectar a uma rede oculta
-    .description = Digite o nome da rede e o tipo de segurança.
 settings-network-hidden-name = Nome da rede
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importar de um arquivo
     .description = Arquivos de configuração do WireGuard, OpenVPN e outras VPNs
 settings-network-vpn-importing = Importando
 settings-network-wireguard = Configurar o WireGuard
-    .description = Digite os dados do seu provedor ou servidor de VPN
 settings-network-wireguard-dialog = O provedor de VPN ou o responsável pelo servidor pode passar esses dados.
 settings-network-wireguard-name-example = VPN de casa
 settings-network-wireguard-public-key = Chave pública { $key }

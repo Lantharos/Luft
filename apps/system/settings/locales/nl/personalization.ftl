@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Leisteen
 ## Appearance: text and motion
 
 settings-appearance-text-size = Tekstgrootte
-settings-appearance-text-size-description = Maakt tekst in alle apps groter of kleiner
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Laat het bureaublad door de vensters van deze
 settings-see-through-app = { $app } doorschijnend
 settings-see-through-add = App toevoegen
 settings-see-through-add-title = Een app doorschijnend maken
-settings-see-through-add-description = De vensters laten zien wat erachter ligt.
 settings-see-through-shows = Wat doorschijnt
 settings-see-through-shows-everything = Alles erachter
 settings-see-through-shows-wallpaper = Alleen de achtergrond

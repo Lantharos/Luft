@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Mikrofonhasználat engedélyezése az alkalm
 
 settings-privacy-file-history = Fájlelőzmények
 settings-privacy-remember-files = Legutóbb használt fájlok megjegyzése
-settings-privacy-remember-files-hint = Az alkalmazások megjeleníthetik a legutóbb megnyitott fájlokat
 settings-privacy-keep-history = Előzmények megőrzése
 settings-privacy-keep-forever = Mindig
 settings-privacy-clear-history = Előzmények törlése
-settings-privacy-clear-history-hint = A lista összes fájljának azonnali elfelejtése
 settings-privacy-clear = Törlés
 settings-privacy-clear-title = Törli a fájlelőzményeket?
 settings-privacy-clear-description = Az alkalmazások többé nem jelenítik meg a legutóbb megnyitott fájlokat. Maguk a fájlok a helyükön maradnak.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Lomtár automatikus ürítése
 settings-privacy-delete-temp = Ideiglenes fájlok automatikus törlése
 settings-privacy-delete-temp-hint = Az ideiglenes mappákban lévő saját fájlok, amelyeket mostanában semmi sem használt
 settings-privacy-delete-after = Törlés ennyi idő után
-settings-privacy-delete-after-hint = Mennyi ideig maradnak meg a fájlok az eltávolításuk előtt
 
 ## Security: summary at the top of the page
 
@@ -205,7 +202,6 @@ settings-encryption-chip-unlock = Feloldás a biztonsági chippel
 settings-encryption-chip-unlock-on = Amíg semmi sem változtat a számítógép indításán
 settings-encryption-chip-unlock-off = Így indításkor nem kell jelmondatot beírnia
 settings-encryption-pin = PIN-kód indításkor
-settings-encryption-pin-description = A lemez feloldása előtt kell beírni
 settings-encryption-change = Módosítás
 settings-encryption-add-pin-row = PIN-kód hozzáadása indításhoz
 settings-encryption-add-pin-row-description = A lemez zárolva marad akkor is, ha elviszik a számítógépet
@@ -268,7 +264,6 @@ settings-recovery-fresh-description = Az előző kulcs már nem működik. Ezt t
 
 settings-passwords-title = Jelszavak és kulcsok
 settings-passwords-not-running = A kulcstartó nem fut
-settings-passwords-not-running-description = A jelszavak és kulcsok az elindulása után jelennek meg itt
 settings-passwords-locked = Zárolva
 settings-passwords-contents = { $count ->
     [0] Még nincs semmi mentve
@@ -290,7 +285,6 @@ settings-passwords-pin = PIN-kód kérése az ujjlenyomat után
 settings-passwords-pin-locked = A módosításhoz oldja fel a kulcstartót
 settings-passwords-pin-description = Így egy ujjlenyomat önmagában nem oldja fel őket
 settings-passwords-lock-with-screen = Zárolás a képernyővel együtt
-settings-passwords-lock-with-screen-description = A képernyővel együtt zárolódnak és oldódnak fel
 settings-passwords-apps = Alkalmazások bejelentkezései és tevékenysége
 settings-passwords-apps-locked = A megtekintésükhöz oldja fel a kulcstartót
 settings-passwords-apps-description = Mit tárolnak itt az alkalmazások, és mikor használták
@@ -323,7 +317,6 @@ settings-passwords-history-denied-unnamed = { $app } nem használhatott egy ment
 settings-passwords-history-signed = { $app } aláírt ezzel: „{ $item }”
 settings-passwords-history-signed-unnamed = { $app } aláírt egy mentett jelszóval
 settings-passwords-history-clear = Előzmények törlése
-settings-passwords-history-clear-description = Annak elfelejtése, hogy mely alkalmazások és mikor használták a kulcstartót
 settings-passwords-history-clear-button = Törlés
 settings-passwords-history-clear-title = Törli a legutóbbi hozzáféréseket?
 settings-passwords-history-clear-confirm = Törlődik a lista arról, hogy mely alkalmazások és mikor használták a kulcstartót. A mentett jelszavak és kulcsok változatlanok maradnak.

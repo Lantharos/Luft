@@ -70,7 +70,6 @@ settings-appearance-tint-slate = Grár
 ## Appearance: text and motion
 
 settings-appearance-text-size = Textastærð
-settings-appearance-text-size-description = Stækkar eða minnkar texta í öllum forritum
 
 ## Taskbar
 
@@ -210,7 +209,6 @@ settings-see-through-description = Láttu skjáborðið sjást í gegnum glugga 
 settings-see-through-app = Gegnsætt { $app }
 settings-see-through-add = Bæta við forriti
 settings-see-through-add-title = Gera forrit gegnsætt
-settings-see-through-add-description = Gluggar þess hleypa því sem er á bak við í gegn.
 settings-see-through-shows = Hvað sést í gegn
 settings-see-through-shows-everything = Allt fyrir aftan
 settings-see-through-shows-wallpaper = Aðeins bakgrunnsmyndin

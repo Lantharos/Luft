@@ -66,7 +66,6 @@ settings-network-airplane = Uçak modu
     .description = Tüm kablosuz bağlantıları kapatır
 settings-network-airplane-hardware = Donanım anahtarıyla açıldı
 settings-network-known = Bilinen ağlar
-    .description = Bu bilgisayarın daha önce katıldığı ağlar, yakında olsun ya da olmasın
 settings-network-known-count = { $count ->
         [one] { $count } kayıtlı ağ
        *[other] { $count } kayıtlı ağ
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = Kayıtlı parola işe yaramadı. P
 settings-network-wifi-settings = Ağ ayarları
 settings-network-wifi-searching = Ağlar aranıyor
 settings-network-hidden = Gizli bir ağa bağlan
-    .description = Ağın adını ve nasıl korunduğunu girin.
 settings-network-hidden-name = Ağ adı
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Dosyadan içe aktar
     .description = WireGuard, OpenVPN ve diğer VPN yapılandırma dosyaları
 settings-network-vpn-importing = İçe aktarılıyor
 settings-network-wireguard = WireGuard’ı kur
-    .description = VPN sağlayıcınızdan ya da sunucunuzdan aldığınız bilgileri girin
 settings-network-wireguard-dialog = Bu bilgileri VPN sağlayıcınız ya da sunucunun sahibi verebilir.
 settings-network-wireguard-name-example = Ev VPN’i
 settings-network-wireguard-public-key = Ortak anahtar { $key }

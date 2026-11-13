@@ -71,7 +71,6 @@ settings-appearance-tint-slate = Ardezie
 ## Appearance: text and motion
 
 settings-appearance-text-size = Mărime text
-settings-appearance-text-size-description = Mărește sau micșorează textul în toate aplicațiile
 
 ## Taskbar
 
@@ -213,7 +212,6 @@ settings-see-through-description = Lasă desktopul să se vadă prin ferestrele 
 settings-see-through-app = { $app } translucidă
 settings-see-through-add = Adaugă o aplicație
 settings-see-through-add-title = Fă o aplicație translucidă
-settings-see-through-add-description = Ferestrele ei lasă să se vadă ce e în spate.
 settings-see-through-shows = Ce se vede
 settings-see-through-shows-everything = Tot ce e în spate
 settings-see-through-shows-wallpaper = Doar imaginea de fundal

@@ -59,7 +59,7 @@
 			/>
 		{/snippet}
 	</Row>
-	<Row title={t('settings-mouse-touchpad-tap')} description={t('settings-mouse-touchpad-tap-description')} disabled={off}>
+	<Row title={t('settings-mouse-touchpad-tap')} disabled={off}>
 		<Switch label={t('settings-mouse-touchpad-tap')} disabled={off} checked={touchpad.values['tap-to-click'] ?? false} onchange={(on) => touchpad.set('tap-to-click', on)} />
 	</Row>
 	<Row title={t('settings-mouse-natural-scrolling')} description={t('settings-mouse-touchpad-natural-scrolling-description')} disabled={off}>

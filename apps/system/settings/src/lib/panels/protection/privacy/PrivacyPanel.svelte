@@ -131,7 +131,7 @@
 </Section>
 
 <Section title={t('settings-privacy-file-history')}>
-	<Row title={t('settings-privacy-remember-files')} description={t('settings-privacy-remember-files-hint')}>
+	<Row title={t('settings-privacy-remember-files')}>
 		<Switch label={t('settings-privacy-remember-files')} checked={remembering} onchange={(on) => privacy.set('remember-recent-files', on)} />
 	</Row>
 	<Row title={t('settings-privacy-keep-history')} disabled={!remembering}>
@@ -143,7 +143,7 @@
 			onchange={(age) => privacy.set('recent-files-max-age', age)}
 		/>
 	</Row>
-	<Row title={t('settings-privacy-clear-history')} description={t('settings-privacy-clear-history-hint')}>
+	<Row title={t('settings-privacy-clear-history')}>
 		<button type="button" class="button" onclick={() => (clearing = true)}>{t('settings-privacy-clear')}</button>
 	</Row>
 </Section>
@@ -170,7 +170,7 @@
 			onchange={(on) => housekeeping.set('remove-old-screenshots', on)}
 		/>
 	</Row>
-	<Row title={t('settings-privacy-delete-after')} description={t('settings-privacy-delete-after-hint')} disabled={!cleaning}>
+	<Row title={t('settings-privacy-delete-after')} disabled={!cleaning}>
 		<Select
 			label={t('settings-privacy-delete-after')}
 			options={including(fileAges, privacy.values['old-files-age'], days)}

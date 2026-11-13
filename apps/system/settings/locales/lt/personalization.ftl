@@ -72,7 +72,6 @@ settings-appearance-tint-slate = Pilkšva
 ## Appearance: text and motion
 
 settings-appearance-text-size = Teksto dydis
-settings-appearance-text-size-description = Padidina arba sumažina tekstą visose programose
 
 ## Taskbar
 
@@ -216,7 +215,6 @@ settings-see-through-description = Darbalaukis matosi pro šių programų langus
 settings-see-through-app = Permatoma: { $app }
 settings-see-through-add = Pridėti programą
 settings-see-through-add-title = Padaryti programą permatomą
-settings-see-through-add-description = Jos langai praleidžia tai, kas už jų.
 settings-see-through-shows = Kas matosi kiaurai
 settings-see-through-shows-everything = Viskas, kas už
 settings-see-through-shows-wallpaper = Tik fono paveikslėlis

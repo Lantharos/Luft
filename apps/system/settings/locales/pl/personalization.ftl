@@ -72,7 +72,6 @@ settings-appearance-tint-slate = Grafitowy
 ## Appearance: text and motion
 
 settings-appearance-text-size = Rozmiar tekstu
-settings-appearance-text-size-description = Powiększa lub pomniejsza tekst we wszystkich aplikacjach
 
 ## Taskbar
 
@@ -216,7 +215,6 @@ settings-see-through-description = Pulpit prześwituje przez okna tych aplikacji
 settings-see-through-app = Przezroczyste: { $app }
 settings-see-through-add = Dodaj aplikację
 settings-see-through-add-title = Uczyń aplikację przezroczystą
-settings-see-through-add-description = Jej okna przepuszczają to, co jest za nimi.
 settings-see-through-shows = Co prześwituje
 settings-see-through-shows-everything = Wszystko z tyłu
 settings-see-through-shows-wallpaper = Tylko tapeta

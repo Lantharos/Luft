@@ -16,7 +16,7 @@
 {:else if extensions.unavailable}
 	<p class="px-2 text-[13px] text-[var(--text-muted)]">{t('settings-extensions-unavailable')}</p>
 {:else if extensions.list}
-	<Section description={t('settings-extensions-description')}>
+	<Section>
 		{#each extensions.list as extension (extension.id)}
 			<Row title={extension.name} description={summary(extension)} truncate onclick={() => (app.section = extension.id.toLowerCase())}>
 				{#if extension.state !== 'invalid'}

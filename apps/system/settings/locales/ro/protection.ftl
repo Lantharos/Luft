@@ -36,11 +36,9 @@ settings-privacy-microphone-allow = Permite aplicațiilor să folosească microf
 
 settings-privacy-file-history = Istoric fișiere
 settings-privacy-remember-files = Reține fișierele folosite recent
-settings-privacy-remember-files-hint = Aplicațiile pot afișa fișierele deschise cel mai recent
 settings-privacy-keep-history = Păstrează istoricul
 settings-privacy-keep-forever = Pentru totdeauna
 settings-privacy-clear-history = Șterge istoricul
-settings-privacy-clear-history-hint = Elimină acum toate fișierele din listă
 settings-privacy-clear = Șterge
 settings-privacy-clear-title = Ștergeți istoricul fișierelor?
 settings-privacy-clear-description = Aplicațiile nu vor mai afișa fișierele deschise recent. Fișierele rămân unde sunt.
@@ -52,7 +50,6 @@ settings-privacy-empty-trash = Golește automat coșul de gunoi
 settings-privacy-delete-temp = Șterge automat fișierele temporare
 settings-privacy-delete-temp-hint = Fișierele din folderele temporare pe care nu le-a mai folosit nimic în ultima vreme
 settings-privacy-delete-after = Șterge după
-settings-privacy-delete-after-hint = Cât timp rămân fișierele înainte de a fi eliminate
 
 ## Security: summary at the top of the page
 
@@ -211,7 +208,6 @@ settings-encryption-chip-unlock = Deblocare cu cipul de securitate
 settings-encryption-chip-unlock-on = Cât timp nimic nu schimbă modul în care pornește acest computer
 settings-encryption-chip-unlock-off = Ca să nu mai tastați o frază de acces la pornire
 settings-encryption-pin = PIN la pornire
-settings-encryption-pin-description = Îl tastați înainte de deblocarea discului
 settings-encryption-change = Schimbă
 settings-encryption-add-pin-row = Adaugă un PIN la pornire
 settings-encryption-add-pin-row-description = Discul rămâne blocat chiar dacă cineva ia computerul
@@ -276,7 +272,6 @@ settings-recovery-fresh-description = Cheia anterioară nu mai funcționează. P
 
 settings-passwords-title = Parole și chei
 settings-passwords-not-running = Portcheiul nu rulează
-settings-passwords-not-running-description = Parolele și cheile apar aici după ce pornește
 settings-passwords-locked = Blocat
 settings-passwords-contents = { $count ->
     [0] Nimic salvat încă
@@ -299,7 +294,6 @@ settings-passwords-pin = Cere un PIN după amprentă
 settings-passwords-pin-locked = Deblocați portcheiul pentru a schimba asta
 settings-passwords-pin-description = Ca amprenta să nu le poată debloca singură
 settings-passwords-lock-with-screen = Blocare odată cu ecranul
-settings-passwords-lock-with-screen-description = Se blochează și se deblochează odată cu ecranul
 settings-passwords-apps = Conectări și activitate ale aplicațiilor
 settings-passwords-apps-locked = Deblocați portcheiul pentru a le vedea
 settings-passwords-apps-description = Ce păstrează aplicațiile aici și când le-au folosit
@@ -333,7 +327,6 @@ settings-passwords-history-denied-unnamed = Aplicației { $app } nu i s-a permis
 settings-passwords-history-signed = Aplicația { $app } a semnat cu „{ $item }”
 settings-passwords-history-signed-unnamed = Aplicația { $app } a semnat cu o parolă salvată
 settings-passwords-history-clear = Șterge istoricul
-settings-passwords-history-clear-description = Uită ce aplicații au folosit portcheiul și când
 settings-passwords-history-clear-button = Șterge
 settings-passwords-history-clear-title = Ștergeți accesul recent?
 settings-passwords-history-clear-confirm = Lista cu aplicațiile care au folosit portcheiul și momentele în care l-au folosit este ștearsă. Parolele și cheile salvate rămân neschimbate.

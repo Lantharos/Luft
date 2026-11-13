@@ -66,7 +66,6 @@ settings-network-airplane = Mode d’avió
     .description = Desactiva totes les connexions sense fil
 settings-network-airplane-hardware = Activat per un interruptor físic
 settings-network-known = Xarxes conegudes
-    .description = Xarxes a què s’ha connectat abans aquest ordinador, tant si són a prop com si no
 settings-network-known-count = { $count ->
         [one] { $count } xarxa desada
        *[other] { $count } xarxes desades
@@ -90,7 +89,6 @@ settings-network-wifi-saved-password-failed = La contrasenya desada no ha funcio
 settings-network-wifi-settings = Configuració de la xarxa
 settings-network-wifi-searching = S’estan cercant xarxes
 settings-network-hidden = Connecta’t a una xarxa oculta
-    .description = Introduïu el nom de la xarxa i com està protegida.
 settings-network-hidden-name = Nom de la xarxa
 
 ## Network: joining a Wi‑Fi network
@@ -249,7 +247,6 @@ settings-network-vpn-import = Importa des d’un fitxer
     .description = Fitxers de configuració de WireGuard, OpenVPN i altres VPN
 settings-network-vpn-importing = S’està important
 settings-network-wireguard = Configura WireGuard
-    .description = Introduïu les dades del vostre proveïdor de VPN o del servidor
 settings-network-wireguard-dialog = El vostre proveïdor de VPN o el propietari del servidor us poden donar aquestes dades.
 settings-network-wireguard-name-example = VPN de casa
 settings-network-wireguard-public-key = Clau pública { $key }

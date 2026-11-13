@@ -51,8 +51,6 @@ impl Card {
         Ok(card)
     }
 
-    /// The kernel makes whoever opens a card nobody shows its master, which would keep the login screen off it
-    /// for as long as the card is held open without being shown, as on a computer started without a display.
     fn leave_master_to_whoever_shows_it(&self) {
         let _ = self.release_master_lock();
     }

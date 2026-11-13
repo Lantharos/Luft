@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { errorText, Row, Section, Segmented } from '@luft/ui';
+	import { channelName } from '#lib/account/channels.js';
 	import type { StoreDetails } from '#lib/bindings.js';
 	import { follow } from '#lib/catalog/store.js';
 	import type { AppDetails } from '#lib/catalog/types.js';
@@ -17,17 +18,18 @@
 
 	const WITH_SYSTEM = 'system';
 
-	const label = (channel: string) => channel.charAt(0).toUpperCase() + channel.slice(1);
-	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? 'Same as Luft' : label(choice) })));
+	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? 'Same as Luft' : channelName(choice) })));
 	const withSystem = $derived(store.choice === WITH_SYSTEM);
 	const ended = $derived(store.endedChannel);
 	const onOtherChannel = $derived(store.releaseChannel !== null && store.releaseChannel !== store.channel);
+	const invited = $derived(store.invited.includes(store.channel));
+	const about = $derived(invited ? `Only people ${store.developer || 'the developer'} invited get these.` : PREVIEWS[store.channel]);
 	const description = $derived(
 		[
-			ended ? `${label(ended)} has ended, so this now follows ${label(store.channel)}.` : null,
-			withSystem && !ended ? `Luft is on ${label(store.channel)}, so this is too.` : PREVIEWS[store.channel],
+			ended ? `${channelName(ended)} has ended, so this now follows ${channelName(store.channel)}.` : null,
+			withSystem && !ended ? `Luft is on ${channelName(store.channel)}, so this is too.` : about,
 			onOtherChannel ? `Its newest version right now is the ${store.releaseChannel} one.` : null,
-			installed && ended ? `You keep the version you have until a newer one is out on ${label(store.channel)}.` : null,
+			installed && ended ? `You keep the version you have until a newer one is out on ${channelName(store.channel)}.` : null,
 			installed && !ended && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null
 		]
 			.filter(Boolean)

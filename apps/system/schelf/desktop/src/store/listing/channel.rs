@@ -6,7 +6,7 @@ use std::sync::OnceLock;
 use luft_app::block_on;
 use luft_software::system::image::Deployments;
 
-use crate::store::device;
+use crate::store::{device, invited};
 
 pub const STABLE: &str = "stable";
 const PREVIEWS: [&str; 2] = ["beta", "nightly"];
@@ -107,8 +107,11 @@ impl Following {
     }
 }
 
+/// The invited channel you follow comes first, so losing it brings back
+/// the channel you followed before.
 pub fn following(id: &str) -> Following {
-    Following::decide(id, chosen().remove(&id.to_lowercase()), system)
+    let chosen = invited::followed(id).or_else(|| chosen().remove(&id.to_lowercase()));
+    Following::decide(id, chosen, system)
 }
 
 /// Whether one of Luft's own items follows a channel other than stable.
@@ -127,6 +130,9 @@ pub(super) fn remember(channels: &mut BTreeMap<String, String>, id: &str, channe
 }
 
 pub fn follow(id: &str, channel: &str) -> Result<(), String> {
+    if invited::follow(id, channel)? {
+        return Ok(());
+    }
     if channel != WITH_SYSTEM && channel != STABLE && !PREVIEWS.contains(&channel) {
         return Err(format!("Schelf doesn't offer the {channel} channel."));
     }
@@ -136,15 +142,22 @@ pub fn follow(id: &str, channel: &str) -> Result<(), String> {
     luft_app::files::replace(&path(), &text).map_err(|error| error.to_string())
 }
 
-/// The channels a page offers, stable first, out of the ones an app ships on.
-pub fn offered<'a>(shipping: impl IntoIterator<Item = &'a str>) -> Vec<String> {
+/// The channels a page offers, stable first, out of the ones an app ships
+/// on: the previews, then the ones you were `invited` to.
+pub fn offered<'a>(shipping: impl IntoIterator<Item = &'a str>, invited: &[String]) -> Vec<String> {
     let shipping: Vec<&str> = shipping.into_iter().collect();
-    std::iter::once(STABLE)
+    let mut offered: Vec<String> = std::iter::once(STABLE)
         .chain(
             PREVIEWS
                 .into_iter()
                 .filter(|channel| shipping.contains(channel)),
         )
         .map(str::to_owned)
-        .collect()
+        .collect();
+    for channel in invited {
+        if shipping.contains(&channel.as_str()) && !offered.contains(channel) {
+            offered.push(channel.clone());
+        }
+    }
+    offered
 }

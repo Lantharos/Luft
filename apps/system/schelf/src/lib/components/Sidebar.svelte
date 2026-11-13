@@ -4,8 +4,10 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import Puzzle from '@lucide/svelte/icons/puzzle';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import UserRound from '@lucide/svelte/icons/user-round';
 	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES } from '#lib/catalog/categories.js';
+	import { account } from '#lib/state/account.svelte.js';
 	import { activity, percent } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation, type Route } from '#lib/state/navigation.svelte.js';
@@ -84,6 +86,10 @@
 			{/if}
 		</div>
 	{/if}
+	<button type="button" class="nav-item" onclick={() => account.show()}>
+		<UserRound size={18} />
+		<span class="flex-1 truncate">{account.signedIn ? account.signedIn.name || account.signedIn.email : 'Account'}</span>
+	</button>
 </aside>
 
 <style>

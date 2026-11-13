@@ -1,6 +1,7 @@
 pub mod catalog;
 pub mod device;
 pub mod install;
+pub mod invited;
 pub mod listing;
 pub mod record;
 pub mod revocations;
@@ -142,7 +143,7 @@ fn entry(id: &str) -> Result<Option<CatalogApp>, String> {
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    window
+    invited::register(window)
         .command("store_refresh", |Empty {}| refresh())
         .command("store_state", |Empty {}| Ok(state()))
         .command("store_revocations", |Empty {}| {

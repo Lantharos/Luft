@@ -8,7 +8,9 @@ use luft_software::task::Task;
 use sha2::{Digest, Sha256};
 
 use crate::catalog::cache;
+use crate::store::invited;
 use crate::store::listing::Artifact;
+use crate::store::signed::NO_ACCESS;
 
 const CHANGED: &str =
     "The download didn't match what schelf.store published, so it wasn't installed.";
@@ -31,6 +33,19 @@ fn sha256(path: &Path) -> Result<String, String> {
         .collect())
 }
 
+/// Asks for `url`, with your session when it's a file schelf.store keeps for
+/// the people it invited.
+fn ask(url: &str) -> Result<ureq::http::Response<ureq::Body>, String> {
+    let mut request = http::agent().get(url);
+    if let Some(session) = invited::session_for(url)? {
+        request = request.header("authorization", format!("Bearer {session}"));
+    }
+    request.call().map_err(|error| match error {
+        ureq::Error::StatusCode(401) => NO_ACCESS.to_owned(),
+        error => http::failure(error),
+    })
+}
+
 /// Downloads the artifact, keeping it only when it's exactly the file the
 /// store signed for.
 pub fn verified(
@@ -45,8 +60,8 @@ pub fn verified(
     let folder = cache::folder().join("store/downloads");
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(format!("{id}.download"));
-    http::download(
-        &format!("{}?reason={reason}", artifact.url),
+    http::save(
+        ask(&format!("{}?reason={reason}", artifact.url))?,
         &path,
         Some(artifact.size),
         task,

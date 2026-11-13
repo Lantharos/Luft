@@ -134,7 +134,7 @@ fn a_rollout_that_has_not_reached_the_device_is_skipped() {
 #[test]
 fn the_page_offers_stable_and_the_preview_channels_an_app_ships_on() {
     let tide = channels_of_tide();
-    assert_eq!(tide.channels(LINUX), [STABLE, "beta", "nightly"]);
+    assert_eq!(tide.channels(LINUX, &[]), [STABLE, "beta", "nightly"]);
     let custom = listing(
         "sabine",
         &[
@@ -142,8 +142,21 @@ fn the_page_offers_stable_and_the_preview_channels_an_app_ships_on() {
             release("1.0.0", STABLE, 100, &[archive()]),
         ],
     );
-    assert_eq!(custom.channels(LINUX), [STABLE]);
+    assert_eq!(custom.channels(LINUX, &[]), [STABLE]);
     assert!(channel::follow("io.example.Tide", "alpha").is_err());
+}
+
+#[test]
+fn the_page_offers_an_invited_channel_once_it_has_a_release() {
+    let invited = listing(
+        "sabine",
+        &[
+            release("2.0.0-rc.1", "testers", 100, &[archive()]),
+            release("1.0.0", STABLE, 100, &[archive()]),
+        ],
+    );
+    let channels = ["testers".to_owned(), "early".to_owned()];
+    assert_eq!(invited.channels(LINUX, &channels), [STABLE, "testers"]);
 }
 
 #[test]
@@ -205,7 +218,7 @@ fn linux_files_luft_cannot_install_are_offered_to_download() {
         .download(&on(TIDE, None, None), LINUX, EVERYONE)
         .unwrap();
     assert_eq!(artifact.name(), "tide_amd64.deb");
-    assert_eq!(tide.channels(LINUX), [STABLE]);
+    assert_eq!(tide.channels(LINUX, &[]), [STABLE]);
 }
 
 #[test]
@@ -382,7 +395,7 @@ fn an_ended_channel_leaves_the_page_but_keeps_its_releases_in_the_listing() {
         release("2.0.0-beta.3", "beta", 100, &[archive()]),
         release("1.9.0", STABLE, 100, &[archive()]),
     ]);
-    assert_eq!(tide.channels(LINUX), [STABLE]);
+    assert_eq!(tide.channels(LINUX, &[]), [STABLE]);
     assert_eq!(newest_version(&tide, "beta"), Some("2.0.0-beta.3"));
 }
 

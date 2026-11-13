@@ -3,6 +3,15 @@
 import { invoke, listen, type CallOptions } from "@lantharos/sabine";
 
 export const commands = {
+	accountDismiss: (options?: CallOptions) => invoke<AccountState>("account_dismiss", {}, options),
+	accountRefresh: (options?: CallOptions) => invoke<AccountState>("account_refresh", {}, options),
+	accountSignIn: (options?: CallOptions) => invoke<Approval>("account_sign_in", {}, options),
+	accountSignInCancel: (options?: CallOptions) => invoke<null>("account_sign_in_cancel", {}, options),
+	accountSignInPoll: (params: {
+		intervalMs: number,
+	}, options?: CallOptions) => invoke<SignIn>("account_sign_in_poll", params, options),
+	accountSignOut: (options?: CallOptions) => invoke<AccountState>("account_sign_out", {}, options),
+	accountState: (options?: CallOptions) => invoke<AccountState>("account_state", {}, options),
 	appActivationFiles: (params: {
 		arguments: string[],
 		workingDirectory?: string | null,
@@ -147,6 +156,18 @@ export const events = {
 	schelfOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("schelf.operations", callback),
 };
 
+/**  Who is signed in to schelf.store on this computer. */
+export type Account = {
+	email: string,
+	name: string,
+};
+
+export type AccountState = {
+	account: Account | null,
+	invitations: Invitation[],
+	notices: Notices,
+};
+
 export type Action = "install" | "remove" | "update";
 
 export type AddedSource = {
@@ -196,6 +217,16 @@ export type Appearance = {
 	posture: Posture,
 	keyboard: boolean,
 	locale: Locale,
+};
+
+/**
+ *  What signing in shows: the code to compare on the page that approves it,
+ *  and how long to wait between asking whether it was.
+ */
+export type Approval = {
+	code: string,
+	page: string,
+	intervalMs: number,
 };
 
 /**  Why an app or one of its versions was pulled or flagged. */
@@ -364,6 +395,14 @@ export type InstalledFromStore = {
 	block: Block | null,
 };
 
+/**  An invite-only channel of an app on schelf.store that you may follow. */
+export type Invitation = {
+	app: string,
+	name: string,
+	channel: string,
+	page: string,
+};
+
 export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore"; id: string; consent: Consent } | { kind: "updateStore"; id: string; consent: Consent } | { kind: "removeStore"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
 /**  Whether you let an app that asks to run unsandboxed do so. */
 fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
@@ -384,6 +423,12 @@ export type Locale = {
 	fixed: boolean,
 };
 
+/**  An invited channel you can't follow any more, to tell you about once. */
+export type Lost = {
+	name: string,
+	channel: string,
+};
+
 /**  Something an app looked for when it started and didn't find. */
 export type Missing = {
 	kind: Need,
@@ -398,6 +443,15 @@ export type Names = {
 };
 
 export type Need = "library" | "program" | "perlModule" | "pythonModule" | "typelib";
+
+/**
+ *  What to tell you about once: the channels you lost, and whether your
+ *  sign-in ended.
+ */
+export type Notices = {
+	lost: Lost[],
+	ended: boolean,
+};
 
 export type Notifications = {
 	allowed: boolean,
@@ -522,6 +576,8 @@ export type Setting = { setting: "allowed"; value: boolean } | { setting: "banne
 
 export type Severity = "block" | "warn";
 
+export type SignIn = { state: "waiting"; intervalMs: number } | { state: "approved"; account: Account } | { state: "declined" } | { state: "expired" };
+
 export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system" | "sabine" | "extension";
 
 export type SourceKey = {
@@ -557,6 +613,8 @@ export type StoreDetails = {
 	/**  What's picked on the page out of `choices`. */
 	choice: string,
 	choices: string[],
+	/**  The invite-only channels among `choices`. */
+	invited: string[],
 	version: string | null,
 	published: string | null,
 	notes: string,

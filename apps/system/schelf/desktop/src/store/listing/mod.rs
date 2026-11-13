@@ -13,8 +13,8 @@ use std::path::Path;
 use serde::Deserialize;
 
 use super::catalog::{Kind, Publisher};
-use super::device;
-use super::signed::{self, Age};
+use super::signed::Age;
+use super::{device, invited};
 use channel::Following;
 
 pub use access::{Declared, ExtensionAccess, ListenPort, permission_title, sandbox_lacks, widens};
@@ -80,13 +80,20 @@ pub struct Listing {
     #[serde(default)]
     ended_channels: BTreeMap<String, String>,
     releases: Vec<Release>,
+    /// Where schelf.store keeps the copy this was read from.
+    #[serde(skip)]
+    pub document: String,
 }
 
 impl Listing {
     /// A copy of a listing on disk, such as one shipped with the system.
     pub fn read(path: &Path) -> Result<Self, String> {
         let bytes = std::fs::read(path).map_err(|error| error.to_string())?;
-        serde_json::from_slice(&bytes).map_err(|error| error.to_string())
+        let listing: Self = serde_json::from_slice(&bytes).map_err(|error| error.to_string())?;
+        Ok(Self {
+            document: luft_store_seal::listing_document(&listing.id),
+            ..listing
+        })
     }
 
     fn text(&self) -> Option<&Text> {
@@ -256,9 +263,10 @@ impl Listing {
             .max_by(|(left, _), (right, _)| version::compare(&left.version, &right.version))
     }
 
-    /// The channels this app ships on for this device, that its page offers.
-    /// An ended channel isn't one of them.
-    fn channels(&self, platforms: &[&str]) -> Vec<String> {
+    /// The channels this app ships on for this device, that its page offers,
+    /// out of the public ones and the `invited` ones. An ended channel isn't
+    /// one of them.
+    fn channels(&self, platforms: &[&str], invited: &[String]) -> Vec<String> {
         channel::offered(
             self.releases
                 .iter()
@@ -267,6 +275,7 @@ impl Listing {
                         && !self.ended_channels.contains_key(&release.channel)
                 })
                 .map(|release| release.channel.as_str()),
+            invited,
         )
     }
 }
@@ -278,10 +287,13 @@ pub fn fetch(id: &str, age: Age) -> Result<Listing, String> {
     if !valid {
         return Err(luft_software::http::MISSING.into());
     }
-    let bytes = signed::fetch(&format!("index/v1/apps/{id}.json"), age)?;
+    let (document, bytes) = invited::listing(id, age)?;
     let listing: Listing = serde_json::from_slice(&bytes).map_err(|error| error.to_string())?;
     if !listing.id.eq_ignore_ascii_case(id) {
         return Err("schelf.store sent another app's listing.".into());
     }
-    Ok(listing)
+    Ok(Listing {
+        document,
+        ..listing
+    })
 }

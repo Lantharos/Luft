@@ -1,5 +1,6 @@
 import { renderMarkdown } from '@luft/ui';
 import { commands, type CatalogApp, type Collection, type StoreDetails } from '#lib/bindings.js';
+import { account } from '#lib/state/account.svelte.js';
 import type { CategoryId } from './categories';
 import type { AppDetails } from './types';
 
@@ -71,6 +72,8 @@ export async function fedoraDetails(app: CatalogApp): Promise<AppDetails> {
 	};
 }
 
-export const storeDetails = (id: string) => commands.storeDetails({ id }).then(fromStore);
+const noticed = <T>(asked: Promise<T>) => asked.finally(() => void account.reload());
 
-export const follow = (id: string, channel: string) => commands.storeFollow({ id, channel }).then(fromStore);
+export const storeDetails = (id: string) => noticed(commands.storeDetails({ id })).then(fromStore);
+
+export const follow = (id: string, channel: string) => noticed(commands.storeFollow({ id, channel })).then(fromStore);

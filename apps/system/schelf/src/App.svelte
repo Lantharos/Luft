@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, WindowControls } from '@luft/ui';
+	import AccessNotice from '#lib/account/AccessNotice.svelte';
+	import AccountDialog from '#lib/account/AccountDialog.svelte';
 	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import AppPage from '#lib/pages/app/AppPage.svelte';
@@ -12,6 +14,7 @@
 	import Search from '#lib/pages/search/Search.svelte';
 	import Sources from '#lib/pages/sources/Sources.svelte';
 	import Updates from '#lib/pages/updates/Updates.svelte';
+	import { account } from '#lib/state/account.svelte.js';
 	import { start } from '#lib/state/app.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { opening } from '#lib/state/opening.svelte.js';
@@ -78,4 +81,10 @@
 
 {#if opening.failed}
 	<OpenFailedDialog failed={opening.failed} />
+{/if}
+
+{#if account.open}
+	<AccountDialog />
+{:else if account.notices.lost.length || account.notices.ended}
+	<AccessNotice />
 {/if}

@@ -7,8 +7,8 @@ use super::{
     channel,
 };
 use crate::store::catalog::{self, CatalogApp, Kind};
-use crate::store::device;
 use crate::store::record::Installed;
+use crate::store::{device, invited};
 
 /// A file to download for an app this computer can't install itself.
 #[derive(Serialize, Type)]
@@ -61,6 +61,8 @@ pub struct StoreDetails {
     /// What's picked on the page out of `choices`.
     pub choice: String,
     pub choices: Vec<String>,
+    /// The invite-only channels among `choices`.
+    pub invited: Vec<String>,
     pub version: Option<String>,
     pub published: Option<String>,
     pub notes: String,
@@ -109,6 +111,7 @@ impl StoreDetails {
             ended_channel: None,
             release_channel: None,
             choices: Vec::new(),
+            invited: Vec::new(),
             version: None,
             published: None,
             notes: String::new(),
@@ -155,7 +158,9 @@ impl StoreDetails {
             name: artifact.name().to_owned(),
             size: artifact.size,
         });
-        let choices = following.choices(listing.channels(platforms));
+        let mut invited = invited::offered(&listing.id);
+        let choices = following.choices(listing.channels(platforms, &invited));
+        invited.retain(|channel| choices.contains(channel));
         let withdrawn = listing.releases.is_empty();
         let text = listing.text();
         let declared = release
@@ -176,6 +181,7 @@ impl StoreDetails {
             ended_channel: following.ended,
             release_channel: release.as_ref().map(|release| release.channel.clone()),
             choices,
+            invited,
             access: declared
                 .as_ref()
                 .filter(|declared| limited && declared.unsandboxed.is_none())

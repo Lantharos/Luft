@@ -60,7 +60,21 @@ pub fn download(
     size: Option<u64>,
     task: Task,
 ) -> Result<(), String> {
-    let response = agent().get(url).call().map_err(failure)?;
+    save(
+        agent().get(url).call().map_err(failure)?,
+        destination,
+        size,
+        task,
+    )
+}
+
+/// Writes the body of `response` to `destination`, as `download` does.
+pub fn save(
+    response: ureq::http::Response<ureq::Body>,
+    destination: &Path,
+    size: Option<u64>,
+    task: Task,
+) -> Result<(), String> {
     let total = response.body().content_length().or(size);
     let mut body = response
         .into_body()

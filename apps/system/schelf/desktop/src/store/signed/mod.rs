@@ -12,6 +12,9 @@ use crate::catalog::cache;
 use luft_store_seal::{Expiry, Keys, STORE_KEYS, Seal, Stamp};
 
 const SEAL: &str = ".sig";
+/// What a document only invited people get answers when schelf.store didn't
+/// take the session it was asked with.
+pub const NO_ACCESS: &str = "schelf.store didn't let this computer in.";
 const LENGTH: usize = size_of::<u64>();
 
 static KEYS: Mutex<Option<Arc<Keys>>> = Mutex::new(None);
@@ -106,10 +109,13 @@ enum Answer {
     Same,
 }
 
-fn get(url: &str, tag: Option<&str>) -> Result<Answer, String> {
+fn get(url: &str, tag: Option<&str>, session: Option<&str>) -> Result<Answer, String> {
     let mut request = http::agent().get(url);
     if let Some(tag) = tag {
         request = request.header("if-none-match", tag);
+    }
+    if let Some(session) = session {
+        request = request.header("authorization", format!("Bearer {session}"));
     }
     match request.call() {
         Ok(response) if response.status() == 304 => Ok(Answer::Same),
@@ -127,12 +133,13 @@ fn get(url: &str, tag: Option<&str>) -> Result<Answer, String> {
                 .map_err(|_| OFFLINE.to_string())?;
             Ok(Answer::Changed { body, tag })
         }
+        Err(ureq::Error::StatusCode(401)) => Err(NO_ACCESS.into()),
         Err(error) => Err(http::failure(error)),
     }
 }
 
-fn bytes(url: &str) -> Result<Vec<u8>, String> {
-    match get(url, None)? {
+fn bytes(url: &str, session: Option<&str>) -> Result<Vec<u8>, String> {
+    match get(url, None, session)? {
         Answer::Changed { body, .. } => Ok(body),
         Answer::Same => Err(OFFLINE.into()),
     }
@@ -145,10 +152,13 @@ fn bytes(url: &str) -> Result<Vec<u8>, String> {
 /// fetched anew rather than asked about by its tag. A copy that has expired
 /// is never used, one signed for another path is never used, and one older
 /// than the last taken from schelf.store is never taken. `expiry` says whether the document has to expire at all.
+/// A document only invited people get is asked for with their `session`,
+/// and one schelf.store no longer lets them have is never used.
 fn load<T>(
     document: &str,
     age: Age,
     expiry: Expiry,
+    session: Option<&str>,
     check: impl Fn(&[u8], &Seal) -> Result<T, String>,
 ) -> Result<(Vec<u8>, T), String> {
     let cached = Cached::of(document);
@@ -173,10 +183,10 @@ fn load<T>(
         Ok((body, checked))
     };
     let url = format!("{DOWNLOADS}{document}");
-    let fetched = get(&url, tag.as_deref()).and_then(|answer| match answer {
+    let fetched = get(&url, tag.as_deref(), session).and_then(|answer| match answer {
         Answer::Same => Ok(None),
         Answer::Changed { body, tag } => {
-            let seal = bytes(&format!("{url}{SEAL}"))?;
+            let seal = bytes(&format!("{url}{SEAL}"), session)?;
             let fresh = Stored { body, seal, tag };
             let (checked, stamp) = trusted(&fresh)?;
             stamp::accept(&stamp, document)?;
@@ -190,7 +200,7 @@ fn load<T>(
             cached.touch();
             held(OFFLINE.to_owned())
         }
-        Err(error) if error == MISSING => Err(error),
+        Err(error) if error == MISSING || error == NO_ACCESS => Err(error),
         Err(error) => held(error),
     }
 }
@@ -200,21 +210,31 @@ fn keys(age: Age) -> Result<Arc<Keys>, String> {
     if let (Some(keys), Age::Within(_)) = (slot.as_ref(), age) {
         return Ok(keys.clone());
     }
-    let (_, keys) = load(STORE_KEYS, age, Expiry::WhenGiven, Keys::read)?;
+    let (_, keys) = load(STORE_KEYS, age, Expiry::WhenGiven, None, Keys::read)?;
     let keys = Arc::new(keys);
     *slot = Some(keys.clone());
     Ok(keys)
 }
 
-/// A document from schelf.store, checked against the store's keys before
-/// anything reads it or it's kept on disk.
-pub fn fetch(document: &str, age: Age) -> Result<Vec<u8>, String> {
-    let (body, ()) = load(document, age, Expiry::Required, |body, seal| {
+fn verified(document: &str, age: Age, session: Option<&str>) -> Result<Vec<u8>, String> {
+    let (body, ()) = load(document, age, Expiry::Required, session, |body, seal| {
         keys(age)?
             .verify(body, seal)
             .or_else(|_| keys(Age::Current)?.verify(body, seal))
     })?;
     Ok(body)
+}
+
+/// A document from schelf.store, checked against the store's keys before
+/// anything reads it or it's kept on disk.
+pub fn fetch(document: &str, age: Age) -> Result<Vec<u8>, String> {
+    verified(document, age, None)
+}
+
+/// A document schelf.store only gives the people it invited, asked for with
+/// their `session` and checked like any other.
+pub fn fetch_invited(document: &str, age: Age, session: &str) -> Result<Vec<u8>, String> {
+    verified(document, age, Some(session))
 }
 
 /// A document and its seal as Schelf last took them from schelf.store, for a

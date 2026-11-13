@@ -36,6 +36,16 @@ impl Stamp {
             .ok_or_else(|| UNSTAMPED.to_owned())
     }
 
+    /// The stamp of a listing of `id`, which has to say when it stops
+    /// counting: its own listing, or the one for people invited to one of
+    /// its channels.
+    pub fn listing(body: &[u8], id: &str) -> Result<Self, String> {
+        serde_json::from_slice::<Self>(body)
+            .ok()
+            .filter(|stamp| stamp.expires.is_some() && crate::lists(&stamp.path, id))
+            .ok_or_else(|| UNSTAMPED.to_owned())
+    }
+
     /// Whether the document still counts, so an old copy can't be served
     /// forever in place of a newer one.
     pub fn current(&self) -> Result<(), String> {

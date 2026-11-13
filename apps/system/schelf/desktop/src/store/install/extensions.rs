@@ -82,10 +82,10 @@ fn signed_by_store(document: &Sealed) -> Signed<'_> {
 /// signature: with the extensions that run inside Luft when the store
 /// approved this release to, otherwise with the ones that run in a sandbox.
 /// Then has the desktop load it. A copy an earlier Luft unpacked into the
-/// account's own folder goes.
-pub fn install(id: &str, archive: &Path, task: Task) -> Result<String, String> {
+/// account's own folder goes. `document` is the listing it was chosen from.
+pub fn install(id: &str, document: &str, archive: &Path, task: Task) -> Result<String, String> {
     task.progress(Stage::Installing, None);
-    let listing = signed::sealed(&luft_store_seal::listing_document(id))?;
+    let listing = signed::sealed(document)?;
     let keys = signed::sealed(luft_store_seal::STORE_KEYS)?;
     block_on(store_extensions::install(
         id,

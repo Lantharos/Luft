@@ -2,6 +2,7 @@ import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 import { appearance, keepWindowState } from '@luft/ui';
 import { commands, type CatalogApp } from '#lib/bindings.js';
 import * as store from '#lib/catalog/store.js';
+import { account } from './account.svelte';
 import { catalog } from './catalog.svelte';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
@@ -51,7 +52,7 @@ async function unlisted(id: string): Promise<CatalogApp | null> {
 	return { id: details.id, kind, origin: 'schelf', name, summary, icon, art, developer, package: null };
 }
 
-async function openListing(id: string) {
+export async function openListing(id: string) {
 	const listing = (await store.entry(id).catch(() => null)) ?? (await unlisted(id));
 	if (listing) {
 		navigation.open({ page: 'app', target: { listing }, name: listing.name });
@@ -104,5 +105,5 @@ export async function start() {
 		openPage(list);
 		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));
 	});
-	await Promise.all([operations.start(), library.start(), catalog.start()]);
+	await Promise.all([operations.start(), library.start(), catalog.start(), account.start()]);
 }

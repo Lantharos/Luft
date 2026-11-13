@@ -83,6 +83,10 @@ Schelf reads one catalog from schelf.store: the store's apps, then mirrors of Fl
 
 A store app's own file decides what installs, and a download whose size or SHA-256 differs from the signed entry is thrown away. AppImages install with the permissions in the signed release. Flathub apps' details still come from Flathub's API, and Fedora apps' from Fedora's repositories. Extensions go through the system instead; [How extensions run](/extensions/how-extensions-run/) covers what's checked before one runs inside the desktop.
 
+### Invited channels
+
+Someone signed in to schelf.store in Schelf has a session the store gave through its device sign-in, kept only in [Luft Keyring](/security/keyring/). For an app they're invited to, Schelf reads `invited/index/v1/apps/<id>/<channel>.json`, which holds the public releases and that channel's, and downloads files under `invited/` with the session. Nothing else gets the session. The listing goes through every check above, with its own `path` and serial, and the system only installs an extension from it when it's signed for one of that extension's paths. When the store turns the session down, Schelf asks whether the sign-in still holds: if it does, the invitation was taken back, so it forgets that channel and goes back to the public listing; if not, it signs out on this computer and keeps the channel for the next sign-in.
+
 ### Pulled apps
 
 Shortly after sign-in and every hour after, `luft-app-revocations.timer` runs `schelf --check-revocations`, and Schelf checks too while it's open. It accepts `trust/v1/revocations.json` only when it's signed, unexpired and its serial isn't lower than the last one, and writes the pulled store apps to `~/.local/share/luft/blocked-appimages.json`. Their sandbox then refuses to start them and opens their page in Schelf, which explains why and offers to remove them.

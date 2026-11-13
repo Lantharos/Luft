@@ -24,7 +24,7 @@ Since a sound plays from the file the extension picked, an extension that could 
 
 ## When something goes wrong
 
-Every call into an extension's code is guarded. One that throws while it turns on, or from anything Kestrel calls in it later, is turned off, everything it made is taken away, and a notification says so. Kestrel records which extensions run, and when `kestrel-wrapper` restarts it after a crash, each of them gets a crash counted. After two in a row it stays off. A start that isn't after a crash forgets the counts.
+Every call into an extension's code is guarded. One that throws while it turns on, or from anything Kestrel calls in it later, is turned off, everything it made is taken away, and a notification says so. Kestrel records which extensions run, and when `kestrel-wrapper` restarts it after a crash, each of them gets a crash counted. A second crash within two minutes of that restart, with the extension still running, keeps it off; a crash later than that counts as the first again, so one crash and the restart after it never turn anything off. When the desktop that said an extension was turned off goes down again within those two minutes, the next one says it again. A start that isn't after a crash forgets the counts.
 
 Screen effects can hang the GPU, so they get more:
 

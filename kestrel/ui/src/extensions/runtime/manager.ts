@@ -9,7 +9,7 @@ import type { SettingValue } from '../api/v1/types.js';
 import { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
 import { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
-import { CrashGuard } from './crashes.js';
+import { CrashGuard } from './crashes/guard.js';
 import { removeTree } from '../api/v1/core/files.js';
 import { dataFolder, discover, findOne, type Installed } from './installed/folders.js';
 import { luftVersionAtLeast } from './installed/luftVersion.js';
@@ -51,8 +51,7 @@ export class ExtensionManager {
       openSettings: id => openSettings(`extensions/${id}`),
       pageChanged: id => this.pageListeners.forEach(listener => listener(id)),
     };
-    const culprits = this.crashes.culprits;
-    for (const id of culprits) this.keepOff(id, { kind: 'crash', detail: '' });
+    for (const id of this.crashes.culprits) this.keepOff(id, { kind: 'crash', detail: '' });
     this.disconnectors = [
       this.store.watchValues(id => {
         this.instances.get(id)?.settingsChanged();
@@ -64,7 +63,8 @@ export class ExtensionManager {
       this.developerTools.watch(() => this.rescan()),
     ];
     this.rescan();
-    for (const id of culprits) this.notice(id, 'crash');
+    for (const id of this.crashes.turnedOffLately)
+      if (this.store.problem(id)?.kind === 'crash') this.notice(id, 'crash');
     void askLuftVersion().then(version => {
       if (!version || version === this.luft) return;
       this.luft = version;

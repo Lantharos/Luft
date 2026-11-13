@@ -1,13 +1,9 @@
 import GLib from 'gi://GLib';
 
-import { restartedAfterCrash } from '../../system/status/health/restarted.js';
+import { restartedAfterCrash } from '../../../system/status/health/restarted.js';
+import { afterCrash, type Record } from './count.js';
 
 const CRASHES_BEFORE_OFF = 2;
-
-interface Record {
-  running: string[];
-  crashes: { [id: string]: number };
-}
 
 const decoder = new TextDecoder();
 
@@ -17,18 +13,23 @@ export class CrashGuard {
   readonly culprits: string[];
 
   constructor() {
-    this.record = restartedAfterCrash ? this.afterCrash() : { running: [], crashes: {} };
+    const now = GLib.get_monotonic_time();
+    this.record = restartedAfterCrash ? this.afterCrash(now) : { started: now, running: [], crashes: {}, turnedOff: [] };
     this.culprits = Object.entries(this.record.crashes).filter(([, crashes]) => crashes >= CRASHES_BEFORE_OFF).map(([id]) => id);
     for (const id of this.culprits) delete this.record.crashes[id];
+    this.record.turnedOff = [...new Set([...this.record.turnedOff, ...this.culprits])];
   }
 
-  private afterCrash(): Record {
+  get turnedOffLately(): readonly string[] {
+    return this.record.turnedOff;
+  }
+
+  private afterCrash(now: number): Record {
     try {
       const [, contents] = GLib.file_get_contents(this.file);
-      const previous = JSON.parse(decoder.decode(contents)) as Record;
-      return { running: [], crashes: Object.fromEntries(previous.running.map(id => [id, (previous.crashes[id] ?? 0) + 1])) };
+      return afterCrash(JSON.parse(decoder.decode(contents)) as Record, now);
     } catch {
-      return { running: [], crashes: {} };
+      return { started: now, running: [], crashes: {}, turnedOff: [] };
     }
   }
 

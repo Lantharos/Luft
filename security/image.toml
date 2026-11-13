@@ -16,7 +16,7 @@ part = "boot"
 "/usr/lib/systemd/system/sshd.service.d/luft-remote-login.conf" = "data/remote-login/sshd.service.conf"
 "/etc/ssh/sshd_config.d/05-luft.conf" = { from = "data/remote-login/05-luft.conf", mode = "600" }
 "/usr/share/selinux/packages/" = ["data/firewall/luft-firewall.cil", "data/remote-login/luft-remote-login.cil", "data/trust/luft-nvpcr.cil", "data/trust/luft-bless-boot.cil"]
-"/usr/lib/udev/rules.d/" = ["data/trust/61-trustd-drives.rules"]
+"/usr/lib/udev/rules.d/" = ["data/usb/40-luft-usb-held.rules", "data/trust/61-trustd-drives.rules"]
 "/usr/lib/dracut/dracut.conf.d/" = ["data/trust/90-trustd.conf"]
 "/usr/lib/dracut/modules.d/90trustd/" = [
     "data/trust/dracut/90-luft-root-partition.rules",

@@ -78,9 +78,13 @@ pub fn admit(id: &str) {
     if !device.is_authorized() {
         device.authorize();
     }
-    device
+    admit_parts(id);
+    device.announce();
+}
+
+pub fn admit_parts(id: &str) {
+    Device::named(id)
         .interfaces()
         .filter(|interface| !interface.is_authorized())
         .for_each(|interface| interface.authorize());
-    device.announce();
 }

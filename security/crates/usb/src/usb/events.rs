@@ -12,6 +12,7 @@ const MESSAGE_SIZE: usize = 8192;
 #[derive(Debug, PartialEq, Eq)]
 pub enum Event {
     Added(String),
+    Configured(String),
     Removed(String),
     Missed,
 }
@@ -23,7 +24,7 @@ pub struct Events {
 fn parse(message: &[u8]) -> Option<Event> {
     let mut action = None;
     let mut path = None;
-    let mut is_device = false;
+    let mut kind = None;
     for field in message
         .split(|byte| *byte == 0)
         .filter_map(|field| std::str::from_utf8(field).ok())
@@ -32,14 +33,15 @@ fn parse(message: &[u8]) -> Option<Event> {
             action = Some(value);
         } else if let Some(value) = field.strip_prefix("DEVPATH=") {
             path = Some(value);
-        } else if field == "DEVTYPE=usb_device" {
-            is_device = true;
+        } else if let Some(value) = field.strip_prefix("DEVTYPE=") {
+            kind = Some(value);
         }
     }
-    let id = path.filter(|_| is_device)?.rsplit('/').next()?.to_owned();
-    match action? {
-        "add" => Some(Event::Added(id)),
-        "remove" => Some(Event::Removed(id)),
+    let mut parts = path?.rsplit('/');
+    match (kind?, action?) {
+        ("usb_device", "add") => Some(Event::Added(parts.next()?.to_owned())),
+        ("usb_device", "remove") => Some(Event::Removed(parts.next()?.to_owned())),
+        ("usb_interface", "add") => Some(Event::Configured(parts.nth(1)?.to_owned())),
         _ => None,
     }
 }
@@ -81,10 +83,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn reads_usb_devices_announced_by_the_kernel() {
+    fn reads_usb_devices_and_their_new_parts_announced_by_the_kernel() {
         let device = b"add@/devices/pci0000:00/0000:00:14.0/usb3/3-2\0ACTION=add\0DEVPATH=/devices/pci0000:00/0000:00:14.0/usb3/3-2\0SUBSYSTEM=usb\0DEVTYPE=usb_device\0SEQNUM=5012\0";
         assert_eq!(parse(device), Some(Event::Added("3-2".to_owned())));
         let interface = b"add@/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0ACTION=add\0DEVPATH=/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0SUBSYSTEM=usb\0DEVTYPE=usb_interface\0SEQNUM=5013\0";
-        assert_eq!(parse(interface), None);
+        assert_eq!(parse(interface), Some(Event::Configured("3-2".to_owned())));
+        let gone = b"remove@/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0ACTION=remove\0DEVPATH=/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0SUBSYSTEM=usb\0DEVTYPE=usb_interface\0SEQNUM=5014\0";
+        assert_eq!(parse(gone), None);
     }
 }

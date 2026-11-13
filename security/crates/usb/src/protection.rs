@@ -10,6 +10,12 @@ use crate::usb::{self, Admission, Event};
 
 pub type Device = (String, String);
 
+#[derive(Clone, PartialEq, Eq)]
+struct Held {
+    name: String,
+    announce: bool,
+}
+
 pub struct Change {
     pub enabled: bool,
     pub guarding: bool,
@@ -21,7 +27,7 @@ pub struct Protection {
     enabled: bool,
     unlocked: Unlocked,
     guarding: bool,
-    held: BTreeMap<String, String>,
+    held: BTreeMap<String, Held>,
     unclaimed: Vec<Device>,
 }
 
@@ -38,7 +44,7 @@ impl Protection {
         if protection.should_guard() {
             protection.guarding = true;
             usb::hold_new_devices();
-            waiting.iter().for_each(|id| protection.hold(id));
+            waiting.iter().for_each(|id| protection.hold(id, true));
         } else {
             usb::welcome_new_devices();
             waiting.iter().for_each(|id| usb::admit(id));
@@ -55,7 +61,10 @@ impl Protection {
     }
 
     pub fn held(&self) -> Vec<Device> {
-        self.held.clone().into_iter().collect()
+        self.held
+            .iter()
+            .map(|(id, held)| (id.clone(), held.name.clone()))
+            .collect()
     }
 
     pub fn signed_in(&self) -> Option<u32> {
@@ -99,7 +108,8 @@ impl Protection {
         self.track(|protection| {
             match event {
                 Event::Added(id) if protection.guarding => protection.welcome(&id),
-                Event::Added(_) => {}
+                Event::Configured(id) if protection.guarding => protection.hold(&id, false),
+                Event::Added(_) | Event::Configured(_) => {}
                 Event::Removed(id) => {
                     protection.held.remove(&id);
                 }
@@ -149,23 +159,33 @@ impl Protection {
 
     fn release(&mut self) -> Vec<Device> {
         usb::welcome_new_devices();
-        let released = std::mem::take(&mut self.held);
-        released.keys().for_each(|id| usb::admit(id));
-        released.into_iter().collect()
+        std::mem::take(&mut self.held)
+            .into_iter()
+            .map(|(id, held)| {
+                if held.announce {
+                    usb::admit(&id);
+                } else {
+                    usb::admit_parts(&id);
+                }
+                (id, held.name)
+            })
+            .collect()
     }
 
     fn welcome(&mut self, id: &str) {
         if usb::is_root_hub(id) {
             usb::hold_new_devices_on(id);
         } else {
-            self.hold(id);
+            self.hold(id, true);
         }
     }
 
-    fn hold(&mut self, id: &str) {
+    fn hold(&mut self, id: &str, announce: bool) {
         match usb::admit_usable_part(id) {
             Admission::Waiting => {
-                self.held.insert(id.to_owned(), usb::name(id));
+                let announce = self.held.get(id).map_or(announce, |held| held.announce);
+                let name = usb::name(id);
+                self.held.insert(id.to_owned(), Held { name, announce });
             }
             Admission::Complete => {
                 self.held.remove(id);
@@ -177,7 +197,7 @@ impl Protection {
         self.held.retain(|id, _| usb::exists(id));
         if self.guarding {
             usb::hold_new_devices();
-            usb::waiting().for_each(|id| self.hold(&id));
+            usb::waiting().for_each(|id| self.hold(&id, true));
         }
     }
 }

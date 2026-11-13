@@ -6323,6 +6323,7 @@ dependencies = [
  "sha2",
  "socket2",
  "specta",
+ "tempfile",
  "tokio",
  "ureq",
  "url",

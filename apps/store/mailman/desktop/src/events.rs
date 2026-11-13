@@ -9,6 +9,7 @@ pub const OUTBOX: BridgeEvent<OutboxEvent> = BridgeEvent::new("mailman.outbox");
 pub const BODY: BridgeEvent<BodyArrived> = BridgeEvent::new("mailman.body");
 pub const IMAGES: BridgeEvent<Vec<(String, Option<String>)>> = BridgeEvent::new("mailman.images");
 pub const IDENTITIES: BridgeEvent<i64> = BridgeEvent::new("mailman.identities");
+pub const RETURNED: BridgeEvent<String> = BridgeEvent::new("mailman.returned");
 
 pub fn declare(window: SabineWindow) -> SabineWindow {
     window
@@ -19,4 +20,5 @@ pub fn declare(window: SabineWindow) -> SabineWindow {
         .bridge_event(&BODY)
         .bridge_event(&IMAGES)
         .bridge_event(&IDENTITIES)
+        .bridge_event(&RETURNED)
 }

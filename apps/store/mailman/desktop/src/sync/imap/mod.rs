@@ -151,6 +151,7 @@ impl ImapRemote {
                 .map(u32::to_string)
                 .collect();
             context.store.remove_remotes(mailbox.id, &gone)?;
+            settle_departures(context, mailbox, |uid| selected.vanished.contains(&uid))?;
             let changes: Vec<(String, Flags)> = selected
                 .changed
                 .iter()
@@ -171,6 +172,7 @@ impl ImapRemote {
         };
         let gone: Vec<String> = local.difference(&server).map(u32::to_string).collect();
         context.store.remove_remotes(mailbox.id, &gone)?;
+        settle_departures(context, mailbox, |uid| !server.contains(&uid))?;
         let kept: Vec<u32> = local.intersection(&server).copied().collect();
         if !kept.is_empty() {
             let changed_since = mailbox
@@ -200,6 +202,20 @@ impl ImapRemote {
             .iter()
             .any(|host| self.smtp.host.ends_with(host))
     }
+}
+
+fn settle_departures(
+    context: &Context,
+    mailbox: &Mailbox,
+    gone: impl Fn(u32) -> bool,
+) -> Result<(), String> {
+    let settled: Vec<String> = context
+        .store
+        .departed(mailbox.id)?
+        .into_iter()
+        .filter(|remote| remote.parse().is_ok_and(&gone))
+        .collect();
+    context.store.settle_departures(mailbox.id, &settled)
 }
 
 fn new_message(header: Header) -> NewMessage {

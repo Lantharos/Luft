@@ -8,10 +8,10 @@ use serde::Serialize;
 use specta::Type;
 
 use super::Shared;
-use super::ops::Operation;
+use super::ops::{self, Operation};
 use super::remote::{self, Connection, Context, Remote};
 use crate::accounts::{Account, Protocol, SignInError};
-use crate::events::{CHANGED, IDENTITIES, OUTBOX, STATUS};
+use crate::events::{CHANGED, IDENTITIES, OUTBOX, RETURNED, STATUS};
 use crate::mail::{envelope, render};
 use crate::store::Store;
 use crate::store::{Fetched, Inserted, Mailbox, Outgoing, Role, now};
@@ -339,6 +339,7 @@ impl Worker {
         if queued.is_empty() {
             return Ok(());
         }
+        let mut returned = Vec::new();
         for item in queued {
             let Ok(operation) = serde_json::from_str::<Operation>(&item.operation) else {
                 self.shared.store.dequeue(item.id)?;
@@ -348,7 +349,13 @@ impl Worker {
                 Ok(()) => self.shared.store.dequeue(item.id)?,
                 Err(error) if item.attempts + 1 >= GIVE_UP_AFTER => {
                     self.shared.store.dequeue(item.id)?;
-                    self.status(SyncState::Error, Some(error));
+                    match ops::give_up(&self.shared.store, &operation, &error)? {
+                        Some(gave_up) => {
+                            self.shared.events.emit(RETURNED, gave_up.message);
+                            returned.extend(gave_up.resync);
+                        }
+                        None => self.status(SyncState::Error, Some(error)),
+                    }
                 }
                 Err(error) => {
                     self.shared.store.attempted(item.id)?;
@@ -357,6 +364,11 @@ impl Worker {
             }
         }
         self.changed();
+        for mailbox in returned {
+            if let Some(mailbox) = self.shared.store.mailbox(mailbox)? {
+                self.sync_mailbox(&mailbox)?;
+            }
+        }
         Ok(())
     }
 

@@ -88,6 +88,15 @@ CREATE TABLE IF NOT EXISTS bodies (
 	raw BLOB NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS departures (
+	mailbox INTEGER NOT NULL REFERENCES mailboxes ON DELETE CASCADE,
+	remote TEXT NOT NULL,
+	message INTEGER NOT NULL,
+	PRIMARY KEY (mailbox, remote)
+) WITHOUT ROWID;
+
+CREATE INDEX IF NOT EXISTS departures_by_message ON departures (message);
+
 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5 (subject, people, body, message UNINDEXED, tokenize = 'unicode61 remove_diacritics 2');
 
 CREATE TRIGGER IF NOT EXISTS messages_forget_search AFTER DELETE ON messages BEGIN

@@ -145,7 +145,7 @@ impl Store {
     pub fn clear_mailbox(&self, id: i64) -> Result<(), String> {
         self.writing(|connection| {
             connection.execute_batch(&format!(
-                "DELETE FROM messages WHERE mailbox = {id}; UPDATE mailboxes SET backfill = NULL WHERE id = {id};"
+                "DELETE FROM messages WHERE mailbox = {id}; DELETE FROM departures WHERE mailbox = {id}; UPDATE mailboxes SET backfill = NULL WHERE id = {id};"
             ))
         })
     }

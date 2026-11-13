@@ -1,4 +1,5 @@
 mod bodies;
+mod departures;
 mod index;
 mod messages;
 mod threads;

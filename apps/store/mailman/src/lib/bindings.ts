@@ -155,6 +155,7 @@ export const events = {
 	mailmanImages: (callback: (payload: ([string, string | null])[]) => void) => listen<([string, string | null])[]>("mailman.images", callback),
 	mailmanOpen: (callback: (payload: null) => void) => listen<null>("mailman.open", callback),
 	mailmanOutbox: (callback: (payload: OutboxEvent) => void) => listen<OutboxEvent>("mailman.outbox", callback),
+	mailmanReturned: (callback: (payload: string) => void) => listen<string>("mailman.returned", callback),
 	mailmanStatus: (callback: (payload: SyncStatus) => void) => listen<SyncStatus>("mailman.status", callback),
 };
 

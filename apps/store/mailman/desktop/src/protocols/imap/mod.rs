@@ -150,7 +150,10 @@ impl Client {
                     uid: fetch.uid()?,
                     flags: fetch.flags().unwrap_or_default(),
                     size: fetch.number("RFC822.SIZE").unwrap_or(0),
-                    raw: fetch.section("BODY[")?.to_vec(),
+                    raw: fetch
+                        .section("BODY[")
+                        .filter(|raw| !raw.is_empty())?
+                        .to_vec(),
                 })
             })
             .collect())

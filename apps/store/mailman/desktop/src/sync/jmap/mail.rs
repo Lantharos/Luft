@@ -90,6 +90,20 @@ fn new_message(email: &Value) -> Option<NewMessage> {
     })
 }
 
+fn settle_departures(
+    context: &Context,
+    mailbox: &Mailbox,
+    gone: impl Fn(&String) -> bool,
+) -> Result<(), String> {
+    let settled: Vec<String> = context
+        .store
+        .departed(mailbox.id)?
+        .into_iter()
+        .filter(|id| gone(id))
+        .collect();
+    context.store.settle_departures(mailbox.id, &settled)
+}
+
 fn ids(value: &Value) -> Vec<String> {
     value
         .as_array()
@@ -288,6 +302,8 @@ impl JmapRemote {
         present: Vec<(String, Flags)>,
     ) -> Result<Vec<Inserted>, String> {
         context.store.remove_remotes(mailbox.id, &gone)?;
+        let gone: HashSet<&String> = gone.iter().collect();
+        settle_departures(context, mailbox, |id| gone.contains(id))?;
         let ids: Vec<String> = present.iter().map(|(id, _)| id.clone()).collect();
         let known = context.store.known_remotes(mailbox.id, &ids)?;
         let (flags, fresh): (Vec<_>, Vec<_>) =
@@ -332,6 +348,7 @@ impl JmapRemote {
             .cloned()
             .collect();
         context.store.remove_remotes(mailbox.id, &gone)?;
+        settle_departures(context, mailbox, |id| !on_server.contains(id))?;
         let known: Vec<String> = server
             .iter()
             .filter(|id| local.contains(*id))

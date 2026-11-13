@@ -40,5 +40,8 @@ ureq = { workspace = true, features = ["json"] }
 url.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 
+[dev-dependencies]
+tempfile.workspace = true
+
 [lints]
 workspace = true

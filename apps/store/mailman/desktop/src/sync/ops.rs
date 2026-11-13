@@ -54,3 +54,39 @@ pub fn resolve(store: &Store, messages: &[Target]) -> Result<Vec<Target>, String
     }
     Ok(resolved)
 }
+
+pub struct GaveUp {
+    pub message: String,
+    pub resync: Option<i64>,
+}
+
+pub fn give_up(
+    store: &Store,
+    operation: &Operation,
+    error: &str,
+) -> Result<Option<GaveUp>, String> {
+    let (verb, messages, resync) = match operation {
+        Operation::Move { from, to, messages } => {
+            let moved: Vec<(i64, String)> = messages
+                .iter()
+                .map(|target| (target.id, target.remote.clone()))
+                .collect();
+            store.return_moved(*from, *to, &moved)?;
+            ("move", messages, None)
+        }
+        Operation::Destroy { mailbox, messages } => {
+            let ids: Vec<i64> = messages.iter().map(|target| target.id).collect();
+            store.return_destroyed(*mailbox, &ids)?;
+            ("delete", messages, Some(*mailbox))
+        }
+        _ => return Ok(None),
+    };
+    let what = match messages.len() {
+        1 => "a message".to_owned(),
+        count => format!("{count} messages"),
+    };
+    Ok(Some(GaveUp {
+        message: format!("Couldn't {verb} {what}: {error}"),
+        resync,
+    }))
+}

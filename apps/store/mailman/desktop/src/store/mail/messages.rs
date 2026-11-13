@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use rusqlite::{OptionalExtension, Transaction, params};
 
+use super::departures::depart;
 use super::index::{self, Entry};
 use crate::mail::classify;
 use crate::mail::envelope::Envelope;
@@ -194,6 +195,7 @@ impl Store {
                     "UPDATE OR IGNORE messages SET mailbox = ?2, remote = '~' || id, snoozed_until = NULL WHERE id = ?1 AND mailbox != ?2",
                 )?;
                 for id in ids {
+                    depart(&transaction, *id, Some(target))?;
                     update.execute(params![id, target])?;
                 }
             }
@@ -210,6 +212,12 @@ impl Store {
                 )?,
                 None => 0,
             };
+            if settled > 0 {
+                connection.execute(
+                    "DELETE FROM departures WHERE (mailbox, remote) IN (SELECT mailbox, remote FROM messages WHERE id = ?1)",
+                    [id],
+                )?;
+            }
             if settled == 0 {
                 connection.execute(
                     "DELETE FROM messages WHERE id = ?1 AND remote LIKE '~%'",
@@ -237,6 +245,7 @@ impl Store {
                 let mut delete =
                     transaction.prepare_cached("DELETE FROM messages WHERE id = ?1")?;
                 for id in ids {
+                    depart(&transaction, *id, None)?;
                     delete.execute([id])?;
                 }
             }
@@ -282,8 +291,9 @@ fn insert(
     let mut statement = transaction.prepare_cached(
         "INSERT INTO messages (account, mailbox, remote, message_id, in_reply_to, refs, subject, sender_name, sender, recipients, date,
             seen, flagged, answered, draft, attachments, size, category, unsubscribe, verdict)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19,
-            (SELECT verdict FROM senders WHERE address = ?9))
+         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19,
+            (SELECT verdict FROM senders WHERE address = ?9)
+         WHERE NOT EXISTS (SELECT 1 FROM departures WHERE mailbox = ?2 AND remote = ?3)
          ON CONFLICT (mailbox, remote) DO NOTHING",
     )?;
     let changed = statement.execute(params![

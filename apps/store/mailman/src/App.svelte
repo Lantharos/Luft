@@ -83,6 +83,7 @@
 			events.mailmanOutbox(({ error }) => {
 				if (error) toasts.show(`Couldn't send: ${error}. Mailman will try again.`, { failed: true });
 			}),
+			events.mailmanReturned((message) => toasts.show(message, { failed: true })),
 			sabineEvents.openUrlsAvailable(() => void api.takeLaunches().then((launches) => opened.handle(launches, false)))
 		];
 		void start();

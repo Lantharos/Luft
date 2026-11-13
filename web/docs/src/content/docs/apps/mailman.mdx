@@ -27,7 +27,7 @@ asks:
 
 import Shot from '../../../components/Shot.astro';
 
-Mailman keeps a local copy of every account, so opening, searching and sorting mail never waits on the network. New mail arrives as it's sent, and only changes are fetched.
+Mailman keeps a local copy of every account, so opening, searching and sorting mail never waits on the network. New mail arrives as it's sent, and only changes are fetched. Archiving, deleting and moving mail happen at once while the server catches up in the background. If the server refuses, the mail comes back where it was and Mailman tells you why.
 
 <Shot name="mailman" alt="Mailman showing a message" />
 

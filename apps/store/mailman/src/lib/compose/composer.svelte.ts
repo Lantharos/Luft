@@ -215,7 +215,7 @@ class Composer {
 			this.inFlight.set(event.id, { started: true });
 			return this.showProgress();
 		}
-		this.inFlight.delete(event.id);
+		const watched = this.inFlight.delete(event.id);
 		if (event.state === 'sent') {
 			this.kept.delete(event.id);
 			this.failed.delete(event.id);
@@ -223,9 +223,8 @@ class Composer {
 			if (!this.failureShowing()) toasts.show('Sent');
 			return;
 		}
-		const reported = this.failed.has(event.id);
+		if (!watched && this.failed.has(event.id)) return;
 		this.failed.add(event.id);
-		if (reported && !showingFailure) return this.showProgress();
 		toasts.show(`Couldn't send: ${event.error}. Mailman will try again.`, {
 			failed: true,
 			duration: null,

@@ -24,7 +24,6 @@ export { Curve, Gesture, motionPreference, projection, rubberband, Spring, Sprin
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
-export { appIconStyle } from './media/iconStyle';
 
 export { default as ContextMenu } from './menus/ContextMenu.svelte';
 export { default as MenuButton } from './menus/MenuButton.svelte';

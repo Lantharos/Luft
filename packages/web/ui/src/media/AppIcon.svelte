@@ -2,7 +2,7 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import AppWindow from '@lucide/svelte/icons/app-window';
 	import { appearance, type AppIconStyle } from '../appearance.svelte';
-	import { appIconStyle, FITTED_PLATE } from './iconStyle';
+	import { appIconLook, FITTED_PLATE } from './iconStyle';
 
 	interface Props {
 		icon: string | null;
@@ -18,10 +18,10 @@
 	const source = $derived(icon?.startsWith('http') ? icon : icon && fileUrl(icon));
 	const icons = $derived(appearance.appIcons);
 	const requested = $derived(style ?? icons?.style ?? 'default');
-	const chosen = $derived(appIconStyle(id, requested));
-	const plate = $derived(requested === chosen ? size : Math.round(size * FITTED_PLATE));
-	const paint = $derived(icons && id && chosen !== 'default' ? icons[chosen] : null);
-	const glyphUrl = $derived(paint && icons && id ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
+	const look = $derived(appIconLook(id, requested));
+	const box = $derived(Math.round(size * FITTED_PLATE));
+	const paint = $derived(icons && (look === 'tinted' || look === 'clear') ? icons[look] : null);
+	const glyphUrl = $derived(icons && id && look !== 'default' ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
 	const glyph = $derived(glyphUrl && glyphUrl !== missingGlyph ? `url("${glyphUrl}")` : null);
 
 	$effect(() => {
@@ -33,16 +33,20 @@
 	});
 </script>
 
-{#if paint && glyph}
+{#if look === 'plain' && glyph}
+	<span class="glyph bare" style:width="{box}px" style:height="{box}px" style:margin="{(size - box) / 2}px" style:--glyph={glyph}>
+		<span class="shade"></span>
+		<span class="ink"></span>
+	</span>
+{:else if paint && glyph}
 	<span
-		class="styled"
+		class="glyph plated"
 		class:rim={paint.rim > 0}
-		style:width="{plate}px"
-		style:height="{plate}px"
-		style:margin="{(size - plate) / 2}px"
+		style:width="{size}px"
+		style:height="{size}px"
 		style:--plate={paint.plate}
-		style:--ink={paint.ink}
-		style:--shade={paint.shade}
+		style:--glyph-ink={paint.ink}
+		style:--glyph-shade={paint.shade}
 		style:--rim-top="rgb(255 255 255 / {paint.rim})"
 		style:--rim-middle="rgb(255 255 255 / {paint.rim / 4})"
 		style:--glyph={glyph}
@@ -73,10 +77,20 @@
 		color: var(--text-muted);
 	}
 
-	.styled {
+	.glyph {
 		position: relative;
 		display: block;
 		flex: none;
+	}
+
+	.bare {
+		--glyph-ink: currentColor;
+		--glyph-shade: color-mix(in srgb, currentColor 50%, transparent);
+		--glyph-box: 100%;
+	}
+
+	.plated {
+		--glyph-box: 64%;
 		border-radius: 22.5%;
 		background: var(--plate);
 	}
@@ -85,15 +99,15 @@
 	.ink {
 		position: absolute;
 		inset: 0;
-		mask: var(--glyph) center / contain no-repeat;
+		mask: var(--glyph) center / var(--glyph-box) no-repeat;
 	}
 
 	.shade {
-		background: var(--shade);
+		background: var(--glyph-shade);
 	}
 
 	.ink {
-		background: var(--ink);
+		background: var(--glyph-ink);
 		mask-mode: luminance;
 	}
 

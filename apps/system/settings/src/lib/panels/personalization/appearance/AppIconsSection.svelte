@@ -98,5 +98,6 @@
 		border-radius: 12px;
 		padding: 10px 12px;
 		background: #181817;
+		color: #f3f3ef;
 	}
 </style>

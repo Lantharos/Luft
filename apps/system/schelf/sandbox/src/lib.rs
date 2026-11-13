@@ -7,6 +7,7 @@ mod confine;
 mod drives;
 mod escalate;
 mod files;
+mod flatpaks;
 mod inside;
 mod launch;
 mod open;
@@ -20,7 +21,26 @@ use luft_software::apps::appimage::SANDBOX;
 
 static L10N: Localizer = localizer!("locales", ["sandbox"]);
 
-pub use launch::{quit, running};
+use luft_software::apps::flatpak;
+
+/// Whether the AppImage or Flatpak app is open now.
+pub fn running(id: &str) -> Result<bool, String> {
+    if flatpak::is_installed(id) {
+        Ok(flatpaks::running(id))
+    } else {
+        launch::running(id)
+    }
+}
+
+/// Asks the running app to quit, as closing it would, and waits until it
+/// has. Returns whether it was running.
+pub fn quit(id: &str) -> Result<bool, String> {
+    if flatpak::is_installed(id) {
+        flatpaks::quit(id)
+    } else {
+        launch::quit(id)
+    }
+}
 
 const SERVE: &str = "--sandbox-serve";
 const CONFINE: &str = "--sandbox-confine";

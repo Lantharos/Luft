@@ -10,7 +10,7 @@
 use std::collections::{HashMap, HashSet};
 use std::mem::MaybeUninit;
 use std::os::fd::{AsFd, AsRawFd, OwnedFd};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -24,13 +24,12 @@ use tokio::sync::mpsc;
 use tokio::time::{Instant, sleep_until};
 use zbus::Connection;
 
-use super::{Trips, Turn, ask, due, pidfd, plant};
-use crate::launch::{child_pid, runtime_dir};
+use super::{Asked, Trips, Turn, ask, due, offer_restart, pidfd, plant};
+use crate::escalate::Asking;
+use crate::flatpaks::{Instance, OWN_SANDBOXES, instance, instances_folder, section_value};
 
 const UDISKS: &str = "org.freedesktop.UDisks2";
 const UDISKS_ROOT: &str = "/org/freedesktop/UDisks2";
-const INSTANCES: &str = ".flatpak";
-const OWN_SANDBOXES: &str = "schelf-";
 const SANDBOX_INFO: &str = ".flatpak-info";
 const SETTING_UP: Duration = Duration::from_millis(200);
 const SETTLE: Duration = Duration::from_millis(150);
@@ -45,23 +44,6 @@ struct Sandbox {
     turns: HashMap<String, Turn>,
 }
 
-fn section_value(text: &str, section: &str, key: &str) -> Option<String> {
-    let mut inside = false;
-    for line in text.lines() {
-        let line = line.trim();
-        if line.starts_with('[') {
-            inside = line == section;
-        } else if inside
-            && let Some(value) = line
-                .strip_prefix(key)
-                .and_then(|rest| rest.strip_prefix('='))
-        {
-            return Some(value.to_owned());
-        }
-    }
-    None
-}
-
 fn alive(process: &OwnedFd) -> bool {
     let mut polled = libc::pollfd {
         fd: process.as_raw_fd(),
@@ -73,14 +55,8 @@ fn alive(process: &OwnedFd) -> bool {
 
 /// The sandbox of the Flatpak instance `name`, once it's set up: its first
 /// process has moved into its own root, which holds the instance's info.
-fn attach(instances: &Path, name: &str) -> Option<Sandbox> {
-    let folder = instances.join(name);
-    let app = section_value(
-        &std::fs::read_to_string(folder.join("info")).ok()?,
-        "[Application]",
-        "name",
-    )?;
-    let pid = child_pid(&std::fs::read_to_string(folder.join("bwrapinfo.json")).ok()?)?;
+fn attach(name: &str) -> Option<Sandbox> {
+    let Instance { app, pid, .. } = instance(name)?;
     let process = pidfd(pid)?;
     let root = openat2(
         rustix::fs::CWD,
@@ -119,7 +95,7 @@ struct Instances {
 
 impl Instances {
     fn open() -> Result<Self, String> {
-        let folder = runtime_dir()?.join(INSTANCES);
+        let folder = instances_folder()?;
         std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
         let fd = inotify::init(inotify::CreateFlags::NONBLOCK | inotify::CreateFlags::CLOEXEC)
             .map_err(|error| error.to_string())?;
@@ -194,6 +170,36 @@ impl Instances {
     }
 }
 
+/// Waits until the process ends.
+async fn ended(process: &OwnedFd) {
+    let Some(watch) = process.try_clone().ok().and_then(|process| {
+        unsafe { AsyncFd::register_with_interest(process, Interest::READABLE) }.ok()
+    }) else {
+        return std::future::pending().await;
+    };
+    let _ = watch.readable().await;
+}
+
+/// Offers to restart a Flatpak app it was given a drive while it runs, and
+/// restarts it the way Schelf does when you ask.
+async fn offer_restart_after(session: &Connection, app: String, process: &OwnedFd, drive: &Drive) {
+    let asking = Asking {
+        name: crate::flatpaks::name(&app).unwrap_or_else(|| app.clone()),
+        id: app,
+    };
+    if !offer_restart(session, &asking, drive, ended(process)).await {
+        return;
+    }
+    let restarted = tokio::task::spawn_blocking(move || {
+        crate::flatpaks::quit(&asking.id)?;
+        crate::flatpaks::open(&asking.id)
+    })
+    .await;
+    if let Ok(Err(error)) = restarted {
+        eprintln!("Couldn't restart the app: {error}");
+    }
+}
+
 /// What the watcher keeps while it runs.
 struct Watcher {
     session: Connection,
@@ -244,7 +250,7 @@ impl Watcher {
     async fn set_up(&mut self) {
         let waiting: Vec<String> = self.setting_up.keys().cloned().collect();
         for name in waiting {
-            match attach(&self.instances.folder, &name) {
+            match attach(&name) {
                 Some(sandbox) => {
                     self.setting_up.remove(&name);
                     self.sandboxes.insert(name.clone(), sandbox);
@@ -278,7 +284,10 @@ impl Watcher {
             );
             tokio::spawn(async move {
                 let asked = ask(&session, &app, process.as_fd(), &drive).await;
-                let _ = answered.send((name, drive.uuid, Turn::after(Some(asked))));
+                let _ = answered.send((name, drive.uuid.clone(), Turn::after(Some(asked))));
+                if asked == Asked::Allowed {
+                    offer_restart_after(&session, app, &process, &drive).await;
+                }
             });
         }
     }

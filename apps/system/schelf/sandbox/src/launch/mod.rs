@@ -112,7 +112,7 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
     }
 }
 
-/// Whether a copy of the app is running, in its sandbox or not.
+/// Whether a copy of the AppImage is running, in its sandbox or not.
 pub fn running(id: &str) -> Result<bool, String> {
     Ok(matches!(Folder::of(id)?.lock()?, Lock::Running))
 }
@@ -260,7 +260,7 @@ fn sandbox(
     Ok(Ended {
         code: status.code().unwrap_or(1),
         reason,
-        restart: wanted.restart(),
+        restart: wanted.ended(),
     })
 }
 

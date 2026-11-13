@@ -121,6 +121,7 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
         &summary,
         &body,
         &t!(L10N, "sandbox-review"),
+        std::future::pending(),
     )
     .await?
     {
@@ -133,13 +134,16 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
 }
 
 /// Tells you something about the app in a notification with one button,
-/// and says whether you picked it before the notification went away.
+/// and says whether you picked it before the notification went away. Once
+/// `gone` is ready the button means nothing any more, so the notification
+/// is taken away.
 pub async fn offer_action(
     connection: &Connection,
     app: &Asking,
     summary: &str,
     body: &str,
     action: &str,
+    gone: impl Future<Output = ()>,
 ) -> zbus::Result<bool> {
     let notifications = Proxy::new(connection, NOTIFICATIONS, PATH, NOTIFICATIONS).await?;
     let mut invoked = notifications.receive_signal("ActionInvoked").await?;
@@ -179,7 +183,11 @@ pub async fn offer_action(
             }
         }
     };
-    tokio::time::timeout(ANSWER_WAIT, answer)
-        .await
-        .unwrap_or(Ok(false))
+    tokio::select! {
+        answered = tokio::time::timeout(ANSWER_WAIT, answer) => answered.unwrap_or(Ok(false)),
+        () = gone => {
+            notifications.call::<_, _, ()>("CloseNotification", &(id,)).await?;
+            Ok(false)
+        }
+    }
 }

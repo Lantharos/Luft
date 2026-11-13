@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GLibUnix from 'gi://GLibUnix';
 import Shell from 'gi://Shell';
 
 import { identifyProcess } from '../../../../shared/apps/identity.js';
@@ -32,17 +33,20 @@ type Invocation = Gio.DBusMethodInvocation;
 
 const refuse = (invocation: Invocation, kind: string, message: string) => invocation.return_dbus_error(`${ERROR}.${kind}`, message);
 
+interface Asking {
+  app: string;
+  process: PidFd;
+}
+
 /** The sandboxed app the process behind `fd` belongs to, judged by its sandbox while the pidfd holds it. */
-function sandboxedApp(fd: number | null): string | null {
+function sandboxedApp(fd: number | null): Asking | null {
   if (fd === null) return null;
   const process = new PidFd(fd);
-  try {
-    const pid = process.pid;
-    const identity = pid ? identifyProcess(pid) : null;
-    return identity && 'app' in identity && process.pid === pid ? identity.app : null;
-  } finally {
-    process.close();
-  }
+  const pid = process.pid;
+  const identity = pid ? identifyProcess(pid) : null;
+  if (identity && 'app' in identity && process.pid === pid) return { app: identity.app, process };
+  process.close();
+  return null;
 }
 
 /**
@@ -58,7 +62,7 @@ export class DriveAccessService {
   private readonly asked = new Map<string, number[]>();
   private readonly focusChanged: number;
   private inFrontNow: string | null = null;
-  private open: ModalDialog | null = null;
+  private open: { dialog: ModalDialog; asking: Asking } | null = null;
 
   constructor() {
     this.focusChanged = global.display.connect('notify::focus-window', () => this.noteFocus());
@@ -87,7 +91,16 @@ export class DriveAccessService {
   }
 
   async AskAsync([index, uuid]: [number, string], invocation: Invocation, fdList: Gio.UnixFDList | null): Promise<void> {
-    const app = sandboxedApp(stealFd(fdList, index));
+    const asking = sandboxedApp(stealFd(fdList, index));
+    try {
+      await this.consider(invocation, asking, uuid);
+    } finally {
+      if (this.open?.asking !== asking) asking?.process.close();
+    }
+  }
+
+  private async consider(invocation: Invocation, asking: Asking | null, uuid: string): Promise<void> {
+    const app = asking?.app;
     if (await refuseSandboxed(invocation, 'ask for drives')) return;
     if (!await callerRuns(invocation, luftAppPrograms(SCHELF))) {
       refuse(invocation, 'NotSchelf', 'Only Schelf from the system image can ask whether an app may use a drive');
@@ -118,34 +131,44 @@ export class DriveAccessService {
       refuse(invocation, 'Unknown', 'That drive isn\'t mounted');
       return;
     }
-    this.ask(invocation, app, drive);
+    this.ask(invocation, asking!, drive);
   }
 
-  private ask(invocation: Invocation, appId: string, drive: MountedDrive): void {
-    const app = Shell.AppSystem.get_default().lookup_app(`${appId}.desktop`);
+  /** Shows the prompt until it's answered, the asker leaves or the app's process ends. */
+  private ask(invocation: Invocation, asking: Asking, drive: MountedDrive): void {
+    const app = Shell.AppSystem.get_default().lookup_app(`${asking.app}.desktop`);
     let watch = 0;
+    let exited = 0;
     const finish = (allowed: boolean | null) => {
       if (watch) Gio.bus_unwatch_name(watch);
-      watch = 0;
+      if (exited) GLib.source_remove(exited);
+      watch = exited = 0;
       this.open = null;
+      asking.process.close();
       if (allowed === null) refuse(invocation, 'Closed', 'The prompt closed without an answer');
       else invocation.return_value(new GLib.Variant('(b)', [allowed]));
     };
-    const dialog = openDriveDialog(app?.get_name() ?? appId, app, drive, allowed => finish(allowed));
+    const dialog = openDriveDialog(app?.get_name() ?? asking.app, app, drive, allowed => finish(allowed));
     if (!dialog) {
       refuse(invocation, 'Locked', 'The prompt couldn\'t be shown');
       return;
     }
-    this.open = dialog;
-    watch = Gio.bus_watch_name_on_connection(Gio.DBus.session, invocation.get_sender()!, Gio.BusNameWatcherFlags.NONE, null, () => {
+    this.open = { dialog, asking };
+    const gone = () => {
       dialog.close();
       finish(null);
+    };
+    watch = Gio.bus_watch_name_on_connection(Gio.DBus.session, invocation.get_sender()!, Gio.BusNameWatcherFlags.NONE, null, gone);
+    exited = GLibUnix.fd_add_full(GLib.PRIORITY_DEFAULT, asking.process.fd, GLib.IOCondition.IN, () => {
+      exited = 0;
+      gone();
+      return GLib.SOURCE_REMOVE;
     });
   }
 
   destroy(): void {
     global.display.disconnect(this.focusChanged);
-    this.open?.close();
+    this.open?.dialog.close();
     this.exported.unexport();
   }
 }

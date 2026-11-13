@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {answerable, labelled, styled} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';
@@ -30,6 +31,13 @@ export interface Looked {
   kind?: string;
   writable?: boolean;
   error?: string;
+}
+
+export function notificationTitled(text: string) {
+  for (const source of Main.messageTray.getSources())
+    for (const notification of source.notifications)
+      if (notification.title?.includes(text)) return notification;
+  return null;
 }
 
 export const shownDialog = () => styled(DIALOG).find(actor => actor.mapped) ?? null;
@@ -100,16 +108,25 @@ export async function checkOnlySchelfAsks() {
 export class Looker {
   private answered = 0;
 
-  private constructor(readonly window: Meta.Window, private readonly process: Process) {}
+  private constructor(readonly window: Meta.Window, private readonly process: Process | null) {}
 
   static async open(argv: string[], id: string, options: SpawnOptions): Promise<Looker> {
     const earlier = new Set(windows());
     const process = spawn(argv, {...options, env: {...options.env, GSK_RENDERER: 'cairo'}});
+    return new Looker(await Looker.shown(id, earlier), process);
+  }
+
+  /** The looker the app opened by itself, such as when it was restarted. */
+  static async adopt(id: string, earlier: Set<Meta.Window>): Promise<Looker> {
+    return new Looker(await Looker.shown(id, earlier), null);
+  }
+
+  private static async shown(id: string, earlier: Set<Meta.Window>) {
     const window = await waitForWindow(candidate => !earlier.has(candidate) && candidate.get_title()?.startsWith(LOOKER) === true &&
       candidate.get_sandboxed_app_id() === id, `${id} opens a window in its sandbox`, WINDOW_TIMEOUT);
     window.activate(global.get_current_time());
     await waitUntil(() => global.display.focus_window === window, `${id} is in front`);
-    return new Looker(window, process);
+    return window;
   }
 
   async look(): Promise<Looked> {
@@ -124,7 +141,7 @@ export class Looker {
 
   async close(): Promise<void> {
     this.window.delete(global.get_current_time());
-    await stop(this.process);
+    if (this.process) await stop(this.process);
     await waitUntil(() => !windows().includes(this.window), 'the app closes');
   }
 }

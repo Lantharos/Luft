@@ -3,7 +3,8 @@ set -euo pipefail
 
 if [[ $# -ne 2 ]]; then
   echo "Usage: shelter.sh HOME BRANCH" >&2
-  echo "Installs org.example.Shelter, which runs gjs on what it's given, for the user of HOME, on GNOME's runtime BRANCH." >&2
+  echo "Installs org.example.Shelter, which runs gjs on what it's given, or on its own folder's drive-looker.js" >&2
+  echo "with the folder named in its file folder, for the user of HOME, on GNOME's runtime BRANCH." >&2
   exit 2
 fi
 home="$1" branch="$2"
@@ -13,9 +14,16 @@ export HOME="$home" FLATPAK_USER_DIR="$home/.local/share/flatpak"
 flatpak --user uninstall -y --noninteractive org.example.Shelter > /dev/null 2>&1 || true
 flatpak --user remote-delete --force shelter > /dev/null 2>&1 || true
 flatpak build-init "$work/app" org.example.Shelter org.gnome.Platform org.gnome.Platform "$branch" > /dev/null
-mkdir -p "$work/app/files/bin"
-printf '#!/bin/sh\nexec gjs -m "$@"\n' > "$work/app/files/bin/shelter"
+mkdir -p "$work/app/files/bin" "$work/app/files/share/applications"
+cat > "$work/app/files/bin/shelter" <<'SCRIPT'
+#!/bin/sh
+own="$HOME/.var/app/org.example.Shelter"
+[ $# -gt 0 ] || set -- "$own/drive-looker.js" "$(cat "$own/folder")"
+exec gjs -m "$@"
+SCRIPT
 chmod +x "$work/app/files/bin/shelter"
+printf '[Desktop Entry]\nType=Application\nName=Shelter\nExec=shelter\nIcon=org.example.Shelter\n' \
+  > "$work/app/files/share/applications/org.example.Shelter.desktop"
 flatpak build-finish "$work/app" --command=shelter --socket=wayland > /dev/null
 flatpak build-export "$work/repo" "$work/app" stable > /dev/null
 flatpak --user remote-add --no-gpg-verify shelter "$work/repo"

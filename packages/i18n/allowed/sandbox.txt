@@ -20,3 +20,5 @@ apps/system/schelf/sandbox/src/drives/ask.rs	Couldn't keep what {id} may do with
 apps/system/schelf/sandbox/src/drives/flatpaks.rs	Couldn't watch the stand-in for {} in {name}: {error}
 apps/system/schelf/sandbox/src/drives/flatpaks.rs	Couldn't open the drives apps were given where they're mounted now: {error}
 apps/system/schelf/sandbox/src/drives/flatpaks.rs	There's no home folder.
+apps/system/schelf/sandbox/src/flatpaks.rs	The app didn't quit.
+apps/system/schelf/sandbox/src/flatpaks.rs	That app isn't installed any more.

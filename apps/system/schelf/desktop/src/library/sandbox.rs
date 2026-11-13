@@ -73,13 +73,9 @@ pub async fn has_full_access(Access { id, source }: Access) -> Result<bool, Stri
 /// Changes full access, and says whether the app is open, since it keeps
 /// running the way it started until it opens again.
 pub async fn set_full_access(change: full_access::Change) -> Result<bool, String> {
-    let (id, appimage) = (change.id.clone(), change.source == Source::AppImage);
+    let id = change.id.clone();
     full_access::change(change).await?;
-    if appimage {
-        luft_sandbox::running(&id)
-    } else {
-        Ok(false)
-    }
+    luft_sandbox::running(&id)
 }
 
 #[derive(Deserialize, Type)]

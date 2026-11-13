@@ -52,7 +52,7 @@ The `flatpak` command works too: `flatpak install --user flathub org.example.App
 
 Flatpak apps and AppImages run in a sandbox: they only see their own files and the ones you pick for them, can't read the clipboard while you're using another app, can't control other apps' windows, and can't read what other apps saved in your keyring. An app that needs one more place, such as Steam with a game library on a second drive, can be given just that place:
 
-- When an app you're using looks inside a drive it can't use, Luft asks whether it may. Choose **Allow**, and the app sees the drive the next time it opens. **Don't allow** is remembered, so it doesn't ask again.
+- When an app you're using looks inside a drive it can't use, Luft asks whether it may. Choose **Allow**, and the app sees the drive the next time it opens; a notification offers to **Restart** it now, and nothing restarts until you pick that. **Don't allow** is remembered, so it doesn't ask again.
 - On the app's page in Schelf, **Drives and folders** gives it a drive or a folder, or takes one away. Settings → Apps does the same.
 - In the terminal, `schelf give steam Games` gives Steam the drive called Games, and `--read-only` lets it only read.
 

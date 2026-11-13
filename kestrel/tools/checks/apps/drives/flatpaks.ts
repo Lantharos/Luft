@@ -3,10 +3,10 @@ import GLib from 'gi://GLib';
 
 import {labelled} from '../../lib/actors.js';
 import {appBinary} from '../../lib/apps/luftApp.js';
-import {builtFixture, fixture, outcome, spawn, stop} from '../../lib/processes.js';
+import {builtFixture, fixture, outcome, spawn, stop, windows} from '../../lib/processes.js';
 import {settled} from '../../lib/wait.js';
 import {IN_SESSION} from '../lib/appImages.js';
-import {answer, answers, DRIVE_LABEL, driveFolder, eventually, type Looked, Looker, mount, require, setAnswer, shownDialog,
+import {answer, answers, DRIVE_LABEL, driveFolder, eventually, type Looked, Looker, mount, notificationTitled, require, setAnswer, shownDialog,
   unmount} from './drive.js';
 
 const ID = 'org.example.Shelter';
@@ -32,6 +32,32 @@ async function lookOnceThere(looker: Looker): Promise<Looked> {
   return looked;
 }
 
+const OFFER = `Shelter can use ${DRIVE_LABEL}`;
+
+/** Restarting from the notification closes the app as closing it would and opens it again from its menu entry. */
+async function checkRestart(asking: Looker, point: string) {
+  const offered = await eventually(() => notificationTitled(OFFER), 'Luft offers to restart the Flatpak app so it sees the drive');
+  require(windows().includes(asking.window), 'the Flatpak app keeps running until you choose');
+  const earlier = new Set(windows());
+  const restart = require(offered.actions.find(action => action.label === 'Restart'), 'the offer has a Restart button');
+  restart.activate();
+  await eventually(() => !windows().includes(asking.window), 'restarting closes the Flatpak app', 25000);
+  const reopened = await Looker.adopt(ID, earlier);
+  require(reopened.window.get_sandboxed_app_id() === ID, `and opens it again in its sandbox, which shows the drive at ${point} once it's there`);
+  await reopened.close();
+}
+
+/** An offer to restart goes away when the app is closed some other way. */
+async function checkClosedElsewhere(open: (folder: string) => Promise<Looker>, point: string) {
+  await setAnswer(ID, []);
+  const asking = await open(point);
+  await lookOnceThere(asking);
+  await answer('Allow');
+  await eventually(() => notificationTitled(OFFER), 'the offer to restart shows again after allowing again');
+  await asking.close();
+  await eventually(() => !notificationTitled(OFFER), 'and goes away once the app is closed some other way', 10000);
+}
+
 /** A Flatpak app that looks for a drive it wasn't given, with the watcher Luft runs for Flatpak sandboxes. */
 export async function checkFlatpaks(home: string) {
   const branch = gnomeBranch(home);
@@ -44,10 +70,13 @@ export async function checkFlatpaks(home: string) {
     XDG_CACHE_HOME: `${home}/.cache`, FLATPAK_USER_DIR: null, FLATPAK_SYSTEM_DIR: null};
   const own = `${home}/.var/app/${ID}`;
   GLib.mkdir_with_parents(own, 0o755);
-  const script = `${own}/drive-looker.js`;
-  Gio.File.new_for_path(builtFixture('clients', 'windows', 'driveLooker.js')).copy(Gio.File.new_for_path(script), Gio.FileCopyFlags.OVERWRITE, null, null);
-  const open = (folder: string) => Looker.open(['flatpak', 'run', '--user', '--no-documents-portal', ID, script, folder], ID, {env});
-  const watcher = spawn([appBinary('schelf'), '--watch-drives'], {env});
+  Gio.File.new_for_path(builtFixture('clients', 'windows', 'driveLooker.js'))
+    .copy(Gio.File.new_for_path(`${own}/drive-looker.js`), Gio.FileCopyFlags.OVERWRITE, null, null);
+  const open = (folder: string) => {
+    GLib.file_set_contents(`${own}/folder`, folder);
+    return Looker.open(['flatpak', 'run', '--user', '--no-documents-portal', ID], ID, {env});
+  };
+  const watcher = spawn([appBinary('schelf'), '--watch-drives'], {env: {...env, GSK_RENDERER: 'cairo'}});
   const folder = driveFolder(home);
   try {
     const point = await mount();
@@ -59,7 +88,8 @@ export async function checkFlatpaks(home: string) {
     await answer('Allow');
     await eventually(async () => (await answers(ID))[0] === 'read-write', 'allowing gives the Flatpak app the drive');
     require(overrides(home).includes(`filesystems=${point};`), 'the Flatpak app\'s overrides open where the drive is mounted');
-    await asking.close();
+    await checkRestart(asking, point);
+    await checkClosedElsewhere(open, point);
     await unmount();
     await eventually(() => !overrides(home).includes(point), 'once the drive is gone, its old place isn\'t opened to the app any more', 10000);
     await mount(folder);

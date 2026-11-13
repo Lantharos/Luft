@@ -87,7 +87,7 @@ Inside a sandbox a drive the app wasn't given doesn't exist, so there's nothing 
 
 - Only an app in front, or one used in the last ten seconds, is asked, so an app that scans drives in the background never interrupts. Each drive is asked about once for each run of the app.
 - **Don't allow** is the default and is kept, so the app isn't asked again and the folder isn't put there again. Giving it the drive in Settings or Schelf overrides that.
-- **Allow** gives the drive to read and change, from the next time the app opens. An AppImage then offers to restart.
+- **Allow** gives the drive to read and change, from the next time the app opens. A notification then offers to restart it, and only that button does: Schelf asks the app to quit as closing it would, the way it does for full access, then opens it again from its menu entry. The notification goes away when the app closes some other way, and the prompt when the app closes before it's answered.
 - Folders in your home aren't watched: the app reaches them through the file chooser, or you give one in Settings or Schelf.
 
 Opening the folder can be noticed, a glance at the folder holding it can't, and nothing an app does through its own code can be told apart from someone choosing the drive in it. That's why the prompt waits for the app to be in front.

@@ -1,6 +1,5 @@
 use luft_app::dbus;
 use luft_app::portal::{FileChooser, uri_path};
-use luft_software::apps::flatpak;
 use luft_software::apps::places::{self, Access, DriveTarget, GivenDrive, PluggedDrive};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -30,16 +29,6 @@ pub struct Folder {
     folder: String,
 }
 
-/// Whether an AppImage is open now, so Schelf can offer to restart it.
-/// Flatpak apps keep running as they started until you open them again.
-fn running(id: &str) -> Result<bool, String> {
-    if flatpak::is_installed(id) {
-        Ok(false)
-    } else {
-        luft_sandbox::running(id)
-    }
-}
-
 pub async fn given(App { id }: App) -> Result<Places, String> {
     let connection = dbus::session().await?;
     let mut drives = places::given(connection).await?;
@@ -65,7 +54,7 @@ pub async fn plugged(App { id }: App) -> Result<Vec<PluggedDrive>, String> {
 pub async fn give_drive(target: DriveTarget) -> Result<bool, String> {
     let id = target.app.clone();
     places::give_chosen(dbus::session().await?, target).await?;
-    running(&id)
+    luft_sandbox::running(&id)
 }
 
 pub async fn take_drive(target: DriveTarget) -> Result<(), String> {
@@ -89,7 +78,7 @@ pub async fn add_folder(App { id }: App) -> Result<Option<bool>, String> {
         Access::ReadWrite,
     )
     .await?;
-    running(&id).map(Some)
+    luft_sandbox::running(&id).map(Some)
 }
 
 pub async fn remove_folder(Folder { id, folder }: Folder) -> Result<(), String> {

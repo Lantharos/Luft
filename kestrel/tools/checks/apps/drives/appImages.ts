@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {labelled} from '../../lib/actors.js';
 import {builtFixture, outcome, scratch} from '../../lib/processes.js';
@@ -10,17 +9,10 @@ import {withApp} from '../lib/apps.js';
 import {IN_SESSION, install, launchLine, SABINE_BUILDER} from '../lib/appImages.js';
 import type {Point} from '../../lib/input/input.js';
 import {scrollToEnd, showEnd} from '../settings/navigation.js';
-import {answer, answers, checkOnlySchelfAsks, DRIVE_LABEL, DRIVE_SIZE, driveFolder, eventually, Looker, mount, require, setAnswer,
+import {answer, answers, checkOnlySchelfAsks, notificationTitled, DRIVE_LABEL, DRIVE_SIZE, driveFolder, eventually, Looker, mount, require, setAnswer,
   shownDialog, unmount} from './drive.js';
 
 const QUIET = 3000;
-
-function notificationTitled(text: string) {
-  for (const source of Main.messageTray.getSources())
-    for (const notification of source.notifications)
-      if (notification.title?.includes(text)) return notification;
-  return null;
-}
 
 async function sabineApp(name: string) {
   const image = scratch(`${name}.AppImage`);

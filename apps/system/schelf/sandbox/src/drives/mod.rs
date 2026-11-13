@@ -15,7 +15,7 @@ mod trips;
 use std::os::fd::{FromRawFd, OwnedFd};
 use std::time::{Duration, Instant};
 
-pub use ask::{Asked, ask};
+pub use ask::{Asked, ask, offer_restart};
 pub use flatpaks::watch;
 pub use trips::{Trips, events};
 

@@ -67,6 +67,17 @@ fn installations() -> impl Iterator<Item = std::path::PathBuf> {
     user.into_iter().chain([system])
 }
 
+/// The menu entry Flatpak exported for the app, from your installation or everyone's.
+pub fn desktop_file(id: &str) -> Option<std::path::PathBuf> {
+    installations()
+        .map(|installation| {
+            installation
+                .join("exports/share/applications")
+                .join(format!("{id}.desktop"))
+        })
+        .find(|file| file.is_file())
+}
+
 /// Whether a Flatpak app by that ID is installed, for you or for everyone.
 pub fn is_installed(id: &str) -> bool {
     installations().any(|installation| installation.join("app").join(id).join("current").exists())

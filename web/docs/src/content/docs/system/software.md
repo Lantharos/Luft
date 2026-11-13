@@ -7,6 +7,7 @@ asks:
   - { ask: flatpak install, to: flatpak }
   - { ask: app can't see my drive, to: drives-and-folders }
   - { ask: steam library on another drive, to: drives-and-folders }
+  - { ask: steam not a supported location, to: drives-and-folders }
   - { ask: app can't see my files, to: drives-and-folders }
   - { ask: give app full access, to: full-access }
   - { ask: flatseal, to: full-access }
@@ -58,6 +59,8 @@ Flatpak apps and AppImages run in a sandbox: they only see their own files and t
 
 A drive is given as the drive itself, not its name, so another stick called Games doesn't get it, and it keeps working wherever the drive is mounted. The app reaches it directly, as fast as any other app.
 
+Steam's Flatpak currently turns down every drive in Settings → Storage → Add Drive with "This is not a supported location for a Steam library folder", on any system, until Valve fixes it. To add one anyway, give Steam full access in Schelf, let it restart, and add the drive. You can turn full access off again afterwards; the library keeps working.
+
 ### Full access
 
 A few apps need much more than a drive or a folder, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
@@ -68,7 +71,7 @@ A few apps need much more than a drive or a folder, such as password managers th
 - read the passwords and keys saved in your keyring, other apps' too
 - start any program as you, outside a sandbox
 
-Apps that keep their whole home in their own folder, such as Steam, get everything except your home folder, since seeing it would confuse them. Only give full access to apps you trust. Schelf asks you to confirm, and the app gets its new access the next time it opens; if it's open, Schelf offers to restart it. Until then, opening it again, or a link it handles, goes to the copy that's running. Turning it off puts the app back in its sandbox. An AppImage keeps its settings and data in `~/.var/app/` followed by its ID either way, so nothing it saved goes missing when you switch. For a Flatpak that also undoes changes you made to its permissions with other tools, such as Flatseal.
+Apps that keep their whole home in their own folder, such as Steam, get everything too but keep that folder as their home, since finding yours in its place would confuse them. Only give full access to apps you trust. Schelf asks you to confirm, and the app gets its new access the next time it opens; if it's open, Schelf offers to restart it. Until then, opening it again, or a link it handles, goes to the copy that's running. Turning it off puts the app back in its sandbox. An AppImage keeps its settings and data in `~/.var/app/` followed by its ID either way, so nothing it saved goes missing when you switch. For a Flatpak that also undoes changes you made to its permissions with other tools, such as Flatseal.
 
 Command-line tools and system packages don't run in a sandbox, so they have full access already. Settings → Apps lists what every sandboxed app was allowed, and takes any of it away.
 

@@ -9,7 +9,8 @@ use crate::apps::operand::operand;
 use crate::apps::places;
 
 const EVERYTHING: [&str; 1] = ["--filesystem=host"];
-const EVERYTHING_BUT_HOME: [&str; 6] = [
+const EVERYTHING_BUT_HOME: [&str; 7] = [
+    "--filesystem=host-root",
     "--filesystem=host-os",
     "--filesystem=host-etc",
     "--filesystem=/run/media",

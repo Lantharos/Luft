@@ -60,7 +60,7 @@ export function describePage(keystrokes: Keystrokes): void {
         ...problem ? [{ type: 'text', text: problem } as PageItem] : [],
         { type: 'button', title: t('add-pack'), description: t('add-pack-detail'), label: t('add-pack-button'), onActivate: () => void add() },
         { type: 'button', title: t('template'), description: t('template-detail'), label: t('template-button'), onActivate: () => extension.open(`file://${extension.path}/template`) },
-        { type: 'button', title: t('guide'), description: t('guide-detail'), label: t('guide-button'), onActivate: () => extension.open(GUIDE) },
+        { type: 'button', title: t('guide'), label: t('guide-button'), onActivate: () => extension.open(GUIDE) },
       ],
     },
   ]);

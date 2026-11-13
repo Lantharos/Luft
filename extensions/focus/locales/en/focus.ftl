@@ -5,7 +5,7 @@ extension-description = A timer in the taskbar for work sessions, with notificat
 focus = Focus
 
 length = Session length
-    .description = What a new session starts with. You can pick another before starting
+    .description = What a new session starts with
 length-15 = 15 minutes
 length-25 = 25 minutes
 length-45 = 45 minutes
@@ -18,9 +18,9 @@ length-short-45 = 45 min
 length-short-60 = 1 h
 length-short-90 = 1½ h
 hold-notifications = Hold notifications back
-    .description = They wait in the notification center until the session ends. Urgent ones still show
+    .description = Urgent ones still show
 soundscapes = Play Soundscapes
-    .description = Starts the mix you last chose while a session runs, if Soundscapes is installed
+    .description = Plays the mix you last chose
 shortcut-toggle = Start or end a session
 session = Session
 taskbar = Taskbar
@@ -57,4 +57,4 @@ done-quiet = No notifications came in
 again = Another session
 
 expand-on-hover = Show more on hover
-    .description = Widens in the taskbar to show the time left when you point at it
+    .description = Shows the time left

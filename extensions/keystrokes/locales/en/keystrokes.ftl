@@ -19,20 +19,19 @@ in-use = In use
 use = Use
 listen = Listen
 privacy = What Keystrokes can see
-privacy-detail = Nothing you type. Luft plays these sounds itself and only tells a letter or other key from Space, Enter and Backspace, and the extension never hears of a press at all: not which key, not how many, not when. Everything stays silent while the screen is locked and while a password field has the keyboard
+privacy-detail = Nothing you type. Luft plays the sounds itself and only tells a letter apart from Space, Enter and Backspace, and the extension never hears a press at all: not which key, not how many, not when. Everything stays silent on the lock screen and in password fields
 # An honest limit of the extension, shown under what it can see
-privacy-limit = Luft knows a password field when an app says it is one. Terminals and some older apps don't, so you'll hear keys there, such as when a command asks for your password. Keystrokes still doesn't learn what you typed
+privacy-limit = Terminals and some older apps don't mark their password fields, so you'll hear keys there, such as when a command asks for your password. Keystrokes still doesn't learn what you typed
 make-your-own = Make your own
-make-your-own-detail = A set of sounds is a folder with sound files and a small pack.json that says what each is for
+make-your-own-detail = A folder of sound files and a pack.json that says what each is for
 add-pack = Add sounds
 add-pack-detail = Pick the folder with its pack.json
 add-pack-button = Pick a folder
 remove-pack = Remove
 template = Get the template
-template-detail = Opens a folder with a pack.json and plain sounds to replace. Copy it somewhere of your own first
+template-detail = A pack.json and plain sounds to replace. Copy it somewhere of your own first
 template-button = Open
 guide = How to make one
-guide-detail = What each sound is for, how long they can be, and how to record your own
 guide-button = Read the guide
 # Why a folder can't be added. { $kind } is a word from pack.json, such as space, and stays in English
 pack-no-manifest = There's no pack.json in that folder

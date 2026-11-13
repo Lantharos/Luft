@@ -13,16 +13,15 @@ signed-in-as = { $name }
 sign-out = Sign out
 # While signing in; $code is a code such as BCDF-GHJK
 code = Confirm the code { $code } in your browser
-    .description = The page opened in your browser. It's waiting for you there
+    .description = It's waiting in your browser
 page-closed = Closed the page?
 open-again = Open it again
 cancel = Cancel
 sign-in-failed = Signing in didn't finish
-    .description = The code wasn't confirmed in time. Sign in again and confirm it in your browser within 15 minutes
+    .description = The code wasn't confirmed within 15 minutes. Sign in again
 
 showing = In the taskbar
 count = Count
-    .description = What the number next to Pult counts
 count-open = Everything waiting
 count-unread = What you haven't read
 urgent = Notify about urgent items

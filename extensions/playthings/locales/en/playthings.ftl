@@ -42,10 +42,10 @@ displays = Displays
 displays-main = Main display
 displays-every = Every display
 ambient = Gentle motion
-    .description = Sway, drift and flicker a little on their own. They rest during full screen, with battery saver and when you ask for less motion
+    .description = They rest during full screen, with battery saver and when you ask for less motion
 # Dragging playthings to where you like them
 arrange = Arrange
-arrange-detail = Drag things on your desktop to where you like them, on each display
+arrange-detail = Drag things to where you like them, on each display
 arrange-button = Arrange
 arrange-hint = Drag things to where you like them.
 arrange-done = Done

@@ -21,7 +21,6 @@ progress = { $position } kestusest { $length }
 second-line = Pealkirja all
 players-playing = Esitamisel
 hide-paused = Peida peatamisel
-    .description = Näita vaid siis, kui midagi on esitamisel
 players = Pleierid
 players-description = Rakendus, mida ta järgib. Brauser on nähtav siin niipea, kui midagi on esitamisel
 look = Välimus

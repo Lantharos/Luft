@@ -14,9 +14,8 @@ title-width = Widest the title gets
     .description = Longer titles slide along within it
 look = Look
 hide-paused = Hide when paused
-    .description = Show it only while something plays
 players = Players
-players-description = The apps it follows. A browser shows up here once it plays something
+players-description = A browser shows up here once it plays something
 no-players = Nothing has played yet
 # Screen-reader name of the taskbar element and the pop-up
 now-playing = Now playing
@@ -34,4 +33,3 @@ unknown-artist = Unknown artist
 progress = { $position } of { $length }
 
 expand-on-hover = Show more on hover
-    .description = Widens in the taskbar to show more of what plays when you point at it

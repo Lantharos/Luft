@@ -126,6 +126,12 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
                 plan(update.key.clone(), update.name.clone(), job, Vec::new())
             }),
     );
+    plans.extend(of(Source::StoreTool).into_iter().map(|update| {
+        let job = Job::UpdateStoreTool {
+            name: update.id.clone(),
+        };
+        plan(update.key.clone(), update.name.clone(), job, Vec::new())
+    }));
     plans
 }
 

@@ -8,4 +8,5 @@ pub mod host;
 pub mod library;
 pub mod operations;
 pub mod store;
+pub mod tools;
 pub mod updates;

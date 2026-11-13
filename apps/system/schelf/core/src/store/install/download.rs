@@ -43,6 +43,42 @@ fn ask(url: &str) -> Result<ureq::http::Response<ureq::Body>, String> {
     request.call().map_err(signed::refused)
 }
 
+/// A file as schelf.store signed for it: where it is, how big it is and its
+/// SHA-256.
+pub struct Published<'a> {
+    pub url: &'a str,
+    pub size: u64,
+    pub sha256: &'a str,
+}
+
+/// Downloads `file` for `id`, asked for with `query`, keeping it only when
+/// it's exactly the file the store signed for.
+pub fn published_file(
+    id: &str,
+    file: &Published,
+    query: &str,
+    task: Task,
+) -> Result<PathBuf, String> {
+    if !file.url.starts_with(crate::store::DOWNLOADS) {
+        return Err(CHANGED.into());
+    }
+    let folder = cache::folder().join("store/downloads");
+    fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
+    let path = folder.join(format!("{id}.download"));
+    http::save(
+        ask(&format!("{}?{query}", file.url))?,
+        &path,
+        Some(file.size),
+        task,
+    )?;
+    task.progress(Stage::Installing, None);
+    if !matches(&path, file)? {
+        let _ = fs::remove_file(&path);
+        return Err(CHANGED.into());
+    }
+    Ok(path)
+}
+
 /// Downloads the artifact, keeping it only when it's exactly the file the
 /// store signed for.
 pub fn verified(
@@ -51,24 +87,7 @@ pub fn verified(
     reason: &str,
     task: Task,
 ) -> Result<PathBuf, String> {
-    if !artifact.url.starts_with(crate::store::DOWNLOADS) {
-        return Err(CHANGED.into());
-    }
-    let folder = cache::folder().join("store/downloads");
-    fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
-    let path = folder.join(format!("{id}.download"));
-    http::save(
-        ask(&format!("{}?reason={reason}", artifact.url))?,
-        &path,
-        Some(artifact.size),
-        task,
-    )?;
-    task.progress(Stage::Installing, None);
-    if !published(&path, artifact)? {
-        let _ = fs::remove_file(&path);
-        return Err(CHANGED.into());
-    }
-    Ok(path)
+    published_file(id, &artifact.published(), &format!("reason={reason}"), task)
 }
 
 /// The artifact's file shipped with the system next to `listing`'s copy,
@@ -76,7 +95,7 @@ pub fn verified(
 pub fn shipped(listing: &Path, artifact: &Artifact) -> Result<PathBuf, String> {
     let name = artifact.url.rsplit('/').next().unwrap_or_default();
     let path = listing.with_file_name(name);
-    if !published(&path, artifact)? {
+    if !matches(&path, &artifact.published())? {
         return Err(format!(
             "{} isn't the file schelf.store published.",
             path.display()
@@ -85,7 +104,7 @@ pub fn shipped(listing: &Path, artifact: &Artifact) -> Result<PathBuf, String> {
     Ok(path)
 }
 
-fn published(path: &Path, artifact: &Artifact) -> Result<bool, String> {
-    let sized = fs::metadata(path).is_ok_and(|metadata| metadata.len() == artifact.size);
-    Ok(sized && sha256(path)? == artifact.sha256.to_ascii_lowercase())
+fn matches(path: &Path, file: &Published) -> Result<bool, String> {
+    let sized = fs::metadata(path).is_ok_and(|metadata| metadata.len() == file.size);
+    Ok(sized && sha256(path)? == file.sha256.to_ascii_lowercase())
 }

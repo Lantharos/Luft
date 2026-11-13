@@ -4,6 +4,7 @@ mod flatpaks;
 pub mod full_access;
 pub mod sources;
 mod store;
+mod store_tools;
 mod system;
 mod tools;
 
@@ -23,6 +24,7 @@ pub enum Source {
     System,
     Sabine,
     Extension,
+    StoreTool,
 }
 
 #[derive(Serialize, Clone, Debug, Type)]
@@ -62,6 +64,7 @@ pub fn installed() -> Vec<InstalledApp> {
         let debs = scope.spawn(|| when(luft, debian::installed));
         let mut apps = appimages::installed();
         apps.extend(store::installed());
+        apps.extend(store_tools::installed());
         apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(tools.join().unwrap_or_default());

@@ -6,12 +6,12 @@ use serde::Serialize;
 use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
-use crate::host;
 use crate::library::Source;
 use crate::store;
 use crate::store::listing::Format;
 use crate::store::record;
 use crate::store::updates::StoreUpdate;
+use crate::{host, tools};
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -176,6 +176,28 @@ async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
     work.await.unwrap_or_else(|error| Err(error.to_string()))
 }
 
+fn store_tools(updates: Vec<tools::ToolUpdate>) -> Vec<AppUpdate> {
+    updates
+        .into_iter()
+        .map(|update| AppUpdate {
+            key: format!("storetool/{}", update.name),
+            source: Source::StoreTool,
+            id: update.name.clone(),
+            desktop: None,
+            name: update.name,
+            icon: None,
+            from: Some(update.from),
+            to: Some(update.to),
+            size: 0,
+            platform: false,
+            installation: None,
+            reference: None,
+            package: None,
+            store: None,
+        })
+        .collect()
+}
+
 fn when(
     available: bool,
     find: impl FnOnce() -> Result<Vec<AppUpdate>, String>,
@@ -191,8 +213,10 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     let appimages = spawn_blocking(appimages);
     let debs = spawn_blocking(move || when(luft, || debian::updates().map(debs)));
     let store = spawn_blocking(|| store::updates::find().map(from_store));
+    let store_tools = spawn_blocking(|| tools::updates().map(store_tools));
     let debs = joined(debs).await;
     let store = joined(store).await;
+    let store_tools = joined(store_tools).await;
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
@@ -201,6 +225,7 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
         ("command-line tools", tools.as_ref().err()),
         ("Ubuntu apps", debs.as_ref().err()),
         ("schelf.store apps", store.as_ref().err()),
+        ("tools from schelf.store", store_tools.as_ref().err()),
     ]
     .into_iter()
     .filter_map(|(source, reason)| Some(format!("Couldn't check your {source}. {}", reason?)))
@@ -210,6 +235,7 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     apps.extend(tools.unwrap_or_default());
     apps.extend(debs.unwrap_or_default());
     apps.extend(store.unwrap_or_default());
+    apps.extend(store_tools.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
     (apps, failed)
 }

@@ -4,6 +4,7 @@ use specta::Type;
 use super::access::{Declared, ExtensionAccess};
 use super::luft;
 use crate::store::device;
+use crate::store::install::download::Published;
 use crate::store::install::extensions;
 
 /// How Luft installs a store app, and so how it updates and removes it.
@@ -52,6 +53,14 @@ impl Artifact {
             (Packaging::Appimage | Packaging::Files, "appimage") => Some(Format::Appimage),
             (Packaging::LuftExtension, "extension") => Some(Format::LuftExtension),
             _ => None,
+        }
+    }
+
+    pub fn published(&self) -> Published<'_> {
+        Published {
+            url: &self.url,
+            size: self.size,
+            sha256: &self.sha256,
         }
     }
 

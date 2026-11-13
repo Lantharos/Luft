@@ -109,6 +109,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | Command | Does |
 | --- | --- |
 | `schelf install ripgrep` | Installs an app or a tool, or several at once (`schelf add` works too) |
+| `schelf add alice/notes` | Installs a command-line tool from schelf.store into `~/.local/bin`, after saying who publishes it. Tools of verified publishers also go by their name alone |
 | `schelf install ./app.AppImage` | Installs a `.rpm`, `.deb`, `.AppImage`, `.flatpak`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
 | `schelf search image editor` | Looks on schelf.store, Flathub, in Fedora and your software sources at once, and through your AppImages |
@@ -121,7 +122,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf untrust 1password` | Puts it back in its sandbox |
 | `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
-A name schelf.store has comes from there. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.
+A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
 

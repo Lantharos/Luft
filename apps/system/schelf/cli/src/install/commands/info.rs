@@ -4,6 +4,7 @@ use schelf_core::library::{InstalledApp, Source};
 use schelf_core::store::listing::{self, Builder, Format, StoreDetails, channel};
 use schelf_core::store::record;
 use schelf_core::store::signed::Age;
+use schelf_core::tools;
 
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
@@ -307,9 +308,43 @@ fn built(details: &StoreDetails) -> Option<String> {
     )
 }
 
+fn store_tool(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
+    let tool =
+        tools::find(&candidate.id, tools::STABLE)?.ok_or("It isn't on schelf.store any more.")?;
+    let index = &tool.index;
+    let offer = tool.offer();
+    let installed = installed_version(apps, Origin::Store, &index.address);
+    let mut facts = Facts(Vec::new());
+    facts.add("Source", Some("schelf.store, command-line tool".to_owned()));
+    facts.add("Address", Some(index.address.clone()));
+    facts.add("Version", offer.map(|(release, _)| release.version.clone()));
+    facts.add(
+        "Installed",
+        Some(installed.map_or_else(
+            || "no".to_owned(),
+            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        )),
+    );
+    facts.add("Download", offer.map(|(_, file)| bytes(file.size)));
+    let verified = if index.publisher.verified {
+        "verified"
+    } else {
+        "not verified by schelf.store"
+    };
+    facts.add(
+        "Publisher",
+        Some(format!("{}, {verified}", index.publisher.name)),
+    );
+    facts.add("Source code", index.repository.clone());
+    facts.add("Runs with", Some("Everything you can do".to_owned()));
+    show(&index.name, "", facts, "");
+    Ok(())
+}
+
 fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
     match (candidate.catalog, candidate.kind) {
         (Catalog::Store, _) => store_app(candidate, apps),
+        (Catalog::Tools, _) => store_tool(candidate, apps),
         (Catalog::Flathub, _) => flathub_app(candidate, apps),
         (Catalog::Fedora, Kind::Desktop) => system_package(
             candidate,

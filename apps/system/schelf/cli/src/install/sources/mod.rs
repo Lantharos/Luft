@@ -5,6 +5,7 @@ pub mod installed;
 mod resolve;
 pub mod store;
 pub mod system;
+pub mod tools;
 
 use schelf_core::host;
 use schelf_core::library::Source;
@@ -69,7 +70,7 @@ impl Origin {
 
     pub fn of(source: Source) -> Self {
         match source {
-            Source::Sabine | Source::Extension => Self::Store,
+            Source::Sabine | Source::Extension | Source::StoreTool => Self::Store,
             Source::Flatpak => Self::Flathub,
             Source::Tool => Self::Fedora,
             Source::AppImage => Self::AppImage,
@@ -88,17 +89,24 @@ impl Origin {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Catalog {
     Store,
+    Tools,
     Flathub,
     Fedora,
     System,
 }
 
 impl Catalog {
-    pub const ALL: [Self; 4] = [Self::Store, Self::Flathub, Self::Fedora, Self::System];
+    pub const ALL: [Self; 5] = [
+        Self::Store,
+        Self::Tools,
+        Self::Flathub,
+        Self::Fedora,
+        Self::System,
+    ];
 
     pub fn origin(self) -> Origin {
         match self {
-            Self::Store => Origin::Store,
+            Self::Store | Self::Tools => Origin::Store,
             Self::Flathub => Origin::Flathub,
             Self::Fedora => Origin::Fedora,
             Self::System => Origin::System,
@@ -131,6 +139,7 @@ impl Catalog {
     pub fn search(self, query: &str) -> Result<Vec<Candidate>, String> {
         match self {
             Self::Store => store::search(query),
+            Self::Tools => Ok(Vec::new()),
             Self::Flathub => flathub::search(query),
             Self::Fedora => fedora::search(query),
             Self::System => system::search(query),
@@ -140,6 +149,7 @@ impl Catalog {
     pub fn find(self, name: &str) -> Result<Vec<Candidate>, String> {
         match self {
             Self::Store => store::find(name),
+            Self::Tools => tools::find(name),
             Self::Flathub => flathub::find(name),
             Self::Fedora => fedora::find(name),
             Self::System => system::find(name),
@@ -149,6 +159,7 @@ impl Catalog {
     fn install(self, id: &str, kind: Kind, yes: bool) -> Result<(String, Job), Exit> {
         Ok(match (self, kind) {
             (Self::Store, _) => store::install(id, yes)?,
+            (Self::Tools, _) => tools::install(id, yes)?,
             (Self::Flathub, _) => (
                 format!("flathub:{id}"),
                 Job::InstallFlathub { id: id.to_owned() },

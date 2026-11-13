@@ -5,6 +5,7 @@ export function sourceName({ source, origin, listing }: Pick<InstalledApp, 'sour
 	if (listing) return source === 'extension' ? 'Extension from schelf.store' : 'schelf.store';
 	if (source === 'appImage') return 'Installed from a file';
 	if (source === 'tool') return 'Command-line tool';
+	if (source === 'storeTool') return 'Command-line tool from schelf.store';
 	if (source === 'debian') return 'Made for Ubuntu';
 	if (source === 'system') return origin === 'Fedora' ? 'Part of the system' : `Part of the system, from ${origin}`;
 	return origin === 'flathub' ? 'Flathub' : origin;

@@ -1,4 +1,4 @@
-mod download;
+pub mod download;
 pub mod extensions;
 
 use std::path::Path;

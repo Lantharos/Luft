@@ -45,6 +45,7 @@ fn release(
 #[test]
 fn a_device_gets_the_newest_release_its_rollout_reaches_on_the_channel_people_moved_to() {
     let notes = index(serde_json::json!([
+        release("1.3.0", "stable", 100, &[("macos-aarch64", "binary")]),
         release("1.2.0", "stable", 10, &[("linux-x86_64", "binary")]),
         release("1.1.0", "stable", 100, &[("linux-x86_64", "binary")]),
         release(
@@ -54,16 +55,26 @@ fn a_device_gets_the_newest_release_its_rollout_reaches_on_the_channel_people_mo
             &[("linux-x86_64", "binary")]
         ),
     ]));
-    assert_eq!(notes.release_on("stable", 0.05).unwrap().version, "1.2.0");
-    assert_eq!(notes.release_on("stable", 0.5).unwrap().version, "1.1.0");
-    assert_eq!(notes.release_on("beta", 0.5).unwrap().version, "1.1.0");
-    assert!(notes.release_on("alpha", 0.5).is_none());
+    let version = |channel, draw| {
+        notes
+            .release_for(channel, draw, "linux-x86_64")
+            .map(|(release, _)| release.version.as_str())
+    };
+    assert_eq!(version("stable", 0.05), Some("1.2.0"));
+    assert_eq!(version("stable", 0.5), Some("1.1.0"));
+    assert_eq!(version("beta", 0.5), Some("1.1.0"));
+    assert_eq!(version("alpha", 0.5), None);
 }
 
 #[test]
-fn a_channel_with_only_a_release_still_rolling_out_offers_it() {
-    let notes = index(serde_json::json!([release("1.2.0", "stable", 10, &[])]));
-    assert_eq!(notes.release_on("stable", 0.9).unwrap().version, "1.2.0");
+fn a_release_still_rolling_out_waits_for_devices_it_hasnt_reached() {
+    let notes = index(serde_json::json!([release(
+        "1.2.0",
+        "stable",
+        10,
+        &[("linux-x86_64", "binary")]
+    )]));
+    assert!(notes.release_for("stable", 0.9, "linux-x86_64").is_none());
 }
 
 #[test]

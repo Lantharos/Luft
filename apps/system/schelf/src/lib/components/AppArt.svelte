@@ -23,7 +23,7 @@
 	});
 </script>
 
-{#if source === 'tool'}
+{#if source === 'tool' || source === 'storeTool'}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><SquareTerminal size={size * 0.5} /></span>
 {:else if source === 'system'}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><Server size={size * 0.5} /></span>

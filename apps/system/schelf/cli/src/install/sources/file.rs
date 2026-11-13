@@ -2,9 +2,9 @@ use std::path::{Path, PathBuf};
 
 use luft_software::system::repositories::Described;
 use schelf_core::files::{self, OpenedFile};
-use schelf_core::host;
 use schelf_core::library::sources::CheckedSource;
 use schelf_core::operations::{Job, Request};
+use schelf_core::{host, tools};
 
 use crate::install::perform::{Plan, Verb};
 
@@ -17,13 +17,17 @@ const EXTENSIONS: [&str; 6] = [
     ".flatpakrepo",
 ];
 
+/// Whether `target` names a file rather than something to look for: a file
+/// that's there, or a path or file name that isn't a tool's address.
 pub fn named(target: &str) -> bool {
+    if Path::new(target).is_file() {
+        return true;
+    }
     let lowered = target.to_lowercase();
-    target.contains('/')
+    (target.contains('/') && !tools::is_address(target))
         || EXTENSIONS
             .iter()
             .any(|extension| lowered.ends_with(extension))
-        || Path::new(target).is_file()
 }
 
 /// Why this computer can't install a file like `path`, when it can't.

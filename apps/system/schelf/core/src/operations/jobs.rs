@@ -9,8 +9,8 @@ use luft_software::task::Task;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use crate::store;
 use crate::store::install::{Consent, Reason};
+use crate::{store, tools};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
@@ -105,6 +105,16 @@ pub enum Job {
     RemoveRepository {
         file: String,
     },
+    InstallStoreTool {
+        address: String,
+        channel: String,
+    },
+    UpdateStoreTool {
+        name: String,
+    },
+    RemoveStoreTool {
+        name: String,
+    },
 }
 
 /// Installs the app in a bundle. Most bundles get their runtime from
@@ -136,19 +146,22 @@ impl Job {
             | Self::InstallTool { .. }
             | Self::InstallToolFile { .. }
             | Self::InstallSystemPackages { .. }
-            | Self::InstallSystemPackageFile { .. } => Action::Install,
+            | Self::InstallSystemPackageFile { .. }
+            | Self::InstallStoreTool { .. } => Action::Install,
             Self::RemoveFlatpak { .. }
             | Self::RemoveStore { .. }
             | Self::RemoveDeb { .. }
             | Self::RemoveAppImage { .. }
             | Self::RemoveTool { .. }
             | Self::RemoveSystemPackages { .. }
-            | Self::RemoveRepository { .. } => Action::Remove,
+            | Self::RemoveRepository { .. }
+            | Self::RemoveStoreTool { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdateStore { .. }
             | Self::UpdateDebs { .. }
             | Self::UpdateAppImage { .. }
-            | Self::UpdateTools { .. } => Action::Update,
+            | Self::UpdateTools { .. }
+            | Self::UpdateStoreTool { .. } => Action::Update,
         }
     }
 
@@ -182,6 +195,9 @@ impl Job {
             }
             Self::InstallAppImage { path, full_access } => {
                 let installed = appimage::install(path, task)?;
+                if !appimage::sandboxed() {
+                    return Ok(());
+                }
                 block_on(appimage::reset(
                     &installed.app.id,
                     installed.declaration.as_ref(),
@@ -231,6 +247,11 @@ impl Job {
             Self::RemoveRepository { file } => {
                 block_on(system_packages::remove_repository(file, task))
             }
+            Self::InstallStoreTool { address, channel } => {
+                tools::install(address, channel, "install", task)
+            }
+            Self::UpdateStoreTool { name } => tools::update(name, task),
+            Self::RemoveStoreTool { name } => tools::remove(name),
         }
     }
 }

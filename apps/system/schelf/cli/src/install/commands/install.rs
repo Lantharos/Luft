@@ -6,7 +6,7 @@ use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::perform::{Plan, Verb, carry_out};
 use crate::install::sources::{
-    Candidate, Catalog, Kind, Origin, Resolved, fedora, file, installed, resolve,
+    Candidate, Catalog, Kind, Origin, Resolved, catalogs, fedora, file, installed, resolve,
 };
 use crate::install::terminal::Line;
 use crate::install::terminal::{Ink, Look, Table};
@@ -15,8 +15,17 @@ const COMMANDS_SHOWN: usize = 5;
 
 fn nothing(name: &str, only: Option<Catalog>, suggestions: &[Candidate]) {
     let ink = Ink::stderr();
-    let places = only.map_or("schelf.store, Flathub or Fedora", Catalog::title);
-    eprintln!("There's nothing called {} on {places}.", ink.bold(name));
+    let mut places: Vec<&str> = catalogs(only)
+        .into_iter()
+        .filter(|catalog| *catalog != Catalog::System)
+        .map(Catalog::title)
+        .collect();
+    places.dedup();
+    eprintln!(
+        "There's nothing called {} on {}.",
+        ink.bold(name),
+        places_of(&places)
+    );
     if suggestions.is_empty() {
         return;
     }
@@ -32,13 +41,23 @@ fn nothing(name: &str, only: Option<Catalog>, suggestions: &[Candidate]) {
     table.eprint(ink);
 }
 
+fn places_of(places: &[&str]) -> String {
+    match places {
+        [rest @ .., last] if !rest.is_empty() => format!("{} or {last}", rest.join(", ")),
+        _ => places.concat(),
+    }
+}
+
 fn choose(name: &str, found: Vec<Candidate>, yes: bool) -> Result<Candidate, Exit> {
     let options: Vec<String> = found.iter().map(Candidate::describe).collect();
     let hint = if found
         .iter()
-        .all(|candidate| candidate.catalog == found[0].catalog)
+        .all(|candidate| candidate.catalog.origin() == found[0].catalog.origin())
     {
-        format!("Name the one you want by its ID, such as {}.", found[0].id)
+        format!(
+            "Name the one you want by its ID or address, such as {}.",
+            found[0].id
+        )
     } else {
         "Pick one with --store, --flathub or --fedora.".to_owned()
     };

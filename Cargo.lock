@@ -9041,18 +9041,21 @@ dependencies = [
 name = "schelf-core"
 version = "0.1.0"
 dependencies = [
+ "bzip2",
  "chrono",
  "dirs",
  "flate2",
  "futures-util",
  "getrandom 0.4.3",
  "libc",
+ "liblzma",
  "luft-dbus",
  "luft-dbus-macros",
  "luft-software",
  "luft-store-seal",
  "memmap2",
  "quick-xml 0.42.0",
+ "schelf-publish",
  "serde",
  "serde_json",
  "sha2",
@@ -9063,6 +9066,7 @@ dependencies = [
  "tokio",
  "ureq",
  "zbus 6.0.0",
+ "zip",
  "zstd 0.14.3",
 ]
 

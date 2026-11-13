@@ -70,11 +70,10 @@ pub fn resolve(name: &str, only: Option<Catalog>) -> Result<Resolved, String> {
         .into_iter()
         .flatten()
         .collect();
-    if found
-        .iter()
-        .any(|candidate| candidate.catalog == Catalog::Store)
-    {
-        found.retain(|candidate| candidate.catalog == Catalog::Store);
+    let on_store =
+        |candidate: &Candidate| matches!(candidate.catalog, Catalog::Store | Catalog::Tools);
+    if found.iter().any(on_store) {
+        found.retain(on_store);
     }
     match found.len() {
         0 => {

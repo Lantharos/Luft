@@ -405,7 +405,7 @@ export type Invitation = {
 
 export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore"; id: string; consent: Consent } | { kind: "updateStore"; id: string; consent: Consent } | { kind: "removeStore"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
 /**  Whether you let an app that asks to run unsandboxed do so. */
-fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
+fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string } | { kind: "installStoreTool"; address: string; channel: string } | { kind: "updateStoreTool"; name: string } | { kind: "removeStoreTool"; name: string };
 
 export type Kind = "app" | "extension";
 
@@ -578,7 +578,7 @@ export type Severity = "block" | "warn";
 
 export type SignIn = { state: "waiting"; intervalMs: number } | { state: "approved"; account: Account } | { state: "declined" } | { state: "expired" };
 
-export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system" | "sabine" | "extension";
+export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system" | "sabine" | "extension" | "storeTool";
 
 export type SourceKey = {
 	fingerprint: string,

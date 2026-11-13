@@ -16,7 +16,7 @@ use super::sources::{Catalog, Origin};
 use super::terminal::{Ink, prompt};
 
 fn needs_luft(what: &str) -> Exit {
-    eprintln!("{what} need Luft, which this computer doesn't run.");
+    eprintln!("{what} Luft, which this computer doesn't run.");
     Exit::Missing
 }
 
@@ -24,10 +24,10 @@ pub fn run(arguments: &Arguments) -> Exit {
     let system = arguments.only == Some(Origin::System);
     let luft = host::luft();
     match arguments.command {
-        Command::Install | Command::Update if system && !luft => needs_luft("System packages"),
-        Command::Repo if !luft => needs_luft("Software sources for system packages"),
+        Command::Install | Command::Update if system && !luft => needs_luft("System packages need"),
+        Command::Repo if !luft => needs_luft("Software sources for system packages need"),
         Command::Trust | Command::Untrust if !luft => {
-            needs_luft("Full access for Flatpak apps and AppImages")
+            needs_luft("Full access for Flatpak apps and AppImages needs")
         }
         Command::Install if system => system::install(arguments),
         Command::Update if system => system::explain_updates(),

@@ -77,6 +77,9 @@ fn removal_job(app: &InstalledApp) -> Job {
         Source::System => Job::RemoveSystemPackages {
             packages: vec![app.id.clone()],
         },
+        Source::StoreTool => Job::RemoveStoreTool {
+            name: app.id.clone(),
+        },
     }
 }
 

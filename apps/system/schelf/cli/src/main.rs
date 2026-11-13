@@ -56,6 +56,7 @@ fn run(program: &str, arguments: &[String]) -> i32 {
 
 fn main() {
     luft_software::apps::appimage::launch_through(host::app().map(Path::to_path_buf));
+    schelf_core::tools::adopt_self(env!("CARGO_PKG_VERSION"));
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     std::process::exit(run(&program(), &arguments));
 }

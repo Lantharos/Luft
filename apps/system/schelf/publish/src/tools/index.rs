@@ -80,19 +80,15 @@ impl ToolIndex {
             .map_or(channel, String::as_str)
     }
 
-    /// The release a device that drew `draw` gets on `channel`: the newest one
-    /// whose rollout reaches it, or the newest one when none does yet.
-    pub fn release_on(&self, channel: &str, draw: f64) -> Option<&Release> {
+    /// The release a device on `target` that drew `draw` gets on `channel`,
+    /// with its file: the newest one whose rollout reaches it and that has a
+    /// file for the device.
+    pub fn release_for(&self, channel: &str, draw: f64, target: &str) -> Option<(&Release, &File)> {
         let now = self.channel_now(channel);
-        let mut on: Vec<&Release> = self
-            .releases
+        self.releases
             .iter()
-            .filter(|release| release.channel == now)
-            .collect();
-        let reaching = on.iter().position(|release| release.reaches(draw));
-        reaching
-            .map(|index| on.swap_remove(index))
-            .or(on.into_iter().next())
+            .filter(|release| release.channel == now && release.reaches(draw))
+            .find_map(|release| Some((release, pick_file(release, target)?)))
     }
 }
 

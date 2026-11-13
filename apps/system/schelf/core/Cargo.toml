@@ -8,18 +8,21 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+bzip2.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 dirs.workspace = true
 flate2 = { workspace = true, features = ["zlib-rs"] }
 futures-util.workspace = true
 getrandom.workspace = true
 libc.workspace = true
+liblzma.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-software = { workspace = true, features = ["system"] }
 luft-store-seal.workspace = true
 memmap2.workspace = true
 quick-xml.workspace = true
+schelf-publish.workspace = true
 serde.workspace = true
 serde_json = { workspace = true, features = ["raw_value"] }
 sha2.workspace = true
@@ -29,6 +32,7 @@ tar.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "sync"] }
 ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
+zip.workspace = true
 zstd.workspace = true
 
 [dev-dependencies]

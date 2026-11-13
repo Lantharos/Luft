@@ -51,11 +51,14 @@ impl Command {
         match self {
             Self::Install => {
                 "install NAME|FILE...  [--store|--flathub|--fedora|--system] [-y]\n\n\
-                 Installs apps and extensions from schelf.store, apps from Flathub and\n\
+                 Installs apps, extensions and command-line tools from schelf.store, a\n\
+                 tool also by its address, such as alice/notes, apps from Flathub and\n\
                  Fedora, and command-line tools from Fedora into your account, or a .rpm,\n\
                  .AppImage, .flatpakref or .flatpakrepo file. A name schelf.store has comes\n\
                  from there, then from Flathub, then from Fedora; when that still leaves a\n\
-                 choice, Schelf asks. Apps from schelf.store show what they can use first.\n\
+                 choice, such as an app and a tool of the same name on schelf.store,\n\
+                 Schelf asks. Apps from schelf.store show what they can use first, and\n\
+                 tools who publishes them.\n\
                  You can write add instead of install.\n\n\
                  Fedora packages that bring a service or driver, such as Tailscale, Docker or\n\
                  libvirt, go into the system itself, where they start with the computer and\n\

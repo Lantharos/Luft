@@ -5,6 +5,8 @@ use serde::Serialize;
 use specta::Type;
 
 const DEVICE_SCHEMES: &[&str] = &["mtp", "gphoto2", "afc"];
+const APPLE_SCHEME: &str = "afc";
+const UNTRUSTED: &str = "Unlock your iPhone and tap Trust";
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -13,6 +15,17 @@ pub struct NetworkLocation {
     uri: String,
     path: String,
     device: bool,
+}
+
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluggedDevice {
+    name: String,
+    uri: String,
+}
+
+fn is_device(scheme: &str) -> bool {
+    DEVICE_SCHEMES.contains(&scheme)
 }
 
 fn location(mount: &gio::Mount) -> Option<NetworkLocation> {
@@ -25,7 +38,7 @@ fn location(mount: &gio::Mount) -> Option<NetworkLocation> {
     Some(NetworkLocation {
         name: mount.name().to_string(),
         path: root.path()?.to_string_lossy().into_owned(),
-        device: DEVICE_SCHEMES.contains(&scheme.as_str()),
+        device: is_device(&scheme),
         uri,
     })
 }
@@ -36,6 +49,31 @@ pub fn list() -> Vec<NetworkLocation> {
         .iter()
         .filter_map(location)
         .collect()
+}
+
+pub fn plugged() -> Vec<PluggedDevice> {
+    gio::VolumeMonitor::get()
+        .volumes()
+        .iter()
+        .filter(|volume| volume.get_mount().is_none())
+        .filter_map(|volume| {
+            let root = volume.activation_root()?;
+            let scheme = root.uri_scheme()?;
+            is_device(&scheme).then(|| PluggedDevice {
+                name: volume.name().to_string(),
+                uri: root.uri().to_string(),
+            })
+        })
+        .collect()
+}
+
+pub fn explain_connect(uri: &str, error: &gio::glib::Error) -> String {
+    let refused = error.matches(gio::IOErrorEnum::ConnectionRefused)
+        || error.matches(gio::IOErrorEnum::PermissionDenied);
+    if refused && gio::File::for_uri(uri).uri_scheme().as_deref() == Some(APPLE_SCHEME) {
+        return UNTRUSTED.to_owned();
+    }
+    explain(error)
 }
 
 pub fn locate(file: &gio::File) -> Result<NetworkLocation, String> {

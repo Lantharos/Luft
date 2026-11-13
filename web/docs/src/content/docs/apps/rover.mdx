@@ -25,6 +25,9 @@ asks:
   - { ask: ntfs drive, to: drives }
   - { ask: windows drive read only, to: drives, shared: true }
   - { ask: files owned by another user, to: drives }
+  - { ask: iphone photos, to: connecting-a-phone }
+  - { ask: android file transfer, to: connecting-a-phone }
+  - { ask: usb tethering, to: connecting-a-phone }
   - { ask: connect to nas, to: connecting-to-network-drives }
   - { ask: smb share, to: connecting-to-network-drives }
   - { ask: map network drive, to: connecting-to-network-drives }
@@ -76,6 +79,17 @@ To keep internal drives closed until you open them, turn off **Mount internal dr
 When Windows was hibernated or shut down with Fast Startup, its drives open read-only and a notification says so. To change files on them, start Windows and hold Shift while you choose Shut down.
 
 When the files on a drive belong to another account, such as one from a system that was on the computer before, Rover says so and gives the command that makes them yours.
+
+## Connecting a phone
+
+Plug a phone in with its cable and it shows up under the drives, by its own name.
+
+- **iPhone and iPad:** unlock it and tap **Trust** when it asks. Its photos open in Rover, and both keep the pairing, so it asks only once. If Rover says to unlock it, unlock it and tap Trust, then click it again.
+- **Android:** unlock it, tap the USB notification and choose **File transfer** for your files or **PTP** for photos only.
+
+To use the phone's internet, turn on **Personal Hotspot** on an iPhone, or **USB tethering** on Android. The phone gets its own tile in [Quick settings](/desktop/quick-settings/), and while it's on, Luft uses it ahead of the cable and Wi-Fi. Turn the tile off to go back.
+
+Apps can open files from the phone through the file picker.
 
 ## Connecting to network drives
 

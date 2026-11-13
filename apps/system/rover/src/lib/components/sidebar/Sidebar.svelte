@@ -10,6 +10,7 @@
 	import { mainPlaces, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import CloudGroup from './CloudGroup.svelte';
+	import DeviceItem from './DeviceItem.svelte';
 	import DriveItem from './DriveItem.svelte';
 	import FavoritesGroup from './FavoritesGroup.svelte';
 	import NetworkItem from './NetworkItem.svelte';
@@ -125,13 +126,16 @@
 
 		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} onmenu={showMenu} />
 
-		{#if manager.drives.ordered.length > 0 || manager.drives.windows.length > 0}
+		{#if manager.drives.ordered.length > 0 || manager.drives.windows.length > 0 || manager.network.devices.length > 0}
 			<div class="flex flex-none flex-col gap-px">
 				{#each manager.drives.ordered as drive (drive.mountPoint)}
 					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mountPoint} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
 				{#each manager.drives.windows as drive (drive.device)}
 					<WindowsItem {drive} {manager} />
+				{/each}
+				{#each manager.network.devices as device (device.uri)}
+					<DeviceItem {device} {manager} {drag} onopentab={openInTab} />
 				{/each}
 			</div>
 		{/if}

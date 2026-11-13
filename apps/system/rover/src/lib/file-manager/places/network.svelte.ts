@@ -1,23 +1,26 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
 import { commands } from '#lib/bindings.js';
-import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/bindings.js';
+import type { NetworkAsk, NetworkLocation, NetworkPlace, PluggedDevice } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { addressName, normalizeAddress, sameAddress } from '../location/addresses';
 
 const RECENT_SERVERS = 8;
 const CANCELLED = 'cancelled';
+const CAMERA_SCHEME = 'gphoto2:';
 
 export type NetworkEntry = { place: NetworkPlace; location: NetworkLocation | null; saved: boolean };
+export type DeviceEntry = { name: string; uri: string; camera: boolean; location: NetworkLocation | null };
 
 export class NetworkState {
 	locations = $state.raw<NetworkLocation[]>([]);
+	plugged = $state.raw<PluggedDevice[]>([]);
 	ask = $state.raw<Exclude<NetworkAsk, { kind: 'done' }> | null>(null);
 	readonly connecting = new SvelteSet<string>();
 
 	entries = $derived.by((): NetworkEntry[] => {
 		const saved = settings.value.networkPlaces;
-		const connected = this.locations.map((location) => ({
+		const connected = this.locations.filter((location) => !location.device).map((location) => ({
 			place: { name: location.name, uri: location.uri },
 			location,
 			saved: saved.some((place) => sameAddress(place.uri, location.uri))
@@ -31,8 +34,16 @@ export class NetworkState {
 		return [...connected, ...waiting, ...pending];
 	});
 
+	devices = $derived.by((): DeviceEntry[] => [
+		...this.locations.filter((location) => location.device).map((location) => ({ name: location.name, uri: location.uri, location })),
+		...this.plugged.map((device) => ({ ...device, location: null }))
+	].map((device) => ({ ...device, camera: device.uri.startsWith(CAMERA_SCHEME) })));
+
 	load = async () => {
-		this.locations = await commands.networkLocations().catch(() => this.locations);
+		[this.locations, this.plugged] = await Promise.all([
+			commands.networkLocations().catch(() => this.locations),
+			commands.networkPlugged().catch(() => this.plugged)
+		]);
 	};
 
 	receiveAsk = (ask: NetworkAsk) => {
@@ -61,20 +72,28 @@ export class NetworkState {
 		if (!uri) throw new Error('That doesn’t look like a server address');
 		const known = this.#pathFor(uri);
 		if (known) return known;
+		const location = await this.#mount(uri);
+		if (!location) return null;
+		this.#remember(uri);
+		if (keep) this.save({ name: location.name, uri });
+		return location.path;
+	};
+
+	open = async (device: DeviceEntry) => device.location?.path ?? (await this.#mount(device.uri))?.path ?? null;
+
+	async #mount(uri: string) {
 		this.connecting.add(uri);
 		try {
 			const location = await commands.networkConnect({ uri });
-			this.#remember(uri);
-			if (keep) this.save({ name: location.name, uri });
 			await this.load();
-			return location.path;
+			return location;
 		} catch (caught) {
 			if (String(caught).includes(CANCELLED)) return null;
 			throw caught;
 		} finally {
 			this.connecting.delete(uri);
 		}
-	};
+	}
 
 	disconnect = async (uri: string) => {
 		await commands.networkDisconnect({ uri });

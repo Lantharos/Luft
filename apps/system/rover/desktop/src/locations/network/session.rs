@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::discover;
-use super::mounts::{self, NetworkLocation};
+use super::mounts::{self, NetworkLocation, PluggedDevice};
 use crate::app::events::{NETWORK_ASK as ASK, NETWORK_CHANGED as CHANGED};
 use crate::app::settings::NetworkPlace;
 
@@ -87,7 +87,11 @@ impl Session {
                         monitor.connect_mount_added(move |_, _| added());
                         let removed = notify.clone();
                         monitor.connect_mount_removed(move |_, _| removed());
-                        monitor.connect_mount_changed(move |_, _| notify());
+                        let changed = notify.clone();
+                        monitor.connect_mount_changed(move |_, _| changed());
+                        let plugged = notify.clone();
+                        monitor.connect_volume_added(move |_, _| plugged());
+                        monitor.connect_volume_removed(move |_, _| notify());
                         glib::MainLoop::new(Some(&context), false).run();
                     })
                     .expect("the network thread owns its context");
@@ -114,6 +118,13 @@ impl Session {
         .unwrap_or_default()
     }
 
+    pub fn plugged(&self) -> Vec<PluggedDevice> {
+        self.call(|reply| {
+            let _ = reply.send(mounts::plugged());
+        })
+        .unwrap_or_default()
+    }
+
     pub fn connect(&self, uri: String) -> Result<NetworkLocation, String> {
         let events = self.events.clone();
         self.call(move |reply| {
@@ -131,7 +142,7 @@ impl Session {
                     events.emit(ASK, NetworkAsk::Done { id });
                     let mounted = match result {
                         Err(error) if !error.matches(gio::IOErrorEnum::AlreadyMounted) => {
-                            Err(mounts::explain(&error))
+                            Err(mounts::explain_connect(&uri, &error))
                         }
                         _ => mounts::locate(&target),
                     };

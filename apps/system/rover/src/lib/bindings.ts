@@ -168,6 +168,7 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("network_disconnect", params, options),
 	networkDiscover: (options?: CallOptions) => invoke<NetworkPlace[]>("network_discover", {}, options),
 	networkLocations: (options?: CallOptions) => invoke<NetworkLocation[]>("network_locations", {}, options),
+	networkPlugged: (options?: CallOptions) => invoke<PluggedDevice[]>("network_plugged", {}, options),
 	openLink: (params: {
 		uri: string,
 		token?: string | null,
@@ -591,6 +592,11 @@ export type PinnedFolder = {
 	path: string,
 	isDir: boolean,
 	icon: string | null,
+};
+
+export type PluggedDevice = {
+	name: string,
+	uri: string,
 };
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */

@@ -12,7 +12,7 @@ import { pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { CloudState } from './places/cloud.svelte';
 import { DrivesState } from './places/drives.svelte';
-import { NetworkState, type NetworkEntry } from './places/network.svelte';
+import { NetworkState, type DeviceEntry, type NetworkEntry } from './places/network.svelte';
 import { sortedEntries, visibleEntries } from './listing/entries';
 import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';
@@ -161,6 +161,11 @@ export class FileManager {
 		const leaving = this.view === 'home' && this.network.holding(this.currentPath)?.uri === uri;
 		if (leaving) await this.navigate(this.homePath);
 		await this.network.disconnect(uri).catch(this.notify);
+	};
+
+	openDevice = async (device: DeviceEntry, show: (path: string) => Promise<void> = this.navigate) => {
+		const path = await this.network.open(device).catch((caught) => void this.notify(caught));
+		if (path) await show(path);
 	};
 
 	openAddress = async (address: string, show: (path: string) => Promise<void> = this.navigate, keep = false) => {

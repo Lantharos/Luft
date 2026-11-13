@@ -36,6 +36,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .with("network_locations", &session, |session, Empty {}| {
             Ok(session.locations())
         })
+        .with("network_plugged", &session, |session, Empty {}| {
+            Ok(session.plugged())
+        })
         .with("network_connect", &session, |session, Address { uri }| {
             session.connect(uri)
         })

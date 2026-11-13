@@ -87,6 +87,8 @@ static GIcon *default_gicon = NULL;
 
 #define IMAGE_MISSING_ICON_NAME "image-missing"
 #define DEFAULT_ICON_SIZE 48
+#define PIXEL_TOLERANCE 0.25f
+#define CONTENT_BOX_ROUNDING 1.f
 
 static gboolean
 st_icon_lost_texture (StIcon *icon)
@@ -291,6 +293,57 @@ st_icon_style_changed (StWidget *widget)
   ST_WIDGET_CLASS (st_icon_parent_class)->style_changed (widget);
 }
 
+static float
+fitted_length (float natural,
+               float available)
+{
+  return natural - available < CONTENT_BOX_ROUNDING ? natural : available;
+}
+
+static float
+centred_on_pixels (float room,
+                   float scale)
+{
+  return floorf (room * scale / 2 + PIXEL_TOLERANCE) / scale;
+}
+
+static float
+st_icon_inset (StThemeNode *theme_node,
+               StSide       side)
+{
+  return st_theme_node_get_padding (theme_node, side) + st_theme_node_get_border_width (theme_node, side);
+}
+
+static void
+st_icon_allocate (ClutterActor          *actor,
+                  const ClutterActorBox *box)
+{
+  StIconPrivate *priv = ST_ICON (actor)->priv;
+  StThemeNode *theme_node = st_widget_get_theme_node (ST_WIDGET (actor));
+  float left = st_icon_inset (theme_node, ST_SIDE_LEFT);
+  float top = st_icon_inset (theme_node, ST_SIDE_TOP);
+  float available_width = clutter_actor_box_get_width (box) - left - st_icon_inset (theme_node, ST_SIDE_RIGHT);
+  float available_height = clutter_actor_box_get_height (box) - top - st_icon_inset (theme_node, ST_SIDE_BOTTOM);
+  float scale = clutter_actor_get_real_resource_scale (actor);
+  ClutterActorBox texture_box;
+  float width, height;
+
+  clutter_actor_set_allocation (actor, box);
+
+  if (priv->icon_texture == NULL)
+    return;
+
+  clutter_actor_get_preferred_width (priv->icon_texture, -1, NULL, &width);
+  clutter_actor_get_preferred_height (priv->icon_texture, -1, NULL, &height);
+  width = fitted_length (width, available_width);
+  height = fitted_length (height, available_height);
+  texture_box.x1 = left + centred_on_pixels (available_width - width, scale);
+  texture_box.y1 = top + centred_on_pixels (available_height - height, scale);
+  texture_box.x2 = texture_box.x1 + width;
+  texture_box.y2 = texture_box.y1 + height;
+  clutter_actor_allocate (priv->icon_texture, &texture_box);
+}
+
 static void
 st_icon_class_init (StIconClass *klass)
 {
@@ -302,6 +355,7 @@ st_icon_class_init (StIconClass *klass)
   object_class->set_property = st_icon_set_property;
   object_class->dispose = st_icon_dispose;
 
+  actor_class->allocate = st_icon_allocate;
   actor_class->paint_node = st_icon_paint_node;
 
   widget_class->style_changed = st_icon_style_changed;
@@ -486,8 +540,6 @@ st_icon_finish_update (StIcon *icon)
   if (priv->pending_texture)
     {
       priv->icon_texture = g_steal_pointer (&priv->pending_texture);
-      clutter_actor_set_x_align (priv->icon_texture, CLUTTER_ACTOR_ALIGN_CENTER);
-      clutter_actor_set_y_align (priv->icon_texture, CLUTTER_ACTOR_ALIGN_CENTER);
       clutter_actor_add_child (CLUTTER_ACTOR (icon), priv->icon_texture);
 
       /* Remove the temporary ref we added */

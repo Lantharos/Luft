@@ -65,6 +65,7 @@ export class Taskbar {
       appIcons.watch(() => this.relayout()),
     );
     whenPixelScaleChanges(this.actor, () => this.relayout());
+    this.actor.connect('style-changed', () => appIcons.setTaskbarInk(this.actor.get_theme_node().get_foreground_color().to_string()));
   }
 
   shutdown(): void {
@@ -128,14 +129,13 @@ export class Taskbar {
     return frameOnPixels(this.metrics.button, this.iconSize, pixelScale(this.actor));
   }
 
-  private placeIcon(item: AppItem, { inset }: PixelFrame): void {
-    const icon = this.iconSize;
+  private placeIcon(item: AppItem, { inner, inset }: PixelFrame): void {
     const scale = pixelScale(this.actor);
     const nudge = -outward(this.edge) * Math.floor(scale) / scale;
-    item.icon.set_size(icon, icon);
+    item.icon.set_size(inner, inner);
     if (this.vertical) item.icon.set_position(inset + nudge, inset);
     else item.icon.set_position(inset, inset + nudge);
-    (item.icon.child as St.Icon).icon_size = icon;
+    (item.icon.child as St.Icon).icon_size = this.iconSize;
     appIcons.fit(item.icon.child as St.Icon, this.artworkFill);
   }
 

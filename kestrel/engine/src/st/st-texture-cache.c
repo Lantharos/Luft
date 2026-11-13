@@ -878,6 +878,14 @@ icon_lookup_size (int    size,
     }
 }
 
+static float
+icon_actor_size (int   lookup_size,
+                 int   lookup_scale,
+                 float resource_scale)
+{
+  return lookup_size * lookup_scale / resource_scale;
+}
+
 static void
 load_texture_async (StTextureCache       *cache,
                     AsyncTextureLoadData *data)
@@ -1043,6 +1051,7 @@ load_styled_icon (StTextureCache *cache,
   AsyncTextureLoadData *request;
   ClutterActor *actor = create_invisible_actor ();
   int lookup_size, lookup_scale;
+  float actor_size;
   g_autofree char *icon_string = g_icon_to_string (G_ICON (icon));
   g_autofree char *key = NULL;
   StTextureCachePolicy policy = icon_string ? ST_TEXTURE_CACHE_POLICY_FOREVER
@@ -1052,7 +1061,8 @@ load_styled_icon (StTextureCache *cache,
   key = g_strdup_printf (CACHE_PREFIX_STYLED_ICON "%s,size=%d,pixels=%d,scale=%d",
                          icon_string ? icon_string : "", size, lookup_size, lookup_scale);
   clutter_actor_set_content_gravity (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
-  clutter_actor_set_size (actor, size * paint_scale, size * paint_scale);
+  actor_size = icon_actor_size (lookup_size, lookup_scale, resource_scale);
+  clutter_actor_set_size (actor, actor_size, actor_size);
   if (!ensure_request (cache, key, policy, &request, actor))
     {
       ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
@@ -1095,6 +1105,7 @@ load_fitted_icon (StTextureCache *cache,
   AsyncTextureLoadData *request;
   ClutterActor *actor = create_invisible_actor ();
   int lookup_size, lookup_scale;
+  float actor_size;
   g_autofree char *icon_string = g_icon_to_string (G_ICON (icon));
   g_autofree char *key = NULL;
   StTextureCachePolicy policy = icon_string ? ST_TEXTURE_CACHE_POLICY_FOREVER
@@ -1104,7 +1115,8 @@ load_fitted_icon (StTextureCache *cache,
   key = g_strdup_printf (CACHE_PREFIX_FITTED_ICON "%s,size=%d,pixels=%d,scale=%d",
                          icon_string ? icon_string : "", size, lookup_size, lookup_scale);
   clutter_actor_set_content_gravity (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
-  clutter_actor_set_size (actor, size * paint_scale, size * paint_scale);
+  actor_size = icon_actor_size (lookup_size, lookup_scale, resource_scale);
+  clutter_actor_set_size (actor, actor_size, actor_size);
   if (!ensure_request (cache, key, policy, &request, actor))
     {
       ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
@@ -1171,8 +1183,6 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
   StIconStyle icon_style = ST_ICON_STYLE_REQUESTED;
   StIconLookupFlags lookup_flags;
 
-  actor_size = size * paint_scale;
-
   if (ST_IS_STYLED_ICON (icon))
     return load_styled_icon (cache, ST_STYLED_ICON (icon), size, paint_scale, resource_scale);
 
@@ -1192,8 +1202,8 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
 
       return g_object_new (CLUTTER_TYPE_ACTOR,
                            "content-gravity", CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT,
-                           "width", actor_size,
-                           "height", actor_size,
+                           "width", (float) (size * paint_scale),
+                           "height", (float) (size * paint_scale),
                            "content", CLUTTER_CONTENT (icon),
                            NULL);
     }
@@ -1247,6 +1257,7 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
 
   actor = create_invisible_actor ();
   clutter_actor_set_content_gravity  (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
+  actor_size = icon_actor_size (lookup_size, lookup_scale, resource_scale);
   clutter_actor_set_size (actor, actor_size, actor_size);
   if (!ensure_request (cache, key, policy, &request, actor))
     {

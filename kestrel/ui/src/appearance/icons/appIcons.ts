@@ -46,6 +46,7 @@ class AppIcons {
   private readonly hidden = new Set<St.Icon>();
   private readonly listeners = new Set<() => void>();
   private accent: { seed: Seed; dark: boolean; taskbarDark: boolean } | null = null;
+  private taskbarInk: string | null = null;
   private restyleId = 0;
   style = this.settings.get_string('app-icon-style') as IconStyle;
   private square = !this.settings.get_boolean('rounded-window-corners');
@@ -63,6 +64,12 @@ class AppIcons {
 
   setAccent(seed: Seed, dark: boolean, taskbarDark: boolean): void {
     this.accent = { seed, dark, taskbarDark };
+    this.refresh();
+  }
+
+  setTaskbarInk(ink: string): void {
+    if (ink === this.taskbarInk) return;
+    this.taskbarInk = ink;
     this.refresh();
   }
 
@@ -128,7 +135,7 @@ class AppIcons {
     const dark = this.accent?.dark ?? true;
     const taskbarDark = this.accent?.taskbarDark ?? true;
     const painted = seed ? paints(seed, dark, foreground(dark)) : null;
-    const taskbarPainted = seed ? paints(seed, taskbarDark, foreground(taskbarDark)) : null;
+    const taskbarPainted = seed ? paints(seed, taskbarDark, this.taskbarInk ?? foreground(taskbarDark)) : null;
     const square = !this.settings.get_boolean('rounded-window-corners');
     if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
     const restyleAll = style !== 'default' || this.style !== 'default';

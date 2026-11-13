@@ -3,6 +3,7 @@ import St from 'gi://St';
 
 import type { EaseOptions, EaseProperties } from '../../environment.js';
 import { Spring } from '../../../../../packages/web/motion/src/index';
+import { pressOnPixels } from '../display/graphics.js';
 
 export { cubicBezier, Curve, Duration, Gesture, projection, rubberband, Spring, type SpringToken } from '../../../../../packages/web/motion/src/index';
 
@@ -21,15 +22,16 @@ export function animateAdjustment(adjustment: St.Adjustment, target: number, par
 const LIFT = 4;
 
 export function liftIcon(button: St.Button, icon: Clutter.Actor, away: () => [number, number] = () => [0, -1]): void {
-  icon.set_pivot_point(0.5, 0.5);
   const update = () => {
     const lift = button.hover && !button.pressed ? LIFT : 0;
     const [x, y] = away();
+    const press = button.pressed ? pressOnPixels(icon) : null;
+    if (press) icon.set_pivot_point(...press.pivot);
     animateActor(icon, {
       translation_x: x * lift,
       translation_y: y * lift,
-      scale_x: button.pressed ? 0.96 : 1,
-      scale_y: button.pressed ? 0.96 : 1,
+      scale_x: press?.scale ?? 1,
+      scale_y: press?.scale ?? 1,
       spring: Spring.snappy,
     });
   };

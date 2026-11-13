@@ -13,6 +13,10 @@ import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { appName } from '../../shared/apps/names.js';
 import { AppHint, appKind } from './appHint.js';
+import { CellRowLayout, CenteredColumnLayout } from './cells.js';
+import { FillLayout } from '../../shared/layout/fill.js';
+
+const ICON_SIZE = 36;
 
 export class StartGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
@@ -130,10 +134,10 @@ export class StartGrid {
     this.firstResult = undefined;
     const ids = this.layout.items(this.folder).filter(id => this.visible(id));
     for (let index = 0; index < ids.length; index += 6) {
-      const row = new St.BoxLayout({ style_class: 'kestrel-app-row' });
+      const row = new St.Widget({ style_class: 'kestrel-app-row', layout_manager: new CellRowLayout(ICON_SIZE) });
       for (let column = 0; column < 6; column++) {
         const id = ids[index + column];
-        const button = id ? this.cachedButton(id) : new St.Widget({ width: 92, x_expand: true });
+        const button = id ? this.cachedButton(id) : new St.Widget({ width: 92 });
         row.add_child(button);
         if (id && reorder) {
           const allocated = button.connect('notify::allocation', () => {
@@ -222,17 +226,16 @@ export class StartGrid {
     const folder = this.layout.folder(id);
     const app = this.apps.get(id);
     const label = folder?.name ?? appName(app!);
-    const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-content', x_align: Clutter.ActorAlign.CENTER });
-    const icon = this.icon(id, 36);
-    icon.x_align = Clutter.ActorAlign.CENTER;
+    const content = new St.Widget({ style_class: 'kestrel-app-content', layout_manager: new CenteredColumnLayout() });
+    const icon = this.icon(id, ICON_SIZE);
     content.add_child(icon);
-    const name = new St.Label({ text: label, style_class: 'kestrel-app-label', x_align: Clutter.ActorAlign.CENTER });
+    const name = new St.Label({ text: label, style_class: 'kestrel-app-label' });
     name.clutter_text.line_wrap = true;
     name.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
     name.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     name.clutter_text.line_alignment = Pango.Alignment.CENTER;
     content.add_child(name);
-    const button = new St.Button({ name: `kestrel-start-item-${id}`, style_class: 'kestrel-app-button', child: content, width: 92, x_expand: true, can_focus: true, track_hover: true, accessible_name: label });
+    const button = new St.Button({ name: `kestrel-start-item-${id}`, style_class: 'kestrel-app-button', child: content, layout_manager: new FillLayout(), width: 92, can_focus: true, track_hover: true, accessible_name: label });
     button.connect('key-focus-in', () => this.reveal(button));
     const kind = app && appKind(app, label);
     if (kind) this.hint.bind(button, kind);

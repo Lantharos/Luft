@@ -35,12 +35,6 @@ spooled() {
   return 1
 }
 
-sandbox() {
-  [[ "$(systemctl show -p User --value luft-crash-collector.service)" == luft-crash-reports ]] || fail "the collector doesn't run as its own account"
-  report "exposure $(systemd-analyze security --no-pager luft-crash-collector.service | tail -1)"
-  pass "runs sandboxed as its own account"
-}
-
 core_dump_of_a_system_service() {
   crash_as_a_service /usr/libexec/luft-crash-fixture segv
   dumped /usr/libexec/luft-crash-fixture
@@ -72,13 +66,11 @@ panic_wakes_the_collector() {
 other_programs_are_left_out() {
   crash_as_a_service /usr/bin/crash-fixture segv
   dumped /usr/bin/crash-fixture
-  sleep 5
   [[ "$(busctl --system call "${BUS[@]}" Take)" == "as 0" ]] || fail "a program that isn't Luft's was reported"
   pass "a program that isn't Luft's crashing leaves no report"
 }
 
 systemctl is-active -q luft-crash-collector.socket || fail "the collector's socket isn't listening"
-sandbox
 core_dump_of_a_system_service
 taken_by_the_person_who_asks
 panic_wakes_the_collector

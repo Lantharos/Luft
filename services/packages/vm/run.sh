@@ -26,7 +26,7 @@ place 755 "$here/check.sh" /usr/libexec/luft-packages-check
 place 644 "$here/luft-packages-check.service" /usr/lib/systemd/system/luft-packages-check.service
 place 644 "$here/usr.mount" /usr/lib/systemd/system/usr.mount
 build_check_image "$image_name:45" "$image_name-packages-check" \
-  "groupadd --system greetd && install -Dm755 /usr/bin/busctl /usr/lib/sabine/com.lantharos.settings/settings && \
+  "install -Dm755 /usr/bin/busctl /usr/lib/sabine/com.lantharos.settings/settings && \
   systemctl enable usr.mount luft-packages-check.service && useradd --create-home --uid 1000 mara"
 make_root_drive "$image_name-packages-check"
 

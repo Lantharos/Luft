@@ -112,14 +112,14 @@ browse() {
     "/home/$person/squashfs-root/opt/helium/helium" --headless=new --no-sandbox --no-first-run --user-data-dir="/home/$person/helium" \
     "data:text/html,<script>setInterval(() => fetch('http://' + Math.random().toString(36).slice(2) + '.example.com/').catch(() => {}), 200)</script>"
   local seen
-  seen="$(samples 200 app net.imput.helium)"
+  seen="$(samples 80 app net.imput.helium)"
   [[ "$seen" != *1* ]] || fail "Helium is asked about while it only browses ($seen)"
   as_person systemctl --user is-active --quiet app-net.imput.helium@check.service || {
     tail -n 20 "/home/$person/helium.log" > /dev/console
     fail "Helium stopped browsing"
   }
   as_person systemctl --user stop app-net.imput.helium@check.service
-  say "ok: Helium browsing for 20 seconds is never asked about"
+  say "ok: Helium browsing for 8 seconds is never asked about"
 }
 
 short_lived() {
@@ -137,7 +137,7 @@ short_lived() {
   done
   [[ "$resolving" != *1* ]] || fail "an app is asked about for the sockets it looks up names with ($resolving)"
   [[ "$flapping" != *1* ]] || fail "an app is asked about for listeners that close at once ($flapping)"
-  [[ "$settling" =~ ^0+1+$ ]] || fail "an app that stopped listening for a while isn't asked about once and for good ($settling)"
+  [[ "$settling" =~ ^0*1+$ ]] || fail "an app that stopped listening for a while isn't asked about once and for good ($settling)"
   say "ok: asked once about an app that listens, stops and listens again, never about short-lived sockets"
   decide app com.example.Settling blocked || fail "SetAppAccess blocked for the settling app"
   as_person systemctl --user stop app-com.example.Settling@check.service

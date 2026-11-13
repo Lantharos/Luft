@@ -40,8 +40,8 @@ sleep_until_woken() {
 woken_early() {
   battery Discharging 50
   sleep_until_woken early
-  sleep 10
-  systemctl is-active -q luft-sleep-power-off.service && fail "shut down after being woken"
+  [[ -z "$(systemctl list-jobs --no-legend luft-sleep-power-off.service)$(journalctl -b -q -o cat -u luft-sleep-power-off.service)" ]] ||
+    fail "shut down after being woken"
   pass "waking it up early leaves it on"
   umount /sys/class/power_supply
   sleep_until_woken plain

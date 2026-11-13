@@ -14,7 +14,7 @@ listed() { gdbus call "${PRINTING[@]}" --method com.lantharos.Settings.Printing.
 
 for _ in $(seq 60); do
   printers="$(listed)"
-  [[ "$printers" == *"'$printer'"* ]] && break
+  [[ "$printers" == *"'$printer'"* && "$printers" == *"'accepting': <true>"* ]] && break
   sleep 1
 done
 report "session lists: $printers"

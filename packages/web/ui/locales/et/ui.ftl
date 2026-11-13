@@ -17,6 +17,7 @@ ui-select-placeholder = Vali
 ui-password-show = Kuva salasõna
 ui-password-hide = Peida salasõna
 ui-toast-dismiss = Sulge
+ui-toast-details = Üksikasjad
 
 ## Media playback controls
 

@@ -228,6 +228,9 @@ setup-protect-keep-safe = Hoia see taastevõti turvalises kohas, sellest arvutis
 setup-protect-passphrase-label = Paroolifraas
 setup-protect-repeat = Tipi uuesti
 setup-protect-mismatch = Need ei ühti
+setup-protect-usb-save = Salvesta
+setup-protect-usb-done = Salvestatud
+setup-protect-usb-close-saved = Valmis
 setup-protect-skip = Ära krüpti
 setup-protect-encrypt = Krüpti
 

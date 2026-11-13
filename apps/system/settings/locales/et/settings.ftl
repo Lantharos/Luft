@@ -28,6 +28,7 @@ settings-more-show =
         [one] Kuva veel { $count }
        *[other] Kuva veel { $count }
     }
+settings-more-done = Valmis
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Tund
 settings-time-picker-minute = Minut

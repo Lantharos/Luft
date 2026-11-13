@@ -4,6 +4,14 @@ mkdir -p "$1"
 vm="$(cd "$1" && pwd)"
 stage="$vm/stage"
 
+from_this_tree() {
+  [[ -z "${LUFT_VM_CHECK_IMAGE:-}" ]]
+}
+
+base_image() {
+  echo "${LUFT_VM_CHECK_IMAGE:-${LUFT_IMAGE_NAME:-localhost/luft}:45}"
+}
+
 start_stage() {
   [[ ! -d "$stage" ]] || { chmod -R u+w "$stage"; rm -rf "$stage"; }
   mkdir -p "$stage/root"

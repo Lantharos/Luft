@@ -19,7 +19,7 @@ SABINE_BINDINGS=$PWD/packages/web/network/bridge/bindings.ts cargo run -p luft-n
 
 Their types also land in the bindings of every app that uses them, so run `sabine bindings` in those apps too.
 
-Every Rust crate belongs to one Cargo workspace at the repository's root, with one `Cargo.lock` and the versions of shared dependencies in its `Cargo.toml`. `cargo clippy --all-targets` and `cargo test --no-fail-fast` there check them all, and `-p NAME` picks one. Some tests only pass as root, as CI runs them, so a few failures on your own account can be expected.
+Every Rust crate belongs to one Cargo workspace at the repository's root, with one `Cargo.lock` and the versions of shared dependencies in its `Cargo.toml`. `cargo clippy --all-targets` and `cargo test --workspace --no-fail-fast` there check them all, and `-p NAME` picks one. SushiBoot and the VM's display loader only build for UEFI, so they have no tests and get Clippy for `x86_64-unknown-uefi`; the rollback check below covers SushiBoot's boot counting. Some tests only pass as root, as CI runs them, so a few failures on your own account can be expected.
 
 Services test their own logic with `cargo test`, often against a stand-in server, such as `services/accounts` with token exchange and conflict names. Their path through the desktop is a headless group, such as `apps:cloud` for cloud drives against a local `rclone serve webdav` or `system:crashReports` against a stand-in for the crash inbox, and a headless session runs a private CUPS with two printers for the printing pages.
 
@@ -57,7 +57,23 @@ Disks, startup, installing and system services are tested in QEMU VMs from `os/v
 
 `LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` keeps its screenshots, the serial console, the journal and `bootc status` in `check` inside it when a step fails or times out.
 
-Checks of single parts, such as the installer, Luft Keyring, the system packages service, crash reports, printing, sleep, Windows and Disks, live in a `vm` folder next to their code and share `os/vm/check.sh`: a check image with the check's files on top of the system, started directly with the image's kernel or installed with `disk.sh`. A drive started that way has SELinux off, since its files carry no labels; `relabel_root_drive` labels it once, after which `SELINUX="selinux=1 enforcing=1"` starts it enforcing, so a check fails on anything SELinux denies.
+Checks of single parts live in a `vm` folder next to their code and share `os/vm/check.sh`: a check image with the check's files on top of the system, started directly with the image's kernel or installed with `disk.sh`. They build this checkout's programs into `localhost/luft:45` or `localhost/luft-system:45` from `os/image/build.sh`; the times are on a desktop with KVM, after the first build.
+
+| Check | Covers | Takes |
+| --- | --- | --- |
+| `apps/system/setup/installer/vm/run.sh` | Installing onto a whole drive, beside a kept partition and beside Windows, encryption and the recovery key, and setup on the installed drives | up to 30 min |
+| `kestrel/keyring/tools/vm/build.sh`, then `run.sh tpm`, `gone`, `none` | Signing in with a password or a fingerprint, the lock screen, `sudo`, PINs and resealing, with a TPM, after it's gone and without one | 3 min each |
+| `packages/shield/vm/run.sh` | Other programs of the same account can't read the keyring, and the unlock service refuses them | 1 min |
+| `security/vm/firewall/run.sh` | Network types, per-app and per-program decisions, extension ports, other tables kept, across a restart | 3 min |
+| `security/vm/remote-login/run.sh` | Off by default, who may turn it on and sign in, penalties, going back to an older system | 2 min |
+| `services/crashes/vm/run.sh` | Core dumps and panics become reports for the first person who asks | 1.5 min |
+| `services/packages/vm/run.sh` | An unreviewed extension is copied only with an administrator's approval, out of the account's reach | 1 min |
+| `services/printers/vm/run.sh` | A network printer and a USB one set themselves up and print | 2 min |
+| `services/sleep/vm/run.sh` | Sleeping and waking, and shutting down instead of sleeping on with a low battery | 14 min |
+| `services/windows/vm/run.sh` | Fast Startup, the clock, Bluetooth pairings and a hibernated Windows on a real NTFS drive | 1 min |
+| `apps/system/disks/vm/run.sh`, `grow/run.sh`, `move/run.sh` | Removing other systems, growing Luft, and moving it across drives with a power cut in the middle | up to 2 h each |
+
+A drive started directly with the image's kernel has SELinux off, since its files carry no labels; `relabel_root_drive` labels it once, after which `SELINUX="selinux=1 enforcing=1"` starts it enforcing, so a check fails on anything SELinux denies. The shield, firewall and remote login checks take `LUFT_VM_CHECK_IMAGE=IMAGE` to check a built image as it is, without this checkout's programs on top, as the nightly does.
 
 Luft opens no text console unless Developer tools is on, so no check waits for a `login:` prompt. A service in the check image writes each result to the serial console instead, and `disk.sh` opens root's console on the drives it makes. The installer check installs its own check image, so each drive it installs says on the serial console that it started through SushiBoot and that setup stayed on screen.
 
@@ -97,4 +113,4 @@ When a change can reach Kestrel, a job in a Fedora container started with system
 .github/scripts/kestrel/container.sh run kestrel/tools/session.sh capture --only lockScreen
 ```
 
-Before the nightly tag moves, the Image workflow installs each new image, the standard and the NVIDIA one, in a VM with `os/vm/disk.sh` and runs `os/vm/check.py session` on it. The tag only moves when that passes.
+Before the nightly tag moves, the Image workflow installs each new image, the standard and the NVIDIA one, in a VM with `os/vm/disk.sh` and runs `os/vm/check.py session` on it. The tag only moves when that passes. Beside it, the shield, firewall and remote login checks run on the new standard image as it was built. Their failures mark the run as failed and keep their serial logs, but don't hold the tag back. The other part checks and `check.py rollback` run by hand.

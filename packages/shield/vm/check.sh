@@ -104,7 +104,7 @@ without_its_group() {
   pid="$(main_pid luft-keyring.service)"
   awk '$1 == "Gid:" && $2 == $3 {found = 1} END {exit !found}' "/proc/$pid/status" ||
     fail "the keyring started with no new privileges got its group"
-  logged "$since" "it didn't start with its program's group" || fail "the unlock service took the keyring without its group"
+  logged "$since" "Refused a connection from user 1000" || fail "the unlock service took the keyring without its group"
   [[ "$(chip)" == 's ""' ]] || fail "the keyring without its group still reached the chip: $(chip)"
   rm "$NO_GROUP"
   restart_keyring

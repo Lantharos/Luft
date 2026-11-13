@@ -9,12 +9,16 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 serial="$vm/serial.log"
 forwarded=$((20000 + RANDOM % 20000))
 
+setup="systemctl enable luft-firewall.service luft-remote-login-check.service"
+
 start_stage
-bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
+if from_this_tree; then
+  bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
+  setup="semodule -i /usr/share/selinux/packages/luft-remote-login.cil && $setup"
+fi
 place 755 "$here/check.sh" /usr/libexec/luft-remote-login-check
 place 644 "$here/luft-remote-login-check.service" /usr/lib/systemd/system/luft-remote-login-check.service
-build_check_image "${LUFT_REMOTE_LOGIN_BASE:-$image_name:45}" "$image_name-remote-login-check" \
-  "semodule -i /usr/share/selinux/packages/luft-remote-login.cil && systemctl enable luft-firewall.service luft-remote-login-check.service"
+build_check_image "$(base_image)" "$image_name-remote-login-check" "$setup"
 make_root_drive "$image_name-remote-login-check"
 relabel_root_drive "$serial.relabel"
 

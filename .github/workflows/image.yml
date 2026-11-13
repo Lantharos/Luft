@@ -523,23 +523,16 @@ jobs:
 
       - uses: ./.github/actions/registry
 
-      - name: QEMU with KVM
-        run: |
-          echo "LUFT_VM=$RUNNER_TEMP/vm" >> "$GITHUB_ENV"
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules > /dev/null
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          sudo apt-get update --quiet
-          sudo apt-get install --yes --quiet --no-install-recommends qemu-system-x86 qemu-utils ovmf swtpm
-          sudo apparmor_parser --remove /etc/apparmor.d/usr.bin.swtpm
+      - uses: ./.github/actions/qemu
 
       - name: Install the new nightly
         run: |
+          echo "LUFT_VM=$RUNNER_TEMP/vm" >> "$GITHUB_ENV"
           password="$(openssl rand -hex 16)"
           echo "::add-mask::$password"
           echo "VM_PASSWORD=$password" >> "$GITHUB_ENV"
           podman pull --quiet "$IMAGE:$VERSION$SUFFIX" > /dev/null
-          VM_PASSWORD="$password" VM_FOLLOWS="$IMAGE:$MAJOR-nightly$SUFFIX" os/vm/disk.sh "$IMAGE:$VERSION$SUFFIX"
+          LUFT_VM="$RUNNER_TEMP/vm" VM_PASSWORD="$password" VM_FOLLOWS="$IMAGE:$MAJOR-nightly$SUFFIX" os/vm/disk.sh "$IMAGE:$VERSION$SUFFIX"
 
       - name: Start it with Secure Boot and sign in
         run: os/vm/check.py --out "$RUNNER_TEMP/boot-test" session
@@ -551,6 +544,47 @@ jobs:
           path: |
             ${{ runner.temp }}/boot-test
             ${{ runner.temp }}/vm/install.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+  vm-checks:
+    name: VM check (${{ matrix.check.name }})
+    needs: [plan, image]
+    if: always() && needs.image.result == 'success'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - name: shield
+            folder: packages/shield/vm
+          - name: firewall
+            folder: security/vm/firewall
+          - name: remote login
+            folder: security/vm/remote-login
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+      FOLDER: ${{ matrix.check.folder }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/make-room
+
+      - uses: ./.github/actions/registry
+
+      - uses: ./.github/actions/qemu
+
+      - name: Check the new nightly as it was built
+        run: |
+          podman pull --quiet "$IMAGE:$VERSION" > /dev/null
+          LUFT_VM_CHECK_IMAGE="$IMAGE:$VERSION" "$FOLDER/run.sh"
+
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: vm-check-${{ strategy.job-index }}
+          path: target/vm/*/serial*
           if-no-files-found: ignore
           retention-days: 14
 

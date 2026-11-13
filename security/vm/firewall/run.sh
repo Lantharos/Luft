@@ -17,16 +17,20 @@ for guest in 8000 8001 8002 8003 80; do
 done
 forwarded="$(IFS=,; echo "${forwards[*]}")"
 
+setup="systemctl enable usr.mount luft-firewall-base.service luft-firewall.service luft-firewall-check.service"
+
 start_stage
-bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
+if from_this_tree; then
+  bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
+  setup="semodule -i /usr/share/selinux/packages/luft-firewall.cil && $setup"
+fi
 place 755 "$here/check.sh" /usr/libexec/luft-firewall-check
 place 644 "$here/sockets.py" /usr/libexec/luft-firewall-check-sockets
 place 644 "$here/luft-firewall-check.service" /usr/lib/systemd/system/luft-firewall-check.service
 place 644 "$here/kestrel.service" /etc/systemd/user/kestrel.service
 place 644 "$here/usr.mount" /usr/lib/systemd/system/usr.mount
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-firewall-check.rules
-build_check_image "${LUFT_FIREWALL_BASE:-$image_name:45}" "$image_name-firewall-check" \
-  "semodule -i /usr/share/selinux/packages/luft-firewall.cil && systemctl enable usr.mount luft-firewall-base.service luft-firewall.service luft-firewall-check.service"
+build_check_image "$(base_image)" "$image_name-firewall-check" "$setup"
 make_root_drive "$image_name-firewall-check"
 relabel_root_drive "$serial.relabel"
 

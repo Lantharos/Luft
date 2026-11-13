@@ -134,8 +134,8 @@ class Check:
         states = f"systemctl --user --machine={USER}@ is-active {SESSION_UNITS}"
         self.wait("the desktop is up", lambda: self.succeeds(f'test "$({states} | sort -u)" = active'), 300)
         self.steady("Kestrel", f"systemctl --user --machine={USER}@ show --property=MainPID --value kestrel.service")
-        seasons = f"test -d ~{USER}/.local/share/luft/extensions/com.lantharos.Seasons"
-        self.wait("the preinstalled extensions are in", lambda: self.succeeds(seasons), 120)
+        draft = f"grep -q com.lantharos.draft ~{USER}/.local/state/luft/preinstalled"
+        self.wait("the preinstalled apps are in", lambda: self.succeeds(draft), 120)
         if self.output(f"ls -A {INCIDENTS} 2>/dev/null | wc -l") != "0":
             raise MachineError("the graphics watchdog recorded an incident")
         self.wake()

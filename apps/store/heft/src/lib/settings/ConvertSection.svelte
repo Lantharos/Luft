@@ -32,18 +32,15 @@
 			<Switch label={t('settings-convert')} checked={settings.values.convert && !!reader.model?.installed} disabled={!reader.model} onchange={turn} />
 		</div>
 		{#if settings.values.convert && reader.model?.installed}
-			<div class="flex flex-col gap-1">
-				<Slider
-					label={t('settings-convert-after')}
-					value={settings.values.convertAfter / 1000}
-					min={0.5}
-					max={2}
-					step={0.1}
-					format={(value) => t('settings-convert-seconds', { value })}
-					onchange={(value) => settings.set('convertAfter', Math.round(value * 1000))}
-				/>
-				<p class="text-[12px] text-(--text-muted)">{t('settings-convert-pause', { value: settings.values.convertAfter / 1000 })}</p>
-			</div>
+			<Slider
+				label={t('settings-convert-after')}
+				value={settings.values.convertAfter / 1000}
+				min={0.5}
+				max={2}
+				step={0.1}
+				format={(value) => t('settings-convert-seconds', { value })}
+				onchange={(value) => settings.set('convertAfter', Math.round(value * 1000))}
+			/>
 		{/if}
 		<div class="flex items-center justify-between gap-4">
 			<div class="min-w-0">

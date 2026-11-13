@@ -31,7 +31,7 @@ sounds-choose-title = Choose sounds
 ## The empty board and search
 
 empty-title = Drop sounds here
-empty-detail = Or add them from a folder. They're copied, so they keep working if the originals move.
+empty-detail = Or add them from a folder.
 empty-search = Nothing matches { $search }
 
 ## Messages
@@ -89,7 +89,6 @@ editor-preview = Listen
 editor-loop = Loop
 editor-loop-detail = Plays until you press it again
 editor-stop-others = Stop other sounds
-editor-stop-others-detail = Cuts off whatever is playing
 editor-trigger = Hotkey plays
 editor-trigger-press = On press
 editor-trigger-hold = While held

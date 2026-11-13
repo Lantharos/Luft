@@ -20,7 +20,7 @@ check-startup-mbr = The drive uses an old partition table
 check-startup-mbr-windows = Luft needs a GPT drive. Windows can convert it with MBR2GPT without losing files.
 check-startup-mbr-linux = Luft needs a GPT drive to start from.
 check-startup-no-esp = No EFI system partition
-check-startup-no-esp-detail = Luft adds its start files next to the ones already on the EFI system partition, and there isn't one.
+check-startup-no-esp-detail = Luft needs one for its start files.
 check-startup-esp-full = The EFI system partition is full
 # $size is a number of megabytes
 check-startup-esp-full-detail = Luft needs { $size } MB there for its start files. Old kernels or start entries usually take up the space.
@@ -59,13 +59,13 @@ check-system-unknown = Its drive is laid out in a way Luft can't replace yet whi
 check-encryption-off = Windows isn't encrypted
 check-encryption-off-detail = Install Luft can read its settings and your Bluetooth devices.
 check-encryption-on = Windows is encrypted with BitLocker
-check-encryption-on-detail = That's fine. Windows makes the room itself, and Meet Luft brings over what Luft can't read from a locked drive. Keep your recovery key nearby, just in case.
+check-encryption-on-detail = That's fine. Keep your recovery key nearby, just in case.
 check-encryption-changing = BitLocker is still encrypting or decrypting
 # "Device encryption" is the name of the page in Windows Settings; use the name Windows uses in your language
 check-encryption-changing-detail = Wait until Windows finishes, then come back. You can see how far it is in Settings, under Device encryption.
 # Fast Startup is the name of a Windows setting; use the name Windows uses in your language
 check-fast-startup-on = Fast Startup is on
-check-fast-startup-on-detail = Windows hibernates instead of shutting down, which keeps its drive locked and can leave sound and Wi-Fi in a state Luft can't use. Meet Luft offers to turn it off before restarting.
+check-fast-startup-on-detail = It can leave sound and Wi-Fi unusable in Luft. Meet Luft offers to turn it off before restarting.
 check-fast-startup-off = Fast Startup is off
 check-fast-startup-off-detail = Windows shuts down fully.
 check-secure-boot-on = Secure Boot is on
@@ -126,7 +126,7 @@ check-start-entries-detail = { $count ->
    *[other] { $names } point at systems that aren't on this PC anymore. They can be tidied away.
 }
 check-download-unavailable = Luft can't be downloaded right now
-check-download-unavailable-detail = Meet Luft downloads about 3 GB. Check that you’re online and check again, or use a Luft ISO you already have.
+check-download-unavailable-detail = Check that you’re online, or use a Luft ISO you already have.
 
 ## Choosing a Luft ISO file
 

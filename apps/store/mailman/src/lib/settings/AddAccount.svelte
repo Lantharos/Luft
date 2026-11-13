@@ -157,7 +157,7 @@
 {#if confirming}
 	<ConfirmDialog
 		title="Connect without encryption?"
-		description="Your password and every message would travel to {exposed} as plain text, readable by anyone on the networks in between. Continue only if you run this server yourself on a network you trust."
+		description="Your password and messages would reach {exposed} as plain text, readable by anyone on the network in between. Only continue with a server and network you trust."
 		action="Connect unencrypted"
 		danger
 		run={async () => void connect()}

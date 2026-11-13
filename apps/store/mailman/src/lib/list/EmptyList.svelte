@@ -3,7 +3,7 @@
 
 	const QUIET: Record<string, [string, string]> = {
 		inbox: ['Inbox zero', 'Everything is taken care of.'],
-		screener: ['Nobody new', 'People writing to you for the first time wait here until you let them in.'],
+		screener: ['Nobody new', 'New senders wait here until you let them in.'],
 		later: ['Nothing set aside', 'Press B on a conversation to bring it back when it suits you.'],
 		starred: ['No stars', 'Press S to star what matters.'],
 		drafts: ['No drafts', 'Unfinished messages are kept here.'],

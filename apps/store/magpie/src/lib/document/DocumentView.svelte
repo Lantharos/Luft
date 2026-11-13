@@ -56,7 +56,7 @@
 
 <div class="document {DOCUMENT_SCOPE}">
 	{#if problem}
-		<CantShow {item} message="This document can't be opened." detail="It may be damaged or protected in a way Magpie doesn't support." />
+		<CantShow {item} message="This document can't be opened." detail="It may be damaged or protected." />
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 		<div bind:this={container} class="pages soft-scroll" onclick={followLink} {@attach wheelZoom}>

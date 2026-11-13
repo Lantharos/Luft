@@ -314,7 +314,6 @@ settings-convert = Претварај писање у текст
 settings-convert-body = Кад застанете после реда, он постаје откуцан текст тамо где сте писали. Реч исправите писањем преко ње, квачицу додајте цртањем изнад слова, речи прецртајте да их обришете, а тапните између речи да ту допишете.
 settings-convert-after = Пауза пре претварања
 settings-convert-seconds = { $value } s
-settings-convert-pause = Претвара се у текст кад оловка мирује { $value } s.
 settings-languages = Језици које користиш на часу
 settings-languages-body = Квачице које нацрташ иду на слова која ти језици користе, мада се може додати било која, а снимци се реченицу по реченицу разликују међу њима. Предмет може да има своје.
 settings-languages-choose = Изабери
@@ -435,7 +434,6 @@ settings-process-body = Исписивање снимака, прављење б
 settings-recording-whisper = исписује говор
 settings-recording-writer = прави белешке
 settings-recording-model = { $use }, { $size }, { $licence }
-
 
 subject-languages = Језици на часовима овог предмета
 subject-languages-body = За снимке: Heft разликује само ове језике, и што их је мање, то их поузданије разликује. Whisper најслабије препознаје албански, па га на часу на албанском изабери самог.

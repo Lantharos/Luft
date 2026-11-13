@@ -17,7 +17,7 @@
 			</div>
 		{:else}
 			<h2 class="text-[20px] font-semibold">Open something to look at</h2>
-			<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">Photos, videos, music, PDFs and fonts open here. You can also drop a file onto this window.</p>
+			<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">Photos, videos, music, PDFs and fonts. You can also drop a file here.</p>
 			<button type="button" class="button primary large mt-5" onclick={openFile}>Open…</button>
 		{/if}
 	</div>

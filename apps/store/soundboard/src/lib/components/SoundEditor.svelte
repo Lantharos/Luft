@@ -138,7 +138,7 @@
 			<Row title={t('editor-loop')} description={t('editor-loop-detail')}>
 				<Switch checked={draft.looping} label={t('editor-loop')} onchange={(looping) => (draft.looping = looping)} />
 			</Row>
-			<Row title={t('editor-stop-others')} description={t('editor-stop-others-detail')}>
+			<Row title={t('editor-stop-others')}>
 				<Switch checked={draft.stopOthers} label={t('editor-stop-others')} onchange={(stopOthers) => (draft.stopOthers = stopOthers)} />
 			</Row>
 			<Row title={t('editor-trigger')}>

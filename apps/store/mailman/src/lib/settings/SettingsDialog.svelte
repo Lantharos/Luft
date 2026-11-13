@@ -43,15 +43,15 @@
 			<ActionRow title="Add an account" description="Gmail, Outlook, Fastmail, iCloud or any IMAP or JMAP server" icon={Plus} onclick={onadd} />
 		</Section>
 		<Section title="Inbox">
-			<Row title="Screener" description="People writing for the first time wait in the Screener until you let them in">
+			<Row title="Screener" description="New senders wait until you let them in">
 				<Switch checked={mail.settings.screener} label="Screener" onchange={(screener) => void change({ screener })} />
 			</Row>
-			<Row title="Bundles" description="Newsletters, receipts and updates are kept out of the inbox and summed up at its top">
+			<Row title="Bundles" description="Newsletters, receipts and updates, summed up above the inbox">
 				<Switch checked={mail.settings.bundles} label="Bundles" onchange={(bundles) => void change({ bundles })} />
 			</Row>
 		</Section>
 		<Section title="Writing">
-			<Row title="Time to undo sending" description="Messages wait this long before they leave">
+			<Row title="Time to undo sending">
 				<Segmented options={UNDO} value={mail.settings.undoSeconds} label="Time to undo sending" onchange={(undoSeconds) => void change({ undoSeconds })} />
 			</Row>
 		</Section>
@@ -59,7 +59,7 @@
 			<Row title="Darken bright messages" description="Designed newsletters follow the dark style too">
 				<Switch checked={mail.settings.darkMail} label="Darken bright messages" onchange={(darkMail) => void change({ darkMail })} />
 			</Row>
-			<Row title="Notifications" description="A quiet note for new mail from people you know">
+			<Row title="Notifications" description="For new mail from people you know">
 				<Switch checked={mail.settings.notifications} label="Notifications" onchange={(notifications) => void change({ notifications })} />
 			</Row>
 		</Section>

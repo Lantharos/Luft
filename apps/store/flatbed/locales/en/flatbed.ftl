@@ -6,7 +6,7 @@ start-failed = Flatbed couldn't start: { $reason }
 
 sources-title = Scan from
 # Shown under the list while no scanner has been found yet.
-sources-looking = Scanners on your network and plugged in show up here as soon as they're found.
+sources-looking = Scanners show up here as soon as they're found.
 source-network = On the network
 source-usb = Plugged in
 source-camera = Camera
@@ -33,7 +33,7 @@ save-open = Save…
 welcome-glass = Put a page face down on the scanner's glass
 welcome-feeder = Load the pages into the scanner's feeder
 welcome-camera = Lay the page flat in good light and hold the camera over it
-welcome-drop = Flatbed straightens and cleans up every page. You can also drop in photos of pages you took before.
+welcome-drop = Or drop in photos of pages you took before.
 
 ## Scanning
 
@@ -55,7 +55,7 @@ import-unreadable = { $count ->
 scan-scanning = Scanning on { $name }
 scan-cancel = Cancel
 scan-incoming = The page being scanned
-scan-busy = The scanner is busy with something else. Try again once it's done.
+scan-busy = The scanner is busy. Try again once it's done.
 scan-feeder-empty = There's no paper in the feeder.
 scan-gone = The scanner can't be reached anymore. Check that it's on.
 scan-failed = The scan stopped: { $reason }
@@ -79,17 +79,17 @@ corner-bottom-left = Bottom left corner
 
 clear-title = Remove all pages?
 clear-description = { $count ->
-    [one] The page you scanned is removed. Save it first if you want to keep it.
-   *[other] The { $count } pages you scanned are removed. Save them first if you want to keep them.
+    [one] Save the page first if you want to keep it.
+   *[other] Save the { $count } pages first if you want to keep them.
 }
 clear-confirm = Remove
 
 ## Camera
 
 camera-title = Take a photo of a page
-camera-description = When the outline sits on the paper's edges, take the photo. Take as many pages as you like.
+camera-description = Take the photo when the outline sits on the paper's edges.
 camera-opening = Opening the camera
-camera-refused = Flatbed isn't allowed to use the camera. You can allow it in Settings → Privacy.
+camera-refused = Flatbed isn't allowed to use the camera. Allow it in Settings → Privacy.
 camera-failed = The camera couldn't start: { $reason }
 camera-take = Take photo
 camera-taken = { $count ->
@@ -109,8 +109,8 @@ format-pdf = PDF
 format-jpeg = JPG
 format-png = PNG
 save-searchable = Searchable text
-save-searchable-detail = Reads the text on every page so you can find and copy it
-save-searchable-missing = Text recognition isn't installed on this computer
+save-searchable-detail = Lets you find and copy the text
+save-searchable-missing = Text recognition isn't installed
 save-paper = Page size
 paper-automatic = As scanned
 paper-a4 = A4
@@ -118,7 +118,7 @@ paper-letter = Letter
 save-pictures-one = The page is saved as a picture
 save-pictures-several = { $count ->
     [one] The page is saved as a picture
-   *[other] Each of the { $count } pages is saved as a picture of its own, numbered, in the folder you choose
+   *[other] The { $count } pages are saved as numbered pictures in the folder you choose
 }
 save-choose-file = Save…
 save-choose-folder = Choose folder…
@@ -145,7 +145,7 @@ send-failed = It couldn't be sent: { $reason }
 ## Adding a scanner
 
 add-title = Add a scanner
-add-description = Scanners usually show up by themselves. If yours doesn't, type the address it has on your network.
+add-description = If your scanner doesn't show up by itself, type its network address.
 add-address = Address
 # The variable is what was typed.
 add-failed = No scanner answered at { $address }.
@@ -156,7 +156,7 @@ add-confirm = Add
 
 identity-title = This scanner's identity changed
 # $name is the scanner's name
-identity-description = { $name } doesn't identify itself the way it did before. That happens when a scanner is reset or replaced, but it can also mean something else on the network is posing as it. Nothing is sent to it unless you trust it again.
+identity-description = { $name } identifies itself differently now. A reset or replaced scanner does this, but so does something on the network posing as it. Nothing is sent to it unless you trust it again.
 # Button that leaves the scanner alone
 identity-leave = Don't use it
 # Button that accepts the scanner as it is now
@@ -166,10 +166,10 @@ identity-trust = Trust this scanner
 
 settings-title = Settings
 settings-fine = Fine scans
-settings-fine-detail = Scans at 600 pixels per inch, for small print and photos. Scanning takes longer.
+settings-fine-detail = For small print and photos. Scanning takes longer.
 settings-languages = Languages to read
-settings-languages-detail = Text on your pages is read on this computer in these languages, so saved PDFs can be searched.
-settings-languages-missing = Text recognition isn't installed on this computer, so saved PDFs hold pictures of the pages only.
+settings-languages-detail = Saved PDFs can be searched in these languages.
+settings-languages-missing = Text recognition isn't installed, so saved PDFs can't be searched.
 
 ## Dialogs
 

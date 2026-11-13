@@ -97,7 +97,7 @@ subject-trash-body = Its notebooks go with it. You can bring it back from the tr
 subject-new-page = New page
 subject-new-notebook = New notebook
 subject-new-title = New subject
-subject-new-body = Each subject gets a notebook to start with. Add a textbook or more notebooks whenever you like.
+subject-new-body = Each subject starts with one notebook.
 subject-edit-title = Subject
 subject-name = Name
 # An example subject name, shown in the empty name field.
@@ -105,10 +105,10 @@ subject-name-example = Mathematics
 subject-color = Color
 subject-create = Add subject
 archive-title = Archive
-archive-body = Subjects you're done with, such as last year's, kept out of the way.
+archive-body = Subjects you're done with, kept out of the way.
 archive-restore = Bring back
 trash-title = Trash
-trash-body = Subjects and notebooks stay here for 30 days before they're deleted.
+trash-body = Everything here is deleted after 30 days.
 trash-empty = The trash is empty
 trash-restore = Restore
 trash-delete = Delete now
@@ -128,14 +128,14 @@ notebook-name = Name
 # An example notebook name, shown in the empty name field.
 notebook-name-example = Class notes
 notebook-typed = Mostly typed
-notebook-typed-body = Enter keeps going down the page, and typing carries on to a new page when one is full.
+notebook-typed-body = Typing carries on to a new page when one is full.
 # The variable is the subject the notebook goes into.
 notebook-new-title = New notebook in { $subject }
 notebook-create = Create
 # Where the notebook is scrolled to.
 page-of = Page { $page } of { $pages }
 deleted-pages-title = Deleted pages
-deleted-pages-body = Pages deleted from this notebook. Bring one back and it returns to where it was.
+deleted-pages-body = Restored pages go back to where they were.
 deleted-pages-restore = Restore
 
 ## Paper
@@ -212,15 +212,15 @@ export-page-name = { $notebook }, page { $page }
 
 settings-title = Settings
 settings-pressure = Pressure
-settings-pressure-body = Drag the curve up for a light touch to write boldly, or down to need a firmer press.
+settings-pressure-body = Up writes boldly with a light touch, down needs a firmer press.
 settings-smoothing = Smoothing
 settings-smoothing-value = { $percent }%
 settings-smoothing-body = Evens out shaky lines. More smoothing trails the pen a little.
 settings-buttons = Pen buttons
-settings-buttons-body = What the side buttons do is set for every app in Luft's pen settings. A button set to erase erases here too, with the eraser you chose.
+settings-buttons-body = Set for every app in Luft's pen settings. A button set to erase uses the eraser you chose here.
 settings-buttons-open = Pen settings
 settings-prediction = Draw slightly ahead of the pen
-settings-prediction-body = Guesses where the pen is going for the next few milliseconds, so ink keeps up with fast writing.
+settings-prediction-body = Ink keeps up with fast writing.
 settings-finger-pans = Scroll with one finger
 settings-finger-pans-body = Two fingers always scroll and zoom.
 settings-touch-draws = Draw with a finger
@@ -255,7 +255,7 @@ text-copy = Copy
 notebook-split = Open another notebook beside this one
 notebook-unsplit = Close the one beside
 beside-title = Open beside
-beside-body = Both stay open side by side, each on its own page, and come back together next time.
+beside-body = Both stay open side by side, and come back together next time.
 
 # Shown when PDFs or pictures are opened with Heft or sent to it; the variables are how many there are, the first one's name, and $kind: "books" for PDFs, "pictures" for pictures, "files" for both.
 import-title = { $count ->
@@ -299,15 +299,15 @@ settings-toolbar = Tools
 settings-toolbar-top = Along the top
 settings-toolbar-side = Down the side
 settings-toolbar-dock = Floating
-settings-toolbar-tablet = When the computer is folded into a tablet or the window is taller than it is wide, the page fills the width and the tools float over it, on the side away from the hand you write with. Drag the handle on top to move them.
-settings-toolbar-tablet-now = Folded into a tablet, the page fills the width and the tools float over it. Drag the handle on top to move them.
+settings-toolbar-tablet = In tablet mode or a tall window, the tools float over the page, away from your writing hand.
+settings-toolbar-tablet-now = In tablet mode, the tools float over the page. Drag the handle on top to move them.
 settings-pages = Pages
 settings-pages-continuous = One after another
 settings-pages-single = One at a time
-settings-pages-body = One at a time, scroll on past the end of a page or use Page Down to turn to the next.
+settings-pages-body = Scroll past the end of a page or press Page Down to turn it.
 
 settings-handwriting = Search handwriting
-settings-handwriting-body = Heft reads what you write by hand on this computer, nothing leaves it, so search finds it like typed text. It reads in the background while you aren't writing, and waits while the battery is low. It knows Serbian, German, English and Albanian in Latin letters.
+settings-handwriting-body = Search finds handwriting like typed text, and nothing leaves this computer. Works for Albanian, German, English and Serbian in Latin letters.
 # The variable is the download's size, such as 1.5 GB.
 settings-handwriting-download = Download ({ $size })
 settings-handwriting-downloading = Downloading, { $percent }%
@@ -320,17 +320,16 @@ settings-handwriting-done = Everything written is searchable.
 settings-handwriting-waiting = Waits for a pause in your writing.
 settings-handwriting-battery = Waits until the computer is charging or the battery is fuller.
 settings-convert = Turn writing into text
-settings-convert-body = When you pause after a line, it becomes typed text where you wrote it. Fix a word by writing over it, add an accent by drawing it over the letter, cross words out to delete them, and tap between words to write more there.
+settings-convert-body = Lines become typed text when you pause. Write over a word to fix it, draw accents over letters, cross words out to delete them, and tap between words to add more.
 settings-convert-after = Pause before it turns
 settings-convert-seconds = { $value } s
-settings-convert-pause = Turns into text once the pen has rested for { $value } s.
 settings-languages = Languages you use in class
-settings-languages-body = Accents you draw go on the letters these languages use, though any accent can be added, and recordings are told apart sentence by sentence among them. A subject can have its own.
+settings-languages-body = For accents you draw and for telling speakers' languages apart in recordings. A subject can have its own.
 settings-languages-choose = Choose
 settings-keep-corrections = Keep my corrections
-settings-keep-corrections-body = Saves what you correct on this computer, never anywhere else, so it can help reading improve later.
+settings-keep-corrections-body = Kept on this computer to help reading improve later.
 convert-download-title = Turn writing into text
-convert-download-body = Heft reads handwriting on this computer, so it needs a model for reading first. Nothing you write leaves the computer.
+convert-download-body = This needs a download first. Nothing you write leaves this computer.
 settings-handwriting-missing = This version of Luft can't read handwriting yet.
 settings-handwriting-failed = Couldn't download it: { $error }
 
@@ -355,8 +354,8 @@ crop-title = Crop
 crop-reset = Show all of it
 crop-done = Crop
 camera-title = Take a photo
-camera-opening = Opening the camera…
-camera-refused = Heft may not use the camera. You can allow it in Settings, under Privacy.
+camera-opening = Opening the camera
+camera-refused = Heft isn't allowed to use the camera. Allow it in Settings, under Privacy.
 camera-failed = The camera didn't open: { $error }
 camera-take = Take photo
 
@@ -374,16 +373,16 @@ recordings-open = Play a recording
 recordings-title = Recordings
 
 consent-title = Ask before you record
-consent-ask = In many places it's against the law to record people without asking them, and in some it's a crime. Ask your teacher, and the class if they can be heard, before you record.
-consent-law = While Heft records, a red dot shows in the notebook and Luft shows that the microphone is on. Recording goes on if you close Heft, until you stop it.
-consent-local = The recording, what's said in it and the notes made from it stay in this notebook on this computer. Heft never uploads them.
+consent-ask = Recording people without asking is illegal in many places, and a crime in some. Ask your teacher, and the class if they can be heard, before you record.
+consent-law = A red dot shows while Heft records. Recording goes on if you close Heft, until you stop it.
+consent-local = The recording, its transcript and notes stay on this computer. Nothing is uploaded.
 consent-record = They agreed, record
 
 # The variable is how long the recording is, such as 45:12.
 stopped-title = Recorded { $length }
-stopped-body = Heft can write out what was said and make notes of it, with when each thing was said, on this computer. It takes a while and works only while you aren't writing.
+stopped-body = Heft can write out what was said and make notes of it on this computer. It takes a while, and only runs while you aren't writing.
 # The variable is the size of both downloads together, such as 3.1 GB.
-stopped-download = It needs two downloads first, { $size } together: Whisper to write out speech and Qwen3 to make the notes.
+stopped-download = This needs a { $size } download first.
 stopped-on-battery = The computer is on battery, so it can wait for the charger.
 stopped-charging = The computer is charging, so it can start right away.
 stopped-keep = Close
@@ -445,17 +444,16 @@ notes-field-answer = Answer
 palette-hit-said = { $subject } · { $notebook } · said at { $time }
 
 settings-recording = Recording classes
-settings-recording-body = Heft records on this computer and keeps the recording in the notebook. It can write out what was said and make notes of it, also on this computer; nothing is uploaded.
+settings-recording-body = Recordings, transcripts and notes stay on this computer.
 settings-process = Heavy work in the background
 settings-process-now = Right away
 settings-process-charger = When charging
-settings-process-body = Transcribing and making notes of recordings, and reading handwriting for search, take the computer a while. Either way they only run while you aren't writing, and wait while the battery is below 30%.
+settings-process-body = For transcripts, notes and handwriting search. They only run while you aren't writing, and wait while the battery is below 30%.
 settings-recording-whisper = writes out speech
 settings-recording-writer = makes notes
 # The variables: what the model does, its size and licence.
 settings-recording-model = { $use }, { $size }, { $licence }
 
-
 subject-languages = Languages spoken in this subject's classes
-subject-languages-body = For recordings: Heft tells only these apart, so fewer is more reliable. Whisper is weakest at Albanian, so name it on its own in a class taught in Albanian.
+subject-languages-body = For recordings. Fewer are told apart more reliably, and Albanian works best on its own.
 settings-handwriting-charger = Waits for the charger.

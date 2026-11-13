@@ -88,8 +88,8 @@ check-ready-title = { $platform ->
 }
 check-blocked-title = Almost there
 check-moment = This takes a moment.
-check-slow = Windows is working out how much room it can spare. On a big drive this can take a few minutes.
-check-blocked-description = Something needs to change before Luft can move in. Here’s what to do.
+check-slow = Windows is working out how much room it can spare, which can take a few minutes.
+check-blocked-description = Something needs to change before Luft can move in.
 check-found-description = Here’s what Meet Luft found.
 check-checking = Checking the drive, the firmware and the hardware
 check-again = Check again
@@ -99,7 +99,7 @@ check-action-tidy = Tidy up
 check-firmware-title = Restart into the firmware settings?
 check-firmware-description = Save anything you’re working on first. Turn on Secure Boot there and save, and your computer starts again as usual.
 check-tidy-title = Remove the old start entries?
-check-tidy-description = They only point at systems that are already gone. Windows and everything else start just like before.
+check-tidy-description = They only point at systems that are gone. Everything else starts as before.
 check-get-ready-title = Get Luft ready?
 check-get-ready-file = Meet Luft copies Luft from your ISO into a folder on this computer and adds a start entry for it. Nothing is repartitioned.
 # $size is the download size, like "2.1 GB"
@@ -109,7 +109,7 @@ check-get-ready-confirm = Get it ready
 ## Choosing how much of the Windows drive Luft gets
 
 room-title = How much room for Luft?
-room-description = Windows makes itself smaller to give Luft space. Your files in Windows stay exactly where they are.
+room-description = Windows makes itself smaller to give Luft space. Your files stay where they are.
 # $size is the space Luft starts from, like "3.2 GB"
 room-live = Windows keeps room to grow. Luft also sets aside { $size } to start from, which it gives back once it’s installed.
 # Button, verb
@@ -159,7 +159,7 @@ room-erase-confirm = Erase and make room
 ## Luft is ready on Windows
 
 ready-title = Luft is ready
-ready-description = Choose how you’d like to meet it. Windows starts as usual afterwards, unless you install Luft and choose it.
+ready-description = Windows starts as usual afterwards, unless you install Luft and choose it.
 ready-update-title = Get the newest Luft
 ready-update-description = A newer build is out. It replaces this one and keeps the room and anything you packed.
 ready-try-title = Try Luft
@@ -182,7 +182,7 @@ ready-fast-startup-title = Turn off Fast Startup in Windows
 ready-fast-startup-description = Windows then shuts down fully, so sound, Wi-Fi and Bluetooth start fresh in Luft.
 # Makes Windows and Luft read the hardware clock the same way
 ready-clock-title = Keep the clock right in both
-ready-clock-description = Windows reads the computer’s clock the way Luft does, so the time no longer jumps when you switch.
+ready-clock-description = The time no longer jumps when you switch.
 ready-remove-title = Remove Luft from this PC?
 # The moving box holds the things packed to take along to Luft
 ready-remove-description = Meet Luft deletes everything it added, including the moving box, and gives Windows all of its space back.
@@ -190,7 +190,7 @@ ready-remove-description = Meet Luft deletes everything it added, including the 
 ## Luft is ready on Linux
 ## $system is the name of the Linux system already installed, like "Fedora Linux 42"
 
-linux-ready-description = Choose how you’d like to meet it. { $system } keeps starting as usual until you decide otherwise.
+linux-ready-description = { $system } keeps starting as usual until you decide otherwise.
 # Stands in for $system when Meet Luft can't tell which system is installed
 linux-ready-this-system = this system
 linux-ready-update-description = A newer build is out. It replaces the one Meet Luft keeps and keeps the logs from trying it.
@@ -233,7 +233,7 @@ luft-pending-trim-description = Restart into Luft, and it makes itself smaller w
 luft-windows-free-title = Give Windows the free space
 luft-windows-free-description = { $size } right after Windows isn’t used by anything. Windows can take it back.
 luft-leftovers-title = Clean up after trying Luft
-luft-leftovers-description = The partitions Meet Luft made to start Luft are still here. Luft doesn’t need them anymore.
+luft-leftovers-description = Luft no longer needs the partitions Meet Luft made to start it.
 # Button, verb: restarts into Luft
 luft-start = Restart into Luft
 # Button that calls off a change Luft hasn't made yet
@@ -251,7 +251,7 @@ luft-remove-confirm = Remove Luft
 
 resize-title = How much space for Luft?
 resize-description = Drag to share the drive between Windows and Luft. Luft makes the change itself the next time it starts.
-resize-measuring = Windows is working out how much room it can spare. On a big drive this can take a few minutes.
+resize-measuring = Windows is working out how much room it can spare, which can take a few minutes.
 resize-full = Luft is too full to move, and Windows can’t spare enough room for it. Make some room in Luft or in Windows first.
 # $drive is the name of a drive, like "Samsung SSD 990 PRO"
 resize-drive-description = Drag to choose how much of { $drive } Luft takes. Luft makes the change itself the next time it starts.
@@ -279,7 +279,7 @@ resize-shrink-description = Luft moves its files the next time it starts, which 
 ## Packing things to take along to Luft (the moving box)
 
 box-title = Bring your things
-box-description = Choose what to take along. Luft unpacks it into your new account when it’s installed, and nothing is removed from Windows.
+box-description = Luft unpacks it into your new account when it’s installed. Nothing is removed from Windows.
 box-looking = Looking through your folders
 box-folder-desktop = Desktop
 box-folder-documents = Documents
@@ -313,7 +313,7 @@ box-pack = Pack
 ## The code shown after packing, which opens the moving box when Luft is installed
 
 packed-title = Write this code down
-packed-description = Your things are packed and locked. Luft asks for this code before it unpacks them, so nobody else can open the box or change what’s in it.
+packed-description = Luft asks for it before unpacking, so nobody else can open or change what you packed.
 packed-lost = The code isn’t kept anywhere. If you lose it, pack again to get a new one.
 # Button
 packed-done = I’ve written it down
@@ -328,31 +328,31 @@ working-erasing = Erasing the drive
 working-partitioning = Setting up Luft’s space
     .description = Preparing the partitions Luft starts from.
 working-downloading = Bringing Luft over
-    .description = Luft is copied straight into its own space and checked on the way.
+    .description = It’s checked on the way.
 working-packing = Packing your things
-    .description = Copying everything you chose into the moving box. Big folders take a while.
+    .description = Big folders take a while.
 working-removing = Removing Luft
     .description = Giving the space back to Windows.
 working-removing-linux = Removing Luft
     .description = Taking out its files and its start entry.
 working-writing = Making the stick
-    .description = Luft is written onto the whole stick. Keep it plugged in.
+    .description = Keep the stick plugged in.
 working-copying = Adding Luft to Ventoy
-    .description = Luft is copied next to the other ISOs on the stick. Keep it plugged in.
+    .description = Keep the stick plugged in.
 working-verifying = Checking the stick
     .description = Reading it all back to make sure it starts.
 working-stick-downloading = Downloading Luft
     .description = It’s checked on the way and kept, so the next stick is quicker.
 # $done and $total are sizes, like "1.2 GB of 2.1 GB"
 working-progress = { $done } of { $total }
-working-keep-open = Please keep this window open.
+working-keep-open = Keep this window open.
 
 ## After Luft was removed
 
 removed-title = All back to how it was
 removed-description = { $platform ->
-    [linux] Luft’s files and its start entry are gone, and your computer starts just like before. Come back any time.
-   *[windows] Luft’s partitions and its start entry are gone, and Windows has all of its space again. Come back any time.
+    [linux] Luft’s files and its start entry are gone, and your computer starts just like before.
+   *[windows] Luft’s partitions and its start entry are gone, and Windows has all of its space again.
 }
 
 ## Making a USB stick
@@ -403,7 +403,7 @@ stick-done-title = Your Luft stick is ready
 stick-done-ventoy-title = Luft is on your Ventoy stick
 stick-done-take-out = You can take it out now.
 stick-done-eject = Eject it before you take it out.
-stick-done-start = To start from it, plug it in and choose it in the computer’s start menu, which opens with a key like F12, F8 or Esc right after switching on.
+stick-done-start = To start from it, choose it in the start menu, which opens with a key like F12, F8 or Esc right after switching on.
 stick-done-ventoy-key = With Secure Boot on, Ventoy asks once to enroll its own key the first time it starts.
 stick-done = Done
 # Button that makes one more stick
@@ -412,8 +412,8 @@ stick-done-another = Make another
 ## Meet Luft started on Luft itself
 
 on-luft-title = You’re already on Luft
-on-luft-description = Meet Luft gets other computers ready for Luft. This one is ready, and Luft looks after itself here.
+on-luft-description = Meet Luft gets other computers ready for Luft. This one already is.
 on-luft-space-title = Give Luft more space
-on-luft-space-description = Disks shows the free space on this computer’s drives and gives what’s next to Luft to it.
+on-luft-space-description = Open Disks to give Luft the free space next to it.
 on-luft-updates-title = Get the newest Luft
-on-luft-updates-description = Settings looks for updates under System and installs them while you keep working.
+on-luft-updates-description = Find updates in Settings, under System.

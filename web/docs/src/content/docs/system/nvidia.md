@@ -36,6 +36,10 @@ The other way round, on the NVIDIA image without an NVIDIA card, Settings offers
 
 Switching works like an update. Settings shows how much it downloads, which counts only what your computer doesn't have yet, and the switch happens at the next restart. You stay on the same version and the same [releases or nightly builds](/system/updates/#releases-and-nightly-builds), and the image you came from stays as the previous version to go back to, so switching back while it's still current just starts it again.
 
+## Flatpak apps and the driver
+
+Flatpak apps, Steam and its games among them, bring their own copy of NVIDIA's driver libraries, which has to match the driver of the running system exactly. Luft fetches the matching copy for every Flatpak app you have while an update with a new driver waits for the restart, so it's usually there before you need it, and checks again each time you sign in. Without a connection it waits for one. Copies for drivers that neither the running version nor the one kept to go back to uses are removed.
+
 ## When the graphics driver stops responding
 
 If the graphics card stops responding entirely, Luft restarts the computer cleanly once the kernel confirms the failure, and explains what happened at the next start, with suggestions for that computer. Settings lists the last ten under System, About, **Recent problems**. [Hung graphics](/developers/system/recovery/#hung-graphics) explains how Luft tells a hang from a slow moment.

@@ -1,5 +1,7 @@
 mod chromium;
 #[cfg(feature = "system")]
+pub mod drivers;
+#[cfg(feature = "system")]
 mod full_access;
 mod installed;
 mod permissions;

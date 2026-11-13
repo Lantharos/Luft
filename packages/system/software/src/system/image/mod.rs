@@ -40,6 +40,14 @@ pub struct Update {
     layers: Vec<String>,
 }
 
+/// Which graphics driver a version of Luft on the computer comes with: NVIDIA's, by the
+/// version the image says it has, or the open-source drivers of the standard image.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Graphics {
+    Standard,
+    Nvidia(Option<String>),
+}
+
 /// The build this computer is running: its version, release channel and image digest.
 pub struct Running {
     pub version: Option<String>,
@@ -95,6 +103,15 @@ impl Deployments {
             channel: booted.channel(),
             digest: booted.digest().map(str::to_owned),
         }
+    }
+
+    /// The graphics drivers of the version waiting for the next restart and of the one kept to
+    /// go back to, when there are such versions.
+    pub fn graphics(&self) -> (Option<Graphics>, Option<Graphics>) {
+        (
+            self.0.staged.as_ref().map(Deployment::graphics),
+            self.0.rollback.as_ref().map(Deployment::graphics),
+        )
     }
 
     /// The channel this system gets its updates from, and whether it's still waiting for that

@@ -53,3 +53,5 @@ RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,from=parts,source=nvidia,target=/run/luft/nvidia \
     /run/luft/stages/nvidia.sh /run/luft/nvidia
 RUN bootc container lint
+ARG NVIDIA_DRIVER
+LABEL com.lantharos.nvidia-driver="${NVIDIA_DRIVER}"

@@ -38,7 +38,7 @@ impl Installed {
     }
 }
 
-fn location(installation: Installation) -> PathBuf {
+pub(super) fn location(installation: Installation) -> PathBuf {
     let (variable, default) = match installation {
         Installation::System => ("FLATPAK_SYSTEM_DIR", PathBuf::from(SYSTEM_INSTALLATION)),
         Installation::User => (

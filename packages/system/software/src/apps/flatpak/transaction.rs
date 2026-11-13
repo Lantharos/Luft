@@ -82,7 +82,7 @@ pub fn add_remote(installation: Installation, name: &str, file: &Path) -> Result
     .map(|_| ())
 }
 
-fn run(command: &mut Command, task: Task) -> Result<(), String> {
+pub(super) fn run(command: &mut Command, task: Task) -> Result<(), String> {
     let mut child = command
         .env("LC_ALL", "C.UTF-8")
         .env_remove("LANGUAGE")

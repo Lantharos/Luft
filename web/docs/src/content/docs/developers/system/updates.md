@@ -27,7 +27,7 @@ The major version follows Fedora: Luft 1 is Fedora 45, and Luft 2 moves to Fedor
 
 The version lives only in the image's labels: the `org.opencontainers.image.version` label of its configuration and the same annotation on its manifest. The system inside has none, and `/etc/os-release` says `VERSION="1"`. That is what lets a promotion rename a nightly without touching its layers. Settings, the restart dialog and SushiBoot's menu all read the version that `bootc status` reports, and bootc writes it into each version's boot entry. Moving from a nightly to the release made from it renames the running version's boot entry, so the menu shows the release straight away.
 
-What's new comes from the image's `com.lantharos.release-notes` label, or, when get.luft.computer is reachable, from the changelogs of every version between the installed one and the offered one, merged.
+What's new comes from the image's `com.lantharos.release-notes` label, or, when get.luft.computer is reachable, from the changelogs of every version between the installed one and the offered one, merged. The NVIDIA image also names its driver's version in `com.lantharos.nvidia-driver`, such as `620.70.06`, so it's known before the image starts.
 
 ## The updater
 
@@ -53,6 +53,12 @@ The updater owns when updates are looked for. The schedule (every day, every wee
 ### Channels
 
 `SwitchChannel` moves a computer between `:1` and `:1-nightly`, keeping its image, and never to an older version; [How updates work](/system/updates/#releases-and-nightly-builds) says what people see while a move waits. The chosen channel stays in the schedule file until the move is done. When the stable version that ends a wait is the very nightly the computer runs, promoted, bootc points the running version at `:1` and the updater renames its boot entry, with nothing downloaded.
+
+### NVIDIA's driver in Flatpak apps
+
+A runtime declares the `org.freedesktop.Platform.GL` extension point with `download-if=active-gl-driver`, and apps with 32-bit parts, such as Steam, declare `org.freedesktop.Platform.GL32` the same way. Flatpak names the active drivers from `/sys/module/nvidia/version` (or `FLATPAK_GL_DRIVERS`), so 620.70.06 wants `org.freedesktop.Platform.GL.nvidia-620-70-06`, and `VAAPI.nvidia` extensions follow `have-kernel-module-nvidia`. It only adds them as related refs of an app or runtime it's installing or updating in that transaction, and only a plain `flatpak update` of everything prunes those whose driver isn't active, taking the one the previous version needs with them. After an image update with a new driver, apps that had nothing to update stay without it.
+
+Schelf fills that in itself, in every installation, from the extension points in the installed apps' and runtimes' metadata. It installs the extensions for the running driver and for the staged version's, read from its `com.lantharos.nvidia-driver` label, on whichever branches the app's own remote has, and removes those for drivers that no version on the computer has. A version without the label could need any of them, so nothing is removed while one is kept. `luft-app-graphics.service` does this at sign-in on computers running NVIDIA's driver, after waiting for NetworkManager to report a connection when there's something to download, and `schelf --update-apps` does it every six hours, which usually fetches the next version's extensions before the restart. Installing or updating a Flatpak in Schelf ends with the same step. Without NVIDIA's driver and nothing installed for one, it reads the installations' folders and stops.
 
 ### Sabine and installed apps
 

@@ -7,6 +7,7 @@ use super::notes::{self, Section};
 
 const VERSION: &str = "org.opencontainers.image.version";
 const NOTES: &str = "com.lantharos.release-notes";
+const NVIDIA_DRIVER: &str = "com.lantharos.nvidia-driver";
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -61,6 +62,10 @@ impl Config {
 
     pub fn layers(&self) -> &[String] {
         &self.rootfs.diff_ids
+    }
+
+    pub fn nvidia_driver(&self) -> Option<String> {
+        self.label(NVIDIA_DRIVER)
     }
 }
 

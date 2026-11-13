@@ -16,6 +16,7 @@ pub fn run(command: &str) -> Option<i32> {
     let result = match command {
         "--preinstall" => preinstall(),
         "--update-apps" => update_apps(),
+        "--update-drivers" => update_drivers(),
         "--check-revocations" => store::check_revocations(),
         "--integrate-apps" => {
             integrate_apps();
@@ -139,9 +140,24 @@ fn update_store_apps(failures: &mut Vec<String>) {
     }
 }
 
+fn update_drivers() -> Result<(), String> {
+    let changes = flatpak::drivers::changes();
+    if changes.is_empty() {
+        return Ok(());
+    }
+    if changes.downloads() {
+        block_on(flatpak::drivers::online());
+    }
+    quietly(|task| flatpak::drivers::apply(&changes, task))
+}
+
 fn update_apps() -> Result<(), String> {
     let mut failures = Vec::new();
     update_store_apps(&mut failures);
+    if let Err(error) = quietly(|task| flatpak::drivers::apply(&flatpak::drivers::changes(), task))
+    {
+        failures.push(error);
+    }
     let managed: BTreeSet<String> = store::record::all()
         .into_values()
         .map(|installed| installed.local)

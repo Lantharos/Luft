@@ -9,7 +9,8 @@ part = "app-schelf"
     "data/luft-integrate-apps.service",
     "data/luft-preinstall.service",
     "data/luft-app-drives.service",
+    "data/luft-app-graphics.service",
 ]
 
 [enable]
-user = ["luft-integrate-apps.service", "luft-preinstall.service", "luft-app-drives.service", "luft-app-updates.timer", "luft-app-revocations.timer"]
+user = ["luft-integrate-apps.service", "luft-preinstall.service", "luft-app-drives.service", "luft-app-graphics.service", "luft-app-updates.timer", "luft-app-revocations.timer"]

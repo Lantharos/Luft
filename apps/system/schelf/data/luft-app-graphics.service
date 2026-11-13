@@ -1,0 +1,14 @@
+[Unit]
+Description=Give apps the graphics driver
+After=kestrel-session.target graphical-session.target luft-preinstall.service
+PartOf=graphical-session.target
+ConditionUser=!@system
+ConditionPathExists=/sys/module/nvidia
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-launch /usr/lib/sabine/com.lantharos.schelf/schelf --update-drivers
+Nice=10
+
+[Install]
+WantedBy=kestrel-session.target

@@ -410,8 +410,15 @@ rechunk() {
   podman unshare rm -rf "$work"
 }
 
+nvidia_driver() {
+  local rpms=("$state/parts/nvidia/rpms"/xorg-x11-drv-nvidia-[0-9]*.rpm) version
+  [[ -f "${rpms[0]}" ]] || { echo "The NVIDIA part has no driver package" >&2; return 1; }
+  version="${rpms[0]##*/xorg-x11-drv-nvidia-}"
+  echo "${version%%-*}"
+}
+
 build_images() {
-  local variant parts=luft system="$image_name-system:$FEDORA" refs name ref names
+  local variant parts=luft system="$image_name-system:$FEDORA" refs name ref names driver
   [[ " $* " != *" luft-nvidia "* ]] || parts="luft-nvidia"
   require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
   [[ -n "$(pcr_keys)" ]] || { echo "Set LUFT_PCR_KEY_<generation> for a generation in os/versions.env ($PCR_GENERATIONS)." >&2; exit 1; }
@@ -428,7 +435,9 @@ build_images() {
     case "$variant" in
       luft) "$image/seal.sh" "$system" "$image_name:$FEDORA" ;;
       luft-nvidia)
-        build_system luft-nvidia "$system-nvidia" --build-arg "SYSTEM=$(podman image inspect --format '{{.Id}}' "$system")"
+        driver="$(nvidia_driver)"
+        build_system luft-nvidia "$system-nvidia" --build-arg "SYSTEM=$(podman image inspect --format '{{.Id}}' "$system")" \
+          --build-arg "NVIDIA_DRIVER=$driver"
         "$image/seal.sh" "$system-nvidia" "$image_name:$FEDORA-nvidia"
         ;;
     esac

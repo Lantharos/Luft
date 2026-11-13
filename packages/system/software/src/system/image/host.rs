@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use luft_variant::{Channel, Variant};
 use serde::Deserialize;
 
+use super::Graphics;
 use super::config::{Config, Release};
 use super::registry;
 
@@ -176,5 +177,12 @@ impl Deployment {
 
     pub fn digest(&self) -> Option<&str> {
         Some(&self.image.as_ref()?.image_digest)
+    }
+
+    pub fn graphics(&self) -> Graphics {
+        match self.variant() {
+            Some(Variant::Nvidia) => Graphics::Nvidia(self.config.nvidia_driver()),
+            _ => Graphics::Standard,
+        }
     }
 }

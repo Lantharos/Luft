@@ -2,6 +2,7 @@
 	"apps/system/rover/data/luft-rover-file-manager.service": 9.2,
 	"apps/system/rover/data/luft-rover-portal.service": 9.2,
 	"apps/system/schelf/data/luft-app-drives.service": 9.2,
+	"apps/system/schelf/data/luft-app-graphics.service": 9.2,
 	"apps/system/schelf/data/luft-app-revocations.service": 9.2,
 	"apps/system/schelf/data/luft-app-updates.service": 9.2,
 	"apps/system/schelf/data/luft-integrate-apps.service": 9.2,

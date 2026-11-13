@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::store::install::{Consent, Reason};
-use crate::{store, tools};
+use crate::{host, store, tools};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
@@ -117,6 +117,17 @@ pub enum Job {
     },
 }
 
+/// Sets up the Flatpak apps just installed or updated, and on Luft gives them the extensions for
+/// the NVIDIA drivers of its versions on the computer that Flatpak didn't fetch with them.
+fn settle_flatpaks(task: Task) {
+    flatpak::integrate();
+    if host::luft()
+        && let Err(error) = flatpak::drivers::apply(&flatpak::drivers::changes(), task)
+    {
+        eprintln!("{error}");
+    }
+}
+
 /// Installs the app in a bundle. Most bundles get their runtime from
 /// Flathub unless it's installed already, so Flathub is added first, and
 /// named when the install fails without it.
@@ -129,7 +140,7 @@ fn install_flatpak_bundle(path: &Path, task: Task) -> Result<(), String> {
         ),
         Ok(()) => error,
     })?;
-    flatpak::integrate();
+    settle_flatpaks(task);
     Ok(())
 }
 
@@ -171,7 +182,7 @@ impl Job {
             Self::InstallFlathub { id } => {
                 flatpak::ensure_flathub(Installation::User)?;
                 flatpak::install(Installation::User, FLATHUB, id, task)?;
-                flatpak::integrate();
+                settle_flatpaks(task);
                 Ok(())
             }
             Self::InstallStore { id, consent } => {
@@ -183,7 +194,7 @@ impl Job {
             Self::RemoveStore { id } => store::install::remove(id),
             Self::InstallFlatpakRef { path } => {
                 flatpak::install_ref(Installation::User, path, task)?;
-                flatpak::integrate();
+                settle_flatpaks(task);
                 Ok(())
             }
             Self::InstallFlatpakBundle { path } => install_flatpak_bundle(path, task),
@@ -226,7 +237,7 @@ impl Job {
             } => {
                 let references: Vec<&str> = references.iter().map(String::as_str).collect();
                 flatpak::update(*installation, &references, task)?;
-                flatpak::integrate();
+                settle_flatpaks(task);
                 Ok(())
             }
             Self::UpdateAppImage { id } => appimage::update(&appimage::find(id)?, task).map(|_| ()),

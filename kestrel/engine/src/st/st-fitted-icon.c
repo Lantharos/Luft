@@ -236,16 +236,69 @@ _st_fitted_icon_shape_extent (float coverage)
   return 1.f - (1.f - SQUARE_EXTENT) * squareness;
 }
 
-static GdkPixbuf *
-clear_border (GdkPixbuf *source)
+static cairo_surface_t *
+pixbuf_to_surface (GdkPixbuf *pixbuf)
 {
-  int width = gdk_pixbuf_get_width (source);
-  int height = gdk_pixbuf_get_height (source);
-  GdkPixbuf *framed = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, width + 2, height + 2);
+  int width = gdk_pixbuf_get_width (pixbuf);
+  int height = gdk_pixbuf_get_height (pixbuf);
+  int channels = gdk_pixbuf_get_n_channels (pixbuf);
+  int rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+  const guint8 *pixels = gdk_pixbuf_read_pixels (pixbuf);
+  cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
+  guint8 *data = cairo_image_surface_get_data (surface);
+  int stride = cairo_image_surface_get_stride (surface);
 
-  gdk_pixbuf_fill (framed, 0);
-  gdk_pixbuf_copy_area (source, 0, 0, width, height, framed, 1, 1);
-  return framed;
+  for (int y = 0; y < height; y++)
+    {
+      const guint8 *in = pixels + y * rowstride;
+      guint32 *row = (guint32 *) (data + y * stride);
+
+      for (int x = 0; x < width; x++, in += channels)
+        {
+          guint32 alpha = channels == 4 ? in[3] : 255;
+
+          row[x] = alpha << 24 |
+                   (in[0] * alpha + 127) / 255 << 16 |
+                   (in[1] * alpha + 127) / 255 << 8 |
+                   (in[2] * alpha + 127) / 255;
+        }
+    }
+  cairo_surface_mark_dirty (surface);
+  return surface;
+}
+
+GdkPixbuf *
+_st_surface_to_pixbuf (cairo_surface_t *surface)
+{
+  int size = cairo_image_surface_get_width (surface);
+  int stride = cairo_image_surface_get_stride (surface);
+  const guint8 *data = cairo_image_surface_get_data (surface);
+  GdkPixbuf *pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, size, size);
+  guint8 *pixels = gdk_pixbuf_get_pixels (pixbuf);
+  int rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+
+  cairo_surface_flush (surface);
+  for (int y = 0; y < size; y++)
+    {
+      const guint32 *row = (const guint32 *) (data + y * stride);
+      guint8 *out = pixels + y * rowstride;
+
+      for (int x = 0; x < size; x++, out += 4)
+        {
+          guint32 alpha = row[x] >> 24;
+
+          out[3] = alpha;
+          if (alpha == 0)
+            {
+              out[0] = out[1] = out[2] = 0;
+              continue;
+            }
+          out[0] = MIN (255, ((row[x] >> 16 & 0xff) * 255 + alpha / 2) / alpha);
+          out[1] = MIN (255, ((row[x] >> 8 & 0xff) * 255 + alpha / 2) / alpha);
+          out[2] = MIN (255, ((row[x] & 0xff) * 255 + alpha / 2) / alpha);
+        }
+    }
+  return pixbuf;
 }
 
 static GdkPixbuf *
@@ -253,25 +306,32 @@ fit (GdkPixbuf *source,
      int        pixels,
      float      fill)
 {
-  int canvas = MAX (gdk_pixbuf_get_width (source), gdk_pixbuf_get_height (source));
-  g_autoptr (GdkPixbuf) framed = NULL;
-  GdkPixbuf *fitted = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, pixels, pixels);
-  Artwork artwork = { 0, 0, canvas, canvas, 1.f };
-  double scale, center_x, center_y;
+  int width = gdk_pixbuf_get_width (source);
+  int height = gdk_pixbuf_get_height (source);
+  Artwork artwork = { 0, 0, width, height, 1.f };
+  cairo_surface_t *artwork_surface = pixbuf_to_surface (source);
+  cairo_surface_t *fitted = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, pixels, pixels);
+  cairo_t *cr = cairo_create (fitted);
+  GdkPixbuf *pixbuf;
+  double scale;
 
-  gdk_pixbuf_fill (fitted, 0);
   if (!find_artwork (source, &artwork))
     artwork.coverage = 0.f;
 
   scale = MIN (pixels * fill * _st_fitted_icon_shape_extent (artwork.coverage) / MAX (artwork.width, artwork.height),
-               pixels * fill * MAX_GROWTH / canvas);
-  center_x = artwork.x + artwork.width / 2. + 1;
-  center_y = artwork.y + artwork.height / 2. + 1;
-  framed = clear_border (source);
-  gdk_pixbuf_composite (framed, fitted, 0, 0, pixels, pixels,
-                        pixels / 2. - center_x * scale, pixels / 2. - center_y * scale,
-                        scale, scale, GDK_INTERP_HYPER, 255);
-  return fitted;
+               pixels * fill * MAX_GROWTH / MAX (width, height));
+  cairo_translate (cr, pixels / 2., pixels / 2.);
+  cairo_scale (cr, scale, scale);
+  cairo_translate (cr, -(artwork.x + artwork.width / 2.), -(artwork.y + artwork.height / 2.));
+  cairo_set_source_surface (cr, artwork_surface, 0, 0);
+  cairo_pattern_set_filter (cairo_get_source (cr), CAIRO_FILTER_BEST);
+  cairo_paint (cr);
+  cairo_destroy (cr);
+
+  pixbuf = _st_surface_to_pixbuf (fitted);
+  cairo_surface_destroy (fitted);
+  cairo_surface_destroy (artwork_surface);
+  return pixbuf;
 }
 
 static void

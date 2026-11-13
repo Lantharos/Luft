@@ -398,40 +398,6 @@ colorize (cairo_surface_t         *surface,
   cairo_surface_mark_dirty (surface);
 }
 
-static GdkPixbuf *
-surface_to_pixbuf (cairo_surface_t *surface)
-{
-  int size = cairo_image_surface_get_width (surface);
-  int stride = cairo_image_surface_get_stride (surface);
-  const guint8 *data = cairo_image_surface_get_data (surface);
-  GdkPixbuf *pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, size, size);
-  guint8 *pixels = gdk_pixbuf_get_pixels (pixbuf);
-  int rowstride = gdk_pixbuf_get_rowstride (pixbuf);
-
-  cairo_surface_flush (surface);
-  for (int y = 0; y < size; y++)
-    {
-      const guint32 *row = (const guint32 *) (data + y * stride);
-      guint8 *out = pixels + y * rowstride;
-
-      for (int x = 0; x < size; x++, out += 4)
-        {
-          guint32 alpha = row[x] >> 24;
-
-          out[3] = alpha;
-          if (alpha == 0)
-            {
-              out[0] = out[1] = out[2] = 0;
-              continue;
-            }
-          out[0] = MIN (255, ((row[x] >> 16 & 0xff) * 255 + alpha / 2) / alpha);
-          out[1] = MIN (255, ((row[x] >> 8 & 0xff) * 255 + alpha / 2) / alpha);
-          out[2] = MIN (255, ((row[x] & 0xff) * 255 + alpha / 2) / alpha);
-        }
-    }
-  return pixbuf;
-}
-
 static int
 plate_size (const StStyledIconPaint *paint,
             int                      size)
@@ -473,7 +439,7 @@ _st_styled_icon_paint (const StStyledIconPaint *paint,
   cairo_paint (cr);
   cairo_destroy (cr);
 
-  pixbuf = surface_to_pixbuf (canvas);
+  pixbuf = _st_surface_to_pixbuf (canvas);
   cairo_surface_destroy (placed);
   cairo_surface_destroy (mask);
   cairo_surface_destroy (canvas);

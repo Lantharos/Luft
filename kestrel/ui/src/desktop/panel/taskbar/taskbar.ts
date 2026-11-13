@@ -15,6 +15,7 @@ import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
 import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
 import * as DND from '../../../shared/popups/dnd.js';
+import { frameOnPixels, pixelScale, whenPixelScaleChanges, type PixelFrame } from '../../../shared/display/graphics.js';
 
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
@@ -61,8 +62,9 @@ export class Taskbar {
     this.disconnectors.push(
       () => signals.forEach(id => display.disconnect(id)),
       launcherEntries.watch(appId => { const item = this.items.get(appId); if (item) this.updateIndicator(item); }),
-      appIcons.watch(() => { for (const item of this.items.values()) this.placeIcon(item); }),
+      appIcons.watch(() => this.relayout()),
     );
+    whenPixelScaleChanges(this.actor, () => this.relayout());
   }
 
   shutdown(): void {
@@ -95,6 +97,13 @@ export class Taskbar {
     }
   }
 
+  private relayout(): void {
+    for (const item of this.items.values()) {
+      this.layoutItem(item);
+      this.updateDots(item);
+    }
+  }
+
   private get vertical(): boolean {
     return isVertical(this.edge);
   }
@@ -115,26 +124,31 @@ export class Taskbar {
     return this.metrics.artwork / this.metrics.icon;
   }
 
-  private placeIcon(item: AppItem): void {
-    const { button } = this.metrics;
+  private get frame(): PixelFrame {
+    return frameOnPixels(this.metrics.button, this.iconSize, pixelScale(this.actor));
+  }
+
+  private placeIcon(item: AppItem, { inset }: PixelFrame): void {
     const icon = this.iconSize;
-    const nudge = -outward(this.edge);
-    const centered = (button - icon) / 2;
+    const scale = pixelScale(this.actor);
+    const nudge = -outward(this.edge) * Math.floor(scale) / scale;
     item.icon.set_size(icon, icon);
-    if (this.vertical) item.icon.set_position(Math.round(centered) + nudge, centered);
-    else item.icon.set_position(centered, Math.round(centered) + nudge);
+    if (this.vertical) item.icon.set_position(inset + nudge, inset);
+    else item.icon.set_position(inset, inset + nudge);
     (item.icon.child as St.Icon).icon_size = icon;
     appIcons.fit(item.icon.child as St.Icon, this.artworkFill);
   }
 
   private layoutItem(item: AppItem): void {
-    const { button, gap } = this.metrics;
+    const { button: slot, gap } = this.metrics;
+    const frame = this.frame;
+    const button = frame.outer;
     const vertical = this.vertical;
-    item.slot[vertical ? 'width' : 'height'] = button;
+    item.slot[vertical ? 'width' : 'height'] = slot;
     item.button.set_position(vertical ? 0 : Math.floor(gap / 2), vertical ? Math.floor(gap / 2) : 0);
     item.button.set_size(button, button);
     item.button.child.set_size(button, button);
-    this.placeIcon(item);
+    this.placeIcon(item, frame);
     const dotOffset = outward(this.edge) > 0 ? button - DOT_SIZE : 0;
     for (const dot of item.dots) {
       if (vertical) dot.set({ x: dotOffset, width: DOT_SIZE });
@@ -276,7 +290,7 @@ export class Taskbar {
   }
 
   private updateDots(item: AppItem, animate = false): void {
-    const { button } = this.metrics;
+    const button = this.frame.outer;
     const count = item.indicators.showsProgress ? 0 : Math.min(4, this.windowsOf(item.app).filter(window => !window.skip_taskbar).length);
     const width = item.focused ? Math.min(DOT_SIZE * 3, Math.floor((button - 8 - (count - 1) * DOT_GAP) / Math.max(1, count))) : DOT_SIZE;
     const start = (button - (count * width + (count - 1) * DOT_GAP)) / 2;

@@ -11,8 +11,10 @@ between device pixels, as it does for most popups and labels.
 
 Lay text out and size offscreen effects at the actor's unrounded resource
 scale, and move text layouts and textures that map one texel to one device
-pixel onto whole pixels when they are painted. Scaled or rotated actors,
-such as those in an animation that zooms, keep their exact position.
+pixel onto whole pixels when they are painted. They land on the pixel a
+rectangle with the same edge starts on, so an icon stays centred on the
+background behind it. Scaled or rotated actors, such as those in an
+animation that zooms, keep their exact position.
 
 Upstream-Status: forwardable
 ---
@@ -298,8 +300,8 @@ index d017006f20aa7a631214d4313ef450ae4191ead3..bfa6284fbd03323188af9868116467fc
 +      fabsf (out[2].x - out[0].x) > PIXEL_EPSILON)
 +    return FALSE;
 +
-+  *offset_x = (roundf (out[0].x) - out[0].x) / step_x;
-+  *offset_y = (roundf (out[0].y) - out[0].y) / step_y;
++  *offset_x = (ceilf (out[0].x - 0.5f) - out[0].x) / step_x;
++  *offset_y = (ceilf (out[0].y - 0.5f) - out[0].y) / step_y;
 +  return TRUE;
 +}
 +

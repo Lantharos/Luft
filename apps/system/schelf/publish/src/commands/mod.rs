@@ -73,7 +73,7 @@ pub const COMMANDS: [Command; 22] = [
     ),
     plain(
         "publish",
-        "publish [files…] [--channel <name>] [--version <version>]",
+        "publish [files…] [--channel <name>] [--version <version>] [--dry-run]",
         "Publish a release: from GitHub Actions, with a token, or signed in (goes to review)",
         publish::publish,
     ),

@@ -17,7 +17,7 @@ use crate::artifacts::version::{VersionSource, release_version};
 use crate::error::{Error, Result};
 use crate::project::config::config_place;
 use crate::project::git::git;
-use crate::ui::output::{blank, done, emit, field_in, line, step, title};
+use crate::ui::output::{blank, done, emit, field_in, line, note, step, title};
 use crate::ui::style::{bold, link};
 use crate::ui::{FAILED, OK, USAGE};
 
@@ -72,7 +72,55 @@ struct Outcome<'a> {
     release: Box<RawValue>,
     status: Box<RawValue>,
     checks: Box<RawValue>,
+    tools: Box<RawValue>,
     url: Box<RawValue>,
+}
+
+#[derive(Serialize)]
+struct Planned<'a> {
+    name: &'a str,
+    path: &'a str,
+    part: Option<&'a str>,
+    platform: &'a str,
+    kind: &'a str,
+    size: u64,
+    sha256: &'a str,
+}
+
+#[derive(Serialize)]
+struct Plan<'a> {
+    app: &'a str,
+    version: &'a str,
+    channel: Option<&'a str>,
+    artifacts: Vec<Planned<'a>>,
+}
+
+fn report_plan(
+    id: &str,
+    version: &str,
+    channel: Option<&str>,
+    artifacts: &[HashedArtifact],
+) -> i32 {
+    emit(&Plan {
+        app: id,
+        version,
+        channel,
+        artifacts: artifacts
+            .iter()
+            .map(|hashed| Planned {
+                name: &hashed.artifact.name,
+                path: &hashed.artifact.path,
+                part: hashed.artifact.part.as_deref(),
+                platform: &hashed.artifact.platform,
+                kind: &hashed.artifact.kind,
+                size: hashed.size,
+                sha256: &hashed.sha256,
+            })
+            .collect(),
+    });
+    note("Nothing was published.");
+    blank();
+    OK
 }
 
 fn report(published: &Published) -> i32 {
@@ -82,6 +130,7 @@ fn report(published: &Published) -> i32 {
         release: pick(&published.release.raw, "release"),
         status: pick(&completed.raw, "status"),
         checks: pick(&completed.raw, "checks"),
+        tools: pick(&completed.raw, "tools"),
         url: pick(&completed.raw, "dashboard"),
     });
     print_applied(&published.applied.value);
@@ -151,7 +200,13 @@ pub fn publish(args: &mut Args) -> Result<i32> {
         ));
     }
     let id = context.manifest.name().to_owned();
-    title(&format!("Publishing {id} {version}"));
+    let dry_run = args.has("dry-run");
+    let doing = if dry_run {
+        "Would publish"
+    } else {
+        "Publishing"
+    };
+    title(&format!("{doing} {id} {version}"));
     let shape = Shape {
         format: &context.manifest.format,
         parts: &context.manifest.parts,
@@ -168,6 +223,9 @@ pub fn publish(args: &mut Args) -> Result<i32> {
         field_in(&label, &artifact.name, 24);
     }
     blank();
+    if dry_run {
+        return Ok(report_plan(&id, &version, channel, &artifacts));
+    }
     let signed = credential(args)?;
     let config: ConfigBundle = config_bundle(&place.root, &place.config)?;
     let notes = args.flag("notes").unwrap_or(&context.notes).to_owned();

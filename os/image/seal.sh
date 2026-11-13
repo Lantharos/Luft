@@ -16,8 +16,8 @@ Secure Boot, with its TPM policy signed too, and checks that it names the
 system bootc installs from SEALED. The kernel comes from
 localhost/luft-kernel:$FEDORA (LUFT_IMAGE_NAME-kernel:$FEDORA), made by os/image/build.sh.
 Signs with the keys named by LUFT_SECUREBOOT_KEY and LUFT_SECUREBOOT_CERT, and
-its TPM policy with the LUFT_PCR_KEY_1, LUFT_PCR_KEY_2... whose public halves
-SYSTEM ships in /usr/lib/luft/pcr-keys.
+its TPM policy with the LUFT_PCR_KEY_<generation> of each generation whose
+public half SYSTEM ships in /usr/lib/luft/pcr-keys.
 USAGE
 }
 

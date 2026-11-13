@@ -11,9 +11,6 @@ inputs:
   seal:
     description: Whether the job seals images, which needs a TPM policy key for every generation in os/versions.env
     default: "false"
-  pcr-key-1:
-    description: LUFT_PCR_KEY
-    required: false
   pcr-key-2:
     description: LUFT_PCR_KEY_2
     required: false
@@ -27,7 +24,6 @@ runs:
         KEY: ${{ inputs.key }}
         CERT: ${{ inputs.certificate }}
         SEAL: ${{ inputs.seal }}
-        PCR_KEY_1: ${{ inputs.pcr-key-1 }}
         PCR_KEY_2: ${{ inputs.pcr-key-2 }}
       run: |
         [[ -n "$KEY" && -n "$CERT" ]] || { echo "::error::LUFT_SECUREBOOT_KEY or LUFT_SECUREBOOT_CERT isn't set."; exit 1; }

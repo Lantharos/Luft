@@ -64,8 +64,8 @@ stable version is out when LUFT_STABLE_RELEASED=1, which the nightly sets once
 there's a v$MAJOR.N tag; both land in /usr/share/luft/release.
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
-and, for the TPM policy, LUFT_PCR_KEY_1, LUFT_PCR_KEY_2 and so on, one for each
-generation in os/versions.env that the image should unlock a disk for. Without
+and, for the TPM policy, LUFT_PCR_KEY_<generation> for each generation in
+os/versions.env that the image should unlock a disk for. Without
 any of them it signs with throwaway keys kept in ~/.local/state/luft/throwaway-keys
 (LUFT_THROWAWAY_KEYS), shared by every checkout and the VMs, which Secure Boot
 only accepts once they're enrolled.
@@ -414,7 +414,7 @@ build_images() {
   local variant parts=luft system="$image_name-system:$FEDORA" refs name ref names
   [[ " $* " != *" luft-nvidia "* ]] || parts="luft-nvidia"
   require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
-  [[ -n "$(pcr_keys)" ]] || { echo "Set LUFT_PCR_KEY_1, or the key of another generation in os/versions.env." >&2; exit 1; }
+  [[ -n "$(pcr_keys)" ]] || { echo "Set LUFT_PCR_KEY_<generation> for a generation in os/versions.env ($PCR_GENERATIONS)." >&2; exit 1; }
   mapfile -t names < <(part_names "$parts")
   refs="$(part_refs "${names[@]}")"
   while read -r name ref; do

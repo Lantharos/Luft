@@ -1,12 +1,20 @@
 # shellcheck shell=bash
+# shellcheck source=os/versions.env
+source "$(dirname "${BASH_SOURCE[0]}")/../versions.env"
+
 throwaway_keys() {
   local keys="${LUFT_THROWAWAY_KEYS:-${XDG_STATE_HOME:-$HOME/.local/state}/luft/throwaway-keys}"
   mkdir -p "$keys"
   chmod 700 "$keys"
   [[ -f "$keys/secureboot.key" ]] || openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
     -subj "/CN=Luft throwaway Secure Boot key/" -keyout "$keys/secureboot.key" -out "$keys/secureboot.crt"
-  [[ -f "$keys/pcr.key" ]] || openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr.key"
-  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt" LUFT_PCR_KEY_1="$keys/pcr.key"
+  export LUFT_SECUREBOOT_KEY="$keys/secureboot.key" LUFT_SECUREBOOT_CERT="$keys/secureboot.crt"
+  local generation
+  for generation in ${PCR_GENERATIONS//,/ }; do
+    [[ -f "$keys/pcr-$generation.key" ]] ||
+      openssl genpkey -quiet -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$keys/pcr-$generation.key"
+    export "LUFT_PCR_KEY_$generation=$keys/pcr-$generation.key"
+  done
 }
 
 pcr_keys() {

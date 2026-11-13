@@ -469,7 +469,6 @@ jobs:
           key: ${{ secrets.LUFT_SECUREBOOT_KEY }}
           certificate: ${{ secrets.LUFT_SECUREBOOT_CERT }}
           seal: true
-          pcr-key-1: ${{ secrets.LUFT_PCR_KEY }}
           pcr-key-2: ${{ secrets.LUFT_PCR_KEY_2 }}
 
       - name: Build both images

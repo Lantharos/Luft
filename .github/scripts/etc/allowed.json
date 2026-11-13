@@ -69,6 +69,9 @@
 	"packages/system/disks/src/mounting.rs": {
 		"/etc": "Refuses to mount a drive over the system's own folders"
 	},
+	"packages/system/software/src/apps/places/drives.rs": {
+		"/etc": "Never offers the system's own folders to an app as a drive"
+	},
 	"packages/system/network/src/vpn/plugins.rs": {
 		"/etc/NetworkManager/VPN": "Reads the VPN plugins installed"
 	},

@@ -11,3 +11,13 @@ sandbox-camera-body = It tried to use a camera. You can allow that in Schelf, th
 sandbox-review = Review access
 # Shown when an app can't start because the record of what it may do couldn't be read
 sandbox-unreadable = Luft couldn’t read what it’s allowed to do.
+
+## Once you let an app use a drive it looked for
+
+# Title of a notification; $app is the app's name and $drive the drive's name
+sandbox-drive-given = { $app } can use { $drive }
+# Title of the same notification for a drive without a name
+sandbox-drive-given-unnamed = { $app } can use the drive
+sandbox-drive-restart-body = It sees the drive once it opens again.
+# Button on that notification that closes the app and opens it again
+sandbox-restart = Restart

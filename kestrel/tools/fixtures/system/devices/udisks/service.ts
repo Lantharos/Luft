@@ -12,6 +12,8 @@ type Options = Record<string, GLib.Variant>;
 const IFACE = (name: string) => `org.freedesktop.UDisks2.${name}`;
 const RESIZE: Record<string, number> = {ext4: 2 | 4 | 16, btrfs: 2 | 4 | 8 | 16, ntfs: 2 | 4, vfat: 2 | 4};
 const IMAGE_BYTES = 8 * 1024 * 1024;
+/** A Mount option only the stand-in takes: a real folder for checks to mount the drive on. */
+export const STAND_IN_FOLDER = 'fixture-folder';
 
 const nodeInfo = Gio.DBusNodeInfo.new_for_xml(new TextDecoder().decode(GLib.file_get_contents(
   GLib.build_filenamev([KESTREL_TOOLS.root, 'kestrel/tools/fixtures/system/devices/udisks/interfaces.xml']))[1]));
@@ -148,9 +150,9 @@ export function publishUdisks(calls: string[]) {
     if (block.mountPoints !== null) {
       interfaces.push(skeleton('Filesystem', {
         MountPoints: block.mountPoints.map(bytes), Size: block.size,
-        MountAsync: (_args: [Options], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
+        MountAsync: ([options]: [Options], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
           record('Mount');
-          return new GLib.Variant('(s)', [model.mount(block.path)]);
+          return new GLib.Variant('(s)', [model.mount(block.path, (unpack(options) as Record<string, unknown>)[STAND_IN_FOLDER] as string | undefined)]);
         }),
         UnmountAsync: (_args: [Options], invocation: Gio.DBusMethodInvocation) => answer(invocation, () => {
           record('Unmount');

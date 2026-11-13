@@ -46,3 +46,12 @@ kestrel/ui/src/system/changes/service.ts	Another set of changes is waiting for r
 kestrel/ui/src/system/changes/service.ts	Too many reviews were asked for in the last minute. Wait a little and ask again.
 kestrel/ui/src/system/changes/service.ts	The review couldn’t be shown. Unlock the screen and ask again.
 kestrel/ui/src/extensions/sandbox/shell/limits.ts	Extension ${id}, sandboxed by Kestrel
+kestrel/ui/src/system/hardware/drives/access/service.ts	Only Schelf from the system image can ask whether an app may use a drive
+kestrel/ui/src/system/hardware/drives/access/service.ts	The process handed over isn\'t in a sandbox
+kestrel/ui/src/system/hardware/drives/access/service.ts	The screen is locked
+kestrel/ui/src/system/hardware/drives/access/service.ts	Only the app in front, or one used a moment ago, can be asked about
+kestrel/ui/src/system/hardware/drives/access/service.ts	Another drive is being asked about
+kestrel/ui/src/system/hardware/drives/access/service.ts	This app was asked about drives too often in the last minute
+kestrel/ui/src/system/hardware/drives/access/service.ts	That drive isn\'t mounted
+kestrel/ui/src/system/hardware/drives/access/service.ts	The prompt closed without an answer
+kestrel/ui/src/system/hardware/drives/access/service.ts	The prompt couldn\'t be shown

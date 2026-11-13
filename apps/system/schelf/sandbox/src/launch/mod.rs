@@ -7,8 +7,10 @@ mod mount;
 mod profile;
 mod proxy;
 pub mod seccomp;
+mod stand_ins;
 mod unsandboxed;
 mod wait;
+mod wanted;
 
 use std::process::Command;
 use std::time::{Duration, Instant};
@@ -23,10 +25,13 @@ use crate::portal::Bus;
 use crate::request::Request;
 use capture::Kind;
 use display::{wayland, x11};
+pub use folder::runtime_dir;
 use folder::{Folder, Lock};
 pub use profile::INSIDE_LAUNCHER;
 use profile::Profile;
+use stand_ins::StandIns;
 use wait::{Event, Watched};
+use wanted::Wanted;
 
 pub const BWRAP: &str = "bwrap";
 const QUICK_EXIT: Duration = Duration::from_secs(8);
@@ -92,8 +97,14 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
             let outcome = sandbox(&app, &grants, &folder, arguments);
             folder.clean();
             drop(lock);
-            let (code, reason) = outcome?;
-            if let Some(reason) = reason {
+            let Ended {
+                code,
+                reason,
+                restart,
+            } = outcome?;
+            if restart {
+                start_again(id);
+            } else if let Some(reason) = reason {
                 runtime.block_on(escalate::offer(&session, &app.asking(), reason));
             }
             Ok(code)
@@ -125,12 +136,30 @@ pub fn quit(id: &str) -> Result<bool, String> {
     Ok(true)
 }
 
+/// How the app's sandbox ended: its exit code, what it may have needed, and
+/// whether you asked for it to open again.
+struct Ended {
+    code: i32,
+    reason: Option<Reason>,
+    restart: bool,
+}
+
+/// Opens the app again, in a sandbox that shows what it was given since.
+fn start_again(id: &str) {
+    if let Ok(launcher) = std::env::current_exe() {
+        let _ = Command::new(launcher)
+            .arg(appimage::SANDBOX)
+            .arg(id)
+            .spawn();
+    }
+}
+
 fn sandbox(
     app: &App,
     grants: &Grants,
     folder: &Folder,
     arguments: Vec<String>,
-) -> Result<(i32, Option<Reason>), String> {
+) -> Result<Ended, String> {
     folder.prepare()?;
     let talk = proxy::TALK
         .into_iter()
@@ -146,6 +175,7 @@ fn sandbox(
         Some(x11::Display::stand_in(&folder.x11_socket())?)
     };
     let decoys = devices::Decoys::plant(&folder.decoys(), grants)?;
+    let stand_ins = StandIns::plant(&folder.drives(), &profile::home()?, grants)?;
     let filter = seccomp::filter()?;
     let relay = folder.relay();
     let profile = Profile {
@@ -158,6 +188,7 @@ fn sandbox(
         wayland: display.as_ref().map(|_| folder.wayland_socket()),
         x11: x11.as_ref(),
         decoys: &decoys,
+        stand_ins: &stand_ins,
     };
     let bus = Bus::start(relay.clone(), proxy.socket(), profile.layout()?)?;
     let instance = folder.instance()?;
@@ -171,10 +202,17 @@ fn sandbox(
     let started = Instant::now();
     let mut child = command.spawn().map_err(|error| error.to_string())?;
     folder.wait_for_server_or(&mut child);
-    if let Some(pid) = sandbox_pid(&instance) {
+    let pid = sandbox_pid(&instance);
+    if let Some(pid) = pid {
         bus.sandbox_started(pid);
     }
     decoys.opened();
+    stand_ins.wanted();
+    let wanted = Wanted::new(
+        app.asking(),
+        pid.and_then(crate::drives::pidfd),
+        folder.server().join(folder::SERVER_SOCKET),
+    );
     let Ok(server) = folder.connect() else {
         let _ = child.kill();
         let _ = child.wait();
@@ -188,6 +226,7 @@ fn sandbox(
         decoys: &decoys,
         display: x11.as_ref(),
         streams: &streams,
+        stand_ins: &stand_ins,
     };
     let mut offers = Offers::new(app.asking());
     let mut display_wanted = false;
@@ -201,6 +240,7 @@ fn sandbox(
                     offers.make(Reason::Camera);
                 }
                 Event::StreamOpened(Kind::Sound) => offers.make(Reason::Microphone),
+                Event::DriveWanted(drive) => wanted.ask(drive),
             }
         }
     };
@@ -217,7 +257,11 @@ fn sandbox(
     } else {
         None
     };
-    Ok((status.code().unwrap_or(1), reason))
+    Ok(Ended {
+        code: status.code().unwrap_or(1),
+        reason,
+        restart: wanted.restart(),
+    })
 }
 
 /// The sandbox's first process, from what bubblewrap wrote about it.

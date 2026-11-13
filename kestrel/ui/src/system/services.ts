@@ -39,12 +39,14 @@ import { playSound } from './sound/sounds/sounds.js';
 import { UpdateNotices } from './status/updates/updateNotices.js';
 import { CrashReports } from './status/crashReports/crashReports.js';
 import { ChangesService } from './changes/service.js';
+import { DriveAccessService } from './hardware/drives/access/service.js';
 
 export class SystemServices {
   private readonly memoryNotices = new MemoryNotices();
   private readonly updateNotices = new UpdateNotices();
   private readonly crashReports = new CrashReports();
   private readonly changes = new ChangesService();
+  private readonly driveAccess = new DriveAccessService();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly chargerSound = new ChargerSound();
@@ -96,6 +98,7 @@ export class SystemServices {
     this.firewallQuestions.destroy();
     this.crashReports.destroy();
     this.changes.destroy();
+    this.driveAccess.destroy();
     this.keyring.destroy();
     this.appearance.destroy();
     for (const sync of this.loginScreen) sync.destroy();

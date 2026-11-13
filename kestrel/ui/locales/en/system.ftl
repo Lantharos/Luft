@@ -528,6 +528,16 @@ firewall-app-body = Devices on your home networks, VPNs and virtual machines cou
 firewall-app-deny = Don’t allow
 firewall-app-allow = Allow
 
+## Asking whether an app may use a drive it looked for
+
+# $app is the app's name and $drive the drive's name
+drive-access-title = Let { $app } use { $drive }?
+drive-access-title-unnamed = Let { $app } use this drive?
+# $size is the drive's size, such as 500 GB
+drive-access-body = It’s a { $size } drive. { $app } can read and change everything on it, from the next time it opens.
+drive-access-deny = Don’t allow
+drive-access-allow = Allow
+
 ## Display change confirmation
 
 # Dialog title, keep it shorter than 30 characters

@@ -139,11 +139,11 @@ export class Model {
     this.changed(path, true);
   }
 
-  mount(path: string) {
+  mount(path: string, folder?: string) {
     const block = this.block(path);
     if (block.mountPoints === null) throw new Failure('NotSupported', 'Not a filesystem');
     if (block.mountPoints.length) throw new Failure('AlreadyMounted', `${block.device} is already mounted`);
-    block.mountPoints = [`/run/media/${this.user}/${block.IdLabel || block.IdUUID}`];
+    block.mountPoints = [folder ?? `/run/media/${this.user}/${block.IdLabel || block.IdUUID}`];
     this.changed(path);
     return block.mountPoints[0];
   }

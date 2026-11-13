@@ -1,7 +1,10 @@
-//! The sandbox AppImages run in, started as `schelf --sandbox APP-ID ARGUMENT…`.
+//! The sandbox AppImages run in, started as `schelf --sandbox APP-ID ARGUMENT…`,
+//! and `schelf --watch-drives`, which asks you when a Flatpak app looks for a
+//! drive it wasn't given.
 
 mod app;
 mod confine;
+mod drives;
 mod escalate;
 mod files;
 mod inside;
@@ -21,6 +24,7 @@ pub use launch::{quit, running};
 
 const SERVE: &str = "--sandbox-serve";
 const CONFINE: &str = "--sandbox-confine";
+const WATCH_DRIVES: &str = "--watch-drives";
 
 /// Runs the app or the sandbox's own server when that's what the command
 /// line asks for, and returns the exit status.
@@ -35,6 +39,7 @@ pub fn run(arguments: &[String]) -> Option<i32> {
         (flag, [id, rest @ ..]) if flag == SANDBOX => Some(launch::run(id, rest.to_vec())),
         (flag, rest) if flag == SERVE => Some(inside::serve(rest.to_vec())),
         (flag, command) if flag == CONFINE => Some(confine::exec(command)),
+        (flag, []) if flag == WATCH_DRIVES => Some(drives::watch()),
         _ => None,
     }
 }

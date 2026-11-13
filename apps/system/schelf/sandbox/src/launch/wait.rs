@@ -1,9 +1,12 @@
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::process::{Child, ExitStatus};
 
+use luft_software::apps::places::Drive;
+
 use super::capture::{Kind, Watch};
 use super::devices::Decoys;
 use super::display::x11;
+use super::stand_ins::StandIns;
 
 pub enum Event {
     Exited(ExitStatus),
@@ -11,6 +14,7 @@ pub enum Event {
     CameraOpened,
     StreamOpened(Kind),
     DisplayWanted,
+    DriveWanted(Drive),
 }
 
 /// What the launcher watches while the app runs.
@@ -19,6 +23,7 @@ pub struct Watched<'a> {
     pub decoys: &'a Decoys,
     pub display: Option<&'a x11::Display>,
     pub streams: &'a Watch,
+    pub stand_ins: &'a StandIns,
 }
 
 fn pidfd(child: &Child) -> Result<OwnedFd, String> {
@@ -38,13 +43,14 @@ fn readable(fd: RawFd) -> libc::pollfd {
 }
 
 /// Waits until the sandbox ends, or the app opens a device, looks for an
-/// X11 display it wasn't given, or opens a stream that takes in sound or
-/// video.
+/// X11 display it wasn't given, looks inside a drive it wasn't given, or
+/// opens a stream that takes in sound or video.
 pub fn next(child: &mut Child, watched: Watched) -> Result<Vec<Event>, String> {
     let Watched {
         decoys,
         display,
         streams,
+        stand_ins,
     } = watched;
     let process = pidfd(child)?;
     let mut polled = [
@@ -56,6 +62,7 @@ pub fn next(child: &mut Child, watched: Watched) -> Result<Vec<Event>, String> {
                 .map_or(-1, |fd| fd.as_raw_fd()),
         ),
         readable(streams.fd().as_raw_fd()),
+        readable(stand_ins.fd().as_raw_fd()),
     ];
     loop {
         let ready = unsafe { libc::poll(polled.as_mut_ptr(), polled.len() as libc::nfds_t, -1) };
@@ -77,6 +84,9 @@ pub fn next(child: &mut Child, watched: Watched) -> Result<Vec<Event>, String> {
         }
         if polled[3].revents != 0 {
             events.extend(streams.opened().into_iter().map(Event::StreamOpened));
+        }
+        if polled[4].revents != 0 {
+            events.extend(stand_ins.wanted().into_iter().map(Event::DriveWanted));
         }
         if polled[0].revents != 0 {
             let status = child.wait().map_err(|error| error.to_string())?;

@@ -183,6 +183,11 @@ impl Folder {
         self.path.join("devices")
     }
 
+    /// Where the stand-ins for drives the app wasn't given are kept.
+    pub fn drives(&self) -> PathBuf {
+        self.path.join("drives")
+    }
+
     pub fn temporary(&self) -> PathBuf {
         self.path.join("tmp")
     }
@@ -194,6 +199,7 @@ impl Folder {
             self.proxy(),
             self.server(),
             self.decoys(),
+            self.drives(),
             self.accounts(),
             self.pulse(),
             self.temporary(),
@@ -236,6 +242,7 @@ impl Folder {
             "bus",
             "server",
             "devices",
+            "drives",
             "wayland",
             "x11",
             "accounts",

@@ -16,3 +16,7 @@ apps/system/schelf/sandbox/src/portal/spawn.rs	Unsupported sandbox flags enabled
 apps/system/schelf/sandbox/src/portal/spawn.rs	No command given
 apps/system/schelf/sandbox/src/portal/spawn.rs	Invalid environment variable name
 apps/system/schelf/sandbox/src/portal/spawn.rs	The app's sandbox has ended.
+apps/system/schelf/sandbox/src/drives/ask.rs	Couldn't keep what {id} may do with {}: {error}
+apps/system/schelf/sandbox/src/drives/flatpaks.rs	Couldn't watch the stand-in for {} in {name}: {error}
+apps/system/schelf/sandbox/src/drives/flatpaks.rs	Couldn't open the drives apps were given where they're mounted now: {error}
+apps/system/schelf/sandbox/src/drives/flatpaks.rs	There's no home folder.

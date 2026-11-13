@@ -8,8 +8,10 @@ use super::devices::Decoys;
 use super::display::x11;
 use super::folder::{self, Folder, INSIDE_SERVER, SERVER_SOCKET};
 use super::seccomp::FILTER_FD;
+use super::stand_ins::StandIns;
 use crate::app::{App, Device, Grants};
 use crate::portal::Layout;
+use luft_software::apps::places::Access;
 
 pub const INFO_FD: i32 = 5;
 const INSIDE_APP: &str = "/app";
@@ -34,6 +36,7 @@ pub struct Profile<'a> {
     pub wayland: Option<PathBuf>,
     pub x11: Option<&'a x11::Display>,
     pub decoys: &'a Decoys,
+    pub stand_ins: &'a StandIns,
 }
 
 #[derive(Default)]
@@ -207,6 +210,15 @@ impl Profile<'_> {
         }
         for folder in &self.grants.read_only_folders {
             arguments.same("--ro-bind", folder);
+        }
+        for (point, access) in &self.grants.drives {
+            match access {
+                Access::ReadWrite => arguments.same("--bind", point),
+                Access::ReadOnly => arguments.same("--ro-bind", point),
+            };
+        }
+        for (stand_in, point) in &self.stand_ins.binds {
+            arguments.bind("--ro-bind", stand_in, point);
         }
         arguments.same("--bind", &data);
         if !self.shares_home(home)

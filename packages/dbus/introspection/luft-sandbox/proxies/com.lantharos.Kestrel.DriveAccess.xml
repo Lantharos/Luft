@@ -1,0 +1,9 @@
+<node>
+  <interface name="com.lantharos.Kestrel.DriveAccess">
+    <method name="Ask">
+      <arg type="h" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+  </interface>
+</node>

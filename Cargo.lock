@@ -6020,8 +6020,10 @@ dependencies = [
  "luft-identity",
  "luft-software",
  "pipewire",
+ "rustix",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
  "wayland-client",
  "wayland-protocols",
@@ -9036,6 +9038,7 @@ dependencies = [
  "schelf-publish",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
  "zbus 6.0.0",
 ]

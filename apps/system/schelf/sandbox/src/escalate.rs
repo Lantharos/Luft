@@ -14,7 +14,7 @@ use crate::L10N;
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
 const PATH: &str = "/org/freedesktop/Notifications";
 const SCHELF: &str = "com.lantharos.schelf";
-const REVIEW: &str = "review";
+const ACTION: &str = "act";
 const NEVER_EXPIRES: i32 = 0;
 const ANSWER_WAIT: Duration = Duration::from_secs(10 * 60);
 
@@ -103,9 +103,6 @@ impl Offers {
 }
 
 async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::Result<()> {
-    let notifications = Proxy::new(connection, NOTIFICATIONS, PATH, NOTIFICATIONS).await?;
-    let mut invoked = notifications.receive_signal("ActionInvoked").await?;
-    let mut closed = notifications.receive_signal("NotificationClosed").await?;
     let body = match reason {
         Reason::Closed => t!(L10N, "sandbox-closed-body"),
         Reason::Device => t!(L10N, "sandbox-device-body"),
@@ -118,7 +115,35 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
         Reason::Display | Reason::Microphone | Reason::Camera => "access",
     };
     let summary = t!(L10N, "sandbox-needs-more", app = app.name.as_str());
-    let review = t!(L10N, "sandbox-review");
+    if offer_action(
+        connection,
+        app,
+        &summary,
+        &body,
+        &t!(L10N, "sandbox-review"),
+    )
+    .await?
+    {
+        let _ = Command::new("gio")
+            .arg("open")
+            .arg(format!("schelf:{page}?{}", app.id))
+            .status();
+    }
+    Ok(())
+}
+
+/// Tells you something about the app in a notification with one button,
+/// and says whether you picked it before the notification went away.
+pub async fn offer_action(
+    connection: &Connection,
+    app: &Asking,
+    summary: &str,
+    body: &str,
+    action: &str,
+) -> zbus::Result<bool> {
+    let notifications = Proxy::new(connection, NOTIFICATIONS, PATH, NOTIFICATIONS).await?;
+    let mut invoked = notifications.receive_signal("ActionInvoked").await?;
+    let mut closed = notifications.receive_signal("NotificationClosed").await?;
     let hints = HashMap::from([("desktop-entry", Variant::from(SCHELF))]);
     let id: u32 = notifications
         .call(
@@ -127,9 +152,9 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
                 app.name.as_str(),
                 0u32,
                 app.id.as_str(),
-                summary.as_str(),
-                body.as_str(),
-                vec![REVIEW, review.as_str()],
+                summary,
+                body,
+                vec![ACTION, action],
                 hints,
                 NEVER_EXPIRES,
             ),
@@ -139,9 +164,9 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
         loop {
             tokio::select! {
                 Some(message) = invoked.next() => {
-                    let (shown, action): (u32, String) = message.body().deserialize()?;
+                    let (shown, picked): (u32, String) = message.body().deserialize()?;
                     if shown == id {
-                        return Ok::<bool, zbus::Error>(action == REVIEW);
+                        return Ok::<bool, zbus::Error>(picked == ACTION);
                     }
                 }
                 Some(message) = closed.next() => {
@@ -154,14 +179,7 @@ async fn notify(connection: &Connection, app: &Asking, reason: Reason) -> zbus::
             }
         }
     };
-    if tokio::time::timeout(ANSWER_WAIT, answer)
+    tokio::time::timeout(ANSWER_WAIT, answer)
         .await
-        .unwrap_or(Ok(false))?
-    {
-        let _ = Command::new("gio")
-            .arg("open")
-            .arg(format!("schelf:{page}?{}", app.id))
-            .status();
-    }
-    Ok(())
+        .unwrap_or(Ok(false))
 }

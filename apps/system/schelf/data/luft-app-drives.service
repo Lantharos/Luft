@@ -1,0 +1,13 @@
+[Unit]
+Description=Ask before sandboxed apps use the drives they look for
+After=kestrel-session.target graphical-session.target
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Service]
+ExecStart=/usr/libexec/luft-launch /usr/lib/sabine/com.lantharos.schelf/schelf --watch-drives
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=kestrel-session.target

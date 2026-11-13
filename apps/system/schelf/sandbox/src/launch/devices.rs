@@ -5,13 +5,13 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 
 use crate::app::{Device, Grants};
+use crate::drives::events;
 
 const DEVICES: &str = "/dev";
 const USB: &str = "/dev/bus/usb";
 const HID: &str = "hidraw";
 const SERIAL: [&str; 2] = ["ttyUSB", "ttyACM"];
 const CAMERA: &str = "video";
-const EVENT_HEADER: usize = size_of::<libc::inotify_event>();
 
 /// Stand-ins for the USB, HID and serial devices and the cameras the app
 /// wasn't given: empty files where the devices would be, which tell the
@@ -170,15 +170,4 @@ impl Decoys {
             }
         }
     }
-}
-
-fn events(mut buffer: &[u8]) -> impl Iterator<Item = (i32, u32)> {
-    std::iter::from_fn(move || {
-        let header = buffer.get(..EVENT_HEADER)?;
-        let watched = i32::from_ne_bytes(header[0..4].try_into().ok()?);
-        let mask = u32::from_ne_bytes(header[4..8].try_into().ok()?);
-        let name = u32::from_ne_bytes(header[12..16].try_into().ok()?) as usize;
-        buffer = buffer.get(EVENT_HEADER + name..)?;
-        Some((watched, mask))
-    })
 }

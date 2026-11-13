@@ -6,6 +6,7 @@ use luft_identity::permissions::{
     READ_ONLY_FOLDERS, X11,
 };
 use luft_software::apps::appimage;
+use luft_software::apps::places::{self, Access, Drive};
 use zbus::Connection;
 
 use crate::L10N;
@@ -67,6 +68,10 @@ pub struct Grants {
     pub microphone: bool,
     pub camera: bool,
     pub bus: Vec<String>,
+    /// Where the drives it was given are mounted now.
+    pub drives: Vec<(PathBuf, Access)>,
+    /// The drives mounted now that it was never asked about.
+    pub unasked: Vec<Drive>,
 }
 
 fn existing_folders(paths: Vec<String>) -> Vec<PathBuf> {
@@ -90,6 +95,8 @@ impl Grants {
             x11,
             microphone,
             camera,
+            held,
+            mounted,
         ) = tokio::join!(
             permissions::allowed(connection, &FULL_ACCESS, id),
             permissions::values(connection, &FOLDERS, id),
@@ -101,7 +108,11 @@ impl Grants {
             permissions::allowed(connection, &X11, id),
             permissions::allowed(connection, &MICROPHONE, id),
             permissions::allowed(connection, &CAMERA, id),
+            places::held(connection, id),
+            places::mounted(),
         );
+        let held = held.map_err(|_| t!(L10N, "sandbox-unreadable"))?;
+        let mounted = mounted.unwrap_or_default();
         let given =
             |values: zbus::Result<Vec<String>>| values.map_err(|_| t!(L10N, "sandbox-unreadable"));
         Ok(Self {
@@ -118,6 +129,11 @@ impl Grants {
             x11,
             microphone,
             camera,
+            drives: places::reachable(&held, &mounted),
+            unasked: places::unasked(&held, &mounted)
+                .into_iter()
+                .cloned()
+                .collect(),
         })
     }
 

@@ -74,6 +74,7 @@ pub fn field(label: &str, value: &str) {
 }
 
 pub fn field_in(label: &str, value: &str, width: usize) {
+    let width = width.max(label.chars().count() + 2);
     write(&format!("{INDENT}{}{value}", muted(&pad(label, width))));
 }
 

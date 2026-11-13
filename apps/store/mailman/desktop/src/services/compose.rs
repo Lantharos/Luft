@@ -109,6 +109,7 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
         sender: sender.from.address,
         recipients: built.recipients,
         remind_at,
+        placed: None,
     };
     let id = state.store.queue_outgoing(&outgoing, &draft, send_at)?;
     let recipients: Vec<Address> = draft
@@ -121,6 +122,18 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
     state.store.meet(&recipients)?;
     state.engine.wake_outbox();
     Ok(Queued { id, send_at })
+}
+
+pub fn cancel(state: &MailmanState, id: i64) -> Result<Option<Draft>, String> {
+    let Some(cancelled) = state.store.cancel_outgoing(id)? else {
+        return Ok(None);
+    };
+    if let Some(remote) = cancelled.placed {
+        state
+            .engine
+            .queue(cancelled.account, &Operation::DiscardPlaced { remote })?;
+    }
+    Ok(Some(cancelled.draft))
 }
 
 pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> Result<(), String> {

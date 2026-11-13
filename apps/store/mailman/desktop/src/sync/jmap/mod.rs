@@ -1,6 +1,7 @@
 mod identities;
 mod mail;
 pub mod push;
+mod submit;
 
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
@@ -12,7 +13,7 @@ use serde_json::{Map, Value, json};
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
 use crate::accounts::{Login, SignInError};
-use crate::protocols::jmap::{CORE, Client, MAIL, SUBMISSION};
+use crate::protocols::jmap::{CORE, Client, MAIL};
 use crate::store::{Delivery, Flag, Mailbox, Outgoing, RemoteFolder, Role};
 use mail::Changes;
 
@@ -282,44 +283,15 @@ impl Remote for JmapRemote {
             Operation::Identity { id, remote } => {
                 self.push_identity(context, *id, remote.as_deref())
             }
+            Operation::DiscardPlaced { remote } => self.destroy(std::slice::from_ref(remote)),
         }
     }
 
     fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String> {
-        let sent = context
-            .store
-            .mailbox_with_role(context.account.id, Role::Sent)?
-            .ok_or("This account has no Sent folder")?;
-        let identity = self.sending_identity(&outgoing.sender, &context.account.name)?;
-        let email = self.import(&outgoing.raw, &sent.remote, json!({ "$seen": true }))?;
-        let recipients: Vec<Value> = outgoing
-            .recipients
-            .iter()
-            .map(|address| json!({ "email": address }))
-            .collect();
-        let responses = self.client.call(
-            &[CORE, MAIL, SUBMISSION],
-            vec![(
-                "EmailSubmission/set",
-                json!({ "accountId": self.client.account, "create": { "send": {
-                    "identityId": identity, "emailId": email,
-                    "envelope": { "mailFrom": { "email": outgoing.sender }, "rcptTo": recipients }
-                } } }),
-            )],
-        )?;
-        let failure = &responses[0]["notCreated"]["send"];
-        if !failure.is_object() {
-            return Ok(Delivery::Sent);
-        }
-        self.destroy(&[email])?;
-        let reason = failure["description"]
-            .as_str()
-            .or(failure["type"].as_str())
-            .unwrap_or("The server refused it")
-            .to_owned();
-        match failure["type"].as_str() {
-            Some("serverFail" | "serverUnavailable" | "forbiddenToSend") => Err(reason),
-            _ => Ok(Delivery::Refused(reason)),
-        }
+        self.submit(context, outgoing)
+    }
+
+    fn saves_sent_itself(&self) -> bool {
+        true
     }
 }

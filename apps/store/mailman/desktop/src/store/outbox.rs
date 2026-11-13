@@ -12,6 +12,13 @@ pub struct Outgoing {
     pub sender: String,
     pub recipients: Vec<String>,
     pub remind_at: Option<i64>,
+    pub placed: Option<String>,
+}
+
+pub struct Cancelled {
+    pub account: i64,
+    pub draft: Draft,
+    pub placed: Option<String>,
 }
 
 pub enum Delivery {
@@ -34,6 +41,7 @@ fn outgoing(row: &Row) -> rusqlite::Result<Outgoing> {
         sender: row.get(3)?,
         recipients: serde_json::from_str(&recipients).unwrap_or_default(),
         remind_at: row.get(5)?,
+        placed: row.get(6)?,
     })
 }
 
@@ -59,7 +67,7 @@ impl Store {
     pub fn due_outgoing(&self) -> Result<Vec<Outgoing>, String> {
         self.reading(|connection| {
             connection
-                .prepare_cached("SELECT id, account, raw, sender, recipients, remind_at FROM outbox WHERE send_at <= ?1 ORDER BY send_at")?
+                .prepare_cached("SELECT id, account, raw, sender, recipients, remind_at, placed FROM outbox WHERE send_at <= ?1 ORDER BY send_at")?
                 .query_map([now()], outgoing)?
                 .collect()
         })
@@ -71,17 +79,23 @@ impl Store {
         })
     }
 
-    pub fn cancel_outgoing(&self, id: i64) -> Result<Option<Draft>, String> {
-        self.writing(|connection| {
+    pub fn cancel_outgoing(&self, id: i64) -> Result<Option<Cancelled>, String> {
+        let cancelled = self.writing(|connection| {
             connection
                 .query_row(
-                    "DELETE FROM outbox WHERE id = ?1 AND send_at > ?2 RETURNING draft",
+                    "DELETE FROM outbox WHERE id = ?1 AND send_at > ?2 RETURNING account, draft, placed",
                     params![id, now()],
-                    |row| row.get::<_, String>(0),
+                    |row| Ok((row.get(0)?, row.get::<_, String>(1)?, row.get(2)?)),
                 )
                 .optional()
-        })
-        .map(|draft| draft.and_then(|draft| serde_json::from_str(&draft).ok()))
+        })?;
+        Ok(cancelled.and_then(|(account, draft, placed)| {
+            Some(Cancelled {
+                account,
+                draft: serde_json::from_str(&draft).ok()?,
+                placed,
+            })
+        }))
     }
 
     pub fn mentions_anywhere_kept(&self, text: &str) -> Result<bool, String> {
@@ -96,21 +110,33 @@ impl Store {
         })
     }
 
-    pub fn finish_outgoing(&self, id: i64) -> Result<(), String> {
-        self.writing(|connection| connection.execute("DELETE FROM outbox WHERE id = ?1", [id]))
-            .map(drop)
-    }
-
-    pub fn shelve_outgoing(&self, id: i64, account: i64, operation: &str) -> Result<(), String> {
+    pub fn settle_outgoing(
+        &self,
+        id: i64,
+        account: i64,
+        follow_up: Option<&str>,
+    ) -> Result<(), String> {
         self.writing(|connection| {
             let transaction = connection.transaction()?;
-            transaction.execute(
-                "INSERT INTO operations (account, operation) VALUES (?1, ?2)",
-                params![account, operation],
-            )?;
             transaction.execute("DELETE FROM outbox WHERE id = ?1", [id])?;
+            if let Some(operation) = follow_up {
+                transaction.execute(
+                    "INSERT INTO operations (account, operation) VALUES (?1, ?2)",
+                    params![account, operation],
+                )?;
+            }
             transaction.commit()
         })
+    }
+
+    pub fn place_outgoing(&self, id: i64, placed: &str) -> Result<(), String> {
+        self.writing(|connection| {
+            connection.execute(
+                "UPDATE outbox SET placed = ?2 WHERE id = ?1",
+                params![id, placed],
+            )
+        })
+        .map(drop)
     }
 
     pub fn retry_outgoing(&self, id: i64, error: &str) -> Result<(), String> {

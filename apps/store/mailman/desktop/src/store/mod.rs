@@ -1,4 +1,6 @@
 mod accounts;
+#[cfg(test)]
+pub mod fixture;
 mod mail;
 mod mailboxes;
 mod outbox;

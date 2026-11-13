@@ -105,94 +105,8 @@ impl Store {
 
 #[cfg(test)]
 mod tests {
-    use tempfile::TempDir;
-
-    use crate::accounts::{AccountConfig, Protocol};
-    use crate::mail::envelope;
-    use crate::protocols::net::{Security, Server};
-    use crate::store::{Flags, Mailbox, NewMessage, RemoteFolder, Role, Store};
+    use crate::store::fixture::Account;
     use crate::sync::ops::{self, Target};
-
-    struct Account {
-        _scratch: TempDir,
-        store: Store,
-        added: i64,
-        inbox: Mailbox,
-        trash: Mailbox,
-    }
-
-    impl Account {
-        fn new() -> Self {
-            let scratch = tempfile::tempdir().unwrap();
-            let store = Store::open(&scratch.path().join("mail.sqlite")).unwrap();
-            let server = Server {
-                host: "127.0.0.1".into(),
-                port: 143,
-                security: Security::None,
-            };
-            let config = AccountConfig {
-                protocol: Protocol::Imap {
-                    imap: server.clone(),
-                    smtp: server,
-                },
-                username: "mara".into(),
-                oauth: None,
-            };
-            let account = store
-                .add_account("mara@example.test", "Mara", &config)
-                .unwrap();
-            let mailboxes = store
-                .replace_mailboxes(
-                    account.id,
-                    &[folder("INBOX", Role::Inbox), folder("Trash", Role::Trash)],
-                )
-                .unwrap();
-            let find = |role| {
-                mailboxes
-                    .iter()
-                    .find(|mailbox| mailbox.role == Some(role))
-                    .unwrap()
-                    .clone()
-            };
-            Self {
-                inbox: find(Role::Inbox),
-                trash: find(Role::Trash),
-                added: account.added,
-                store,
-                _scratch: scratch,
-            }
-        }
-
-        fn sync(&self, mailbox: &Mailbox, remote: &str) -> Vec<i64> {
-            self.store
-                .insert_messages(mailbox, self.added, &[listed(remote)])
-                .unwrap()
-                .into_iter()
-                .map(|inserted| inserted.id)
-                .collect()
-        }
-    }
-
-    fn listed(remote: &str) -> NewMessage {
-        NewMessage {
-            remote: remote.into(),
-            envelope: envelope::parse(
-                b"From: theo@example.test\r\nSubject: Harbour photos\r\n\r\n",
-            ),
-            flags: Flags::default(),
-            size: 0,
-            received: 0,
-        }
-    }
-
-    fn folder(remote: &str, role: Role) -> RemoteFolder {
-        RemoteFolder {
-            remote: remote.into(),
-            name: remote.into(),
-            role: Some(role),
-            selectable: true,
-        }
-    }
 
     #[test]
     fn removed_messages_stay_removed_while_the_server_still_lists_them() {
@@ -231,6 +145,36 @@ mod tests {
             &[Target {
                 id,
                 remote: format!("~{id}"),
+            }],
+        )
+        .unwrap();
+        assert_eq!(destroyed[0].remote, "12");
+    }
+
+    #[test]
+    fn mail_arriving_after_a_deletion_never_takes_over_the_deleted_messages_pending_move() {
+        let account = Account::new();
+        let (inbox, trash) = (&account.inbox, &account.trash);
+        let deleted = account.sync(inbox, "7")[0];
+        account.store.relocate(&[deleted], trash.id).unwrap();
+        account.store.forget(&[deleted]).unwrap();
+        let arrived = account.sync(inbox, "8")[0];
+
+        account
+            .store
+            .settle_remote(deleted, trash.id, Some("12"))
+            .unwrap();
+        assert_ne!(arrived, deleted);
+        assert_eq!(
+            account.store.current_remote(arrived).unwrap().as_deref(),
+            Some("8")
+        );
+        let destroyed = ops::resolve(
+            &account.store,
+            trash.id,
+            &[Target {
+                id: deleted,
+                remote: format!("~{deleted}"),
             }],
         )
         .unwrap();

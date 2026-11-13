@@ -72,7 +72,7 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             compose::send(state, draft)
         })
         .with("cancel_send", state, |state, Id { id }| {
-            state.store.cancel_outgoing(id)
+            compose::cancel(state, id)
         })
         .with(
             "save_draft",

@@ -32,11 +32,12 @@ pub trait Remote: Send {
     ) -> Result<Vec<(i64, Vec<u8>)>, String>;
     fn apply(&mut self, context: &Context, operation: &Operation) -> Result<(), String>;
     fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String>;
+    fn saves_sent_itself(&self) -> bool;
 }
 
 pub struct Connection {
     pub remote: Box<dyn Remote>,
-    expires: Option<i64>,
+    pub(super) expires: Option<i64>,
 }
 
 impl Connection {

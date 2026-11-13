@@ -210,12 +210,6 @@ impl ImapRemote {
             .map(|mailbox| mailbox.remote)
             .ok_or_else(|| "That folder no longer exists".into())
     }
-
-    fn saves_sent_itself(&self) -> bool {
-        SAVES_SENT_ITSELF
-            .iter()
-            .any(|host| self.smtp.host.ends_with(host))
-    }
 }
 
 fn settle_departures(
@@ -422,22 +416,18 @@ impl Remote for ImapRemote {
                     &raw,
                 )
             }
-            Operation::Identity { .. } => Ok(()),
+            Operation::Identity { .. } | Operation::DiscardPlaced { .. } => Ok(()),
         }
     }
 
-    fn send(&mut self, context: &Context, outgoing: &Outgoing) -> Result<Delivery, String> {
-        let delivery = smtp::send(&self.smtp, &self.login, outgoing)?;
-        if matches!(delivery, Delivery::Refused(_)) || self.saves_sent_itself() {
-            return Ok(delivery);
-        }
-        if let Some(sent) = context
-            .store
-            .mailbox_with_role(context.account.id, Role::Sent)?
-        {
-            self.client.append(&sent.remote, "\\Seen", &outgoing.raw)?;
-        }
-        Ok(delivery)
+    fn send(&mut self, _: &Context, outgoing: &Outgoing) -> Result<Delivery, String> {
+        smtp::send(&self.smtp, &self.login, outgoing)
+    }
+
+    fn saves_sent_itself(&self) -> bool {
+        SAVES_SENT_ITSELF
+            .iter()
+            .any(|host| self.smtp.host.ends_with(host))
     }
 }
 

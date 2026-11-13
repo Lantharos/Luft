@@ -29,6 +29,9 @@ pub enum Operation {
         id: i64,
         remote: Option<String>,
     },
+    DiscardPlaced {
+        remote: String,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -81,6 +84,12 @@ pub fn give_up(
             let ids: Vec<i64> = messages.iter().map(|target| target.id).collect();
             store.return_destroyed(*mailbox, &ids)?;
             ("delete", messages, Some(*mailbox))
+        }
+        Operation::Append { draft: false, .. } => {
+            return Ok(Some(GaveUp {
+                message: format!("Sent, but couldn't save a copy to Sent: {error}"),
+                resync: None,
+            }));
         }
         _ => return Ok(None),
     };

@@ -53,7 +53,9 @@ gstreamer1-plugins-good
 gtk4
 gutenprint-cups
 gvfs
+gvfs-afc
 gvfs-fuse
+gvfs-gphoto2
 gvfs-mtp
 gvfs-nfs
 gvfs-smb
@@ -117,6 +119,7 @@ tesseract-langpack-sqi
 thermald
 udisks2
 upower
+usbmuxd
 usbutils
 vulkan-tools
 wireplumber

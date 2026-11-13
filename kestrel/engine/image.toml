@@ -13,8 +13,5 @@ sources = [
     "packages/web/ui/src/taskbar",
 ]
 
-[links]
-"/usr/share/fonts/luft" = "../kestrel/fonts"
-
 [enable]
 system = ["kestrel-authenticate.socket"]

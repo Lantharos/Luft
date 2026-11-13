@@ -112,7 +112,7 @@ profile = "release-abort"
 "/usr/lib/dracut/modules.d/90trustd/" = [{ from = "data/dracut/module-setup.sh", mode = "755" }]
 
 [links]
-"/usr/share/fonts/luft" = "../kestrel/fonts"
+"/usr/bin/sch" = "schelf"
 
 [enable]
 system = ["luft-updater-check.timer"]

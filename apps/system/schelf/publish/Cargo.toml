@@ -1,0 +1,29 @@
+[package]
+name = "schelf-publish"
+version = "0.1.0"
+description = "Publishing apps, extensions and projects on schelf.store from the terminal"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+base64.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
+glob.workspace = true
+libc.workspace = true
+quick-xml.workspace = true
+regex.workspace = true
+serde.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
+sha2.workspace = true
+toml.workspace = true
+ureq.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

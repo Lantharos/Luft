@@ -13,6 +13,7 @@ members = [
     "apps/store/meet/desktop",
     "apps/system/rover/desktop",
     "apps/system/schelf/desktop",
+    "apps/system/schelf/publish",
     "apps/system/schelf/sandbox",
     "apps/system/settings/desktop",
     "apps/system/setup/contract",
@@ -103,6 +104,7 @@ default-members = [
     "apps/store/meet/desktop",
     "apps/system/rover/desktop",
     "apps/system/schelf/desktop",
+    "apps/system/schelf/publish",
     "apps/system/schelf/sandbox",
     "apps/system/settings/desktop",
     "apps/system/setup/contract",
@@ -215,6 +217,7 @@ luft-trust = { path = "packages/system/trust" }
 luft-unpack = { path = "packages/unpack" }
 luft-variant = { path = "packages/system/variant" }
 luft-windows = { path = "packages/system/windows" }
+schelf-publish = { path = "apps/system/schelf/publish" }
 sushi = { path = "sushi/crates/sushi" }
 sushi-scene = { path = "sushi/crates/sushi-scene" }
 

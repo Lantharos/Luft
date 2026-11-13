@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.alice.Notes</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Notes</name>
+  <name xml:lang="de">Notizen</name>
+  <summary>A quick place for your thoughts</summary>
+  <summary xml:lang="de">Ein schneller Ort für Gedanken</summary>
+  <developer id="io.github.alice">
+    <name>Alice &amp; Co</name>
+  </developer>
+  <description>
+    <p>Notes keeps
+      what you write.</p>
+    <p xml:lang="de">Notizen behält, was du schreibst.</p>
+    <ul>
+      <li>Fast search</li>
+      <li>Works offline</li>
+    </ul>
+  </description>
+  <url type="homepage">https://notes.example</url>
+  <url type="bugtracker">https://github.com/alice/notes/issues</url>
+  <categories><category>Office</category><category>Utility</category></categories>
+  <keywords><keyword>memo</keyword><keyword xml:lang="de">Notiz</keyword></keywords>
+  <launchable type="desktop-id">io.github.alice.Notes.desktop</launchable>
+  <icon type="remote" width="128" height="128">https://notes.example/icon.png</icon>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main window</caption>
+      <image type="source" width="1280" height="800">https://notes.example/1.png</image>
+    </screenshot>
+    <screenshot>
+      <image type="thumbnail" width="624" height="351">https://notes.example/2-small.png</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="1.2.0" date="2026-10-01"/>
+    <release version="1.1.0" timestamp="1767225600"/>
+  </releases>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">mild</content_attribute>
+  </content_rating>
+</component>

@@ -71,6 +71,7 @@ Checks of single parts live in a `vm` folder next to their code and share `os/vm
 | `services/printers/vm/run.sh` | A network printer and a USB one set themselves up and print | 2 min |
 | `services/sleep/vm/run.sh` | Sleeping and waking, and shutting down instead of sleeping on with a low battery | 14 min |
 | `services/windows/vm/run.sh` | Fast Startup, the clock, Bluetooth pairings and a hibernated Windows on a real NTFS drive | 1 min |
+| `sushi/vm/run.sh` | Starting without a display reaches the login screen, with the graphics driver loading before and after it | 4 min |
 | `apps/system/disks/vm/run.sh`, `grow/run.sh`, `move/run.sh` | Removing other systems, growing Luft, and moving it across drives with a power cut in the middle | up to 2 h each |
 
 A drive started directly with the image's kernel has SELinux off, since its files carry no labels; `relabel_root_drive` labels it once, after which `SELINUX="selinux=1 enforcing=1"` starts it enforcing, so a check fails on anything SELinux denies. The shield, firewall and remote login checks take `LUFT_VM_CHECK_IMAGE=IMAGE` to check a built image as it is, without this checkout's programs on top, as the nightly does.
@@ -113,4 +114,4 @@ When a change can reach Kestrel, a job in a Fedora container started with system
 .github/scripts/kestrel/container.sh run kestrel/tools/session.sh capture --only lockScreen
 ```
 
-Before the nightly tag moves, the Image workflow installs each new image, the standard and the NVIDIA one, in a VM with `os/vm/disk.sh` and runs `os/vm/check.py session` on it. The tag only moves when that passes. Beside it, the shield, firewall and remote login checks run on the new standard image as it was built. Their failures mark the run as failed and keep their serial logs, but don't hold the tag back. The other part checks and `check.py rollback` run by hand.
+Before the nightly tag moves, the Image workflow installs each new image, the standard and the NVIDIA one, in a VM with `os/vm/disk.sh` and runs `os/vm/check.py session` on it. The tag only moves when that passes. Beside it, the shield, firewall and remote login checks run on the new standard image as it was built. Their failures mark the run as failed and keep their serial logs, but don't hold the tag back. The other part checks and `check.py rollback` run by hand: the rollback and no-display checks seal images of their own, which needs the system before sealing and the signing keys the nightly keeps to its build.

@@ -13,9 +13,9 @@ STATE = "/var/lib/keyring-test"
 PASSWORD = "luft-vm"
 person = pwd.getpwnam("luft")
 FINGER = "/run/luft-vm-fingerprint/finger"
+VERIFYING = "/run/luft-vm-fingerprint/verifying"
 METHOD_QUESTION = "Sign in with (fingerprint/password): "
 FINGERPRINT_QUESTION = "Touch the fingerprint reader, or type password: "
-QUICK = 5
 result_path = os.path.join(person.pw_dir, "result.json")
 tally = {"passed": 0, "failed": 0}
 
@@ -64,15 +64,27 @@ def answer(message, method):
     return PASSWORD if message["auth_message_type"] == "secret" else None
 
 
+def signed_out():
+    for _ in range(120):
+        state = subprocess.run(
+            ["loginctl", "show-user", person.pw_name, "--property=State", "--value"],
+            capture_output=True, text=True, check=False,
+        ).stdout.strip()
+        if state not in ("active", "online"):
+            return True
+        time.sleep(0.25)
+    return False
+
+
 def login(method, scenario, finger=None):
     with open(os.path.join(STATE, "scenario.json"), "w") as output:
         json.dump({"name": scenario}, output)
     with open(FINGER, "w") as reader:
         reader.write(finger or ("match" if method == "fingerprint" else "none"))
-    if os.path.exists(result_path):
-        os.remove(result_path)
+    for leftover in (result_path, VERIFYING):
+        if os.path.exists(leftover):
+            os.remove(leftover)
     messages = []
-    started = time.monotonic()
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
         connection.connect(greetd_socket())
         reply = exchange(connection, {"type": "create_session", "username": person.pw_name})
@@ -83,8 +95,10 @@ def login(method, scenario, finger=None):
         check(signed_in, f"{scenario}: signing in with a {method} works")
         if method == "fingerprint":
             check(not any(message["auth_message_type"] == "secret" for message in messages), f"{scenario}: no password was asked for")
+        elif method == "password":
+            check(not os.path.exists(VERIFYING), f"{scenario}: the password is checked without asking the reader")
         else:
-            check(time.monotonic() - started < QUICK, f"{scenario}: the password is checked without waiting for the reader")
+            check(os.path.exists(VERIFYING), f"{scenario}: the reader was waiting when the password was chosen")
         if not signed_in:
             return
         exchange(connection, {"type": "start_session", "cmd": [os.path.join(HERE, "probe.py")], "env": []})
@@ -95,12 +109,11 @@ def login(method, scenario, finger=None):
     else:
         check(False, f"{scenario}: the session reported back")
         return
-    time.sleep(1)
     with open(result_path) as result:
         outcome = json.load(result)
     for label, passed in outcome:
         check(passed, f"{scenario}: {label}")
-    time.sleep(3)
+    check(signed_out(), f"{scenario}: the session ended")
 
 
 def extend_secure_boot_state():

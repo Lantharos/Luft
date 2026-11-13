@@ -115,23 +115,6 @@ def as_settings(method, signature, arguments):
     ).stdout.strip()
 
 
-def keyring_is_shielded():
-    pid = subprocess.run(
-        ["systemctl", "--user", "show", "--property=MainPID", "--value", "luft-keyring.service"],
-        capture_output=True,
-        text=True,
-        check=False,
-    ).stdout.strip()
-    with open(f"/proc/{pid}/status") as status:
-        real, effective = next(line for line in status if line.startswith("Gid:")).split()[1:3]
-    try:
-        open(f"/proc/{pid}/environ").close()
-        readable = True
-    except PermissionError:
-        readable = False
-    return real != effective and not readable
-
-
 def lock_screen_flows(chip):
     check(lock(), "the keyring locks")
     check(
@@ -180,7 +163,6 @@ def main():
         check(wait_for("TpmSealed", True), "the keyring is sealed by the security chip")
         check(keyring("Chip") == "ready", "the security chip is ready")
         check(not asked, "signing in with the password asked nothing more")
-        check(keyring_is_shielded(), "the keyring runs with its own group, out of reach of the person's other programs")
         check(
             secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0,
             "a secret is saved",

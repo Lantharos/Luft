@@ -4,6 +4,7 @@ from pathlib import Path
 from gi.repository import Gio, GLib
 
 FINGER = Path("/run/luft-vm-fingerprint/finger")
+VERIFYING = Path("/run/luft-vm-fingerprint/verifying")
 MANAGER = "/net/reactivated/Fprint/Manager"
 DEVICE = "/net/reactivated/Fprint/Device/0"
 NODE = """<node>
@@ -52,6 +53,7 @@ def call(connection, sender, path, interface, method, parameters, invocation):
         invocation.return_value(GLib.Variant("(as)", (["right-index-finger"],)))
     elif method == "VerifyStart":
         verifying["sender"] = sender
+        VERIFYING.touch()
         invocation.return_value(None)
         connection.emit_signal(None, DEVICE, interface, "VerifyFingerSelected", GLib.Variant("(s)", ("any",)))
     else:

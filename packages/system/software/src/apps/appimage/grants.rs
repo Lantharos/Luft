@@ -1,8 +1,8 @@
 use std::collections::BTreeSet;
 use std::path::Path;
 
-use luft_app::dbus;
-use luft_app::identity::permissions::{
+use luft_dbus as dbus;
+use luft_identity::permissions::{
     self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
     Permission, READ_ONLY_FOLDERS, X11, YES,
 };

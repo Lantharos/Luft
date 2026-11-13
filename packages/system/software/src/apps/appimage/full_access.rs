@@ -1,5 +1,5 @@
-use luft_app::dbus;
-use luft_app::identity::permissions::{self, FULL_ACCESS};
+use luft_dbus as dbus;
+use luft_identity::permissions::{self, FULL_ACCESS};
 
 /// Starts the AppImage without its sandbox from its next launch, or puts it
 /// back in its sandbox.

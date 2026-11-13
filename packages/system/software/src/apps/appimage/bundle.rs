@@ -8,6 +8,7 @@ use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 use super::declaration::{self, Declaration};
 use super::elf;
 use super::library::IconSize;
+#[cfg(feature = "sabine")]
 use super::sabine::SabineApp;
 use crate::apps::chromium;
 use crate::apps::desktop::DesktopEntry;
@@ -34,6 +35,7 @@ pub struct Bundle {
     /// What a Sabine app declares about its sandbox; none for other apps.
     pub declaration: Option<Declaration>,
     /// The Sabine app it holds and the Sabine build it was made with.
+    #[cfg(feature = "sabine")]
     pub sabine_app: Option<SabineApp>,
 }
 
@@ -237,6 +239,7 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         electron,
         chromium,
         declaration,
+        #[cfg(feature = "sabine")]
         sabine_app: manifest.as_deref().and_then(SabineApp::read),
     })
 }

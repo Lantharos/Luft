@@ -16,7 +16,7 @@ futures-util.workspace = true
 libc.workspace = true
 luft-dbus-macros.workspace = true
 serde.workspace = true
-tokio = { workspace = true, features = ["sync", "time"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "sync", "time"] }
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [lints]

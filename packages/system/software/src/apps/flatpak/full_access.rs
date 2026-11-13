@@ -1,7 +1,7 @@
 use std::process::Command;
 
-use luft_app::dbus::{self, failed};
-use luft_app::identity::permissions;
+use luft_dbus::{self as dbus, failed};
+use luft_identity::permissions;
 use tokio::task::spawn_blocking;
 
 use super::transaction::friendly;

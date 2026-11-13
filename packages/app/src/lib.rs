@@ -22,7 +22,6 @@ pub mod portal;
 #[cfg(feature = "recovery")]
 pub mod recovery;
 mod sample;
-pub mod secrets;
 #[cfg(feature = "settings")]
 pub mod settings;
 pub mod share;

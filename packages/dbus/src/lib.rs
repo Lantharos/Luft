@@ -5,6 +5,8 @@ pub mod objects;
 pub mod panics;
 pub mod polkit;
 pub mod power;
+pub mod runtime;
+pub mod secrets;
 pub mod service;
 
 #[doc(hidden)]

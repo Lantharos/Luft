@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use std::os::unix::fs::{PermissionsExt, symlink};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::OnceLock;
 
 use super::bundle::{self, Bundle};
 use super::declaration::Declaration;
@@ -162,7 +163,7 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<Installed, Strin
             fs::remove_file(&earlier.desktop).map_err(failed)?;
             remove_icons(&earlier.id);
             #[cfg(feature = "system")]
-            luft_app::block_on(super::grants::forget(&earlier.id))?;
+            forget_grants(&earlier.id)?;
         }
     }
     integrate(&id, &path, &bundle)?;
@@ -250,9 +251,7 @@ fn icon_fits(icon: &Path) -> bool {
 
 pub fn repair() {
     for app in library::list() {
-        if app.launcher.as_deref() == Some(launcher().as_path())
-            && app.icon.as_deref().is_some_and(icon_fits)
-        {
+        if app.launcher.as_deref() == launcher() && app.icon.as_deref().is_some_and(icon_fits) {
             continue;
         }
         if let Ok(bundle) = bundle::read(&app.path) {
@@ -269,9 +268,24 @@ fn forwarded(argument: &str) -> String {
     }
 }
 
-/// Schelf itself, which starts AppImages in their sandbox.
-pub fn launcher() -> PathBuf {
-    std::env::current_exe().unwrap_or_default()
+static LAUNCHER: OnceLock<Option<PathBuf>> = OnceLock::new();
+
+/// Starts AppImages through `sandbox`, the program that runs them in their
+/// sandbox, or straight away on a system without one. Unless told
+/// otherwise, the running program is that sandbox.
+pub fn launch_through(sandbox: Option<PathBuf>) {
+    let _ = LAUNCHER.set(sandbox);
+}
+
+/// Whether AppImages start in a sandbox here.
+pub fn sandboxed() -> bool {
+    launcher().is_some()
+}
+
+fn launcher() -> Option<&'static Path> {
+    LAUNCHER
+        .get_or_init(|| std::env::current_exe().ok())
+        .as_deref()
 }
 
 fn quoted(path: &Path) -> String {
@@ -282,18 +296,24 @@ fn plain(argument: &&str) -> bool {
     ![FILES, URIS].contains(argument)
 }
 
-fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
+fn exec_line(original: &str, id: &str, bundle: &Bundle, executable: &Path) -> String {
     let mut arguments: Vec<String> = original
         .split_whitespace()
         .skip(1)
         .filter(plain)
         .map(str::to_owned)
         .collect();
+    let Some(sandbox) = launcher() else {
+        return std::iter::once(quoted(executable))
+            .chain(arguments)
+            .collect::<Vec<_>>()
+            .join(" ");
+    };
     if bundle.chromium {
         chromium::enable_features(&mut arguments);
         chromium::load_autoscroll(&mut arguments);
     }
-    [quoted(&launcher()), SANDBOX.to_owned(), id.to_owned()]
+    [quoted(sandbox), SANDBOX.to_owned(), id.to_owned()]
         .into_iter()
         .chain(arguments.iter().map(|argument| forwarded(argument)))
         .collect::<Vec<_>>()
@@ -353,7 +373,7 @@ fn desktop_entry(id: &str, bundle: &Bundle, executable: &Path, icon: Option<&str
         };
         match key.trim() {
             "Exec" if group != Group::Other => {
-                lines.push(format!("Exec={}", exec_line(value, id, bundle)));
+                lines.push(format!("Exec={}", exec_line(value, id, bundle, executable)));
             }
             "Icon" if group == Group::Main => {
                 if let Some(icon) = icon {
@@ -398,7 +418,7 @@ fn remove_icons(id: &str) {
 pub fn remove(id: &str) -> Result<(), String> {
     let app = library::find(id)?;
     #[cfg(feature = "system")]
-    luft_app::block_on(super::grants::forget(id))?;
+    forget_grants(id)?;
     fs::remove_file(&app.path).map_err(failed)?;
     fs::remove_file(&app.desktop).map_err(failed)?;
     remove_icons(id);
@@ -408,6 +428,17 @@ pub fn remove(id: &str) -> Result<(), String> {
     }
     refresh_menus(&library::applications());
     Ok(())
+}
+
+/// Takes back what the sandbox let the AppImage use; without a sandbox it
+/// was never given anything.
+#[cfg(feature = "system")]
+fn forget_grants(id: &str) -> Result<(), String> {
+    if sandboxed() {
+        luft_dbus::runtime::block_on(super::grants::forget(id))
+    } else {
+        Ok(())
+    }
 }
 
 fn owned_icon(icon: &Path, executable: &Path) -> bool {

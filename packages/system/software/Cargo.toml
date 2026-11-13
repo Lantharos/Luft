@@ -8,23 +8,24 @@ edition.workspace = true
 rust-version.workspace = true
 
 [features]
-default = ["system"]
+default = ["system", "sabine"]
 image = ["dep:futures-util", "dep:luft-dbus", "dep:tokio", "dep:zbus"]
-system = ["image", "dep:luft-app"]
+sabine = ["dep:sabine-service"]
+system = ["image", "dep:luft-identity"]
 
 [dependencies]
 backhand = { workspace = true, features = ["gzip", "lz4", "xz", "zstd"] }
 dirs.workspace = true
 flate2 = { workspace = true, features = ["zlib-rs"] }
-futures-util = { workspace = true, optional = true }
+futures-util = { workspace = true, features = ["async-await-macro", "std"], optional = true }
 glob.workspace = true
 libc.workspace = true
 liblzma.workspace = true
-luft-app = { workspace = true, features = ["apps"], optional = true }
 luft-dbus = { workspace = true, optional = true }
+luft-identity = { workspace = true, optional = true }
 luft-variant.workspace = true
 rustix = { workspace = true, features = ["fs"] }
-sabine-service.workspace = true
+sabine-service = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 sha1.workspace = true

@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::path::Path;
 
-use luft_app::dbus::{self, service::Service};
+use luft_dbus::{self as dbus, service::Service};
 use zbus::Fd;
 
 const PACKAGES: Service = Service {

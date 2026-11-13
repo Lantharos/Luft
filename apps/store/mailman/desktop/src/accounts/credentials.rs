@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use luft_app::{block_on, secrets};
+use luft_app::block_on;
+use luft_app::dbus::secrets;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 

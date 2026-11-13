@@ -2,7 +2,7 @@ use std::fs::File;
 
 use futures_util::future::{Either, select};
 use futures_util::{StreamExt, pin_mut};
-use luft_app::dbus::{self, failed, service::Service};
+use luft_dbus::{self as dbus, failed, service::Service};
 use serde::{Deserialize, Serialize};
 use zbus::DynamicType;
 use zbus::Fd;

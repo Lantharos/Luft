@@ -5,7 +5,7 @@ use tokio::task::spawn_blocking;
 use zbus::Fd;
 use zbus::wire::DynamicDeserialize;
 
-use crate::dbus::{self, failed};
+use crate::{failed, session};
 
 const NAME: &str = "com.lantharos.Keyring1";
 const PATH: &str = "/com/lantharos/Keyring1";
@@ -18,7 +18,7 @@ async fn call<R>(
 where
     R: for<'a> DynamicDeserialize<'a>,
 {
-    dbus::session()
+    session()
         .await?
         .call_method(Some(NAME), PATH, Some(INTERFACE), method, body)
         .await

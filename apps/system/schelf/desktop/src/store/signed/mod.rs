@@ -12,9 +12,20 @@ use crate::catalog::cache;
 use luft_store_seal::{Expiry, Keys, STORE_KEYS, Seal, Stamp};
 
 const SEAL: &str = ".sig";
-/// What a document only invited people get answers when schelf.store didn't
-/// take the session it was asked with.
-pub const NO_ACCESS: &str = "schelf.store didn't let this computer in.";
+/// What schelf.store answers for something only invited people get when the
+/// session it was asked with is fine but no longer let in.
+pub const NO_ACCESS: &str = "schelf.store no longer lets you in.";
+/// What it answers when there's no session it takes, such as one that ended.
+pub const SIGNED_OUT: &str = "Your schelf.store sign-in ended.";
+
+/// What a refused request to schelf.store means.
+pub fn refused(error: ureq::Error) -> String {
+    match error {
+        ureq::Error::StatusCode(401) => SIGNED_OUT.to_owned(),
+        ureq::Error::StatusCode(403) => NO_ACCESS.to_owned(),
+        error => http::failure(error),
+    }
+}
 const LENGTH: usize = size_of::<u64>();
 
 static KEYS: Mutex<Option<Arc<Keys>>> = Mutex::new(None);
@@ -133,8 +144,7 @@ fn get(url: &str, tag: Option<&str>, session: Option<&str>) -> Result<Answer, St
                 .map_err(|_| OFFLINE.to_string())?;
             Ok(Answer::Changed { body, tag })
         }
-        Err(ureq::Error::StatusCode(401)) => Err(NO_ACCESS.into()),
-        Err(error) => Err(http::failure(error)),
+        Err(error) => Err(refused(error)),
     }
 }
 
@@ -200,7 +210,7 @@ fn load<T>(
             cached.touch();
             held(OFFLINE.to_owned())
         }
-        Err(error) if error == MISSING || error == NO_ACCESS => Err(error),
+        Err(error) if [MISSING, NO_ACCESS, SIGNED_OUT].contains(&error.as_str()) => Err(error),
         Err(error) => held(error),
     }
 }

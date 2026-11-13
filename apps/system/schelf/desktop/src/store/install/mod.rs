@@ -15,7 +15,7 @@ use super::invited;
 use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
-use super::signed::{Age, NO_ACCESS};
+use super::signed::Age;
 
 /// What you saw and agreed to before installing or updating a store app.
 #[derive(Deserialize, Serialize, Clone, Debug, Type)]
@@ -235,13 +235,8 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
         .ok_or_else(|| unavailable(&listing))?;
     agreed(&listing, offer.release, consent)?;
     refuse_pulled(&listing, offer.release)?;
-    let file =
-        download::verified(&listing.id, offer.artifact, reason.query(), task).map_err(|error| {
-            match error {
-                error if error == NO_ACCESS => invited::turned_down(&listing.id),
-                error => error,
-            }
-        })?;
+    let file = download::verified(&listing.id, offer.artifact, reason.query(), task)
+        .map_err(|error| invited::turned_down(&listing.id, error))?;
     let placed = place(&listing, offer, &file, consent.full_access, task);
     let _ = std::fs::remove_file(&file);
     placed

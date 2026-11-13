@@ -10,7 +10,7 @@ use specta::Type;
 
 use super::AUTH;
 use crate::store::device;
-use crate::store::signed::NO_ACCESS;
+use crate::store::signed;
 
 const APP_ID: &str = "com.lantharos.schelf";
 const SECRET: &str = "schelf.store";
@@ -75,10 +75,7 @@ pub fn forget() -> Result<(), String> {
 fn answer<T: DeserializeOwned>(
     response: Result<ureq::http::Response<ureq::Body>, ureq::Error>,
 ) -> Result<T, String> {
-    let response = response.map_err(|error| match error {
-        ureq::Error::StatusCode(401) => NO_ACCESS.to_owned(),
-        error => http::failure(error),
-    })?;
+    let response = response.map_err(signed::refused)?;
     serde_json::from_str(&http::read(response)?).map_err(|_| OFFLINE.to_owned())
 }
 
@@ -86,8 +83,7 @@ fn bearer(token: &str) -> String {
     format!("Bearer {token}")
 }
 
-/// What schelf.store answers at `url` to `token`, which is `NO_ACCESS` when
-/// it doesn't take the token.
+/// What schelf.store answers at `url` to `token`.
 pub fn get<T: DeserializeOwned>(url: &str, token: &str) -> Result<T, String> {
     answer(
         http::agent()
@@ -97,7 +93,7 @@ pub fn get<T: DeserializeOwned>(url: &str, token: &str) -> Result<T, String> {
     )
 }
 
-/// Who `token` signs in, or None when schelf.store no longer takes it.
+/// Who `token` signs in, or None when schelf.store doesn't take it.
 pub fn whose(token: &str) -> Result<Option<Account>, String> {
     let signed: Option<Signed> = get(&format!("{AUTH}get-session"), token)?;
     Ok(signed.map(|signed| signed.user))

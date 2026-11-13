@@ -10,7 +10,7 @@ use sha2::{Digest, Sha256};
 use crate::catalog::cache;
 use crate::store::invited;
 use crate::store::listing::Artifact;
-use crate::store::signed::NO_ACCESS;
+use crate::store::signed;
 
 const CHANGED: &str =
     "The download didn't match what schelf.store published, so it wasn't installed.";
@@ -40,10 +40,7 @@ fn ask(url: &str) -> Result<ureq::http::Response<ureq::Body>, String> {
     if let Some(session) = invited::session_for(url)? {
         request = request.header("authorization", format!("Bearer {session}"));
     }
-    request.call().map_err(|error| match error {
-        ureq::Error::StatusCode(401) => NO_ACCESS.to_owned(),
-        error => http::failure(error),
-    })
+    request.call().map_err(signed::refused)
 }
 
 /// Downloads the artifact, keeping it only when it's exactly the file the

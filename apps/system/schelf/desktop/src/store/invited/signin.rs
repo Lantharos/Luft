@@ -9,7 +9,7 @@ use specta::Type;
 use super::AUTH;
 use super::session::{self, Account};
 
-const CLIENT: &str = "schelf-cli";
+const CLIENT: &str = "schelf-app";
 const GRANT: &str = "urn:ietf:params:oauth:grant-type:device_code";
 const SLOWER: Duration = Duration::from_secs(5);
 

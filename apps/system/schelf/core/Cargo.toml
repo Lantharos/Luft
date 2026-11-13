@@ -1,0 +1,38 @@
+[package]
+name = "schelf-core"
+version = "0.1.0"
+description = "What Schelf installs, updates and removes, shared by the app and the schelf command"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono = { workspace = true, features = ["serde"] }
+dirs.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
+futures-util.workspace = true
+getrandom.workspace = true
+libc.workspace = true
+luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
+luft-software = { workspace = true, features = ["system"] }
+luft-store-seal.workspace = true
+memmap2.workspace = true
+quick-xml.workspace = true
+serde.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
+sha2.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
+tar.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "sync"] }
+ureq.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+zstd.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

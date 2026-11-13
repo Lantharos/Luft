@@ -1,12 +1,8 @@
 mod app;
 mod background;
-mod catalog;
-mod cli;
-mod files;
+mod commands;
 mod library;
 mod operations;
-mod store;
-mod updates;
 
 use luft_app::{Events, GlassWindow};
 use sabine::SabineWindow;
@@ -23,14 +19,11 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
 
 pub fn run_app() -> ! {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
-    if let Some(code) = luft_sandbox::run(&arguments)
-        .or_else(|| cli::run(&arguments))
-        .or_else(|| {
-            arguments
-                .first()
-                .and_then(|command| background::run(command))
-        })
-    {
+    if let Some(code) = luft_sandbox::run(&arguments).or_else(|| {
+        arguments
+            .first()
+            .and_then(|command| background::run(command))
+    }) {
         std::process::exit(code);
     }
     let events = Events::default();
@@ -54,10 +47,11 @@ async fn serve(queue: Queue) {
 
 fn build_window(window: SabineWindow, queue: &Queue) -> SabineWindow {
     let window = app::register(GLASS_WINDOW.apply(window));
-    let window = catalog::register(window);
-    let window = store::register(window);
+    let window = commands::catalog::register(window);
+    let window = commands::store::register(window);
+    let window = commands::sources::register(window);
     let window = library::register(window);
-    let window = files::register(window);
-    let window = updates::register(window);
+    let window = commands::files::register(window);
+    let window = commands::updates::register(window);
     operations::register(window, queue)
 }

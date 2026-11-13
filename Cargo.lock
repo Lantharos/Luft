@@ -6056,8 +6056,8 @@ dependencies = [
  "glob",
  "libc",
  "liblzma",
- "luft-app",
  "luft-dbus",
+ "luft-identity",
  "luft-variant",
  "rustix",
  "sabine-service",
@@ -9004,11 +9004,7 @@ dependencies = [
 name = "schelf"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "dirs",
- "flate2",
- "futures-util",
- "getrandom 0.4.3",
  "gio",
  "gio-unix",
  "libc",
@@ -9016,11 +9012,47 @@ dependencies = [
  "luft-dbus-macros",
  "luft-sandbox",
  "luft-software",
+ "sabine",
+ "schelf-core",
+ "serde",
+ "serde_json",
+ "specta",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
+name = "schelf-cli"
+version = "0.4.0"
+dependencies = [
+ "futures-util",
+ "libc",
+ "luft-dbus",
+ "luft-software",
+ "schelf-core",
+ "schelf-publish",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
+name = "schelf-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "dirs",
+ "flate2",
+ "futures-util",
+ "getrandom 0.4.3",
+ "libc",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-software",
  "luft-store-seal",
  "memmap2",
  "quick-xml 0.42.0",
- "sabine",
- "sabine-service",
  "serde",
  "serde_json",
  "sha2",
@@ -9032,6 +9064,26 @@ dependencies = [
  "ureq",
  "zbus 6.0.0",
  "zstd 0.14.3",
+]
+
+[[package]]
+name = "schelf-publish"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "chrono",
+ "dirs",
+ "flate2",
+ "glob",
+ "libc",
+ "quick-xml 0.42.0",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "toml",
+ "ureq",
 ]
 
 [[package]]

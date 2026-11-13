@@ -119,10 +119,13 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf info gimp` | Shows the details from every place that has it |
 | `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
 | `schelf untrust 1password` | Puts it back in its sandbox |
+| `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
 A name schelf.store has comes from there. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
+
+The same command runs on other Linux systems too. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, system packages, extensions and full access say they need Luft.
 
 When its output goes to another program instead of a terminal, `search` and `list` print one line per entry with the fields separated by tabs, and nothing is coloured. `NO_COLOR` turns colours off in a terminal too.
 
@@ -131,8 +134,9 @@ When its output goes to another program instead of a terminal, `search` and `lis
 | 0 | Done, or nothing needed doing |
 | 1 | Something couldn't be installed, removed or updated |
 | 2 | The command was wrong, or Schelf needed an answer it couldn't ask for |
-| 3 | Nothing by that name was found or installed |
-| 4 | You said no when asked |
+| 3 | Nothing by that name was found or installed, or you aren't signed in to schelf.store |
+| 4 | schelf.store waits for you to approve something in the browser |
+| 5 | You said no when asked, or an approval was declined or expired |
 | 130 | Stopped with Ctrl+C |
 
 ### dnf and other package managers

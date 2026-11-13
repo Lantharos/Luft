@@ -11,11 +11,7 @@ rust-version.workspace = true
 name = "schelf_lib"
 
 [dependencies]
-chrono = { workspace = true, features = ["serde"] }
 dirs.workspace = true
-flate2 = { workspace = true, features = ["zlib-rs"] }
-futures-util.workspace = true
-getrandom.workspace = true
 gio.workspace = true
 gio-unix = { workspace = true, features = ["v2_58"] }
 libc.workspace = true
@@ -23,24 +19,13 @@ luft-app = { workspace = true, features = ["apps", "launch"] }
 luft-dbus-macros.workspace = true
 luft-sandbox.workspace = true
 luft-software = { workspace = true, features = ["default"] }
-luft-store-seal.workspace = true
-memmap2.workspace = true
-quick-xml.workspace = true
 sabine.workspace = true
-sabine-service.workspace = true
+schelf-core.workspace = true
 serde.workspace = true
-serde_json = { workspace = true, features = ["raw_value"] }
-sha2.workspace = true
+serde_json.workspace = true
 specta.workspace = true
-specta-typescript.workspace = true
-tar.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "signal", "sync"] }
-ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
-zstd.workspace = true
-
-[dev-dependencies]
-tempfile.workspace = true
 
 [lints]
 workspace = true

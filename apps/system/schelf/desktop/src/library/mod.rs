@@ -1,55 +1,15 @@
-mod appimages;
-mod debian;
-mod flatpaks;
-pub mod full_access;
 mod opening;
+mod sandbox;
 mod settings;
-pub mod sources;
-mod store;
-mod system;
-mod tools;
 
 use gio::prelude::*;
+use luft_app::apps::{App, custom_icon};
 use luft_app::{Commands, Empty};
 use luft_software::apps::flatpak::{self, Installation, Permissions};
 use sabine::SabineWindow;
-use serde::{Deserialize, Serialize};
+use schelf_core::library::{self, InstalledApp, Source};
+use serde::Deserialize;
 use specta::Type;
-
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub enum Source {
-    Flatpak,
-    AppImage,
-    Tool,
-    Debian,
-    System,
-    Sabine,
-    Extension,
-}
-
-#[derive(Serialize, Clone, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct InstalledApp {
-    pub key: String,
-    pub source: Source,
-    pub id: String,
-    pub desktop: Option<String>,
-    pub name: String,
-    pub summary: Option<String>,
-    pub icon: Option<String>,
-    pub version: Option<String>,
-    pub size: u64,
-    pub origin: String,
-    pub installation: Option<Installation>,
-    pub reference: Option<String>,
-    pub package: Option<String>,
-    pub path: Option<String>,
-    pub commands: Vec<String>,
-    pub services: Vec<String>,
-    /// The schelf.store app it was installed as.
-    pub listing: Option<String>,
-}
 
 #[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -58,22 +18,23 @@ struct FlatpakRef {
     reference: String,
 }
 
-pub fn installed() -> Vec<InstalledApp> {
-    let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
-        let flatpaks = scope.spawn(flatpaks::installed);
-        let tools = scope.spawn(tools::installed);
-        let system = scope.spawn(system::installed);
-        let debs = scope.spawn(debian::installed);
-        let mut apps = appimages::installed();
-        apps.extend(store::installed());
-        apps.extend(debs.join().unwrap_or_default());
-        apps.extend(flatpaks.join().unwrap_or_default());
-        apps.extend(tools.join().unwrap_or_default());
-        apps.extend(system.join().unwrap_or_default());
-        apps
-    });
+/// Flatpak apps by the name and icon their menu entries give them, and
+/// every app with the icon you chose for it.
+fn installed() -> Vec<InstalledApp> {
+    let mut apps = library::installed();
     for app in &mut apps {
-        if let Some(icon) = app.desktop.as_deref().and_then(luft_app::apps::custom_icon) {
+        let Some(desktop) = app.desktop.clone() else {
+            continue;
+        };
+        if app.source == Source::Flatpak
+            && let Some(info) = gio_unix::DesktopAppInfo::new(&desktop)
+        {
+            app.summary = info.description().map(|text| text.to_string());
+            let named = App::new(desktop.clone(), &info);
+            app.name = named.name;
+            app.icon = named.icon;
+        }
+        if let Some(icon) = custom_icon(&desktop) {
             app.icon = Some(icon.to_string_lossy().into_owned());
         }
     }
@@ -97,15 +58,15 @@ fn permissions(
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    sources::register(window)
+    window
         .command("library_installed", |Empty {}| Ok(installed()))
         .command_async("library_open", opening::open)
         .command("library_permissions", permissions)
-        .command_async("library_sandbox", appimages::sandbox)
-        .command_async("library_set_sandbox_switch", appimages::set_switch)
-        .command_async("library_full_access", full_access::has)
-        .command_async("library_set_full_access", full_access::set)
-        .command_async("library_restart", full_access::restart)
+        .command_async("library_sandbox", sandbox::sandbox)
+        .command_async("library_set_sandbox_switch", sandbox::set_switch)
+        .command_async("library_full_access", sandbox::has_full_access)
+        .command_async("library_set_full_access", sandbox::set_full_access)
+        .command_async("library_restart", sandbox::restart)
         .command("library_custom_icons", settings::icons::state)
         .command_async("library_choose_icon", settings::icons::choose)
         .command_async(

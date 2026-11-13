@@ -2,34 +2,14 @@ use luft_app::dbus::{self, failed};
 use luft_app::identity::caller;
 use luft_dbus_macros::introspect;
 use luft_software::progress::Progress;
+use schelf_core::operations::bus::{NAME, PATH, UNKNOWN_FRACTION};
+use schelf_core::operations::{OperationState, Request};
 use zbus::fdo::{self, RequestNameFlags};
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::{Connection, interface, proxy};
+use zbus::{Connection, interface};
 
-use super::{Notice, OperationState, Queue, Request};
-
-pub const NAME: &str = "com.lantharos.Schelf";
-pub const PATH: &str = "/com/lantharos/Schelf";
-pub const UNKNOWN_FRACTION: f64 = -1.0;
-
-#[introspect]
-#[proxy(
-    interface = "com.lantharos.Schelf1",
-    default_service = "com.lantharos.Schelf",
-    default_path = "/com/lantharos/Schelf"
-)]
-pub trait Schelf {
-    fn start(&self, request: &str) -> zbus::Result<u64>;
-
-    fn cancel(&self, id: u64) -> zbus::Result<()>;
-
-    #[zbus(signal)]
-    fn changed(&self, id: u64, state: String, stage: String, fraction: f64) -> zbus::Result<()>;
-
-    #[zbus(signal)]
-    fn finished(&self, id: u64, error: String) -> zbus::Result<()>;
-}
+use super::{Notice, Queue};
 
 struct Operations {
     queue: Queue,

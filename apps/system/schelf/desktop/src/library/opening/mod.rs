@@ -7,8 +7,8 @@ use luft_software::system::system_packages;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::Source;
 use diagnosis::Missing;
+use schelf_core::library::Source;
 use watch::Outcome;
 
 const DBUS_ACTIVATABLE: &str = "DBusActivatable";

@@ -1,5 +1,4 @@
 pub mod bus;
-mod jobs;
 
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
@@ -13,29 +12,11 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
-pub use jobs::{Action, Job};
+use schelf_core::operations::{Action, Job, OperationState, Request};
 
 const OPERATIONS: BridgeEvent<Vec<Operation>> = BridgeEvent::new("schelf.operations");
 const LIBRARY: BridgeEvent<Finished> = BridgeEvent::new("schelf.library");
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(120);
-
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Type)]
-#[serde(rename_all = "camelCase")]
-pub enum OperationState {
-    Queued,
-    Running,
-    Failed,
-}
-
-impl OperationState {
-    pub fn name(self) -> &'static str {
-        match self {
-            Self::Queued => "queued",
-            Self::Running => "running",
-            Self::Failed => "failed",
-        }
-    }
-}
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
@@ -62,15 +43,6 @@ struct Finished {
     keys: Vec<String>,
     action: Action,
     succeeded: bool,
-}
-
-#[derive(Deserialize, Serialize, Type)]
-pub struct Request {
-    pub key: String,
-    pub title: String,
-    pub job: Job,
-    #[serde(default)]
-    pub members: Vec<String>,
 }
 
 pub enum Notice {

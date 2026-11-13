@@ -1,0 +1,7 @@
+part = "app-schelf"
+
+[programs]
+"/usr/bin/schelf" = "schelf-cli"
+
+[links]
+"/usr/bin/sch" = "schelf"

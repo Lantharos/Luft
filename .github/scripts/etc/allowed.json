@@ -10,8 +10,14 @@
 		"/etc/default/keyboard": "Reads the keyboard layout of the Linux Meet Luft runs on",
 		"/etc/X11/xorg.conf.d/00-keyboard.conf": "Reads the keyboard layout of the Linux Meet Luft runs on"
 	},
-	"apps/system/schelf/desktop/src/cli/commands/remove.rs": {
+	"apps/system/schelf/cli/src/install/commands/remove.rs": {
 		"/etc": "Tells what removing system packages takes away"
+	},
+	"apps/system/schelf/core/src/host.rs": {
+		"/etc/os-release": "Reads whether the computer runs Luft"
+	},
+	"apps/system/schelf/publish/src/check/tests.rs": {
+		"/etc": "Checks that apps can't ask for /etc"
 	},
 	"apps/system/schelf/sandbox/src/launch/profile/system.rs": {
 		"/etc": "Shows AppImages the system's configuration read-only"

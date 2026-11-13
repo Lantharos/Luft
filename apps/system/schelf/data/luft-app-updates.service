@@ -5,6 +5,6 @@ ConditionUser=!@system
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-launch /usr/bin/schelf --update-apps
+ExecStart=/usr/libexec/luft-launch /usr/lib/sabine/com.lantharos.schelf/schelf --update-apps
 Nice=10
 IOSchedulingClass=idle

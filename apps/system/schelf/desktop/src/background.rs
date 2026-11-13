@@ -7,8 +7,8 @@ use luft_software::apps::appimage::{self, Placement};
 use luft_software::apps::{flatpak, toolbox, updates};
 use luft_software::task::{Cancel, Task};
 
-use crate::store;
-use crate::store::install::Reason;
+use schelf_core::store;
+use schelf_core::store::install::Reason;
 
 const SEEDS: &str = "/usr/share/luft/preinstall";
 

@@ -4,6 +4,6 @@ ConditionUser=!@system
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-launch /usr/bin/schelf --check-revocations
+ExecStart=/usr/libexec/luft-launch /usr/lib/sabine/com.lantharos.schelf/schelf --check-revocations
 Nice=10
 IOSchedulingClass=idle

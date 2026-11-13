@@ -27,7 +27,12 @@ Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpak
 
 ## Command line
 
-The same binary is the `schelf` command, with `sch` linked to it in Luft's image: `install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal). Publishing commands such as `publish` and `login` run the `schelf` package from npm, and `schelf` alone in a terminal prints the help instead of opening the window. Its code is in `desktop/src/cli`, with each place software comes from in `cli/sources`.
+The `schelf` command, with `sch` linked to it in Luft's image, is its own program in `cli`: `install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal), and the publishing commands from `publish`, such as `login`, `check` and `publish`. It hands anything else, such as a file or a `schelf:` link, to the app. What both install, update and remove is in `core`. The command has no Sabine or GTK in it, so it builds as one static program that also runs on other Linux systems, where it installs schelf.store apps as AppImages, Flathub apps when Flatpak is there, and says what needs Luft.
+
+```sh
+cargo run -p schelf-cli -- search notes
+cargo build --release --target x86_64-unknown-linux-musl -p schelf-cli
+```
 
 While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/system/software` while it changes anything.
 

@@ -37,6 +37,7 @@
 	const confirmation = $derived(choice.waiting ? STAY[target] : CONFIRM[target]);
 	const moving = $derived(activity.running === 'channel');
 	const unavailable = $derived(target === 'stable' && (stable === null || stable === 'unknown'));
+	const nowhereToSwitch = $derived(target === 'stable' && stable === 'notYet');
 
 	const description = $derived.by(() => {
 		if (choice.waiting) return t(WAITING[choice.chosen]);
@@ -55,7 +56,7 @@
 <Row title={t(TITLES[current])} {description} below={moving ? progress : undefined}>
 	{#if moving}
 		<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
-	{:else}
+	{:else if !nowhereToSwitch}
 		<button type="button" class="button" disabled={activity.running !== null || unavailable} onclick={() => (confirming = true)}>{t('settings-updates-switch')}</button>
 	{/if}
 </Row>

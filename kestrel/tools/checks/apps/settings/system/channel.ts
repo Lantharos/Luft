@@ -50,14 +50,14 @@ async function switchTo(app: LuftApp, channel: string, confirm: Point, name: str
   await app.settle(() => true);
 }
 
-async function checkUnknown() {
-  await onUpdates('nightly', 'unknown', async app => {
-    (await app.frame()).save('settings-channel-unknown');
+async function checkStableCantBeChosen(stable: Published, name: string) {
+  await onUpdates('nightly', stable, async app => {
+    (await app.frame()).save(`settings-channel-${name}`);
     const shown = await app.frame(app.area(CHANNEL));
     app.click(SWITCH);
-    require((await app.settle(() => true, app.area(CHANNEL))).looksLike(shown), 'Switch can’t be pressed while it’s unknown whether a stable version is out');
+    require((await app.settle(() => true, app.area(CHANNEL))).looksLike(shown), `nothing switches to stable while it’s ${name}`);
   });
-  require((await switchesAsked()).length === 0, 'nothing asks the updater to switch while stable can’t be chosen');
+  require((await switchesAsked()).length === 0, `nothing asks the updater to switch while stable is ${name}`);
 }
 
 async function stays(app: LuftApp, channel: string, shown: Frame) {
@@ -66,13 +66,13 @@ async function stays(app: LuftApp, channel: string, shown: Frame) {
   require(after.looksLike(shown, 2), `staying on ${channel} shows it as it was before the move`);
 }
 
-async function switchToStable(stable: Published, name: string) {
-  await onUpdates('nightly', stable, async app => {
-    (await app.frame()).save(`settings-channel-nightly-${name}`);
+async function switchToStable() {
+  await onUpdates('nightly', 'yes', async app => {
+    (await app.frame()).save('settings-channel-nightly-out');
     const nightly = await app.frame(app.area(CHANNEL));
-    await switchTo(app, 'stable', CONFIRM_STABLE, `stable-${name}`);
-    (await app.frame()).save(`settings-channel-waiting-stable-${name}`);
-    if (stable === 'yes') await stays(app, 'nightly', nightly);
+    await switchTo(app, 'stable', CONFIRM_STABLE, 'stable-out');
+    (await app.frame()).save('settings-channel-waiting-stable-out');
+    await stays(app, 'nightly', nightly);
   });
 }
 
@@ -95,9 +95,9 @@ async function checkToNightly() {
 export async function checkChannel() {
   await switchesAsked();
   try {
-    await checkUnknown();
-    await switchToStable('no', 'none-out');
-    await switchToStable('yes', 'out');
+    await checkStableCantBeChosen('unknown', 'unknown');
+    await checkStableCantBeChosen('no', 'not out yet');
+    await switchToStable();
     await checkToNightly();
   } finally {
     await useChannel('', 'no');

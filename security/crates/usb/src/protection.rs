@@ -107,7 +107,7 @@ impl Protection {
     pub fn handle(&mut self, event: Event) -> Change {
         self.track(|protection| {
             match event {
-                Event::Added(id) if protection.guarding => protection.welcome(&id),
+                Event::Added(id) if protection.guarding => protection.hold(&id, true),
                 Event::Configured(id) if protection.guarding => protection.hold(&id, false),
                 Event::Added(_) | Event::Configured(_) => {}
                 Event::Removed(id) => {
@@ -170,14 +170,6 @@ impl Protection {
                 (id, held.name)
             })
             .collect()
-    }
-
-    fn welcome(&mut self, id: &str) {
-        if usb::is_root_hub(id) {
-            usb::hold_new_devices_on(id);
-        } else {
-            self.hold(id, true);
-        }
     }
 
     fn hold(&mut self, id: &str, announce: bool) {

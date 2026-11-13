@@ -3,7 +3,6 @@ mod events;
 mod sysfs;
 
 pub use events::{Event, Events};
-pub use sysfs::is_root_hub;
 
 use descriptors::Function;
 use sysfs::{Bus, Device};
@@ -11,10 +10,6 @@ use sysfs::{Bus, Device};
 pub fn hold_new_devices() {
     sysfs::hold_on_new_buses();
     Bus::all().for_each(|bus| bus.hold_new_devices());
-}
-
-pub fn hold_new_devices_on(bus: &str) {
-    Bus::named(bus).hold_new_devices();
 }
 
 pub fn welcome_new_devices() {
@@ -54,6 +49,7 @@ pub fn admit_usable_part(id: &str) -> Admission {
         if !descriptors::functions(&descriptors).any(Function::usable_while_locked) {
             return Admission::Waiting;
         }
+        Bus::of(id).hold_new_devices();
         device.authorize();
     }
     let mut admission = Admission::Complete;

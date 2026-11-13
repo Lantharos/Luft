@@ -51,7 +51,7 @@ fn entries(path: &Path) -> impl Iterator<Item = String> {
         .filter_map(|entry| entry.file_name().into_string().ok())
 }
 
-pub fn is_root_hub(id: &str) -> bool {
+fn is_root_hub(id: &str) -> bool {
     id.starts_with("usb")
 }
 
@@ -131,6 +131,11 @@ impl Bus {
         }
     }
 
+    pub fn of(device: &str) -> Self {
+        let number = device.split_once('-').map_or(device, |(number, _)| number);
+        Self::named(&format!("usb{number}"))
+    }
+
     pub fn all() -> impl Iterator<Item = Self> {
         Device::ids()
             .filter(|id| is_root_hub(id))
@@ -160,11 +165,11 @@ fn system_policy() -> &'static str {
     read(Path::new(PARAMETERS), DEFAULT_POLICY).map_or("1", |value| policy(&value))
 }
 
-/// Has buses that appear from now on, such as a dock's, start out holding
-/// their devices, since a new bus takes the kernel's own policy until its
-/// event is handled. The policy the system had is kept in `/run`, so it comes
-/// back with [`welcome_on_new_buses`] even after this service restarted, and a
-/// service that never comes back leaves new buses holding.
+/// Has buses that appear from now on, such as a dock's, hold their devices
+/// from the start, while their own root hubs connect as part of the computer.
+/// The policy the system had is kept in `/run`, so it comes back with
+/// [`welcome_on_new_buses`] even after this service restarted, and a service
+/// that never comes back leaves new buses holding.
 pub fn hold_on_new_buses() {
     let kept = Path::new(SYSTEM_POLICY);
     if !kept.exists()

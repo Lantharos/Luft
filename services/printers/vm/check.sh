@@ -68,30 +68,13 @@ gadget_device() {
   return 1
 }
 
-gadget_hub() {
-  local serial
-  for serial in /sys/bus/usb/devices/usb*/serial; do
-    [[ "$(cat "$serial")" == dummy_hcd.0 ]] && { echo "${serial%/*}/${serial//[^0-9]/}-0:1.0"; return 0; }
-  done
-  return 1
-}
-
 usb_printer() {
-  local hub device interface
+  local device
   /usr/libexec/luft-printers-check-gadget "$USB_OUTPUT" > "$WORK/gadget.log" 2>&1 &
-  eventually "the gadget's USB bus didn't appear" gadget_hub || return
-  hub="$(gadget_hub)"
-  eventually "the gadget's USB bus has no hub" test -e "$hub/authorized" || return
-  echo 1 > "$hub/authorized"
-  echo "${hub##*/}" > /sys/bus/usb/drivers_probe
   eventually "no USB printer appeared" gadget_device || return
   device="$(gadget_device)"
-  interface="$device/${device##*/}:1.0"
   [[ "$(cat "$device/authorized")" == 0 ]] || fail "the printer was allowed with nobody signed in" || return
   echo 1 > "$device/authorized"
-  eventually "the allowed USB printer has no interface" test -e "$interface/authorized" || return
-  echo 1 > "$interface/authorized"
-  echo "${interface##*/}" > /sys/bus/usb/drivers_probe
   echo add > "$device/uevent"
   eventually "the allowed USB printer has no printer port" test -e /dev/usb/lp0 || return
   pass "the USB printer is plugged in and let in, as USB protection does at an unlock"

@@ -10,11 +10,13 @@ pub enum Command {
     Info,
     Trust,
     Untrust,
+    Give,
+    Take,
     Repo,
 }
 
 impl Command {
-    const ALL: [Self; 9] = [
+    const ALL: [Self; 11] = [
         Self::Install,
         Self::Remove,
         Self::Search,
@@ -23,6 +25,8 @@ impl Command {
         Self::Info,
         Self::Trust,
         Self::Untrust,
+        Self::Give,
+        Self::Take,
         Self::Repo,
     ];
 
@@ -36,6 +40,8 @@ impl Command {
             Self::Info => "info",
             Self::Trust => "trust",
             Self::Untrust => "untrust",
+            Self::Give => "give",
+            Self::Take => "take",
             Self::Repo => "repo",
         }
     }
@@ -101,6 +107,18 @@ impl Command {
                 "untrust NAME...\n\n\
                  Takes full access away again and puts apps back in their sandbox."
             }
+            Self::Give => {
+                "give NAME [DRIVE|FOLDER]  [--read-only]\n\n\
+                 Lets a Flatpak app or an AppImage use one drive or folder from the next\n\
+                 time it opens, without giving it full access. Name a drive as Schelf\n\
+                 shows it, such as Games, or by where it's mounted. A drive goes by the\n\
+                 drive itself, so another one with the same name doesn't get it. Without\n\
+                 a drive or folder, shows what the app has and the drives you can give it."
+            }
+            Self::Take => {
+                "take NAME DRIVE|FOLDER\n\n\
+                 Takes a drive or folder away from an app again, from the next time it opens."
+            }
             Self::Repo => {
                 "repo add SOURCE  [-y]\n\
                  \x20      repo remove NAME  [-y]\n\
@@ -126,6 +144,7 @@ pub struct Arguments {
     pub words: Vec<String>,
     pub only: Option<Origin>,
     pub yes: bool,
+    pub read_only: bool,
 }
 
 pub fn recognised(first: &str) -> bool {
@@ -141,6 +160,7 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
         words: Vec::new(),
         only: None,
         yes: false,
+        read_only: false,
     };
     let mut options = true;
     for argument in rest {
@@ -148,6 +168,7 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
             "--" if options => options = false,
             "-h" | "--help" if options => return Ok(Request::Help(command)),
             "-y" | "--yes" if options => parsed.yes = true,
+            "--read-only" if options && command == Command::Give => parsed.read_only = true,
             option if options && option.starts_with('-') && option.len() > 1 => {
                 let origin = Origin::ALL
                     .into_iter()
@@ -169,10 +190,15 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
             | Command::Info
             | Command::Trust
             | Command::Untrust
+            | Command::Give
+            | Command::Take
             | Command::Repo
     );
     if needs_words && parsed.words.is_empty() {
         return Err(format!("{} needs a name.", command.word()));
+    }
+    if command == Command::Take && parsed.words.len() < 2 {
+        return Err("take needs an app and the drive or folder to take from it.".into());
     }
     if command == Command::List && !parsed.words.is_empty() {
         return Err("list doesn't take names.".into());

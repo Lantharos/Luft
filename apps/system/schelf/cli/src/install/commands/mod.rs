@@ -1,6 +1,7 @@
 mod info;
 mod install;
 mod list;
+mod places;
 mod remove;
 pub mod repo;
 mod search;
@@ -29,6 +30,9 @@ pub fn run(arguments: &Arguments) -> Exit {
         Command::Trust | Command::Untrust if !luft => {
             needs_luft("Full access for Flatpak apps and AppImages needs")
         }
+        Command::Give | Command::Take if !luft => {
+            needs_luft("Giving Flatpak apps and AppImages drives and folders needs")
+        }
         Command::Install if system => system::install(arguments),
         Command::Update if system => system::explain_updates(),
         Command::Install => install::run(arguments),
@@ -39,6 +43,8 @@ pub fn run(arguments: &Arguments) -> Exit {
         Command::Info => info::run(arguments),
         Command::Trust => trust::run(arguments, true),
         Command::Untrust => trust::run(arguments, false),
+        Command::Give => places::run(arguments, true),
+        Command::Take => places::run(arguments, false),
         Command::Repo => repo::run(arguments),
     }
 }

@@ -484,6 +484,24 @@ settings-apps-serial = Serial devices
 settings-apps-serial-hint = Such as 3D printers and boards connected over USB
 # Shown under a folder an app may only read
 settings-apps-folder-read-only = Read only
+settings-apps-drives = Drives
+settings-apps-drives-hint = It can use everything on these drives, from the next time it opens.
+# $count is a number of drives an app may use
+settings-apps-drives-count = { $count ->
+    [one] { $count } drive
+   *[other] { $count } drives
+}
+settings-apps-drive-give = Give a drive
+# Title of the dialog that lists drives; $app is an app name
+settings-apps-drive-give-title = Give { $app } a drive
+settings-apps-drive-read-only = Only let it read
+settings-apps-drive-none = No other drives are plugged in
+# A drive without a name; $size is its size, such as 500 GB
+settings-apps-drive-unnamed = { $size } drive
+# Shown under a drive an app was given that isn't plugged in
+settings-apps-drive-unplugged = Not plugged in
+# Screen reader label of the remove button; $drive is a drive's name
+settings-apps-drive-remove-app = Stop sharing { $drive }
 settings-apps-microphone = Microphone
 settings-apps-microphone-hint = It can record sound, from the microphone and from what this computer plays. Applies right away.
 settings-apps-camera-hint = It can use the cameras of this computer. Some apps only find them the next time they open.

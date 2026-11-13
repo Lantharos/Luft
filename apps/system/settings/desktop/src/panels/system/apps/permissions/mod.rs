@@ -14,6 +14,7 @@ use luft_app::identity::permissions::{
 };
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
+use luft_software::apps::places::{self, Access, DriveTarget, GivenDrive, PluggedDrive};
 use luft_software::apps::{appimage, flatpak};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
@@ -35,6 +36,7 @@ struct AppAccess {
     #[serde(flatten)]
     app: App,
     app_image: bool,
+    flatpak: bool,
     location: Option<bool>,
     camera: Option<bool>,
     clipboard: Option<bool>,
@@ -42,6 +44,7 @@ struct AppAccess {
     full_access: bool,
     folders: Vec<String>,
     read_only_folders: Vec<String>,
+    drives: Vec<GivenDrive>,
     devices: Vec<String>,
     online: bool,
     downloads: bool,
@@ -108,10 +111,8 @@ fn identify(id: &str) -> App {
         })
 }
 
-fn installed(id: &str, app_images: &BTreeSet<String>) -> bool {
-    app_images.contains(id)
-        || App::by_id(&format!("{id}.desktop")).is_some()
-        || super::startup::flatpak_installed(id)
+fn installed(id: &str, sandboxed: &BTreeSet<String>) -> bool {
+    sandboxed.contains(id) || App::by_id(&format!("{id}.desktop")).is_some()
 }
 
 fn open(closed: &HashMap<String, Vec<String>>, id: &str) -> bool {
@@ -153,7 +154,12 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
     let microphone =
         by_app(permissions::lookup(connection, MICROPHONE.table, MICROPHONE.id).await?);
     let services = by_app(permissions::lookup(connection, BUS.table, BUS.id).await?);
+    let drives = places::given(connection)
+        .await
+        .map_err(zbus::Error::Failure)?;
     let app_images: BTreeSet<String> = appimage::list().into_iter().map(|app| app.id).collect();
+    let flatpaks = flatpak::installed_ids();
+    let sandboxed: BTreeSet<String> = app_images.union(&flatpaks).cloned().collect();
     let ids: BTreeSet<&String> = location
         .keys()
         .chain(camera.keys())
@@ -164,14 +170,16 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
         .chain(read_only_folders.keys())
         .chain(devices.keys())
         .chain(services.keys())
-        .chain(&app_images)
-        .filter(|id| installed(id, &app_images))
+        .chain(drives.keys())
+        .chain(&sandboxed)
+        .filter(|id| installed(id, &sandboxed))
         .collect();
     let mut apps: Vec<AppAccess> = ids
         .into_iter()
         .map(|id| AppAccess {
             app: identify(id),
             app_image: app_images.contains(id),
+            flatpak: flatpaks.contains(id),
             location: location.get(id).copied(),
             camera: camera.get(id).copied(),
             clipboard: clipboard.get(id).copied(),
@@ -179,6 +187,7 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
             full_access: full_access.contains(id),
             folders: folders.get(id).cloned().unwrap_or_default(),
             read_only_folders: read_only_folders.get(id).cloned().unwrap_or_default(),
+            drives: drives.get(id).cloned().unwrap_or_default(),
             devices: devices.get(id).cloned().unwrap_or_default(),
             online: open(&offline, id),
             downloads: open(&without_downloads, id),
@@ -229,18 +238,27 @@ async fn forget_passwords(AppTarget { app }: AppTarget) -> Result<(), String> {
 }
 
 async fn add_folder(AppTarget { app }: AppTarget) -> Result<bool, String> {
-    sandbox::add_folder(
-        dbus::session().await?,
-        &app,
-        &t!(L10N, "desktop-apps-folder-title"),
-    )
-    .await
+    let Some(folder) = sandbox::choose_folder(&t!(L10N, "desktop-apps-folder-title")).await? else {
+        return Ok(false);
+    };
+    places::give_folder(dbus::session().await?, &app, &folder, Access::ReadWrite).await?;
+    Ok(true)
 }
 
 async fn remove_folder(Folder { app, folder }: Folder) -> Result<(), String> {
-    sandbox::remove_folder(dbus::session().await?, &app, &folder)
-        .await
-        .map_err(explain)
+    places::take_folder(dbus::session().await?, &app, &folder).await
+}
+
+async fn plugged_drives(AppTarget { app }: AppTarget) -> Result<Vec<PluggedDrive>, String> {
+    places::plugged(dbus::session().await?, &app).await
+}
+
+async fn give_drive(target: DriveTarget) -> Result<(), String> {
+    places::give_chosen(dbus::session().await?, target).await
+}
+
+async fn take_drive(target: DriveTarget) -> Result<(), String> {
+    places::take_chosen(dbus::session().await?, target).await
 }
 
 async fn set_switch(SwitchChange { app, switch, on }: SwitchChange) -> Result<(), String> {
@@ -271,6 +289,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("apps_passwords_forget", forget_passwords)
         .command_async("apps_folder_add", add_folder)
         .command_async("apps_folder_remove", remove_folder)
+        .command_async("apps_drives_plugged", plugged_drives)
+        .command_async("apps_drive_give", give_drive)
+        .command_async("apps_drive_take", take_drive)
         .command_async("apps_device_set", set_device)
         .command_async("apps_sandbox_set", set_switch)
         .command_async("apps_service_remove", remove_service)

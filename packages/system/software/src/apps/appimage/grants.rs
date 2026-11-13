@@ -55,8 +55,8 @@ const EVERYTHING: [&Permission; 10] = [
 ];
 const ALL_DEVICES: &str = "all";
 
-/// Forgets everything the app was given, so another app that later takes its
-/// id starts with nothing.
+/// Forgets everything the app was given, drives included, so another app
+/// that later takes its id starts with nothing.
 pub async fn forget(id: &str) -> Result<(), String> {
     let connection = dbus::session().await?;
     for permission in EVERYTHING {
@@ -64,7 +64,7 @@ pub async fn forget(id: &str) -> Result<(), String> {
             .await
             .map_err(|error| dbus::explain(&error))?;
     }
-    Ok(())
+    crate::apps::places::forget(connection, id).await
 }
 
 /// Gives a newly installed app what it declared and nothing an earlier app

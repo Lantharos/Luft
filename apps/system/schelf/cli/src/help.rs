@@ -10,11 +10,14 @@ Commands:
   info NAME             Show details
   trust NAME...         Give Flatpak apps full access
   untrust NAME...       Put them back in their sandbox
+  give NAME [PLACE]     Let an app use one drive or folder
+  take NAME PLACE       Take a drive or folder away again
   repo add|remove|list  Manage software sources for system packages
 
 Options:
   --store, --flathub, --fedora, --appimage  Use only this source
   --system              Fedora packages for the whole system, such as services
+  --read-only           Give a drive or folder only to read
   -y, --yes             Go ahead without asking
   -h, --help            Show help, also for a command
   --version             Show the version

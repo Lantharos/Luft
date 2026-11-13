@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use luft_dbus::runtime::block_on;
 use luft_software::apps::flatpak::{self, FLATHUB, Installation};
-use luft_software::apps::{appimage, debian, toolbox};
+use luft_software::apps::{appimage, debian, places, toolbox};
 use luft_software::system::repositories::{self, Draft};
 use luft_software::system::system_packages;
 use luft_software::task::Task;
@@ -209,7 +209,15 @@ impl Job {
             Self::RemoveFlatpak {
                 installation,
                 reference,
-            } => flatpak::uninstall(*installation, reference, task),
+            } => {
+                flatpak::uninstall(*installation, reference, task)?;
+                let id = flatpak::app_id(reference);
+                if flatpak::is_installed(id) {
+                    Ok(())
+                } else {
+                    block_on(async { places::forget(luft_dbus::session().await?, id).await })
+                }
+            }
             Self::RemoveAppImage { id } => appimage::remove(id),
             Self::RemoveTool { package } => toolbox::remove(package, task),
             Self::UpdateFlatpaks {

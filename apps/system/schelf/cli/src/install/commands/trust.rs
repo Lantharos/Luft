@@ -20,7 +20,7 @@ fn sandboxed(app: &InstalledApp) -> bool {
     full_access::offered(app.source)
 }
 
-fn sandboxed_named(
+pub(super) fn sandboxed_named(
     name: &str,
     everything: &[InstalledApp],
     yes: bool,
@@ -61,6 +61,10 @@ fn warn(app: &InstalledApp, yes: bool) -> Result<(), Exit> {
     }
     eprintln!(
         "Only give full access to apps you trust. It takes effect the next time the app opens."
+    );
+    eprintln!(
+        "To let it use one drive or folder, give it just that: schelf give {} PLACE",
+        app.id
     );
     let question = format!("Give {} full access?", app.name);
     if !prompt::interactive() {

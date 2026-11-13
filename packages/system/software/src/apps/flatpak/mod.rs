@@ -47,6 +47,43 @@ impl Installation {
     }
 }
 
+/// The app ID in a reference such as `app/org.gimp.GIMP/x86_64/stable`.
+pub fn app_id(reference: &str) -> &str {
+    let mut parts = reference.split('/');
+    match parts.next() {
+        Some("app") => parts.next().unwrap_or_default(),
+        first => first.unwrap_or_default(),
+    }
+}
+
+fn installations() -> impl Iterator<Item = std::path::PathBuf> {
+    let user = std::env::var_os("FLATPAK_USER_DIR")
+        .map(std::path::PathBuf::from)
+        .or_else(|| dirs::data_dir().map(|data| data.join("flatpak")));
+    let system = std::env::var_os("FLATPAK_SYSTEM_DIR").map_or_else(
+        || std::path::PathBuf::from("/var/lib/flatpak"),
+        std::path::PathBuf::from,
+    );
+    user.into_iter().chain([system])
+}
+
+/// Whether a Flatpak app by that ID is installed, for you or for everyone.
+pub fn is_installed(id: &str) -> bool {
+    installations().any(|installation| installation.join("app").join(id).join("current").exists())
+}
+
+/// The IDs of every Flatpak app installed, for you or for everyone, read
+/// from the installations' folders rather than asking Flatpak.
+pub fn installed_ids() -> std::collections::BTreeSet<String> {
+    installations()
+        .filter_map(|installation| std::fs::read_dir(installation.join("app")).ok())
+        .flatten()
+        .flatten()
+        .filter(|app| app.path().join("current").exists())
+        .filter_map(|app| app.file_name().into_string().ok())
+        .collect()
+}
+
 fn command(installation: Installation) -> Command {
     let mut command = Command::new("flatpak");
     command.arg(installation.flag());

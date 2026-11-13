@@ -4,8 +4,7 @@ use std::collections::HashMap;
 
 use futures_util::{Stream, StreamExt};
 use luft_dbus_macros::introspect;
-use zbus::OwnedVariant;
-use zbus::{Connection, proxy};
+use zbus::{Connection, OwnedVariant, Variant, proxy};
 
 const NOT_FOUND: &str = "org.freedesktop.portal.Error.NotFound";
 pub const YES: &str = "yes";
@@ -92,6 +91,13 @@ pub const CAMERA: Permission = Permission {
 /// Sandboxed apps' choices about items in Luft Keyring, one entry per item.
 pub const KEYRING_ITEMS: &str = "keyring-items";
 
+/// Drives sandboxed apps were given or refused, one entry per filesystem by
+/// its UUID, whose data names the drive it lives on. Each app holds
+/// [`READ_WRITE`], [`READ_ONLY`] or [`NO`].
+pub const DRIVES: &str = "drives";
+pub const READ_WRITE: &str = "read-write";
+pub const READ_ONLY: &str = "read-only";
+
 #[introspect]
 #[proxy(
     interface = "org.freedesktop.impl.portal.PermissionStore",
@@ -108,6 +114,14 @@ pub trait Store {
         id: &str,
         app: &str,
         permissions: &[&str],
+    ) -> zbus::Result<()>;
+
+    fn set_value(
+        &self,
+        table: &str,
+        create: bool,
+        id: &str,
+        data: &Variant<'_>,
     ) -> zbus::Result<()>;
 
     fn delete_permission(&self, table: &str, id: &str, app: &str) -> zbus::Result<()>;
@@ -133,11 +147,36 @@ fn missing(error: &zbus::Error) -> bool {
 
 /// The apps of one entry and what each was given; none when it doesn't exist.
 pub async fn lookup(connection: &Connection, table: &str, id: &str) -> zbus::Result<Apps> {
+    Ok(described(connection, table, id)
+        .await?
+        .map(|(apps, _)| apps)
+        .unwrap_or_default())
+}
+
+/// One entry's apps with the data kept beside them, or nothing when it doesn't exist.
+pub async fn described(
+    connection: &Connection,
+    table: &str,
+    id: &str,
+) -> zbus::Result<Option<(Apps, OwnedVariant)>> {
     match StoreProxy::new(connection).await?.lookup(table, id).await {
-        Ok((apps, _)) => Ok(apps),
-        Err(error) if missing(&error) => Ok(Apps::new()),
+        Ok(entry) => Ok(Some(entry)),
+        Err(error) if missing(&error) => Ok(None),
         Err(error) => Err(error),
     }
+}
+
+/// Keeps `data` beside the apps of one entry, making the entry when it's new.
+pub async fn describe(
+    connection: &Connection,
+    table: &str,
+    id: &str,
+    data: &Variant<'_>,
+) -> zbus::Result<()> {
+    StoreProxy::new(connection)
+        .await?
+        .set_value(table, true, id, data)
+        .await
 }
 
 /// What the app was given in one entry: yes, no, or nothing yet.
@@ -214,6 +253,18 @@ pub async fn remove(connection: &Connection, table: &str, id: &str) -> zbus::Res
 
 /// Every entry of a table with its apps.
 pub async fn entries(connection: &Connection, table: &str) -> zbus::Result<Vec<(String, Apps)>> {
+    Ok(described_entries(connection, table)
+        .await?
+        .into_iter()
+        .map(|(id, apps, _)| (id, apps))
+        .collect())
+}
+
+/// Every entry of a table with its apps and the data kept beside them.
+pub async fn described_entries(
+    connection: &Connection,
+    table: &str,
+) -> zbus::Result<Vec<(String, Apps, OwnedVariant)>> {
     let store = StoreProxy::new(connection).await?;
     let ids = match store.list(table).await {
         Ok(ids) => ids,
@@ -222,8 +273,9 @@ pub async fn entries(connection: &Connection, table: &str) -> zbus::Result<Vec<(
     };
     let mut entries = Vec::with_capacity(ids.len());
     for id in ids {
-        let apps = lookup(connection, table, &id).await?;
-        entries.push((id, apps));
+        if let Some((apps, data)) = described(connection, table, &id).await? {
+            entries.push((id, apps, data));
+        }
     }
     Ok(entries)
 }

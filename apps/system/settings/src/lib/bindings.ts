@@ -109,6 +109,21 @@ export const commands = {
 		device: SandboxDevice,
 		on: boolean,
 	}, options?: CallOptions) => invoke<null>("apps_device_set", params, options),
+	appsDriveGive: (params: {
+		app: string,
+		uuid: string,
+		drive: string,
+		readOnly?: boolean,
+	}, options?: CallOptions) => invoke<null>("apps_drive_give", params, options),
+	appsDriveTake: (params: {
+		app: string,
+		uuid: string,
+		drive: string,
+		readOnly?: boolean,
+	}, options?: CallOptions) => invoke<null>("apps_drive_take", params, options),
+	appsDrivesPlugged: (params: {
+		app: string,
+	}, options?: CallOptions) => invoke<PluggedDrive[]>("apps_drives_plugged", params, options),
 	appsFolderAdd: (params: {
 		app: string,
 	}, options?: CallOptions) => invoke<boolean>("apps_folder_add", params, options),
@@ -780,6 +795,7 @@ export type App = {
 
 export type AppAccess = {
 	appImage: boolean,
+	flatpak: boolean,
 	location: boolean | null,
 	camera: boolean | null,
 	clipboard: boolean | null,
@@ -787,6 +803,7 @@ export type AppAccess = {
 	fullAccess: boolean,
 	folders: string[],
 	readOnlyFolders: string[],
+	drives: GivenDrive[],
 	devices: string[],
 	online: boolean,
 	downloads: boolean,
@@ -1197,6 +1214,16 @@ export type FontFamily = {
 	removable: boolean,
 };
 
+/**  A drive an app was given, plugged in or not. */
+export type GivenDrive = {
+	uuid: string,
+	drive: string,
+	label: string,
+	size: number,
+	readOnly: boolean,
+	pluggedIn: boolean,
+};
+
 export type GuardedNetwork = {
 	connection: string,
 	name: string,
@@ -1523,6 +1550,14 @@ export type PenKind = "screen" | "tablet";
 export type Phone = {
 	id: string,
 	number: string,
+};
+
+/**  A drive plugged in now that an app could be given. */
+export type PluggedDrive = {
+	uuid: string,
+	drive: string,
+	label: string,
+	size: number,
 };
 
 export type Port = {

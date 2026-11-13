@@ -1,6 +1,6 @@
 import { errorText } from '@luft/ui';
 import { commands, events } from '#lib/bindings.js';
-import type { AppAccess, SandboxDevice, SandboxSwitch, Switchable } from '#lib/bindings.js';
+import type { AppAccess, GivenDrive, PluggedDrive, SandboxDevice, SandboxSwitch, Switchable } from '#lib/bindings.js';
 
 export class Permissions {
 	apps = $state<AppAccess[]>([]);
@@ -40,6 +40,11 @@ export class Permissions {
 	addFolder = (app: AppAccess) => this.run(() => commands.appsFolderAdd({ app: app.id }));
 
 	removeFolder = (app: AppAccess, folder: string) => this.run(() => commands.appsFolderRemove({ app: app.id, folder }));
+
+	giveDrive = (app: AppAccess, drive: PluggedDrive, readOnly: boolean) =>
+		this.run(() => commands.appsDriveGive({ app: app.id, uuid: drive.uuid, drive: drive.drive, readOnly }));
+
+	takeDrive = (app: AppAccess, drive: GivenDrive) => this.run(() => commands.appsDriveTake({ app: app.id, uuid: drive.uuid, drive: drive.drive }));
 
 	setDevice = (app: AppAccess, device: SandboxDevice, on: boolean) => this.run(() => commands.appsDeviceSet({ app: app.id, device, on }));
 

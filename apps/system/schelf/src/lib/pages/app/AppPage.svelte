@@ -16,6 +16,7 @@
 	import AppFacts from './AppFacts.svelte';
 	import Channel from './Channel.svelte';
 	import FullAccess from './FullAccess.svelte';
+	import Places from './places/Places.svelte';
 	import NameAndIcon from './NameAndIcon.svelte';
 	import Notifications from './Notifications.svelte';
 	import Provenance from './Provenance.svelte';
@@ -158,6 +159,9 @@
 				<AccessList permissions={fullAccess ? null : permissions}>
 					{#if sandboxed.source === 'appImage' && !fullAccess && localPermissions}
 						<SandboxAccess app={sandboxed} permissions={localPermissions} bind:open={reviewing} onchange={() => readSandbox(sandboxed.id)} />
+					{/if}
+					{#if !fullAccess}
+						<Places app={sandboxed} />
 					{/if}
 					<FullAccess app={sandboxed} reason={unsandboxedReason} bind:on={fullAccess} bind:asking />
 				</AccessList>

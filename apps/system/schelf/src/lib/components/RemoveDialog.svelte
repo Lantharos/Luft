@@ -8,10 +8,11 @@
 
 	const description = $derived.by(() => {
 		if (app.source === 'extension') return `${app.name} will be removed from your desktop.`;
-		if (app.source === 'appImage') return `${app.name} and its file in ${app.origin} will be deleted.`;
+		if (app.source === 'appImage') return `${app.name} and its file in ${app.origin} will be deleted, with everything you allowed it.`;
 		if (app.source === 'tool') return `${app.name} and its commands will be removed. Your files stay.`;
 		if (app.source === 'debian') return `${app.name} will be removed from this computer. Your files and settings stay.`;
 		if (app.source === 'system') return `${app.name} is removed for everyone, settings and data included.`;
+		if (app.source === 'flatpak') return `${app.name} will be removed from this computer and loses the drives and folders you gave it. Your files and settings stay.`;
 		return `${app.name} will be removed from this computer. Your files and settings stay.`;
 	});
 

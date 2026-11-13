@@ -1,4 +1,5 @@
 mod opening;
+mod places;
 mod sandbox;
 mod settings;
 
@@ -67,6 +68,12 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("library_full_access", sandbox::has_full_access)
         .command_async("library_set_full_access", sandbox::set_full_access)
         .command_async("library_restart", sandbox::restart)
+        .command_async("library_places", places::given)
+        .command_async("library_drives_plugged", places::plugged)
+        .command_async("library_give_drive", places::give_drive)
+        .command_async("library_take_drive", places::take_drive)
+        .command_async("library_add_folder", places::add_folder)
+        .command_async("library_remove_folder", places::remove_folder)
         .command("library_custom_icons", settings::icons::state)
         .command_async("library_choose_icon", settings::icons::choose)
         .command_async(

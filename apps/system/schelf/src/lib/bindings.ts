@@ -109,6 +109,9 @@ export const commands = {
 	flathubSummary: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").Summary>("flathub_summary", params, options),
+	libraryAddFolder: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<boolean | null>("library_add_folder", params, options),
 	libraryChooseIcon: (params: {
 		desktop: string,
 	}, options?: CallOptions) => invoke<boolean>("library_choose_icon", params, options),
@@ -118,10 +121,19 @@ export const commands = {
 	libraryCustomIcons: (params: {
 		desktop: string,
 	}, options?: CallOptions) => invoke<CustomIcons>("library_custom_icons", params, options),
+	libraryDrivesPlugged: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<PluggedDrive[]>("library_drives_plugged", params, options),
 	libraryFullAccess: (params: {
 		id: string,
 		source: Source,
 	}, options?: CallOptions) => invoke<boolean>("library_full_access", params, options),
+	libraryGiveDrive: (params: {
+		app: string,
+		uuid: string,
+		drive: string,
+		readOnly?: boolean,
+	}, options?: CallOptions) => invoke<boolean>("library_give_drive", params, options),
 	libraryInstalled: (options?: CallOptions) => invoke<InstalledApp[]>("library_installed", {}, options),
 	libraryNames: (params: {
 		desktop: string,
@@ -138,6 +150,13 @@ export const commands = {
 		installation: Installation,
 		reference: string,
 	}, options?: CallOptions) => invoke<Permissions>("library_permissions", params, options),
+	libraryPlaces: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Places>("library_places", params, options),
+	libraryRemoveFolder: (params: {
+		id: string,
+		folder: string,
+	}, options?: CallOptions) => invoke<null>("library_remove_folder", params, options),
 	libraryRename: (params: {
 		desktop: string,
 		name: string,
@@ -167,6 +186,12 @@ export const commands = {
 		switch: Switch,
 		on: boolean,
 	}, options?: CallOptions) => invoke<boolean>("library_set_sandbox_switch", params, options),
+	libraryTakeDrive: (params: {
+		app: string,
+		uuid: string,
+		drive: string,
+		readOnly?: boolean,
+	}, options?: CallOptions) => invoke<null>("library_take_drive", params, options),
 	operationsCancel: (params: {
 		id: number,
 	}, options?: CallOptions) => invoke<null>("operations_cancel", params, options),
@@ -443,6 +468,21 @@ export type Finished = {
 /**  How Luft installs a store app, and so how it updates and removes it. */
 export type Format = "sabine" | "appimage" | "luft-extension";
 
+/**  A drive an app was given, plugged in or not. */
+export type GivenDrive = {
+	uuid: string,
+	drive: string,
+	label: string,
+	size: number,
+	readOnly: boolean,
+	pluggedIn: boolean,
+};
+
+export type GivenFolder = {
+	path: string,
+	readOnly: boolean,
+};
+
 export type IconPaint = {
 	plate: string,
 	ink: string,
@@ -608,6 +648,20 @@ export type Permissions = {
 	filesystems: string[],
 	sessionBus: string[],
 	systemBus: string[],
+};
+
+/**  The drives and folders an app was given beyond its sandbox. */
+export type Places = {
+	drives: GivenDrive[],
+	folders: GivenFolder[],
+};
+
+/**  A drive plugged in now that an app could be given. */
+export type PluggedDrive = {
+	uuid: string,
+	drive: string,
+	label: string,
+	size: number,
 };
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */

@@ -2,6 +2,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import { AppIcon, Dialog, ItemRow, Row, Switch } from '@luft/ui';
 	import type { AppAccess, SandboxDevice, Switchable } from '#lib/bindings.js';
+	import PlacesRows from './PlacesRows.svelte';
 	import type { Permissions } from './permissions.svelte';
 
 	let { app, permissions }: { app: AppAccess; permissions: Permissions } = $props();
@@ -18,15 +19,13 @@
 		{ device: 'serial', label: 'settings-apps-serial', hint: 'settings-apps-serial-hint' }
 	];
 
-	const folders = $derived([
-		...app.folders.map((folder) => ({ folder, readOnly: false })),
-		...app.readOnlyFolders.map((folder) => ({ folder, readOnly: true }))
-	]);
+	const folders = $derived(app.folders.length + app.readOnlyFolders.length);
 	const granted = $derived([
 		...SWITCHES.filter(({ kind }) => app[kind]).map(({ label }) => t(label)),
 		...(app.microphone ? [t('settings-apps-microphone')] : []),
 		...(app.passwords?.allowed ? [t('settings-apps-passwords')] : []),
-		...(folders.length ? [t('settings-apps-folders-count', { count: folders.length })] : []),
+		...(app.drives.length ? [t('settings-apps-drives-count', { count: app.drives.length })] : []),
+		...(folders ? [t('settings-apps-folders-count', { count: folders })] : []),
 		...DEVICES.filter(({ device }) => app.devices.includes(device)).map(({ label }) => t(label)),
 		...(app.services.length ? [t('settings-apps-services-count', { count: app.services.length })] : []),
 		...(app.fullAccess ? [t('settings-apps-full-access')] : [])
@@ -65,25 +64,10 @@
 					</button>
 				</Row>
 			{/if}
+			{#if (app.appImage || app.flatpak) && !app.fullAccess}
+				<PlacesRows {app} {permissions} />
+			{/if}
 			{#if app.appImage && !app.fullAccess}
-				<Row title={t('settings-apps-folders')} description={t('settings-apps-folders-hint')}>
-					<button type="button" class="button" disabled={permissions.busy} onclick={() => permissions.addFolder(app)}>
-						{t('settings-apps-folder-add')}
-					</button>
-				</Row>
-				{#each folders as { folder, readOnly } (folder)}
-					<Row title={folder} description={readOnly ? t('settings-apps-folder-read-only') : undefined} truncate>
-						<button
-							type="button"
-							class="button"
-							aria-label={t('settings-apps-folder-remove-app', { folder })}
-							disabled={permissions.busy}
-							onclick={() => permissions.removeFolder(app, folder)}
-						>
-							{t('settings-apps-folder-remove')}
-						</button>
-					</Row>
-				{/each}
 				<Row title={t('settings-apps-microphone')} description={t('settings-apps-microphone-hint')}>
 					<Switch label={t('settings-apps-microphone')} checked={app.microphone} disabled={permissions.busy} onchange={(on) => permissions.setSwitch(app, 'microphone', on)} />
 				</Row>

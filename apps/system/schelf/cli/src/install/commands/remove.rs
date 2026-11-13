@@ -35,9 +35,15 @@ fn prepare(arguments: &Arguments, everything: &[InstalledApp]) -> Result<Vec<Pla
     let names: Vec<String> = chosen.iter().map(|app| app.name.clone()).collect();
     let (system, others): (Vec<&InstalledApp>, Vec<&InstalledApp>) =
         chosen.iter().partition(|app| app.source == Source::System);
-    let warning = match system.len() {
-        0 => "",
-        1 => " What it added to /etc and /var goes too.",
+    let sandboxed = chosen
+        .iter()
+        .any(|app| matches!(app.source, Source::Flatpak | Source::AppImage));
+    let warning = match (system.len(), sandboxed) {
+        (0, false) => "",
+        (0, true) => {
+            " Drives and folders you gave it have to be given again if you install it later."
+        }
+        (1, _) => " What it added to /etc and /var goes too.",
         _ => " What they added to /etc and /var goes too.",
     };
     confirm(

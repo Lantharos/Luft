@@ -6,7 +6,7 @@ use futures_util::StreamExt;
 use luft_app::Events;
 use luft_app::dbus;
 use luft_app::identity::permissions::{
-    self, BACKGROUND_CLIPBOARD, FOLDERS, FULL_ACCESS, KEYRING_ITEMS,
+    self, BACKGROUND_CLIPBOARD, DRIVES, FOLDERS, FULL_ACCESS, KEYRING_ITEMS,
 };
 use sabine::BridgeEvent;
 use tokio::time::timeout;
@@ -15,13 +15,14 @@ use super::{AppAccess, read};
 
 pub const CHANGED: BridgeEvent<Vec<AppAccess>> = BridgeEvent::new("apps.permissions");
 const SETTLE: Duration = Duration::from_millis(120);
-const TABLES: [&str; 6] = [
+const TABLES: [&str; 7] = [
     "location",
     "devices",
     BACKGROUND_CLIPBOARD.table,
     FULL_ACCESS.table,
     KEYRING_ITEMS,
     FOLDERS.table,
+    DRIVES,
 ];
 
 pub fn watch(events: Events) {

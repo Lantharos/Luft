@@ -100,7 +100,7 @@ fn runs(info: &gio_unix::DesktopAppInfo) -> bool {
 
 fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
     match info.string(FLATPAK) {
-        Some(id) => flatpak_installed(&id),
+        Some(id) => luft_software::apps::flatpak::is_installed(&id),
         None => program(info).is_some_and(|program| glib::find_program_in_path(program).is_some()),
     }
 }
@@ -108,15 +108,6 @@ fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
 fn program(info: &gio_unix::DesktopAppInfo) -> Option<OsString> {
     let line = info.commandline()?;
     glib::shell_parse_argv(line).ok()?.into_iter().next()
-}
-
-pub(super) fn flatpak_installed(id: &str) -> bool {
-    [
-        glib::user_data_dir().join("flatpak"),
-        PathBuf::from("/var/lib/flatpak"),
-    ]
-    .iter()
-    .any(|installation| installation.join("app").join(id).join("current").exists())
 }
 
 fn entry(user: &Path, name: OsString) -> Option<Entry> {

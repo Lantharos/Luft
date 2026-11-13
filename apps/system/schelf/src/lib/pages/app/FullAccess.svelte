@@ -62,7 +62,7 @@
 				? 'It runs outside its sandbox, like a program you start yourself.'
 				: reason
 					? `It asks to run without its sandbox: “${reason}” Only turn this on if you trust it.`
-					: 'Takes away its sandbox. Only turn this on for apps you trust.')
+					: 'Takes away its sandbox. For one drive or folder, give it just that instead.')
 	);
 </script>
 

@@ -6,6 +6,7 @@ use tokio::task::spawn_blocking;
 
 use super::transaction::friendly;
 use crate::apps::operand::operand;
+use crate::apps::places;
 
 const EVERYTHING: [&str; 1] = ["--filesystem=host"];
 const EVERYTHING_BUT_HOME: [&str; 6] = [
@@ -35,7 +36,8 @@ pub async fn has_full_access(app_id: &str) -> bool {
 }
 
 /// Lets the app out of its sandbox for this account and has Kestrel and Luft's services treat
-/// it as you, or puts it back in its sandbox as it shipped. Applies from the next time it starts.
+/// it as you, or puts it back in its sandbox as it shipped with the drives and folders you gave
+/// it. Applies from the next time it starts.
 pub async fn set_full_access(app_id: &str, on: bool) -> Result<(), String> {
     let id = operand(app_id)?.to_owned();
     let session = dbus::session().await?;
@@ -55,7 +57,8 @@ pub async fn set_full_access(app_id: &str, on: bool) -> Result<(), String> {
         record(true).await
     } else {
         record(false).await?;
-        override_sandbox(id, false).await
+        override_sandbox(id.clone(), false).await?;
+        places::reapply(session, &id).await
     }
 }
 

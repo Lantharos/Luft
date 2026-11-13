@@ -262,7 +262,7 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - uses: Lantharos/Store/publish@4be5507c12e9388d2abfa556ae08b5d2ee77a5cd # v1
+      - uses: Lantharos/Store/publish@6d0b384946e556e9b880fa7bb35973a28a11634a # v1
         with:
           files: dist/**
           schelf-toml: ${{ matrix.item.folder }}/schelf.toml

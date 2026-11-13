@@ -1,5 +1,0 @@
-[D-BUS Service]
-Name=com.lantharos.Sleep1
-Exec=/usr/libexec/luft-sleep
-User=root
-SystemdService=luft-sleep.service

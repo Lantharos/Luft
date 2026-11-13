@@ -239,28 +239,6 @@ settings-power-button-suspend = Miego režimas
 settings-power-button-hibernate = Užmigdyti
 settings-power-button-ask = Klausti, ką daryti
 settings-power-button-nothing = Nieko nedaryti
-settings-power-long-sleep = Išjungti po ilgo miego
-settings-power-long-sleep-description = Kad akumuliatorius miegant visiškai neišsikrautų, kompiuteris išsijungia, kai akumuliatorius senka arba po ilgo miego naudojant akumuliatorių. Atidaryti langai neišlieka.
-settings-power-long-sleep-failed = Nepavyko to pakeisti. Bandykite dar kartą.
-settings-power-long-sleep-after = Išjungti po
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } valandos
-    [few] { $hours } valandų
-    [many] { $hours } valandos
-   *[other] { $hours } valandų
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dienos
-    [few] { $days } dienų
-    [many] { $days } dienos
-   *[other] { $days } dienų
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } savaitės
-    [few] { $weeks } savaičių
-    [many] { $weeks } savaitės
-   *[other] { $weeks } savaičių
-}
 
 ## Keyboard
 

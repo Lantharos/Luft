@@ -3,7 +3,6 @@ mod keyboard;
 mod limit;
 mod profiles;
 mod properties;
-mod sleep;
 
 use futures_util::StreamExt;
 use luft_app::dbus::{self, failed};
@@ -38,11 +37,6 @@ struct PowerProfile {
 #[derive(Deserialize, specta::Type)]
 struct ChargeLimitChange {
     enabled: bool,
-}
-
-#[derive(Deserialize, specta::Type)]
-struct PowerOffAfter {
-    seconds: u32,
 }
 
 #[derive(Deserialize, specta::Type)]
@@ -118,14 +112,6 @@ async fn set_charge_limit(ChargeLimitChange { enabled }: ChargeLimitChange) -> R
     limit::set(dbus::system().await?, enabled).await
 }
 
-async fn power_off_after(Empty {}: Empty) -> Result<Option<u32>, String> {
-    Ok(sleep::power_off_after(dbus::system().await?).await)
-}
-
-async fn set_power_off_after(PowerOffAfter { seconds }: PowerOffAfter) -> Result<(), String> {
-    sleep::set_power_off_after(dbus::system().await?, seconds).await
-}
-
 async fn set_keyboard(KeyboardBrightness { id, level }: KeyboardBrightness) -> Result<(), String> {
     keyboard::set(dbus::system().await?, &id, level).await
 }
@@ -137,6 +123,4 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("power_set_profile", set_profile)
         .command_async("power_set_charge_limit", set_charge_limit)
         .command_async("power_set_keyboard", set_keyboard)
-        .command_async("power_off_after", power_off_after)
-        .command_async("power_set_power_off_after", set_power_off_after)
 }

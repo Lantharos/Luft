@@ -227,22 +227,6 @@ settings-power-button-suspend = Uyku
 settings-power-button-hibernate = Hazırda beklet
 settings-power-button-ask = Ne yapılacağını sor
 settings-power-button-nothing = Hiçbir şey yapma
-settings-power-long-sleep = Uzun bir uykudan sonra kapat
-settings-power-long-sleep-description = Uykudayken pilin bitmesine izin vermek yerine, pil azaldığında ya da pil gücündeyken uzun süre uykuda kaldığında bilgisayar kapanır. Açık pencereler korunmaz.
-settings-power-long-sleep-failed = Bu ayar değiştirilemedi. Yeniden deneyin.
-settings-power-long-sleep-after = Kapanma süresi
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } saat
-   *[other] { $hours } saat
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } gün
-   *[other] { $days } gün
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } hafta
-   *[other] { $weeks } hafta
-}
 
 ## Keyboard
 

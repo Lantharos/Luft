@@ -317,22 +317,6 @@ settings-power-button-suspend = Sleep
 settings-power-button-hibernate = Hibernate
 settings-power-button-ask = Ask what to do
 settings-power-button-nothing = Do nothing
-settings-power-long-sleep = Shut down after a long sleep
-settings-power-long-sleep-description = After this long asleep on battery, the computer shuts down and open windows aren’t kept. It always shuts down before the battery runs flat.
-settings-power-long-sleep-failed = This couldn't be changed. Try again.
-settings-power-long-sleep-after = Shut down after
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } hour
-   *[other] { $hours } hours
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } day
-   *[other] { $days } days
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } week
-   *[other] { $weeks } weeks
-}
 
 ## Keyboard
 

@@ -227,22 +227,6 @@ settings-power-button-suspend = Suspender
 settings-power-button-hibernate = Hibernar
 settings-power-button-ask = Preguntar qué hacer
 settings-power-button-nothing = No hacer nada
-settings-power-long-sleep = Apagar tras una suspensión larga
-settings-power-long-sleep-description = En vez de dejar que la batería se agote mientras está suspendido, el ordenador se apaga cuando la batería baja o tras una suspensión larga con batería. Las ventanas abiertas no se conservan.
-settings-power-long-sleep-failed = No se ha podido cambiar. Vuelve a intentarlo.
-settings-power-long-sleep-after = Apagar tras
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } hora
-   *[other] { $hours } horas
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } día
-   *[other] { $days } días
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } semana
-   *[other] { $weeks } semanas
-}
 
 ## Keyboard
 

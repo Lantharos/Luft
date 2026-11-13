@@ -245,31 +245,6 @@ settings-power-button-suspend = Sospensjoni
 settings-power-button-hibernate = Ibernazzjoni
 settings-power-button-ask = Staqsi x’għandu jsir
 settings-power-button-nothing = Xejn
-settings-power-long-sleep = Itfi wara sospensjoni twila
-settings-power-long-sleep-description = Minflok ma jħalli l-batterija tispiċċa waqt is-sospensjoni, il-kompjuter jintefa meta l-batterija tkun baxxa jew wara sospensjoni twila fuq il-batterija. It-twieqi miftuħa ma jinżammux.
-settings-power-long-sleep-failed = Dan ma setax jinbidel. Erġa’ pprova.
-settings-power-long-sleep-after = Itfi wara
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } siegħa
-    [two] { $hours } sigħat
-    [few] { $hours } sigħat
-    [many] { $hours } siegħa
-   *[other] { $hours } siegħa
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } jum
-    [two] { $days } jiem
-    [few] { $days } jiem
-    [many] { $days } jum
-   *[other] { $days } jum
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } ġimgħa
-    [two] { $weeks } ġimgħat
-    [few] { $weeks } ġimgħat
-    [many] { $weeks } ġimgħa
-   *[other] { $weeks } ġimgħa
-}
 
 ## Keyboard
 

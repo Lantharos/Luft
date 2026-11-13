@@ -227,22 +227,6 @@ settings-power-button-suspend = Mettre en veille
 settings-power-button-hibernate = Mettre en veille prolongée
 settings-power-button-ask = Demander quoi faire
 settings-power-button-nothing = Ne rien faire
-settings-power-long-sleep = Éteindre après une longue veille
-settings-power-long-sleep-description = Plutôt que de laisser la batterie se vider pendant la veille, l’ordinateur s’éteint quand la batterie devient faible ou après une longue veille sur batterie. Les fenêtres ouvertes ne sont pas conservées.
-settings-power-long-sleep-failed = Impossible de modifier ce paramètre. Réessayez.
-settings-power-long-sleep-after = Éteindre après
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } heure
-   *[other] { $hours } heures
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } jour
-   *[other] { $days } jours
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } semaine
-   *[other] { $weeks } semaines
-}
 
 ## Keyboard
 

@@ -227,22 +227,6 @@ settings-power-button-suspend = Lepotila
 settings-power-button-hibernate = Horrostila
 settings-power-button-ask = Kysy, mitä tehdään
 settings-power-button-nothing = Älä tee mitään
-settings-power-long-sleep = Sammuta pitkän lepotilan jälkeen
-settings-power-long-sleep-description = Akku ei tyhjene lepotilassa, vaan tietokone sammuu, kun akun varaus on vähissä tai kun se on ollut pitkään lepotilassa akkuvirralla. Avoimia ikkunoita ei säilytetä.
-settings-power-long-sleep-failed = Tätä ei voitu muuttaa. Yritä uudelleen.
-settings-power-long-sleep-after = Sammutusviive
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } tunti
-   *[other] { $hours } tuntia
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } päivä
-   *[other] { $days } päivää
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } viikko
-   *[other] { $weeks } viikkoa
-}
 
 ## Keyboard
 

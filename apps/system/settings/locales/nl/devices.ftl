@@ -227,22 +227,6 @@ settings-power-button-suspend = Slaapstand
 settings-power-button-hibernate = Sluimerstand
 settings-power-button-ask = Vragen wat er moet gebeuren
 settings-power-button-nothing = Niets doen
-settings-power-long-sleep = Afsluiten na lange slaapstand
-settings-power-long-sleep-description = In plaats van de batterij leeg te laten lopen in de slaapstand, sluit de computer af wanneer de batterij bijna leeg is of na een lange slaapstand op batterij. Geopende vensters blijven niet bewaard.
-settings-power-long-sleep-failed = Dit kan niet worden gewijzigd. Probeer het opnieuw.
-settings-power-long-sleep-after = Afsluiten na
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } uur
-   *[other] { $hours } uur
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } dagen
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } week
-   *[other] { $weeks } weken
-}
 
 ## Keyboard
 

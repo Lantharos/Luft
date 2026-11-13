@@ -6,7 +6,6 @@ import {checkAccessibility} from './settings/system/accessibility.js';
 import {checkChannel} from './settings/system/channel.js';
 import {checkDictation} from './settings/system/dictation.js';
 import {checkHardware} from './settings/system/hardware.js';
-import {checkLongSleep} from './settings/system/power.js';
 import {checkPrinters} from './settings/system/printers.js';
 import {checkReport} from './settings/system/report.js';
 import {checkUpdates} from './settings/system/updates.js';
@@ -18,7 +17,6 @@ export async function run() {
       await checkAccessibility(app);
       await checkLive(app);
       await checkHardware(app);
-      await checkLongSleep(app);
       await checkPrinters(app);
       await checkRecoveryKey(app);
       await checkDictation(app);

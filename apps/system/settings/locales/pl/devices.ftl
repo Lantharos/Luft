@@ -239,28 +239,6 @@ settings-power-button-suspend = Uśpij
 settings-power-button-hibernate = Hibernuj
 settings-power-button-ask = Pytaj, co zrobić
 settings-power-button-nothing = Nic nie rób
-settings-power-long-sleep = Wyłączaj po długim uśpieniu
-settings-power-long-sleep-description = Zamiast pozwolić, by bateria rozładowała się w czasie uśpienia, komputer wyłącza się, gdy poziom baterii jest niski lub po długim uśpieniu na baterii. Otwarte okna nie są zachowywane.
-settings-power-long-sleep-failed = Nie udało się tego zmienić. Spróbuj ponownie.
-settings-power-long-sleep-after = Czas do wyłączenia
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } godzina
-    [few] { $hours } godziny
-    [many] { $hours } godzin
-   *[other] { $hours } godziny
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dzień
-    [few] { $days } dni
-    [many] { $days } dni
-   *[other] { $days } dnia
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } tydzień
-    [few] { $weeks } tygodnie
-    [many] { $weeks } tygodni
-   *[other] { $weeks } tygodnia
-}
 
 ## Keyboard
 

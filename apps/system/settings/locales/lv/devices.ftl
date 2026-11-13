@@ -233,25 +233,6 @@ settings-power-button-suspend = Miega režīms
 settings-power-button-hibernate = Hibernēt
 settings-power-button-ask = Jautāt, ko darīt
 settings-power-button-nothing = Neko nedarīt
-settings-power-long-sleep = Izslēgt pēc ilga miega
-settings-power-long-sleep-description = Lai miega režīmā akumulators neizlādētos pilnībā, dators izslēdzas, kad akumulatora uzlādes līmenis kļūst zems vai pēc ilga miega, darbojoties ar akumulatoru. Atvērtie logi netiek saglabāti.
-settings-power-long-sleep-failed = To neizdevās mainīt. Mēģiniet vēlreiz.
-settings-power-long-sleep-after = Izslēgt pēc
-settings-power-long-sleep-hours = { $hours ->
-    [zero] { $hours } stundas
-    [one] { $hours } stunda
-   *[other] { $hours } stundas
-}
-settings-power-long-sleep-days = { $days ->
-    [zero] { $days } dienas
-    [one] { $days } diena
-   *[other] { $days } dienas
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [zero] { $weeks } nedēļas
-    [one] { $weeks } nedēļa
-   *[other] { $weeks } nedēļas
-}
 
 ## Keyboard
 

@@ -1,16 +1,13 @@
 mod battery;
-mod config;
 mod plan;
-mod service;
 mod suspend;
 
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
     let result = match std::env::args().nth(1).as_deref() {
-        None => service::run(),
         Some("suspend") => suspend::run(),
-        Some(other) => Err(anyhow::anyhow!("Unknown command {other}")),
+        _ => Err(anyhow::anyhow!("Usage: luft-sleep suspend")),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

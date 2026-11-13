@@ -227,22 +227,6 @@ settings-power-button-suspend = Gjumë
 settings-power-button-hibernate = Përgjumje
 settings-power-button-ask = Pyet çfarë të bëjë
 settings-power-button-nothing = Mos bëj asgjë
-settings-power-long-sleep = Fik pas një gjumi të gjatë
-settings-power-long-sleep-description = Në vend që ta lërë baterinë të shkarkohet gjatë gjumit, kompjuteri fiket kur bateria bie ose pas një gjumi të gjatë me bateri. Dritaret e hapura nuk ruhen.
-settings-power-long-sleep-failed = Kjo nuk u ndryshua dot. Provo sërish.
-settings-power-long-sleep-after = Fik pas
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } orë
-   *[other] { $hours } orë
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } ditë
-   *[other] { $days } ditë
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } javë
-   *[other] { $weeks } javë
-}
 
 ## Keyboard
 

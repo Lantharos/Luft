@@ -227,22 +227,6 @@ settings-power-button-suspend = Hvilemodus
 settings-power-button-hibernate = Dvalemodus
 settings-power-button-ask = Spør hva som skal gjøres
 settings-power-button-nothing = Ikke gjør noe
-settings-power-long-sleep = Slå av etter lang tid i hvilemodus
-settings-power-long-sleep-description = I stedet for at batteriet går tomt i hvilemodus, slås datamaskinen av når batterinivået blir lavt eller etter lang tid i hvilemodus på batteri. Åpne vinduer blir ikke tatt vare på.
-settings-power-long-sleep-failed = Dette kunne ikke endres. Prøv igjen.
-settings-power-long-sleep-after = Slå av etter
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } time
-   *[other] { $hours } timer
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } dager
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } uke
-   *[other] { $weeks } uker
-}
 
 ## Keyboard
 

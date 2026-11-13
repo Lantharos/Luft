@@ -227,22 +227,6 @@ settings-power-button-suspend = Standby
 settings-power-button-hibernate = Ruhezustand
 settings-power-button-ask = Nachfragen
 settings-power-button-nothing = Nichts tun
-settings-power-long-sleep = Nach langem Standby herunterfahren
-settings-power-long-sleep-description = Statt den Akku im Standby ganz zu leeren, fährt der Computer herunter, wenn der Akku schwach wird oder er lange im Akkubetrieb im Standby war. Geöffnete Fenster bleiben nicht erhalten.
-settings-power-long-sleep-failed = Das konnte nicht geändert werden. Versuch es noch einmal.
-settings-power-long-sleep-after = Herunterfahren nach
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } Stunde
-   *[other] { $hours } Stunden
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } Tag
-   *[other] { $days } Tage
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } Woche
-   *[other] { $weeks } Wochen
-}
 
 ## Keyboard
 

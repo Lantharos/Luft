@@ -227,22 +227,6 @@ settings-power-button-suspend = Kvilemodus
 settings-power-button-hibernate = Dvalemodus
 settings-power-button-ask = Spør kva som skal skje
 settings-power-button-nothing = Ikkje gjer noko
-settings-power-long-sleep = Slå av etter lang kvile
-settings-power-long-sleep-description = I staden for å la batteriet gå tomt i kvilemodus slår datamaskinen seg av når batteriet blir lågt, eller etter lang kvile på batteri. Opne vindauge blir ikkje tekne vare på.
-settings-power-long-sleep-failed = Kunne ikkje endre dette. Prøv igjen.
-settings-power-long-sleep-after = Slå av etter
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } time
-   *[other] { $hours } timar
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } dagar
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } veke
-   *[other] { $weeks } veker
-}
 
 ## Keyboard
 

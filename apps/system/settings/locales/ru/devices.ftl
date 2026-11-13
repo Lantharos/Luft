@@ -239,28 +239,6 @@ settings-power-button-suspend = Спящий режим
 settings-power-button-hibernate = Гибернация
 settings-power-button-ask = Спрашивать, что делать
 settings-power-button-nothing = Ничего не делать
-settings-power-long-sleep = Выключать после долгого сна
-settings-power-long-sleep-description = Чтобы батарея не разрядилась полностью во сне, компьютер выключается, когда заряд становится низким или после долгого сна от батареи. Открытые окна не сохраняются.
-settings-power-long-sleep-failed = Не удалось изменить эту настройку. Попробуйте ещё раз.
-settings-power-long-sleep-after = Выключать через
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } час
-    [few] { $hours } часа
-    [many] { $hours } часов
-   *[other] { $hours } часа
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } день
-    [few] { $days } дня
-    [many] { $days } дней
-   *[other] { $days } дня
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } неделя
-    [few] { $weeks } недели
-    [many] { $weeks } недель
-   *[other] { $weeks } недели
-}
 
 ## Keyboard
 

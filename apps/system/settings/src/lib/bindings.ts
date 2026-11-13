@@ -436,7 +436,6 @@ export const commands = {
 	postStartPairing: (options?: CallOptions) => invoke<string>("post_start_pairing", {}, options),
 	postState: (options?: CallOptions) => invoke<PostState>("post_state", {}, options),
 	postStopPairing: (options?: CallOptions) => invoke<null>("post_stop_pairing", {}, options),
-	powerOffAfter: (options?: CallOptions) => invoke<number | null>("power_off_after", {}, options),
 	powerSetChargeLimit: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("power_set_charge_limit", params, options),
@@ -444,9 +443,6 @@ export const commands = {
 		id: string,
 		level: number,
 	}, options?: CallOptions) => invoke<null>("power_set_keyboard", params, options),
-	powerSetPowerOffAfter: (params: {
-		seconds: number,
-	}, options?: CallOptions) => invoke<null>("power_set_power_off_after", params, options),
 	powerSetProfile: (params: {
 		profile: string,
 	}, options?: CallOptions) => invoke<null>("power_set_profile", params, options),

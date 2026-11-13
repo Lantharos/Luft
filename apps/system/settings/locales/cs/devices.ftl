@@ -239,28 +239,6 @@ settings-power-button-suspend = Uspat
 settings-power-button-hibernate = Hibernovat
 settings-power-button-ask = Zeptat se
 settings-power-button-nothing = Nedělat nic
-settings-power-long-sleep = Vypnout po dlouhém spánku
-settings-power-long-sleep-description = Aby se baterie ve spánku úplně nevybila, počítač se vypne, když je baterie slabá nebo když dlouho spí na baterii. Otevřená okna se nezachovají.
-settings-power-long-sleep-failed = Nastavení se nepodařilo změnit. Zkuste to znovu.
-settings-power-long-sleep-after = Doba do vypnutí
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } hodina
-    [few] { $hours } hodiny
-    [many] { $hours } hodiny
-   *[other] { $hours } hodin
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } den
-    [few] { $days } dny
-    [many] { $days } dne
-   *[other] { $days } dní
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } týden
-    [few] { $weeks } týdny
-    [many] { $weeks } týdne
-   *[other] { $weeks } týdnů
-}
 
 ## Keyboard
 

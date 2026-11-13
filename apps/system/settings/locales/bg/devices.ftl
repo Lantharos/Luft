@@ -227,22 +227,6 @@ settings-power-button-suspend = Заспиване
 settings-power-button-hibernate = Хибернация
 settings-power-button-ask = Питане какво да се направи
 settings-power-button-nothing = Нищо
-settings-power-long-sleep = Изключване след дълго заспиване
-settings-power-long-sleep-description = Вместо да остави батерията да се изтощи по време на заспиване, компютърът се изключва, когато батерията стане слаба или след дълго заспиване на батерия. Отворените прозорци не се запазват.
-settings-power-long-sleep-failed = Това не можа да се промени. Опитайте отново.
-settings-power-long-sleep-after = Изключване след
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } час
-   *[other] { $hours } часа
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } ден
-   *[other] { $days } дни
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } седмица
-   *[other] { $weeks } седмици
-}
 
 ## Keyboard
 

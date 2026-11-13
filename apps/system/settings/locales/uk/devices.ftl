@@ -239,28 +239,6 @@ settings-power-button-suspend = Сплячий режим
 settings-power-button-hibernate = Гібернація
 settings-power-button-ask = Запитувати
 settings-power-button-nothing = Нічого не робити
-settings-power-long-sleep = Вимикати після тривалого сну
-settings-power-long-sleep-description = Щоб акумулятор не розрядився повністю у сплячому режимі, комп’ютер вимикається, коли заряд стає низьким або після тривалого сну від акумулятора. Відкриті вікна не зберігаються.
-settings-power-long-sleep-failed = Не вдалося змінити цей параметр. Спробуйте ще раз.
-settings-power-long-sleep-after = Вимикати через
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } годину
-    [few] { $hours } години
-    [many] { $hours } годин
-   *[other] { $hours } години
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } день
-    [few] { $days } дні
-    [many] { $days } днів
-   *[other] { $days } дня
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } тиждень
-    [few] { $weeks } тижні
-    [many] { $weeks } тижнів
-   *[other] { $weeks } тижня
-}
 
 ## Keyboard
 

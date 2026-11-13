@@ -245,31 +245,6 @@ settings-power-button-suspend = Codladh
 settings-power-button-hibernate = Geimhrigh
 settings-power-button-ask = Fiafraigh díom
 settings-power-button-nothing = Ná déan faic
-settings-power-long-sleep = Múch tar éis codladh fada
-settings-power-long-sleep-description = Seachas ligean don cheallra ídiú le linn codlata, múchtar an ríomhaire nuair a éiríonn an ceallra íseal nó tar éis codladh fada ar cheallra. Ní choinnítear fuinneoga oscailte.
-settings-power-long-sleep-failed = Níorbh fhéidir é seo a athrú. Bain triail eile as.
-settings-power-long-sleep-after = Múch tar éis
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } uair
-    [two] { $hours } uair
-    [few] { $hours } uaire
-    [many] { $hours } n-uaire
-   *[other] { $hours } uair
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } lá
-    [two] { $days } lá
-    [few] { $days } lá
-    [many] { $days } lá
-   *[other] { $days } lá
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } seachtain
-    [two] { $weeks } sheachtain
-    [few] { $weeks } seachtaine
-    [many] { $weeks } seachtaine
-   *[other] { $weeks } seachtain
-}
 
 ## Keyboard
 

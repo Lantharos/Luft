@@ -227,22 +227,6 @@ settings-power-button-suspend = Спиење
 settings-power-button-hibernate = Хибернација
 settings-power-button-ask = Прашај што да се направи
 settings-power-button-nothing = Ништо
-settings-power-long-sleep = Исклучување по долго спиење
-settings-power-long-sleep-description = Наместо батеријата да се испразни додека компјутерот спие, тој се исклучува кога батеријата ќе ослабне или по долго спиење на батерија. Отворените прозорци не се зачувуваат.
-settings-power-long-sleep-failed = Ова не можеше да се промени. Обидете се повторно.
-settings-power-long-sleep-after = Исклучување по
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } час
-   *[other] { $hours } часа
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } ден
-   *[other] { $days } дена
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } недела
-   *[other] { $weeks } недели
-}
 
 ## Keyboard
 

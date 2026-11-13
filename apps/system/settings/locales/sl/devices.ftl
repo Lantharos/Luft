@@ -239,28 +239,6 @@ settings-power-button-suspend = Spanje
 settings-power-button-hibernate = Mirovanje
 settings-power-button-ask = Vprašaj, kaj naj naredi
 settings-power-button-nothing = Ne naredi ničesar
-settings-power-long-sleep = Zaustavitev po dolgem spanju
-settings-power-long-sleep-description = Da se baterija med spanjem ne izprazni do konca, se računalnik zaustavi, ko je baterija skoraj prazna ali po dolgem spanju na bateriji. Odprta okna se ne ohranijo.
-settings-power-long-sleep-failed = Tega ni bilo mogoče spremeniti. Poskusite znova.
-settings-power-long-sleep-after = Zaustavi čez
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } uro
-    [two] { $hours } uri
-    [few] { $hours } ure
-   *[other] { $hours } ur
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dan
-    [two] { $days } dneva
-    [few] { $days } dni
-   *[other] { $days } dni
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } teden
-    [two] { $weeks } tedna
-    [few] { $weeks } tedne
-   *[other] { $weeks } tednov
-}
 
 ## Keyboard
 

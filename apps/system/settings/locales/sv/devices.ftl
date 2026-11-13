@@ -227,22 +227,6 @@ settings-power-button-suspend = Viloläge
 settings-power-button-hibernate = Dvala
 settings-power-button-ask = Fråga vad som ska göras
 settings-power-button-nothing = Gör ingenting
-settings-power-long-sleep = Stäng av efter lång tid i viloläge
-settings-power-long-sleep-description = I stället för att låta batteriet ta slut i viloläge stängs datorn av när batteriet börjar ta slut eller efter lång tid i viloläge på batteri. Öppna fönster sparas inte.
-settings-power-long-sleep-failed = Det gick inte att ändra det här. Försök igen.
-settings-power-long-sleep-after = Stäng av efter
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } timme
-   *[other] { $hours } timmar
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } dagar
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } vecka
-   *[other] { $weeks } veckor
-}
 
 ## Keyboard
 

@@ -227,22 +227,6 @@ settings-power-button-suspend = Αναστολή λειτουργίας
 settings-power-button-hibernate = Αδρανοποίηση
 settings-power-button-ask = Ερώτηση για την ενέργεια
 settings-power-button-nothing = Καμία ενέργεια
-settings-power-long-sleep = Τερματισμός μετά από μεγάλη αναστολή
-settings-power-long-sleep-description = Αντί να αδειάσει η μπαταρία όσο ο υπολογιστής βρίσκεται σε αναστολή λειτουργίας, ο υπολογιστής τερματίζεται όταν η μπαταρία πέσει χαμηλά ή μετά από μεγάλο διάστημα αναστολής με μπαταρία. Τα ανοιχτά παράθυρα δεν διατηρούνται.
-settings-power-long-sleep-failed = Δεν ήταν δυνατή η αλλαγή. Δοκιμάστε ξανά.
-settings-power-long-sleep-after = Τερματισμός μετά από
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } ώρα
-   *[other] { $hours } ώρες
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } ημέρα
-   *[other] { $days } ημέρες
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } εβδομάδα
-   *[other] { $weeks } εβδομάδες
-}
 
 ## Keyboard
 

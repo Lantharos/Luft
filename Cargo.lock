@@ -6041,12 +6041,8 @@ name = "luft-sleep"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "luft-dbus",
- "luft-dbus-macros",
  "rustix",
  "tempfile",
- "tokio",
- "zbus 6.0.0",
 ]
 
 [[package]]

@@ -232,25 +232,6 @@ settings-power-button-suspend = Unerežiim
 settings-power-button-hibernate = Talveunerežiim
 settings-power-button-ask = Küsi, mida teha
 settings-power-button-nothing = Ära tee midagi
-settings-power-long-sleep = Lülita pärast pikka und välja
-settings-power-long-sleep-description = Selle asemel, et lasta akul unerežiimis tühjaks saada, lülitub arvuti välja, kui aku hakkab tühjaks saama või pärast pikka und akutoitel. Avatud aknaid ei säilitata.
-settings-power-long-sleep-failed = Seda ei õnnestunud muuta. Proovi uuesti.
-settings-power-long-sleep-after = Lülita välja pärast
-settings-power-long-sleep-hours =
-    { $hours ->
-        [one] { $hours } tund
-       *[other] { $hours } tundi
-    }
-settings-power-long-sleep-days =
-    { $days ->
-        [one] { $days } päev
-       *[other] { $days } päeva
-    }
-settings-power-long-sleep-weeks =
-    { $weeks ->
-        [one] { $weeks } nädal
-       *[other] { $weeks } nädalat
-    }
 
 ## Keyboard
 

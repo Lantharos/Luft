@@ -227,22 +227,6 @@ settings-power-button-suspend = Sospendi
 settings-power-button-hibernate = Iberna
 settings-power-button-ask = Chiedi cosa fare
 settings-power-button-nothing = Non fare nulla
-settings-power-long-sleep = Spegni dopo una lunga sospensione
-settings-power-long-sleep-description = Invece di lasciar scaricare la batteria durante la sospensione, il computer si spegne quando la batteria è scarica o dopo una lunga sospensione a batteria. Le finestre aperte non vengono mantenute.
-settings-power-long-sleep-failed = Impossibile cambiare questa impostazione. Riprova.
-settings-power-long-sleep-after = Spegni dopo
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } ora
-   *[other] { $hours } ore
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } giorno
-   *[other] { $days } giorni
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } settimana
-   *[other] { $weeks } settimane
-}
 
 ## Keyboard
 

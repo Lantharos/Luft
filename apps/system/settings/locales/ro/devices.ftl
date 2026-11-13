@@ -233,25 +233,6 @@ settings-power-button-suspend = Repaus
 settings-power-button-hibernate = Hibernare
 settings-power-button-ask = Întreabă ce să facă
 settings-power-button-nothing = Nu face nimic
-settings-power-long-sleep = Oprire după un repaus lung
-settings-power-long-sleep-description = În loc să lase bateria să se descarce complet în repaus, computerul se oprește când bateria scade sau după un repaus lung pe baterie. Ferestrele deschise nu se păstrează.
-settings-power-long-sleep-failed = Setarea nu a putut fi schimbată. Încercați din nou.
-settings-power-long-sleep-after = Oprește după
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } oră
-    [few] { $hours } ore
-   *[other] { $hours } de ore
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } zi
-    [few] { $days } zile
-   *[other] { $days } de zile
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } săptămână
-    [few] { $weeks } săptămâni
-   *[other] { $weeks } de săptămâni
-}
 
 ## Keyboard
 

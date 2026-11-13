@@ -227,22 +227,6 @@ settings-power-button-suspend = Slumre
 settings-power-button-hibernate = Dvale
 settings-power-button-ask = Spørg, hvad der skal ske
 settings-power-button-nothing = Gør intet
-settings-power-long-sleep = Sluk efter lang slumretilstand
-settings-power-long-sleep-description = I stedet for at lade batteriet løbe tørt i slumretilstand slukker computeren, når batteriet bliver lavt, eller efter lang tid i slumretilstand på batteri. Åbne vinduer bevares ikke.
-settings-power-long-sleep-failed = Det kunne ikke ændres. Prøv igen.
-settings-power-long-sleep-after = Sluk efter
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } time
-   *[other] { $hours } timer
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } dage
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } uge
-   *[other] { $weeks } uger
-}
 
 ## Keyboard
 

@@ -227,22 +227,6 @@ settings-power-button-suspend = Alvó állapot
 settings-power-button-hibernate = Hibernálás
 settings-power-button-ask = Rákérdezés
 settings-power-button-nothing = Nincs művelet
-settings-power-long-sleep = Leállítás hosszú alvó állapot után
-settings-power-long-sleep-description = Ahelyett, hogy alvó állapotban teljesen lemerülne az akkumulátor, a számítógép leáll, ha az akkumulátor töltöttsége alacsony, vagy ha hosszú ideig alszik akkumulátorról. A megnyitott ablakok nem maradnak meg.
-settings-power-long-sleep-failed = Ezt nem sikerült módosítani. Próbálja újra.
-settings-power-long-sleep-after = Leállítás ennyi idő után
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } óra
-   *[other] { $hours } óra
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } nap
-   *[other] { $days } nap
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } hét
-   *[other] { $weeks } hét
-}
 
 ## Keyboard
 

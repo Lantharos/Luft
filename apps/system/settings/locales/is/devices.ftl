@@ -227,22 +227,6 @@ settings-power-button-suspend = Svefn
 settings-power-button-hibernate = Dvali
 settings-power-button-ask = Spyrja hvað skuli gera
 settings-power-button-nothing = Gera ekkert
-settings-power-long-sleep = Slökkva eftir langan svefn
-settings-power-long-sleep-description = Í stað þess að láta rafhlöðuna tæmast í svefni slekkur tölvan á sér þegar rafhlaðan er að tæmast eða eftir langan svefn á rafhlöðu. Opnir gluggar eru ekki geymdir.
-settings-power-long-sleep-failed = Ekki tókst að breyta þessu. Reyndu aftur.
-settings-power-long-sleep-after = Slökkva eftir
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } klukkustund
-   *[other] { $hours } klukkustundir
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dag
-   *[other] { $days } daga
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } viku
-   *[other] { $weeks } vikur
-}
 
 ## Keyboard
 

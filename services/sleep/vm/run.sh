@@ -12,13 +12,12 @@ start_stage
 stage_part services
 place 755 "$here/check.sh" /usr/libexec/luft-sleep-check
 place 644 "$here/luft-sleep-check.service" /usr/lib/systemd/system/luft-sleep-check.service
-place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-sleep-check.rules
 build_check_image "$image_name:45" "$image_name-sleep-check" "systemctl enable luft-sleep-check.service"
 make_root_drive "$image_name-sleep-check"
 
 BIOS=1 CPUS=2 MEMORY=3072 APPEND="mem_sleep_default=deep" boot_root_drive "$serial" 10 -global ICH9-LPC.disable_s3=0
 expect_in_log "$serial" luft-sleep-check "PASS sleeps as usual"
-BIOS=1 CPUS=2 MEMORY=3072 APPEND="mem_sleep_default=deep luft.sleep-check=long" boot_root_drive "$serial" 10 -global ICH9-LPC.disable_s3=0
-expect_in_log "$serial" luft-sleep-check "SLEEPING long"
+BIOS=1 CPUS=2 MEMORY=3072 APPEND="mem_sleep_default=deep luft.sleep-check=low" boot_root_drive "$serial" 20 -global ICH9-LPC.disable_s3=0
+expect_in_log "$serial" luft-sleep-check "SLEEPING on a low battery"
 grep -qa 'shutting down instead of sleeping on' "$serial"
 grep -qa 'luft-sleep-check: logind .*PrepareForShutdown (true' "$serial"

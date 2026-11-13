@@ -9,7 +9,6 @@
 	import DevicesSection from './DevicesSection.svelte';
 	import { durationOptions } from './format';
 	import KeyboardSection from './KeyboardSection.svelte';
-	import LongSleep from './LongSleep.svelte';
 
 	type Power = {
 		'idle-dim': boolean;
@@ -179,7 +178,6 @@
 				onchange={(seconds) => setSuspendDelay('battery', seconds)}
 			/>
 		</Row>
-		<LongSleep />
 	{/if}
 	<Row title={t('settings-power-button')}>
 		<Select

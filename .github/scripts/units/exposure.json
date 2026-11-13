@@ -63,7 +63,6 @@
 	"services/printers/data/luft-printer-setup.service": 0.9,
 	"services/printers/data/luft-printers.service": 0.9,
 	"services/sleep/data/luft-sleep-power-off.service": 0.9,
-	"services/sleep/data/luft-sleep.service": 0.9,
 	"services/speech/data/luft-speech.service": 5.9,
 	"services/speech/data/luft-transcription.service": 5.7,
 	"services/updater/data/luft-updater-check.service": 0.9,

@@ -11,7 +11,6 @@ use rustix::time::{
 };
 
 use crate::battery;
-use crate::config;
 use crate::plan::{Plan, Step, woken_by_alarm};
 
 const SYSTEMD_SLEEP: &str = "/usr/lib/systemd/systemd-sleep";
@@ -72,7 +71,7 @@ pub fn run() -> anyhow::Result<()> {
     };
     let alarm = Alarm::new().context("Couldn't set a wake-up alarm")?;
     let closed_lid = lid_closed() == Some(true);
-    let (mut plan, mut wait) = Plan::start(config::power_off_after(), boot_time(), reading);
+    let (mut plan, mut wait) = Plan::start(boot_time(), reading);
     loop {
         let due = boot_time() + wait;
         alarm.ring_in(wait)?;

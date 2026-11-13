@@ -233,25 +233,6 @@ settings-power-button-suspend = Mirovanje
 settings-power-button-hibernate = Hibernacija
 settings-power-button-ask = Pitaj što učiniti
 settings-power-button-nothing = Ne čini ništa
-settings-power-long-sleep = Isključi nakon dugog mirovanja
-settings-power-long-sleep-description = Umjesto da se baterija isprazni tijekom mirovanja, računalo se isključi kad je baterija pri kraju ili nakon dugog mirovanja na bateriji. Otvoreni prozori se ne čuvaju.
-settings-power-long-sleep-failed = Promjena nije uspjela. Pokušajte ponovno.
-settings-power-long-sleep-after = Isključi nakon
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } sat
-    [few] { $hours } sata
-   *[other] { $hours } sati
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } dan
-    [few] { $days } dana
-   *[other] { $days } dana
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } tjedan
-    [few] { $weeks } tjedna
-   *[other] { $weeks } tjedana
-}
 
 ## Keyboard
 

@@ -61,6 +61,18 @@ settings-appearance-wallpaper-span = Span displays
 settings-appearance-wallpaper-battery = Play videos on battery
 settings-appearance-wallpaper-battery-description = Otherwise video wallpapers pause until you plug in
 
+## Appearance: glass
+
+settings-appearance-glass = Glass
+settings-appearance-glass-luca = Luca
+settings-appearance-glass-maris = Maris
+settings-appearance-glass-mixed = Mixed
+settings-appearance-glass-taskbar = Taskbar
+settings-appearance-glass-surfaces = Start, panels and menus
+settings-appearance-glass-windows = App windows
+settings-appearance-glass-power-saver = Maris in power saver
+settings-appearance-glass-power-saver-description = Luca blurs what’s behind as it changes. Maris shows the wallpaper and uses less power
+
 ## Appearance: app icons
 
 settings-appearance-icons = App icons

@@ -1,6 +1,6 @@
 ---
 title: Appearance
-description: Light and dark, corners, wallpapers, the accent colour, app icons, fonts and cursors.
+description: Light and dark, corners, glass, wallpapers, the accent colour, app icons, fonts and cursors.
 sidebar:
   order: 1
 asks:
@@ -11,6 +11,9 @@ asks:
   - { ask: dark mode schedule, to: light-and-dark }
   - { ask: oled black, to: light-and-dark }
   - { ask: square corners, to: corners }
+  - { ask: blur, to: glass }
+  - { ask: transparency, to: glass }
+  - { ask: glass effect, to: glass }
   - { ask: change wallpaper, to: wallpapers }
   - { ask: background picture, to: wallpapers }
   - { ask: live wallpaper, to: wallpapers }
@@ -31,7 +34,7 @@ asks:
 
 import Shot from '../../../components/Shot.astro';
 
-Everything here is in Settings, under **Appearance**. The page opens on a preview of your desktop that follows every change; wallpapers, app icons, text and fonts, and the cursor each open from a row under it.
+Everything here is in Settings, under **Appearance**. The page opens on a preview of your desktop that follows every change; wallpapers, app icons, glass, text and fonts, and the cursor each open from a row under it.
 
 <Shot name="settings-appearance" alt="The Appearance page in Settings" />
 
@@ -45,6 +48,17 @@ Luft starts dark. Pick **Light**, **Dark** or **Auto**, which switches to dark a
 ## Corners
 
 **Corners** decides the shape of everything: **Rounded**, or **Square** for windows, the taskbar, Quick Settings, Start, menus and the Luft apps, down to their buttons and switches. Maximized and snapped windows are square where they meet the edge of the screen or another window, and full-screen windows are square either way.
+
+## Glass
+
+The taskbar, Start, panels, menus and the sidebars of Luft's apps are glass. **Glass** chooses how each of them looks:
+
+| Style | Looks like |
+| --- | --- |
+| Luca | Blurs whatever is behind the glass, windows and videos included, and follows it as it changes. This is the default |
+| Maris | Shows the blurred wallpaper behind the glass, whatever is in between. It looks the same as Luca on an empty desktop and costs almost nothing to draw |
+
+Pick a style for the **taskbar**, for **Start, panels and menus**, and for **app windows**, in any mix. While the power saver is on, all glass uses Maris until you turn it off again, unless you turn off **Maris in power saver**.
 
 ## Wallpapers
 

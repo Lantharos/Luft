@@ -5,7 +5,7 @@ import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
-import { blurBackdrop, followWindowCorners } from '../../appearance/kestrelGlass.js';
+import { blurBackdrop, followWindowCorners } from '../../appearance/glass/kestrelGlass.js';
 import { Curve, Duration } from '../../shared/motion/motion.js';
 
 const TILE_PREVIEW_GAP = 8;

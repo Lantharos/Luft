@@ -3,7 +3,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import { clamp } from '../../../../shared/math.js';
-import { PILL, styleSurface } from '../../../../appearance/kestrelGlass.js';
+import { PILL, styleSurface } from '../../../../appearance/glass/kestrelGlass.js';
 import { Curve, Duration } from '../../../../shared/motion/motion.js';
 
 export class Tooltip extends St.Label {

@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
-import { PILL, styleSurface } from '../../appearance/kestrelGlass.js';
+import { PILL, styleSurface } from '../../appearance/glass/kestrelGlass.js';
 import { clamp } from '../../shared/math.js';
 import { Curve, Duration } from '../../shared/motion/motion.js';
 

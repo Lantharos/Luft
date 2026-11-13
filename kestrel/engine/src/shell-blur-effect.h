@@ -37,6 +37,19 @@ typedef enum
   SHELL_BLUR_MODE_BACKGROUND,
 } ShellBlurMode;
 
+/**
+ * ShellBlurStyle:
+ * @SHELL_BLUR_STYLE_LUCA: blur what is beneath the actor as it changes
+ * @SHELL_BLUR_STYLE_MARIS: show the compositor's frosted wallpaper beneath it
+ *
+ * How a background blur looks.
+ */
+typedef enum
+{
+  SHELL_BLUR_STYLE_LUCA,
+  SHELL_BLUR_STYLE_MARIS,
+} ShellBlurStyle;
+
 #define SHELL_TYPE_BLUR_EFFECT (shell_blur_effect_get_type())
 G_DECLARE_FINAL_TYPE (ShellBlurEffect, shell_blur_effect, SHELL, BLUR_EFFECT, ClutterEffect)
 
@@ -53,5 +66,9 @@ void shell_blur_effect_set_brightness (ShellBlurEffect *self,
 ShellBlurMode shell_blur_effect_get_mode (ShellBlurEffect *self);
 void shell_blur_effect_set_mode (ShellBlurEffect *self,
                                  ShellBlurMode    mode);
+
+ShellBlurStyle shell_blur_effect_get_style (ShellBlurEffect *self);
+void shell_blur_effect_set_style (ShellBlurEffect *self,
+                                  ShellBlurStyle   style);
 
 G_END_DECLS

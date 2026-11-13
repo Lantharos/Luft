@@ -7,7 +7,7 @@ import {useScheme, type Scheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
 const PAGES = ['bluetooth', 'post', 'network', 'network/ethernet', 'network/vpn', 'network/firewall', 'network/proxy', 'display', 'sound', 'power', 'input', 'input/shortcuts',
-  'input/dictation', 'appearance', 'appearance/icons', 'appearance/text', 'appearance/fonts', 'appearance/cursor', 'appearance/wallpaper', 'taskbar', 'taskbar/start', 'taskbar/more', 'windows', 'accessibility', 'apps', 'privacy', 'security',
+  'input/dictation', 'appearance', 'appearance/icons', 'appearance/text', 'appearance/fonts', 'appearance/cursor', 'appearance/glass', 'appearance/wallpaper', 'taskbar', 'taskbar/start', 'taskbar/more', 'windows', 'accessibility', 'apps', 'privacy', 'security',
   'security/encryption', 'security/keyring', 'security/remote-login', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 
 const SQUARE_PAGES = ['appearance', 'appearance/icons', 'taskbar', 'windows', 'network', 'network/firewall', 'security/remote-login'];

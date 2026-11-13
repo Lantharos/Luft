@@ -1,0 +1,28 @@
+<schemalist>
+  <enum id="com.lantharos.kestrel.GlassStyle">
+    <value nick="luca" value="0"/>
+    <value nick="maris" value="1"/>
+  </enum>
+
+  <schema id="com.lantharos.kestrel.glass" path="/com/lantharos/kestrel/glass/">
+    <key name="taskbar" enum="com.lantharos.kestrel.GlassStyle">
+      <default>'luca'</default>
+      <summary>How the taskbar's glass looks</summary>
+      <description>“luca” blurs whatever is behind it as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+    </key>
+    <key name="surfaces" enum="com.lantharos.kestrel.GlassStyle">
+      <default>'luca'</default>
+      <summary>How the glass of Start, panels, menus and dialogs looks</summary>
+      <description>“luca” blurs whatever is behind them as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+    </key>
+    <key name="windows" enum="com.lantharos.kestrel.GlassStyle">
+      <default>'luca'</default>
+      <summary>How the glass of app windows looks</summary>
+      <description>“luca” blurs whatever is behind them as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+    </key>
+    <key name="maris-on-power-saver" type="b">
+      <default>true</default>
+      <summary>Whether all glass shows the wallpaper while power saver is on</summary>
+    </key>
+  </schema>
+</schemalist>

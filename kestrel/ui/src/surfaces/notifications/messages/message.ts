@@ -6,7 +6,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as Util from '../../../core/runtime/util.js';
-import { styleSurface } from '../../../appearance/kestrelGlass.js';
+import { styleSurface } from '../../../appearance/glass/kestrelGlass.js';
 import { Curve, Duration } from '../../../shared/motion/motion.js';
 import { MessageHeader } from './messageHeader.js';
 import { LabelExpanderLayout, ScaleLayout } from './messageLayouts.js';

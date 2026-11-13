@@ -5,7 +5,7 @@ import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
-import { styleSurface } from '../../appearance/kestrelGlass.js';
+import { styleSurface } from '../../appearance/glass/kestrelGlass.js';
 import { Curve, Duration } from '../../shared/motion/motion.js';
 import { fixMarkup } from '../../core/runtime/util.js';
 import { MprisSource, type MprisPlayer } from '../../surfaces/notifications/tray/mpris.js';

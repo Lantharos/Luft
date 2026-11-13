@@ -3,7 +3,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
-import { PILL, styleSurface } from '../../../../appearance/kestrelGlass.js';
+import { PILL, styleSurface } from '../../../../appearance/glass/kestrelGlass.js';
 import { Tooltip } from '../ui/tooltip.js';
 import type { Tool } from './markupCanvas.js';
 

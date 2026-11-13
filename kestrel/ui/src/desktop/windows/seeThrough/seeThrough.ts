@@ -6,11 +6,11 @@ import type Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { blurBackdrop } from '../../../appearance/kestrelGlass.js';
+import { blurBackdrop } from '../../../appearance/glass/kestrelGlass.js';
 import { showsWallpaper } from '../../wallpaper/pictures.js';
 import { SeeThroughEffect } from './seeThroughEffect.js';
 import { WallpaperBackdrop } from './wallpaperBackdrop.js';
-import { WallpaperFrost } from './wallpaperFrost.js';
+import { WallpaperFrost } from '../../../core/stage/background/wallpaperFrost.js';
 
 const APPS = 'see-through-apps';
 const SHOWS = 'see-through-shows';
@@ -61,7 +61,7 @@ interface Backdrop {
 
 class LiveBackdrop implements Backdrop {
   readonly actor = new St.Widget();
-  private readonly blur = blurBackdrop(this.actor, 0);
+  private readonly blur = blurBackdrop(this.actor, 0, 'windows');
 
   sync(settings: Gio.Settings): void {
     this.blur.enabled = settings.get_boolean('see-through-blur');

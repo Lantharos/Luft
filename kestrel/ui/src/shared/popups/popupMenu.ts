@@ -1,4 +1,4 @@
-import { freezeSelection } from '../../appearance/kestrelGlass.js';
+import { freezeSelection } from '../../appearance/glass/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 

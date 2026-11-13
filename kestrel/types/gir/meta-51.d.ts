@@ -1809,11 +1809,17 @@ export namespace Meta {
         emit<K extends keyof Compositor.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<Compositor.SignalSignatures[K]>): void;
 
         // Methods
+        add_frosted_wallpaper(area: Mtk.Rectangle, texture: Cogl.Texture): void;
+
+        clear_frosted_wallpaper(): void;
+
         disable_unredirect(): void;
 
         enable_unredirect(): void;
 
         get_backend(): Backend;
+
+        get_background_blur_from_wallpaper(): boolean;
 
         get_background_blur_params(): [number, number, number];
 
@@ -1832,6 +1838,8 @@ export namespace Meta {
         get_window_actors(): Clutter.Actor[];
 
         get_window_group(): Clutter.Actor;
+
+        set_background_blur_from_wallpaper(from_wallpaper: boolean): void;
 
         set_background_blur_params(blur_radius: number, saturation: number, noise: number): void;
 

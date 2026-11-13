@@ -1,6 +1,6 @@
 import type Clutter from 'gi://Clutter';
 
-export { blurSurface } from '../../appearance/kestrelGlass.js';
+export { blurSurface } from '../../appearance/glass/kestrelGlass.js';
 
 export const SURFACE_GAP = 10;
 

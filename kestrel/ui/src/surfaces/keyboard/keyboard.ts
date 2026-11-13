@@ -4,7 +4,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
-import { styleSurface } from '../../appearance/kestrelGlass.js';
+import { styleSurface } from '../../appearance/glass/kestrelGlass.js';
 import { Curve, Duration } from '../../shared/motion/motion.js';
 import { AspectContainer, Suggestions } from './containers.js';
 import { KeyboardController } from './controller.js';

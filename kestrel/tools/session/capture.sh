@@ -11,7 +11,7 @@ max_sign_ins=8
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 taskbar_positions=(left top right)
-scaled_groups="board:board board:corner board:glass board:touch board:view board:x11 input:scrolling panel:battery panel:markup panel:repaints panel:screenshot"
+scaled_groups="appearance:glass board:board board:corner board:glass board:touch board:view board:x11 input:scrolling panel:battery panel:markup panel:repaints panel:screenshot"
 edge_groups="taskbar:hiddenTaskbar taskbar:taskbar taskbar:taskbarOptions start:start panel:motion panel:repaints panel:screenshot panel:surfaces"
 declare -A variant_groups=(
   [laptop]="$scaled_groups tablet:keyboard"

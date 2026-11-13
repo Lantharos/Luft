@@ -1,0 +1,1221 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 13 Nov 2026 22:21:03 +0100
+Subject: [PATCH] clutter: blur with a dual Kawase pyramid in targets pooled by
+ size class
+
+The texture is halved a few times and brought back up to half its size,
+so every pixel weighs in once and moving content no longer shimmers, and
+strips like a taskbar are no longer blurred at full size with long
+kernels. Targets are kept by levels and by size rounded up to 64 pixels,
+with the framebuffer copy going straight into the first level, so
+resizing reuses them instead of allocating new ones every frame.
+
+Upstream-Status: luft-only Kestrel keeps blur targets across frames and the blur radius matching its own glass
+---
+ clutter/clutter/clutter-blur-private.h       |  20 +-
+ clutter/clutter/clutter-blur.c               | 585 ++++++++++---------
+ clutter/clutter/clutter-paint-node-private.h |  12 +
+ clutter/clutter/clutter-paint-nodes.c        | 265 ++++-----
+ 4 files changed, 432 insertions(+), 450 deletions(-)
+
+diff --git a/clutter/clutter/clutter-blur-private.h b/clutter/clutter/clutter-blur-private.h
+index bbc9bdcd787578f9cd3681214d4e89e99ea4afe4..7098b5332ce2191e3fabbc16a23a84040a06f5a4 100644
+--- a/clutter/clutter/clutter-blur-private.h
++++ b/clutter/clutter/clutter-blur-private.h
+@@ -23,16 +23,26 @@
+ 
+ G_BEGIN_DECLS
+ 
++#define CLUTTER_BLUR_MAX_LEVELS 6
++
+ typedef struct _ClutterBlur ClutterBlur;
+ 
+-float clutter_blur_calculate_downscale_factor (float width,
+-                                               float height,
+-                                               float radius);
++int clutter_blur_get_levels (float  radius,
++                             float *offset);
++
++void clutter_blur_get_result_size (int  n_levels,
++                                   int  width,
++                                   int  height,
++                                   int *result_width,
++                                   int *result_height);
+ 
+ ClutterBlur * clutter_blur_new (CoglTexture *texture,
+-                                float        radius);
++                                int          n_levels);
+ 
+-void clutter_blur_apply (ClutterBlur *blur);
++void clutter_blur_apply (ClutterBlur *blur,
++                         int          width,
++                         int          height,
++                         float        offset);
+ 
+ CoglTexture * clutter_blur_get_texture (ClutterBlur *blur);
+ 
+diff --git a/clutter/clutter/clutter-blur.c b/clutter/clutter/clutter-blur.c
+index 5151a4af66be3a8f5441107c979e17e7f93b0563..527f4c363cc692e76202330e7409f02418cd1a29 100644
+--- a/clutter/clutter/clutter-blur.c
++++ b/clutter/clutter/clutter-blur.c
+@@ -26,317 +26,251 @@
+  *
+  * Blur textures
+  *
+- * #ClutterBlur is a moderately fast gaussian blur implementation.
++ * #ClutterBlur is a dual Kawase blur: the texture is halved a few times,
++ * each step averaging five taps around every pixel, and brought back up to
++ * half its size, each step averaging eight taps. Every source pixel weighs
++ * in exactly once, so moving content doesn't shimmer, and the work stays
++ * small however wide the blur is.
+  *
+- * # Optimizations
+- *
+- * There are a number of optimizations in place to make this blur implementation
+- * real-time. All in all, the implementation performs best when using large
+- * blur-radii that allow downscaling the texture to smaller sizes, at small
+- * radii where no downscaling is possible this can easily halve the framerate.
+- *
+- * ## Multipass
+- *
+- * It is implemented in 2 passes: vertical and horizontal.
+- *
+- * ## Downscaling
+- *
+- * #ClutterBlur uses dynamic downscaling to speed up blurring. Downscaling
+- * happens in factors of 2 (the image is downscaled either by 2, 4, 8, 16, …)
+- * and depends on the blur radius, the texture size, among others.
+- *
+- * The texture is drawn into a downscaled framebuffer; the blur passes are
+- * applied on the downscaled texture contents; and finally, the blurred
+- * contents are drawn
+- * upscaled again.
+- *
+- * ## Hardware Interpolation
+- *
+- * This blur implementation cuts down the number of sampling operations by
+- * exploiting the hardware interpolation that is performed when sampling between
+- * pixel boundaries. This technique is described at:
+- *
+- * http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+- *
+- * ## Incremental gauss-factor calculation
+- *
+- * The kernel values for the gaussian kernel are computed incrementally instead
+- * of running the expensive calculations multiple times inside the blur shader.
+- * The implementation is based on the algorithm presented by K. Turkowski in
+- * GPU Gems 3, chapter 40:
+- *
+- * https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch40.html
++ * The texture may be larger than what is blurred. Only the area from its
++ * top left corner that [method@Clutter.Blur.apply] is given is read, and
++ * the result covers the same area of [method@Clutter.Blur.get_texture]
++ * at half the size.
+  *
++ * https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf
+  */
+ 
+-static const char *gaussian_blur_glsl_declarations =
+-"uniform float sigma;                                                      \n"
+-"uniform float pixel_step;                                                 \n"
+-"uniform vec2 direction;                                                   \n";
+-
+-static const char *gaussian_blur_glsl =
+-"  vec2 uv = vec2 (cogl_tex_coord.st);                                     \n"
+-"                                                                          \n"
+-"  vec3 gauss_coefficient;                                                 \n"
+-"  gauss_coefficient.x = 1.0 / (sqrt (2.0 * 3.14159265) * sigma);          \n"
+-"  gauss_coefficient.y = exp (-0.5 / (sigma * sigma));                     \n"
+-"  gauss_coefficient.z = gauss_coefficient.y * gauss_coefficient.y;        \n"
+-"                                                                          \n"
+-"  float gauss_coefficient_total = gauss_coefficient.x;                    \n"
+-"                                                                          \n"
+-"  vec4 ret = texture2D (cogl_sampler, uv) * gauss_coefficient.x;          \n"
+-"  gauss_coefficient.xy *= gauss_coefficient.yz;                           \n"
+-"                                                                          \n"
+-"  int n_steps = int (ceil (1.5 * sigma)) * 2;                             \n"
+-"                                                                          \n"
+-"  for (int i = 1; i <= n_steps; i += 2) {                                 \n"
+-"    float coefficient_subtotal = gauss_coefficient.x;                     \n"
+-"    gauss_coefficient.xy *= gauss_coefficient.yz;                         \n"
+-"    coefficient_subtotal += gauss_coefficient.x;                          \n"
+-"                                                                          \n"
+-"    float gauss_ratio = gauss_coefficient.x / coefficient_subtotal;       \n"
+-"                                                                          \n"
+-"    float foffset = float (i) + gauss_ratio;                              \n"
+-"    vec2 offset = direction * foffset * pixel_step;                       \n"
+-"                                                                          \n"
+-"    ret += texture2D (cogl_sampler, uv + offset) * coefficient_subtotal;  \n"
+-"    ret += texture2D (cogl_sampler, uv - offset) * coefficient_subtotal;  \n"
+-"                                                                          \n"
+-"    gauss_coefficient_total += 2.0 * coefficient_subtotal;                \n"
+-"    gauss_coefficient.xy *= gauss_coefficient.yz;                         \n"
+-"  }                                                                       \n"
+-"                                                                          \n"
+-"  cogl_texel = ret / gauss_coefficient_total;                             \n";
++#define OFFSETS 7
++#define SMALLEST_TABLE_LEVELS 2
++#define LARGEST_TABLE_LEVELS 4
+ 
+-#define MIN_DOWNSCALE_SIZE 256.f
+-#define MAX_SIGMA 6.f
++static const float table_offsets[OFFSETS] = { 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f };
+ 
+-enum
+-{
+-  VERTICAL,
+-  HORIZONTAL,
++static const float table_sigmas[][OFFSETS] = {
++  { 3.01f, 4.17f, 5.37f, 6.43f, 7.60f, 8.78f, 10.0f },
++  { 6.51f, 9.07f, 11.75f, 14.14f, 16.78f, 19.39f, 22.12f },
++  { 13.26f, 18.72f, 23.99f, 28.72f, 34.08f, 39.63f, 45.24f },
+ };
+ 
++#define WIDEST_OFFSET 5
++
++static const char *sample_declarations =
++"uniform vec2 kawase_step;                                                 \n"
++"uniform vec4 kawase_bounds;                                               \n"
++"                                                                          \n"
++"vec4 kawase_sample (sampler2D source, vec2 position)                      \n"
++"{                                                                         \n"
++"  return texture2D (source,                                               \n"
++"                    clamp (position, kawase_bounds.xy, kawase_bounds.zw));\n"
++"}                                                                         \n";
++
++static const char *down_source =
++"  vec2 uv = cogl_tex_coord.st;                                            \n"
++"  vec2 o = kawase_step;                                                   \n"
++"  vec4 sum = kawase_sample (cogl_sampler, uv) * 4.0;                      \n"
++"  sum += kawase_sample (cogl_sampler, uv - o);                            \n"
++"  sum += kawase_sample (cogl_sampler, uv + o);                            \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (o.x, -o.y));             \n"
++"  sum += kawase_sample (cogl_sampler, uv - vec2 (o.x, -o.y));             \n"
++"  cogl_texel = sum / 8.0;                                                 \n";
++
++static const char *up_source =
++"  vec2 uv = cogl_tex_coord.st;                                            \n"
++"  vec2 o = kawase_step;                                                   \n"
++"  vec4 sum = kawase_sample (cogl_sampler, uv + vec2 (-2.0 * o.x, 0.0));   \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (-o.x, o.y)) * 2.0;       \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (0.0, 2.0 * o.y));        \n"
++"  sum += kawase_sample (cogl_sampler, uv + o) * 2.0;                      \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (2.0 * o.x, 0.0));        \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (o.x, -o.y)) * 2.0;       \n"
++"  sum += kawase_sample (cogl_sampler, uv + vec2 (0.0, -2.0 * o.y));       \n"
++"  sum += kawase_sample (cogl_sampler, uv - o) * 2.0;                      \n"
++"  cogl_texel = sum / 12.0;                                                \n";
++
+ typedef struct
+ {
+-  CoglFramebuffer *framebuffer;
+-  CoglPipeline *pipeline;
+   CoglTexture *texture;
+-  int orientation;
+-} BlurPass;
++  CoglFramebuffer *framebuffer;
++} LevelTarget;
+ 
+-struct _ClutterBlur
++typedef struct
+ {
+-  CoglTexture *source_texture;
+-  float sigma;
+-  float downscale_factor;
++  LevelTarget down;
++  LevelTarget up;
++  CoglPipeline *down_pipeline;
++  CoglPipeline *up_pipeline;
++  int width;
++  int height;
++} BlurLevel;
+ 
+-  BlurPass pass[2];
++struct _ClutterBlur
++{
++  int n_levels;
++  BlurLevel level[CLUTTER_BLUR_MAX_LEVELS + 1];
+ };
+ 
+-static CoglPipeline*
+-create_blur_pipeline (CoglContext *ctx)
++static float
++interpolate_offset (const float *sigmas,
++                    float        sigma)
+ {
+-  static CoglPipelineKey blur_pipeline_key = "clutter-blur-pipeline-private";
+-  CoglPipeline *blur_pipeline;
++  int i;
+ 
+-  blur_pipeline =
+-    cogl_context_get_named_pipeline (ctx, &blur_pipeline_key);
++  for (i = 1; i < OFFSETS - 1 && sigma > sigmas[i]; i++)
++    ;
++
++  return table_offsets[i - 1] +
++    (sigma - sigmas[i - 1]) / (sigmas[i] - sigmas[i - 1]) *
++    (table_offsets[i] - table_offsets[i - 1]);
++}
++
++/**
++ * clutter_blur_get_levels: (skip)
++ * @radius: blur radius, twice the sigma of the gaussian blur it matches
++ * @offset: (out): the sampling offset that matches @radius at that depth
++ *
++ * Returns: how many times the texture is halved, 0 for no blur
++ */
++int
++clutter_blur_get_levels (float  radius,
++                         float *offset)
++{
++  float sigma = radius / 2.0f;
++  float scale = 1.0f;
++  int levels;
++
++  if (sigma < 0.5f)
++    {
++      *offset = 0.0f;
++      return 0;
++    }
++
++  for (levels = SMALLEST_TABLE_LEVELS;
++       levels < LARGEST_TABLE_LEVELS &&
++       sigma > table_sigmas[levels - SMALLEST_TABLE_LEVELS][WIDEST_OFFSET];
++       levels++)
++    ;
++
++  while (levels < CLUTTER_BLUR_MAX_LEVELS &&
++         sigma / scale > table_sigmas[LARGEST_TABLE_LEVELS - SMALLEST_TABLE_LEVELS][WIDEST_OFFSET])
++    {
++      scale *= 2.0f;
++      levels++;
++    }
++
++  *offset = MAX (0.0f, interpolate_offset (table_sigmas[MIN (levels, LARGEST_TABLE_LEVELS) - SMALLEST_TABLE_LEVELS],
++                                           sigma / scale));
++  return levels;
++}
++
++static CoglPipeline *
++create_pass_pipeline (CoglContext     *ctx,
++                      CoglPipelineKey *key,
++                      const char      *source)
++{
++  CoglPipeline *pipeline = cogl_context_get_named_pipeline (ctx, key);
+ 
+-  if (G_UNLIKELY (blur_pipeline == NULL))
++  if (G_UNLIKELY (pipeline == NULL))
+     {
+       CoglSnippet *snippet;
+ 
+-      blur_pipeline = cogl_pipeline_new (ctx);
+-      cogl_pipeline_set_static_name (blur_pipeline, "ClutterBlur");
+-      cogl_pipeline_set_layer_null_texture (blur_pipeline, 0);
+-      cogl_pipeline_set_layer_filters (blur_pipeline,
+-                                       0,
++      pipeline = cogl_pipeline_new (ctx);
++      cogl_pipeline_set_static_name (pipeline, "ClutterBlur");
++      cogl_pipeline_set_layer_null_texture (pipeline, 0);
++      cogl_pipeline_set_layer_filters (pipeline, 0,
+                                        COGL_PIPELINE_FILTER_LINEAR,
+                                        COGL_PIPELINE_FILTER_LINEAR);
+-      cogl_pipeline_set_layer_wrap_mode (blur_pipeline,
+-                                         0,
++      cogl_pipeline_set_layer_wrap_mode (pipeline, 0,
+                                          COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
++      cogl_pipeline_set_blend (pipeline, "RGBA = ADD (SRC_COLOR, 0)", NULL);
+ 
+       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_TEXTURE_LOOKUP,
+-                                  gaussian_blur_glsl_declarations,
+-                                  NULL);
+-      cogl_snippet_set_replace (snippet, gaussian_blur_glsl);
+-      cogl_pipeline_add_layer_snippet (blur_pipeline, 0, snippet);
++                                  sample_declarations, NULL);
++      cogl_snippet_set_replace (snippet, source);
++      cogl_pipeline_add_layer_snippet (pipeline, 0, snippet);
+       g_object_unref (snippet);
+ 
+-      cogl_context_set_named_pipeline (ctx, &blur_pipeline_key, blur_pipeline);
++      cogl_context_set_named_pipeline (ctx, key, pipeline);
+     }
+ 
+-  return cogl_pipeline_copy (blur_pipeline);
++  return cogl_pipeline_copy (pipeline);
+ }
+ 
+-static void
+-update_blur_uniforms (ClutterBlur *blur,
+-                      BlurPass    *pass)
++static CoglPipeline *
++create_down_pipeline (CoglContext *ctx,
++                      CoglTexture *source)
+ {
+-  gboolean vertical = pass->orientation == VERTICAL;
+-  int sigma_uniform;
+-  int pixel_step_uniform;
+-  int direction_uniform;
+-
+-  pixel_step_uniform =
+-    cogl_pipeline_get_uniform_location (pass->pipeline, "pixel_step");
+-  if (pixel_step_uniform > -1)
+-    {
+-      float pixel_step;
++  static CoglPipelineKey key = "clutter-blur-kawase-down";
++  CoglPipeline *pipeline = create_pass_pipeline (ctx, &key, down_source);
+ 
+-      if (vertical)
+-        pixel_step = 1.f / cogl_texture_get_height (pass->texture);
+-      else
+-        pixel_step = 1.f / cogl_texture_get_width (pass->texture);
+-
+-      cogl_pipeline_set_uniform_1f (pass->pipeline,
+-                                    pixel_step_uniform,
+-                                    pixel_step);
+-    }
+-
+-  sigma_uniform = cogl_pipeline_get_uniform_location (pass->pipeline, "sigma");
+-  if (sigma_uniform > -1)
+-    {
+-      cogl_pipeline_set_uniform_1f (pass->pipeline,
+-                                    sigma_uniform,
+-                                    blur->sigma / blur->downscale_factor);
+-    }
+-
+-  direction_uniform =
+-    cogl_pipeline_get_uniform_location (pass->pipeline, "direction");
+-  if (direction_uniform > -1)
+-    {
+-      gboolean horizontal = !vertical;
+-      float direction[2] = {
+-        horizontal,
+-        vertical,
+-      };
+-
+-      cogl_pipeline_set_uniform_float (pass->pipeline,
+-                                       direction_uniform,
+-                                       2, 1,
+-                                       direction);
+-    }
++  cogl_pipeline_set_layer_texture (pipeline, 0, source);
++  return pipeline;
+ }
+ 
+-static gboolean
+-create_fbo (ClutterBlur *blur,
+-            CoglContext *ctx,
+-            BlurPass    *pass)
++static CoglPipeline *
++create_up_pipeline (CoglContext *ctx,
++                    CoglTexture *source)
+ {
+-  float scaled_height;
+-  float scaled_width;
+-  float height;
+-  float width;
+-
+-  g_clear_object (&pass->texture);
+-  g_clear_object (&pass->framebuffer);
+-
+-  width = cogl_texture_get_width (blur->source_texture);
+-  height = cogl_texture_get_height (blur->source_texture);
+-  scaled_width = floorf (width / blur->downscale_factor);
+-  scaled_height = floorf (height / blur->downscale_factor);
+-
+-  pass->texture = cogl_texture_2d_new_with_size (ctx,
+-                                                 (int) scaled_width,
+-                                                 (int) scaled_height);
+-  if (!pass->texture)
+-    return FALSE;
+-
+-  pass->framebuffer =
+-    COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (pass->texture));
+-  if (!pass->framebuffer)
+-    {
+-      g_warning ("%s: Unable to create an Offscreen buffer", G_STRLOC);
+-      return FALSE;
+-    }
++  static CoglPipelineKey key = "clutter-blur-kawase-up";
++  CoglPipeline *pipeline = create_pass_pipeline (ctx, &key, up_source);
+ 
+-  cogl_framebuffer_orthographic (pass->framebuffer,
+-                                 0.0, 0.0,
+-                                 scaled_width,
+-                                 scaled_height,
+-                                 0.0, 1.0);
+-  return TRUE;
++  cogl_pipeline_set_layer_texture (pipeline, 0, source);
++  return pipeline;
+ }
+ 
+ static gboolean
+-setup_blur_pass (ClutterBlur *blur,
+-                 BlurPass    *pass,
+-                 int          orientation,
+-                 CoglTexture *texture)
++allocate_target (LevelTarget *target,
++                 CoglContext *ctx,
++                 int          width,
++                 int          height)
+ {
+-  CoglContext *context = cogl_texture_get_context (texture);
+-  pass->orientation = orientation;
+-  pass->pipeline = create_blur_pipeline (context);
+-  cogl_pipeline_set_layer_texture (pass->pipeline, 0, texture);
++  g_autoptr (CoglOffscreen) offscreen = NULL;
++  g_autoptr (GError) error = NULL;
+ 
+-  if (!create_fbo (blur, context, pass))
+-    return FALSE;
++  target->texture = cogl_texture_2d_new_with_size (ctx, width, height);
++  cogl_texture_set_premultiplied (target->texture, TRUE);
++  offscreen = cogl_offscreen_new_with_texture (target->texture);
++  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
++    {
++      g_warning ("Unable to allocate a %dx%d blur level: %s",
++                 width, height, error->message);
++      return FALSE;
++    }
+ 
+-  update_blur_uniforms (blur, pass);
++  cogl_framebuffer_orthographic (COGL_FRAMEBUFFER (offscreen),
++                                 0.0, 0.0, width, height, 0.0, 1.0);
++  target->framebuffer = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
+   return TRUE;
+ }
+ 
+-float
+-clutter_blur_calculate_downscale_factor (float width,
+-                                         float height,
+-                                         float radius)
++static void
++clear_target (LevelTarget *target)
+ {
+-  float downscale_factor = 1.f;
+-  float scaled_width = width;
+-  float scaled_height = height;
+-  float scaled_sigma = radius / 2.0f;
+-
+-  /* This is the algorithm used by Firefox; keep downscaling until either the
+-   * blur radius is lower than the threshold, or the downscaled texture is too
+-   * small.
+-   */
+-  while (scaled_sigma > MAX_SIGMA &&
+-         scaled_width > MIN_DOWNSCALE_SIZE &&
+-         scaled_height > MIN_DOWNSCALE_SIZE)
+-    {
+-      downscale_factor *= 2.f;
+-
+-      scaled_width = width / downscale_factor;
+-      scaled_height = height / downscale_factor;
+-      scaled_sigma = radius / (2.0f * downscale_factor);
+-    }
+-
+-  return downscale_factor;
++  g_clear_object (&target->framebuffer);
++  g_clear_object (&target->texture);
+ }
+ 
+ static void
+-apply_blur_pass (BlurPass *pass)
++clear_level (BlurLevel *level)
+ {
+-  CoglColor transparent;
+-
+-  cogl_color_init_from_4f (&transparent, 0.0, 0.0, 0.0, 0.0);
+-
+-  cogl_framebuffer_clear (pass->framebuffer,
+-                          COGL_BUFFER_BIT_COLOR,
+-                          &transparent);
+-
+-  cogl_framebuffer_draw_rectangle (pass->framebuffer,
+-                                   pass->pipeline,
+-                                   0, 0,
+-                                   cogl_texture_get_width (pass->texture),
+-                                   cogl_texture_get_height (pass->texture));
++  g_clear_object (&level->down_pipeline);
++  g_clear_object (&level->up_pipeline);
++  clear_target (&level->down);
++  clear_target (&level->up);
+ }
+ 
+-static void
+-clear_blur_pass (BlurPass *pass)
++static LevelTarget *
++brought_up (ClutterBlur *blur,
++            int          index)
+ {
+-  g_clear_object (&pass->pipeline);
+-  g_clear_object (&pass->texture);
+-  g_clear_object (&pass->framebuffer);
++  BlurLevel *level = &blur->level[index];
++
++  return index == blur->n_levels ? &level->down : &level->up;
+ }
+ 
+ /**
+  * clutter_blur_new:
+  * @texture: a #CoglTexture
+- * @sigma: blur sigma
++ * @n_levels: how many times to halve it, from clutter_blur_get_levels()
+  *
+  * Creates a new #ClutterBlur.
+  *
+@@ -344,58 +278,133 @@ clear_blur_pass (BlurPass *pass)
+  */
+ ClutterBlur *
+ clutter_blur_new (CoglTexture *texture,
+-                  float        radius)
++                  int          n_levels)
+ {
++  CoglContext *ctx;
+   ClutterBlur *blur;
+-  unsigned int height;
+-  unsigned int width;
+-  BlurPass *hpass;
+-  BlurPass *vpass;
++  int i;
+ 
+   g_return_val_if_fail (texture != NULL, NULL);
+-  g_return_val_if_fail (radius >= 0.0f, NULL);
+-
+-  width = cogl_texture_get_width (texture);
+-  height = cogl_texture_get_height (texture);
++  g_return_val_if_fail (n_levels >= 0 && n_levels <= CLUTTER_BLUR_MAX_LEVELS, NULL);
+ 
++  ctx = cogl_texture_get_context (texture);
+   blur = g_new0 (ClutterBlur, 1);
+-  blur->sigma = radius / 2.0f;
+-  blur->source_texture = g_object_ref (texture);
+-  blur->downscale_factor =
+-    clutter_blur_calculate_downscale_factor (width, height, radius);
+-
+-  if (G_APPROX_VALUE (blur->sigma, 0.0f, FLT_EPSILON))
+-    goto out;
++  blur->n_levels = n_levels;
++  blur->level[0].down.texture = g_object_ref (texture);
+ 
+-  vpass = &blur->pass[VERTICAL];
+-  hpass = &blur->pass[HORIZONTAL];
+-
+-  if (!setup_blur_pass (blur, vpass, VERTICAL, texture) ||
+-      !setup_blur_pass (blur, hpass, HORIZONTAL, vpass->texture))
++  for (i = 1; i <= n_levels; i++)
+     {
+-      clutter_blur_free (blur);
+-      return NULL;
++      BlurLevel *level = &blur->level[i];
++      CoglTexture *larger = blur->level[i - 1].down.texture;
++      int width = (cogl_texture_get_width (larger) + 1) / 2;
++      int height = (cogl_texture_get_height (larger) + 1) / 2;
++
++      if (!allocate_target (&level->down, ctx, width, height) ||
++          (i < n_levels && !allocate_target (&level->up, ctx, width, height)))
++        {
++          clutter_blur_free (blur);
++          return NULL;
++        }
++
++      level->down_pipeline = create_down_pipeline (ctx, larger);
+     }
+ 
+-out:
+-  return g_steal_pointer (&blur);
++  for (i = 1; i < n_levels; i++)
++    blur->level[i].up_pipeline = create_up_pipeline (ctx, brought_up (blur, i + 1)->texture);
++
++  return blur;
++}
++
++static void
++run_pass (CoglPipeline      *pipeline,
++          const LevelTarget *target,
++          const LevelTarget *source,
++          const BlurLevel   *source_level,
++          const BlurLevel   *target_level,
++          float              offset)
++{
++  float texture_width = cogl_texture_get_width (source->texture);
++  float texture_height = cogl_texture_get_height (source->texture);
++  float step[2] = { 0.5f * offset / texture_width, 0.5f * offset / texture_height };
++  float bounds[4] = {
++    0.5f / texture_width,
++    0.5f / texture_height,
++    (source_level->width - 0.5f) / texture_width,
++    (source_level->height - 0.5f) / texture_height,
++  };
++
++  cogl_pipeline_set_uniform_float (pipeline,
++                                   cogl_pipeline_get_uniform_location (pipeline, "kawase_step"),
++                                   2, 1, step);
++  cogl_pipeline_set_uniform_float (pipeline,
++                                   cogl_pipeline_get_uniform_location (pipeline, "kawase_bounds"),
++                                   4, 1, bounds);
++  cogl_framebuffer_draw_textured_rectangle (target->framebuffer, pipeline,
++                                            0, 0, target_level->width, target_level->height,
++                                            0, 0,
++                                            source_level->width / texture_width,
++                                            source_level->height / texture_height);
+ }
+ 
+ /**
+  * clutter_blur_apply:
+  * @blur: a #ClutterBlur
++ * @width: width of the area to blur, from the texture's top left corner
++ * @height: height of that area
++ * @offset: sampling offset from clutter_blur_get_levels()
+  *
+- * Applies the blur. The resulting texture can be retrieved by
+- * [method@Clutter.Blur.get_texture].
++ * Applies the blur. The result is in [method@Clutter.Blur.get_texture],
++ * in the area clutter_blur_get_result_size() gives.
+  */
+ void
+-clutter_blur_apply (ClutterBlur *blur)
++clutter_blur_apply (ClutterBlur *blur,
++                    int          width,
++                    int          height,
++                    float        offset)
+ {
+-  if (G_APPROX_VALUE (blur->sigma, 0.0, FLT_EPSILON))
+-    return;
++  int i;
++
++  blur->level[0].width = width;
++  blur->level[0].height = height;
++
++  for (i = 1; i <= blur->n_levels; i++)
++    {
++      BlurLevel *level = &blur->level[i];
+ 
+-  apply_blur_pass (&blur->pass[VERTICAL]);
+-  apply_blur_pass (&blur->pass[HORIZONTAL]);
++      level->width = (blur->level[i - 1].width + 1) / 2;
++      level->height = (blur->level[i - 1].height + 1) / 2;
++      run_pass (level->down_pipeline, &level->down,
++                &blur->level[i - 1].down, &blur->level[i - 1], level,
++                offset);
++    }
++
++  for (i = blur->n_levels - 1; i >= 1; i--)
++    {
++      BlurLevel *level = &blur->level[i];
++
++      run_pass (level->up_pipeline, &level->up,
++                brought_up (blur, i + 1), &blur->level[i + 1], level,
++                offset);
++    }
++}
++
++/**
++ * clutter_blur_get_result_size: (skip)
++ * @n_levels: how many times the texture is halved
++ * @width: width of the blurred area
++ * @height: height of the blurred area
++ * @result_width: (out): width of the result
++ * @result_height: (out): height of the result
++ */
++void
++clutter_blur_get_result_size (int  n_levels,
++                              int  width,
++                              int  height,
++                              int *result_width,
++                              int *result_height)
++{
++  *result_width = n_levels > 0 ? (width + 1) / 2 : width;
++  *result_height = n_levels > 0 ? (height + 1) / 2 : height;
+ }
+ 
+ /**
+@@ -410,10 +419,7 @@ clutter_blur_apply (ClutterBlur *blur)
+ CoglTexture *
+ clutter_blur_get_texture (ClutterBlur *blur)
+ {
+-  if (G_APPROX_VALUE (blur->sigma, 0.0, FLT_EPSILON))
+-    return blur->source_texture;
+-  else
+-    return blur->pass[HORIZONTAL].texture;
++  return blur->n_levels > 0 ? brought_up (blur, 1)->texture : blur->level[0].down.texture;
+ }
+ 
+ /**
+@@ -425,10 +431,11 @@ clutter_blur_get_texture (ClutterBlur *blur)
+ void
+ clutter_blur_free (ClutterBlur *blur)
+ {
++  int i;
++
+   g_assert (blur);
+ 
+-  clear_blur_pass (&blur->pass[VERTICAL]);
+-  clear_blur_pass (&blur->pass[HORIZONTAL]);
+-  g_clear_object (&blur->source_texture);
++  for (i = 0; i <= blur->n_levels; i++)
++    clear_level (&blur->level[i]);
+   g_free (blur);
+ }
+diff --git a/clutter/clutter/clutter-paint-node-private.h b/clutter/clutter/clutter-paint-node-private.h
+index 24243cb4534d8a2284975b408b0143e5e6cb61e5..863fb9d6b7158d3ff62e35cb0974581701d1b4a7 100644
+--- a/clutter/clutter/clutter-paint-node-private.h
++++ b/clutter/clutter/clutter-paint-node-private.h
+@@ -118,6 +118,18 @@ ClutterPaintNode * clutter_blur_node_new_from_framebuffer          (CoglFramebuf
+                                                                     float                  noise,
+                                                                     uint8_t                opacity);
+ 
++CLUTTER_EXPORT
++void clutter_blur_node_get_result_size (ClutterPaintNode *node,
++                                        int              *width,
++                                        int              *height);
++
++CLUTTER_EXPORT
++void clutter_blur_add_framebuffer_effect (CoglPipeline *pipeline,
++                                          float         saturation,
++                                          float         noise,
++                                          float         noise_width,
++                                          float         noise_height);
++
+ #define CLUTTER_TYPE_EFFECT_NODE                (clutter_effect_node_get_type ())
+ #define CLUTTER_EFFECT_NODE(obj)                (G_TYPE_CHECK_INSTANCE_CAST ((obj), CLUTTER_TYPE_EFFECT_NODE, ClutterEffectNode))
+ #define CLUTTER_IS_EFFECT_NODE(obj)             (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CLUTTER_TYPE_EFFECT_NODE))
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index 1d45293f7a155ee84a6cb112b24943212064be64..92498f4ca0fd62369d7cdcb74467d3dfe9f7a972 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1483,15 +1483,15 @@ clutter_blit_node_add_blit_rectangle (ClutterBlitNode *blit_node,
+ 
+ #define IDLE_BLUR_TARGET_LIMIT 8
+ #define IDLE_BLUR_TARGET_LIFETIME_MS 2000
++#define BLUR_TARGET_SIZE_STEP 64
+ 
+ typedef struct
+ {
+   CoglFramebuffer *offscreen;
+-  CoglFramebuffer *capture;
+   ClutterBlur *blur;
+-  unsigned int width;
+-  unsigned int height;
+-  float radius;
++  int capacity_width;
++  int capacity_height;
++  int n_levels;
+   int64_t idle_since_us;
+ } BlurTarget;
+ 
+@@ -1504,38 +1504,51 @@ struct _ClutterBlurNode
+ 
+   BlurTarget *target;
+   CoglFramebuffer *source_framebuffer;
+-  CoglFramebuffer *capture_framebuffer;
+-  CoglPipeline *capture_pipeline;
+   int source_x;
+   int source_y;
+-  int source_width;
+-  int source_height;
++  int width;
++  int height;
++  float offset;
+ };
+ 
+ G_DEFINE_TYPE (ClutterBlurNode, clutter_blur_node, CLUTTER_TYPE_LAYER_NODE)
+ 
++static int
++size_class (int size)
++{
++  return (size + BLUR_TARGET_SIZE_STEP - 1) / BLUR_TARGET_SIZE_STEP * BLUR_TARGET_SIZE_STEP;
++}
++
++static gboolean
++capacity_fits (int capacity,
++               int size)
++{
++  return capacity >= size && capacity <= size_class (size) + BLUR_TARGET_SIZE_STEP;
++}
++
+ static void
+ blur_target_free (BlurTarget *target)
+ {
+   g_clear_pointer (&target->blur, clutter_blur_free);
+   g_clear_object (&target->offscreen);
+-  g_clear_object (&target->capture);
+   g_free (target);
+ }
+ 
+ static BlurTarget *
+-blur_target_new (CoglContext  *cogl_context,
+-                 unsigned int  width,
+-                 unsigned int  height,
+-                 float         radius)
++blur_target_new (CoglContext *cogl_context,
++                 int          width,
++                 int          height,
++                 int          n_levels)
+ {
+   g_autoptr (CoglTexture) texture = NULL;
+   g_autoptr (CoglOffscreen) offscreen = NULL;
+   g_autoptr (GError) error = NULL;
++  int capacity_width = size_class (width);
++  int capacity_height = size_class (height);
+   BlurTarget *target;
+   ClutterBlur *blur;
+ 
+-  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
++  texture = cogl_texture_2d_new_with_size (cogl_context, capacity_width, capacity_height);
+   cogl_texture_set_premultiplied (texture, TRUE);
+ 
+   offscreen = cogl_offscreen_new_with_texture (texture);
+@@ -1546,32 +1559,29 @@ blur_target_new (CoglContext  *cogl_context,
+       return NULL;
+     }
+ 
+-  blur = clutter_blur_new (texture, radius);
++  blur = clutter_blur_new (texture, n_levels);
+   if (!blur)
+-    {
+-      g_warning ("Failed to create blur pipeline");
+-      return NULL;
+-    }
++    return NULL;
+ 
+   cogl_framebuffer_orthographic (COGL_FRAMEBUFFER (offscreen),
+                                  0.0, 0.0,
+-                                 width, height,
++                                 capacity_width, capacity_height,
+                                  0.0, 1.0);
+ 
+   target = g_new0 (BlurTarget, 1);
+   target->offscreen = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
+   target->blur = blur;
+-  target->width = width;
+-  target->height = height;
+-  target->radius = radius;
++  target->capacity_width = capacity_width;
++  target->capacity_height = capacity_height;
++  target->n_levels = n_levels;
+   return target;
+ }
+ 
+ static BlurTarget *
+-take_blur_target (CoglContext  *cogl_context,
+-                  unsigned int  width,
+-                  unsigned int  height,
+-                  float         radius)
++take_blur_target (CoglContext *cogl_context,
++                  int          width,
++                  int          height,
++                  int          n_levels)
+ {
+   GList *l;
+ 
+@@ -1579,9 +1589,9 @@ take_blur_target (CoglContext  *cogl_context,
+     {
+       BlurTarget *target = l->data;
+ 
+-      if (target->width == width &&
+-          target->height == height &&
+-          target->radius == radius &&
++      if (capacity_fits (target->capacity_width, width) &&
++          capacity_fits (target->capacity_height, height) &&
++          target->n_levels == n_levels &&
+           cogl_framebuffer_get_context (target->offscreen) == cogl_context)
+         {
+           g_queue_delete_link (&idle_blur_targets, l);
+@@ -1589,7 +1599,7 @@ take_blur_target (CoglContext  *cogl_context,
+         }
+     }
+ 
+-  return blur_target_new (cogl_context, width, height, radius);
++  return blur_target_new (cogl_context, width, height, n_levels);
+ }
+ 
+ static gboolean
+@@ -1629,59 +1639,6 @@ release_blur_target (BlurTarget *target)
+     }
+ }
+ 
+-static gboolean
+-ensure_blur_capture (BlurTarget   *target,
+-                     CoglContext  *cogl_context,
+-                     unsigned int  width,
+-                     unsigned int  height)
+-{
+-  g_autoptr (CoglTexture) texture = NULL;
+-  g_autoptr (CoglOffscreen) offscreen = NULL;
+-  g_autoptr (GError) error = NULL;
+-
+-  if (target->capture &&
+-      cogl_framebuffer_get_width (target->capture) == (int) width &&
+-      cogl_framebuffer_get_height (target->capture) == (int) height)
+-    return TRUE;
+-
+-  g_clear_object (&target->capture);
+-  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
+-  offscreen = cogl_offscreen_new_with_texture (texture);
+-  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
+-    {
+-      g_warning ("Unable to allocate blur capture offscreen: %s",
+-                 error->message);
+-      return FALSE;
+-    }
+-
+-  target->capture = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
+-  return TRUE;
+-}
+-
+-static gboolean
+-create_blur_capture_render_objects (ClutterBlurNode *blur_node,
+-                                    unsigned int     width,
+-                                    unsigned int     height)
+-{
+-  CoglContext *cogl_context =
+-    cogl_framebuffer_get_context (blur_node->source_framebuffer);
+-  CoglTexture *texture;
+-
+-  if (!ensure_blur_capture (blur_node->target, cogl_context, width, height))
+-    return FALSE;
+-
+-  texture = cogl_offscreen_get_texture (COGL_OFFSCREEN (blur_node->target->capture));
+-  blur_node->capture_pipeline = create_texture_pipeline ();
+-  cogl_pipeline_set_layer_filters (blur_node->capture_pipeline, 0,
+-                                   COGL_PIPELINE_FILTER_LINEAR,
+-                                   COGL_PIPELINE_FILTER_LINEAR);
+-  cogl_pipeline_set_layer_texture (blur_node->capture_pipeline, 0, texture);
+-
+-  blur_node->capture_framebuffer = g_object_ref (blur_node->target->capture);
+-
+-  return TRUE;
+-}
+-
+ static const char *blur_framebuffer_effect_declarations =
+   "uniform float blur_framebuffer_saturation;                               \n"
+   "uniform float blur_framebuffer_noise;                                    \n"
+@@ -1715,12 +1672,12 @@ static const char *blur_framebuffer_effect_source =
+   "      cogl_color_out.rgb = color * cogl_color_out.a;                      \n"
+   "    }                                                                     \n";
+ 
+-static void
+-add_blur_framebuffer_effect (CoglPipeline *pipeline,
+-                             float         saturation,
+-                             float         noise,
+-                             float         noise_width,
+-                             float         noise_height)
++void
++clutter_blur_add_framebuffer_effect (CoglPipeline *pipeline,
++                                     float         saturation,
++                                     float         noise,
++                                     float         noise_width,
++                                     float         noise_height)
+ {
+   static CoglSnippet *snippet;
+   int saturation_uniform;
+@@ -1772,53 +1729,28 @@ clutter_blur_node_post_draw (ClutterPaintNode    *node,
+ 
+   if (blur_node->source_framebuffer)
+     {
+-      ClutterLayerNode *layer_node = CLUTTER_LAYER_NODE (node);
+-      CoglFramebuffer *capture_target;
+       g_autoptr (GError) error = NULL;
+ 
+-      capture_target = blur_node->capture_framebuffer
+-        ? blur_node->capture_framebuffer
+-        : layer_node->offscreen;
+-
+       should_blur =
+         cogl_framebuffer_blit (blur_node->source_framebuffer,
+-                               capture_target,
++                               blur_node->target->offscreen,
+                                blur_node->source_x,
+                                blur_node->source_y,
+                                0,
+                                0,
+-                               blur_node->source_width,
+-                               blur_node->source_height,
++                               blur_node->width,
++                               blur_node->height,
+                                &error);
+       if (!should_blur)
+-        {
+-          g_warning ("Failed to capture blur node framebuffer: %s",
+-                     error->message);
+-        }
+-      else if (blur_node->capture_framebuffer)
+-        {
+-          CoglColor transparent;
+-          float dst_width;
+-          float dst_height;
+-
+-          dst_width = cogl_framebuffer_get_width (layer_node->offscreen);
+-          dst_height = cogl_framebuffer_get_height (layer_node->offscreen);
+-
+-          cogl_color_init_from_4f (&transparent, 0.0, 0.0, 0.0, 0.0);
+-          cogl_framebuffer_clear (layer_node->offscreen,
+-                                  COGL_BUFFER_BIT_COLOR,
+-                                  &transparent);
+-          cogl_framebuffer_draw_textured_rectangle (layer_node->offscreen,
+-                                                    blur_node->capture_pipeline,
+-                                                    0.0, 0.0,
+-                                                    dst_width, dst_height,
+-                                                    0.0, 0.0,
+-                                                    1.0, 1.0);
+-        }
++        g_warning ("Failed to capture blur node framebuffer: %s",
++                   error->message);
+     }
+ 
+   if (should_blur)
+-    clutter_blur_apply (blur_node->target->blur);
++    clutter_blur_apply (blur_node->target->blur,
++                        blur_node->width,
++                        blur_node->height,
++                        blur_node->offset);
+ 
+   parent_class->post_draw (node, paint_context);
+ }
+@@ -1830,8 +1762,6 @@ clutter_blur_node_finalize (ClutterPaintNode *node)
+ 
+   g_clear_pointer (&blur_node->target, release_blur_target);
+   g_clear_object (&blur_node->source_framebuffer);
+-  g_clear_object (&blur_node->capture_framebuffer);
+-  g_clear_object (&blur_node->capture_pipeline);
+ 
+   CLUTTER_PAINT_NODE_CLASS (clutter_blur_node_parent_class)->finalize (node);
+ }
+@@ -1851,6 +1781,22 @@ clutter_blur_node_init (ClutterBlurNode *blur_node)
+ {
+ }
+ 
++static void
++show_blurred_area (CoglPipeline *pipeline,
++                   CoglTexture  *texture,
++                   int           width,
++                   int           height)
++{
++  graphene_matrix_t matrix;
++
++  graphene_matrix_init_scale (&matrix,
++                              (float) width / cogl_texture_get_width (texture),
++                              (float) height / cogl_texture_get_height (texture),
++                              1.f);
++  cogl_pipeline_set_layer_texture (pipeline, 0, texture);
++  cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
++}
++
+ /**
+  * clutter_blur_node_new:
+  * @width width of the blur layer
+@@ -1875,6 +1821,7 @@ clutter_blur_node_new (unsigned int width,
+   ClutterContext *context;
+   ClutterBackend *backend;
+   CoglContext *cogl_context;
++  int n_levels, result_width, result_height;
+ 
+   g_return_val_if_fail (radius >= 0.0, NULL);
+ 
+@@ -1882,7 +1829,13 @@ clutter_blur_node_new (unsigned int width,
+   backend = clutter_context_get_backend (context);
+   cogl_context = clutter_backend_get_cogl_context (backend);
+   blur_node = _clutter_paint_node_create (CLUTTER_TYPE_BLUR_NODE);
+-  blur_node->target = take_blur_target (cogl_context, width, height, radius);
++  blur_node->width = MAX (width, 1u);
++  blur_node->height = MAX (height, 1u);
++  n_levels = clutter_blur_get_levels (radius, &blur_node->offset);
++  blur_node->target = take_blur_target (cogl_context,
++                                        blur_node->width,
++                                        blur_node->height,
++                                        n_levels);
+   if (!blur_node->target)
+     return (ClutterPaintNode *) blur_node;
+ 
+@@ -1892,12 +1845,33 @@ clutter_blur_node_new (unsigned int width,
+   cogl_pipeline_set_layer_filters (layer_node->pipeline, 0,
+                                    COGL_PIPELINE_FILTER_LINEAR,
+                                    COGL_PIPELINE_FILTER_LINEAR);
+-  cogl_pipeline_set_layer_texture (layer_node->pipeline, 0,
+-                                   clutter_blur_get_texture (blur_node->target->blur));
++  clutter_blur_get_result_size (n_levels, blur_node->width, blur_node->height,
++                                &result_width, &result_height);
++  show_blurred_area (layer_node->pipeline,
++                     clutter_blur_get_texture (blur_node->target->blur),
++                     result_width, result_height);
+ 
+   return (ClutterPaintNode *) blur_node;
+ }
+ 
++/**
++ * clutter_blur_node_get_result_size: (skip)
++ * @node: a #ClutterBlurNode
++ * @width: (out): width of the blurred contents it paints
++ * @height: (out): height of the blurred contents it paints
++ */
++void
++clutter_blur_node_get_result_size (ClutterPaintNode *node,
++                                   int              *width,
++                                   int              *height)
++{
++  ClutterBlurNode *blur_node = CLUTTER_BLUR_NODE (node);
++
++  clutter_blur_get_result_size (blur_node->target->n_levels,
++                                blur_node->width, blur_node->height,
++                                width, height);
++}
++
+ /**
+  * clutter_blur_node_new_from_framebuffer:
+  * @framebuffer: the source framebuffer
+@@ -1932,10 +1906,6 @@ clutter_blur_node_new_from_framebuffer (CoglFramebuffer *framebuffer,
+   ClutterLayerNode *layer_node;
+   CoglColor color;
+   float opacity_f;
+-  float downscale_factor;
+-  unsigned int scaled_width;
+-  unsigned int scaled_height;
+-  float scaled_radius;
+ 
+   g_return_val_if_fail (COGL_IS_FRAMEBUFFER (framebuffer), NULL);
+   g_return_val_if_fail (width > 0, NULL);
+@@ -1944,13 +1914,7 @@ clutter_blur_node_new_from_framebuffer (CoglFramebuffer *framebuffer,
+   g_return_val_if_fail (saturation >= 0.0, NULL);
+   g_return_val_if_fail (noise >= 0.0, NULL);
+ 
+-  downscale_factor =
+-    clutter_blur_calculate_downscale_factor (width, height, radius);
+-  scaled_width = MAX (1u, (unsigned int) floorf (width / downscale_factor));
+-  scaled_height = MAX (1u, (unsigned int) floorf (height / downscale_factor));
+-  scaled_radius = radius / downscale_factor;
+-
+-  node = clutter_blur_node_new (scaled_width, scaled_height, scaled_radius);
++  node = clutter_blur_node_new (width, height, radius);
+   blur_node = CLUTTER_BLUR_NODE (node);
+   if (!blur_node->target)
+     {
+@@ -1961,26 +1925,15 @@ clutter_blur_node_new_from_framebuffer (CoglFramebuffer *framebuffer,
+   blur_node->source_framebuffer = g_object_ref (framebuffer);
+   blur_node->source_x = src_x;
+   blur_node->source_y = src_y;
+-  blur_node->source_width = width;
+-  blur_node->source_height = height;
+-
+-  if (downscale_factor > 1.0f)
+-    {
+-      if (!create_blur_capture_render_objects (blur_node, width, height))
+-        {
+-          clutter_paint_node_unref (node);
+-          return NULL;
+-        }
+-    }
+ 
+   layer_node = CLUTTER_LAYER_NODE (blur_node);
+   layer_node->skip_color_state_transform = TRUE;
+ 
+-  add_blur_framebuffer_effect (layer_node->pipeline,
+-                               saturation,
+-                               noise,
+-                               width,
+-                               height);
++  clutter_blur_add_framebuffer_effect (layer_node->pipeline,
++                                       saturation,
++                                       noise,
++                                       blur_node->target->capacity_width,
++                                       blur_node->target->capacity_height);
+ 
+   opacity_f = opacity / 255.0f;
+   cogl_color_init_from_4f (&color, opacity_f, opacity_f, opacity_f, opacity_f);

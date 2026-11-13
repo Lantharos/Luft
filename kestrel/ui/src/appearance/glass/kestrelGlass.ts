@@ -2,7 +2,7 @@ import type Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { toggleStyleClass } from '../shared/widgets/styleClass.js';
+import { toggleStyleClass } from '../../shared/widgets/styleClass.js';
 
 export const PILL = 999;
 const THEMED_PROPERTIES = [
@@ -18,8 +18,16 @@ interface Backdrop {
   corners: number;
 }
 
+export type GlassKind = 'taskbar' | 'surfaces' | 'windows';
+
 const surfaces = new Set<Backdrop>();
 const cornered = new Set<Backdrop>();
+const backdrops = new Map<Shell.BlurEffect, GlassKind>();
+const styles: Record<GlassKind, Shell.BlurStyle> = {
+  taskbar: Shell.BlurStyle.LUCA,
+  surfaces: Shell.BlurStyle.LUCA,
+  windows: Shell.BlurStyle.LUCA,
+};
 let solid = false;
 let square = false;
 
@@ -67,25 +75,41 @@ function followTheme(actor: St.Widget, effect: Shell.BlurEffect): void {
   });
 }
 
-export function blurBackdrop(actor: St.Widget, corners: number): Shell.BlurEffect {
+export function setGlassStyle(kind: GlassKind, style: Shell.BlurStyle): void {
+  styles[kind] = style;
+  for (const [effect, effectKind] of backdrops)
+    if (effectKind === kind) effect.style = style;
+}
+
+export function repaintWallpaperGlass(): void {
+  for (const effect of backdrops.keys())
+    if (effect.style === Shell.BlurStyle.MARIS) effect.queue_repaint();
+}
+
+export function blurBackdrop(actor: St.Widget, corners: number, kind: GlassKind = 'surfaces'): Shell.BlurEffect {
   const theme = St.ThemeContext.get_for_stage(global.stage);
   const effect = new Shell.BlurEffect({
     mode: Shell.BlurMode.BACKGROUND,
+    style: styles[kind],
     radius: 30 * theme.scale_factor,
     brightness: 1,
   });
+  backdrops.set(effect, kind);
   effect.set_property('corner-radius', corners);
   followTheme(actor, effect);
   actor.add_effect_with_name('backdrop', effect);
   const changed = theme.connect('notify::scale-factor', () => {
     effect.radius = 30 * theme.scale_factor;
   });
-  actor.connect('destroy', () => theme.disconnect(changed));
+  actor.connect('destroy', () => {
+    theme.disconnect(changed);
+    backdrops.delete(effect);
+  });
   return effect;
 }
 
-export function blurSurface(actor: St.Widget, corners = 24): void {
-  const surface = { actor, effect: blurBackdrop(actor, corners), corners };
+export function blurSurface(actor: St.Widget, corners = 24, kind: GlassKind = 'surfaces'): void {
+  const surface = { actor, effect: blurBackdrop(actor, corners, kind), corners };
   surfaces.add(surface);
   if (solid) makeSolid(surface, true);
   if (square) followCorners(surface);

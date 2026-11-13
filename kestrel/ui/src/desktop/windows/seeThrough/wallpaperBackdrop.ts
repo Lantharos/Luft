@@ -3,7 +3,7 @@ import Cogl from 'gi://Cogl';
 import GObject from 'gi://GObject';
 import type Mtk from 'gi://Mtk';
 
-import type { WallpaperPiece } from './wallpaperFrost.js';
+import type { WallpaperPiece } from '../../../core/stage/background/wallpaperFrost.js';
 
 const ROUNDED_CORNERS = Cogl.Snippet.new(Cogl.SnippetHook.FRAGMENT, 'uniform vec4 frame_in_texture; uniform vec2 frame_size; uniform float corner_radius;', `
   vec2 position = (cogl_tex_coord_in[0].xy - frame_in_texture.xy) / (frame_in_texture.zw - frame_in_texture.xy) * frame_size;

@@ -1,4 +1,4 @@
-import { freezeSelection } from '../../appearance/kestrelGlass.js';
+import { freezeSelection } from '../../appearance/glass/kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';

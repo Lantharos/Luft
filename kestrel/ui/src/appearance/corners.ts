@@ -1,6 +1,6 @@
 import type Gio from 'gi://Gio';
 
-import { setSquareSurfaces } from './kestrelGlass.js';
+import { setSquareSurfaces } from './glass/kestrelGlass.js';
 import { setSquareCorners } from './kestrelTheme.js';
 
 const ROUNDED = 'rounded-window-corners';

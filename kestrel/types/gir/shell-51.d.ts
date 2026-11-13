@@ -100,6 +100,16 @@ export namespace Shell {
     }
 
 
+    export namespace BlurStyle {
+        export const $gtype: GObject.GType<BlurStyle>;
+    }
+
+    enum BlurStyle {
+        LUCA = 0,
+        MARIS = 1,
+    }
+
+
     export namespace KeySound {
         export const $gtype: GObject.GType<KeySound>;
     }
@@ -430,6 +440,7 @@ export namespace Shell {
             "notify::mode": (pspec: GObject.ParamSpec) => void;
             "notify::radius": (pspec: GObject.ParamSpec) => void;
             "notify::saturation": (pspec: GObject.ParamSpec) => void;
+            "notify::style": (pspec: GObject.ParamSpec) => void;
             "notify::actor": (pspec: GObject.ParamSpec) => void;
             "notify::enabled": (pspec: GObject.ParamSpec) => void;
             "notify::name": (pspec: GObject.ParamSpec) => void;
@@ -447,6 +458,7 @@ export namespace Shell {
             mode: BlurMode;
             radius: number;
             saturation: number;
+            style: BlurStyle;
         }
     }
 
@@ -484,6 +496,9 @@ export namespace Shell {
         get saturation(): number;
         set saturation(val: number);
 
+        get style(): BlurStyle;
+        set style(val: BlurStyle);
+
         /**
          * Compile-time signal type information.
          *
@@ -517,11 +532,15 @@ export namespace Shell {
 
         get_radius(): number;
 
+        get_style(): BlurStyle;
+
         set_brightness(brightness: number): void;
 
         set_mode(mode: BlurMode): void;
 
         set_radius(radius: number): void;
+
+        set_style(style: BlurStyle): void;
     }
 
 

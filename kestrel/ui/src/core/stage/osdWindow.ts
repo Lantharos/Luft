@@ -1,4 +1,4 @@
-import { styleSurface, PILL } from '../../appearance/kestrelGlass.js';
+import { styleSurface, PILL } from '../../appearance/glass/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import GLib from 'gi://GLib';

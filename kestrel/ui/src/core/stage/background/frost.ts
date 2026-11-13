@@ -109,8 +109,10 @@ export class FrostedWallpaper {
   }
 
   private async refresh(): Promise<void> {
+    if (this.cancellable.is_cancelled()) return;
     const generation = ++this.generation;
     const key = await this.key();
+    if (generation !== this.generation) return;
     const known = kept.get(this.slot);
     if (key && known?.key === key) {
       this.reveal(known.texture);

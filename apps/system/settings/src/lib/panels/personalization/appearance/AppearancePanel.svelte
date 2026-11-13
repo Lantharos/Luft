@@ -2,6 +2,7 @@
 	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import Image from '@lucide/svelte/icons/image';
+	import Layers from '@lucide/svelte/icons/layers';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import MousePointer2 from '@lucide/svelte/icons/mouse-pointer-2';
 	import Type from '@lucide/svelte/icons/type';
@@ -19,6 +20,8 @@
 	import CursorStore from './cursors/CursorStore.svelte';
 	import FontsPage from './fonts/FontsPage.svelte';
 	import FontsSection from './fonts/FontsSection.svelte';
+	import { GLASS_SCHEMA, glassSummary, type Glass } from './glass.js';
+	import GlassSection from './GlassSection.svelte';
 	import { fontLibrary } from './fonts/library.svelte';
 	import StyleSection from './StyleSection.svelte';
 
@@ -28,6 +31,12 @@
 	const WALLPAPER = 'wallpaper';
 	const WALLPAPER_GROUP = 'wallpaper/';
 
+	const GLASS_STYLES = {
+		luca: 'settings-appearance-glass-luca',
+		maris: 'settings-appearance-glass-maris',
+		mixed: 'settings-appearance-glass-mixed'
+	};
+
 	const ICON_STYLES: Record<string, string> = {
 		default: 'settings-appearance-icons-original',
 		tinted: 'settings-appearance-icons-tinted',
@@ -36,6 +45,7 @@
 
 	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'theme-apps']);
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'cursor-theme']);
+	const glass = useSettings<Glass>(GLASS_SCHEMA, ['taskbar', 'surfaces', 'windows']);
 	const wallpaper = wallpaperName();
 
 	let font = $derived(appearance.typography.interface ?? fontLibrary.defaults?.interface ?? '');
@@ -72,6 +82,10 @@
 	<SubPage title={t('settings-appearance-text')} onclose={() => open(null)}>
 		<FontsSection onbrowse={() => open('fonts')} />
 	</SubPage>
+{:else if app.section === 'glass'}
+	<SubPage title={t('settings-appearance-glass')} onclose={() => open(null)}>
+		<GlassSection />
+	</SubPage>
 {:else if app.section === 'cursor'}
 	<SubPage title={t('settings-cursors')} onclose={() => open(null)}>
 		<CursorSection onbrowse={() => open('cursors')} />
@@ -85,6 +99,9 @@
 		</Row>
 		<Row title={t('settings-appearance-icons')} icon={LayoutGrid} onclick={() => open('icons')}>
 			<RowValue text={t(ICON_STYLES[kestrel.values['app-icon-style'] ?? 'tinted'])} />
+		</Row>
+		<Row title={t('settings-appearance-glass')} icon={Layers} onclick={() => open('glass')}>
+			<RowValue text={t(GLASS_STYLES[glassSummary(glass.values)])} />
 		</Row>
 		<Row title={t('settings-appearance-text')} icon={Type} onclick={() => open('text')}>
 			<RowValue {text} />

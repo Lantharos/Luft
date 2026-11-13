@@ -4,7 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gly from 'gi://Gly';
 import St from 'gi://St';
-import { cornerRadius } from '../../appearance/kestrelGlass.js';
+import { cornerRadius } from '../../appearance/glass/kestrelGlass.js';
 
 Gio._promisify(Gly.Loader.prototype, 'load_async');
 Gio._promisify(Gly.Image.prototype, 'next_frame_async');

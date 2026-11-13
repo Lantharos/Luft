@@ -77,3 +77,6 @@
 0077-core-keep-the-writable-properties-of-Mutter-s-D-Bus-.patch
 0078-wayland-keep-where-a-window-was-when-it-maximizes-du.patch
 0079-kms-shut-down-after-the-pointer-stops-reaching-the-c.patch
+0080-clutter-blur-with-a-dual-Kawase-pyramid-in-targets-p.patch
+0081-compositor-blur-app-glass-again-only-when-what-is-be.patch
+0082-compositor-let-the-shell-show-a-frosted-wallpaper-un.patch

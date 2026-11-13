@@ -1,4 +1,4 @@
-import { styleSurface } from '../../appearance/kestrelGlass.js';
+import { styleSurface } from '../../appearance/glass/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';

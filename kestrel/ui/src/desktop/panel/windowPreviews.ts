@@ -6,7 +6,7 @@ import St from 'gi://St';
 import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
 import { taskbarPreferences, type TaskbarLayout } from './preferences/taskbarPreferences.js';
 import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
-import { freezeSelection } from '../../appearance/kestrelGlass.js';
+import { freezeSelection } from '../../appearance/glass/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
 import type { Monitor } from './panel.js';
 import { windowIcon } from '../../appearance/icons/appIcons.js';

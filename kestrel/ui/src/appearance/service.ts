@@ -1,7 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { followCorners } from './corners.js';
-import { setSolidSurfaces } from './kestrelGlass.js';
+import { setSolidSurfaces } from './glass/kestrelGlass.js';
+import { GlassStyles } from './glass/styles.js';
 
 import { accentColor, fromHex, namedAccent, NEUTRAL, seedFromColor, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
@@ -58,6 +59,7 @@ export class AppearanceService {
   });
   private readonly unwatchScheme = watchScheme(() => this.update());
   private readonly unwatchCorners = followCorners(this.settings);
+  private readonly glass = new GlassStyles();
   private wallpaperSeed: Seed | null = null;
   private appearance: Appearance | null = null;
   private taskbar = '{}';
@@ -211,6 +213,7 @@ export class AppearanceService {
     this.unwatchIcons();
     this.unwatchScheme();
     this.unwatchCorners();
+    this.glass.destroy();
     Gio.bus_unown_name(this.nameId);
     this.dbus.unexport();
     this.stylesheet.unload();

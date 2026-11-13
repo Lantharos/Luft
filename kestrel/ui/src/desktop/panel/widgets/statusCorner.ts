@@ -23,7 +23,7 @@ export interface CornerActions {
 
 function pill(name: string, child: Clutter.Actor, activate: () => void): St.Button {
   const button = new St.Button({ name, style_class: 'kestrel-corner-pill kestrel-glass', can_focus: true, track_hover: true, child });
-  blurSurface(button, 999);
+  blurSurface(button, 999, 'taskbar');
   button.connect('clicked', activate);
   return button;
 }
@@ -42,7 +42,7 @@ export class StatusCorner {
   constructor(actions: CornerActions) {
     this.launcher = createLauncher(actions.start, MARK_SIZE, () => this.actor);
     this.launcher.button.add_style_class_name('kestrel-corner-start kestrel-glass');
-    blurSurface(this.launcher.button, 999);
+    blurSurface(this.launcher.button, 999, 'taskbar');
     const statusBox = new St.BoxLayout({ style_class: 'kestrel-corner-status' });
     statusBox.add_child(this.status);
     statusBox.add_child(new BatteryIndicator(16).actor);

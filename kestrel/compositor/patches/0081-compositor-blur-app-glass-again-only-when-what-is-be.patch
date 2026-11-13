@@ -1,0 +1,2239 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 13 Nov 2026 22:21:13 +0100
+Subject: [PATCH] compositor: blur app glass again only when what is behind it
+ changed
+
+Each glass window keeps its blurred backdrop for every view and draws it
+again until something below it repaints there, the stacking changes or
+the window moves. The blur reads only the glass itself, so the redraw
+clip no longer grows past it and sets off other glass, and what is
+under the rest of the window can be culled. Clones draw their window's
+kept backdrop, and windows that aren't painted aren't blurred.
+
+Upstream-Status: luft-only builds on Kestrel's redraw clip filters
+---
+ src/compositor/meta-background-behind.c       | 166 +++
+ src/compositor/meta-background-blur-private.h | 107 ++
+ src/compositor/meta-background-blur.c         | 344 +++++++
+ src/compositor/meta-background-effect.c       | 955 ++++++------------
+ src/compositor/meta-background-effect.h       |  30 +-
+ src/compositor/meta-background-geometry.c     | 192 ++++
+ src/compositor/meta-surface-actor.c           | 135 +--
+ src/compositor/meta-window-actor.c            |   6 -
+ src/meson.build                               |   4 +
+ 9 files changed, 1165 insertions(+), 774 deletions(-)
+ create mode 100644 src/compositor/meta-background-behind.c
+ create mode 100644 src/compositor/meta-background-blur-private.h
+ create mode 100644 src/compositor/meta-background-blur.c
+ create mode 100644 src/compositor/meta-background-geometry.c
+
+diff --git a/src/compositor/meta-background-behind.c b/src/compositor/meta-background-behind.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc0688b987377aeba83af616e859802cdc492e3a
+--- /dev/null
++++ b/src/compositor/meta-background-behind.c
+@@ -0,0 +1,166 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <string.h>
++
++#include "compositor/meta-background-blur-private.h"
++
++#define PRINT_SEED 0xcbf29ce484222325
++#define PRINT_PRIME 0x100000001b3
++
++static guint64
++mix (guint64 print,
++     guint64 value)
++{
++  return (print ^ value) * PRINT_PRIME;
++}
++
++static guint64
++mix_float (guint64 print,
++           float   value)
++{
++  guint32 bits;
++
++  memcpy (&bits, &value, sizeof bits);
++  return mix (print, bits);
++}
++
++static guint64
++mix_clip (guint64       print,
++          ClutterActor *actor)
++{
++  float x, y, width, height;
++
++  if (!clutter_actor_has_clip (actor))
++    return mix (print, 0);
++
++  clutter_actor_get_clip (actor, &x, &y, &width, &height);
++  print = mix_float (print, x);
++  print = mix_float (print, y);
++  print = mix_float (print, width);
++  return mix_float (print, height);
++}
++
++static gboolean
++paints (ClutterActor *actor)
++{
++  return clutter_actor_is_mapped (actor) && clutter_actor_get_opacity (actor) > 0;
++}
++
++static gboolean
++has_damaged_child (ClutterActor *parent)
++{
++  ClutterActor *child;
++
++  for (child = clutter_actor_get_first_child (parent); child;
++       child = clutter_actor_get_next_sibling (child))
++    {
++      if (paints (child) && clutter_actor_has_damage (child))
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static const MetaBackgroundPlacement *
++previous_placement (GArray       *previous,
++                    ClutterActor *actor)
++{
++  guint i;
++
++  for (i = 0; i < previous->len; i++)
++    {
++      const MetaBackgroundPlacement *placement = &g_array_index (previous, MetaBackgroundPlacement, i);
++
++      if (placement->actor == actor)
++        return placement;
++    }
++
++  return NULL;
++}
++
++static gboolean
++box_reaches (const ClutterActorBox *box,
++             const MtkRegion       *region)
++{
++  graphene_rect_t bounds = GRAPHENE_RECT_INIT (box->x1, box->y1,
++                                               box->x2 - box->x1,
++                                               box->y2 - box->y1);
++  MtkRectangle rect;
++
++  mtk_rectangle_from_graphene_rect (&bounds, MTK_ROUNDING_STRATEGY_GROW, &rect);
++  return mtk_region_contains_rectangle (region, &rect) != MTK_REGION_OVERLAP_OUT;
++}
++
++static gboolean
++damage_reaches (const MetaBackgroundPlacement *placement,
++                const MetaBackgroundPlacement *before,
++                const MtkRegion *region)
++{
++  if (!placement->bounded || (before && !before->bounded))
++    return TRUE;
++
++  return box_reaches (&placement->box, region) ||
++    (before && box_reaches (&before->box, region));
++}
++
++gboolean
++meta_background_blur_behind_changed (MetaBackgroundBlur *blur,
++                                     const MtkRegion    *blurred)
++{
++  guint64 print = PRINT_SEED;
++  gboolean changed = FALSE;
++  ClutterActor *child, *parent;
++  GArray *swap;
++
++  g_array_set_size (blur->placements, 0);
++  for (child = blur->actor; (parent = clutter_actor_get_parent (child)); child = parent)
++    {
++      ClutterActor *sibling;
++
++      changed |= clutter_actor_has_damage (parent) && !has_damaged_child (parent);
++      print = mix (print, GPOINTER_TO_SIZE (parent));
++      print = mix (print, clutter_actor_get_opacity (parent));
++      print = mix_clip (print, parent);
++      for (sibling = clutter_actor_get_first_child (parent); sibling != child;
++           sibling = clutter_actor_get_next_sibling (sibling))
++        {
++          MetaBackgroundPlacement placement = { .actor = sibling };
++
++          if (!paints (sibling))
++            continue;
++
++          print = mix (print, GPOINTER_TO_SIZE (sibling));
++          placement.bounded = clutter_actor_get_paint_box (sibling, &placement.box);
++          g_array_append_val (blur->placements, placement);
++          if (clutter_actor_has_damage (sibling))
++            changed |= damage_reaches (&placement,
++                                       previous_placement (blur->previous_placements, sibling),
++                                       blurred);
++        }
++    }
++
++  changed |= print != blur->print;
++  blur->print = print;
++  swap = blur->previous_placements;
++  blur->previous_placements = blur->placements;
++  blur->placements = swap;
++
++  return changed;
++}
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..84210b291210de6b42e2ca4b8a3ccc3ff7e32d64
+--- /dev/null
++++ b/src/compositor/meta-background-blur-private.h
+@@ -0,0 +1,107 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include "backends/meta-stage-private.h"
++#include "compositor/meta-background-effect.h"
++
++typedef struct _MetaBackgroundBlurView MetaBackgroundBlurView;
++
++typedef struct
++{
++  graphene_matrix_t actor_to_framebuffer;
++  graphene_matrix_t framebuffer_to_actor;
++  float scale;
++  gboolean flip_x;
++  gboolean flip_y;
++} MetaBackgroundTransform;
++
++typedef struct
++{
++  ClutterActor *actor;
++  ClutterActorBox box;
++  gboolean bounded;
++} MetaBackgroundPlacement;
++
++struct _MetaBackgroundBlurView
++{
++  MetaBackgroundBlur *blur;
++  ClutterStageView *view;
++  CoglFramebuffer *framebuffer;
++  CoglPipeline *pipeline;
++  int capacity_width;
++  int capacity_height;
++  MtkRectangle source_rect;
++  ClutterActorBox actor_box;
++  ClutterActorBox region_box;
++  gboolean flip_x;
++  gboolean flip_y;
++  gboolean valid;
++  gboolean seen;
++  gboolean dirty;
++  MtkRectangle stage_area;
++};
++
++struct _MetaBackgroundBlur
++{
++  MetaCompositor *compositor;
++  ClutterActor *actor;
++  MtkRegion *blur_region;
++  MetaStage *stage;
++  MetaStageRedrawClipFilter *redraw_clip_filter;
++  gulong before_paint_id;
++  GList *views;
++  GArray *placements;
++  GArray *previous_placements;
++  guint64 print;
++};
++
++MetaBackgroundBlurView * meta_background_blur_get_view (MetaBackgroundBlur *blur,
++                                                        ClutterStageView   *view);
++
++MetaBackgroundBlurView * meta_background_blur_find_result (MetaBackgroundBlur    *blur,
++                                                           const ClutterActorBox *region_box);
++
++void meta_background_blur_get_region_box (MetaBackgroundBlur    *blur,
++                                          const ClutterActorBox *content_box,
++                                          int                    content_width,
++                                          int                    content_height,
++                                          ClutterActorBox       *region_box);
++
++gboolean meta_background_blur_behind_changed (MetaBackgroundBlur *blur,
++                                              const MtkRegion    *blurred);
++
++gboolean meta_background_get_transform (ClutterActor            *actor,
++                                        ClutterPaintContext     *paint_context,
++                                        CoglFramebuffer         *framebuffer,
++                                        const ClutterActorBox   *actor_box,
++                                        MetaBackgroundTransform *transform);
++
++gboolean meta_background_actor_box_to_framebuffer (const ClutterActorBox         *actor_box,
++                                                   const MetaBackgroundTransform *transform,
++                                                   graphene_rect_t               *framebuffer_rect);
++
++gboolean meta_background_framebuffer_to_actor_box (const graphene_rect_t         *framebuffer_rect,
++                                                   const MetaBackgroundTransform *transform,
++                                                   ClutterActorBox               *actor_box);
++
++gboolean meta_background_region_rect_to_actor_box (const MtkRectangle    *region_rect,
++                                                   const ClutterActorBox *content_box,
++                                                   int                    content_width,
++                                                   int                    content_height,
++                                                   ClutterActorBox       *actor_box);
+diff --git a/src/compositor/meta-background-blur.c b/src/compositor/meta-background-blur.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..47c0c4929c59d6bccff38ded59c96e68b6e44d5e
+--- /dev/null
++++ b/src/compositor/meta-background-blur.c
+@@ -0,0 +1,344 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <math.h>
++
++#include "compositor/meta-background-blur-private.h"
++
++#include "clutter/clutter-mutter.h"
++
++static void view_destroyed (gpointer  data,
++                            GObject  *view);
++
++static void
++free_view (MetaBackgroundBlurView *blur_view)
++{
++  g_object_weak_unref (G_OBJECT (blur_view->view), view_destroyed, blur_view);
++  g_clear_object (&blur_view->framebuffer);
++  g_clear_object (&blur_view->pipeline);
++  g_free (blur_view);
++}
++
++MetaBackgroundBlurView *
++meta_background_blur_get_view (MetaBackgroundBlur *blur,
++                               ClutterStageView   *view)
++{
++  MetaBackgroundBlurView *blur_view;
++  GList *l;
++
++  for (l = blur->views; l; l = l->next)
++    {
++      blur_view = l->data;
++      if (blur_view->view == view)
++        return blur_view;
++    }
++
++  blur_view = g_new0 (MetaBackgroundBlurView, 1);
++  blur_view->blur = blur;
++  blur_view->view = view;
++  g_object_weak_ref (G_OBJECT (view), view_destroyed, blur_view);
++  blur->views = g_list_prepend (blur->views, blur_view);
++  return blur_view;
++}
++
++MetaBackgroundBlurView *
++meta_background_blur_find_result (MetaBackgroundBlur    *blur,
++                                  const ClutterActorBox *region_box)
++{
++  GList *l;
++
++  for (l = blur->views; l; l = l->next)
++    {
++      MetaBackgroundBlurView *blur_view = l->data;
++
++      if (blur_view->valid &&
++          clutter_actor_box_equal (&blur_view->region_box, region_box))
++        return blur_view;
++    }
++
++  return NULL;
++}
++
++void
++meta_background_blur_get_region_box (MetaBackgroundBlur    *blur,
++                                     const ClutterActorBox *content_box,
++                                     int                    content_width,
++                                     int                    content_height,
++                                     ClutterActorBox       *region_box)
++{
++  MtkRectangle extents = mtk_region_get_extents (blur->blur_region);
++  float x_scale = (content_box->x2 - content_box->x1) / MAX (content_width, 1);
++  float y_scale = (content_box->y2 - content_box->y1) / MAX (content_height, 1);
++
++  *region_box = (ClutterActorBox) {
++    .x1 = content_box->x1 + extents.x * x_scale,
++    .y1 = content_box->y1 + extents.y * y_scale,
++    .x2 = content_box->x1 + (extents.x + extents.width) * x_scale,
++    .y2 = content_box->y1 + (extents.y + extents.height) * y_scale,
++  };
++}
++
++static MtkRegion *
++region_on_stage (const MtkRegion    *region,
++                 graphene_matrix_t  *actor_to_stage,
++                 const MtkRectangle *layout)
++{
++  MtkRegion *on_stage;
++
++  if (!graphene_matrix_is_2d (actor_to_stage))
++    return NULL;
++
++  on_stage = mtk_region_apply_matrix_transform_expand (region, actor_to_stage);
++  mtk_region_intersect_rectangle (on_stage, layout);
++  return on_stage;
++}
++
++static MtkRegion *
++original_on_stage (MetaBackgroundBlur *blur,
++                   const MtkRectangle *layout)
++{
++  graphene_matrix_t actor_to_stage;
++
++  clutter_actor_get_relative_transformation_matrix (blur->actor,
++                                                    CLUTTER_ACTOR (blur->stage),
++                                                    &actor_to_stage);
++  return region_on_stage (blur->blur_region, &actor_to_stage, layout);
++}
++
++static gboolean
++add_to_redraw_clip (MtkRegion       *redraw_clip,
++                    const MtkRegion *area)
++{
++  g_autoptr (MtkRegion) missing = mtk_region_copy (area);
++
++  mtk_region_subtract (missing, redraw_clip);
++  if (mtk_region_is_empty (missing))
++    return FALSE;
++
++  mtk_region_union (redraw_clip, missing);
++  return TRUE;
++}
++
++static gboolean
++touches (const MtkRegion *redraw_clip,
++         const MtkRegion *area)
++{
++  g_autoptr (MtkRegion) overlap = NULL;
++
++  if (!redraw_clip)
++    return TRUE;
++
++  overlap = mtk_region_copy (area);
++  mtk_region_intersect (overlap, redraw_clip);
++  return !mtk_region_is_empty (overlap);
++}
++
++static gboolean
++look_behind (MetaBackgroundBlur *blur,
++             ClutterStageView   *view,
++             MtkRegion          *redraw_clip,
++             const MtkRectangle *layout)
++{
++  MetaBackgroundBlurView *blur_view = meta_background_blur_get_view (blur, view);
++  g_autoptr (MtkRegion) area = NULL;
++  g_autoptr (MtkRegion) looked = NULL;
++  MtkRectangle extents;
++
++  if (!clutter_actor_is_mapped (blur->actor) ||
++      clutter_actor_get_paint_opacity (blur->actor) == 0 ||
++      !g_list_find (clutter_actor_peek_stage_views (blur->actor), view))
++    return FALSE;
++
++  area = original_on_stage (blur, layout);
++  if (!area || mtk_region_is_empty (area))
++    return FALSE;
++
++  if (!blur_view->seen)
++    {
++      blur_view->seen = TRUE;
++      extents = mtk_region_get_extents (area);
++      looked = mtk_region_copy (area);
++      if (redraw_clip)
++        mtk_region_intersect (looked, redraw_clip);
++      blur_view->dirty = !blur_view->valid ||
++        !mtk_rectangle_equal (&extents, &blur_view->stage_area) ||
++        (!mtk_region_is_empty (looked) &&
++         meta_background_blur_behind_changed (blur, looked));
++      blur_view->stage_area = extents;
++      if (blur_view->dirty)
++        clutter_actor_invalidate_paint_cache (blur->actor);
++    }
++
++  if (!blur_view->dirty || !redraw_clip || !touches (redraw_clip, area))
++    return FALSE;
++
++  return add_to_redraw_clip (redraw_clip, area);
++}
++
++typedef struct
++{
++  MetaBackgroundBlur *blur;
++  ClutterStageView *view;
++  MtkRegion *redraw_clip;
++  MtkRectangle layout;
++  gboolean grew;
++} CloneData;
++
++static void
++look_behind_clone (ClutterActor *source,
++                   ClutterActor *clone,
++                   gpointer      user_data)
++{
++  CloneData *data = user_data;
++  g_autoptr (MtkRegion) area = NULL;
++  graphene_matrix_t actor_to_source;
++  graphene_matrix_t source_to_clone;
++  graphene_matrix_t clone_to_stage;
++  graphene_matrix_t actor_to_stage;
++
++  if (!g_list_find (clutter_actor_peek_stage_views (clone), data->view))
++    return;
++
++  clutter_actor_get_relative_transformation_matrix (data->blur->actor, source,
++                                                    &actor_to_source);
++  clutter_clone_get_source_transform (CLUTTER_CLONE (clone), &source_to_clone);
++  clutter_actor_get_relative_transformation_matrix (clone,
++                                                    CLUTTER_ACTOR (data->blur->stage),
++                                                    &clone_to_stage);
++  graphene_matrix_multiply (&actor_to_source, &source_to_clone, &actor_to_stage);
++  graphene_matrix_multiply (&actor_to_stage, &clone_to_stage, &actor_to_stage);
++
++  area = region_on_stage (data->blur->blur_region, &actor_to_stage, &data->layout);
++  if (!area || !touches (data->redraw_clip, area))
++    return;
++
++  clutter_actor_invalidate_paint_cache (data->blur->actor);
++  if (data->redraw_clip)
++    data->grew |= add_to_redraw_clip (data->redraw_clip, area);
++}
++
++static gboolean
++clones_keep_a_result (MetaBackgroundBlur *blur)
++{
++  GList *l;
++
++  for (l = blur->views; l; l = l->next)
++    {
++      MetaBackgroundBlurView *blur_view = l->data;
++
++      if (blur_view->valid)
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static gboolean
++expand_redraw_clip (MetaStage        *stage,
++                    ClutterStageView *view,
++                    MtkRegion        *redraw_clip,
++                    gpointer          user_data)
++{
++  MetaBackgroundBlur *blur = user_data;
++  CloneData data = {
++    .blur = blur,
++    .view = view,
++    .redraw_clip = redraw_clip,
++  };
++
++  if (clutter_actor_get_stage (blur->actor) != CLUTTER_ACTOR (stage))
++    return FALSE;
++
++  clutter_stage_view_get_layout (view, &data.layout);
++  data.grew = look_behind (blur, view, redraw_clip, &data.layout);
++
++  if (!clones_keep_a_result (blur))
++    clutter_actor_foreach_mapped_clone (blur->actor, look_behind_clone, &data);
++
++  return data.grew;
++}
++
++static void
++forget_frame (MetaBackgroundBlur *blur,
++              ClutterStageView   *view)
++{
++  GList *l;
++
++  for (l = blur->views; l; l = l->next)
++    {
++      MetaBackgroundBlurView *blur_view = l->data;
++
++      if (blur_view->view != view)
++        continue;
++
++      blur_view->seen = FALSE;
++      blur_view->dirty = FALSE;
++    }
++}
++
++static void
++view_destroyed (gpointer  data,
++                GObject  *view)
++{
++  MetaBackgroundBlurView *blur_view = data;
++  MetaBackgroundBlur *blur = blur_view->blur;
++
++  blur->views = g_list_remove (blur->views, blur_view);
++  g_clear_object (&blur_view->framebuffer);
++  g_clear_object (&blur_view->pipeline);
++  g_free (blur_view);
++}
++
++MetaBackgroundBlur *
++meta_background_blur_new (MetaCompositor  *compositor,
++                          ClutterActor    *actor,
++                          const MtkRegion *blur_region)
++{
++  MetaBackgroundBlur *blur;
++
++  g_return_val_if_fail (CLUTTER_IS_ACTOR (actor), NULL);
++  g_return_val_if_fail (blur_region != NULL, NULL);
++
++  blur = g_new0 (MetaBackgroundBlur, 1);
++  blur->compositor = compositor;
++  blur->actor = actor;
++  blur->blur_region = mtk_region_copy (blur_region);
++  blur->stage = META_STAGE (meta_compositor_get_stage (compositor));
++  blur->placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
++  blur->previous_placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
++  blur->redraw_clip_filter =
++    meta_stage_add_redraw_clip_filter (blur->stage, expand_redraw_clip, blur, NULL);
++  blur->before_paint_id =
++    g_signal_connect_swapped (blur->stage, "before-paint",
++                              G_CALLBACK (forget_frame), blur);
++  return blur;
++}
++
++void
++meta_background_blur_destroy (MetaBackgroundBlur *blur)
++{
++  g_clear_pointer (&blur->redraw_clip_filter,
++                   meta_stage_remove_redraw_clip_filter);
++  g_clear_signal_handler (&blur->before_paint_id, blur->stage);
++  g_list_free_full (blur->views, (GDestroyNotify) free_view);
++  g_clear_pointer (&blur->blur_region, mtk_region_unref);
++  g_array_unref (blur->placements);
++  g_array_unref (blur->previous_placements);
++  g_free (blur);
++}
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 0a2cffc6c8c3115ee10a0627b54fe8595651e772..b3fde400fc83ece64c3058b905d027f0f5da9ba9 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -17,731 +17,420 @@
+ 
+ #include "config.h"
+ 
+-#include "compositor/meta-window-corners.h"
+-
+-#include "compositor/meta-background-effect.h"
+-
+-#include <float.h>
+ #include <math.h>
+ 
+-#include "backends/meta-stage-private.h"
++#include "compositor/meta-background-blur-private.h"
++#include "compositor/meta-window-corners.h"
++
+ #include "clutter/clutter-mutter.h"
+ #include "clutter/clutter-paint-node-private.h"
+ 
+-struct _MetaBackgroundBlur
+-{
+-  ClutterActor *actor;
+-  MtkRegion *blur_region;
+-  float radius;
+-  MetaStageRedrawClipFilter *redraw_clip_filter;
+-};
++#define RESULT_SIZE_STEP 64
+ 
+ typedef struct
+ {
+-  graphene_matrix_t actor_to_framebuffer;
+-  graphene_matrix_t framebuffer_to_actor;
+-  float scale;
+-  gboolean flip_x;
+-  gboolean flip_y;
+-} FramebufferTransform;
++  ClutterActor *actor;
++  ClutterPaintNode *root_node;
++  CoglFramebuffer *framebuffer;
++  MtkRectangle framebuffer_bounds;
++  graphene_rect_t bounds;
++  MetaBackgroundTransform transform;
++  MtkRectangle source_rect;
++  ClutterActorBox source_box;
++  ClutterActorBox region_box;
++  MtkRegion *paint_region;
++  const ClutterActorBox *content_box;
++  int content_width;
++  int content_height;
++  float radius;
++  float saturation;
++  float noise;
++  uint8_t opacity;
++} Paint;
+ 
+ static int
+-calculate_blur_sample_padding (float radius)
++result_size_class (int size)
+ {
+-  return (int) ceilf (radius * 2.0f);
++  return (size + RESULT_SIZE_STEP - 1) / RESULT_SIZE_STEP * RESULT_SIZE_STEP;
+ }
+ 
+-static float
+-get_2d_transform_scale (const graphene_matrix_t *transform)
++static gboolean
++paint_box (Paint                 *paint,
++           int                    index,
++           ClutterActorBox       *actor_box,
++           graphene_rect_t       *framebuffer_rect)
+ {
+-  double xx;
+-  double yx;
+-  double xy;
+-  double yy;
+-
+-  graphene_matrix_to_2d (transform, &xx, &yx, &xy, &yy, NULL, NULL);
+-
+-  return (float) MAX (hypot (xx, yx), hypot (xy, yy));
++  MtkRectangle region_rect = mtk_region_get_rectangle (paint->paint_region, index);
++
++  return meta_background_region_rect_to_actor_box (&region_rect,
++                                                   paint->content_box,
++                                                   paint->content_width,
++                                                   paint->content_height,
++                                                   actor_box) &&
++    meta_background_actor_box_to_framebuffer (actor_box, &paint->transform,
++                                              framebuffer_rect) &&
++    graphene_rect_intersection (framebuffer_rect, &paint->bounds, framebuffer_rect) &&
++    meta_background_framebuffer_to_actor_box (framebuffer_rect, &paint->transform,
++                                              actor_box);
+ }
+ 
+-static MtkRegion *
+-transform_region_to_stage (ClutterActor    *actor,
+-                           MetaStage       *stage,
+-                           const MtkRegion *region,
+-                           float           *scale)
++static void
++add_live_rectangle (ClutterPaintNode      *node,
++                    const Paint           *paint,
++                    const graphene_rect_t *framebuffer_rect,
++                    const ClutterActorBox *actor_box)
+ {
+-  graphene_matrix_t actor_to_stage;
+-
+-  clutter_actor_get_relative_transformation_matrix (actor,
+-                                                    CLUTTER_ACTOR (stage),
+-                                                    &actor_to_stage);
+-  if (!graphene_matrix_is_2d (&actor_to_stage))
+-    return NULL;
+-
+-  *scale = get_2d_transform_scale (&actor_to_stage);
+-
+-  return mtk_region_apply_matrix_transform_expand (region, &actor_to_stage);
++  const MtkRectangle *source = &paint->source_rect;
++  float x1 = CLAMP ((framebuffer_rect->origin.x - source->x) / source->width, 0.f, 1.f);
++  float y1 = CLAMP ((framebuffer_rect->origin.y - source->y) / source->height, 0.f, 1.f);
++  float x2 = CLAMP ((framebuffer_rect->origin.x + framebuffer_rect->size.width - source->x) /
++                    source->width, 0.f, 1.f);
++  float y2 = CLAMP ((framebuffer_rect->origin.y + framebuffer_rect->size.height - source->y) /
++                    source->height, 0.f, 1.f);
++
++  clutter_paint_node_add_texture_rectangle (node, actor_box,
++                                            paint->transform.flip_x ? x2 : x1,
++                                            paint->transform.flip_y ? y2 : y1,
++                                            paint->transform.flip_x ? x1 : x2,
++                                            paint->transform.flip_y ? y1 : y2);
+ }
+ 
+-static MtkRegion *
+-transform_region_to_clone_stage (ClutterActor    *actor,
+-                                 ClutterActor    *source,
+-                                 ClutterActor    *clone,
+-                                 MetaStage       *stage,
+-                                 const MtkRegion *region,
+-                                 float           *scale)
++static void
++add_result_rectangle (ClutterPaintNode             *node,
++                      const MetaBackgroundBlurView *result,
++                      const ClutterActorBox        *actor_box)
+ {
+-  graphene_matrix_t actor_to_source;
+-  graphene_matrix_t source_to_clone;
+-  graphene_matrix_t clone_to_stage;
+-  graphene_matrix_t actor_to_clone;
+-  graphene_matrix_t actor_to_stage;
+-
+-  clutter_actor_get_relative_transformation_matrix (actor,
+-                                                    source,
+-                                                    &actor_to_source);
+-  clutter_actor_get_relative_transformation_matrix (clone,
+-                                                    CLUTTER_ACTOR (stage),
+-                                                    &clone_to_stage);
+-  if (!graphene_matrix_is_2d (&actor_to_source) ||
+-      !graphene_matrix_is_2d (&clone_to_stage))
+-    return NULL;
+-
+-  clutter_clone_get_source_transform (CLUTTER_CLONE (clone),
+-                                      &source_to_clone);
+-
+-  graphene_matrix_multiply (&actor_to_source,
+-                            &source_to_clone,
+-                            &actor_to_clone);
+-  graphene_matrix_multiply (&actor_to_clone,
+-                            &clone_to_stage,
+-                            &actor_to_stage);
+-
+-  *scale = get_2d_transform_scale (&actor_to_stage);
+-
+-  return mtk_region_apply_matrix_transform_expand (region, &actor_to_stage);
++  const ClutterActorBox *source = &result->actor_box;
++  float width = source->x2 - source->x1;
++  float height = source->y2 - source->y1;
++  float x1 = CLAMP ((actor_box->x1 - source->x1) / width, 0.f, 1.f);
++  float y1 = CLAMP ((actor_box->y1 - source->y1) / height, 0.f, 1.f);
++  float x2 = CLAMP ((actor_box->x2 - source->x1) / width, 0.f, 1.f);
++  float y2 = CLAMP ((actor_box->y2 - source->y1) / height, 0.f, 1.f);
++
++  clutter_paint_node_add_texture_rectangle (node, actor_box,
++                                            result->flip_x ? 1.f - x1 : x1,
++                                            result->flip_y ? 1.f - y1 : y1,
++                                            result->flip_x ? 1.f - x2 : x2,
++                                            result->flip_y ? 1.f - y2 : y2);
+ }
+ 
+-typedef struct
+-{
+-  MetaBackgroundBlur *blur;
+-  MetaStage *stage;
+-  ClutterStageView *stage_view;
+-  MtkRegion *redraw_clip;
+-  MtkRectangle view_layout;
+-  gboolean changed;
+-  gboolean intersects;
+-} ExpandRedrawClipData;
+-
+ static void
+-expand_redraw_clip (ExpandRedrawClipData *data,
+-                    const MtkRegion      *blur_region,
+-                    float                 scale)
++apply_corners (const Paint  *paint,
++               CoglPipeline *pipeline)
+ {
+-  g_autoptr (MtkRegion) sample_region = NULL;
+-  gboolean region_intersects = FALSE;
+-  gboolean expands = FALSE;
+-  int n_rects;
+-
+-  sample_region =
+-    meta_background_effect_create_blur_sample_region (blur_region,
+-                                                      data->blur->radius * scale);
+-  mtk_region_intersect_rectangle (sample_region, &data->view_layout);
+-
+-  n_rects = mtk_region_num_rectangles (sample_region);
+-  for (int i = 0; i < n_rects; i++)
+-    {
+-      MtkRectangle rect;
+-      MtkRegionOverlap overlap;
+-
+-      rect = mtk_region_get_rectangle (sample_region, i);
+-      overlap = mtk_region_contains_rectangle (data->redraw_clip, &rect);
+-      region_intersects |= overlap != MTK_REGION_OVERLAP_OUT;
+-      expands |= overlap != MTK_REGION_OVERLAP_IN;
+-
+-      if (region_intersects && expands)
+-        break;
+-    }
+-
+-  data->intersects |= region_intersects;
++  MetaWindowCorners corners = meta_window_corners_for_actor (paint->actor);
++  graphene_rect_t bounds;
+ 
+-  if (!region_intersects || !expands)
++  if (corners.radius <= 0)
+     return;
+ 
+-  mtk_region_union (data->redraw_clip, sample_region);
+-  data->changed = TRUE;
++  graphene_matrix_transform_bounds (&paint->transform.actor_to_framebuffer,
++                                    &corners.bounds, &bounds);
++  corners.bounds = bounds;
++  corners.bounds.origin.x -= paint->source_rect.x;
++  corners.bounds.origin.y -= paint->source_rect.y;
++  corners.radius *= paint->transform.scale;
++  meta_window_corners_apply (&corners, META_WINDOW_CORNER_FILL_CLEAR, pipeline,
++                             paint->source_rect.width, paint->source_rect.height);
+ }
+ 
+ static void
+-expand_redraw_clip_for_clone (ClutterActor *source,
+-                              ClutterActor *clone,
+-                              gpointer      user_data)
++paint_live (Paint *paint)
+ {
+-  ExpandRedrawClipData *data = user_data;
+-  g_autoptr (MtkRegion) blur_region = NULL;
+-  float scale;
+-
+-  if (!g_list_find (clutter_actor_peek_stage_views (clone), data->stage_view))
+-    return;
+-
+-  if (!data->redraw_clip)
+-    {
+-      data->intersects = TRUE;
+-      return;
+-    }
+-
+-  blur_region = transform_region_to_clone_stage (data->blur->actor,
+-                                                 source,
+-                                                 clone,
+-                                                 data->stage,
+-                                                 data->blur->blur_region,
+-                                                 &scale);
+-  if (!blur_region)
++  g_autoptr (ClutterPaintNode) blur_node = NULL;
++  gboolean painted = FALSE;
++  int i;
++
++  blur_node = clutter_blur_node_new_from_framebuffer (paint->framebuffer,
++                                                      paint->source_rect.x,
++                                                      paint->source_rect.y,
++                                                      paint->source_rect.width,
++                                                      paint->source_rect.height,
++                                                      paint->radius,
++                                                      paint->saturation,
++                                                      paint->noise,
++                                                      paint->opacity);
++  if (!blur_node)
+     return;
+ 
+-  expand_redraw_clip (data, blur_region, scale);
+-}
++  apply_corners (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
+ 
+-static gboolean
+-meta_background_blur_expand_redraw_clip (MetaStage        *stage,
+-                                         ClutterStageView *stage_view,
+-                                         MtkRegion        *redraw_clip,
+-                                         gpointer          user_data)
+-{
+-  MetaBackgroundBlur *blur = user_data;
+-  ExpandRedrawClipData data = {
+-    .blur = blur,
+-    .stage = stage,
+-    .stage_view = stage_view,
+-    .redraw_clip = redraw_clip,
+-  };
+-  g_autoptr (MtkRegion) blur_region = NULL;
+-  float scale;
+-
+-  if (clutter_actor_get_stage (blur->actor) != CLUTTER_ACTOR (stage))
+-    return FALSE;
+-
+-  if (redraw_clip)
+-    clutter_stage_view_get_layout (stage_view, &data.view_layout);
+-
+-  if (clutter_actor_is_mapped (blur->actor) &&
+-      g_list_find (clutter_actor_peek_stage_views (blur->actor), stage_view))
++  for (i = 0; i < mtk_region_num_rectangles (paint->paint_region); i++)
+     {
+-      if (!redraw_clip)
+-        data.intersects = TRUE;
+-      else
+-        {
+-          blur_region = transform_region_to_stage (blur->actor,
+-                                                   stage,
+-                                                   blur->blur_region,
+-                                                   &scale);
+-          if (blur_region)
+-            expand_redraw_clip (&data, blur_region, scale);
+-        }
+-    }
+-
+-  clutter_actor_foreach_mapped_clone (blur->actor,
+-                                      expand_redraw_clip_for_clone,
+-                                      &data);
+-
+-  if (data.intersects)
+-    clutter_actor_invalidate_paint_cache (blur->actor);
++      graphene_rect_t framebuffer_rect;
++      ClutterActorBox actor_box;
+ 
+-  return data.changed;
+-}
++      if (!paint_box (paint, i, &actor_box, &framebuffer_rect))
++        continue;
+ 
+-MetaBackgroundBlur *
+-meta_background_blur_new (ClutterActor    *actor,
+-                          const MtkRegion *blur_region,
+-                          float            radius)
+-{
+-  ClutterActor *stage_actor;
+-  MetaBackgroundBlur *blur;
+-
+-  g_return_val_if_fail (CLUTTER_IS_ACTOR (actor), NULL);
+-  g_return_val_if_fail (blur_region != NULL, NULL);
+-  g_return_val_if_fail (radius >= 0.0f, NULL);
+-
+-  stage_actor = clutter_actor_get_stage (actor);
+-  if (!stage_actor)
+-    return NULL;
+-
+-  g_return_val_if_fail (META_IS_STAGE (stage_actor), NULL);
+-
+-  blur = g_new0 (MetaBackgroundBlur, 1);
+-  blur->actor = actor;
+-  blur->blur_region = mtk_region_copy (blur_region);
+-  blur->radius = radius;
+-  blur->redraw_clip_filter =
+-    meta_stage_add_redraw_clip_filter (META_STAGE (stage_actor),
+-                                       meta_background_blur_expand_redraw_clip,
+-                                       blur,
+-                                       NULL);
+-
+-  return blur;
+-}
++      add_live_rectangle (blur_node, paint, &framebuffer_rect, &actor_box);
++      painted = TRUE;
++    }
+ 
+-void
+-meta_background_blur_destroy (MetaBackgroundBlur *blur)
+-{
+-  g_clear_pointer (&blur->redraw_clip_filter,
+-                   meta_stage_remove_redraw_clip_filter);
+-  g_clear_pointer (&blur->blur_region, mtk_region_unref);
+-  g_free (blur);
++  if (painted)
++    clutter_paint_node_add_child (paint->root_node, blur_node);
+ }
+ 
+-MtkRegion *
+-meta_background_effect_create_blur_sample_region (const MtkRegion *blur_region,
+-                                                  float            radius)
++static gboolean
++ensure_result (MetaBackgroundBlurView *result,
++               CoglContext            *cogl,
++               int                     width,
++               int                     height)
+ {
+-  g_autoptr (MtkRegion) sample_region = NULL;
+-  int padding;
+-  int n_rects;
+-
+-  sample_region = mtk_region_create ();
+-  padding = calculate_blur_sample_padding (radius);
+-  n_rects = mtk_region_num_rectangles (blur_region);
+-
+-  for (int i = 0; i < n_rects; i++)
++  g_autoptr (CoglTexture) texture = NULL;
++  g_autoptr (CoglOffscreen) offscreen = NULL;
++  g_autoptr (GError) error = NULL;
++  int capacity_width = result_size_class (width);
++  int capacity_height = result_size_class (height);
++
++  if (result->framebuffer &&
++      result->capacity_width >= width && result->capacity_height >= height &&
++      result->capacity_width <= capacity_width + RESULT_SIZE_STEP &&
++      result->capacity_height <= capacity_height + RESULT_SIZE_STEP)
++    return TRUE;
++
++  g_clear_object (&result->framebuffer);
++  texture = cogl_texture_2d_new_with_size (cogl, capacity_width, capacity_height);
++  cogl_texture_set_premultiplied (texture, TRUE);
++  offscreen = cogl_offscreen_new_with_texture (texture);
++  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), &error))
+     {
+-      MtkRectangle rect;
+-      MtkRectangle sample_rect;
+-
+-      rect = mtk_region_get_rectangle (blur_region, i);
+-      sample_rect = (MtkRectangle) {
+-        .x = rect.x - padding,
+-        .y = rect.y - padding,
+-        .width = rect.width + 2 * padding,
+-        .height = rect.height + 2 * padding,
+-      };
+-
+-      mtk_region_union_rectangle (sample_region, &sample_rect);
++      g_warning ("Unable to keep a %dx%d background blur: %s",
++                 capacity_width, capacity_height, error->message);
++      return FALSE;
+     }
+ 
+-  return g_steal_pointer (&sample_region);
++  cogl_framebuffer_orthographic (COGL_FRAMEBUFFER (offscreen), 0, 0,
++                                 capacity_width, capacity_height, 0, 1);
++  result->framebuffer = COGL_FRAMEBUFFER (g_steal_pointer (&offscreen));
++  result->capacity_width = capacity_width;
++  result->capacity_height = capacity_height;
++  return TRUE;
+ }
+ 
+-static gboolean
+-project_actor_point (const graphene_matrix_t *modelview_projection,
+-                     const float             *viewport,
+-                     float                    actor_x,
+-                     float                    actor_y,
+-                     graphene_point_t        *framebuffer_point)
++static CoglPipeline *
++create_result_pipeline (const Paint            *paint,
++                        MetaBackgroundBlurView *result,
++                        int                     width,
++                        int                     height)
+ {
+-  float x = actor_x;
+-  float y = actor_y;
+-  float z = 0.0f;
+-  float w = 1.0f;
+-
+-  cogl_graphene_matrix_project_point (modelview_projection, &x, &y, &z, &w);
+-  if (G_APPROX_VALUE (w, 0.0f, FLT_EPSILON))
+-    return FALSE;
+-
+-  graphene_point_init (framebuffer_point,
+-                       viewport[0] + ((x / w + 1.0f) * viewport[2] / 2.0f),
+-                       viewport[1] + ((1.0f - y / w) * viewport[3] / 2.0f));
+-
+-  return TRUE;
++  CoglContext *cogl = cogl_framebuffer_get_context (result->framebuffer);
++  CoglTexture *texture = cogl_offscreen_get_texture (COGL_OFFSCREEN (result->framebuffer));
++  CoglPipeline *pipeline = cogl_pipeline_new (cogl);
++  graphene_matrix_t matrix;
++
++  cogl_pipeline_set_layer_texture (pipeline, 0, texture);
++  cogl_pipeline_set_layer_filters (pipeline, 0,
++                                   COGL_PIPELINE_FILTER_LINEAR,
++                                   COGL_PIPELINE_FILTER_LINEAR);
++  cogl_pipeline_set_layer_wrap_mode (pipeline, 0,
++                                     COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
++  graphene_matrix_init_scale (&matrix,
++                              (float) width / result->capacity_width,
++                              (float) height / result->capacity_height,
++                              1.f);
++  cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
++  clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise,
++                                       paint->source_rect.width * (float) result->capacity_width / width,
++                                       paint->source_rect.height * (float) result->capacity_height / height);
++  apply_corners (paint, pipeline);
++  return pipeline;
+ }
+ 
+ static gboolean
+-get_framebuffer_transform (ClutterActor          *actor,
+-                           ClutterPaintContext   *paint_context,
+-                           CoglFramebuffer       *framebuffer,
+-                           const ClutterActorBox *actor_box,
+-                           FramebufferTransform  *transform)
++refresh_result (Paint                  *paint,
++                MetaBackgroundBlurView *result)
+ {
+-  graphene_matrix_t actor_to_eye;
+-  graphene_matrix_t projection;
+-  graphene_matrix_t modelview_projection;
+-  graphene_point_t origin;
+-  graphene_point_t x_point;
+-  graphene_point_t y_point;
+-  graphene_point_t opposite_point;
+-  graphene_point_t expected_opposite;
+-  float xx;
+-  float yy;
+-  float width;
+-  float height;
+-  float x0;
+-  float y0;
+-  float viewport[4];
+-
+-  width = actor_box->x2 - actor_box->x1;
+-  height = actor_box->y2 - actor_box->y1;
+-  if (width <= 0.0f || height <= 0.0f)
+-    return FALSE;
+-
+-  clutter_actor_get_effective_eye_transformation_matrix (actor,
+-                                                         paint_context,
+-                                                         &actor_to_eye);
+-
+-  cogl_framebuffer_get_projection_matrix (framebuffer, &projection);
+-  cogl_framebuffer_get_viewport4fv (framebuffer, viewport);
+-  graphene_matrix_multiply (&actor_to_eye,
+-                            &projection,
+-                            &modelview_projection);
+-
+-  if (!project_actor_point (&modelview_projection, viewport,
+-                            actor_box->x1, actor_box->y1, &origin) ||
+-      !project_actor_point (&modelview_projection, viewport,
+-                            actor_box->x2, actor_box->y1, &x_point) ||
+-      !project_actor_point (&modelview_projection, viewport,
+-                            actor_box->x1, actor_box->y2, &y_point) ||
+-      !project_actor_point (&modelview_projection, viewport,
+-                            actor_box->x2, actor_box->y2, &opposite_point))
+-    return FALSE;
+-
+-  graphene_point_init (&expected_opposite,
+-                       x_point.x + y_point.x - origin.x,
+-                       x_point.y + y_point.y - origin.y);
+-  if (!graphene_point_near (&opposite_point,
+-                            &expected_opposite,
+-                            CLUTTER_COORDINATE_EPSILON))
+-    return FALSE;
++  g_autoptr (ClutterPaintNode) layer_node = NULL;
++  g_autoptr (ClutterPaintNode) blur_node = NULL;
++  int width = (paint->source_rect.width + 1) / 2;
++  int height = (paint->source_rect.height + 1) / 2;
+ 
+-  if (!G_APPROX_VALUE (x_point.y, origin.y, CLUTTER_COORDINATE_EPSILON) ||
+-      !G_APPROX_VALUE (y_point.x, origin.x, CLUTTER_COORDINATE_EPSILON))
++  result->valid = FALSE;
++  if (!ensure_result (result, cogl_framebuffer_get_context (paint->framebuffer), width, height))
+     return FALSE;
+ 
+-  xx = (x_point.x - origin.x) / width;
+-  yy = (y_point.y - origin.y) / height;
+-  x0 = origin.x - actor_box->x1 * xx;
+-  y0 = origin.y - actor_box->y1 * yy;
+-  graphene_matrix_init_from_2d (&transform->actor_to_framebuffer,
+-                                xx, 0.0f, 0.0f, yy,
+-                                x0, y0);
+-  if (!graphene_matrix_inverse (&transform->actor_to_framebuffer,
+-                                &transform->framebuffer_to_actor))
++  blur_node = clutter_blur_node_new_from_framebuffer (paint->framebuffer,
++                                                      paint->source_rect.x,
++                                                      paint->source_rect.y,
++                                                      paint->source_rect.width,
++                                                      paint->source_rect.height,
++                                                      paint->radius,
++                                                      1.f, 0.f, 255);
++  if (!blur_node)
+     return FALSE;
+ 
+-  transform->scale = MAX (fabsf (xx), fabsf (yy));
+-  transform->flip_x = xx < 0.0f;
+-  transform->flip_y = yy < 0.0f;
++  g_clear_object (&result->pipeline);
++  result->pipeline = create_result_pipeline (paint, result, width, height);
++  layer_node = clutter_layer_node_new_to_framebuffer (result->framebuffer, result->pipeline);
++  clutter_paint_node_add_child (layer_node, blur_node);
++  clutter_paint_node_add_texture_rectangle (blur_node,
++                                            &(ClutterActorBox) { 0, 0, width, height },
++                                            0, 0, 1, 1);
++  clutter_paint_node_add_child (paint->root_node, layer_node);
++
++  result->source_rect = paint->source_rect;
++  result->actor_box = paint->source_box;
++  result->region_box = paint->region_box;
++  result->flip_x = paint->transform.flip_x;
++  result->flip_y = paint->transform.flip_y;
++  result->valid = TRUE;
++  result->dirty = FALSE;
+   return TRUE;
+ }
+ 
+-static gboolean
+-actor_box_to_framebuffer_rect (const ClutterActorBox      *actor_box,
+-                               const FramebufferTransform *transform,
+-                               graphene_rect_t            *framebuffer_rect)
+-{
+-  graphene_rect_t actor_rect;
+-
+-  graphene_rect_init (&actor_rect,
+-                      actor_box->x1,
+-                      actor_box->y1,
+-                      actor_box->x2 - actor_box->x1,
+-                      actor_box->y2 - actor_box->y1);
+-  graphene_matrix_transform_bounds (&transform->actor_to_framebuffer,
+-                                    &actor_rect,
+-                                    framebuffer_rect);
+-
+-  return framebuffer_rect->size.width > 0.0f &&
+-         framebuffer_rect->size.height > 0.0f;
+-}
+-
+-static gboolean
+-framebuffer_rect_to_actor_box (const graphene_rect_t      *framebuffer_rect,
+-                               const FramebufferTransform *transform,
+-                               ClutterActorBox            *actor_box)
+-{
+-  graphene_rect_t actor_rect;
+-
+-  graphene_matrix_transform_bounds (&transform->framebuffer_to_actor,
+-                                    framebuffer_rect,
+-                                    &actor_rect);
+-
+-  *actor_box = (ClutterActorBox) {
+-    .x1 = actor_rect.origin.x,
+-    .y1 = actor_rect.origin.y,
+-    .x2 = actor_rect.origin.x + actor_rect.size.width,
+-    .y2 = actor_rect.origin.y + actor_rect.size.height,
+-  };
+-
+-  return actor_box->x2 > actor_box->x1 && actor_box->y2 > actor_box->y1;
+-}
+-
+-static gboolean
+-region_rect_to_actor_box (const MtkRectangle    *region_rect,
+-                          const ClutterActorBox *content_box,
+-                          int                    content_width,
+-                          int                    content_height,
+-                          ClutterActorBox       *actor_box)
++static void
++paint_result (Paint                  *paint,
++              MetaBackgroundBlurView *result)
+ {
+-  float x_scale;
+-  float y_scale;
++  g_autoptr (ClutterPaintNode) node = NULL;
++  CoglColor color;
++  float alpha = paint->opacity / 255.f;
++  int i;
+ 
+-  if (content_width <= 0 || content_height <= 0)
+-    return FALSE;
++  cogl_color_init_from_4f (&color, alpha, alpha, alpha, alpha);
++  cogl_pipeline_set_color (result->pipeline, &color);
++  node = clutter_pipeline_node_new (result->pipeline);
++  clutter_paint_node_set_static_name (node, "MetaBackgroundBlur (kept)");
+ 
+-  x_scale = (content_box->x2 - content_box->x1) / content_width;
+-  y_scale = (content_box->y2 - content_box->y1) / content_height;
++  for (i = 0; i < mtk_region_num_rectangles (paint->paint_region); i++)
++    {
++      graphene_rect_t framebuffer_rect;
++      ClutterActorBox actor_box;
+ 
+-  *actor_box = (ClutterActorBox) {
+-    .x1 = content_box->x1 + region_rect->x * x_scale,
+-    .y1 = content_box->y1 + region_rect->y * y_scale,
+-    .x2 = content_box->x1 + (region_rect->x + region_rect->width) * x_scale,
+-    .y2 = content_box->y1 + (region_rect->y + region_rect->height) * y_scale,
+-  };
++      if (paint_box (paint, i, &actor_box, &framebuffer_rect))
++        add_result_rectangle (node, result, &actor_box);
++    }
+ 
+-  return actor_box->x2 > actor_box->x1 && actor_box->y2 > actor_box->y1;
++  clutter_paint_node_add_child (paint->root_node, node);
+ }
+ 
+ static gboolean
+-expand_framebuffer_rect_for_blur (const MtkRectangle *framebuffer_rect,
+-                                  const MtkRectangle *framebuffer_bounds,
+-                                  float               radius,
+-                                  MtkRectangle       *sample_rect)
++keeps_result (const Paint      *paint,
++              ClutterStageView *view)
+ {
+-  int padding;
+-
+-  padding = calculate_blur_sample_padding (radius);
+-
+-  *sample_rect = (MtkRectangle) {
+-    .x = framebuffer_rect->x - padding,
+-    .y = framebuffer_rect->y - padding,
+-    .width = framebuffer_rect->width + 2 * padding,
+-    .height = framebuffer_rect->height + 2 * padding,
+-  };
+-
+-  return mtk_rectangle_intersect (sample_rect,
+-                                  framebuffer_bounds,
+-                                  sample_rect);
++  return view &&
++    !clutter_actor_is_in_clone_paint (paint->actor) &&
++    paint->framebuffer == clutter_stage_view_get_framebuffer (view);
+ }
+ 
+ static void
+-add_blur_rectangle (ClutterPaintNode           *paint_node,
+-                    const MtkRectangle         *source_rect,
+-                    const graphene_rect_t      *framebuffer_rect,
+-                    const ClutterActorBox      *actor_box,
+-                    const FramebufferTransform *transform)
++paint_blur (MetaBackgroundBlur *blur,
++            Paint              *paint,
++            ClutterStageView   *view)
+ {
+-  float texture_x1;
+-  float texture_y1;
+-  float texture_x2;
+-  float texture_y2;
+-
+-  texture_x1 =
+-    CLAMP ((framebuffer_rect->origin.x - source_rect->x) /
+-           (float) source_rect->width,
+-           0.0f,
+-           1.0f);
+-  texture_y1 =
+-    CLAMP ((framebuffer_rect->origin.y - source_rect->y) /
+-           (float) source_rect->height,
+-           0.0f,
+-           1.0f);
+-  texture_x2 =
+-    CLAMP ((framebuffer_rect->origin.x + framebuffer_rect->size.width -
+-            source_rect->x) /
+-           (float) source_rect->width,
+-           0.0f,
+-           1.0f);
+-  texture_y2 =
+-    CLAMP ((framebuffer_rect->origin.y + framebuffer_rect->size.height -
+-            source_rect->y) /
+-           (float) source_rect->height,
+-           0.0f,
+-           1.0f);
+-
+-  if (transform->flip_x)
+-    {
+-      float tmp = texture_x1;
++  MetaBackgroundBlurView *result;
+ 
+-      texture_x1 = texture_x2;
+-      texture_x2 = tmp;
+-    }
+-  if (transform->flip_y)
++  if (clutter_actor_is_in_clone_paint (paint->actor))
+     {
+-      float tmp = texture_y1;
+-
+-      texture_y1 = texture_y2;
+-      texture_y2 = tmp;
++      result = meta_background_blur_find_result (blur, &paint->region_box);
++      if (result)
++        paint_result (paint, result);
++      else
++        paint_live (paint);
++      return;
+     }
+ 
+-  clutter_paint_node_add_texture_rectangle (paint_node,
+-                                            actor_box,
+-                                            texture_x1,
+-                                            texture_y1,
+-                                            texture_x2,
+-                                            texture_y2);
+-}
+-
+-void
+-meta_background_effect_paint_blur_region (ClutterPaintNode       *root_node,
+-                                          ClutterActor           *actor,
+-                                          ClutterPaintContext    *paint_context,
+-                                          const ClutterActorBox  *content_box,
+-                                          int                     content_width,
+-                                          int                     content_height,
+-                                          const MtkRegion        *blur_region,
+-                                          const MtkRegion        *clip_region,
+-                                          float                   radius,
+-                                          float                   saturation,
+-                                          float                   noise,
+-                                          uint8_t                 opacity)
+-{
+-  ClutterActor *stage;
+-  CoglFramebuffer *source_framebuffer;
+-  FramebufferTransform framebuffer_transform;
+-  ClutterActorBox extents_actor_box;
+-  MtkRectangle content_rect;
+-  MtkRectangle effect_extents;
+-  graphene_rect_t extents_framebuffer_rect;
+-  graphene_rect_t framebuffer_bounds;
+-  MtkRectangle framebuffer_bounds_int;
+-  MtkRectangle effect_framebuffer_rect;
+-  MtkRectangle source_rect;
+-  g_autoptr (MtkRegion) effect_region = NULL;
+-  g_autoptr (MtkRegion) paint_region = NULL;
+-  g_autoptr (ClutterPaintNode) blur_node = NULL;
+-  float blur_radius;
+-  int n_rects;
+-  gboolean has_blur_rects = FALSE;
+-
+-  if (opacity == 0)
+-    return;
++  if (!keeps_result (paint, view))
++    {
++      paint_live (paint);
++      return;
++    }
+ 
+-  stage = clutter_actor_get_stage (actor);
+-  if (!stage)
++  result = meta_background_blur_get_view (blur, view);
++  if ((result->dirty || !result->valid ||
++       !mtk_rectangle_equal (&result->source_rect, &paint->source_rect) ||
++       !clutter_actor_box_equal (&result->region_box, &paint->region_box)) &&
++      !refresh_result (paint, result))
+     return;
+ 
+-  source_framebuffer = clutter_paint_node_get_framebuffer (root_node);
+-  if (!source_framebuffer)
+-    source_framebuffer = clutter_paint_context_get_framebuffer (paint_context);
+-  if (!source_framebuffer)
+-    return;
++  paint_result (paint, result);
++}
+ 
+-  content_rect = (MtkRectangle) {
+-    .width = content_width,
+-    .height = content_height,
+-  };
++static gboolean
++prepare_paint (MetaBackgroundBlur    *blur,
++               Paint                 *paint,
++               ClutterPaintContext   *paint_context,
++               const MtkRegion       *clip_region)
++{
++  MtkRectangle content_rect = { 0, 0, paint->content_width, paint->content_height };
++  g_autoptr (MtkRegion) effect_region = mtk_region_copy (blur->blur_region);
++  MtkRectangle extents;
++  graphene_rect_t source;
++
++  paint->framebuffer = clutter_paint_node_get_framebuffer (paint->root_node);
++  if (!paint->framebuffer)
++    paint->framebuffer = clutter_paint_context_get_framebuffer (paint_context);
++  if (!paint->framebuffer)
++    return FALSE;
+ 
+-  effect_region = mtk_region_copy (blur_region);
+   mtk_region_intersect_rectangle (effect_region, &content_rect);
+-
+   if (mtk_region_is_empty (effect_region))
+-    return;
++    return FALSE;
+ 
+-  paint_region = mtk_region_copy (effect_region);
++  paint->paint_region = mtk_region_copy (effect_region);
+   if (clip_region)
+-    mtk_region_intersect (paint_region, clip_region);
+-
+-  if (mtk_region_is_empty (paint_region))
+-    return;
++    mtk_region_intersect (paint->paint_region, clip_region);
++  if (mtk_region_is_empty (paint->paint_region))
++    return FALSE;
+ 
+-  framebuffer_bounds_int = (MtkRectangle) {
+-    .width = cogl_framebuffer_get_width (source_framebuffer),
+-    .height = cogl_framebuffer_get_height (source_framebuffer),
++  paint->framebuffer_bounds = (MtkRectangle) {
++    .width = cogl_framebuffer_get_width (paint->framebuffer),
++    .height = cogl_framebuffer_get_height (paint->framebuffer),
+   };
+-  framebuffer_bounds = mtk_rectangle_to_graphene_rect (&framebuffer_bounds_int);
+-  effect_extents = mtk_region_get_extents (effect_region);
+-
+-  if (!region_rect_to_actor_box (&effect_extents,
+-                                 content_box,
+-                                 content_width,
+-                                 content_height,
+-                                 &extents_actor_box))
+-    return;
+-
+-  if (!get_framebuffer_transform (actor,
+-                                  paint_context,
+-                                  source_framebuffer,
+-                                  &extents_actor_box,
+-                                  &framebuffer_transform))
+-    return;
+-
+-  blur_radius = radius * framebuffer_transform.scale;
+-
+-  if (!actor_box_to_framebuffer_rect (&extents_actor_box,
+-                                      &framebuffer_transform,
+-                                      &extents_framebuffer_rect))
+-    return;
++  paint->bounds = mtk_rectangle_to_graphene_rect (&paint->framebuffer_bounds);
++  extents = mtk_region_get_extents (effect_region);
++
++  if (!meta_background_region_rect_to_actor_box (&extents, paint->content_box,
++                                                 paint->content_width,
++                                                 paint->content_height,
++                                                 &paint->region_box) ||
++      !meta_background_get_transform (paint->actor, paint_context, paint->framebuffer,
++                                      &paint->region_box, &paint->transform) ||
++      !meta_background_actor_box_to_framebuffer (&paint->region_box, &paint->transform,
++                                                 &source) ||
++      !graphene_rect_intersection (&source, &paint->bounds, &source))
++    return FALSE;
+ 
+-  if (!graphene_rect_intersection (&extents_framebuffer_rect,
+-                                   &framebuffer_bounds,
+-                                   &extents_framebuffer_rect))
+-    return;
++  mtk_rectangle_from_graphene_rect (&source, MTK_ROUNDING_STRATEGY_GROW,
++                                    &paint->source_rect);
++  if (!mtk_rectangle_intersect (&paint->source_rect, &paint->framebuffer_bounds,
++                                &paint->source_rect))
++    return FALSE;
+ 
+-  mtk_rectangle_from_graphene_rect (&extents_framebuffer_rect,
+-                                    MTK_ROUNDING_STRATEGY_GROW,
+-                                    &effect_framebuffer_rect);
++  source = mtk_rectangle_to_graphene_rect (&paint->source_rect);
++  paint->radius *= paint->transform.scale;
++  return meta_background_framebuffer_to_actor_box (&source, &paint->transform,
++                                                   &paint->source_box);
++}
+ 
+-  if (!expand_framebuffer_rect_for_blur (&effect_framebuffer_rect,
+-                                         &framebuffer_bounds_int,
+-                                         blur_radius,
+-                                         &source_rect))
+-    return;
++void
++meta_background_blur_paint (MetaBackgroundBlur    *blur,
++                            ClutterPaintNode      *root_node,
++                            ClutterPaintContext   *paint_context,
++                            const ClutterActorBox *content_box,
++                            int                    content_width,
++                            int                    content_height,
++                            const MtkRegion       *clip_region,
++                            uint8_t                opacity)
++{
++  Paint paint = {
++    .actor = blur->actor,
++    .root_node = root_node,
++    .content_box = content_box,
++    .content_width = content_width,
++    .content_height = content_height,
++    .opacity = opacity,
++  };
+ 
+-  blur_node =
+-    clutter_blur_node_new_from_framebuffer (source_framebuffer,
+-                                            source_rect.x,
+-                                            source_rect.y,
+-                                            source_rect.width,
+-                                            source_rect.height,
+-                                            blur_radius,
+-                                            saturation,
+-                                            noise,
+-                                            opacity);
+-  if (!blur_node)
++  if (opacity == 0 || !clutter_actor_get_stage (blur->actor))
+     return;
+ 
+-  MetaWindowCorners corners = meta_window_corners_for_actor (actor);
+-  if (corners.radius > 0)
+-    {
+-      graphene_rect_t bounds;
+-      CoglPipeline *pipeline =
+-        clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node));
+-
+-      graphene_matrix_transform_bounds (&framebuffer_transform.actor_to_framebuffer,
+-                                         &corners.bounds, &bounds);
+-      corners.bounds = bounds;
+-      corners.bounds.origin.x -= source_rect.x;
+-      corners.bounds.origin.y -= source_rect.y;
+-      corners.radius *= framebuffer_transform.scale;
+-      meta_window_corners_apply (&corners, META_WINDOW_CORNER_FILL_CLEAR, pipeline,
+-                                 source_rect.width, source_rect.height);
+-    }
+-
+-  n_rects = mtk_region_num_rectangles (paint_region);
+-  for (int i = 0; i < n_rects; i++)
+-    {
+-      MtkRectangle region_rect;
+-      graphene_rect_t framebuffer_rect;
+-      ClutterActorBox actor_box;
+-
+-      region_rect = mtk_region_get_rectangle (paint_region, i);
+-      if (!region_rect_to_actor_box (&region_rect,
+-                                     content_box,
+-                                     content_width,
+-                                     content_height,
+-                                     &actor_box))
+-        continue;
+-
+-      if (!actor_box_to_framebuffer_rect (&actor_box,
+-                                          &framebuffer_transform,
+-                                          &framebuffer_rect))
+-        continue;
+-
+-      if (!graphene_rect_intersection (&framebuffer_rect,
+-                                       &framebuffer_bounds,
+-                                       &framebuffer_rect))
+-        continue;
+-
+-      if (!framebuffer_rect_to_actor_box (&framebuffer_rect,
+-                                          &framebuffer_transform,
+-                                          &actor_box))
+-        continue;
+-
+-      add_blur_rectangle (blur_node,
+-                          &source_rect,
+-                          &framebuffer_rect,
+-                          &actor_box,
+-                          &framebuffer_transform);
+-      has_blur_rects = TRUE;
+-    }
++  meta_compositor_get_background_blur_params (blur->compositor, &paint.radius,
++                                              &paint.saturation, &paint.noise);
++  if (prepare_paint (blur, &paint, paint_context, clip_region))
++    paint_blur (blur, &paint, clutter_paint_context_get_stage_view (paint_context));
+ 
+-  if (has_blur_rects)
+-    clutter_paint_node_add_child (root_node, blur_node);
++  g_clear_pointer (&paint.paint_region, mtk_region_unref);
+ }
+diff --git a/src/compositor/meta-background-effect.h b/src/compositor/meta-background-effect.h
+index 15a02d89bc3a24c9259a37bd1bde7bd428069e09..686abd39164890a89b0623705c2e2b2730fc594a 100644
+--- a/src/compositor/meta-background-effect.h
++++ b/src/compositor/meta-background-effect.h
+@@ -18,27 +18,21 @@
+ #pragma once
+ 
+ #include "clutter/clutter.h"
++#include "meta/compositor.h"
+ #include "mtk/mtk.h"
+ 
+ typedef struct _MetaBackgroundBlur MetaBackgroundBlur;
+ 
+-MtkRegion * meta_background_effect_create_blur_sample_region (const MtkRegion *blur_region,
+-                                                              float            radius);
+-
+-MetaBackgroundBlur * meta_background_blur_new (ClutterActor    *actor,
+-                                               const MtkRegion *blur_region,
+-                                               float            radius);
++MetaBackgroundBlur * meta_background_blur_new (MetaCompositor  *compositor,
++                                               ClutterActor    *actor,
++                                               const MtkRegion *blur_region);
+ void meta_background_blur_destroy (MetaBackgroundBlur *blur);
+ 
+-void meta_background_effect_paint_blur_region (ClutterPaintNode       *root_node,
+-                                               ClutterActor           *actor,
+-                                               ClutterPaintContext    *paint_context,
+-                                               const ClutterActorBox  *content_box,
+-                                               int                     content_width,
+-                                               int                     content_height,
+-                                               const MtkRegion        *blur_region,
+-                                               const MtkRegion        *clip_region,
+-                                               float                   radius,
+-                                               float                   saturation,
+-                                               float                   noise,
+-                                               uint8_t                 opacity);
++void meta_background_blur_paint (MetaBackgroundBlur    *blur,
++                                 ClutterPaintNode      *root_node,
++                                 ClutterPaintContext   *paint_context,
++                                 const ClutterActorBox *content_box,
++                                 int                    content_width,
++                                 int                    content_height,
++                                 const MtkRegion       *clip_region,
++                                 uint8_t                opacity);
+diff --git a/src/compositor/meta-background-geometry.c b/src/compositor/meta-background-geometry.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..992c9db6d5c1b1fbcd528ca695338cbd4e4f2959
+--- /dev/null
++++ b/src/compositor/meta-background-geometry.c
+@@ -0,0 +1,192 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <float.h>
++#include <math.h>
++
++#include "compositor/meta-background-blur-private.h"
++
++#include "clutter/clutter-mutter.h"
++
++static gboolean
++project_actor_point (const graphene_matrix_t *modelview_projection,
++                     const float             *viewport,
++                     float                    actor_x,
++                     float                    actor_y,
++                     graphene_point_t        *framebuffer_point)
++{
++  float x = actor_x;
++  float y = actor_y;
++  float z = 0.0f;
++  float w = 1.0f;
++
++  cogl_graphene_matrix_project_point (modelview_projection, &x, &y, &z, &w);
++  if (G_APPROX_VALUE (w, 0.0f, FLT_EPSILON))
++    return FALSE;
++
++  graphene_point_init (framebuffer_point,
++                       viewport[0] + ((x / w + 1.0f) * viewport[2] / 2.0f),
++                       viewport[1] + ((1.0f - y / w) * viewport[3] / 2.0f));
++
++  return TRUE;
++}
++
++gboolean
++meta_background_get_transform (ClutterActor            *actor,
++                               ClutterPaintContext     *paint_context,
++                               CoglFramebuffer         *framebuffer,
++                               const ClutterActorBox   *actor_box,
++                               MetaBackgroundTransform *transform)
++{
++  graphene_matrix_t actor_to_eye;
++  graphene_matrix_t projection;
++  graphene_matrix_t modelview_projection;
++  graphene_point_t origin;
++  graphene_point_t x_point;
++  graphene_point_t y_point;
++  graphene_point_t opposite_point;
++  graphene_point_t expected_opposite;
++  float xx;
++  float yy;
++  float width;
++  float height;
++  float x0;
++  float y0;
++  float viewport[4];
++
++  width = actor_box->x2 - actor_box->x1;
++  height = actor_box->y2 - actor_box->y1;
++  if (width <= 0.0f || height <= 0.0f)
++    return FALSE;
++
++  clutter_actor_get_effective_eye_transformation_matrix (actor,
++                                                         paint_context,
++                                                         &actor_to_eye);
++
++  cogl_framebuffer_get_projection_matrix (framebuffer, &projection);
++  cogl_framebuffer_get_viewport4fv (framebuffer, viewport);
++  graphene_matrix_multiply (&actor_to_eye,
++                            &projection,
++                            &modelview_projection);
++
++  if (!project_actor_point (&modelview_projection, viewport,
++                            actor_box->x1, actor_box->y1, &origin) ||
++      !project_actor_point (&modelview_projection, viewport,
++                            actor_box->x2, actor_box->y1, &x_point) ||
++      !project_actor_point (&modelview_projection, viewport,
++                            actor_box->x1, actor_box->y2, &y_point) ||
++      !project_actor_point (&modelview_projection, viewport,
++                            actor_box->x2, actor_box->y2, &opposite_point))
++    return FALSE;
++
++  graphene_point_init (&expected_opposite,
++                       x_point.x + y_point.x - origin.x,
++                       x_point.y + y_point.y - origin.y);
++  if (!graphene_point_near (&opposite_point,
++                            &expected_opposite,
++                            CLUTTER_COORDINATE_EPSILON))
++    return FALSE;
++
++  if (!G_APPROX_VALUE (x_point.y, origin.y, CLUTTER_COORDINATE_EPSILON) ||
++      !G_APPROX_VALUE (y_point.x, origin.x, CLUTTER_COORDINATE_EPSILON))
++    return FALSE;
++
++  xx = (x_point.x - origin.x) / width;
++  yy = (y_point.y - origin.y) / height;
++  x0 = origin.x - actor_box->x1 * xx;
++  y0 = origin.y - actor_box->y1 * yy;
++  graphene_matrix_init_from_2d (&transform->actor_to_framebuffer,
++                                xx, 0.0f, 0.0f, yy,
++                                x0, y0);
++  if (!graphene_matrix_inverse (&transform->actor_to_framebuffer,
++                                &transform->framebuffer_to_actor))
++    return FALSE;
++
++  transform->scale = MAX (fabsf (xx), fabsf (yy));
++  transform->flip_x = xx < 0.0f;
++  transform->flip_y = yy < 0.0f;
++  return TRUE;
++}
++
++gboolean
++meta_background_actor_box_to_framebuffer (const ClutterActorBox         *actor_box,
++                                          const MetaBackgroundTransform *transform,
++                                          graphene_rect_t               *framebuffer_rect)
++{
++  graphene_rect_t actor_rect;
++
++  graphene_rect_init (&actor_rect,
++                      actor_box->x1,
++                      actor_box->y1,
++                      actor_box->x2 - actor_box->x1,
++                      actor_box->y2 - actor_box->y1);
++  graphene_matrix_transform_bounds (&transform->actor_to_framebuffer,
++                                    &actor_rect,
++                                    framebuffer_rect);
++
++  return framebuffer_rect->size.width > 0.0f &&
++         framebuffer_rect->size.height > 0.0f;
++}
++
++gboolean
++meta_background_framebuffer_to_actor_box (const graphene_rect_t         *framebuffer_rect,
++                                          const MetaBackgroundTransform *transform,
++                                          ClutterActorBox               *actor_box)
++{
++  graphene_rect_t actor_rect;
++
++  graphene_matrix_transform_bounds (&transform->framebuffer_to_actor,
++                                    framebuffer_rect,
++                                    &actor_rect);
++
++  *actor_box = (ClutterActorBox) {
++    .x1 = actor_rect.origin.x,
++    .y1 = actor_rect.origin.y,
++    .x2 = actor_rect.origin.x + actor_rect.size.width,
++    .y2 = actor_rect.origin.y + actor_rect.size.height,
++  };
++
++  return actor_box->x2 > actor_box->x1 && actor_box->y2 > actor_box->y1;
++}
++
++gboolean
++meta_background_region_rect_to_actor_box (const MtkRectangle    *region_rect,
++                                          const ClutterActorBox *content_box,
++                                          int                    content_width,
++                                          int                    content_height,
++                                          ClutterActorBox       *actor_box)
++{
++  float x_scale;
++  float y_scale;
++
++  if (content_width <= 0 || content_height <= 0)
++    return FALSE;
++
++  x_scale = (content_box->x2 - content_box->x1) / content_width;
++  y_scale = (content_box->y2 - content_box->y1) / content_height;
++
++  *actor_box = (ClutterActorBox) {
++    .x1 = content_box->x1 + region_rect->x * x_scale,
++    .y1 = content_box->y1 + region_rect->y * y_scale,
++    .x2 = content_box->x1 + (region_rect->x + region_rect->width) * x_scale,
++    .y2 = content_box->y1 + (region_rect->y + region_rect->height) * y_scale,
++  };
++
++  return actor_box->x2 > actor_box->x1 && actor_box->y2 > actor_box->y1;
++}
+diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
+index a0def345969dc41827028d4585e6f7afbdf0d55b..0455882821262bbaa87d6baf8464ed99f5c8550d 100644
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -54,7 +54,6 @@ typedef struct _MetaSurfaceActorPrivate
+   MetaWindowCorners input_corners;
+   MtkRectangle input_bounds;
+   MtkRegion *background_blur_region;
+-  MtkRegion *background_blur_sample_region;
+   MetaBackgroundBlur *background_blur;
+ 
+   /* MetaCullable regions, see that documentation for more details */
+@@ -261,36 +260,6 @@ meta_surface_actor_pick (ClutterActor       *actor,
+     clutter_actor_pick (child, pick_context);
+ }
+ 
+-static gboolean
+-meta_surface_actor_get_paint_volume (ClutterActor       *actor,
+-                                     ClutterPaintVolume *volume)
+-{
+-  MetaSurfaceActor *surface_actor = META_SURFACE_ACTOR (actor);
+-  MetaSurfaceActorPrivate *priv =
+-    meta_surface_actor_get_instance_private (surface_actor);
+-
+-  if (!clutter_paint_volume_set_from_allocation (volume, actor))
+-    return FALSE;
+-
+-  if (priv->background_blur_sample_region)
+-    {
+-      MtkRectangle sample_rect;
+-      ClutterActorBox sample_box;
+-
+-      sample_rect = mtk_region_get_extents (priv->background_blur_sample_region);
+-      sample_box = (ClutterActorBox) {
+-        .x1 = sample_rect.x,
+-        .y1 = sample_rect.y,
+-        .x2 = sample_rect.x + sample_rect.width,
+-        .y2 = sample_rect.y + sample_rect.height,
+-      };
+-
+-      clutter_paint_volume_union_box (volume, &sample_box);
+-    }
+-
+-  return TRUE;
+-}
+-
+ static void
+ meta_surface_actor_realize (ClutterActor *actor)
+ {
+@@ -403,7 +372,6 @@ meta_surface_actor_dispose (GObject *object)
+   g_clear_pointer (&priv->background_blur,
+                    meta_background_blur_destroy);
+   g_clear_pointer (&priv->background_blur_region, mtk_region_unref);
+-  g_clear_pointer (&priv->background_blur_sample_region, mtk_region_unref);
+   clutter_actor_set_content (CLUTTER_ACTOR (self), NULL);
+   g_clear_object (&priv->content);
+ 
+@@ -424,7 +392,6 @@ meta_surface_actor_class_init (MetaSurfaceActorClass *klass)
+   object_class->get_property = meta_surface_actor_get_property;
+ 
+   actor_class->pick = meta_surface_actor_pick;
+-  actor_class->get_paint_volume = meta_surface_actor_get_paint_volume;
+   actor_class->realize = meta_surface_actor_realize;
+   actor_class->unrealize = meta_surface_actor_unrealize;
+ 
+@@ -499,11 +466,11 @@ subtract_opaque_region (MetaSurfaceActor *surface_actor,
+       if (!opaque_region)
+         return;
+ 
+-      if (priv->background_blur_sample_region)
++      if (priv->background_blur_region)
+         {
+           effective_opaque_region = mtk_region_copy (opaque_region);
+           mtk_region_subtract (effective_opaque_region,
+-                               priv->background_blur_sample_region);
++                               priv->background_blur_region);
+           opaque_region = effective_opaque_region;
+         }
+ 
+@@ -545,65 +512,22 @@ sync_background_blur (MetaSurfaceActor *surface_actor)
+ {
+   MetaSurfaceActorPrivate *priv =
+     meta_surface_actor_get_instance_private (surface_actor);
+-  ClutterActor *actor = CLUTTER_ACTOR (surface_actor);
+-  float blur_radius;
+ 
+   g_clear_pointer (&priv->background_blur,
+                    meta_background_blur_destroy);
+ 
+-  if (!priv->background_blur_region)
+-    return;
+-
+-  if (!clutter_actor_is_mapped (actor) &&
+-      !clutter_actor_has_mapped_clones (actor))
+-    return;
+-
+-  meta_compositor_get_background_blur_params (priv->compositor,
+-                                              &blur_radius,
+-                                              NULL,
+-                                              NULL);
+-  priv->background_blur =
+-    meta_background_blur_new (actor,
+-                              priv->background_blur_region,
+-                              blur_radius);
+-}
+-
+-static void
+-update_background_blur_sample_region (MetaSurfaceActor *surface_actor)
+-{
+-  MetaSurfaceActorPrivate *priv =
+-    meta_surface_actor_get_instance_private (surface_actor);
+-  float blur_radius;
+-
+-  g_clear_pointer (&priv->background_blur_sample_region, mtk_region_unref);
+   if (!priv->background_blur_region || !priv->compositor)
+     return;
+ 
+-  meta_compositor_get_background_blur_params (priv->compositor,
+-                                              &blur_radius,
+-                                              NULL,
+-                                              NULL);
+-  priv->background_blur_sample_region =
+-    meta_background_effect_create_blur_sample_region (
+-      priv->background_blur_region,
+-      blur_radius);
+-}
+-
+-static void
+-background_blur_mapped_changed (MetaSurfaceActor *surface_actor,
+-                                GParamSpec       *pspec,
+-                                gpointer          user_data)
+-{
+-  sync_background_blur (surface_actor);
++  priv->background_blur =
++    meta_background_blur_new (priv->compositor,
++                              CLUTTER_ACTOR (surface_actor),
++                              priv->background_blur_region);
+ }
+ 
+ static void
+ meta_surface_actor_init (MetaSurfaceActor *surface_actor)
+ {
+-  g_signal_connect (surface_actor,
+-                    "notify::mapped",
+-                    G_CALLBACK (background_blur_mapped_changed),
+-                    NULL);
+ }
+ 
+ MetaShapedTexture *
+@@ -828,19 +752,13 @@ meta_surface_actor_set_background_blur_region (MetaSurfaceActor *surface_actor,
+   if (mtk_region_equal (priv->background_blur_region, region))
+     return;
+ 
+-  queue_redraw_for_region (surface_actor, priv->background_blur_sample_region);
+-  g_clear_pointer (&priv->background_blur,
+-                   meta_background_blur_destroy);
+-
++  queue_redraw_for_region (surface_actor, priv->background_blur_region);
+   g_clear_pointer (&priv->background_blur_region, mtk_region_unref);
+   if (region)
+     priv->background_blur_region = mtk_region_ref (region);
+-  update_background_blur_sample_region (surface_actor);
+ 
+   sync_background_blur (surface_actor);
+-
+-  clutter_actor_invalidate_paint_volume (CLUTTER_ACTOR (surface_actor));
+-  queue_redraw_for_region (surface_actor, priv->background_blur_sample_region);
++  queue_redraw_for_region (surface_actor, priv->background_blur_region);
+ }
+ 
+ void
+@@ -849,14 +767,8 @@ meta_surface_actor_invalidate_background_blur (MetaSurfaceActor *surface_actor)
+   MetaSurfaceActorPrivate *priv =
+     meta_surface_actor_get_instance_private (surface_actor);
+ 
+-  queue_redraw_for_region (surface_actor, priv->background_blur_sample_region);
+-  g_clear_pointer (&priv->background_blur,
+-                   meta_background_blur_destroy);
+-  update_background_blur_sample_region (surface_actor);
+   sync_background_blur (surface_actor);
+-
+-  clutter_actor_invalidate_paint_volume (CLUTTER_ACTOR (surface_actor));
+-  queue_redraw_for_region (surface_actor, priv->background_blur_sample_region);
++  queue_redraw_for_region (surface_actor, priv->background_blur_region);
+ }
+ 
+ void
+@@ -871,29 +783,18 @@ meta_surface_actor_paint_background_effects (MetaSurfaceActor    *surface_actor,
+ {
+   MetaSurfaceActorPrivate *priv =
+     meta_surface_actor_get_instance_private (surface_actor);
+-  float blur_radius;
+-  float saturation;
+-  float noise;
+ 
+-  if (!priv->background_blur_region || !priv->compositor)
++  if (!priv->background_blur)
+     return;
+ 
+-  meta_compositor_get_background_blur_params (priv->compositor,
+-                                              &blur_radius,
+-                                              &saturation,
+-                                              &noise);
+-  meta_background_effect_paint_blur_region (root_node,
+-                                            CLUTTER_ACTOR (surface_actor),
+-                                            paint_context,
+-                                            content_box,
+-                                            content_width,
+-                                            content_height,
+-                                            priv->background_blur_region,
+-                                            clip_region,
+-                                            blur_radius,
+-                                            saturation,
+-                                            noise,
+-                                            opacity);
++  meta_background_blur_paint (priv->background_blur,
++                              root_node,
++                              paint_context,
++                              content_box,
++                              content_width,
++                              content_height,
++                              clip_region,
++                              opacity);
+ }
+ 
+ void
+diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
+index 4a242c7b75d84a84f678bfcf925b425467acdebd..dbce6b00985d6cf717889980f9c28231b03ce105 100644
+--- a/src/compositor/meta-window-actor.c
++++ b/src/compositor/meta-window-actor.c
+@@ -565,8 +565,6 @@ on_clone_notify_mapped (ClutterClone    *clone,
+     priv->n_mapped_clones++;
+   else
+     priv->n_mapped_clones--;
+-  if (!priv->disposed)
+-    meta_window_actor_invalidate_background_blur (window_actor);
+   update_is_effectively_visible (window_actor);
+ }
+ 
+@@ -582,8 +580,6 @@ on_cloned (ClutterActor *actor,
+                     G_CALLBACK (on_clone_notify_mapped), actor);
+   if (clutter_actor_is_mapped (CLUTTER_ACTOR (clone)))
+     priv->n_mapped_clones++;
+-  if (!priv->disposed)
+-    meta_window_actor_invalidate_background_blur (window_actor);
+   update_is_effectively_visible (window_actor);
+ }
+ 
+@@ -598,8 +594,6 @@ on_decloned (ClutterActor *actor,
+   g_signal_handlers_disconnect_by_func (clone, on_clone_notify_mapped, actor);
+   if (clutter_actor_is_mapped (CLUTTER_ACTOR (clone)))
+     priv->n_mapped_clones--;
+-  if (!priv->disposed)
+-    meta_window_actor_invalidate_background_blur (window_actor);
+   update_is_effectively_visible (window_actor);
+ }
+ 
+diff --git a/src/meson.build b/src/meson.build
+index 97de536063c35113b74515b20bce41bc9c2c6ef6..df06750139c88e4f9595ffe9373db149a3f51f8e 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -262,8 +262,12 @@ mutter_sources = [
+   'compositor/meta-background-actor.c',
+   'compositor/meta-background-content.c',
+   'compositor/meta-background-content-private.h',
++  'compositor/meta-background-behind.c',
++  'compositor/meta-background-blur.c',
++  'compositor/meta-background-blur-private.h',
+   'compositor/meta-background-effect.c',
+   'compositor/meta-background-effect.h',
++  'compositor/meta-background-geometry.c',
+   'compositor/meta-background.c',
+   'compositor/meta-background-group.c',
+   'compositor/meta-background-private.h',

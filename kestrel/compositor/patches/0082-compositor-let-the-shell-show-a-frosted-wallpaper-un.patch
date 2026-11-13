@@ -1,0 +1,739 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 13 Nov 2026 22:37:17 +0100
+Subject: [PATCH] compositor: let the shell show a frosted wallpaper under app
+ glass
+
+The shell hands over a blurred copy of each monitor's wallpaper and says
+whether background effects use it. While they do, app glass draws the
+piece of wallpaper behind it, with the same saturation, grain and
+corners as the blur, and needs no redraw clip, copy or blur at all.
+
+Upstream-Status: luft-only API for Kestrel's glass styles
+---
+ src/compositor/compositor.c                   | 142 +++++++++++++++++-
+ src/compositor/meta-background-behind.c       |   2 +-
+ src/compositor/meta-background-blur-private.h |  34 +++++
+ src/compositor/meta-background-blur.c         |   3 +-
+ src/compositor/meta-background-effect.c       | 121 ++++++++-------
+ src/compositor/meta-background-wallpaper.c    | 141 +++++++++++++++++
+ src/meson.build                               |   1 +
+ src/meta/compositor.h                         |  20 +++
+ 8 files changed, 397 insertions(+), 67 deletions(-)
+ create mode 100644 src/compositor/meta-background-wallpaper.c
+
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 03ec2eec6d97e7ca9ca9daf5efc30e0185275b94..ab399043b7f303b87b11bb2b742c0e2abc6a2951 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -142,10 +142,18 @@ typedef struct _MetaCompositorPrivate
+   float background_blur_radius;
+   float background_saturation;
+   float background_noise;
++  GArray *frosted_wallpaper;
++  gboolean background_blur_from_wallpaper;
+ 
+   GSettings *kestrel_settings;
+ } MetaCompositorPrivate;
+ 
++typedef struct
++{
++  MtkRectangle area;
++  CoglTexture *texture;
++} FrostedWallpaperPiece;
++
+ #define DEFAULT_BACKGROUND_BLUR_RADIUS 24.0f
+ #define DEFAULT_BACKGROUND_BLUR_SATURATION 1.25f
+ #define DEFAULT_BACKGROUND_BLUR_NOISE 0.015f
+@@ -1260,6 +1268,14 @@ meta_compositor_get_property (GObject    *object,
+     }
+ }
+ 
++static void
++clear_frosted_wallpaper_piece (gpointer data)
++{
++  FrostedWallpaperPiece *piece = data;
++
++  g_clear_object (&piece->texture);
++}
++
+ static void
+ meta_compositor_init (MetaCompositor *compositor)
+ {
+@@ -1269,6 +1285,8 @@ meta_compositor_init (MetaCompositor *compositor)
+   priv->background_blur_radius = DEFAULT_BACKGROUND_BLUR_RADIUS;
+   priv->background_saturation = DEFAULT_BACKGROUND_BLUR_SATURATION;
+   priv->background_noise = DEFAULT_BACKGROUND_BLUR_NOISE;
++  priv->frosted_wallpaper = g_array_new (FALSE, FALSE, sizeof (FrostedWallpaperPiece));
++  g_array_set_clear_func (priv->frosted_wallpaper, clear_frosted_wallpaper_piece);
+ 
+   invalidate_top_window_actor_for_views (compositor);
+ }
+@@ -1419,6 +1437,7 @@ meta_compositor_dispose (GObject *object)
+ 
+   g_clear_pointer (&priv->windows, g_list_free);
+   g_clear_pointer (&priv->uncovered, mtk_region_unref);
++  g_clear_pointer (&priv->frosted_wallpaper, g_array_unref);
+ 
+   G_OBJECT_CLASS (meta_compositor_parent_class)->dispose (object);
+ }
+@@ -1509,6 +1528,17 @@ meta_compositor_is_unredirect_inhibited (MetaCompositor *compositor)
+   return priv->disable_unredirect_count > 0;
+ }
+ 
++static void
++invalidate_background_blurs (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++  GList *l;
++
++  for (l = priv->windows; l; l = l->next)
++    meta_window_actor_invalidate_background_blur (l->data);
++}
++
+ /**
+  * meta_compositor_set_background_blur_params:
+  * @compositor: a #MetaCompositor
+@@ -1530,7 +1560,6 @@ meta_compositor_set_background_blur_params (MetaCompositor *compositor,
+                                             float           noise)
+ {
+   MetaCompositorPrivate *priv;
+-  GList *l;
+ 
+   g_return_if_fail (META_IS_COMPOSITOR (compositor));
+   g_return_if_fail (blur_radius >= 0.0f);
+@@ -1548,8 +1577,115 @@ meta_compositor_set_background_blur_params (MetaCompositor *compositor,
+   priv->background_saturation = saturation;
+   priv->background_noise = noise;
+ 
+-  for (l = priv->windows; l; l = l->next)
+-    meta_window_actor_invalidate_background_blur (l->data);
++  invalidate_background_blurs (compositor);
++}
++
++/**
++ * meta_compositor_clear_frosted_wallpaper:
++ * @compositor: a #MetaCompositor
++ *
++ * Forgets every piece of frosted wallpaper.
++ */
++void
++meta_compositor_clear_frosted_wallpaper (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  if (priv->frosted_wallpaper->len == 0)
++    return;
++
++  g_array_set_size (priv->frosted_wallpaper, 0);
++  if (priv->background_blur_from_wallpaper)
++    invalidate_background_blurs (compositor);
++}
++
++/**
++ * meta_compositor_add_frosted_wallpaper:
++ * @compositor: a #MetaCompositor
++ * @area: the part of the stage @texture covers, usually a monitor
++ * @texture: the blurred wallpaper of that area
++ *
++ * Adds a piece of blurred wallpaper that background effects show instead
++ * of blurring what is behind them, while
++ * meta_compositor_set_background_blur_from_wallpaper() says so.
++ */
++void
++meta_compositor_add_frosted_wallpaper (MetaCompositor     *compositor,
++                                       const MtkRectangle *area,
++                                       CoglTexture        *texture)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++  FrostedWallpaperPiece piece = { *area, g_object_ref (texture) };
++
++  g_array_append_val (priv->frosted_wallpaper, piece);
++  if (priv->background_blur_from_wallpaper)
++    invalidate_background_blurs (compositor);
++}
++
++/**
++ * meta_compositor_get_frosted_wallpaper: (skip)
++ * @compositor: a #MetaCompositor
++ * @index: which piece
++ * @area: (out): the part of the stage the piece covers
++ *
++ * Returns: (transfer none) (nullable): the piece's texture, or %NULL past
++ *   the last piece
++ */
++CoglTexture *
++meta_compositor_get_frosted_wallpaper (MetaCompositor *compositor,
++                                       unsigned int    index,
++                                       MtkRectangle   *area)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++  FrostedWallpaperPiece *piece;
++
++  if (index >= priv->frosted_wallpaper->len)
++    return NULL;
++
++  piece = &g_array_index (priv->frosted_wallpaper, FrostedWallpaperPiece, index);
++  *area = piece->area;
++  return piece->texture;
++}
++
++/**
++ * meta_compositor_set_background_blur_from_wallpaper:
++ * @compositor: a #MetaCompositor
++ * @from_wallpaper: whether background effects show the frosted wallpaper
++ *
++ * Lets background effects requested through ext-background-effect-v1 show
++ * the frosted wallpaper under the window instead of blurring what is
++ * behind it.
++ */
++void
++meta_compositor_set_background_blur_from_wallpaper (MetaCompositor *compositor,
++                                                    gboolean        from_wallpaper)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  if (priv->background_blur_from_wallpaper == from_wallpaper)
++    return;
++
++  priv->background_blur_from_wallpaper = from_wallpaper;
++  invalidate_background_blurs (compositor);
++}
++
++/**
++ * meta_compositor_get_background_blur_from_wallpaper:
++ * @compositor: a #MetaCompositor
++ *
++ * Returns: whether background effects show the frosted wallpaper
++ */
++gboolean
++meta_compositor_get_background_blur_from_wallpaper (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->background_blur_from_wallpaper && priv->frosted_wallpaper->len > 0;
+ }
+ 
+ /**
+diff --git a/src/compositor/meta-background-behind.c b/src/compositor/meta-background-behind.c
+index bc0688b987377aeba83af616e859802cdc492e3a..26974595644e8665652fdb80ba6876134b4facc2 100644
+--- a/src/compositor/meta-background-behind.c
++++ b/src/compositor/meta-background-behind.c
+@@ -111,7 +111,7 @@ box_reaches (const ClutterActorBox *box,
+ static gboolean
+ damage_reaches (const MetaBackgroundPlacement *placement,
+                 const MetaBackgroundPlacement *before,
+-                const MtkRegion *region)
++                const MtkRegion               *region)
+ {
+   if (!placement->bounded || (before && !before->bounded))
+     return TRUE;
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+index 84210b291210de6b42e2ca4b8a3ccc3ff7e32d64..e32ee0be7093838b3c29251f3cc65c100cf65c59 100644
+--- a/src/compositor/meta-background-blur-private.h
++++ b/src/compositor/meta-background-blur-private.h
+@@ -38,6 +38,28 @@ typedef struct
+   gboolean bounded;
+ } MetaBackgroundPlacement;
+ 
++typedef struct
++{
++  MetaCompositor *compositor;
++  ClutterActor *actor;
++  ClutterPaintNode *root_node;
++  CoglFramebuffer *framebuffer;
++  MtkRectangle framebuffer_bounds;
++  graphene_rect_t bounds;
++  MetaBackgroundTransform transform;
++  MtkRectangle source_rect;
++  ClutterActorBox source_box;
++  ClutterActorBox region_box;
++  MtkRegion *paint_region;
++  const ClutterActorBox *content_box;
++  int content_width;
++  int content_height;
++  float radius;
++  float saturation;
++  float noise;
++  uint8_t opacity;
++} MetaBackgroundPaint;
++
+ struct _MetaBackgroundBlurView
+ {
+   MetaBackgroundBlur *blur;
+@@ -105,3 +127,15 @@ gboolean meta_background_region_rect_to_actor_box (const MtkRectangle    *region
+                                                    int                    content_width,
+                                                    int                    content_height,
+                                                    ClutterActorBox       *actor_box);
++
++gboolean meta_background_paint_box (MetaBackgroundPaint *paint,
++                                    int                  index,
++                                    ClutterActorBox     *actor_box,
++                                    graphene_rect_t     *framebuffer_rect);
++
++void meta_background_apply_corners (const MetaBackgroundPaint *paint,
++                                    CoglPipeline              *pipeline,
++                                    const graphene_rect_t     *space);
++
++void meta_background_paint_wallpaper (MetaBackgroundPaint *paint,
++                                      ClutterStageView    *view);
+diff --git a/src/compositor/meta-background-blur.c b/src/compositor/meta-background-blur.c
+index 47c0c4929c59d6bccff38ded59c96e68b6e44d5e..e9d1c5cab7139fdea2d76bc203d206b8d43f3316 100644
+--- a/src/compositor/meta-background-blur.c
++++ b/src/compositor/meta-background-blur.c
+@@ -262,7 +262,8 @@ expand_redraw_clip (MetaStage        *stage,
+     .redraw_clip = redraw_clip,
+   };
+ 
+-  if (clutter_actor_get_stage (blur->actor) != CLUTTER_ACTOR (stage))
++  if (meta_compositor_get_background_blur_from_wallpaper (blur->compositor) ||
++      clutter_actor_get_stage (blur->actor) != CLUTTER_ACTOR (stage))
+     return FALSE;
+ 
+   clutter_stage_view_get_layout (view, &data.layout);
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index b3fde400fc83ece64c3058b905d027f0f5da9ba9..d9b5d164ce97993bd396db971a7d4e6ce9c979d1 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -27,38 +27,17 @@
+ 
+ #define RESULT_SIZE_STEP 64
+ 
+-typedef struct
+-{
+-  ClutterActor *actor;
+-  ClutterPaintNode *root_node;
+-  CoglFramebuffer *framebuffer;
+-  MtkRectangle framebuffer_bounds;
+-  graphene_rect_t bounds;
+-  MetaBackgroundTransform transform;
+-  MtkRectangle source_rect;
+-  ClutterActorBox source_box;
+-  ClutterActorBox region_box;
+-  MtkRegion *paint_region;
+-  const ClutterActorBox *content_box;
+-  int content_width;
+-  int content_height;
+-  float radius;
+-  float saturation;
+-  float noise;
+-  uint8_t opacity;
+-} Paint;
+-
+ static int
+ result_size_class (int size)
+ {
+   return (size + RESULT_SIZE_STEP - 1) / RESULT_SIZE_STEP * RESULT_SIZE_STEP;
+ }
+ 
+-static gboolean
+-paint_box (Paint                 *paint,
+-           int                    index,
+-           ClutterActorBox       *actor_box,
+-           graphene_rect_t       *framebuffer_rect)
++gboolean
++meta_background_paint_box (MetaBackgroundPaint *paint,
++                           int                  index,
++                           ClutterActorBox     *actor_box,
++                           graphene_rect_t     *framebuffer_rect)
+ {
+   MtkRectangle region_rect = mtk_region_get_rectangle (paint->paint_region, index);
+ 
+@@ -75,10 +54,10 @@ paint_box (Paint                 *paint,
+ }
+ 
+ static void
+-add_live_rectangle (ClutterPaintNode      *node,
+-                    const Paint           *paint,
+-                    const graphene_rect_t *framebuffer_rect,
+-                    const ClutterActorBox *actor_box)
++add_live_rectangle (ClutterPaintNode          *node,
++                    const MetaBackgroundPaint *paint,
++                    const graphene_rect_t     *framebuffer_rect,
++                    const ClutterActorBox     *actor_box)
+ {
+   const MtkRectangle *source = &paint->source_rect;
+   float x1 = CLAMP ((framebuffer_rect->origin.x - source->x) / source->width, 0.f, 1.f);
+@@ -115,9 +94,10 @@ add_result_rectangle (ClutterPaintNode             *node,
+                                             result->flip_y ? 1.f - y2 : y2);
+ }
+ 
+-static void
+-apply_corners (const Paint  *paint,
+-               CoglPipeline *pipeline)
++void
++meta_background_apply_corners (const MetaBackgroundPaint *paint,
++                               CoglPipeline              *pipeline,
++                               const graphene_rect_t     *space)
+ {
+   MetaWindowCorners corners = meta_window_corners_for_actor (paint->actor);
+   graphene_rect_t bounds;
+@@ -128,15 +108,25 @@ apply_corners (const Paint  *paint,
+   graphene_matrix_transform_bounds (&paint->transform.actor_to_framebuffer,
+                                     &corners.bounds, &bounds);
+   corners.bounds = bounds;
+-  corners.bounds.origin.x -= paint->source_rect.x;
+-  corners.bounds.origin.y -= paint->source_rect.y;
++  corners.bounds.origin.x -= space->origin.x;
++  corners.bounds.origin.y -= space->origin.y;
+   corners.radius *= paint->transform.scale;
+   meta_window_corners_apply (&corners, META_WINDOW_CORNER_FILL_CLEAR, pipeline,
+-                             paint->source_rect.width, paint->source_rect.height);
++                             (int) roundf (space->size.width),
++                             (int) roundf (space->size.height));
++}
++
++static void
++apply_source_corners (const MetaBackgroundPaint *paint,
++                      CoglPipeline              *pipeline)
++{
++  graphene_rect_t space = mtk_rectangle_to_graphene_rect (&paint->source_rect);
++
++  meta_background_apply_corners (paint, pipeline, &space);
+ }
+ 
+ static void
+-paint_live (Paint *paint)
++paint_live (MetaBackgroundPaint *paint)
+ {
+   g_autoptr (ClutterPaintNode) blur_node = NULL;
+   gboolean painted = FALSE;
+@@ -154,14 +144,14 @@ paint_live (Paint *paint)
+   if (!blur_node)
+     return;
+ 
+-  apply_corners (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
++  apply_source_corners (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
+ 
+   for (i = 0; i < mtk_region_num_rectangles (paint->paint_region); i++)
+     {
+       graphene_rect_t framebuffer_rect;
+       ClutterActorBox actor_box;
+ 
+-      if (!paint_box (paint, i, &actor_box, &framebuffer_rect))
++      if (!meta_background_paint_box (paint, i, &actor_box, &framebuffer_rect))
+         continue;
+ 
+       add_live_rectangle (blur_node, paint, &framebuffer_rect, &actor_box);
+@@ -210,10 +200,10 @@ ensure_result (MetaBackgroundBlurView *result,
+ }
+ 
+ static CoglPipeline *
+-create_result_pipeline (const Paint            *paint,
+-                        MetaBackgroundBlurView *result,
+-                        int                     width,
+-                        int                     height)
++create_result_pipeline (const MetaBackgroundPaint *paint,
++                        MetaBackgroundBlurView    *result,
++                        int                        width,
++                        int                        height)
+ {
+   CoglContext *cogl = cogl_framebuffer_get_context (result->framebuffer);
+   CoglTexture *texture = cogl_offscreen_get_texture (COGL_OFFSCREEN (result->framebuffer));
+@@ -234,23 +224,19 @@ create_result_pipeline (const Paint            *paint,
+   clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise,
+                                        paint->source_rect.width * (float) result->capacity_width / width,
+                                        paint->source_rect.height * (float) result->capacity_height / height);
+-  apply_corners (paint, pipeline);
++  apply_source_corners (paint, pipeline);
+   return pipeline;
+ }
+ 
+ static gboolean
+-refresh_result (Paint                  *paint,
++refresh_result (MetaBackgroundPaint    *paint,
+                 MetaBackgroundBlurView *result)
+ {
+   g_autoptr (ClutterPaintNode) layer_node = NULL;
+   g_autoptr (ClutterPaintNode) blur_node = NULL;
+-  int width = (paint->source_rect.width + 1) / 2;
+-  int height = (paint->source_rect.height + 1) / 2;
++  int width, height;
+ 
+   result->valid = FALSE;
+-  if (!ensure_result (result, cogl_framebuffer_get_context (paint->framebuffer), width, height))
+-    return FALSE;
+-
+   blur_node = clutter_blur_node_new_from_framebuffer (paint->framebuffer,
+                                                       paint->source_rect.x,
+                                                       paint->source_rect.y,
+@@ -261,6 +247,10 @@ refresh_result (Paint                  *paint,
+   if (!blur_node)
+     return FALSE;
+ 
++  clutter_blur_node_get_result_size (blur_node, &width, &height);
++  if (!ensure_result (result, cogl_framebuffer_get_context (paint->framebuffer), width, height))
++    return FALSE;
++
+   g_clear_object (&result->pipeline);
+   result->pipeline = create_result_pipeline (paint, result, width, height);
+   layer_node = clutter_layer_node_new_to_framebuffer (result->framebuffer, result->pipeline);
+@@ -281,7 +271,7 @@ refresh_result (Paint                  *paint,
+ }
+ 
+ static void
+-paint_result (Paint                  *paint,
++paint_result (MetaBackgroundPaint    *paint,
+               MetaBackgroundBlurView *result)
+ {
+   g_autoptr (ClutterPaintNode) node = NULL;
+@@ -299,7 +289,7 @@ paint_result (Paint                  *paint,
+       graphene_rect_t framebuffer_rect;
+       ClutterActorBox actor_box;
+ 
+-      if (paint_box (paint, i, &actor_box, &framebuffer_rect))
++      if (meta_background_paint_box (paint, i, &actor_box, &framebuffer_rect))
+         add_result_rectangle (node, result, &actor_box);
+     }
+ 
+@@ -307,8 +297,8 @@ paint_result (Paint                  *paint,
+ }
+ 
+ static gboolean
+-keeps_result (const Paint      *paint,
+-              ClutterStageView *view)
++keeps_result (const MetaBackgroundPaint *paint,
++              ClutterStageView          *view)
+ {
+   return view &&
+     !clutter_actor_is_in_clone_paint (paint->actor) &&
+@@ -316,12 +306,18 @@ keeps_result (const Paint      *paint,
+ }
+ 
+ static void
+-paint_blur (MetaBackgroundBlur *blur,
+-            Paint              *paint,
+-            ClutterStageView   *view)
++paint_blur (MetaBackgroundBlur  *blur,
++            MetaBackgroundPaint *paint,
++            ClutterStageView    *view)
+ {
+   MetaBackgroundBlurView *result;
+ 
++  if (meta_compositor_get_background_blur_from_wallpaper (paint->compositor))
++    {
++      meta_background_paint_wallpaper (paint, view);
++      return;
++    }
++
+   if (clutter_actor_is_in_clone_paint (paint->actor))
+     {
+       result = meta_background_blur_find_result (blur, &paint->region_box);
+@@ -349,10 +345,10 @@ paint_blur (MetaBackgroundBlur *blur,
+ }
+ 
+ static gboolean
+-prepare_paint (MetaBackgroundBlur    *blur,
+-               Paint                 *paint,
+-               ClutterPaintContext   *paint_context,
+-               const MtkRegion       *clip_region)
++prepare_paint (MetaBackgroundBlur  *blur,
++               MetaBackgroundPaint *paint,
++               ClutterPaintContext *paint_context,
++               const MtkRegion     *clip_region)
+ {
+   MtkRectangle content_rect = { 0, 0, paint->content_width, paint->content_height };
+   g_autoptr (MtkRegion) effect_region = mtk_region_copy (blur->blur_region);
+@@ -415,7 +411,8 @@ meta_background_blur_paint (MetaBackgroundBlur    *blur,
+                             const MtkRegion       *clip_region,
+                             uint8_t                opacity)
+ {
+-  Paint paint = {
++  MetaBackgroundPaint paint = {
++    .compositor = blur->compositor,
+     .actor = blur->actor,
+     .root_node = root_node,
+     .content_box = content_box,
+diff --git a/src/compositor/meta-background-wallpaper.c b/src/compositor/meta-background-wallpaper.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..a432fe1c22f02890ac7069b0e90e8b247ea1a0ca
+--- /dev/null
++++ b/src/compositor/meta-background-wallpaper.c
+@@ -0,0 +1,141 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "compositor/meta-background-blur-private.h"
++
++#include "clutter/clutter-mutter.h"
++#include "clutter/clutter-paint-node-private.h"
++
++static gboolean
++stage_to_framebuffer (MetaBackgroundPaint *paint,
++                      ClutterStageView    *view,
++                      graphene_matrix_t   *matrix)
++{
++  graphene_matrix_t actor_to_stage;
++  graphene_matrix_t stage_to_actor;
++  MtkRectangle layout;
++  float scale;
++
++  if (view && paint->framebuffer == clutter_stage_view_get_framebuffer (view))
++    {
++      clutter_stage_view_get_layout (view, &layout);
++      scale = clutter_stage_view_get_scale (view);
++      graphene_matrix_init_translate (matrix,
++                                      &GRAPHENE_POINT3D_INIT (-layout.x, -layout.y, 0.f));
++      graphene_matrix_scale (matrix, scale, scale, 1.f);
++      return TRUE;
++    }
++
++  clutter_actor_get_relative_transformation_matrix (paint->actor,
++                                                    clutter_actor_get_stage (paint->actor),
++                                                    &actor_to_stage);
++  if (!graphene_matrix_inverse (&actor_to_stage, &stage_to_actor))
++    return FALSE;
++
++  graphene_matrix_multiply (&stage_to_actor, &paint->transform.actor_to_framebuffer, matrix);
++  return TRUE;
++}
++
++static CoglPipeline *
++create_piece_pipeline (MetaBackgroundPaint   *paint,
++                       CoglTexture           *texture,
++                       const graphene_rect_t *piece)
++{
++  CoglPipeline *pipeline = cogl_pipeline_new (cogl_texture_get_context (texture));
++  float alpha = paint->opacity / 255.f;
++  CoglColor color;
++
++  cogl_pipeline_set_layer_texture (pipeline, 0, texture);
++  cogl_pipeline_set_layer_filters (pipeline, 0,
++                                   COGL_PIPELINE_FILTER_LINEAR,
++                                   COGL_PIPELINE_FILTER_LINEAR);
++  cogl_pipeline_set_layer_wrap_mode (pipeline, 0,
++                                     COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
++  clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise,
++                                       piece->size.width, piece->size.height);
++  meta_background_apply_corners (paint, pipeline, piece);
++  cogl_color_init_from_4f (&color, alpha, alpha, alpha, alpha);
++  cogl_pipeline_set_color (pipeline, &color);
++  return pipeline;
++}
++
++static void
++add_piece_rectangle (ClutterPaintNode        *node,
++                     MetaBackgroundPaint     *paint,
++                     const graphene_matrix_t *to_framebuffer,
++                     const graphene_rect_t   *piece,
++                     const graphene_rect_t   *framebuffer_rect)
++{
++  gboolean flip_x = graphene_matrix_get_value (to_framebuffer, 0, 0) < 0.f;
++  gboolean flip_y = graphene_matrix_get_value (to_framebuffer, 1, 1) < 0.f;
++  ClutterActorBox actor_box;
++  graphene_rect_t shown;
++  float x1, y1, x2, y2;
++
++  if (!graphene_rect_intersection (framebuffer_rect, piece, &shown) ||
++      !meta_background_framebuffer_to_actor_box (&shown, &paint->transform, &actor_box))
++    return;
++
++  x1 = (shown.origin.x - piece->origin.x) / piece->size.width;
++  y1 = (shown.origin.y - piece->origin.y) / piece->size.height;
++  x2 = (shown.origin.x + shown.size.width - piece->origin.x) / piece->size.width;
++  y2 = (shown.origin.y + shown.size.height - piece->origin.y) / piece->size.height;
++  clutter_paint_node_add_texture_rectangle (node, &actor_box,
++                                            flip_x ? 1.f - x1 : x1,
++                                            flip_y ? 1.f - y1 : y1,
++                                            flip_x ? 1.f - x2 : x2,
++                                            flip_y ? 1.f - y2 : y2);
++}
++
++void
++meta_background_paint_wallpaper (MetaBackgroundPaint *paint,
++                                 ClutterStageView    *view)
++{
++  graphene_matrix_t to_framebuffer;
++  MtkRectangle area;
++  CoglTexture *texture;
++  unsigned int i;
++
++  if (!stage_to_framebuffer (paint, view, &to_framebuffer))
++    return;
++
++  for (i = 0; (texture = meta_compositor_get_frosted_wallpaper (paint->compositor, i, &area)); i++)
++    {
++      g_autoptr (ClutterPaintNode) node = NULL;
++      g_autoptr (CoglPipeline) pipeline = NULL;
++      graphene_rect_t piece = mtk_rectangle_to_graphene_rect (&area);
++      int j;
++
++      graphene_matrix_transform_bounds (&to_framebuffer, &piece, &piece);
++      pipeline = create_piece_pipeline (paint, texture, &piece);
++      node = clutter_pipeline_node_new (pipeline);
++      clutter_paint_node_set_static_name (node, "MetaBackgroundBlur (wallpaper)");
++
++      for (j = 0; j < mtk_region_num_rectangles (paint->paint_region); j++)
++        {
++          graphene_rect_t framebuffer_rect;
++          ClutterActorBox actor_box;
++
++          if (meta_background_paint_box (paint, j, &actor_box, &framebuffer_rect))
++            add_piece_rectangle (node, paint, &to_framebuffer, &piece, &framebuffer_rect);
++        }
++
++      clutter_paint_node_add_child (paint->root_node, node);
++    }
++}
+diff --git a/src/meson.build b/src/meson.build
+index df06750139c88e4f9595ffe9373db149a3f51f8e..81b3b8823e8732d73d0984ef2eb85af7daa1b54c 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -268,6 +268,7 @@ mutter_sources = [
+   'compositor/meta-background-effect.c',
+   'compositor/meta-background-effect.h',
+   'compositor/meta-background-geometry.c',
++  'compositor/meta-background-wallpaper.c',
+   'compositor/meta-background.c',
+   'compositor/meta-background-group.c',
+   'compositor/meta-background-private.h',
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index 13053042be5c069e4fb89d3fe8a7aea45d243986..24aa40d88715b859eceb4702e0fa377a9df39818 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -115,3 +115,23 @@ void meta_compositor_get_background_blur_params (MetaCompositor *compositor,
+                                                  float          *blur_radius,
+                                                  float          *saturation,
+                                                  float          *noise);
++
++META_EXPORT
++void meta_compositor_clear_frosted_wallpaper (MetaCompositor *compositor);
++
++META_EXPORT
++void meta_compositor_add_frosted_wallpaper (MetaCompositor     *compositor,
++                                            const MtkRectangle *area,
++                                            CoglTexture        *texture);
++
++META_EXPORT
++CoglTexture * meta_compositor_get_frosted_wallpaper (MetaCompositor *compositor,
++                                                     unsigned int    index,
++                                                     MtkRectangle   *area);
++
++META_EXPORT
++void meta_compositor_set_background_blur_from_wallpaper (MetaCompositor *compositor,
++                                                         gboolean        from_wallpaper);
++
++META_EXPORT
++gboolean meta_compositor_get_background_blur_from_wallpaper (MetaCompositor *compositor);

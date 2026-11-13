@@ -1,11 +1,11 @@
 import type Cogl from 'gi://Cogl';
 import St from 'gi://St';
 
-import * as Main from '../../../core/main.js';
-import { FrostedWallpaper, type Frost, type FrostMonitor } from '../../../core/stage/background/frost.js';
+import * as Main from '../../main.js';
+import { FrostedWallpaper, type Frost, type FrostMonitor } from './frost.js';
 
-const BLURRED: Frost = { name: 'see-through', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null };
-const SHARP: Frost = { name: 'see-through-sharp', radius: 0, downscale: 1, brightness: 1, saturation: 1, wash: null };
+const BLURRED: Frost = { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null };
+const SHARP: Frost = { name: 'sharp', radius: 0, downscale: 1, brightness: 1, saturation: 1, wash: null };
 
 export interface WallpaperPiece {
   monitor: FrostMonitor;

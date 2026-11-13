@@ -74,6 +74,42 @@
 			]
 		},
 		{
+			"id": "appearance.glass-taskbar",
+			"page": "appearance",
+			"title": "settings-appearance-glass-taskbar",
+			"key": "com.lantharos.kestrel.glass taskbar",
+			"options": [
+				{ "value": "luca", "label": "settings-appearance-glass-luca" },
+				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+			]
+		},
+		{
+			"id": "appearance.glass-surfaces",
+			"page": "appearance",
+			"title": "settings-appearance-glass-surfaces",
+			"key": "com.lantharos.kestrel.glass surfaces",
+			"options": [
+				{ "value": "luca", "label": "settings-appearance-glass-luca" },
+				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+			]
+		},
+		{
+			"id": "appearance.glass-windows",
+			"page": "appearance",
+			"title": "settings-appearance-glass-windows",
+			"key": "com.lantharos.kestrel.glass windows",
+			"options": [
+				{ "value": "luca", "label": "settings-appearance-glass-luca" },
+				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+			]
+		},
+		{
+			"id": "appearance.glass-power-saver",
+			"page": "appearance",
+			"title": "settings-appearance-glass-power-saver",
+			"key": "com.lantharos.kestrel.glass maris-on-power-saver"
+		},
+		{
 			"id": "taskbar.shown",
 			"page": "taskbar",
 			"title": "settings-taskbar-shown",

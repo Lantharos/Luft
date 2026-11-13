@@ -1,6 +1,6 @@
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
-import { blurBackdrop } from '../../../appearance/kestrelGlass.js';
+import { blurBackdrop } from '../../../appearance/glass/kestrelGlass.js';
 
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
@@ -27,7 +27,7 @@ export class TaskbarSurface {
   constructor(private readonly actor: St.Widget, private readonly peek: St.Widget, private readonly islands: () => readonly Island[],
     private readonly screen: () => TaskbarLayout) {
     this.baseClasses = actor.style_class;
-    this.blur = blurBackdrop(actor, 0);
+    this.blur = blurBackdrop(actor, 0, 'taskbar');
     const unwatch = watchScheme(() => this.sync());
     surfaces.add(this);
     actor.connect('destroy', () => {
@@ -101,7 +101,7 @@ export class TaskbarSurface {
   private blurOf(island: St.Widget): Shell.BlurEffect {
     let blur = this.blurs.get(island);
     if (!blur) {
-      blur = blurBackdrop(island, 0);
+      blur = blurBackdrop(island, 0, 'taskbar');
       this.blurs.set(island, blur);
     }
     return blur;

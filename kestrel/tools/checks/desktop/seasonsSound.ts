@@ -7,7 +7,7 @@ import {intoSpeakers, removeNode} from '../lib/audio/routing.js';
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
-import {listed, request, SEASONS, setSetting} from '../extensions/lib/extensions.js';
+import {forgetCrashes, listed, request, SEASONS, setSetting} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Seasons sound');
 const FADE_IN_MS = 2500;
@@ -93,6 +93,7 @@ export async function run() {
   if (GLib.file_test(RESTARTED, GLib.FileTest.EXISTS)) {
     await expectRain('after Kestrel starts again with both on');
     kestrel.reset('extension-settings');
+    forgetCrashes();
     return;
   }
   await checkOrders();

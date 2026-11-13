@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
+import {watchdogPastResume} from '../lockScreen/lib/sleep.js';
 import {callLog, takeCalls} from './lib/systemCalls.js';
 
 const {require, eventually} = checks('watchdog');
@@ -49,6 +50,7 @@ export async function run() {
     null, '(tb)')).deepUnpack();
   require(waitMs === 0 && !recovering, 'Kestrel tells the watchdog that its frames reach the screen');
 
+  await watchdogPastResume();
   takeCalls();
   const {calls, released} = hang();
   require(released !== null && released <= RELEASE_LIMIT,

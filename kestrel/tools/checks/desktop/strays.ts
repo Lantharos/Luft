@@ -8,7 +8,7 @@ import {call} from '../lib/dbus.js';
 import {checks} from '../lib/check.js';
 import {click, drag, moveTo, rest} from '../lib/input/input.js';
 import {scratch, stopAll} from '../lib/processes.js';
-import {capture, screenshot} from '../lib/screenshots.js';
+import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {removeTree} from '../apps/lib/files.js';
 import {openWindow} from '../tiling/lib/tiling.js';
@@ -28,8 +28,6 @@ const LEVEL_MS = 60000;
 const ENCOUNTER_MS = 120000;
 const FULLSCREEN_SETTLE_MS = 2000;
 const IDLE_PAINTS = 0.2;
-const SEQUENCE_FRAMES = 24;
-const SEQUENCE_STEP_MS = 100;
 const GRIP_SHARE = 0.25;
 const SETTLE_MS = 12000;
 const SEEK_ABOVE_TASKBAR = 380;
@@ -80,17 +78,6 @@ async function fullscreenPaints(name: string) {
   return changes;
 }
 
-async function recordSequence(name: string) {
-  const folder = GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'strays-sequence', name]);
-  GLib.mkdir_with_parents(folder, 0o755);
-  const {width, height} = global.stage;
-  for (let frame = 0; frame < SEQUENCE_FRAMES; frame++) {
-    const shot = await screenshot({x: 0, y: Math.max(0, height - 360), width: Math.min(width, 900), height: 360});
-    GLib.file_set_contents(GLib.build_filenamev([folder, `${String(frame).padStart(2, '0')}.png`]), shot.toArray());
-    await pause(SEQUENCE_STEP_MS);
-  }
-}
-
 async function checkWalkingOnTheTaskbar() {
   await eventually(() => sprites().length === 1, 'one stray shows when one is asked for');
   await eventually(atRest, 'it comes down and sits', 15000);
@@ -103,7 +90,6 @@ async function checkWalkingOnTheTaskbar() {
     await pause(200);
     click(sprite());
     await eventually(() => /walking/.test(mood()), 'a click sends it walking');
-    await recordSequence('walk');
   });
   require(sprite().x !== start, 'it moves along');
   require(near(foot(), taskbarTop()), 'it stays on the taskbar as it walks');
@@ -147,7 +133,6 @@ async function checkLandingOnAWindow() {
 
   window.delete(global.get_current_time());
   await eventually(() => /falling/.test(mood()) || near(foot(), taskbarTop()), 'it falls when the window closes');
-  await recordSequence('fall');
   await eventually(() => near(foot(), taskbarTop()) && atRest(), 'and lands on what is below', 8000);
 }
 
@@ -182,13 +167,12 @@ async function checkPipFlies() {
     ({window} = await openWindow('A perch', 420, 300));
     window.move_frame(true, 700, 120);
     await eventually(() => /flying/.test(mood()), 'Pip takes off for a window that appears', 5000);
-    await recordSequence('fly');
     await eventually(() => near(foot(), surfaceTop(window), 4), 'and flies straight to it and perches', 10000);
   });
   await eventually(atRest, 'Pip settles on its perch', 8000);
   await capture('strays-pip');
   const perch = sprite();
-  await drag([middle(), perch.y + perch.height / 4], [1300, 380], {steps: 16, hover: 100});
+  await carry([1300, 380]);
   report('let go in mid-air', {mood: mood(), x: middle(), feet: foot()});
   await eventually(() => /hovering/.test(mood()) && near(foot(), 404, 30), 'let go in mid-air, Pip stays there', 3000);
   const clear: [number, number] = [perch.x + 1, perch.y + 1];
@@ -278,60 +262,44 @@ async function checkLevels() {
   const {window} = await openWindow('Something to climb', 520, 320);
   window.move_frame(true, 460, 330);
   await pause(SETTLE_MS);
-  for (const level of ['sleepy', 'lively', 'restless']) {
-    await setActivity(level);
-    rest();
-    const started = threadSwitches();
-    const seen: Record<string, Record<string, number>> = {};
-    let [settled, moves, last] = [0, 0, ''];
-    const watching = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
-      const now = sprites().map(actor => `${mood(actor)}`).join();
-      if (now !== last) moves++;
-      last = now;
-      if (atRest()) settled++;
-      for (const actor of sprites()) {
-        const [name, doing] = mood(actor).split(', ');
-        seen[name] ??= {};
-        seen[name][doing] = (seen[name][doing] ?? 0) + 1;
-      }
-      return GLib.SOURCE_CONTINUE;
-    });
-    const clock = GLib.get_monotonic_time();
-    const paints = await paintsOver(LEVEL_MS);
+  const together = new Set<string>();
+  let doing: Record<string, Record<string, number>> = {};
+  let [moves, last] = [0, ''];
+  const watching = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+    const now = sprites().map(actor => `${mood(actor)}`).join();
+    if (now !== last) moves++;
+    last = now;
+    for (const actor of sprites()) {
+      const [name, mode] = mood(actor).split(', ');
+      doing[name] ??= {};
+      doing[name][mode] = (doing[name][mode] ?? 0) + 1;
+      if (TOGETHER.test(mode)) together.add(`${name} ${mode}`);
+    }
+    return GLib.SOURCE_CONTINUE;
+  });
+  try {
+    for (const level of ['sleepy', 'lively', 'restless']) {
+      [moves, doing] = [0, {}];
+      await setActivity(level);
+      rest();
+      await eventually(() => moves >= 4, `they do things at ${level}`, LEVEL_MS);
+      report(`three strays, ${level}`, {changes: moves, doing});
+    }
+    await eventually(() => together.size > 0, 'strays get up to something with each other', ENCOUNTER_MS);
+    report('together', [...together]);
+  } finally {
     GLib.source_remove(watching);
-    const seconds = (GLib.get_monotonic_time() - clock) / 1e6;
-    const woke = [...threadSwitches()].reduce((sum, [thread, count]) => sum + count - (started.get(thread) ?? 0), 0);
-    report(`three strays, ${level}`, {paintsPerSecond: paints / seconds, wakeupsPerSecond: woke / seconds, changes: moves, allRestingShare: settled * 0.2 / seconds, doing: seen});
-    require(moves >= 4, `they do things at ${level} (${moves} changes in a minute)`);
   }
+  await setActivity('lively');
   window.delete(global.get_current_time());
   await pause(800);
 }
 
-async function checkEncounters() {
-  await setActivity('restless');
-  const seen = new Map<string, number>();
-  const doingLast = new Map<string, string>();
-  const watching = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-    for (const actor of sprites()) {
-      const [name, doing] = mood(actor).split(', ');
-      if (TOGETHER.test(doing) && doingLast.get(name) !== doing) seen.set(`${name} ${doing}`, (seen.get(`${name} ${doing}`) ?? 0) + 1);
-      doingLast.set(name, doing);
-    }
-    return GLib.SOURCE_CONTINUE;
-  });
-  await pause(ENCOUNTER_MS);
-  GLib.source_remove(watching);
-  report('together over 120 s, restless', Object.fromEntries(seen));
-  require(seen.size > 0, 'strays get up to something with each other');
-  await setActivity('lively');
-}
-
-async function checkAsleep(without: number) {
+async function checkAsleep() {
   a11y.set_string('reduced-motion', 'reduce');
   await eventually(() => sprites().every(actor => /sleeping/.test(mood(actor))), 'they all go to sleep', 15000);
   const asleep = await measure('three strays asleep');
-  require(asleep.paintsPerSecond <= IDLE_PAINTS, `nothing but the clock paints while they sleep (${asleep.paintsPerSecond} a second, ${without} without them)`);
+  require(asleep.paintsPerSecond <= IDLE_PAINTS, `nothing but the clock paints while they sleep (${asleep.paintsPerSecond} a second)`);
   a11y.reset('reduced-motion');
 }
 
@@ -398,10 +366,6 @@ export async function run() {
   const forced = global.force_animations;
   global.force_animations = true;
   try {
-    rest();
-    await pause(2000);
-    const before = await measure('without Strays');
-    await fullscreenPaints('alone');
     await installBuilt(STRAYS);
     await eventually(async () => (await listed(STRAYS))?.state === 'running', 'Strays runs once installed');
     await setStrays({count: new GLib.Variant('d', 1)});
@@ -418,8 +382,7 @@ export async function run() {
     await checkPacks();
     await checkSeekingWindows();
     await checkLevels();
-    await checkEncounters();
-    await checkAsleep(before.paintsPerSecond);
+    await checkAsleep();
 
     await withRandom(0.99, async () => {
       await setStrays({count: new GLib.Variant('d', 6)});

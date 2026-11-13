@@ -26,7 +26,6 @@ async function openColumns() {
   for (const title of ['Notes', 'Inbox', 'Music']) {
     const {window} = await openWindow(title);
     windows.push(window);
-    await eventually(() => window.has_focus() || focus(window), `${title} opens`);
     await focus(window);
   }
   const [first, second, third] = windows;

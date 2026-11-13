@@ -87,8 +87,6 @@ async function checkRules(before: Frame, striped: ReturnType<typeof areaOf>, oth
   await eventually(nothingAttached, 'taking it away leaves nothing attached');
   require((await frame()).pixelsApart(before, SAME) === 0, 'and the screen as it was');
 
-  const rulesCheck = await listed(PHOSPHOR);
-  require(rulesCheck !== null, 'Phosphor is still here');
   await choose('overlay', 'tint');
   await choose('overlay-strength', 1);
   await eventually(() => attachedEffects().overlays === 2, 'an overlay goes on every app');

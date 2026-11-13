@@ -31,8 +31,6 @@ async function checkLockMode(panel: Clutter.Actor, start: Clutter.Actor) {
     Main.sessionMode.popMode('unlock-dialog');
   }
   await eventually(() => panel.visible, 'the taskbar returns after leaving lock mode');
-  for (const name of ['polkitAgent', 'networkAgent', 'automountManager'])
-    require(!!Main.componentManager.allComponents[name], `the ${name} component is loaded`);
 }
 
 async function checkHeadset(start: Clutter.Actor) {

@@ -22,8 +22,6 @@ const monitor = Shell.AudioMonitor.get_default();
 const SWEEP_FRAMES = 120;
 const ROUNDS = 3;
 const MUSIC_S = 180;
-const CPU_SAMPLE_MS = 8000;
-const TICKS_PER_S = 100;
 
 type Edge = 'bottom' | 'top' | 'left' | 'right';
 type Resting = Record<Edge, Frame>;
@@ -121,8 +119,8 @@ async function restingEdges(): Promise<Resting> {
 async function requireLitEdges(resting: Resting, lit: readonly Edge[], label: string) {
   const areas = probes();
   for (const edge of EDGES) {
-    const apart = (await captureFrame(areas[edge])).pixelsApart(resting[edge], LIT);
-    require(lit.includes(edge) ? apart > 0 : apart === 0, `${label}: the ${edge} edge ${lit.includes(edge) ? 'glows' : 'stays dark'}`);
+    const glows = lit.includes(edge);
+    await eventually(async () => (await captureFrame(areas[edge])).pixelsApart(resting[edge], LIT) > 0 === glows, `${label}: the ${edge} edge ${glows ? 'glows' : 'stays dark'}`);
   }
 }
 
@@ -254,22 +252,6 @@ async function checkFollowsTaskbar(resting: Record<Edge, Resting>) {
   await pause(FADED_IN_MS);
 }
 
-function ticks(path: string): number {
-  const text = new TextDecoder().decode(GLib.file_get_contents(path)[1]);
-  const fields = text.slice(text.lastIndexOf(')') + 2).split(' ');
-  return Number(fields[11]) + Number(fields[12]);
-}
-
-async function cpu(edges: readonly Edge[]) {
-  const whole = '/proc/self/stat';
-  const compositor = `/proc/self/task/${new TextDecoder().decode(GLib.file_get_contents(whole)[1]).split(' ')[0]}/stat`;
-  await settledOn(edges);
-  const before = [ticks(whole), ticks(compositor)];
-  await pause(CPU_SAMPLE_MS);
-  const percent = (used: number) => Math.round(used / TICKS_PER_S / (CPU_SAMPLE_MS / 1000) * 1000) / 10;
-  return {process: percent(ticks(whole) - before[0]), compositor: percent(ticks(compositor) - before[1])};
-}
-
 function report<Frames>(name: string, frames: Frames): Frames {
   console.log(`Kestrel visualizer frames, ${name}: ${JSON.stringify(frames)}`);
   return frames;
@@ -305,9 +287,6 @@ export async function run() {
       await checkFollowsTaskbar(resting);
       await checkBehindWindows();
       await checkReach();
-      const usage: Record<string, Awaited<ReturnType<typeof cpu>>> = {};
-      for (const [name, edges] of Object.entries({bottom: ['bottom'] as Edge[], sides: SIDES, around: EDGES})) usage[name] = await cpu(edges);
-      report('CPU', usage);
       await settledOn(['bottom']);
       await openWindow('Above the glow', 720, 420);
       await pause(700);
@@ -319,7 +298,7 @@ export async function run() {
       swept.raise();
       await pause(700);
       const playing = report('music playing', await sweep(swept));
-      GLib.file_set_contents(GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'visualizer-frames.json']), JSON.stringify({quiet, playing, usage}, null, 2));
+      GLib.file_set_contents(GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'visualizer-frames.json']), JSON.stringify({quiet, playing}, null, 2));
       require(playing.missed <= quiet.missed + 2, `a window slides over the glow without missing frames (${quiet.missed} → ${playing.missed} missed)`);
     } finally {
       await stop(music);

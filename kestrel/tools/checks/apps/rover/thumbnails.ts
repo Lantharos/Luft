@@ -19,7 +19,6 @@ const path = (...parts: string[]) => GLib.build_filenamev(parts);
 const entryPath = (name: string) => path(GLib.get_user_data_dir(), 'thumbnailers', `${name}.thumbnailer`);
 
 export async function withThumbnailers(run: () => Promise<void>) {
-  if (!exists(THUMBNAILER)) throw new Error('luft-thumbnailer is not built, run cargo build --release -p luft-thumbnailer');
   for (const name of ENTRIES) {
     const entry = read(repository('services/thumbnailer/data', `${name}.thumbnailer`));
     write(entryPath(name), entry.replaceAll('/usr/libexec/luft-thumbnailer', THUMBNAILER));

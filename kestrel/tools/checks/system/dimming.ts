@@ -7,7 +7,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 import {checks} from '../lib/check.js';
 import {moveBy} from '../lib/input/input.js';
 import {output, screenshot} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
+import {pause, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('dimming');
 const SCREEN_BLANK_DELAY = 20;
@@ -137,7 +137,7 @@ async function checkBacklight(dimmedLuminance: number) {
   const covered = Main.layoutManager.monitors.length - 1;
   try {
     brightness.value = 0.8;
-    require(backlight.brightness === 800, 'the stand-in built-in panel follows the brightness');
+    await waitUntil(() => backlight.brightness === 800, 'the stand-in built-in panel follows the brightness');
 
     const ramp = await dim(backlight, dimmed);
     require(monotonic(ramp.writes, -1) && distinct(ramp.writes) >= 30, 'the backlight steps down smoothly');

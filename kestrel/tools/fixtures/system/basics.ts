@@ -35,6 +35,7 @@ const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login"
   <method name="SetCanHibernate"><arg type="s" direction="in"/></method>
   <method name="SetSleepRefused"><arg type="b" direction="in"/></method>
   <method name="SetRestartRefused"><arg type="b" direction="in"/></method>
+  <method name="ResumedAt"><arg type="x" direction="out"/></method>
 </interface></node>`;
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
@@ -154,6 +155,7 @@ export function publishBasics(publish: Publish, calls: string[]) {
   let canHibernate = 'na';
   let sleepRefused = false;
   let restartRefused = false;
+  let resumedAt = 0;
   const login = publish(LOGIN, {
     InhibitAsync([what, , , mode]: string[], invocation: Gio.DBusMethodInvocation) {
       calls.push(`Inhibit ${what} ${mode}`);
@@ -190,7 +192,11 @@ export function publishBasics(publish: Publish, calls: string[]) {
       lidClosed = closed;
       login.emit_property_changed('LidClosed', new GLib.Variant('b', closed));
     },
-    PrepareForSleep: (sleeping: boolean) => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
+    PrepareForSleep(sleeping: boolean) {
+      if (!sleeping) resumedAt = GLib.get_monotonic_time();
+      login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping]));
+    },
+    ResumedAt: () => resumedAt,
     SetCanHibernate: (answer: string) => {
       canHibernate = answer;
     },

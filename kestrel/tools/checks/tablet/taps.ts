@@ -6,7 +6,7 @@ import {descendants, named, ofType} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {centerOf, moveTo, type Point} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
-import {pause, settled} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 import {clicksOf, inside, middle, monitor, pressesStayWith} from './lib/presses.js';
 import {fold, tap, touchDown, touchMove, touchUp} from './lib/touch.js';
 
@@ -73,7 +73,7 @@ async function tapsReachTheirWindow() {
   first.move_resize_frame(false, monitor().x + 60, monitor().y + 60, 640, 420);
   second.move_resize_frame(false, monitor().x + 420, monitor().y + 240, 640, 420);
   second.activate(global.get_current_time());
-  await eventually(() => global.display.focus_window === second, 'the second window has focus');
+  await waitUntil(() => global.display.focus_window === second, 'the second window has focus');
   await settled();
 
   await tap(inside(first, [120, 160]));

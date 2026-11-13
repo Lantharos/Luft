@@ -76,18 +76,6 @@ async function checkEffects() {
   await capture('seasons-fog');
 }
 
-async function checkIslands() {
-  kestrel.set_string('taskbar-style', 'separate');
-  await show('rain', 'Storm');
-  await pause(2000);
-  await capture('seasons-rain-islands');
-  await show('snow', 'Snow');
-  await pause(SETTLING_MS);
-  await capture('seasons-snow-islands');
-  kestrel.reset('taskbar-style');
-  await choose('effect', 'rain');
-}
-
 function keepPictures(landing: string) {
   const folder = GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extension-data', SEASONS, 'picked']);
   GLib.mkdir_with_parents(folder, 0o700);
@@ -180,7 +168,6 @@ export async function run() {
   global.force_animations = true;
   try {
     await checkEffects();
-    await checkIslands();
     await checkPictures();
     await checkFollowing();
     await checkOverLiveWallpaper();

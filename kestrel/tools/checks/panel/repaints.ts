@@ -2,6 +2,7 @@ import type Meta from 'gi://Meta';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {boxOf, nearSide, outward, vertical} from '../lib/edge.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {shownAndRepainted} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -26,9 +27,11 @@ async function matchesRepaint(label: string) {
 }
 
 function reachUnderTaskbar(window: Meta.Window, depth: number) {
-  const [, top] = named('kestrel-panel')!.get_transformed_position();
-  const frame = window.get_frame_rect();
-  window.move_frame(true, 120, Math.round(top + depth - frame.height));
+  const inner = nearSide(boxOf(named('kestrel-panel')!));
+  const {width, height} = window.get_frame_rect();
+  const along = Math.round(outward() > 0 ? inner + depth - (vertical() ? width : height) : inner - depth);
+  if (vertical()) window.move_frame(true, along, 120);
+  else window.move_frame(true, 120, along);
 }
 
 async function animate(window: Meta.Window, place: Place) {

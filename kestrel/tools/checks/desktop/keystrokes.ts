@@ -250,17 +250,15 @@ async function checkLatency() {
   const taken: number[] = [];
   try {
     await request('Disable', KEYSTROKES);
-    await pause(STREAM_SLEEPS_MS);
     press(Clutter.KEY_a);
     await pause(400);
-    const first = Number(sounds.get_latest_latency()) / 1000;
     for (let index = 0; index < LATENCY_PRESSES; index++) {
       press(Clutter.KEY_a);
       await pause(LATENCY_GAP_MS);
       taken.push(Number(sounds.get_latest_latency()) / 1000);
     }
     const sorted = taken.toSorted((a, b) => a - b);
-    const numbers = {firstAfterRestMs: first, medianMs: percentile(sorted, 0.5), p95Ms: percentile(sorted, 0.95), longestMs: sorted.at(-1)};
+    const numbers = {medianMs: percentile(sorted, 0.5), p95Ms: percentile(sorted, 0.95), longestMs: sorted.at(-1)};
     console.log(`Kestrel keystrokes latency: ${JSON.stringify(numbers)}`);
     require(numbers.p95Ms < LONGEST_LATENCY_MS, `a press is heard within ${LONGEST_LATENCY_MS} ms (${numbers.medianMs.toFixed(1)} ms typically, ${numbers.p95Ms.toFixed(1)} ms at worst in twenty)`);
   } finally {
@@ -300,12 +298,10 @@ async function checkCost() {
   const idle = await usage(() => pause(WAKEUPS_MS));
   const typing = await usage(() => typingFor(CPU_MS));
   await request('Disable', KEYSTROKES);
-  await pause(STREAM_SLEEPS_MS);
-  const off = await usage(() => pause(WAKEUPS_MS));
   const typingOff = await usage(() => typingFor(CPU_MS));
   await request('Enable', KEYSTROKES);
-  console.log(`Kestrel keystrokes cost: ${JSON.stringify({idle, typing, off, typingOff})}`);
-  require(idle.audioWakeupsPerSecond === 0, `at rest its sound threads never wake (${idle.audioWakeupsPerSecond} a second, ${idle.wakeupsPerSecond} across all of Kestrel, ${off.wakeupsPerSecond} with it off)`);
+  console.log(`Kestrel keystrokes cost: ${JSON.stringify({idle, typing, typingOff})}`);
+  require(idle.audioWakeupsPerSecond === 0, `at rest its sound threads never wake (${idle.audioWakeupsPerSecond} a second, ${idle.wakeupsPerSecond} across all of Kestrel)`);
   require(typing.cpuPercent - typingOff.cpuPercent < 3, `and typing adds next to no CPU (${typingOff.cpuPercent} → ${typing.cpuPercent}%)`);
 }
 

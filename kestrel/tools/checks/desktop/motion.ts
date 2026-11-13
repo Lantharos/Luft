@@ -140,7 +140,7 @@ async function checkMinimizeRestore(window: Meta.Window) {
   window.minimize();
   await waitUntil(() => !actor.visible, 'the window minimises', 3000);
   window.unminimize();
-  await pause(60);
+  await waitUntil(() => actor.visible && actor.get_transition('scale-x'), 'the window starts restoring', 3000);
   window.minimize();
   await waitUntil(() => window.minimized && !actor.visible && actor.get_transition('opacity') === null,
     'minimising mid-restore finishes hidden', 3000);
@@ -154,14 +154,16 @@ async function checkMinimizeRestore(window: Meta.Window) {
 async function checkTaskView() {
   const view = existing('kestrel-task-view');
   toggleSurface('tasks');
-  await pause(80);
+  await waitUntil(() => taskViewProgress() > 0, 'the task view starts opening', 2000);
   toggleSurface('tasks');
   await waitUntil(() => !view.visible, 'the task view hides when closed mid-opening', 2000);
   toggleSurface('tasks');
   await waitUntil(() => taskViewProgress() === 1, 'the task view opens', 2000);
   toggleSurface('tasks');
-  await pause(60);
-  const leaving = taskViewProgress();
+  const leaving = await waitUntil(() => {
+    const progress = taskViewProgress();
+    return progress > 0 && progress < 1 && progress;
+  }, 'the task view starts closing', 2000);
   toggleSurface('tasks');
   await nextFrame();
   require(leaving < 1 && taskViewProgress() >= leaving, 'reopening the task view mid-close carries on from where it was');

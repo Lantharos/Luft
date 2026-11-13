@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {drag} from '../lib/input/input.js';
-import {gjs, scratch, waitForWindow} from '../lib/processes.js';
+import {gjs, scratch, stop, waitForWindow} from '../lib/processes.js';
 import {settled} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
 import {children, exists, removeTree, write} from './lib/files.js';
@@ -14,7 +14,7 @@ import {checkSettings} from './mailman/settings.js';
 
 const {eventually} = checks('Luft app');
 const MESSAGE = 'From: Theo Brandt <theo@example.test>\r\nTo: Mara Lindqvist <mara@example.test>\r\nSubject: Harbour photos\r\n\r\nThe photos from Saturday are in the shared folder.\r\n';
-const DRAG = {steps: 24, interval: 30, hover: 300};
+const DRAG = {steps: 24, interval: 30, hover: 500};
 const DATA = GLib.build_filenamev([GLib.get_user_data_dir(), 'com.lantharos.mailman']);
 const CACHE = scratch('com.lantharos.mailman');
 
@@ -25,12 +25,17 @@ async function checkDrop(app: LuftApp, palette: Palette) {
   const received = () => children(stashed).some(info => exists(GLib.build_filenamev([stashed, info.get_name(), 'Harbour photos.eml'])));
   try {
     await showDark(app, palette);
-    gjs('clients/apps/fileDragSource.js', [message]);
-    const source = await waitForWindow('Kestrel drag source');
-    await settled();
-    const {x, y, width, height} = app.window.get_frame_rect();
-    await drag(source.get_compositor_private(), [x + width / 3, y + height / 2], DRAG);
-    await eventually(received, 'a message file dropped from another app reaches Mailman');
+    const dragSource = gjs('clients/apps/fileDragSource.js', [message]);
+    try {
+      const source = await waitForWindow('Kestrel drag source');
+      source.move_frame(true, 10, 20);
+      await settled();
+      const {x, y, width, height} = app.window.get_frame_rect();
+      await drag(source.get_compositor_private(), [x + width / 3, y + height / 2], DRAG);
+      await eventually(received, 'a message file dropped from another app reaches Mailman');
+    } finally {
+      await stop(dragSource);
+    }
     app.window.activate(global.get_current_time());
     (await app.settle(() => true)).save('mailman-dropped-message-dark');
   } finally {

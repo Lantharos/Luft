@@ -1,3 +1,4 @@
+import type Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 const POLL = 16;
@@ -34,6 +35,17 @@ export function nextFrame(): Promise<void> {
     });
     global.stage.queue_redraw();
   });
+}
+
+export async function standsStill(actor: Clutter.Actor, label: string): Promise<void> {
+  let last = '';
+  await waitUntil(async () => {
+    await nextFrame();
+    const now = [...actor.get_transformed_position(), ...actor.get_transformed_size()].join();
+    const still = actor.mapped && actor.reactive && now === last;
+    last = now;
+    return still;
+  }, label);
 }
 
 export async function settled(timeout = 3000): Promise<void> {

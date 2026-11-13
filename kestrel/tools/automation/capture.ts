@@ -7,6 +7,7 @@ import {rest} from '../checks/lib/input/input.js';
 import {clearNotifications} from '../checks/lib/notifications.js';
 import {stopAll} from '../checks/lib/processes.js';
 import {settled} from '../checks/lib/wait.js';
+import {rememberSessionStart, requireSessionAsAtStart} from './leftovers.js';
 import {endSession, runGroup} from './runner.js';
 
 const FILE_MANAGER = 'com.lantharos.rover.desktop';
@@ -46,12 +47,14 @@ async function reset() {
   await settled();
   if (Main.screenShield.locked) throw new Error('The group left the screen locked');
   if (Main.modalCount > 0) throw new Error('The group left a dialog open');
+  requireSessionAsAtStart();
 }
 
 export async function run() {
   pinFileManager();
   await activateInAppRuntime();
   await settled();
+  rememberSessionStart();
   try {
     for (let group = claim(); group; group = claim()) {
       if (!await runGroup(group, reset)) throw new Error(`${group} failed, ending this session`);

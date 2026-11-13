@@ -9,7 +9,7 @@ import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {penTap} from '../lib/input/penStroke.js';
-import {pause, settled} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 import {BTN_STYLUS2, hover, leave, pen, pressButton} from './lib/pen.js';
 
 const {require, eventually} = checks('pen');
@@ -80,7 +80,7 @@ async function withSquareCorners(action: () => Promise<void>) {
 
 export async function run() {
   await writeAtOnce();
-  await eventually(async () => (await listed()).some(([, , kind]) => kind === 'screen'), 'Kestrel lists the virtual pen as a pen on the screen');
+  await waitUntil(async () => (await listed()).some(([, , kind]) => kind === 'screen'), 'Kestrel lists the virtual pen as a pen on the screen');
   await checkEraserButton();
   await checkStartButton();
   await withApp('settings', [], async app => {

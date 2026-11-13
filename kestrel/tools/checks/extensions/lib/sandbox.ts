@@ -3,7 +3,6 @@ import GLib from 'gi://GLib';
 
 import {install, ownFolder, rewrite} from './extensions.js';
 
-const PAGE_KIB = 4;
 const decoder = new TextDecoder();
 
 function read(path: string): string | null {
@@ -29,11 +28,6 @@ export function hostsOf(id: string, folder = ownFolder(id)): string[] {
     const parent = parentOf(pid);
     return !!parent && (read(`/proc/${parent}/cmdline`) ?? '').split('\0').includes(folder);
   });
-}
-
-export function privateKib(pid: string): number {
-  const [, resident, shared] = (read(`/proc/${pid}/statm`) ?? '0 0 0').split(' ').map(Number);
-  return (resident - shared) * PAGE_KIB;
 }
 
 export function installOwn(fixture: string, id: string, change: (manifest: string) => string = text => text) {

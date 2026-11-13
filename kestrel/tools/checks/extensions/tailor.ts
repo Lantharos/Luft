@@ -50,7 +50,7 @@ export async function run() {
     await request('Disable', TAILOR);
     await eventually(async () => (await listed(TAILOR))?.state === 'off', 'it can be turned off');
     await eventually(async () => read(LIBRARY) === STEAM_STYLES && !exists(`${STEAM}/tailor`) && !exists(`${STEAM}/css/library.original.css`), 'turning it off runs the helper once to put Steam back exactly');
-    require(read(VESKTOP_SETTINGS) === ORIGINAL_SETTINGS && !exists(VESKTOP_THEME), 'and Vesktop');
+    await eventually(() => read(VESKTOP_SETTINGS) === ORIGINAL_SETTINGS && !exists(VESKTOP_THEME), 'and Vesktop');
   } finally {
     interfaceSettings.set_string('color-scheme', scheme);
     await request('Remove', TAILOR);

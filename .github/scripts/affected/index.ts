@@ -14,14 +14,15 @@ process.chdir(git('rev-parse', '--show-toplevel')!);
 const RUNS_EVERYTHING = ['.github/workflows/checks.yml', 'os/image/parts/stages/workspace.ts', relative(process.cwd(), import.meta.dir)];
 const UNIT_CHECK = relative(process.cwd(), join(import.meta.dir, '../units'));
 const COMPOSITOR = ['kestrel/compositor', 'packages/identity/sandbox-cases.ini'];
+const PERMISSIONS = ['kestrel/ui/src/extensions/api/v1/types.ts', '.github/scripts/store/permissions.ts'];
 
 const files = git('ls-files')!.split('\n');
 const graph = new Graph();
 const crates = buildRust(graph, files);
 const webTargets = buildWeb(graph, files);
 
-function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; kestrel: boolean; units: boolean; compositor: boolean; dbus: boolean } {
-	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, kestrel: true, units: true, compositor: true, dbus: true };
+function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; kestrel: boolean; units: boolean; compositor: boolean; dbus: boolean; permissions: boolean } {
+	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, kestrel: true, units: true, compositor: true, dbus: true, permissions: true };
 	const affected = graph.affected([...changes.files, ...workspaceChanges(crates, changes.files, changes.base)]);
 	return {
 		crates: crates.filter((crate) => affected.has(crate.dir)),
@@ -30,6 +31,7 @@ function plan(changes: { base: string; files: string[] } | undefined): { crates:
 		units: changes.files.some((file) => isUnitPath(file) || covers(UNIT_CHECK, file)),
 		compositor: changes.files.some((file) => COMPOSITOR.some((path) => covers(path, file))),
 		dbus: touchesDbus(changes.files),
+		permissions: changes.files.some((file) => PERMISSIONS.includes(file)),
 	};
 }
 
@@ -48,6 +50,7 @@ const outputs = {
 	units: String(runs.units),
 	compositor: String(runs.compositor),
 	dbus: String(runs.dbus),
+	permissions: String(runs.permissions),
 };
 
 const lines = Object.entries(outputs).map(([key, value]) => `${key}=${value}`);

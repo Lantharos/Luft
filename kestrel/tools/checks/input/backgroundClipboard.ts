@@ -74,7 +74,8 @@ async function checkX11(client: Client) {
     await eventually(async () => await client.send('paste', 'pasted') === 'Copied in X11', 'background apps read what X11 apps copy');
     await eventually(() => window.has_focus(), 'the X11 app takes focus');
     press(Clutter.KEY_c);
-    await eventually(async () => await client.send('paste', 'pasted') === '', 'an X11 app clears its own copy');
+    await eventually(async () => !await clipboardText(), 'an X11 app clears its own copy');
+    require(await client.send('paste', 'pasted') === '', 'background apps see the X11 copy is gone');
   } finally {
     await stop(app);
   }

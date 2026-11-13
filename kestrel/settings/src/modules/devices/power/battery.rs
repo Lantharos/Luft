@@ -92,3 +92,43 @@ impl Discharge {
         self.ending(false)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const MINUTE: i64 = 60;
+
+    fn reading(percentage: f64, minutes_left: i64) -> Reading {
+        Reading {
+            percentage,
+            time_to_empty: minutes_left * MINUTE,
+        }
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn estimates_count_once_the_battery_has_run_a_minute() {
+        let discharge = Discharge::new(false);
+        assert_eq!(discharge.charge(reading(40.0, 9)), Charge::Fine);
+        assert_eq!(discharge.seconds_left(reading(40.0, 9)), None);
+
+        tokio::time::advance(ESTIMATE_SETTLES_AFTER).await;
+
+        assert_eq!(discharge.charge(reading(40.0, 30)), Charge::Fine);
+        assert_eq!(discharge.charge(reading(40.0, 24)), Charge::Low);
+        assert_eq!(discharge.charge(reading(40.0, 9)), Charge::Critical);
+        assert_eq!(discharge.seconds_left(reading(40.0, 9)), Some(9 * MINUTE));
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn implausible_estimates_leave_the_percentage_to_decide() {
+        let discharge = Discharge::new(false);
+        tokio::time::advance(ESTIMATE_SETTLES_AFTER).await;
+
+        for minutes_left in [0, 25 * 60] {
+            assert_eq!(discharge.seconds_left(reading(40.0, minutes_left)), None);
+            assert_eq!(discharge.charge(reading(40.0, minutes_left)), Charge::Fine);
+            assert_eq!(discharge.charge(reading(12.0, minutes_left)), Charge::Low);
+        }
+    }
+}

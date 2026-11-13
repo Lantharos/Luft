@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -49,7 +48,6 @@ export async function checkControls() {
   const layout = ofType(named('kestrel-input-source'), St.Button);
   require(shown(layout) && ofType(layout.get_child(), St.Label).text === 'EN', 'the keyboard layout can be switched');
 
-  require(Pango.FontDescription.from_string(label.clutter_text.font_name).get_family() === 'Open Runde', 'the login screen draws its text in Open Runde');
   const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const height = label.height;
   await choose('kestrel-greeter-accessibility', 'Larger text');

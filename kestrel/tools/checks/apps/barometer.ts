@@ -11,14 +11,11 @@ import {checkPalette, withPalette} from './lib/palette.js';
 
 const {require, eventually} = checks('Luft app');
 const MAILMAN = 'com.lantharos.mailman';
-const SAMPLER = 'barometer-sampl';
 const CONTENT = {x: 280, y: 0, width: 840};
 const NAMES = {x: 290, y: 100, width: 250, height: 90};
 const OPEN: Point = [465, 154];
 const STOP: Point = [524, 154];
 const SETTLE = 3000;
-const MEASURED_SAMPLES = 10;
-const SAMPLE_INTERVAL = 1000;
 const REOPEN_TIMEOUT = 15000;
 const SHOW_TIMEOUT = 5000;
 const FORCE_AFTER = 5000;
@@ -28,26 +25,6 @@ const decoder = new TextDecoder();
 const read = (path: string) => decoder.decode(GLib.file_get_contents(path)[1]).trim();
 const mailmanWindow = () => windows().find(window => window.get_wm_class() === MAILMAN && windowShown(window));
 const scopeOf = (pid: number) => `/sys/fs/cgroup${read(`/proc/${pid}/cgroup`).split('::')[1]}`;
-
-function samplerNanoseconds(pid: number) {
-  const tasks = `/proc/${pid}/task`;
-  const directory = GLib.Dir.open(tasks, 0);
-  try {
-    for (let task = directory.read_name(); task; task = directory.read_name()) {
-      if (read(`${tasks}/${task}/comm`) === SAMPLER) return Number(read(`${tasks}/${task}/schedstat`).split(' ')[0]);
-    }
-  } finally {
-    directory.close();
-  }
-  throw new Error('Barometer has no sampler thread');
-}
-
-async function measureSampler(barometer: LuftApp) {
-  const before = samplerNanoseconds(barometer.pid);
-  await pause(MEASURED_SAMPLES * SAMPLE_INTERVAL);
-  const perSample = (samplerNanoseconds(barometer.pid) - before) / MEASURED_SAMPLES / 1e6;
-  console.log(`Kestrel Luft app check: Barometer's apps view takes ${perSample.toFixed(2)} ms of processor time per sample`);
-}
 
 function shows(barometer: LuftApp, expected: Frame, label: string) {
   return eventually(async () => (await barometer.frame(barometer.area(NAMES))).looksLike(expected), label, SHOW_TIMEOUT);
@@ -74,8 +51,6 @@ async function checkBackgroundApps() {
       await pause(SETTLE);
       (await barometer.settle(() => true, barometer.area(CONTENT))).save('barometer-background');
       console.log(`Kestrel Luft app check: Mailman uses ${(Number(read(`${scope}/memory.current`)) / MIB).toFixed(1)} MB in the background`);
-      await measureSampler(barometer);
-
       await press(barometer, OPEN);
       const reopened = await eventually(mailmanWindow, "Open brings Mailman's window back", REOPEN_TIMEOUT);
       barometer.window.activate(global.get_current_time());

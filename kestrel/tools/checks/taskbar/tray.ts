@@ -6,7 +6,7 @@ import {checks} from '../lib/check.js';
 import {click, press} from '../lib/input/input.js';
 import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {settled, standsStill, waitUntil} from '../lib/wait.js';
 
 const {eventually} = checks('tray');
 
@@ -17,6 +17,7 @@ async function choose(menu: Clutter.Actor, name: string) {
 }
 
 async function openApp(tray: Clutter.Actor, menu: Clutter.Actor) {
+  await standsStill(tray, 'the tray button stands still');
   click(tray);
   await eventually(() => menu.visible && named('Chatter', menu), 'the tray panel lists apps by name');
   await choose(menu, 'Chatter');

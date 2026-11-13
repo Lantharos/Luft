@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import St from 'gi://St';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -9,6 +10,7 @@ import {call} from '../lib/dbus.js';
 import {click, moveTo, rest} from '../lib/input/input.js';
 import {clearNotifications} from '../lib/notifications.js';
 import {capture} from '../lib/screenshots.js';
+import {remember} from '../lib/settings.js';
 import {pause, settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
@@ -103,6 +105,7 @@ async function checkEnding() {
 }
 
 export async function run() {
+  const restore = remember(new Gio.Settings({schema_id: 'com.lantharos.kestrel'}), ['taskbar-arrangement']);
   await installBuilt(SOUNDSCAPES);
   await installBuilt(FOCUS);
   try {
@@ -116,5 +119,6 @@ export async function run() {
     clearNotifications();
     await request('Remove', FOCUS);
     await request('Remove', SOUNDSCAPES);
+    restore();
   }
 }

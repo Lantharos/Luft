@@ -16,7 +16,7 @@ import {prepareForSleep} from '../lockScreen/lib/sleep.js';
 import {closeStart, descriptionOf, openStart, rows, search, titleOf} from '../start/search/results.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
-import {builtFolder, installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
+import {builtFolder, forgetCrashes, installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 import {FOCUS, REMINDERS, STATE, type Stored, answer, answerChooser, bannerMentions, banners, buttonIn, cleanSlate, only, crashKestrel, element, file, keepFor, mentions, openPanel, popup, push, read, readJson, reminder, requeue, row, saved, seed, sentence} from './reminders/world.js';
 
 const {require, eventually} = checks('Reminders');
@@ -30,6 +30,14 @@ const FIRES_MS = 6000;
 const WAKEUPS_S = 30;
 const RESTART_MS = 150_000;
 const MANY = 400;
+const screensaver = new Gio.Settings({schema_id: 'org.gnome.desktop.screensaver'});
+const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+
+function leaveAsFound() {
+  screensaver.reset('lock-enabled');
+  kestrel.reset('taskbar-arrangement');
+  forgetCrashes();
+}
 
 async function wakeJustBefore(at: number) {
   await prepareForSleep(true);
@@ -445,15 +453,19 @@ async function verifyRestart() {
 
 export async function run() {
   if (GLib.file_test(STATE, GLib.FileTest.EXISTS)) {
-    await verifyRestart();
+    try {
+      await verifyRestart();
+    } finally {
+      leaveAsFound();
+    }
     return;
   }
   cleanSlate();
   await installBuilt(REMINDERS);
   await eventually(async () => (await listed(REMINDERS))?.state === 'running', 'Reminders runs once installed');
   await checkConditionalSettings();
-  new Gio.Settings({schema_id: 'org.gnome.desktop.screensaver'}).set_boolean('lock-enabled', false);
   setClock(THURSDAY_NOON);
+  screensaver.set_boolean('lock-enabled', false);
   try {
     await checkAdding();
     await checkEditing();
@@ -472,6 +484,7 @@ export async function run() {
     await prepareRestart();
   } finally {
     realClock();
+    leaveAsFound();
   }
 }
 

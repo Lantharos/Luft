@@ -23,6 +23,10 @@ function entries(): Set<string> {
     .map(info => info.get_name()).filter(name => name.endsWith('.desktop')).map(name => name.slice(0, -'.desktop'.length)));
 }
 
+const fileId = (path: string) => Gio.File.new_for_path(path).query_info('id::file', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('id::file');
+
+const sameFile = (path: string, other: string) => GLib.file_test(path, GLib.FileTest.EXISTS) && fileId(path) === fileId(other);
+
 export function launchLine(id: string) {
   const entry = new GLib.KeyFile();
   entry.load_from_file(desktopFile(id), GLib.KeyFileFlags.NONE);
@@ -39,6 +43,6 @@ export async function install(path: string) {
   const [id] = [...entries()].filter(name => !before.has(name));
   require(id, `${GLib.path_get_basename(path)} gets a menu entry`);
   const {program, rest} = launchLine(id);
-  require(program === GLib.canonicalize_filename(SCHELF, null) && rest[0] === SANDBOX && rest[1] === id, `the menu entry of ${id} starts it in its sandbox`);
+  require(sameFile(program, SCHELF) && rest[0] === SANDBOX && rest[1] === id, `the menu entry of ${id} starts it in its sandbox (${[program, ...rest].join(' ')})`);
   return id;
 }

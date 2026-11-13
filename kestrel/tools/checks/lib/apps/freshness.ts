@@ -21,7 +21,7 @@ export function requireFresh(name: string): void {
   const folder = appFolder(name);
   const app = (...parts: string[]) => GLib.build_filenamev([folder, ...parts]);
   const builds = [
-    {build: repository('target/release', name), sources: [app('desktop/src'), app('desktop/Cargo.toml'), repository('Cargo.lock')], rebuild: `cargo build --release -p ${name}`},
+    {build: repository('target/release', name), sources: [app('desktop/src'), app('desktop/Cargo.toml')], rebuild: `cargo build --release -p ${name}`},
     {build: app('dist'), sources: [app('src'), app('index.html'), app('public'), app('locales')], rebuild: `bun run build in ${folder}`},
   ];
   const stale = builds.filter(({build, sources}) => exists(build) && newest(build) < Math.max(...sources.filter(exists).map(newest)));

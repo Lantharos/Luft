@@ -106,6 +106,7 @@ async function checkUsb() {
 
 async function checkWallpaper() {
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const original = ['picture-uri', 'picture-uri-dark', 'picture-options'].map(key => [key, background.get_string(key)]);
   const uri = wallpaperFile().get_uri();
   const set = (preview: boolean) => call('Wallpaper', 'SetWallpaperURI', new GLib.Variant('(osssa{sv})', [requestHandle(), 'com.lantharos.magpie', '', uri, {
@@ -124,6 +125,7 @@ async function checkWallpaper() {
     Gio.File.new_for_uri(stored).delete(null);
   } finally {
     for (const [key, value] of original) background.set_string(key, value);
+    for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.reset(key);
   }
 }
 

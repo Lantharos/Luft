@@ -8,7 +8,7 @@ import {descendants, labelled, ofType, shown, styled} from '../../lib/actors.js'
 import {call} from '../../lib/dbus.js';
 import {click} from '../../lib/input/input.js';
 import {scratch} from '../../lib/processes.js';
-import {waitUntil} from '../../lib/wait.js';
+import {standsStill, waitUntil} from '../../lib/wait.js';
 import {request} from '../../extensions/lib/extensions.js';
 
 export const REMINDERS = 'com.lantharos.Reminders';
@@ -88,6 +88,7 @@ export const answer = (name: string) => ofType(labelled(name, banners()[0]!), St
 export const row = (title: string) => popup() && descendants(popup()!).find(actor => actor instanceof St.Button && actor.accessible_name?.startsWith(`${title},`) && actor.mapped) as St.Button | undefined;
 
 export async function openPanel() {
+  await standsStill(element()!, 'Reminders stands still in the taskbar');
   click(element()!);
   await waitUntil(popup, 'the pop-up opens');
 }

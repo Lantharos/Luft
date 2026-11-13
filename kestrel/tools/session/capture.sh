@@ -10,9 +10,16 @@ max_startup_failures=3
 max_sign_ins=8
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
-laptop_areas=(board input:dictation input:scrolling panel:battery panel:markup panel:repaints panel:screenshot tablet:keyboard tablet:longPress windows:serverDecorations windows:x11Frames)
 taskbar_positions=(left top right)
-position_areas=(taskbar start panel tiling)
+scaled_groups="board:board board:corner board:glass board:touch board:view board:x11 input:scrolling panel:battery panel:markup panel:repaints panel:screenshot"
+edge_groups="taskbar:hiddenTaskbar taskbar:taskbar taskbar:taskbarOptions start:start panel:motion panel:repaints panel:screenshot panel:surfaces"
+declare -A variant_groups=(
+  [laptop]="$scaled_groups tablet:keyboard"
+  [laptop15]="$scaled_groups windows:serverDecorations windows:x11Frames"
+  [left]="$edge_groups taskbar:ink tiling:layouts tiling:scrolling tiling:scrollingMotion"
+  [top]="$edge_groups tiling:layouts tiling:scrolling"
+  [right]="$edge_groups tiling:monitors"
+)
 two_display_groups=(tiling:monitors system:dimming windows:seeThroughWallpaper taskbar:arrangement desktop:playthings restore:monitors)
 second_display=1280x720
 
@@ -22,26 +29,13 @@ usage() {
 }
 
 all_groups() {
-  local area laptop
+  local variant group
   (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.ts' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
-    | sed 's|^\./||; s|\.ts$||; s|/|:|' | sort
-  {
-    for laptop in "${!laptops[@]}"; do variants "$laptop" "${laptop_areas[@]}"; done
-    for position in "${taskbar_positions[@]}"; do variants "$position" "${position_areas[@]}"; done
-  } | sort
+    | sed 's|^\./||; s|\.ts$||; s|/|:|' | sort | if [[ -n "${LUFT_LOCALE:-}" ]]; then cat; else grep -vx system:translations; fi
+  for variant in "${!variant_groups[@]}"; do
+    for group in ${variant_groups[$variant]}; do echo "$group+$variant"; done
+  done | sort
   printf '%s\n' greeter setup scaling
-}
-
-variants() {
-  local variant="$1" area
-  shift
-  for area in "$@"; do
-    if [[ "$area" == *:* ]]; then
-      echo "$area+$variant"
-    else
-      (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.ts') | sed "s|^\./|$area:|; s|\.ts$|+$variant|"
-    fi
-  done
 }
 
 select_groups() {

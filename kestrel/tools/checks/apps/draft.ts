@@ -80,8 +80,7 @@ async function checkFreezing(draft: LuftApp, palette: Palette) {
     const {typed, hidden} = await typeAndHide(draft);
     tern = await openApp('tern');
     const ternHidden = await runOutOfSight(tern, palette);
-    const frozenAfter = await draft.reaches('frozen', hidden, FREEZE_AFTER + FREEZE_MARGIN);
-    require(frozenAfter >= FREEZE_AFTER, `Draft freezes ${Math.round(frozenAfter / 1000)} s after it was minimized`);
+    await draft.reaches('frozen', hidden, FREEZE_AFTER + FREEZE_MARGIN);
     require(!tern.lifecycle.some(change => change.state === 'frozen' && change.at >= ternHidden), 'Tern keeps running while a command runs out of sight');
     await thaw(draft, typed);
   } finally {

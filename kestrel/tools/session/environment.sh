@@ -68,7 +68,7 @@ build_helpers() {
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio \
-    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture -p luft-cli)
+    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture -p luft-cli -p luft-thumbnailer)
 }
 
 dbus_service() {

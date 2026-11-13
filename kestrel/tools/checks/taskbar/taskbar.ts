@@ -4,13 +4,14 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
+import {descendants, existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
 import {islandOf} from './taskbarOptions/taskbar.js';
 import {checks} from '../lib/check.js';
 import {centerOf, moveTo, rest} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {hold} from '../lib/frameClock.js';
+import {nextFrame, settled, waitUntil} from '../lib/wait.js';
 import {beyond, boxOf, farSide, nearSide, vertical} from '../lib/edge.js';
 
 const {require, eventually} = checks('taskbar');
@@ -91,15 +92,21 @@ async function checkFocus(panel: Clutter.Actor, window: Meta.Window) {
 
 async function checkOpening(panel: Clutter.Actor) {
   const center = islandOf('dock');
-  const length = () => vertical() ? center.height : center.width;
-  const lengths = new Set([length()]);
-  const sample = global.stage.connect('after-paint', () => lengths.add(length()));
+  const along = vertical() ? 'height' : 'width';
+  const length = () => center[along];
+  const before = length();
   const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
+    const growing = await waitUntil(() => descendants(center).map(actor => actor.get_transition(along)).find(transition => transition), 'a button starts growing into the taskbar');
+    const held = hold([growing]);
+    held.step(3);
+    await nextFrame();
+    const midway = length();
+    held.release();
     await settled();
     await capture('window');
-    require(lengths.size > 2, 'the taskbar animates its length as a window opens');
+    require(before < midway && midway < length(), `the taskbar animates its length as a window opens (${before}, ${midway}, ${length()})`);
 
     toggleSurface('start');
     await eventually(() => shown(named('kestrel-start')), 'Start opens over a window');
@@ -114,7 +121,6 @@ async function checkOpening(panel: Clutter.Actor) {
     require(!beyond(farSide(window.get_frame_rect()), nearSide(boxOf(panel))), 'a maximized window stays clear of the taskbar');
   } finally {
     await stop(app);
-    global.stage.disconnect(sample);
   }
 }
 

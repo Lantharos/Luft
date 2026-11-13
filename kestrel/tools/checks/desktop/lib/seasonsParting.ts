@@ -21,6 +21,7 @@ const POINT: Point = [1200, 430];
 const CORE = 18;
 const SAMPLES = 14;
 const SAMPLE_GAP_MS = 110;
+const TYPICAL_OF = 3;
 const SETTLE_MS = 1400;
 const SHOWING = 15;
 const STILL_PARTED = 0.35;
@@ -41,6 +42,12 @@ async function activity(area: Area) {
     await pause(SAMPLE_GAP_MS);
   }
   return total;
+}
+
+async function typicalActivity(area: Area) {
+  const seen = [];
+  for (let sample = 0; sample < TYPICAL_OF; sample++) seen.push(await activity(area));
+  return seen.sort((a, b) => a - b)[Math.floor(TYPICAL_OF / 2)];
 }
 
 export const listening = () => descendants(global.window_group).some(actor => actor instanceof Meta.BackgroundActor &&
@@ -95,10 +102,10 @@ async function checkWindowInFront() {
   await eventually(() => window.get_frame_rect().x === under[0] - 400, 'the window moves over the pointer');
   const beside: Point = [under[0] + 40, under[1]];
   await pause(SETTLE_MS);
-  const open = await activity(around(beside));
+  const open = await typicalActivity(around(beside));
   moveTo([under[0] - 12, under[1]]);
   await pause(SETTLE_MS);
-  const onWindow = await activity(around(beside));
+  const onWindow = await typicalActivity(around(beside));
   require(open > parted, `a window opening under the pointer lets what falls close up (${open} against ${parted})`);
   require(onWindow > open * BACK, `nothing reacts through the window (${onWindow} against ${open})`);
   window.delete(global.get_current_time());

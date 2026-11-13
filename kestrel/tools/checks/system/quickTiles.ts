@@ -206,7 +206,7 @@ async function checkRotation() {
   press(Clutter.KEY_Escape);
   const sensor = gjs('services/sensorProxy.js');
   try {
-    await eventually(() => accelerometer.present, 'Kestrel finds the accelerometer');
+    await waitUntil(() => accelerometer.present, 'Kestrel finds the accelerometer');
     await openAddList();
     require(shown(named('Auto-rotate', menu())), 'the add list offers auto rotate with an accelerometer');
     click(existing('Auto-rotate', menu()));

@@ -6,7 +6,7 @@ import {Main, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js'
 import {checks} from '../lib/check.js';
 import {moveTo, type Point} from '../lib/input/input.js';
 import {gjs, stop, waitForWindows} from '../lib/processes.js';
-import {pause, settled} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 import {inside, monitor, pressesStayWith} from './lib/presses.js';
 import {fold, plugInTouchscreen} from './lib/touch.js';
 
@@ -80,7 +80,7 @@ export async function run() {
     const [behind, front] = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
     behind.move_resize_frame(false, monitor().x + 80, monitor().y + 80, 640, 420);
     behind.activate(global.get_current_time());
-    await eventually(() => global.display.focus_window === behind, 'the window behind had focus last');
+    await waitUntil(() => global.display.focus_window === behind, 'the window behind had focus last');
 
     await pressesUnder(front, behind, 'with the taskbar always shown');
     front.unmaximize();

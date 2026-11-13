@@ -89,9 +89,9 @@ sudo plymouth display-message --text="Upgrading firefox"
 
 ## CI
 
-On every push and pull request, `.github/workflows/checks.yml` runs only what a change can reach: Clippy and the tests of the crates it touches, through their own files, their dependencies or the locked packages they build with, and `bun run check` for the interface packages. It fails when an app's bindings no longer match its Rust side, and runs the D-Bus, units, `/etc` and image component consistency scripts when what they read changes.
+On every push and pull request, `.github/workflows/checks.yml` runs only what a change can reach: Clippy and the tests of the crates it touches, through their own files, their dependencies or the locked packages they build with, and `bun run check` for the interface packages. It fails when an app's bindings no longer match its Rust side, and runs the D-Bus and units consistency scripts when what they read changes. The `/etc` and image component scripts run on every push, and the extension permissions are compared with the store's when the extension API's types change.
 
-When a change can reach Kestrel, a job in a Fedora container started with systemd checks that the Mutter patch series applies, builds Mutter and the engine, and runs a set of headless groups: the session starts, Start opens and searches, the panel's surfaces open and move, the lock screen locks and unlocks, and the watchdog's checks pass. A failure uploads the session's logs and screenshots. To run something in the same container on your own computer:
+When a change can reach Kestrel, a job in a Fedora container started with systemd checks that the Mutter patch series applies, builds Mutter and the engine, and runs a set of headless groups: the session starts, Start opens and searches, the panel's surfaces open and move, the lock screen locks and unlocks, the watchdog's checks pass, and what keeps extensions and apps in their place holds: the extension sandbox, the background clipboard, global shortcuts, network access, the taskbar and keyring prompts. A failure uploads the session's logs and screenshots. To run something in the same container on your own computer:
 
 ```sh
 .github/scripts/kestrel/container.sh run kestrel/tools/session.sh capture --only lockScreen

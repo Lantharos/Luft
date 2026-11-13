@@ -337,12 +337,10 @@ async function checkSleeping(fullScreenAlone: number) {
   const [from, to] = across(lantern, 110);
   const back = () => sweep(to, from, 18);
   const forth = () => sweep(from, to, 18);
-  await measure('brushing a lantern', 5000, async () => {
-    for (let pass = 0; pass < 7; pass++) {
-      await forth();
-      await back();
-    }
-  });
+  for (let pass = 0; pass < 7; pass++) {
+    await forth();
+    await back();
+  }
   rest();
   await settled(lantern);
 }
@@ -435,19 +433,8 @@ async function resting(name: string, milliseconds: number, what: string) {
 }
 
 async function takeBaseline() {
-  await pause(1500);
   rest();
   await pause(1500);
-  await measure('moving the pointer without Playthings', 4000, async () => {
-    for (let pass = 0; pass < 6; pass++) {
-      await sweep([200, 300], [420, 300], 18);
-      await sweep([420, 300], [200, 300], 18);
-    }
-  });
-  rest();
-  await pause(800);
-  console.log(`Kestrel playthings, display scale: ${global.display.get_monitor_scale(global.display.get_primary_monitor())}`);
-  await measure('without Playthings', 5000);
   let paints = 0;
   await fullScreen(async () => {
     ({paints} = await measure('full screen without Playthings', 3000));

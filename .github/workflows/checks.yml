@@ -32,6 +32,7 @@ jobs:
       units: ${{ steps.affected.outputs.units }}
       compositor: ${{ steps.affected.outputs.compositor }}
       dbus: ${{ steps.affected.outputs.dbus }}
+      permissions: ${{ steps.affected.outputs.permissions }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -162,14 +163,9 @@ jobs:
       CCACHE_DIR: ${{ github.workspace }}/kestrel/run/ccache
       KESTREL_SESSION_DIR: ${{ github.workspace }}/kestrel/run/smoke
       KESTREL_CAPTURE_DIR: ${{ github.workspace }}/kestrel/run/smoke/screenshots
-      SMOKE_GROUPS: system:session,start:search,lockScreen:lock,lockScreen:unlock,panel:surfaces,panel:motion,desktop:motion,system:watchdog
+      SMOKE_GROUPS: system:session,start:search,lockScreen:lock,lockScreen:unlock,panel:surfaces,panel:motion,desktop:motion,system:watchdog,extensions:confined,extensions:hostile,extensions:origins,windows:state,network:appAccess,keyring:prompter,portal:shortcuts,input:backgroundClipboard
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: ./.github/actions/bun
-
-      - name: Extension permissions the store knows
-        run: bun .github/scripts/store/permissions.ts
 
       - uses: ./.github/actions/registry
 
@@ -293,6 +289,19 @@ jobs:
 
       - run: bun .github/scripts/dbus/index.ts
 
+  permissions:
+    name: Extension permissions the store knows
+    needs: changes
+    if: needs.changes.outputs.permissions == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/bun
+
+      - run: bun .github/scripts/store/permissions.ts
+
   etc:
     name: State outside /etc
     runs-on: ubuntu-slim
@@ -317,7 +326,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, compositor-identity, dbus, etc, image-sources]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, compositor-identity, dbus, permissions, etc, image-sources]
     if: always()
     runs-on: ubuntu-slim
     steps:

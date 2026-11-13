@@ -66,21 +66,37 @@ async function displayConfig<T>(method: string, parameters: GLib.Variant | null 
   return reply.deepUnpack<T>();
 }
 
+const modeOf = (monitors: MonitorState[], [, , , , , [[connector]]]: LogicalMonitor) => monitors.find(([[name]]) => name === connector)![1]
+  .find(([, , , , , , properties]) => properties['is-current']?.deepUnpack())!;
+
+const placed = ([, y, , transform, primary, [[connector]]]: LogicalMonitor, x: number, scale: number, mode: string): Layout =>
+  [x, y, scale, transform, primary, [[connector, mode, {}]]];
+
+const arrangedAs = () => Main.layoutManager.monitors.map(({x, y, width, height, geometry_scale}) => [x, y, width, height, geometry_scale].join()).join(' ');
+
+async function applyLayout(layout: Layout[]) {
+  const [serial] = await displayConfig<CurrentState>('GetCurrentState');
+  await displayConfig('ApplyMonitorsConfig', new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [serial, TEMPORARY, layout, {}]));
+}
+
 async function scaleSecondDisplay() {
-  const [serial, monitors, logicalMonitors] = await displayConfig<CurrentState>('GetCurrentState');
-  const modeOf = ([, , , , , [[connector]]]: LogicalMonitor) => monitors.find(([[name]]) => name === connector)![1]
-    .find(([, , , , , , properties]) => properties['is-current']?.deepUnpack())!;
+  const [, monitors, logicalMonitors] = await displayConfig<CurrentState>('GetCurrentState');
+  const arranged = arrangedAs();
+  const original = logicalMonitors.map(monitor => placed(monitor, monitor[0], monitor[2], modeOf(monitors, monitor)[0]));
   const primary = logicalMonitors.find(([, , , , isPrimary]) => isPrimary)!;
   const second = logicalMonitors.find(monitor => monitor !== primary)!;
-  const [primaryMode, primaryWidth] = modeOf(primary);
-  const [secondMode, secondWidth, , , , scales] = modeOf(second);
+  const [primaryMode, primaryWidth] = modeOf(monitors, primary);
+  const [secondMode, secondWidth, , , , scales] = modeOf(monitors, second);
   const scale = Math.max(...scales);
-  const placed = (monitor: LogicalMonitor, x: number, monitorScale: number, mode: string): Layout =>
-    [x, 0, monitorScale, 0, monitor === primary, [[monitor[5][0][0], mode, {}]]];
-  const layout = [placed(primary, 0, primary[2], primaryMode), placed(second, Math.round(primaryWidth / primary[2]), scale, secondMode)];
-  await displayConfig('ApplyMonitorsConfig', new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [serial, TEMPORARY, layout, {}]));
+  await applyLayout([placed(primary, 0, primary[2], primaryMode), placed(second, Math.round(primaryWidth / primary[2]), scale, secondMode)]);
   await eventually(() => Main.layoutManager.monitors.some(monitor => monitor.geometry_scale === scale), `the second display uses a scale of ${scale}`);
-  return Math.round(secondWidth / scale);
+  return {
+    width: Math.round(secondWidth / scale),
+    restore: async () => {
+      await applyLayout(original);
+      await eventually(() => arrangedAs() === arranged, 'the displays go back to how they were');
+    },
+  };
 }
 
 function wallpaperBackdrop(window: Meta.Window) {
@@ -130,8 +146,10 @@ export async function run() {
   background.set_string('picture-uri-dark', writePicture('dark', PICTURES.dark));
   background.set_string('picture-uri', writePicture('light', PICTURES.light));
   interfaceSettings.set_string('color-scheme', 'prefer-dark');
+  let scaled: Awaited<ReturnType<typeof scaleSecondDisplay>> | null = null;
   try {
-    const secondWidth = Main.layoutManager.monitors.length > 1 ? await scaleSecondDisplay() : 0;
+    if (Main.layoutManager.monitors.length > 1) scaled = await scaleSecondDisplay();
+    const secondWidth = scaled?.width ?? 0;
     await withBehind(behind => withApp('tern', ['-e', 'sh', '-c', 'sleep 600'], async ({window: tern}) => {
       const app = require(Shell.WindowTracker.get_default().get_window_app(tern), 'Tern has an app');
       const primary = Main.layoutManager.primaryMonitor!;
@@ -180,6 +198,7 @@ export async function run() {
       await eventually(() => !wallpaperBackdrop(tern), 'showing everything behind again drops the still wallpaper');
     }));
   } finally {
+    await scaled?.restore();
     for (const key of KESTREL_KEYS) kestrel.reset(key);
     for (const [key, value] of savedBackground) background.set_string(key, value);
     interfaceSettings.set_string('color-scheme', scheme);

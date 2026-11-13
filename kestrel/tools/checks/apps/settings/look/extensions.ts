@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
-import {pause} from '../../../lib/wait.js';
+import {pause, waitUntil} from '../../../lib/wait.js';
 import type {Point} from '../../../lib/input/input.js';
 import {installBuilt, listed, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
 import {installOwn} from '../../../extensions/lib/sandbox.js';
@@ -120,7 +120,7 @@ async function checkSandboxedPage(app: LuftApp) {
   installOwn('sandboxed', SANDBOXED);
   await request('Reload', SANDBOXED);
   try {
-    await eventually(async () => (await listed(SANDBOXED))?.state === 'running', 'an extension from the account’s own folder runs in its sandbox', 20000);
+    await waitUntil(async () => (await listed(SANDBOXED))?.state === 'running', 'an extension from the account’s own folder runs', 20000);
     (await show(app, `extensions/${SANDBOXED.toLowerCase()}`)).save('settings-extension-sandboxed');
   } finally {
     await request('Remove', SANDBOXED);

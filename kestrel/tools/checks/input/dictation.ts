@@ -465,8 +465,7 @@ export async function run() {
     }
   } finally {
     for (const key of ['enabled', 'language', 'engine']) dictation.reset(key);
-    copilotKey.reset('press');
-    copilotKey.reset('hold');
+    for (const key of ['press', 'hold', 'seen']) copilotKey.reset(key);
     keybindings.reset('dictate');
     inputSources.set_value('sources', savedSources.sources);
     inputSources.set_value('mru-sources', savedSources.mru);

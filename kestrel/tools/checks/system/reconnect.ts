@@ -8,6 +8,7 @@ import {checks} from '../lib/check.js';
 import {scratch, windows, windowShown} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
+import {forgetCrashes} from '../extensions/lib/extensions.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 
 const {require, eventually} = checks('reconnect');
@@ -129,6 +130,7 @@ async function verify(saved: Saved) {
   await capture('reconnect-after');
   Gio.Subprocess.new(['kill', ...saved.apps.map(app => String(app.pid))], Gio.SubprocessFlags.NONE);
   await eventually(() => saved.apps.every(app => !windowOf(app.client)), 'the reconnected apps close');
+  forgetCrashes();
   GLib.unlink(STATE);
 }
 

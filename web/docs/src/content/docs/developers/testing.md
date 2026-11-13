@@ -32,6 +32,8 @@ The checks, stand-in services and test clients are TypeScript in `kestrel/tools`
 
 Some groups also run on two laptop panels at their automatic scale, or with the taskbar on another edge, as the groups ending in `+laptop`, `+laptop15`, `+left`, `+top` and `+right`, with their screenshots in folders of their own.
 
+Each group has to leave the session as it found it: a group that leaves the screen locked, a dialog open, a setting changed or the displays arranged differently fails, so nothing it changed reaches the groups after it.
+
 ## What a headless session is
 
 A headless session takes nothing from the computer's settings or home folder. Each starts from the settings of a fresh Luft install, in US English with the US keyboard layout and in UTC, signed in as Mara Lindqvist on Mara's Laptop, and a check that needs another setting sets it itself. Kestrel, the apps and every service in it share a private system bus, where stand-ins from `kestrel/tools/fixtures` serve accounts, networks, Bluetooth, logind, the updater and the other system services, so nothing reaches the computer's own login screen, startup check or hardware. File pickers go through the real portal frontend to a stand-in, and the document portal is the real one, mounted in the session's runtime folder, so sandboxed apps get files the way they do on Luft. With `LUFT_SAMPLE_SYSTEM` set, screenshots show sample hardware and drives instead of the host's.
@@ -55,7 +57,7 @@ Point `KESTREL_SESSION_DIR` and `KESTREL_CAPTURE_DIR` at empty scratch folders, 
 | `KESTREL_CAPTURE_TASKBAR` | bottom | `left`, `top` or `right` |
 | `KESTREL_EXTENSIONS` | none | Extensions from the session's build folder to install on top of Seasons, such as `com.lantharos.Phosphor` |
 | `KESTREL_SANDBOXED_EXTENSIONS` | off | `1` installs Luft's own extensions in the account's own folder, so they run [sandboxed](/extensions/how-extensions-run/#the-sandbox) |
-| `LUFT_LOCALE` | US English | A language for Kestrel and the apps, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations` |
+| `LUFT_LOCALE` | US English | A language for Kestrel and the apps, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations`, which only runs with it set |
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on |
 

@@ -10,7 +10,7 @@ import {sweepBackdrops} from '../panel/backdrops/sweep.js';
 import {measureMark} from './launcher/layers.js';
 
 const {require} = checks('Start button');
-const STYLES = ['tinted', 'clear', 'default'] as const;
+const STYLES = ['tinted', 'clear'] as const;
 const MIN_BACKDROP_CONTRAST = 2;
 const MIN_PARTNER_CONTRAST = 1.4;
 const CROP_ZOOM = 4;

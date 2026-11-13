@@ -7,7 +7,7 @@ import {checks} from '../lib/check.js';
 import {chord, rest} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
+import {pause, waitUntil} from '../lib/wait.js';
 import {actorOf, area, edgeTiling, focus, frame, near, openWindow, resetTiling, restingTiles, sameRect, shownX, tiledTightly, useTiling} from './lib/tiling.js';
 
 const {require, eventually} = checks('tiling modes');
@@ -64,7 +64,7 @@ export async function run() {
     await chord(Clutter.KEY_Super_L, Clutter.KEY_f);
     await eventually(() => !tiled(windows[1]) && sameRect(frame(windows[1]), placed[1].rect), 'a window let float goes back to where it floated before tiling');
     windows[1].move_frame(true, 300, 260);
-    await eventually(() => frame(windows[1]).x === 300, 'the floating window moves where it is put');
+    await waitUntil(() => frame(windows[1]).x === 300, 'the floating window moves where it is put');
     const floated = frame(windows[1]);
     await restingTiles();
 

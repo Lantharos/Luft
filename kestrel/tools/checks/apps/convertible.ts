@@ -14,7 +14,6 @@ import {checkPalette, saveBothStyles, withPalette, type Palette} from './lib/pal
 const {require, eventually} = checks('Luft app');
 const CONVERT_TIMEOUT = 30000;
 const SETTLE = 1500;
-const IDLE_MILLISECONDS = 10000;
 const FIRST_SUGGESTION: Point = [800, 95];
 const QUEUE_BUTTON: Point = [943, 26];
 const EDIT_MODE: Point = [878, 26];
@@ -29,21 +28,6 @@ const PICTURE = repository('os', 'image', 'files', 'usr', 'share', 'backgrounds'
 function placePicture(path: string) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(path), 0o755);
   Gio.File.new_for_path(PICTURE).copy(Gio.File.new_for_path(path), Gio.FileCopyFlags.OVERWRITE, null, null);
-}
-
-function wakeups(pid: number) {
-  return children(`/proc/${pid}/task`).reduce((total, task) => {
-    const status = read(`/proc/${pid}/task/${task.get_name()}/status`);
-    return total + Number(status.match(/^voluntary_ctxt_switches:\s+(\d+)/m)?.[1] ?? 0);
-  }, 0);
-}
-
-async function measureIdle(app: LuftApp) {
-  await pause(SETTLE);
-  const before = wakeups(app.pid);
-  await pause(IDLE_MILLISECONDS);
-  const perSecond = (wakeups(app.pid) - before) / (IDLE_MILLISECONDS / 1000);
-  console.log(`Kestrel Luft app check: Convertible wakes ${perSecond.toFixed(1)} times a second at rest, without its web page`);
 }
 
 async function convert(app: LuftApp) {
@@ -118,7 +102,6 @@ export async function run() {
   await withPalette(async palette => {
     await withApp('convertible', [], async app => {
       await checkPalette(app, palette);
-      await measureIdle(app);
     });
     await withApp('convertible', [picture], async app => {
       await checkDropPickDone(app, folder, picture, palette);

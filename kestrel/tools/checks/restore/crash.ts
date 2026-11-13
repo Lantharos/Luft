@@ -6,6 +6,7 @@ import {checks} from '../lib/check.js';
 import {scratch, windowShown} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
+import {forgetCrashes} from '../extensions/lib/extensions.js';
 import {install, NOTEBOOK, open, processesOf, quit, titled, uninstall, windowsOf} from './lib/apps.js';
 import {boxOf, crashKestrel, maximized, near, phases, type Box} from './lib/signIn.js';
 
@@ -79,6 +80,7 @@ async function crashed(data: Data) {
   Gio.Subprocess.new(['kill', String(data.rover)], Gio.SubprocessFlags.NONE);
   await eventually(() => !roverWindows().length && !windowsOf(NOTEBOOK).length, 'the apps close');
   uninstall(NOTEBOOK);
+  forgetCrashes();
   done();
 }
 

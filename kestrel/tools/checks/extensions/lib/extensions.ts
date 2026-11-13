@@ -11,6 +11,11 @@ const IFACE = 'com.lantharos.Kestrel.Extensions';
 
 export const SEASONS = 'com.lantharos.Seasons';
 
+export function forgetCrashes() {
+  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  for (const key of ['disabled-extensions', 'extension-problems']) kestrel.reset(key);
+}
+
 export interface Listed {
   id: string;
   name: string;

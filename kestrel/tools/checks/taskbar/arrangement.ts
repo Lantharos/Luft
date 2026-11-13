@@ -10,6 +10,7 @@ import {alongEdge, arrange, arrangement, boxOf, type Arrangement} from '../lib/e
 import {centerOf, click, moveTo, press, pressButton, releaseButton, rest, restingPoint, rightClick} from '../lib/input/input.js';
 import {fixture, spawn, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
+import {remember} from '../lib/settings.js';
 import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('taskbar arrangement');
@@ -288,6 +289,7 @@ async function checkSecondDisplay() {
 }
 
 export async function run() {
+  const restore = remember(settings, KEYS);
   try {
     spawn(['python3', fixture('clients', 'wayland', 'decorationClient.py'), 'client', ...WINDOW]);
     const window = await waitForWindow(WINDOW[0], 'a window to maximize opens');
@@ -303,7 +305,7 @@ export async function run() {
     await checkSecondDisplay();
   } finally {
     taskbarEditor()?.cancel();
-    for (const key of KEYS) settings.reset(key);
+    restore();
     await stopAll();
   }
 }

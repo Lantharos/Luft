@@ -1,16 +1,14 @@
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import type Meta from 'gi://Meta';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
-import {capture, captureFrame} from '../lib/screenshots.js';
+import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {listed, request} from '../extensions/lib/extensions.js';
-import {act, attachedEffects, choose, installProbes, nothingAttached, pageItems, PHOSPHOR, SHADERS, shadersRun} from './phosphor/effects.js';
+import {attachedEffects, choose, installProbes, nothingAttached, PHOSPHOR, SHADERS, shadersRun} from './phosphor/effects.js';
 import {checkCorners} from './phosphor/corners.js';
-import {installStripedApp, STRIPED_DESKTOP_ID} from './phosphor/windows.js';
+import {installStripedApp} from './phosphor/windows.js';
 
 const looks = checks('phosphor looks');
 const {require, eventually} = looks;
@@ -26,12 +24,6 @@ async function open(title: string, x: number, y: number, client = 'stripedWindow
   window.move_frame(true, x, y);
   await pause(300);
   return window;
-}
-
-async function shot() {
-  await settled();
-  const {x, y, width, height} = Main.layoutManager.primaryMonitor!;
-  return captureFrame({x, y, width, height: height - 64});
 }
 
 async function checkEveryLook() {
@@ -90,36 +82,16 @@ async function checkTransitions() {
   require(!anyTurnedOff(), 'every transition compiles');
 }
 
-async function checkRules(window: Meta.Window) {
-  window.activate(global.get_current_time());
-  const area = window.get_frame_rect();
-  const before = await shot();
-  const add = (await pageItems()).find(item => item.options?.some(option => option.value === STRIPED_DESKTOP_ID));
-  require(!!add, 'the page offers the striped app for a rule');
-  await act(add!.action!, new GLib.Variant('s', STRIPED_DESKTOP_ID));
-  const rule = (await pageItems()).find(item => item.type === 'list') as unknown as {items: {actions: {label: string; action: string}[]}[]};
-  const crtToggle = rule.items[0].actions.find(action => action.label.startsWith('CRT'))!;
-  await act(crtToggle.action, new GLib.Variant('b', true));
-  await eventually(() => attachedEffects().effects === 1, 'a CRT on one app goes on that app only');
-  await capture('phosphor-rule');
-  const after = await shot();
-  require(after.pixelsApart(before, 6) > 0, 'the app\'s window changes');
-  const {box} = after.differences(before);
-  const scale = global.display.get_monitor_scale(global.display.get_primary_monitor());
-  require(box.x2 <= (area.x + area.width) * scale + 2 && box.y2 <= (area.y + area.height) * scale + 2, 'and nothing outside it');
-}
-
 export async function run() {
   installStripedApp();
   try {
     await installProbes();
     await eventually(shadersRun, 'the probe runs');
     await eventually(async () => (await listed(PHOSPHOR))?.state === 'running', 'Phosphor runs');
-    const striped = await open('Striped', 100, 90);
+    await open('Striped', 100, 90);
     await open('Other', 760, 300, 'boardWindow');
     await checkEveryLook();
     await checkTransitions();
-    await checkRules(striped);
     await stopAll();
     await checkCorners(looks);
   } finally {

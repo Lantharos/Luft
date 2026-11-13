@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 
 import {existing} from '../lib/actors.js';
+import {remember} from '../lib/settings.js';
 import {checkAlways, checkWindows} from './taskbarOptions/autoHide.js';
 import {checkDisplays} from './taskbarOptions/displays.js';
 import {checkAlignment, checkFloating, checkLooks, checkSizes, checkWallpaperGlass} from './taskbarOptions/looks.js';
@@ -20,6 +21,7 @@ async function checkPinned() {
 export async function run() {
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const scheme = styles.get_string('color-scheme');
+  const restore = remember(settings, KEYS);
   try {
     require(edgeGap() === HEIGHTS.normal, 'the taskbar reserves its thickness along its edge of the screen');
     await checkAlignment();
@@ -35,7 +37,7 @@ export async function run() {
     await checkWorkspaceWindows();
     await checkDisplays();
   } finally {
-    for (const key of KEYS) settings.reset(key);
+    restore();
     styles.set_string('color-scheme', scheme);
   }
 }

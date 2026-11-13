@@ -1,10 +1,14 @@
+import type Meta from 'gi://Meta';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {centerOf, moveTo} from '../../lib/input/input.js';
 import {pause} from '../../lib/wait.js';
 import {gjs, stop, waitForWindow} from '../../lib/processes.js';
-import {edgeGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set} from './taskbar.js';
+import {edgeGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, require, set} from './taskbar.js';
 import {farSide, outward, vertical} from '../../lib/edge.js';
+import {sameRect} from '../../tiling/lib/tiling.js';
+
+const HIDE_DELAY = 450;
 
 const islands = () => panel().get_children().filter(child => child.name?.startsWith('kestrel-island-'));
 const revealed = () => panel().visible && [panel(), ...islands()].every(part => part.visible && part.translation_x === 0 && part.translation_y === 0);
@@ -66,17 +70,33 @@ async function checkSeparateHover() {
   await eventually(hidden, 'the separate taskbar hides once the pointer leaves');
 }
 
+function moveTouching(window: Meta.Window, touching: boolean) {
+  const monitor = primary();
+  const {width, height} = window.get_frame_rect();
+  const place = [monitor.x + (monitor.width - width) / 2, monitor.y + (monitor.height - height) / 2];
+  if (touching) place[vertical() ? 0 : 1] = outward() > 0 ? farSide(monitor) - (vertical() ? width : height) : farSide(monitor);
+  window.move_frame(true, Math.round(place[0]), Math.round(place[1]));
+}
+
 export async function checkWindows() {
   set('taskbar-auto-hide', 'windows');
   const app = gjs('clients/windows/window.js');
   const window = await waitForWindow('Kestrel window check');
   const monitor = primary();
-  await eventually(() => panel().visible && edgeGap() === 0, 'the taskbar stays while no window touches it');
-  window.maximize();
-  await eventually(() => farSide(window.get_frame_rect()) === farSide(monitor), 'a maximized window fills the screen up to the taskbar\'s edge');
-  await eventually(hidden, 'the taskbar hides while a window touches it');
-  window.unmaximize();
+  moveTouching(window, false);
+  await pause(HIDE_DELAY + 200);
+  require(panel().visible && edgeGap() === 0, 'the taskbar stays while no window touches it');
+  moveTouching(window, true);
+  await eventually(hidden, 'the taskbar hides once a window touches it');
+  moveTouching(window, false);
   await eventually(() => panel().visible, 'the taskbar returns once the window moves away');
+  const placed = window.get_frame_rect();
+  window.maximize();
+  await eventually(() => sameRect(window.get_frame_rect(), monitor, 0), 'a maximized window fills the screen');
+  await eventually(hidden, 'the taskbar hides while a maximized window covers it');
+  window.unmaximize();
+  await eventually(() => sameRect(window.get_frame_rect(), placed, 0), 'unmaximizing puts the window back where it was');
+  await eventually(() => panel().visible, 'the taskbar returns once the window is unmaximized');
   await stop(app);
   set('taskbar-auto-hide', 'never');
   await eventually(() => panel().visible && edgeGap() === HEIGHTS.normal, 'turning auto-hide off reserves the taskbar again');

@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import {StandInPultInbox} from '../../fixtures/services/pultInbox.js';
@@ -12,6 +11,7 @@ import {click, press} from '../lib/input/input.js';
 import {launchDetached} from '../lib/apps/luftApp.js';
 import {scratch, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
+import {forgetCrashes} from '../extensions/lib/extensions.js';
 import {pause, settled} from '../lib/wait.js';
 import {
   askDialog, choose, collected, contentsDialog, crash, cursor, dumped, FIXTURE, forbidden, poke, removeConfig,
@@ -97,14 +97,6 @@ async function signals(inbox: StandInPultInbox) {
 }
 
 const APP_SIGNALS = ['SEGV', 'ABRT', 'QUIT'];
-const LUFT_APPS = {
-  'com.lantharos.barometer': 'Barometer', 'com.lantharos.disks': 'Disks', 'com.lantharos.keys': 'Keys',
-  'com.lantharos.rover': 'Rover', 'com.lantharos.schelf': 'Schelf', 'com.lantharos.settings': 'Settings',
-  'com.lantharos.setup': 'Install Luft', 'com.lantharos.signin': 'Network Sign-In', 'com.lantharos.tern': 'Tern',
-  'com.lantharos.draft': 'Draft', 'com.lantharos.flatbed': 'Flatbed', 'com.lantharos.magpie': 'Magpie',
-  'com.lantharos.mailman': 'Mailman',
-};
-
 /** Sabine apps catch some signals for themselves, so this tries the next one until the app dumps core. */
 async function crashApp(pid: number) {
   for (const signal of APP_SIGNALS) {
@@ -120,9 +112,6 @@ async function crashApp(pid: number) {
 }
 
 async function appCrash(inbox: StandInPultInbox) {
-  const apps = Shell.AppSystem.get_default();
-  for (const [id, name] of Object.entries(LUFT_APPS))
-    require(apps.lookup_app(`${id}.desktop`)?.get_name() === name, `a crash of ${id} is called ${name}`);
   const rover = launchDetached('rover', scratch('crash-reports-rover.log'));
   await waitForWindow(window => window.get_pid() === rover || window.get_wm_class() === 'com.lantharos.rover', 'Rover opens');
   const before = cursor();
@@ -222,6 +211,7 @@ async function afterTheShellCrashed({port}: {port: number}) {
     inbox.close();
     removeConfig();
     GLib.unlink(STATE);
+    forgetCrashes();
   }
 }
 

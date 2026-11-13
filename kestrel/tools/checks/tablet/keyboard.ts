@@ -93,7 +93,7 @@ async function checkToolkit(window: string, start: () => Process, clientType: Me
   try {
     const opened = await waitForWindow(candidate => !before.has(candidate) && /^Kestrel (window check|entry)/.test(candidate.get_title() ?? ''),
       `${window} opens with a text field`);
-    require(opened.get_client_type() === clientType, `${window} runs as the expected kind of client`);
+    await waitUntil(() => opened.get_client_type() === clientType, `${window} runs as the expected kind of client`);
     await settled();
     const field = await eventually(caret, `the field in ${window} reports where its caret is`);
     if (tapsBesideField) await tapsBeside(`below the focused field in ${window}`, belowField(opened));
@@ -142,7 +142,7 @@ async function checkChromium(label: string, argv: string[], clientType: Meta.Win
   const process = spawn([...argv, page], {env: {TMPDIR: scratch(), ...env}});
   try {
     const window = await waitForWindow(candidate => candidate.get_title()?.startsWith('Kestrel field'), `${label} opens the page`, BROWSER_OPEN_TIMEOUT);
-    require(window.get_client_type() === clientType, `${label} runs as the expected kind of client`);
+    await waitUntil(() => window.get_client_type() === clientType, `${label} runs as the expected kind of client`);
     window.maximize();
     await settled();
     await tapsOpen(`a field in ${label}`, centerOf(window.get_compositor_private<Meta.WindowActor>()));

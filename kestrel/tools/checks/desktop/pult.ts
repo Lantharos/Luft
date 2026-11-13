@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
@@ -18,6 +19,7 @@ import {closeStart, openStart, rows, search, titleOf} from '../start/search/resu
 import {builtFolder, installBuilt, listed, request, rewrite} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Pult');
+const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const PULT = 'com.lantharos.Pult';
 const NAME = 'com.lantharos.Kestrel';
 const PATH = '/com/lantharos/Kestrel/Extensions';
@@ -101,14 +103,21 @@ async function checkSigningOut(pult: StandInPult, keyring: ScratchKeyring) {
   await eventually(() => !mentions(element(), '9'), 'and the taskbar stops counting');
 }
 
+function pointAtStandIn(file: string, from: string, to: string) {
+  rewrite(GLib.build_filenamev([builtFolder(PULT), file]), text => {
+    if (!text.includes(from)) throw new Error(`Pult's ${file} no longer names ${from}, so it can't be pointed at the stand-in`);
+    return text.replaceAll(from, to);
+  });
+}
+
 export async function run() {
   const keyring = new ScratchKeyring();
   require(await keyring.own(), 'a scratch keyring stands in for the Secret Service');
   const pult = new StandInPult(freePorts('pult').pult);
   try {
     await installBuilt(PULT);
-    rewrite(GLib.build_filenamev([builtFolder(PULT), 'extension.toml']), text => text.replace('"app.pult.sh"', `"127.0.0.1:${pult.port}"`));
-    rewrite(GLib.build_filenamev([builtFolder(PULT), 'extension.js']), text => text.replaceAll('https://app.pult.sh', pult.base));
+    pointAtStandIn('extension.toml', '"app.pult.sh"', `"127.0.0.1:${pult.port}"`);
+    pointAtStandIn('extension.js', 'https://app.pult.sh', pult.base);
     await request('Reload', PULT);
     await eventually(async () => (await listed(PULT))?.state === 'running', 'Pult runs once installed');
     await checkSignedOut();
@@ -118,6 +127,7 @@ export async function run() {
     await checkSigningOut(pult, keyring);
   } finally {
     await request('Remove', PULT);
+    kestrel.reset('taskbar-arrangement');
     pult.close();
     keyring.close();
   }

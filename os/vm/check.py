@@ -104,11 +104,8 @@ class Check:
             raise MachineError(f"{what} restarted within {SETTLE} seconds")
 
     def enroll_key(self):
-        try:
-            self.machine.enroll(PASSWORD, 120)
-            self.log("added Luft's key on shim's blue screen")
-        except MachineError:
-            self.log("shim didn't ask to add Luft's key")
+        self.machine.enroll(PASSWORD, 120)
+        self.log("added Luft's key on shim's blue screen")
 
     def secure_boot(self):
         if "SecureBoot enabled" not in self.output("mokutil --sb-state"):
@@ -188,7 +185,7 @@ def switch(check: Check, drive: str):
     check.output(f"mkdir -p /run/next && mount -o ro LABEL={drive} /run/next")
     check.output(f"bootc switch --transport oci-archive /run/next/{drive}.ociarchive")
     check.log(f"switched to {drive}, restarting")
-    check.restart(lambda: check.shell("systemctl reboot", 10))
+    check.restart(lambda: check.output("systemd-run --on-active=1 systemctl reboot"))
 
 
 def boot_entries(check: Check) -> str:
@@ -200,6 +197,7 @@ def rollback(check: Check, arguments: argparse.Namespace):
     check.start("installed", " ".join(f"{check.vm / name}.img:ro" for name in ("update", "broken")))
     check.enroll_key()
     check.wait_for_greeter()
+    check.secure_boot()
     switch(check, "update")
     check.wait_for_greeter()
     check.wait("the update is marked as good", lambda: "+" not in boot_entries(check) and
@@ -211,9 +209,8 @@ def rollback(check: Check, arguments: argparse.Namespace):
     for attempt in range(1, 4):
         if not check.succeeds(broken):
             raise MachineError(f"try {attempt} didn't start the broken version")
-        time.sleep(arguments.broken_seconds)
-        if check.succeeds(GREETER):
-            raise MachineError("the broken version brought up the login screen")
+        check.wait(f"try {attempt} gives up on the login screen",
+                   lambda: check.succeeds("systemctl is-failed --quiet greetd"), arguments.broken_seconds, every=2)
         check.log(f"try {attempt}: no login screen, restarting: {boot_entries(check)}")
         check.restart(lambda: check.machine.qmp("system_reset"))
     check.wait_for_greeter()
@@ -238,7 +235,7 @@ def main():
         "rollback", help="update, then update to a version that never reaches the login screen, and check that the "
                          "computer goes back after three tries")
     going_back.add_argument("--broken-seconds", type=float, default=180,
-                            help="how long a start of the broken version is given before it's restarted")
+                            help="how long a start of the broken version may take to give up on its login screen")
     arguments = parser.parse_args()
     vm = arguments.vm.resolve()
     out = (arguments.out or vm / "check").resolve()

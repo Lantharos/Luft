@@ -87,6 +87,16 @@ fn ended() -> Result<(), String> {
     follows::tell(|notices| notices.ended = true)
 }
 
+/// The session schelf.store gave this computer, while someone is signed in.
+pub fn token() -> Result<Option<String>, String> {
+    session::token()
+}
+
+/// Acts on schelf.store no longer taking this computer's session.
+pub fn signed_out() -> Result<(), String> {
+    ended()
+}
+
 /// Asks schelf.store again which invite-only channels you may follow.
 pub fn refresh() -> Result<(), String> {
     let Some(token) = session::token()? else {

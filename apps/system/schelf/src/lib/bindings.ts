@@ -21,6 +21,82 @@ export const commands = {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("app_open_url", params, options),
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
+	developerAccount: (options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Account>>("developer_account", {}, options),
+	developerApproval: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Approval>>("developer_approval", params, options),
+	developerAsk: (params: {
+		actions: ApprovalAction[],
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Approval>>("developer_ask", params, options),
+	developerCancelApproval: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Approval>>("developer_cancel_approval", params, options),
+	developerCheckDomain: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").PublisherDomain>>("developer_check_domain", params, options),
+	developerCheckProjectDomain: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Project>>("developer_check_project_domain", params, options),
+	developerDomain: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").PublisherDomain>>("developer_domain", params, options),
+	developerMembers: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Members>>("developer_members", params, options),
+	developerNamespaces: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Namespaces>>("developer_namespaces", params, options),
+	developerPeople: (params: {
+		id: string,
+		channel: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").ChannelAccess>>("developer_people", params, options),
+	developerProject: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Project>>("developer_project", params, options),
+	developerProjects: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Projects>>("developer_projects", params, options),
+	developerPromote: (params: {
+		id: string,
+		release: string,
+		channel: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Promoted>>("developer_promote", params, options),
+	developerRelease: (params: {
+		id: string,
+		release: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Release>>("developer_release", params, options),
+	developerReleases: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Releases>>("developer_releases", params, options),
+	developerRevokeDownloadToken: (params: {
+		id: string,
+		channel: string,
+		entry: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").ChannelAccess>>("developer_revoke_download_token", params, options),
+	developerRevokeMemberInvite: (params: {
+		publisher: string,
+		invite: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Members>>("developer_revoke_member_invite", params, options),
+	developerRollout: (params: {
+		id: string,
+		release: string,
+		change: Change,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Release>>("developer_rollout", params, options),
+	developerStats: (params: {
+		id: string,
+		days: number,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Stats>>("developer_stats", params, options),
+	developerTools: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").PublisherTools>>("developer_tools", params, options),
+	developerUninvite: (params: {
+		id: string,
+		channel: string,
+		entry: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").ChannelAccess>>("developer_uninvite", params, options),
+	developerVerification: (params: {
+		publisher: string,
+	}, options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").VerificationState>>("developer_verification", params, options),
 	fedoraDetails: (params: {
 		package: string,
 	}, options?: CallOptions) => invoke<FedoraDetails | null>("fedora_details", params, options),
@@ -229,6 +305,9 @@ export type Approval = {
 	intervalMs: number,
 };
 
+/**  What the app asks to be approved in the browser, as schelf.store names it. */
+export type ApprovalAction = { type: "release.rollback"; app: string; release: string } | { type: "release.inside-luft"; app: string; release: string } | { type: "channel.invite"; app: string; channel: string; email: string } | { type: "member.invite"; publisher: string; to: Invitee; role: Role } | { type: "member.role"; publisher: string; user: string; role: Role } | { type: "member.remove"; publisher: string; user: string } | { type: "publisher.domain"; publisher: string; domain?: string | null };
+
 /**  Why an app or one of its versions was pulled or flagged. */
 export type Block = {
 	action: Severity,
@@ -251,6 +330,12 @@ export type CatalogApp = {
 	developer: string | null,
 	package: string | null,
 };
+
+/**
+ *  What the app changes about a rollout by itself. Rolling back asks for
+ *  approval instead.
+ */
+export type Change = { action: "pause" } | { action: "resume" } | { action: "all" } | { action: "set"; percent: number };
 
 /**  A repository and what the system said about it, to be trusted before it's added. */
 export type CheckedSource = {
@@ -346,6 +431,9 @@ export type FedoraDetails = {
 	download: number,
 };
 
+/**  What asking schelf.store came to, with the cases the page shows its own way. */
+export type Fetched<T> = { state: "ready"; data: T } | { state: "offline" } | { state: "signedOut" } | { state: "failed"; error: string };
+
 export type Finished = {
 	keys: string[],
 	action: Action,
@@ -402,6 +490,8 @@ export type Invitation = {
 	channel: string,
 	page: string,
 };
+
+export type Invitee = ({ email: string }) & { github?: never } | ({ github: string }) & { email?: never };
 
 export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore"; id: string; consent: Consent } | { kind: "updateStore"; id: string; consent: Consent } | { kind: "removeStore"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
 /**  Whether you let an app that asks to run unsandboxed do so. */
@@ -552,6 +642,8 @@ export type RepositoryDraft = {
 	text: string,
 	keys: { [key in string]: string },
 };
+
+export type Role = "owner" | "admin" | "developer";
 
 /**
  *  What an installed AppImage's sandbox opens to it, and why it asked to run

@@ -1,11 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import { appearance, GlassShell, IconButton, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
 	import AccessNotice from '#lib/account/AccessNotice.svelte';
 	import AccountDialog from '#lib/account/AccountDialog.svelte';
 	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
+	import ApprovalDialog from '#lib/developer/components/ApprovalDialog.svelte';
+	import DeveloperSidebar from '#lib/developer/components/DeveloperSidebar.svelte';
+	import Project from '#lib/developer/pages/project/Project.svelte';
+	import Publisher from '#lib/developer/pages/publisher/Publisher.svelte';
+	import Release from '#lib/developer/pages/release/Release.svelte';
+	import { approvals } from '#lib/developer/state/approval.svelte.js';
+	import { developer } from '#lib/developer/state/developer.svelte.js';
 	import AppPage from '#lib/pages/app/AppPage.svelte';
 	import Browse from '#lib/pages/browse/Browse.svelte';
 	import Discover from '#lib/pages/discover/Discover.svelte';
@@ -42,7 +49,11 @@
 <svelte:window onkeydown={keys} />
 
 <GlassShell>
-	<Sidebar />
+	{#if navigation.developing}
+		<DeveloperSidebar />
+	{:else}
+		<Sidebar />
+	{/if}
 	<main class="glass-content">
 		<header class="drag-region flex h-[60px] flex-none items-center gap-3 pr-4 pl-6">
 			{#if depth > 1}
@@ -71,16 +82,32 @@
 							<OpenFile path={entry.path} />
 						{:else if entry.page === 'sources'}
 							<Sources />
+						{:else if entry.page === 'project'}
+							<Project id={entry.id} tab={entry.tab} />
+						{:else if entry.page === 'release'}
+							<Release id={entry.id} release={entry.release} />
+						{:else if entry.page === 'publisher'}
+							<Publisher section={entry.section} />
 						{/if}
 					</div>
 				{/each}
 			{/if}
 		</div>
 	</main>
+	<Toast
+		class="left-[calc(var(--sidebar-width)_+_(100vw_-_var(--sidebar-width))_/_2)]"
+		toast={developer.notices.current}
+		dismissible
+		ondismiss={developer.notices.dismiss}
+	/>
 </GlassShell>
 
 {#if opening.failed}
 	<OpenFailedDialog failed={opening.failed} />
+{/if}
+
+{#if approvals.asking}
+	<ApprovalDialog asking={approvals.asking} />
 {/if}
 
 {#if account.open}

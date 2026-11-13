@@ -1,5 +1,6 @@
 import { commands, events, type AccountState, type Approval } from '#lib/bindings.js';
 import { openUrl } from '#lib/bridge/index.js';
+import { developer } from '#lib/developer/state/developer.svelte.js';
 
 export type SignInStep = { step: 'idle' } | { step: 'starting' } | { step: 'waiting'; approval: Approval } | { step: 'declined' } | { step: 'expired' } | { step: 'failed'; error: string };
 
@@ -21,6 +22,7 @@ class Account {
 
 	async reload() {
 		this.state = await commands.accountState();
+		void developer.sync(this.state.account?.email ?? null);
 	}
 
 	show() {
@@ -69,6 +71,7 @@ class Account {
 
 	async signOut() {
 		this.state = await commands.accountSignOut();
+		void developer.sync(null);
 	}
 
 	async dismiss() {

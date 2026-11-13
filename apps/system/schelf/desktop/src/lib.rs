@@ -1,6 +1,7 @@
 mod app;
 mod background;
 mod commands;
+mod developer;
 mod library;
 mod operations;
 
@@ -53,5 +54,6 @@ fn build_window(window: SabineWindow, queue: &Queue) -> SabineWindow {
     let window = library::register(window);
     let window = commands::files::register(window);
     let window = commands::updates::register(window);
+    let window = developer::register(window);
     operations::register(window, queue)
 }

@@ -1,6 +1,7 @@
 import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 import { appearance, keepWindowState } from '@luft/ui';
 import { commands, type CatalogApp } from '#lib/bindings.js';
+import { developer } from '#lib/developer/state/developer.svelte.js';
 import * as store from '#lib/catalog/store.js';
 import { account } from './account.svelte';
 import { catalog } from './catalog.svelte';
@@ -101,6 +102,7 @@ export async function start() {
 	openPage([state.page]);
 	openFiles(state.files);
 	keepWindowState(navigation.kept);
+	developer.start();
 	sabineEvents.singleInstance(async ({ arguments: list, workingDirectory }) => {
 		openPage(list);
 		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));

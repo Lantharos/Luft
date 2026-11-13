@@ -1,15 +1,20 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Dialog, Spinner } from '@luft/ui';
 	import type { Invitation } from '#lib/bindings.js';
 	import { openUrl } from '#lib/bridge/index.js';
+	import PublisherMark from '#lib/developer/components/PublisherMark.svelte';
+	import { developer } from '#lib/developer/state/developer.svelte.js';
 	import { account } from '#lib/state/account.svelte.js';
+	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { openListing } from '#lib/state/app.js';
 	import { channelName } from './channels.js';
 
 	const step = $derived(account.signIn);
 	const signedIn = $derived(account.signedIn);
 	const invitations = $derived(account.state?.invitations ?? []);
+	const publishers = $derived(navigation.developing && developer.publishers.length > 1 ? developer.publishers : []);
 
 	const title = $derived(signedIn ? signedIn.name || signedIn.email : step.step === 'waiting' ? 'Approve in your browser' : 'Sign in to schelf.store');
 	const description = $derived.by(() => {
@@ -28,6 +33,11 @@
 		}
 	});
 
+	function choose(publisher: string) {
+		account.close();
+		void developer.choose(publisher);
+	}
+
 	function open(invitation: Invitation) {
 		account.close();
 		void openListing(invitation.app);
@@ -41,7 +51,21 @@
 
 <Dialog {title} {description} onclose={() => account.close()}>
 	{#if signedIn}
-		{#if invitations.length}
+		{#if publishers.length}
+			<ul class="-mx-2 flex flex-col">
+				{#each publishers as publisher (publisher.id)}
+					<li>
+						<button type="button" class="invitation" onclick={() => choose(publisher.id)}>
+							<PublisherMark {publisher} size={24} />
+							<span class="min-w-0 flex-1 truncate">{publisher.name}</span>
+							{#if publisher.id === developer.publisher?.id}
+								<Check size={16} class="text-[var(--accent)]" />
+							{/if}
+						</button>
+					</li>
+				{/each}
+			</ul>
+		{:else if invitations.length}
 			<ul class="-mx-2 flex flex-col">
 				{#each invitations as invitation (`${invitation.app}/${invitation.channel}`)}
 					<li>

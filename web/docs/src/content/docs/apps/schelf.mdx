@@ -64,6 +64,12 @@ When a developer takes an invitation back, Schelf tells you once, keeps what you
 
 schelf.store can pull an app that turns out to be harmful. Schelf checks for that every hour: a pulled app can't start any more, and its page says why and offers to remove it. Your files stay until you do. For a version with a known problem, the page shows a warning instead.
 
+### Your own projects
+
+If you publish on schelf.store, choosing your name at the bottom of the sidebar switches Schelf to your projects, and **Back to the store** switches back. Each project shows what's live on each channel, its releases with every check and why one went to review, downloads and updates over time, its channels and rollouts, the people invited to its invite-only channels, and its files and command-line tools with their install lines to copy. Below the projects are your publisher's command-line tools, members, verification and download domain. When you belong to more than one publisher, choose its name at the top to switch.
+
+Schelf does what the `schelf` command can do by itself, such as pausing a rollout, releasing it to everyone or taking back an invitation. Rolling back, inviting someone or changing who's a member opens schelf.store in your browser to approve it first, and Schelf shows the result once you have. Verification and anything else only the dashboard does open it there.
+
 ## Command-line tools
 
 Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedora into a Toolbox container. Its commands work in [Tern](/apps/tern/) like any other, and its updates appear under Updates.

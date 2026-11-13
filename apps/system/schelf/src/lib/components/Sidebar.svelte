@@ -7,6 +7,8 @@
 	import UserRound from '@lucide/svelte/icons/user-round';
 	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES } from '#lib/catalog/categories.js';
+	import NavItem from '#lib/components/NavItem.svelte';
+	import { developer } from '#lib/developer/state/developer.svelte.js';
 	import { account } from '#lib/state/account.svelte.js';
 	import { activity, percent } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -40,20 +42,8 @@
 	const remaining = $derived(operations.pending);
 </script>
 
-{#snippet item(route: Route, title: string, Icon: Component, count?: number)}
-	<button
-		type="button"
-		class="nav-item"
-		class:active={active(route)}
-		aria-current={active(route) ? 'page' : undefined}
-		onclick={() => navigation.open(route)}
-	>
-		<Icon size={18} />
-		<span class="flex-1 truncate">{title}</span>
-		{#if count}
-			<span class="count">{count}</span>
-		{/if}
-	</button>
+{#snippet item(route: Route, title: string, icon: Component, count?: number)}
+	<NavItem {title} {icon} {count} active={active(route)} onclick={() => navigation.open(route)} />
 {/snippet}
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
@@ -86,47 +76,14 @@
 			{/if}
 		</div>
 	{/if}
-	<button type="button" class="nav-item" onclick={() => account.show()}>
-		<UserRound size={18} />
-		<span class="flex-1 truncate">{account.signedIn ? account.signedIn.name || account.signedIn.email : 'Account'}</span>
-	</button>
+	<NavItem
+		title={account.signedIn ? account.signedIn.name || account.signedIn.email : 'Account'}
+		icon={UserRound}
+		onclick={() => (developer.publisher ? developer.enter() : account.show())}
+	/>
 </aside>
 
 <style>
-	.nav-item {
-		display: flex;
-		height: 38px;
-		width: 100%;
-		align-items: center;
-		gap: 12px;
-		border-radius: var(--radius-pill);
-		padding-inline: 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.nav-item:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item.active {
-		background: transparent;
-		color: var(--text);
-	}
-
-	.nav-item:active {
-		transform: scale(0.97);
-	}
-
-	.count {
-		font-size: 13px;
-		font-variant-numeric: tabular-nums;
-		color: var(--sidebar-text-muted);
-	}
-
 	.activity {
 		display: flex;
 		flex-direction: column;

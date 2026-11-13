@@ -9014,9 +9014,11 @@ dependencies = [
  "luft-software",
  "sabine",
  "schelf-core",
+ "schelf-publish",
  "serde",
  "serde_json",
  "specta",
+ "specta-typescript",
  "tokio",
  "zbus 6.0.0",
 ]

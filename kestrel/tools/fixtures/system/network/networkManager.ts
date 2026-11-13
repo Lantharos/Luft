@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import type {Publish} from '../bus.js';
 import {CONTROL_XML, NETWORK_MANAGER_XML} from './interfaces.js';
+import {Phone} from './phone.js';
 import {Wifi, type Network, type NetworkManagerHost} from './wifi.js';
 
 const ROOT = '/org/freedesktop';
@@ -83,7 +84,8 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
         checks++;
         return connectivity;
       },
-      ActivateConnection: (connection: string, _device: string, _specific: string) => wifi.activate(connection),
+      ActivateConnection: (connection: string, _device: string, _specific: string) =>
+        phone.owns(connection) ? phone.activate() : wifi.activate(connection),
       AddAndActivateConnection: (_settings: object, _device: string, accessPoint: string) => wifi.addAndActivate(accessPoint),
     }],
   ]);
@@ -106,7 +108,7 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
   }]]);
   object(WIRED_DEVICE, [
     ['.Device', {Interface: 'enp5s0', DeviceType: ETHERNET, Managed: true, Real: true, State: DEVICE_ACTIVATED, StateReason: [DEVICE_ACTIVATED, 0],
-      ActiveConnection: ACTIVE, AvailableConnections: [WIRED_CONNECTION]}],
+      ActiveConnection: ACTIVE, AvailableConnections: [WIRED_CONNECTION], Driver: 'r8169'}],
     ['.Device.Wired', {HwAddress: '52:54:00:4C:55:01', Speed: 1000, Carrier: true}],
   ]);
   server.set_connection(Gio.DBus.system);
@@ -138,6 +140,7 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
     },
   };
   const wifi = new Wifi(host);
+  const phone = new Phone(host);
 
   publish(CONTROL_XML, {
     SetConnectivity(state: number) {
@@ -159,6 +162,8 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
     TakeSecretRequests: () => wifi.takeSecretRequests(),
     AnswerSecrets: (id: number, joined: boolean) => wifi.answerSecrets(id, joined),
     Forgotten: () => wifi.forgotten,
+    AddPhone: () => phone.add(),
+    RemovePhone: () => phone.remove(),
   }, '/com/lantharos/KestrelChecks/NetworkManager');
 
   return (connection: string, zone: string) => {

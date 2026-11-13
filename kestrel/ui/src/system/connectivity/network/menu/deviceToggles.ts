@@ -5,7 +5,8 @@ import NM from 'gi://NM';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
 import { Spinner } from '../../../../shared/widgets/animation.js';
-import { NMBluetoothDeviceItem, NMModemDeviceItem, NMWiredDeviceItem } from './deviceItems.js';
+import { NMBluetoothDeviceItem, NMModemDeviceItem, NMPhoneDeviceItem, NMWiredDeviceItem } from './deviceItems.js';
+import { isPhone } from './nmUtils.js';
 import { NMDeviceToggle } from './toggle.js';
 import { NMWirelessDeviceItem } from './wirelessDeviceItem.js';
 
@@ -134,8 +135,37 @@ export class NMWiredToggle extends NMDeviceToggle<NM.Device, NMWiredDeviceItem> 
     });
   }
 
+  handles(device: NM.Device): boolean {
+    return super.handles(device) && !isPhone(device);
+  }
+
   createDeviceMenuItem(device: NM.Device): NMWiredDeviceItem {
     return new NMWiredDeviceItem(this.client!, device);
+  }
+}
+
+export class NMPhoneToggle extends NMDeviceToggle<NM.Device, NMPhoneDeviceItem> {
+  static {
+    GObject.registerClass(this);
+  }
+
+  constructor() {
+    super(NM.DeviceType.ETHERNET);
+
+    KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-phone-settings');
+    KestrelUi.localized(this, () => {
+      this.menu.setHeader('phone-symbolic', KestrelUi.t('network-menu-phones'));
+      this.menuButtonAccessibleName = KestrelUi.t('network-menu-phones-open-menu');
+      this.refreshLabels();
+    });
+  }
+
+  handles(device: NM.Device): boolean {
+    return isPhone(device);
+  }
+
+  createDeviceMenuItem(device: NM.Device): NMPhoneDeviceItem {
+    return new NMPhoneDeviceItem(this.client!, device);
   }
 }
 

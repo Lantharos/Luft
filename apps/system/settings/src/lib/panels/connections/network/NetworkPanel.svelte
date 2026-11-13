@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
+	import type { Wired } from '@luft/network';
 	import { onMount } from 'svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import ConnectionPage from './connection/ConnectionPage.svelte';
@@ -23,9 +25,11 @@
 
 	let editing = $state<Editing | null>(null);
 	let browsingKnown = $state(false);
+	let phoneDevice = $state<string | null>(null);
 
 	let network = $derived(connections.network);
 	let section = $derived(app.section);
+	let phone = $derived(connections.phones.find((candidate) => candidate.device === phoneDevice));
 
 	const close = () => (app.section = null);
 	const configure = (target: Target, title: string) => (editing = { target, title });
@@ -39,8 +43,10 @@
 	<KnownNetworks {network} onconfigure={configure} onclose={() => (browsingKnown = false)} />
 {:else if network?.wifi && section === 'wifi'}
 	<WifiPage {connections} wifi={network.wifi} onbrowse={() => (browsingKnown = true)} onconfigure={configure} onclose={close} />
-{:else if network?.wired.length && section === 'ethernet'}
-	<EthernetPage {connections} wired={network.wired} onconfigure={configure} onclose={close} />
+{:else if phone}
+	<EthernetPage title={connections.wiredTitle(phone)} {connections} wired={[phone]} onconfigure={configure} onclose={() => (phoneDevice = null)} />
+{:else if connections.cables.length && section === 'ethernet'}
+	<EthernetPage title={t('settings-page-ethernet')} {connections} wired={connections.cables} onconfigure={configure} onclose={close} />
 {:else if network && section === 'vpn'}
 	<VpnPage {connections} vpns={network.vpns} onconfigure={configure} onclose={close} />
 {:else if connections.firewall && section === 'firewall'}
@@ -48,5 +54,5 @@
 {:else if proxy.available && section === 'proxy'}
 	<ProxyPage {proxy} onclose={close} />
 {:else if network}
-	<Overview {connections} {network} {proxy} onopen={(page) => (app.section = page)} />
+	<Overview {connections} {network} {proxy} onopen={(page) => (app.section = page)} onphone={(wired: Wired) => (phoneDevice = wired.device)} />
 {/if}

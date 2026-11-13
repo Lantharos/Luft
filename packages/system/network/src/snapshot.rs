@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fs;
 use std::net::Ipv6Addr;
 
 use luft_app::dbus::objects::{Object, Objects};
@@ -19,6 +20,9 @@ const ACTIVATED: u32 = 100;
 
 const ACTIVE_ACTIVATING: u32 = 1;
 const ACTIVE_ACTIVATED: u32 = 2;
+
+const APPLE_PHONE_DRIVER: &str = "ipheth";
+const PHONE_DRIVERS: [&str; 2] = [APPLE_PHONE_DRIVER, "rndis_host"];
 
 const AP_PRIVACY: u32 = 0x1;
 const KEY_PSK: u32 = 0x100;
@@ -81,6 +85,7 @@ pub struct Wired {
     device: String,
     connection: Option<String>,
     name: String,
+    phone: bool,
     state: Link,
     speed: Option<u32>,
     details: Option<Details>,
@@ -278,14 +283,33 @@ fn profile(objects: &Objects, device: &Object) -> Option<String> {
         })
 }
 
+fn phone_name(interface: &str, driver: &str) -> String {
+    fs::read_to_string(format!("/sys/class/net/{interface}/device/../product"))
+        .map(|product| product.trim().replace('_', " "))
+        .ok()
+        .filter(|product| !product.is_empty())
+        .unwrap_or_else(|| match driver {
+            APPLE_PHONE_DRIVER => "iPhone".to_owned(),
+            _ => String::new(),
+        })
+}
+
 fn wired(objects: &Objects) -> Vec<Wired> {
     let mut wired: Vec<Wired> = devices(objects, ETHERNET)
         .map(|device| {
             let state = link(device.get("State").unwrap_or(0));
+            let interface: String = device.get("Interface").unwrap_or_default();
+            let driver: String = device.get("Driver").unwrap_or_default();
+            let phone = PHONE_DRIVERS.contains(&driver.as_str());
             Wired {
                 device: device.path.to_owned(),
                 connection: profile(objects, &device),
-                name: device.get("Interface").unwrap_or_default(),
+                name: if phone {
+                    phone_name(&interface, &driver)
+                } else {
+                    interface
+                },
+                phone,
                 state,
                 speed: objects
                     .get(device.path, WIRED)
@@ -295,7 +319,11 @@ fn wired(objects: &Objects) -> Vec<Wired> {
             }
         })
         .collect();
-    wired.sort_by(|left, right| left.name.cmp(&right.name));
+    wired.sort_by(|left, right| {
+        left.phone
+            .cmp(&right.phone)
+            .then_with(|| left.name.cmp(&right.name))
+    });
     wired
 }
 

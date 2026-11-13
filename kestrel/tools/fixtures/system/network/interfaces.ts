@@ -64,6 +64,8 @@ export const NETWORK_MANAGER_XML = `<node>
   <property name="StateReason" type="(uu)" access="read"/>
   <property name="ActiveConnection" type="o" access="read"/>
   <property name="AvailableConnections" type="ao" access="read"/>
+  <property name="Driver" type="s" access="read"/>
+  <method name="Disconnect"/>
 </interface>
 <interface name="org.freedesktop.NetworkManager.Device.Wired">
   <property name="HwAddress" type="s" access="read"/>
@@ -108,4 +110,6 @@ export const CONTROL_XML = `<node><interface name="com.lantharos.KestrelChecks.N
   <method name="TakeSecretRequests"><arg type="a(ua{sa{sv}}ou)" direction="out"/></method>
   <method name="AnswerSecrets"><arg type="u" direction="in"/><arg type="b" direction="in"/></method>
   <method name="Forgotten"><arg type="as" direction="out"/></method>
+  <method name="AddPhone"/>
+  <method name="RemovePhone"/>
 </interface></node>`;

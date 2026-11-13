@@ -9,7 +9,7 @@ import * as MessageTray from '../../../../surfaces/notifications/tray/messageTra
 import { ownPermission } from '../../../../shared/dbus/polkit.js';
 import { SystemIndicator } from '../../../status/toggles/quickSettings.js';
 import { CaptivePortalHandler } from './captivePortal.js';
-import { NMBluetoothToggle, NMModemToggle, NMWiredToggle, NMWirelessToggle } from './deviceToggles.js';
+import { NMBluetoothToggle, NMModemToggle, NMPhoneToggle, NMWiredToggle, NMWirelessToggle } from './deviceToggles.js';
 import { connectionName, deviceKind } from './nmUtils.js';
 import { NMVpnToggle } from './vpn.js';
 
@@ -29,14 +29,9 @@ export class Indicator extends SystemIndicator {
 
   readonly wirelessToggle = new NMWirelessToggle();
   private readonly vpnToggle = new NMVpnToggle();
-  private readonly deviceToggles = new Map<NM.DeviceType, NMWiredToggle | NMWirelessToggle | NMModemToggle | NMBluetoothToggle>([
-    [NM.DeviceType.ETHERNET, new NMWiredToggle()],
-    [NM.DeviceType.WIFI, this.wirelessToggle],
-    [NM.DeviceType.MODEM, new NMModemToggle()],
-    [NM.DeviceType.BT, new NMBluetoothToggle()],
-  ]);
+  private readonly deviceToggles = [new NMWiredToggle(), new NMPhoneToggle(), this.wirelessToggle, new NMModemToggle(), new NMBluetoothToggle()];
 
-  private readonly toggles = [...this.deviceToggles.values(), this.vpnToggle];
+  private readonly toggles = [...this.deviceToggles, this.vpnToggle];
   private readonly primaryIndicator: St.Icon;
   private readonly primaryIndicatorBinding = new GObject.BindingGroup();
   private client: NM.Client | null = null;
@@ -163,7 +158,7 @@ export class Indicator extends SystemIndicator {
     const [device] = this.mainConnection?.get_devices() ?? [];
     const idleToggle = this.wirelessToggle.visible ? this.wirelessToggle : null;
     const primaryToggle = this.mainConnection
-      ? (device && this.deviceToggles.get(device.device_type)) ?? null
+      ? (device && this.deviceToggles.find(toggle => toggle.handles(device))) ?? null
       : idleToggle;
     this.primaryIndicatorBinding.set_source(primaryToggle);
 

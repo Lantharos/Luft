@@ -90,6 +90,8 @@ settings-network-known-in-range = In range
 settings-network-ethernet = Ethernet
 # Used when the computer has several network cables; $name is the network card's name
 settings-network-ethernet-named = Ethernet ({ $name })
+# A phone sharing its internet over a cable, when the phone doesn't give its name
+settings-network-phone = Phone
 # $speed is the link speed, like "1 Gb/s"
 settings-network-wired-connected = Connected · { $speed }
 settings-network-empty = No network connections

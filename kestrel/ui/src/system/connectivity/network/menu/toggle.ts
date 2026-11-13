@@ -225,6 +225,10 @@ export abstract class NMDeviceToggle<D extends NM.Device, T extends DeviceMenuIt
     this.syncDeviceNames();
   }
 
+  handles(device: NM.Device): boolean {
+    return device.get_device_type() === this.deviceType;
+  }
+
   protected shouldShowDevice(device: D): boolean {
     return SHOWN_DEVICE_STATES.has(device.state);
   }
@@ -265,7 +269,7 @@ export abstract class NMDeviceToggle<D extends NM.Device, T extends DeviceMenuIt
 
   private addDevice(device: NM.Device): void {
     if (this.nmDevices.has(device as D)) return;
-    if (device.get_device_type() !== this.deviceType) return;
+    if (!this.handles(device)) return;
 
     const typed = device as D;
     typed.connectObject(

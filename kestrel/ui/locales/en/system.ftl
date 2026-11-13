@@ -478,6 +478,10 @@ network-menu-tethers-open-menu = Open Bluetooth tethering menu
 # Quick settings tile title, "Tether" as in "Bluetooth Tether"
 network-menu-tether = Tether
 network-menu-tether-settings = Bluetooth settings
+# Menu header for internet shared from a phone plugged in with a cable
+network-menu-phones = Phone
+network-menu-phones-open-menu = Open phone menu
+network-menu-phone-settings = Network settings
 network-menu-mobile-connections = Mobile connections
 network-menu-mobile-open-menu = Open mobile connections menu
 network-menu-mobile-settings = Mobile network settings
@@ -485,6 +489,8 @@ network-menu-mobile-settings = Mobile network settings
 network-menu-mobile = Mobile
 # Quick settings tile title and menu item for a wired network adapter
 network-device-wired = Wired
+# Quick settings tile title for a phone sharing its internet over a cable, when the phone doesn't give its name
+network-device-phone = Phone
 # A network adapter when there are several of the same kind. $kind is its kind, such as Wired; $name is its interface name, such as enp3s0
 network-device-named = { $kind } ({ $name })
 # Notification title shown when a network needs signing in on a web page

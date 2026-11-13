@@ -4,10 +4,11 @@
 	import Globe from '@lucide/svelte/icons/globe';
 	import Plane from '@lucide/svelte/icons/plane';
 	import Shield from '@lucide/svelte/icons/shield';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section, Switch } from '@luft/ui';
-	import type { Network } from '@luft/network';
+	import type { Network, Wired } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
 	import { firewallSummary } from './firewall/summary';
 	import { proxyLabel, type Proxy } from './proxy/proxy.svelte';
@@ -20,9 +21,10 @@
 		network: Network;
 		proxy: Proxy;
 		onopen: (page: Page) => void;
+		onphone: (phone: Wired) => void;
 	}
 
-	let { connections, network, proxy, onopen }: Props = $props();
+	let { connections, network, proxy, onopen, onphone }: Props = $props();
 
 	let activeVpn = $derived(network.vpns.find((vpn) => vpn.state !== 'disconnected'));
 	let vpnSummary = $derived(
@@ -45,7 +47,13 @@
 		</ActionRow>
 	{/if}
 	{#each network.wired as wired (wired.device)}
-		<ActionRow title={connections.wiredTitle(wired)} icon={EthernetPort} description={connections.wiredSummary(wired)} alert={Boolean(connections.problems[wired.device])} onclick={() => onopen('ethernet')}>
+		<ActionRow
+			title={connections.wiredTitle(wired)}
+			icon={wired.phone ? Smartphone : EthernetPort}
+			description={connections.wiredSummary(wired)}
+			alert={Boolean(connections.problems[wired.device])}
+			onclick={() => (wired.phone ? onphone(wired) : onopen('ethernet'))}
+		>
 			{#snippet actions()}
 				<Switch
 					label={connections.wiredTitle(wired)}

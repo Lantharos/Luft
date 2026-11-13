@@ -1,5 +1,6 @@
 <script lang="ts">
 	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
@@ -9,23 +10,24 @@
 	import type { NetworkState } from '../state.svelte';
 
 	interface Props {
+		title: string;
 		connections: NetworkState;
 		wired: Wired[];
 		onconfigure: (target: Target, title: string) => void;
 		onclose: () => void;
 	}
 
-	let { connections, wired, onconfigure, onclose }: Props = $props();
+	let { title, connections, wired, onconfigure, onclose }: Props = $props();
 
 	function details(wired: Wired) {
 		return wired.details ? detailRows(wired.details) : [];
 	}
 </script>
 
-<SubPage title={t('settings-page-ethernet')} {onclose}>
+<SubPage {title} {onclose}>
 	{#each wired as device (device.device)}
 		<Section title={wired.length > 1 ? connections.wiredTitle(device) : undefined}>
-			<Row title={connections.wiredTitle(device)} icon={EthernetPort} description={connections.wiredSummary(device)}>
+			<Row title={connections.wiredTitle(device)} icon={device.phone ? Smartphone : EthernetPort} description={connections.wiredSummary(device)}>
 				<Switch
 					label={connections.wiredTitle(device)}
 					checked={device.state === 'connected' || device.state === 'connecting'}

@@ -38,8 +38,12 @@ export class NetworkState {
 		return connected ? t('settings-network-wifi-connected', { network: connected.ssid }) : undefined;
 	}
 
+	cables = $derived(this.network?.wired.filter((wired) => !wired.phone) ?? []);
+	phones = $derived(this.network?.wired.filter((wired) => wired.phone) ?? []);
+
 	wiredTitle(wired: Wired) {
-		return this.network!.wired.length > 1 ? t('settings-network-ethernet-named', { name: wired.name }) : t('settings-network-ethernet');
+		if (wired.phone) return wired.name || t('settings-network-phone');
+		return this.cables.length > 1 ? t('settings-network-ethernet-named', { name: wired.name }) : t('settings-network-ethernet');
 	}
 
 	wiredSummary(wired: Wired) {

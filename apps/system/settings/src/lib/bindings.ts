@@ -2053,6 +2053,7 @@ export type Wired = {
 	device: string,
 	connection: string | null,
 	name: string,
+	phone: boolean,
 	state: Link,
 	speed: number | null,
 	details: Details | null,

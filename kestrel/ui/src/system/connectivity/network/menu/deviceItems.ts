@@ -179,6 +179,16 @@ export class NMWiredDeviceItem extends NMDeviceItem {
   }
 }
 
+export class NMPhoneDeviceItem extends NMWiredDeviceItem {
+  static {
+    GObject.registerClass(this);
+  }
+
+  get icon_name(): string {
+    return 'phone-symbolic';
+  }
+}
+
 export class NMModemDeviceItem extends NMDeviceItem {
   static {
     GObject.registerClass(this);

@@ -1,4 +1,4 @@
-import type GLib from 'gi://GLib';
+import GLib from 'gi://GLib';
 import NM from 'gi://NM';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
@@ -13,6 +13,24 @@ const DEVICE_KINDS = new Map<NM.DeviceType, string>([
   [NM.DeviceType.BT, 'network-menu-tether'],
   [NM.DeviceType.MODEM, 'network-menu-mobile'],
 ]);
+
+const APPLE_PHONE_DRIVER = 'ipheth';
+const PHONE_DRIVERS = new Set([APPLE_PHONE_DRIVER, 'rndis_host']);
+
+export function isPhone(device: NM.Device): boolean {
+  return device.device_type === NM.DeviceType.ETHERNET && PHONE_DRIVERS.has(device.get_driver() ?? '');
+}
+
+function usbProduct(device: NM.Device): string | null {
+  const path = `/sys/class/net/${device.get_iface()}/device/../product`;
+  if (!GLib.file_test(path, GLib.FileTest.EXISTS)) return null;
+  const [, contents] = GLib.file_get_contents(path);
+  return new TextDecoder().decode(contents).trim().replaceAll('_', ' ') || null;
+}
+
+function phoneName(device: NM.Device): string {
+  return usbProduct(device) ?? (device.get_driver() === APPLE_PHONE_DRIVER ? 'iPhone' : KestrelUi.t('network-device-phone'));
+}
 
 export function signalToIcon(value: number): string {
   if (value < 20) return 'none';
@@ -38,6 +56,7 @@ export function forgetUnlessJoined(activeConnection: NM.ActiveConnection): void 
 }
 
 export function deviceKind(device: NM.Device | undefined): string {
+  if (device && isPhone(device)) return phoneName(device);
   const id = device && DEVICE_KINDS.get(device.device_type);
   return id ? KestrelUi.t(id) : device?.get_iface() ?? '';
 }

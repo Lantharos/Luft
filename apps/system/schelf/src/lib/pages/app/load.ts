@@ -49,6 +49,7 @@ export async function load(target: AppTarget): Promise<Loaded> {
 	}
 }
 
-export function installedFor(target: AppTarget): InstalledApp | null {
-	return 'installed' in target ? library.byKey(target.installed) : library.forListing(target.listing);
+export function installedFor(target: AppTarget, listing: CatalogApp | null): InstalledApp | null {
+	if (!('installed' in target)) return library.forListing(target.listing);
+	return library.byKey(target.installed) ?? (listing && library.forListing(listing));
 }

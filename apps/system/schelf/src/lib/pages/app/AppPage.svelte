@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import ShieldOff from '@lucide/svelte/icons/shield-off';
 	import { Row, Section } from '@luft/ui';
@@ -33,7 +34,7 @@
 	let reviewing = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
-	const installed = $derived(installedFor(target));
+	const installed = $derived(installedFor(target, loaded?.listing ?? null));
 	const permissions = $derived(localPermissions ?? details?.permissions ?? null);
 	const known = $derived('listing' in target ? target.listing : null);
 	const title = $derived(details?.name ?? installed?.name ?? name);
@@ -66,7 +67,7 @@
 	$effect(() => {
 		const current = target;
 		loaded = null;
-		void load(current).then((result) => {
+		void untrack(() => load(current)).then((result) => {
 			if (target === current) loaded = result;
 		});
 	});

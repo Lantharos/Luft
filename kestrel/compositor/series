@@ -76,3 +76,4 @@
 0076-core-keep-Mutter-s-D-Bus-services-from-sandboxed-app.patch
 0077-core-keep-the-writable-properties-of-Mutter-s-D-Bus-.patch
 0078-wayland-keep-where-a-window-was-when-it-maximizes-du.patch
+0079-kms-shut-down-after-the-pointer-stops-reaching-the-c.patch

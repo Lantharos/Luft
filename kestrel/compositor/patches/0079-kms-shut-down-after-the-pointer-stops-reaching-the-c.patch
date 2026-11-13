@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 13 Nov 2026 14:15:28 +0100
+Subject: [PATCH] kms: shut down after the pointer stops reaching the cursor
+ manager
+
+KMS drops its cursor manager when the backend prepares to shut down,
+and its handler was connected before the native cursor renderer's,
+which is what stops the input thread from handing it pointer
+positions. Moving the pointer in between had the input thread call
+into a cursor manager that was already gone, and the compositor
+crashed on the way out. KMS now prepares to shut down after the
+handlers of everything that feeds it.
+
+Fixes https://gitlab.gnome.org/GNOME/mutter/-/issues/4652
+
+Upstream-Status: forwardable
+---
+ src/backends/native/meta-kms.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/backends/native/meta-kms.c b/src/backends/native/meta-kms.c
+index ad58cea26583d1bc2dad3fc0d3c833d26b6fac56..634991b3b0250ce0eb3de97cca77163cf61bc35f 100644
+--- a/src/backends/native/meta-kms.c
++++ b/src/backends/native/meta-kms.c
+@@ -479,9 +479,9 @@ meta_kms_new (MetaBackend   *backend,
+     g_signal_connect (udev, "device-removed",
+                       G_CALLBACK (on_udev_device_removed), kms);
+ 
+-  g_signal_connect (backend, "prepare-shutdown",
+-                    G_CALLBACK (on_prepare_shutdown),
+-                    kms);
++  g_signal_connect_after (backend, "prepare-shutdown",
++                          G_CALLBACK (on_prepare_shutdown),
++                          kms);
+ 
+   return kms;
+ }

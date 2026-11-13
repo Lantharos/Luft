@@ -1,0 +1,11 @@
+[Unit]
+Description=Check the login screen starts without a display and lights one connected later
+After=greetd.service
+
+[Service]
+Type=oneshot
+TimeoutStartSec=infinity
+ExecStart=/usr/libexec/luft-headless-check
+
+[Install]
+WantedBy=graphical.target

@@ -12,7 +12,7 @@ How shim, SushiBoot, the signed startup images and the TPM fit together is in [B
 | `sushictl` | Controls `sushid` |
 | `sushiboot` | The boot menu |
 
-`data/` holds the systemd units, the dracut module, the driver list and the default configuration.
+`data/` holds the systemd units, the dracut module, the driver list and the default configuration. `vm/run.sh` checks in a VM that Luft starts without a display and lights one plugged in later.
 
 ## Build
 

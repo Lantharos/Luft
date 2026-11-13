@@ -1,0 +1,1 @@
+ACTION=="change", SUBSYSTEM=="drm", ENV{SYNTH_ARG_HOTPLUG}=="1", ENV{HOTPLUG}="1"

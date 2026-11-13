@@ -424,18 +424,18 @@ impl Daemon {
                     .as_ref()
                     .is_none_or(|screen| screen.display().replaced());
                 if replaced || since.elapsed() > WAIT_LIMIT {
-                    eprintln!(
-                        "{} after {} ms",
-                        if replaced {
-                            "The next program showed its first frame"
-                        } else {
-                            "Stopped waiting for the next program to draw"
-                        },
-                        since.elapsed().as_millis()
-                    );
                     let _ = std::fs::remove_file(control::LOGO_PLACEMENT);
                     self.plymouth = None;
                     if let Some(screen) = self.screen.take() {
+                        eprintln!(
+                            "{} after {} ms",
+                            if replaced {
+                                "The next program showed its first frame"
+                            } else {
+                                "Stopped waiting for the next program to draw"
+                            },
+                            since.elapsed().as_millis()
+                        );
                         self.held = Some(screen.into_card());
                     }
                     self.phase = Phase::Holding;

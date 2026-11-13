@@ -1,0 +1,14 @@
+[Unit]
+Description=Load the graphics driver in the system, as NVIDIA's is
+DefaultDependencies=no
+After=sushi-drivers.service
+Before=greetd.service
+ConditionKernelCommandLine=!luft-headless-check.late-driver
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/modprobe virtio_gpu
+
+[Install]
+WantedBy=sysinit.target

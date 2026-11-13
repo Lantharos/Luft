@@ -47,7 +47,14 @@ impl Card {
             path: path.to_owned(),
         };
         card.set_client_capability(ClientCapability::UniversalPlanes, true)?;
+        card.leave_master_to_whoever_shows_it();
         Ok(card)
+    }
+
+    /// The kernel makes whoever opens a card nobody shows its master, which would keep the login screen off it
+    /// for as long as the card is held open without being shown, as on a computer started without a display.
+    fn leave_master_to_whoever_shows_it(&self) {
+        let _ = self.release_master_lock();
     }
 
     pub fn path(&self) -> &Path {

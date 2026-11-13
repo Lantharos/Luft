@@ -11,7 +11,7 @@
 	interface Option {
 		key: keyof WindowsChoices;
 		title: string;
-		description: string;
+		description?: string;
 	}
 
 	let { windows }: Props = $props();
@@ -25,8 +25,7 @@
 			},
 			!windows.universalClock && {
 				key: 'universalClock',
-				title: t('setup-windows-clock'),
-				description: t('setup-windows-clock-description')
+				title: t('setup-windows-clock')
 			},
 			windows.bluetooth > 0 && {
 				key: 'bluetooth',
@@ -43,7 +42,9 @@
 			<div class="flex items-center gap-4">
 				<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 					<span class="text-[14px] font-medium">{option.title}</span>
-					<span class="text-[13px] leading-snug text-[var(--text-soft)]">{option.description}</span>
+					{#if option.description}
+						<span class="text-[13px] leading-snug text-[var(--text-soft)]">{option.description}</span>
+					{/if}
 				</div>
 				<Switch
 					checked={install.windowsChoices[option.key]}

@@ -26,7 +26,6 @@ setup-region-title = Merħba f’Luft
 setup-region-language = Lingwa
 setup-region-keyboard = Tastiera
 setup-region-time-zone = Żona tal-ħin
-setup-region-intro = Ejja nissettjaw kollox. Agħżel il-lingwa, it-tastiera u ż-żona tal-ħin.
 setup-region-intro-guessed-computer = Ejja nissettjaw kollox. Għażilna dawn skont il-kompjuter, għalhekk ibdel dak li mhux tajjeb.
 setup-region-intro-guessed = Ejja nissettjaw kollox. Għażilna { $guesses }, għalhekk ibdel dak li mhux tajjeb.
 setup-region-guess-from-computer = { $fields } skont il-kompjuter
@@ -105,7 +104,6 @@ setup-meet-room-packed = Dak li ppakkjajt f’Windows, { $size }, jinfetaħ fil-
 setup-windows-fast-startup = Itfi Fast Startup f’Windows
 setup-windows-fast-startup-description = Windows imbagħad jintefa kompletament, għalhekk il-ħoss, il-Wi-Fi u l-Bluetooth jibdew mill-ġdid f’Luft u d-diska tiegħu tibqa’ aċċessibbli.
 setup-windows-clock = Żomm il-ħin korrett fit-tnejn
-setup-windows-clock-description = Windows jaqra l-arloġġ tal-kompjuter bl-istess mod bħal Luft, għalhekk il-ħin ma jibqax jaqbeż meta taqleb.
 setup-windows-bluetooth = Ġib l-apparati Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } apparat imqabbad ma’ Windows jaħdem f’Luft mingħajr ma terġa’ tqabbdu.
@@ -213,7 +211,6 @@ setup-account-mismatch = Il-passwords ma jaqblux
 ## Installing
 
 setup-finishing-failed-title = Luft ma setax jiġi installat
-setup-finishing-failed-description = Xi ħaġa marret ħażin waqt l-installazzjoni.
 setup-finishing-failed-stick = Il-kompjuter għadu jibda bħal qabel. Tista’ tibqa’ tuża Luft mid-drajv USB, jew tirristartja u terġa’ tipprova.
 setup-finishing-failed-trying = Il-kompjuter għadu jibda bħal qabel. Tista’ tibqa’ tuża Luft kif inhu issa, jew tirristartja u terġa’ tipprova.
 setup-finishing-use-stick = Uża Luft mid-drajv USB

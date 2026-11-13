@@ -26,7 +26,6 @@ setup-region-title = Tere tulemast Luftisse
 setup-region-language = Keel
 setup-region-keyboard = Klaviatuur
 setup-region-time-zone = Ajavöönd
-setup-region-intro = Alustame seadistamist. Vali keel, klaviatuur ja ajavöönd.
 setup-region-intro-guessed-computer = Alustame seadistamist. Need on tuvastatud sinu arvuti põhjal, nii et muuda, mis ei sobi.
 setup-region-intro-guessed = Alustame seadistamist. Tuvastasime { $guesses }, nii et muuda, mis ei sobi.
 setup-region-guess-from-computer = { $fields } sinu arvuti põhjal
@@ -103,7 +102,6 @@ setup-meet-room-packed = Asjad, mille Windowsis kaasa pakkisid ({ $size }), paki
 setup-windows-fast-startup = Lülita Windowsi kiirkäivitus välja
 setup-windows-fast-startup-description = Siis lülitub Windows täielikult välja, nii et heli, Wi-Fi ja Bluetooth käivituvad Luftis puhtalt ning Windowsi ketas jääb kasutatavaks.
 setup-windows-clock = Hoia kell mõlemas õige
-setup-windows-clock-description = Windows loeb arvuti kella samamoodi nagu Luft, nii et kellaaeg ei hüppa enam süsteemi vahetamisel.
 setup-windows-bluetooth = Too Bluetoothi seadmed kaasa
 setup-windows-bluetooth-description =
     { $count ->
@@ -200,7 +198,6 @@ setup-account-mismatch = Salasõnad ei ühti
 ## Installing
 
 setup-finishing-failed-title = Lufti ei õnnestunud installida
-setup-finishing-failed-description = Installimisel läks midagi valesti.
 setup-finishing-failed-stick = Arvuti käivitub endiselt samamoodi nagu varem. Võid Lufti edasi kasutada USB-mälupulgalt või taaskäivitada ja uuesti proovida.
 setup-finishing-failed-trying = Arvuti käivitub endiselt samamoodi nagu varem. Võid Lufti edasi kasutada praegusel kujul või taaskäivitada ja uuesti proovida.
 setup-finishing-use-stick = Kasuta Lufti mälupulgalt

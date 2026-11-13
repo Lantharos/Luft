@@ -9,8 +9,8 @@
 	let { store, installed, onchange }: { store: StoreDetails; installed: boolean; onchange: (details: AppDetails) => void } = $props();
 
 	const PREVIEWS: Record<string, string> = {
-		beta: 'Previews of the next version. They can have bugs, so keep a copy of anything important.',
-		nightly: 'Built from the newest code, often every day. They can break, and they reach you after automatic checks without anyone looking at them first.'
+		beta: 'Previews of the next version. Back up anything important.',
+		nightly: 'Built from the newest code, often daily, and nobody reviews them first. They can break.'
 	};
 
 	let problem = $state('');

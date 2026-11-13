@@ -175,7 +175,7 @@
 						title="Full access"
 						description={store.declared?.unsandboxed
 							? `It asks to run outside a sandbox: “${store.declared.unsandboxed}”`
-							: 'It runs outside a sandbox, with everything a program you start yourself can do.'}
+							: 'It runs outside a sandbox, like a program you start yourself.'}
 						icon={ShieldOff}
 					/>
 				</AccessList>

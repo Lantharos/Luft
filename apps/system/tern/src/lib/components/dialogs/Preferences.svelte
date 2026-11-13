@@ -93,13 +93,13 @@
 		<Row title="Shell" description="New tabs and panes start with this shell.">
 			<Select label="Shell" options={shells} value={settings.current.shell ?? DEFAULT_SHELL} onchange={(shell) => settings.update({ shell: shell || null })} />
 		</Row>
-		<Row title="History" description="How many lines each terminal keeps to scroll back through.">
+		<Row title="History" description="Lines kept to scroll back through.">
 			<Select label="History" options={SCROLLBACK} value={settings.current.scrollback} onchange={(scrollback) => settings.update({ scrollback })} />
 		</Row>
-		<Row title="Copy selected text" description="Copies text as soon as you select it.">
+		<Row title="Copy selected text">
 			<Switch label="Copy selected text" checked={settings.current.copyOnSelect} onchange={(copyOnSelect) => settings.update({ copyOnSelect })} />
 		</Row>
-		<Row title="Let programs read the clipboard" description="Programs in the terminal, including ones on other computers over SSH, can read what you copied.">
+		<Row title="Let programs read the clipboard" description="Including programs on other computers over SSH.">
 			<Switch label="Let programs read the clipboard" checked={settings.current.clipboardReads} onchange={(clipboardReads) => settings.update({ clipboardReads })} />
 		</Row>
 	</Section>

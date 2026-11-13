@@ -26,7 +26,6 @@ setup-region-title = Tervetuloa Luftiin
 setup-region-language = Kieli
 setup-region-keyboard = Näppäimistö
 setup-region-time-zone = Aikavyöhyke
-setup-region-intro = Otetaan Luft käyttöön. Valitse kieli, näppäimistö ja aikavyöhyke.
 setup-region-intro-guessed-computer = Otetaan Luft käyttöön. Nämä on päätelty tietokoneestasi, joten muuta, jos jokin on väärin.
 setup-region-intro-guessed = Otetaan Luft käyttöön. Valmiiksi pääteltiin { $guesses }, joten muuta, jos jokin on väärin.
 setup-region-guess-from-computer = { $fields } tietokoneen perusteella
@@ -105,7 +104,6 @@ setup-meet-room-packed = Windowsissa pakkaamasi asiat ({ $size }) puretaan uudel
 setup-windows-fast-startup = Poista Windowsin nopea käynnistys käytöstä
 setup-windows-fast-startup-description = Windows sammuu silloin kokonaan, joten ääni, Wi-Fi ja Bluetooth käynnistyvät Luftissa puhtaalta pöydältä ja Windowsin levy pysyy avoimena.
 setup-windows-clock = Pidä kello oikeassa molemmissa
-setup-windows-clock-description = Windows lukee tietokoneen kelloa samalla tavalla kuin Luft, joten aika ei enää hypi, kun vaihdat järjestelmää.
 setup-windows-bluetooth = Tuo Bluetooth-laitteesi
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } Windowsissa pariliitetty laite toimii Luftissa ilman uutta pariliitosta.
@@ -198,7 +196,6 @@ setup-account-mismatch = Salasanat eivät täsmää
 ## Installing
 
 setup-finishing-failed-title = Luftia ei voitu asentaa
-setup-finishing-failed-description = Asennuksessa tapahtui virhe.
 setup-finishing-failed-stick = Tietokoneesi käynnistyy yhä samalla tavalla kuin ennenkin. Voit jatkaa Luftin käyttöä USB-tikulta tai käynnistää tietokoneen uudelleen ja yrittää uudestaan.
 setup-finishing-failed-trying = Tietokoneesi käynnistyy yhä samalla tavalla kuin ennenkin. Voit jatkaa Luftin käyttöä sellaisenaan tai käynnistää tietokoneen uudelleen ja yrittää uudestaan.
 setup-finishing-use-stick = Käytä Luftia tikulta

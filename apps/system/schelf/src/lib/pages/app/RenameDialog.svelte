@@ -22,7 +22,7 @@
 	}
 </script>
 
-<Dialog title="Rename {names.custom ?? names.own}" description="The new name shows everywhere the app appears, such as Start and the taskbar. Leave it empty to use “{names.own}” again." onclose={() => onclose(false)}>
+<Dialog title="Rename {names.custom ?? names.own}" description="Leave it empty to use “{names.own}” again." onclose={() => onclose(false)}>
 	<TextField label="Name" bind:value={name} placeholder={names.own} {error} live disabled={busy} onkeydown={(event) => event.key === 'Enter' && save()} />
 	{#snippet actions()}
 		<button type="button" class="button" onclick={() => onclose(false)}>Cancel</button>

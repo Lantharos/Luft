@@ -41,7 +41,7 @@
 {#if asking}
 	<Dialog
 		title="Windows is still asleep"
-		description="Windows was hibernated or shut down with Fast Startup, so Luft opens its drive read-only to keep your files safe. To change files on it, start Windows and hold Shift while you choose Shut down."
+		description="It was hibernated or shut down with Fast Startup, so its drive opens read-only. To change files on it, start Windows and hold Shift while you choose Shut down."
 		onclose={() => (asking = false)}
 	>
 		{#snippet actions()}

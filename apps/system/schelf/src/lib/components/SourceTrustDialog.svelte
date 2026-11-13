@@ -10,7 +10,7 @@
 
 <ConsentDialog
 	title="Trust {name}?"
-	description="Packages from {name} install for everyone on this computer and can run as administrator while they install. They update with Luft from then on, so whoever runs this source can change software on this computer. Only add sources you trust."
+	description="Whoever runs it can change software on this computer: its packages install for everyone and can run as administrator. Only add sources you trust."
 	{confirm}
 	danger
 	{onconfirm}

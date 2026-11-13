@@ -177,7 +177,7 @@
 						<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 							<span class="truncate text-[15px] font-medium">{flathub.name}{flathub.verified ? ' · Verified' : ''}</span>
 							<span class="text-[13px] text-[var(--text-muted)]">
-								The better way to get it: it runs in a sandbox, keeps itself up to date, and doesn't need Ubuntu's software downloaded for it.
+								Runs in a sandbox and keeps itself up to date.
 							</span>
 						</div>
 						{#if flathubOperation && flathubOperation.state !== 'failed'}
@@ -218,37 +218,37 @@
 				{#if file.kind === 'flatpakBundle'}
 					<Row title="Size"><span>{bytes(file.size)}</span></Row>
 					{#if file.runtime}
-						<Row title="Needs" description="Installed from Flathub along with it, unless you have it already."><span class="max-w-[320px] truncate">{file.runtime.split('/')[0]}</span></Row>
+						<Row title="Needs" description="Installed from Flathub along with it."><span class="max-w-[320px] truncate">{file.runtime.split('/')[0]}</span></Row>
 					{/if}
 					{#if file.origin}
 						<Row title="Updates from" description={file.origin}><span>{new URL(file.origin).host}</span></Row>
 					{:else}
-						<Row title="Updates" description="It doesn't update by itself. Install a newer file when one comes out." />
+						<Row title="Updates" description="Install a newer file when one comes out." />
 					{/if}
 				{/if}
 				{#if file.kind === 'deb'}
 					<Row
 						title="Installs to"
-						description="A separate space with Ubuntu's software, which this kind of app needs. It can read and change your files. Installing the first one downloads Ubuntu itself, a few hundred megabytes."
+						description="A separate space with Ubuntu's software that can read and change your files. The first one downloads Ubuntu, a few hundred megabytes."
 					/>
-					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out." />
+					<Row title="Updates" description="From its maker's software source if it adds one. Otherwise, install a newer file." />
 				{/if}
 				{#if file.kind === 'appImage'}
-					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Your account</span></Row>
+					<Row title="Installs to" description="Kept up to date when Schelf can."><span>Your account</span></Row>
 				{:else if file.kind === 'package' && file.system}
-					<Row title="Installs to" description="For everyone on this computer, rebuilt with every update of Luft."><span>System</span></Row>
+					<Row title="Installs to" description="For everyone on this computer, updated with Luft."><span>System</span></Row>
 					{#if source && sourceName}
 						<Row title="Updates from" description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
 					{/if}
 				{:else if file.kind === 'package'}
-					<Row title="Installs to" description="For you only, kept apart from the system. Its commands run in Tern, Luft's terminal."><span>Your account</span></Row>
+					<Row title="Installs to" description="For you only. Its commands run in Tern."><span>Your account</span></Row>
 				{/if}
 				<Row title="File" description={path} />
 			</Section>
 
 			{#if file.kind === 'package' && source}
 				<p class="px-2 text-[13px] text-[var(--text-muted)]">
-					{file.package} installs from {sourceName}, checked against its key, so it keeps getting updates. {source.added
+					{file.package} installs from {sourceName}, so it keeps getting updates. {source.added
 						? "It's one of your software sources already."
 						: 'Installing adds it to your software sources.'}
 				</p>
@@ -270,7 +270,7 @@
 {#if unsandboxing && file?.kind === 'appImage' && file.unsandboxed}
 	<ConsentDialog
 		title="Give {file.name} full access?"
-		description="{file.name} asks to run outside a sandbox: “{file.unsandboxed}” There it can do anything a program you start yourself can, without asking. You can take full access away on its page later."
+		description="{file.name} asks to run outside a sandbox: “{file.unsandboxed}” There it can do all of this without asking. You can take full access away on its page later."
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="Install with full access"
 		danger
@@ -285,7 +285,7 @@
 {#if confirming && file?.kind === 'package'}
 	<ConsentDialog
 		title="Install {file.package} without checking it?"
-		description="Nobody vouches for this package file: it isn't signed by Fedora or by a software source you added. Only install it if you trust whoever gave it to you."
+		description="It isn't signed by Fedora or a software source you added. Only install it if you trust whoever gave it to you."
 		facts={file.system
 			? ['Not verified', 'Installs for everyone on this computer', 'Can run as administrator while it installs', "Won't get updates"]
 			: ['Not verified', 'Installs for you only, but can read and change your files', "Won't get updates"]}

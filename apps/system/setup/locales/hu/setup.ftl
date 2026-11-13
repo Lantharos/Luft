@@ -26,7 +26,6 @@ setup-region-title = Üdvözli a Luft
 setup-region-language = Nyelv
 setup-region-keyboard = Billentyűzet
 setup-region-time-zone = Időzóna
-setup-region-intro = Kezdjük a beállítást. Válassza ki a nyelvet, a billentyűzetet és az időzónát.
 setup-region-intro-guessed-computer = Kezdjük a beállítást. Ezeket a számítógép alapján töltöttük ki, módosítsa, ami nem stimmel.
 setup-region-intro-guessed = Kezdjük a beállítást. Néhány beállítást előre kitöltöttünk: { $guesses }. Módosítsa, ami nem stimmel.
 setup-region-guess-from-computer = { $fields } (a számítógép alapján)
@@ -105,7 +104,6 @@ setup-meet-room-packed = A Windowsban becsomagolt dolgai ({ $size }) az új fió
 setup-windows-fast-startup = Gyors rendszerindítás kikapcsolása a Windowsban
 setup-windows-fast-startup-description = Így a Windows teljesen leáll, ezért a hang, a Wi-Fi és a Bluetooth tisztán indul a Luftban, a Windows lemeze pedig hozzáférhető marad.
 setup-windows-clock = Pontos óra mindkét rendszerben
-setup-windows-clock-description = A Windows ugyanúgy olvassa a számítógép óráját, mint a Luft, így váltáskor nem ugrik el az idő.
 setup-windows-bluetooth = Bluetooth-eszközök átvétele
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } Windowsban párosított eszköz újrapárosítás nélkül működik majd a Luftban.
@@ -198,7 +196,6 @@ setup-account-mismatch = A jelszavak nem egyeznek
 ## Installing
 
 setup-finishing-failed-title = A Luft telepítése nem sikerült
-setup-finishing-failed-description = Hiba történt a telepítés közben.
 setup-finishing-failed-stick = A számítógép továbbra is ugyanúgy indul, mint korábban. A Luftot tovább használhatja a pendrive-ról, vagy újraindíthatja a számítógépet, és újra megpróbálhatja.
 setup-finishing-failed-trying = A számítógép továbbra is ugyanúgy indul, mint korábban. A Luftot tovább használhatja a mostani formájában, vagy újraindíthatja a számítógépet, és újra megpróbálhatja.
 setup-finishing-use-stick = Luft használata a pendrive-ról

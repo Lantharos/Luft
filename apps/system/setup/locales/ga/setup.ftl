@@ -26,7 +26,6 @@ setup-region-title = Fáilte go Luft
 setup-region-language = Teanga
 setup-region-keyboard = Méarchlár
 setup-region-time-zone = Crios ama
-setup-region-intro = Bímis ag tosú. Roghnaigh do theanga, do mhéarchlár agus do chrios ama.
 setup-region-intro-guessed-computer = Bímis ag tosú. Fuaireamar na socruithe seo ó do ríomhaire, mar sin athraigh aon rud nach bhfuil i gceart.
 setup-region-intro-guessed = Bímis ag tosú. Fuaireamar { $guesses }, mar sin athraigh aon rud nach bhfuil i gceart.
 setup-region-guess-from-computer = { $fields } ó do ríomhaire
@@ -105,7 +104,6 @@ setup-meet-room-packed = Díphacálfar na rudaí a phacáil tú i Windows, { $si
 setup-windows-fast-startup = Cas as Tosú Tapa i Windows
 setup-windows-fast-startup-description = Múchfaidh Windows go hiomlán ansin, mar sin tosóidh fuaim, Wi-Fi agus Bluetooth as an nua i Luft agus fanfaidh a thiomántán oscailte.
 setup-windows-clock = Coinnigh an clog ceart sa dá chóras
-setup-windows-clock-description = Léann Windows clog an ríomhaire mar a dhéanann Luft, mar sin ní léimfidh an t-am níos mó nuair a athraíonn tú ó cheann go chéile.
 setup-windows-bluetooth = Tabhair do ghléasanna Bluetooth leat
 setup-windows-bluetooth-description = { $count ->
     [one] Oibreoidh { $count } ghléas atá péireáilte i Windows i Luft gan é a phéireáil arís.
@@ -213,7 +211,6 @@ setup-account-mismatch = Ní hionann na pasfhocail
 ## Installing
 
 setup-finishing-failed-title = Níorbh fhéidir Luft a shuiteáil
-setup-finishing-failed-description = Chuaigh rud éigin mícheart le linn na suiteála.
 setup-finishing-failed-stick = Tosaíonn do ríomhaire fós mar a thosaigh sé roimhe seo. Is féidir leat leanúint ar aghaidh ag úsáid Luft ón gcipín USB, nó atosú agus triail eile a bhaint as.
 setup-finishing-failed-trying = Tosaíonn do ríomhaire fós mar a thosaigh sé roimhe seo. Is féidir leat leanúint ar aghaidh ag úsáid Luft mar atá sé anois, nó atosú agus triail eile a bhaint as.
 setup-finishing-use-stick = Úsáid Luft ón gcipín

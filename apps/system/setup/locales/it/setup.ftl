@@ -26,7 +26,6 @@ setup-region-title = Ti diamo il benvenuto in Luft
 setup-region-language = Lingua
 setup-region-keyboard = Tastiera
 setup-region-time-zone = Fuso orario
-setup-region-intro = Iniziamo con la configurazione. Scegli lingua, tastiera e fuso orario.
 setup-region-intro-guessed-computer = Iniziamo con la configurazione. Abbiamo ricavato queste impostazioni dal tuo computer: correggi quello che non va.
 setup-region-intro-guessed = Iniziamo con la configurazione. Abbiamo ricavato { $guesses }: correggi quello che non va.
 setup-region-guess-from-computer = { $fields } dal tuo computer
@@ -105,7 +104,6 @@ setup-meet-room-packed = Quello che hai preparato in Windows, { $size }, viene t
 setup-windows-fast-startup = Disattiva l’avvio rapido in Windows
 setup-windows-fast-startup-description = Così Windows si spegne del tutto: audio, Wi-Fi e Bluetooth ripartono da zero in Luft e il suo disco resta accessibile.
 setup-windows-clock = Mantieni l’ora corretta in entrambi
-setup-windows-clock-description = Windows legge l’orologio del computer come fa Luft, così l’ora non salta più quando passi dall’uno all’altro.
 setup-windows-bluetooth = Porta con te i dispositivi Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } dispositivo associato in Windows funzionerà in Luft senza doverlo associare di nuovo.
@@ -198,7 +196,6 @@ setup-account-mismatch = Le password non corrispondono
 ## Installing
 
 setup-finishing-failed-title = Impossibile installare Luft
-setup-finishing-failed-description = Si è verificato un problema durante l’installazione.
 setup-finishing-failed-stick = Il computer si avvia ancora come prima. Puoi continuare a usare Luft dalla chiavetta USB, oppure riavviare e riprovare.
 setup-finishing-failed-trying = Il computer si avvia ancora come prima. Puoi continuare a usare Luft così com’è ora, oppure riavviare e riprovare.
 setup-finishing-use-stick = Usa Luft dalla chiavetta

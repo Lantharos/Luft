@@ -38,10 +38,7 @@
 </script>
 
 {#if install.failed}
-	<StepFrame title={t('setup-finishing-failed-title')} description={t('setup-finishing-failed-description')}>
-		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">
-			{t(fromStick ? 'setup-finishing-failed-stick' : 'setup-finishing-failed-trying')}
-		</p>
+	<StepFrame title={t('setup-finishing-failed-title')} description={t(fromStick ? 'setup-finishing-failed-stick' : 'setup-finishing-failed-trying')}>
 		{#snippet actions()}
 			{#if status?.error}
 				<button type="button" class="plain-button large" onclick={() => (showingDetails = true)}>{t('setup-finishing-details')}</button>
@@ -51,7 +48,7 @@
 		{/snippet}
 	</StepFrame>
 	{#if showingDetails}
-		<Dialog title={t('setup-finishing-details-title')} description={t('setup-finishing-details-description')} wide onclose={() => (showingDetails = false)}>
+		<Dialog title={t('setup-finishing-details-title')} wide onclose={() => (showingDetails = false)}>
 			<p class="text-[13px] leading-relaxed break-words whitespace-pre-wrap text-[var(--text-soft)] select-text">{status?.error}</p>
 			{#snippet actions()}
 				<button type="button" class="button" onclick={() => (showingDetails = false)}>{t('setup-close')}</button>

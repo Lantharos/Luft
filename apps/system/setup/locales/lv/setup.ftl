@@ -26,7 +26,6 @@ setup-region-title = Laipni lūdzam Luft
 setup-region-language = Valoda
 setup-region-keyboard = Tastatūra
 setup-region-time-zone = Laika josla
-setup-region-intro = Sāksim iestatīšanu. Izvēlieties valodu, tastatūru un laika joslu.
 setup-region-intro-guessed-computer = Sāksim iestatīšanu. Šie iestatījumi noteikti pēc jūsu datora, tāpēc izlabojiet, ja kas neatbilst.
 setup-region-intro-guessed = Sāksim iestatīšanu. Mēs noteicām { $guesses }, tāpēc izlabojiet, ja kas neatbilst.
 setup-region-guess-from-computer = { $fields } pēc jūsu datora
@@ -105,7 +104,6 @@ setup-meet-room-packed = Sistēmā Windows sapakotais ({ $size }) tiks izpakots 
 setup-windows-fast-startup = Izslēgt ātro startēšanu sistēmā Windows
 setup-windows-fast-startup-description = Tad Windows izslēdzas pilnībā, tāpēc skaņa, Wi-Fi un Bluetooth sistēmā Luft startē no jauna un tās disks paliek pieejams.
 setup-windows-clock = Pareizs pulkstenis abās sistēmās
-setup-windows-clock-description = Windows nolasa datora pulksteni tāpat kā Luft, tāpēc laiks vairs nelec, kad pārslēdzaties.
 setup-windows-bluetooth = Paņemt līdzi Bluetooth ierīces
 setup-windows-bluetooth-description = { $count ->
     [zero] { $count } sistēmā Windows savienotas ierīces darbosies sistēmā Luft bez atkārtotas savienošanas pārī.
@@ -203,7 +201,6 @@ setup-account-mismatch = Paroles nesakrīt
 ## Installing
 
 setup-finishing-failed-title = Luft neizdevās instalēt
-setup-finishing-failed-description = Instalēšanas laikā radās kļūda.
 setup-finishing-failed-stick = Dators joprojām startē tāpat kā iepriekš. Varat turpināt lietot Luft no USB zibatmiņas vai restartēt un mēģināt vēlreiz.
 setup-finishing-failed-trying = Dators joprojām startē tāpat kā iepriekš. Varat turpināt lietot Luft tāpat kā tagad vai restartēt un mēģināt vēlreiz.
 setup-finishing-use-stick = Lietot Luft no zibatmiņas

@@ -19,8 +19,8 @@
 	let title = $derived(`${folders ? 'A folder' : 'An item'} named “${conflict.target.name}” is already here`);
 	let description = $derived(
 		folders
-			? 'Merging keeps everything from both folders and asks again about any files with the same name.'
-			: 'Replacing moves the existing item to the trash, so you can still get it back.'
+			? 'Merging keeps both and asks again about files with the same name.'
+			: 'Replacing moves the existing one to the trash.'
 	);
 
 	function answer(resolution: Resolution) {

@@ -16,7 +16,7 @@
 	const TEXT: Record<Kind, { title: string; description: string; failed: string }> = {
 		tool: {
 			title: 'Command-line tools',
-			description: 'They install for you only, kept apart from the system, and you run them in Tern.',
+			description: 'Installed for you only. You run them in Tern.',
 			failed: "Command-line tools can't be searched right now."
 		},
 		system: {

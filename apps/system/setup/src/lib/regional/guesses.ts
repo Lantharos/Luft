@@ -11,9 +11,9 @@ const FROM: Record<Source, string> = { computer: 'setup-region-guess-from-comput
 
 export const outranks = (source: Source, other: Source | undefined) => !other || SOURCES.indexOf(source) <= SOURCES.indexOf(other);
 
-export function describe(guesses: Guesses): string {
+export function describe(guesses: Guesses): string | undefined {
 	const guessed = FIELDS.filter((field) => guesses[field]);
-	if (guessed.length === 0) return t('setup-region-intro');
+	if (guessed.length === 0) return undefined;
 	if (guessed.length === FIELDS.length && guessed.every((field) => guesses[field] === 'computer')) return t('setup-region-intro-guessed-computer');
 	const list = new Intl.ListFormat(i18n.locale);
 	const parts = SOURCES.flatMap((source) => {

@@ -22,7 +22,7 @@
 
 	const EMPTY: Partial<Record<Filter, string>> = {
 		tool: 'Command-line tools you install from search show up here.',
-		system: 'Drivers and services you add to the system show up here. Search for one, or open its file.'
+		system: 'Drivers and services you add to the system show up here.'
 	};
 
 	const NOUNS: Partial<Record<Filter, [string, string]>> = { tool: ['tool', 'tools'], system: ['add-on', 'add-ons'], extension: ['extension', 'extensions'] };

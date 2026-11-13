@@ -26,7 +26,6 @@ setup-region-title = Mirë se vjen në Luft
 setup-region-language = Gjuha
 setup-region-keyboard = Tastiera
 setup-region-time-zone = Zona kohore
-setup-region-intro = Le të përgatisim gjithçka. Zgjidh gjuhën, tastierën dhe zonën kohore.
 setup-region-intro-guessed-computer = Le të përgatisim gjithçka. Këto i morëm me mend nga kompjuteri yt, ndaj ndrysho çfarë nuk është në rregull.
 setup-region-intro-guessed = Le të përgatisim gjithçka. Morëm me mend { $guesses }, ndaj ndrysho çfarë nuk është në rregull.
 setup-region-guess-from-computer = { $fields } nga kompjuteri yt
@@ -105,7 +104,6 @@ setup-meet-room-packed = Gjërat që paketove në Windows, { $size }, shpaketohe
 setup-windows-fast-startup = Çaktivizo Fast Startup në Windows
 setup-windows-fast-startup-description = Kështu Windows fiket plotësisht, ndaj zëri, Wi-Fi dhe Bluetooth nisin nga e para në Luft dhe disku i tij mbetet i qasshëm.
 setup-windows-clock = Mbaje orën të saktë në të dyja
-setup-windows-clock-description = Windows e lexon orën e kompjuterit njësoj si Luft, ndaj ora nuk kërcen më kur kalon nga njëri te tjetri.
 setup-windows-bluetooth = Merr me vete pajisjet Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } pajisje e çiftuar në Windows do të funksionojë në Luft pa u çiftuar sërish.
@@ -198,7 +196,6 @@ setup-account-mismatch = Fjalëkalimet nuk përputhen
 ## Installing
 
 setup-finishing-failed-title = Luft nuk u instalua dot
-setup-finishing-failed-description = Diçka shkoi keq gjatë instalimit.
 setup-finishing-failed-stick = Kompjuteri yt niset ende si më parë. Mund të vazhdosh ta përdorësh Luft nga memoria USB ose të rinisësh dhe të provosh sërish.
 setup-finishing-failed-trying = Kompjuteri yt niset ende si më parë. Mund të vazhdosh ta përdorësh Luft siç është tani ose të rinisësh dhe të provosh sërish.
 setup-finishing-use-stick = Përdor Luft nga memoria USB

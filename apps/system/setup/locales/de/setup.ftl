@@ -26,7 +26,6 @@ setup-region-title = Willkommen bei Luft
 setup-region-language = Sprache
 setup-region-keyboard = Tastatur
 setup-region-time-zone = Zeitzone
-setup-region-intro = Richten wir alles ein. Wähl deine Sprache, Tastatur und Zeitzone.
 setup-region-intro-guessed-computer = Richten wir alles ein. Wir haben das anhand deines Computers erkannt, ändere einfach, was nicht passt.
 setup-region-intro-guessed = Richten wir alles ein. Wir haben { $guesses } erkannt, ändere einfach, was nicht passt.
 setup-region-guess-from-computer = deine { $fields } anhand deines Computers
@@ -105,7 +104,6 @@ setup-meet-room-packed = Was du in Windows eingepackt hast, { $size }, wird in d
 setup-windows-fast-startup = Schnellstart in Windows ausschalten
 setup-windows-fast-startup-description = Windows fährt dann vollständig herunter, sodass Sound, WLAN und Bluetooth in Luft frisch starten und sein Datenträger zugänglich bleibt.
 setup-windows-clock = Uhrzeit in beiden richtig halten
-setup-windows-clock-description = Windows liest die Uhr des Computers so wie Luft, damit die Uhrzeit beim Wechseln nicht mehr springt.
 setup-windows-bluetooth = Bluetooth-Geräte mitnehmen
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } in Windows gekoppeltes Gerät funktioniert in Luft, ohne es neu zu koppeln.
@@ -198,7 +196,6 @@ setup-account-mismatch = Die Passwörter stimmen nicht überein
 ## Installing
 
 setup-finishing-failed-title = Luft konnte nicht installiert werden
-setup-finishing-failed-description = Beim Installieren ist etwas schiefgelaufen.
 setup-finishing-failed-stick = Dein Computer startet noch genauso wie vorher. Du kannst Luft weiter vom USB-Stick verwenden oder neu starten und es erneut versuchen.
 setup-finishing-failed-trying = Dein Computer startet noch genauso wie vorher. Du kannst Luft weiter so verwenden, wie es jetzt ist, oder neu starten und es erneut versuchen.
 setup-finishing-use-stick = Luft vom Stick verwenden

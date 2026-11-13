@@ -14,7 +14,7 @@
 	}
 </script>
 
-<Dialog title="Empty the trash?" description="Everything in the trash will be deleted for good. This can't be undone." {onclose}>
+<Dialog title="Empty the trash?" description="Everything in it is deleted for good." {onclose}>
 	{#snippet actions()}
 		<button class="button" type="button" onclick={onclose}>Cancel</button>
 		<button class="button danger" type="button" onclick={confirm}>Empty trash</button>

@@ -62,7 +62,7 @@
 		</Row>
 		<Row
 			title="Show on the lock screen"
-			description={notifications.shownOnLockScreen ? undefined : 'Notifications are hidden on the lock screen for every app, in Settings under Privacy'}
+			description={notifications.shownOnLockScreen ? undefined : 'Hidden for every app in Settings, under Privacy'}
 			disabled={off || !notifications.shownOnLockScreen}
 		>
 			<Switch

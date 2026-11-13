@@ -26,7 +26,6 @@ setup-region-title = Bun venit în Luft
 setup-region-language = Limbă
 setup-region-keyboard = Tastatură
 setup-region-time-zone = Fus orar
-setup-region-intro = Să începem configurarea. Alegeți limba, tastatura și fusul orar.
 setup-region-intro-guessed-computer = Să începem configurarea. Le-am dedus de pe computer, așa că modificați ce nu este corect.
 setup-region-intro-guessed = Să începem configurarea. Am dedus { $guesses }, așa că modificați ce nu este corect.
 setup-region-guess-from-computer = { $fields } de pe computer
@@ -105,7 +104,6 @@ setup-meet-room-packed = Ce ați împachetat în Windows ({ $size }) se despache
 setup-windows-fast-startup = Dezactivează Pornire rapidă în Windows
 setup-windows-fast-startup-description = Windows se va opri complet, așa că sunetul, Wi-Fi și Bluetooth pornesc curat în Luft, iar unitatea lui rămâne accesibilă.
 setup-windows-clock = Ora corectă în ambele sisteme
-setup-windows-clock-description = Windows citește ceasul computerului la fel ca Luft, așa că ora nu mai sare când treceți de la un sistem la altul.
 setup-windows-bluetooth = Păstrează dispozitivele Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } dispozitiv asociat în Windows va funcționa în Luft fără o nouă asociere.
@@ -203,7 +201,6 @@ setup-account-mismatch = Parolele nu se potrivesc
 ## Installing
 
 setup-finishing-failed-title = Luft nu a putut fi instalat
-setup-finishing-failed-description = Ceva nu a funcționat în timpul instalării.
 setup-finishing-failed-stick = Computerul pornește în continuare ca înainte. Puteți folosi Luft în continuare de pe stickul USB sau puteți reporni și încerca din nou.
 setup-finishing-failed-trying = Computerul pornește în continuare ca înainte. Puteți folosi Luft în continuare așa cum este acum sau puteți reporni și încerca din nou.
 setup-finishing-use-stick = Folosește Luft de pe stick

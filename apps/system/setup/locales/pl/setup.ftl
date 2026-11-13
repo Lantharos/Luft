@@ -26,7 +26,6 @@ setup-region-title = Witaj w systemie Luft
 setup-region-language = Język
 setup-region-keyboard = Klawiatura
 setup-region-time-zone = Strefa czasowa
-setup-region-intro = Zacznijmy od kilku ustawień. Wybierz język, klawiaturę i strefę czasową.
 setup-region-intro-guessed-computer = Zacznijmy od kilku ustawień. Zostały dobrane na podstawie komputera, więc zmień to, co się nie zgadza.
 setup-region-intro-guessed = Zacznijmy od kilku ustawień. Dobrano { $guesses }, więc zmień to, co się nie zgadza.
 setup-region-guess-from-computer = { $fields } na podstawie komputera
@@ -105,7 +104,6 @@ setup-meet-room-packed = Rzeczy spakowane w systemie Windows ({ $size }) zostan�
 setup-windows-fast-startup = Wyłącz szybkie uruchamianie w systemie Windows
 setup-windows-fast-startup-description = Windows będzie się wtedy całkowicie wyłączać, więc dźwięk, Wi-Fi i Bluetooth uruchomią się w systemie Luft od nowa, a dysk systemu Windows pozostanie dostępny.
 setup-windows-clock = Zachowaj poprawny czas w obu systemach
-setup-windows-clock-description = Windows będzie odczytywać zegar komputera tak samo jak Luft, więc czas nie będzie się przestawiać po przełączeniu systemu.
 setup-windows-bluetooth = Przenieś urządzenia Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } urządzenie sparowane w systemie Windows będzie działać w systemie Luft bez ponownego parowania.
@@ -208,7 +206,6 @@ setup-account-mismatch = Hasła nie są zgodne
 ## Installing
 
 setup-finishing-failed-title = Nie udało się zainstalować systemu Luft
-setup-finishing-failed-description = Podczas instalacji coś poszło nie tak.
 setup-finishing-failed-stick = Komputer nadal uruchamia się tak jak wcześniej. Możesz dalej korzystać z systemu Luft z pamięci USB albo uruchomić komputer ponownie i spróbować jeszcze raz.
 setup-finishing-failed-trying = Komputer nadal uruchamia się tak jak wcześniej. Możesz dalej korzystać z systemu Luft w obecnej postaci albo uruchomić komputer ponownie i spróbować jeszcze raz.
 setup-finishing-use-stick = Używaj systemu Luft z pamięci USB

@@ -26,7 +26,6 @@ setup-region-title = Sveiki atvykę į Luft
 setup-region-language = Kalba
 setup-region-keyboard = Klaviatūra
 setup-region-time-zone = Laiko juosta
-setup-region-intro = Pradėkime. Pasirinkite kalbą, klaviatūrą ir laiko juostą.
 setup-region-intro-guessed-computer = Pradėkime. Šiuos nustatymus parinkome pagal jūsų kompiuterį, tad pakeiskite tai, kas netinka.
 setup-region-intro-guessed = Pradėkime. Parinkome { $guesses }, tad pakeiskite tai, kas netinka.
 setup-region-guess-from-computer = { $fields } pagal jūsų kompiuterį
@@ -105,7 +104,6 @@ setup-meet-room-packed = Tai, ką susipakavote sistemoje Windows ({ $size }), bu
 setup-windows-fast-startup = Išjungti spartųjį paleidimą sistemoje Windows
 setup-windows-fast-startup-description = Tada Windows išsijungia visiškai, todėl garsas, Wi-Fi ir Bluetooth sistemoje Luft pasileidžia iš naujo, o Windows diskas lieka pasiekiamas.
 setup-windows-clock = Teisingas laikas abiejose sistemose
-setup-windows-clock-description = Windows skaito kompiuterio laikrodį taip pat kaip Luft, todėl perjungiant sistemas laikas nebešokinėja.
 setup-windows-bluetooth = Perkelti Bluetooth įrenginius
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } sistemoje Windows susietas įrenginys veiks sistemoje Luft jo nesusiejant iš naujo.
@@ -209,7 +207,6 @@ setup-account-mismatch = Slaptažodžiai nesutampa
 ## Installing
 
 setup-finishing-failed-title = Nepavyko įdiegti sistemos Luft
-setup-finishing-failed-description = Diegiant kažkas nepavyko.
 setup-finishing-failed-stick = Kompiuteris vis dar pasileidžia taip pat kaip anksčiau. Galite toliau naudoti Luft iš USB atmintuko arba paleisti iš naujo ir bandyti dar kartą.
 setup-finishing-failed-trying = Kompiuteris vis dar pasileidžia taip pat kaip anksčiau. Galite toliau naudoti Luft taip, kaip dabar, arba paleisti iš naujo ir bandyti dar kartą.
 setup-finishing-use-stick = Naudoti Luft iš atmintuko

@@ -26,7 +26,6 @@ setup-region-title = Välkommen till Luft
 setup-region-language = Språk
 setup-region-keyboard = Tangentbord
 setup-region-time-zone = Tidszon
-setup-region-intro = Nu sätter vi igång. Välj språk, tangentbord och tidszon.
 setup-region-intro-guessed-computer = Nu sätter vi igång. Vi har gissat de här utifrån datorn, så ändra det som inte stämmer.
 setup-region-intro-guessed = Nu sätter vi igång. Vi har gissat { $guesses }, så ändra det som inte stämmer.
 setup-region-guess-from-computer = { $fields } utifrån datorn
@@ -105,7 +104,6 @@ setup-meet-room-packed = Det du packade i Windows, { $size }, packas upp i ditt 
 setup-windows-fast-startup = Stäng av Snabbstart i Windows
 setup-windows-fast-startup-description = Då stängs Windows av helt, så ljud, Wi-Fi och Bluetooth startar på nytt i Luft och disken förblir tillgänglig.
 setup-windows-clock = Håll klockan rätt i båda
-setup-windows-clock-description = Windows läser datorns klocka på samma sätt som Luft, så tiden hoppar inte längre när du byter.
 setup-windows-bluetooth = Ta med dina Bluetooth-enheter
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } enhet som är ihopparad i Windows fungerar i Luft utan att paras ihop igen.
@@ -198,7 +196,6 @@ setup-account-mismatch = Lösenorden stämmer inte överens
 ## Installing
 
 setup-finishing-failed-title = Det gick inte att installera Luft
-setup-finishing-failed-description = Något gick fel under installationen.
 setup-finishing-failed-stick = Datorn startar fortfarande som förut. Du kan fortsätta använda Luft från USB-minnet eller starta om och försöka igen.
 setup-finishing-failed-trying = Datorn startar fortfarande som förut. Du kan fortsätta använda Luft som det är nu eller starta om och försöka igen.
 setup-finishing-use-stick = Använd Luft från USB-minnet

@@ -68,7 +68,7 @@
 	const removal = $derived.by(() => {
 		if (!removing) return '';
 		const packages = removing.packages;
-		if (!packages.length) return 'Nothing installed comes from it. You can add it again later.';
+		if (!packages.length) return 'Nothing installed comes from it.';
 		return `This also removes ${packages.join(', ')} from the system, with everything ${packages.length === 1 ? 'it' : 'they'} added.`;
 	});
 </script>
@@ -76,8 +76,7 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<p class="px-2 text-[14px] text-[var(--text-soft)]">
-			A software source is a place a company publishes its own software, such as Docker or 1Password. What you install from one becomes part of the
-			system, is checked to really come from that company, and updates with Luft.
+			Software from companies like Docker or 1Password, which becomes part of the system and updates with Luft.
 		</p>
 
 		<Section title="Add a source" description="Type 1password, docker, google-chrome or vscode, or paste the address its maker gives you.">
@@ -140,10 +139,10 @@
 {/if}
 
 {#if explaining}
-	<Dialog title="Other kinds of address" description="Schelf takes these too, typed or pasted into the same field." onclose={() => (explaining = false)}>
+	<Dialog title="Other kinds of address" onclose={() => (explaining = false)}>
 		<div class="flex flex-col">
-			<Row title="A .repo file" description="Its full web address, starting with https://, as the maker's install instructions show it." />
-			<Row title="A COPR project" description="Community builds for Fedora. Type copr: and then the owner and project, such as copr:owner/project." />
+			<Row title="A .repo file" description="Its full https:// address, from the maker's install instructions." />
+			<Row title="A COPR project" description="Community builds for Fedora, typed like copr:owner/project." />
 		</div>
 		{#snippet actions()}
 			<button type="button" class="button primary" onclick={() => (explaining = false)}>Done</button>

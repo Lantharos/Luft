@@ -26,7 +26,6 @@ setup-region-title = Bem-vindo ao Luft
 setup-region-language = Idioma
 setup-region-keyboard = Teclado
 setup-region-time-zone = Fuso horário
-setup-region-intro = Vamos começar. Escolha o idioma, o teclado e o fuso horário.
 setup-region-intro-guessed-computer = Vamos começar. Estas opções foram deduzidas a partir do computador; altere o que não estiver certo.
 setup-region-intro-guessed = Vamos começar. Deduzimos { $guesses }; altere o que não estiver certo.
 setup-region-guess-from-computer = { $fields } a partir do computador
@@ -105,7 +104,6 @@ setup-meet-room-packed = O que empacotou no Windows ({ $size }) é desempacotado
 setup-windows-fast-startup = Desativar o arranque rápido no Windows
 setup-windows-fast-startup-description = Assim o Windows encerra por completo, o som, o Wi-Fi e o Bluetooth arrancam do zero no Luft e o disco do Windows fica acessível.
 setup-windows-clock = Manter o relógio certo nos dois
-setup-windows-clock-description = O Windows passa a ler o relógio do computador da mesma forma que o Luft, por isso a hora deixa de saltar quando muda de sistema.
 setup-windows-bluetooth = Trazer os dispositivos Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } dispositivo emparelhado no Windows vai funcionar no Luft sem ser preciso emparelhá-lo novamente.
@@ -198,7 +196,6 @@ setup-account-mismatch = As palavras-passe não coincidem
 ## Installing
 
 setup-finishing-failed-title = Não foi possível instalar o Luft
-setup-finishing-failed-description = Ocorreu um problema durante a instalação.
 setup-finishing-failed-stick = O computador continua a arrancar como antes. Pode continuar a utilizar o Luft a partir da pen USB, ou reiniciar e tentar novamente.
 setup-finishing-failed-trying = O computador continua a arrancar como antes. Pode continuar a utilizar o Luft como está agora, ou reiniciar e tentar novamente.
 setup-finishing-use-stick = Utilizar o Luft a partir da pen

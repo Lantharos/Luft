@@ -26,7 +26,6 @@ setup-region-title = Vitajte v Lufte
 setup-region-language = Jazyk
 setup-region-keyboard = Klávesnica
 setup-region-time-zone = Časové pásmo
-setup-region-intro = Poďme všetko nastaviť. Vyberte jazyk, klávesnicu a časové pásmo.
 setup-region-intro-guessed-computer = Poďme všetko nastaviť. Tieto údaje sme odhadli podľa vášho počítača, tak zmeňte, čo nesedí.
 setup-region-intro-guessed = Poďme všetko nastaviť. Odhadli sme { $guesses }, tak zmeňte, čo nesedí.
 setup-region-guess-from-computer = { $fields } podľa vášho počítača
@@ -105,7 +104,6 @@ setup-meet-room-packed = Veci, ktoré ste zbalili vo Windows ({ $size }), sa roz
 setup-windows-fast-startup = Vypnúť rýchle spustenie vo Windows
 setup-windows-fast-startup-description = Windows sa potom úplne vypne, takže zvuk, Wi-Fi a Bluetooth sa v Lufte spustia načisto a jeho disk zostane prístupný.
 setup-windows-clock = Správny čas v oboch systémoch
-setup-windows-clock-description = Windows bude čítať hodiny počítača rovnako ako Luft, takže čas pri prepínaní nebude skákať.
 setup-windows-bluetooth = Preniesť zariadenia Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } zariadenie spárované vo Windows bude fungovať v Lufte bez nového párovania.
@@ -208,7 +206,6 @@ setup-account-mismatch = Heslá sa nezhodujú
 ## Installing
 
 setup-finishing-failed-title = Luft sa nepodarilo nainštalovať
-setup-finishing-failed-description = Pri inštalácii sa niečo pokazilo.
 setup-finishing-failed-stick = Počítač sa stále spúšťa tak ako predtým. Luft môžete ďalej používať z USB kľúča alebo reštartovať a skúsiť to znova.
 setup-finishing-failed-trying = Počítač sa stále spúšťa tak ako predtým. Luft môžete ďalej používať tak, ako je teraz, alebo reštartovať a skúsiť to znova.
 setup-finishing-use-stick = Používať Luft z USB kľúča

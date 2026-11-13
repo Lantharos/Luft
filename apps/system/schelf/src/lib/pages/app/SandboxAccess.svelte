@@ -47,25 +47,25 @@
 	}
 </script>
 
-<Row title="Change what it can use" description="The microphone, cameras, its Downloads folder and the older way of showing windows. Settings has the rest, under Apps.">
+<Row title="Change what it can use" description="Microphone, camera, Downloads and X11. More in Settings, under Apps.">
 	<button type="button" class="button" onclick={() => (open = true)}>Change</button>
 </Row>
 
 {#if open}
 	<Dialog title="What {app.name} can use" wide onclose={() => (open = false)}>
 		<div class="flex flex-col">
-			<Row title="Microphone" description="It can record sound, from the microphone and from what this computer plays. Applies right away.">
+			<Row title="Microphone" description="Records the microphone and what this computer plays. Applies right away.">
 				<Switch label="Microphone" checked={microphone} disabled={busy} onchange={(on) => change('microphone', on)} />
 			</Row>
-			<Row title="Camera" description="It can use the cameras of this computer. Some apps only find them the next time they open.">
+			<Row title="Camera" description="Some apps only find it the next time they open.">
 				<Switch label="Camera" checked={camera} disabled={busy} onchange={(on) => change('camera', on)} />
 			</Row>
-			<Row title="Downloads folder" description="It can read and change the files in your Downloads folder, from the next time it opens. Files you pick in a file window always reach it.">
+			<Row title="Downloads folder" description="It can read and change the files there, from the next time it opens. Files you pick always reach it.">
 				<Switch label="Downloads folder" checked={downloads} disabled={busy} onchange={(on) => change('downloads', on)} />
 			</Row>
 			<Row
 				title="Older way of showing windows"
-				description="Some older apps only work with X11. Apps that use it can see each other’s windows and what you type in them. Applies the next time it opens."
+				description="For older apps that need X11, where apps can see each other’s windows and typing. Applies the next time it opens."
 			>
 				<Switch label="Older way of showing windows" checked={x11} disabled={busy} onchange={(on) => change('x11', on)} />
 			</Row>

@@ -55,8 +55,8 @@
 	<ConsentDialog
 		title="{verb} {store.name} with full access?"
 		description="{reason
-			? `${store.name} asks to run outside a sandbox: “${reason}” There it can do anything a program you start yourself can, without asking.`
-			: `${store.name} doesn't run in a sandbox, so it can do anything a program you start yourself can, without asking.`}{store.installer === 'appimage' ? ' You can take full access away on its page later.' : ''}"
+			? `${store.name} asks to run outside a sandbox: “${reason}” There it can do all of this without asking.`
+			: `${store.name} doesn't run in a sandbox, so it can do all of this without asking.`}{store.installer === 'appimage' ? ' You can take full access away on its page later.' : ''}"
 		facts={FULL_ACCESS_ABILITIES}
 		{note}
 		confirm="{verb} with full access"

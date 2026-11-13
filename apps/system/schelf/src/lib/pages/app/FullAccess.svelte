@@ -59,10 +59,10 @@
 	const description = $derived(
 		error ??
 			(on
-				? `${app.name} runs outside its sandbox, with everything a program you start yourself can do.`
+				? 'It runs outside its sandbox, like a program you start yourself.'
 				: reason
-					? `${app.name} runs in a sandbox, though it asks to run without one: “${reason}” Only turn full access on if you trust it.`
-					: `${app.name} runs in a sandbox, with its own files and only what you give it. Full access takes the sandbox away; only turn it on for apps you trust.`)
+					? `It asks to run without its sandbox: “${reason}” Only turn this on if you trust it.`
+					: 'Takes away its sandbox. Only turn this on for apps you trust.')
 	);
 </script>
 
@@ -72,7 +72,7 @@
 
 {#if open && app.desktop}
 	{@const desktop = app.desktop}
-	<Row title="{app.name} is open" description="It keeps running the way it started until it opens again.">
+	<Row title="{app.name} is open" description="Changes apply once it opens again.">
 		<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>Restart</button>
 	</Row>
 {/if}
@@ -80,7 +80,7 @@
 {#if asking}
 	<ConsentDialog
 		title="Give {app.name} full access?"
-		description="{app.name} will run outside its sandbox and can do anything a program you start yourself can, without asking. It takes effect the next time it opens."
+		description="From the next time it opens, {app.name} can do all of this without asking."
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="Give full access"
 		danger

@@ -11,7 +11,7 @@
 
 <ConsentDialog
 	title="Install {name} for the whole computer?"
-	description="{name} brings a service or driver that only works as part of the system, so it can't be kept to your account like other tools."
+	description="{name} brings a service or driver that only works as part of the system."
 	facts={['Installs for everyone on this computer', 'Starts with the computer', 'Updates with Luft']}
 	confirm="Install"
 	onconfirm={install}

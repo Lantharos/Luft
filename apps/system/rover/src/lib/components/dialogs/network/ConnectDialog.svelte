@@ -65,7 +65,7 @@
 		onkeydown={(event) => event.key === 'Enter' && connect()}
 	/>
 	<p class="-mt-1 px-1 text-[12.5px] text-[var(--text-muted)]">
-		{protocol ? `Connects with ${protocol}` : 'SFTP, Windows shares (SMB), FTP, WebDAV and NFS addresses work here.'}
+		{protocol ? `Connects with ${protocol}` : 'SFTP, Windows shares (SMB), FTP, WebDAV or NFS'}
 	</p>
 	<Checkbox label="Keep in sidebar" checked={keep} onchange={(value) => (keep = value)}>Keep in sidebar</Checkbox>
 

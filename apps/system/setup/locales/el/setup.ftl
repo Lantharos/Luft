@@ -26,7 +26,6 @@ setup-region-title = Καλώς ήρθατε στο Luft
 setup-region-language = Γλώσσα
 setup-region-keyboard = Πληκτρολόγιο
 setup-region-time-zone = Ζώνη ώρας
-setup-region-intro = Ας ξεκινήσουμε. Επιλέξτε γλώσσα, πληκτρολόγιο και ζώνη ώρας.
 setup-region-intro-guessed-computer = Ας ξεκινήσουμε. Τα παρακάτω τα συμπεράναμε από τον υπολογιστή σας, οπότε αλλάξτε ό,τι δεν είναι σωστό.
 setup-region-intro-guessed = Ας ξεκινήσουμε. Συμπεράναμε { $guesses }, οπότε αλλάξτε ό,τι δεν είναι σωστό.
 setup-region-guess-from-computer = { $fields } από τον υπολογιστή σας
@@ -105,7 +104,6 @@ setup-meet-room-packed = Όσα πακετάρατε στα Windows, { $size }, 
 setup-windows-fast-startup = Απενεργοποίηση της γρήγορης εκκίνησης στα Windows
 setup-windows-fast-startup-description = Τα Windows θα τερματίζουν πλήρως, ώστε ο ήχος, το Wi-Fi και το Bluetooth να ξεκινούν από την αρχή στο Luft και ο δίσκος τους να μένει προσβάσιμος.
 setup-windows-clock = Σωστή ώρα και στα δύο συστήματα
-setup-windows-clock-description = Τα Windows θα διαβάζουν το ρολόι του υπολογιστή όπως το Luft, ώστε η ώρα να μην αλλάζει όταν κάνετε εναλλαγή.
 setup-windows-bluetooth = Μεταφορά των συσκευών Bluetooth
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } συσκευή συζευγμένη στα Windows θα λειτουργεί στο Luft χωρίς νέα σύζευξη.
@@ -198,7 +196,6 @@ setup-account-mismatch = Οι κωδικοί πρόσβασης δεν ταιρ�
 ## Installing
 
 setup-finishing-failed-title = Δεν ήταν δυνατή η εγκατάσταση του Luft
-setup-finishing-failed-description = Κάτι πήγε στραβά κατά την εγκατάσταση.
 setup-finishing-failed-stick = Ο υπολογιστής σας ξεκινά ακόμη όπως πριν. Μπορείτε να συνεχίσετε να χρησιμοποιείτε το Luft από το στικ USB ή να κάνετε επανεκκίνηση και να δοκιμάσετε ξανά.
 setup-finishing-failed-trying = Ο υπολογιστής σας ξεκινά ακόμη όπως πριν. Μπορείτε να συνεχίσετε να χρησιμοποιείτε το Luft όπως είναι τώρα ή να κάνετε επανεκκίνηση και να δοκιμάσετε ξανά.
 setup-finishing-use-stick = Χρήση του Luft από το στικ

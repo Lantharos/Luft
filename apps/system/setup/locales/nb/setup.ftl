@@ -26,7 +26,6 @@ setup-region-title = Velkommen til Luft
 setup-region-language = Språk
 setup-region-keyboard = Tastatur
 setup-region-time-zone = Tidssone
-setup-region-intro = La oss sette deg i gang. Velg språk, tastatur og tidssone.
 setup-region-intro-guessed-computer = La oss sette deg i gang. Vi har gjettet disse ut fra datamaskinen, så endre det som ikke stemmer.
 setup-region-intro-guessed = La oss sette deg i gang. Vi har gjettet { $guesses }, så endre det som ikke stemmer.
 setup-region-guess-from-computer = { $fields } ut fra datamaskinen
@@ -105,7 +104,6 @@ setup-meet-room-packed = Det du pakket i Windows, { $size }, pakkes ut i den nye
 setup-windows-fast-startup = Slå av rask oppstart i Windows
 setup-windows-fast-startup-description = Da slår Windows seg helt av, så lyd, wifi og Bluetooth starter på nytt i Luft, og disken forblir tilgjengelig.
 setup-windows-clock = Hold klokken riktig i begge
-setup-windows-clock-description = Windows leser datamaskinens klokke på samme måte som Luft, så tiden hopper ikke lenger når du bytter.
 setup-windows-bluetooth = Ta med Bluetooth-enhetene dine
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } enhet som er sammenkoblet i Windows, virker i Luft uten ny sammenkobling.
@@ -198,7 +196,6 @@ setup-account-mismatch = Passordene er ikke like
 ## Installing
 
 setup-finishing-failed-title = Luft kunne ikke installeres
-setup-finishing-failed-description = Noe gikk galt under installeringen.
 setup-finishing-failed-stick = Datamaskinen starter fortsatt som før. Du kan fortsette å bruke Luft fra minnepinnen, eller starte på nytt og prøve igjen.
 setup-finishing-failed-trying = Datamaskinen starter fortsatt som før. Du kan fortsette å bruke Luft slik det er nå, eller starte på nytt og prøve igjen.
 setup-finishing-use-stick = Bruk Luft fra minnepinnen

@@ -26,7 +26,6 @@ setup-region-title = Welkom bij Luft
 setup-region-language = Taal
 setup-region-keyboard = Toetsenbord
 setup-region-time-zone = Tijdzone
-setup-region-intro = Laten we beginnen. Kies je taal, toetsenbord en tijdzone.
 setup-region-intro-guessed-computer = Laten we beginnen. We hebben dit afgeleid van je computer, dus pas aan wat niet klopt.
 setup-region-intro-guessed = Laten we beginnen. We hebben { $guesses } afgeleid, dus pas aan wat niet klopt.
 setup-region-guess-from-computer = je { $fields } van je computer
@@ -105,7 +104,6 @@ setup-meet-room-packed = Wat je in Windows hebt ingepakt ({ $size }) wordt uitge
 setup-windows-fast-startup = Snel opstarten uitschakelen in Windows
 setup-windows-fast-startup-description = Windows sluit dan helemaal af, zodat geluid, wifi en Bluetooth in Luft fris starten en de schijf toegankelijk blijft.
 setup-windows-clock = De klok in beide goed houden
-setup-windows-clock-description = Windows leest de klok van de computer zoals Luft dat doet, zodat de tijd niet meer verspringt als je wisselt.
 setup-windows-bluetooth = Je Bluetooth-apparaten meenemen
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } apparaat dat in Windows is gekoppeld, werkt in Luft zonder opnieuw te koppelen.
@@ -198,7 +196,6 @@ setup-account-mismatch = De wachtwoorden komen niet overeen
 ## Installing
 
 setup-finishing-failed-title = Luft kon niet worden geïnstalleerd
-setup-finishing-failed-description = Er ging iets mis tijdens het installeren.
 setup-finishing-failed-stick = Je computer start nog net als eerst. Je kunt Luft vanaf de usb-stick blijven gebruiken, of opnieuw opstarten en het nog eens proberen.
 setup-finishing-failed-trying = Je computer start nog net als eerst. Je kunt Luft blijven gebruiken zoals het nu is, of opnieuw opstarten en het nog eens proberen.
 setup-finishing-use-stick = Luft vanaf de stick gebruiken

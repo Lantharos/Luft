@@ -26,7 +26,6 @@ setup-region-title = Dobro došli u Luft
 setup-region-language = Jezik
 setup-region-keyboard = Tastatura
 setup-region-time-zone = Vremenska zona
-setup-region-intro = Hajde da podesimo računar. Izaberite jezik, tastaturu i vremensku zonu.
 setup-region-intro-guessed-computer = Hajde da podesimo računar. Ovo smo pretpostavili na osnovu računara, pa promenite ono što ne odgovara.
 setup-region-intro-guessed = Hajde da podesimo računar. Pretpostavili smo { $guesses }, pa promenite ono što ne odgovara.
 setup-region-guess-from-computer = { $fields } na osnovu računara
@@ -105,7 +104,6 @@ setup-meet-room-packed = Stvari koje ste spakovali u sistemu Windows, { $size },
 setup-windows-fast-startup = Isključi Brzo pokretanje u sistemu Windows
 setup-windows-fast-startup-description = Windows će se tada potpuno gasiti, pa zvuk, Wi-Fi i Bluetooth u sistemu Luft kreću iz početka, a njegov disk ostaje dostupan.
 setup-windows-clock = Tačno vreme u oba sistema
-setup-windows-clock-description = Windows čita sat računara na isti način kao Luft, pa se vreme više ne pomera kada prelazite iz jednog u drugi.
 setup-windows-bluetooth = Prenesi Bluetooth uređaje
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } uređaj uparen u sistemu Windows radiće u sistemu Luft bez ponovnog uparivanja.
@@ -203,7 +201,6 @@ setup-account-mismatch = Lozinke se ne poklapaju
 ## Installing
 
 setup-finishing-failed-title = Luft nije mogao da se instalira
-setup-finishing-failed-description = Nešto je pošlo naopako tokom instaliranja.
 setup-finishing-failed-stick = Računar se i dalje pokreće kao i ranije. Možete da nastavite da koristite Luft sa USB fleša ili da ponovo pokrenete računar i pokušate opet.
 setup-finishing-failed-trying = Računar se i dalje pokreće kao i ranije. Možete da nastavite da koristite Luft ovakav kakav je sada ili da ponovo pokrenete računar i pokušate opet.
 setup-finishing-use-stick = Koristi Luft sa fleša

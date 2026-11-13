@@ -15,7 +15,7 @@
 	{#if built}
 		<Row
 			title="Built on GitHub Actions"
-			description="{where ? `${where}, by` : 'By'} the workflow its developer set up. schelf.store checked it before it reached you."
+			description="{where ? `${where}, by` : 'By'} the developer's workflow. Checked by schelf.store."
 		>
 			{#if provenance.run}
 				{@const run = provenance.run}
@@ -23,7 +23,7 @@
 			{/if}
 		</Row>
 	{:else}
-		<Row title="Uploaded by the developer" description="It wasn't built in public, so only the developer knows how it was made. schelf.store checked it before it reached you." />
+		<Row title="Uploaded by the developer" description="Only the developer knows how it was made. Checked by schelf.store." />
 	{/if}
 	{#if provenance.repository}
 		{@const repository = provenance.repository}

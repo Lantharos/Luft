@@ -43,7 +43,7 @@
 		caches: {
 			title: 'Clear app caches?',
 			action: 'Clear caches',
-			description: (size: number) => `This frees up to ${bytes(size)}. Apps make these copies again when they need them, so some may open slower the next time.`
+			description: (size: number) => `This frees up to ${bytes(size)}. Some apps may open slower the next time.`
 		}
 	};
 

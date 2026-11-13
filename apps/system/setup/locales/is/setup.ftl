@@ -26,7 +26,6 @@ setup-region-title = Velkomin í Luft
 setup-region-language = Tungumál
 setup-region-keyboard = Lyklaborð
 setup-region-time-zone = Tímabelti
-setup-region-intro = Byrjum. Veldu tungumál, lyklaborð og tímabelti.
 setup-region-intro-guessed-computer = Byrjum. Við giskuðum á þetta út frá tölvunni, svo breyttu því sem passar ekki.
 setup-region-intro-guessed = Byrjum. Við giskuðum á { $guesses }, svo breyttu því sem passar ekki.
 setup-region-guess-from-computer = { $fields } út frá tölvunni
@@ -105,7 +104,6 @@ setup-meet-room-packed = Það sem þú pakkaðir saman í Windows, { $size }, v
 setup-windows-fast-startup = Slökkva á flýtiræsingu í Windows
 setup-windows-fast-startup-description = Þá slekkur Windows alveg á sér, svo hljóð, Wi-Fi og Bluetooth byrja upp á nýtt í Luft og diskur Windows helst opinn.
 setup-windows-clock = Halda klukkunni réttri í báðum
-setup-windows-clock-description = Windows les klukku tölvunnar á sama hátt og Luft, svo tíminn hoppar ekki lengur þegar þú skiptir á milli.
 setup-windows-bluetooth = Taka Bluetooth-tækin með
 setup-windows-bluetooth-description = { $count ->
     [one] { $count } tæki parað í Windows virkar í Luft án þess að para það aftur.
@@ -198,7 +196,6 @@ setup-account-mismatch = Lykilorðin passa ekki saman
 ## Installing
 
 setup-finishing-failed-title = Ekki tókst að setja upp Luft
-setup-finishing-failed-description = Eitthvað fór úrskeiðis við uppsetninguna.
 setup-finishing-failed-stick = Tölvan ræsist enn eins og áður. Þú getur haldið áfram að nota Luft af USB-lyklinum eða endurræst og reynt aftur.
 setup-finishing-failed-trying = Tölvan ræsist enn eins og áður. Þú getur haldið áfram að nota Luft eins og núna eða endurræst og reynt aftur.
 setup-finishing-use-stick = Nota Luft af lyklinum

@@ -26,7 +26,6 @@ setup-region-title = Luft’a hoş geldiniz
 setup-region-language = Dil
 setup-region-keyboard = Klavye
 setup-region-time-zone = Saat dilimi
-setup-region-intro = Luft’u kuralım. Dilinizi, klavyenizi ve saat diliminizi seçin.
 setup-region-intro-guessed-computer = Luft’u kuralım. Bunları bilgisayarınıza göre tahmin ettik, yanlış olanı değiştirin.
 setup-region-intro-guessed = Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin.
 setup-region-guess-from-computer = { $fields } bilgisayarınıza göre
@@ -105,7 +104,6 @@ setup-meet-room-packed = Windows’ta paketledikleriniz ({ $size }) yeni hesabı
 setup-windows-fast-startup = Windows’ta Hızlı başlatmayı kapat
 setup-windows-fast-startup-description = Böylece Windows tamamen kapanır. Ses, Wi-Fi ve Bluetooth Luft’ta temiz bir şekilde başlar ve Windows’un diski erişilebilir kalır.
 setup-windows-clock = Saat iki sistemde de doğru kalsın
-setup-windows-clock-description = Windows bilgisayarın saatini Luft ile aynı şekilde okur, böylece sistemler arasında geçiş yaptığınızda saat artık kaymaz.
 setup-windows-bluetooth = Bluetooth cihazlarınızı getirin
 setup-windows-bluetooth-description = { $count ->
     [one] Windows’ta eşleştirilmiş { $count } cihaz, yeniden eşleştirmeye gerek kalmadan Luft’ta çalışır.
@@ -198,7 +196,6 @@ setup-account-mismatch = Parolalar eşleşmiyor
 ## Installing
 
 setup-finishing-failed-title = Luft yüklenemedi
-setup-finishing-failed-description = Yükleme sırasında bir sorun oluştu.
 setup-finishing-failed-stick = Bilgisayarınız hâlâ eskisi gibi başlıyor. Luft’u USB bellekten kullanmaya devam edebilir ya da yeniden başlatıp tekrar deneyebilirsiniz.
 setup-finishing-failed-trying = Bilgisayarınız hâlâ eskisi gibi başlıyor. Luft’u şimdiki hâliyle kullanmaya devam edebilir ya da yeniden başlatıp tekrar deneyebilirsiniz.
 setup-finishing-use-stick = Luft’u USB bellekten kullan

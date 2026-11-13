@@ -34,7 +34,7 @@
 
 <Dialog
 	title={`Priority of ${name}`}
-	description="Higher priority gets this process more processor time when others want it too. Raising it above normal asks for your password."
+	description="Higher priority gets it more processor time when others want it too. Above normal asks for your password."
 	onclose={() => (tasks.priority = null)}
 >
 	<div class="flex flex-col gap-4">

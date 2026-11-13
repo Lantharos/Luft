@@ -33,11 +33,10 @@ setup-region-title = Welcome to Luft
 setup-region-language = Language
 setup-region-keyboard = Keyboard
 setup-region-time-zone = Time zone
-setup-region-intro = Let’s get you set up. Choose your language, keyboard and time zone.
-setup-region-intro-guessed-computer = Let’s get you set up. We guessed these from your computer, so change anything that’s off.
+setup-region-intro-guessed-computer = We guessed these from your computer. Change anything that’s off.
 # $guesses lists what was guessed and where from, built from the setup-region-guess-* messages and
 # joined like "your keyboard from your computer and your time zone from your network"
-setup-region-intro-guessed = Let’s get you set up. We guessed { $guesses }, so change anything that’s off.
+setup-region-intro-guessed = We guessed { $guesses }. Change anything that’s off.
 # $fields is a list of setup-region-field-* names, like "language and keyboard"
 setup-region-guess-from-computer = your { $fields } from your computer
 # $fields is a list of setup-region-field-* names, like "language and keyboard"
@@ -49,20 +48,20 @@ setup-region-field-time-zone = time zone
 ## Note that Luft is still early, shown after the welcome step
 
 setup-early-title = Luft isn’t finished yet
-setup-early-body = You’re early. Luft works well enough to use every day, but it’s still being built. Things will change, some will break, and a few will be missing.
-setup-early-reports = If something looks or feels wrong, tell us. Nothing is too small: an icon that’s off by a pixel, a word that reads oddly, a moment where you didn’t know what to do. Those reports are how Luft gets good.
-setup-early-nightly = This is a nightly build. A new one comes out every day with the latest changes, and nobody has used it for long before it reaches you.
+setup-early-body = Luft is good enough for every day, but things will still change, break or be missing.
+setup-early-reports = If something looks or feels wrong, tell us. Nothing is too small, not even an icon that’s off by a pixel.
+setup-early-nightly = This is a nightly build, made every day and barely used before it reaches you.
 # Shown instead of setup-early-nightly once a stable version is out
-setup-early-nightly-stable = This is a nightly build. A new one comes out every day with the latest changes, and nobody has used it for long before it reaches you. If you’d rather have fewer surprises, you can switch to the stable version in Settings later.
+setup-early-nightly-stable = This is a nightly build, made every day and barely used before it reaches you. For fewer surprises, switch to the stable version later in Settings.
 # github.com/Lantharos/Luft/issues stays as it is
 setup-early-report = Report a problem at github.com/Lantharos/Luft/issues
 
 ## Where Luft goes
 
 setup-destination-choose-title = Where should Luft go?
-setup-destination-choose-description = Pick how Luft fits on this computer. Nothing changes until you confirm.
+setup-destination-choose-description = Nothing changes until you confirm.
 setup-destination-alongside-title = Make room next to Windows
-setup-destination-alongside-description = Windows gets smaller to make space for Luft. Your files in Windows stay as they are.
+setup-destination-alongside-description = Windows gets smaller to make room. Its files stay as they are.
 setup-destination-whole-title = Choose a drive
 setup-destination-whole-description = Luft takes over the whole drive. Everything on it is erased.
 setup-destination-custom-title = Choose the space for Luft
@@ -74,7 +73,7 @@ setup-destination-meet-title = Next to Windows
 setup-destination-meet-description = Meet Luft already made this room, so Windows stays just as it is.
 # $drive is a drive name, like "Samsung SSD 980"
 setup-destination-meet-drive-title = On { $drive }
-setup-destination-meet-drive-description = Meet Luft already made this room on another drive, and Luft starts from there with start files of its own.
+setup-destination-meet-drive-description = Meet Luft already made this room on another drive.
 setup-destination-looking = Looking at your drives
 
 setup-destination-meet-choice = Alongside Windows
@@ -89,7 +88,7 @@ setup-destination-alongside-choice = Alongside { $windows }
 setup-destination-alongside-choice-description = Keep Windows and its files, and give Luft part of its drive.
 # $system is the name of a Linux system on this computer
 setup-destination-replace-choice = Replace { $system }
-setup-destination-replace-choice-description = Keep your files, your account and your settings, and let Luft take its place.
+setup-destination-replace-choice-description = Keep your files, account and settings, and let Luft take its place.
 setup-destination-whole-choice = Use a whole drive
 setup-destination-whole-choice-description = Erase a drive and give all of it to Luft.
 # Button that leaves setup and starts the desktop from the USB stick, without installing anything
@@ -114,13 +113,13 @@ setup-confirm-shrink-title = Shrink Windows to { $size }?
 setup-confirm-meet-title = Install Luft next to Windows?
 setup-confirm-meet-drive-title = Install Luft on { $drive }?
 setup-confirm-free-title = Install Luft in the free space?
-setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them. The computer can’t be encrypted this way, so someone who takes the drive could read your files.
+setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them. Luft can’t be encrypted this way, so anyone with the drive could read your files.
 setup-confirm-replace-erase-old = Luft starts copying right away. The old system is erased for good, and your files stay where they are.
 setup-confirm-erase-description = Everything on this drive is erased for good, including other systems and files.
 # $drive is a drive name, like "Samsung SSD 980". The drive has nothing on it
 setup-confirm-empty-title = Install Luft on { $drive }?
-setup-confirm-empty-description = This drive is empty, so nothing is lost. Luft starts copying right away, and you can set up your account while it works.
-setup-confirm-install-description = Luft starts copying right away. You can set up your account while it works.
+setup-confirm-empty-description = This drive is empty, so nothing is lost. Luft starts copying right away.
+setup-confirm-install-description = Luft starts copying right away.
 setup-confirm-erase = Erase and install
 # Button, verb
 setup-confirm-install = Install
@@ -130,8 +129,8 @@ setup-confirm-install = Install
 setup-protect-title = Protect your files
 setup-protect-tpm = Encrypt this computer so nobody can read your files without signing in, even if it’s lost. It unlocks by itself when it starts.
 setup-protect-passphrase = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.
-setup-protect-passphrase-secure-boot-off = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost. Secure Boot is turned off on this computer. With it turned on in the computer’s startup settings, Luft could unlock by itself when it starts.
-setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
+setup-protect-passphrase-secure-boot-off = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost. Turn on Secure Boot in the computer’s startup settings and Luft can unlock by itself.
+setup-protect-keep-safe = Keep this recovery key safe, away from this computer. You need it if it ever can’t unlock by itself.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again
 setup-protect-mismatch = They don’t match
@@ -140,7 +139,7 @@ setup-protect-key-label = Recovery key { $key }
 setup-protect-save-usb = Save to a USB drive
 setup-protect-print = Print
 setup-protect-write = Write it down
-setup-protect-usb-plug = Plug in a USB drive to save the key on it. Anything else on the drive stays as it is.
+setup-protect-usb-plug = Plug in a USB drive to save the key on. Nothing else on it changes.
 # Button, verb: saves the recovery key on this USB drive
 setup-protect-usb-save = Save
 setup-protect-usb-done = Saved
@@ -162,7 +161,7 @@ setup-protect-encrypt = Encrypt
 ## Making room next to Windows
 
 # $drive is a drive name, like "Samsung SSD 980"
-setup-alongside-hint = Drag to share { $drive } between Windows and Luft. Windows keeps all of its files and some room to grow.
+setup-alongside-hint = Drag to share { $drive } between Windows and Luft.
 setup-windows-bitlocker = Windows keeps this drive locked with BitLocker, so Luft can’t make room on it. In Windows, turn off device encryption, or shrink the drive in Disk Management and choose the free space under Custom.
 setup-windows-hibernated = Windows is asleep or was shut down with Fast Startup, so its drive can’t be changed safely. Start Windows, hold Shift while you choose Shut down, then start Luft again.
 setup-windows-dirty = Windows’ drive needs a quick check first. Start Windows, restart it once, then start Luft again.
@@ -179,7 +178,7 @@ setup-meet-room-packed = The things you packed in Windows, { $size }, are unpack
 ## The moving box packed in Windows with Meet Luft, which opens with the code Meet Luft showed
 
 setup-box-title = Unpack what you brought from Windows?
-setup-box-description = Meet Luft locked the things you packed with a code and showed it to you in Windows. Type it here and Luft unpacks them into your new account.
+setup-box-description = Type the code Meet Luft showed you in Windows to unpack them into your new account.
 # Label of the field the code is typed into
 setup-box-code = Code from Meet Luft
 # Button that opens the moving box with the typed code
@@ -190,13 +189,12 @@ setup-box-skip = Leave them behind
 ## Windows options
 
 setup-windows-fast-startup = Turn off Fast Startup in Windows
-setup-windows-fast-startup-description = Windows then shuts down fully, so sound, Wi-Fi and Bluetooth start fresh in Luft and its drive stays open.
+setup-windows-fast-startup-description = Windows then shuts down fully, so its drive stays open and devices start fresh in Luft.
 setup-windows-clock = Keep the clock right in both
-setup-windows-clock-description = Windows reads the computer’s clock the way Luft does, so the time no longer jumps when you switch.
 setup-windows-bluetooth = Bring your Bluetooth devices
 setup-windows-bluetooth-description = { $count ->
-    [one] { $count } device paired in Windows will work in Luft without pairing again.
-   *[other] { $count } devices paired in Windows will work in Luft without pairing again.
+    [one] { $count } device paired in Windows
+   *[other] { $count } devices paired in Windows
 }
 
 ## Choosing a drive
@@ -225,7 +223,7 @@ setup-custom-free-space = { $size } of free space
 # $drive is a drive name, like "Samsung SSD 980"
 setup-custom-on-drive = On { $drive }
 # $size is a size like "20 GB"
-setup-custom-none = Make at least { $size } of free space in Disks, then look again. Luft goes into the space you leave free.
+setup-custom-none = Make at least { $size } of free space in Disks, then look again.
 
 ## Replacing a Linux system
 
@@ -269,7 +267,7 @@ setup-replace-blocked-read-only = Its drive is read-only.
 ## Connecting to the internet
 
 setup-network-title = Connect to the internet
-setup-network-intro = This is optional. Being online lets Luft set your clock and time zone, and the network you join here is ready when Luft starts for the first time.
+setup-network-intro = Optional. It lets Luft set your clock and time zone, and keeps you connected once Luft is installed.
 setup-network-unavailable = Networks aren’t available right now. You can connect later from the panel.
 setup-network-looking = Looking for networks
 setup-network-cable = Connected with a cable
@@ -289,7 +287,7 @@ setup-network-join = Join
 ## Account
 
 setup-account-title = Who’s using this computer?
-setup-account-description = This is the account you sign in with. You can add more people later in Settings.
+setup-account-description = You can add more people later in Settings.
 setup-account-full-name = Your name
 # Example name shown in the empty name field. Use a well-known name that fits your language
 setup-account-full-name-example = Ada Lovelace
@@ -306,22 +304,20 @@ setup-account-mismatch = The passwords don’t match
 ## Installing
 
 setup-finishing-failed-title = Luft couldn’t be installed
-setup-finishing-failed-description = Something went wrong while installing.
-setup-finishing-failed-stick = Your computer still starts the way it did before. You can try again, or keep using Luft from the USB stick.
-setup-finishing-failed-trying = Your computer still starts the way it did before. You can try again, or keep using Luft as it is now.
+setup-finishing-failed-stick = Your computer still starts the way it did before. Try again, or keep using Luft from the USB stick.
+setup-finishing-failed-trying = Your computer still starts the way it did before. Try again, or keep using Luft as it is now.
 setup-finishing-try-again = Try again
 setup-finishing-details = Details
 setup-finishing-details-title = What went wrong
-setup-finishing-details-description = This is what the installer reported. It can help someone work out what happened.
 setup-finishing-use-stick = Use Luft from the stick
 setup-finishing-keep-trying = Keep trying Luft
 setup-finishing-installed-title = Luft is installed
-setup-finishing-secure-boot-stick = Right after the restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code. Take out the USB stick once Luft has started.
-setup-finishing-secure-boot = Right after the restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code.
+setup-finishing-secure-boot-stick = After the restart, a blue screen asks for this code to finish setting up Secure Boot. Take out the USB stick once Luft has started.
+setup-finishing-secure-boot = After the restart, a blue screen asks for this code to finish setting up Secure Boot.
 setup-finishing-restart-started-stick = Restart to start using it. Take out the USB stick once Luft has started.
 setup-finishing-restart = Restart to start using it.
 setup-finishing-installing-title = Installing Luft
-setup-finishing-description = Luft is being copied to your computer. This takes a few minutes.
+setup-finishing-description = This takes a few minutes.
 setup-finishing-plug-in = Keep your computer plugged in until it’s done.
 setup-stage-idle = Getting ready
 setup-stage-preparing = Making room for Luft
@@ -334,7 +330,7 @@ setup-stage-finished = Done
 
 setup-network-type-title = What kind of network is this?
 # $network is the name of the network, or a list of names when the computer joined several
-setup-network-type-description = You’re connected to { $network }. On a home network, your other devices can find this computer.
+setup-network-type-description = You’re connected to { $network }.
 setup-network-type-home = Home
     .detail = At home or at work. Casting, games and sharing files just work
 setup-network-type-public = Public
@@ -353,7 +349,7 @@ setup-enroll-code-label = Code { $code }
 setup-enroll-code-hint = Type all eight digits, without a space. Nothing shows while you type.
 setup-enroll-missed = If the blue screen goes by, Luft starts anyway and you can try again.
 setup-secure-boot-finish-title = Finish setting up Secure Boot
-setup-secure-boot-pending = Right after the next restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code.
+setup-secure-boot-pending = After the next restart, a blue screen asks for this code to finish setting up Secure Boot.
 setup-secure-boot-not-set-up = Secure Boot isn’t set up for Luft yet, so Luft starts without its boot menu. Get a code, restart, and use the keyboard on the blue screen.
 setup-secure-boot-getting = Getting your code
 setup-secure-boot-get-code = Get a code
@@ -361,7 +357,7 @@ setup-secure-boot-get-code = Get a code
 ## Fingerprint
 
 setup-fingerprint-title = Sign in with your finger
-setup-fingerprint-description = Unlock Luft with a touch instead of typing your password. You can add more fingers later in Settings.
+setup-fingerprint-description = Unlock Luft with a touch instead of your password.
 setup-fingerprint-which = Which finger?
 setup-fingerprint-another = Add another finger?
 # Label of the finger dropdown (screen readers)
@@ -373,13 +369,13 @@ setup-fingerprint-choose-another = Choose another finger
 ## Done
 
 setup-ready-title = You’re all set
-setup-ready-secure-boot = Restart once more to finish setting up Secure Boot. Right after the restart, a blue screen asks for this code. Use the keyboard there.
+setup-ready-secure-boot = Restart once more to finish setting up Secure Boot. A blue screen then asks for this code.
 setup-ready-done = Your desktop is ready. Have fun with Luft.
 setup-ready-start-title = Start
 setup-ready-start-detail = Your apps, files and search, from the taskbar or the Super key.
 setup-ready-schelf-title = Schelf
 setup-ready-schelf-detail = Get more apps and keep them up to date.
 setup-ready-settings-title = Settings
-setup-ready-settings-detail = Wi-Fi, accounts, wallpaper and everything else about this computer.
+setup-ready-settings-detail = Wi-Fi, accounts, wallpaper and everything else.
 setup-ready-settings-secure-boot = Finish setting up Secure Boot whenever you’re ready, under Security.
 setup-ready-start = Start using Luft

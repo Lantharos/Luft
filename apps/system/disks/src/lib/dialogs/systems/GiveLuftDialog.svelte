@@ -48,11 +48,11 @@
 	});
 
 	let growing = $derived.by(() => {
-		if (growth === 'now') return 'Luft grows into the space right away, and you can keep using the computer while it does.';
+		if (growth === 'now') return 'Luft grows into the space right away, while you keep using the computer.';
 		if (growth !== 'at-start') return '';
 		const copies = used === null ? 'all of Luft’s files' : `all of Luft’s files, about ${bytes(used)}`;
 		const rest = alsoAfter ? `, then grows over the ${bytes(alsoAfter)} free right after it` : ', then grows to fill it';
-		return `Luft moves into the space in front of it the next time the computer starts${rest}. Moving copies ${copies}, which can take from a few minutes to an hour or more on a full drive. You can use the computer while it runs. Keep it plugged in; if it turns off partway, Luft carries on where it left off at the next start.`;
+		return `Luft moves into the space in front of it the next time the computer starts${rest}. Moving copies ${copies}, which can take an hour or more on a full drive. Keep the computer plugged in; if it turns off partway, Luft carries on at the next start.`;
 	});
 
 	$effect(() => {

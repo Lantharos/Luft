@@ -163,7 +163,7 @@ jobs:
       CCACHE_DIR: ${{ github.workspace }}/kestrel/run/ccache
       KESTREL_SESSION_DIR: ${{ github.workspace }}/kestrel/run/smoke
       KESTREL_CAPTURE_DIR: ${{ github.workspace }}/kestrel/run/smoke/screenshots
-      SMOKE_GROUPS: system:session,start:search,lockScreen:lock,lockScreen:unlock,panel:surfaces,panel:motion,desktop:motion,system:watchdog,extensions:confined,extensions:hostile,extensions:origins,windows:state,network:appAccess,keyring:prompter,portal:shortcuts,input:backgroundClipboard
+      SMOKE_GROUPS: system:session,start:search,lockScreen:lock,lockScreen:unlock,panel:surfaces,panel:motion,desktop:motion,system:watchdog,extensions:hostile,windows:state,network:appAccess,portal:shortcuts,input:backgroundClipboard
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 

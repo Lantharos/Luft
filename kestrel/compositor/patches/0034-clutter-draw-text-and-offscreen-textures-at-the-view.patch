@@ -259,7 +259,7 @@ index 418a52e9c77b929463712870a4d4ac55e6628a12..942b4b122159252e7dba55126ca8fd96
  {
    CLUTTER_CULL_RESULT_IN,
 diff --git a/clutter/clutter/clutter-util.c b/clutter/clutter/clutter-util.c
-index d017006f20aa7a631214d4313ef450ae4191ead3..bfa6284fbd03323188af9868116467fc7eb0bb58 100644
+index d017006f20aa7a631214d4313ef450ae4191ead3..134387cadcc2faeedcce0147b23f497acddcb0fc 100644
 --- a/clutter/clutter/clutter-util.c
 +++ b/clutter/clutter/clutter-util.c
 @@ -108,6 +108,45 @@ _clutter_util_fully_transform_vertices (const graphene_matrix_t  *modelview,

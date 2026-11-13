@@ -33,6 +33,7 @@ fn launch_activation_token() -> Option<String> {
 fn window(window: SabineWindow, state: &MailmanState, opens_window: bool) -> SabineWindow {
     let attached = state.notifier.clone();
     let unfocused = state.notifier.clone();
+    let engine = state.engine.clone();
     let window = WINDOW
         .apply(window)
         .background()
@@ -46,7 +47,8 @@ fn window(window: SabineWindow, state: &MailmanState, opens_window: bool) -> Sab
             if !visibility.visible {
                 unfocused.set_focused(false);
             }
-        });
+        })
+        .on_quit(move || engine.stop());
     bridge::register(window, state)
 }
 

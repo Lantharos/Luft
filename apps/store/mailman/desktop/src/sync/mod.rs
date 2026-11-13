@@ -9,6 +9,9 @@ mod worker;
 
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
 
 use crossbeam_channel::Sender;
 use luft_app::Events;
@@ -22,6 +25,8 @@ pub use ops::{Operation, Target};
 use worker::{Job, Queue};
 pub use worker::{OutboxEvent, SyncStatus};
 
+const STOP_TIMEOUT: Duration = Duration::from_secs(30);
+
 #[derive(Clone)]
 pub struct Shared {
     pub store: Store,
@@ -29,10 +34,12 @@ pub struct Shared {
     pub credentials: Credentials,
     pub notifier: Notifier,
     sending: Arc<Mutex<HashSet<i64>>>,
+    stopping: Arc<AtomicBool>,
 }
 
 struct Running {
     queue: Queue,
+    worker: Option<JoinHandle<()>>,
     bodies: Sender<i64>,
     push: remote::Push,
 }
@@ -59,6 +66,7 @@ impl Engine {
                 credentials,
                 notifier,
                 sending: Arc::default(),
+                stopping: Arc::default(),
             },
             running: Arc::default(),
         }
@@ -74,13 +82,14 @@ impl Engine {
 
     pub fn add(&self, account: Account) {
         let id = account.id;
-        let queue = worker::spawn(account.clone(), self.shared.clone());
+        let (queue, worker) = worker::spawn(account.clone(), self.shared.clone());
         let bodies = fetcher::spawn(account.clone(), self.shared.clone());
         let push = self.push(account, queue.arrivals());
         self.running.lock().insert(
             id,
             Running {
                 queue,
+                worker,
                 bodies,
                 push,
             },
@@ -92,6 +101,22 @@ impl Engine {
         match account.config.protocol.clone() {
             Protocol::Imap { .. } => imap::idle::watch(account, credentials, arrived),
             Protocol::Jmap { session } => jmap::push::watch(session, account, credentials, arrived),
+        }
+    }
+
+    /// Lets every account finish the job it is on, so the app ends without
+    /// losing or repeating a send or a change on the server.
+    pub fn stop(&self) {
+        self.shared.stopping.store(true, Ordering::Release);
+        let running = std::mem::take(&mut *self.running.lock());
+        for account in running.values() {
+            account.queue.post(Job::Stop);
+        }
+        let deadline = Instant::now() + STOP_TIMEOUT;
+        for worker in running.into_values().filter_map(|account| account.worker) {
+            while !worker.is_finished() && Instant::now() < deadline {
+                std::thread::sleep(Duration::from_millis(25));
+            }
         }
     }
 

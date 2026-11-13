@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
 use crossbeam_channel::{Receiver, Sender, TryRecvError, select};
@@ -35,6 +36,7 @@ pub enum Job {
     Mailbox(i64),
     Flush,
     Send(Outgoing),
+    Stop,
 }
 
 #[derive(Clone)]
@@ -80,7 +82,7 @@ pub struct SyncStatus {
     signed_out: bool,
 }
 
-pub fn spawn(account: Account, shared: Shared) -> Queue {
+pub fn spawn(account: Account, shared: Shared) -> (Queue, Option<JoinHandle<()>>) {
     let (jobs, queued) = crossbeam_channel::unbounded();
     let (arrivals, arrived) = crossbeam_channel::bounded(1);
     let refreshing = Arc::new(AtomicBool::new(false));
@@ -98,15 +100,16 @@ pub fn spawn(account: Account, shared: Shared) -> Queue {
         poll_at: Instant::now() + POLL,
         retry: FIRST_RETRY,
     };
-    std::thread::Builder::new()
+    let thread = std::thread::Builder::new()
         .name(format!("account-{}", worker.account.id))
         .spawn(move || worker.run())
         .ok();
-    Queue {
+    let queue = Queue {
         jobs,
         arrivals,
         refreshing,
-    }
+    };
+    (queue, thread)
 }
 
 struct Worker {
@@ -168,6 +171,9 @@ impl Worker {
                     }
                 }
             };
+            if self.shared.stopping.load(Ordering::Acquire) {
+                return;
+            }
             self.handle(job);
         }
     }
@@ -216,6 +222,7 @@ impl Worker {
             Job::Mailbox(id) => self.syncing(|worker| worker.sync_one(id)),
             Job::Flush => self.syncing(Self::flush),
             Job::Send(outgoing) => self.send(&outgoing),
+            Job::Stop => {}
         }
     }
 
@@ -272,6 +279,9 @@ impl Worker {
         self.status(SyncState::Syncing, None);
         self.flush()?;
         for mailbox in self.folders()? {
+            if self.shared.stopping.load(Ordering::Acquire) {
+                return Ok(());
+            }
             self.sync_mailbox(&mailbox)?;
             if self.arrived.try_recv().is_ok() {
                 self.sync_arrivals()?;

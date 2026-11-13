@@ -28,7 +28,8 @@
       Remaining (t, seconds), CanEncrypt (b, Luft's partition can be encrypted in place),
       TpmUnlocks (b, the TPM can unlock the disk, so a passphrase is optional),
       Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
-      RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
+      RecoveryKeyStored (b, the recovery key can be shown again), OlderRecoveryKey (b, the key kept is one of
+      64 letters from before the 12 words, which ReplaceRecoveryKey swaps for words), TpmRefused (b, the TPM didn't unlock the disk
       at the last startup, so the recovery key or passphrase was needed), SecureBootChanged (b, the Secure Boot
       settings changed in a way Luft didn't expect, so the TPM stays sealed to the old ones until an administrator
       confirms them with AcceptSecureBootChange), Resize (s: "" when nothing is waiting, or "grow", "shrink" or

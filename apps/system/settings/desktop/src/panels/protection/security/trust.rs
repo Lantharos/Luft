@@ -85,6 +85,7 @@ pub struct Disk {
     tpm_unlocks: bool,
     unlock: Vec<UnlockMethod>,
     recovery_key_stored: bool,
+    older_recovery_key: bool,
     tpm_refused: bool,
     secure_boot_changed: bool,
 }
@@ -192,6 +193,7 @@ fn disk(map: &Map) -> Disk {
             .filter_map(parse)
             .collect(),
         recovery_key_stored: flag(map, "RecoveryKeyStored"),
+        older_recovery_key: flag(map, "OlderRecoveryKey"),
         tpm_refused: flag(map, "TpmRefused"),
         secure_boot_changed: flag(map, "SecureBootChanged"),
     }

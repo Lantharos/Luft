@@ -99,19 +99,23 @@ impl Unlock {
         }
     }
 
+    fn reads_words(&self) -> bool {
+        self.ask.wants_only_a_recovery_key() && !words::is_passphrase(self.secret.bytes())
+    }
+
     fn refresh(&mut self) {
         let copy = self.ask.copy();
-        let only_a_key = self.ask.wants_only_a_recovery_key();
+        let reads_words = self.reads_words();
         self.prompt.title = copy.title;
         self.prompt.explanation = copy.explanation;
         self.prompt.placeholder = copy.placeholder.to_owned();
         self.prompt.typed = self.secret.characters();
-        self.prompt.key = only_a_key.then(|| words::shown(self.secret.bytes()));
+        self.prompt.key = reads_words.then(|| words::shown(self.secret.bytes()));
         self.prompt.note = if self.rejected {
             Some((copy.rejected.to_owned(), 1.0))
-        } else if self.caps_lock && !only_a_key {
+        } else if self.caps_lock && !reads_words {
             Some(("Caps Lock is on".to_owned(), 0.7))
-        } else if only_a_key {
+        } else if reads_words {
             Some(self.words_note(words::read(self.secret.bytes())))
         } else {
             self.ask
@@ -121,7 +125,7 @@ impl Unlock {
     }
 
     fn ready_to_answer(&self) -> bool {
-        !self.ask.wants_only_a_recovery_key()
+        !self.reads_words()
             || matches!(
                 luft_recovery_key::read(self.secret.bytes()),
                 Reading::Key(_)

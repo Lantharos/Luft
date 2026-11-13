@@ -75,6 +75,7 @@ pub struct DiskStatus {
     pub tpm_unlocks: bool,
     pub unlock: Vec<&'static str>,
     pub recovery_key_stored: bool,
+    pub older_recovery_key: bool,
     pub tpm_refused: bool,
     pub secure_boot_changed: bool,
     pub resize: Option<Change>,
@@ -122,6 +123,7 @@ pub fn status(tpm: &Tpm) -> Option<DiskStatus> {
         tpm_unlocks: keys::unavailable_reason(tpm).is_none(),
         unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
         recovery_key_stored: keys::has_escrow(),
+        older_recovery_key: keys::escrow_is_older_kind(),
         tpm_refused: header.as_ref().is_some_and(|header| header.has(luks::TPM2))
             && !seal::sealed_this_start()
             && journal::tpm_refused_this_boot(),

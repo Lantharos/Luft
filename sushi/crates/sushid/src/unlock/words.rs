@@ -1,4 +1,4 @@
-use luft_recovery_key::{self as recovery, SHORTEST_PREFIX, WORDS};
+use luft_recovery_key::{self as recovery, LONGEST_WORD, SHORTEST_PREFIX, WORDS};
 use sushi::scene::{Shown, ShownKey, Slot};
 
 pub struct Words {
@@ -17,6 +17,10 @@ fn known(token: &[u8], current: bool) -> bool {
 
 pub fn current(typed: &[u8]) -> usize {
     tokens(typed).count() - 1
+}
+
+pub fn is_passphrase(typed: &[u8]) -> bool {
+    !typed.contains(&b' ') && (typed.contains(&b'-') || typed.len() > LONGEST_WORD)
 }
 
 pub fn can_move_on(typed: &[u8]) -> bool {

@@ -182,6 +182,9 @@ fn follow_up() {
     if let Err(error) = startup::follow_up() {
         eprintln!("Couldn't follow up on Luft's startup: {error:#}");
     }
+    if let Err(error) = disk::unlock::keys::note_older_kind() {
+        eprintln!("Couldn't tell what kind of recovery key this computer keeps: {error:#}");
+    }
     if let Err(error) = disk::unlock::seal::follow_up() {
         eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
     }

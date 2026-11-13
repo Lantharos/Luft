@@ -18,6 +18,7 @@ use crate::system::secrets::secret::Secret;
 pub const SHORTEST_PASSPHRASE: usize = 8;
 const ESCROW: &str = "recovery-key.cred";
 const ESCROW_NAME: &str = "trustd.recovery-key";
+const OLDER_KIND: &str = "recovery-key-older-kind";
 const NEW_PIN_CREDENTIAL: &str = "cryptenroll.new-tpm2-pin";
 
 pub fn generate_recovery_key() -> Result<Secret> {
@@ -48,7 +49,20 @@ pub fn is_recovery_key(key: &Secret) -> bool {
 
 pub fn escrow_in(state: &Path, key: &Secret) -> Result<()> {
     paths::ensure_private(state)?;
-    creds::seal(ESCROW_NAME, key, Protection::Tpm, &state.join(ESCROW))
+    creds::seal(ESCROW_NAME, key, Protection::Tpm, &state.join(ESCROW))?;
+    let _ = std::fs::remove_file(state.join(OLDER_KIND));
+    Ok(())
+}
+
+pub fn note_older_kind() -> Result<()> {
+    if escrowed().is_some_and(|key| !is_recovery_key(&key)) {
+        paths::write_private(&paths::state(OLDER_KIND), b"")?;
+    }
+    Ok(())
+}
+
+pub fn escrow_is_older_kind() -> bool {
+    paths::state(OLDER_KIND).exists()
 }
 
 pub fn escrow(key: &Secret) -> Result<()> {

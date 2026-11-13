@@ -114,6 +114,7 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         ("TpmUnlocks", disk.tpm_unlocks.into()),
         ("Unlock", disk.unlock.clone().into()),
         ("RecoveryKeyStored", disk.recovery_key_stored.into()),
+        ("OlderRecoveryKey", disk.older_recovery_key.into()),
         ("TpmRefused", disk.tpm_refused.into()),
         ("SecureBootChanged", disk.secure_boot_changed.into()),
         ("Resize", resize(disk.resize).into()),

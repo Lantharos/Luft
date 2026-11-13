@@ -4,7 +4,7 @@ use sha2::{Digest, Sha256};
 
 pub const WORDS: usize = 12;
 pub const SHORTEST_PREFIX: usize = 4;
-const LONGEST_WORD: usize = 8;
+pub const LONGEST_WORD: usize = 8;
 const ENTROPY: usize = 16;
 const INDEX_BITS: usize = 11;
 const CHECKSUM_BITS: usize = 4;

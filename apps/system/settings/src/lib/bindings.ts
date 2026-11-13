@@ -1021,6 +1021,7 @@ export type Disk = {
 	tpmUnlocks: boolean,
 	unlock: UnlockMethod[],
 	recoveryKeyStored: boolean,
+	olderRecoveryKey: boolean,
 	tpmRefused: boolean,
 	secureBootChanged: boolean,
 };

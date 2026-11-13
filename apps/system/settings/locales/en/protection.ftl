@@ -361,6 +361,8 @@ settings-recovery-description = Gets you in if the drive can’t unlock by itsel
 settings-recovery-show = Show
 # Button, verb
 settings-recovery-replace = Replace
+settings-recovery-older-title = Your recovery key is an older kind
+settings-recovery-older-description = Replace it with one of 12 words, which is easier to type
 settings-recovery-replace-title = Replace your recovery key?
 settings-recovery-replace-description = Your current key stops working, and you’ll get a new one to save.
 settings-recovery-replace-key = Replace key
@@ -568,6 +570,7 @@ settings-recovery-check-description = Type the recovery key from the copy you ke
 settings-recovery-check-description-stored = Type the recovery key from the copy you kept, or leave the field empty to check the copy this computer keeps. Nothing changes on this computer.
 settings-recovery-check-field = Recovery key
 settings-recovery-check-works = This key unlocks your drive. Keep it where you found it.
+settings-recovery-check-works-older = This key unlocks your drive, but it’s an older kind. Replace it with one of 12 words and save that one.
 settings-recovery-check-fails = This key doesn’t unlock your drive. Check for typing mistakes, or replace it with a new key and save that one.
 
 ## Turning protections off

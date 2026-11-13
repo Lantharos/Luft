@@ -62,7 +62,7 @@ pub fn recovery_key_works(typed: &Secret) -> Result<bool> {
     let key = if typed.is_empty() {
         show_recovery_key()?
     } else {
-        keys::recovery_key(typed)?
+        keys::normalize(typed)?
     };
     let device = disk.device();
     Ok(header

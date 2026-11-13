@@ -89,6 +89,11 @@
 		</Row>
 	{/if}
 
+	{#if disk.olderRecoveryKey}
+		<Row title={t('settings-recovery-older-title')} description={t('settings-recovery-older-description')}>
+			<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'replaceKey' })}>{t('settings-recovery-replace')}</button>
+		</Row>
+	{/if}
 	<Row title={t('settings-recovery-title')} description={t('settings-recovery-description')}>
 		{#if disk.recoveryKeyStored}
 			<button type="button" class="button" disabled={busy} onclick={showKey}>{t('settings-recovery-show')}</button>

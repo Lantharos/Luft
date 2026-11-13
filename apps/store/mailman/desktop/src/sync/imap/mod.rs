@@ -32,8 +32,8 @@ pub struct ImapRemote {
     login: Login,
 }
 
-fn uids(context: &Context, messages: &[ops::Target]) -> Result<Vec<u32>, String> {
-    Ok(ops::resolve(context.store, messages)?
+fn uids(context: &Context, mailbox: i64, messages: &[ops::Target]) -> Result<Vec<u32>, String> {
+    Ok(ops::resolve(context.store, mailbox, messages)?
         .iter()
         .filter_map(|target| target.remote.parse().ok())
         .collect())
@@ -354,7 +354,7 @@ impl Remote for ImapRemote {
                 flag,
                 value,
             } => {
-                let uids = uids(context, messages)?;
+                let uids = uids(context, *mailbox, messages)?;
                 if uids.is_empty() {
                     return Ok(());
                 }
@@ -370,7 +370,7 @@ impl Remote for ImapRemote {
             Operation::Move { from, to, messages } => {
                 let source = self.path_of(context, *from)?;
                 let target = self.path_of(context, *to)?;
-                let messages = ops::resolve(context.store, messages)?;
+                let messages = ops::resolve(context.store, *from, messages)?;
                 let pairs: Vec<(i64, u32)> = messages
                     .iter()
                     .filter_map(|moved| Some((moved.id, moved.remote.parse().ok()?)))
@@ -389,12 +389,12 @@ impl Remote for ImapRemote {
                     .collect();
                 for (id, uid) in pairs {
                     let settled = copied.get(&uid).map(u32::to_string);
-                    context.store.settle_remote(id, settled.as_deref())?;
+                    context.store.settle_remote(id, *to, settled.as_deref())?;
                 }
                 Ok(())
             }
             Operation::Destroy { mailbox, messages } => {
-                let uids = uids(context, messages)?;
+                let uids = uids(context, *mailbox, messages)?;
                 if uids.is_empty() {
                     return Ok(());
                 }

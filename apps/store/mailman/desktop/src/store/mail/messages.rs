@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use rusqlite::{OptionalExtension, Transaction, params};
 
-use super::departures::depart;
+use super::departures::{depart, depart_removed};
 use super::index::{self, Entry};
 use crate::mail::classify;
 use crate::mail::envelope::Envelope;
@@ -203,28 +203,31 @@ impl Store {
         })
     }
 
-    pub fn settle_remote(&self, id: i64, remote: Option<&str>) -> Result<(), String> {
+    pub fn settle_remote(&self, id: i64, mailbox: i64, remote: Option<&str>) -> Result<(), String> {
         self.writing(|connection| {
+            let transaction = connection.transaction()?;
             let settled = match remote {
-                Some(remote) => connection.execute(
+                Some(remote) => transaction.execute(
                     "UPDATE OR IGNORE messages SET remote = ?2 WHERE id = ?1",
                     params![id, remote],
                 )?,
                 None => 0,
             };
             if settled > 0 {
-                connection.execute(
+                transaction.execute(
                     "DELETE FROM departures WHERE (mailbox, remote) IN (SELECT mailbox, remote FROM messages WHERE id = ?1)",
                     [id],
                 )?;
-            }
-            if settled == 0 {
-                connection.execute(
+            } else {
+                if let Some(remote) = remote {
+                    depart_removed(&transaction, id, mailbox, remote)?;
+                }
+                transaction.execute(
                     "DELETE FROM messages WHERE id = ?1 AND remote LIKE '~%'",
                     [id],
                 )?;
             }
-            Ok(())
+            transaction.commit()
         })
     }
 

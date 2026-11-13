@@ -202,10 +202,10 @@ impl Remote for JmapRemote {
     fn apply(&mut self, context: &Context, operation: &Operation) -> Result<(), String> {
         match operation {
             Operation::Flag {
+                mailbox,
                 messages,
                 flag,
                 value,
-                ..
             } => {
                 let keyword = match flag {
                     Flag::Seen => "$seen",
@@ -217,7 +217,7 @@ impl Remote for JmapRemote {
                 } else {
                     Value::Null
                 };
-                let targets = ops::resolve(context.store, messages)?;
+                let targets = ops::resolve(context.store, *mailbox, messages)?;
                 self.set_email(
                     targets
                         .iter()
@@ -241,19 +241,21 @@ impl Remote for JmapRemote {
                     .mailbox(*to)?
                     .ok_or("That folder no longer exists")?
                     .remote;
-                let messages = ops::resolve(context.store, messages)?;
+                let messages = ops::resolve(context.store, *from, messages)?;
                 let update = messages
                     .iter()
                     .map(|moved| (moved.remote.clone(), json!({ format!("mailboxIds/{source}"): null, format!("mailboxIds/{target}"): true })))
                     .collect();
                 self.set_email(update)?;
                 for moved in &messages {
-                    context.store.settle_remote(moved.id, Some(&moved.remote))?;
+                    context
+                        .store
+                        .settle_remote(moved.id, *to, Some(&moved.remote))?;
                 }
                 Ok(())
             }
-            Operation::Destroy { messages, .. } => {
-                let remotes: Vec<String> = ops::resolve(context.store, messages)?
+            Operation::Destroy { mailbox, messages } => {
+                let remotes: Vec<String> = ops::resolve(context.store, *mailbox, messages)?
                     .into_iter()
                     .map(|target| target.remote)
                     .collect();

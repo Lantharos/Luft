@@ -37,11 +37,14 @@ pub struct Target {
     pub remote: String,
 }
 
-pub fn resolve(store: &Store, messages: &[Target]) -> Result<Vec<Target>, String> {
+pub fn resolve(store: &Store, mailbox: i64, messages: &[Target]) -> Result<Vec<Target>, String> {
     let mut resolved = Vec::new();
     for moved in messages {
         let remote = if moved.remote.starts_with('~') {
-            store.current_remote(moved.id)?
+            match store.current_remote(moved.id)? {
+                Some(remote) => Some(remote),
+                None => store.departed_remote(mailbox, moved.id)?,
+            }
         } else {
             Some(moved.remote.clone())
         };

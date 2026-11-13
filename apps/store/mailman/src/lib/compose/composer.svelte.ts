@@ -1,6 +1,6 @@
 import { longDateTime } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
-import type { Address, Attached, ConversationMessage, Draft, Rendered } from '#lib/bindings.js';
+import type { Address, Attached, ConversationMessage, Draft, OutboxEvent, Rendered } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
@@ -56,6 +56,10 @@ class Composer {
 	expanded = $state(false);
 	sending = $state(false);
 	private keys = 0;
+	private kept = new Map<number, Composition>();
+	private inFlight = new Map<number, { started: boolean }>();
+	private failed = new Set<number>();
+	private failure: { id: number; toast: number } | null = null;
 
 	defaultAccount() {
 		const mailbox = mail.mailboxes.find((candidate) => `mailbox:${candidate.id}` === list.view);
@@ -189,12 +193,13 @@ class Composer {
 			if (composition.replaces !== null) await commands.act({ action: 'deleteForever', ids: [composition.replaces] });
 			this.current = null;
 			this.expanded = false;
-			const later = sendAt !== null;
-			toasts.show(later ? 'Scheduled to send' : 'Sending', {
-				busy: !later,
-				duration: later ? 5000 : Math.max(2000, (queued.sendAt - Date.now() / 1000) * 1000),
-				action: { label: 'Undo', run: () => void this.undo(queued.id, { ...composition, body: content.source }) }
-			});
+			this.kept.set(queued.id, { ...composition, body: content.source, replaces: null });
+			if (sendAt === null) {
+				this.inFlight.set(queued.id, { started: false });
+				this.showProgress();
+			} else {
+				toasts.show('Scheduled to send', { action: { label: 'Undo', run: () => void this.takeBack(queued.id) } });
+			}
 		} catch (error) {
 			toasts.fail(error);
 		} finally {
@@ -202,10 +207,77 @@ class Composer {
 		}
 	}
 
-	private async undo(id: number, composition: Composition) {
-		const restored = await commands.cancelSend({ id });
-		if (!restored) return toasts.show('It was already sent');
-		this.current = { ...composition, key: ++this.keys };
+	receive = (event: OutboxEvent) => {
+		const showingFailure = this.failure?.id === event.id && this.failure.toast === toasts.current?.id;
+		if (event.state === 'sending') {
+			if (!showingFailure && !this.inFlight.has(event.id)) return;
+			if (showingFailure) this.failure = null;
+			this.inFlight.set(event.id, { started: true });
+			return this.showProgress();
+		}
+		this.inFlight.delete(event.id);
+		if (event.state === 'sent') {
+			this.kept.delete(event.id);
+			this.failed.delete(event.id);
+			if (this.inFlight.size) return this.showProgress();
+			if (!this.failureShowing()) toasts.show('Sent');
+			return;
+		}
+		const reported = this.failed.has(event.id);
+		this.failed.add(event.id);
+		if (reported && !showingFailure) return this.showProgress();
+		toasts.show(`Couldn't send: ${event.error}. Mailman will try again.`, {
+			failed: true,
+			duration: null,
+			action: { label: 'Open draft', run: () => void this.takeBack(event.id) }
+		});
+		this.failure = { id: event.id, toast: toasts.current!.id };
+	};
+
+	private failureShowing() {
+		return this.failure !== null && this.failure.toast === toasts.current?.id;
+	}
+
+	private showProgress() {
+		const sending = [...this.inFlight];
+		if (!sending.length || this.failureShowing()) return;
+		const [id, latest] = sending[sending.length - 1];
+		toasts.show(sending.length === 1 ? 'Sending' : `Sending ${sending.length} messages`, {
+			busy: true,
+			duration: null,
+			action: latest.started ? null : { label: 'Undo', run: () => void this.takeBack(id) }
+		});
+	}
+
+	private async takeBack(id: number) {
+		const draft = await commands.cancelSend({ id });
+		if (!draft) return this.showProgress();
+		const composition = this.kept.get(id);
+		this.kept.delete(id);
+		this.inFlight.delete(id);
+		this.failed.delete(id);
+		if (composition) this.current = { ...composition, key: ++this.keys };
+		else await this.restore(draft);
+		this.showProgress();
+	}
+
+	private async restore(draft: Draft) {
+		const files = await commands.describeFiles({ paths: draft.attachments.filter((file) => file.cid === null).map((file) => file.path) });
+		this.start({
+			account: draft.account,
+			identity: draft.identity,
+			from: draft.from,
+			to: draft.to,
+			cc: draft.cc,
+			bcc: draft.bcc,
+			showCopies: draft.cc.length + draft.bcc.length > 0,
+			subject: draft.subject,
+			body: draft.html || `<p>${escapeHtml(draft.text).replace(/\n/g, '<br>')}</p>`,
+			attachments: files.map((file) => ({ ...file, cid: null })),
+			inReplyTo: draft.inReplyTo,
+			references: draft.references,
+			remindAfter: draft.remindAfter
+		});
 	}
 
 	async close(content: Content | null) {

@@ -83,10 +83,11 @@ pub struct SyncStatus {
 }
 
 #[derive(Serialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct OutboxEvent {
-    id: i64,
-    error: Option<String>,
+#[serde(tag = "state", rename_all = "camelCase")]
+pub enum OutboxEvent {
+    Sending { id: i64 },
+    Sent { id: i64 },
+    Failed { id: i64, error: String },
 }
 
 pub fn spawn(account: Account, shared: Shared) -> Queue {
@@ -448,6 +449,7 @@ impl Worker {
 
     fn send(&mut self, outgoing: &Outgoing) -> Result<(), String> {
         let id = outgoing.id;
+        self.shared.events.emit(OUTBOX, OutboxEvent::Sending { id });
         let sent = self.with_remote(|remote, context| remote.send(context, outgoing));
         let settled = self.settle(outgoing, sent);
         self.shared.sending.lock().remove(&id);
@@ -459,6 +461,7 @@ impl Worker {
         match sent {
             Ok(()) => {
                 self.shared.store.finish_outgoing(id)?;
+                self.shared.events.emit(OUTBOX, OutboxEvent::Sent { id });
                 self.shared.notifier.sent();
                 if let Some(at) = outgoing.remind_at {
                     let sent = envelope::parse(&outgoing.raw);
@@ -471,9 +474,6 @@ impl Worker {
                         )?;
                     }
                 }
-                self.shared
-                    .events
-                    .emit(OUTBOX, OutboxEvent { id, error: None });
                 if let Some(sent) = self
                     .shared
                     .store
@@ -487,9 +487,9 @@ impl Worker {
                 self.shared.store.retry_outgoing(id, &error)?;
                 self.shared.events.emit(
                     OUTBOX,
-                    OutboxEvent {
+                    OutboxEvent::Failed {
                         id,
-                        error: Some(error.clone()),
+                        error: error.clone(),
                     },
                 );
                 Err(error)

@@ -17,7 +17,7 @@ interface ShowOptions {
 	action?: ToastAction | null;
 	failed?: boolean;
 	busy?: boolean;
-	duration?: number;
+	duration?: number | null;
 }
 
 const SHOWN_MS = 5000;
@@ -29,13 +29,15 @@ export class Toasts {
 	#timer: ReturnType<typeof setTimeout> | undefined;
 	#next = 0;
 	#held = false;
+	#lasting = false;
 
 	constructor(private readonly shownMs = SHOWN_MS) {}
 
 	show(message: string, { action = null, failed = false, busy = false, duration = this.shownMs }: ShowOptions = {}) {
 		clearTimeout(this.#timer);
 		this.current = { id: ++this.#next, message, action, failed, busy };
-		if (!this.#held) this.#timer = setTimeout(this.dismiss, duration);
+		this.#lasting = duration === null;
+		if (!this.#held && duration !== null) this.#timer = setTimeout(this.dismiss, duration);
 	}
 
 	run = () => {
@@ -59,6 +61,6 @@ export class Toasts {
 
 	release = () => {
 		this.#held = false;
-		if (this.current) this.#timer = setTimeout(this.dismiss, AFTER_HOVER_MS);
+		if (this.current && !this.#lasting) this.#timer = setTimeout(this.dismiss, AFTER_HOVER_MS);
 	};
 }

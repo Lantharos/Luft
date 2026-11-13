@@ -3196,6 +3196,7 @@ export namespace St {
     namespace StyledIcon {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
+            "notify::bare": (pspec: GObject.ParamSpec) => void;
             "notify::corner": (pspec: GObject.ParamSpec) => void;
             "notify::fill": (pspec: GObject.ParamSpec) => void;
             "notify::glyph-names": (pspec: GObject.ParamSpec) => void;
@@ -3208,6 +3209,7 @@ export namespace St {
 
         // Constructor properties interface
         interface ConstructorProps extends GObject.Object.ConstructorProps, Gio.Icon.ConstructorProps {
+            bare: boolean;
             corner: number;
             fill: number;
             glyph_names: string[];
@@ -3224,6 +3226,8 @@ export namespace St {
         static $gtype: GObject.GType<StyledIcon>;
 
         // Properties
+        get bare(): boolean;
+
         get corner(): number;
 
         get fill(): number;

@@ -7,7 +7,7 @@
 #include "st-icon-colors.h"
 #include "st-styled-icon-private.h"
 
-#define GLYPH_BOX 0.64f
+#define DERIVED_OVERSAMPLE 4
 
 struct _StStyledIcon
 {
@@ -29,6 +29,7 @@ enum
   PROP_RIM,
   PROP_CORNER,
   PROP_FILL,
+  PROP_BARE,
   N_PROPS
 };
 
@@ -69,7 +70,8 @@ st_styled_icon_hash (GIcon *icon)
   hash = hash * 31 + color_hash (&self->paint.shade);
   hash = hash * 31 + (guint) (self->paint.rim * 1000);
   hash = hash * 31 + (guint) (self->paint.corner * 1000);
-  return hash * 31 + (guint) (self->paint.fill * 1000);
+  hash = hash * 31 + (guint) (self->paint.fill * 1000);
+  return hash * 31 + self->paint.bare;
 }
 
 static gboolean
@@ -87,7 +89,8 @@ st_styled_icon_equal (GIcon *icon,
          cogl_color_equal (&self->paint.shade, &that->paint.shade) &&
          self->paint.rim == that->paint.rim &&
          self->paint.corner == that->paint.corner &&
-         self->paint.fill == that->paint.fill;
+         self->paint.fill == that->paint.fill &&
+         self->paint.bare == that->paint.bare;
 }
 
 static char *
@@ -116,6 +119,7 @@ st_styled_icon_to_tokens (GIcon     *icon,
   g_ptr_array_add (tokens, g_strdup_printf ("%d", (int) roundf (self->paint.rim * 1000)));
   g_ptr_array_add (tokens, g_strdup_printf ("%d", (int) roundf (self->paint.corner * 1000)));
   g_ptr_array_add (tokens, g_strdup_printf ("%d", (int) roundf (self->paint.fill * 1000)));
+  g_ptr_array_add (tokens, g_strdup (self->paint.bare ? "bare" : "plated"));
   *out_version = 0;
   return TRUE;
 }
@@ -172,6 +176,9 @@ st_styled_icon_set_property (GObject      *object,
     case PROP_FILL:
       self->paint.fill = g_value_get_float (value);
       break;
+    case PROP_BARE:
+      self->paint.bare = g_value_get_boolean (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -211,6 +218,9 @@ st_styled_icon_get_property (GObject    *object,
       break;
     case PROP_FILL:
       g_value_set_float (value, self->paint.fill);
+      break;
+    case PROP_BARE:
+      g_value_set_boolean (value, self->paint.bare);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -263,18 +273,15 @@ st_styled_icon_class_init (StStyledIconClass *klass)
   props[PROP_FILL] =
     g_param_spec_float ("fill", NULL, NULL, 0.f, 1.f, 0.f, flags);
 
+  props[PROP_BARE] =
+    g_param_spec_boolean ("bare", NULL, NULL, FALSE, flags);
+
   g_object_class_install_properties (object_class, N_PROPS, props);
 }
 
 static void
 st_styled_icon_init (StStyledIcon *self)
 {
-}
-
-int
-_st_styled_icon_glyph_size (int size)
-{
-  return (int) roundf (size * GLYPH_BOX);
 }
 
 StIconInfo *
@@ -285,12 +292,13 @@ _st_styled_icon_lookup (StStyledIcon *icon,
                         gboolean     *glyph)
 {
   StIconInfo *info = NULL;
+  int pixels = size * scale;
 
   if (icon->glyph_names && icon->glyph_names[0])
     info = st_icon_theme_choose_icon_for_scale (theme,
                                                 (const char **) icon->glyph_names,
-                                                _st_styled_icon_glyph_size (size),
-                                                scale, 0);
+                                                _st_styled_icon_glyph_box (&icon->paint, pixels),
+                                                1, ST_ICON_LOOKUP_FORCE_SIZE);
   if (info && st_icon_info_is_symbolic (info))
     {
       *glyph = TRUE;
@@ -298,7 +306,8 @@ _st_styled_icon_lookup (StStyledIcon *icon,
     }
 
   g_clear_object (&info);
-  info = st_icon_theme_lookup_by_gicon_for_scale (theme, icon->source, size, scale,
+  info = st_icon_theme_lookup_by_gicon_for_scale (theme, icon->source,
+                                                  pixels * DERIVED_OVERSAMPLE, 1,
                                                   ST_ICON_LOOKUP_FORCE_REGULAR |
                                                   ST_ICON_LOOKUP_FORCE_SIZE);
   *glyph = info && st_icon_info_is_symbolic (info);

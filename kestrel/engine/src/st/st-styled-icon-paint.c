@@ -7,6 +7,7 @@
 #include "st-fitted-icon-private.h"
 #include "st-styled-icon-private.h"
 
+#define GLYPH_BOX 0.64
 #define DERIVED_FILL 0.86
 #define OPAQUE 230
 #define VISIBLE 8
@@ -348,18 +349,17 @@ draw_plate (cairo_t                 *cr,
 static cairo_surface_t *
 place_glyph (cairo_surface_t             *mask,
              const cairo_rectangle_int_t *bounds,
-             gboolean                     glyph,
+             double                       box,
              int                          size)
 {
   cairo_surface_t *placed = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
   cairo_t *cr = cairo_create (placed);
-  double box = _st_styled_icon_glyph_size (size) * (glyph ? 1. : DERIVED_FILL);
   double scale = box / MAX (bounds->width, bounds->height);
 
   cairo_translate (cr, (size - bounds->width * scale) / 2, (size - bounds->height * scale) / 2);
   cairo_scale (cr, scale, scale);
   cairo_set_source_surface (cr, mask, -bounds->x, -bounds->y);
-  cairo_pattern_set_filter (cairo_get_source (cr), CAIRO_FILTER_GOOD);
+  cairo_pattern_set_filter (cairo_get_source (cr), CAIRO_FILTER_BEST);
   cairo_rectangle (cr, 0, 0, bounds->width, bounds->height);
   cairo_fill (cr);
   cairo_destroy (cr);
@@ -410,6 +410,17 @@ plate_size (const StStyledIconPaint *paint,
   return size - 2 * (int) roundf ((size - side) / 2.f);
 }
 
+int
+_st_styled_icon_glyph_box (const StStyledIconPaint *paint,
+                           int                      size)
+{
+  int plate = plate_size (paint, size);
+
+  if (paint->bare)
+    return plate;
+  return plate - 2 * (int) round (plate * (1 - GLYPH_BOX) / 2);
+}
+
 GdkPixbuf *
 _st_styled_icon_paint (const StStyledIconPaint *paint,
                        GdkPixbuf               *source,
@@ -427,14 +438,21 @@ _st_styled_icon_paint (const StStyledIconPaint *paint,
   cairo_rectangle_int_t bounds;
   cairo_surface_t *canvas = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
   cairo_surface_t *mask = glyph ? symbolic_mask (&pixels, &bounds) : derived_mask (&pixels, &bounds);
-  int plate = plate_size (paint, size);
-  cairo_surface_t *placed = place_glyph (mask, &bounds, glyph, plate);
+  double box = _st_styled_icon_glyph_box (paint, size) * (glyph ? 1. : DERIVED_FILL);
+  cairo_surface_t *placed = place_glyph (mask, &bounds, box, size);
   cairo_t *cr = cairo_create (canvas);
   GdkPixbuf *pixbuf;
 
   colorize (placed, paint);
-  cairo_translate (cr, (size - plate) / 2, (size - plate) / 2);
-  draw_plate (cr, paint, plate, scale);
+  if (!paint->bare)
+    {
+      int plate = plate_size (paint, size);
+
+      cairo_save (cr);
+      cairo_translate (cr, (size - plate) / 2, (size - plate) / 2);
+      draw_plate (cr, paint, plate, scale);
+      cairo_restore (cr);
+    }
   cairo_set_source_surface (cr, placed, 0, 0);
   cairo_paint (cr);
   cairo_destroy (cr);

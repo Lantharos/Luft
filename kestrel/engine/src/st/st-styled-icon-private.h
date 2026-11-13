@@ -14,6 +14,7 @@ typedef struct
   float rim;
   float corner;
   float fill;
+  gboolean bare;
 } StStyledIconPaint;
 
 StIconInfo *_st_styled_icon_lookup (StStyledIcon *icon,
@@ -42,6 +43,7 @@ GdkPixbuf *_st_styled_icon_paint (const StStyledIconPaint *paint,
                                   int                      size,
                                   float                    scale);
 
-int _st_styled_icon_glyph_size (int size);
+int _st_styled_icon_glyph_box (const StStyledIconPaint *paint,
+                               int                      size);
 
 G_END_DECLS

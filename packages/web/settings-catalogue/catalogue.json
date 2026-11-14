@@ -107,11 +107,7 @@
 			"id": "appearance.glass-blurs",
 			"page": "appearance",
 			"title": "settings-appearance-glass-blurs",
-			"key": "com.lantharos.kestrel.glass luca-blurs",
-			"options": [
-				{ "value": "everything", "label": "settings-appearance-glass-blurs-everything" },
-				{ "value": "wallpaper", "label": "settings-appearance-glass-blurs-wallpaper" }
-			]
+			"key": "com.lantharos.kestrel.glass luca-blurs"
 		},
 		{
 			"id": "appearance.glass-power-saver",

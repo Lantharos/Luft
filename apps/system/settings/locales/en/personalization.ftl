@@ -70,9 +70,7 @@ settings-appearance-glass-mixed = Mixed
 settings-appearance-glass-taskbar = Taskbar
 settings-appearance-glass-surfaces = Start, panels and menus
 settings-appearance-glass-windows = App windows
-settings-appearance-glass-blurs = Luca blurs
-settings-appearance-glass-blurs-everything = Everything behind
-settings-appearance-glass-blurs-wallpaper = Wallpaper only
+settings-appearance-glass-blurs = Luca blurs only the wallpaper
 settings-appearance-glass-power-saver = Wallpaper only in power saver
 
 ## Appearance: app icons

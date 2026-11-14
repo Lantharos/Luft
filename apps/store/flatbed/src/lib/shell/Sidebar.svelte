@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { selectionPill } from '@luft/ui';
+	import { selectionPill, Spinner } from '@luft/ui';
 	import Camera from '@lucide/svelte/icons/camera';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Printer from '@lucide/svelte/icons/printer';
@@ -33,6 +33,12 @@
 				</span>
 			</button>
 		{/each}
+		{#if flatbed.searching}
+			<div class="source quiet pointer-events-none" role="status">
+				<Spinner size={17} />
+				<span class="truncate">{t('sources-searching')}</span>
+			</div>
+		{/if}
 		<button
 			type="button"
 			class="source"
@@ -52,9 +58,6 @@
 			<span class="truncate">{t('source-add')}</span>
 		</button>
 	</nav>
-	{#if !flatbed.scanners.length}
-		<p class="px-3 pt-3 text-[12px] leading-[1.45] text-[var(--sidebar-text-muted)]">{t('sources-looking')}</p>
-	{/if}
 	<div class="flex-1"></div>
 	<button type="button" class="source quiet" data-no-drag onclick={onsettings}>
 		<Settings size={17} />

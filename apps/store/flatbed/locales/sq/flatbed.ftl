@@ -5,7 +5,6 @@ start-failed = Flatbed nuk u nis dot: { $reason }
 ## Where pages come from
 
 sources-title = Skano nga
-sources-looking = Skanerët në rrjet dhe ata të lidhur me kompjuterin shfaqen këtu sapo gjenden.
 source-network = Në rrjet
 source-usb = I lidhur
 source-camera = Kamera

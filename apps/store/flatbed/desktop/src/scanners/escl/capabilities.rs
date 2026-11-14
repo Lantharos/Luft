@@ -13,6 +13,7 @@ pub struct Input {
 pub struct Capabilities {
     pub version: String,
     pub model: String,
+    pub uuid: String,
     pub platen: Option<Input>,
     pub feeder: Option<Input>,
     pub both_sides: bool,
@@ -69,6 +70,7 @@ pub fn parse(xml: &str) -> Result<Capabilities, String> {
     Ok(Capabilities {
         version: text("Version"),
         model: text("MakeAndModel"),
+        uuid: text("UUID"),
         platen: child(root, "PlatenInputCaps").map(input),
         feeder: feeder
             .and_then(|adf| child(adf, "AdfSimplexInputCaps"))

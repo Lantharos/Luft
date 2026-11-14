@@ -14,6 +14,7 @@ use std::time::{Duration, Instant};
 
 pub use helper::run as run_helper;
 
+use super::searching::Lookup;
 use super::{Connection, Feed, Progress, ScanError, Scanner, found_sane};
 use pixels::Assembly;
 use wire::{Frame, Reply, Request};
@@ -91,9 +92,13 @@ fn with_helper<T>(work: impl FnOnce(&mut Helper) -> Result<T, String>) -> Result
 }
 
 pub fn start() {
+    let lookup = Lookup::begin();
     std::thread::Builder::new()
         .name("sane".into())
-        .spawn(list)
+        .spawn(move || {
+            list();
+            drop(lookup);
+        })
         .expect("a thread for SANE");
 }
 

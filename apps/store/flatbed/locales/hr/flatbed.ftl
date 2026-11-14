@@ -5,7 +5,6 @@ start-failed = Flatbed se nije mogao pokrenuti: { $reason }
 ## Where pages come from
 
 sources-title = Skeniraj s
-sources-looking = Skeneri na mreži i oni priključeni na računalo pojavit će se ovdje čim budu pronađeni.
 source-network = Na mreži
 source-usb = Priključen
 source-camera = Kamera

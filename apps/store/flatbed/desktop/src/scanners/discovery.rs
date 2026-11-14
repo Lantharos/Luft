@@ -1,14 +1,17 @@
 use std::collections::BTreeSet;
 use std::net::IpAddr;
 use std::sync::Mutex;
+use std::time::Duration;
 
 use mdns_sd::{ResolvedService, ServiceDaemon, ServiceEvent};
 
+use super::searching::Lookup;
 use super::{escl, found_escl, known, lost, sane};
 
 const PLAIN: &str = "_uscan._tcp.local.";
 const SECURE: &str = "_uscans._tcp.local.";
 const BJNP: &str = "_canon-bjnp1._tcp.local.";
+const ANSWERS_WITHIN: Duration = Duration::from_secs(5);
 
 static BJNP_HOSTS: Mutex<BTreeSet<IpAddr>> = Mutex::new(BTreeSet::new());
 
@@ -24,6 +27,11 @@ pub fn start() {
         browse(&daemon, service, move |found| escl_found(found, secure));
     }
     browse(&daemon, BJNP, bjnp_found);
+    let lookup = Lookup::begin();
+    std::thread::spawn(move || {
+        std::thread::sleep(ANSWERS_WITHIN);
+        drop(lookup);
+    });
 }
 
 fn browse(
@@ -87,7 +95,11 @@ fn escl_found(service: &ResolvedService, secure: bool) {
         .to_owned();
     let endpoint = escl::Endpoint::new(secure, &address.to_string(), service.port, &root);
     let key = service.fullname.clone();
-    std::thread::spawn(move || found_escl(key, name, endpoint, Some(address)));
+    let lookup = Lookup::begin();
+    std::thread::spawn(move || {
+        found_escl(key, name, endpoint, Some(address));
+        drop(lookup);
+    });
 }
 
 fn bjnp_found(service: &ResolvedService) {

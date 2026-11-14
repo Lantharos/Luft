@@ -78,6 +78,7 @@ export const events = {
 	scanFinished: (callback: (payload: ScanError | null) => void) => listen<ScanError | null>("scan.finished", callback),
 	scanPreview: (callback: (payload: Uint8Array) => void) => listen<Uint8Array>("scan.preview", callback),
 	scannersChanged: (callback: (payload: Scanner[]) => void) => listen<Scanner[]>("scanners.changed", callback),
+	scannersSearching: (callback: (payload: boolean) => void) => listen<boolean>("scanners.searching", callback),
 };
 
 export type AppIconStyle = "default" | "tinted" | "clear";
@@ -92,6 +93,7 @@ export type AppIcons = {
 export type AppState = {
 	document: DocumentView,
 	scanners: Scanner[],
+	searching: boolean,
 	settings: Settings,
 	readingLanguages: string[] | null,
 } & Appearance;

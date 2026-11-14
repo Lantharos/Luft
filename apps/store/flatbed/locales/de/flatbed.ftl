@@ -5,7 +5,6 @@ start-failed = Flatbed konnte nicht starten: { $reason }
 ## Where pages come from
 
 sources-title = Scannen von
-sources-looking = Scanner im Netzwerk und angeschlossene Scanner erscheinen hier, sobald sie gefunden werden.
 source-network = Im Netzwerk
 source-usb = Angeschlossen
 source-camera = Kamera

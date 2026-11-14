@@ -1,7 +1,9 @@
 mod discovery;
 pub mod escl;
+mod identity;
 mod known;
 pub mod sane;
+mod searching;
 
 use std::net::IpAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -15,6 +17,7 @@ use specta::Type;
 use crate::document::{self, Kind, Source};
 use crate::imaging::{Mode, Origin};
 use crate::{EVENTS, settings};
+use searching::Lookup;
 
 pub const CHANGED: BridgeEvent<Vec<Scanner>> = BridgeEvent::new("scanners.changed");
 pub const PREVIEW: BridgeEvent<Bytes> = BridgeEvent::new("scan.preview");
@@ -71,6 +74,7 @@ struct Entry {
     scanner: Scanner,
     backend: Backend,
     address: Option<IpAddr>,
+    uuid: Option<String>,
 }
 
 impl Entry {
@@ -96,6 +100,22 @@ impl Entry {
             .is_some_and(|address| !address.is_loopback() && other.at(address));
         named_alike || at_same_address
     }
+
+    fn same_device(&self, other: &Entry) -> bool {
+        match (&self.uuid, &other.uuid) {
+            (Some(uuid), Some(other)) => uuid == other,
+            _ => {
+                self.scanner.connection != other.scanner.connection
+                    && identity::same_model(&self.scanner.name, &other.scanner.name)
+            }
+        }
+    }
+
+    fn plugged_in_for(&self, other: &Entry) -> bool {
+        self.scanner.connection == Connection::Usb
+            && other.scanner.connection == Connection::Network
+            && self.same_device(other)
+    }
 }
 
 static SCANNERS: Mutex<Vec<Entry>> = Mutex::new(Vec::new());
@@ -105,14 +125,20 @@ pub fn start() {
     discovery::start();
     sane::start();
     for address in settings::current().addresses {
+        let lookup = Lookup::begin();
         std::thread::spawn(move || {
             let _ = add_address(&address);
+            drop(lookup);
         });
     }
 }
 
 pub fn list() -> Vec<Scanner> {
     visible(&SCANNERS.lock().expect("scanners lock"))
+}
+
+pub fn searching() -> bool {
+    searching::active()
 }
 
 fn visible(entries: &[Entry]) -> Vec<Scanner> {
@@ -125,7 +151,7 @@ fn visible(entries: &[Entry]) -> Vec<Scanner> {
         .copied()
         .filter(|entry| entry.escl().is_some_and(escl::Endpoint::secure))
         .collect();
-    entries
+    let reachable: Vec<&Entry> = entries
         .iter()
         .filter(|entry| match entry.escl() {
             Some(endpoint) => {
@@ -135,6 +161,10 @@ fn visible(entries: &[Entry]) -> Vec<Scanner> {
                 .address
                 .is_none_or(|address| !escl.iter().any(|other| other.at(address))),
         })
+        .collect();
+    reachable
+        .iter()
+        .filter(|entry| !reachable.iter().any(|other| other.plugged_in_for(entry)))
         .map(|entry| entry.scanner.clone())
         .collect()
 }
@@ -201,6 +231,9 @@ fn show_escl(
         },
         backend: Backend::Escl(endpoint),
         address,
+        uuid: capabilities
+            .as_ref()
+            .and_then(|capabilities| identity::uuid(&capabilities.uuid)),
     };
     update(|entries| {
         entries.retain(|kept| kept.scanner.id != entry.scanner.id);
@@ -260,6 +293,7 @@ fn found_sane(devices: Vec<(Scanner, Option<IpAddr>)>) {
             backend: Backend::Sane(scanner.id.trim_start_matches("sane:").to_owned()),
             scanner,
             address,
+            uuid: None,
         }));
     });
 }
@@ -400,6 +434,7 @@ pub fn cancel() {
 pub fn declare(window: SabineWindow) -> SabineWindow {
     window
         .bridge_event(&CHANGED)
+        .bridge_event(&searching::SEARCHING)
         .bridge_event(&PREVIEW)
         .bridge_event(&FINISHED)
 }

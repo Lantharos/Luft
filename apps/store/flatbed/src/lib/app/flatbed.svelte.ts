@@ -8,6 +8,7 @@ export const CAMERA = 'camera';
 class Flatbed {
 	document = $state.raw<DocumentView>({ mode: 'colour', pages: [] });
 	scanners = $state.raw<Scanner[]>([]);
+	searching = $state(false);
 	settings = $state.raw<Settings>({ languages: [], paper: 'automatic', fine: false, addresses: [], scanner: null });
 	readingLanguages = $state.raw<string[] | null>(null);
 	source = $state(CAMERA);
@@ -27,6 +28,7 @@ class Flatbed {
 	start(state: AppState) {
 		this.document = state.document;
 		this.scanners = state.scanners;
+		this.searching = state.searching;
 		this.settings = state.settings;
 		this.readingLanguages = state.readingLanguages;
 		this.pickSource(state.settings.scanner);
@@ -36,6 +38,7 @@ class Flatbed {
 				this.scanners = scanners;
 				if (this.source === CAMERA || !scanners.some((scanner) => scanner.id === this.source)) this.pickSource(this.settings.scanner);
 			}),
+			events.scannersSearching((searching) => (this.searching = searching)),
 			events.scanPreview((bytes) => this.showPreview(bytes)),
 			events.scanFinished((problem) => this.finished(problem)),
 			events.saveProgress((fraction) => (this.saving = fraction))

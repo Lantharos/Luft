@@ -13,6 +13,7 @@ pub struct AppState {
     appearance: Appearance,
     document: DocumentView,
     scanners: Vec<Scanner>,
+    searching: bool,
     settings: Settings,
     reading_languages: Option<Vec<String>>,
 }
@@ -22,6 +23,7 @@ pub async fn app_state() -> Result<AppState, String> {
         appearance: Appearance::current().await,
         document: document::view(),
         scanners: scanners::list(),
+        searching: scanners::searching(),
         settings: settings::current(),
         reading_languages: document::reading_languages().map(<[String]>::to_vec),
     })

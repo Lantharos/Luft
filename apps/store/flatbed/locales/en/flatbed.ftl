@@ -5,8 +5,7 @@ start-failed = Flatbed couldn't start: { $reason }
 ## Where pages come from
 
 sources-title = Scan from
-# Shown under the list while no scanner has been found yet.
-sources-looking = Scanners show up here as soon as they're found.
+sources-searching = Looking for scanners…
 source-network = On the network
 source-usb = Plugged in
 source-camera = Camera

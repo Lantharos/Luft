@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import {dismissImmediately, Main, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -6,94 +7,136 @@ import {setPowerProfile} from '../desktop/lib/playthings.js';
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {rest, rightClick} from '../lib/input/input.js';
-import {fixture, spawn, waitForWindow} from '../lib/processes.js';
+import {fixture, outputLines, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('glass');
 const KINDS = ['taskbar', 'surfaces', 'windows'] as const;
+const KEYS = [...KINDS, 'luca-blurs', 'wallpaper-on-power-saver'];
 const BACKDROP_COLOR = 'd02020';
 const REDDISH = 60;
+const SURFACE_DISTANCE = 24;
+const CLIENT_TINT = [0x18, 0x24, 0x30];
+const CLIENT_ALPHA = 0x60 / 255;
 
-type Style = 'luca' | 'maris';
+type Kind = (typeof KINDS)[number];
 
+const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 const backdrops = () => descendants(global.stage).flatMap(actor => actor.mapped ? actor.get_effects() : [])
   .filter((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect && effect.mode === Shell.BlurMode.BACKGROUND);
 const taskbarGlass = () => named('kestrel-panel')!.get_effects().find((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect)!;
-const styleOf = (style: Style) => style === 'maris' ? Shell.BlurStyle.MARIS : Shell.BlurStyle.LUCA;
 
 function startItem() {
   return descendants(global.stage).find(actor => actor.name?.startsWith('kestrel-start-item-') && actor.mapped)!;
 }
 
-async function shows(style: Style, label: string) {
-  await eventually(() => backdrops().length > 0 && backdrops().every(effect => effect.style === styleOf(style)) &&
-    global.compositor.get_background_blur_from_wallpaper() === (style === 'maris'), label);
-  await settled();
-}
-
-async function glassCenter(window: {get_frame_rect(): {x: number; y: number; width: number; height: number}}) {
+async function centerOf(window: Meta.Window) {
   const frame = window.get_frame_rect();
   const shot = await captureFrame({x: frame.x + Math.round(frame.width / 2), y: frame.y + Math.round(frame.height / 2), width: 1, height: 1});
   const [red, green, blue] = shot.pixbuf.get_pixels();
-  return red - Math.max(green, blue);
+  return [red, green, blue];
 }
 
-async function captureStyle(style: Style, glass: Parameters<typeof glassCenter>[0]) {
-  await capture(`glass-${style}-desktop`);
+const reddish = ([red, green, blue]: number[]) => red - Math.max(green, blue) > REDDISH;
+
+function nearSurface(color: number[]) {
+  const {red, green, blue} = global.compositor.get_glass_surface();
+  const expected = [red, green, blue].map((channel, index) => channel * (1 - CLIENT_ALPHA) + CLIENT_TINT[index]);
+  return Math.max(...expected.map((channel, index) => Math.abs(channel - color[index]))) < SURFACE_DISTANCE;
+}
+
+function choose(styles: Partial<Record<Kind, 'luca' | 'maris'>>, lucaBlurs: 'everything' | 'wallpaper' = 'everything') {
+  for (const kind of KINDS) settings.set_string(kind, styles[kind] ?? 'luca');
+  settings.set_string('luca-blurs', lucaBlurs);
+}
+
+async function glassClient(title: string, glass: string[] = []) {
+  const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
+  const process = spawn(['python3', fixture('clients', 'wayland', 'blurClient.py'), title, '520', '360', ...glass], {flags: Gio.SubprocessFlags.STDOUT_PIPE});
+  const materials = outputLines(process);
+  const window = await waitForWindow(title);
+  window.move_frame(true, area.x + Math.round(area.width / 2), area.y + Math.round(area.height / 4));
+  window.raise();
+  return {process, window, materials};
+}
+
+async function captureSurfaces(name: string) {
+  await capture(`glass-${name}-desktop`);
   toggleSurface('start');
   await settled();
-  await capture(`glass-${style}-start`);
+  await capture(`glass-${name}-start`);
   rightClick(startItem());
   await eventually(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Start');
   await settled();
-  await capture(`glass-${style}-menu`);
+  await capture(`glass-${name}-menu`);
   dismissImmediately();
   rest();
   await settled();
-  const reddish = await glassCenter(glass);
-  require(style === 'luca' ? reddish > REDDISH : reddish < REDDISH,
-    style === 'luca' ? 'Luca glass on an app window blurs the window behind it' : 'Maris glass on an app window shows the wallpaper instead of the window behind it');
 }
 
 export async function run() {
-  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
-  const choose = (styles: Record<(typeof KINDS)[number], Style>) => KINDS.forEach(kind => settings.set_string(kind, styles[kind]));
   try {
     const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
     spawn(['python3', fixture('clients', 'wayland', 'decorationClient.py'), 'client', 'Backdrop', BACKDROP_COLOR]);
     const backdrop = await waitForWindow('Backdrop');
     backdrop.move_resize_frame(true, area.x, area.y, area.width, area.height);
-    spawn(['python3', fixture('clients', 'wayland', 'blurClient.py'), 'Glass', '520', '360']);
-    const glass = await waitForWindow('Glass');
-    glass.move_frame(true, area.x + Math.round(area.width / 2), area.y + Math.round(area.height / 4));
+    const glass = await glassClient('Glass');
     await settled();
 
-    await shows('luca', 'glass starts as Luca everywhere');
-    await captureStyle('luca', glass);
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.LUCA), 'glass starts as Luca everywhere');
+    require(reddish(await centerOf(glass.window)), 'Luca glass on an app window blurs the window behind it');
+    await captureSurfaces('luca');
+
+    choose({}, 'wallpaper');
+    await eventually(() => backdrops().length > 0 && backdrops().every(effect => effect.style === Shell.BlurStyle.WALLPAPER),
+      'Luca glass that blurs only the wallpaper shows the blurred wallpaper');
+    await settled();
+    require(!reddish(await centerOf(glass.window)), 'Luca glass on an app window that blurs only the wallpaper shows the wallpaper instead of the window behind it');
+    await captureSurfaces('wallpaper');
 
     choose({taskbar: 'maris', surfaces: 'maris', windows: 'maris'});
-    await shows('maris', 'every kind of glass turns to Maris');
-    await captureStyle('maris', glass);
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.MARIS), 'every kind of glass turns to Maris');
+    await settled();
+    require(nearSurface(await centerOf(glass.window)), 'Maris glass on an app window is the surface colour');
+    await captureSurfaces('maris');
 
-    choose({taskbar: 'luca', surfaces: 'luca', windows: 'maris'});
-    await eventually(() => taskbarGlass().style === Shell.BlurStyle.LUCA && global.compositor.get_background_blur_from_wallpaper(),
-      'the taskbar stays Luca while app windows are Maris');
+    choose({windows: 'maris'}, 'wallpaper');
+    await eventually(() => taskbarGlass().style === Shell.BlurStyle.WALLPAPER, 'the taskbar blurs only the wallpaper while app windows are Maris');
+    await settled();
+    require(nearSurface(await centerOf(glass.window)), 'app windows stay Maris while Luca blurs only the wallpaper');
 
-    choose({taskbar: 'luca', surfaces: 'luca', windows: 'luca'});
-    await shows('luca', 'glass goes back to Luca');
+    choose({});
+    const asking = await glassClient('Asks for Maris', ['window', 'maris']);
+    await eventually(() => asking.materials.at(-1) === 'maris', 'an app asking for Maris hears it has Maris');
+    await settled();
+    require(nearSurface(await centerOf(asking.window)), 'an app asking for Maris gets Maris while people chose Luca');
+    await stop(asking.process);
 
+    const transient = await glassClient('Transient', ['transient', 'user']);
+    await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface starts with the Luca of panels and menus');
+    settings.set_string('surfaces', 'maris');
+    await eventually(() => transient.materials.at(-1) === 'maris', 'a transient surface follows panels and menus to Maris');
+    settings.set_string('windows', 'maris');
+    settings.set_string('surfaces', 'luca');
+    await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface stays with panels and menus, not app windows');
+    await stop(transient.process);
+
+    choose({taskbar: 'maris'});
+    await eventually(() => taskbarGlass().style === Shell.BlurStyle.MARIS, 'the taskbar turns to Maris');
     await setPowerProfile('power-saver');
-    await shows('maris', 'power saver turns all glass to Maris');
+    await eventually(async () => !reddish(await centerOf(glass.window)), 'power saver makes Luca on app windows blur only the wallpaper');
+    require(taskbarGlass().style === Shell.BlurStyle.MARIS, 'power saver leaves Maris alone');
     await setPowerProfile('balanced');
-    await shows('luca', 'leaving power saver brings Luca back');
+    await eventually(async () => reddish(await centerOf(glass.window)), 'leaving power saver brings back Luca that blurs everything');
 
-    settings.set_boolean('maris-on-power-saver', false);
+    settings.set_boolean('wallpaper-on-power-saver', false);
     await setPowerProfile('power-saver');
     await settled();
-    require(backdrops().every(effect => effect.style === Shell.BlurStyle.LUCA), 'glass stays Luca in power saver when asked to');
+    require(reddish(await centerOf(glass.window)), 'Luca keeps blurring everything in power saver when asked to');
+    await stop(glass.process);
   } finally {
     await setPowerProfile('balanced');
-    for (const key of [...KINDS, 'maris-on-power-saver']) settings.reset(key);
+    for (const key of KEYS) settings.reset(key);
   }
 }

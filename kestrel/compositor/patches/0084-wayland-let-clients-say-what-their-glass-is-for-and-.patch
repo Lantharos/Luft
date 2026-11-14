@@ -1,0 +1,914 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 14 Nov 2026 02:01:52 +0100
+Subject: [PATCH] wayland: let clients say what their glass is for and hear its
+ material
+
+kestrel_glass_v1 gives a surface with glass a glass object. Through it a
+client says whether the glass is the base of a window or a transient
+surface such as a popover, which follows the person's choice for panels
+and menus, and may ask for Luca or Maris instead of the person's choice.
+Maris is always granted, Luca too, and then blurs only the wallpaper
+whenever the person's Luca does. The client hears which material its
+glass has, so it can leave out its own tint over Maris, whose surface
+colour is already the whole surface.
+
+Upstream-Status: luft-only Kestrel's private kestrel_glass_v1 protocol
+---
+ src/compositor/compositor-private.h           |  15 +-
+ src/compositor/compositor.c                   |  80 +++++-
+ src/compositor/meta-background-blur-private.h |   2 +
+ src/compositor/meta-background-blur.c         |  14 +-
+ src/compositor/meta-background-effect.c       |   2 +-
+ src/compositor/meta-background-effect.h       |   9 +-
+ src/compositor/meta-glass.h                   |  38 +++
+ src/compositor/meta-surface-actor.c           |  23 +-
+ src/compositor/meta-surface-actor.h           |   4 +
+ src/meson.build                               |   4 +
+ src/meta/compositor.h                         |   3 +
+ src/wayland/meta-wayland-actor-surface.c      |   3 +
+ src/wayland/meta-wayland-kestrel-glass.c      | 249 ++++++++++++++++++
+ src/wayland/meta-wayland-kestrel-glass.h      |  22 ++
+ src/wayland/meta-wayland-surface-private.h    |   2 +
+ src/wayland/meta-wayland-versions.h           |   1 +
+ src/wayland/meta-wayland.c                    |   2 +
+ src/wayland/protocol/kestrel-glass-v1.xml     | 118 +++++++++
+ 18 files changed, 570 insertions(+), 21 deletions(-)
+ create mode 100644 src/compositor/meta-glass.h
+ create mode 100644 src/wayland/meta-wayland-kestrel-glass.c
+ create mode 100644 src/wayland/meta-wayland-kestrel-glass.h
+ create mode 100644 src/wayland/protocol/kestrel-glass-v1.xml
+
+diff --git a/src/compositor/compositor-private.h b/src/compositor/compositor-private.h
+index 237b5a1f28ae52406827ce6aaa6dd894305e8bc0..21314351463ef393b523caca13cb618b082584ac 100644
+--- a/src/compositor/compositor-private.h
++++ b/src/compositor/compositor-private.h
+@@ -8,18 +8,12 @@
+ #include "clutter/clutter-mutter.h"
+ #include "clutter/clutter.h"
+ #include "compositor/meta-compositor-view.h"
++#include "compositor/meta-glass.h"
+ #include "compositor/meta-plugin-manager.h"
+ #include "compositor/meta-window-actor-private.h"
+ #include "compositor/meta-window-drag.h"
+ #include "meta/compositor.h"
+ #include "meta/display.h"
+-
+-typedef enum
+-{
+-  META_GLASS_MATERIAL_LIVE,
+-  META_GLASS_MATERIAL_WALLPAPER,
+-  META_GLASS_MATERIAL_SURFACE,
+-} MetaGlassMaterial;
+ #include "meta/prefs.h"
+ 
+ /* Wait 2ms after vblank before starting to draw next frame */
+@@ -213,4 +207,9 @@ gboolean meta_compositor_query_pointer_a11y (MetaCompositor    *compositor,
+                                              GVariant         **data_out,
+                                              graphene_point_t  *rel_coords);
+ 
+-MetaGlassMaterial meta_compositor_get_glass_material (MetaCompositor *compositor);
++MetaGlassMaterial meta_compositor_get_glass_material (MetaCompositor      *compositor,
++                                                      MetaGlassRole        role,
++                                                      MetaGlassPreference  preference);
++
++void meta_compositor_count_maris_request (MetaCompositor *compositor,
++                                          int             change);
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 92e6023a5fe0cd376fe01f581b49785d5534559b..5303b2ae2e7df66b3c717448a88b0142773f1550 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -97,6 +97,15 @@ enum
+ 
+ static GParamSpec *obj_props[N_PROPS] = { NULL, };
+ 
++enum
++{
++  GLASS_CHANGED,
++
++  N_SIGNALS
++};
++
++static guint compositor_signals[N_SIGNALS];
++
+ typedef struct _MetaCompositorPrivate
+ {
+   GObject parent;
+@@ -147,6 +156,7 @@ typedef struct _MetaCompositorPrivate
+   MetaGlassStyle glass_transients;
+   gboolean luca_from_wallpaper;
+   CoglColor glass_surface;
++  unsigned int maris_requests;
+ 
+   GSettings *kestrel_settings;
+ } MetaCompositorPrivate;
+@@ -1480,6 +1490,19 @@ meta_compositor_class_init (MetaCompositorClass *klass)
+                          G_PARAM_STATIC_STRINGS);
+   g_object_class_install_properties (object_class, N_PROPS, obj_props);
+ 
++  /**
++   * MetaCompositor::glass-changed:
++   *
++   * Emitted when the style of app glass changes, or whether an app asks
++   * for Maris.
++   */
++  compositor_signals[GLASS_CHANGED] =
++    g_signal_new ("glass-changed",
++                  G_TYPE_FROM_CLASS (klass),
++                  G_SIGNAL_RUN_LAST,
++                  0, NULL, NULL, NULL,
++                  G_TYPE_NONE, 0);
++
+   quark_compositor_view =
+     g_quark_from_static_string ("-meta-compositor-view");
+ }
+@@ -1616,6 +1639,7 @@ meta_compositor_set_glass (MetaCompositor *compositor,
+   priv->glass_transients = transients;
+   priv->luca_from_wallpaper = luca_from_wallpaper;
+   invalidate_background_blurs (compositor);
++  g_signal_emit (compositor, compositor_signals[GLASS_CHANGED], 0);
+ }
+ 
+ /**
+@@ -1653,16 +1677,64 @@ meta_compositor_get_glass_surface (MetaCompositor *compositor)
+   return &priv->glass_surface;
+ }
+ 
++static MetaGlassMaterial
++luca_material (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_WALLPAPER : META_GLASS_MATERIAL_LIVE;
++}
++
+ MetaGlassMaterial
+-meta_compositor_get_glass_material (MetaCompositor *compositor)
++meta_compositor_get_glass_material (MetaCompositor       *compositor,
++                                    MetaGlassRole         role,
++                                    MetaGlassPreference   preference)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++  MetaGlassStyle style;
++
++  switch (preference)
++    {
++    case META_GLASS_PREFERENCE_MARIS:
++      return META_GLASS_MATERIAL_SURFACE;
++    case META_GLASS_PREFERENCE_LUCA:
++      return luca_material (compositor);
++    case META_GLASS_PREFERENCE_USER:
++      break;
++    }
++
++  style = role == META_GLASS_ROLE_TRANSIENT ? priv->glass_transients : priv->glass_windows;
++  return style == META_GLASS_STYLE_MARIS ? META_GLASS_MATERIAL_SURFACE : luca_material (compositor);
++}
++
++void
++meta_compositor_count_maris_request (MetaCompositor *compositor,
++                                     int             change)
+ {
+   MetaCompositorPrivate *priv =
+     meta_compositor_get_instance_private (compositor);
++  gboolean requested = priv->maris_requests > 0;
+ 
+-  if (priv->glass_windows == META_GLASS_STYLE_MARIS)
+-    return META_GLASS_MATERIAL_SURFACE;
++  priv->maris_requests += change;
++  if (requested != (priv->maris_requests > 0))
++    g_signal_emit (compositor, compositor_signals[GLASS_CHANGED], 0);
++}
+ 
+-  return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_WALLPAPER : META_GLASS_MATERIAL_LIVE;
++/**
++ * meta_compositor_get_maris_requested:
++ * @compositor: a #MetaCompositor
++ *
++ * Returns: whether an app asks for Maris glass, whatever the person chose
++ */
++gboolean
++meta_compositor_get_maris_requested (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->maris_requests > 0;
+ }
+ 
+ /**
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+index 11a2cb41f0d0e84cb0ebdfe27fd6ef98fb14da23..5a631cf5c83d275a939a5f9ed1231b2bb95b2407 100644
+--- a/src/compositor/meta-background-blur-private.h
++++ b/src/compositor/meta-background-blur-private.h
+@@ -86,6 +86,8 @@ struct _MetaBackgroundBlur
+   MetaCompositor *compositor;
+   ClutterActor *actor;
+   MtkRegion *blur_region;
++  MetaGlassRole role;
++  MetaGlassPreference preference;
+   MetaStage *stage;
+   MetaStageRedrawClipFilter *redraw_clip_filter;
+   gulong before_paint_id;
+diff --git a/src/compositor/meta-background-blur.c b/src/compositor/meta-background-blur.c
+index 4642e6dc3e7a07678261160db719007668815b14..e2fb6e2ebe7fddbf0e21f294732392c8d3fc9d81 100644
+--- a/src/compositor/meta-background-blur.c
++++ b/src/compositor/meta-background-blur.c
+@@ -263,7 +263,9 @@ expand_redraw_clip (MetaStage        *stage,
+   };
+ 
+   if (meta_background_shows_wallpaper (blur->compositor,
+-                                       meta_compositor_get_glass_material (blur->compositor)) ||
++                                       meta_compositor_get_glass_material (blur->compositor,
++                                                                           blur->role,
++                                                                           blur->preference)) ||
+       clutter_actor_get_stage (blur->actor) != CLUTTER_ACTOR (stage))
+     return FALSE;
+ 
+@@ -308,9 +310,11 @@ view_destroyed (gpointer  data,
+ }
+ 
+ MetaBackgroundBlur *
+-meta_background_blur_new (MetaCompositor  *compositor,
+-                          ClutterActor    *actor,
+-                          const MtkRegion *blur_region)
++meta_background_blur_new (MetaCompositor      *compositor,
++                          ClutterActor        *actor,
++                          const MtkRegion     *blur_region,
++                          MetaGlassRole        role,
++                          MetaGlassPreference  preference)
+ {
+   MetaBackgroundBlur *blur;
+ 
+@@ -321,6 +325,8 @@ meta_background_blur_new (MetaCompositor  *compositor,
+   blur->compositor = compositor;
+   blur->actor = actor;
+   blur->blur_region = mtk_region_copy (blur_region);
++  blur->role = role;
++  blur->preference = preference;
+   blur->stage = META_STAGE (meta_compositor_get_stage (compositor));
+   blur->placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
+   blur->previous_placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 676ac38ef8e84d91af00c4b818e0ac3ab462a973..241e31e160d393f6550d2380e4ff673a054a7281 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -426,7 +426,7 @@ meta_background_blur_paint (MetaBackgroundBlur    *blur,
+ 
+   meta_compositor_get_background_blur_params (blur->compositor, &paint.radius,
+                                               &paint.saturation, &paint.noise);
+-  paint.material = meta_compositor_get_glass_material (blur->compositor);
++  paint.material = meta_compositor_get_glass_material (blur->compositor, blur->role, blur->preference);
+   if (prepare_paint (blur, &paint, paint_context, clip_region))
+     paint_blur (blur, &paint, clutter_paint_context_get_stage_view (paint_context));
+ 
+diff --git a/src/compositor/meta-background-effect.h b/src/compositor/meta-background-effect.h
+index 686abd39164890a89b0623705c2e2b2730fc594a..9be6ddc76fc94fb535975629697501f863b2c4e9 100644
+--- a/src/compositor/meta-background-effect.h
++++ b/src/compositor/meta-background-effect.h
+@@ -18,14 +18,17 @@
+ #pragma once
+ 
+ #include "clutter/clutter.h"
++#include "compositor/meta-glass.h"
+ #include "meta/compositor.h"
+ #include "mtk/mtk.h"
+ 
+ typedef struct _MetaBackgroundBlur MetaBackgroundBlur;
+ 
+-MetaBackgroundBlur * meta_background_blur_new (MetaCompositor  *compositor,
+-                                               ClutterActor    *actor,
+-                                               const MtkRegion *blur_region);
++MetaBackgroundBlur * meta_background_blur_new (MetaCompositor      *compositor,
++                                               ClutterActor        *actor,
++                                               const MtkRegion     *blur_region,
++                                               MetaGlassRole        role,
++                                               MetaGlassPreference  preference);
+ void meta_background_blur_destroy (MetaBackgroundBlur *blur);
+ 
+ void meta_background_blur_paint (MetaBackgroundBlur    *blur,
+diff --git a/src/compositor/meta-glass.h b/src/compositor/meta-glass.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..fe46325f0f3acdbe5b7b0351a06de769aced97e4
+--- /dev/null
++++ b/src/compositor/meta-glass.h
+@@ -0,0 +1,38 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++typedef enum
++{
++  META_GLASS_MATERIAL_LIVE,
++  META_GLASS_MATERIAL_WALLPAPER,
++  META_GLASS_MATERIAL_SURFACE,
++} MetaGlassMaterial;
++
++typedef enum
++{
++  META_GLASS_ROLE_WINDOW,
++  META_GLASS_ROLE_TRANSIENT,
++} MetaGlassRole;
++
++typedef enum
++{
++  META_GLASS_PREFERENCE_USER,
++  META_GLASS_PREFERENCE_LUCA,
++  META_GLASS_PREFERENCE_MARIS,
++} MetaGlassPreference;
+diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
+index 0455882821262bbaa87d6baf8464ed99f5c8550d..a13e36db98fd51add115b9f17ca9032974d2de58 100644
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -55,6 +55,8 @@ typedef struct _MetaSurfaceActorPrivate
+   MtkRectangle input_bounds;
+   MtkRegion *background_blur_region;
+   MetaBackgroundBlur *background_blur;
++  MetaGlassRole glass_role;
++  MetaGlassPreference glass_preference;
+ 
+   /* MetaCullable regions, see that documentation for more details */
+   MtkRegion *unobscured_region;
+@@ -522,7 +524,9 @@ sync_background_blur (MetaSurfaceActor *surface_actor)
+   priv->background_blur =
+     meta_background_blur_new (priv->compositor,
+                               CLUTTER_ACTOR (surface_actor),
+-                              priv->background_blur_region);
++                              priv->background_blur_region,
++                              priv->glass_role,
++                              priv->glass_preference);
+ }
+ 
+ static void
+@@ -761,6 +765,23 @@ meta_surface_actor_set_background_blur_region (MetaSurfaceActor *surface_actor,
+   queue_redraw_for_region (surface_actor, priv->background_blur_region);
+ }
+ 
++void
++meta_surface_actor_set_glass (MetaSurfaceActor    *surface_actor,
++                              MetaGlassRole        role,
++                              MetaGlassPreference  preference)
++{
++  MetaSurfaceActorPrivate *priv =
++    meta_surface_actor_get_instance_private (surface_actor);
++
++  if (priv->glass_role == role && priv->glass_preference == preference)
++    return;
++
++  priv->glass_role = role;
++  priv->glass_preference = preference;
++  sync_background_blur (surface_actor);
++  queue_redraw_for_region (surface_actor, priv->background_blur_region);
++}
++
+ void
+ meta_surface_actor_invalidate_background_blur (MetaSurfaceActor *surface_actor)
+ {
+diff --git a/src/compositor/meta-surface-actor.h b/src/compositor/meta-surface-actor.h
+index 9dce861587a1b7e8ae58f0fa50a334f23166aa1c..a3ff06a0c06bb4c4939155ea53a815ef6bcd024f 100644
+--- a/src/compositor/meta-surface-actor.h
++++ b/src/compositor/meta-surface-actor.h
+@@ -3,6 +3,7 @@
+ #pragma once
+ 
+ #include "backends/meta-backend-types.h"
++#include "compositor/meta-glass.h"
+ #include "meta/meta-shaped-texture.h"
+ #include "meta/window.h"
+ 
+@@ -44,6 +45,9 @@ void meta_surface_actor_set_opaque_region (MetaSurfaceActor *self,
+ 
+ void meta_surface_actor_set_background_blur_region (MetaSurfaceActor *surface_actor,
+                                                     MtkRegion        *region);
++void meta_surface_actor_set_glass (MetaSurfaceActor    *surface_actor,
++                                   MetaGlassRole        role,
++                                   MetaGlassPreference  preference);
+ void meta_surface_actor_invalidate_background_blur (MetaSurfaceActor *surface_actor);
+ void meta_surface_actor_paint_background_effects (MetaSurfaceActor    *surface_actor,
+                                                   ClutterPaintNode    *root_node,
+diff --git a/src/meson.build b/src/meson.build
+index 81b3b8823e8732d73d0984ef2eb85af7daa1b54c..83ef4df3b88750a9156822ddbe4caf088dfc36cb 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -269,6 +269,7 @@ mutter_sources = [
+   'compositor/meta-background-effect.h',
+   'compositor/meta-background-geometry.c',
+   'compositor/meta-background-wallpaper.c',
++  'compositor/meta-glass.h',
+   'compositor/meta-background.c',
+   'compositor/meta-background-group.c',
+   'compositor/meta-background-private.h',
+@@ -656,6 +657,8 @@ mutter_sources += [
+   'wayland/meta-wayland-xdg-shell.h',
+   'wayland/meta-wayland-toplevel-icon.c',
+   'wayland/meta-wayland-toplevel-icon.h',
++  'wayland/meta-wayland-kestrel-glass.c',
++  'wayland/meta-wayland-kestrel-glass.h',
+   'wayland/meta-wayland-kestrel-window.c',
+   'wayland/meta-wayland-kestrel-window.h',
+   'wayland/meta-wayland-xdg-decoration.c',
+@@ -1045,6 +1048,7 @@ wayland_protocols = [
+   ['fractional-scale', 'staging', 1, ],
+   ['fifo', 'staging', 1, ],
+   ['gtk-shell', 'private', ],
++  ['kestrel-glass-v1', 'private', ],
+   ['kestrel-window-v1', 'private', ],
+   ['idle-inhibit', 'unstable', 1, ],
+   ['keyboard-shortcuts-inhibit', 'unstable', 1, ],
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index 4b786517d26bac269cc54e3a30d114dc58939674..0d634c73d648a300de44b3a578d1bd692a5c8048 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -154,6 +154,9 @@ void meta_compositor_set_glass_surface (MetaCompositor  *compositor,
+ META_EXPORT
+ const CoglColor * meta_compositor_get_glass_surface (MetaCompositor *compositor);
+ 
++META_EXPORT
++gboolean meta_compositor_get_maris_requested (MetaCompositor *compositor);
++
+ META_EXPORT
+ void meta_compositor_clear_frosted_wallpaper (MetaCompositor     *compositor,
+                                               MetaWallpaperFrost  frost);
+diff --git a/src/wayland/meta-wayland-actor-surface.c b/src/wayland/meta-wayland-actor-surface.c
+index 7d887ba5e2c382ef9cff88449a4d8a2cff37c465..ecdd287735f166779d15436d6311e29f89dd7ca0 100644
+--- a/src/wayland/meta-wayland-actor-surface.c
++++ b/src/wayland/meta-wayland-actor-surface.c
+@@ -267,6 +267,9 @@ meta_wayland_actor_surface_real_sync_actor_state (MetaWaylandActorSurface *actor
+       {
+         meta_surface_actor_set_background_blur_region (surface_actor, NULL);
+       }
++
++    meta_surface_actor_set_glass (surface_actor, surface->glass_role,
++                                  surface->glass_preference);
+   }
+ 
+   meta_shaped_texture_set_transform (stex, surface->buffer_transform);
+diff --git a/src/wayland/meta-wayland-kestrel-glass.c b/src/wayland/meta-wayland-kestrel-glass.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..5fb3a40c7f69da53ee2eb6b8e90f4fa55b9ae3ba
+--- /dev/null
++++ b/src/wayland/meta-wayland-kestrel-glass.c
+@@ -0,0 +1,249 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "wayland/meta-wayland-kestrel-glass.h"
++
++#include "compositor/compositor-private.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-surface-private.h"
++#include "wayland/meta-wayland-versions.h"
++
++#include "kestrel-glass-v1-server-protocol.h"
++
++#define KESTREL_GLASS_DATA "-meta-wayland-kestrel-glass"
++
++typedef struct
++{
++  struct wl_resource *resource;
++  MetaWaylandSurface *surface;
++  MetaCompositor *compositor;
++  gulong surface_destroyed_id;
++  gulong glass_changed_id;
++  MetaGlassMaterial material;
++} MetaWaylandKestrelGlass;
++
++static enum kestrel_glass_v1_material
++material_of (MetaGlassMaterial material)
++{
++  return material == META_GLASS_MATERIAL_SURFACE ?
++    KESTREL_GLASS_V1_MATERIAL_MARIS : KESTREL_GLASS_V1_MATERIAL_LUCA;
++}
++
++static void
++update (MetaWaylandKestrelGlass *glass)
++{
++  MetaWaylandSurface *surface = glass->surface;
++  MetaSurfaceActor *actor = meta_wayland_surface_get_actor (surface);
++  MetaGlassMaterial material;
++
++  if (actor)
++    meta_surface_actor_set_glass (actor, surface->glass_role, surface->glass_preference);
++
++  material = meta_compositor_get_glass_material (glass->compositor,
++                                                 surface->glass_role,
++                                                 surface->glass_preference);
++  if (material_of (material) == material_of (glass->material))
++    return;
++
++  glass->material = material;
++  kestrel_glass_v1_send_material (glass->resource, material_of (material));
++}
++
++static void
++set_preference (MetaWaylandKestrelGlass *glass,
++                MetaGlassPreference      preference)
++{
++  MetaGlassPreference previous = glass->surface->glass_preference;
++
++  if (previous == META_GLASS_PREFERENCE_MARIS)
++    meta_compositor_count_maris_request (glass->compositor, -1);
++  glass->surface->glass_preference = preference;
++  if (preference == META_GLASS_PREFERENCE_MARIS)
++    meta_compositor_count_maris_request (glass->compositor, 1);
++}
++
++static void
++forget_surface (MetaWaylandKestrelGlass *glass)
++{
++  set_preference (glass, META_GLASS_PREFERENCE_USER);
++  glass->surface->glass_role = META_GLASS_ROLE_WINDOW;
++  g_object_set_data (G_OBJECT (glass->surface), KESTREL_GLASS_DATA, NULL);
++  g_clear_signal_handler (&glass->surface_destroyed_id, glass->surface);
++  glass->surface = NULL;
++}
++
++static void
++glass_destructor (struct wl_resource *resource)
++{
++  MetaWaylandKestrelGlass *glass = wl_resource_get_user_data (resource);
++
++  if (glass->surface)
++    {
++      MetaSurfaceActor *actor = meta_wayland_surface_get_actor (glass->surface);
++
++      forget_surface (glass);
++      if (actor)
++        meta_surface_actor_set_glass (actor, META_GLASS_ROLE_WINDOW,
++                                      META_GLASS_PREFERENCE_USER);
++    }
++  g_clear_signal_handler (&glass->glass_changed_id, glass->compositor);
++  g_free (glass);
++}
++
++static void
++glass_destroy (struct wl_client   *client,
++               struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++glass_set_role (struct wl_client   *client,
++                struct wl_resource *resource,
++                uint32_t            role)
++{
++  MetaWaylandKestrelGlass *glass = wl_resource_get_user_data (resource);
++
++  if (!glass->surface)
++    return;
++
++  glass->surface->glass_role = role == KESTREL_GLASS_V1_ROLE_TRANSIENT ?
++    META_GLASS_ROLE_TRANSIENT : META_GLASS_ROLE_WINDOW;
++  update (glass);
++}
++
++static void
++glass_set_preference (struct wl_client   *client,
++                      struct wl_resource *resource,
++                      uint32_t            preference)
++{
++  MetaWaylandKestrelGlass *glass = wl_resource_get_user_data (resource);
++
++  if (!glass->surface)
++    return;
++
++  switch (preference)
++    {
++    case KESTREL_GLASS_V1_PREFERENCE_LUCA:
++      set_preference (glass, META_GLASS_PREFERENCE_LUCA);
++      break;
++    case KESTREL_GLASS_V1_PREFERENCE_MARIS:
++      set_preference (glass, META_GLASS_PREFERENCE_MARIS);
++      break;
++    default:
++      set_preference (glass, META_GLASS_PREFERENCE_USER);
++      break;
++    }
++  update (glass);
++}
++
++static const struct kestrel_glass_v1_interface glass_implementation =
++{
++  glass_destroy,
++  glass_set_role,
++  glass_set_preference,
++};
++
++static void
++on_surface_destroyed (MetaWaylandSurface      *surface,
++                      MetaWaylandKestrelGlass *glass)
++{
++  forget_surface (glass);
++}
++
++static void
++on_glass_changed (MetaCompositor          *compositor,
++                  MetaWaylandKestrelGlass *glass)
++{
++  if (glass->surface)
++    update (glass);
++}
++
++static void
++manager_destroy (struct wl_client   *client,
++                 struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++manager_get_glass (struct wl_client   *client,
++                   struct wl_resource *resource,
++                   uint32_t            id,
++                   struct wl_resource *surface_resource)
++{
++  MetaWaylandSurface *surface = wl_resource_get_user_data (surface_resource);
++  MetaWaylandCompositor *wayland_compositor = wl_resource_get_user_data (resource);
++  MetaContext *context = meta_wayland_compositor_get_context (wayland_compositor);
++  MetaDisplay *display = meta_context_get_display (context);
++  MetaWaylandKestrelGlass *glass;
++
++  if (g_object_get_data (G_OBJECT (surface), KESTREL_GLASS_DATA))
++    {
++      wl_resource_post_error (resource, KESTREL_GLASS_MANAGER_V1_ERROR_GLASS_EXISTS,
++                              "The surface already has a glass object");
++      return;
++    }
++
++  glass = g_new0 (MetaWaylandKestrelGlass, 1);
++  glass->surface = surface;
++  glass->compositor = meta_display_get_compositor (display);
++  glass->resource = wl_resource_create (client, &kestrel_glass_v1_interface,
++                                        wl_resource_get_version (resource), id);
++  wl_resource_set_implementation (glass->resource, &glass_implementation,
++                                  glass, glass_destructor);
++  g_object_set_data (G_OBJECT (surface), KESTREL_GLASS_DATA, glass);
++  glass->surface_destroyed_id =
++    g_signal_connect (surface, "destroy", G_CALLBACK (on_surface_destroyed), glass);
++  glass->glass_changed_id =
++    g_signal_connect (glass->compositor, "glass-changed", G_CALLBACK (on_glass_changed), glass);
++
++  glass->material = meta_compositor_get_glass_material (glass->compositor,
++                                                        surface->glass_role,
++                                                        surface->glass_preference);
++  kestrel_glass_v1_send_material (glass->resource, material_of (glass->material));
++}
++
++static const struct kestrel_glass_manager_v1_interface manager_implementation =
++{
++  manager_destroy,
++  manager_get_glass,
++};
++
++static void
++bind_manager (struct wl_client *client,
++              void             *data,
++              uint32_t          version,
++              uint32_t          id)
++{
++  struct wl_resource *resource;
++
++  resource = wl_resource_create (client, &kestrel_glass_manager_v1_interface, version, id);
++  wl_resource_set_implementation (resource, &manager_implementation, data, NULL);
++}
++
++void
++meta_wayland_init_kestrel_glass (MetaWaylandCompositor *compositor)
++{
++  if (!wl_global_create (compositor->wayland_display,
++                         &kestrel_glass_manager_v1_interface,
++                         META_KESTREL_GLASS_V1_VERSION,
++                         compositor, bind_manager))
++    g_warning ("Failed to create kestrel_glass_manager_v1 global");
++}
+diff --git a/src/wayland/meta-wayland-kestrel-glass.h b/src/wayland/meta-wayland-kestrel-glass.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..19508f897b17c9c3691495a9d3f48b7643b61749
+--- /dev/null
++++ b/src/wayland/meta-wayland-kestrel-glass.h
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include "wayland/meta-wayland-types.h"
++
++void meta_wayland_init_kestrel_glass (MetaWaylandCompositor *compositor);
+diff --git a/src/wayland/meta-wayland-surface-private.h b/src/wayland/meta-wayland-surface-private.h
+index 5073834d5ddc8f28e8b8170aeba8c21ffe8b04d6..3f809e0cb650e07341d6758e3a6f698ec5cf4600 100644
+--- a/src/wayland/meta-wayland-surface-private.h
++++ b/src/wayland/meta-wayland-surface-private.h
+@@ -197,6 +197,8 @@ struct _MetaWaylandSurface
+   MtkRegion *input_region;
+   MtkRegion *opaque_region;
+   MtkRegion *background_blur_region;
++  MetaGlassRole glass_role;
++  MetaGlassPreference glass_preference;
+   int32_t offset_x, offset_y;
+   GHashTable *outputs;
+   MtkMonitorTransform buffer_transform;
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index d132a103df46454da40305bb934e7ae807c39f9b..c27c8bb9b11d13790db66363090ccfd85f489c34 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -73,6 +73,7 @@
+ #define META_WP_POINTER_WARP_VERSION 1
+ #define META_EXT_BACKGROUND_EFFECT_V1_VERSION 1
+ #define META_KESTREL_WINDOW_V1_VERSION 2
++#define META_KESTREL_GLASS_V1_VERSION 1
+ #define META_ZXDG_DECORATION_MANAGER_V1_VERSION 2
+ #define META_EXT_IDLE_NOTIFIER_V1_VERSION 2
+ #define META_EXT_DATA_CONTROL_MANAGER_V1_VERSION 1
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index 5ae866f0e9e35de9e5dbd7a48924f6bc7b0c82c8..3bbcca7c23cb5575fa8354b3967fac9f6418b9dc 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -72,6 +72,7 @@
+ #include "wayland/meta-wayland-transaction.h"
+ #include "wayland/meta-wayland-xdg-dialog.h"
+ #include "wayland/meta-wayland-toplevel-icon.h"
++#include "wayland/meta-wayland-kestrel-glass.h"
+ #include "wayland/meta-wayland-kestrel-window.h"
+ #include "wayland/meta-wayland-xdg-decoration.h"
+ #include "wayland/meta-wayland-xdg-foreign.h"
+@@ -1042,6 +1043,7 @@ meta_wayland_compositor_new (MetaContext *context)
+   meta_wayland_init_background_effect (compositor);
+   meta_wayland_init_toplevel_icon (compositor);
+   meta_wayland_init_kestrel_window (compositor);
++  meta_wayland_init_kestrel_glass (compositor);
+   meta_wayland_init_xdg_decoration (compositor);
+   meta_wayland_init_fixes (compositor);
+ 
+diff --git a/src/wayland/protocol/kestrel-glass-v1.xml b/src/wayland/protocol/kestrel-glass-v1.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..9e5c0b4a19c3ef957e50ef76f728bedc2d5f44f7
+--- /dev/null
++++ b/src/wayland/protocol/kestrel-glass-v1.xml
+@@ -0,0 +1,118 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="kestrel_glass_v1">
++  <copyright>
++    Copyright © 2026 Lantharos
++
++    Permission is hereby granted, free of charge, to any person obtaining a
++    copy of this software and associated documentation files (the "Software"),
++    to deal in the Software without restriction, including without limitation
++    the rights to use, copy, modify, merge, publish, distribute, sublicense,
++    and/or sell copies of the Software, and to permit persons to whom the
++    Software is furnished to do so, subject to the following conditions:
++
++    The above copyright notice and this permission notice (including the next
++    paragraph) shall be included in all copies or substantial portions of the
++    Software.
++
++    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++    DEALINGS IN THE SOFTWARE.
++  </copyright>
++
++  <interface name="kestrel_glass_manager_v1" version="1">
++    <description summary="the material of a surface's glass">
++      Glass is the part of a surface a client asks to blur through
++      ext_background_effect_v1. Kestrel draws it as one of two materials:
++      Luca, a blur of what is behind the surface or only of the wallpaper,
++      and Maris, the desktop's surface colour over a wide blur of the
++      wallpaper that covers most of it.
++
++      Through a glass object, a client says what kind of surface the glass
++      belongs to and which material it would like, and hears which material
++      the glass has. A client draws its own tint over Luca glass, and none
++      over Maris glass, whose surface colour is already the whole surface.
++    </description>
++
++    <enum name="error">
++      <entry name="glass_exists" value="0"
++             summary="the surface already has a glass object"/>
++    </enum>
++
++    <request name="destroy" type="destructor">
++      <description summary="destroy the manager">
++        Destroying the manager leaves glass objects it created intact.
++      </description>
++    </request>
++
++    <request name="get_glass">
++      <description summary="get the glass object of a surface">
++        Creates the glass object of a surface. A surface can have only one;
++        asking again is a glass_exists error. The compositor sends the
++        material event right away.
++      </description>
++      <arg name="id" type="new_id" interface="kestrel_glass_v1"/>
++      <arg name="surface" type="object" interface="wl_surface"/>
++    </request>
++  </interface>
++
++  <interface name="kestrel_glass_v1" version="1">
++    <description summary="the glass of one surface">
++      Requests take effect immediately and last until they are changed or
++      the object is destroyed, which returns the surface to a window that
++      follows the person's choice.
++    </description>
++
++    <enum name="role">
++      <entry name="window" value="0"
++             summary="the base of a window, such as its sidebar"/>
++      <entry name="transient" value="1"
++             summary="a transient surface, such as a popover, a menu or a palette"/>
++    </enum>
++
++    <enum name="preference">
++      <entry name="user" value="0"
++             summary="the material the person chose for this kind of surface"/>
++      <entry name="luca" value="1" summary="Luca"/>
++      <entry name="maris" value="2" summary="Maris"/>
++    </enum>
++
++    <enum name="material">
++      <entry name="luca" value="0"
++             summary="a blur of what is behind, or of the wallpaper only"/>
++      <entry name="maris" value="1"
++             summary="the surface colour over a wide blur of the wallpaper"/>
++    </enum>
++
++    <request name="destroy" type="destructor">
++      <description summary="return the surface to a window following the person"/>
++    </request>
++
++    <request name="set_role">
++      <description summary="say what kind of surface the glass belongs to">
++        Windows follow the person's choice for app windows, transient
++        surfaces their choice for panels and menus. The default is window.
++      </description>
++      <arg name="role" type="uint" enum="role"/>
++    </request>
++
++    <request name="set_preference">
++      <description summary="ask for a material">
++        Maris is always granted. Luca is granted too, and then blurs only the
++        wallpaper whenever the person's Luca glass does, such as while the
++        power saver is on. The default is user.
++      </description>
++      <arg name="preference" type="uint" enum="preference"/>
++    </request>
++
++    <event name="material">
++      <description summary="the material the glass has">
++        Sent when the object is created and whenever the material changes.
++      </description>
++      <arg name="material" type="uint" enum="material"/>
++    </event>
++  </interface>
++</protocol>

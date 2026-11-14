@@ -151,6 +151,16 @@ export namespace Meta {
     }
 
 
+    export namespace GlassStyle {
+        export const $gtype: GObject.GType<GlassStyle>;
+    }
+
+    enum GlassStyle {
+        LUCA = 0,
+        MARIS = 1,
+    }
+
+
     export namespace GrabOp {
         export const $gtype: GObject.GType<GrabOp>;
     }
@@ -592,6 +602,16 @@ export namespace Meta {
     enum TabShowType {
         ICON = 0,
         INSTANTLY = 1,
+    }
+
+
+    export namespace WallpaperFrost {
+        export const $gtype: GObject.GType<WallpaperFrost>;
+    }
+
+    enum WallpaperFrost {
+        BLURRED = 0,
+        WIDE = 1,
     }
 
 
@@ -1765,6 +1785,8 @@ export namespace Meta {
     namespace Compositor {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
+            /** @signal */
+            "glass-changed": () => void;
             "notify::backend": (pspec: GObject.ParamSpec) => void;
             "notify::display": (pspec: GObject.ParamSpec) => void;
         }
@@ -1809,9 +1831,9 @@ export namespace Meta {
         emit<K extends keyof Compositor.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<Compositor.SignalSignatures[K]>): void;
 
         // Methods
-        add_frosted_wallpaper(area: Mtk.Rectangle, texture: Cogl.Texture): void;
+        add_frosted_wallpaper(frost: WallpaperFrost, area: Mtk.Rectangle, texture: Cogl.Texture): void;
 
-        clear_frosted_wallpaper(): void;
+        clear_frosted_wallpaper(frost: WallpaperFrost): void;
 
         disable_unredirect(): void;
 
@@ -1819,15 +1841,17 @@ export namespace Meta {
 
         get_backend(): Backend;
 
-        get_background_blur_from_wallpaper(): boolean;
-
         get_background_blur_params(): [number, number, number];
 
         get_feedback_group(): Clutter.Actor;
 
+        get_glass_surface(): Cogl.Color;
+
         get_input_panel_group(): Clutter.Actor;
 
         get_laters(): Laters;
+
+        get_maris_requested(): boolean;
 
         get_stage(): Clutter.Stage;
 
@@ -1839,9 +1863,11 @@ export namespace Meta {
 
         get_window_group(): Clutter.Actor;
 
-        set_background_blur_from_wallpaper(from_wallpaper: boolean): void;
-
         set_background_blur_params(blur_radius: number, saturation: number, noise: number): void;
+
+        set_glass(windows: GlassStyle, transients: GlassStyle, luca_from_wallpaper: boolean): void;
+
+        set_glass_surface(surface: Cogl.Color): void;
 
         set_monitor_gap(monitor: number, gap: boolean): void;
     }

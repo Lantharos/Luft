@@ -18,7 +18,7 @@ interface Backdrop {
   corners: number;
 }
 
-export type GlassKind = 'taskbar' | 'surfaces' | 'windows';
+export type GlassKind = 'taskbar' | 'surfaces' | 'windows' | 'see-through';
 
 const surfaces = new Set<Backdrop>();
 const cornered = new Set<Backdrop>();
@@ -27,6 +27,7 @@ const styles: Record<GlassKind, Shell.BlurStyle> = {
   taskbar: Shell.BlurStyle.LUCA,
   surfaces: Shell.BlurStyle.LUCA,
   windows: Shell.BlurStyle.LUCA,
+  'see-through': Shell.BlurStyle.LUCA,
 };
 let solid = false;
 let square = false;
@@ -83,7 +84,7 @@ export function setGlassStyle(kind: GlassKind, style: Shell.BlurStyle): void {
 
 export function repaintWallpaperGlass(): void {
   for (const effect of backdrops.keys())
-    if (effect.style === Shell.BlurStyle.MARIS) effect.queue_repaint();
+    if (effect.style !== Shell.BlurStyle.LUCA) effect.queue_repaint();
 }
 
 export function blurBackdrop(actor: St.Widget, corners: number, kind: GlassKind = 'surfaces'): Shell.BlurEffect {

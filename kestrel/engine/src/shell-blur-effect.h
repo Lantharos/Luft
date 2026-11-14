@@ -40,13 +40,16 @@ typedef enum
 /**
  * ShellBlurStyle:
  * @SHELL_BLUR_STYLE_LUCA: blur what is beneath the actor as it changes
- * @SHELL_BLUR_STYLE_MARIS: show the compositor's frosted wallpaper beneath it
+ * @SHELL_BLUR_STYLE_WALLPAPER: show the compositor's blurred wallpaper beneath it
+ * @SHELL_BLUR_STYLE_MARIS: show the glass surface colour over the
+ *   compositor's wide blur of the wallpaper
  *
  * How a background blur looks.
  */
 typedef enum
 {
   SHELL_BLUR_STYLE_LUCA,
+  SHELL_BLUR_STYLE_WALLPAPER,
   SHELL_BLUR_STYLE_MARIS,
 } ShellBlurStyle;
 

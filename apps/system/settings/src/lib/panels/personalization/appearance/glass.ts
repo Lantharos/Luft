@@ -1,12 +1,15 @@
 export const GLASS_SCHEMA = 'com.lantharos.kestrel.glass';
 
 export type GlassStyle = 'luca' | 'maris';
+export type GlassKind = 'taskbar' | 'surfaces' | 'windows';
+export type LucaBlurs = 'everything' | 'wallpaper';
 
 export type Glass = {
 	taskbar: GlassStyle;
 	surfaces: GlassStyle;
 	windows: GlassStyle;
-	'maris-on-power-saver': boolean;
+	'luca-blurs': LucaBlurs;
+	'wallpaper-on-power-saver': boolean;
 };
 
 export function glassSummary(glass: Partial<Glass>): GlassStyle | 'mixed' {

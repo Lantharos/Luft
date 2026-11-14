@@ -24,9 +24,11 @@
 
 #include "shell-blur-effect.h"
 #include "shell-backdrop.h"
+#include "shell-blur-outline.h"
 #include "shell-global.h"
 
 #include "shell-enum-types.h"
+#include "st.h"
 
 /**
  * ShellBlurEffect:
@@ -44,8 +46,9 @@
  *
  * In @SHELL_BLUR_MODE_BACKGROUND, the @SHELL_BLUR_STYLE_LUCA style blurs what
  * is beneath the actor again whenever it changes, and keeps the result while it
- * doesn't. @SHELL_BLUR_STYLE_MARIS shows the compositor's frosted wallpaper
- * instead, see meta_compositor_add_frosted_wallpaper().
+ * doesn't. @SHELL_BLUR_STYLE_WALLPAPER shows the compositor's blurred wallpaper
+ * instead, and @SHELL_BLUR_STYLE_MARIS its wide one under the glass surface
+ * colour, see meta_compositor_add_frosted_wallpaper().
  */
 
 static const gchar *position_glsl_declarations =
@@ -62,7 +65,10 @@ static const gchar *brightness_glsl_declarations =
 "uniform float corner_radius;                                              \n"
 "uniform float bright_dim;                                                 \n"
 "uniform float dark_lift;                                                  \n"
-"uniform float saturation;                                                 \n";
+"uniform float saturation;                                                 \n"
+"uniform vec4 surface_tint;                                                \n"
+"uniform float grain;                                                      \n"
+"uniform float pixel_scale;                                                \n";
 
 static const gchar *brightness_glsl =
 "  cogl_color_out.rgb *= brightness;                                       \n"
@@ -74,6 +80,14 @@ static const gchar *brightness_glsl =
 "  float lifted = dot(cogl_color_out.rgb, vec3(0.2126, 0.7152, 0.0722));    \n"
 "  cogl_color_out.rgb = clamp(mix(vec3(lifted), cogl_color_out.rgb,         \n"
 "                                 saturation), 0.0, cogl_color_out.a);      \n"
+"  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
+"                           surface_tint.rgb * cogl_color_out.a,           \n"
+"                           surface_tint.a);                               \n"
+"  float noise = texture2D(cogl_sampler1,                                  \n"
+"    (mod(floor(surface_position * pixel_scale), 64.0) + 0.5) / 64.0).r;   \n"
+"  cogl_color_out.rgb = clamp(cogl_color_out.rgb +                         \n"
+"                             (2.0 * noise - 1.0) * grain * cogl_color_out.a,\n"
+"                             0.0, cogl_color_out.a);                      \n"
 "  vec2 half_size = surface_size * 0.5;                                    \n"
 "  float r = min(corner_radius, min(half_size.x, half_size.y));              \n"
 "  vec2 p = abs(surface_position - half_size);                              \n"
@@ -83,6 +97,7 @@ static const gchar *brightness_glsl =
 "    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d);                      \n";
 
 #define RESULT_SIZE_STEP 64
+#define GRAIN 0.02f
 
 typedef enum
 {
@@ -129,6 +144,9 @@ struct _ShellBlurEffect
   float dark_lift;
   int saturation_uniform;
   float saturation;
+  int surface_tint_uniform;
+  int grain_uniform;
+  int pixel_scale_uniform;
 
   ShellBlurMode mode;
   ShellBlurStyle style;
@@ -190,155 +208,6 @@ create_base_pipeline (CoglContext *ctx)
   return cogl_pipeline_copy (base_pipeline);
 }
 
-static CoglPipeline *
-create_outline_pipeline (CoglContext *ctx)
-{
-  static CoglPipelineKey outline_pipeline_key = "shell-blur-effect-outline";
-  CoglPipeline *pipeline =
-    cogl_context_get_named_pipeline (ctx, &outline_pipeline_key);
-
-  if (G_UNLIKELY (pipeline == NULL))
-    {
-      CoglSnippet *snippet;
-
-      pipeline = cogl_pipeline_new (ctx);
-      cogl_pipeline_set_layer_null_texture (pipeline, 0);
-      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_VERTEX,
-        "varying vec2 outline_position;\n",
-        "outline_position = cogl_tex_coord0_in.xy;\n");
-      cogl_pipeline_add_snippet (pipeline, snippet);
-      g_object_unref (snippet);
-      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
-        "varying vec2 outline_position;\n"
-        "uniform vec4 outline_bounds;\n"
-        "uniform float outline_radius;\n",
-        "vec2 half_size = outline_bounds.zw * 0.5;\n"
-        "vec2 q = abs(outline_position - outline_bounds.xy - half_size) - half_size + outline_radius;\n"
-        "float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - outline_radius;\n"
-        "float aa = max(fwidth(d), 0.001);\n"
-        "float outside = smoothstep(-aa * 0.5, aa * 0.5, d);\n"
-        "float inside = smoothstep(-aa * 0.5, aa * 0.5, d + 1.0);\n"
-        "cogl_color_out *= inside - outside;\n");
-      cogl_pipeline_add_snippet (pipeline, snippet);
-      g_object_unref (snippet);
-      cogl_context_set_named_pipeline (ctx, &outline_pipeline_key, pipeline);
-    }
-
-  return cogl_pipeline_copy (pipeline);
-}
-
-static void
-add_outline_band (ClutterPaintNode *node,
-                  float             x1,
-                  float             y1,
-                  float             x2,
-                  float             y2)
-{
-  clutter_paint_node_add_texture_rectangle (node,
-                                            &(ClutterActorBox) { x1, y1, x2, y2 },
-                                            x1, y1, x2, y2);
-}
-
-typedef enum
-{
-  SIDE_TOP = 1 << 0,
-  SIDE_BOTTOM = 1 << 1,
-  SIDE_LEFT = 1 << 2,
-  SIDE_RIGHT = 1 << 3,
-} Sides;
-
-/* The sides of the surface that don't lie against an edge of its monitor */
-static Sides
-exposed_sides (ShellBlurEffect *self)
-{
-  MetaDisplay *display = shell_global_get_display (shell_global_get ());
-  graphene_rect_t extents;
-  MtkRectangle rect, monitor;
-  Sides sides = 0;
-  int index;
-
-  clutter_actor_get_transformed_extents (self->actor, &extents);
-  rect = (MtkRectangle) {
-    (int) floorf (extents.origin.x), (int) floorf (extents.origin.y),
-    (int) ceilf (extents.size.width), (int) ceilf (extents.size.height),
-  };
-  index = meta_display_get_monitor_index_for_rect (display, &rect);
-  if (index < 0)
-    return SIDE_TOP | SIDE_BOTTOM | SIDE_LEFT | SIDE_RIGHT;
-
-  meta_display_get_monitor_geometry (display, index, &monitor);
-  if (extents.origin.y > monitor.y + 0.5f)
-    sides |= SIDE_TOP;
-  if (extents.origin.y + extents.size.height < monitor.y + monitor.height - 0.5f)
-    sides |= SIDE_BOTTOM;
-  if (extents.origin.x > monitor.x + 0.5f)
-    sides |= SIDE_LEFT;
-  if (extents.origin.x + extents.size.width < monitor.x + monitor.width - 0.5f)
-    sides |= SIDE_RIGHT;
-  return sides;
-}
-
-/* The neutral line windows get along their edge, on top of the surface,
- * leaving out the sides that lie against the screen's edge */
-static void
-add_outline_node (ShellBlurEffect  *self,
-                  ClutterPaintNode *node,
-                  uint8_t           paint_opacity)
-{
-  g_autoptr (CoglPipeline) pipeline = NULL;
-  g_autoptr (ClutterPaintNode) outline_node = NULL;
-  float width, height, radius, band, alpha, top, bottom, reach;
-  float bounds[4];
-  CoglColor color;
-  Sides sides;
-
-  clutter_actor_get_size (self->actor, &width, &height);
-  if (width < 2 || height < 2 || paint_opacity == 0)
-    return;
-
-  sides = exposed_sides (self);
-  if (sides == 0)
-    return;
-
-  radius = MIN (MAX (self->corner_radius, 0), MIN (width, height) / 2.0f);
-  band = MIN (MAX (ceilf (radius) + 1.0f, 2.0f), height / 2.0f);
-  alpha = 0.3f * paint_opacity / 255.0f;
-  /* Push the shape past the sides that get no line, so its edge never
-   * shows there */
-  reach = 2.0f * (radius + 2.0f);
-  bounds[0] = sides & SIDE_LEFT ? 0 : -reach;
-  bounds[1] = sides & SIDE_TOP ? 0 : -reach;
-  bounds[2] = width - bounds[0] + (sides & SIDE_RIGHT ? 0 : reach);
-  bounds[3] = height - bounds[1] + (sides & SIDE_BOTTOM ? 0 : reach);
-
-  pipeline = create_outline_pipeline (get_cogl_context ());
-  cogl_color_init_from_4f (&color, 0.5f * alpha, 0.5f * alpha, 0.5f * alpha, alpha);
-  cogl_pipeline_set_color (pipeline, &color);
-  cogl_pipeline_set_uniform_float (pipeline,
-                                   cogl_pipeline_get_uniform_location (pipeline, "outline_bounds"),
-                                   4, 1, bounds);
-  cogl_pipeline_set_uniform_1f (pipeline,
-                                cogl_pipeline_get_uniform_location (pipeline, "outline_radius"),
-                                radius);
-
-  outline_node = clutter_pipeline_node_new (pipeline);
-  clutter_paint_node_set_static_name (outline_node, "ShellBlurEffect (outline)");
-  clutter_paint_node_add_child (node, outline_node);
-  top = sides & SIDE_TOP ? band : 0;
-  bottom = sides & SIDE_BOTTOM ? height - band : height;
-  if (sides & SIDE_TOP)
-    add_outline_band (outline_node, 0, 0, width, top);
-  if (sides & SIDE_BOTTOM)
-    add_outline_band (outline_node, 0, bottom, width, height);
-  if (bottom > top)
-    {
-      if (sides & SIDE_LEFT)
-        add_outline_band (outline_node, 0, top, 2, bottom);
-      if (sides & SIDE_RIGHT)
-        add_outline_band (outline_node, width - 2, top, width, bottom);
-    }
-}
-
 static CoglPipeline*
 create_brightness_pipeline (CoglContext *ctx)
 {
@@ -351,6 +220,13 @@ create_brightness_pipeline (CoglContext *ctx)
       CoglSnippet *snippet;
 
       brightness_pipeline = create_base_pipeline (ctx);
+      cogl_pipeline_set_layer_texture (brightness_pipeline, 1,
+                                       clutter_blur_node_get_grain (ctx));
+      cogl_pipeline_set_layer_filters (brightness_pipeline, 1,
+                                       COGL_PIPELINE_FILTER_NEAREST,
+                                       COGL_PIPELINE_FILTER_NEAREST);
+      cogl_pipeline_set_layer_combine (brightness_pipeline, 1,
+                                       "RGBA = REPLACE(PREVIOUS)", NULL);
 
       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_VERTEX,
                                   position_glsl_declarations,
@@ -391,6 +267,12 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "dark_lift");
   self->saturation_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "saturation");
+  self->surface_tint_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_tint");
+  self->grain_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "grain");
+  self->pixel_scale_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "pixel_scale");
 }
 
 static void
@@ -437,6 +319,32 @@ ensure_pipelines (ShellBlurEffect *self)
 }
 
 
+static MetaCompositor *
+get_compositor (void)
+{
+  return meta_display_get_compositor (shell_global_get_display (shell_global_get ()));
+}
+
+static void
+surface_tint (ShellBlurEffect *self,
+              float           *tint)
+{
+  const CoglColor *surface = meta_compositor_get_glass_surface (get_compositor ());
+  CoglColor background;
+
+  tint[0] = cogl_color_get_red (surface);
+  tint[1] = cogl_color_get_green (surface);
+  tint[2] = cogl_color_get_blue (surface);
+  tint[3] = 0.f;
+  if (self->style != SHELL_BLUR_STYLE_MARIS || !ST_IS_WIDGET (self->actor))
+    return;
+
+  st_theme_node_get_background_color (st_widget_get_theme_node (ST_WIDGET (self->actor)),
+                                      &background);
+  tint[3] = MAX (0.f, 1.f - (1.f - cogl_color_get_alpha (surface)) /
+                          (1.f - cogl_color_get_alpha (&background)));
+}
+
 static void
 update_brightness (ShellBlurEffect *self,
                    CoglPipeline    *pipeline,
@@ -445,6 +353,7 @@ update_brightness (ShellBlurEffect *self,
 {
   CoglColor color;
   float size[2];
+  float tint[4];
 
   clutter_actor_get_size (self->actor, &size[0], &size[1]);
   cogl_pipeline_set_uniform_float (pipeline, self->surface_size_uniform, 2, 1, size);
@@ -454,6 +363,12 @@ update_brightness (ShellBlurEffect *self,
   cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, self->dark_lift);
   cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform, self->saturation);
   cogl_pipeline_set_uniform_1f (pipeline, self->brightness_uniform, self->brightness);
+  surface_tint (self, tint);
+  cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, tint);
+  cogl_pipeline_set_uniform_1f (pipeline, self->grain_uniform,
+                                self->mode == SHELL_BLUR_MODE_BACKGROUND ? GRAIN : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->pixel_scale_uniform,
+                                clutter_actor_get_resource_scale (self->actor));
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -907,8 +822,9 @@ paint_wallpaper (ShellBlurEffect  *self,
                  ClutterPaintNode *node,
                  uint8_t           paint_opacity)
 {
-  MetaDisplay *display = shell_global_get_display (shell_global_get ());
-  MetaCompositor *compositor = meta_display_get_compositor (display);
+  MetaCompositor *compositor = get_compositor ();
+  MetaWallpaperFrost frost = self->style == SHELL_BLUR_STYLE_MARIS ?
+    META_WALLPAPER_FROST_WIDE : META_WALLPAPER_FROST_BLURRED;
   graphene_rect_t extents;
   float width, height;
   MtkRectangle area;
@@ -920,7 +836,7 @@ paint_wallpaper (ShellBlurEffect  *self,
   if (extents.size.width <= 0.f || extents.size.height <= 0.f)
     return;
 
-  for (i = 0; (texture = meta_compositor_get_frosted_wallpaper (compositor, i, &area)); i++)
+  for (i = 0; (texture = meta_compositor_get_frosted_wallpaper (compositor, frost, i, &area)); i++)
     {
       g_autoptr (ClutterPaintNode) wallpaper_node = NULL;
       graphene_rect_t piece = mtk_rectangle_to_graphene_rect (&area);
@@ -1043,7 +959,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
       return;
     }
 
-  if (self->style == SHELL_BLUR_STYLE_MARIS)
+  if (self->style != SHELL_BLUR_STYLE_LUCA)
     paint_wallpaper (self, node, paint_opacity);
   else if (!paint_live (self, node, paint_context, flags, paint_opacity))
     {
@@ -1052,7 +968,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
     }
 
   add_actor_node (self, node, -1);
-  add_outline_node (self, node, paint_opacity);
+  shell_blur_add_outline (self->actor, node, self->corner_radius, paint_opacity);
 }
 
 static void

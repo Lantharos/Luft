@@ -79,4 +79,6 @@
 0079-kms-shut-down-after-the-pointer-stops-reaching-the-c.patch
 0080-clutter-blur-with-a-dual-Kawase-pyramid-in-targets-p.patch
 0081-compositor-blur-app-glass-again-only-when-what-is-be.patch
-0082-compositor-let-the-shell-show-a-frosted-wallpaper-un.patch
+0082-compositor-give-app-glass-Luca-and-Maris-materials-o.patch
+0083-clutter-take-the-grain-of-blurs-from-a-blue-noise-ti.patch
+0084-wayland-let-clients-say-what-their-glass-is-for-and-.patch

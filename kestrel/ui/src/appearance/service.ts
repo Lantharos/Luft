@@ -60,6 +60,7 @@ export class AppearanceService {
   private readonly unwatchScheme = watchScheme(() => this.update());
   private readonly unwatchCorners = followCorners(this.settings);
   private readonly glass = new GlassStyles();
+  private readonly glassSettings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.glass' });
   private wallpaperSeed: Seed | null = null;
   private appearance: Appearance | null = null;
   private taskbar = '{}';
@@ -79,6 +80,7 @@ export class AppearanceService {
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
       [this.settings, this.settings.connect('changed::accent-color', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
+      [this.glassSettings, this.glassSettings.connect('changed::taskbar', () => this.update())],
     ];
     setSolidSurfaces(this.PureBlack && isDark());
   }
@@ -170,6 +172,7 @@ export class AppearanceService {
       palette: buildPalette(seed, this.PureBlack),
     };
     const style = isDark() ? 'dark' : 'light';
+    this.glass.setSurface(this.appearance.palette[style].colors.surface);
     appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     this.stylesheet.apply(seed, this.appearance.palette);
     this.paintTaskbar();

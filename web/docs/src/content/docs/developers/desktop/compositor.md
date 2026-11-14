@@ -10,7 +10,7 @@ Kestrel runs on its own build of Mutter 51 in `kestrel/compositor`: the upstream
 ## What the patches add
 
 - **Windows.** Rounded corners that stay square where a maximized or tiled window meets the screen edge or another window, and on fullscreen windows so they keep direct scanout. A thin outline on every floating window, and a shadow around those that don't draw their own. Floating windows are told they're tiled while corners are square, so GTK, libadwaita, Chromium and Electron apps draw square corners and leave the shadow to the compositor. Title bars in Kestrel's style for X11 apps and for Wayland apps that ask through `xdg-decoration`.
-- **Glass.** A dual Kawase blur with targets kept across frames, app glass that keeps its blur until what is behind it changes, and the frosted wallpaper Maris shows, all described under [Glass](#glass).
+- **Glass.** A dual Kawase blur with targets kept across frames, app glass that keeps its blur until what is behind it changes, the frosted wallpapers glass shows instead of blurring, blue-noise grain, and `kestrel_glass_v1` for apps to hear and ask for a material, all described under [Glass](#glass).
 - **The shell.** Redraw clips that the shell can grow, desktop windows for live wallpapers, the transformed window groups behind the board, shortcuts the shell adds winning over built-in ones, drops from Wayland apps onto the shell's own actors, a signal before a monitor turns, and fragment shader chains over a whole display or a single actor for screen effects. Shell text with fractional glyph advances and grayscale antialiasing, drawn at a fractional scale's own resolution so it stays sharp at 125% and 150%. Text and icons drawn one texel to a device pixel land on the same whole pixel a background with that edge starts on, so an icon centred on its button stays centred at any scale. The shell lays every icon out at a whole number of device pixels, so at 175% a 28 point icon is 47 pixels drawn as they are, not stretched over 46⅔.
 - **Sandboxed apps.** `wp_security_context_v1`, which Flatpak and Luft's AppImage sandbox use to tag their apps' connections. Mutter's screen recording, remote control and display services refuse sandboxed callers, and so does every Mutter D-Bus interface not listed as open. [App sandbox](/security/app-sandbox/) explains what each permission opens.
 - **Protocols.** `xdg-toplevel-icon-v1`, `wp_content_type_v1`, `ext-idle-notify-v1` with idle times of at least ten seconds for sandboxed apps, so no app can follow someone's typing, and `ext-data-control-v1` for password managers that clear what they copied.
@@ -20,14 +20,32 @@ Kestrel runs on its own build of Mutter 51 in `kestrel/compositor`: the upstream
 
 ## Glass
 
-Glass comes in two styles, chosen per kind of surface in `com.lantharos.kestrel.glass`: `taskbar`, `surfaces` for Start, panels, menus and dialogs, and `windows` for app glass and see-through windows. `maris-on-power-saver` turns every kind to Maris while the power saver is on. `kestrel/ui/src/appearance/glass` follows the settings and the power profile, and sets each blur's style.
+Glass comes in two materials, chosen per kind of surface in `com.lantharos.kestrel.glass`: `taskbar`, `surfaces` for Start, panels, menus and dialogs and for apps' transient surfaces, and `windows` for app windows. `luca-blurs` says whether Luca blurs everything behind it or only the wallpaper, and `wallpaper-on-power-saver` makes it blur only the wallpaper while the power saver is on. See-through windows always follow Luca. `kestrel/ui/src/appearance/glass` follows the settings and the power profile, sets each shell blur's style and tells Mutter with `meta_compositor_set_glass`.
 
 **Luca** blurs what is behind the glass with a dual Kawase pyramid in `ClutterBlur`. The area is halved two to six times, five taps a step, and brought back up to half its size, eight taps a step, so every pixel weighs in once and moving content doesn't shimmer. The depth and the tap offset are matched to a Gaussian of the requested radius, so a radius of 30 looks as wide as it did as a Gaussian. Blur targets are pooled by depth and by size rounded up to 64 pixels, with the copy of the screen going straight into the first level, so resizing and the overview reuse them. A result costs about 45 µs of GPU time on a taskbar and 60 to 100 µs on a window sidebar.
 
 - **Shell glass** is `ShellBlurEffect`. It keeps a copy of what is behind it, refreshed only where the stage repainted and something below changed, and its blurred result at half size, which it draws again as one quad until something behind it changes.
 - **App glass** is the `ext-background-effect-v1` blur in `src/compositor/meta-background-*.c`. Before each frame, a redraw clip filter looks at the actors below each glass window, as the shell does. Only when something there repainted under the glass, the stacking changed or the window moved does it add the glass to the redraw clip and blur again. Otherwise the window draws the blur it kept for that view. The blur reads only the glass itself, so the redraw clip never grows past it, other glass isn't set off and what is under the rest of the window stays culled. Clones, such as the overview's, draw their window's kept blur, and windows that aren't painted aren't blurred.
 
-**Maris** shows the frosted wallpaper. `FrostedWallpaper` blurs each monitor's wallpaper once, at a quarter of its size, and stores it on disk. The shell hands the pieces to Mutter with `meta_compositor_add_frosted_wallpaper` and says whether app glass uses them with `meta_compositor_set_background_blur_from_wallpaper`. Shell glass in Maris draws the piece of wallpaper under it with the same dimming, lift, saturation and corners as Luca, and app glass with the same saturation and grain. Neither copies the screen, blurs or grows the redraw clip, so Maris glass costs one textured quad, however busy the screen behind it is.
+**Luca that blurs only the wallpaper** shows the frosted wallpaper instead. `FrostedWallpaper` blurs each monitor's wallpaper once, at a quarter of its size, and stores it on disk. Shell glass draws the piece of wallpaper under it with the same dimming, lift, saturation and corners as a live blur, and app glass with the same saturation and grain. Neither copies the screen, blurs or grows the redraw clip, so this glass costs one textured quad, however busy the screen behind it is.
+
+**Maris** is the desktop's surface colour, from the wallpaper's palette, over a much wider blur of the wallpaper, so only its colours are left and they shift as a window moves. It is drawn the same way from a second frosted wallpaper, blurred with a radius of 300 and stored at a thirty-second of the monitor's size, under the surface colour covering 80% of it. On shell glass the surface's own background counts towards that 80%.
+
+The shell renders each frosted wallpaper only while something uses it: the blurred one while Luca blurs only the wallpaper, the wide one while any kind of surface is Maris or an app asks for it. It hands the pieces to Mutter with `meta_compositor_add_frosted_wallpaper`, and the surface colour with `meta_compositor_set_glass_surface`, whose alpha is the coverage.
+
+The final pass of every glass, shell or app, adds grain of ±2% from a 64 pixel tile of blue noise (`clutter_blur_node_get_grain`) to hide banding.
+
+### Glass in apps
+
+`kestrel_glass_v1` gives a surface with glass a glass object. Through it, an app says whether the glass is the base of a window or a transient surface such as a popover, a menu or a palette, which follows the choice for panels and menus, and can ask for a material instead of the person's choice:
+
+| Preference | Gets |
+| --- | --- |
+| `user` | The material people chose for the role, the default |
+| `maris` | Maris, always |
+| `luca` | Luca, which blurs only the wallpaper whenever people's Luca does |
+
+The app hears which material its glass has through the `material` event, sent when the object is created and whenever it changes. Over Maris it draws no tint of its own, since the surface colour already is the whole surface. Apps that speak only `ext_background_effect_v1` get the person's choice for app windows. Sabine speaks the protocol for its windows; Luft's apps set it through `GlassWindow`'s `backdrop`, see [Writing apps](/developers/desktop/writing-apps/#glass).
 
 ## Editing the patches
 

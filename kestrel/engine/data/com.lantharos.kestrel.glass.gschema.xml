@@ -4,25 +4,35 @@
     <value nick="maris" value="1"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.LucaBlurs">
+    <value nick="everything" value="0"/>
+    <value nick="wallpaper" value="1"/>
+  </enum>
+
   <schema id="com.lantharos.kestrel.glass" path="/com/lantharos/kestrel/glass/">
     <key name="taskbar" enum="com.lantharos.kestrel.GlassStyle">
       <default>'luca'</default>
       <summary>How the taskbar's glass looks</summary>
-      <description>“luca” blurs whatever is behind it as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper.</description>
     </key>
     <key name="surfaces" enum="com.lantharos.kestrel.GlassStyle">
       <default>'luca'</default>
-      <summary>How the glass of Start, panels, menus and dialogs looks</summary>
-      <description>“luca” blurs whatever is behind them as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+      <summary>How the glass of Start, panels and menus looks</summary>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper. Apps’ popovers and palettes follow it too.</description>
     </key>
     <key name="windows" enum="com.lantharos.kestrel.GlassStyle">
       <default>'luca'</default>
       <summary>How the glass of app windows looks</summary>
-      <description>“luca” blurs whatever is behind them as it changes, “maris” shows a blurred piece of the wallpaper.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper.</description>
     </key>
-    <key name="maris-on-power-saver" type="b">
+    <key name="luca-blurs" enum="com.lantharos.kestrel.LucaBlurs">
+      <default>'everything'</default>
+      <summary>What Luca glass blurs</summary>
+      <description>“everything” blurs whatever is behind the glass as it changes, “wallpaper” only the wallpaper, which uses less power.</description>
+    </key>
+    <key name="wallpaper-on-power-saver" type="b">
       <default>true</default>
-      <summary>Whether all glass shows the wallpaper while power saver is on</summary>
+      <summary>Whether Luca glass blurs only the wallpaper while the power saver is on</summary>
     </key>
   </schema>
 </schemalist>

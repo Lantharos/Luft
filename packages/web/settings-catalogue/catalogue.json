@@ -104,10 +104,20 @@
 			]
 		},
 		{
+			"id": "appearance.glass-blurs",
+			"page": "appearance",
+			"title": "settings-appearance-glass-blurs",
+			"key": "com.lantharos.kestrel.glass luca-blurs",
+			"options": [
+				{ "value": "everything", "label": "settings-appearance-glass-blurs-everything" },
+				{ "value": "wallpaper", "label": "settings-appearance-glass-blurs-wallpaper" }
+			]
+		},
+		{
 			"id": "appearance.glass-power-saver",
 			"page": "appearance",
 			"title": "settings-appearance-glass-power-saver",
-			"key": "com.lantharos.kestrel.glass maris-on-power-saver"
+			"key": "com.lantharos.kestrel.glass wallpaper-on-power-saver"
 		},
 		{
 			"id": "taskbar.shown",

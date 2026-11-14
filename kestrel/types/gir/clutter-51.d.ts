@@ -827,6 +827,8 @@ export namespace Clutter {
 
     const EVENT_STOP: boolean;
 
+    const GRAIN_SIZE: number;
+
     const KEY_0: number;
 
     const KEY_1: number;

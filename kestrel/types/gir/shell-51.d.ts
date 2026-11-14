@@ -106,7 +106,8 @@ export namespace Shell {
 
     enum BlurStyle {
         LUCA = 0,
-        MARIS = 1,
+        WALLPAPER = 1,
+        MARIS = 2,
     }
 
 

@@ -4,8 +4,13 @@ import St from 'gi://St';
 import * as Main from '../../main.js';
 import { FrostedWallpaper, type Frost, type FrostMonitor } from './frost.js';
 
-const BLURRED: Frost = { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null };
-const SHARP: Frost = { name: 'sharp', radius: 0, downscale: 1, brightness: 1, saturation: 1, wash: null };
+export type FrostKind = 'blurred' | 'wide' | 'sharp';
+
+const FROSTS: Record<FrostKind, Frost> = {
+  blurred: { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null },
+  wide: { name: 'wide', radius: 300, downscale: 32, brightness: 1, saturation: 1, wash: null },
+  sharp: { name: 'sharp', radius: 0, downscale: 1, brightness: 1, saturation: 1, wash: null },
+};
 
 export interface WallpaperPiece {
   monitor: FrostMonitor;
@@ -38,7 +43,7 @@ export class WallpaperFrost {
   private readonly theme = St.ThemeContext.get_for_stage(global.stage);
   private readonly signals: [{ disconnect(id: number): void }, number][];
 
-  constructor(private blurred: boolean, private readonly changed: () => void) {
+  constructor(private kind: FrostKind, private readonly changed: () => void) {
     this.signals = [
       [this.theme, this.theme.connect('notify::scale-factor', () => this.rebuild())],
       [Main.layoutManager, Main.layoutManager.connect('monitors-changed', () => this.rebuild())],
@@ -46,9 +51,9 @@ export class WallpaperFrost {
     this.rebuild();
   }
 
-  setBlurred(blurred: boolean): void {
-    if (blurred === this.blurred) return;
-    this.blurred = blurred;
+  setKind(kind: FrostKind): void {
+    if (kind === this.kind) return;
+    this.kind = kind;
     this.rebuild();
   }
 
@@ -58,7 +63,7 @@ export class WallpaperFrost {
 
   private rebuild(): void {
     for (const monitor of this.incoming) monitor.destroy();
-    const frost = this.blurred ? BLURRED : SHARP;
+    const frost = FROSTS[this.kind];
     const incoming = Main.layoutManager.monitors.map((monitor: FrostMonitor, index: number) =>
       new MonitorFrost(monitor, index, frost, changed => this.monitors.includes(changed) && this.changed()));
     this.incoming = incoming;

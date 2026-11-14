@@ -61,7 +61,7 @@ interface Backdrop {
 
 class LiveBackdrop implements Backdrop {
   readonly actor = new St.Widget();
-  private readonly blur = blurBackdrop(this.actor, 0, 'windows');
+  private readonly blur = blurBackdrop(this.actor, 0, 'see-through');
 
   sync(settings: Gio.Settings): void {
     this.blur.enabled = settings.get_boolean('see-through-blur');
@@ -181,14 +181,14 @@ export class SeeThroughWindows {
 
   private syncFrost(): void {
     const wanted = showsWallpaperOnly(this.settings) && this.settings.get_strv(APPS).length > 0;
-    const blurred = this.settings.get_boolean('see-through-blur');
+    const kind = this.settings.get_boolean('see-through-blur') ? 'blurred' : 'sharp';
     if (!wanted) {
       this.frost?.destroy();
       this.frost = null;
     } else if (this.frost) {
-      this.frost.setBlurred(blurred);
+      this.frost.setKind(kind);
     } else {
-      this.frost = new WallpaperFrost(blurred, () => this.treated.forEach(treatment => treatment.place()));
+      this.frost = new WallpaperFrost(kind, () => this.treated.forEach(treatment => treatment.place()));
     }
   }
 

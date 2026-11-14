@@ -28,4 +28,4 @@ The patches are against bootc 1.17.4, and the build applies them in reverse alph
 
 `boot-counting.patch` isn't upstream: bootc's main branch writes its entries without a counter, though `kernel-install` gives new entries tries from `/etc/kernel/tries`.
 
-`root-partition.patch` isn't upstream: bootc's main branch still links `/run/systemd/volatile-root` to `/dev/gpt-auto-root` as it is.
+`root-partition.patch` is a simpler form of [bootc-dev/bootc#2651](https://github.com/bootc-dev/bootc/pull/2651), which isn't merged yet: bootc's main branch still links `/run/systemd/volatile-root` to `/dev/gpt-auto-root` as it is.

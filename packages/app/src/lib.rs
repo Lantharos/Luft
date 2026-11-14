@@ -39,4 +39,4 @@ pub use bridge::{Commands, Empty};
 pub use desktop::declare_appearance;
 pub use sample::sample_system;
 pub use tasks::{block_on, spawn};
-pub use window::{Appearance, GlassWindow, run};
+pub use window::{Appearance, Backdrop, GlassWindow, run};

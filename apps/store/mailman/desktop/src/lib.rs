@@ -8,7 +8,7 @@ mod state;
 mod store;
 mod sync;
 
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 use sabine::SabineWindow;
 use state::MailmanState;
 
@@ -21,6 +21,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (560, 520),
     sidebar_width: 248,
     single_instance: Some(APP_ID),
+    backdrop: Backdrop::WINDOW,
 };
 
 fn launch_activation_token() -> Option<String> {

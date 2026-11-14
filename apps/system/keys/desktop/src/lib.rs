@@ -8,7 +8,7 @@ mod method;
 mod paths;
 mod sources;
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::SabineWindow;
 
 const GLASS_WINDOW: GlassWindow = GlassWindow {
@@ -17,6 +17,7 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
     min_size: (900, 600),
     sidebar_width: 260,
     single_instance: Some("com.lantharos.keys"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run() {

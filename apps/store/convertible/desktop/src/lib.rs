@@ -5,7 +5,7 @@ mod queue;
 pub mod worker;
 
 use app::bridge::{self, AppContext};
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Convertible",
@@ -13,6 +13,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (640, 480),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.convertible"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {

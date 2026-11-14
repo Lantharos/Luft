@@ -7,7 +7,7 @@ mod space;
 mod trust;
 mod udisks;
 
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 
 const GLASS_WINDOW: GlassWindow = GlassWindow {
     title: "Disks",
@@ -15,6 +15,7 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
     min_size: (820, 560),
     sidebar_width: 260,
     single_instance: Some("com.lantharos.disks"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run() -> ! {

@@ -9,7 +9,7 @@ mod state;
 
 use std::sync::LazyLock;
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::SabineWindow;
 
 pub use scanners::sane::{SANE_HELPER, run_helper as run_sane_helper};
@@ -22,6 +22,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (720, 520),
     sidebar_width: 280,
     single_instance: Some(APP_ID),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub static EVENTS: LazyLock<Events> = LazyLock::new(Events::default);

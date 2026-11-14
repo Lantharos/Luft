@@ -7,7 +7,7 @@ mod settings;
 mod shell;
 mod state;
 
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 use sabine::{SabineWindow, WindowRegion};
 use state::TernState;
 
@@ -26,6 +26,7 @@ fn build_window(window: SabineWindow, state: &TernState) -> SabineWindow {
         min_size: (420, 260),
         sidebar_width: 0,
         single_instance: Some(APP_ID),
+        backdrop: Backdrop::WINDOW,
     };
     let window = glass.apply(window);
     let window = if state.glass {

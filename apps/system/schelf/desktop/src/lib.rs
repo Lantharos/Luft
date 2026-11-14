@@ -5,7 +5,7 @@ mod developer;
 mod library;
 mod operations;
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::SabineWindow;
 
 use operations::Queue;
@@ -16,6 +16,7 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
     min_size: (820, 560),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.schelf"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {

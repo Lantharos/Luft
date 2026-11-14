@@ -6,7 +6,7 @@ mod settings;
 mod system;
 mod tasks;
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 
 use monitor::Monitor;
 
@@ -16,6 +16,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (820, 560),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.barometer"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {

@@ -1,6 +1,6 @@
 use sabine::{
-    SabineLifecyclePolicy, SabineWindow, SabineWindowControlAction, SingleInstancePolicy,
-    WindowRegion, WindowRegionRect,
+    BackdropPreference, BackdropRole, SabineLifecyclePolicy, SabineWindow,
+    SabineWindowControlAction, SingleInstancePolicy, WindowRegion, WindowRegionRect,
 };
 use serde::Serialize;
 use specta::Type;
@@ -21,12 +21,26 @@ const CONTROL_OFFSETS: [(SabineWindowControlAction, i32); 3] = [
     (SabineWindowControlAction::Close, -44),
 ];
 
+#[derive(Clone, Copy)]
+pub struct Backdrop {
+    pub role: BackdropRole,
+    pub preference: BackdropPreference,
+}
+
+impl Backdrop {
+    pub const WINDOW: Self = Self {
+        role: BackdropRole::Window,
+        preference: BackdropPreference::User,
+    };
+}
+
 pub struct GlassWindow<'a> {
     pub title: &'a str,
     pub size: (u32, u32),
     pub min_size: (u32, u32),
     pub sidebar_width: i32,
     pub single_instance: Option<&'a str>,
+    pub backdrop: Backdrop,
 }
 
 impl GlassWindow<'_> {
@@ -49,6 +63,7 @@ impl GlassWindow<'_> {
             .min_size(self.min_size.0, self.min_size.1)
             .frameless()
             .glass()
+            .backdrop(self.backdrop.role, self.backdrop.preference)
             .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
             .blur_region(WindowRegion::rounded_left(
                 self.sidebar_width,

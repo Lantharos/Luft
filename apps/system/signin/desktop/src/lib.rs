@@ -2,7 +2,7 @@ mod connectivity;
 mod link;
 mod profile;
 
-use luft_app::{Activation, Appearance, Commands, Empty, Events, GlassWindow};
+use luft_app::{Activation, Appearance, Backdrop, Commands, Empty, Events, GlassWindow};
 use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
@@ -16,6 +16,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (520, 420),
     sidebar_width: 0,
     single_instance: Some(APP_ID),
+    backdrop: Backdrop::WINDOW,
 };
 
 #[derive(Serialize, Type)]

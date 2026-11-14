@@ -3,7 +3,7 @@ mod gsettings;
 mod panels;
 mod parse;
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 use luft_i18n::{Localizer, localizer, t};
 use sabine::SabineWindow;
 
@@ -39,6 +39,7 @@ fn build_window(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
         min_size: (760, 520),
         sidebar_width: 280,
         single_instance: Some("com.lantharos.settings"),
+        backdrop: Backdrop::WINDOW,
     };
     let window = app::register(glass.apply(window), events, watcher);
     panels::register(window, events)

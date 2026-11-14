@@ -16,7 +16,7 @@ luft-app = { workspace = true, features = ["apps", "thumbnails"] }
 ```
 
 ```rust
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Settings",
@@ -24,6 +24,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (760, 520),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.settings"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {
@@ -33,6 +34,7 @@ pub fn run_app() -> ! {
 ```
 
 - `sidebar_width` must match the page's `--sidebar-width`.
+- `backdrop` says what the glass is for and which material it would like, see [Glass](#glass).
 - With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event, which bridge commands take as an `Activation`, the same type `Activation::current_process()` gives for the app's own launch.
 - `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` watches Kestrel's palette and the desktop's fonts for the page. The last closure runs at the same point, for the app's own watchers.
@@ -49,6 +51,23 @@ window
 `with` also passes a shared context such as `Events` or the app's state. `command_async` and `with_async` take async functions, awaited on Sabine's runtime, and anything that waits on D-Bus belongs there. `spawn` runs background work on the same runtime, and `block_on` waits on it from a thread of the app's own.
 
 Sandboxed apps only see the files they're given. `Activation::paths_within_reach` and the file chooser in `luft_app::portal` hand back paths the app can open, through the document portal, for the files it was opened with or the person picked.
+
+
+### Glass
+
+The sidebar is glass, and Kestrel draws it as the material people chose for app windows: Luca, a blur of what is behind, or Maris, the surface colour with a hint of the wallpaper. `Backdrop::WINDOW` follows that choice. An app whose layout needs one material asks for it with `BackdropPreference::Maris` or `BackdropPreference::Luca`, and a window that is a popover or a palette rather than an app's main window sets `BackdropRole::Transient`, so it follows the choice for panels and menus:
+
+```rust
+use luft_app::Backdrop;
+use sabine::{BackdropPreference, BackdropRole};
+
+const PALETTE: Backdrop = Backdrop {
+    role: BackdropRole::Transient,
+    preference: BackdropPreference::User,
+};
+```
+
+`GlassShell` leaves out the sidebar's own tint over Maris, whose surface colour is already the whole surface, and keeps it over Luca, where it keeps text readable. How the materials are drawn is in [The compositor](/developers/desktop/compositor/#glass).
 
 ## The page
 

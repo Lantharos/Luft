@@ -4,7 +4,7 @@ mod hotkeys;
 mod library;
 
 use app::state::SoundboardState;
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 use luft_i18n::Localizer;
 use sabine::SabineWindow;
 
@@ -19,6 +19,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (720, 480),
     sidebar_width: 280,
     single_instance: Some(APP_ID),
+    backdrop: Backdrop::WINDOW,
 };
 
 fn window(window: SabineWindow, state: &SoundboardState, opens_window: bool) -> SabineWindow {

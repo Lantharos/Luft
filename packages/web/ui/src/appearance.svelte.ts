@@ -1,4 +1,4 @@
-import { events as systemEvents, system } from '@lantharos/sabine';
+import { events as systemEvents, system, type SystemAppearance } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
 
 import { events, type AppIcons, type Appearance, type Corners, type Lines, type Motion, type Palette, type Posture, type SchemeColors, type Typography } from './bindings/appearance';
@@ -48,7 +48,7 @@ class AppearanceState {
 		void i18n.start(initial.locale);
 		const stops = [
 			events.kestrelPalette((palette) => this.receive(palette)),
-			systemEvents.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
+			systemEvents.appearanceChanged((appearance) => this.follow(appearance)),
 			events.appearanceTypography((typography) => this.type(typography)),
 			events.appearanceMotion((motion) => this.move(motion)),
 			events.appearanceCorners((corners) => this.round(corners)),
@@ -56,8 +56,13 @@ class AppearanceState {
 			events.appearancePosture((posture) => this.hold(posture)),
 			events.appearanceKeyboard((keyboard) => (this.keyboard = keyboard))
 		];
-		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
+		void system.appearance().then((appearance) => this.follow(appearance));
 		return () => stops.forEach((stop) => stop());
+	}
+
+	private follow({ colorScheme, backdrop }: SystemAppearance) {
+		this.scheme = colorScheme;
+		document.documentElement.dataset.backdrop = backdrop;
 	}
 
 	private move(motion: Motion) {

@@ -60,6 +60,10 @@
 		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 	}
 
+	[data-backdrop='maris'] [data-effect='translucent'] .glass-sidebar {
+		background: transparent;
+	}
+
 	[data-scheme='light'] [data-effect='translucent'] .glass-sidebar {
 		--sidebar-text: rgba(0, 0, 0, 0.88);
 		--sidebar-text-muted: rgba(0, 0, 0, 0.64);

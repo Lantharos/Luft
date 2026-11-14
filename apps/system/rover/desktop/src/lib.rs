@@ -9,7 +9,7 @@ mod search;
 
 use app::events::CLOSE_ASKED;
 use app::state::RoverState;
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 use sabine::SabineWindow;
 
 pub use integration::file_manager_bus::{
@@ -48,6 +48,7 @@ fn glass_window(window: SabineWindow, title: &str, single_instance: Option<&str>
         min_size: (800, 600),
         sidebar_width: 260,
         single_instance,
+        backdrop: Backdrop::WINDOW,
     }
     .apply(window)
 }

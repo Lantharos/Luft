@@ -9,7 +9,7 @@ mod state;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, OnceLock};
 
-use luft_app::{Events, GlassWindow};
+use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::{BridgeEvent, SabineProcessHandle, SabineWindow, WindowVisibility};
 
 const WINDOW: GlassWindow = GlassWindow {
@@ -18,6 +18,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (560, 480),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.heft"),
+    backdrop: Backdrop::WINDOW,
 };
 
 const PRESENT: BridgeEvent<()> = BridgeEvent::new("window.present");

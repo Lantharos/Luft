@@ -6,7 +6,7 @@ mod launch;
 mod state;
 mod store;
 
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 use state::DraftState;
 
 const GLASS_WINDOW: GlassWindow = GlassWindow {
@@ -15,6 +15,7 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
     min_size: (640, 420),
     sidebar_width: 260,
     single_instance: Some("com.lantharos.draft"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {

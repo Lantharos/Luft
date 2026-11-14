@@ -9,7 +9,7 @@ mod mpris;
 mod photo;
 
 use app::state::MagpieState;
-use luft_app::GlassWindow;
+use luft_app::{Backdrop, GlassWindow};
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Magpie",
@@ -17,6 +17,7 @@ const WINDOW: GlassWindow = GlassWindow {
     min_size: (640, 460),
     sidebar_width: 280,
     single_instance: Some("com.lantharos.magpie"),
+    backdrop: Backdrop::WINDOW,
 };
 
 pub fn run_app() -> ! {

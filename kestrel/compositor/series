@@ -82,3 +82,4 @@
 0082-compositor-give-app-glass-Luca-and-Maris-materials-o.patch
 0083-clutter-take-the-grain-of-blurs-from-a-blue-noise-ti.patch
 0084-wayland-let-clients-say-what-their-glass-is-for-and-.patch
+0085-compositor-fill-app-glass-out-to-the-window-s-rounde.patch

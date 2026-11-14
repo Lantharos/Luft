@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 14 Nov 2026 04:19:05 +0100
+Subject: [PATCH] compositor: fill app glass out to the window's rounded
+ corners
+
+A glass region is a union of rectangles, so a client following a window's
+rounded corner hands over a staircase. Glass drawn only inside it showed
+the steps wherever nothing drew over them, such as under a Maris sidebar
+that leaves out its own tint. Where the region reaches a rounded corner of
+its window, the square of that corner within the region's extents now
+joins it, and the corner's own anti-aliased mask rounds it, for every
+material.
+
+Upstream-Status: luft-only Kestrel's rounded window corners
+---
+ src/compositor/meta-background-effect.c | 47 +++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 241e31e160d393f6550d2380e4ff673a054a7281..b76959c418a3e1990503e742ca733cb6b03c648d 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -344,6 +344,52 @@ paint_blur (MetaBackgroundBlur  *blur,
+   paint_result (paint, result);
+ }
+ 
++static void
++fill_rounded_corners (const MetaBackgroundPaint *paint,
++                      MtkRegion                 *region)
++{
++  MetaWindowCorners corners = meta_window_corners_for_actor (paint->actor);
++  const ClutterActorBox *box = paint->content_box;
++  MtkRectangle extents = mtk_region_get_extents (region);
++  MetaWindowCornerMask masks[4] = {
++    META_WINDOW_CORNER_TOP_LEFT,
++    META_WINDOW_CORNER_TOP_RIGHT,
++    META_WINDOW_CORNER_BOTTOM_LEFT,
++    META_WINDOW_CORNER_BOTTOM_RIGHT,
++  };
++  float scale_x, scale_y;
++  int x1, y1, x2, y2, width, height;
++
++  if (corners.radius <= 0)
++    return;
++
++  scale_x = paint->content_width / (box->x2 - box->x1);
++  scale_y = paint->content_height / (box->y2 - box->y1);
++  x1 = (int) floorf ((corners.bounds.origin.x - box->x1) * scale_x);
++  y1 = (int) floorf ((corners.bounds.origin.y - box->y1) * scale_y);
++  x2 = (int) ceilf ((corners.bounds.origin.x + corners.bounds.size.width - box->x1) * scale_x);
++  y2 = (int) ceilf ((corners.bounds.origin.y + corners.bounds.size.height - box->y1) * scale_y);
++  width = (int) ceilf (corners.radius * scale_x);
++  height = (int) ceilf (corners.radius * scale_y);
++
++  for (int i = 0; i < 4; i++)
++    {
++      MtkRectangle square = {
++        i % 2 ? x2 - width : x1,
++        i < 2 ? y1 : y2 - height,
++        width,
++        height,
++      };
++
++      if (!(corners.rounded & masks[i]) ||
++          !mtk_rectangle_intersect (&square, &extents, &square) ||
++          mtk_region_contains_rectangle (region, &square) == MTK_REGION_OVERLAP_OUT)
++        continue;
++
++      mtk_region_union_rectangle (region, &square);
++    }
++}
++
+ static gboolean
+ prepare_paint (MetaBackgroundBlur  *blur,
+                MetaBackgroundPaint *paint,
+@@ -361,6 +407,7 @@ prepare_paint (MetaBackgroundBlur  *blur,
+   if (!paint->framebuffer)
+     return FALSE;
+ 
++  fill_rounded_corners (paint, effect_region);
+   mtk_region_intersect_rectangle (effect_region, &content_rect);
+   if (mtk_region_is_empty (effect_region))
+     return FALSE;

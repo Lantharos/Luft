@@ -10,6 +10,8 @@
 .kestrel-start .kestrel-section-title { padding: 0 10px; }
 .kestrel-start { padding: 20px; spacing: 14px; }
 .kestrel-search StIcon { color: ink(0.7); padding-right: 6px; }
+.kestrel-start .kestrel-search, .kestrel-start .kestrel-search:focus { background-color: pick(fill(0.13), rgba(48, 48, 52, 0.55)); }
+.kestrel-start .kestrel-search StLabel.hint-text { color: ink(pick(0.65, 0.72)); }
 
 .kestrel-app-grid, .kestrel-search-results { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }

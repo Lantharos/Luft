@@ -35,6 +35,16 @@ interface Sent {
   arrived?: number;
 }
 
+const TWO_TAPS_IN_ONE_SLOT: Recording = {
+  size: [300, 200],
+  touches: ['finger', 'finger'],
+  events: [
+    [0, 'near', 'pen'], [10, 'move', 150, 100, 0], [50, 'away', 'pen'],
+    [2000, 'down', 0, 160, 110], [2040, 'up', 0],
+    [2100, 'down', 0, 20, 20], [2140, 'up', 0],
+  ],
+};
+
 const seat = global.stage.context.get_backend().get_default_seat();
 const touchscreen = seat.create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE);
 const pen = seat.create_virtual_device(Clutter.InputDeviceType.TABLET_DEVICE);
@@ -123,9 +133,13 @@ export async function run() {
   try {
     for (const hand of ['right', 'left'] as const) {
       penSettings.set_string('hand', hand);
-      for (const name of RECORDINGS) {
+      const recordings: [string, Recording][] = [
+        ...RECORDINGS.map((name): [string, Recording] => [name, load(name)]),
+        ['two taps in one slot', TWO_TAPS_IN_ONE_SLOT],
+      ];
+      for (const [name, recording] of recordings) {
         sent = [];
-        await replay(load(name), hand === 'left');
+        await replay(recording, hand === 'left');
         report(hand === 'left' ? `${name}, mirrored for the left hand` : name);
         await pause(PEN_FORGOTTEN);
       }

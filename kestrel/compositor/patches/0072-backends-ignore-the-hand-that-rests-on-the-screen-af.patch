@@ -30,12 +30,12 @@ Upstream-Status: luft-only tuned on recordings of one 2-in-1; wants hardware dat
  src/backends/meta-input-settings.c            |  23 +
  .../native/meta-input-settings-native.c       |  11 +
  src/backends/native/meta-input-thread.h       |   1 +
- src/backends/native/meta-palm-filter.c        | 434 ++++++++++++++++++
+ src/backends/native/meta-palm-filter.c        | 452 ++++++++++++++++++
  src/backends/native/meta-palm-filter.h        |  58 +++
  src/backends/native/meta-seat-impl.c          |  22 +
  src/backends/native/meta-seat-impl.h          |   9 +
  src/meson.build                               |   2 +
- 9 files changed, 563 insertions(+)
+ 9 files changed, 581 insertions(+)
  create mode 100644 src/backends/native/meta-palm-filter.c
  create mode 100644 src/backends/native/meta-palm-filter.h
 
@@ -144,10 +144,10 @@ index 3694ed02cb1ac0f9cb233b887b0bf72670d09694..0be5a4dcebe0e27a04ec559fa84e9a2a
  #undef META_INPUT_THREAD_H_INSIDE
 diff --git a/src/backends/native/meta-palm-filter.c b/src/backends/native/meta-palm-filter.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..f62f589653a15e11e0a0776c30641ad70b2ebd0e
+index 0000000000000000000000000000000000000000..2e0c07d66fc00fc496319e426accafa37bb2e8d8
 --- /dev/null
 +++ b/src/backends/native/meta-palm-filter.c
-@@ -0,0 +1,434 @@
+@@ -0,0 +1,452 @@
 +/*
 + * Copyright (C) 2026 Kristof Imeri
 + *
@@ -411,6 +411,21 @@ index 0000000000000000000000000000000000000000..f62f589653a15e11e0a0776c30641ad7
 +  g_source_attach (touch->timeout, touch->filter->seat_impl->input_context);
 +}
 +
++static void
++finish_touch_in_slot (MetaPalmFilter *filter,
++                      int             slot)
++{
++  Touch *touch = g_hash_table_lookup (filter->touches, GINT_TO_POINTER (slot));
++
++  if (!touch)
++    return;
++
++  if (touch->verdict == TOUCH_DROPPED)
++    g_hash_table_remove (filter->touches, GINT_TO_POINTER (slot));
++  else
++    let_through (touch);
++}
++
 +static gboolean
 +crowds_a_palm (MetaPalmFilter *filter,
 +               float           x,
@@ -508,7 +523,10 @@ index 0000000000000000000000000000000000000000..f62f589653a15e11e0a0776c30641ad7
 +    return FALSE;
 +
 +  if (type == CLUTTER_TOUCH_BEGIN)
-+    return judge_new_touch (filter, device, time_us, slot, x, y);
++    {
++      finish_touch_in_slot (filter, slot);
++      return judge_new_touch (filter, device, time_us, slot, x, y);
++    }
 +
 +  if (g_hash_table_size (filter->touches) == 0)
 +    return FALSE;

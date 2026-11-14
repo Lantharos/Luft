@@ -67,8 +67,7 @@ static const gchar *brightness_glsl_declarations =
 "uniform float dark_lift;                                                  \n"
 "uniform float saturation;                                                 \n"
 "uniform vec4 surface_tint;                                                \n"
-"uniform float grain;                                                      \n"
-"uniform float pixel_scale;                                                \n";
+"uniform float grain;                                                      \n";
 
 static const gchar *brightness_glsl =
 "  cogl_color_out.rgb *= brightness;                                       \n"
@@ -83,10 +82,14 @@ static const gchar *brightness_glsl =
 "  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
 "                           surface_tint.rgb * cogl_color_out.a,           \n"
 "                           surface_tint.a);                               \n"
-"  float noise = texture2D(cogl_sampler1,                                  \n"
-"    (mod(floor(surface_position * pixel_scale), 64.0) + 0.5) / 64.0).r;   \n"
-"  cogl_color_out.rgb = clamp(cogl_color_out.rgb +                         \n"
-"                             (2.0 * noise - 1.0) * grain * cogl_color_out.a,\n"
+"  vec2 grain_cell = mod(floor(gl_FragCoord.xy), 64.0);                    \n"
+"  float noise = texture2D(cogl_sampler1, (grain_cell + 0.5) / 64.0).r +   \n"
+"    texture2D(cogl_sampler1,                                              \n"
+"      (mod(grain_cell + vec2(32.0, 21.0), 64.0) + 0.5) / 64.0).r;          \n"
+"  float grain_luma = dot(cogl_color_out.rgb, vec3(0.2126, 0.7152, 0.0722))\n"
+"                     / max(cogl_color_out.a, 0.001);                      \n"
+"  cogl_color_out.rgb = clamp(cogl_color_out.rgb + (noise - 1.0) * grain * \n"
+"                             mix(0.5, 1.0, grain_luma) * cogl_color_out.a,\n"
 "                             0.0, cogl_color_out.a);                      \n"
 "  vec2 half_size = surface_size * 0.5;                                    \n"
 "  float r = min(corner_radius, min(half_size.x, half_size.y));              \n"
@@ -97,7 +100,7 @@ static const gchar *brightness_glsl =
 "    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d);                      \n";
 
 #define RESULT_SIZE_STEP 64
-#define GRAIN 0.02f
+#define GRAIN 0.005f
 
 typedef enum
 {
@@ -146,7 +149,6 @@ struct _ShellBlurEffect
   float saturation;
   int surface_tint_uniform;
   int grain_uniform;
-  int pixel_scale_uniform;
 
   ShellBlurMode mode;
   ShellBlurStyle style;
@@ -271,8 +273,6 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_tint");
   self->grain_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "grain");
-  self->pixel_scale_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "pixel_scale");
 }
 
 static void
@@ -367,8 +367,6 @@ update_brightness (ShellBlurEffect *self,
   cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, tint);
   cogl_pipeline_set_uniform_1f (pipeline, self->grain_uniform,
                                 self->mode == SHELL_BLUR_MODE_BACKGROUND ? GRAIN : 0.f);
-  cogl_pipeline_set_uniform_1f (pipeline, self->pixel_scale_uniform,
-                                clutter_actor_get_resource_scale (self->actor));
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,

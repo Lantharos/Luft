@@ -33,7 +33,7 @@ Glass comes in two materials, chosen per kind of surface in `com.lantharos.kestr
 
 The shell renders each frosted wallpaper only while something uses it: the blurred one while Luca blurs only the wallpaper, the wide one while any kind of surface is Maris or an app asks for it. It hands the pieces to Mutter with `meta_compositor_add_frosted_wallpaper`, and the surface colour with `meta_compositor_set_glass_surface`, whose alpha is the coverage.
 
-The final pass of every glass, shell or app, adds grain of ±2% from a 64 pixel tile of blue noise (`clutter_blur_node_get_grain`) to hide banding.
+The final pass of every glass, shell or app, adds grain to hide banding: ±0.5%, half of that on black, from two lookups of a 64 pixel tile of blue noise (`clutter_blur_node_get_grain`) at each screen pixel, so it spreads like triangular dither and reads as a matte surface.
 
 ### Glass in apps
 

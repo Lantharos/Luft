@@ -1,0 +1,168 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 14 Nov 2026 04:50:13 +0100
+Subject: [PATCH] clutter: soften the grain of blurs and take it per screen
+ pixel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+At ±2% the grain read as film grain, strongest on dark glass. It is now
+±0.5% by default, half of that on black, from two lookups of the
+blue-noise tile so it spreads like triangular dither, and taken at each
+screen pixel instead of each pixel of the blurred area, so fractional
+scales repeat no cells. That still hides banding on the widest blurs and
+reads as a matte surface.
+
+Upstream-Status: luft-only Kestrel's glass grain
+---
+ clutter/clutter/clutter-paint-node-private.h |  4 +--
+ clutter/clutter/clutter-paint-nodes.c        | 33 +++++---------------
+ src/compositor/compositor.c                  |  4 +--
+ src/compositor/meta-background-effect.c      |  4 +--
+ src/compositor/meta-background-wallpaper.c   |  3 +-
+ 5 files changed, 13 insertions(+), 35 deletions(-)
+
+diff --git a/clutter/clutter/clutter-paint-node-private.h b/clutter/clutter/clutter-paint-node-private.h
+index 7a435fd4689d322693415b32fd04d8e2ebde4953..0957146f9bcf0738fe0120f6084e8a462ffcfea8 100644
+--- a/clutter/clutter/clutter-paint-node-private.h
++++ b/clutter/clutter/clutter-paint-node-private.h
+@@ -127,9 +127,7 @@ CLUTTER_EXPORT
+ void clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                           float            saturation,
+                                           float            noise,
+-                                          const CoglColor *tint,
+-                                          float            noise_width,
+-                                          float            noise_height);
++                                          const CoglColor *tint);
+ 
+ #define CLUTTER_TYPE_EFFECT_NODE                (clutter_effect_node_get_type ())
+ #define CLUTTER_EFFECT_NODE(obj)                (G_TYPE_CHECK_INSTANCE_CAST ((obj), CLUTTER_TYPE_EFFECT_NODE, ClutterEffectNode))
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index 23d7af0dbd70f8abecaa67a857217f2d292268f4..8fac21806276d1576e14372c1a6b0592d36fd031 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1675,7 +1675,6 @@ clutter_blur_node_get_grain (CoglContext *context)
+ static const char *blur_framebuffer_effect_declarations =
+   "uniform float blur_framebuffer_saturation;                               \n"
+   "uniform float blur_framebuffer_noise;                                    \n"
+-  "uniform vec2 blur_framebuffer_noise_size;                                \n"
+   "uniform vec4 blur_framebuffer_tint;                                      \n";
+ 
+ static const char *blur_framebuffer_effect_source =
+@@ -1689,11 +1688,13 @@ static const char *blur_framebuffer_effect_source =
+   "                   blur_framebuffer_tint.a);                              \n"
+   "      if (blur_framebuffer_noise > 0.0)                                   \n"
+   "        {                                                                 \n"
+-  "          vec2 grain_coord =                                              \n"
+-  "            floor (cogl_tex_coord0_in.st * blur_framebuffer_noise_size);  \n"
++  "          vec2 grain_cell = mod (floor (gl_FragCoord.xy), 64.0);          \n"
+   "          float grain = texture2D (cogl_sampler1,                         \n"
+-  "            (mod (grain_coord, 64.0) + 0.5) / 64.0).r;                    \n"
+-  "          color += vec3 ((2.0 * grain - 1.0) * blur_framebuffer_noise);   \n"
++  "            (grain_cell + 0.5) / 64.0).r +                                \n"
++  "            texture2D (cogl_sampler1,                                     \n"
++  "            (mod (grain_cell + vec2 (32.0, 21.0), 64.0) + 0.5) / 64.0).r; \n"
++  "          color += vec3 ((grain - 1.0) * blur_framebuffer_noise *         \n"
++  "            mix (0.5, 1.0, dot (color, vec3 (0.2126, 0.7152, 0.0722)))); \n"
+   "        }                                                                 \n"
+   "      color = clamp (color, vec3 (0.0), vec3 (1.0));                      \n"
+   "                                                                          \n"
+@@ -1704,14 +1705,11 @@ void
+ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                      float            saturation,
+                                      float            noise,
+-                                     const CoglColor *tint,
+-                                     float            noise_width,
+-                                     float            noise_height)
++                                     const CoglColor *tint)
+ {
+   static CoglSnippet *snippet;
+   int saturation_uniform;
+   int noise_uniform;
+-  int noise_size_uniform;
+   float tint_color[4] = { 0.f, 0.f, 0.f, 0.f };
+ 
+   if (saturation == 1.0f && noise == 0.0f && !tint)
+@@ -1751,19 +1749,6 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                    cogl_pipeline_get_uniform_location (pipeline,
+                                                                        "blur_framebuffer_tint"),
+                                    4, 1, tint_color);
+-
+-  noise_size_uniform =
+-    cogl_pipeline_get_uniform_location (pipeline,
+-                                        "blur_framebuffer_noise_size");
+-  if (noise_size_uniform > -1)
+-    {
+-      float noise_size[2] = { noise_width, noise_height };
+-
+-      cogl_pipeline_set_uniform_float (pipeline,
+-                                       noise_size_uniform,
+-                                       2, 1,
+-                                       noise_size);
+-    }
+ }
+ 
+ static void
+@@ -1980,9 +1965,7 @@ clutter_blur_node_new_from_framebuffer (CoglFramebuffer *framebuffer,
+   clutter_blur_add_framebuffer_effect (layer_node->pipeline,
+                                        saturation,
+                                        noise,
+-                                       NULL,
+-                                       blur_node->target->capacity_width,
+-                                       blur_node->target->capacity_height);
++                                       NULL);
+ 
+   opacity_f = opacity / 255.0f;
+   cogl_color_init_from_4f (&color, opacity_f, opacity_f, opacity_f, opacity_f);
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 5303b2ae2e7df66b3c717448a88b0142773f1550..23e53146dd309ba661ba4d194ed693a1b507a9ff 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -169,7 +169,7 @@ typedef struct
+ 
+ #define DEFAULT_BACKGROUND_BLUR_RADIUS 24.0f
+ #define DEFAULT_BACKGROUND_BLUR_SATURATION 1.25f
+-#define DEFAULT_BACKGROUND_BLUR_NOISE 0.02f
++#define DEFAULT_BACKGROUND_BLUR_NOISE 0.005f
+ 
+ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (MetaCompositor, meta_compositor,
+                                      G_TYPE_OBJECT)
+@@ -1582,7 +1582,7 @@ invalidate_background_blurs (MetaCompositor *compositor)
+  * clients through ext-background-effect-v1.
+  *
+  * The default parameters are a blur radius of 24.0, a saturation of 1.25, and
+- * a noise amount of 0.02.
++ * a noise amount of 0.005.
+  */
+ void
+ meta_compositor_set_background_blur_params (MetaCompositor *compositor,
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index b76959c418a3e1990503e742ca733cb6b03c648d..13ab94e8ad33562b2b1566c2a579ea6ca70979e6 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -221,9 +221,7 @@ create_result_pipeline (const MetaBackgroundPaint *paint,
+                               (float) height / result->capacity_height,
+                               1.f);
+   cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
+-  clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise, NULL,
+-                                       paint->source_rect.width * (float) result->capacity_width / width,
+-                                       paint->source_rect.height * (float) result->capacity_height / height);
++  clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise, NULL);
+   apply_source_corners (paint, pipeline);
+   return pipeline;
+ }
+diff --git a/src/compositor/meta-background-wallpaper.c b/src/compositor/meta-background-wallpaper.c
+index adf76c48114bc0cc511c69d7cc8badcc564577f5..5bf845bff263d2e32b07c25e924febc25d4556a3 100644
+--- a/src/compositor/meta-background-wallpaper.c
++++ b/src/compositor/meta-background-wallpaper.c
+@@ -69,8 +69,7 @@ create_piece_pipeline (MetaBackgroundPaint   *paint,
+                                      COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+   clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise,
+                                        paint->material == META_GLASS_MATERIAL_SURFACE ?
+-                                       meta_compositor_get_glass_surface (paint->compositor) : NULL,
+-                                       piece->size.width, piece->size.height);
++                                       meta_compositor_get_glass_surface (paint->compositor) : NULL);
+   meta_background_apply_corners (paint, pipeline, piece);
+   cogl_color_init_from_4f (&color, alpha, alpha, alpha, alpha);
+   cogl_pipeline_set_color (pipeline, &color);

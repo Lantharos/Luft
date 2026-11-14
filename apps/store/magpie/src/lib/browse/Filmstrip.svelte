@@ -80,6 +80,7 @@
 <style>
 	.strip {
 		max-width: 960px;
+		border-radius: var(--radius-group);
 		padding: 0;
 		overflow: hidden;
 	}

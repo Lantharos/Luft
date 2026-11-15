@@ -3,7 +3,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import { localized, t } from '../../../shared/i18n/index.js';
-import { animateActor, Spring } from '../../../shared/motion/motion.js';
+import { animateActor, pressable, Spring } from '../../../shared/motion/motion.js';
 import type { QuickControl } from '../quickControls.js';
 
 interface TileParts {
@@ -66,6 +66,7 @@ export function styleControl(item: QuickControl): void {
   item.label_actor = title;
   item.set_child(body);
   previous?.destroy();
+  pressable(item);
 }
 
 export interface ActionTile {
@@ -82,5 +83,6 @@ export function actionTile(glyph: string | Clutter.Actor, name: string, activate
   });
   localized(actor, () => (title.text = actor.accessible_name = t(name)));
   actor.connect('clicked', activate);
+  pressable(actor);
   return { actor, title, subtitle };
 }

@@ -43,7 +43,7 @@ Everything here is in Settings, under **Accessibility**. The lock and login scre
 **Motion** has three choices:
 
 - **Full** moves windows, menus and pages as they open and close.
-- **Reduced** keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and minimized windows don't fly to the taskbar. Gestures still follow your fingers.
+- **Reduced** keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, buttons don't shrink as you press them, and windows don't fly to or from the taskbar. Gestures still follow your fingers.
 - **Off** turns animation off entirely, so everything changes at once.
 
 Apps are told which you chose, so they can follow it too.

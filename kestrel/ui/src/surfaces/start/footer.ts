@@ -5,7 +5,7 @@ import St from 'gi://St';
 import { Avatar } from '../../shared/widgets/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
-import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, pressable } from '../../shared/motion/motion.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
 import * as SystemActions from '../../session/actions/systemActions.js';
@@ -48,6 +48,7 @@ export class StartFooter {
       if (!this.open) SystemActions.getDefault().refresh();
       this.setOpen(!this.open);
     });
+    pressable(this.powerButton, this.toggleIcon);
     this.actor.add_child(this.powerButton);
 
     menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('accounts') }]);
@@ -94,6 +95,7 @@ export class StartFooter {
       action.run();
     });
     bindAvailability(action, button);
+    pressable(button);
     return button;
   }
 }

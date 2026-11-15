@@ -3,6 +3,7 @@ import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import { Registry } from '../../../shared/registry.js';
+import { pressable } from '../../../shared/motion/motion.js';
 
 export interface TaskbarEntry {
   readonly icon: Gio.Icon;
@@ -37,6 +38,7 @@ export class ExtensionItems {
       icon.gicon = entry.icon;
       button.accessible_name = entry.label;
     };
+    pressable(button, icon);
     button.connect('clicked', (_button, clicked: number) => clicked === Clutter.BUTTON_SECONDARY ? entry.secondaryClick(button) : entry.click(button));
     sync();
     this.actor.add_child(button);

@@ -7,6 +7,7 @@ import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { localized, onLocaleChanged, t } from '../../../shared/i18n/index.js';
 import { blurSurface } from '../../../shared/layout/surface.js';
 import { dock, isVertical } from '../../../shared/layout/edge.js';
+import { pressable } from '../../../shared/motion/motion.js';
 import { createLauncher, type Launcher } from '../launcher/launcher.js';
 import type { Monitor } from '../panel.js';
 import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
@@ -25,6 +26,7 @@ function pill(name: string, child: Clutter.Actor, activate: () => void): St.Butt
   const button = new St.Button({ name, style_class: 'kestrel-corner-pill kestrel-glass', can_focus: true, track_hover: true, child });
   blurSurface(button, 999, 'taskbar');
   button.connect('clicked', activate);
+  pressable(button, child);
   return button;
 }
 

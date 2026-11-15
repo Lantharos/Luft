@@ -6,6 +6,7 @@ import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { SwipeAway } from './swipeAway.js';
+import { pressable } from '../../shared/motion/motion.js';
 import { openUri } from '../../shared/apps/launch.js';
 
 export interface SignalSource {
@@ -67,6 +68,7 @@ export class NotificationCard {
     content.add_child(body);
     this.open = new St.Button({ child: content, x_expand: true, can_focus: true, track_hover: true, style_class: 'kestrel-notification-open', accessible_name: notification.title ?? '' });
     this.open.connect('clicked', () => { close(); notification.activate(); });
+    pressable(this.open, this.actor);
     this.open.connect('key-focus-in', () => reveal(this.open));
     this.open.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
@@ -106,6 +108,7 @@ export class NotificationCard {
     const button = new St.Button({ label, accessible_name: label, style_class: 'kestrel-notification-action', can_focus: true, track_hover: true, x_expand: true });
     button.connect('clicked', activate);
     button.connect('key-focus-in', () => this.reveal(button));
+    pressable(button);
     return button;
   }
 

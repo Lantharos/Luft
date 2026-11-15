@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
 import Graphene from 'gi://Graphene';
 
-const PRESS_DEPTH = 0.04;
+import { Feedback } from '../../../../../packages/web/motion/src/index';
 
 export function whenGraphicsRestored(restored: () => void): () => void {
   const recovery = global.stage.context.get_backend().get_graphics_recovery_context();
@@ -44,7 +44,7 @@ export interface Press {
 export function pressOnPixels(actor: Clutter.Actor): Press {
   const scale = pixelScale(actor);
   const pixels = Math.round(actor.width * scale);
-  const depth = 2 * Math.max(1, Math.round(pixels * PRESS_DEPTH / 2));
+  const depth = 2 * Math.max(1, Math.round(Math.min(pixels * (1 - Feedback.deepestPress), 2 * Feedback.pressDepth * scale) / 2));
   const { x1, y1 } = actor.get_allocation_box();
   const origin = actor.get_parent()!.apply_relative_transform_to_point(null, new Graphene.Point3D({ x: x1, y: y1, z: 0 }));
   const pivot = (start: number) => (Math.round(start * scale + depth / 2) - start * scale) / depth;

@@ -17,6 +17,7 @@ import type { Taskbar } from '../taskbar/taskbar.js';
 import type { PanelElements } from '../islands/islandSet.js';
 import { taskbarElements, type ElementActor, type ElementLayout } from './extensionElements.js';
 import { launch } from '../../../shared/apps/launch.js';
+import { pressable } from '../../../shared/motion/motion.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 
@@ -80,6 +81,7 @@ export class TaskbarElements implements PanelElements {
       });
       localized(quickButton, () => (quickButton.accessible_name = t('taskbar-quick-settings')));
       quickButton.connect('clicked', actions.quickSettings);
+      pressable(quickButton, this.statusIcons);
       const statusGroup = this.statusGroup = new St.BoxLayout({ name: 'kestrel-taskbar-status-group', style_class: 'kestrel-status-group' });
       const post = currentPost();
       if (post) {
@@ -101,6 +103,7 @@ export class TaskbarElements implements PanelElements {
     });
     localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
     this.clockButton.connect('clicked', actions.notifications);
+    pressable(this.clockButton, this.clock.actor);
     menus.bind(this.clockButton, () => [
       { label: t('taskbar-date-time-settings'), run: () => menus.settings('language') },
     ]);

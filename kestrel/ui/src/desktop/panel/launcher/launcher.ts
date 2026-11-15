@@ -7,7 +7,7 @@ import { MARK_LAYERS, MARK_SCALE, markLayerSvg, type MarkFills, type MarkLayer }
 import { markFills } from './shade.js';
 import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
-import { animateActor, Spring } from '../../../shared/motion/motion.js';
+import { animateActor, pressable, Spring } from '../../../shared/motion/motion.js';
 import { wallpaperFloor, type Backdrop } from '../../wallpaper/floor.js';
 import type { TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import { clampUnit } from '../../../shared/math.js';
@@ -95,6 +95,7 @@ export function createLauncher(activate: () => void, size: number, surface: () =
   localized(button, () => (button.accessible_name = t('taskbar-start')));
   const [mark, resizeMark] = animatedMark(button, surface, backdropOf);
   button.child = mark;
+  pressable(button, mark);
   button.connect('clicked', activate);
   const resize = (buttonSize: number) => {
     button.set_size(buttonSize, buttonSize);

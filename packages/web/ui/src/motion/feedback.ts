@@ -3,15 +3,25 @@ import { motionPreference } from './preference';
 
 const PRESSABLE = 'button, a[href], summary, [role="button"], [role="link"], [role="tab"], [role="option"], [role^="menuitem"]';
 const UNPRESSABLE = ':disabled, [aria-disabled="true"], [role="switch"], [role="slider"], [role="checkbox"], [data-no-press]';
+const SURFACE = '.row-group';
+const FILLS_WITHIN = 2;
 const WIDEST_PRESS = 960;
 const FAST_TRAVEL = 2;
 const SPEED_SMOOTHING = 0.4;
 
 const scales = new WeakMap<HTMLElement, Animation>();
 
+function surfaceFilledBy(element: HTMLElement) {
+	const surface = element.closest<HTMLElement>(SURFACE);
+	if (!surface) return element;
+	const inner = element.getBoundingClientRect();
+	const outer = surface.getBoundingClientRect();
+	return Math.abs(inner.width - outer.width) < FILLS_WITHIN && Math.abs(inner.height - outer.height) < FILLS_WITHIN ? surface : element;
+}
+
 function pressable(target: EventTarget | null) {
 	const element = target instanceof Element ? target.closest<HTMLElement>(PRESSABLE) : null;
-	return element && !element.matches(UNPRESSABLE) ? element : null;
+	return element && !element.matches(UNPRESSABLE) ? surfaceFilledBy(element) : null;
 }
 
 function pressedScale(element: HTMLElement) {

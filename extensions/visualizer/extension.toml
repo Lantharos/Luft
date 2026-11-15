@@ -10,7 +10,6 @@ key = "style"
 type = "choice"
 label = "style"
 default = "glow"
-page = "appearance"
 options = [
   { value = "glow", label = "glow", image = "previews/glow.webp" },
   { value = "wave", label = "wave", image = "previews/wave.webp" },

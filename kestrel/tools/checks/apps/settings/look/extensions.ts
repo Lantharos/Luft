@@ -14,6 +14,7 @@ import {checkUnreviewed} from './unreviewed.js';
 
 const {eventually, require} = checks('Luft app');
 const HEAVY: Point = [955, 318];
+const SEASONS_SWITCH: Point = [940, 102];
 const LEFT_EDGE: Point = [902, 236];
 const RIGHT_EDGE: Point = [962, 236];
 const VISUALIZER = 'com.lantharos.Visualizer';
@@ -47,7 +48,8 @@ async function checkOwnPages(app: LuftApp) {
     app.click(RIGHT_EDGE);
     await pause(300);
     require(String(await setting(VISUALIZER, 'edges')) === 'right', 'the last edge can’t be turned off');
-    (await showEnd(app, 'appearance')).save('settings-appearance-extension-rows');
+    await request('Disable', VISUALIZER);
+    (await show(app, `extensions/${VISUALIZER.toLowerCase()}`, 'a turned off extension shows no settings')).save('settings-extension-visualizer-off');
     const nowPlaying = await show(app, `extensions/${NOW_PLAYING.toLowerCase()}`);
     nowPlaying.save('settings-extension-now-playing');
     (await scrollToEnd(app, nowPlaying)).save('settings-extension-now-playing-place');
@@ -127,9 +129,23 @@ async function checkSandboxedPage(app: LuftApp) {
   }
 }
 
+async function checkListSwitch(app: LuftApp) {
+  const titles = app.area({x: 300, y: 50, width: 580});
+  const list = await app.frame(titles);
+  app.click(SEASONS_SWITCH);
+  await eventually(async () => (await listed(SEASONS))?.enabled === false, 'the switch in the list turns Seasons off');
+  (await app.settle(() => true)).save('settings-extensions-switched');
+  require((await app.frame(titles)).looksLike(list), 'pressing the switch leaves the list where it was');
+  (await show(app, `extensions/${SEASONS}`)).save('settings-extension-seasons-turned-off');
+  await request('Enable', SEASONS);
+  await waitUntil(async () => (await listed(SEASONS))?.state === 'running', 'Seasons runs again');
+  await show(app, 'extensions');
+}
+
 export async function checkExtensions(app: LuftApp) {
   try {
     (await show(app, 'extensions')).save('settings-extensions');
+    await checkListSwitch(app);
     (await show(app, `extensions/${SEASONS}`)).save('settings-extension-seasons');
     const off = await app.settle(() => true);
     await setSetting(SEASONS, 'on', new GLib.Variant('b', true));

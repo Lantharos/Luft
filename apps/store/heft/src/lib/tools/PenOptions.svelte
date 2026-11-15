@@ -76,11 +76,6 @@
 		border-radius: var(--radius-pill);
 		background: var(--swatch);
 		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 12%, transparent);
-		transition: transform var(--motion-tap);
-	}
-
-	.color:active {
-		transform: scale(0.92);
 	}
 
 	.color[aria-checked='true'] {

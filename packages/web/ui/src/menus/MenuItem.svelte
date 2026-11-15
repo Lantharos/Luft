@@ -37,7 +37,7 @@
 		text-align: left;
 		font-size: 13px;
 		color: var(--text-soft);
-		transition-property: background-color, color, transform, opacity;
+		transition-property: background-color, color, opacity;
 		transition-duration: var(--motion-tap);
 		transition-timing-function: var(--ease-decelerate);
 	}
@@ -57,14 +57,6 @@
 	.menu-item.danger,
 	.menu-item.danger:hover:not(:disabled) {
 		color: var(--danger);
-	}
-
-	.menu-item:active:not(:disabled) {
-		transform: scale(0.96);
-	}
-
-	:global(:root[data-motion='reduced']) .menu-item:active:not(:disabled) {
-		transform: none;
 	}
 
 	.menu-item:disabled {

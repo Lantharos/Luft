@@ -35,15 +35,11 @@
 		gap: 6px;
 		border-radius: 12px;
 		background: var(--surface-hover);
-		transition: transform var(--motion-tap) var(--ease-decelerate), background-color var(--motion-tap) var(--ease-decelerate);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.glyph:hover {
 		background: color-mix(in oklab, var(--ink) 14%, transparent);
-	}
-
-	.glyph:active {
-		transform: scale(0.96);
 	}
 
 	.character {

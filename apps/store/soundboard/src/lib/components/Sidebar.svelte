@@ -74,8 +74,7 @@
 		color: var(--sidebar-text);
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.nav-item:hover {
@@ -86,10 +85,6 @@
 	.nav-item.active {
 		background: transparent;
 		color: var(--text);
-	}
-
-	.nav-item:active {
-		transform: scale(0.97);
 	}
 
 	.count {

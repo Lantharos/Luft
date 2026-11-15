@@ -30,6 +30,20 @@
 	--spring-smooth-duration: 475ms;
 	--spring-thrown: linear(0, 0.0134, 0.0485, 0.0986, 0.1587, 0.2245, 0.2929, 0.3614, 0.4283, 0.4923, 0.5526, 0.6085, 0.6597, 0.7063, 0.7481, 0.7855, 0.8186, 0.8476, 0.8729, 0.8949, 0.9138, 0.93, 0.9437, 0.9552, 0.9649, 0.973, 0.9796, 0.985, 0.9894, 0.9929, 0.9957, 0.9979, 0.9995, 1.0007, 1.0016, 1.0022, 1.0026, 1.0029, 1.003, 1.003, 1.0029, 1.0027, 1.0026, 1.0024, 1.0022, 1.002, 1);
 	--spring-thrown-duration: 504ms;
+	--motion-press: var(--motion-tap);
+	--ease-press: var(--ease-decelerate);
+	--motion-release: var(--motion-quick);
+	--ease-release: var(--ease-overshoot);
+	--motion-move: var(--motion-moderate);
+	--ease-move: var(--ease-glide);
+	--motion-reveal: var(--motion-quick);
+	--ease-reveal: var(--ease-decelerate);
+	--motion-leave: var(--motion-brisk);
+	--ease-leave: var(--ease-decelerate);
+	--motion-switch: var(--motion-moderate);
+	--ease-switch: var(--ease-glide);
+	--motion-drill: var(--motion-standard);
+	--ease-drill: var(--ease-glide);
 	--default-transition-duration: var(--motion-tap);
 	--default-transition-timing-function: var(--ease-decelerate);
 }

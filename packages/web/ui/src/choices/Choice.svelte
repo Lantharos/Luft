@@ -35,22 +35,12 @@
 		gap: 16px;
 		border-radius: 18px;
 		padding: 14px 16px 14px 14px;
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover:not(:disabled),
 	.choice.selected {
 		background: var(--surface-hover);
-	}
-
-	.choice:active:not(:disabled) {
-		transform: scale(0.985);
-	}
-
-	:global(:root[data-motion='reduced']) .choice:active:not(:disabled) {
-		transform: none;
 	}
 
 	.choice:disabled {

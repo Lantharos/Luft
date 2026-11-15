@@ -30,15 +30,11 @@
 		border-radius: var(--radius-group);
 		padding: 12px 14px;
 		text-align: left;
-		transition: background-color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover {
 		background: var(--surface-hover);
-	}
-
-	.tile:active {
-		transform: scale(0.98);
 	}
 
 	.text {

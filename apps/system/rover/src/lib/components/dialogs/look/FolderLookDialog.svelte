@@ -136,17 +136,12 @@
 		color: var(--text-soft);
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.icon-choice:hover {
 		background: var(--surface-hover);
 		color: var(--text);
-	}
-
-	.icon-choice:active {
-		transform: scale(0.94);
 	}
 
 	.icon-choice[aria-checked='true'] {

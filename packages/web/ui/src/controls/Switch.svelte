@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Stretch } from '../motion/feedback';
+
 	interface Props {
 		checked: boolean;
 		label: string;
@@ -7,6 +9,14 @@
 	}
 
 	let { checked, label, disabled = false, onchange }: Props = $props();
+
+	let stretch: Stretch | undefined;
+	let shown: boolean | undefined;
+
+	$effect(() => {
+		if (shown !== undefined && shown !== checked) stretch?.travel();
+		shown = checked;
+	});
 </script>
 
 <button
@@ -19,7 +29,7 @@
 	class:on={checked}
 	onclick={() => onchange(!checked)}
 >
-	<span class="knob"></span>
+	<span class="knob" {@attach (knob) => void (stretch = new Stretch(knob))}></span>
 </button>
 
 <style>

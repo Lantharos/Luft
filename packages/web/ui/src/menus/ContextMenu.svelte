@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { revealContents } from '../motion/reveal';
 	import { menu } from '../motion/transitions';
 	import { atPoint, type Point, type PointPlacement } from './placement';
 	import { topLayer } from './topLayer';
@@ -67,6 +68,7 @@
 	bind:this={element}
 	{@attach topLayer}
 	{@attach place}
+	{@attach revealContents}
 	class="menu soft-scroll"
 	class:placed={placement}
 	style:left="{placement?.left ?? at.x}px"

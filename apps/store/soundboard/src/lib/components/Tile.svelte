@@ -95,16 +95,11 @@
 		color: var(--text);
 		background: color-mix(in oklab, var(--tile) 30%, var(--content));
 		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.tile:hover {
 		background: color-mix(in oklab, var(--tile) 42%, var(--content));
-	}
-
-	.tile:active {
-		transform: scale(0.97);
 	}
 
 	.tile.arranging {

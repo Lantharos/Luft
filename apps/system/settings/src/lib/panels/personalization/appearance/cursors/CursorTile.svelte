@@ -60,15 +60,11 @@
 		border-radius: 14px;
 		padding: 8px 8px 10px;
 		text-align: left;
-		transition: transform var(--motion-tap) var(--ease-decelerate), box-shadow var(--motion-tap) var(--ease-decelerate);
+		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.choice:hover {
 		box-shadow: 0 0 0 2px var(--content), 0 0 0 4px var(--hairline);
-	}
-
-	.choice:active {
-		transform: scale(0.98);
 	}
 
 	.choice.selected {

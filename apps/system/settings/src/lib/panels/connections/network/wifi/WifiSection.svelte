@@ -2,7 +2,7 @@
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { t } from '@luft/i18n';
-	import { ActionRow, IconButton, item, reorder, Row, Section, Spinner } from '@luft/ui';
+	import { ActionRow, IconButton, Row, Section, Spinner } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
@@ -120,9 +120,7 @@
 
 <Section title={t('settings-network-wifi-networks')}>
 	{#each shown as network (network.ssid)}
-		<div class="row-slot" animate:reorder in:item out:item>
-			{@render row(network)}
-		</div>
+		{@render row(network)}
 	{:else}
 		<Row title={t('settings-network-wifi-searching')}>
 			<Spinner />

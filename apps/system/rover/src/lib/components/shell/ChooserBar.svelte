@@ -13,7 +13,7 @@
 	let { chooser, selectedCount }: Props = $props();
 
 	const BUTTON =
-		'inline-flex h-10 min-w-[96px] select-none items-center justify-center rounded-full px-5 text-[13px] font-medium leading-none transition-[background-color,color,transform,opacity,box-shadow,filter] active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100';
+		'inline-flex h-10 min-w-[96px] select-none items-center justify-center rounded-full px-5 text-[13px] font-medium leading-none transition-[background-color,color,opacity,box-shadow,filter] disabled:opacity-40';
 	const SECONDARY =
 		'bg-[var(--control)] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] hover:bg-[var(--control-hover)] focus-visible:bg-[var(--control-hover)]';
 	const PRIMARY =

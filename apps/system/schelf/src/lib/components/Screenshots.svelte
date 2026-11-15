@@ -73,11 +73,6 @@
 		border-radius: 14px;
 		background: var(--surface);
 		scroll-snap-align: start;
-		transition: transform var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.shot:active {
-		transform: scale(0.985);
 	}
 
 	.shot img {

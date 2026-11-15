@@ -4,7 +4,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { ActionRow, Dialog, errorText, IconButton, item, reorder, Row, Section, Select, Spinner, Switch } from '@luft/ui';
+	import { ActionRow, Dialog, errorText, IconButton, Row, Section, Select, Spinner, Switch } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Adapter, Bluetooth, BluetoothDevice, PairingRequest } from '#lib/bindings.js';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
@@ -179,25 +179,23 @@
 		{#if bluetooth.paired.length}
 			<Section title={t('settings-bluetooth-paired')}>
 				{#each bluetooth.paired as device (device.path)}
-					<div class="row-slot" animate:reorder in:item out:item>
-						<ActionRow
-							title={device.name}
-							description={status(device)}
-							alert={Boolean(problems[device.path])}
-							icon={KIND_ICONS[device.kind]}
-							disabled={!adapter.powered}
-							onclick={() => toggle(device)}
-						>
-							{#snippet trailing()}
-								{#if busy[device.path]}
-									<Spinner size={16} />
-								{/if}
-							{/snippet}
-							{#snippet actions()}
-								<IconButton icon={Info} label={t('settings-bluetooth-details')} onclick={() => (inspecting = device.path)} />
-							{/snippet}
-						</ActionRow>
-					</div>
+					<ActionRow
+						title={device.name}
+						description={status(device)}
+						alert={Boolean(problems[device.path])}
+						icon={KIND_ICONS[device.kind]}
+						disabled={!adapter.powered}
+						onclick={() => toggle(device)}
+					>
+						{#snippet trailing()}
+							{#if busy[device.path]}
+								<Spinner size={16} />
+							{/if}
+						{/snippet}
+						{#snippet actions()}
+							<IconButton icon={Info} label={t('settings-bluetooth-details')} onclick={() => (inspecting = device.path)} />
+						{/snippet}
+					</ActionRow>
 				{/each}
 			</Section>
 		{/if}
@@ -206,9 +204,7 @@
 			<WindowsDevices />
 			<Section title={t('settings-bluetooth-nearby')}>
 				{#each nearby as device (device.path)}
-					<div class="row-slot" animate:reorder in:item out:item>
-						{@render nearbyRow(device)}
-					</div>
+					{@render nearbyRow(device)}
 				{:else}
 					<Row title={t('settings-bluetooth-searching')} description={t('settings-bluetooth-searching.description')}>
 						<Spinner size={16} />

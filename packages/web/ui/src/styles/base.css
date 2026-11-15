@@ -71,13 +71,6 @@
 	.tooltip {
 		animation-name: fade-in;
 	}
-
-	.window-control:active,
-	.button:active:not(:disabled),
-	.plain-button:active:not(:disabled),
-	.icon-button:active:not(:disabled) {
-		transform: none;
-	}
 }
 
 @keyframes fade-in {

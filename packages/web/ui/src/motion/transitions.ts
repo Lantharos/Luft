@@ -58,6 +58,4 @@ export const fade = presence({}, {});
 
 export const toast = presence({ y: 16, spring: Spring.snappy }, { y: 8 });
 
-export const item = presence({ scale: 0.98 }, {});
-
 export const page = presence({ y: 16 }, {});

@@ -20,7 +20,7 @@ export { default as TextField } from './controls/TextField.svelte';
 export { default as ConfirmDialog } from './dialogs/ConfirmDialog.svelte';
 export { default as Dialog } from './dialogs/Dialog.svelte';
 
-export { Curve, Gesture, motionPreference, projection, rubberband, Spring, SpringValue, type SpringToken } from './motion';
+export { Curve, Gesture, motionPreference, projection, Role, rubberband, Spring, SpringValue, type SpringToken } from './motion';
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
@@ -61,9 +61,10 @@ export { default as RecoveryWords } from './security/recovery/RecoveryWords.svel
 export { default as WriteDownDialog } from './security/recovery/WriteDownDialog.svelte';
 
 export { springTiming } from './motion/easing';
-export { reorder } from './motion/lists';
+export { listMotion, reorder } from './motion/lists';
 export { selectionPill } from './motion/pill';
-export { dialog, fade, item, menu, page, toast } from './motion/transitions';
+export { revealContents } from './motion/reveal';
+export { dialog, fade, menu, page, toast } from './motion/transitions';
 
 export { MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, type MarkFills, type MarkLayer } from './taskbar/mark';
 export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint, TaskbarLooks } from './taskbar/looks';

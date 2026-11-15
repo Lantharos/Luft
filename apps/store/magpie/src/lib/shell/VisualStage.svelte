@@ -89,16 +89,11 @@
 		backdrop-filter: blur(18px);
 		transition:
 			opacity var(--motion-quick) var(--ease-decelerate),
-			background-color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.nav:hover {
 		background: var(--control-hover);
-	}
-
-	.nav:active {
-		transform: scale(0.94);
 	}
 
 	.left {

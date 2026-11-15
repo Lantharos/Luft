@@ -2,6 +2,8 @@ import { events as systemEvents, system, type SystemAppearance } from '@lantharo
 import { i18n } from '@luft/i18n';
 
 import { events, type AppIcons, type Appearance, type Corners, type Lines, type Motion, type Palette, type Posture, type SchemeColors, type Typography } from './bindings/appearance';
+import { pressFeedback } from './motion/feedback';
+import { calmed, followReducedMotion } from './motion/preference';
 import type { TaskbarLooks } from './taskbar/looks';
 
 export type { AppIconStyle, Appearance, Palette, Posture, SchemeColors } from './bindings/appearance';
@@ -54,7 +56,9 @@ class AppearanceState {
 			events.appearanceCorners((corners) => this.round(corners)),
 			events.appearanceLines((lines) => this.line(lines)),
 			events.appearancePosture((posture) => this.hold(posture)),
-			events.appearanceKeyboard((keyboard) => (this.keyboard = keyboard))
+			events.appearanceKeyboard((keyboard) => (this.keyboard = keyboard)),
+			followReducedMotion(() => this.move(this.motion)),
+			pressFeedback()
 		];
 		void system.appearance().then((appearance) => this.follow(appearance));
 		return () => stops.forEach((stop) => stop());
@@ -67,7 +71,7 @@ class AppearanceState {
 
 	private move(motion: Motion) {
 		this.motion = motion;
-		document.documentElement.dataset.motion = motion;
+		document.documentElement.dataset.motion = calmed(motion);
 	}
 
 	private round(corners: Corners) {

@@ -38,10 +38,6 @@
 		transform: scale(1.015);
 	}
 
-	.tile:active .art {
-		transform: scale(0.99);
-	}
-
 	.name,
 	.summary {
 		overflow: hidden;

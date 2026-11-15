@@ -79,8 +79,7 @@
 		color: var(--sidebar-text);
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.source:hover:not(:disabled) {
@@ -99,9 +98,5 @@
 
 	.source.quiet {
 		color: var(--sidebar-text-muted);
-	}
-
-	.source:active:not(:disabled) {
-		transform: scale(0.97);
 	}
 </style>

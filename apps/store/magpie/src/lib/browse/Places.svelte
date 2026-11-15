@@ -52,8 +52,7 @@
 		color: var(--sidebar-text);
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.place:hover {
@@ -64,9 +63,5 @@
 	.place.active {
 		background: transparent;
 		color: var(--text);
-	}
-
-	.place:active {
-		transform: scale(0.97);
 	}
 </style>

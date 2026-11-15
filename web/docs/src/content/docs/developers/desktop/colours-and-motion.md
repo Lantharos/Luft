@@ -102,6 +102,20 @@ The theme's stylesheets have the durations as `$motion-tap`, `$motion-quick`, `$
 
 `@luft/ui` defines every token as a CSS custom property: `--motion-quick` and the other durations, `--ease-decelerate` and the other curves, and each spring from rest as a `linear()` easing in `--spring-snappy` with its time in `--spring-snappy-duration`. Tailwind's `transition` utilities default to `--motion-tap` and `--ease-decelerate`.
 
+Roles name what a motion is for, so every app moves with the same character. Each pairs a duration with a curve, as `--motion-release` and `--ease-release` in CSS and `Role.release` in TypeScript:
+
+| Role | Duration | Curve | Use |
+| --- | --- | --- | --- |
+| `press` | `tap` | `decelerate` | Shrinking under a finger or pointer |
+| `release` | `quick` | `overshoot` | Springing back after a press |
+| `move` | `moderate` | `settle` | Rows sliding to a new place, a thumb stretching |
+| `reveal` | `quick` | `decelerate` | Rows and menu items arriving |
+| `leave` | `brisk` | `decelerate` | Rows and pages fading out |
+| `switch` | `moderate` | `settle` | Changing between pages of a sidebar |
+| `drill` | `standard` | `settle` | Going into a sub-page and back |
+
+`Feedback` holds the rest: how deep a press goes, how far a thumb stretches and the timing of a stagger.
+
 A CSS spring always starts from rest. For something that can be interrupted or thrown, `SpringValue` runs the spring through the Web Animations API and picks up the current position and speed whenever it's retargeted:
 
 ```ts
@@ -112,14 +126,12 @@ offset.set(fingerX);
 offset.to(0, { velocity: releaseSpeed, spring: Spring.thrown });
 ```
 
-The Svelte transitions `page`, `dialog`, `fade`, `toast`, `item` and `menu` make things enter and leave the same way in every app, and `reorder` slides list items to their new places as others come and go; inside a `Section`, wrap each row in a `row-slot` so the dividers stay between rows. `selectionPill()` slides one highlight to a sidebar's item marked `aria-current="page"`, and `Toasts` shows one toast at a time that pauses under the pointer and can be swiped away. A toast shown with `duration: null` stays until it's closed, and one with a `detail` opens the full text in a dialog.
+Every button, link, tab, option and menu item shrinks a little while it's pressed and springs back on release. Small things shrink to 96%, larger ones by about 4 pixels on each side, so a wide row barely moves. Switches, sliders and checkboxes answer in their own way: a thumb stretches while it travels. Nothing needs to be added for this; an element opts out with `data-no-press`.
 
-```svelte
-{#each devices as device (device.id)}
-	<div class="row-slot" animate:reorder in:item out:item>…</div>
-{/each}
-```
+The rows of a `Section` slide to their new places when others are added, removed or reordered, new rows fade in and removed ones fade out where they were. `listMotion` gives any other list the same, as an attachment on the element whose children are the rows; it needs to be positioned. Dialogs, menus and popovers show their contents a beat after their surface, one item after another.
+
+The Svelte transitions `page`, `dialog`, `fade`, `toast` and `menu` make things enter and leave the same way in every app, and `reorder` slides the items of a keyed `{#each}` to their new places, for grids that are rearranged by dragging. `selectionPill()` slides one highlight to a sidebar's item marked `aria-current="page"`, and `Toasts` shows one toast at a time that pauses under the pointer and can be swiped away. A toast shown with `duration: null` stays until it's closed, and one with a `detail` opens the full text in a dialog.
 
 ### Reduced motion
 
-Settings has two choices: Animations off changes everything at once, and Reduce motion keeps animation but takes out the movement. Kestrel reads them from `enable-animations` and `reduced-motion` in GNOME's interface settings, and its settings portal reports either as reduced motion to other apps. Luft's apps see `data-motion="off"` or `data-motion="reduced"` on the root element, and `motionPreference()` returns `full`, `reduced` or `off`. Under reduced motion the shared styles keep only colour and opacity transitions, the presets only fade, and `SpringValue` changes at once unless it settles a gesture.
+Settings has two choices: Animations off changes everything at once, and Reduce motion keeps animation but takes out the movement. Kestrel reads them from `enable-animations` and `reduced-motion` in GNOME's interface settings, and its settings portal reports either as reduced motion to other apps. Luft's apps see `data-motion="off"` or `data-motion="reduced"` on the root element, also when only the browser engine reports `prefers-reduced-motion`, and `motionPreference()` returns `full`, `reduced` or `off`. Under reduced motion the shared styles keep only colour and opacity transitions, the presets, and lists only fade, presses and stretches stay still, and `SpringValue` changes at once unless it settles a gesture.

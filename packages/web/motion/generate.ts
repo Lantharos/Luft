@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import tokens from './tokens.json' with { type: 'json' };
 import { Curve, DampedSpring, Duration, Spring } from './src/index';
 
 const SAMPLES_PER_SECOND = 90;
@@ -22,12 +23,16 @@ function stylesheet(): string {
 	const durations = Object.entries(Duration).map(([name, ms]) => `--motion-${kebab(name)}: ${ms}ms;`);
 	const curves = Object.entries(Curve).map(([name, points]) => `--ease-${kebab(name)}: cubic-bezier(${points.join(', ')});`);
 	const springs = (Object.keys(Spring) as (keyof typeof Spring)[]).flatMap(springEasing);
+	const roles = Object.entries(tokens.role).flatMap(([name, { duration, curve }]) => [
+		`--motion-${kebab(name)}: var(--motion-${kebab(duration)});`,
+		`--ease-${kebab(name)}: var(--ease-${kebab(curve)});`
+	]);
 	const block = (lines: string[]) => lines.map((line) => `\t${line}`).join('\n');
 	return [
 		'/* Generated from packages/web/motion/tokens.json by packages/web/motion/generate.ts. */',
 		'',
 		'@theme static {',
-		block([...durations, ...curves, ...springs]),
+		block([...durations, ...curves, ...springs, ...roles]),
 		'\t--default-transition-duration: var(--motion-tap);',
 		'\t--default-transition-timing-function: var(--ease-decelerate);',
 		'}',

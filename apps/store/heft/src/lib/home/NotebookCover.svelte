@@ -73,10 +73,6 @@
 		transform: translateY(-3px);
 	}
 
-	.cover:active .book {
-		transform: scale(0.97);
-	}
-
 	.spine {
 		position: absolute;
 		inset: 0 auto 0 0;

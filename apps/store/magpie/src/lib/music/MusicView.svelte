@@ -177,16 +177,11 @@
 		background: var(--accent);
 		color: var(--accent-text);
 		transition:
-			transform var(--motion-tap) var(--ease-decelerate),
 			filter var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.play:hover {
 		background: var(--accent-hover);
-	}
-
-	.play:active {
-		transform: scale(0.95);
 	}
 
 	.on {

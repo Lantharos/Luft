@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PrinterIcon from '@lucide/svelte/icons/printer';
 	import { t } from '@luft/i18n';
-	import { ActionRow, item, reorder, Row, Section } from '@luft/ui';
+	import { ActionRow, Row, Section } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { PrintersState } from '#lib/bindings.js';
 	import AddDialog from './AddDialog.svelte';
@@ -36,15 +36,13 @@
 {:else if known}
 	<Section>
 		{#each printers as printer (printer.name)}
-			<div class="row-slot" animate:reorder in:item out:item>
-				<ActionRow
-					title={printer.description}
-					description={[printer.default ? t('settings-printers-default') : '', summary(printer), waiting(printer.name)].filter(Boolean).join(' · ')}
-					alert={needsAttention(printer)}
-					icon={PrinterIcon}
-					onclick={() => (opened = printer.name)}
-				/>
-			</div>
+			<ActionRow
+				title={printer.description}
+				description={[printer.default ? t('settings-printers-default') : '', summary(printer), waiting(printer.name)].filter(Boolean).join(' · ')}
+				alert={needsAttention(printer)}
+				icon={PrinterIcon}
+				onclick={() => (opened = printer.name)}
+			/>
 		{:else}
 			<Row title={t('settings-printers-none')} description={t('settings-printers-none-description')} icon={PrinterIcon} />
 		{/each}

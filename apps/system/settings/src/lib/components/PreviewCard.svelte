@@ -30,16 +30,11 @@
 		padding: 10px 10px 14px;
 		text-align: left;
 		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.card:hover {
 		background: var(--surface-hover);
-	}
-
-	.card:active {
-		transform: scale(0.985);
 	}
 
 	.frame {

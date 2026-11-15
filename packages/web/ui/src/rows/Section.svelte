@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { listMotion } from '../motion/lists';
 
 	interface Props {
 		title?: string;
@@ -17,7 +18,7 @@
 	{#if description}
 		<p class="description">{description}</p>
 	{/if}
-	<div class="row-group">{@render children()}</div>
+	<div class="row-group" {@attach listMotion}>{@render children()}</div>
 </section>
 
 <style>

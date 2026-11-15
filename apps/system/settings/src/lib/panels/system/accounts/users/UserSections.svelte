@@ -111,11 +111,6 @@
 		position: relative;
 		flex: none;
 		border-radius: var(--radius-pill);
-		transition: transform var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.picture:active {
-		transform: scale(0.96);
 	}
 
 	.overlay {

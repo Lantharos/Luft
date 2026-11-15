@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Stretch } from '../motion/feedback';
+
 	interface Props {
 		value: number;
 		min?: number;
@@ -21,6 +23,15 @@
 
 	let current = $derived(draft ?? value);
 	let fraction = $derived(max === min ? 0 : (current - min) / (max - min));
+
+	let stretch: Stretch | undefined;
+	let shown: number | undefined;
+	let pointerX = 0;
+
+	$effect(() => {
+		if (shown !== undefined && shown !== fraction && !dragging) stretch?.travel();
+		shown = fraction;
+	});
 
 	function snap(raw: number) {
 		const stepped = Math.round((raw - min) / step) * step + min;
@@ -47,12 +58,17 @@
 	function pointerDown(event: PointerEvent) {
 		if (disabled || event.button !== 0) return;
 		dragging = true;
+		pointerX = event.clientX;
 		track!.setPointerCapture(event.pointerId);
 		update(fromPointer(event));
 	}
 
 	function pointerMove(event: PointerEvent) {
-		if (dragging) update(fromPointer(event));
+		if (!dragging) return;
+		const before = fraction;
+		update(fromPointer(event));
+		stretch?.follow(fraction === before ? 0 : event.clientX - pointerX, event.timeStamp);
+		pointerX = event.clientX;
 	}
 
 	function release() {
@@ -107,11 +123,10 @@
 		<div class="fill"></div>
 	</div>
 	<div class="handle">
-		<div class="thumb">
-			{#if dragging && format}
-				<span class="value">{format(current)}</span>
-			{/if}
-		</div>
+		<div class="thumb" {@attach (thumb) => void (stretch = new Stretch(thumb))}></div>
+		{#if dragging && format}
+			<span class="value">{format(current)}</span>
+		{/if}
 	</div>
 </div>
 
@@ -181,8 +196,8 @@
 
 	.value {
 		position: absolute;
-		bottom: 28px;
-		left: 50%;
+		bottom: 32px;
+		left: 0;
 		transform: translateX(-50%);
 		padding: 3px 9px;
 		border-radius: var(--radius-pill);

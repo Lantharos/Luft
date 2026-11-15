@@ -37,8 +37,7 @@
 		color: var(--sidebar-text);
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.entry:hover {
@@ -49,10 +48,6 @@
 	.entry.active {
 		background: transparent;
 		color: var(--text);
-	}
-
-	.entry:active {
-		transform: scale(0.98);
 	}
 
 	.text {

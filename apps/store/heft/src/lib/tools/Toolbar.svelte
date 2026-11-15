@@ -180,17 +180,13 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		color: var(--text-muted);
-		transition-property: background-color, color, transform;
+		transition-property: background-color, color;
 		transition-duration: var(--motion-tap);
 	}
 
 	.tool:hover {
 		background: var(--surface-hover);
 		color: var(--text);
-	}
-
-	.tool:active {
-		transform: scale(0.94);
 	}
 
 	.tool[aria-pressed='true'] {

@@ -140,16 +140,11 @@
 		font-weight: 600;
 		text-shadow: none;
 		transition:
-			filter var(--motion-tap) var(--ease-decelerate),
-			transform var(--motion-tap) var(--ease-decelerate);
+			filter var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.write:hover {
 		background: var(--accent-hover);
-	}
-
-	.write:active {
-		transform: scale(0.97);
 	}
 
 	.write.rail {

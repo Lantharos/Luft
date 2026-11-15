@@ -1,10 +1,5 @@
-import { Curve, Duration } from '@luft/motion';
+import { Role } from '@luft/motion';
 import { motionPreference } from '../motion/preference';
-
-const EASE = `cubic-bezier(${Curve.decelerate.join(', ')})`;
-const ENTER_MS = Duration.quick;
-const MOVE_MS = Duration.standard;
-const LEAVE_MS = Duration.quick;
 
 export const MAX_STAGGER_MS = 60;
 
@@ -14,26 +9,26 @@ export function motionAllowed() {
 
 export function animateEnter(node: HTMLElement, delay = 0) {
 	node.animate([{ opacity: 0, scale: '0.96' }, { opacity: 1, scale: '1' }], {
-		duration: ENTER_MS,
+		duration: Role.reveal.duration,
 		delay,
-		easing: EASE,
+		easing: Role.reveal.easing,
 		fill: 'backwards'
 	});
 }
 
 export function animateMoveFrom(node: HTMLElement, dx: number, dy: number) {
-	node.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], { duration: MOVE_MS, easing: EASE });
+	node.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], { duration: Role.move.duration, easing: Role.move.easing });
 }
 
 export function animateMoveTo(node: HTMLElement, dx: number, dy: number) {
-	return node.animate([{ translate: '0 0' }, { translate: `${dx}px ${dy}px` }], { duration: MOVE_MS, easing: EASE, fill: 'forwards' })
+	return node.animate([{ translate: '0 0' }, { translate: `${dx}px ${dy}px` }], { duration: Role.move.duration, easing: Role.move.easing, fill: 'forwards' })
 		.finished;
 }
 
 export function animateLeave(node: HTMLElement) {
 	return node.animate([{ opacity: 1, scale: '1' }, { opacity: 0, scale: '0.96' }], {
-		duration: LEAVE_MS,
-		easing: EASE,
+		duration: Role.leave.duration,
+		easing: Role.leave.easing,
 		fill: 'forwards'
 	}).finished;
 }

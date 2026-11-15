@@ -78,11 +78,6 @@
 		padding-inline: 12px;
 		text-align: left;
 		font-size: 14px;
-		transition: transform var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.sidebar-item__main:active:not(:disabled) {
-		transform: scale(0.97);
 	}
 
 	.sidebar-item__main:disabled {

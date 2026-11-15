@@ -5,6 +5,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { topLayer } from '../menus/topLayer';
+	import { revealContents } from '../motion/reveal';
 	import { dialog, fade } from '../motion/transitions';
 
 	interface Props {
@@ -63,7 +64,7 @@
 	in:fade
 	out:fade
 >
-	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap} in:dialog out:dialog>
+	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap} {@attach revealContents} in:dialog out:dialog>
 		<div class="flex flex-col gap-1.5">
 			<h2 class="text-[17px] font-semibold">{title}</h2>
 			{#if description}

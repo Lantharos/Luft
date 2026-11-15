@@ -39,15 +39,11 @@
 		background: var(--surface);
 		padding: 28px 0 28px 32px;
 		text-align: left;
-		transition: background-color var(--motion-tap) var(--ease-decelerate), transform var(--motion-tap) var(--ease-decelerate);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.spotlight:hover {
 		background: var(--surface-hover);
-	}
-
-	.spotlight:active {
-		transform: scale(0.99);
 	}
 
 	img {

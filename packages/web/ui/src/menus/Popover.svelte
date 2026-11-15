@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { revealContents } from '../motion/reveal';
 	import { menu } from '../motion/transitions';
 	import { besideAnchor, nextToAnchor, type Align, type AnchorPlacement, type Side } from './placement';
 	import { topLayer } from './topLayer';
@@ -41,6 +42,7 @@
 <div
 	{@attach topLayer}
 	{@attach place}
+	{@attach revealContents}
 	class="popover soft-scroll"
 	class:placed={placement}
 	class:above={placement?.above}

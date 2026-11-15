@@ -6,12 +6,14 @@ mod stall;
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_i18n::t;
 use tokio::time::{Instant, sleep_until, timeout};
 use zbus::Connection;
 use zbus::OwnedFd;
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 
+use crate::L10N;
 use crate::context::Context;
 use crate::modules::system::memory::Relief;
 use crate::shared::system::{LoginProxy, LoginSessionProxy};
@@ -45,7 +47,7 @@ impl PowerKeys {
             .inhibit(
                 "handle-power-key:handle-suspend-key:handle-hibernate-key",
                 &who,
-                "The desktop decides what the power keys do",
+                &t!(L10N, "inhibit-power-keys"),
                 "block",
             )
             .await

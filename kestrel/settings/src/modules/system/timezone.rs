@@ -1,9 +1,11 @@
 use futures_util::StreamExt;
 use luft_daylight::Coordinates;
 use luft_dbus_macros::introspect;
+use luft_i18n::t;
 use tzf_rs::EmbeddedFinder;
 use zbus::{Connection, proxy};
 
+use crate::L10N;
 use crate::context::Context;
 use crate::shared::location;
 use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
@@ -108,17 +110,21 @@ async fn announce(session: &Connection, zone: &str, replaces: u32) -> u32 {
     let city = zone.rsplit('/').next().unwrap_or(zone).replace('_', " ");
     let now = glib::TimeZone::from_identifier(Some(zone))
         .and_then(|zone| glib::DateTime::now(&zone).ok());
-    let offset = now
-        .and_then(|now| now.format("%Z, UTC%:::z").ok())
-        .map(|offset| format!(" ({offset})"))
-        .unwrap_or_default();
-    let body = format!("Clocks now follow {city} time{offset}.");
+    let body = match now.and_then(|now| now.format("%Z, UTC%:::z").ok()) {
+        Some(offset) => t!(
+            L10N,
+            "timezone-changed-offset",
+            city = city,
+            offset = offset.as_str()
+        ),
+        None => t!(L10N, "timezone-changed", city = city),
+    };
     let shown = Notification {
         app: "Date & Time",
         icon: "preferences-system-time-symbolic",
-        summary: "Time zone updated",
+        summary: &t!(L10N, "timezone-changed-title"),
         body: &body,
-        actions: &[(SETTINGS_ACTION, "Settings")],
+        actions: &[(SETTINGS_ACTION, &t!(L10N, "notification-settings"))],
         urgency: URGENCY_NORMAL,
         transient: false,
         sound: Sound::Usual,

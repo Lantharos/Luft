@@ -1,10 +1,12 @@
 use std::time::Duration;
 
+use luft_i18n::t;
 use tokio::time::{Instant, sleep_until};
 use zbus::Connection;
 use zbus::OwnedFd;
 
 use super::proxies::PowerProfilesProxy;
+use crate::L10N;
 use crate::shared::system::LoginProxy;
 
 const LID_SETTLE: Duration = Duration::from_secs(8);
@@ -45,11 +47,7 @@ impl Inhibitors {
     pub async fn hold_sleep(&mut self) {
         if self.sleep.is_none() {
             self.sleep = self
-                .inhibit(
-                    "sleep",
-                    "The screen locks before the computer sleeps",
-                    "delay",
-                )
+                .inhibit("sleep", &t!(L10N, "inhibit-lock-before-sleep"), "delay")
                 .await;
         }
     }
@@ -63,7 +61,7 @@ impl Inhibitors {
             self.lid = self
                 .inhibit(
                     "handle-lid-switch",
-                    "An external monitor is connected or the displays just changed",
+                    &t!(L10N, "inhibit-lid-displays"),
                     "block",
                 )
                 .await;
@@ -114,7 +112,7 @@ impl Inhibitors {
                 Some(cookie) => profiles.release_profile(cookie).await,
                 None => {
                     let cookie = profiles
-                        .hold_profile("power-saver", "Making the battery last", APPLICATION)
+                        .hold_profile("power-saver", &t!(L10N, "inhibit-power-saver"), APPLICATION)
                         .await?;
                     self.power_saver = Some(cookie);
                     Ok(())

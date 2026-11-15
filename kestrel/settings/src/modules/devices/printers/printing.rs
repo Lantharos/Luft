@@ -5,6 +5,7 @@ use std::sync::Arc;
 use luft_cups::ipp::{Attributes, JOB};
 use luft_cups::{Cups, PRINT_JOB, expect_success, printer_uri};
 use luft_dbus_macros::introspect;
+use luft_i18n::t;
 use tokio::fs::File;
 use zbus::object_server::SignalEmitter;
 use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
@@ -12,6 +13,7 @@ use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 use super::defaults;
 use super::discovery::Discovered;
 use super::printer::{ATTRIBUTES, Printer};
+use crate::L10N;
 
 pub const PATH: &str = "/com/lantharos/Settings/Printing";
 const DOCUMENT_FORMAT: &str = "application/pdf";
@@ -115,7 +117,7 @@ impl Printing {
         response
             .integer("job-id")
             .and_then(|job| u32::try_from(job).ok())
-            .ok_or_else(|| fdo::Error::Failed("The printer didn't take the document".into()))
+            .ok_or_else(|| fdo::Error::Failed(t!(L10N, "printer-not-taken")))
     }
 }
 
@@ -200,7 +202,7 @@ impl Printing {
         let page = File::open(TEST_PAGE).await.map_err(failed)?;
         self.send(
             printer,
-            "Test page",
+            &t!(L10N, "printer-test-page"),
             DOCUMENT_FORMAT,
             page,
             &JobOptions::default(),

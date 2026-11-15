@@ -11,11 +11,13 @@ use std::time::Duration;
 
 use futures_util::StreamExt;
 use luft_cups::{Cups, LEASE_SECONDS};
+use luft_i18n::t;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 use tokio::time::{Instant, interval, sleep, sleep_until};
 use zbus::message::Type;
 use zbus::{Connection, MatchRule, Message, MessageStream};
 
+use crate::L10N;
 use crate::context::Context;
 use crate::shared::notify::{self, Notification, Sound, URGENCY_CRITICAL, URGENCY_NORMAL};
 use discovery::Discovered;
@@ -207,9 +209,9 @@ impl Printers {
             self.printing.insert(printer.clone());
         }
         if let Some(summary) = messages::job_summary(state) {
-            let body = format!("“{name}” on {printer}");
+            let body = t!(L10N, "printer-job", name = name, printer = printer.as_str());
             let replaces = self.job_notifications.get(&job).copied().unwrap_or(0);
-            let id = self.show(summary, &body, URGENCY_NORMAL, replaces).await;
+            let id = self.show(&summary, &body, URGENCY_NORMAL, replaces).await;
             self.job_notifications.insert(job, id);
         }
         if messages::job_finished(state) {
@@ -290,7 +292,8 @@ impl Printers {
         if kind & (REMOTE_PRINTER | DISCOVERED_PRINTER) == 0
             && !added.boolean("printer-is-temporary")
         {
-            self.show("Printer added", printer, URGENCY_NORMAL, 0).await;
+            self.show(&t!(L10N, "printer-added"), printer, URGENCY_NORMAL, 0)
+                .await;
         }
     }
 

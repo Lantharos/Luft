@@ -9,9 +9,11 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
 use futures_util::StreamExt;
+use luft_i18n::t;
 use tokio::time::{Instant, interval, interval_at, sleep_until};
 use zbus::Connection;
 
+use crate::L10N;
 use crate::context::Context;
 use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_CRITICAL};
 use crate::shared::settings::Schemas;
@@ -165,9 +167,12 @@ async fn confirm_emptying(session: &Connection, replaces: u32) -> u32 {
     let shown = Notification {
         app: "Disk Space",
         icon: "user-trash-symbolic",
-        summary: "Empty the trash?",
-        body: "Everything in it will be deleted for good.",
-        actions: &[("delete-trash", "Delete for good"), ("keep-trash", "Keep")],
+        summary: &t!(L10N, "trash-empty-title"),
+        body: &t!(L10N, "trash-empty"),
+        actions: &[
+            ("delete-trash", &t!(L10N, "trash-empty-delete")),
+            ("keep-trash", &t!(L10N, "trash-empty-keep")),
+        ],
         urgency: URGENCY_CRITICAL,
         transient: true,
         sound: Sound::Silent,
@@ -187,23 +192,31 @@ async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
         tokio::task::spawn_blocking(|| trash::open_all().iter().any(Trash::holds_items))
             .await
             .unwrap_or(false);
-    let (summary, mut body) = match &low.name {
+    let trash = if has_trash { "yes" } else { "no" };
+    let (summary, body) = match &low.name {
         Some(name) => (
-            format!("Low disk space on {name}"),
-            format!("{name} has only {free} left."),
+            t!(L10N, "disk-low-named-title", name = name.as_str()),
+            t!(
+                L10N,
+                "disk-low-named",
+                name = name.as_str(),
+                free = free.as_str(),
+                trash = trash
+            ),
         ),
         None => (
-            "Low disk space".to_owned(),
-            format!("This computer has only {free} left."),
+            t!(L10N, "disk-low-title"),
+            t!(L10N, "disk-low", free = free.as_str(), trash = trash),
         ),
     };
+    let examine = t!(L10N, "disk-low-examine");
+    let empty_trash = t!(L10N, "disk-low-empty-trash");
     let mut actions = Vec::new();
     if disks_path().exists() {
-        actions.push(("examine", "Examine"));
+        actions.push(("examine", examine.as_str()));
     }
     if has_trash {
-        body.push_str(" Emptying the trash can free some up.");
-        actions.push(("empty-trash", "Empty Trash"));
+        actions.push(("empty-trash", empty_trash.as_str()));
     }
     let shown = Notification {
         app: "Disk Space",

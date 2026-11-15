@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use luft_i18n::t;
 use tokio::sync::Mutex;
 use tokio::time::Instant;
 use zbus::Connection;
@@ -16,6 +17,7 @@ use super::proxies::{
     ShellBrightnessProxy,
 };
 use super::watches::{Watch, Watches};
+use crate::L10N;
 use crate::shared::notify::{self, Notification, Sound, URGENCY_CRITICAL};
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
@@ -382,24 +384,15 @@ impl Power {
 
     pub async fn warn_about_sleep(&mut self) {
         let (summary, body) = match self.warned_action {
-            Action::Logout => (
-                "Signing out soon",
-                "You'll be signed out because the computer isn't being used.",
-            ),
-            Action::Hibernate => (
-                "Hibernating soon",
-                "The computer will hibernate because it isn't being used.",
-            ),
-            _ => (
-                "Going to sleep soon",
-                "The computer will go to sleep because it isn't being used.",
-            ),
+            Action::Logout => (t!(L10N, "idle-sign-out-title"), t!(L10N, "idle-sign-out")),
+            Action::Hibernate => (t!(L10N, "idle-hibernate-title"), t!(L10N, "idle-hibernate")),
+            _ => (t!(L10N, "idle-sleep-title"), t!(L10N, "idle-sleep")),
         };
         let shown = Notification {
             app: "Power",
             icon: "system-suspend-symbolic",
-            summary,
-            body,
+            summary: &summary,
+            body: &body,
             actions: &[],
             urgency: URGENCY_CRITICAL,
             transient: false,

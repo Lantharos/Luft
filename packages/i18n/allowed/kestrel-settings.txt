@@ -1,1 +1,6 @@
 kestrel/settings/src/modules/system/security/remote_login.rs	Remote Login
+kestrel/settings/src/modules/system/timezone.rs	Date & Time
+kestrel/settings/src/modules/system/housekeeping/mod.rs	Disk Space
+kestrel/settings/src/modules/devices/power/manager.rs	Couldn't {} the screen: {error}
+kestrel/settings/src/modules/devices/power/manager.rs	Couldn't turn the screens {}: {error}
+kestrel/settings/src/modules/system/watchdog/mod.rs	Kestrel stopped responding, so the power button turns the computer off directly until it answers again

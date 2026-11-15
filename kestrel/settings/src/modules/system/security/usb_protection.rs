@@ -1,7 +1,9 @@
 use futures_util::StreamExt;
 use luft_dbus_macros::introspect;
+use luft_i18n::t;
 use zbus::{Connection, proxy};
 
+use crate::L10N;
 use crate::context::Context;
 use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
 
@@ -64,15 +66,15 @@ async fn announce_released(
     }
 }
 
-fn describe(devices: &[(String, String)]) -> (String, &'static str) {
+fn describe(devices: &[(String, String)]) -> (String, String) {
     match devices {
         [(_, name)] => (
-            format!("{name} is now available"),
-            "It was plugged in while the screen was locked.",
+            t!(L10N, "usb-unlocked-one-title", name = name.as_str()),
+            t!(L10N, "usb-unlocked-one"),
         ),
         _ => (
-            format!("{} devices are now available", devices.len()),
-            "They were plugged in while the screen was locked.",
+            t!(L10N, "usb-unlocked-many-title", count = devices.len()),
+            t!(L10N, "usb-unlocked-many"),
         ),
     }
 }
@@ -83,8 +85,8 @@ async fn announce(session: &Connection, devices: &[(String, String)], replaces: 
         app: "USB Devices",
         icon: "media-removable-symbolic",
         summary: &summary,
-        body,
-        actions: &[(SETTINGS_ACTION, "Settings")],
+        body: &body,
+        actions: &[(SETTINGS_ACTION, &t!(L10N, "notification-settings"))],
         urgency: URGENCY_NORMAL,
         transient: true,
         sound: Sound::Usual,

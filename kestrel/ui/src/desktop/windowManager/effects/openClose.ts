@@ -1,6 +1,7 @@
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import type Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import { Curve, Duration, Spring, holdMotion, reducedMotion } from '../../../kestrelUi.js';
 import { RunningTransition, windowTransitions } from './shaderTransition.js';
@@ -8,9 +9,10 @@ import { RunningTransition, windowTransitions } from './shaderTransition.js';
 const OPEN = { scale: 0.94, rise: 8 };
 const DIALOG_OPEN = { scale: 0.96, rise: 0 };
 const CLOSE_SCALE = 0.95;
+const SMALLEST_SCALE = 0.04;
 const CONTENT_TIMEOUT = 1000;
 const PAINT_TIMEOUT = 100;
-const ANIMATED = ['scale-x', 'scale-y', 'translation-y', 'opacity'];
+const ANIMATED = ['scale-x', 'scale-y', 'translation-x', 'translation-y', 'opacity'];
 
 interface Effect {
   completed: () => void;
@@ -19,7 +21,26 @@ interface Effect {
   transition: RunningTransition | null;
 }
 
+interface Origin {
+  scale: number;
+  x: number;
+  y: number;
+}
+
 const hasContent = (texture: Meta.ShapedTexture) => texture.get_preferred_size()[1] > 0;
+
+function iconOrigin(window: Meta.Window): Origin | null {
+  const app = Shell.WindowTracker.get_default().get_window_app(window);
+  const [hasIcon, icon] = window.get_icon_geometry();
+  if (!app || app.get_n_windows() > 1 || !hasIcon) return null;
+  const rect = window.get_buffer_rect();
+  const scale = Math.max(SMALLEST_SCALE, Math.min(icon.width / rect.width, icon.height / rect.height));
+  return {
+    scale,
+    x: icon.x + icon.width / 2 - rect.width * scale / 2 - rect.x,
+    y: icon.y + icon.height / 2 - rect.height * scale / 2 - rect.y,
+  };
+}
 
 function waitFor(object: GObject.Object, connect: (done: () => void) => number, timeout: number, then: () => void): () => void {
   const cancel = () => {
@@ -81,9 +102,9 @@ export class OpenCloseEffects {
     }
     const { scale, rise } = dialog ? DIALOG_OPEN : OPEN;
     const motion = !reducedMotion();
-    actor.set_pivot_point(0.5, 0.5);
     actor.opacity = 0;
     if (motion) {
+      actor.set_pivot_point(0.5, 0.5);
       actor.set_scale(scale, scale);
       actor.translation_y = rise;
     }
@@ -93,13 +114,19 @@ export class OpenCloseEffects {
     effect.cancel = afterFirstFrame(actor, () => {
       effect.cancel = null;
       effect.release = holdMotion();
+      const origin = motion && !dialog ? iconOrigin(actor.meta_window!) : null;
+      if (origin) {
+        actor.set_pivot_point(0, 0);
+        actor.set_scale(origin.scale, origin.scale);
+        actor.set_translation(origin.x, origin.y, 0);
+      }
       actor.ease({
         opacity: 255, duration: Duration.quick, curve: Curve.decelerate,
         onStopped: motion ? undefined : () => this.finish(actor),
       });
       if (motion) {
         actor.ease({
-          scale_x: 1, scale_y: 1, translation_y: 0, spring: Spring.snappy,
+          scale_x: 1, scale_y: 1, translation_x: 0, translation_y: 0, spring: Spring.snappy,
           onStopped: () => this.finish(actor),
         });
       }
@@ -136,7 +163,7 @@ export class OpenCloseEffects {
     effect.cancel?.();
     effect.transition?.stop();
     for (const property of ANIMATED) actor.remove_transition(property);
-    actor.set({ opacity: 255, scale_x: 1, scale_y: 1, translation_y: 0 });
+    actor.set({ opacity: 255, scale_x: 1, scale_y: 1, translation_x: 0, translation_y: 0 });
     actor.set_pivot_point(0, 0);
     effect.release?.();
     effect.completed();

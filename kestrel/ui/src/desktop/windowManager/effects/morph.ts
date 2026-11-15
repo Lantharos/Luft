@@ -7,6 +7,7 @@ import Mtk from 'gi://Mtk';
 import { Curve, Duration, Spring, holdMotion, reducedMotion } from '../../../kestrelUi.js';
 import { type Rect, WindowSnapshot } from './snapshot.js';
 import { transitionVelocity } from './velocity.js';
+import { DragVelocity } from './dragVelocity.js';
 
 const CLIENT_DEADLINE = 400;
 const GEOMETRY = ['x', 'y', 'width', 'height'] as const;
@@ -210,6 +211,7 @@ class Morph {
 }
 
 export class WindowMorphs {
+  private readonly dragged = new DragVelocity();
   private readonly morphs = new Map<Meta.WindowActor, Morph>();
   private readonly handedOver = new Map<Meta.WindowActor, HandOver & { snapshot: WindowSnapshot }>();
   private dropLater = 0;
@@ -222,7 +224,9 @@ export class WindowMorphs {
     this.handedOver.delete(actor);
     const snapshot = handedOver?.snapshot ?? snapshotOf(actor, from);
     if (!snapshot) return false;
-    const morph = new Morph(actor, snapshot, handedOver?.velocity, () => {
+    const thrown = this.dragged.of(actor.meta_window!);
+    const velocity = handedOver?.velocity ?? (thrown && { ...thrown, width: 0, height: 0 });
+    const morph = new Morph(actor, snapshot, velocity, () => {
       if (this.morphs.get(actor) === morph) this.morphs.delete(actor);
       completed();
     });

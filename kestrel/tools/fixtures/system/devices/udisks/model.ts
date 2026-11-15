@@ -306,6 +306,12 @@ export class Model {
     encrypted.passphrase = next;
   }
 
+  plugIn(fixture: FixtureDrive) {
+    this._add(fixture);
+    this.changed(fixture.drive.path);
+    for (const block of this.blocks.values()) if (block.drive === fixture.drive.path) this.changed(block.path);
+  }
+
   powerOff(drivePath: string) {
     for (const block of [...this.blocks.values()].filter(candidate => candidate.drive === drivePath)) {
       if (block.mountPoints?.length) throw new Failure('DeviceBusy', `${block.device} is mounted`);

@@ -83,6 +83,15 @@ export interface FixtureDrive {
   partitions: ReturnType<typeof partition>[];
 }
 
+export const pluggedInDrive = (): FixtureDrive => ({
+  drive: drive('Kingston_DataTraveler', {Vendor: 'Kingston', Model: 'DataTraveler', Size: 64 * GiB, ConnectionBus: 'usb', Media: 'thumb',
+    Removable: true, MediaRemovable: true, Ejectable: true, CanPowerOff: true, SortKey: '01hotplug/Kingston'}),
+  device: 'sde', partitionPrefix: '', size: 64 * GiB, table: 'dos',
+  partitions: [
+    partition('', 1, MiB, 64 * GiB - 2 * MiB, '0x07', {IdUsage: 'filesystem', IdType: 'exfat', IdVersion: '1.0', IdLabel: 'PHOTOS', IdUUID: '3C9E-71B4'}),
+  ],
+});
+
 export function fixtureDrives(user: string): FixtureDrive[] {
   return [
     {

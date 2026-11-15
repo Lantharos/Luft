@@ -20,7 +20,6 @@ const PIM_UNSUPPORTED_ERROR = 'Compiled against a version of libcryptsetup that 
 interface MountOptions {
   checkSession?: boolean;
   useMountOp?: boolean;
-  allowAutorun?: boolean;
 }
 
 interface AutorunVolume extends Gio.Volume {
@@ -32,10 +31,16 @@ export function allowsAutorun(volume: AutorunVolume): boolean {
   return !!volume.allowAutorun;
 }
 
+function removable(volume: Gio.Volume): boolean {
+  const drive = volume.get_drive();
+  return !drive || drive.is_removable() || drive.is_media_removable();
+}
+
 class AutomountManager {
   private readonly activeOperations = new Map<Gio.Volume, ShellMountOperation | null>();
   private readonly session = GnomeSession.SessionManager();
   private readonly volumeMonitor = Gio.VolumeMonitor.get();
+  private readonly atSessionStart = new Set(this.volumeMonitor.get_volumes());
   private inhibited = false;
   private cancellable: Gio.Cancellable | null = null;
   private mountAllId = 0;
@@ -76,7 +81,7 @@ class AutomountManager {
 
   private startupMountAll(): void {
     for (const volume of this.volumeMonitor.get_volumes())
-      this.checkAndMountVolume(volume, { checkSession: false, useMountOp: false, allowAutorun: false });
+      this.checkAndMountVolume(volume, { checkSession: false, useMountOp: false });
 
     this.mountAllId = 0;
   }
@@ -103,18 +108,25 @@ class AutomountManager {
     }
   }
 
-  private checkAndMountVolume(volume: AutorunVolume, { checkSession = true, useMountOp = true, allowAutorun = true }: MountOptions = {}): void {
+  private arrivedDuringSession(volume: Gio.Volume): boolean {
+    return !this.atSessionStart.has(volume) && removable(volume);
+  }
+
+  private checkAndMountVolume(volume: AutorunVolume, { checkSession = true, useMountOp = true }: MountOptions = {}): void {
     if (checkSession && !this.session.SessionIsActive) return;
     if (this.inhibited) return;
     if (volume.get_mount()) return;
 
+    const announced = this.arrivedDuringSession(volume);
     if (!volume.should_automount() || !volume.can_mount()) {
-      volume.allowAutorun = true;
-      this.allowAutorunExpire(volume);
+      if (announced) {
+        volume.allowAutorun = true;
+        this.allowAutorunExpire(volume);
+      }
       return;
     }
 
-    this.mountVolume(volume, useMountOp ? new ShellMountOperation(volume) : null, allowAutorun);
+    this.mountVolume(volume, useMountOp ? new ShellMountOperation(volume) : null, announced);
   }
 
   private mountVolume(volume: AutorunVolume, operation: ShellMountOperation | null, allowAutorun = false): void {
@@ -148,6 +160,7 @@ class AutomountManager {
   }
 
   private onVolumeRemoved(volume: AutorunVolume): void {
+    this.atSessionStart.delete(volume);
     if (!volume.allowAutorunExpireId) return;
 
     GLib.source_remove(volume.allowAutorunExpireId);

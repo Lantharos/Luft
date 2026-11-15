@@ -13,6 +13,7 @@ import {PACKAGES_NAME, publishPackages} from './software/packages.js';
 import {PRINTERS_NAME, publishPrinters} from './devices/printers.js';
 import {publishRemoteLogin, REMOTE_LOGIN_NAME} from './security/remoteLogin.js';
 import {publishSecurity, SECURITY_NAMES} from './security/security.js';
+import {pluggedInDrive} from './devices/udisks/drives.js';
 import {publishUdisks} from './devices/udisks/service.js';
 import {publishUpdater, UPDATER_NAME} from './software/updater.js';
 import {publishWindows, WINDOWS_NAME} from './software/windows.js';
@@ -20,6 +21,9 @@ import {publishWindows, WINDOWS_NAME} from './software/windows.js';
 const CALLS = `<node><interface name="com.lantharos.KestrelChecks.Calls">
   <method name="Take"><arg type="as" direction="out"/></method>
   <method name="Seen"><arg type="as" direction="out"/></method>
+</interface></node>`;
+const DRIVES = `<node><interface name="com.lantharos.KestrelChecks.Drives">
+  <method name="PlugIn"/>
 </interface></node>`;
 
 const calls: string[] = [];
@@ -44,7 +48,9 @@ publish(CALLS, {
   },
   Seen: () => [...taken, ...calls],
 }, '/com/lantharos/KestrelChecks');
-publishSecurity(publish, calls, publishUdisks(calls));
+const udisks = publishUdisks(calls);
+publishSecurity(publish, calls, udisks);
+publish(DRIVES, {PlugIn: () => udisks.plugIn(pluggedInDrive())}, '/com/lantharos/KestrelChecks/Drives');
 publishWindows(publish);
 publishFiles(publish, calls);
 publishPrinters(publish, calls);

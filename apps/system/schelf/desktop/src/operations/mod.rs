@@ -69,6 +69,7 @@ struct Inner {
     events: Events,
     entries: Mutex<Vec<Entry>>,
     wake: Condvar,
+    settled: Condvar,
     next: AtomicU64,
     notices: Mutex<Option<UnboundedSender<Notice>>>,
 }
@@ -79,6 +80,7 @@ impl Queue {
             events,
             entries: Mutex::new(Vec::new()),
             wake: Condvar::new(),
+            settled: Condvar::new(),
             next: AtomicU64::new(1),
             notices: Mutex::new(None),
         }));
@@ -129,6 +131,21 @@ impl Queue {
     fn publish(&self) {
         let operations = Self::snapshot(&self.entries());
         self.0.events.emit(OPERATIONS, operations);
+        self.0.settled.notify_all();
+    }
+
+    pub fn wait_until_settled(&self) {
+        let entries = self.entries();
+        drop(
+            self.0
+                .settled
+                .wait_while(entries, |entries| {
+                    entries
+                        .iter()
+                        .any(|entry| entry.operation.state != OperationState::Failed)
+                })
+                .unwrap_or_else(|poisoned| poisoned.into_inner()),
+        );
     }
 
     fn next_job(&self) -> (u64, Job, Cancel) {

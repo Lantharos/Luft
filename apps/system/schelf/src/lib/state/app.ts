@@ -1,6 +1,6 @@
-import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { appWindow } from '@lantharos/sabine';
 import { appearance, keepWindowState } from '@luft/ui';
-import { commands, type CatalogApp } from '#lib/bindings.js';
+import { commands, events, type CatalogApp } from '#lib/bindings.js';
 import { developer } from '#lib/developer/state/developer.svelte.js';
 import * as store from '#lib/catalog/store.js';
 import { account } from './account.svelte';
@@ -14,11 +14,6 @@ const PAGES: Record<string, Route> = {
 	'schelf:installed': { page: 'installed' },
 	'schelf:extensions': { page: 'extensions' }
 };
-
-function openFiles(files: string[]) {
-	const [path] = files;
-	if (path) navigation.open({ page: 'file', path });
-}
 
 const SEARCH = 'schelf:search?';
 const FULL_ACCESS = 'schelf:full-access?';
@@ -64,48 +59,30 @@ export async function openListing(id: string) {
 	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name });
 }
 
-function openPage(argumentsList: (string | null)[]) {
-	const listing = argumentsList.find((argument) => argument?.startsWith(LISTING));
-	if (listing) {
-		void openListing(decodeURIComponent(listing.slice(LISTING.length)));
-		return;
-	}
-	const app = argumentsList.find((argument) => argument?.startsWith(APP));
-	if (app) {
-		void openApp(decodeURIComponent(app.slice(APP.length)));
-		return;
-	}
-	const fullAccess = argumentsList.find((argument) => argument?.startsWith(FULL_ACCESS));
-	if (fullAccess) {
-		void askFullAccess(decodeURIComponent(fullAccess.slice(FULL_ACCESS.length)));
-		return;
-	}
-	const access = argumentsList.find((argument) => argument?.startsWith(ACCESS));
-	if (access) {
-		void reviewAccess(decodeURIComponent(access.slice(ACCESS.length)));
-		return;
-	}
-	const search = argumentsList.find((argument) => argument?.startsWith(SEARCH));
-	if (search) {
-		navigation.query = decodeURIComponent(search.slice(SEARCH.length));
+function openPage(url: string) {
+	if (url.startsWith(LISTING)) return void openListing(decodeURIComponent(url.slice(LISTING.length)));
+	if (url.startsWith(APP)) return void openApp(decodeURIComponent(url.slice(APP.length)));
+	if (url.startsWith(FULL_ACCESS)) return void askFullAccess(decodeURIComponent(url.slice(FULL_ACCESS.length)));
+	if (url.startsWith(ACCESS)) return void reviewAccess(decodeURIComponent(url.slice(ACCESS.length)));
+	if (url.startsWith(SEARCH)) {
+		navigation.query = decodeURIComponent(url.slice(SEARCH.length));
 		navigation.search(navigation.query);
 		return;
 	}
-	const route = argumentsList.map((argument) => PAGES[argument ?? '']).find(Boolean);
+	const route = PAGES[url];
 	if (route) navigation.open(route);
 }
 
 export async function start() {
 	const [state, kept] = await Promise.all([commands.appState(), appWindow.restoredState<Route[]>()]);
 	appearance.start(state);
-	if (kept && !state.page && !state.files.length) navigation.reopen(kept);
-	openPage([state.page]);
-	openFiles(state.files);
+	if (kept && !state.page) navigation.reopen(kept);
+	if (state.page) openPage(state.page);
 	keepWindowState(navigation.kept);
 	developer.start();
-	sabineEvents.singleInstance(async ({ arguments: list, workingDirectory }) => {
-		openPage(list);
-		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));
+	events.schelfPage(async () => {
+		const page = await commands.appPage();
+		if (page) openPage(page);
 	});
 	await Promise.all([operations.start(), library.start(), catalog.start(), account.start()]);
 }

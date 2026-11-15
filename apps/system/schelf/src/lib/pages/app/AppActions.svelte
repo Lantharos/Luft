@@ -11,7 +11,7 @@
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
-	import { updateJob } from '#lib/app/jobs.js';
+	import { storeJob, updateJob } from '#lib/app/jobs.js';
 	import { sandboxLacks } from '#lib/app/extensionAccess.js';
 	import StoreConsent from './StoreConsent.svelte';
 
@@ -40,14 +40,8 @@
 		void operations.run(key, name, job);
 	}
 
-	function storeJob(fullAccess: boolean): Job | null {
-		if (!store?.installer || !store.version) return null;
-		const consent = { version: store.version, permissions: store.declared, extension: store.extension, fullAccess };
-		return consenting === 'update' ? { kind: 'updateStore', id: store.id, consent } : { kind: 'installStore', id: store.id, consent };
-	}
-
 	function agreed(fullAccess: boolean) {
-		const job = storeJob(fullAccess);
+		const job = store && storeJob(store, fullAccess, consenting === 'update');
 		const key = consenting === 'update' ? installed?.key : listingKey;
 		consenting = null;
 		if (job && key) run(key, job);

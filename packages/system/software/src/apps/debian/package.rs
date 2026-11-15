@@ -29,9 +29,13 @@ pub struct Deb {
     pub summary: String,
     pub description: String,
     pub homepage: Option<String>,
+    /// Who made the package, without their address
+    pub maintainer: Option<String>,
     pub size: u64,
     /// The name of its main app, from its menu entry, when it has one
     pub name: Option<String>,
+    /// The file name of that menu entry
+    pub desktop: Option<String>,
     pub icon: Option<Icon>,
 }
 
@@ -215,11 +219,18 @@ pub fn inspect(path: &Path) -> Result<Deb, String> {
         }
         None => std::mem::take(&mut description),
     };
-    let entry = found
+    let (desktop, entry) = found
         .entries
         .iter()
-        .map(|(_, text)| DesktopEntry::parse(text))
-        .find(DesktopEntry::visible);
+        .map(|(path, text)| (path, DesktopEntry::parse(text)))
+        .find(|(_, entry)| entry.visible())
+        .map(|(path, entry)| {
+            let name = Path::new(path)
+                .file_name()
+                .map(|name| name.to_string_lossy().into_owned());
+            (name, Some(entry))
+        })
+        .unwrap_or_default();
     let icon = entry
         .as_ref()
         .and_then(|entry| entry.get("Icon"))
@@ -231,11 +242,23 @@ pub fn inspect(path: &Path) -> Result<Deb, String> {
         summary,
         description,
         homepage: control.get("Homepage").cloned(),
+        maintainer: control
+            .get("Maintainer")
+            .map(|maintainer| {
+                maintainer
+                    .split('<')
+                    .next()
+                    .unwrap_or_default()
+                    .trim()
+                    .to_owned()
+            })
+            .filter(|maintainer| !maintainer.is_empty()),
         size: field("Installed-Size").parse::<u64>().unwrap_or(0) * 1024,
         name: entry
             .as_ref()
             .and_then(|entry| entry.get("Name"))
             .map(str::to_owned),
+        desktop,
         icon,
     })
     .and_then(|deb| {

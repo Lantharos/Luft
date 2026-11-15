@@ -16,7 +16,6 @@
 	import AppPage from '#lib/pages/app/AppPage.svelte';
 	import Browse from '#lib/pages/browse/Browse.svelte';
 	import Discover from '#lib/pages/discover/Discover.svelte';
-	import OpenFile from '#lib/pages/file/OpenFile.svelte';
 	import Installed from '#lib/pages/installed/Installed.svelte';
 	import Search from '#lib/pages/search/Search.svelte';
 	import Sources from '#lib/pages/sources/Sources.svelte';
@@ -78,8 +77,6 @@
 							<Search query={entry.query} />
 						{:else if entry.page === 'app'}
 							<AppPage target={entry.target} name={entry.name} askFullAccess={entry.askFullAccess} reviewAccess={entry.reviewAccess} />
-						{:else if entry.page === 'file'}
-							<OpenFile path={entry.path} />
 						{:else if entry.page === 'sources'}
 							<Sources />
 						{:else if entry.page === 'project'}

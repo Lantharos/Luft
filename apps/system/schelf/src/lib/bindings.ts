@@ -12,14 +12,11 @@ export const commands = {
 	}, options?: CallOptions) => invoke<SignIn>("account_sign_in_poll", params, options),
 	accountSignOut: (options?: CallOptions) => invoke<AccountState>("account_sign_out", {}, options),
 	accountState: (options?: CallOptions) => invoke<AccountState>("account_state", {}, options),
-	appActivationFiles: (params: {
-		arguments: string[],
-		workingDirectory?: string | null,
-	}, options?: CallOptions) => invoke<string[]>("app_activation_files", params, options),
 	appOpenUrl: (params: {
 		url: string,
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("app_open_url", params, options),
+	appPage: (options?: CallOptions) => invoke<string | null>("app_page", {}, options),
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
 	developerAccount: (options?: CallOptions) => invoke<Fetched<import("#lib/developer/store.js").Account>>("developer_account", {}, options),
 	developerApproval: (params: {
@@ -109,6 +106,9 @@ export const commands = {
 	flathubSummary: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").Summary>("flathub_summary", params, options),
+	installState: (params: {
+		request: number,
+	}, options?: CallOptions) => invoke<InstallState>("install_state", params, options),
 	libraryAddFolder: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<boolean | null>("library_add_folder", params, options),
@@ -255,6 +255,7 @@ export const events = {
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	schelfLibrary: (callback: (payload: Finished) => void) => listen<Finished>("schelf.library", callback),
 	schelfOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("schelf.operations", callback),
+	schelfPage: (callback: (payload: null) => void) => listen<null>("schelf.page", callback),
 };
 
 /**  Who is signed in to schelf.store on this computer. */
@@ -289,7 +290,6 @@ export type AppIcons = {
 };
 
 export type AppState = {
-	files: string[],
 	page: string | null,
 } & Appearance;
 
@@ -491,6 +491,10 @@ export type IconPaint = {
 	rim: number,
 };
 
+export type InstallState = {
+	path: string,
+} & Appearance;
+
 export type Installation = "user" | "system";
 
 export type InstalledApp = {
@@ -604,14 +608,18 @@ export type OnFlathub = {
 	verified: boolean,
 };
 
-export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; 
+export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; developer: string | null; icon: string | null; size: number; runtime: string | null; 
 /**
  *  The repository it keeps getting updates from, when it was built
  *  with one's address.
  */
 origin: string | null; 
 /**  What its sandbox opens to it. */
-permissions: Permissions | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
+permissions: Permissions | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; vendor: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; maintainer: string | null; size: number; 
+/**  The file name of its main app's menu entry. */
+desktop: string | null; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
+/**  The file name of its menu entry. */
+desktop: string | null; 
 /**  What it declared it needs, for a Sabine app. */
 permissions: Permissions | null; 
 /**  Why it asks to run outside a sandbox, when it does. */

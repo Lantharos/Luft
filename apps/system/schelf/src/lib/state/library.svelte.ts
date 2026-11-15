@@ -9,12 +9,16 @@ class Library {
 	error = $state<string | null>(null);
 
 	async start() {
+		await this.watch();
+		void this.check();
+	}
+
+	async watch() {
 		events.schelfLibrary(({ keys, action, succeeded }) => {
 			if (succeeded && action !== 'install') this.forget(keys);
 			void this.refresh();
 		});
 		await this.refresh();
-		void this.check();
 	}
 
 	async refresh() {

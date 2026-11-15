@@ -43,6 +43,7 @@ pub enum OpenedFile {
         title: String,
         branch: String,
         summary: Option<String>,
+        developer: Option<String>,
         icon: Option<String>,
         size: u64,
         runtime: Option<String>,
@@ -68,6 +69,7 @@ pub enum OpenedFile {
         description: String,
         license: String,
         homepage: Option<String>,
+        vendor: Option<String>,
         size: u64,
         installed: bool,
         system: bool,
@@ -84,7 +86,10 @@ pub enum OpenedFile {
         summary: String,
         description: String,
         homepage: Option<String>,
+        maintainer: Option<String>,
         size: u64,
+        /// The file name of its main app's menu entry.
+        desktop: Option<String>,
         icon: Option<String>,
         installed: bool,
         runs_here: bool,
@@ -97,6 +102,8 @@ pub enum OpenedFile {
         version: Option<String>,
         icon: Option<String>,
         size: u64,
+        /// The file name of its menu entry.
+        desktop: Option<String>,
         /// What it declared it needs, for a Sabine app.
         permissions: Option<Permissions>,
         /// Why it asks to run outside a sandbox, when it does.
@@ -170,46 +177,58 @@ impl BundleMetadata<'_> {
     }
 }
 
-/// The untranslated name and summary of the app in a bundle's AppStream
-/// data, which describes just that app: its first component.
-fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
+#[derive(Default)]
+struct BundleAppstream {
+    name: Option<String>,
+    summary: Option<String>,
+    developer: Option<String>,
+}
+
+/// The untranslated name, summary and developer of the app in a bundle's
+/// AppStream data, which describes just that app: its first component.
+fn bundle_appstream(compressed: &[u8]) -> BundleAppstream {
     let mut xml = String::new();
     if flate2::read::GzDecoder::new(compressed)
         .read_to_string(&mut xml)
         .is_err()
     {
-        return (None, None);
+        return BundleAppstream::default();
     }
     let mut reader = quick_xml::Reader::from_str(&xml);
-    let (mut name, mut summary) = (None, None);
+    let mut found = BundleAppstream::default();
     let (mut current, mut field, mut text) = (String::new(), None, String::new());
     loop {
         match reader.read_event() {
             Ok(Event::Start(element)) => {
-                let tag = element.local_name().as_ref().to_owned();
+                let tag: String = element.local_name().as_ref().to_owned();
                 let localized = element
                     .try_get_attribute("xml:lang")
                     .ok()
                     .flatten()
                     .is_some();
-                let of_app = current == "component";
-                if (tag == "name" || tag == "summary") && !localized && of_app {
-                    field = Some(tag.clone());
+                let wanted = match (current.as_str(), tag.as_str()) {
+                    ("component", "name" | "summary") => Some(tag.clone()),
+                    ("component", "developer_name") | ("developer", "name") => {
+                        Some("developer".to_owned())
+                    }
+                    _ => None,
+                };
+                if let Some(wanted) = wanted.filter(|_| !localized) {
+                    field = Some((wanted, tag.clone()));
                     text.clear();
                 }
                 current = tag;
             }
             Ok(Event::Text(content)) if field.is_some() => text.push_str(&content.xml10_content()),
             Ok(Event::End(element)) => {
-                let tag = element.local_name().as_ref().to_owned();
-                if field.as_deref() == Some(tag.as_str()) {
-                    let slot = if tag == "name" {
-                        &mut name
-                    } else {
-                        &mut summary
+                let tag: String = element.local_name().as_ref().to_owned();
+                if let Some((wanted, _)) = field.take_if(|(_, open)| *open == tag) {
+                    let slot = match wanted.as_str() {
+                        "name" => &mut found.name,
+                        "summary" => &mut found.summary,
+                        _ => &mut found.developer,
                     };
                     slot.get_or_insert_with(|| text.trim().to_owned());
-                    field = None;
                 }
                 if tag == "component" {
                     break;
@@ -220,10 +239,12 @@ fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
             Ok(_) => {}
         }
     }
-    (
-        name.filter(|name| !name.is_empty()),
-        summary.filter(|summary| !summary.is_empty()),
-    )
+    let present = |value: Option<String>| value.filter(|value| !value.is_empty());
+    BundleAppstream {
+        name: present(found.name),
+        summary: present(found.summary),
+        developer: present(found.developer),
+    }
 }
 
 fn save_icon(bytes: &[u8], extension: &str) -> Option<String> {
@@ -258,7 +279,11 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
             .find_map(|line| line.strip_prefix("runtime="))
             .map(str::to_owned)
     });
-    let (name, summary) = metadata
+    let BundleAppstream {
+        name,
+        summary,
+        developer,
+    } = metadata
         .bytes("appdata")
         .map(bundle_appstream)
         .unwrap_or_default();
@@ -272,6 +297,7 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
         id: id.to_owned(),
         branch: branch.to_owned(),
         summary,
+        developer,
         icon,
         size,
         runtime,
@@ -309,13 +335,21 @@ fn flatpak_repo(path: &str) -> Result<OpenedFile, String> {
 fn package(path: &str) -> Result<OpenedFile, String> {
     let output = Command::new("rpm")
         .args(["--query", "--package", "--queryformat"])
-        .arg("%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{SUMMARY}\x1f%{LICENSE}\x1f%{URL}\x1f%{SIZE}\x1f%{DESCRIPTION}")
+        .arg("%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{SUMMARY}\x1f%{LICENSE}\x1f%{URL}\x1f%{VENDOR}\x1f%{SIZE}\x1f%{DESCRIPTION}")
         .arg(path)
         .output()
         .map_err(|error| error.to_string())?;
     let text = String::from_utf8_lossy(&output.stdout);
-    let [name, version, summary, license, url, size, description] =
-        text.split('\x1f').collect::<Vec<_>>()[..]
+    let [
+        name,
+        version,
+        summary,
+        license,
+        url,
+        vendor,
+        size,
+        description,
+    ] = text.split('\x1f').collect::<Vec<_>>()[..]
     else {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     };
@@ -341,6 +375,7 @@ fn package(path: &str) -> Result<OpenedFile, String> {
         description: description.trim().to_owned(),
         license: license.to_owned(),
         homepage: (url != "(none)").then(|| url.to_owned()),
+        vendor: (vendor != "(none)").then(|| vendor.to_owned()),
         size: size.parse().unwrap_or(0),
         installed,
         system,
@@ -409,7 +444,9 @@ fn deb(path: &str) -> Result<OpenedFile, String> {
         summary: deb.summary,
         description: deb.description,
         homepage: deb.homepage,
+        maintainer: deb.maintainer,
         size: deb.size,
+        desktop: deb.desktop,
         name,
     })
 }
@@ -430,6 +467,7 @@ fn appimage_file(path: &str) -> Result<OpenedFile, String> {
             .map(|metadata| metadata.len())
             .unwrap_or(0),
         icon,
+        desktop: bundle.desktop_id.as_ref().map(|id| format!("{id}.desktop")),
         permissions: bundle
             .declaration
             .as_ref()

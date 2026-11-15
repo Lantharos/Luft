@@ -1,4 +1,4 @@
-import type { AppUpdate, InstalledApp, Job } from '#lib/bindings.js';
+import type { AppUpdate, InstalledApp, Job, StoreDetails } from '#lib/bindings.js';
 
 export function removeJob(app: InstalledApp): Job {
 	if (app.listing) return { kind: 'removeStore', id: app.listing };
@@ -17,4 +17,10 @@ export function updateJob(update: AppUpdate): Job {
 	if (update.source === 'debian') return { kind: 'updateDebs', packages: [update.package!] };
 	if (update.source === 'storeTool') return { kind: 'updateStoreTool', name: update.id };
 	return { kind: 'updateAppImage', id: update.id };
+}
+
+export function storeJob(store: StoreDetails, fullAccess: boolean, updating = false): Job | null {
+	if (!store.installer || !store.version) return null;
+	const consent = { version: store.version, permissions: store.declared, extension: store.extension, fullAccess };
+	return updating ? { kind: 'updateStore', id: store.id, consent } : { kind: 'installStore', id: store.id, consent };
 }

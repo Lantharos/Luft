@@ -4,18 +4,20 @@ mod commands;
 mod developer;
 mod library;
 mod operations;
+mod windows;
 
 use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::SabineWindow;
 
 use operations::Queue;
+use windows::Windows;
 
 const GLASS_WINDOW: GlassWindow = GlassWindow {
     title: "Schelf",
     size: (1180, 780),
     min_size: (820, 560),
     sidebar_width: 280,
-    single_instance: Some("com.lantharos.schelf"),
+    single_instance: None,
     backdrop: Backdrop::WINDOW,
 };
 
@@ -30,10 +32,11 @@ pub fn run_app() -> ! {
     }
     let events = Events::default();
     let queue = Queue::start(events.clone());
+    let windows = Windows::new(queue.clone(), events.clone());
     let served = queue.clone();
     luft_app::run(
         &events,
-        |window| build_window(window, &queue),
+        |window| build_window(window, &queue, &windows),
         move |_| {
             std::thread::spawn(background::integrate_apps);
             luft_app::spawn(serve(served));
@@ -47,8 +50,8 @@ async fn serve(queue: Queue) {
     }
 }
 
-fn build_window(window: SabineWindow, queue: &Queue) -> SabineWindow {
-    let window = app::register(GLASS_WINDOW.apply(window));
+fn build_window(window: SabineWindow, queue: &Queue, windows: &Windows) -> SabineWindow {
+    let window = windows.register(app::register(GLASS_WINDOW.apply(window), windows));
     let window = commands::catalog::register(window);
     let window = commands::store::register(window);
     let window = commands::sources::register(window);

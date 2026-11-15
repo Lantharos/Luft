@@ -1,6 +1,7 @@
 use std::env;
 use std::path::{Component, Path, PathBuf};
 
+use sabine::SingleInstanceActivation;
 use sabine::documents::{self, Handed};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -16,6 +17,15 @@ const ROOT: &str = "/";
 pub struct Activation {
     arguments: Vec<String>,
     working_directory: Option<PathBuf>,
+}
+
+impl From<&SingleInstanceActivation> for Activation {
+    fn from(activation: &SingleInstanceActivation) -> Self {
+        Self {
+            arguments: activation.arguments.clone(),
+            working_directory: activation.working_directory.clone(),
+        }
+    }
 }
 
 impl Activation {

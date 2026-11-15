@@ -13,7 +13,6 @@ export type Route =
 	| { page: 'collection'; collection: Collection }
 	| { page: 'search'; query: string }
 	| { page: 'app'; target: AppTarget; name: string; askFullAccess?: boolean; reviewAccess?: boolean }
-	| { page: 'file'; path: string }
 	| { page: 'sources' }
 	| { page: 'project'; id: string; tab: ProjectTab }
 	| { page: 'release'; id: string; release: string; version: string }

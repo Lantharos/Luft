@@ -27,8 +27,6 @@ export function title(route: Route) {
 			return `Results for “${route.query}”`;
 		case 'app':
 			return '';
-		case 'file':
-			return 'Install from a file';
 		case 'sources':
 			return 'Software sources';
 		case 'project':

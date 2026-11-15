@@ -8,7 +8,7 @@
 
 @mixin panel-ink {
   color: ink();
-  .kestrel-task-button:hover, .kestrel-status-button:hover, .kestrel-peek:hover { background-color: fill(0.10); }
+  .kestrel-task-button:hover, .kestrel-status-button:hover, .kestrel-extension-element:hover, .kestrel-peek:hover { background-color: fill(0.10); }
   .kestrel-task-button:active, .kestrel-task-plate { background-color: fill(0.15); }
   .kestrel-status-button:active { background-color: fill(0.14); }
   .kestrel-task-button:focus, .kestrel-status-button:focus { background-color: fill(0.17); }

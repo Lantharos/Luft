@@ -60,7 +60,9 @@ export async function checkTray() {
   const between = left(status()) - right(post);
   console.log(`Post in the tray: gaps between the icons ${gaps.join(', ')}px, ${between}px between the buttons, icons ${row.map(icon => `${icon.width}×${icon.height}`).join(', ')}`);
   require(gaps.every(gap => gap === gaps[0]), 'Post’s icon is as far from the network icon as the status icons are from each other');
-  require(between >= 1 && between <= 2, 'Post’s button sits 1 or 2 pixels from the status button');
+  require(between === 0, 'Post’s button meets the status button');
+  const centred = (button: Clutter.Actor, first: Clutter.Actor, last: Clutter.Actor) => Math.abs((left(first) - left(button)) - (right(button) - right(last))) < 1;
+  require(centred(post, own!, own!) && centred(status(), shown[0]!, shown.at(-1)!), 'each button has as much room on one side of its icons as on the other');
   require(shown.every(icon => icon.width === own!.width && icon.height === own!.height), 'Post’s icon is the size of the status icons');
   require(row.every(icon => Math.abs(middle(icon) - middle(own!)) < 1), 'and lines up with them');
   const weights = await Promise.all(shown.map((icon, index) => inkOf(icon, `post-weight-status-${index}`)));

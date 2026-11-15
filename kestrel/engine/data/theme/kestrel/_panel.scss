@@ -11,14 +11,14 @@
 
 .kestrel-panel.kestrel-taskbar-transparent { @include halo(soft); }
 .kestrel-panel.kestrel-taskbar-transparent .kestrel-tablet-strip-handle { box-shadow: 0 0 3px halo(0.55); }
-.kestrel-extension-element { padding: 0 8px; }
+.kestrel-extension-element { padding: 0 8px; border-radius: 12px; transition-duration: $motion-tap; }
 .kestrel-taskbar-compact .kestrel-status-button { height: 34px; padding: 0 6px; }
 .kestrel-taskbar-large .kestrel-status-button { height: 48px; padding: 0 10px; }
 .kestrel-taskbar-compact .kestrel-extension-element { padding: 0 6px; }
 .kestrel-taskbar-large .kestrel-extension-element { padding: 0 10px; }
-.kestrel-taskbar-touch .kestrel-extension-element { padding: 0 14px; }
-.kestrel-taskbar-compact .kestrel-task-button, .kestrel-taskbar-compact .kestrel-status-button, .kestrel-taskbar-compact .kestrel-task-attention { border-radius: 10px; }
-.kestrel-taskbar-large .kestrel-task-button, .kestrel-taskbar-large .kestrel-status-button, .kestrel-taskbar-large .kestrel-task-attention { border-radius: 14px; }
+.kestrel-taskbar-touch .kestrel-extension-element { padding: 0 14px; border-radius: 16px; }
+.kestrel-taskbar-compact .kestrel-task-button, .kestrel-taskbar-compact .kestrel-status-button, .kestrel-taskbar-compact .kestrel-extension-element, .kestrel-taskbar-compact .kestrel-task-attention { border-radius: 10px; }
+.kestrel-taskbar-large .kestrel-task-button, .kestrel-taskbar-large .kestrel-status-button, .kestrel-taskbar-large .kestrel-extension-element, .kestrel-taskbar-large .kestrel-task-attention { border-radius: 14px; }
 .kestrel-taskbar-large .kestrel-clock { font-size: 13px; }
 .kestrel-taskbar-touch .kestrel-status-button { height: 52px; padding: 0 14px; border-radius: 16px; }
 .kestrel-taskbar-touch .kestrel-task-button, .kestrel-taskbar-touch .kestrel-task-attention { border-radius: 16px; }
@@ -44,18 +44,13 @@
 .kestrel-taskbar-vertical .kestrel-privacy { width: 28px; padding: 10px 0; margin: 4px 0; }
 .kestrel-taskbar-vertical .kestrel-status-icons { spacing: 10px; }
 
-.kestrel-status-group { spacing: 2px; }
+.kestrel-status-group { spacing: 0; }
 .kestrel-post-icons { spacing: 6px; }
 .kestrel-post-progress { font-size: 12px; font-weight: 500; font-feature-settings: "tnum"; }
-.kestrel-panel .kestrel-status-button.kestrel-post-button { padding-left: 5px; padding-right: 5px; }
-.kestrel-panel .kestrel-status-button.kestrel-after-post { padding-left: 5px; }
-.kestrel-panel .kestrel-status-button.kestrel-after-post:rtl { padding-left: 8px; padding-right: 5px; }
-.kestrel-panel.kestrel-taskbar-compact .kestrel-status-button.kestrel-after-post:rtl { padding-left: 6px; }
-.kestrel-panel.kestrel-taskbar-large .kestrel-status-button.kestrel-after-post:rtl { padding-left: 10px; }
-.kestrel-panel.kestrel-taskbar-touch .kestrel-status-button.kestrel-after-post:rtl { padding-left: 14px; }
-.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-post-button { padding: 4px 0; }
-.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-after-post,
-.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-after-post:rtl { padding-top: 4px; padding-left: 0; padding-right: 0; }
+.kestrel-panel .kestrel-status-button.kestrel-post-button,
+.kestrel-panel .kestrel-status-button.kestrel-after-post { padding-left: 6px; padding-right: 6px; }
+.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-post-button,
+.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-after-post { padding: 5px 0; }
 .kestrel-taskbar-vertical .kestrel-clock { font-size: 11px; text-align: center; }
 .kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-clock { font-size: 12px; }
 .kestrel-taskbar-vertical .kestrel-peek { width: auto; height: 8px; }
@@ -73,7 +68,7 @@
   transition-duration: $motion-tap;
 }
 .kestrel-task-button StIcon { icon-shadow: none; }
-.kestrel-status-button:hover, .kestrel-icon-button:hover, .kestrel-text-button:hover { background-color: fill(0.10); }
+.kestrel-status-button:hover, .kestrel-extension-element:hover, .kestrel-icon-button:hover, .kestrel-text-button:hover { background-color: fill(0.10); }
 
 .kestrel-running-dot { margin: 0; border-radius: 2px; transition-duration: $motion-quick; }
 .kestrel-task-attention { border-radius: 12px; background-color: rgba(255, 150, 40, 0.62); }

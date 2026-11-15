@@ -25,6 +25,7 @@ static long (*bpf_map_update_elem)(void *map, const void *key, const void *value
 	(void *)BPF_FUNC_map_update_elem;
 static long (*bpf_map_delete_elem)(void *map, const void *key) = (void *)BPF_FUNC_map_delete_elem;
 static __u64 (*bpf_get_socket_cookie)(void *ctx) = (void *)BPF_FUNC_get_socket_cookie;
+static __u64 (*bpf_get_netns_cookie)(void *ctx) = (void *)BPF_FUNC_get_netns_cookie;
 static __u64 (*bpf_get_current_pid_tgid)(void) = (void *)BPF_FUNC_get_current_pid_tgid;
 static long (*bpf_ringbuf_output)(void *ringbuf, void *data, __u64 size, __u64 flags) =
 	(void *)BPF_FUNC_ringbuf_output;
@@ -46,8 +47,15 @@ static int tracked(__u32 protocol)
 	return protocol == IPPROTO_TCP || protocol == IPPROTO_UDP;
 }
 
+static int on_host_network(void *ctx)
+{
+	return bpf_get_netns_cookie(ctx) == bpf_get_netns_cookie(0);
+}
+
 static void ask(void *ctx)
 {
+	if (!on_host_network(ctx))
+		return;
 	__u64 cookie = bpf_get_socket_cookie(ctx);
 	__u8 state = ASKED;
 	bpf_map_update_elem(&sockets, &cookie, &state, BPF_ANY);

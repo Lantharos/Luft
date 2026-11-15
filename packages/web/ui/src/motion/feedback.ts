@@ -11,17 +11,21 @@ const SPEED_SMOOTHING = 0.4;
 
 const scales = new WeakMap<HTMLElement, Animation>();
 
-function surfaceFilledBy(element: HTMLElement) {
+function squeezedFor(element: HTMLElement) {
 	const surface = element.closest<HTMLElement>(SURFACE);
 	if (!surface) return element;
 	const inner = element.getBoundingClientRect();
 	const outer = surface.getBoundingClientRect();
-	return Math.abs(inner.width - outer.width) < FILLS_WITHIN && Math.abs(inner.height - outer.height) < FILLS_WITHIN ? surface : element;
+	if (Math.abs(inner.width - outer.width) >= FILLS_WITHIN) return element;
+	if (Math.abs(inner.height - outer.height) < FILLS_WITHIN) return surface;
+	let row = element;
+	while (row.parentElement !== surface) row = row.parentElement!;
+	return row;
 }
 
 function pressable(target: EventTarget | null) {
 	const element = target instanceof Element ? target.closest<HTMLElement>(PRESSABLE) : null;
-	return element && !element.matches(UNPRESSABLE) ? surfaceFilledBy(element) : null;
+	return element && !element.matches(UNPRESSABLE) ? squeezedFor(element) : null;
 }
 
 function pressedScale(element: HTMLElement) {
@@ -37,7 +41,9 @@ function scaleTo(element: HTMLElement, scale: number, role: RoleToken, fill: Fil
 	const animation = element.animate({ scale: [from === 'none' ? '1' : from, String(scale)] }, { duration: role.duration, easing: role.easing, fill });
 	scales.set(element, animation);
 	animation.onfinish = () => {
-		if (fill === 'none' && scales.get(element) === animation) scales.delete(element);
+		if (fill !== 'none' || scales.get(element) !== animation) return;
+		scales.delete(element);
+		delete element.dataset.pressed;
 	};
 }
 
@@ -50,6 +56,7 @@ export function pressFeedback(): () => void {
 		const scale = element ? pressedScale(element) : 1;
 		if (!element || scale === 1) return;
 		pressed.set(event.pointerId, element);
+		element.dataset.pressed = '';
 		scaleTo(element, scale, Role.press, 'forwards');
 	};
 

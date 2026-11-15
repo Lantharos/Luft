@@ -36,6 +36,8 @@ typedef struct _StCursorFrame StCursorFrame;
 
 struct _StCursorFrame
 {
+  GFile *file;
+  gboolean loaded;
   RsvgHandle *image;
   cairo_surface_t *surface;
   CoglTexture *texture;
@@ -69,6 +71,7 @@ clear_frame (gpointer user_data)
 {
   StCursorFrame *frame = user_data;
 
+  g_clear_object (&frame->file);
   g_clear_object (&frame->image);
   g_clear_pointer (&frame->surface, cairo_surface_destroy);
   g_clear_object (&frame->texture);
@@ -152,7 +155,6 @@ load_cursor (StCursor  *cursor,
   g_autoptr (JsonParser) json_parser = NULL;
   g_autoptr (GFile) dir = NULL;
   g_autoptr (GInputStream) istream = NULL;
-  g_autofree char *uri = NULL;
   JsonNode *root;
   JsonArray *frames;
   int i;
@@ -181,7 +183,6 @@ load_cursor (StCursor  *cursor,
       StCursorFrame frame = { 0, };
       JsonObject *frame_desc;
       const char *filename;
-      g_autoptr (GFile) svg_file = NULL;
 
       frame_desc = json_array_get_object_element (frames, i);
       if (!frame_desc)
@@ -191,14 +192,13 @@ load_cursor (StCursor  *cursor,
         }
 
       filename = json_object_get_string_member_with_default (frame_desc, "filename", NULL);
-      svg_file = g_file_get_child (dir, filename);
-
-      frame.image =
-        rsvg_handle_new_from_gfile_sync (svg_file, RSVG_HANDLE_FLAGS_NONE, NULL, error);
-      if (!frame.image)
-        return FALSE;
-
-      rsvg_handle_get_intrinsic_size_in_pixels (frame.image, &frame.width, &frame.height);
+      frame.file = g_file_get_child (dir, filename);
+      if (!g_file_query_exists (frame.file, NULL))
+        {
+          g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, "%s is missing", filename);
+          g_object_unref (frame.file);
+          return FALSE;
+        }
 
       frame.delay =
         json_object_get_int_member_with_default (frame_desc, "delay", 0);
@@ -299,6 +299,32 @@ st_cursor_initable_iface_init (GInitableIface *iface)
   iface->init = st_cursor_initable_init;
 }
 
+static StCursorFrame *
+current_frame (StCursor *cursor)
+{
+  StCursorFrame *frame;
+  g_autoptr (GError) error = NULL;
+  g_autofree char *uri = NULL;
+
+  g_assert (cursor->current_frame < cursor->frames->len);
+  frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
+  if (frame->loaded)
+    return frame;
+
+  frame->loaded = TRUE;
+  frame->image = rsvg_handle_new_from_gfile_sync (frame->file, RSVG_HANDLE_FLAGS_NONE, NULL, &error);
+  if (frame->image)
+    {
+      rsvg_handle_get_intrinsic_size_in_pixels (frame->image, &frame->width, &frame->height);
+      return frame;
+    }
+
+  uri = g_file_get_uri (frame->file);
+  g_warning ("Could not load cursor frame %s: %s", uri, error->message);
+  frame->width = frame->height = frame->nominal_size;
+  return frame;
+}
+
 static cairo_surface_t *
 create_surface_for_frame (StCursor      *cursor,
                           StCursorFrame *frame)
@@ -314,6 +340,9 @@ create_surface_for_frame (StCursor      *cursor,
   cairo_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, w, h);
   if (!cairo_surface)
     return NULL;
+
+  if (!frame->image)
+    return cairo_surface;
 
   cairo_ctx = cairo_create (cairo_surface);
 
@@ -385,8 +414,7 @@ st_cursor_get_geometry (ClutterCursor *clutter_cursor,
       return;
     }
 
-  g_assert (cursor->current_frame < cursor->frames->len);
-  frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
+  frame = current_frame (cursor);
 
   scale = (double) meta_cursor_get_size (META_CURSOR (cursor)) / frame->nominal_size;
 
@@ -411,8 +439,7 @@ st_cursor_get_data (ClutterCursor *clutter_cursor,
   if (cursor->frames->len == 0)
     return NULL;
 
-  g_assert (cursor->current_frame < cursor->frames->len);
-  frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
+  frame = current_frame (cursor);
 
   if (cursor->invalidated)
     {
@@ -436,8 +463,7 @@ st_cursor_get_texture (ClutterCursor *clutter_cursor)
   if (cursor->frames->len == 0)
     return NULL;
 
-  g_assert (cursor->current_frame < cursor->frames->len);
-  frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
+  frame = current_frame (cursor);
 
   if (cursor->texture_invalidated || _st_texture_is_defunct (frame->texture))
     {
@@ -512,7 +538,7 @@ st_cursor_prepare_at (ClutterCursor *clutter_cursor,
   cursor->scale = best_scale;
   st_cursor_invalidate (clutter_cursor);
 
-  frame = &g_array_index (cursor->frames, StCursorFrame, cursor->current_frame);
+  frame = current_frame (cursor);
   scale = (double) meta_cursor_get_size (META_CURSOR (cursor)) / frame->nominal_size;
   clutter_cursor_set_viewport_dst_size (clutter_cursor,
                                         frame->width * scale,

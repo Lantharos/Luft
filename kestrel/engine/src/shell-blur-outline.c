@@ -30,12 +30,42 @@ cogl_context_of (ClutterActor *actor)
   return clutter_backend_get_cogl_context (backend);
 }
 
+#define LINE_GREY 0.5f
+#define LINE_ALPHA 0.3f
+
+static const char *outline_glsl_declarations =
+  "varying vec2 outline_position;\n"
+  "uniform vec4 outline_bounds;\n"
+  "uniform float outline_radius;\n"
+  "uniform vec2 outline_spans[" G_STRINGIFY (SHELL_BLUR_OUTLINE_SPANS) "];\n"
+  "uniform int outline_span_count;\n"
+  "uniform float outline_axis;\n"
+  "uniform float outline_within;\n";
+
+static const char *outline_glsl =
+  "vec2 half_size = outline_bounds.zw * 0.5;\n"
+  "vec2 q = abs(outline_position - outline_bounds.xy - half_size) - half_size + outline_radius;\n"
+  "float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - outline_radius;\n"
+  "float aa = max(fwidth(d), 0.001);\n"
+  "float outside = smoothstep(-aa * 0.5, aa * 0.5, d);\n"
+  "float inside = smoothstep(-aa * 0.5, aa * 0.5, d + 1.0);\n"
+  "float at = mix(outline_position.x, outline_position.y, outline_axis);\n"
+  "float spanned = 0.0;\n"
+  "for (int i = 0; i < " G_STRINGIFY (SHELL_BLUR_OUTLINE_SPANS) "; i++) {\n"
+  "  vec2 span = outline_spans[i];\n"
+  "  if (i < outline_span_count)\n"
+  "    spanned = max(spanned, clamp(at - span.x + 0.5, 0.0, 1.0) * clamp(span.y - at + 0.5, 0.0, 1.0));\n"
+  "}\n"
+  "cogl_color_out *= (inside - outside) * mix(1.0 - spanned, spanned, outline_within);\n";
+
 static CoglPipeline *
-create_outline_pipeline (CoglContext *ctx)
+create_outline_pipeline (CoglContext *ctx,
+                         gboolean     shaded)
 {
-  static CoglPipelineKey outline_pipeline_key = "shell-blur-effect-outline";
-  CoglPipeline *pipeline =
-    cogl_context_get_named_pipeline (ctx, &outline_pipeline_key);
+  static CoglPipelineKey plain_key = "shell-blur-effect-outline";
+  static CoglPipelineKey shaded_key = "shell-blur-effect-outline-shaded";
+  CoglPipelineKey *key = shaded ? &shaded_key : &plain_key;
+  CoglPipeline *pipeline = cogl_context_get_named_pipeline (ctx, key);
 
   if (G_UNLIKELY (pipeline == NULL))
     {
@@ -43,25 +73,20 @@ create_outline_pipeline (CoglContext *ctx)
 
       pipeline = cogl_pipeline_new (ctx);
       cogl_pipeline_set_layer_null_texture (pipeline, 0);
+      if (shaded)
+        cogl_pipeline_set_blend (pipeline,
+                                 "RGBA = ADD(SRC_COLOR*(DST_COLOR), DST_COLOR*(1-SRC_COLOR[A]))",
+                                 NULL);
       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_VERTEX,
         "varying vec2 outline_position;\n",
         "outline_position = cogl_tex_coord0_in.xy;\n");
       cogl_pipeline_add_snippet (pipeline, snippet);
       g_object_unref (snippet);
       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
-        "varying vec2 outline_position;\n"
-        "uniform vec4 outline_bounds;\n"
-        "uniform float outline_radius;\n",
-        "vec2 half_size = outline_bounds.zw * 0.5;\n"
-        "vec2 q = abs(outline_position - outline_bounds.xy - half_size) - half_size + outline_radius;\n"
-        "float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - outline_radius;\n"
-        "float aa = max(fwidth(d), 0.001);\n"
-        "float outside = smoothstep(-aa * 0.5, aa * 0.5, d);\n"
-        "float inside = smoothstep(-aa * 0.5, aa * 0.5, d + 1.0);\n"
-        "cogl_color_out *= inside - outside;\n");
+                                  outline_glsl_declarations, outline_glsl);
       cogl_pipeline_add_snippet (pipeline, snippet);
       g_object_unref (snippet);
-      cogl_context_set_named_pipeline (ctx, &outline_pipeline_key, pipeline);
+      cogl_context_set_named_pipeline (ctx, key, pipeline);
     }
 
   return cogl_pipeline_copy (pipeline);
@@ -118,64 +143,111 @@ exposed_sides (ClutterActor *actor)
   return sides;
 }
 
-/* The neutral line windows get along their edge, on top of the surface,
- * leaving out the sides that lie against the screen's edge */
-void
-shell_blur_add_outline (ClutterActor     *actor,
-                        ClutterPaintNode *node,
-                        float             corner_radius,
-                        uint8_t           paint_opacity)
+typedef struct
+{
+  float width;
+  float height;
+  float band;
+  float radius;
+  float bounds[4];
+  float axis;
+  Sides sides;
+} Shape;
+
+static void
+add_outline_node (ClutterActor           *actor,
+                  ClutterPaintNode       *node,
+                  const Shape            *shape,
+                  const ShellBlurOutline *outline,
+                  gboolean                shaded,
+                  const float            *color,
+                  float                   opacity)
 {
   g_autoptr (CoglPipeline) pipeline = NULL;
   g_autoptr (ClutterPaintNode) outline_node = NULL;
-  float width, height, radius, band, alpha, top, bottom, reach;
-  float bounds[4];
-  CoglColor color;
-  Sides sides;
+  float width = shape->width, height = shape->height;
+  float top, bottom;
+  CoglColor tint;
 
-  clutter_actor_get_size (actor, &width, &height);
-  if (width < 2 || height < 2 || paint_opacity == 0)
-    return;
-
-  sides = exposed_sides (actor);
-  if (sides == 0)
-    return;
-
-  radius = MIN (MAX (corner_radius, 0), MIN (width, height) / 2.0f);
-  band = MIN (MAX (ceilf (radius) + 1.0f, 2.0f), height / 2.0f);
-  alpha = 0.3f * paint_opacity / 255.0f;
-  /* Push the shape past the sides that get no line, so its edge never
-   * shows there */
-  reach = 2.0f * (radius + 2.0f);
-  bounds[0] = sides & SIDE_LEFT ? 0 : -reach;
-  bounds[1] = sides & SIDE_TOP ? 0 : -reach;
-  bounds[2] = width - bounds[0] + (sides & SIDE_RIGHT ? 0 : reach);
-  bounds[3] = height - bounds[1] + (sides & SIDE_BOTTOM ? 0 : reach);
-
-  pipeline = create_outline_pipeline (cogl_context_of (actor));
-  cogl_color_init_from_4f (&color, 0.5f * alpha, 0.5f * alpha, 0.5f * alpha, alpha);
-  cogl_pipeline_set_color (pipeline, &color);
+  pipeline = create_outline_pipeline (cogl_context_of (actor), shaded);
+  cogl_color_init_from_4f (&tint, color[0] * opacity, color[1] * opacity,
+                           color[2] * opacity, color[3] * opacity);
+  cogl_pipeline_set_color (pipeline, &tint);
   cogl_pipeline_set_uniform_float (pipeline,
                                    cogl_pipeline_get_uniform_location (pipeline, "outline_bounds"),
-                                   4, 1, bounds);
+                                   4, 1, shape->bounds);
   cogl_pipeline_set_uniform_1f (pipeline,
                                 cogl_pipeline_get_uniform_location (pipeline, "outline_radius"),
-                                radius);
+                                shape->radius);
+  cogl_pipeline_set_uniform_float (pipeline,
+                                   cogl_pipeline_get_uniform_location (pipeline, "outline_spans"),
+                                   2, SHELL_BLUR_OUTLINE_SPANS, outline->spans);
+  cogl_pipeline_set_uniform_1i (pipeline,
+                                cogl_pipeline_get_uniform_location (pipeline, "outline_span_count"),
+                                outline->n_spans);
+  cogl_pipeline_set_uniform_1f (pipeline,
+                                cogl_pipeline_get_uniform_location (pipeline, "outline_axis"),
+                                shape->axis);
+  cogl_pipeline_set_uniform_1f (pipeline,
+                                cogl_pipeline_get_uniform_location (pipeline, "outline_within"),
+                                shaded ? 0.f : (float) outline->shaded);
 
   outline_node = clutter_pipeline_node_new (pipeline);
   clutter_paint_node_set_static_name (outline_node, "ShellBlurEffect (outline)");
   clutter_paint_node_add_child (node, outline_node);
-  top = sides & SIDE_TOP ? band : 0;
-  bottom = sides & SIDE_BOTTOM ? height - band : height;
-  if (sides & SIDE_TOP)
+  top = shape->sides & SIDE_TOP ? shape->band : 0;
+  bottom = shape->sides & SIDE_BOTTOM ? height - shape->band : height;
+  if (shape->sides & SIDE_TOP)
     add_outline_band (outline_node, 0, 0, width, top);
-  if (sides & SIDE_BOTTOM)
+  if (shape->sides & SIDE_BOTTOM)
     add_outline_band (outline_node, 0, bottom, width, height);
   if (bottom > top)
     {
-      if (sides & SIDE_LEFT)
+      if (shape->sides & SIDE_LEFT)
         add_outline_band (outline_node, 0, top, 2, bottom);
-      if (sides & SIDE_RIGHT)
+      if (shape->sides & SIDE_RIGHT)
         add_outline_band (outline_node, width - 2, top, width, bottom);
     }
+}
+
+/* The neutral line windows get along their edge, on top of the surface,
+ * leaving out the sides that lie against the screen's edge. A shaded
+ * outline lightens or darkens what is beneath it instead, and keeps the
+ * neutral line only along its spans */
+void
+shell_blur_add_outline (ClutterActor           *actor,
+                        ClutterPaintNode       *node,
+                        const ShellBlurOutline *outline,
+                        float                   corner_radius,
+                        uint8_t                 paint_opacity)
+{
+  static const float line[4] = { LINE_GREY * LINE_ALPHA, LINE_GREY * LINE_ALPHA, LINE_GREY * LINE_ALPHA, LINE_ALPHA };
+  float shade[4] = { outline->lift, outline->lift, outline->lift, outline->dim };
+  float reach, opacity;
+  Shape shape;
+
+  clutter_actor_get_size (actor, &shape.width, &shape.height);
+  if (shape.width < 2 || shape.height < 2 || paint_opacity == 0)
+    return;
+
+  shape.sides = exposed_sides (actor);
+  if (shape.sides == 0)
+    return;
+
+  shape.radius = MIN (MAX (corner_radius, 0), MIN (shape.width, shape.height) / 2.0f);
+  shape.band = MIN (MAX (ceilf (shape.radius) + 1.0f, 2.0f), shape.height / 2.0f);
+  shape.axis = shape.sides & (SIDE_TOP | SIDE_BOTTOM) ? 0.f : 1.f;
+  /* Push the shape past the sides that get no line, so its edge never
+   * shows there */
+  reach = 2.0f * (shape.radius + 2.0f);
+  shape.bounds[0] = shape.sides & SIDE_LEFT ? 0 : -reach;
+  shape.bounds[1] = shape.sides & SIDE_TOP ? 0 : -reach;
+  shape.bounds[2] = shape.width - shape.bounds[0] + (shape.sides & SIDE_RIGHT ? 0 : reach);
+  shape.bounds[3] = shape.height - shape.bounds[1] + (shape.sides & SIDE_BOTTOM ? 0 : reach);
+  opacity = paint_opacity / 255.0f;
+
+  if (outline->shaded)
+    add_outline_node (actor, node, &shape, outline, TRUE, shade, opacity);
+  if (!outline->shaded || outline->n_spans > 0)
+    add_outline_node (actor, node, &shape, outline, FALSE, line, opacity);
 }

@@ -40,7 +40,7 @@ function checkShading(name: string, label?: string) {
     `the ${name} taskbar draws its text and icons in ${light ? 'dark' : 'light'} ink, and its glass ${light ? 'lifts dark' : 'dims bright'} wallpapers behind it`);
 }
 
-function plainWallpaper(name: string, gray: number) {
+export function plainWallpaper(name: string, gray: number) {
   const path = scratch(`taskbar-${name}-wallpaper.png`);
   const surface = new Cairo.ImageSurface(Cairo.Format.RGB24, 64, 64);
   const context = new Cairo.Context(surface);
@@ -50,7 +50,7 @@ function plainWallpaper(name: string, gray: number) {
   return Gio.File.new_for_path(path).get_uri();
 }
 
-async function withWallpaper(uri: string, action: () => Promise<void>) {
+export async function withWallpaper(uri: string, action: () => Promise<void>) {
   const saved = PICTURES.map(key => [key, background.get_string(key)]);
   try {
     for (const key of PICTURES) background.set_string(key, uri);

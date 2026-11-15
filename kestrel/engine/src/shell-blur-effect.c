@@ -18,6 +18,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <string.h>
+
 #include <meta/compositor.h>
 #include <meta/display.h>
 #include <mtk/mtk.h>
@@ -149,6 +151,8 @@ struct _ShellBlurEffect
   float saturation;
   int surface_tint_uniform;
   int grain_uniform;
+
+  ShellBlurOutline outline;
 
   ShellBlurMode mode;
   ShellBlurStyle style;
@@ -966,7 +970,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
     }
 
   add_actor_node (self, node, -1);
-  shell_blur_add_outline (self->actor, node, self->corner_radius, paint_opacity);
+  shell_blur_add_outline (self->actor, node, &self->outline, self->corner_radius, paint_opacity);
 }
 
 static void
@@ -1106,6 +1110,18 @@ shell_blur_effect_set_property (GObject      *object,
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
+}
+
+static void
+set_outline (ShellBlurEffect        *self,
+             const ShellBlurOutline *outline)
+{
+  if (memcmp (&self->outline, outline, sizeof (ShellBlurOutline)) == 0)
+    return;
+
+  self->outline = *outline;
+  if (self->actor)
+    clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
 }
 
 static void
@@ -1299,4 +1315,48 @@ shell_blur_effect_set_style (ShellBlurEffect *self,
     clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STYLE]);
+}
+
+/**
+ * shell_blur_effect_set_outline_shade:
+ * @self: a #ShellBlurEffect
+ * @lift: how much lighter the outline makes what it covers
+ * @dim: how much darker the outline makes what it covers
+ * @spans: (array length=n_spans): start and end of each stretch that keeps
+ *   the neutral line, in pixels along the outline
+ * @n_spans: how many numbers @spans holds
+ *
+ * Paints the outline as a lighter or darker shade of what is beneath it,
+ * except along @spans.
+ */
+void
+shell_blur_effect_set_outline_shade (ShellBlurEffect *self,
+                                     float            lift,
+                                     float            dim,
+                                     const float     *spans,
+                                     int              n_spans)
+{
+  ShellBlurOutline outline = { .shaded = TRUE, .lift = lift, .dim = dim };
+  int i;
+
+  g_return_if_fail (SHELL_IS_BLUR_EFFECT (self));
+
+  outline.n_spans = MIN (n_spans / 2, SHELL_BLUR_OUTLINE_SPANS);
+  for (i = 0; i < outline.n_spans * 2; i++)
+    outline.spans[i] = spans[i];
+  set_outline (self, &outline);
+}
+
+/**
+ * shell_blur_effect_clear_outline_shade:
+ * @self: a #ShellBlurEffect
+ *
+ * Paints the outline as the neutral line again.
+ */
+void
+shell_blur_effect_clear_outline_shade (ShellBlurEffect *self)
+{
+  g_return_if_fail (SHELL_IS_BLUR_EFFECT (self));
+
+  set_outline (self, &(ShellBlurOutline) { 0 });
 }

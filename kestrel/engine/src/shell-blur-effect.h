@@ -74,4 +74,11 @@ ShellBlurStyle shell_blur_effect_get_style (ShellBlurEffect *self);
 void shell_blur_effect_set_style (ShellBlurEffect *self,
                                   ShellBlurStyle   style);
 
+void shell_blur_effect_set_outline_shade (ShellBlurEffect *self,
+                                          float            lift,
+                                          float            dim,
+                                          const float     *spans,
+                                          int              n_spans);
+void shell_blur_effect_clear_outline_shade (ShellBlurEffect *self);
+
 G_END_DECLS

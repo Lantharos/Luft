@@ -19,9 +19,14 @@ export class WindowOverlap {
   }
 
   touches(area: Mtk.Rectangle): boolean {
+    return this.touching(area).length > 0;
+  }
+
+  touching(area: Mtk.Rectangle): Mtk.Rectangle[] {
     const workspace = global.workspace_manager.get_active_workspace();
-    return [...this.windows.keys()].some(window => !window.minimized && window.showing_on_its_workspace() &&
-      window.located_on_workspace(workspace) && TOUCHING_TYPES.includes(window.window_type) && window.get_frame_rect().overlap(area));
+    return [...this.windows.keys()].filter(window => !window.minimized && window.showing_on_its_workspace() &&
+      window.located_on_workspace(workspace) && TOUCHING_TYPES.includes(window.window_type) && window.get_frame_rect().overlap(area))
+      .map(window => window.get_frame_rect());
   }
 
   destroy(): void {

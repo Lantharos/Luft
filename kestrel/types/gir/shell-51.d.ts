@@ -527,6 +527,8 @@ export namespace Shell {
         emit<K extends keyof BlurEffect.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<BlurEffect.SignalSignatures[K]>): void;
 
         // Methods
+        clear_outline_shade(): void;
+
         get_brightness(): number;
 
         get_mode(): BlurMode;
@@ -538,6 +540,8 @@ export namespace Shell {
         set_brightness(brightness: number): void;
 
         set_mode(mode: BlurMode): void;
+
+        set_outline_shade(lift: number, dim: number, spans: number[]): void;
 
         set_radius(radius: number): void;
 

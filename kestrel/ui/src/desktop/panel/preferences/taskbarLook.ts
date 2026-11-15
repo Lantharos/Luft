@@ -6,6 +6,7 @@ import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { isVertical, rightToLeft } from '../../../shared/layout/edge.js';
 import type { Island } from '../islands/islandSet.js';
+import { TaskbarEdge } from './taskbarEdge.js';
 import { taskbarPreferences, type TaskbarLayout } from './taskbarPreferences.js';
 
 const BLURRED: TaskbarLook[] = ['glass', 'accent'];
@@ -22,12 +23,14 @@ export class TaskbarSurface {
   private readonly blur: Shell.BlurEffect;
   private readonly baseClasses: string;
   private readonly blurs = new WeakMap<St.Widget, Shell.BlurEffect>();
+  private readonly edge: TaskbarEdge;
   private shaped: number | null = null;
 
   constructor(private readonly actor: St.Widget, private readonly peek: St.Widget, private readonly islands: () => readonly Island[],
     private readonly screen: () => TaskbarLayout) {
     this.baseClasses = actor.style_class;
     this.blur = blurBackdrop(actor, 0, 'taskbar');
+    this.edge = new TaskbarEdge(actor, this.blur, screen);
     const unwatch = watchScheme(() => this.sync());
     surfaces.add(this);
     actor.connect('destroy', () => {
@@ -70,6 +73,7 @@ export class TaskbarSurface {
     }
     this.syncPeek();
     this.round();
+    this.edge.sync();
   }
 
   syncPeek(): void {

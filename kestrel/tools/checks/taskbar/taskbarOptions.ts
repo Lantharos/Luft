@@ -4,6 +4,7 @@ import {existing} from '../lib/actors.js';
 import {remember} from '../lib/settings.js';
 import {checkAlways, checkWindows} from './taskbarOptions/autoHide.js';
 import {checkDisplays} from './taskbarOptions/displays.js';
+import {checkEdgeLine} from './taskbarOptions/edgeLine.js';
 import {checkAlignment, checkFloating, checkLooks, checkSizes, checkWallpaperGlass} from './taskbarOptions/looks.js';
 import {edgeGap, eventually, HEIGHTS, KEYS, panel, require, set, settings} from './taskbarOptions/taskbar.js';
 import {checkPositions} from './taskbarOptions/positions.js';
@@ -29,6 +30,7 @@ export async function run() {
     await checkLooks();
     await checkWallpaperGlass();
     styles.set_string('color-scheme', scheme);
+    await checkEdgeLine();
     await checkFloating();
     await checkSizes();
     await checkAlways();

@@ -48,6 +48,12 @@ alpha_at (const Pixels *pixels,
 }
 
 static float
+tone_of (const guint8 *pixel)
+{
+  return (0.2126f * pixel[0] + 0.7152f * pixel[1] + 0.0722f * pixel[2]) / 255.f;
+}
+
+static float
 distance (const guint8 *pixel,
           const float   color[3])
 {
@@ -252,7 +258,7 @@ derived_mask (const Pixels          *pixels,
                       smoothstep (0.6f, 0.95f, coverage);
 
         alpha[index] = coverage;
-        tone[index] = (0.2126f * pixel[0] + 0.7152f * pixel[1] + 0.0722f * pixel[2]) / 255.f;
+        tone[index] = tone_of (pixel);
         histogram[MIN ((int) (tone[index] * TONE_BINS), TONE_BINS - 1)] += coverage;
         total += coverage;
 
@@ -289,7 +295,7 @@ symbolic_mask (const Pixels          *pixels,
       guint32 *row = (guint32 *) (data + y * stride);
 
       for (int x = 0; x < pixels->width; x++)
-        row[x] = mask_pixel (alpha_at (pixels, x, y) / 255.f, 1.f);
+        row[x] = mask_pixel (alpha_at (pixels, x, y) / 255.f, tone_of (pixel_at (pixels, x, y)));
     }
   cairo_surface_mark_dirty (surface);
   *bounds = (cairo_rectangle_int_t) { 0, 0, pixels->width, pixels->height };

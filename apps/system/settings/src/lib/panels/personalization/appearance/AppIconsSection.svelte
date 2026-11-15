@@ -16,7 +16,8 @@
 	const STYLES: { value: AppIconStyle; label: string }[] = [
 		{ value: 'default', label: 'settings-appearance-icons-original' },
 		{ value: 'tinted', label: 'settings-appearance-icons-tinted' },
-		{ value: 'clear', label: 'settings-appearance-icons-clear' }
+		{ value: 'clear', label: 'settings-appearance-icons-clear' },
+		{ value: 'monochrome', label: 'settings-appearance-icons-monochrome' }
 	];
 	const TINTS = [
 		{ value: '#3584e4', label: 'settings-appearance-tint-blue' },
@@ -51,7 +52,7 @@
 </script>
 
 <Section>
-	<div class="grid grid-cols-3 gap-3 px-4 py-3.5">
+	<div class="grid grid-cols-2 gap-3 px-4 py-3.5">
 		{#each STYLES as option (option.value)}
 			<button type="button" class="choice" class:selected={style === option.value} aria-pressed={style === option.value} onclick={() => kestrel.set('app-icon-style', option.value)}>
 				<span class="icons">
@@ -93,7 +94,6 @@
 		gap: 8px;
 		border-radius: 12px;
 		padding: 10px 12px;
-		background: #181817;
-		color: #f3f3ef;
+		background: var(--control-hover);
 	}
 </style>

@@ -16,7 +16,7 @@ import {contrast, luminance} from '../lib/colors.js';
 
 const {require, eventually} = checks('app icon');
 const WALLPAPERS = [['lavender', 'Night lavender.jpg', [88, 52, 140]], ['forest', 'Autumn forest bench.jpg', [62, 108, 40]]] as const;
-const STYLES = ['default', 'tinted', 'clear'] as const;
+const STYLES = ['default', 'tinted', 'clear', 'monochrome'] as const;
 const SCHEMES = [['dark', 'prefer-dark'], ['light', 'default']] as const;
 const PALETTE_TIMEOUT = 10000;
 const appSystem = Shell.AppSystem.get_default();
@@ -61,14 +61,15 @@ function shownApps() {
   });
 }
 
-const bare = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon && icon.gicon.bare;
+const plated = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon && !icon.gicon.bare;
 
 function checkLuftApps(setting: string) {
   const apps = shownApps();
-  const luft = ({id}: {id: string}) => id.startsWith(LUFT_APP);
-  const plain = (onTaskbar: boolean) => (onTaskbar ? appIcons.taskbarPaints : appIcons.paints)?.plain.ink;
-  require(apps.some(luft) && !apps.every(luft) && apps.every(app => luft(app) ? bare(app.icon) && inkOf(app.icon) === plain(app.onTaskbar) : inkOf(app.icon) === null),
-    `Luft's own apps draw bare glyphs in the plain foreground beside original icons (${setting})`);
+  const luft = apps.filter(({id}) => id.startsWith(LUFT_APP));
+  const inks = new Map(luft.map(({id, icon}) => [id, inkOf(icon)]));
+  require(luft.length > 0 && luft.length < apps.length && apps.every(app => luft.includes(app) ? plated(app.icon) : inkOf(app.icon) === null),
+    `Luft's own apps draw their glyphs on their own plates beside original icons (${setting})`);
+  require(new Set(inks.values()).size === inks.size, `every Luft app has a colour of its own (${setting})`);
 }
 
 const loaded = (icon: St.Icon) => icon.get_children().some(child => child.content && child.opacity > 0);
@@ -97,8 +98,8 @@ async function checkWallpaper(settings: Gio.Settings, interfaceSettings: Gio.Set
     interfaceSettings.set_string('color-scheme', colorScheme);
     const plate = async () => (await appearance('AppIcons'))['tinted-plate'];
     await eventually(async () => (scheme === 'dark') === (luminance(await plate()) < 0.2), `tinted plates follow the ${scheme} style (${slug})`);
-    const {'tinted-plate': tintedPlate, 'tinted-ink': ink} = await appearance('AppIcons');
-    require(contrast(ink, tintedPlate) >= 4.5, `tinted glyphs stay readable on a ${scheme} plate (${slug})`);
+    const {'tinted-plate': tintedPlate, 'tinted-ink': ink, 'tinted-shade': shade} = await appearance('AppIcons');
+    require(contrast(ink, tintedPlate) >= 4.5 && contrast(shade, tintedPlate) >= 3, `tinted glyphs stay readable on a ${scheme} plate (${slug})`);
     inks[scheme] = ink;
     await checkStyles(settings, slug, scheme);
   }

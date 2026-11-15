@@ -374,16 +374,17 @@ on_source_loaded (GObject      *source,
 }
 
 static StIconColors *
-white_colors (void)
+layer_colors (void)
 {
   StIconColors *colors = st_icon_colors_new ();
-  CoglColor white;
+  CoglColor white, black;
 
   cogl_color_init_from_4f (&white, 1.f, 1.f, 1.f, 1.f);
+  cogl_color_init_from_4f (&black, 0.f, 0.f, 0.f, 1.f);
   colors->foreground = white;
   colors->warning = white;
   colors->error = white;
-  colors->success = white;
+  colors->success = black;
   return colors;
 }
 
@@ -411,7 +412,7 @@ _st_styled_icon_render_async (StStyledIcon        *icon,
 
   if (glyph)
     {
-      StIconColors *colors = white_colors ();
+      StIconColors *colors = layer_colors ();
 
       st_icon_info_load_symbolic_async (info, colors, cancellable, on_source_loaded, task);
       st_icon_colors_unref (colors);

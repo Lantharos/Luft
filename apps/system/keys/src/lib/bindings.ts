@@ -125,13 +125,14 @@ export const events = {
 
 export type AltGr = "ralt" | "lalt" | "alt" | "rctrl" | "menu" | "rwin" | "caps";
 
-export type AppIconStyle = "default" | "tinted" | "clear";
+export type AppIconStyle = "default" | "tinted" | "clear" | "monochrome";
 
 export type AppIcons = {
 	style: AppIconStyle,
 	glyphs: string,
 	tinted: IconPaint,
 	clear: IconPaint,
+	monochrome: IconPaint,
 };
 
 export type AppState = Appearance & Launch;

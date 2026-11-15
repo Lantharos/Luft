@@ -813,13 +813,14 @@ export type AppAccess = {
 
 export type AppCategory = "browser" | "email" | "calendar" | "music" | "video" | "photos" | "text" | "files" | "archives";
 
-export type AppIconStyle = "default" | "tinted" | "clear";
+export type AppIconStyle = "default" | "tinted" | "clear" | "monochrome";
 
 export type AppIcons = {
 	style: AppIconStyle,
 	glyphs: string,
 	tinted: IconPaint,
 	clear: IconPaint,
+	monochrome: IconPaint,
 };
 
 export type AppState = {

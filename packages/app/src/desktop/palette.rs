@@ -48,6 +48,7 @@ pub enum AppIconStyle {
     Default,
     Tinted,
     Clear,
+    Monochrome,
 }
 
 #[derive(Serialize, Type)]
@@ -56,6 +57,7 @@ pub struct AppIcons {
     glyphs: String,
     tinted: IconPaint,
     clear: IconPaint,
+    monochrome: IconPaint,
 }
 
 #[derive(Serialize, Type)]
@@ -79,6 +81,7 @@ impl AppIcons {
         Some(Self {
             tinted: paint("tinted")?,
             clear: paint("clear")?,
+            monochrome: paint("monochrome")?,
             style: AppIconStyle::deserialize(IntoDeserializer::<value::Error>::into_deserializer(
                 map.remove("style")?,
             ))

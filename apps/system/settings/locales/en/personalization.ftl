@@ -79,6 +79,7 @@ settings-appearance-icons = App icons
 settings-appearance-icons-original = Original
 settings-appearance-icons-tinted = Tinted
 settings-appearance-icons-clear = Clear
+settings-appearance-icons-monochrome = Monochrome
 settings-appearance-tint = Tint
 settings-appearance-tint-description = The first color follows your accent color
 settings-appearance-tint-blue = Blue

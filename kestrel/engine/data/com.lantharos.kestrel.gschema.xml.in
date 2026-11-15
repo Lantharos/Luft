@@ -15,6 +15,7 @@
     <value nick="default" value="0"/>
     <value nick="tinted" value="1"/>
     <value nick="clear" value="2"/>
+    <value nick="monochrome" value="3"/>
   </enum>
 
   <enum id="com.lantharos.kestrel.SkinTone">
@@ -302,8 +303,9 @@
       <default>'tinted'</default>
       <summary>How app icons are drawn</summary>
       <description>
-        Tinted draws a single-color
-        glyph on a plain plate, Original shows each app's own colors, and Clear draws a light glyph on glass.
+        Tinted draws each glyph on a plate in the accent color, Original
+        shows each app's own colors, Clear draws a light glyph on glass, and
+        Monochrome draws them in greys on a plain plate.
       </description>
     </key>
     <key name="app-icon-tint" type="s">

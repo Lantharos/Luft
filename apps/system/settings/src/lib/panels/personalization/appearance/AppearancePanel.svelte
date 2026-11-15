@@ -40,7 +40,8 @@
 	const ICON_STYLES: Record<string, string> = {
 		default: 'settings-appearance-icons-original',
 		tinted: 'settings-appearance-icons-tinted',
-		clear: 'settings-appearance-icons-clear'
+		clear: 'settings-appearance-icons-clear',
+		monochrome: 'settings-appearance-icons-monochrome'
 	};
 
 	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'theme-apps']);

@@ -2,7 +2,6 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import AppWindow from '@lucide/svelte/icons/app-window';
 	import { appearance, type AppIconStyle } from '../appearance.svelte';
-	import { appIconLook, FITTED_PLATE } from './iconStyle';
 
 	interface Props {
 		icon: string | null;
@@ -17,11 +16,9 @@
 
 	const source = $derived(icon?.startsWith('http') ? icon : icon && fileUrl(icon));
 	const icons = $derived(appearance.appIcons);
-	const requested = $derived(style ?? icons?.style ?? 'default');
-	const look = $derived(appIconLook(id, requested));
-	const box = $derived(Math.round(size * FITTED_PLATE));
-	const paint = $derived(icons && (look === 'tinted' || look === 'clear') ? icons[look] : null);
-	const glyphUrl = $derived(icons && id && look !== 'default' ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
+	const look = $derived(style ?? icons?.style ?? 'default');
+	const paint = $derived(icons && look !== 'default' ? icons[look] : null);
+	const glyphUrl = $derived(icons && paint && id ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
 	const glyph = $derived(glyphUrl && glyphUrl !== missingGlyph ? `url("${glyphUrl}")` : null);
 
 	$effect(() => {
@@ -33,12 +30,7 @@
 	});
 </script>
 
-{#if look === 'plain' && glyph}
-	<span class="glyph bare" style:width="{box}px" style:height="{box}px" style:margin="{(size - box) / 2}px" style:--glyph={glyph}>
-		<span class="shade"></span>
-		<span class="ink"></span>
-	</span>
-{:else if paint && glyph}
+{#if paint && glyph}
 	<span
 		class="glyph plated"
 		class:rim={paint.rim > 0}
@@ -81,12 +73,6 @@
 		position: relative;
 		display: block;
 		flex: none;
-	}
-
-	.bare {
-		--glyph-ink: currentColor;
-		--glyph-shade: color-mix(in srgb, currentColor 50%, transparent);
-		--glyph-box: 100%;
 	}
 
 	.plated {

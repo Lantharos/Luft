@@ -114,13 +114,14 @@ export const events = {
 	windowPresent: (callback: (payload: null) => void) => listen<null>("window.present", callback),
 };
 
-export type AppIconStyle = "default" | "tinted" | "clear";
+export type AppIconStyle = "default" | "tinted" | "clear" | "monochrome";
 
 export type AppIcons = {
 	style: AppIconStyle,
 	glyphs: string,
 	tinted: IconPaint,
 	clear: IconPaint,
+	monochrome: IconPaint,
 };
 
 export type AppState = {

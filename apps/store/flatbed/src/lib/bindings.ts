@@ -81,13 +81,14 @@ export const events = {
 	scannersSearching: (callback: (payload: boolean) => void) => listen<boolean>("scanners.searching", callback),
 };
 
-export type AppIconStyle = "default" | "tinted" | "clear";
+export type AppIconStyle = "default" | "tinted" | "clear" | "monochrome";
 
 export type AppIcons = {
 	style: AppIconStyle,
 	glyphs: string,
 	tinted: IconPaint,
 	clear: IconPaint,
+	monochrome: IconPaint,
 };
 
 export type AppState = {

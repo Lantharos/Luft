@@ -39,7 +39,7 @@ const PROPERTIES: [string, string][] = [
 ];
 const PERSIST_DELAY = 400;
 const CUSTOM_COLOR = /^#[0-9a-f]{6}$/i;
-const PLATED_STYLES = ['tinted', 'clear'] as const;
+const PLATED_STYLES = ['tinted', 'clear', 'monochrome'] as const;
 const PLATE_PARTS = ['plate', 'ink', 'shade', 'rim'] as const;
 
 export class AppearanceService {

@@ -124,7 +124,7 @@ async function longestStall(during: () => Promise<void>) {
 async function measureIconStyles() {
   const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   try {
-    for (const style of ['tinted', 'clear']) {
+    for (const style of ['tinted', 'clear', 'monochrome']) {
       settings.set_string('app-icon-style', style);
       await settled(MEASURE_SETTLE);
       await measureStartOpening(`${style} first`);
@@ -132,7 +132,7 @@ async function measureIconStyles() {
     }
     toggleSurface('start');
     await settled(MEASURE_SETTLE);
-    for (const style of ['tinted', 'clear']) {
+    for (const style of ['tinted', 'clear', 'monochrome']) {
       const longestStallMs = await longestStall(async () => {
         settings.set_string('app-icon-style', style);
         await settled(MEASURE_SETTLE);

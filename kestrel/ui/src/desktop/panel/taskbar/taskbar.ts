@@ -92,7 +92,6 @@ export class Taskbar {
       taskbarPreferences.watch(key => { if (key === 'taskbar-badges') refresh(); }),
     );
     whenPixelScaleChanges(this.actor, () => this.relayout());
-    this.actor.connect('style-changed', () => appIcons.setTaskbarInk(this.actor.get_theme_node().get_foreground_color().to_string()));
   }
 
   shutdown(): void {

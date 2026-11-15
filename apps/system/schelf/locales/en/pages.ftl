@@ -247,7 +247,6 @@ discover-empty = There are no apps here yet. Check back soon.
 ## Installed
 
 installed-show = Show
-installed-all = All
 installed-apps = Apps
 installed-tools = Command-line tools
 installed-system = System add-ons

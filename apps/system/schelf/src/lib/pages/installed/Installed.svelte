@@ -7,10 +7,11 @@
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import InstalledRow from './InstalledRow.svelte';
 
-	type Filter = 'all' | 'apps' | 'tool' | 'system' | 'extension';
+	type Filter = 'apps' | 'tool' | 'system' | 'extension';
 	type Format = 'any' | 'store' | 'flatpak' | 'appImage' | 'debian';
 
 	const APPS: Source[] = ['flatpak', 'appImage', 'debian', 'sabine'];
+	const TOOLS: Source[] = ['tool', 'storeTool'];
 	const kinds: { value: Format; label: string }[] = $derived([
 		{ value: 'any', label: t('installed-kind-any') },
 		{ value: 'store', label: t('installed-kind-store') },
@@ -27,21 +28,20 @@
 	};
 
 	const COUNTS: Record<Filter, [string, string]> = {
-		all: ['installed-count-apps', 'installed-count-apps-size'],
 		apps: ['installed-count-apps', 'installed-count-apps-size'],
 		tool: ['installed-count-tools', 'installed-count-tools-size'],
 		system: ['installed-count-system', 'installed-count-system-size'],
 		extension: ['installed-count-extensions', 'installed-count-extensions-size']
 	};
 
-	let filter = $state<Filter>('all');
+	let filter = $state<Filter>('apps');
 	let format = $state<Format>('any');
 	let removing = $state<InstalledApp | null>(null);
 
 	const apps = $derived(library.installed.filter((app) => APPS.includes(app.source)));
 	const formats = $derived(kinds.filter(({ value }) => value === 'any' || apps.some((app) => made(app) === value)));
 	const shown = $derived.by(() => {
-		if (filter === 'all') return library.installed;
+		if (filter === 'tool') return library.installed.filter((app) => TOOLS.includes(app.source));
 		if (filter !== 'apps') return library.installed.filter((app) => app.source === filter);
 		return format === 'any' ? apps : apps.filter((app) => made(app) === format);
 	});
@@ -64,7 +64,6 @@
 				label={t('installed-show')}
 				value={filter}
 				options={[
-					{ value: 'all', label: t('installed-all') },
 					{ value: 'apps', label: t('installed-apps') },
 					{ value: 'tool', label: t('installed-tools') },
 					{ value: 'system', label: t('installed-system') },

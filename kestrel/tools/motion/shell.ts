@@ -20,7 +20,7 @@ const THROW_STEPS = 14;
 const ROVER = 'com.lantharos.rover.desktop';
 const MARGIN = 24;
 
-async function notify(app: string, title: string, body: string) {
+export async function notify(app: string, title: string, body: string) {
   await call('org.gnome.Shell', '/org/freedesktop/Notifications', 'org.freedesktop.Notifications', 'Notify',
     new GLib.Variant('(susssasa{sv}i)', [app, 0, '', title, body, [], {
       'x-shell-sender': new GLib.Variant('s', Gio.DBus.session.get_unique_name()!),

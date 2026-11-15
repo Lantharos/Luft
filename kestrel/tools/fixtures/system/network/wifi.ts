@@ -17,6 +17,7 @@ const ALLOW_INTERACTION = 0x1;
 const REQUEST_NEW = 0x2;
 const USER_REQUESTED = 0x4;
 const FIRST_CONNECTION = 100;
+const JOINING = 100;
 
 export type Network = [name: string, saved: boolean, psk: string];
 
@@ -65,18 +66,33 @@ export class Wifi {
   private readonly asked = new Map<number, SecretRequest>();
   private device: Gio.DBusExportedObject[] = [];
   private nextId = FIRST_CONNECTION;
+  private nextPoint = 1;
+  private activePoint = '/';
   private lastScan = 0;
 
   constructor(private readonly host: NetworkManagerHost) {}
 
+  private point(name: string, strength: number) {
+    const index = this.nextPoint++;
+    const path = `${MANAGER}/AccessPoint/${index}`;
+    this.points.set(path, name);
+    this.host.object(path, [['.AccessPoint', {
+      Flags: PRIVACY, WpaFlags: 0, RsnFlags: PSK, Ssid: new TextEncoder().encode(name), Frequency: 2437,
+      HwAddress: `52:54:00:57:46:${index.toString(16).padStart(2, '0')}`, Mode: INFRA, MaxBitrate: 270000, Strength: strength, LastSeen: -1,
+    }]]);
+  }
+
+  private pointsChanged() {
+    this.device[1].emit_property_changed('AccessPoints', variant('ao', [...this.points.keys()]));
+  }
+
+  private pathOf(name: string) {
+    return [...this.points].find(([, candidate]) => candidate === name)![0];
+  }
+
   add(networks: Network[]) {
     networks.forEach(([name, saved, psk], index) => {
-      const path = `${MANAGER}/AccessPoint/${index + 1}`;
-      this.points.set(path, name);
-      this.host.object(path, [['.AccessPoint', {
-        Flags: PRIVACY, WpaFlags: 0, RsnFlags: PSK, Ssid: new TextEncoder().encode(name), Frequency: 2437,
-        HwAddress: `52:54:00:57:46:0${index + 1}`, Mode: INFRA, MaxBitrate: 270000, Strength: 90 - index * 10, LastSeen: -1,
-      }]]);
+      this.point(name, 90 - index * 10);
       if (saved) this.save({name, uuid: GLib.uuid_string_random(), psk});
     });
     const wifi = this;
@@ -88,7 +104,10 @@ export class Wifi {
         },
       }],
       ['.Device.Wireless', {
-        HwAddress: '52:54:00:57:46:00', PermHwAddress: '52:54:00:57:46:00', Mode: INFRA, Bitrate: 0, ActiveAccessPoint: '/',
+        HwAddress: '52:54:00:57:46:00', PermHwAddress: '52:54:00:57:46:00', Mode: INFRA, Bitrate: 0,
+        get ActiveAccessPoint() {
+          return wifi.activePoint;
+        },
         WirelessCapabilities: CAPABILITIES,
         get AccessPoints() {
           return [...wifi.points.keys()];
@@ -109,10 +128,33 @@ export class Wifi {
     for (const path of [DEVICE, ...this.points.keys(), ...this.actives]) this.host.remove(path);
     for (const path of this.connections.keys()) this.forget(path);
     this.points.clear();
+    this.nextPoint = 1;
+    this.activePoint = '/';
     this.actives.length = 0;
     this.pending.length = 0;
     this.asked.clear();
     this.device = [];
+  }
+
+  appear(name: string, strength: number) {
+    this.point(name, strength);
+    this.pointsChanged();
+  }
+
+  disappear(name: string) {
+    const path = this.pathOf(name);
+    this.points.delete(path);
+    this.pointsChanged();
+    this.host.remove(path);
+  }
+
+  join(name: string) {
+    this.save({name, uuid: GLib.uuid_string_random(), psk: ''});
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, JOINING, () => {
+      this.activePoint = this.pathOf(name);
+      this.device[1].emit_property_changed('ActiveAccessPoint', variant('o', this.activePoint));
+      return GLib.SOURCE_REMOVE;
+    });
   }
 
   activate(path: string) {

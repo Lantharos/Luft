@@ -106,6 +106,9 @@ export const CONTROL_XML = `<node><interface name="com.lantharos.KestrelChecks.N
   <method name="Checks"><arg type="u" direction="out"/></method>
   <method name="AddWifi"><arg type="a(sbs)" direction="in"/></method>
   <method name="RemoveWifi"/>
+  <method name="ShowWifi"><arg type="s" direction="in"/><arg type="y" direction="in"/></method>
+  <method name="HideWifi"><arg type="s" direction="in"/></method>
+  <method name="JoinWifi"><arg type="s" direction="in"/></method>
   <method name="AskSecrets"><arg type="s" direction="in"/></method>
   <method name="TakeSecretRequests"><arg type="a(ua{sa{sv}}ou)" direction="out"/></method>
   <method name="AnswerSecrets"><arg type="u" direction="in"/><arg type="b" direction="in"/></method>

@@ -8,6 +8,7 @@ import {chord, rest, swipe} from '../checks/lib/input/input.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
 import {nextFrame, pause, settled} from '../checks/lib/wait.js';
 import type {Clip} from './film.js';
+import {listGroups} from './lists.js';
 import {shellGroups} from './shell.js';
 
 type Surface = Parameters<typeof toggleSurface>[0];
@@ -178,4 +179,4 @@ async function keyboardSnap(clip: Clip) {
   await reset();
 }
 
-export const groups = {surfaces, windows, board, gestures, reduced, snap: keyboardSnap, ...shellGroups};
+export const groups = {surfaces, windows, board, gestures, reduced, snap: keyboardSnap, ...shellGroups, ...listGroups};

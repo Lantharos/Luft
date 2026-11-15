@@ -5,20 +5,23 @@ import * as DND from '../../../shared/popups/dnd.js';
 
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 import { rightToLeft } from '../../../shared/layout/edge.js';
+import { glide } from '../../../shared/motion/motion.js';
 
 interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }
 type DelegateActor = St.Widget & { _delegate?: object };
 
+const NUDGE = 0.25;
+
 export class TaskbarDrop {
-  private marked: St.Widget | null = null;
+  private spread = false;
   private readonly monitor = {
     dragMotion: (event: DND.DragEvent) => {
-      if (!this.actor.contains(event.targetActor)) this.unmark();
+      if (!this.actor.contains(event.targetActor)) this.settle();
       return DND.DragMotionResult.CONTINUE;
     },
     dragDrop: () => {
-      this.unmark();
+      this.settle();
       return DND.DragDropResult.CONTINUE;
     },
   };
@@ -47,9 +50,13 @@ export class TaskbarDrop {
     return this.vertical() ? y : x;
   }
 
+  private get reversed(): boolean {
+    return !this.vertical() && rightToLeft();
+  }
+
   private insertionIndex(slots: TaskbarSlot[], position: number): number {
     const vertical = this.vertical();
-    const reversed = !vertical && rightToLeft();
+    const reversed = this.reversed;
     const index = slots.findIndex(({ slot }) => {
       const middle = vertical ? slot.y + slot.height / 2 : slot.x + slot.width / 2;
       return reversed ? position > middle : position < middle;
@@ -61,18 +68,33 @@ export class TaskbarDrop {
     if (!this.pinnable(source)) return DND.DragMotionResult.CONTINUE;
     const slots = this.slots();
     const index = this.insertionIndex(slots, position);
-    const before = index < slots.length;
-    const target = before ? slots[index]?.button : slots[slots.length - 1]?.button;
-    this.unmark();
-    if (target) {
-      target.add_style_class_name(before ? 'drop-before' : 'drop-after');
-      this.marked = target;
-    }
-    return slots.some(slot => slot.id === source.id) ? DND.DragMotionResult.MOVE_DROP : DND.DragMotionResult.COPY_DROP;
+    const from = slots.findIndex(slot => slot.id === source.id);
+    this.makeRoom(slots, index, from);
+    return from >= 0 ? DND.DragMotionResult.MOVE_DROP : DND.DragMotionResult.COPY_DROP;
+  }
+
+  private shiftFor(index: number, insertion: number, from: number): number {
+    if (from < 0) return index === insertion - 1 ? -NUDGE : index === insertion ? NUDGE : 0;
+    const landing = insertion > from ? insertion - 1 : insertion;
+    if (index === from) return landing - from;
+    if (index > from && index <= landing) return -1;
+    if (index < from && index >= landing) return 1;
+    return 0;
+  }
+
+  private makeRoom(slots: TaskbarSlot[], insertion: number, from: number): void {
+    this.spread = true;
+    const property = this.vertical() ? 'translation_y' : 'translation_x';
+    const sign = this.reversed ? -1 : 1;
+    slots.forEach(({ slot }, index) => {
+      const length = this.vertical() ? slot.height : slot.width;
+      const target = this.shiftFor(index, insertion, from) * length * sign;
+      if (slot[property] !== target) glide(slot, { [property]: target });
+    });
   }
 
   private drop(source: DraggedItem, position: number): boolean {
-    this.unmark();
+    this.settle();
     if (!this.pinnable(source)) return false;
     const slots = this.slots();
     const index = this.insertionIndex(slots, position);
@@ -86,9 +108,9 @@ export class TaskbarDrop {
     return true;
   }
 
-  private unmark(): void {
-    this.marked?.remove_style_class_name('drop-before');
-    this.marked?.remove_style_class_name('drop-after');
-    this.marked = null;
+  private settle(): void {
+    if (!this.spread) return;
+    this.spread = false;
+    for (const { slot } of this.slots()) glide(slot, { translation_x: 0, translation_y: 0 });
   }
 }

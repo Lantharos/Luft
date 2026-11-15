@@ -33,6 +33,7 @@ const items = () => descendants(existing('kestrel-start')).filter((actor): actor
 const apps = () => items().filter(button => !button.name.includes('folder:'));
 const idOf = (button: Item) => button.name.replace(ITEM, '');
 const panelApps = () => (named('kestrel-taskbar-dock')?.get_children().map(slot => slot.get_first_child()) ?? []).filter(button => button?.name?.startsWith('kestrel-app-'));
+const taskbarMakesRoom = () => named('kestrel-taskbar-dock')?.get_children().some(slot => slot.translation_x || slot.translation_y) ?? false;
 
 async function dragOnto(sourceOf: Target, targetOf: Target, fraction = 0.5) {
   await settled();
@@ -48,7 +49,7 @@ async function dragOnto(sourceOf: Target, targetOf: Target, fraction = 0.5) {
     moveTo([fromX + (toX - fromX) * step / DRAG_STEPS, fromY + (toY - fromY) * step / DRAG_STEPS]);
     await nextFrame();
   }
-  await waitUntil(() => DROP_MARKS.some(mark => styled(mark).some(actor => actor.mapped)), `dragging over ${target.name} shows where the drop lands`);
+  await waitUntil(() => DROP_MARKS.some(mark => styled(mark).some(actor => actor.mapped)) || taskbarMakesRoom(), `dragging over ${target.name} shows where the drop lands`);
   releaseButton();
   await waitUntil(() => source.opacity === 255, 'the drag ends');
 }

@@ -53,7 +53,7 @@ export class SchemeTheme {
   inkFills(): { focused: string; dot: string } {
     const panel = this.node('kestrel-panel-ink');
     const background = (classes: string) => this.node(classes, panel).get_background_color().to_string();
-    return { focused: background('kestrel-app-focused'), dot: background('kestrel-running-dot') };
+    return { focused: background('kestrel-task-plate'), dot: background('kestrel-running-dot') };
   }
 
   halos(part: InkPart): TaskbarHalos {

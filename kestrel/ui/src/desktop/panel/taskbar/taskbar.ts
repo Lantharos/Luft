@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
+import Graphene from 'gi://Graphene';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -11,7 +12,9 @@ import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
 import { appIcons, taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
-import { animateActor, Curve, Duration, liftIcon } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, liftIcon, Spring, stillMotion } from '../../../shared/motion/motion.js';
+import { moveRows } from '../../../shared/motion/rows.js';
+import { transitionVelocity } from '../../windowManager/effects/velocity.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
@@ -22,12 +25,14 @@ import { frameOnPixels, pixelScale, whenPixelScaleChanges, type PixelFrame } fro
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
 const ENTRY_OFFSET = 18;
+const BOUNCE_SPEED = 360;
 
 interface AppItem {
   app: Shell.App;
   icon: St.Bin;
   slot: St.Widget;
   button: St.Button;
+  plate: St.Widget;
   dots: St.Widget[];
   focused: boolean;
   iconGeometry: Mtk.Rectangle | null;
@@ -70,8 +75,14 @@ export class Taskbar {
     const display = global.display;
     const refresh = () => this.updateIndicators();
     const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];
+    const appSystem = Shell.AppSystem.get_default();
+    const launching = appSystem.connect('app-state-changed', (_system, app: Shell.App) => {
+      const item = this.items.get(app.id);
+      if (item && app.state === Shell.AppState.STARTING) this.bounce(item);
+    });
     this.disconnectors.push(
       () => signals.forEach(id => display.disconnect(id)),
+      () => appSystem.disconnect(launching),
       launcherEntries.watch(appId => {
         const item = this.items.get(appId);
         if (item) this.updateIndicator(item);
@@ -99,7 +110,7 @@ export class Taskbar {
     this.overflow.layout(metrics, this.edge);
     for (const item of this.items.values()) {
       this.layoutItem(item);
-      if (!item.removing) animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: Duration.moderate, curve: Curve.settle });
+      if (!item.removing) this.resizeSlot(item, this.slotLength, Duration.moderate, Curve.settle);
       this.updateDots(item);
     }
   }
@@ -173,6 +184,7 @@ export class Taskbar {
     item.button.set_position(vertical ? 0 : Math.floor(gap / 2), vertical ? Math.floor(gap / 2) : 0);
     item.button.set_size(button, button);
     item.button.child.set_size(button, button);
+    item.plate.set_size(button, button);
     this.placeIcon(item, frame);
     const dotOffset = outward(this.edge) > 0 ? button - DOT_SIZE : 0;
     for (const dot of item.dots) {
@@ -207,22 +219,20 @@ export class Taskbar {
       item.removing = true;
       item.button.reactive = false;
       animateActor(item.button, { opacity: 0, ...toward(this.edge, ENTRY_OFFSET), duration: Duration.quick });
-      animateActor(item.slot, {
-        [this.lengthKey]: 0, duration: Duration.quick, curve: Curve.pulse,
-        onComplete: () => {
-          if (!item.removing) return;
-          this.items.delete(id);
-          item.slot.destroy();
-        },
+      this.resizeSlot(item, 0, Duration.quick, Curve.pulse, () => {
+        if (!item.removing) return;
+        this.items.delete(id);
+        item.slot.destroy();
       });
     }
-    apps.forEach((app, index) => {
+    moveRows(this.actor, () => apps.forEach((app, index) => {
       let item = this.items.get(app.id);
       if (!item) {
         item = this.create(app);
         this.items.set(app.id, item);
         this.actor.add_child(item.slot);
         if (this.initialized) {
+          item.slot.clip_to_allocation = true;
           item.slot[this.lengthKey] = 0;
           item.button.opacity = 0;
           item.button.set(toward(this.edge, ENTRY_OFFSET));
@@ -242,16 +252,32 @@ export class Taskbar {
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
       this.windowsChanged(item);
-      animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
+      this.resizeSlot(item, this.slotLength, this.initialized ? Duration.moderate : 0, Curve.settle);
       animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
-    });
+    }), this.vertical ? 'y' : 'x');
     this.actor.set_child_above_sibling(this.overflow.slot, null);
     this.initialized = true;
     this.updateFocus();
   }
 
+  private resizeSlot(item: AppItem, length: number, duration: number, curve: readonly number[], resized?: () => void): void {
+    if (item.slot[this.lengthKey] === length && !item.slot.get_transition(this.lengthKey)) {
+      resized?.();
+      return;
+    }
+    item.slot.clip_to_allocation = true;
+    animateActor(item.slot, {
+      [this.lengthKey]: length, duration, curve,
+      onComplete: () => {
+        item.slot.clip_to_allocation = false;
+        resized?.();
+      },
+    });
+  }
+
   updateFocus(): void {
     this.updateIndicators();
+    const previous = [...this.items.values()].find(item => item.focused) ?? null;
     for (const [id, item] of this.items) {
       const focused = id === this.tracker.focus_app?.id;
       if (focused) item.button.add_style_class_name('kestrel-app-focused');
@@ -260,6 +286,41 @@ export class Taskbar {
       item.focused = focused;
       this.updateDots(item, true);
     }
+    const next = [...this.items.values()].find(item => item.focused) ?? null;
+    if (next !== previous) this.movePlate(previous, next);
+  }
+
+  private platePosition(item: AppItem): number {
+    const [x, y] = item.button.get_transformed_position();
+    return this.vertical ? y + item.plate.translation_y : x + item.plate.translation_x;
+  }
+
+  private movePlate(from: AppItem | null, to: AppItem | null): void {
+    const property = this.vertical ? 'translation_y' : 'translation_x';
+    const sliding = !!from && !!to && from.button.mapped && to.button.mapped && to.button.has_allocation() && from.plate.visible && !stillMotion();
+    const offset = sliding ? this.platePosition(from) - this.platePosition(to) : 0;
+    const velocity = sliding ? transitionVelocity(from.plate, property.replace('_', '-')) : 0;
+    if (from) {
+      from.plate.remove_all_transitions();
+      from.plate.set({ visible: false, translation_x: 0, translation_y: 0 });
+    }
+    if (!to) return;
+    to.plate.show();
+    if (!sliding) {
+      to.plate.opacity = 0;
+      animateActor(to.plate, { opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
+      return;
+    }
+    to.plate.opacity = 255;
+    to.plate[property] = offset;
+    animateActor(to.plate, { [property]: 0, spring: Spring.snappy, velocity });
+  }
+
+  private bounce(item: AppItem): void {
+    if (stillMotion() || !item.button.mapped) return;
+    const [x, y] = direction(this.edge);
+    const glyph = item.icon.child;
+    animateActor(glyph, { translation_x: 0, translation_y: 0, spring: Spring.thrown, velocity: { translation_x: -x * BOUNCE_SPEED, translation_y: -y * BOUNCE_SPEED } });
   }
 
   private makeDraggable(item: AppItem): { enabled: boolean } {
@@ -304,20 +365,34 @@ export class Taskbar {
     const start = (button - (count * width + (count - 1) * DOT_GAP)) / 2;
     const [position, size] = this.vertical ? ['y', 'height'] as const : ['x', 'width'] as const;
     item.dots.forEach((dot, index) => {
-      dot.visible = index < count;
+      const shown = index < count;
+      const appearing = shown && (!dot.visible || dot.scale_x < 1);
       animateActor(dot, {
         [position]: start + index * (width + DOT_GAP), [size]: width,
-        duration: animate && dot.visible ? Duration.quick : 0, curve: Curve.settle,
+        duration: animate && dot.visible && !appearing ? Duration.quick : 0, curve: Curve.settle,
       });
+      if (shown) dot.show();
+      if (!item.button.mapped || stillMotion()) {
+        dot.remove_transition('scale-x');
+        dot.remove_transition('scale-y');
+        dot.set({ visible: shown, scale_x: 1, scale_y: 1 });
+      } else if (appearing) {
+        if (!dot.get_transition('scale-x')) dot.set_scale(0, 0);
+        animateActor(dot, { scale_x: 1, scale_y: 1, spring: Spring.arrive });
+      } else if (!shown && dot.visible) {
+        animateActor(dot, { scale_x: 0, scale_y: 0, spring: Spring.snappy, onComplete: () => dot.hide() });
+      }
     });
   }
 
   private create(app: Shell.App): AppItem {
     const icon = new St.Bin({ child: taskbarAppIcon(app, this.iconSize, this.artworkFill) });
     const content = new St.Widget();
+    const plate = new St.Widget({ style_class: 'kestrel-task-plate', visible: false });
+    content.add_child(plate);
     content.add_child(icon);
     const dots = Array.from({ length: 4 }, () => {
-      const dot = new St.Widget({ style_class: 'kestrel-running-dot', width: DOT_SIZE, height: DOT_SIZE, visible: false });
+      const dot = new St.Widget({ style_class: 'kestrel-running-dot', width: DOT_SIZE, height: DOT_SIZE, visible: false, pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }) });
       content.add_child(dot);
       return dot;
     });
@@ -325,14 +400,15 @@ export class Taskbar {
       name: `kestrel-app-${app.id}`, style_class: 'kestrel-task-button', child: content,
       can_focus: true, track_hover: true, accessible_name: app.get_name(),
     });
-    const slot = new St.Widget({ [this.lengthKey]: this.slotLength, clip_to_allocation: true });
+    const slot = new St.Widget({ [this.lengthKey]: this.slotLength });
     slot.add_child(button);
-    const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0,
+    const item: AppItem = { app, icon, slot, button, plate, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0,
       draggable: { enabled: false }, indicators: new AppIndicators(content, this.metrics.button, this.edge) };
     this.layoutItem(item);
     item.draggable = this.makeDraggable(item);
     item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(item));
     button.connect('notify::allocation', () => this.syncIconGeometry(item));
+    button.connect('style-changed', () => (plate.style = `border-radius: ${button.get_theme_node().get_border_radius(St.Corner.TOPLEFT) / St.ThemeContext.get_for_stage(global.stage).scale_factor}px;`));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
     liftIcon(button, icon, () => {
       const [x, y] = direction(this.edge);

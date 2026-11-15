@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
 	import type { Hardware } from '#lib/bindings.js';
@@ -19,8 +19,8 @@
 
 	$effect(() => {
 		if (!searching) return;
-		void extensions.load();
-		extensions.indexPages();
+		const list = extensions.list;
+		untrack(() => (list ? extensions.indexPages() : void extensions.load()));
 	});
 	let groups = $derived(present && !searching ? shownGroups(present) : []);
 

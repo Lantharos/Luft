@@ -109,6 +109,10 @@ export class DesktopFilter extends Effect implements DesktopFilterApi {
     }
   }
 
+  play(milliseconds: number): void {
+    this.playUniform('filter_play', milliseconds);
+  }
+
   setCaptured(captured: boolean): void {
     this.filterOptions.captured = captured;
     for (const filter of this.filters.values()) filter.set_captured(captured);

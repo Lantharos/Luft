@@ -9,6 +9,7 @@ export abstract class Effect implements StagedEffect, ScreenEffectBase {
   private problemWas: ScreenEffectProblem | null = null;
   private unstage: (() => void) | null = null;
   private stopClock: (() => void) | null = null;
+  private stopPlaying: (() => void) | null = null;
   private gone = false;
   private readonly owned: Disposable;
   abstract readonly cost: number;
@@ -50,11 +51,32 @@ export abstract class Effect implements StagedEffect, ScreenEffectBase {
     }
   }
 
+  protected playUniform(name: string, milliseconds: number): void {
+    this.endPlaying();
+    if (!this.attached) return;
+    const rate = typeof this.options.animated === 'number' ? this.options.animated : DEFAULT_FRAME_RATE;
+    const start = effectTime();
+    this.stopPlaying = this.stage.clock.add(rate, time => {
+      const part = (time - start) * 1000 / milliseconds;
+      if (part >= 0 && part < 1) this.set(name, part);
+      else {
+        this.endPlaying();
+        this.set(name, 0);
+      }
+    });
+  }
+
+  private endPlaying(): void {
+    this.stopPlaying?.();
+    this.stopPlaying = null;
+  }
+
   fail(problem: ScreenEffectProblem, detail: string): void {
     if (this.problemWas || this.gone) return;
     this.problemWas = problem;
     console.warn(`Screen effect ${this.options.label} of ${this.context.manifest.id} was turned off (${problem}): ${detail}`);
     this.keepTime(false);
+    this.endPlaying();
     this.detach();
     this.stage.attachedChanged();
     this.stage.notice(this.context.name, this.options.label, problem, () => this.context.openSettings());
@@ -64,6 +86,7 @@ export abstract class Effect implements StagedEffect, ScreenEffectBase {
   private release(): void {
     this.gone = true;
     this.keepTime(false);
+    this.endPlaying();
     this.detach();
     this.unstage?.();
     this.stage.sync();

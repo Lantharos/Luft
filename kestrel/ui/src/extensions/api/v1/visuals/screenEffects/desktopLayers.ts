@@ -147,6 +147,10 @@ export class DesktopLayerFilter extends Effect implements DesktopFilterApi {
     }
   }
 
+  play(milliseconds: number): void {
+    this.playUniform('filter_play', milliseconds);
+  }
+
   setCaptured(captured: boolean): void {
     this.filterOptions.captured = captured;
     for (const { effect } of this.layers.values()) effect.set_captured(captured);

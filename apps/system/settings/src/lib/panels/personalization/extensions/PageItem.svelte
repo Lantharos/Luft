@@ -4,8 +4,9 @@
 	import type { Extension, PageItem } from '#lib/bindings.js';
 	import RowValue from '#lib/components/RowValue.svelte';
 	import { percent } from '#lib/format.js';
-	import { extensions, shown } from './extensions.svelte';
+	import { extensions, showing, shown } from './extensions.svelte';
 	import ImageChoice from './ImageChoice.svelte';
+	import PageGroup from './PageGroup.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import SpritePreview from './SpritePreview.svelte';
 	import TaskbarPlace from './TaskbarPlace.svelte';
@@ -105,6 +106,10 @@
 	</div>
 {:else if item.type === 'taskbar-place'}
 	<TaskbarPlace element={item.element} />
+{:else if item.type === 'group'}
+	{#if showing(extension, item)}
+		<PageGroup {extension} group={item} />
+	{/if}
 {:else if item.type === 'list'}
 	{#each item.items as row, index (index)}
 		<Row title={row.title} description={row.description ?? undefined}>

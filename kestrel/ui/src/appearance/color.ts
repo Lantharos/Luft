@@ -154,9 +154,13 @@ const totalWeight = (samples: Sample[]) => samples.reduce((sum, { weight }) => s
 export function seedFromSamples(samples: Rgb[]): Seed {
   const rows = Math.round(Math.sqrt(samples.length));
   const columns = Math.max(1, Math.round(samples.length / Math.max(1, rows)));
-  const colors = samples
-    .map((rgb, index): Sample => ({ color: toOklch(rgb), weight: weightTowardTaskbarRows(Math.floor(index / columns), rows) }))
-    .filter(({ color: [lightness], weight }) => weight > 0 && lightness >= MIN_LIGHTNESS);
+  return seedOf(samples.map((rgb, index): Sample => ({ color: toOklch(rgb), weight: weightTowardTaskbarRows(Math.floor(index / columns), rows) })));
+}
+
+export const seedFromPicture = (samples: Rgb[]): Seed => seedOf(samples.map((rgb): Sample => ({ color: toOklch(rgb), weight: 1 })));
+
+function seedOf(samples: Sample[]): Seed {
+  const colors = samples.filter(({ color: [lightness], weight }) => weight > 0 && lightness >= MIN_LIGHTNESS);
   const vivid = colors.filter(({ color: [, chroma] }) => chroma >= MIN_CHROMA);
   if (!vivid.length || totalWeight(vivid) <= totalWeight(colors) * MIN_VIVID_SHARE) return NEUTRAL;
   const center = dominantHue(vivid);

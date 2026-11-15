@@ -155,10 +155,12 @@ export interface PickOptions {
   /** What the file chooser says it's for, in the language Kestrel uses. */
   title: string;
   /**
-   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), calendars (iCalendar `.ics`), or a folder
-   * of up to 32 files of up to 8 MB each, without the folders inside it, for something that's several files together.
+   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), calendars (iCalendar `.ics`), text (plain
+   * text, JSON or TOML, up to 1 MB, for something people share as a small file, such as settings to read with
+   * {@link Basics.readText}), or a folder of up to 32 files of up to 8 MB each, without the folders inside it, for
+   * something that's several files together.
    */
-  kind: 'images' | 'sounds' | 'calendars' | 'folder';
+  kind: 'images' | 'sounds' | 'calendars' | 'text' | 'folder';
   /** Lets people pick several at once. */
   multiple?: boolean;
 }

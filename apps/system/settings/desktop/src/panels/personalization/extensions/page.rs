@@ -98,6 +98,12 @@ pub enum PageItem {
     TaskbarPlace {
         element: String,
     },
+    Group {
+        title: String,
+        description: Option<String>,
+        value: Option<String>,
+        items: Vec<PageItem>,
+    },
 }
 
 #[derive(Deserialize, Serialize, specta::Type)]

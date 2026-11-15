@@ -10,9 +10,11 @@ import { cornerRadii } from '../../wallpaper/windows.js';
 import { Effect } from '../effect.js';
 import { compileError, outlineSnippet, pipelineContext, Uniforms } from '../shaders.js';
 import type { EffectsStage } from '../stage.js';
-import { type Attachment, FrameInBuffer, type WindowEffect } from './tracker.js';
+import { followAppColor } from './appColor.js';
+import { type Attachment, FrameInBuffer, type WindowEffect, windowDetails } from './tracker.js';
 
 const LARGEST_CORNER_ARC_DEPTH = 5;
+const APP_COLOR = 'outline_app_color';
 
 type Strip = [x: number, y: number, width: number, height: number];
 
@@ -69,11 +71,15 @@ function stripsFor(width: number, height: number, margin: number, inset: number 
 class OverlaidWindow implements Attachment {
   private readonly overlay: Overlay;
   private readonly frameInBuffer: FrameInBuffer;
+  private attached = true;
 
   constructor(private readonly owner: WindowOverlay, private readonly window: Meta.Window, actor: Meta.WindowActor) {
     this.frameInBuffer = new FrameInBuffer(window, () => this.place());
     this.overlay = new OverlayActor(owner.snippet, window, this.frameInBuffer);
     owner.shared.forEach((name, components, values) => this.overlay.uniform(name, components, values));
+    followAppColor(APP_COLOR, owner.sources, windowDetails(window), values => {
+      if (this.attached) this.uniform(APP_COLOR, 3, values);
+    });
     actor.add_child(this.overlay);
     this.place();
   }
@@ -98,6 +104,7 @@ class OverlaidWindow implements Attachment {
   }
 
   detach(): void {
+    this.attached = false;
     this.frameInBuffer.destroy();
     this.overlay.destroy();
     this.owner.left(this);
@@ -108,12 +115,14 @@ export class WindowOverlay extends Effect implements WindowEffect {
   readonly cost = 1;
   readonly snippet: Cogl.Snippet;
   readonly shared = new Uniforms();
+  readonly sources: readonly (string | undefined)[];
   private readonly overlaid = new Set<OverlaidWindow>();
 
   constructor(stage: EffectsStage, context: ApiContext, private readonly overlayOptions: WindowOverlayOptions) {
     const snippet = outlineSnippet(overlayOptions.declarations ?? '', overlayOptions.shader);
     super(stage, context, overlayOptions);
     this.snippet = snippet;
+    this.sources = [overlayOptions.declarations, overlayOptions.shader];
     this.begin(compileError(snippet));
     if (!this.problem) stage.windows.add(this);
   }

@@ -126,8 +126,10 @@ export interface WindowEffectHandle extends ScreenEffectBase {
  * the window changes. The shader gets `vec2 window_uv` and `vec4 window_color`, premultiplied, and changes `window_color`;
  * `window_sample(position)` reads any other pixel, `window_size` is the frame in pixels, `window_frame` is where the frame
  * sits in the texture, which also holds the app's own shadows, as x, y, width and height from 0 to 1, `window_inside(position)`
- * says whether a position is in the frame, and `window_time` follows {@link ScreenEffectOptions.animated}. Keep alpha as it is
- * unless the window is meant to get holes: rounded corners are already in it.
+ * says whether a position is in the frame, `window_time` follows {@link ScreenEffectOptions.animated}, and `window_app_color` is
+ * the app's own colour, taken from its icon, and negative while it isn't known or for an app whose icon has none, so the
+ * shader can use a colour of its own then. Keep alpha as it is unless
+ * the window is meant to get holes: rounded corners are already in it.
  */
 export type WindowShaderOptions = WindowEffectOptions;
 
@@ -136,7 +138,8 @@ export type WindowShaderOptions = WindowEffectOptions;
  * no offscreen texture. The shader gets `vec2 outline_position` in pixels from the frame's top left corner and sets
  * `vec4 outline_color`, premultiplied, so a colour with alpha 0 adds light. `outline_distance(position)` is the distance
  * to the window's edge in pixels, following its rounded corners, negative inside; `outline_inside(position)` is how much of
- * a pixel is inside; `outline_size`, `outline_scale` and `outline_time` say the rest.
+ * a pixel is inside; `outline_app_color` is the app's own colour, as `window_app_color` of {@link WindowShaderOptions};
+ * `outline_size`, `outline_scale` and `outline_time` say the rest.
  */
 export interface WindowOverlayOptions extends WindowEffectOptions {
   /** How many pixels it may draw outside the frame. */
@@ -197,6 +200,12 @@ export interface DesktopFilter extends ScreenEffectBase {
   /** Changes the shaders without a flash. A shader that doesn't compile turns the filter off. */
   setPasses(passes: readonly FilterPass[]): void;
   setCaptured(captured: boolean): void;
+  /**
+   * Moves `filter_play` from 0 to 1 over `milliseconds`, at the filter's frame rate or 30 a second, and back to 0, for
+   * something that happens now and then, such as a glitch every so often. It only draws while it plays, and doesn't play
+   * while {@link ScreenEffectOptions.animated} effects rest. Playing again while it plays starts over.
+   */
+  play(milliseconds: number): void;
 }
 
 export type EffectSurface = 'taskbar' | 'quick-settings' | 'start' | 'notifications';
@@ -402,10 +411,12 @@ export interface PickOptions {
   /** What the file chooser says it's for, in the language Kestrel uses. */
   title: string;
   /**
-   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), calendars (iCalendar `.ics`), or a folder
-   * of up to 32 files of up to 8 MB each, without the folders inside it, for something that's several files together.
+   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), calendars (iCalendar `.ics`), text (plain
+   * text, JSON or TOML, up to 1 MB, for something people share as a small file, such as settings to read with
+   * {@link Basics.readText}), or a folder of up to 32 files of up to 8 MB each, without the folders inside it, for
+   * something that's several files together.
    */
-  kind: 'images' | 'sounds' | 'calendars' | 'folder';
+  kind: 'images' | 'sounds' | 'calendars' | 'text' | 'folder';
   /** Lets people pick several at once. */
   multiple?: boolean;
 }
@@ -1601,9 +1612,23 @@ export interface PageSection {
  * the extension keeps itself, and their callbacks run in the extension. Images are files in the extension's folder or
  * data folder.
  */
-export type PageItem =
+export type PageItem = PageGroupItem | PageGroup;
+
+/** What a {@link PageGroup} can hold: every item but another group. */
+export type PageGroupItem =
   | { setting: string }
   | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageSprite | PageList | PageTaskbarPlace | { type: 'text'; text: string };
+
+/**
+ * A row that opens a dialog with more items, for what would crowd the page, such as the finer controls of one effect or
+ * a list people manage. It shows while any of its items does.
+ */
+export interface PageGroup extends PageControl {
+  type: 'group';
+  /** What the row shows at its end, such as how many things the dialog lists. */
+  value?: string;
+  items: readonly PageGroupItem[];
+}
 
 /**
  * Where one of the extension's taskbar elements sits, chosen by people, never by the extension. On a taskbar that's

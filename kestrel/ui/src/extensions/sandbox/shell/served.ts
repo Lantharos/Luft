@@ -55,7 +55,7 @@ export const CALLS: Record<string, Call> = {
   'storage.delete': call<[string]>([storageKey], (api, [stored]) => api.storage.delete(stored)),
   'open': call<[string]>([text(8192)], (api, [uri]) => api.open(uri)),
   'openSettings': call([], api => api.openSettings()),
-  'pickFiles': call<[Parameters<Api['pickFiles']>[0]]>([shape({ title: label, kind: literal('images', 'sounds', 'calendars', 'folder'), multiple: optional(flag) })],
+  'pickFiles': call<[Parameters<Api['pickFiles']>[0]]>([shape({ title: label, kind: literal('images', 'sounds', 'calendars', 'text', 'folder'), multiple: optional(flag) })],
     (api, [options]) => api.pickFiles(options)),
   'saveFile': call<[Parameters<Api['saveFile']>[0]]>([shape({ title: label, name: label, text: text(LARGEST_TEXT) })], (api, [options]) => api.saveFile(options)),
   'secrets.get': call<[string]>([key], (api, [secret]) => api.secrets.get(secret)),

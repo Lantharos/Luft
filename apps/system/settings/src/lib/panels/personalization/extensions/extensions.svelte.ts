@@ -110,10 +110,12 @@ export function shown(extension: Extension, setting: ExtensionSetting): boolean 
 }
 
 export function shownSections(extension: Extension, sections: PageSection[]): PageSection[] {
-	const showing = (item: PageItem) => {
-		if (item.type !== 'setting') return true;
-		const declared = extension.settings.find((setting) => setting.key === item.key);
-		return !!declared && shown(extension, declared);
-	};
-	return sections.filter((section) => section.items.some(showing));
+	return sections.filter((section) => section.items.some((item) => showing(extension, item)));
+}
+
+export function showing(extension: Extension, item: PageItem): boolean {
+	if (item.type === 'group') return item.items.some((inner) => showing(extension, inner));
+	if (item.type !== 'setting') return true;
+	const declared = extension.settings.find((setting) => setting.key === item.key);
+	return !!declared && shown(extension, declared);
 }

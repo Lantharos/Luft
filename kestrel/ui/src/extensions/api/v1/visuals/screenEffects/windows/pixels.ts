@@ -8,9 +8,11 @@ import type { EffectWindow, WindowShaderOptions } from '../../../types.js';
 import { Effect } from '../effect.js';
 import { compileError, Uniforms, windowSnippet } from '../shaders.js';
 import type { EffectsStage } from '../stage.js';
-import { type Attachment, FrameInBuffer, surfacesOf, type WindowEffect } from './tracker.js';
+import { followAppColor } from './appColor.js';
+import { type Attachment, FrameInBuffer, surfacesOf, type WindowEffect, windowDetails } from './tracker.js';
 
 const NAME = 'extension-window-shader';
+const APP_COLOR = 'window_app_color';
 let serial = 0;
 
 export const WindowPixels = GObject.registerClass(class ExtensionWindowPixels extends Clutter.OffscreenEffect {
@@ -57,11 +59,15 @@ class ShadedWindow implements Attachment {
   private surfaces: Clutter.Actor | null = null;
   private readonly surfaceSignals: number[];
   private readonly frameInBuffer: FrameInBuffer;
+  private attached = true;
 
   constructor(private readonly owner: WindowShader, private readonly window: Meta.Window, private readonly actor: Meta.WindowActor) {
     this.frameInBuffer = new FrameInBuffer(window, () => this.place());
     this.effect.shade(owner.snippet, this.uniforms, () => this.frameInBuffer.check());
     owner.shared.forEach((name, components, values) => this.uniforms.set(name, components, values));
+    followAppColor(APP_COLOR, owner.sources, windowDetails(window), values => {
+      if (this.attached) this.uniform(APP_COLOR, 3, values);
+    });
     frameUniforms(this.uniforms, window);
     this.surfaceSignals = (['child-added', 'child-removed'] as const).map(signal => actor.connect(signal, () => this.follow()));
     this.follow();
@@ -88,6 +94,7 @@ class ShadedWindow implements Attachment {
   }
 
   detach(): void {
+    this.attached = false;
     this.frameInBuffer.destroy();
     for (const signal of this.surfaceSignals) this.actor.disconnect(signal);
     this.surfaces?.remove_effect(this.effect);
@@ -99,12 +106,14 @@ export class WindowShader extends Effect implements WindowEffect {
   readonly cost = 2;
   readonly snippet: Cogl.Snippet;
   readonly shared = new Uniforms();
+  readonly sources: readonly (string | undefined)[];
   private readonly shaded = new Set<ShadedWindow>();
 
   constructor(stage: EffectsStage, context: ApiContext, private readonly shaderOptions: WindowShaderOptions) {
     const snippet = windowSnippet(shaderOptions.declarations ?? '', shaderOptions.shader);
     super(stage, context, shaderOptions);
     this.snippet = snippet;
+    this.sources = [shaderOptions.declarations, shaderOptions.shader];
     this.begin(compileError(snippet));
     if (!this.problem) stage.windows.add(this);
   }

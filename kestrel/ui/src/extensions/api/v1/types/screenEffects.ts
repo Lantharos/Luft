@@ -60,8 +60,10 @@ export interface WindowEffectHandle extends ScreenEffectBase {
  * the window changes. The shader gets `vec2 window_uv` and `vec4 window_color`, premultiplied, and changes `window_color`;
  * `window_sample(position)` reads any other pixel, `window_size` is the frame in pixels, `window_frame` is where the frame
  * sits in the texture, which also holds the app's own shadows, as x, y, width and height from 0 to 1, `window_inside(position)`
- * says whether a position is in the frame, and `window_time` follows {@link ScreenEffectOptions.animated}. Keep alpha as it is
- * unless the window is meant to get holes: rounded corners are already in it.
+ * says whether a position is in the frame, `window_time` follows {@link ScreenEffectOptions.animated}, and `window_app_color` is
+ * the app's own colour, taken from its icon, and negative while it isn't known or for an app whose icon has none, so the
+ * shader can use a colour of its own then. Keep alpha as it is unless
+ * the window is meant to get holes: rounded corners are already in it.
  */
 export type WindowShaderOptions = WindowEffectOptions;
 
@@ -70,7 +72,8 @@ export type WindowShaderOptions = WindowEffectOptions;
  * no offscreen texture. The shader gets `vec2 outline_position` in pixels from the frame's top left corner and sets
  * `vec4 outline_color`, premultiplied, so a colour with alpha 0 adds light. `outline_distance(position)` is the distance
  * to the window's edge in pixels, following its rounded corners, negative inside; `outline_inside(position)` is how much of
- * a pixel is inside; `outline_size`, `outline_scale` and `outline_time` say the rest.
+ * a pixel is inside; `outline_app_color` is the app's own colour, as `window_app_color` of {@link WindowShaderOptions};
+ * `outline_size`, `outline_scale` and `outline_time` say the rest.
  */
 export interface WindowOverlayOptions extends WindowEffectOptions {
   /** How many pixels it may draw outside the frame. */
@@ -131,6 +134,12 @@ export interface DesktopFilter extends ScreenEffectBase {
   /** Changes the shaders without a flash. A shader that doesn't compile turns the filter off. */
   setPasses(passes: readonly FilterPass[]): void;
   setCaptured(captured: boolean): void;
+  /**
+   * Moves `filter_play` from 0 to 1 over `milliseconds`, at the filter's frame rate or 30 a second, and back to 0, for
+   * something that happens now and then, such as a glitch every so often. It only draws while it plays, and doesn't play
+   * while {@link ScreenEffectOptions.animated} effects rest. Playing again while it plays starts over.
+   */
+  play(milliseconds: number): void;
 }
 
 export type EffectSurface = 'taskbar' | 'quick-settings' | 'start' | 'notifications';

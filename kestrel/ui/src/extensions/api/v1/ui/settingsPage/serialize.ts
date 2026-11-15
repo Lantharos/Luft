@@ -48,7 +48,7 @@ export function pageBuilder(folders: readonly string[], settings: ReadonlySet<st
   }));
   const control = (item: Plain, where: string) => ({ title: text(item.title, `${where}.title`), description: optionalText(item.description, `${where}.description`) });
 
-  const describe = (entry: PageItem, where: string): Plain => {
+  const describe = (entry: PageItem, where: string, grouped = false): Plain => {
     const item = entry as unknown as Plain;
     if ('setting' in item) {
       const key = text(item.setting, `${where}.setting`);
@@ -96,6 +96,13 @@ export function pageBuilder(folders: readonly string[], settings: ReadonlySet<st
           actions: actions(row.actions, `${where}.items[${index}]`),
         })),
       };
+      case 'group': {
+        if (grouped) throw new Error(`${where} is a group inside a group`);
+        return {
+          type: 'group', ...control(item, where), value: optionalText(item.value, `${where}.value`),
+          items: (item.items as PageItem[]).slice(0, ITEM_LIMIT).map((inner, index) => describe(inner, `${where}.items[${index}]`, true)),
+        };
+      }
       default: throw new Error(`${where} isn't a kind of page item`);
     }
   };

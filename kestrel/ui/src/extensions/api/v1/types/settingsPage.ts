@@ -123,9 +123,23 @@ export interface PageSection {
  * the extension keeps itself, and their callbacks run in the extension. Images are files in the extension's folder or
  * data folder.
  */
-export type PageItem =
+export type PageItem = PageGroupItem | PageGroup;
+
+/** What a {@link PageGroup} can hold: every item but another group. */
+export type PageGroupItem =
   | { setting: string }
   | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageSprite | PageList | PageTaskbarPlace | { type: 'text'; text: string };
+
+/**
+ * A row that opens a dialog with more items, for what would crowd the page, such as the finer controls of one effect or
+ * a list people manage. It shows while any of its items does.
+ */
+export interface PageGroup extends PageControl {
+  type: 'group';
+  /** What the row shows at its end, such as how many things the dialog lists. */
+  value?: string;
+  items: readonly PageGroupItem[];
+}
 
 /**
  * Where one of the extension's taskbar elements sits, chosen by people, never by the extension. On a taskbar that's

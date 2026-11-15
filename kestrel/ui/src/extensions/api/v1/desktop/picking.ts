@@ -15,11 +15,13 @@ const PICKED = 'picked';
 const MOST_FOLDER_FILES = 32;
 const LISTED_AT_ONCE = 64;
 const LARGEST_FOLDER_FILE = 8 * 1024 * 1024;
+const LARGEST_TEXT = 1024 * 1024;
 
 const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
   images: ['image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/jpeg'],
   sounds: ['audio/ogg', 'audio/flac', 'audio/x-wav', 'audio/wav', 'audio/mpeg'],
   calendars: ['text/calendar'],
+  text: ['text/plain', 'application/json', 'application/toml'],
 };
 
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
@@ -104,9 +106,12 @@ async function copyFolderIn(uri: string, folder: string): Promise<string> {
   return target.get_path()!;
 }
 
+const small = (uri: string) => Gio.File.new_for_uri(uri).query_info('standard::size', Gio.FileQueryInfoFlags.NONE, null).get_size() <= LARGEST_TEXT;
+
 export async function pickFiles(context: ApiContext, options: PickOptions): Promise<string[]> {
   if (!context.gestures.recent) throw new Error('Files can only be picked right after people use the extension');
-  const uris = await chosen(options);
+  const picked = await chosen(options);
+  const uris = options.kind === 'text' ? picked.filter(small) : picked;
   const folder = GLib.build_filenamev([context.dataPath, PICKED]);
   GLib.mkdir_with_parents(folder, 0o700);
   const copyPicked = options.kind === 'folder' ? copyFolderIn : copyIn;

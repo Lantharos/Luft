@@ -6,6 +6,7 @@ uniform vec4 outline_radii;
 uniform float outline_scale;
 uniform float outline_time;
 uniform float outline_margin;
+uniform vec3 outline_app_color;
 
 float outline_distance(vec2 point) {
   vec2 middle = outline_size * 0.5;
@@ -26,6 +27,7 @@ uniform vec2 window_size;
 uniform vec4 window_frame;
 uniform float window_time;
 uniform float window_progress;
+uniform vec3 window_app_color;
 
 vec4 window_sample(vec2 position) {
   return texture2D(window_texture, position);
@@ -41,6 +43,7 @@ const FILTER = `
 uniform vec2 filter_size;
 uniform float filter_scale;
 uniform float filter_time;
+uniform float filter_play;
 
 #define filter_read(sampler, position) texture2D(sampler, position)
 
@@ -53,6 +56,7 @@ const DESKTOP_LAYER = `
 uniform vec2 filter_size;
 uniform float filter_scale;
 uniform float filter_time;
+uniform float filter_play;
 uniform vec4 filter_area;
 
 #define filter_read(sampler, position) texture2D(sampler, ((position) - filter_area.xy) / filter_area.zw)

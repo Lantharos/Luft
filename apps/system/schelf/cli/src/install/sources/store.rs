@@ -13,7 +13,7 @@ use schelf_core::{host, library};
 
 use super::{Candidate, Catalog, Kind};
 use crate::install::Exit;
-use crate::install::commands::{confirm, list_of};
+use crate::install::commands::list_of;
 use crate::install::terminal::Ink;
 use crate::install::terminal::prompt;
 
@@ -193,9 +193,26 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
     lines
 }
 
-/// Shows what the app may use and asks, and whether you gave an AppImage that
-/// asks to run unsandboxed full access.
-fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> Result<bool, Exit> {
+/// What you settled for an app before it's installed.
+struct Agreement {
+    full_access: bool,
+    asks: bool,
+}
+
+const ASKS: Agreement = Agreement {
+    full_access: false,
+    asks: true,
+};
+
+const ASKS_FOR_FULL_ACCESS: Agreement = Agreement {
+    full_access: true,
+    asks: true,
+};
+
+/// Shows what the app may use, and asks whether an AppImage that asks to run
+/// unsandboxed gets full access. Installing it waits for your yes with the
+/// rest unless that question settled it.
+fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> Agreement {
     let ink = Ink::stderr();
     let name = ink.bold(listing.name());
     if let Some(access) = &release.extension {
@@ -207,7 +224,7 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
         for line in extension_access(access) {
             eprintln!("  {line}");
         }
-        return confirm(&format!("Install {}?", listing.name()), yes).map(|()| false);
+        return ASKS;
     }
     let as_appimage = format == Format::Appimage
         || (format == Format::Sabine && host::sabine_service().is_none());
@@ -215,7 +232,7 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
         eprintln!(
             "This computer has no sandbox for apps from schelf.store, so {name} runs with everything you can do."
         );
-        return confirm(&format!("Install {}?", listing.name()), yes).map(|()| true);
+        return ASKS_FOR_FULL_ACCESS;
     }
     let declared = release.permissions.as_ref();
     if let Some(declared) =
@@ -225,25 +242,31 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
         for line in access(declared) {
             eprintln!("  {line}");
         }
-        return confirm(&format!("Install {}?", listing.name()), yes).map(|()| false);
+        return ASKS;
     }
     let why = declared
         .and_then(|declared| declared.unsandboxed.as_deref())
         .map_or_else(String::new, |reason| format!(" It says: {reason}"));
     if format != Format::Appimage {
         eprintln!("{name} runs outside a sandbox, with everything you can do.{why}");
-        return confirm(&format!("Install {}?", listing.name()), yes).map(|()| true);
+        return ASKS_FOR_FULL_ACCESS;
     }
     eprintln!("{name} asks to run outside a sandbox, with everything you can do.{why}");
-    if yes || !prompt::interactive() {
+    let full_access = if yes || !prompt::interactive() {
         eprintln!("It installs in its sandbox. schelf trust gives it full access if you trust it.");
-        return Ok(false);
+        false
+    } else {
+        prompt::agree("Give it full access?")
+    };
+    Agreement {
+        full_access,
+        asks: false,
     }
-    Ok(prompt::agree("Give it full access?"))
 }
 
-/// Shows what the app may use and asks before it's installed.
-pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
+/// Shows what the app may use before it's installed, and whether installing
+/// it waits for your yes.
+pub fn install(id: &str, yes: bool) -> Result<(String, Job, bool), Exit> {
     let listing = listing::fetch(id, Age::Current).map_err(|error| {
         eprintln!("{error}");
         Exit::Failed
@@ -265,7 +288,7 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         }
         return Err(Exit::Missing);
     };
-    let full_access = agree_to(&listing, release, format, yes)?;
+    let Agreement { full_access, asks } = agree_to(&listing, release, format, yes);
     Ok((
         format!("schelf:{}", listing.id),
         Job::InstallStore {
@@ -277,5 +300,6 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
                 full_access,
             },
         },
+        asks,
     ))
 }

@@ -148,7 +148,7 @@ fn remove(name: &str, yes: bool) -> Exit {
         verb: Verb::Remove,
         from: None,
     };
-    carry_out(&[plan], |_| {})
+    carry_out(&[plan], &[], |_| Vec::new())
 }
 
 fn list() -> Exit {

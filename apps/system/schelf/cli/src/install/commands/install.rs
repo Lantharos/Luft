@@ -1,10 +1,10 @@
 use luft_software::apps::toolbox;
 use schelf_core::operations::Job;
 
-use super::{catalog, list_of, pick};
+use super::{catalog, confirm, list_of, pick};
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
-use crate::install::perform::{Plan, Verb, carry_out};
+use crate::install::perform::{Missed, Plan, Verb, carry_out};
 use crate::install::sources::{
     Candidate, Catalog, Kind, Origin, Resolved, catalogs, fedora, file, installed, resolve,
 };
@@ -68,7 +68,8 @@ fn choose(name: &str, found: Vec<Candidate>, yes: bool) -> Result<Candidate, Exi
         .expect("the choice is one of the options"))
 }
 
-fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan>, Exit> {
+/// The plan for `target`, and whether it waits for your yes along with the rest.
+fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<(Plan, bool)>, Exit> {
     let ink = Ink::stdout();
     if file::named(target) {
         let prepared = file::prepare(target).map_err(|error| {
@@ -86,7 +87,7 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
             );
             super::repo::confirm_trust(described, yes)?;
         }
-        return Ok(Some(prepared.plan));
+        return Ok(Some((prepared.plan, false)));
     }
     let line = Line::default();
     line.say(&format!("Looking for {target}"));
@@ -135,7 +136,10 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
             "{} brings a service or driver that only works as part of the system, so it goes there, starts with the computer and updates with Luft.",
             ink.bold(&candidate.name)
         );
-        return Ok(Some(super::system::plan(vec![candidate.id], Verb::Install)));
+        return Ok(Some((
+            super::system::plan(vec![candidate.id], Verb::Install),
+            false,
+        )));
     }
     candidate.plan(yes).map(Some)
 }
@@ -207,15 +211,27 @@ pub fn run(arguments: &Arguments) -> Exit {
         Err(exit) => return exit,
     };
     let mut plans = Vec::new();
+    let mut asks = false;
+    let mut missed = Vec::new();
     for target in &arguments.words {
         match prepare(target, only, arguments.yes) {
-            Ok(plan) => plans.extend(plan),
+            Ok(Some((plan, asked))) => {
+                asks |= asked;
+                plans.push(plan);
+            }
+            Ok(None) => {}
+            Err(exit @ (Exit::Missing | Exit::Failed)) => missed.push(Missed {
+                name: target.clone(),
+                exit,
+            }),
             Err(exit) => return exit,
         }
     }
-    carry_out(&plans, |plan| {
-        for note in notes(plan) {
-            println!("  {note}");
+    if asks {
+        let names: Vec<String> = plans.iter().map(|plan| plan.name().to_owned()).collect();
+        if let Err(exit) = confirm(&format!("Install {}?", list_of(&names)), arguments.yes) {
+            return exit;
         }
-    })
+    }
+    carry_out(&plans, &missed, notes)
 }

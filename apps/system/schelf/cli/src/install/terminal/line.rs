@@ -1,14 +1,13 @@
 use std::io::Write;
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use luft_dbus::runtime::block_on;
 use zbus::{OwnedVariant, Proxy};
 
 use super::{Ink, truncate};
 
-const REDRAW: Duration = Duration::from_millis(50);
 const FRAME: Duration = Duration::from_millis(80);
 const CLEAR_LINE: &str = "\r\x1b[2K";
 const ROUND: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -17,7 +16,7 @@ const SQUARE: &[char] = &['◰', '◳', '◲', '◱'];
 struct Drawn {
     ink: Ink,
     frames: &'static [char],
-    shown: Option<(Instant, String)>,
+    shown: bool,
     spinning: Option<String>,
     frame: usize,
 }
@@ -26,7 +25,7 @@ impl Drawn {
     fn paint(&mut self, line: String) {
         eprint!("{CLEAR_LINE}{line}");
         let _ = std::io::stderr().flush();
-        self.shown = Some((Instant::now(), line));
+        self.shown = true;
     }
 
     fn spin(&mut self) {
@@ -69,21 +68,26 @@ async fn rounded() -> bool {
         .unwrap_or(true)
 }
 
-/// One line of stderr that's redrawn in place: a spinner beside what's happening, or a line of its own.
+/// The spinner's frames, round like Kestrel's window corners or square.
+pub fn spinner() -> &'static [char] {
+    if block_on(rounded()) { ROUND } else { SQUARE }
+}
+
+/// One line of stderr that's redrawn in place: a spinner beside what's happening.
 pub struct Line {
     drawn: Option<Arc<Mutex<Drawn>>>,
 }
 
 impl Default for Line {
     fn default() -> Self {
-        if !super::stderr_is_terminal() {
+        if !super::live() {
             return Self { drawn: None };
         }
-        let frames = if block_on(rounded()) { ROUND } else { SQUARE };
+        let frames = spinner();
         let drawn = Arc::new(Mutex::new(Drawn {
             ink: Ink::stderr(),
             frames,
-            shown: None,
+            shown: false,
             spinning: None,
             frame: 0,
         }));
@@ -127,27 +131,13 @@ impl Line {
         drawn.spin();
     }
 
-    pub fn show(&self, line: String) {
-        let Some(drawn) = &self.drawn else {
-            return;
-        };
-        let mut drawn = lock(drawn);
-        drawn.spinning = None;
-        if let Some((at, previous)) = &drawn.shown
-            && (*previous == line || at.elapsed() < REDRAW)
-        {
-            return;
-        }
-        drawn.paint(line);
-    }
-
     pub fn clear(&self) {
         let Some(drawn) = &self.drawn else {
             return;
         };
         let mut drawn = lock(drawn);
         drawn.spinning = None;
-        if drawn.shown.take().is_some() {
+        if std::mem::take(&mut drawn.shown) {
             eprint!("{CLEAR_LINE}");
             let _ = std::io::stderr().flush();
         }

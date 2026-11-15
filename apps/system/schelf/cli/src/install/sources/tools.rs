@@ -3,7 +3,6 @@ use schelf_core::tools::{self, STABLE, Tool};
 
 use super::{Candidate, Catalog, Kind};
 use crate::install::Exit;
-use crate::install::commands::confirm;
 use crate::install::terminal::Ink;
 
 fn found(name: &str) -> Result<Option<Tool>, String> {
@@ -26,8 +25,8 @@ pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
 }
 
 /// Says who publishes the tool at `address` and that it runs with your
-/// full access, and asks before it's installed.
-pub fn install(address: &str, yes: bool) -> Result<(String, Job), Exit> {
+/// full access. Installing it waits for your yes.
+pub fn install(address: &str) -> Result<(String, Job), Exit> {
     let tool = found(address)
         .map_err(|error| {
             eprintln!("{error}");
@@ -51,7 +50,6 @@ pub fn install(address: &str, yes: bool) -> Result<(String, Job), Exit> {
             tool.publisher()
         );
     }
-    confirm(&format!("Install {}?", tool.index.address), yes)?;
     Ok((
         format!("storetool/{}", tool.index.name),
         Job::InstallStoreTool {

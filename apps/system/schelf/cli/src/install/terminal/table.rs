@@ -10,6 +10,19 @@ pub enum Look {
     Bold,
     Dim,
     Done,
+    Failed,
+}
+
+impl Look {
+    pub fn paint(self, ink: Ink, text: &str) -> String {
+        match self {
+            Self::Plain => text.to_owned(),
+            Self::Bold => ink.bold(text),
+            Self::Dim => ink.dim(text),
+            Self::Done => ink.done(text),
+            Self::Failed => ink.failed(text),
+        }
+    }
 }
 
 pub struct Table {
@@ -87,13 +100,9 @@ impl Table {
                         format!("{cell:<width$}", width = widths[column] + GAP)
                     };
                     let (text, padding) = padded.split_at(padded.trim_end().len());
-                    line.push_str(&match self.looks[column] {
-                        _ if text.is_empty() => String::new(),
-                        Look::Plain => text.to_owned(),
-                        Look::Bold => ink.bold(text),
-                        Look::Dim => ink.dim(text),
-                        Look::Done => ink.done(text),
-                    });
+                    if !text.is_empty() {
+                        line.push_str(&self.looks[column].paint(ink, text));
+                    }
                     line.push_str(padding);
                 }
                 line.trim_end().to_owned()

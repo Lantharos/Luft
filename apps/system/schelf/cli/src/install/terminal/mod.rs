@@ -1,6 +1,6 @@
+pub mod board;
 mod ink;
 mod line;
-pub mod progress;
 pub mod prompt;
 mod table;
 
@@ -8,6 +8,7 @@ use std::io::IsTerminal;
 
 pub use ink::Ink;
 pub use line::Line;
+use line::spinner;
 pub use table::{Look, Table, truncate};
 
 const NARROWEST: usize = 40;
@@ -21,16 +22,28 @@ pub fn stderr_is_terminal() -> bool {
     std::io::stderr().is_terminal()
 }
 
-pub fn width() -> usize {
+/// Whether progress can be drawn in place on stderr: a terminal that takes
+/// colour and moving the cursor.
+pub fn live() -> bool {
+    ink::wanted(stderr_is_terminal())
+}
+
+fn size() -> Option<libc::winsize> {
     let mut size: libc::winsize = unsafe { std::mem::zeroed() };
-    let measured = [libc::STDOUT_FILENO, libc::STDERR_FILENO]
+    [libc::STDOUT_FILENO, libc::STDERR_FILENO]
         .into_iter()
-        .any(|fd| unsafe { libc::ioctl(fd, libc::TIOCGWINSZ, &mut size) } == 0 && size.ws_col > 0);
-    if measured {
+        .any(|fd| unsafe { libc::ioctl(fd, libc::TIOCGWINSZ, &mut size) } == 0 && size.ws_col > 0)
+        .then_some(size)
+}
+
+pub fn width() -> usize {
+    size().map_or(WIDEST, |size| {
         usize::from(size.ws_col).clamp(NARROWEST, WIDEST)
-    } else {
-        WIDEST
-    }
+    })
+}
+
+pub fn height() -> usize {
+    size().map_or(usize::MAX, |size| usize::from(size.ws_row))
 }
 
 pub fn bytes(size: u64) -> String {

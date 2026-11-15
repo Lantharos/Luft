@@ -62,7 +62,7 @@ fn prepare(arguments: &Arguments, everything: &[InstalledApp]) -> Result<Vec<Pla
 pub fn run(arguments: &Arguments) -> Exit {
     let everything = installed::all(arguments.only);
     match prepare(arguments, &everything) {
-        Ok(plans) => carry_out(&plans, |_| {}),
+        Ok(plans) => carry_out(&plans, &[], |_| Vec::new()),
         Err(exit) => exit,
     }
 }

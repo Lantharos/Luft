@@ -8,8 +8,8 @@ use schelf_core::operations::{OperationState, Request};
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 
-use super::Failure;
-use crate::install::terminal::progress::{Status, Update};
+use super::{Failure, Report};
+use crate::install::terminal::board::Update;
 
 const CLOSED: &str = "Schelf closed before it finished.";
 
@@ -41,7 +41,7 @@ fn update(state: &str, stage: &str, fraction: f64) -> Update {
 async fn follow(
     proxy: &SchelfProxy<'static>,
     request: &str,
-    status: &Status<'_>,
+    report: Report<'_>,
     cancel: &Cancel,
 ) -> Result<(), String> {
     let mut changes = proxy.receive_changed().await.map_err(failed)?;
@@ -62,7 +62,7 @@ async fn follow(
                 Some(change) = changes.next() => {
                     let change = change.args().map_err(failed)?;
                     if change.id == id {
-                        status.show(update(&change.state, &change.stage, change.fraction));
+                        report(update(&change.state, &change.stage, change.fraction));
                     }
                 }
                 Some(finish) = finishes.next() => {
@@ -98,9 +98,9 @@ async fn follow(
 pub fn run(
     proxy: &SchelfProxy<'static>,
     request: &Request,
-    status: &Status,
+    report: Report,
     cancel: &Cancel,
 ) -> Result<(), Failure> {
     let request = serde_json::to_string(request).map_err(|error| error.to_string())?;
-    block_on(follow(proxy, &request, status, cancel)).map_err(Failure::from)
+    block_on(follow(proxy, &request, report, cancel)).map_err(Failure::from)
 }

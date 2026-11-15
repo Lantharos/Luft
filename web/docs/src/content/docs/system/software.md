@@ -139,13 +139,15 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf take steam Games` | Takes a drive or folder away again |
 | `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
-A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.
+A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store or a tool installs, the command shows what it can use, then asks once for everything you named.
+
+Installing, updating or removing several things lists each on a line of its own, with how far its download got, its size and speed, and works on three at a time, starting the next as soon as one finishes. Downloads run side by side; putting things in place goes one at a time, since package managers and your account's apps can only take one change at once. Fedora tools, `.deb` apps, system packages and Flatpak apps for everyone do all their work in that one-at-a-time step. When one fails the rest carry on, the summary at the end names what didn't work, and the command exits with an error.
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
 
 The same command runs on other Linux systems too, where `curl -fsSL https://schelf.store/install | sh` puts it in `~/.local/bin` and it keeps itself up to date. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, system packages, extensions and full access say they need Luft.
 
-When its output goes to another program instead of a terminal, `search` and `list` print one line per entry with the fields separated by tabs, and nothing is coloured. `NO_COLOR` turns colours off in a terminal too.
+When its output goes to another program instead of a terminal, `search` and `list` print one line per entry with the fields separated by tabs, nothing is coloured, and progress is told one line at a time instead of redrawn. `NO_COLOR` and `TERM=dumb` do the same in a terminal.
 
 | Exit code | Means |
 | --- | --- |

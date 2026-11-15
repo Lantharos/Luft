@@ -10,7 +10,7 @@ pub struct Ink {
     color: bool,
 }
 
-fn wanted(terminal: bool) -> bool {
+pub(super) fn wanted(terminal: bool) -> bool {
     terminal
         && std::env::var_os("NO_COLOR").is_none_or(|value| value.is_empty())
         && std::env::var("TERM").is_ok_and(|term| term != "dumb")

@@ -156,16 +156,18 @@ impl Catalog {
         }
     }
 
-    fn install(self, id: &str, kind: Kind, yes: bool) -> Result<(String, Job), Exit> {
+    fn install(self, id: &str, kind: Kind, yes: bool) -> Result<(String, Job, bool), Exit> {
+        let asked = |(key, job): (String, Job), asks: bool| (key, job, asks);
         Ok(match (self, kind) {
             (Self::Store, _) => store::install(id, yes)?,
-            (Self::Tools, _) => tools::install(id, yes)?,
+            (Self::Tools, _) => asked(tools::install(id)?, true),
             (Self::Flathub, _) => (
                 format!("flathub:{id}"),
                 Job::InstallFlathub { id: id.to_owned() },
+                false,
             ),
-            (Self::Fedora, Kind::Desktop) | (Self::System, _) => system::install(id),
-            (Self::Fedora, _) => fedora::install(id),
+            (Self::Fedora, Kind::Desktop) | (Self::System, _) => asked(system::install(id), false),
+            (Self::Fedora, _) => asked(fedora::install(id), false),
         })
     }
 }
@@ -214,9 +216,11 @@ impl Candidate {
         )
     }
 
-    pub fn plan(&self, yes: bool) -> Result<Plan, Exit> {
-        let (key, job) = self.catalog.install(&self.id, self.kind, yes)?;
-        Ok(Plan {
+    /// How to install it, and whether that waits for your yes along with the
+    /// rest you asked for.
+    pub fn plan(&self, yes: bool) -> Result<(Plan, bool), Exit> {
+        let (key, job, asks) = self.catalog.install(&self.id, self.kind, yes)?;
+        let plan = Plan {
             request: Request {
                 key,
                 title: self.name.clone(),
@@ -225,6 +229,7 @@ impl Candidate {
             },
             verb: Verb::Install,
             from: Some(self.catalog.title().to_owned()),
-        })
+        };
+        Ok((plan, asks))
     }
 }

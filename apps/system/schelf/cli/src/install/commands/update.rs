@@ -228,5 +228,5 @@ pub fn run(arguments: &Arguments) -> Exit {
             Ink::stdout().bold(&update.name)
         );
     }
-    carry_out(&plans(&updates), |_| {})
+    carry_out(&plans(&updates), &[], |_| Vec::new())
 }

@@ -85,12 +85,12 @@ pub fn install(arguments: &Arguments) -> Exit {
         return Exit::Done;
     }
     let note = if wanted.len() == 1 {
-        "  It's rebuilt with every update of Luft, and its services start with the computer."
+        "It's rebuilt with every update of Luft, and its services start with the computer."
     } else {
-        "  They're rebuilt with every update of Luft, and their services start with the computer."
+        "They're rebuilt with every update of Luft, and their services start with the computer."
     };
-    carry_out(&[plan(wanted, Verb::Install)], |_| {
-        println!("{note}");
+    carry_out(&[plan(wanted, Verb::Install)], &[], |_| {
+        vec![note.to_owned()]
     })
 }
 

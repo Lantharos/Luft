@@ -7,5 +7,5 @@ screenshots = ["check.webp", "room.webp", "ready.webp"]
 categories = ["System", "Utility"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
-brand_color = "#b8862e"
+brand_color = "#ec5947"
 listed = true

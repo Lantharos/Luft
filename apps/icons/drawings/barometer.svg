@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+	<g class="ink">
+		<rect x="27.68" y="35.5" width="15.63" height="5" rx="2.5" transform="rotate(-48.81 35.5 38)"/>
+		<circle cx="32" cy="42" r="5"/>
+	</g>
+	<g class="shade">
+		<path d="M11 42A21 21 0 0 1 53 42A2.5 2.5 0 0 1 48 42A16 16 0 0 0 16 42A2.5 2.5 0 0 1 11 42Z"/>
+	</g>
+</svg>

@@ -1,0 +1,14 @@
+{
+	"name": "@luft/app-icons",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "bun src/build.ts",
+		"check": "tsc --noEmit && bun src/build.ts --check"
+	},
+	"devDependencies": {
+		"@types/bun": "^1.4.3",
+		"canvaskit-wasm": "0.42.0",
+		"typescript": "7.0.2"
+	}
+}

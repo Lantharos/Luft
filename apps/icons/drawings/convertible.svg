@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+	<g class="ink">
+		<path transform="scale(0.5)" d="M34 50a30 30 0 0 1 54-14l6-7 3 28-28-3 8-7a19 19 0 0 0-34 8z"/>
+	</g>
+	<g class="shade">
+		<path transform="scale(0.5)" d="M94 78a30 30 0 0 1-54 14l-6 7-3-28 28 3-8 7a19 19 0 0 0 34-8z"/>
+	</g>
+</svg>

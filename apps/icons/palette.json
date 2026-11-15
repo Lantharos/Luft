@@ -1,0 +1,19 @@
+{
+	"barometer": { "plate": "#022421", "ink": "#b5f5ed", "shade": "#03beb0" },
+	"convertible": { "plate": "#182209", "ink": "#d8f0bb", "shade": "#a5dc4e" },
+	"disks": { "plate": "#1d1a32", "ink": "#e4e3fe", "shade": "#998ef6" },
+	"draft": { "plate": "#2d1806", "ink": "#ffe0c8", "shade": "#f59740" },
+	"flatbed": { "plate": "#16211e", "ink": "#d4ede7", "shade": "#94c7bc" },
+	"heft": { "plate": "#281b0f", "ink": "#ffe0c6", "shade": "#b87e49" },
+	"keys": { "plate": "#0a2229", "ink": "#c2efff", "shade": "#62cef0" },
+	"magpie": { "plate": "#2c1525", "ink": "#ffd9f3", "shade": "#e96bca" },
+	"mailman": { "plate": "#0f1e33", "ink": "#d7e8fe", "shade": "#5299f6" },
+	"meet": { "plate": "#301511", "ink": "#feded8", "shade": "#ec5947" },
+	"rover": { "plate": "#281c02", "ink": "#fee3ad", "shade": "#f0b72d" },
+	"schelf": { "plate": "#2f141b", "ink": "#fedce3", "shade": "#ee678d" },
+	"settings": { "plate": "#1c1e22", "ink": "#e1e6f0", "shade": "#98a2b3" },
+	"setup": { "plate": "#271b17", "ink": "#fcdfd6", "shade": "#e3ac9a" },
+	"signin": { "plate": "#07212f", "ink": "#cfebfe", "shade": "#0790ce" },
+	"soundboard": { "plate": "#25172d", "ink": "#f1ddff", "shade": "#bd72e7" },
+	"tern": { "plate": "#072416", "ink": "#bdf6d3", "shade": "#44ca89" }
+}

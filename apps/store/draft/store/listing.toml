@@ -7,5 +7,5 @@ screenshots = ["light.webp", "dark.webp"]
 categories = ["Utility", "Development"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
-brand_color = "#2f4858"
+brand_color = "#f59740"
 listed = true

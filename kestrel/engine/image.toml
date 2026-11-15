@@ -1,5 +1,6 @@
 part = "kestrel"
 sources = [
+    "apps/icons/palette.json",
     "kestrel/compositor",
     "kestrel/tools/unicode",
     "kestrel/ui",

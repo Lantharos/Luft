@@ -7,6 +7,7 @@ import {touchpad} from '../checks/board/lib/touchpad.js';
 import {chord, rest, swipe} from '../checks/lib/input/input.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
 import {nextFrame, pause, settled} from '../checks/lib/wait.js';
+import {elementGroups} from './elements.js';
 import type {Clip} from './film.js';
 import {listGroups} from './lists.js';
 import {shellGroups} from './shell.js';
@@ -179,4 +180,4 @@ async function keyboardSnap(clip: Clip) {
   await reset();
 }
 
-export const groups = {surfaces, windows, board, gestures, reduced, snap: keyboardSnap, ...shellGroups, ...listGroups};
+export const groups = {surfaces, windows, board, gestures, reduced, snap: keyboardSnap, ...shellGroups, ...listGroups, ...elementGroups};

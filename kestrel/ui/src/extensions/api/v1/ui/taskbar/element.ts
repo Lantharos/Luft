@@ -4,13 +4,12 @@ import St from 'gi://St';
 
 import type { ElementActor, ElementLayout } from '../../../../../desktop/panel/elements/extensionElements.js';
 import type { DragDelegate } from '../../../../../shared/popups/dndTargets.js';
-import { animateActor, Curve, Duration } from '../../../../../shared/motion/motion.js';
+import { animateActor } from '../../../../../shared/motion/motion.js';
 import type { ControlHost } from '../popups/controls.js';
 import { RenderedView } from '../popups/render.js';
 import type { View } from '../../types.js';
-
-const GROW = { duration: Duration.large, curve: Curve.settle };
-const FADE = { duration: Duration.moderate, curve: Curve.gentle };
+import { GROW, morph } from './morph.js';
+import { PinnedLayout } from './pinned.js';
 
 export interface ElementState {
   shown: boolean;
@@ -37,7 +36,7 @@ function insideControl(target: Clutter.Actor | null, element: Clutter.Actor): bo
 
 export class ElementWidget implements ElementActor {
   readonly actor = new St.Widget({
-    style_class: 'kestrel-extension-element', layout_manager: new Clutter.BinLayout(), clip_to_allocation: true,
+    style_class: 'kestrel-extension-element', layout_manager: new PinnedLayout(() => this.layout.vertical), clip_to_allocation: true,
     reactive: true, track_hover: true, x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.CENTER,
   });
   private readonly compact: RenderedView;
@@ -49,14 +48,8 @@ export class ElementWidget implements ElementActor {
   constructor(private readonly state: () => ElementState, controls: ControlHost, private readonly handlers: ElementHandlers, private layout: ElementLayout) {
     this.compact = new RenderedView(controls);
     this.grown = new RenderedView(controls);
-    for (const view of [this.compact, this.grown]) {
-      view.actor.x_align = Clutter.ActorAlign.START;
-      view.actor.y_align = Clutter.ActorAlign.CENTER;
-      view.actor.x_expand = false;
-      this.actor.add_child(view.actor);
-    }
+    for (const view of [this.compact, this.grown]) this.actor.add_child(view.actor);
     this.grown.actor.visible = false;
-    this.grown.actor.opacity = 0;
     this.actor.connect('notify::hover', () => this.sync(true));
     this.actor.connect('button-release-event', (_actor, event) => this.released(event));
     (this.actor as St.Widget & { _delegate?: DragDelegate })._delegate = {
@@ -109,7 +102,9 @@ export class ElementWidget implements ElementActor {
     if (growing !== this.growing) {
       this.growing = growing;
       this.handlers.expanded(growing);
-      this.crossfade(growing ? this.grown : this.compact, growing ? this.compact : this.grown, animate);
+      if (animate) this.actor.set_size(this.actor.width, this.actor.height);
+      const [into, from] = growing ? [this.grown, this.compact] : [this.compact, this.grown];
+      morph(into.actor, from.actor, this.layout.vertical, animate);
     }
     const size = state.shown ? this.along(growing ? this.grown : this.compact) : 0;
     const across = this.layout.thickness;
@@ -138,17 +133,6 @@ export class ElementWidget implements ElementActor {
     const across = this.layout.thickness;
     if (this.layout.vertical) this.actor.set_size(across, -1);
     else this.actor.set_size(-1, across);
-  }
-
-  private crossfade(into: RenderedView, from: RenderedView, animate: boolean): void {
-    into.actor.show();
-    animateActor(into.actor, { opacity: 255, ...FADE, duration: animate ? FADE.duration : 0 });
-    animateActor(from.actor, {
-      opacity: 0, ...FADE, duration: animate ? FADE.duration : 0,
-      onStopped: () => {
-        if (from.actor.opacity === 0) from.actor.hide();
-      },
-    });
   }
 
   private syncOnceOnStage(): void {

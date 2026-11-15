@@ -44,7 +44,7 @@ pub fn mapped(folder: &OwnedFd, path: &str, inode: u64) -> Mapped {
     }
 }
 
-fn status(fd: &OwnedFd) -> Option<libc::stat> {
+pub(super) fn status(fd: &OwnedFd) -> Option<libc::stat> {
     let mut status = MaybeUninit::<libc::stat>::uninit();
     (unsafe { libc::fstat(fd.as_raw_fd(), status.as_mut_ptr()) } == 0)
         .then(|| unsafe { status.assume_init() })

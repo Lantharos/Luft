@@ -12,6 +12,7 @@ use super::image::{self, Mapped};
 use crate::process::open_at;
 
 const MAPS: &CStr = c"maps";
+const ENVIRON: &CStr = c"environ";
 const STAT: &CStr = c"stat";
 const CMDLINE: &CStr = c"cmdline";
 const FIELDS_BEFORE_ENVIRONMENT: usize = 47;
@@ -61,7 +62,7 @@ fn environment_range(stat: &[u8]) -> Option<(usize, usize)> {
 /// The starting environment, read from the process's memory as a tracer
 /// would. `/proc/<pid>/environ` is readable by the process's owner alone, and
 /// reading it as root would take reading every file on the computer.
-fn environment(folder: &OwnedFd, pid: u32) -> Option<Vec<u8>> {
+fn traced_environment(folder: &OwnedFd, pid: u32) -> Option<Vec<u8>> {
     let (start, end) = environment_range(&read(folder, STAT)?)?;
     let mut environment = vec![0u8; end - start];
     let local = libc::iovec {
@@ -76,6 +77,21 @@ fn environment(folder: &OwnedFd, pid: u32) -> Option<Vec<u8>> {
         libc::process_vm_readv(libc::pid_t::try_from(pid).ok()?, &local, 1, &remote, 1, 0)
     };
     (usize::try_from(copied).ok()? == environment.len()).then_some(environment)
+}
+
+fn runs_as_us(folder: &OwnedFd) -> bool {
+    image::status(folder).is_some_and(|folder| folder.st_uid == unsafe { libc::geteuid() })
+}
+
+/// The starting environment of the process behind a `/proc` folder. A
+/// process running as the one asking hands it over in `environ`; the
+/// kernel's hardening lets only root trace a process it didn't start.
+fn environment(folder: &OwnedFd, pid: u32) -> Option<Vec<u8>> {
+    if runs_as_us(folder) {
+        read(folder, ENVIRON)
+    } else {
+        traced_environment(folder, pid)
+    }
 }
 
 struct Mapping<'a> {

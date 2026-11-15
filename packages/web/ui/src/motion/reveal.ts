@@ -9,7 +9,7 @@ export const revealContents: Attachment<HTMLElement> = (container) => {
 	const items = [...container.children].filter((item) => item instanceof HTMLElement);
 	items.forEach((item, index) =>
 		item.animate(
-			{ opacity: [0, 1], translate: [`0 ${RISE}px`, '0 0'] },
+			[{ opacity: 0, translate: `0 ${RISE}px` }, { translate: '0 0' }],
 			{
 				duration: Role.reveal.duration,
 				delay: Feedback.staggerAfter + Math.min(index, Feedback.staggerMost) * Feedback.staggerStep,

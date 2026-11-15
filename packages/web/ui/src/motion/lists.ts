@@ -30,7 +30,7 @@ function depart(list: HTMLElement, row: HTMLElement, place: Place, full: boolean
 }
 
 function arrive(row: HTMLElement, full: boolean) {
-	const frames = full ? { opacity: [0, 1], scale: [AWAY, '1'] } : { opacity: [0, 1] };
+	const frames = full ? [{ opacity: 0, scale: AWAY }, { scale: '1' }] : [{ opacity: 0, offset: 0 }];
 	row.animate(frames, { duration: Role.reveal.duration, easing: Role.reveal.easing, fill: 'backwards' });
 }
 

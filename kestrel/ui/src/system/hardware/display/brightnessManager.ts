@@ -135,12 +135,12 @@ export class BrightnessManager extends GObject.Object {
     this.dimOverlay = new DimOverlay(this.dimmingTarget);
 
     const keybindings: [string, () => void][] = [
-      ['screen-brightness-up', () => this.globalScaleValue?.stepUp()],
-      ['screen-brightness-up-monitor', () => this.currentMonitorScale()?.stepUp()],
-      ['screen-brightness-down', () => this.globalScaleValue?.stepDown()],
-      ['screen-brightness-down-monitor', () => this.currentMonitorScale()?.stepDown()],
-      ['screen-brightness-cycle', () => this.globalScaleValue?.cycleUp()],
-      ['screen-brightness-cycle-monitor', () => this.currentMonitorScale()?.cycleUp()],
+      ['screen-brightness-up', () => this.adjustAll(scale => scale.stepUp())],
+      ['screen-brightness-up-monitor', () => this.adjustCurrent(scale => scale.stepUp())],
+      ['screen-brightness-down', () => this.adjustAll(scale => scale.stepDown())],
+      ['screen-brightness-down-monitor', () => this.adjustCurrent(scale => scale.stepDown())],
+      ['screen-brightness-cycle', () => this.adjustAll(scale => scale.cycleUp())],
+      ['screen-brightness-cycle-monitor', () => this.adjustCurrent(scale => scale.cycleUp())],
     ];
     for (const [name, handler] of keybindings) {
       Main.wm.addKeybinding(name, new Gio.Settings({ schema_id: KEYBINDING_SCHEMA }),
@@ -179,8 +179,17 @@ export class BrightnessManager extends GObject.Object {
     return [...this.monitorScales.values()];
   }
 
-  private currentMonitorScale(): MonitorScale | undefined {
-    return this.monitorScales.get(global.backend.get_current_logical_monitor()!);
+  private adjustAll(change: (scale: BrightnessScale) => void): void {
+    if (!this.globalScaleValue) return;
+    change(this.globalScaleValue);
+    showBrightnessOSD(this.monitorScales.values());
+  }
+
+  private adjustCurrent(change: (scale: BrightnessScale) => void): void {
+    const scale = this.monitorScales.get(global.backend.get_current_logical_monitor()!);
+    if (!scale) return;
+    change(scale);
+    showBrightnessOSD([scale]);
   }
 
   private saveBrightnesses(): void {
@@ -256,17 +265,17 @@ export class BrightnessManager extends GObject.Object {
     }
 
     this.dimOverlay.cover(monitors.filter(monitor => !(this.monitorScales.get(monitor) instanceof BacklightBrightnessScale)));
-    this.sync({ showOSD: false });
+    this.sync();
 
     this.emit('changed');
   }
 
-  private sync({ showOSD = true } = {}): void {
-    this.syncScales(showOSD);
+  private sync(): void {
+    this.syncScales();
     this.dimOverlay.dim(this.dimmingEnabled);
   }
 
-  private syncScales(showOSD: boolean): void {
+  private syncScales(): void {
     if (!this.globalScaleValue) return;
     if (this.inhibitUpdates) return;
     this.inhibitUpdates = true;
@@ -293,14 +302,10 @@ export class BrightnessManager extends GObject.Object {
       }
 
       this.globalScaleValue.value = max;
-
-      if (showOSD) showBrightnessOSD(changedScales);
     } else if (this.globalScaleChanged) {
       this.globalScaleChanged = false;
 
       for (const scale of this.monitorScales.values()) scale.syncWithScale(this.globalScaleValue);
-
-      if (showOSD) showBrightnessOSD(this.monitorScales.values());
     } else {
       scalesUpdated = false;
     }

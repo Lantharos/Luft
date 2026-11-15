@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Παραμονή σε αυτήν την έκ
 settings-updates-restart = Επανεκκίνηση
 settings-updates-restart-to-install = Επανεκκίνηση για εγκατάσταση
 settings-updates-see-new = Τι νέο υπάρχει
-settings-updates-whats-new = Τι νέο υπάρχει
 settings-updates-go-back-title = Επιστροφή στην προηγούμενη έκδοση
 settings-updates-previous = Έκδοση { $version }. Τα αρχεία και οι ρυθμίσεις σας μένουν όπως είναι.
 settings-updates-previous-unversioned = Τα αρχεία και οι ρυθμίσεις σας μένουν όπως είναι.

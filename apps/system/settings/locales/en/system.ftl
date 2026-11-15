@@ -214,7 +214,6 @@ settings-updates-restart = Restart
 settings-updates-restart-to-install = Restart to install
 settings-updates-see-new = See what’s new
 # Button
-settings-updates-whats-new = What’s new
 settings-updates-go-back-title = Go back to the previous version
 settings-updates-previous = Version { $version }. Your files and settings stay as they are.
 settings-updates-previous-unversioned = Your files and settings stay as they are.

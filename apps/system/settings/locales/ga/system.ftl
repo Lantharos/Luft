@@ -192,7 +192,6 @@ settings-updates-stay-unversioned = Fan ar an leagan seo
 settings-updates-restart = Atosaigh
 settings-updates-restart-to-install = Atosaigh chun suiteáil
 settings-updates-see-new = Féach cad atá nua
-settings-updates-whats-new = Cad atá nua
 settings-updates-go-back-title = Téigh ar ais chuig an leagan roimhe seo
 settings-updates-previous = Leagan { $version }. Fanfaidh do chomhaid agus do shocruithe mar atá siad.
 settings-updates-previous-unversioned = Fanfaidh do chomhaid agus do shocruithe mar atá siad.

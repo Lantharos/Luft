@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Ficar nesta versão
 settings-updates-restart = Reiniciar
 settings-updates-restart-to-install = Reiniciar para instalar
 settings-updates-see-new = Ver novidades
-settings-updates-whats-new = Novidades
 settings-updates-go-back-title = Voltar à versão anterior
 settings-updates-previous = Versão { $version }. Os ficheiros e as definições ficam como estão.
 settings-updates-previous-unversioned = Os ficheiros e as definições ficam como estão.

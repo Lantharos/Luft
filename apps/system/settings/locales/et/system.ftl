@@ -186,7 +186,6 @@ settings-updates-stay-unversioned = Jää sellele versioonile
 settings-updates-restart = Taaskäivita
 settings-updates-restart-to-install = Taaskäivita installimiseks
 settings-updates-see-new = Vaata, mis on uut
-settings-updates-whats-new = Mis on uut
 settings-updates-go-back-title = Naase eelmisele versioonile
 settings-updates-previous = Versioon { $version }. Sinu failid ja seadistused jäävad samaks.
 settings-updates-previous-unversioned = Sinu failid ja seadistused jäävad samaks.

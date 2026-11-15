@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Maradás ennél a verziónál
 settings-updates-restart = Újraindítás
 settings-updates-restart-to-install = Újraindítás a telepítéshez
 settings-updates-see-new = Újdonságok megtekintése
-settings-updates-whats-new = Újdonságok
 settings-updates-go-back-title = Visszatérés az előző verzióra
 settings-updates-previous = { $version } verzió. A fájlok és a beállítások változatlanok maradnak.
 settings-updates-previous-unversioned = A fájlok és a beállítások változatlanok maradnak.

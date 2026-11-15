@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Bli på denne versjonen
 settings-updates-restart = Start på nytt
 settings-updates-restart-to-install = Start på nytt for å installere
 settings-updates-see-new = Sjå kva som er nytt
-settings-updates-whats-new = Kva er nytt
 settings-updates-go-back-title = Gå tilbake til den førre versjonen
 settings-updates-previous = Versjon { $version }. Filene og innstillingane dine blir verande som dei er.
 settings-updates-previous-unversioned = Filene og innstillingane dine blir verande som dei er.

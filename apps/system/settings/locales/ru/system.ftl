@@ -189,7 +189,6 @@ settings-updates-stay-unversioned = Остаться на этой версии
 settings-updates-restart = Перезагрузить
 settings-updates-restart-to-install = Перезагрузить для установки
 settings-updates-see-new = Что нового
-settings-updates-whats-new = Что нового
 settings-updates-go-back-title = Вернуться к предыдущей версии
 settings-updates-previous = Версия { $version }. Ваши файлы и настройки останутся без изменений.
 settings-updates-previous-unversioned = Ваши файлы и настройки останутся без изменений.

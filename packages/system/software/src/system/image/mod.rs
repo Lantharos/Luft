@@ -210,14 +210,6 @@ impl Deployments {
         })
     }
 
-    /// Everything new since the version this system updated from, when that one was older.
-    pub fn new_since_previous(&self) -> Option<Vec<Section>> {
-        let channel = self.0.followed.as_ref()?.release_channel()?;
-        let current = self.0.booted.release().version?;
-        let previous = self.0.rollback.as_ref()?.release().version?;
-        notes::between(channel, &previous, &current)
-    }
-
     pub fn variant_offer(&self) -> Option<Variant> {
         let followed = self.0.followed.as_ref()?;
         let suited = Variant::for_this_computer();

@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Bliv på denne version
 settings-updates-restart = Genstart
 settings-updates-restart-to-install = Genstart for at installere
 settings-updates-see-new = Se, hvad der er nyt
-settings-updates-whats-new = Nyheder
 settings-updates-go-back-title = Gå tilbage til den forrige version
 settings-updates-previous = Version { $version }. Dine filer og indstillinger forbliver, som de er.
 settings-updates-previous-unversioned = Dine filer og indstillinger forbliver, som de er.

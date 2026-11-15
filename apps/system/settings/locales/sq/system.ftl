@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Qëndro te ky version
 settings-updates-restart = Rinis
 settings-updates-restart-to-install = Rinis për të instaluar
 settings-updates-see-new = Shih çfarë ka të re
-settings-updates-whats-new = Çfarë ka të re
 settings-updates-go-back-title = Kthehu te versioni i mëparshëm
 settings-updates-previous = Versioni { $version }. Skedarët dhe cilësimet e tua mbeten siç janë.
 settings-updates-previous-unversioned = Skedarët dhe cilësimet e tua mbeten siç janë.

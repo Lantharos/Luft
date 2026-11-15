@@ -1,15 +1,13 @@
 mod switch;
 mod watch;
 
-use luft_software::system::image::{
-    self, ChannelChoice, Deployments, Release, Section, Status, Update,
-};
+use luft_software::system::image::{self, ChannelChoice, Deployments, Release, Status, Update};
 use luft_software::task::Task;
 use luft_software::variant::Channel;
 use serde::Serialize;
 use specta::Type;
 
-use super::store::{Checked, Found, WhatsNew};
+use super::store::{Checked, Found};
 
 pub use switch::run as switch;
 pub use watch::{scan, watch};
@@ -41,21 +39,6 @@ fn check(deployments: &Deployments) -> Result<Option<Update>, String> {
     Ok(update)
 }
 
-fn whats_new(deployments: &Deployments, current: &Release) -> Option<Vec<Section>> {
-    let version = current.version.clone()?;
-    let saved = WhatsNew::load();
-    if saved.version.as_ref() == Some(&version) {
-        return saved.notes;
-    }
-    let notes = deployments.new_since_previous()?;
-    let _ = WhatsNew {
-        version: Some(version),
-        notes: Some(notes.clone()),
-    }
-    .save();
-    Some(notes)
-}
-
 fn expected_size() -> Option<u64> {
     Found::load().update.map(|update| update.size)
 }
@@ -85,8 +68,7 @@ pub fn checked(deployments: Deployments, refreshed: bool) -> Result<ImageOvervie
 }
 
 fn overview(deployments: Deployments, update: Option<Update>, refreshed: bool) -> ImageOverview {
-    let mut status = deployments.status();
-    status.current.notes = whats_new(&deployments, &status.current).or(status.current.notes);
+    let status = deployments.status();
     let available = update
         .filter(|update| deployments.lacks(update))
         .map(|update| Available {

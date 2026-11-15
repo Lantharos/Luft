@@ -186,7 +186,6 @@ settings-updates-stay-unversioned = Rămâi la această versiune
 settings-updates-restart = Repornește
 settings-updates-restart-to-install = Repornește pentru a instala
 settings-updates-see-new = Vezi ce este nou
-settings-updates-whats-new = Noutăți
 settings-updates-go-back-title = Reveniți la versiunea anterioară
 settings-updates-previous = Versiunea { $version }. Fișierele și setările rămân neschimbate.
 settings-updates-previous-unversioned = Fișierele și setările rămân neschimbate.

@@ -189,7 +189,6 @@ settings-updates-stay-unversioned = Likti su šia versija
 settings-updates-restart = Paleisti iš naujo
 settings-updates-restart-to-install = Paleisti iš naujo ir įdiegti
 settings-updates-see-new = Žiūrėti, kas naujo
-settings-updates-whats-new = Kas naujo
 settings-updates-go-back-title = Grįžti į ankstesnę versiją
 settings-updates-previous = Versija { $version }. Jūsų failai ir nustatymai liks nepakeisti.
 settings-updates-previous-unversioned = Jūsų failai ir nustatymai liks nepakeisti.

@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Halda þessari útgáfu
 settings-updates-restart = Endurræsa
 settings-updates-restart-to-install = Endurræsa til að setja upp
 settings-updates-see-new = Sjá hvað er nýtt
-settings-updates-whats-new = Hvað er nýtt
 settings-updates-go-back-title = Fara aftur í fyrri útgáfu
 settings-updates-previous = Útgáfa { $version }. Skrárnar þínar og stillingar haldast óbreyttar.
 settings-updates-previous-unversioned = Skrárnar þínar og stillingar haldast óbreyttar.

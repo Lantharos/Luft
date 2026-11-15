@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Bu sürümde kal
 settings-updates-restart = Yeniden başlat
 settings-updates-restart-to-install = Yüklemek için yeniden başlat
 settings-updates-see-new = Yenilikleri gör
-settings-updates-whats-new = Yenilikler
 settings-updates-go-back-title = Önceki sürüme dön
 settings-updates-previous = Sürüm { $version }. Dosyalarınız ve ayarlarınız olduğu gibi kalır.
 settings-updates-previous-unversioned = Dosyalarınız ve ayarlarınız olduğu gibi kalır.

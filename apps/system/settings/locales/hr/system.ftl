@@ -186,7 +186,6 @@ settings-updates-stay-unversioned = Ostani na ovoj verziji
 settings-updates-restart = Ponovno pokreni
 settings-updates-restart-to-install = Ponovno pokreni za instalaciju
 settings-updates-see-new = Pogledaj novosti
-settings-updates-whats-new = Novosti
 settings-updates-go-back-title = Vrati se na prethodnu verziju
 settings-updates-previous = Verzija { $version }. Vaše datoteke i postavke ostaju nepromijenjene.
 settings-updates-previous-unversioned = Vaše datoteke i postavke ostaju nepromijenjene.

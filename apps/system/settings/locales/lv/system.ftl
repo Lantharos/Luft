@@ -186,7 +186,6 @@ settings-updates-stay-unversioned = Palikt pie šīs versijas
 settings-updates-restart = Restartēt
 settings-updates-restart-to-install = Restartēt, lai instalētu
 settings-updates-see-new = Skatīt jaunumus
-settings-updates-whats-new = Jaunumi
 settings-updates-go-back-title = Atgriezties pie iepriekšējās versijas
 settings-updates-previous = Versija { $version }. Jūsu faili un iestatījumi paliek nemainīti.
 settings-updates-previous-unversioned = Jūsu faili un iestatījumi paliek nemainīti.

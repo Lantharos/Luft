@@ -189,7 +189,6 @@ settings-updates-stay-unversioned = Zůstat u této verze
 settings-updates-restart = Restartovat
 settings-updates-restart-to-install = Restartovat a nainstalovat
 settings-updates-see-new = Zobrazit novinky
-settings-updates-whats-new = Novinky
 settings-updates-go-back-title = Vrátit se k předchozí verzi
 settings-updates-previous = Verze { $version }. Vaše soubory a nastavení zůstanou beze změny.
 settings-updates-previous-unversioned = Vaše soubory a nastavení zůstanou beze změny.

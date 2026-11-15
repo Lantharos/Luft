@@ -192,7 +192,6 @@ settings-updates-stay-unversioned = Ibqa’ fuq din il-verżjoni
 settings-updates-restart = Irristartja
 settings-updates-restart-to-install = Irristartja biex tinstalla
 settings-updates-see-new = Ara x’hemm ġdid
-settings-updates-whats-new = X’hemm ġdid
 settings-updates-go-back-title = Mur lura għall-verżjoni ta’ qabel
 settings-updates-previous = Verżjoni { $version }. Il-fajls u s-settings jibqgħu kif inhuma.
 settings-updates-previous-unversioned = Il-fajls u s-settings jibqgħu kif inhuma.

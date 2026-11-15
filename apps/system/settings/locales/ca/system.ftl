@@ -183,7 +183,6 @@ settings-updates-stay-unversioned = Queda’t en aquesta versió
 settings-updates-restart = Reinicia
 settings-updates-restart-to-install = Reinicia per instal·lar
 settings-updates-see-new = Mostra les novetats
-settings-updates-whats-new = Novetats
 settings-updates-go-back-title = Torneu a la versió anterior
 settings-updates-previous = Versió { $version }. Els fitxers i la configuració es queden com estan.
 settings-updates-previous-unversioned = Els fitxers i la configuració es queden com estan.

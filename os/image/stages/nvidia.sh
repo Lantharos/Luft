@@ -7,6 +7,7 @@ source "$(dirname "$0")/rpmfusion.sh"
 use_rpmfusion
 dnf install -y --setopt=tsflags=nodocs "$driver"/rpms/*.rpm libva-nvidia-driver
 forget_rpmfusion
+rm /usr/share/applications/nvidia-settings.desktop
 dnf clean all
 cp -a "$driver/stage/." /
 

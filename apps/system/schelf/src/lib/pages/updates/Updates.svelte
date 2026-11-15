@@ -32,6 +32,8 @@
 		}
 		const tools = waiting.filter((update) => update.source === 'tool');
 		batch('tool-updates', tools, { kind: 'updateTools', packages: tools.map((update) => update.package!) });
+		const debs = waiting.filter((update) => update.source === 'debian');
+		batch('deb-updates', debs, { kind: 'updateDebs', packages: debs.map((update) => update.package!) });
 		for (const update of waiting.filter((update) => (update.source === 'appImage' || update.source === 'storeTool' || update.store) && !update.store?.widens)) void operations.run(update.key, update.name, updateJob(update));
 	}
 </script>

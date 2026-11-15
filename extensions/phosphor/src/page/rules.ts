@@ -1,0 +1,50 @@
+import type { Extension, PageItem } from '@luft/extension-api';
+
+import { type AppRules, type Granted, type Part, PARTS } from '../rules.js';
+
+const PART_LABELS: Record<Part, string> = { border: 'border', overlay: 'overlay', crt: 'window-crt', aberration: 'window-aberration', motion: 'rule-motion' };
+
+const EVERYWHERE_LABELS: Record<Part, string> = {
+  border: 'everywhere-border',
+  overlay: 'everywhere-overlay',
+  crt: 'everywhere-crt',
+  aberration: 'everywhere-aberration',
+  motion: 'everywhere-motion',
+};
+
+function appName(apps: { id: string; name: string }[], id: string): string {
+  return apps.find(app => app.id === id)?.name ?? id;
+}
+
+export function ruleItems(phosphor: Extension<Granted>, rules: AppRules): PageItem[] {
+  const { t, screenEffects } = phosphor;
+  const apps = screenEffects.apps();
+  const free = apps.filter(app => !rules.apps.includes(app.id));
+  return [
+    ...PARTS.map((part): PageItem => ({
+      type: 'switch', title: t(EVERYWHERE_LABELS[part]), checked: rules.onEverywhere(part),
+      onToggled: checked => rules.setEverywhere(part, checked),
+    })),
+    {
+      type: 'list',
+      empty: t('rules-empty'),
+      items: rules.apps.map(app => ({
+        title: appName(apps, app),
+        actions: [
+          ...PARTS.map(part => ({
+            label: t(rules.value(app, part) ? 'rule-on' : 'rule-off', { part: t(PART_LABELS[part]) }),
+            onActivate: () => rules.toggle(app, part),
+          })),
+          { label: t('rule-remove'), danger: true, onActivate: () => rules.remove(app) },
+        ],
+      })),
+    },
+    {
+      type: 'choice', title: t('rule-add'), value: '',
+      options: [{ value: '', label: t('rule-add-pick') }, ...free.map(app => ({ value: app.id, label: app.name }))],
+      onChanged: value => {
+        if (value) rules.add(value);
+      },
+    },
+  ];
+}

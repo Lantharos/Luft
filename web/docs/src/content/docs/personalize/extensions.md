@@ -1,6 +1,6 @@
 ---
 title: Extensions
-description: Seasons, Strays, Playthings, Keystrokes, Soundscapes, Focus, Reminders, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Strays, Playthings, Keystrokes, Phosphor, Soundscapes, Focus, Reminders, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 asks:
@@ -28,12 +28,17 @@ asks:
   - { ask: rain sounds, to: soundscapes }
   - { ask: background noise for focus, to: soundscapes }
   - { ask: sleep timer, to: soundscapes }
+  - { ask: crt effect, to: phosphor }
+  - { ask: window borders, to: phosphor }
+  - { ask: rice desktop, to: phosphor }
+  - { ask: screen filter, to: phosphor }
+  - { ask: share a look, to: phosphor }
   - { ask: pomodoro, to: focus }
   - { ask: focus timer, to: focus }
   - { ask: work timer, to: focus }
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. You find them in [Schelf](/apps/schelf/), such as Seasons, [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult.
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. You find them in [Schelf](/apps/schelf/), such as Seasons, [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Phosphor, Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult.
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings while it's on, and **Remove**.
 
@@ -77,6 +82,22 @@ The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on an
 ## Keystrokes
 
 [Keystrokes](/personalize/keystrokes/) plays a soft sound as you type and click, from crisp mechanical switches to a typewriter, without seeing what you type. You can make your own set of sounds.
+
+## Phosphor
+
+Phosphor changes how the whole desktop looks: borders and glow around windows, effects inside them, open and close animations, filters over the screen, and lines across the taskbar and Luft's apps. Everything is off until you turn it on, and an effect that's off costs nothing. Set it up in **Settings → Extensions → Phosphor**.
+
+**Look** at the top puts on a whole look at once: Terminal green, Amber CRT, Vaporwave, Noir film, VHS tape, Clean neon or Pocket, a green dithered handheld. **Plain** turns everything off. Change anything afterwards and the look becomes **Custom**; picking Custom later brings back what you had. Under **Your looks** you can save the current look under a name, put a saved one back on, and share a look as a small file that others open with **Open a shared look**.
+
+- **Windows** get a border in one colour, a gradient, a glow, a double line, dashes that march around them, a neon tube or a rainbow, still, flowing or pulsing. **Each app's own colour** takes the border's colour from the app's icon. Overlays add scanlines, a tint, film grain, a vignette or a CRT edge, and windows can cast a hard offset shadow or a soft coloured glow. **Windows in the background** dims them or takes their colour away.
+- **CRT** and chromatic aberration go inside the apps you pick under **Apps**, where you also decide what goes on every app and make exceptions.
+- **Opening and closing** plays a glitch, fold, dissolve, burn, CRT power, pixelate, beam, shatter or static effect, as long or short as you like.
+- **Screen filters** cover the whole screen, or just the desktop: a CRT with scanlines, curvature and an aperture grille, shadow or slot mask under **Tube**, VHS tracking lines and colour bleed, a glitch every so often, bloom, chromatic aberration, film grain and a vignette.
+- **Colour** grades the screen warm, cold, teal and orange, noir, sepia or vivid, by your own temperature, tint, saturation, contrast and brightness, or in two colours of your choice. Palettes bring it down to a handheld's four greens, black and white, an amber terminal or 16 colours, dithered or not, and it can be pixelated, posterized, printed as a halftone, inverted or have its shadows lifted.
+
+Effects that move by themselves, such as flicker, VHS and moving grain, say so: they redraw the screen while they run and rest after 30 seconds without input, on the lock screen, with reduced motion and in power saving. Screen filters stay off on the lock screen and, unless you say otherwise, over fullscreen games and videos, and they don't show in screenshots unless you turn that on.
+
+If the screen becomes hard to read, **Ctrl+Alt+Esc** turns every effect of every extension off until you turn them back on. Phosphor also turns an effect off by itself if it fails or makes the desktop very slow, and tells you.
 
 ## Tailor
 

@@ -1,134 +1,22 @@
-import type { DesktopFilter, Extension, FilterPass } from '@luft/extension-api';
+import type { DesktopFilter, Disposable, Extension } from '@luft/extension-api';
 
+import { colorSetting, rgb } from '../color.js';
 import type { Granted } from '../rules.js';
+import { type Choices, passes, wanted } from './passes.js';
+import { GRADES, ownGrade } from './pieces/color.js';
+import { SHADED_PALETTES } from './pieces/stylize.js';
 
-const FLICKER_RATE = 30;
+const MOVING_RATE = 30;
+const GRAIN_RATE = 24;
 const CURVE_REACH = 0.07;
 const CURVE_STEPS = 6;
 const BLOOM_REACH = 0.02;
 const ABERRATION_REACH = 0.01;
-
-const GRADES: Record<string, { tint: number[]; saturation: number; contrast: number; shadows: number[]; lights: number[] }> = {
-  warm: { tint: [1.08, 1.0, 0.86], saturation: 1.05, contrast: 1.02, shadows: [0, 0, 0], lights: [0, 0, 0] },
-  cold: { tint: [0.88, 0.98, 1.12], saturation: 0.95, contrast: 1.03, shadows: [0, 0, 0], lights: [0, 0, 0] },
-  'teal-orange': { tint: [1, 1, 1], saturation: 1.1, contrast: 1.08, shadows: [-0.05, 0.03, 0.08], lights: [0.08, 0.02, -0.07] },
-  noir: { tint: [1, 1, 1], saturation: 0, contrast: 1.25, shadows: [0, 0, 0], lights: [0, 0, 0] },
-  sepia: { tint: [1.12, 0.98, 0.74], saturation: 0.15, contrast: 1.04, shadows: [0, 0, 0], lights: [0, 0, 0] },
-  vivid: { tint: [1, 1, 1], saturation: 1.45, contrast: 1.1, shadows: [0, 0, 0], lights: [0, 0, 0] },
-};
-
-const CURVE = `
-uniform float crt_curvature;
-
-vec2 curved(vec2 position) {
-  vec2 from_middle = position * 2.0 - 1.0;
-  from_middle *= 1.0 + dot(from_middle, from_middle) * 0.07 * crt_curvature;
-  return from_middle * 0.5 + 0.5;
-}`;
-
-const BRIGHT = `
-vec3 bright = max(filter_color.rgb - 0.62, 0.0);
-filter_color = vec4(bright * (1.0 / 0.38), 1.0);`;
-
-const blur = (sampler: string, axis: string) => `
-vec2 step_size = ${axis} / filter_size * 3.0;
-vec3 sum = filter_read(${sampler}, filter_uv).rgb * 0.227;
-sum += (filter_read(${sampler}, filter_uv + step_size * 1.385).rgb + filter_read(${sampler}, filter_uv - step_size * 1.385).rgb) * 0.316;
-sum += (filter_read(${sampler}, filter_uv + step_size * 3.231).rgb + filter_read(${sampler}, filter_uv - step_size * 3.231).rgb) * 0.0703;
-filter_color = vec4(sum, 1.0);`;
-
-const DECLARATIONS = `
-uniform float crt_scanlines;
-uniform float crt_mask;
-uniform float crt_flicker;
-uniform float grade_amount;
-uniform vec3 grade_tint;
-uniform float grade_saturation;
-uniform float grade_contrast;
-uniform vec3 grade_shadows;
-uniform vec3 grade_lights;
-uniform float shadow_boost;
-uniform float bloom_amount;
-uniform float chromatic_aberration;`;
-
-const USE_BEND = `
-vec2 scene_position = curved(filter_uv);
-float on_tube = step(0.0, scene_position.x) * step(scene_position.x, 1.0) * step(0.0, scene_position.y) * step(scene_position.y, 1.0);
-filter_color = filter_scene(scene_position) * on_tube;`;
-
-const NO_BEND = `
-vec2 scene_position = filter_uv;
-float on_tube = 1.0;`;
-
-const USE_ABERRATION = `
-vec2 from_middle_of_tube = scene_position * 2.0 - 1.0;
-vec2 outward = from_middle_of_tube * filter_size;
-float reach = dot(from_middle_of_tube, from_middle_of_tube) * 0.5;
-vec2 fringe = outward / max(length(outward), 1.0) * reach * chromatic_aberration * 8.0 * filter_scale / filter_size;
-filter_color.r = filter_scene(scene_position + fringe).r * on_tube;
-filter_color.b = filter_scene(scene_position - fringe).b * on_tube;`;
-
-const USE_BLOOM = 'filter_color.rgb += filter_read(cogl_sampler3, scene_position).rgb * bloom_amount;';
-
-const USE_SHADOWS = `
-float dark = 1.0 - clamp(dot(filter_color.rgb, vec3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);
-filter_color.rgb += filter_color.rgb * dark * dark * shadow_boost * 1.6 + vec3(0.03) * dark * dark * dark * shadow_boost;`;
-
-const USE_GRADE = `
-vec3 graded = filter_color.rgb * grade_tint;
-float light = dot(graded, vec3(0.2126, 0.7152, 0.0722));
-graded = mix(vec3(light), graded, grade_saturation);
-graded += mix(grade_shadows, grade_lights, smoothstep(0.1, 0.8, light));
-graded = (graded - 0.5) * grade_contrast + 0.5;
-filter_color.rgb = mix(filter_color.rgb, clamp(graded, 0.0, 1.0), grade_amount);`;
-
-const INVERT: Record<string, string> = {
-  colors: 'filter_color.rgb = 1.0 - clamp(filter_color.rgb, 0.0, 1.0);',
-  lightness: `
-vec3 kept = clamp(filter_color.rgb, 0.0, 1.0);
-filter_color.rgb = kept + 1.0 - max(kept.r, max(kept.g, kept.b)) - min(kept.r, min(kept.g, kept.b));`,
-};
-
-const USE_CRT = `
-float line_height = max(2.0, floor(filter_size.y / 480.0));
-float line = 0.5 + 0.5 * cos(scene_position.y * filter_size.y * 6.2831853 / line_height);
-filter_color.rgb *= 1.0 - line * crt_scanlines * 0.55;
-float column = mod(floor(scene_position.x * filter_size.x), 3.0);
-vec3 mask = vec3(column < 0.5 ? 1.0 : 0.75, abs(column - 1.0) < 0.5 ? 1.0 : 0.75, column > 1.5 ? 1.0 : 0.75);
-filter_color.rgb = mix(filter_color.rgb, filter_color.rgb * mask * 1.15, crt_mask);
-vec2 from_middle = filter_uv * 2.0 - 1.0;
-filter_color.rgb *= 1.0 - dot(from_middle, from_middle) * 0.14 * crt_scanlines;`;
-
-const USE_FLICKER = `
-float roll = fract(scene_position.y - filter_time * 0.11);
-filter_color.rgb *= 1.0 + 0.018 * sin(filter_time * 113.0) + 0.05 * smoothstep(0.93, 1.0, roll);`;
-
-interface Choices {
-  crt: boolean;
-  curved: boolean;
-  flicker: boolean;
-  invert: string;
-  grade: string;
-  shadows: boolean;
-  bloom: boolean;
-  aberration: boolean;
-}
-
-function finalShader({ crt, curved, flicker, invert, grade, shadows, bloom, aberration }: Choices): FilterPass {
-  return {
-    declarations: `${curved ? CURVE : ''}${DECLARATIONS}`,
-    shader: [
-      curved ? USE_BEND : NO_BEND,
-      aberration ? USE_ABERRATION : '',
-      bloom ? USE_BLOOM : '',
-      shadows ? USE_SHADOWS : '',
-      grade !== 'off' ? USE_GRADE : '',
-      INVERT[invert] ?? '',
-      crt ? USE_CRT : '',
-      flicker ? USE_FLICKER : '',
-    ].join('\n'),
-  };
-}
+const PIXEL_REACH = 0.0015;
+const VHS_REACH = 0.012;
+const GLITCH_REACH = 0.03;
+const BURST_MS = 420;
+const SECOND = 1000;
 
 /** Where `curved` puts a point of the picture on the tube, found the way a fixed point is, since it has no closed form. */
 function shownOnTube(curvature: number) {
@@ -144,78 +32,121 @@ function shownOnTube(curvature: number) {
   };
 }
 
-const bloomPasses = (): FilterPass[] => [
-  { shader: BRIGHT, scale: 0.5 },
-  { shader: blur('cogl_sampler1', 'vec2(1.0, 0.0)'), scale: 0.25 },
-  { shader: blur('cogl_sampler2', 'vec2(0.0, 1.0)'), scale: 0.25 },
-];
-
-/** Everything chosen for the whole screen, in one shader, so turning more on doesn't add passes over the display. */
+/** Everything chosen for the whole screen as one filter, built again only when what's on changes. */
 export class ScreenFilter {
   private filter: DesktopFilter | null = null;
   private shape = '';
+  private nextBurst: Disposable | null = null;
 
   constructor(private readonly phosphor: Extension<Granted>) {}
 
   private choices(): Choices {
     const { settings, appearance } = this.phosphor;
+    const still = appearance.reducedMotion;
     const crt = settings.get<boolean>('desktop-crt');
+    const grain = settings.get<number>('screen-grain') > 0;
     return {
       crt,
+      mask: settings.get<string>('crt-mask-type'),
       curved: crt && settings.get<number>('crt-curvature') > 0,
-      flicker: crt && settings.get<boolean>('crt-flicker') && !appearance.reducedMotion,
+      flicker: crt && settings.get<boolean>('crt-flicker') && !still,
       invert: settings.get<string>('invert'),
       grade: settings.get<string>('grade'),
       shadows: settings.get<number>('shadow-boost') > 0,
       bloom: settings.get<number>('bloom') > 0,
       aberration: settings.get<number>('chromatic-aberration') > 0,
+      pixelate: settings.get<number>('pixelate') > 1,
+      palette: settings.get<string>('palette'),
+      dither: settings.get<boolean>('palette-dither'),
+      stylize: settings.get<string>('stylize'),
+      vhs: settings.get<boolean>('vhs'),
+      glitch: settings.get<boolean>('glitch-bursts') && !still,
+      grain,
+      grainMoving: grain && settings.get<boolean>('screen-grain-moving') && !still,
+      vignette: settings.get<number>('screen-vignette') > 0,
     };
   }
 
+  private reach({ curved, bloom, aberration, pixelate, stylize, vhs, glitch }: Choices): number {
+    const { settings } = this.phosphor;
+    return (curved ? settings.get<number>('crt-curvature') * CURVE_REACH : 0)
+      + (bloom ? BLOOM_REACH * settings.get<number>('bloom-radius') : 0)
+      + (aberration ? ABERRATION_REACH : 0)
+      + (pixelate ? settings.get<number>('pixelate') * PIXEL_REACH : 0)
+      + (stylize === 'halftone' ? settings.get<number>('halftone-size') * PIXEL_REACH : 0)
+      + (vhs ? VHS_REACH : 0)
+      + (glitch ? GLITCH_REACH : 0);
+  }
+
+  private rate(choices: Choices, still: boolean): number | false {
+    if (choices.flicker || (choices.vhs && !still)) return MOVING_RATE;
+    return choices.grainMoving ? GRAIN_RATE : false;
+  }
+
   update(): void {
-    const { settings, screenEffects, t } = this.phosphor;
+    const { settings, screenEffects, appearance, t } = this.phosphor;
     const choices = this.choices();
-    const { crt, curved, flicker, invert, grade, shadows, bloom, aberration } = choices;
-    const wanted = crt || invert !== 'off' || grade !== 'off' || shadows || bloom || aberration;
+    const on = wanted(choices);
     const scope = settings.get<'screen' | 'desktop'>('filters-scope');
-    const reach = (curved ? settings.get<number>('crt-curvature') * CURVE_REACH : 0) + (bloom ? BLOOM_REACH : 0) + (aberration ? ABERRATION_REACH : 0);
-    const shape = wanted ? `${JSON.stringify(choices)} ${settings.get<boolean>('filters-fullscreen')} ${scope} ${reach}` : '';
+    const reach = this.reach(choices);
+    const animated = this.rate(choices, appearance.reducedMotion);
+    const shape = on ? `${JSON.stringify(choices)} ${settings.get<boolean>('filters-fullscreen')} ${scope} ${reach} ${animated}` : '';
     if (shape !== this.shape) {
       this.shape = shape;
       this.filter?.dispose();
-      this.filter = !wanted ? null : screenEffects.addDesktopFilter({
+      this.filter = !on ? null : screenEffects.addDesktopFilter({
         label: t('desktop-filters'),
-        passes: [...bloom ? bloomPasses() : [], finalShader(choices)],
-        warps: curved,
-        animated: flicker ? FLICKER_RATE : false,
+        passes: passes(choices),
+        warps: choices.curved,
+        animated,
         fullscreen: settings.get<boolean>('filters-fullscreen'),
         captured: settings.get<boolean>('filters-captured'),
         scope,
         reach,
-        shownAt: curved ? shownOnTube(settings.get<number>('crt-curvature')) : undefined,
+        shownAt: choices.curved ? shownOnTube(settings.get<number>('crt-curvature')) : undefined,
       });
     }
-    this.apply();
+    this.apply(choices);
+    this.burstLater(choices.glitch);
   }
 
-  private apply(): void {
+  private burstLater(glitching: boolean): void {
+    this.nextBurst?.dispose();
+    this.nextBurst = null;
+    if (!glitching || !this.filter) return;
+    const gap = this.phosphor.settings.get<number>('glitch-gap') * SECOND;
+    this.nextBurst = this.phosphor.timers.timeout(gap * (0.5 + Math.random()), () => {
+      this.filter?.play(BURST_MS);
+      this.burstLater(true);
+    });
+  }
+
+  private apply({ grade, palette }: Choices): void {
     const { filter } = this;
     if (!filter) return;
     const { settings } = this.phosphor;
+    const number = (key: string) => settings.get<number>(key);
     filter.setCaptured(settings.get<boolean>('filters-captured'));
-    filter.set('crt_scanlines', settings.get<number>('crt-scanlines'));
-    filter.set('crt_curvature', settings.get<number>('crt-curvature'));
-    filter.set('crt_mask', settings.get<number>('crt-mask'));
-    filter.set('shadow_boost', settings.get<number>('shadow-boost'));
-    filter.set('bloom_amount', settings.get<number>('bloom'));
-    filter.set('chromatic_aberration', settings.get<number>('chromatic-aberration'));
-    const grade = GRADES[settings.get<string>('grade')];
-    if (!grade) return;
-    filter.set('grade_amount', settings.get<number>('grade-strength'));
-    filter.set('grade_tint', ...grade.tint);
-    filter.set('grade_saturation', grade.saturation);
-    filter.set('grade_contrast', grade.contrast);
-    filter.set('grade_shadows', ...grade.shadows);
-    filter.set('grade_lights', ...grade.lights);
+    for (const [uniform, key] of [
+      ['crt_scanlines', 'crt-scanlines'], ['crt_line_count', 'crt-line-count'], ['crt_curvature', 'crt-curvature'], ['crt_mask', 'crt-mask'],
+      ['shadow_boost', 'shadow-boost'], ['bloom_amount', 'bloom'], ['bloom_threshold', 'bloom-threshold'], ['bloom_radius', 'bloom-radius'],
+      ['chromatic_aberration', 'chromatic-aberration'], ['pixel_block', 'pixelate'], ['posterize_levels', 'posterize-levels'],
+      ['halftone_size', 'halftone-size'], ['vhs_strength', 'vhs-strength'], ['screen_grain', 'screen-grain'], ['screen_vignette', 'screen-vignette'],
+    ]) filter.set(uniform, number(key));
+    filter.set('crt_line_shape', 4 ** (1 - 2 * number('crt-line-thickness')));
+    filter.set('crt_flicker_amount', number('crt-flicker-strength') * 2);
+    filter.set('grade_amount', number('grade-strength'));
+    filter.set('duotone_dark', ...colorSetting(this.phosphor, 'duotone-dark'));
+    filter.set('duotone_light', ...colorSetting(this.phosphor, 'duotone-light'));
+    (SHADED_PALETTES[palette] ?? []).forEach((hex, index) => filter.set(`palette_${index}`, ...rgb(hex)));
+    const graded = grade === 'custom'
+      ? ownGrade(number('grade-temperature'), number('grade-tint'), number('grade-saturation'), number('grade-contrast'), number('grade-brightness'))
+      : GRADES[grade];
+    if (!graded) return;
+    filter.set('grade_tint', ...graded.tint);
+    filter.set('grade_saturation', graded.saturation);
+    filter.set('grade_contrast', graded.contrast);
+    filter.set('grade_shadows', ...graded.shadows);
+    filter.set('grade_lights', ...graded.lights);
   }
 }

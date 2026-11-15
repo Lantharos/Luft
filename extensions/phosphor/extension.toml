@@ -1,9 +1,26 @@
 id = "com.lantharos.Phosphor"
 name = "Phosphor"
-description = "Rice the whole desktop: borders, glow, CRT, colour fringes and open and close effects on windows, filters, bloom and chromatic aberration over the screen, and lines across the taskbar and Luft's apps."
-version = "1.0.0"
+description = "Rice the whole desktop with one look or your own: borders, glow, shadows, CRT and open and close effects on windows, CRT, VHS, palettes, grades and bloom over the screen, and lines across the taskbar and Luft's apps."
+version = "1.1.0"
 api = 1
 permissions = ["screen-effects"]
+
+[[settings]]
+key = "look"
+type = "choice"
+label = "look"
+default = "plain"
+options = [
+  { value = "plain", label = "look-plain", image = "looks/plain.webp" },
+  { value = "custom", label = "look-custom", image = "looks/custom.svg" },
+  { value = "terminal", label = "look-terminal", image = "looks/terminal.webp" },
+  { value = "amber", label = "look-amber", image = "looks/amber.webp" },
+  { value = "vaporwave", label = "look-vaporwave", image = "looks/vaporwave.webp" },
+  { value = "noir", label = "look-noir", image = "looks/noir.webp" },
+  { value = "vhs", label = "look-vhs", image = "looks/vhs.webp" },
+  { value = "neon", label = "look-neon", image = "looks/neon.webp" },
+  { value = "pocket", label = "look-pocket", image = "looks/pocket.webp" },
+]
 
 [[settings]]
 key = "border"
@@ -15,12 +32,16 @@ options = [
   { value = "color", label = "border-color-style" },
   { value = "gradient", label = "border-gradient" },
   { value = "glow", label = "border-glow" },
+  { value = "double", label = "border-double" },
+  { value = "dashed", label = "border-dashed" },
+  { value = "neon", label = "border-neon" },
+  { value = "rainbow", label = "border-rainbow" },
 ]
 
 [[settings]]
 key = "border-color"
 depends = "border"
-when = ["color", "gradient", "glow"]
+when = ["color", "gradient", "glow", "double", "dashed", "neon"]
 type = "color"
 label = "border-first-color"
 default = "accent"
@@ -30,6 +51,14 @@ swatches = [
   { value = "#ffb347", label = "amber" },
   { value = "#ff5fa2", label = "neon-pink" },
 ]
+
+[[settings]]
+key = "border-app-color"
+depends = "border"
+when = ["color", "gradient", "glow", "double", "dashed", "neon"]
+type = "switch"
+label = "border-app-color"
+default = false
 
 [[settings]]
 key = "border-second-color"
@@ -47,7 +76,7 @@ swatches = [
 [[settings]]
 key = "border-width"
 depends = "border"
-when = ["color", "gradient", "glow"]
+when = ["color", "gradient", "glow", "double", "dashed", "neon", "rainbow"]
 type = "slider"
 label = "border-width"
 default = 2
@@ -56,9 +85,20 @@ max = 8
 step = 1
 
 [[settings]]
+key = "border-glow-size"
+depends = "border"
+when = ["glow", "neon"]
+type = "slider"
+label = "glow-size"
+default = 24
+min = 8
+max = 48
+step = 2
+
+[[settings]]
 key = "border-motion"
 depends = "border"
-when = ["color", "gradient", "glow"]
+when = ["color", "gradient", "glow", "double", "dashed", "neon", "rainbow"]
 type = "choice"
 label = "border-motion"
 default = "still"
@@ -69,9 +109,20 @@ options = [
 ]
 
 [[settings]]
+key = "border-speed"
+depends = "border-motion"
+when = ["flow", "pulse"]
+type = "slider"
+label = "speed"
+default = 1
+min = 0.25
+max = 3
+step = 0.25
+
+[[settings]]
 key = "border-focused"
 depends = "border"
-when = ["color", "gradient", "glow"]
+when = ["color", "gradient", "glow", "double", "dashed", "neon", "rainbow"]
 type = "switch"
 label = "border-focused"
 default = false
@@ -103,6 +154,55 @@ step = 0.05
 unit = "percent"
 
 [[settings]]
+key = "overlay-tint-color"
+depends = "overlay"
+when = ["tint"]
+type = "color"
+label = "overlay-tint-color"
+default = "accent"
+swatches = [
+  { value = "accent", label = "accent" },
+  { value = "#8bf58a", label = "phosphor-green" },
+  { value = "#ffb347", label = "amber" },
+  { value = "#ff5fa2", label = "neon-pink" },
+  { value = "#5fd4ff", label = "ice" },
+]
+
+[[settings]]
+key = "overlay-line-spacing"
+depends = "overlay"
+when = ["scanlines"]
+type = "slider"
+label = "line-spacing"
+default = 3
+min = 2
+max = 8
+step = 1
+
+[[settings]]
+key = "overlay-grain-size"
+depends = "overlay"
+when = ["grain"]
+type = "slider"
+label = "grain-size"
+default = 2
+min = 1
+max = 6
+step = 1
+
+[[settings]]
+key = "overlay-vignette-size"
+depends = "overlay"
+when = ["vignette"]
+type = "slider"
+label = "vignette-size"
+default = 0.5
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
 key = "window-crt"
 type = "slider"
 label = "window-crt"
@@ -123,6 +223,66 @@ step = 0.05
 unit = "percent"
 
 [[settings]]
+key = "unfocused"
+type = "choice"
+label = "unfocused"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "dim", label = "unfocused-dim" },
+  { value = "desaturate", label = "unfocused-desaturate" },
+]
+
+[[settings]]
+key = "unfocused-strength"
+depends = "unfocused"
+when = ["dim", "desaturate"]
+type = "slider"
+label = "strength"
+default = 0.4
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "shadow"
+type = "choice"
+label = "shadow"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "hard", label = "shadow-hard" },
+  { value = "soft", label = "shadow-soft" },
+]
+
+[[settings]]
+key = "shadow-color"
+depends = "shadow"
+when = ["hard", "soft"]
+type = "color"
+label = "shadow-color"
+default = "#000000"
+swatches = [
+  { value = "#000000", label = "black" },
+  { value = "accent", label = "accent" },
+  { value = "#ff5fa2", label = "neon-pink" },
+  { value = "#5fd4ff", label = "ice" },
+  { value = "#ffb347", label = "amber" },
+]
+
+[[settings]]
+key = "shadow-size"
+depends = "shadow"
+when = ["hard", "soft"]
+type = "slider"
+label = "shadow-size"
+default = 10
+min = 2
+max = 32
+step = 2
+
+[[settings]]
 key = "open-effect"
 type = "choice"
 label = "open-effect"
@@ -134,7 +294,22 @@ options = [
   { value = "dissolve", label = "dissolve" },
   { value = "burn", label = "burn" },
   { value = "crt", label = "crt-power" },
+  { value = "pixelate", label = "pixelate" },
+  { value = "beam", label = "beam" },
+  { value = "shatter", label = "shatter" },
+  { value = "static", label = "static" },
 ]
+
+[[settings]]
+key = "open-length"
+depends = "open-effect"
+when = ["glitch", "fold", "dissolve", "burn", "crt", "pixelate", "beam", "shatter", "static"]
+type = "slider"
+label = "effect-length"
+default = 1
+min = 0.5
+max = 2
+step = 0.1
 
 [[settings]]
 key = "close-effect"
@@ -148,7 +323,22 @@ options = [
   { value = "dissolve", label = "dissolve" },
   { value = "burn", label = "burn" },
   { value = "crt", label = "crt-power" },
+  { value = "pixelate", label = "pixelate" },
+  { value = "beam", label = "beam" },
+  { value = "shatter", label = "shatter" },
+  { value = "static", label = "static" },
 ]
+
+[[settings]]
+key = "close-length"
+depends = "close-effect"
+when = ["glitch", "fold", "dissolve", "burn", "crt", "pixelate", "beam", "shatter", "static"]
+type = "slider"
+label = "effect-length"
+default = 1
+min = 0.5
+max = 2
+step = 0.1
 
 [[settings]]
 key = "windows-fullscreen"
@@ -168,6 +358,27 @@ depends = "desktop-crt"
 type = "slider"
 label = "crt-scanlines"
 default = 0.35
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "crt-line-count"
+depends = "desktop-crt"
+type = "slider"
+label = "crt-line-count"
+default = 480
+min = 160
+max = 1080
+step = 40
+
+[[settings]]
+key = "crt-line-thickness"
+depends = "desktop-crt"
+type = "slider"
+label = "crt-line-thickness"
+default = 0.5
 min = 0
 max = 1
 step = 0.05
@@ -196,11 +407,35 @@ step = 0.05
 unit = "percent"
 
 [[settings]]
+key = "crt-mask-type"
+depends = "crt-mask"
+when = { min = 0.05 }
+type = "choice"
+label = "crt-mask-type"
+default = "aperture"
+options = [
+  { value = "aperture", label = "mask-aperture" },
+  { value = "shadow", label = "mask-shadow" },
+  { value = "slot", label = "mask-slot" },
+]
+
+[[settings]]
 key = "crt-flicker"
 depends = "desktop-crt"
 type = "switch"
 label = "crt-flicker"
 default = false
+
+[[settings]]
+key = "crt-flicker-strength"
+depends = "crt-flicker"
+type = "slider"
+label = "strength"
+default = 0.5
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
 
 [[settings]]
 key = "invert"
@@ -226,12 +461,14 @@ options = [
   { value = "noir", label = "grade-noir" },
   { value = "sepia", label = "grade-sepia" },
   { value = "vivid", label = "grade-vivid" },
+  { value = "custom", label = "grade-custom" },
+  { value = "duotone", label = "grade-duotone" },
 ]
 
 [[settings]]
 key = "grade-strength"
 depends = "grade"
-when = ["warm", "cold", "teal-orange", "noir", "sepia", "vivid"]
+when = ["warm", "cold", "teal-orange", "noir", "sepia", "vivid", "custom", "duotone"]
 type = "slider"
 label = "strength"
 default = 0.7
@@ -239,6 +476,151 @@ min = 0.1
 max = 1
 step = 0.05
 unit = "percent"
+
+[[settings]]
+key = "grade-temperature"
+depends = "grade"
+when = ["custom"]
+type = "slider"
+label = "grade-temperature"
+default = 0
+min = -1
+max = 1
+step = 0.05
+
+[[settings]]
+key = "grade-tint"
+depends = "grade"
+when = ["custom"]
+type = "slider"
+label = "grade-tint"
+default = 0
+min = -1
+max = 1
+step = 0.05
+
+[[settings]]
+key = "grade-saturation"
+depends = "grade"
+when = ["custom"]
+type = "slider"
+label = "grade-saturation"
+default = 1
+min = 0
+max = 2
+step = 0.05
+
+[[settings]]
+key = "grade-contrast"
+depends = "grade"
+when = ["custom"]
+type = "slider"
+label = "grade-contrast"
+default = 1
+min = 0.5
+max = 1.5
+step = 0.05
+
+[[settings]]
+key = "grade-brightness"
+depends = "grade"
+when = ["custom"]
+type = "slider"
+label = "grade-brightness"
+default = 0
+min = -0.5
+max = 0.5
+step = 0.05
+
+[[settings]]
+key = "duotone-dark"
+depends = "grade"
+when = ["duotone"]
+type = "color"
+label = "duotone-dark"
+default = "#1d1145"
+swatches = [
+  { value = "#1d1145", label = "midnight" },
+  { value = "#031a07", label = "phosphor-green" },
+  { value = "#1a0b00", label = "amber" },
+]
+
+[[settings]]
+key = "duotone-light"
+depends = "grade"
+when = ["duotone"]
+type = "color"
+label = "duotone-light"
+default = "#ff9de2"
+swatches = [
+  { value = "#ff9de2", label = "neon-pink" },
+  { value = "#8bf58a", label = "phosphor-green" },
+  { value = "#ffb347", label = "amber" },
+  { value = "accent", label = "accent" },
+]
+
+[[settings]]
+key = "palette"
+type = "choice"
+label = "palette"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "pocket", label = "palette-pocket" },
+  { value = "one-bit", label = "palette-one-bit" },
+  { value = "amber", label = "palette-amber" },
+  { value = "sixteen", label = "palette-sixteen" },
+]
+
+[[settings]]
+key = "palette-dither"
+depends = "palette"
+when = ["pocket", "one-bit", "amber", "sixteen"]
+type = "switch"
+label = "palette-dither"
+default = true
+
+[[settings]]
+key = "pixelate"
+type = "slider"
+label = "pixel-size"
+default = 1
+min = 1
+max = 12
+step = 1
+
+[[settings]]
+key = "stylize"
+type = "choice"
+label = "stylize"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "posterize", label = "posterize" },
+  { value = "halftone", label = "halftone" },
+]
+
+[[settings]]
+key = "posterize-levels"
+depends = "stylize"
+when = ["posterize"]
+type = "slider"
+label = "posterize-levels"
+default = 4
+min = 2
+max = 8
+step = 1
+
+[[settings]]
+key = "halftone-size"
+depends = "stylize"
+when = ["halftone"]
+type = "slider"
+label = "halftone-size"
+default = 7
+min = 4
+max = 16
+step = 1
 
 [[settings]]
 key = "shadow-boost"
@@ -261,6 +643,28 @@ step = 0.05
 unit = "percent"
 
 [[settings]]
+key = "bloom-radius"
+depends = "bloom"
+when = { min = 0.05 }
+type = "slider"
+label = "glow-size"
+default = 1
+min = 0.5
+max = 2
+step = 0.1
+
+[[settings]]
+key = "bloom-threshold"
+depends = "bloom"
+when = { min = 0.05 }
+type = "slider"
+label = "bloom-threshold"
+default = 0.62
+min = 0.3
+max = 0.9
+step = 0.02
+
+[[settings]]
 key = "chromatic-aberration"
 type = "slider"
 label = "chromatic-aberration"
@@ -269,6 +673,67 @@ min = 0
 max = 1
 step = 0.05
 unit = "percent"
+
+[[settings]]
+key = "screen-vignette"
+type = "slider"
+label = "vignette"
+default = 0
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "screen-grain"
+type = "slider"
+label = "grain"
+default = 0
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "screen-grain-moving"
+depends = "screen-grain"
+when = { min = 0.05 }
+type = "switch"
+label = "grain-moving"
+default = false
+
+[[settings]]
+key = "vhs"
+type = "switch"
+label = "vhs"
+default = false
+
+[[settings]]
+key = "vhs-strength"
+depends = "vhs"
+type = "slider"
+label = "strength"
+default = 0.5
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "glitch-bursts"
+type = "switch"
+label = "glitch-bursts"
+default = false
+
+[[settings]]
+key = "glitch-gap"
+depends = "glitch-bursts"
+type = "slider"
+label = "glitch-gap"
+default = 20
+min = 5
+max = 60
+step = 5
 
 [[settings]]
 key = "filters-scope"
@@ -346,5 +811,5 @@ options = [
 ]
 
 [luft]
-minimum = "1.0-nightly.27"
+minimum = "1.0-nightly.33"
 inside = true

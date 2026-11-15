@@ -2,7 +2,7 @@ import type { Disposable, Extension } from '@luft/extension-api';
 
 import type { AppRules, Granted } from '../rules.js';
 
-type Look = 'glitch' | 'fold' | 'dissolve' | 'burn' | 'crt';
+export type Look = 'glitch' | 'fold' | 'dissolve' | 'burn' | 'crt' | 'pixelate' | 'beam' | 'shatter' | 'static';
 
 const NOISE = `
 float noise_at(vec2 cell) {
@@ -72,16 +72,58 @@ float flash = 1.0 - smoothstep(0.1, 0.8, reveal);
 vec4 picture = window_sample(position);
 window_color = vec4(picture.rgb + vec3(0.8, 0.9, 1.0) * flash * picture.a, picture.a) * shown;`,
   },
+  pixelate: {
+    duration: 420,
+    shader: `
+float hidden = 1.0 - reveal;
+vec2 cells = window_size / max(1.0, hidden * hidden * 56.0);
+window_color = window_sample((floor(window_uv * cells) + 0.5) / cells) * smoothstep(0.0, 0.35, reveal);`,
+  },
+  beam: {
+    duration: 520,
+    shader: `
+float open_part = smoothstep(0.2, 0.85, reveal);
+float from_middle = abs(window_uv.x - 0.5);
+float half_width = max(open_part * 0.5, 0.003);
+float shown = 1.0 - smoothstep(half_width - 0.01, half_width, from_middle);
+float beam = exp(-from_middle * 60.0 / (0.4 + open_part * 6.0)) * (1.0 - smoothstep(0.55, 1.0, reveal)) * smoothstep(0.0, 0.12, reveal);
+vec4 picture = window_sample(window_uv) * shown * smoothstep(0.15, 0.6, reveal);
+window_color = picture + vec4(vec3(0.7, 0.88, 1.0) * beam, beam * 0.35);`,
+  },
+  shatter: {
+    duration: 560,
+    shader: `
+vec2 grid = vec2(10.0, 7.0);
+vec2 cell = floor(window_uv * grid);
+vec2 in_cell = fract(window_uv * grid);
+float upper = step(in_cell.x, in_cell.y);
+vec2 middle = upper > 0.5 ? vec2(1.0 / 3.0, 2.0 / 3.0) : vec2(2.0 / 3.0, 1.0 / 3.0);
+float gone = clamp((1.0 - reveal) * 1.6 - noise_at(cell + upper * 17.0) * 0.6, 0.0, 1.0);
+vec2 drift = (vec2(noise_at(cell + 3.1 + upper), noise_at(cell + 7.7 + upper)) - 0.5) * gone * 0.8 + vec2(0.0, gone * gone * 0.6);
+vec2 from = middle + (in_cell - middle - drift) / max(1.0 - gone, 0.001);
+float on_shard = step(0.0, from.x) * step(from.x, 1.0) * step(0.0, from.y) * step(from.y, 1.0) * (upper > 0.5 ? step(from.x, from.y) : step(from.y, from.x));
+window_color = window_sample((cell + from) / grid) * on_shard * (1.0 - gone);`,
+  },
+  static: {
+    duration: 460,
+    shader: `
+vec4 picture = window_sample(window_uv);
+float snow = noise_at(floor(window_uv * window_size / 2.0) + floor(reveal * 40.0) * 13.0);
+float roll = smoothstep(0.0, 0.06, abs(fract(window_uv.y * 2.0 - reveal * 3.0) - 0.5) - 0.44);
+vec3 noise = vec3(snow * (0.75 + 0.25 * roll));
+window_color = vec4(mix(noise * picture.a, picture.rgb, smoothstep(0.25, 0.9, reveal)), picture.a) * smoothstep(0.0, 0.15, reveal);`,
+  },
 };
 
 export function addTransition(phosphor: Extension<Granted>, rules: AppRules, kind: 'open' | 'close', look: Look): Disposable {
   const { screenEffects, settings, t } = phosphor;
   const { duration, shader } = SHADERS[look];
+  const length = settings.get<number>(`${kind}-length`);
   const reveal = kind === 'open' ? 'window_progress' : '1.0 - window_progress';
   return screenEffects.addWindowTransition({
     label: t(kind === 'open' ? 'open-effect' : 'close-effect'),
     kinds: [kind],
-    duration,
+    duration: Math.round(duration * length),
     declarations: NOISE,
     shader: `float reveal = ${reveal};\n${shader}`,
     fullscreen: settings.get<boolean>('windows-fullscreen'),

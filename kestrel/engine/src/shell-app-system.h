@@ -26,5 +26,6 @@ ShellApp       *shell_app_system_lookup_steam_game            (ShellAppSystem *s
                                                                const char     *game);
 
 GSList         *shell_app_system_get_running               (ShellAppSystem  *self);
+GList          *shell_app_system_get_starting              (ShellAppSystem  *self);
 
 GList          *shell_app_system_get_installed             (ShellAppSystem  *self);

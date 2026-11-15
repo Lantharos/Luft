@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Graphene from 'gi://Graphene';
 import Mtk from 'gi://Mtk';
-import Shell from 'gi://Shell';
+import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { WindowPreviews } from '../windowPreviews.js';
 import type { OverflowPopup } from './overflow/overflowPopup.js';
@@ -75,14 +75,8 @@ export class Taskbar {
     const display = global.display;
     const refresh = () => this.updateIndicators();
     const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];
-    const appSystem = Shell.AppSystem.get_default();
-    const launching = appSystem.connect('app-state-changed', (_system, app: Shell.App) => {
-      const item = this.items.get(app.id);
-      if (item && app.state === Shell.AppState.STARTING) this.bounce(item);
-    });
     this.disconnectors.push(
       () => signals.forEach(id => display.disconnect(id)),
-      () => appSystem.disconnect(launching),
       launcherEntries.watch(appId => {
         const item = this.items.get(appId);
         if (item) this.updateIndicator(item);
@@ -313,6 +307,11 @@ export class Taskbar {
     to.plate.opacity = 255;
     to.plate[property] = offset;
     animateActor(to.plate, { [property]: 0, spring: Spring.snappy, velocity });
+  }
+
+  launching(app: Shell.App): void {
+    const item = this.items.get(app.id);
+    if (item) this.bounce(item);
   }
 
   private bounce(item: AppItem): void {

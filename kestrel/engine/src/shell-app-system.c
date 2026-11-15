@@ -51,6 +51,7 @@ typedef struct _ShellAppSystem
   GObject parent;
 
   GHashTable *running_apps;
+  GHashTable *starting_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
   GHashTable *steam_game_to_id;
@@ -343,6 +344,7 @@ shell_app_system_init (ShellAppSystem *self)
   ShellAppCache *cache;
 
   self->running_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
+  self->starting_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
   self->id_to_app = g_hash_table_new_full (g_str_hash, g_str_equal,
                                            g_free,
                                            (GDestroyNotify)g_object_unref);
@@ -361,6 +363,7 @@ shell_app_system_finalize (GObject *object)
   ShellAppSystem *self = SHELL_APP_SYSTEM (object);
 
   g_hash_table_destroy (self->running_apps);
+  g_hash_table_destroy (self->starting_apps);
   g_hash_table_destroy (self->id_to_app);
   g_hash_table_destroy (self->startup_wm_class_to_id);
   g_hash_table_destroy (self->steam_game_to_id);
@@ -547,11 +550,14 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
     {
     case SHELL_APP_STATE_RUNNING:
       g_hash_table_insert (self->running_apps, g_object_ref (app), NULL);
+      g_hash_table_remove (self->starting_apps, app);
       break;
     case SHELL_APP_STATE_STARTING:
+      g_hash_table_insert (self->starting_apps, g_object_ref (app), NULL);
       break;
     case SHELL_APP_STATE_STOPPED:
       g_hash_table_remove (self->running_apps, app);
+      g_hash_table_remove (self->starting_apps, app);
       break;
     default:
       g_warn_if_reached();
@@ -589,6 +595,19 @@ shell_app_system_get_running (ShellAppSystem *self)
   ret = g_slist_sort (ret, (GCompareFunc)shell_app_compare);
 
   return ret;
+}
+
+/**
+ * shell_app_system_get_starting:
+ * @self: A #ShellAppSystem
+ *
+ * Returns: (element-type ShellApp) (transfer container): Applications
+ *   that are launching and have no window yet
+ */
+GList *
+shell_app_system_get_starting (ShellAppSystem *self)
+{
+  return g_hash_table_get_keys (self->starting_apps);
 }
 
 /**

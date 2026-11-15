@@ -1,4 +1,4 @@
-import type Clutter from 'gi://Clutter';
+import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 import St from 'gi://St';
 import Gio from 'gi://Gio';
@@ -9,7 +9,7 @@ import {dismissImmediately, toggleSurface, Main} from 'resource:///com/lantharos
 import {openBoardWindow} from '../checks/board/lib/board.js';
 import {existing, firstStyled, named} from '../checks/lib/actors.js';
 import {call} from '../checks/lib/dbus.js';
-import {centerOf, click, drag, moveTo, pressButton, releaseButton, rest} from '../checks/lib/input/input.js';
+import {centerOf, click, drag, moveTo, press, pressButton, releaseButton, rest, type} from '../checks/lib/input/input.js';
 import {clearNotifications} from '../checks/lib/notifications.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
 import {nextFrame, pause, settled, waitUntil} from '../checks/lib/wait.js';
@@ -18,6 +18,8 @@ import type {Area, Clip} from './film.js';
 const PRESS_HOLD = 180;
 const THROW_STEPS = 14;
 const ROVER = 'com.lantharos.rover.desktop';
+const NEVER_OPENS = 'org.gimp.GIMP.desktop';
+const LAUNCH_TIMEOUT = 15000;
 const MARGIN = 24;
 
 export async function notify(app: string, title: string, body: string) {
@@ -120,6 +122,42 @@ async function notifications(clip: Clip) {
   clearNotifications();
 }
 
+const appOf = (window: Meta.Window) => Shell.WindowTracker.get_default().get_window_app(window)?.id;
+
+async function searchStart(name: string) {
+  toggleSurface('start');
+  await settled();
+  type(name);
+  await settled();
+}
+
+async function unpinnedLaunches(clip: Clip, favorites: Gio.Settings) {
+  const saved = favorites.get_strv('favorite-apps');
+  favorites.set_strv('favorite-apps', saved.filter(id => id !== ROVER));
+  try {
+    await settled();
+    await searchStart('Rover');
+    await clip('taskbar-launch-unpinned', async () => {
+      press(Clutter.KEY_Return);
+      await waitForWindow(window => appOf(window) === ROVER, 'Rover opens');
+    }, {notes: 'An unpinned app launched from Start gets an icon and opens out of it', timeout: 8000});
+    for (const window of Shell.AppSystem.get_default().lookup_app(ROVER).get_windows()) window.delete(global.get_current_time());
+    await waitUntil(() => !named(`kestrel-app-${ROVER}`), 'Rover leaves the taskbar', 5000);
+    await reset();
+    await searchStart('GIMP');
+    press(Clutter.KEY_Return);
+    await waitUntil(() => named(`kestrel-app-${NEVER_OPENS}`)?.mapped, 'GIMP gets an icon while it starts', 2000);
+    const icon = existing(`kestrel-app-${NEVER_OPENS}`) as St.Button;
+    const area = around(icon);
+    await waitUntil(() => !icon.reactive, 'GIMP stops starting', LAUNCH_TIMEOUT + 3000);
+    await clip('taskbar-launch-gives-up', () => waitUntil(() => !named(`kestrel-app-${NEVER_OPENS}`), 'GIMP leaves the taskbar', 5000),
+      {notes: 'An app that never opens a window leaves the taskbar when its launch times out', area, timeout: 6000});
+  } finally {
+    favorites.set_strv('favorite-apps', saved);
+  }
+  await reset();
+}
+
 async function taskbar(clip: Clip) {
   await reset();
   const clients = [openBoardWindow('Focus one', 640, 420), openBoardWindow('Focus two', 640, 420)];
@@ -134,7 +172,7 @@ async function taskbar(clip: Clip) {
   const glyph = (iconOf(rover) as St.Bin).child;
   const bounced = traced('launch', glyph, 'translation_y');
   await clip('taskbar-launch', () => click(rover), {notes: 'A pinned app launches', area: around(rover), timeout: 8000});
-  const roverWindow = await waitForWindow(w => Shell.WindowTracker.get_default().get_window_app(w)?.id === ROVER, 'Rover opens');
+  const roverWindow = await waitForWindow(w => appOf(w) === ROVER, 'Rover opens');
   await settled();
   bounced();
   roverWindow.delete(global.get_current_time());
@@ -165,6 +203,7 @@ async function taskbar(clip: Clip) {
     {notes: 'A pinned app opens out of its taskbar icon', timeout: 8000});
   opening.delete(global.get_current_time());
   await reset();
+  await unpinnedLaunches(clip, favorites);
 }
 
 async function throwToEdge(window: Meta.Window) {

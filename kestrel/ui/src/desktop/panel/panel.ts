@@ -126,7 +126,14 @@ export class KestrelPanel {
     this.arrange();
 
     this.externalSignals.push(
-      [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.refreshAfterMotion))],
+      [this.appSystem, this.appSystem.connect('app-state-changed', (_system, app: Shell.App) => {
+        if (app.state !== Shell.AppState.STARTING) {
+          afterMotion(this.refreshAfterMotion);
+          return;
+        }
+        this.refreshApps();
+        this.taskbar.launching(app);
+      })],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
       [this.tracker, this.tracker.connect('notify::focus-app', () => {
@@ -418,6 +425,14 @@ export class KestrelPanel {
     for (const app of this.appSystem.get_running()) {
       if (!apps.some(shown => shown.id === app.id) && (!this.scoped || this.windowsOf(app).length)) apps.push(app);
     }
+    for (const app of this.startingHere()) {
+      if (!apps.some(shown => shown.id === app.id)) apps.push(app);
+    }
     this.taskbar.update(apps);
+  }
+
+  private startingHere(): Shell.App[] {
+    if (taskbarPreferences.windowsPerDisplay && global.display.get_current_monitor() !== this.monitor?.index) return [];
+    return this.appSystem.get_starting();
   }
 }

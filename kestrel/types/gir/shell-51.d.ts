@@ -372,6 +372,8 @@ export namespace Shell {
 
         get_running(): App[];
 
+        get_starting(): App[];
+
         lookup_app(id: string): App;
 
         lookup_desktop_wmclass(wmclass: string | null): App;

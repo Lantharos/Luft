@@ -1192,6 +1192,16 @@ apply_discrete_gpu_env (GAppLaunchContext *context,
   g_debug ("Could not find discrete GPU in switcheroo-control, not applying environment");
 }
 
+static char *
+announce_launch_without_notification (ShellApp          *app,
+                                      GAppLaunchContext *context)
+{
+  if (g_desktop_app_info_get_boolean (app->info, G_KEY_FILE_DESKTOP_KEY_STARTUP_NOTIFY))
+    return NULL;
+
+  return g_app_launch_context_get_startup_notify_id (context, G_APP_INFO (app->info), NULL);
+}
+
 /**
  * shell_app_launch:
  * @timestamp: Event timestamp, or 0 for current event timestamp
@@ -1276,6 +1286,7 @@ shell_app_launch_with_environment (ShellApp            *app,
   {
     g_autofd int journalfd = -1;
     g_autoptr (ShellAppScope) scope = shell_app_scope_new ();
+    g_autofree char *announced = announce_launch_without_notification (app, context);
 
     shell_app_scope_attach (scope, context);
     journalfd = sd_journal_stream_fd (shell_app_get_id (app), LOG_INFO, FALSE);
@@ -1289,6 +1300,8 @@ shell_app_launch_with_environment (ShellApp            *app,
                                                               journalfd,
                                                               journalfd,
                                                               error);
+    if (!ret && announced)
+      g_app_launch_context_launch_failed (context, announced);
   }
   g_object_unref (context);
 

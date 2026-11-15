@@ -5,12 +5,14 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use luft_i18n::t;
 use parking_lot::Mutex;
 use serde::Deserialize;
 use specta::Type;
 
 use super::encoding::encode;
 use super::{Stat, failed};
+use crate::l10n::L10N;
 
 #[derive(Clone, Default)]
 pub struct Writes {
@@ -55,7 +57,7 @@ impl Writes {
             .buffers
             .lock()
             .remove(&commit.id)
-            .ok_or("Nothing to save")?;
+            .ok_or_else(|| t!(L10N, "draft-error-nothing-to-save"))?;
         let bytes = encode(&text, &commit.encoding, commit.bom)?;
         drop(text);
         replace(&resolve(Path::new(&commit.path)), &bytes, commit.id)
@@ -67,10 +69,12 @@ fn resolve(path: &Path) -> PathBuf {
 }
 
 fn replace(target: &Path, bytes: &[u8], id: u64) -> Result<Stat, String> {
-    let folder = target.parent().ok_or("Not a file path")?;
+    let folder = target
+        .parent()
+        .ok_or_else(|| t!(L10N, "draft-error-not-file-path"))?;
     let name = target
         .file_name()
-        .ok_or("Not a file path")?
+        .ok_or_else(|| t!(L10N, "draft-error-not-file-path"))?
         .to_string_lossy();
     let staging = folder.join(format!(".{name}.draft-{}-{id}", std::process::id()));
     let permissions = fs::metadata(target)

@@ -2,6 +2,7 @@ mod bridge;
 mod desktop;
 mod events;
 mod files;
+mod l10n;
 mod launch;
 mod state;
 mod store;

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Item } from '#lib/bindings.js';
 	import { openUri } from '#lib/bridge/index.js';
 	import CantShow from '#lib/shell/CantShow.svelte';
@@ -56,7 +57,7 @@
 
 <div class="document {DOCUMENT_SCOPE}">
 	{#if problem}
-		<CantShow {item} message="This document can't be opened." detail="It may be damaged or protected." />
+		<CantShow {item} message={t('magpie-document-cant-open')} detail={t('magpie-document-damaged')} />
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 		<div bind:this={container} class="pages soft-scroll" onclick={followLink} {@attach wheelZoom}>

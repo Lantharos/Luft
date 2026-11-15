@@ -1,6 +1,7 @@
 mod accounts;
 mod bridge;
 mod events;
+mod l10n;
 mod mail;
 mod protocols;
 mod services;

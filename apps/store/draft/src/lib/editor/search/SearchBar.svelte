@@ -8,6 +8,7 @@
 	import Regex from '@lucide/svelte/icons/regex';
 	import WholeWord from '@lucide/svelte/icons/whole-word';
 	import X from '@lucide/svelte/icons/x';
+	import { i18n, t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { untrack } from 'svelte';
 	import { debounce } from '#lib/utils/debounce.js';
@@ -41,11 +42,12 @@
 
 	let summary = $derived.by(() => {
 		if (!search) return '';
-		if (invalid) return 'Invalid pattern';
+		if (invalid) return t('draft-search-invalid');
 		if (!count) return '';
-		if (count.total === 0) return 'No results';
-		const total = count.complete ? count.total.toLocaleString() : `${count.total.toLocaleString()}+`;
-		return count.current ? `${count.current.toLocaleString()} of ${total}` : total;
+		if (count.total === 0) return t('draft-search-none');
+		const numbers = new Intl.NumberFormat(i18n.formats);
+		const total = count.complete ? numbers.format(count.total) : t('draft-search-at-least', { count: numbers.format(count.total) });
+		return count.current ? t('draft-search-current', { current: numbers.format(count.current), total }) : total;
 	});
 
 	function commit() {
@@ -113,7 +115,7 @@
 		type="button"
 		class="icon-button search-expand"
 		class:open={replacing}
-		aria-label={replacing ? 'Hide replace' : 'Show replace'}
+		aria-label={replacing ? t('draft-search-hide-replace') : t('draft-search-show-replace')}
 		aria-expanded={replacing}
 		onclick={() => (replacing = !replacing)}
 	>
@@ -126,24 +128,24 @@
 					bind:this={searchField}
 					bind:value={search}
 					{...{ 'main-field': 'true' }}
-					aria-label="Find"
-					placeholder="Find"
+					aria-label={t('draft-search-find')}
+					placeholder={t('draft-search-find')}
 					spellcheck="false"
 					oninput={commit}
 					onkeydown={(event) => keydown(event, 'search')}
 				/>
-				{@render option('Match case', caseSensitive, () => toggle('caseSensitive'), CaseSensitive)}
-				{@render option('Whole word', wholeWord, () => toggle('wholeWord'), WholeWord)}
-				{@render option('Regular expression', regexp, () => toggle('regexp'), Regex)}
+				{@render option(t('draft-search-match-case'), caseSensitive, () => toggle('caseSensitive'), CaseSensitive)}
+				{@render option(t('draft-search-whole-word'), wholeWord, () => toggle('wholeWord'), WholeWord)}
+				{@render option(t('draft-search-regex'), regexp, () => toggle('regexp'), Regex)}
 			</div>
 			<span class="search-summary" class:invalid aria-live="polite">{summary}</span>
-			<button type="button" class="icon-button" aria-label="Previous match" onclick={() => findPrevious(view)} {@attach tooltip('Previous match')}>
+			<button type="button" class="icon-button" aria-label={t('draft-search-previous')} onclick={() => findPrevious(view)} {@attach tooltip(t('draft-search-previous'))}>
 				<ArrowUp size={16} />
 			</button>
-			<button type="button" class="icon-button" aria-label="Next match" onclick={() => findNext(view)} {@attach tooltip('Next match')}>
+			<button type="button" class="icon-button" aria-label={t('draft-search-next')} onclick={() => findNext(view)} {@attach tooltip(t('draft-search-next'))}>
 				<ArrowDown size={16} />
 			</button>
-			<button type="button" class="icon-button" aria-label="Close" onclick={close}>
+			<button type="button" class="icon-button" aria-label={t('draft-search-close')} onclick={close}>
 				<X size={16} />
 			</button>
 		</div>
@@ -153,15 +155,15 @@
 					<input
 						bind:this={replaceField}
 						bind:value={replacement}
-						aria-label="Replace"
-						placeholder="Replace"
+						aria-label={t('draft-search-replacement')}
+						placeholder={t('draft-search-replacement')}
 						spellcheck="false"
 						oninput={commit}
 						onkeydown={(event) => keydown(event, 'replace')}
 					/>
 				</div>
-				<button type="button" class="plain-button search-action" onclick={() => replaceNext(view)}>Replace</button>
-				<button type="button" class="plain-button search-action" onclick={() => replaceAll(view)}>Replace all</button>
+				<button type="button" class="plain-button search-action" onclick={() => replaceNext(view)}>{t('draft-search-replace')}</button>
+				<button type="button" class="plain-button search-action" onclick={() => replaceAll(view)}>{t('draft-search-replace-all')}</button>
 			</div>
 		{/if}
 	</div>

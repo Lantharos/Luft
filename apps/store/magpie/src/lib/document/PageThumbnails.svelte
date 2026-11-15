@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import { documentState } from './state.svelte';
 	import { PageThumbnails } from './thumbnails';
@@ -49,7 +50,7 @@
 			type="button"
 			class="thumbnail"
 			class:current={pageNumber === documentState.page}
-			aria-label="Page {pageNumber}"
+			aria-label={t('magpie-document-page', { page: pageNumber })}
 			onclick={() => documentState.goTo(pageNumber)}
 		>
 			<span class="paper" style:aspect-ratio="1 / {aspect}">

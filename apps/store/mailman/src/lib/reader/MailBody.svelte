@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { appearance } from '@luft/ui';
 	import type { Rendered } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
@@ -85,7 +86,7 @@
 	}
 </script>
 
-<iframe bind:this={frame} class="mail-body" title="Message" sandbox="allow-same-origin"></iframe>
+<iframe bind:this={frame} class="mail-body" title={t('mailman-reader-body')} sandbox="allow-same-origin"></iframe>
 
 <style>
 	.mail-body {

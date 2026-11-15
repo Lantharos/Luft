@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -25,14 +26,14 @@
 	let typing = $derived(composition.from !== null);
 	let typed = $derived(composition.from?.trim() ?? '');
 	let mayBeRefused = $derived(typing && isAddress(typed) && !mail.identitiesOf(composition.account).some((own) => covers(own, typed)));
-	let placeholder = $derived(identity && isWildcard(identity) ? `name${identity.address.slice(1)}` : 'Address to send from');
+	let placeholder = $derived(identity && isWildcard(identity) ? t('mailman-compose-wildcard-placeholder', { domain: identity.address.slice(1) }) : t('mailman-compose-address-placeholder'));
 
 	function sendable(account: Account) {
 		return mail.identitiesOf(account.id).toSorted((a, b) => Number(b.address === account.email) - Number(a.address === account.email) || a.address.localeCompare(b.address));
 	}
 
 	function describe(identity: Identity) {
-		return isWildcard(identity) ? `Any address at ${identity.address.slice(2)}` : identity.address;
+		return isWildcard(identity) ? t('mailman-compose-any-address', { domain: identity.address.slice(2) }) : identity.address;
 	}
 
 	async function focusInput() {
@@ -69,12 +70,12 @@
 	}
 </script>
 
-<ComposeField label="From" note={mayBeRefused ? 'Your mail server may not let you send as this address' : undefined}>
+<ComposeField label={t('mailman-compose-from')} note={mayBeRefused ? t('mailman-compose-may-be-refused') : undefined}>
 	{#if typing}
-		<input bind:this={input} bind:value={composition.from} class="address" {placeholder} aria-label="Address to send from" spellcheck="false" autocomplete="off" onblur={settle} />
+		<input bind:this={input} bind:value={composition.from} class="address" {placeholder} aria-label={t('mailman-compose-address-placeholder')} spellcheck="false" autocomplete="off" onblur={settle} />
 	{/if}
 	{#if choices > 1}
-		<MenuButton label="Send from" class={['sender', typing && 'compact']} align="start" minWidth={280}>
+		<MenuButton label={t('mailman-compose-send-from')} class={['sender', typing && 'compact']} align="start" minWidth={280}>
 			{#snippet trigger()}
 				{#if !typing}{@render current()}{/if}
 				<ChevronDown size={14} class="flex-none text-[var(--text-muted)]" />
@@ -96,7 +97,7 @@
 					{#if group.account.customFrom}
 						{@const chosen = typing && group.account.id === composition.account && !!identity && !isWildcard(identity)}
 						<MenuItem checked={chosen} onclick={() => (close(), another(group.account))}>
-							<span class="flex-1">Another address…</span>
+							<span class="flex-1">{t('mailman-compose-another-address')}</span>
 							{#if chosen}<Check size={15} class="flex-none" />{/if}
 						</MenuItem>
 					{/if}

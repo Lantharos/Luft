@@ -1,0 +1,7 @@
+apps/store/magpie/desktop/src/lib.rs	Magpie
+apps/store/magpie/desktop/src/media/video/matroska.rs	Dolby Digital
+apps/store/magpie/desktop/src/media/video/matroska.rs	Dolby Digital Plus
+apps/store/magpie/desktop/src/media/video/matroska.rs	Dolby TrueHD
+apps/store/magpie/desktop/src/media/video/mp4.rs	Dolby Digital
+apps/store/magpie/desktop/src/media/video/mp4.rs	Dolby Digital Plus
+apps/store/magpie/desktop/src/media/video/mp4.rs	Dolby Vision

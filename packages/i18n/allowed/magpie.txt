@@ -1,0 +1,5 @@
+apps/store/magpie/src/lib/browse/Sidebar.svelte	${x}px 0
+apps/store/magpie/src/lib/font/FontSample.svelte	Aa
+apps/store/magpie/src/lib/video/codecs.ts	Dolby Digital
+apps/store/magpie/src/lib/video/codecs.ts	Dolby Digital Plus
+apps/store/magpie/src/lib/video/codecs.ts	Dolby Vision

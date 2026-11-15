@@ -2,9 +2,11 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
+use luft_i18n::t;
 use matroska_demuxer::{Frame, MatroskaFile, TrackEntry, TrackType};
 
 use super::{Cue, Streams, SubtitleTrack};
+use crate::l10n::L10N;
 
 const LINGERING_CUE: f64 = 4.0;
 const ASS_TEXT_FIELD: usize = 8;
@@ -112,7 +114,7 @@ pub fn cues(path: &Path, track: u64) -> Result<Vec<Cue>, String> {
         .iter()
         .find(|entry| entry.track_number().get() == track)
         .map(|entry| entry.codec_id().to_string())
-        .ok_or("Unknown track")?;
+        .ok_or_else(|| t!(L10N, "magpie-video-unknown-track"))?;
     let ass = codec.contains("ASS") || codec.contains("SSA");
     let seconds = file.info().timestamp_scale().get() as f64 / 1e9;
     let mut frame = Frame::default();

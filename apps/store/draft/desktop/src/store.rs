@@ -1,9 +1,12 @@
 use std::fs;
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use serde::Deserialize;
 use serde_json::Value;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
@@ -43,7 +46,7 @@ fn file(name: StoreName) -> &'static str {
 
 pub fn backups() -> Result<PathBuf, String> {
     let folder = dirs::state_dir()
-        .ok_or("Could not find the state folder")?
+        .ok_or_else(|| t!(L10N, "draft-error-no-state-folder"))?
         .join("draft")
         .join("backups");
     fs::create_dir_all(&folder).map_err(failed)?;
@@ -60,7 +63,7 @@ pub fn write(Write { name, value }: Write) -> Result<(), String> {
 
 pub fn remove_backup(Backup { name }: Backup) -> Result<(), String> {
     if name.contains('/') || name.starts_with('.') {
-        return Err("Not a backup".into());
+        return Err(t!(L10N, "draft-error-not-backup"));
     }
     match fs::remove_file(backups()?.join(name)) {
         Err(error) if error.kind() != std::io::ErrorKind::NotFound => Err(failed(error)),

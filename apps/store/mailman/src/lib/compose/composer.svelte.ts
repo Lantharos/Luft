@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { longDateTime, type ToastAction } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Address, Attached, ConversationMessage, Draft, OutboxEvent, Rendered } from '#lib/bindings.js';
@@ -48,7 +49,7 @@ function prefixed(subject: string, prefix: 'Re' | 'Fwd') {
 function quoteOf(message: ConversationMessage, rendered: Rendered | null) {
 	const name = message.senderName || message.sender;
 	const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : escapeHtml(message.snippet);
-	return `<div>On ${escapeHtml(longDateTime(message.date))}, ${escapeHtml(name)} wrote:</div><blockquote type="cite" style="margin:0 0 0 .8ex;border-left:2px solid #ccc;padding-left:1ex">${body}</blockquote>`;
+	return `<div>${escapeHtml(t('mailman-compose-quote-header', { date: longDateTime(message.date), name }))}</div><blockquote type="cite" style="margin:0 0 0 .8ex;border-left:2px solid #ccc;padding-left:1ex">${body}</blockquote>`;
 }
 
 class Composer {
@@ -78,7 +79,7 @@ class Composer {
 	}
 
 	start(partial: Partial<Composition> = {}) {
-		if (!mail.accounts.length) return toasts.show('Add an account to write mail');
+		if (!mail.accounts.length) return toasts.show(t('mailman-compose-no-account'));
 		const sending = { ...this.sendingFrom(partial.account ?? this.defaultAccount(), null), ...partial };
 		this.current = {
 			key: ++this.keys,
@@ -121,12 +122,19 @@ class Composer {
 	}
 
 	forward(message: ConversationMessage, rendered: Rendered | null) {
-		const header = `<div>---------- Forwarded message ----------<br>From: ${escapeHtml(message.senderName)} &lt;${escapeHtml(message.sender)}&gt;<br>Date: ${escapeHtml(longDateTime(message.date))}<br>Subject: ${escapeHtml(message.subject)}</div>`;
+		const header = [
+			t('mailman-compose-forwarded'),
+			t('mailman-compose-forwarded-from', { sender: `${message.senderName} <${message.sender}>` }),
+			t('mailman-compose-forwarded-date', { date: longDateTime(message.date) }),
+			t('mailman-compose-forwarded-subject', { subject: message.subject })
+		]
+			.map(escapeHtml)
+			.join('<br>');
 		const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : '';
 		this.start({
 			...this.sendingFrom(mail.account(message.account) ? message.account : this.defaultAccount(), sendingFor(message, mail.identities)),
 			subject: prefixed(message.subject, 'Fwd'),
-			quote: `${header}<br>${body}`
+			quote: `<div>${header}</div><br>${body}`
 		});
 	}
 
@@ -198,7 +206,7 @@ class Composer {
 				this.inFlight.set(queued.id, { started: false });
 				this.showProgress();
 			} else {
-				toasts.show('Scheduled to send', { action: { label: 'Undo', run: () => void this.takeBack(queued.id) } });
+				toasts.show(t('mailman-compose-scheduled'), { action: { label: t('mailman-compose-undo'), run: () => void this.takeBack(queued.id) } });
 			}
 		} catch (error) {
 			toasts.fail(error);
@@ -220,22 +228,22 @@ class Composer {
 			this.kept.delete(event.id);
 			this.failed.delete(event.id);
 			if (this.inFlight.size) return this.showProgress();
-			if (!this.failureShowing()) toasts.show('Sent');
+			if (!this.failureShowing()) toasts.show(t('mailman-compose-sent'));
 			return;
 		}
 		if (event.state === 'refused') {
 			const { draft } = event;
 			this.kept.delete(event.id);
 			this.failed.delete(event.id);
-			return this.showFailure(event.id, 'Not sent. Saved to Drafts.', event.reason, draft === null ? null : { label: 'Open draft', run: () => void this.reopen(draft) });
+			return this.showFailure(event.id, t('mailman-compose-refused'), event.reason, draft === null ? null : { label: t('mailman-compose-open-draft'), run: () => void this.reopen(draft) });
 		}
 		if (!watched && this.failed.has(event.id)) return;
 		this.failed.add(event.id);
-		this.showFailure(event.id, 'Not sent yet. Trying again in a minute.', event.reason, { label: 'Open draft', run: () => void this.takeBack(event.id) });
+		this.showFailure(event.id, t('mailman-compose-retrying'), event.reason, { label: t('mailman-compose-open-draft'), run: () => void this.takeBack(event.id) });
 	};
 
 	private showFailure(id: number, message: string, reason: string, action: ToastAction | null) {
-		toasts.show(message, { failed: true, duration: null, action, detail: { title: "Why it wasn't sent", text: reason } });
+		toasts.show(message, { failed: true, duration: null, action, detail: { title: t('mailman-compose-why'), text: reason } });
 		this.failure = { id, toast: toasts.current!.id };
 	}
 
@@ -247,10 +255,10 @@ class Composer {
 		const sending = [...this.inFlight];
 		if (!sending.length || this.failureShowing()) return;
 		const [id, latest] = sending[sending.length - 1];
-		toasts.show(sending.length === 1 ? 'Sending' : `Sending ${sending.length} messages`, {
+		toasts.show(sending.length === 1 ? t('mailman-compose-sending') : t('mailman-compose-sending-many', { count: sending.length }), {
 			busy: true,
 			duration: null,
-			action: latest.started ? null : { label: 'Undo', run: () => void this.takeBack(id) }
+			action: latest.started ? null : { label: t('mailman-compose-undo'), run: () => void this.takeBack(id) }
 		});
 	}
 
@@ -292,7 +300,7 @@ class Composer {
 		if (!composition || !content || (content.empty && !composition.subject && !composition.to.length)) return;
 		try {
 			await commands.saveDraft({ draft: this.draft(composition, content, null), replaces: composition.replaces });
-			toasts.show('Saved to Drafts');
+			toasts.show(t('mailman-compose-saved'));
 		} catch (error) {
 			toasts.fail(error);
 		}

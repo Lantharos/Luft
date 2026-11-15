@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { fileDragStart, VirtualScroller } from '@luft/ui';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Folder from '@lucide/svelte/icons/folder';
@@ -54,7 +55,7 @@
 		{/snippet}
 	</VirtualScroller>
 {:else}
-	<div class="grid flex-1 place-items-center text-[14px] text-[var(--text-muted)]">There's nothing here to look at.</div>
+	<div class="grid flex-1 place-items-center text-[14px] text-[var(--text-muted)]">{t('magpie-gallery-empty')}</div>
 {/if}
 
 <style>

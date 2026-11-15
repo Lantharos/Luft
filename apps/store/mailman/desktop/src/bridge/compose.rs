@@ -1,10 +1,12 @@
 use luft_app::portal::FileChooser;
 use luft_app::{Commands, Empty};
+use luft_i18n::t;
 use sabine::{BridgeCommand, BridgeError, BridgeResponse, BridgeResult, SabineWindow};
 use serde::Serialize;
 use specta::Type;
 
 use super::params::*;
+use crate::l10n::L10N;
 use crate::services::{cache, compose};
 use crate::state::MailmanState;
 
@@ -30,7 +32,7 @@ fn chosen(path: &std::path::Path) -> Chosen {
 
 async fn choose_files(Empty {}: Empty) -> Result<Vec<Chosen>, String> {
     let chooser = FileChooser {
-        title: "Attach Files",
+        title: &t!(L10N, "mailman-dialog-attach"),
         multiple: true,
         ..FileChooser::default()
     };

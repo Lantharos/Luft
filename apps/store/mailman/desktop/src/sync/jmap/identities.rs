@@ -1,6 +1,8 @@
+use luft_i18n::t;
 use serde_json::{Value, json};
 
 use super::JmapRemote;
+use crate::l10n::L10N;
 use crate::protocols::jmap::{CORE, MAIL, SUBMISSION};
 use crate::store::Identity;
 use crate::sync::remote::Context;
@@ -65,8 +67,7 @@ impl JmapRemote {
         match refused {
             Some(failure) => Err(failure["description"]
                 .as_str()
-                .unwrap_or("The server refused this address")
-                .to_owned()),
+                .map_or_else(|| t!(L10N, "mailman-error-address-refused"), str::to_owned)),
             None => Ok(responses[0].clone()),
         }
     }
@@ -105,7 +106,7 @@ impl JmapRemote {
                 let response = self.set_identity(json!({ "create": { "new": created } }))?;
                 let remote = response["created"]["new"]["id"]
                     .as_str()
-                    .ok_or("The server didn't keep this address")?;
+                    .ok_or_else(|| t!(L10N, "mailman-error-address-not-kept"))?;
                 context.store.set_identity_remote(id, remote)
             }
             (Some(identity), Some(remote)) => self

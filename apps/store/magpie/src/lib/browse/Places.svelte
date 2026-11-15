@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { selectionPill } from '@luft/ui';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Film from '@lucide/svelte/icons/film';
@@ -8,7 +9,7 @@
 	import { commands } from '#lib/bindings.js';
 	import type { Place } from '#lib/bindings.js';
 	import { library } from '#lib/library/library.svelte.js';
-	import { PLACE_NAMES } from '#lib/library/places.js';
+	import { placeName } from '#lib/library/places.js';
 
 	const ICONS: Record<Place, typeof Image> = { pictures: Image, videos: Film, music: Music, documents: FileText };
 
@@ -29,12 +30,12 @@
 			onclick={() => library.browse(location.path)}
 		>
 			<Icon size={17} />
-			<span class="truncate">{PLACE_NAMES[location.place]}</span>
+			<span class="truncate">{placeName(location.place)}</span>
 		</button>
 	{/each}
 	<button type="button" class="place" onclick={openFolder}>
 		<FolderOpen size={17} />
-		<span class="truncate">Open folder…</span>
+		<span class="truncate">{t('magpie-open-folder')}</span>
 	</button>
 </nav>
 

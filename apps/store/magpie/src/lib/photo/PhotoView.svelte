@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { t } from '@luft/i18n';
 	import type { Item } from '#lib/bindings.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
@@ -77,7 +78,7 @@
 
 <div class="photo" class:zoomed={viewport.zoomed} {@attach measure} {@attach photoGestures(viewport, navigate)}>
 	{#if failed}
-		<CantShow {item} message="This image can't be shown." />
+		<CantShow {item} message={t('magpie-photo-cant-show')} />
 	{:else if source?.type === 'element'}
 		<img
 			class="element"

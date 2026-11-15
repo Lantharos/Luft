@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip, VirtualScroller } from '@luft/ui';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { codepoints, hex } from './characters';
@@ -11,13 +12,13 @@
 	async function copy(codepoint: number) {
 		const character = String.fromCodePoint(codepoint);
 		await navigator.clipboard.writeText(character);
-		chrome.notify(`Copied ${character}`);
+		chrome.notify(t('magpie-font-copied', { character }));
 	}
 </script>
 
 <VirtualScroller class="soft-scroll min-h-0 flex-1" items={list} key={(codepoint) => String(codepoint)} layout={LAYOUT}>
 	{#snippet children(codepoint)}
-		<button type="button" class="glyph" {@attach tooltip(`Copy ${hex(codepoint)}`)} onclick={() => copy(codepoint)}>
+		<button type="button" class="glyph" {@attach tooltip(t('magpie-font-copy', { code: hex(codepoint) }))} onclick={() => copy(codepoint)}>
 			<span class="character" style:font-family="'{fontState.family}'" style:font-variation-settings={fontState.variation}>{String.fromCodePoint(codepoint)}</span>
 			<span class="code">{hex(codepoint)}</span>
 		</button>

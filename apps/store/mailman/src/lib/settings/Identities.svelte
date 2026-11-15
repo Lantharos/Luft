@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
+	import { t } from '@luft/i18n';
 	import type { Account, Identity } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import IdentityEditor from './IdentityEditor.svelte';
@@ -20,7 +21,7 @@
 </script>
 
 <div class="flex flex-col gap-1.5">
-	<span class="px-1 text-[13px] text-[var(--text-soft)]">Addresses you send from</span>
+	<span class="px-1 text-[13px] text-[var(--text-soft)]">{t('mailman-identities')}</span>
 	{#each identities as identity (identity.id)}
 		{#if editing?.id === identity.id}
 			<IdentityEditor {identity} onclose={() => (editing = null)} />
@@ -30,14 +31,14 @@
 					{#if identity.name}<span class="font-medium">{identity.name}</span>{/if}
 					<span class="text-[var(--text-soft)]">{identity.address}</span>
 				</span>
-				{#if identity.preferred}<span class="flex-none text-[12px] text-[var(--text-muted)]">Used by default</span>{/if}
+				{#if identity.preferred}<span class="flex-none text-[12px] text-[var(--text-muted)]">{t('mailman-identities-default')}</span>{/if}
 			</button>
 		{/if}
 	{/each}
 	{#if editing?.id === 0}
 		<IdentityEditor identity={editing} onclose={() => (editing = null)} />
 	{:else}
-		<button type="button" class="plain-button add" onclick={() => (editing = blank())}><Plus size={15} />Add an address</button>
+		<button type="button" class="plain-button add" onclick={() => (editing = blank())}><Plus size={15} />{t('mailman-identities-add')}</button>
 	{/if}
 </div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import type { ThreadRow as Row } from '#lib/bindings.js';
 	import { navigate, openThread } from '#lib/app/navigation.js';
@@ -32,7 +33,7 @@
 	}
 </script>
 
-<section class="flex min-h-0 flex-1 flex-col" aria-label="Conversations">
+<section class="flex min-h-0 flex-1 flex-col" aria-label={t('mailman-list-label')}>
 	{#if list.items.length}
 		<VirtualScroller bind:this={scroller} class="soft-scroll min-h-0 flex-1" items={list.items} {key} layout={LAYOUT} stableOrder role="listbox" style="overflow-x: hidden" onscroll={scrolled}>
 			{#snippet children(item)}

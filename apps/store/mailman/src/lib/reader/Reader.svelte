@@ -2,14 +2,15 @@
 	import Forward from '@lucide/svelte/icons/forward';
 	import Reply from '@lucide/svelte/icons/reply';
 	import ReplyAll from '@lucide/svelte/icons/reply-all';
-	import { plural } from '@luft/ui';
+	import { t } from '@luft/i18n';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import * as actions from '#lib/mail/actions.js';
 	import { list } from '#lib/mail/list.svelte.js';
+	import Marked from '#lib/shell/Marked.svelte';
 	import MessageView from './MessageView.svelte';
 	import { reader } from './reader.svelte';
 
-	const CATEGORY: Record<string, string> = { newsletter: 'Newsletter', receipt: 'Receipt', notification: 'Update' };
+	const CATEGORIES = ['newsletter', 'receipt', 'notification'];
 	const FOLD_AFTER = 4;
 
 	let messages = $derived(reader.messages);
@@ -37,35 +38,34 @@
 		<div class="flex flex-col gap-1 px-1 pb-3">
 			<h1 class="text-[22px] leading-tight font-semibold">{reader.subject || '(no subject)'}</h1>
 			<div class="flex items-center gap-3 text-[13px] text-[var(--text-muted)]">
-				<span>{plural(messages.length, 'message', 'messages')}{latest && CATEGORY[latest.category] ? ` · ${CATEGORY[latest.category]}` : ''}</span>
+				<span>{latest && CATEGORIES.includes(latest.category) ? t('mailman-reader-messages-category', { count: messages.length, category: latest.category }) : t('mailman-reader-messages', { count: messages.length })}</span>
 				{#if unsubscribable && reader.thread !== null}
-					<button type="button" class="link" onclick={() => void actions.unsubscribe(unsubscribable.id, unsubscribable.senderName || unsubscribable.sender, reader.thread!)}>Unsubscribe</button>
+					<button type="button" class="link" onclick={() => void actions.unsubscribe(unsubscribable.id, unsubscribable.senderName || unsubscribable.sender, reader.thread!)}>{t('mailman-reader-unsubscribe')}</button>
 				{/if}
 			</div>
 		</div>
 		{#if screening}
 			<div class="screen">
-				<p class="min-w-0 flex-1 text-[13.5px]">
-					<span class="font-semibold">{latest?.senderName || screening}</span>
-					<span class="text-[var(--text-muted)]">is writing to you for the first time.</span>
+				<p class="min-w-0 flex-1 text-[13.5px] text-[var(--text-muted)]">
+					<Marked text={t('mailman-reader-first-time', { sender: latest?.senderName || screening })} />
 				</p>
-				<button type="button" class="button" onclick={() => void actions.screen(screening, 'denied', [reader.thread!])}>Screen out</button>
-				<button type="button" class="button primary" onclick={() => void actions.screen(screening, 'approved', [reader.thread!])}>Let in</button>
+				<button type="button" class="button" onclick={() => void actions.screen(screening, 'denied', [reader.thread!])}>{t('mailman-reader-screen-out')}</button>
+				<button type="button" class="button primary" onclick={() => void actions.screen(screening, 'approved', [reader.thread!])}>{t('mailman-reader-let-in')}</button>
 			</div>
 		{/if}
 		{#each messages as message, index (message.id)}
 			{#if folded.has(message.id) && !foldShown}
 				{#if index === 1}
-					<button type="button" class="fold" onclick={() => (foldShown = true)}>{plural(folded.size, 'earlier message', 'earlier messages')}</button>
+					<button type="button" class="fold" onclick={() => (foldShown = true)}>{t('mailman-reader-earlier', { count: folded.size })}</button>
 				{/if}
 			{:else}
 				<MessageView {message} expanded={reader.expanded.has(message.id)} />
 			{/if}
 		{/each}
 		<div class="flex gap-2 pt-3 pl-1">
-			<button type="button" class="button" onclick={() => reply(false)}><Reply size={16} />Reply</button>
-			<button type="button" class="button" onclick={() => reply(true)}><ReplyAll size={16} />Reply all</button>
-			<button type="button" class="button" onclick={() => latest && composer.forward(latest, reader.bodies.get(latest.id) ?? null)}><Forward size={16} />Forward</button>
+			<button type="button" class="button" onclick={() => reply(false)}><Reply size={16} />{t('mailman-reader-reply')}</button>
+			<button type="button" class="button" onclick={() => reply(true)}><ReplyAll size={16} />{t('mailman-reader-reply-all')}</button>
+			<button type="button" class="button" onclick={() => latest && composer.forward(latest, reader.bodies.get(latest.id) ?? null)}><Forward size={16} />{t('mailman-reader-forward')}</button>
 		</div>
 	</div>
 </div>
@@ -95,6 +95,11 @@
 		border-radius: 20px;
 		background: var(--accent-soft);
 		padding: 10px 10px 10px 18px;
+	}
+
+	.screen :global(b) {
+		color: var(--text);
+		font-weight: 600;
 	}
 
 	.fold {

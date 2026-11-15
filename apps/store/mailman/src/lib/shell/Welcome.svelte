@@ -1,5 +1,6 @@
 <script lang="ts">
 	import MailPlus from '@lucide/svelte/icons/mail-plus';
+	import { t } from '@luft/i18n';
 
 	interface Props {
 		onadd: () => void;
@@ -11,12 +12,12 @@
 <div class="flex flex-1 flex-col items-center justify-center gap-5 px-10 pb-16 text-center">
 	<span class="mark"><MailPlus size={30} /></span>
 	<div class="flex max-w-[380px] flex-col gap-2">
-		<h1 class="text-[22px] font-semibold">Your mail, without the noise</h1>
+		<h1 class="text-[22px] font-semibold">{t('mailman-welcome-title')}</h1>
 		<p class="text-[14px] leading-relaxed text-[var(--text-muted)]">
-			Add an account to bring in your mail. New senders wait in the Screener, newsletters and receipts get bundled, and everything is a keystroke away.
+			{t('mailman-welcome-body')}
 		</p>
 	</div>
-	<button type="button" class="button primary large" onclick={onadd}>Add an account</button>
+	<button type="button" class="button primary large" onclick={onadd}>{t('mailman-welcome-add')}</button>
 </div>
 
 <style>

@@ -1,4 +1,5 @@
 import { app, fileUrl } from '@lantharos/sabine';
+import { t } from '@luft/i18n';
 import { activationToken, fileUrlPath } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { StoreName, Value } from '#lib/bindings.js';
@@ -13,7 +14,7 @@ export interface SaveTarget {
 
 export async function readFile(path: string) {
 	const response = await fetch(fileUrl(path));
-	if (!response.ok) throw new Error(`Couldn't read ${path}`);
+	if (!response.ok) throw new Error(t('draft-error-read', { path }));
 	return new Uint8Array(await response.arrayBuffer());
 }
 

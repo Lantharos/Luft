@@ -16,7 +16,7 @@ pub use preview::source;
 
 #[derive(Serialize, Type)]
 pub struct FontFile {
-    format: &'static str,
+    format: String,
     faces: Vec<FontFace>,
 }
 

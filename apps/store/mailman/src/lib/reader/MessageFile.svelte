@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Avatar, errorText, longDateTime } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
 	import { commands } from '#lib/bindings.js';
@@ -7,6 +8,7 @@
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
 	import MailBody from './MailBody.svelte';
+	import { names } from './names';
 
 	interface Props {
 		path: string;
@@ -37,18 +39,18 @@
 <div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto flex max-w-[880px] flex-col gap-4 px-6 pt-2 pb-12">
 		{#if opened}
-			<h1 class="px-1 text-[22px] leading-tight font-semibold">{opened.subject || '(no subject)'}</h1>
+			<h1 class="px-1 text-[22px] leading-tight font-semibold">{opened.subject || t('mailman-list-no-subject')}</h1>
 			<article class="message">
 				<header class="flex items-start gap-3">
 					<Avatar picture={null} name={opened.from.name || opened.from.address} size={36} />
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-[14px] font-semibold">{opened.from.name || opened.from.address} <span class="font-normal text-[var(--text-muted)]">{opened.from.address}</span></p>
-						<p class="truncate text-[12.5px] text-[var(--text-muted)]">to {[...opened.to, ...opened.cc].map((address) => address.name || address.address).join(', ')}</p>
+						<p class="truncate text-[12.5px] text-[var(--text-muted)]">{t('mailman-reader-to', { recipients: names([...opened.to, ...opened.cc].map((address) => address.name || address.address)) })}</p>
 					</div>
 					{#if opened.date}<span class="flex-none text-[12.5px] text-[var(--text-muted)]">{longDateTime(opened.date)}</span>{/if}
 				</header>
 				{#if opened.rendered.remote.length && !images}
-					<button type="button" class="plain-button self-start" onclick={() => (images = true)}>Show pictures</button>
+					<button type="button" class="plain-button self-start" onclick={() => (images = true)}>{t('mailman-reader-show-pictures')}</button>
 				{/if}
 				<div class="pl-12">
 					<MailBody rendered={opened.rendered} {images} bind:quotes expandQuotes />
@@ -56,7 +58,7 @@
 				</div>
 			</article>
 			{#if mail.accounts.length}
-				<button type="button" class="button self-start" onclick={reply}><Reply size={16} />Reply</button>
+				<button type="button" class="button self-start" onclick={reply}><Reply size={16} />{t('mailman-reader-reply')}</button>
 			{/if}
 		{:else if failure}
 			<p class="px-1 pt-10 text-center text-[14px] text-[var(--text-muted)]">{failure}</p>

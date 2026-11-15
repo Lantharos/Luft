@@ -1,19 +1,20 @@
 <script lang="ts">
-	import { plural } from '@luft/ui';
+	import { t } from '@luft/i18n';
 	import { list } from '#lib/mail/list.svelte.js';
+	import Marked from '#lib/shell/Marked.svelte';
 
 	let unread = $derived(list.rows.filter((row) => row.unread > 0).length);
 </script>
 
 <div class="flex flex-1 flex-col items-center justify-center gap-2 px-10 pb-20 text-center">
-	<p class="text-[15px] font-semibold text-[var(--text-soft)]">{unread ? plural(unread, 'unread conversation', 'unread conversations') : 'Nothing selected'}</p>
+	<p class="text-[15px] font-semibold text-[var(--text-soft)]">{unread ? t('mailman-empty-reader-unread', { count: unread }) : t('mailman-empty-reader')}</p>
 	<p class="text-[13px] text-[var(--text-muted)]">
-		<kbd>J</kbd> and <kbd>K</kbd> move through your mail, <kbd>E</kbd> archives, <kbd>Ctrl K</kbd> finds anything
+		<Marked text={t('mailman-empty-reader-keys')} />
 	</p>
 </div>
 
 <style>
-	kbd {
+	p :global(kbd) {
 		border-radius: 6px;
 		background: var(--control);
 		padding: 1px 6px;

@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Account } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import Identities from './Identities.svelte';
+	import { PROVIDER_NAMES } from './providers.js';
 
 	interface Props {
 		account: Account;
@@ -16,7 +18,7 @@
 	let name = $derived(account.name);
 	let confirming = $state(false);
 
-	let kind = $derived(account.config.protocol.kind === 'jmap' ? 'JMAP' : account.config.oauth ? `Signed in with ${account.config.oauth === 'google' ? 'Google' : 'Microsoft'}` : 'IMAP and SMTP');
+	let kind = $derived(account.config.protocol.kind === 'jmap' ? 'JMAP' : account.config.oauth ? t('mailman-account-oauth', { provider: PROVIDER_NAMES[account.config.oauth] }) : t('mailman-account-imap'));
 
 	async function rename() {
 		const renamed = name.trim() || account.email;
@@ -33,21 +35,21 @@
 	async function remove() {
 		await commands.removeAccount({ id: account.id });
 		await mail.reloadAccounts();
-		toasts.show(`${account.email} was removed from Mailman`);
+		toasts.show(t('mailman-account-removed', { email: account.email }));
 	}
 </script>
 
 {#snippet details()}
 	<div class="flex flex-col gap-3 pt-1">
-		<TextField bind:value={name} label="Account name" showLabel onkeydown={(event) => event.key === 'Enter' && void rename()} />
+		<TextField bind:value={name} label={t('mailman-account-name')} showLabel onkeydown={(event) => event.key === 'Enter' && void rename()} />
 		<Identities {account} />
 		<div class="flex gap-2">
 			<span class="flex-1"></span>
 			{#if confirming}
-				<button type="button" class="button" onclick={() => (confirming = false)}>Keep</button>
-				<button type="button" class="button danger" onclick={() => void remove()}>Remove and forget its mail</button>
+				<button type="button" class="button" onclick={() => (confirming = false)}>{t('mailman-account-keep')}</button>
+				<button type="button" class="button danger" onclick={() => void remove()}>{t('mailman-account-remove-confirm')}</button>
 			{:else}
-				<button type="button" class="button danger" onclick={() => (confirming = true)}>Remove</button>
+				<button type="button" class="button danger" onclick={() => (confirming = true)}>{t('mailman-account-remove')}</button>
 			{/if}
 		</div>
 	</div>

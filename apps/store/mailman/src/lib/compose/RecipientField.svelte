@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Address } from '#lib/bindings.js';
@@ -87,14 +88,14 @@
 		{#each addresses as address (address.address)}
 			<span class="chip" {@attach tooltip(address.address)}>
 				{address.name || address.address}
-				<button type="button" aria-label="Remove {address.address}" onclick={() => (addresses = addresses.filter((candidate) => candidate !== address))}><X size={12} /></button>
+				<button type="button" aria-label={t('mailman-compose-remove', { name: address.address })} onclick={() => (addresses = addresses.filter((candidate) => candidate !== address))}><X size={12} /></button>
 			</span>
 		{/each}
 		<input {@attach focusOnStart} bind:value={text} aria-label={label} spellcheck="false" autocomplete="off" onkeydown={keydown} onblur={commit} onpaste={paste} />
 	</div>
 	{@render trailing?.()}
 	{#if suggestions.length}
-		<div class="suggestions" role="listbox" aria-label="Suggestions">
+		<div class="suggestions" role="listbox" aria-label={t('mailman-compose-suggestions')}>
 			{#each suggestions as suggestion, index (suggestion.address)}
 				<button
 					type="button"

@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_i18n::t;
 
 mod gmail;
 pub mod idle;
@@ -10,6 +11,7 @@ mod moves;
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
 use crate::accounts::{Account, Login, Provider, SignInError};
+use crate::l10n::L10N;
 use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
@@ -208,7 +210,7 @@ impl ImapRemote {
             .store
             .mailbox(mailbox)?
             .map(|mailbox| mailbox.remote)
-            .ok_or_else(|| "That folder no longer exists".into())
+            .ok_or_else(|| t!(L10N, "mailman-error-folder-missing"))
     }
 }
 
@@ -434,6 +436,6 @@ impl Remote for ImapRemote {
 pub fn connect(account: &Account, login: Login) -> Result<ImapRemote, SignInError> {
     match &account.config.protocol {
         crate::accounts::Protocol::Imap { imap, smtp } => ImapRemote::connect(imap, smtp, login),
-        crate::accounts::Protocol::Jmap { .. } => Err("This account doesn't use IMAP".into()),
+        crate::accounts::Protocol::Jmap { .. } => Err(t!(L10N, "mailman-error-not-imap").into()),
     }
 }

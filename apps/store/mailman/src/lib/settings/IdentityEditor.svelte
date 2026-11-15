@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Identity } from '#lib/bindings.js';
@@ -49,29 +50,29 @@
 
 <div class="editor">
 	<div class="grid grid-cols-2 gap-3">
-		<TextField bind:value={name} label="Name" showLabel />
-		<TextField bind:value={address} label="Address" showLabel disabled={fixed} placeholder="you@example.com" invalid={!!address.trim() && !ADDRESS.test(address.trim())} />
+		<TextField bind:value={name} label={t('mailman-identity-name')} showLabel />
+		<TextField bind:value={address} label={t('mailman-identity-address')} showLabel disabled={fixed} placeholder={t('mailman-add-email-placeholder')} invalid={!!address.trim() && !ADDRESS.test(address.trim())} />
 	</div>
-	<TextField bind:value={replyTo} label="Replies go to" showLabel placeholder="The same address" invalid={!!replyTo.trim() && !ADDRESS.test(replyTo.trim())} />
+	<TextField bind:value={replyTo} label={t('mailman-identity-reply-to')} showLabel placeholder={t('mailman-identity-reply-to-placeholder')} invalid={!!replyTo.trim() && !ADDRESS.test(replyTo.trim())} />
 	<label class="flex flex-col gap-1.5">
-		<span class="px-1 text-[13px] text-[var(--text-soft)]">Signature</span>
-		<textarea bind:value={signature} rows="3" class="signature-field" placeholder="Added below messages sent from this address"></textarea>
+		<span class="px-1 text-[13px] text-[var(--text-soft)]">{t('mailman-identity-signature')}</span>
+		<textarea bind:value={signature} rows="3" class="signature-field" placeholder={t('mailman-identity-signature-placeholder')}></textarea>
 	</label>
 	{#if preview}
-		<div class="preview" aria-label="How the signature looks">
-			<p>Your message</p>
+		<div class="preview" aria-label={t('mailman-identity-preview')}>
+			<p>{t('mailman-identity-your-message')}</p>
 			<div class="signature">{@html preview}</div>
 		</div>
 	{/if}
 	<div class="flex gap-2">
-		<button type="button" class="button primary" disabled={!valid || saving} onclick={() => void save()}>Save</button>
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
+		<button type="button" class="button primary" disabled={!valid || saving} onclick={() => void save()}>{t('mailman-identity-save')}</button>
+		<button type="button" class="button" onclick={onclose}>{t('mailman-identity-cancel')}</button>
 		<span class="flex-1"></span>
 		{#if identity.id !== 0 && !identity.preferred}
-			<button type="button" class="button" onclick={() => void save(true)}>Send from this by default</button>
+			<button type="button" class="button" onclick={() => void save(true)}>{t('mailman-identity-make-default')}</button>
 		{/if}
 		{#if removable}
-			<button type="button" class="button danger" onclick={() => void remove()}>Remove</button>
+			<button type="button" class="button danger" onclick={() => void remove()}>{t('mailman-identity-remove')}</button>
 		{/if}
 	</div>
 </div>

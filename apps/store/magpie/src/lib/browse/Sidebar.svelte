@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { plural, SpringValue } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { SpringValue } from '@luft/ui';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import PageThumbnails from '#lib/document/PageThumbnails.svelte';
 	import { documentState } from '#lib/document/state.svelte.js';
@@ -26,16 +27,16 @@
 		}
 		wasOpen = opening;
 	});
-	let title = $derived(library.group === 'audio' ? 'Queue' : library.group === 'document' ? 'Pages' : library.folder ? folderTitle(library.folder, library.places) : '');
+	let title = $derived(library.group === 'audio' ? t('magpie-panel-queue') : library.group === 'document' ? t('magpie-panel-pages') : library.folder ? folderTitle(library.folder, library.places) : '');
 	let summary = $derived.by(() => {
-		if (library.group === 'audio') return plural(player.queue.length, 'song', 'songs');
-		if (library.group === 'document') return documentState.pages ? plural(documentState.pages, 'page', 'pages') : '';
-		if (library.group === 'font') return plural(library.siblings.length, 'font', 'fonts');
+		if (library.group === 'audio') return t('magpie-sidebar-songs', { count: player.queue.length });
+		if (library.group === 'document') return documentState.pages ? t('magpie-sidebar-pages', { count: documentState.pages }) : '';
+		if (library.group === 'font') return t('magpie-sidebar-fonts', { count: library.siblings.length });
 		const photos = library.siblings.filter((item) => item.kind === 'image').length;
 		const videos = library.siblings.length - photos;
-		if (!videos) return plural(photos, 'photo', 'photos');
-		if (!photos) return plural(videos, 'video', 'videos');
-		return `${plural(photos, 'photo', 'photos')}, ${plural(videos, 'video', 'videos')}`;
+		if (!videos) return t('magpie-sidebar-photos', { count: photos });
+		if (!photos) return t('magpie-sidebar-videos', { count: videos });
+		return t('magpie-sidebar-photos-videos', { photos, videos });
 	});
 </script>
 

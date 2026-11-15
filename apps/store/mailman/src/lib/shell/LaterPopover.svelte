@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Popover, weekdayTime } from '@luft/ui';
 	import { SNOOZES } from '#lib/app/when.js';
 
@@ -11,7 +12,7 @@
 	let { anchor, onpick, onclose }: Props = $props();
 </script>
 
-<Popover {anchor} label="Later" role="menu" align="end" minWidth={240} {onclose}>
+<Popover {anchor} label={t('mailman-later')} role="menu" align="end" minWidth={240} {onclose}>
 	{#each SNOOZES as moment (moment.id)}
 		{@const at = moment.at()}
 		<button
@@ -23,7 +24,7 @@
 				onpick(at);
 			}}
 		>
-			<span>{moment.label}</span>
+			<span>{moment.label()}</span>
 			<span class="text-[12px] text-[var(--text-muted)]">{weekdayTime(at)}</span>
 		</button>
 	{/each}

@@ -2,7 +2,10 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::{Cue, Streams, SubtitleTrack};
+use crate::l10n::L10N;
 
 const SUBTITLE_HANDLERS: [&[u8; 4]; 3] = [b"text", b"sbtl", b"subt"];
 const TEXT_CODECS: [&[u8; 4]; 2] = [b"tx3g", b"wvtt"];
@@ -226,8 +229,8 @@ fn samples(
     file_length: u64,
     mut visit: impl FnMut(Sample) -> Result<(), String>,
 ) -> Result<(), String> {
-    const UNREADABLE: &str = "This track can't be read";
-    let layout = layout(table).ok_or(UNREADABLE)?;
+    let unreadable = || t!(L10N, "magpie-video-track-unreadable");
+    let layout = layout(table).ok_or_else(unreadable)?;
     let mut durations = (0..layout.time_runs)
         .map_while(|index| {
             let at = 8 + index * 8;
@@ -258,12 +261,12 @@ fn samples(
             let size = if layout.uniform_size != 0 {
                 layout.uniform_size
             } else {
-                be32(layout.sizes, 12 + index as usize * 4).ok_or(UNREADABLE)?
+                be32(layout.sizes, 12 + index as usize * 4).ok_or_else(unreadable)?
             };
             let end = offset
                 .checked_add(u64::from(size))
                 .filter(|end| *end <= file_length)
-                .ok_or(UNREADABLE)?;
+                .ok_or_else(unreadable)?;
             let duration = durations.next().unwrap_or(0);
             visit(Sample {
                 offset,
@@ -299,14 +302,14 @@ fn sample_text(codec: &[u8; 4], data: &[u8]) -> String {
 
 pub fn cues(path: &Path, id: u32) -> Result<Vec<Cue>, String> {
     let mut file = File::open(path).map_err(|error| error.to_string())?;
-    let moov = movie(&mut file).ok_or("This video has no index")?;
+    let moov = movie(&mut file).ok_or_else(|| t!(L10N, "magpie-video-no-index"))?;
     let file_length = file.metadata().map_err(|error| error.to_string())?.len();
     let track = children(&moov)
         .into_iter()
         .filter(|(kind, _)| kind == b"trak")
         .filter_map(|(_, trak)| track(trak))
         .find(|track| track.id == id)
-        .ok_or("Unknown track")?;
+        .ok_or_else(|| t!(L10N, "magpie-video-unknown-track"))?;
     let timescale = f64::from(track.timescale.max(1));
     let mut cues = Vec::new();
     samples(track.table, file_length, |sample| {

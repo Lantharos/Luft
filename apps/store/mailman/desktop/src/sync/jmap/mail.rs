@@ -2,9 +2,11 @@ use std::collections::{HashMap, HashSet};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_i18n::t;
 use serde_json::{Value, json};
 
 use super::JmapRemote;
+use crate::l10n::L10N;
 use crate::mail::envelope::{self, HEADERS};
 use crate::protocols::jmap::{BLOB, CORE, MAIL};
 use crate::store::{Flags, Inserted, Mailbox, NewMessage, now};
@@ -201,7 +203,7 @@ impl JmapRemote {
         let query = match responses.next() {
             Some(Ok(query)) => query,
             Some(Err(_)) => return Ok(None),
-            None => return Err("The server didn't answer".into()),
+            None => return Err(t!(L10N, "mailman-error-no-answer")),
         };
         let emails = match responses.next() {
             Some(Ok(got)) => got["list"].as_array().cloned().unwrap_or_default(),
@@ -222,7 +224,7 @@ impl JmapRemote {
         headers: bool,
     ) -> Result<Page, String> {
         self.query_page(mailbox, start, limit, headers)?
-            .ok_or_else(|| "The server wouldn't list this folder".into())
+            .ok_or_else(|| t!(L10N, "mailman-error-folder-not-listed"))
     }
 
     pub fn changes(&mut self, since: &str) -> Result<Option<&Changes>, String> {

@@ -16,6 +16,7 @@ dirs.workspace = true
 encoding_rs.workspace = true
 ignore.workspace = true
 luft-app = { workspace = true, features = ["settings", "watch"] }
+luft-i18n.workspace = true
 parking_lot.workspace = true
 sabine.workspace = true
 serde.workspace = true

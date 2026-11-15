@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import type { Snippet } from 'svelte';
@@ -9,7 +10,7 @@
 	let { children: extra }: { children?: Snippet<[() => void]> } = $props();
 </script>
 
-<MenuButton class="icon-button" label="More" align="end" {@attach tooltip('More')}>
+<MenuButton class="icon-button" label={t('magpie-more')} align="end" {@attach tooltip(t('magpie-more'))}>
 	{#snippet trigger()}<Ellipsis size={18} />{/snippet}
 	{#snippet children(close)}
 		{#if extra}
@@ -21,20 +22,20 @@
 				onclick={() => {
 					close();
 					void send(library.current!.path);
-				}}>Send…</MenuItem
+				}}>{t('magpie-send')}</MenuItem
 			>
 			<MenuItem
 				onclick={() => {
 					close();
 					void showInFolder(library.current!.path);
-				}}>Show in folder</MenuItem
+				}}>{t('magpie-show-in-folder')}</MenuItem
 			>
 		{/if}
 		<MenuItem
 			onclick={() => {
 				close();
 				void openFile();
-			}}>Open…</MenuItem
+			}}>{t('magpie-open')}</MenuItem
 		>
 	{/snippet}
 </MenuButton>

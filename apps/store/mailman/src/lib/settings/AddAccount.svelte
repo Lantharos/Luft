@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ConfirmDialog, Dialog, errorText, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { commands } from '#lib/bindings.js';
@@ -38,7 +39,7 @@
 	let exposed = $derived(protocol === 'jmap' ? session.trim() : [imap, smtp].filter((server) => server.security === 'none').map((server) => server.host)[0]);
 
 	async function lookUp() {
-		if (!VALID.test(email.trim())) return (error = 'Enter your full email address');
+		if (!VALID.test(email.trim())) return (error = t('mailman-add-invalid-email'));
 		error = '';
 		busy = true;
 		const found = await commands
@@ -67,7 +68,7 @@
 	}
 
 	function add() {
-		if (!canOAuth && !password) return (error = 'Enter the password or app password for this account');
+		if (!canOAuth && !password) return (error = t('mailman-add-password-missing'));
 		if (unencrypted) return (confirming = true);
 		return connect();
 	}
@@ -79,7 +80,7 @@
 			const secret: NewSecret = canOAuth ? { kind: 'oAuth', provider: oauth! } : { kind: 'password', password };
 			const account = await api.addAccount(email.trim(), name.trim(), config(), secret, unencrypted);
 			await mail.reloadAccounts();
-			toasts.show(`${account.email} is ready`);
+			toasts.show(t('mailman-add-ready', { email: account.email }));
 			onclose();
 		} catch (failure) {
 			error = errorText(failure);
@@ -95,41 +96,41 @@
 	}
 </script>
 
-<Dialog title="Add an account" description={step === 'email' ? 'Mailman finds the right servers for most providers on its own.' : email} wide={showServers} {onclose}>
+<Dialog title={t('mailman-add-title')} description={step === 'email' ? t('mailman-add-description') : email} wide={showServers} {onclose}>
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="flex flex-col gap-3" onkeydown={submit}>
 		{#if step === 'email'}
-			<TextField bind:value={name} label="Your name" showLabel placeholder="Ada Lovelace" autocomplete="name" />
-			<TextField bind:value={email} label="Email address" showLabel placeholder="you@example.com" inputmode="email" autocomplete="email" />
+			<TextField bind:value={name} label={t('mailman-add-your-name')} showLabel placeholder={t('mailman-add-name-placeholder')} autocomplete="name" />
+			<TextField bind:value={email} label={t('mailman-add-email')} showLabel placeholder={t('mailman-add-email-placeholder')} inputmode="email" autocomplete="email" />
 		{:else}
 			{#if canOAuth}
 				<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">
-					Your browser opens so you can sign in with {PROVIDER_NAMES[oauth!]}. Mailman never sees your password.
+					{t('mailman-add-oauth', { provider: PROVIDER_NAMES[oauth!] })}
 				</p>
-				<button type="button" class="plain-button self-start" onclick={() => (usePassword = true)}>Use an app password instead</button>
+				<button type="button" class="plain-button self-start" onclick={() => (usePassword = true)}>{t('mailman-add-use-password')}</button>
 			{:else}
-				<PasswordField bind:value={password} label="Password" showLabel placeholder="Password or app password" autocomplete="current-password" />
+				<PasswordField bind:value={password} label={t('mailman-add-password')} showLabel placeholder={t('mailman-add-password-placeholder')} autocomplete="current-password" />
 			{/if}
 			<button type="button" class="disclosure" onclick={() => (showServers = !showServers)}>
 				<ChevronRight size={16} class={['transition-transform duration-200', showServers && 'rotate-90']} />
-				Server settings
+				{t('mailman-add-servers')}
 			</button>
 			{#if showServers}
 				<Segmented
 					options={[
-						{ value: 'imap', label: 'IMAP and SMTP' },
+						{ value: 'imap', label: t('mailman-add-imap') },
 						{ value: 'jmap', label: 'JMAP' }
 					]}
 					value={protocol}
-					label="Protocol"
+					label={t('mailman-add-protocol')}
 					onchange={(value) => (protocol = value)}
 				/>
-				<TextField bind:value={username} label="User name" showLabel />
+				<TextField bind:value={username} label={t('mailman-add-username')} showLabel />
 				{#if protocol === 'imap'}
-					<ServerFields title="Incoming" bind:server={imap} />
-					<ServerFields title="Outgoing" bind:server={smtp} />
+					<ServerFields kind="incoming" bind:server={imap} />
+					<ServerFields kind="outgoing" bind:server={smtp} />
 				{:else}
-					<TextField bind:value={session} label="Session address" showLabel placeholder="https://api.example.com/jmap/session" type="url" />
+					<TextField bind:value={session} label={t('mailman-add-session')} showLabel placeholder="https://api.example.com/jmap/session" type="url" />
 				{/if}
 			{/if}
 		{/if}
@@ -139,16 +140,16 @@
 	</div>
 	{#snippet actions()}
 		{#if step === 'sign-in'}
-			<button type="button" class="button" disabled={busy} onclick={() => ((step = 'email'), (error = ''))}>Back</button>
+			<button type="button" class="button" disabled={busy} onclick={() => ((step = 'email'), (error = ''))}>{t('mailman-add-back')}</button>
 		{:else}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
+			<button type="button" class="button" onclick={onclose}>{t('mailman-add-cancel')}</button>
 		{/if}
 		<button type="button" class="button primary" disabled={busy} onclick={() => void (step === 'email' ? lookUp() : add())}>
 			{#if busy}
 				<Spinner />
-				{step === 'email' ? 'Looking up' : canOAuth ? 'Waiting for sign-in' : 'Connecting'}
+				{step === 'email' ? t('mailman-add-looking-up') : canOAuth ? t('mailman-add-waiting') : t('mailman-add-connecting')}
 			{:else}
-				{step === 'email' ? 'Continue' : canOAuth ? `Continue with ${PROVIDER_NAMES[oauth!]}` : 'Add account'}
+				{step === 'email' ? t('mailman-add-continue') : canOAuth ? t('mailman-add-continue-with', { provider: PROVIDER_NAMES[oauth!] }) : t('mailman-add-add')}
 			{/if}
 		</button>
 	{/snippet}
@@ -156,9 +157,9 @@
 
 {#if confirming}
 	<ConfirmDialog
-		title="Connect without encryption?"
-		description="Your password and messages would reach {exposed} as plain text, readable by anyone on the network in between. Only continue with a server and network you trust."
-		action="Connect unencrypted"
+		title={t('mailman-add-unencrypted-title')}
+		description={t('mailman-add-unencrypted-description', { server: exposed })}
+		action={t('mailman-add-unencrypted-action')}
 		danger
 		run={async () => void connect()}
 		onclose={() => (confirming = false)}

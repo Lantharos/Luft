@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { NativeVideo } from '@lantharos/sabine';
+	import { t } from '@luft/i18n';
 	import { canPlayNatively, decodeFailed, NativeVideoSurface } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import { onDestroy } from 'svelte';
@@ -211,7 +212,7 @@
 	function failed() {
 		const undecodable = decodeFailed(video!);
 		if (undecodable && canPlayNatively()) native = true;
-		else problem = undecodable ? explain(info) : "This video can't be played.";
+		else problem = undecodable ? explain(info) : t('magpie-video-cant-play');
 	}
 
 	function pictureInPicture() {
@@ -222,14 +223,14 @@
 
 <div class="player" class:playing={!paused}>
 	{#if problem}
-		<CantShow {item} message={problem} detail="It may still open in another app." />
+		<CantShow {item} message={problem} detail={t('magpie-video-another-app')} />
 	{:else}
 		{#if native}
 			<NativeVideoSurface
 				class="surface"
 				src={source}
 				bind:player
-				onfail={() => (problem = "This video can't be played.")}
+				onfail={() => (problem = t('magpie-video-cant-play'))}
 				onclick={toggle}
 				ondblclick={() => chrome.setFullscreen(!chrome.fullscreen)}
 			/>
@@ -254,7 +255,7 @@
 			></video>
 		{/if}
 		{#if paused}
-			<button type="button" class="big-play" aria-label="Play" onclick={() => media?.play()}>
+			<button type="button" class="big-play" aria-label={t('magpie-video-play')} onclick={() => media?.play()}>
 				<Play size={30} fill="currentColor" />
 			</button>
 		{/if}

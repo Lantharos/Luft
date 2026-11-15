@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { plural, Row, Section, Select, Slider } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { Row, Section, Select, Slider } from '@luft/ui';
 	import { count, headline, sampleText } from './characters';
 	import { fontState } from './state.svelte';
 	import Variations from './Variations.svelte';
@@ -23,7 +24,7 @@
 		<div class="flex flex-col gap-2">
 			<p class="hero" {style}>{headline(face.characters, face.family)}</p>
 			<p class="text-[13px] text-[var(--text-muted)]">
-				{face.style} · {plural(count(face.characters), 'character', 'characters')}
+				{t('magpie-font-style-characters', { style: face.style, count: count(face.characters) })}
 			</p>
 		</div>
 
@@ -34,7 +35,7 @@
 				contenteditable="plaintext-only"
 				role="textbox"
 				tabindex="0"
-				aria-label="Sample text"
+				aria-label={t('magpie-font-sample')}
 				spellcheck="false"
 				oninput={(event) => (text = event.currentTarget.textContent ?? '')}
 				{@attach fill}
@@ -49,19 +50,19 @@
 
 		<Section>
 			{#if faces.length > 1}
-				<Row title="Face">
+				<Row title={t('magpie-font-face')}>
 					<Select
-						label="Face"
+						label={t('magpie-font-face')}
 						options={faces.map((candidate, index) => ({ value: index, label: `${candidate.family} ${candidate.style}` }))}
 						value={fontState.faceIndex}
 						onchange={(index) => fontState.selectFace(index)}
 					/>
 				</Row>
 			{/if}
-			<Row title="Size">
-				<span class="w-12 text-right tabular-nums">{size} px</span>
+			<Row title={t('magpie-font-size')}>
+				<span class="w-12 text-right tabular-nums">{t('magpie-font-pixels', { size })}</span>
 				{#snippet below()}
-					<Slider label="Size" min={12} max={160} step={1} value={size} oninput={(value) => (size = value)} onchange={(value) => (size = value)} />
+					<Slider label={t('magpie-font-size')} min={12} max={160} step={1} value={size} oninput={(value) => (size = value)} onchange={(value) => (size = value)} />
 				{/snippet}
 			</Row>
 		</Section>

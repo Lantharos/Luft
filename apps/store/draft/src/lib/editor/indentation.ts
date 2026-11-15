@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { indentUnit } from '@codemirror/language';
 import { EditorState, type Extension } from '@codemirror/state';
 
@@ -14,7 +15,7 @@ export function indentationExtension({ tabs, width }: Indentation): Extension {
 }
 
 export function describeIndentation({ tabs, width }: Indentation) {
-	return tabs ? `Tabs: ${width}` : `Spaces: ${width}`;
+	return tabs ? t('draft-status-tabs', { width }) : t('draft-status-spaces', { width });
 }
 
 function* leadingLines(text: string) {

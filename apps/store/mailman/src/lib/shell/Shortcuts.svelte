@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import type { Command } from '#lib/app/commands.js';
+	import { keyNames } from '#lib/app/keys.js';
 
 	interface Props {
 		commands: Command[];
@@ -12,17 +14,17 @@
 	let shown = $derived(commands.filter((command) => command.keys));
 </script>
 
-<Dialog title="Keyboard shortcuts" description="Press Ctrl+K anywhere to find any command." wide {onclose}>
+<Dialog title={t('mailman-shortcuts-title')} description={t('mailman-shortcuts-description')} wide {onclose}>
 	<div class="grid grid-cols-2 gap-x-6 gap-y-1">
 		{#each shown as command (command.id)}
 			<div class="flex min-h-[34px] items-center gap-3 text-[13px]">
 				<span class="min-w-0 flex-1 truncate text-[var(--text-soft)]">{command.title}</span>
-				<span class="flex gap-1">{#each command.keys!.split(' ') as key, index (index)}<kbd>{key}</kbd>{/each}</span>
+				<span class="flex gap-1">{#each keyNames(command.keys!).split(' ') as key, index (index)}<kbd>{key}</kbd>{/each}</span>
 			</div>
 		{/each}
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('mailman-shortcuts-done')}</button>
 	{/snippet}
 </Dialog>
 

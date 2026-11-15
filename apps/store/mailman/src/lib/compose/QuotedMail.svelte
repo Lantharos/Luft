@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { quoteStylesheet, showFiles, SKELETON } from '#lib/reader/body.js';
 
 	interface Props {
@@ -31,7 +32,7 @@
 	});
 </script>
 
-<iframe bind:this={frame} class="quoted-mail" title="Quoted text" sandbox="allow-same-origin"></iframe>
+<iframe bind:this={frame} class="quoted-mail" title={t('mailman-compose-quoted-frame')} sandbox="allow-same-origin"></iframe>
 
 <style>
 	.quoted-mail {

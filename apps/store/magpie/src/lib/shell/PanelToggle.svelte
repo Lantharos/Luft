@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import GalleryHorizontalEnd from '@lucide/svelte/icons/gallery-horizontal-end';
 	import ListMusic from '@lucide/svelte/icons/list-music';
@@ -9,7 +10,7 @@
 	let { group }: { group: Group } = $props();
 
 	let pressed = $derived(group === 'visual' ? chrome.strip : chrome.panel);
-	let label = $derived(group === 'visual' ? 'Thumbnails' : group === 'audio' ? 'Queue' : 'Pages');
+	let label = $derived(group === 'visual' ? t('magpie-panel-thumbnails') : group === 'audio' ? t('magpie-panel-queue') : t('magpie-panel-pages'));
 	let Icon = $derived(group === 'visual' ? GalleryHorizontalEnd : group === 'audio' ? ListMusic : PanelLeft);
 
 	function toggle() {

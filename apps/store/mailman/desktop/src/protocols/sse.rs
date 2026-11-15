@@ -2,9 +2,11 @@ use std::io::{BufRead, BufReader, ErrorKind, Read, Write};
 use std::net::TcpStream;
 use std::time::Duration;
 
+use luft_i18n::t;
 use url::{Position, Url};
 
 use super::net::{Security, Server, Stream};
+use crate::l10n::L10N;
 
 pub struct EventStream {
     body: Box<dyn BufRead + Send>,
@@ -17,17 +19,17 @@ impl EventStream {
         let security = match url.scheme() {
             "https" => Security::Tls,
             "http" => Security::None,
-            scheme => return Err(format!("Push over {scheme} isn't supported")),
+            scheme => return Err(t!(L10N, "mailman-error-push-scheme", scheme = scheme)),
         };
         let host = url
             .host_str()
-            .ok_or("The push address has no host")?
+            .ok_or_else(|| t!(L10N, "mailman-error-push-no-host"))?
             .trim_start_matches('[')
             .trim_end_matches(']')
             .to_owned();
         let port = url
             .port_or_known_default()
-            .ok_or("The push address has no port")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-push-no-port"))?;
         let stream = Stream::connect(&Server {
             host,
             port,
@@ -49,7 +51,7 @@ impl EventStream {
         let status = line(&mut reader)?;
         let code = status.split_whitespace().nth(1).unwrap_or_default();
         if code != "200" {
-            return Err(format!("The server refused push ({code})"));
+            return Err(t!(L10N, "mailman-error-push-refused", code = code));
         }
         let mut chunked = false;
         loop {
@@ -97,10 +99,10 @@ impl EventStream {
 fn line(reader: &mut impl BufRead) -> Result<String, String> {
     let mut line = String::new();
     match reader.read_line(&mut line) {
-        Ok(0) => Err("The server closed the event stream".into()),
+        Ok(0) => Err(t!(L10N, "mailman-error-stream-closed")),
         Ok(_) => Ok(line.trim_end_matches(['\r', '\n']).to_owned()),
         Err(error) if matches!(error.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) => {
-            Err("The event stream went silent".into())
+            Err(t!(L10N, "mailman-error-stream-silent"))
         }
         Err(error) => Err(error.to_string()),
     }

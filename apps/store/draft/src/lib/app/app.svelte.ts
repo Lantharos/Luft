@@ -1,4 +1,5 @@
 import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { i18n } from '@luft/i18n';
 import { appearance, PaletteState } from '@luft/ui';
 import { tick } from 'svelte';
 import { commands, events } from '#lib/bindings.js';
@@ -47,6 +48,7 @@ export class App {
 		this.configured = true;
 		const session = await readStore<Session>(sessionName(this.workspace.browsing));
 		appearance.start(state);
+		await i18n.ready;
 		this.workspace.editor.setWrap(this.settings.value.wrap);
 		this.workspace.home = state.home;
 		this.workspace.backups.folder = state.backups;

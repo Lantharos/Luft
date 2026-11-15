@@ -1,8 +1,10 @@
 use std::collections::BTreeMap;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::state::MailmanState;
 use crate::store::{Flag, Located, Role};
 use crate::sync::{Operation, Target};
@@ -91,7 +93,11 @@ fn destination(state: &MailmanState, account: i64, roles: &[Role]) -> Result<i64
             return Ok(mailbox.id);
         }
     }
-    Err(format!("This account has no {} folder", roles[0].as_str()))
+    Err(t!(
+        L10N,
+        "mailman-error-no-folder",
+        role = roles[0].as_str()
+    ))
 }
 
 fn relocate(state: &MailmanState, moves: Vec<(Located, i64)>) -> Result<Undo, String> {

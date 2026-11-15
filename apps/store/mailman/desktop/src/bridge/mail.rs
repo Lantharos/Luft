@@ -1,5 +1,6 @@
 use luft_app::portal::{self, FileChooser};
 use luft_app::{Commands, Empty, block_on};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
@@ -7,6 +8,7 @@ use tokio::task::spawn_blocking;
 
 use super::params::*;
 use crate::events::IMAGES;
+use crate::l10n::L10N;
 use crate::mail::envelope::{self, Address};
 use crate::mail::{images, render};
 use crate::services::{actions, cache};
@@ -26,13 +28,16 @@ struct OpenedFile {
 
 fn body(state: &MailmanState, Id { id }: Id) -> Result<Option<render::Rendered>, String> {
     let Some(raw) = state.store.body(id)? else {
-        let message = state.store.message(id)?.ok_or("That message is gone")?;
+        let message = state
+            .store
+            .message(id)?
+            .ok_or_else(|| t!(L10N, "mailman-error-message-gone"))?;
         state.engine.request_body(message.account, id);
         return Ok(None);
     };
     render::render(&raw, &cache::message_parts(id))
         .map(Some)
-        .ok_or_else(|| "This message can't be read".into())
+        .ok_or_else(|| t!(L10N, "mailman-error-message-unreadable"))
 }
 
 fn raw_attachment(state: &MailmanState, part: &Part) -> Result<(String, Vec<u8>), String> {
@@ -41,10 +46,10 @@ fn raw_attachment(state: &MailmanState, part: &Part) -> Result<(String, Vec<u8>)
         (None, Some(id)) => state
             .store
             .body(id)?
-            .ok_or("This message hasn't arrived yet")?,
-        (None, None) => return Err("That attachment is gone".into()),
+            .ok_or_else(|| t!(L10N, "mailman-error-message-not-arrived"))?,
+        (None, None) => return Err(t!(L10N, "mailman-error-attachment-gone")),
     };
-    render::attachment(&raw, part.index).ok_or_else(|| "That attachment is gone".into())
+    render::attachment(&raw, part.index).ok_or_else(|| t!(L10N, "mailman-error-attachment-gone"))
 }
 
 fn remote_images(state: &MailmanState, Urls { urls }: Urls) -> Result<(), String> {
@@ -93,7 +98,7 @@ async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<Strin
     let name = safe_name(&name);
     let downloads = dirs::download_dir();
     let chooser = FileChooser {
-        title: "Save Attachment",
+        title: &t!(L10N, "mailman-dialog-save-attachment"),
         current_name: Some(&name),
         current_folder: downloads.as_deref(),
         ..FileChooser::default()
@@ -113,7 +118,7 @@ async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<Strin
 
 fn open_file(Path { path }: Path) -> Result<OpenedFile, String> {
     let raw = std::fs::read(&path).map_err(|error| error.to_string())?;
-    let parsed = render::parse(&raw).ok_or("This file isn't an email")?;
+    let parsed = render::parse(&raw).ok_or_else(|| t!(L10N, "mailman-error-not-email"))?;
     let envelope = envelope::from_message(&parsed);
     let folder = cache::opened_file(&path);
     Ok(OpenedFile {
@@ -122,7 +127,8 @@ fn open_file(Path { path }: Path) -> Result<OpenedFile, String> {
         to: envelope.recipients.to,
         cc: envelope.recipients.cc,
         date: envelope.date,
-        rendered: render::render(&raw, &folder).ok_or("This file isn't an email")?,
+        rendered: render::render(&raw, &folder)
+            .ok_or_else(|| t!(L10N, "mailman-error-not-email"))?,
     })
 }
 
@@ -138,7 +144,8 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
                  after,
                  limit,
              }| {
-                let view = View::parse(&view, query).ok_or("Unknown view")?;
+                let view = View::parse(&view, query)
+                    .ok_or_else(|| t!(L10N, "mailman-error-unknown-view"))?;
                 state
                     .store
                     .threads(&view, &state.store.settings(), after, limit)

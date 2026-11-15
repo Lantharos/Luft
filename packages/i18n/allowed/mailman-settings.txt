@@ -1,0 +1,4 @@
+apps/store/mailman/src/lib/settings/AddAccount.svelte	https://api.example.com/jmap/session
+apps/store/mailman/src/lib/settings/ServerFields.svelte	STARTTLS
+apps/store/mailman/src/lib/settings/ServerFields.svelte	TLS
+apps/store/mailman/src/lib/settings/ServerFields.svelte	imap.example.com

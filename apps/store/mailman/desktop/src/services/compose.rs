@@ -1,9 +1,11 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use luft_app::{block_on, portal};
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::mail::compose::{self, Draft, Sender};
 use crate::mail::envelope::{Address, Recipients};
 use crate::mail::render;
@@ -59,12 +61,12 @@ fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
     let account = state
         .store
         .account(draft.account)?
-        .ok_or("That account is gone")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-that-account-gone"))?;
     let identity = state
         .store
         .identity(draft.identity)?
         .filter(|identity| identity.account == account.id)
-        .ok_or("That address can't send from this account")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-address-not-allowed"))?;
     let address = draft
         .from
         .as_deref()
@@ -72,7 +74,7 @@ fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
         .filter(|from| !from.is_empty())
         .map_or_else(|| identity.address.clone(), str::to_lowercase);
     if !is_address(&address) {
-        return Err("Pick the address to send from".into());
+        return Err(t!(L10N, "mailman-error-pick-address"));
     }
     let own = state
         .store
@@ -80,7 +82,7 @@ fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
         .iter()
         .any(|candidate| candidate.account == account.id && covers(candidate, &address));
     if !own && !account.custom_from {
-        return Err("This account only sends from its own addresses".into());
+        return Err(t!(L10N, "mailman-error-own-addresses-only"));
     }
     Ok(Sender {
         from: Address {
@@ -94,7 +96,7 @@ fn sender(state: &MailmanState, draft: &Draft) -> Result<Sender, String> {
 
 pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
     if draft.to.is_empty() && draft.cc.is_empty() && draft.bcc.is_empty() {
-        return Err("Add someone to send this to".into());
+        return Err(t!(L10N, "mailman-error-no-recipients"));
     }
     let sender = sender(state, &draft)?;
     let built = compose::build(&draft, &sender)?;
@@ -141,7 +143,7 @@ pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> 
     let drafts = state
         .store
         .mailbox_with_role(draft.account, Role::Drafts)?
-        .ok_or("This account has no Drafts folder")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-no-drafts"))?;
     state.engine.queue(
         draft.account,
         &Operation::Append {
@@ -168,12 +170,15 @@ pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> 
 }
 
 pub fn reopen(state: &MailmanState, id: i64) -> Result<ReopenedDraft, String> {
-    let message = state.store.message(id)?.ok_or("That draft is gone")?;
+    let message = state
+        .store
+        .message(id)?
+        .ok_or_else(|| t!(L10N, "mailman-error-draft-gone"))?;
     let raw = state
         .store
         .body(id)?
-        .ok_or("This draft hasn't arrived yet")?;
-    let parsed = render::parse(&raw).ok_or("That draft can't be read")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-draft-not-arrived"))?;
+    let parsed = render::parse(&raw).ok_or_else(|| t!(L10N, "mailman-error-draft-unreadable"))?;
     let html = parsed
         .body_html(0)
         .map(|html| html.into_owned())
@@ -197,16 +202,25 @@ pub fn unsubscribe(
     id: i64,
     token: Option<&str>,
 ) -> Result<Unsubscribed, String> {
-    let message = state.store.message(id)?.ok_or("That message is gone")?;
+    let message = state
+        .store
+        .message(id)?
+        .ok_or_else(|| t!(L10N, "mailman-error-message-gone"))?;
     let unsubscribe = message
         .unsubscribe
-        .ok_or("This sender doesn't offer a way to unsubscribe")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-no-unsubscribe"))?;
     if let (true, Some(url)) = (unsubscribe.one_click, &unsubscribe.http) {
         net::http()
             .post(url)
             .content_type("application/x-www-form-urlencoded")
             .send("List-Unsubscribe=One-Click")
-            .map_err(|error| format!("Unsubscribing failed: {error}"))?;
+            .map_err(|error| {
+                t!(
+                    L10N,
+                    "mailman-error-unsubscribe-failed",
+                    error = error.to_string()
+                )
+            })?;
         return Ok(Unsubscribed::Done);
     }
     if let Some(mailto) = &unsubscribe.mailto {
@@ -222,7 +236,7 @@ pub fn unsubscribe(
         let identity = state
             .store
             .preferred_identity(message.account)?
-            .ok_or("This account has no address to send from")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-no-address"))?;
         let draft = Draft {
             account: message.account,
             identity: identity.id,
@@ -247,7 +261,7 @@ pub fn unsubscribe(
     }
     let url = unsubscribe
         .http
-        .ok_or("This sender doesn't offer a way to unsubscribe")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-no-unsubscribe"))?;
     block_on(portal::open_web_link(&url, token))?;
     Ok(Unsubscribed::Opened)
 }

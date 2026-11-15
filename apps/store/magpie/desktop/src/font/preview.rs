@@ -1,11 +1,13 @@
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
 use skrifa::{FontRef, Tag};
 use write_fonts::FontBuilder;
 
 use super::data::FontData;
 use crate::cache;
+use crate::l10n::L10N;
 
 const CACHE_BUDGET: u64 = 256 * 1024 * 1024;
 const CFF: Tag = Tag::new(b"CFF ");
@@ -16,8 +18,8 @@ pub fn source(path: &Path, index: u32) -> Result<String, String> {
     if !data.is_collection() {
         return Ok(path.to_string_lossy().into_owned());
     }
-    let font = FontRef::from_index(&data.bytes, index)
-        .map_err(|_| "This font file is damaged".to_string())?;
+    let font =
+        FontRef::from_index(&data.bytes, index).map_err(|_| t!(L10N, "magpie-font-damaged"))?;
     let outlines = font.table_data(CFF).or_else(|| font.table_data(CFF2));
     let extension = if outlines.is_some() { "otf" } else { "ttf" };
     let folder = cache::folder("fonts")?;

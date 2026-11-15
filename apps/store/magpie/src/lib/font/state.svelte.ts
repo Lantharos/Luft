@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { errorText } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { FontFace, FontFile, FontInstance, FontStatus, Role } from '#lib/bindings.js';
@@ -55,28 +56,29 @@ class FontState {
 	}
 
 	async install() {
-		await this.#change((path) => commands.fontInstall({ path }), (family) => `${family} is installed`);
+		await this.#change((path) => commands.fontInstall({ path }), (family) => t('magpie-font-done-installed', { family }));
 	}
 
 	async use(role: Role) {
 		await this.#change(
 			(path) => commands.fontUse({ path, role }),
-			(family) => (role === 'interface' ? `${family} is now the system font` : `${family} is now the monospace font`)
+			(family) => (role === 'interface' ? t('magpie-font-done-system', { family }) : t('magpie-font-done-monospace', { family }))
 		);
 	}
 
 	async remove() {
-		await this.#change((path) => commands.fontRemove({ path }), (family) => `${family} was moved to the trash`);
+		await this.#change((path) => commands.fontRemove({ path }), (family) => t('magpie-font-done-removed', { family }));
 	}
 
 	async #change(action: (path: string) => Promise<FontStatus>, done: (family: string) => string) {
 		const path = this.path;
-		if (!path || this.busy) return;
+		const family = this.face?.family;
+		if (!path || !family || this.busy) return;
 		this.busy = true;
 		try {
 			const status = await action(path);
 			if (this.path === path) this.status = status;
-			chrome.notify(done(this.face?.family ?? 'The font'));
+			chrome.notify(done(family));
 		} catch (reason) {
 			chrome.notify(errorText(reason));
 		} finally {

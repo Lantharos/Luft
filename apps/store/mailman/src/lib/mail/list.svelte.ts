@@ -9,7 +9,6 @@ const MAX_RELOAD = 1500;
 
 export interface Summary {
 	view: string;
-	label: string;
 	count: number;
 	names: string[];
 }
@@ -94,14 +93,14 @@ class ThreadList {
 		const counts = mail.counts;
 		if (mail.settings.screener && counts.screener > 0) {
 			const page = await commands.threads({ view: 'screener', query: null, after: null, limit: 4 });
-			summaries.push({ view: 'screener', label: 'New senders', count: counts.screener, names: names(page.rows) });
+			summaries.push({ view: 'screener', count: counts.screener, names: names(page.rows) });
 		}
 		if (!mail.settings.bundles) return summaries;
 		for (const bundle of BUNDLES) {
 			const count = bundle.count?.(counts) ?? 0;
 			if (!count) continue;
 			const page = await commands.threads({ view: bundle.id, query: null, after: null, limit: 6 });
-			summaries.push({ view: bundle.id, label: bundle.label, count, names: names(page.rows.filter((row) => row.unread > 0)) });
+			summaries.push({ view: bundle.id, count, names: names(page.rows.filter((row) => row.unread > 0)) });
 		}
 		return summaries;
 	}

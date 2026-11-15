@@ -1,8 +1,10 @@
 use luft_app::{Commands, Empty};
+use luft_i18n::t;
 use sabine::SabineWindow;
 
 use super::params::*;
 use crate::accounts::{Account, Login, Secret, discover, oauth_sign_in};
+use crate::l10n::L10N;
 use crate::services::cache;
 use crate::state::MailmanState;
 use crate::store::now;
@@ -35,7 +37,7 @@ fn sign_in(
             let tokens = oauth_sign_in(provider, Some(email), token)?;
             let refresh = tokens
                 .refresh
-                .ok_or("The provider didn't allow staying signed in")?;
+                .ok_or_else(|| t!(L10N, "mailman-error-no-refresh"))?;
             Ok(SignedIn {
                 login: Login::Bearer {
                     username: tokens.email.clone().unwrap_or_else(|| email.to_owned()),
@@ -56,7 +58,7 @@ fn sign_in(
 
 fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
     if request.config.unencrypted() && !request.unencrypted {
-        return Err("This server isn't encrypted, so the account wasn't added".into());
+        return Err(t!(L10N, "mailman-error-unencrypted"));
     }
     let requested = request.email.trim().to_lowercase();
     let signed_in = sign_in(
@@ -100,7 +102,7 @@ fn sign_in_again(state: &MailmanState, request: SignInAgain) -> Result<(), Strin
     let account = state
         .store
         .account(request.id)?
-        .ok_or("This account is gone")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-account-gone"))?;
     let signed_in = sign_in(
         request.secret,
         &account.config.username,
@@ -108,7 +110,11 @@ fn sign_in_again(state: &MailmanState, request: SignInAgain) -> Result<(), Strin
         request.token.as_deref(),
     )?;
     if signed_in.email.is_some_and(|email| email != account.email) {
-        return Err(format!("Sign in as {} to use this account", account.email));
+        return Err(t!(
+            L10N,
+            "mailman-error-sign-in-as",
+            email = account.email.as_str()
+        ));
     }
     Engine::verify(&account, signed_in.login)?;
     state.credentials.save(account.id, signed_in.secret)?;

@@ -4,10 +4,12 @@ mod mp4;
 
 use std::path::Path;
 
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
 use crate::folder::kinds::extension;
+use crate::l10n::L10N;
 
 #[derive(Serialize, Default, Type)]
 pub struct VideoInfo {
@@ -54,9 +56,10 @@ pub fn info(path: &Path) -> VideoInfo {
 }
 
 pub fn cues(path: &Path, id: &str) -> Result<Vec<Cue>, String> {
+    let unknown = || t!(L10N, "magpie-video-unknown-track");
     match id.split_once(':') {
-        Some(("mkv", track)) => matroska::cues(path, track.parse().map_err(|_| "Unknown track")?),
-        Some(("mp4", track)) => mp4::cues(path, track.parse().map_err(|_| "Unknown track")?),
-        _ => Err("Unknown track".into()),
+        Some(("mkv", track)) => matroska::cues(path, track.parse().map_err(|_| unknown())?),
+        Some(("mp4", track)) => mp4::cues(path, track.parse().map_err(|_| unknown())?),
+        _ => Err(unknown()),
     }
 }

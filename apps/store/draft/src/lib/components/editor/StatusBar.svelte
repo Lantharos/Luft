@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { PaletteSource } from '@luft/ui';
 	import type { App } from '#lib/app/app.svelte.js';
 	import { useApp } from '#lib/app/context.js';
@@ -15,8 +16,8 @@
 	let cursor = $derived(workspace.cursor);
 
 	let selection = $derived.by(() => {
-		if (cursor.selections > 1) return `${cursor.selections} cursors`;
-		return cursor.selected ? `${cursor.selected.toLocaleString()} selected` : '';
+		if (cursor.selections > 1) return t('draft-status-cursors', { count: cursor.selections });
+		return cursor.selected ? t('draft-status-selected', { count: cursor.selected }) : '';
 	});
 
 	function pick(build: (app: App, document: Document) => PaletteSource) {
@@ -36,11 +37,11 @@
 		{#if selection}
 			<span class="shrink-0">{selection}</span>
 		{/if}
-		<button type="button" class="status-item" onclick={() => app.palette.show(quickOpen(app), ':')}>Ln {cursor.line}, Col {cursor.column}</button>
+		<button type="button" class="status-item" onclick={() => app.palette.show(quickOpen(app), ':')}>{t('draft-status-position', { line: String(cursor.line), column: String(cursor.column) })}</button>
 		<button type="button" class="status-item" onclick={() => pick(indentationPicker)}>{describeIndentation(document.indentation)}</button>
 		<button type="button" class="status-item" onclick={() => pick(encodingPicker)}>{encodingName(document.encoding, document.bom)}</button>
 		<button type="button" class="status-item" onclick={() => pick(lineEndingPicker)}>{document.lineEnding.toUpperCase()}</button>
-		<button type="button" class="status-item" onclick={() => pick(languagePicker)}>{document.language ?? 'Plain Text'}</button>
+		<button type="button" class="status-item" onclick={() => pick(languagePicker)}>{document.language ?? t('draft-plain-text')}</button>
 	{/if}
 </footer>
 

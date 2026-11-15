@@ -1,6 +1,8 @@
+use luft_i18n::t;
 use serde_json::{Value, json};
 
 use super::JmapRemote;
+use crate::l10n::L10N;
 use crate::protocols::jmap::{CORE, MAIL, SUBMISSION};
 use crate::store::{Delivery, Outgoing, Role};
 use crate::sync::remote::Context;
@@ -46,8 +48,7 @@ impl JmapRemote {
         let reason = failure["description"]
             .as_str()
             .or(failure["type"].as_str())
-            .unwrap_or("The server refused it")
-            .to_owned();
+            .map_or_else(|| t!(L10N, "mailman-error-refused-it"), str::to_owned);
         match failure["type"].as_str() {
             Some("serverFail" | "serverUnavailable" | "forbiddenToSend") => Err(reason),
             _ => Ok(Delivery::Refused(reason)),
@@ -58,7 +59,7 @@ impl JmapRemote {
         let sent = context
             .store
             .mailbox_with_role(context.account.id, Role::Sent)?
-            .ok_or("This account has no Sent folder")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-no-sent"))?;
         let email = self.import(
             &outgoing.raw,
             &sent.remote,

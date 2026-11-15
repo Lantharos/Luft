@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { MenuItem, tooltip } from '@luft/ui';
 	import Info from '@lucide/svelte/icons/info';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
@@ -14,8 +15,8 @@
 	async function copy() {
 		if (!activePhoto.source) return;
 		await copyImage(activePhoto.source).then(
-			() => chrome.notify('Copied'),
-			() => chrome.notify("This image couldn't be copied")
+			() => chrome.notify(t('magpie-copied')),
+			() => chrome.notify(t('magpie-photo-copy-failed'))
 		);
 	}
 
@@ -23,26 +24,26 @@
 		const item = activePhoto.item;
 		if (!item) return;
 		await commands.setWallpaper({ path: item.path }).then(
-			(style) => chrome.notify(style === 'dark' ? 'Set as your dark style wallpaper' : 'Set as your light style wallpaper'),
-			() => chrome.notify("The wallpaper couldn't be changed")
+			(style) => chrome.notify(style === 'dark' ? t('magpie-photo-wallpaper-dark') : t('magpie-photo-wallpaper-light')),
+			() => chrome.notify(t('magpie-photo-wallpaper-failed'))
 		);
 	}
 </script>
 
-<button type="button" class="icon-button" aria-label="Rotate left" disabled={!activePhoto.viewport} onclick={() => activePhoto.viewport?.rotate(-1)} {@attach tooltip('Rotate left')}>
+<button type="button" class="icon-button" aria-label={t('magpie-photo-rotate-left')} disabled={!activePhoto.viewport} onclick={() => activePhoto.viewport?.rotate(-1)} {@attach tooltip(t('magpie-photo-rotate-left'))}>
 	<RotateCcw size={17} />
 </button>
-<button type="button" class="icon-button" aria-label="Rotate right" disabled={!activePhoto.viewport} onclick={() => activePhoto.viewport?.rotate(1)} {@attach tooltip('Rotate right')}>
+<button type="button" class="icon-button" aria-label={t('magpie-photo-rotate-right')} disabled={!activePhoto.viewport} onclick={() => activePhoto.viewport?.rotate(1)} {@attach tooltip(t('magpie-photo-rotate-right'))}>
 	<RotateCw size={17} />
 </button>
 <button
 	type="button"
 	class="icon-button"
-	aria-label="Details"
+	aria-label={t('magpie-photo-details')}
 	aria-pressed={chrome.details}
 	class:active={chrome.details}
 	onclick={() => (chrome.details = !chrome.details)}
-	{@attach tooltip('Details')}
+	{@attach tooltip(t('magpie-photo-details'))}
 >
 	<Info size={17} />
 </button>
@@ -52,35 +53,35 @@
 			onclick={() => {
 				close();
 				slideshow.start();
-			}}>Slideshow</MenuItem
+			}}>{t('magpie-photo-slideshow')}</MenuItem
 		>
 		<MenuItem
 			disabled={!activePhoto.source}
 			onclick={() => {
 				close();
 				void copy();
-			}}>Copy</MenuItem
+			}}>{t('magpie-photo-copy')}</MenuItem
 		>
 		<MenuItem
 			disabled={!canPrint()}
 			onclick={() => {
 				close();
 				void printCurrent();
-			}}>Print…</MenuItem
+			}}>{t('magpie-print')}</MenuItem
 		>
 		<MenuItem
 			disabled={!activePhoto.item}
 			onclick={() => {
 				close();
 				void useAsWallpaper();
-			}}>Set as wallpaper</MenuItem
+			}}>{t('magpie-photo-wallpaper')}</MenuItem
 		>
 		<MenuItem
 			disabled={!activePhoto.viewport}
 			onclick={() => {
 				close();
 				activePhoto.viewport?.flip();
-			}}>Flip horizontally</MenuItem
+			}}>{t('magpie-photo-flip')}</MenuItem
 		>
 	{/snippet}
 </MoreMenu>

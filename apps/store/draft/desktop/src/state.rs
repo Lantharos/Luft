@@ -1,9 +1,11 @@
 use luft_app::{Activation, Appearance, Events};
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
 use crate::files::watch::Watcher;
 use crate::files::write::Writes;
+use crate::l10n::L10N;
 use crate::launch;
 use crate::store;
 
@@ -36,7 +38,7 @@ impl DraftState {
 }
 
 pub async fn app_state() -> Result<AppState, String> {
-    let home = dirs::home_dir().ok_or("Could not find the home folder")?;
+    let home = dirs::home_dir().ok_or_else(|| t!(L10N, "draft-error-no-home"))?;
     Ok(AppState {
         appearance: Appearance::current().await,
         home: home.to_string_lossy().into_owned(),

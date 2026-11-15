@@ -1,6 +1,7 @@
 import { selectSelectionMatches } from '@codemirror/search';
 import { addCursorAbove, addCursorBelow, toggleComment } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
+import { t } from '@luft/i18n';
 import type { App } from '#lib/app/app.svelte.js';
 import { showInFolder } from '#lib/bridge/index.js';
 import { reload } from '#lib/documents/opening.js';
@@ -12,9 +13,9 @@ import { quickOpen } from '#lib/palette/sources.js';
 
 export interface Command {
 	id: string;
-	title: string;
+	title: () => string;
 	keys?: string[];
-	hint?: string;
+	editorKeys?: string;
 	available?: () => boolean;
 	run: () => void;
 }
@@ -38,46 +39,46 @@ export function buildCommands(app: App): Command[] {
 		if (document) palette.show(build(app, document));
 	};
 	return [
-		{ id: 'file.new', title: 'New File', keys: ['Ctrl+N'], run: () => app.newFile() },
-		{ id: 'file.open', title: 'Open File…', keys: ['Ctrl+O'], run: () => void app.openFiles() },
-		{ id: 'folder.open', title: 'Open Folder…', keys: ['Ctrl+Shift+O'], run: () => void app.openFolder() },
-		{ id: 'folder.close', title: 'Close Folder', available: () => workspace.tree.root !== null, run: () => workspace.tree.close() },
-		{ id: 'file.save', title: 'Save', keys: ['Ctrl+S'], available: hasDocument, run: () => void save(workspace, active()!) },
-		{ id: 'file.saveAs', title: 'Save As…', keys: ['Ctrl+Shift+S'], available: hasDocument, run: () => void saveAs(workspace, active()!) },
-		{ id: 'file.saveAll', title: 'Save All', keys: ['Ctrl+Alt+S'], run: () => void saveAll(workspace) },
+		{ id: 'file.new', title: () => t('draft-command-new-file'), keys: ['Ctrl+N'], run: () => app.newFile() },
+		{ id: 'file.open', title: () => t('draft-command-open-file'), keys: ['Ctrl+O'], run: () => void app.openFiles() },
+		{ id: 'folder.open', title: () => t('draft-command-open-folder'), keys: ['Ctrl+Shift+O'], run: () => void app.openFolder() },
+		{ id: 'folder.close', title: () => t('draft-command-close-folder'), available: () => workspace.tree.root !== null, run: () => workspace.tree.close() },
+		{ id: 'file.save', title: () => t('draft-command-save'), keys: ['Ctrl+S'], available: hasDocument, run: () => void save(workspace, active()!) },
+		{ id: 'file.saveAs', title: () => t('draft-command-save-as'), keys: ['Ctrl+Shift+S'], available: hasDocument, run: () => void saveAs(workspace, active()!) },
+		{ id: 'file.saveAll', title: () => t('draft-command-save-all'), keys: ['Ctrl+Alt+S'], run: () => void saveAll(workspace) },
 		{
 			id: 'file.revert',
-			title: 'Revert to Saved',
+			title: () => t('draft-command-revert'),
 			available: () => Boolean(active()?.path && active()?.dirty),
 			run: () => void reload(workspace, active()!)
 		},
-		{ id: 'tab.close', title: 'Close Tab', keys: ['Ctrl+W'], available: hasDocument, run: () => void workspace.close(active()!) },
-		{ id: 'tab.closeOthers', title: 'Close Other Tabs', available: () => workspace.documents.length > 1, run: () => void workspace.closeOthers(active()!) },
-		{ id: 'tab.next', title: 'Next Tab', keys: ['Ctrl+Tab', 'Ctrl+PageDown'], run: () => workspace.cycle(1) },
-		{ id: 'tab.previous', title: 'Previous Tab', keys: ['Ctrl+Shift+Tab', 'Ctrl+PageUp'], run: () => workspace.cycle(-1) },
-		{ id: 'palette.files', title: 'Go to File…', keys: ['Ctrl+P'], run: () => app.showQuickOpen() },
-		{ id: 'palette.commands', title: 'Show All Commands', keys: ['Ctrl+Shift+P'], run: () => palette.show(quickOpen(app), '>') },
-		{ id: 'editor.goToLine', title: 'Go to Line…', keys: ['Ctrl+G'], available: hasDocument, run: () => palette.show(quickOpen(app), ':') },
-		{ id: 'editor.find', title: 'Find', keys: ['Ctrl+F'], available: hasDocument, run: search(false) },
-		{ id: 'editor.replace', title: 'Replace', keys: ['Ctrl+H'], available: hasDocument, run: search(true) },
-		{ id: 'editor.selectMatches', title: 'Select All Occurrences', hint: 'Ctrl+Shift+L', available: hasDocument, run: withView(selectSelectionMatches) },
-		{ id: 'editor.cursorAbove', title: 'Add Cursor Above', hint: 'Ctrl+Alt+↑', available: hasDocument, run: withView(addCursorAbove) },
-		{ id: 'editor.cursorBelow', title: 'Add Cursor Below', hint: 'Ctrl+Alt+↓', available: hasDocument, run: withView(addCursorBelow) },
-		{ id: 'editor.comment', title: 'Toggle Comment', hint: 'Ctrl+/', available: hasDocument, run: withView(toggleComment) },
-		{ id: 'editor.trim', title: 'Trim Trailing Whitespace', available: hasDocument, run: withView(trimTrailingWhitespace) },
-		{ id: 'view.sidebar', title: 'Toggle Sidebar', keys: ['Ctrl+B'], available: () => workspace.browsing, run: () => app.settings.update({ sidebar: !app.settings.value.sidebar }) },
-		{ id: 'view.wrap', title: 'Toggle Word Wrap', keys: ['Alt+Z'], run: () => app.toggleWrap() },
-		{ id: 'view.preview', title: 'Toggle Markdown Preview', keys: ['Ctrl+Shift+V'], available: () => app.markdown, run: () => app.togglePreview() },
-		{ id: 'view.zoomIn', title: 'Larger Text', keys: ['Ctrl+=', 'Ctrl+Shift+='], run: () => app.zoom(1) },
-		{ id: 'view.zoomOut', title: 'Smaller Text', keys: ['Ctrl+-'], run: () => app.zoom(-1) },
-		{ id: 'view.zoomReset', title: 'Reset Text Size', keys: ['Ctrl+0'], run: () => app.zoom(0) },
-		{ id: 'document.language', title: 'Change Language…', available: hasDocument, run: pick(languagePicker) },
-		{ id: 'document.encoding', title: 'Change Encoding…', available: hasDocument, run: pick(encodingPicker) },
-		{ id: 'document.indentation', title: 'Change Indentation…', available: hasDocument, run: pick(indentationPicker) },
-		{ id: 'settings.indentation', title: 'Change Default Indentation…', run: () => palette.show(defaultIndentationPicker(app)) },
-		{ id: 'document.lineEndings', title: 'Change Line Endings…', available: hasDocument, run: pick(lineEndingPicker) },
-		{ id: 'file.reveal', title: 'Reveal in Sidebar', available: () => Boolean(active()?.path && workspace.tree.root), run: () => app.reveal(active()!) },
-		{ id: 'file.showInFolder', title: 'Show in Rover', available: () => Boolean(active()?.path), run: () => void showInFolder(active()!.path!) },
-		{ id: 'file.copyPath', title: 'Copy Path', available: () => Boolean(active()?.path), run: () => void navigator.clipboard.writeText(active()!.path!) }
+		{ id: 'tab.close', title: () => t('draft-command-close-tab'), keys: ['Ctrl+W'], available: hasDocument, run: () => void workspace.close(active()!) },
+		{ id: 'tab.closeOthers', title: () => t('draft-command-close-other-tabs'), available: () => workspace.documents.length > 1, run: () => void workspace.closeOthers(active()!) },
+		{ id: 'tab.next', title: () => t('draft-command-next-tab'), keys: ['Ctrl+Tab', 'Ctrl+PageDown'], run: () => workspace.cycle(1) },
+		{ id: 'tab.previous', title: () => t('draft-command-previous-tab'), keys: ['Ctrl+Shift+Tab', 'Ctrl+PageUp'], run: () => workspace.cycle(-1) },
+		{ id: 'palette.files', title: () => t('draft-command-go-to-file'), keys: ['Ctrl+P'], run: () => app.showQuickOpen() },
+		{ id: 'palette.commands', title: () => t('draft-command-show-commands'), keys: ['Ctrl+Shift+P'], run: () => palette.show(quickOpen(app), '>') },
+		{ id: 'editor.goToLine', title: () => t('draft-command-go-to-line'), keys: ['Ctrl+G'], available: hasDocument, run: () => palette.show(quickOpen(app), ':') },
+		{ id: 'editor.find', title: () => t('draft-command-find'), keys: ['Ctrl+F'], available: hasDocument, run: search(false) },
+		{ id: 'editor.replace', title: () => t('draft-command-replace'), keys: ['Ctrl+H'], available: hasDocument, run: search(true) },
+		{ id: 'editor.selectMatches', title: () => t('draft-command-select-matches'), editorKeys: 'Ctrl+Shift+L', available: hasDocument, run: withView(selectSelectionMatches) },
+		{ id: 'editor.cursorAbove', title: () => t('draft-command-cursor-above'), editorKeys: 'Ctrl+Alt+↑', available: hasDocument, run: withView(addCursorAbove) },
+		{ id: 'editor.cursorBelow', title: () => t('draft-command-cursor-below'), editorKeys: 'Ctrl+Alt+↓', available: hasDocument, run: withView(addCursorBelow) },
+		{ id: 'editor.comment', title: () => t('draft-command-toggle-comment'), editorKeys: 'Ctrl+/', available: hasDocument, run: withView(toggleComment) },
+		{ id: 'editor.trim', title: () => t('draft-command-trim-whitespace'), available: hasDocument, run: withView(trimTrailingWhitespace) },
+		{ id: 'view.sidebar', title: () => t('draft-command-toggle-sidebar'), keys: ['Ctrl+B'], available: () => workspace.browsing, run: () => app.settings.update({ sidebar: !app.settings.value.sidebar }) },
+		{ id: 'view.wrap', title: () => t('draft-command-toggle-wrap'), keys: ['Alt+Z'], run: () => app.toggleWrap() },
+		{ id: 'view.preview', title: () => t('draft-command-toggle-preview'), keys: ['Ctrl+Shift+V'], available: () => app.markdown, run: () => app.togglePreview() },
+		{ id: 'view.zoomIn', title: () => t('draft-command-larger-text'), keys: ['Ctrl+=', 'Ctrl+Shift+='], run: () => app.zoom(1) },
+		{ id: 'view.zoomOut', title: () => t('draft-command-smaller-text'), keys: ['Ctrl+-'], run: () => app.zoom(-1) },
+		{ id: 'view.zoomReset', title: () => t('draft-command-reset-text-size'), keys: ['Ctrl+0'], run: () => app.zoom(0) },
+		{ id: 'document.language', title: () => t('draft-command-change-language'), available: hasDocument, run: pick(languagePicker) },
+		{ id: 'document.encoding', title: () => t('draft-command-change-encoding'), available: hasDocument, run: pick(encodingPicker) },
+		{ id: 'document.indentation', title: () => t('draft-command-change-indentation'), available: hasDocument, run: pick(indentationPicker) },
+		{ id: 'settings.indentation', title: () => t('draft-command-change-default-indentation'), run: () => palette.show(defaultIndentationPicker(app)) },
+		{ id: 'document.lineEndings', title: () => t('draft-command-change-line-endings'), available: hasDocument, run: pick(lineEndingPicker) },
+		{ id: 'file.reveal', title: () => t('draft-command-reveal'), available: () => Boolean(active()?.path && workspace.tree.root), run: () => app.reveal(active()!) },
+		{ id: 'file.showInFolder', title: () => t('draft-command-show-in-rover'), available: () => Boolean(active()?.path), run: () => void showInFolder(active()!.path!) },
+		{ id: 'file.copyPath', title: () => t('draft-command-copy-path'), available: () => Boolean(active()?.path), run: () => void navigator.clipboard.writeText(active()!.path!) }
 	];
 }

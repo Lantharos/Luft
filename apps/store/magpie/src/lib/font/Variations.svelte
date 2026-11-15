@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Slider } from '@luft/ui';
 	import type { FontFace } from '#lib/bindings.js';
+	import { formatNumber } from '#lib/library/format.js';
 	import { fontState } from './state.svelte';
 
 	let { face }: { face: FontFace } = $props();
@@ -9,15 +11,15 @@
 		face.instances.findIndex((candidate) => candidate.coordinates.every(([tag, value]) => fontState.coordinates[tag] === value))
 	);
 	let step = (min: number, max: number) => (max - min > 20 ? 1 : 0.1);
-	let format = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 1 });
+	let format = (value: number) => formatNumber(value, 1);
 </script>
 
 <Section>
 	{#if face.instances.length}
-		<Row title="Named style">
+		<Row title={t('magpie-font-named-style')}>
 			<Select
-				label="Named style"
-				placeholder="Custom"
+				label={t('magpie-font-named-style')}
+				placeholder={t('magpie-font-custom')}
 				options={face.instances.map((candidate, index) => ({ value: index, label: candidate.name }))}
 				value={instance}
 				onchange={(index) => fontState.applyInstance(face.instances[index])}

@@ -3,6 +3,7 @@ mod apps;
 mod cache;
 mod folder;
 mod font;
+mod l10n;
 mod launch;
 mod media;
 mod mpris;

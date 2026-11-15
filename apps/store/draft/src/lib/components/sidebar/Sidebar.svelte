@@ -1,7 +1,9 @@
 <script lang="ts">
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Search from '@lucide/svelte/icons/search';
+	import { t } from '@luft/i18n';
 	import { useApp } from '#lib/app/context.js';
+	import { keyNames } from '#lib/commands/keys.js';
 	import FileTree from './FileTree.svelte';
 
 	const app = useApp();
@@ -11,8 +13,8 @@
 <aside class="glass-sidebar drag-region sidebar">
 	<button type="button" class="quick-open" onclick={() => app.showQuickOpen()}>
 		<Search size={15} />
-		<span class="flex-1 truncate text-left">Go to file</span>
-		<kbd>Ctrl P</kbd>
+		<span class="flex-1 truncate text-left">{t('draft-sidebar-go-to-file')}</span>
+		<kbd>{keyNames('Ctrl+P').join(' ')}</kbd>
 	</button>
 
 	<div class="sidebar-body">
@@ -22,7 +24,7 @@
 			<div class="sidebar-empty">
 				<button type="button" class="open-folder" onclick={() => void app.openFolder()}>
 					<FolderOpen size={16} />
-					<span>Open Folder</span>
+					<span>{t('draft-sidebar-open-folder')}</span>
 				</button>
 			</div>
 		{/if}

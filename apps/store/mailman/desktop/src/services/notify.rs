@@ -4,6 +4,7 @@ use std::sync::{Arc, OnceLock};
 
 use futures_util::StreamExt;
 use luft_app::{Events, dbus};
+use luft_i18n::t;
 use parking_lot::Mutex;
 use sabine::SabineProcessHandle;
 use serde::Serialize;
@@ -12,6 +13,7 @@ use zbus::{Proxy, Variant};
 
 use crate::APP_ID;
 use crate::events::OPEN_THREAD;
+use crate::l10n::L10N;
 use crate::store::Notable;
 
 const DESTINATION: &str = "org.freedesktop.Notifications";
@@ -58,6 +60,7 @@ async fn notify(title: &str, body: &str, sound: Option<&str>) -> Result<u32, Str
     if let Some(sound) = sound {
         hints.insert("sound-name", Variant::from(sound));
     }
+    let open = t!(L10N, "mailman-notify-open");
     proxy()
         .await?
         .call(
@@ -68,7 +71,7 @@ async fn notify(title: &str, body: &str, sound: Option<&str>) -> Result<u32, Str
                 APP_ID,
                 title,
                 body,
-                vec![DEFAULT_ACTION, "Open"],
+                vec![DEFAULT_ACTION, open.as_str()],
                 hints,
                 -1i32,
             ),
@@ -117,7 +120,7 @@ impl Notifier {
                     many.iter().map(|message| message.sender.as_str()).collect();
                 senders.dedup();
                 (
-                    format!("{} new messages", many.len()),
+                    t!(L10N, "mailman-notify-new", count = many.len()),
                     senders.join(", "),
                     None,
                 )

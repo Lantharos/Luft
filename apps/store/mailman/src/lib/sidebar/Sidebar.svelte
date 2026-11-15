@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill, tooltip } from '@luft/ui';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Search from '@lucide/svelte/icons/search';
@@ -62,29 +63,29 @@
 
 <aside class="glass-sidebar drag-region">
 	<div class="flex h-[60px] flex-none items-center gap-2 px-3">
-		<button type="button" class="write" class:rail aria-label={rail ? 'Write' : undefined} onclick={() => composer.start()} {@attach tooltip('Write (C)')}>
+		<button type="button" class="write" class:rail aria-label={rail ? t('mailman-sidebar-write') : undefined} onclick={() => composer.start()} {@attach tooltip(t('mailman-sidebar-write-tooltip'))}>
 			<PenLine size={rail ? 18 : 16} />
-			{#if !rail}<span>Write</span>{/if}
+			{#if !rail}<span>{t('mailman-sidebar-write')}</span>{/if}
 		</button>
 		{#if !rail}
-			<button type="button" class="icon-button" aria-label="Settings" onclick={onsettings} {@attach tooltip('Settings')}>
+			<button type="button" class="icon-button" aria-label={t('mailman-sidebar-settings')} onclick={onsettings} {@attach tooltip(t('mailman-sidebar-settings'))}>
 				<Settings size={18} />
 			</button>
 		{/if}
 	</div>
 	{#if !rail}
 		<div class="flex-none px-3 pb-3">
-			<SearchField bind:this={search} bind:value={query} label="Search mail" variant="sidebar" onkeydown={searchKey} />
+			<SearchField bind:this={search} bind:value={query} label={t('mailman-sidebar-search')} variant="sidebar" onkeydown={searchKey} />
 		</div>
 	{/if}
 	<nav class="scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3" class:hidden-scroll={rail} class:soft-scroll={!rail} {@attach selectionPill()}>
 		{#if rail}
-			<NavItem label="Search mail" icon={Search} active={list.searching} {rail} onclick={onsearch} />
+			<NavItem label={t('mailman-sidebar-search')} icon={Search} active={list.searching} {rail} onclick={onsearch} />
 		{/if}
 		<div class="flex flex-col gap-px">
 			{#each primary as view (view.id)}
 				<NavItem
-					label={view.label}
+					label={view.label()}
 					icon={view.icon}
 					active={list.view === view.id && !list.searching}
 					count={view.count?.(mail.counts) ?? 0}
@@ -96,9 +97,9 @@
 		</div>
 		{#if mail.settings.bundles}
 			<div class="flex flex-col gap-px">
-				{#if !rail}<p class="group">Bundles</p>{/if}
+				{#if !rail}<p class="group">{t('mailman-sidebar-bundles')}</p>{/if}
 				{#each BUNDLES as view (view.id)}
-					<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={view.count?.(mail.counts) ?? 0} {rail} onclick={() => navigate(view.id)} />
+					<NavItem label={view.label()} icon={view.icon} active={list.view === view.id && !list.searching} count={view.count?.(mail.counts) ?? 0} {rail} onclick={() => navigate(view.id)} />
 				{/each}
 			</div>
 		{/if}
@@ -106,10 +107,10 @@
 			{@const folders = mail.folders(account.id)}
 			{#if folders.length}
 				<div class="flex flex-col gap-px">
-					{#if !rail}<p class="group truncate">{multiple ? account.email : 'Folders'}</p>{/if}
+					{#if !rail}<p class="group truncate">{multiple ? account.email : t('mailman-sidebar-folders')}</p>{/if}
 					{#each folders as folder (folder.id)}
 						{@const view = mailboxView(folder)}
-						<NavItem label={view.label} icon={view.icon} active={list.view === view.id && !list.searching} count={mail.unreadIn(folder.id)} {rail} onclick={() => navigate(view.id)} />
+						<NavItem label={view.label()} icon={view.icon} active={list.view === view.id && !list.searching} count={mail.unreadIn(folder.id)} {rail} onclick={() => navigate(view.id)} />
 					{/each}
 				</div>
 			{/if}
@@ -117,7 +118,7 @@
 	</nav>
 	{#if rail}
 		<div class="flex flex-none justify-center pb-3">
-			<button type="button" class="icon-button large" aria-label="Settings" onclick={onsettings} {@attach tooltip('Settings')}>
+			<button type="button" class="icon-button large" aria-label={t('mailman-sidebar-settings')} onclick={onsettings} {@attach tooltip(t('mailman-sidebar-settings'))}>
 				<Settings size={18} />
 			</button>
 		</div>

@@ -1,4 +1,5 @@
 import { print } from '@lantharos/sabine';
+import { t } from '@luft/i18n';
 import { commands } from '#lib/bindings.js';
 import { library } from '#lib/library/library.svelte.js';
 import { player } from '#lib/music/player.svelte.js';
@@ -16,7 +17,7 @@ export async function openPaths(paths: string[]) {
 	if (!first) return;
 	if (player.playing && library.group === 'audio') {
 		const queued = await player.enqueue(paths);
-		if (queued) return chrome.notify(queued === 1 ? 'Added to the queue' : `Added ${queued} songs to the queue`);
+		if (queued) return chrome.notify(queued === 1 ? t('magpie-music-queued-one') : t('magpie-music-queued', { count: queued }));
 	}
 	await library.open(first);
 	if (rest.length && library.group === 'audio') await player.enqueue(rest);
@@ -35,5 +36,5 @@ export function canPrint() {
 }
 
 export async function printCurrent() {
-	await printJob()?.().catch(() => chrome.notify("This couldn't be printed"));
+	await printJob()?.().catch(() => chrome.notify(t('magpie-print-failed')));
 }

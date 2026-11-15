@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -48,12 +49,12 @@
 			</div>
 		{/key}
 		{#if library.hasPrevious}
-			<button type="button" class="nav left fade-idle" aria-label="Previous" onclick={() => library.step(-1)} {@attach tooltip('Previous')}>
+			<button type="button" class="nav left fade-idle" aria-label={t('magpie-previous')} onclick={() => library.step(-1)} {@attach tooltip(t('magpie-previous'))}>
 				<ChevronLeft size={22} />
 			</button>
 		{/if}
 		{#if library.hasNext}
-			<button type="button" class="nav right fade-idle" aria-label="Next" onclick={() => library.step(1)} {@attach tooltip('Next')}>
+			<button type="button" class="nav right fade-idle" aria-label={t('magpie-next')} onclick={() => library.step(1)} {@attach tooltip(t('magpie-next'))}>
 				<ChevronRight size={22} />
 			</button>
 		{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Avatar, longDateTime, relativeDay, tooltip } from '@luft/ui';
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import Reply from '@lucide/svelte/icons/reply';
@@ -9,6 +10,7 @@
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
 	import MailBody from './MailBody.svelte';
+	import { names } from './names';
 	import { reader } from './reader.svelte';
 
 	interface Props {
@@ -38,7 +40,7 @@
 	});
 
 	function label(address: Address) {
-		return own.has(address.address) ? 'me' : address.name || address.address;
+		return own.has(address.address) ? t('mailman-reader-me') : address.name || address.address;
 	}
 
 	async function always() {
@@ -58,14 +60,14 @@
 					<span class="min-w-0 truncate text-[12.5px] text-[var(--text-muted)]">{message.sender}</span>
 				</div>
 				<p class="truncate text-[12.5px] text-[var(--text-muted)]">
-					to {recipients.map(label).join(', ') || 'undisclosed recipients'}
+					{recipients.length ? t('mailman-reader-to', { recipients: names(recipients.map(label)) }) : t('mailman-reader-undisclosed')}
 				</p>
 			</div>
 			<span class="flex-none pt-0.5 text-[12.5px] text-[var(--text-muted)]" {@attach tooltip(longDateTime(message.date))}>{relativeDay(message.date)}</span>
 			{#if message.draft}
-				<button type="button" class="plain-button edit" onclick={() => void composer.reopen(message.id)}>Continue writing</button>
+				<button type="button" class="plain-button edit" onclick={() => void composer.reopen(message.id)}>{t('mailman-reader-continue')}</button>
 			{:else}
-				<button type="button" class="icon-button reply" aria-label="Reply" onclick={() => composer.reply(message, rendered, false)} {@attach tooltip('Reply (R)')}>
+				<button type="button" class="icon-button reply" aria-label={t('mailman-reader-reply')} onclick={() => composer.reply(message, rendered, false)} {@attach tooltip(t('mailman-reader-reply-tooltip'))}>
 					<Reply size={16} />
 				</button>
 			{/if}
@@ -74,19 +76,19 @@
 			<div class="notice">
 				<ImageOff size={15} class="flex-none" />
 				<span class="min-w-0 flex-1 truncate">
-					Pictures are hidden{rendered.trackers ? `, ${rendered.trackers === 1 ? 'a tracker' : `${rendered.trackers} trackers`} blocked` : ''}
+					{rendered.trackers ? t('mailman-reader-pictures-hidden-trackers', { count: rendered.trackers }) : t('mailman-reader-pictures-hidden')}
 				</span>
-				<button type="button" class="plain-button small" onclick={() => (images = true)}>Show</button>
-				<button type="button" class="plain-button small" onclick={() => void always()}>Always from {name}</button>
+				<button type="button" class="plain-button small" onclick={() => (images = true)}>{t('mailman-reader-show')}</button>
+				<button type="button" class="plain-button small" onclick={() => void always()}>{t('mailman-reader-always', { sender: name })}</button>
 			</div>
 		{:else if rendered?.trackers && !remembered}
-			<p class="notice quiet">{rendered.trackers === 1 ? 'A tracker was' : `${rendered.trackers} trackers were`} blocked</p>
+			<p class="notice quiet">{t('mailman-reader-trackers-blocked', { count: rendered.trackers })}</p>
 		{/if}
 		<div class="body">
 			{#if rendered}
 				<MailBody {rendered} {images} bind:quotes expandQuotes={showQuotes} />
 				{#if quotes}
-					<button type="button" class="more" aria-label={showQuotes ? 'Hide quoted text' : 'Show quoted text'} onclick={() => (showQuotes = !showQuotes)} {@attach tooltip(showQuotes ? 'Hide quoted text' : 'Show quoted text')}>
+					<button type="button" class="more" aria-label={showQuotes ? t('mailman-reader-hide-quoted') : t('mailman-reader-show-quoted')} onclick={() => (showQuotes = !showQuotes)} {@attach tooltip(showQuotes ? t('mailman-reader-hide-quoted') : t('mailman-reader-show-quoted'))}>
 						<Ellipsis size={16} />
 					</button>
 				{/if}

@@ -1,6 +1,10 @@
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
+
+use crate::l10n::L10N;
+
 const WOFF: &[u8; 4] = b"wOFF";
 const WOFF2: &[u8; 4] = b"wOF2";
 const COLLECTION: &[u8; 4] = b"ttcf";
@@ -21,7 +25,7 @@ pub struct FontData {
 impl FontData {
     pub fn read(path: &Path) -> Result<Self, String> {
         let raw = fs::read(path).map_err(|error| error.to_string())?;
-        let damaged = |_| "This font file is damaged".to_string();
+        let damaged = |_| t!(L10N, "magpie-font-damaged");
         let (bytes, container) = match raw.get(..4) {
             Some(magic) if magic == WOFF => (
                 wuff::decompress_woff1(&raw).map_err(damaged)?,
@@ -50,17 +54,17 @@ impl FontData {
         }
     }
 
-    pub fn format(&self) -> &'static str {
+    pub fn format(&self) -> String {
         match (
             self.container,
             self.is_collection(),
             self.bytes.starts_with(CFF),
         ) {
-            (Container::Woff2, ..) => "WOFF2",
-            (Container::Woff, ..) => "WOFF",
-            (_, true, _) => "Font collection",
-            (_, _, true) => "OpenType",
-            _ => "TrueType",
+            (Container::Woff2, ..) => "WOFF2".into(),
+            (Container::Woff, ..) => "WOFF".into(),
+            (_, true, _) => t!(L10N, "magpie-font-collection"),
+            (_, _, true) => "OpenType".into(),
+            _ => "TrueType".into(),
         }
     }
 }

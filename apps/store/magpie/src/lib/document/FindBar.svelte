@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { SearchField, tooltip } from '@luft/ui';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
@@ -27,20 +28,20 @@
 
 <div class="flex items-center gap-1">
 	<div class="w-[220px]">
-		<SearchField bind:this={field} bind:value={documentState.query} label="Find in document" onkeydown={keydown} />
+		<SearchField bind:this={field} bind:value={documentState.query} label={t('magpie-document-find-label')} onkeydown={keydown} />
 	</div>
 	{#if documentState.query}
 		<span class="min-w-[64px] text-center text-[12px] text-[var(--text-muted)] tabular-nums">
-			{documentState.matches.total ? `${documentState.matches.current} of ${documentState.matches.total}` : 'No matches'}
+			{documentState.matches.total ? t('magpie-document-matches', { current: documentState.matches.current, total: documentState.matches.total }) : t('magpie-document-no-matches')}
 		</span>
 	{/if}
-	<button type="button" class="icon-button" aria-label="Previous match" disabled={!documentState.matches.total} onclick={() => documentState.find(true)} {@attach tooltip('Previous match')}>
+	<button type="button" class="icon-button" aria-label={t('magpie-document-previous-match')} disabled={!documentState.matches.total} onclick={() => documentState.find(true)} {@attach tooltip(t('magpie-document-previous-match'))}>
 		<ChevronUp size={17} />
 	</button>
-	<button type="button" class="icon-button" aria-label="Next match" disabled={!documentState.matches.total} onclick={() => documentState.find()} {@attach tooltip('Next match')}>
+	<button type="button" class="icon-button" aria-label={t('magpie-document-next-match')} disabled={!documentState.matches.total} onclick={() => documentState.find()} {@attach tooltip(t('magpie-document-next-match'))}>
 		<ChevronDown size={17} />
 	</button>
-	<button type="button" class="icon-button" aria-label="Close search" onclick={() => documentState.closeFind()} {@attach tooltip('Close search')}>
+	<button type="button" class="icon-button" aria-label={t('magpie-document-close-find')} onclick={() => documentState.closeFind()} {@attach tooltip(t('magpie-document-close-find'))}>
 		<X size={17} />
 	</button>
 </div>

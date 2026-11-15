@@ -4,9 +4,11 @@ use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_i18n::t;
 
 use super::response::{self, Response, Status, Untagged};
 use crate::accounts::{Login, SignInError};
+use crate::l10n::L10N;
 use crate::protocols::net::{Security, Server, Stream};
 
 const READ_TIMEOUT: Duration = Duration::from_secs(90);
@@ -173,7 +175,7 @@ impl Client {
     fn run_sensitive(&mut self, command: &str) -> Result<Reply, SignInError> {
         let tag = self.tag();
         self.send(format!("{tag} {command}\r\n").as_bytes())?;
-        let failed = |error| format!("Signing in failed: {error}");
+        let failed = |error: String| t!(L10N, "mailman-error-sign-in-failed", error = error);
         self.outcome(&tag, "sign in")
             .map_err(failed)?
             .map_err(|refused| SignInError::Refused(failed(refused)))

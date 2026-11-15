@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { ago } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Action } from '#lib/bindings.js';
@@ -10,11 +11,11 @@ import { mail } from './mail.svelte';
 type Mover = 'archive' | 'trash' | 'spam' | 'inbox' | 'deleteForever';
 
 const MOVED: Record<Mover, (count: number) => string> = {
-	archive: (count) => (count === 1 ? 'Archived' : `Archived ${count} conversations`),
-	trash: (count) => (count === 1 ? 'Moved to Trash' : `Moved ${count} conversations to Trash`),
-	spam: (count) => (count === 1 ? 'Marked as junk' : `Marked ${count} conversations as junk`),
-	inbox: (count) => (count === 1 ? 'Moved to Inbox' : `Moved ${count} conversations to Inbox`),
-	deleteForever: (count) => (count === 1 ? 'Deleted forever' : `Deleted ${count} conversations forever`)
+	archive: (count) => t('mailman-done-archived', { count }),
+	trash: (count) => t('mailman-done-trashed', { count }),
+	spam: (count) => t('mailman-done-junk', { count }),
+	inbox: (count) => t('mailman-done-inbox', { count }),
+	deleteForever: (count) => t('mailman-done-deleted', { count })
 };
 
 const STAYS: Partial<Record<Mover, string>> = { archive: 'archive', trash: 'trash', spam: 'junk', inbox: 'inbox' };
@@ -34,9 +35,9 @@ async function undoable(action: Action, threads: number[], message: string) {
 		const undo = await commands.act({ ...action, threads });
 		toasts.show(message, {
 			action: undo.moves.length
-				? { label: 'Undo', run: () => void restore(undo.moves) }
+				? { label: t('mailman-undo'), run: () => void restore(undo.moves) }
 				: action.action === 'snooze'
-					? { label: 'Undo', run: () => void commands.act({ action: 'unsnooze', threads }).then(refreshAll) }
+					? { label: t('mailman-undo'), run: () => void commands.act({ action: 'unsnooze', threads }).then(refreshAll) }
 					: undefined
 		});
 	} catch (error) {
@@ -63,15 +64,15 @@ export function move(kind: Mover, threads: number[], message = MOVED[kind](threa
 
 export function moveTo(mailbox: number, threads: number[]) {
 	if (!threads.length) return;
-	const name = mail.mailboxes.find((candidate) => candidate.id === mailbox)?.name ?? 'folder';
+	const name = mail.mailboxes.find((candidate) => candidate.id === mailbox)?.name;
 	if (list.view !== `mailbox:${mailbox}`) leave(threads);
-	void undoable({ action: 'move', mailbox }, threads, `Moved to ${name}`);
+	void undoable({ action: 'move', mailbox }, threads, name ? t('mailman-done-moved', { folder: name }) : t('mailman-done-moved-folder'));
 }
 
 export function snooze(at: number, threads: number[]) {
 	if (!threads.length) return;
 	if (list.view !== 'later') leave(threads);
-	void undoable({ action: 'snooze', until: at }, threads, `Back ${ago(at)}`);
+	void undoable({ action: 'snooze', until: at }, threads, t('mailman-done-snoozed', { when: ago(at) }));
 }
 
 export async function wake(threads: number[]) {
@@ -101,8 +102,8 @@ export async function screen(address: string, verdict: 'approved' | 'denied', th
 	if (list.view === 'screener' || list.view === 'screened') leave(threads);
 	const previous = await commands.screen({ address, verdict }).catch(toasts.fail);
 	if (previous)
-		toasts.show(verdict === 'approved' ? `${address} can reach your inbox` : `${address} is screened out`, {
-			action: { label: 'Undo', run: () => void commands.screen({ address, verdict: previous }).then(refreshAll) }
+		toasts.show(verdict === 'approved' ? t('mailman-done-approved', { address }) : t('mailman-done-screened-out', { address }), {
+			action: { label: t('mailman-undo'), run: () => void commands.screen({ address, verdict: previous }).then(refreshAll) }
 		});
 	await refreshAll();
 }
@@ -110,8 +111,8 @@ export async function screen(address: string, verdict: 'approved' | 'denied', th
 export async function unsubscribe(id: number, sender: string, thread: number) {
 	try {
 		const result = await api.unsubscribe(id);
-		if (result === 'opened') return toasts.show('Finish unsubscribing in your browser');
-		move('archive', [thread], `Unsubscribed from ${sender}`);
+		if (result === 'opened') return toasts.show(t('mailman-unsubscribe-in-browser'));
+		move('archive', [thread], t('mailman-unsubscribed', { sender }));
 	} catch (error) {
 		toasts.fail(error);
 	}

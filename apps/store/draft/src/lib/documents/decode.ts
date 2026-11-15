@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { commands } from '#lib/bindings.js';
 import type { LineEnding } from './encodings';
 
@@ -35,7 +36,7 @@ function strictUtf8(bytes: Uint8Array) {
 export async function decode(bytes: Uint8Array, path: string, forced?: string): Promise<DecodedText> {
 	const marked = byteOrderMark(bytes);
 	const encoding = forced ?? marked;
-	if (!encoding?.startsWith('utf-16') && bytes.subarray(0, SNIFF_BYTES).includes(0)) throw new Error('This file doesn’t contain text');
+	if (!encoding?.startsWith('utf-16') && bytes.subarray(0, SNIFF_BYTES).includes(0)) throw new Error(t('draft-error-not-text'));
 	const text = encoding ? new TextDecoder(encoding).decode(bytes) : strictUtf8(bytes);
 	if (text !== null) return { text, encoding: encoding ?? 'utf-8', bom: marked !== null && marked === encoding, lineEnding: lineEnding(text) };
 	const detected = await commands.fileEncoding({ path });

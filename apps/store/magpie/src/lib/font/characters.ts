@@ -1,4 +1,5 @@
-const PANGRAM = 'The quick brown fox jumps over the lazy dog';
+import { t } from '@luft/i18n';
+
 const FALLBACK_LENGTH = 32;
 
 export type Ranges = [number, number][];
@@ -44,7 +45,8 @@ function visible(ranges: Ranges, limit: number) {
 
 export function sampleText(ranges: Ranges, provided: string | null) {
 	if (provided && covers(ranges, provided)) return provided;
-	if (covers(ranges, PANGRAM)) return PANGRAM;
+	const pangram = t('magpie-font-pangram');
+	if (covers(ranges, pangram)) return pangram;
 	return visible(ranges, FALLBACK_LENGTH);
 }
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';
 
@@ -14,11 +15,11 @@
 
 	let { label, icon: Icon, active, count = 0, strong = false, rail = false, onclick }: Props = $props();
 
-	let shownCount = $derived(count > 999 ? '999+' : `${count}`);
+	let shownCount = $derived(count > 999 ? t('mailman-sidebar-count-capped') : `${count}`);
 </script>
 
 {#if rail}
-	<button type="button" class="item rail" class:active aria-label={count > 0 ? `${label}, ${shownCount}` : label} aria-current={active ? 'page' : undefined} {onclick} {@attach tooltip(count > 0 ? `${label} · ${shownCount}` : label)}>
+	<button type="button" class="item rail" class:active aria-label={count > 0 ? t('mailman-sidebar-folder-count', { folder: label, count: shownCount }) : label} aria-current={active ? 'page' : undefined} {onclick} {@attach tooltip(count > 0 ? t('mailman-sidebar-folder-count-tooltip', { folder: label, count: shownCount }) : label)}>
 		<Icon size={18} />
 		{#if count > 0}
 			<span class="dot" class:strong></span>

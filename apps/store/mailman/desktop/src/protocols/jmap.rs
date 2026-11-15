@@ -2,10 +2,12 @@ use std::time::Duration;
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_i18n::t;
 use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::accounts::{Login, SignInError};
+use crate::l10n::L10N;
 
 const TIMEOUT: Duration = Duration::from_secs(60);
 const MAX_REDIRECTS: usize = 5;
@@ -76,7 +78,7 @@ impl Client {
                 .join(location.to_str().map_err(|error| error.to_string())?)
                 .map_err(|error| error.to_string())?;
             if url.scheme() == "https" && next.scheme() != "https" {
-                return Err("The server sent the sign-in somewhere unencrypted".into());
+                return Err(t!(L10N, "mailman-error-redirect-unencrypted").into());
             }
             url = next;
             response = agent
@@ -87,7 +89,11 @@ impl Client {
         }
         let status = response.status();
         if !status.is_success() {
-            let failed = format!("Signing in failed ({status})");
+            let failed = t!(
+                L10N,
+                "mailman-error-sign-in-status",
+                status = status.to_string()
+            );
             return Err(match status.as_u16() {
                 401 | 403 => SignInError::Refused(failed),
                 _ => SignInError::Failed(failed),
@@ -101,7 +107,7 @@ impl Client {
             .primary_accounts
             .get(MAIL)
             .cloned()
-            .ok_or("This server doesn't offer mail")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-no-mail"))?;
         let core = session.capabilities.get(CORE).cloned().unwrap_or_default();
         let limit = |name: &str, fallback: u64| core[name].as_u64().unwrap_or(fallback) as usize;
         Ok(Self {
@@ -143,7 +149,11 @@ impl Client {
             .send_json(json!({ "using": using, "methodCalls": method_calls }))
             .map_err(|error| error.to_string())?;
         if !response.status().is_success() {
-            return Err(format!("The server refused ({})", response.status()));
+            return Err(t!(
+                L10N,
+                "mailman-error-refused-status",
+                status = response.status().to_string()
+            ));
         }
         let response: Value = response
             .body_mut()
@@ -161,8 +171,7 @@ impl Client {
                 Some("error") => Err(response[1]["description"]
                     .as_str()
                     .or(response[1]["type"].as_str())
-                    .unwrap_or("The server refused")
-                    .to_owned()),
+                    .map_or_else(|| t!(L10N, "mailman-error-refused"), str::to_owned)),
                 _ => Ok(response[1].clone()),
             })
             .collect())
@@ -210,6 +219,6 @@ impl Client {
         response["blobId"]
             .as_str()
             .map(str::to_owned)
-            .ok_or_else(|| "The server didn't keep the message".into())
+            .ok_or_else(|| t!(L10N, "mailman-error-message-not-kept"))
     }
 }

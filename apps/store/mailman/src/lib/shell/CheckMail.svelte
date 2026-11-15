@@ -1,9 +1,10 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { mail } from '#lib/mail/mail.svelte.js';
 </script>
 
-<button type="button" class="icon-button" aria-label="Check for new mail" aria-busy={mail.checking} onclick={mail.checkNow} {@attach tooltip('Check for new mail (F5)')}>
+<button type="button" class="icon-button" aria-label={t('mailman-check-mail')} aria-busy={mail.checking} onclick={mail.checkNow} {@attach tooltip(t('mailman-check-mail-tooltip'))}>
 	<RefreshCw size={16} />
 </button>

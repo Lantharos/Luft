@@ -2,11 +2,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use luft_app::fonts;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
 use super::data::FontData;
 use super::faces::{self, FontIdentity};
+use crate::l10n::L10N;
 
 const MAX_SUFFIX: u32 = 100;
 
@@ -68,7 +70,7 @@ fn target(folder: &Path, stem: &str, extension: &str, bytes: &[u8]) -> Result<Pa
         .chain((2..=MAX_SUFFIX).map(|number| format!("{stem}-{number}.{extension}")))
         .map(|name| folder.join(name))
         .find(|candidate| fs::read(candidate).map_or(true, |existing| existing == bytes))
-        .ok_or_else(|| "There's no free name for this font in your fonts folder".into())
+        .ok_or_else(|| t!(L10N, "magpie-font-no-free-name"))
 }
 
 pub fn install(path: &Path) -> Result<FontStatus, String> {
@@ -97,7 +99,7 @@ pub fn use_as(path: &Path, role: fonts::Role) -> Result<FontStatus, String> {
         .into_iter()
         .find(|face| matches(&identity, face))
         .map(|face| face.family)
-        .ok_or("The font couldn't be found after installing it")?;
+        .ok_or_else(|| t!(L10N, "magpie-font-not-found"))?;
     fonts::use_family(role, &family)?;
     Ok(status)
 }

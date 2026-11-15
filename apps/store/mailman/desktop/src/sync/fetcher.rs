@@ -1,4 +1,5 @@
 use crossbeam_channel::{Receiver, Sender};
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
@@ -7,6 +8,7 @@ use super::remote::{self, Connection};
 use super::worker::keep;
 use crate::accounts::Account;
 use crate::events::BODY;
+use crate::l10n::L10N;
 
 #[derive(Serialize, Type)]
 pub struct BodyArrived {
@@ -58,10 +60,13 @@ impl Fetcher {
         if store.body(id)?.is_some() {
             return Ok(());
         }
-        let located = store.locate(&[id])?.pop().ok_or("This message is gone")?;
+        let located = store
+            .locate(&[id])?
+            .pop()
+            .ok_or_else(|| t!(L10N, "mailman-error-this-message-gone"))?;
         let mailbox = store
             .mailbox(located.mailbox)?
-            .ok_or("This folder is gone")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-folder-gone"))?;
         if !self.connection.as_ref().is_some_and(Connection::current) {
             self.connection = Some(remote::connect(&self.account, &self.shared.credentials)?);
         }
@@ -70,7 +75,7 @@ impl Fetcher {
             .remote
             .bodies(&mailbox, &[(located.id, located.remote)])?;
         if bodies.is_empty() {
-            return Err("The server didn't return this message".into());
+            return Err(t!(L10N, "mailman-error-message-not-returned"));
         }
         keep(store, &bodies)
     }

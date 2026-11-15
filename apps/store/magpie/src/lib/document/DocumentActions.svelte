@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { MenuItem, tooltip } from '@luft/ui';
 	import Minus from '@lucide/svelte/icons/minus';
 	import MoveHorizontal from '@lucide/svelte/icons/move-horizontal';
@@ -14,16 +15,16 @@
 {#if documentState.finding}
 	<FindBar />
 {:else}
-	<button type="button" class="icon-button" aria-label="Find in document" disabled={!documentState.viewer} onclick={() => (documentState.finding = true)} {@attach tooltip('Find')}>
+	<button type="button" class="icon-button" aria-label={t('magpie-document-find-label')} disabled={!documentState.viewer} onclick={() => (documentState.finding = true)} {@attach tooltip(t('magpie-document-find'))}>
 		<Search size={17} />
 	</button>
 {/if}
 <div class="mx-1 flex items-center">
-	<button type="button" class="icon-button" aria-label="Zoom out" disabled={!documentState.viewer} onclick={() => documentState.zoom(-1)} {@attach tooltip('Zoom out')}>
+	<button type="button" class="icon-button" aria-label={t('magpie-zoom-out')} disabled={!documentState.viewer} onclick={() => documentState.zoom(-1)} {@attach tooltip(t('magpie-zoom-out'))}>
 		<Minus size={16} />
 	</button>
-	<span class="min-w-[48px] text-center text-[12px] font-semibold text-[var(--text-soft)] tabular-nums">{Math.round(documentState.scale * 100)}%</span>
-	<button type="button" class="icon-button" aria-label="Zoom in" disabled={!documentState.viewer} onclick={() => documentState.zoom(1)} {@attach tooltip('Zoom in')}>
+	<span class="min-w-[48px] text-center text-[12px] font-semibold text-[var(--text-soft)] tabular-nums">{t('magpie-zoom-percent', { percent: Math.round(documentState.scale * 100) })}</span>
+	<button type="button" class="icon-button" aria-label={t('magpie-zoom-in')} disabled={!documentState.viewer} onclick={() => documentState.zoom(1)} {@attach tooltip(t('magpie-zoom-in'))}>
 		<Plus size={16} />
 	</button>
 </div>
@@ -31,11 +32,11 @@
 	type="button"
 	class="icon-button"
 	class:on={documentState.fit === 'page-width'}
-	aria-label="Fit width"
+	aria-label={t('magpie-document-fit-width')}
 	aria-pressed={documentState.fit === 'page-width'}
 	disabled={!documentState.viewer}
 	onclick={() => documentState.setFit('page-width')}
-	{@attach tooltip('Fit width')}
+	{@attach tooltip(t('magpie-document-fit-width'))}
 >
 	<MoveHorizontal size={17} />
 </button>
@@ -43,11 +44,11 @@
 	type="button"
 	class="icon-button"
 	class:on={documentState.fit === 'page-fit'}
-	aria-label="Fit page"
+	aria-label={t('magpie-document-fit-page')}
 	aria-pressed={documentState.fit === 'page-fit'}
 	disabled={!documentState.viewer}
 	onclick={() => documentState.setFit('page-fit')}
-	{@attach tooltip('Fit page')}
+	{@attach tooltip(t('magpie-document-fit-page'))}
 >
 	<RectangleVertical size={17} />
 </button>
@@ -58,7 +59,7 @@
 			onclick={() => {
 				close();
 				void printCurrent();
-			}}>Print…</MenuItem
+			}}>{t('magpie-print')}</MenuItem
 		>
 	{/snippet}
 </MoreMenu>

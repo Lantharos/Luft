@@ -1,0 +1,15 @@
+apps/store/draft/src/lib/documents/encodings.ts	Shift JIS
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1250
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1251
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1252
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1253
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1254
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1255
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1256
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1257
+apps/store/draft/src/lib/documents/encodings.ts	Windows 1258
+apps/store/draft/src/lib/editor/phrases.ts	Control character
+apps/store/draft/src/lib/editor/phrases.ts	Fold line
+apps/store/draft/src/lib/editor/phrases.ts	Unfold line
+apps/store/draft/src/lib/palette/pickers.ts	CRLF
+apps/store/draft/src/lib/palette/pickers.ts	LF

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
-	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { appearance, basename, CommandPalette, GlassShell, PaletteState, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Account } from '#lib/bindings.js';
@@ -49,13 +50,13 @@
 
 	let showList = $derived(layout.sideBySide || reader.thread === null);
 	let showReader = $derived(layout.sideBySide || reader.thread !== null);
-	let title = $derived(list.searching ? 'Search' : viewLabel(list.view, mail.mailboxes));
+	let title = $derived(list.searching ? t('mailman-header-search') : viewLabel(list.view, mail.mailboxes));
 	let subtitle = $derived.by(() => {
-		if (list.chosen.size) return `${list.chosen.size} selected`;
-		if (list.searching) return list.total >= SEARCH_CAP ? `${SEARCH_CAP.toLocaleString()}+ results` : plural(list.total, 'result', 'results');
+		if (list.chosen.size) return t('mailman-header-selected', { count: list.chosen.size });
+		if (list.searching) return list.total >= SEARCH_CAP ? t('mailman-header-results-capped', { count: SEARCH_CAP }) : t('mailman-header-results', { count: list.total });
 		const unread = list.rows.filter((row) => row.unread > 0).length;
-		if (list.view === 'inbox' && unread) return plural(unread, 'unread', 'unread');
-		return list.total ? plural(list.total, 'conversation', 'conversations') : null;
+		if (list.view === 'inbox' && unread) return t('mailman-header-unread', { count: unread });
+		return list.total ? t('mailman-header-conversations', { count: list.total }) : null;
 	});
 
 	const shell: Shell = {
@@ -161,10 +162,10 @@
 		{/if}
 		<main class="glass-content relative isolate">
 			{#if opened.file}
-				<Header title="Message" subtitle={basename(opened.file)}>
+				<Header title={t('mailman-header-message')} subtitle={basename(opened.file)}>
 					{#snippet leading()}
 						{#if !opened.focused}
-							<button type="button" class="icon-button" aria-label="Back to mail" onclick={() => opened.close()} {@attach tooltip('Back to mail')}><ArrowLeft size={18} /></button>
+							<button type="button" class="icon-button" aria-label={t('mailman-header-back-to-mail')} onclick={() => opened.close()} {@attach tooltip(t('mailman-header-back-to-mail'))}><ArrowLeft size={18} /></button>
 						{/if}
 					{/snippet}
 				</Header>
@@ -173,7 +174,7 @@
 				<Header {title} {subtitle} width={layout.sideBySide && mail.accounts.length ? layout.listWidth : null}>
 					{#snippet leading()}
 						{#if !layout.sideBySide && reader.thread !== null}
-							<button type="button" class="icon-button" aria-label="Back" onclick={() => reader.close()} {@attach tooltip('Back (Esc)')}><ArrowLeft size={18} /></button>
+							<button type="button" class="icon-button" aria-label={t('mailman-header-back')} onclick={() => reader.close()} {@attach tooltip(t('mailman-header-back-tooltip'))}><ArrowLeft size={18} /></button>
 						{/if}
 					{/snippet}
 					{#snippet tools()}

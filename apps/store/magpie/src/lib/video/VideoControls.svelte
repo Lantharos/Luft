@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { MediaControls, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Captions from '@lucide/svelte/icons/captions';
 	import Gauge from '@lucide/svelte/icons/gauge';
@@ -11,7 +12,6 @@
 	import type { FramePreview } from './frame-preview';
 
 	const RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
-	const languages = new Intl.DisplayNames(undefined, { type: 'language' });
 
 	interface Props {
 		paused: boolean;
@@ -31,10 +31,12 @@
 
 	let { paused = $bindable(), time, duration, buffered, rate, tracks, track, frames, pictureInPicture, onseek, onrate, ontrack, onpicture }: Props = $props();
 
+	let languages = $derived(new Intl.DisplayNames([i18n.locale], { type: 'language' }));
+
 	function trackName(candidate: SubtitleTrack, index: number) {
 		const language = candidate.language && languages.of(candidate.language);
-		if (candidate.label && language && candidate.label.toLowerCase() !== candidate.language) return `${language} · ${candidate.label}`;
-		return language || candidate.label || `Track ${index + 1}`;
+		if (candidate.label && language && candidate.label.toLowerCase() !== candidate.language) return t('magpie-video-subtitle-named', { language, label: candidate.label });
+		return language || candidate.label || t('magpie-video-subtitle-number', { number: index + 1 });
 	}
 </script>
 
@@ -53,7 +55,7 @@
 	preview={frames ? framePreview : undefined}
 >
 	{#if tracks.length}
-		<MenuButton class="icon-button" label="Subtitles" align="end" {@attach tooltip('Subtitles')}>
+		<MenuButton class="icon-button" label={t('magpie-video-subtitles')} align="end" {@attach tooltip(t('magpie-video-subtitles'))}>
 			{#snippet trigger()}<Captions size={17} class={track ? 'text-[var(--accent)]' : ''} />{/snippet}
 			{#snippet children(close)}
 				<MenuItem
@@ -61,7 +63,7 @@
 					onclick={() => {
 						close();
 						ontrack(null);
-					}}>Off</MenuItem
+					}}>{t('magpie-video-subtitles-off')}</MenuItem
 				>
 				<MenuSeparator />
 				{#each tracks as candidate, index (candidate.id)}
@@ -76,7 +78,7 @@
 			{/snippet}
 		</MenuButton>
 	{/if}
-	<MenuButton class="icon-button" label="Speed" align="end" minWidth={140} {@attach tooltip('Speed')}>
+	<MenuButton class="icon-button" label={t('magpie-video-speed')} align="end" minWidth={140} {@attach tooltip(t('magpie-video-speed'))}>
 		{#snippet trigger()}<Gauge size={17} class={rate !== 1 ? 'text-[var(--accent)]' : ''} />{/snippet}
 		{#snippet children(close)}
 			{#each RATES as option (option)}
@@ -85,22 +87,22 @@
 					onclick={() => {
 						close();
 						onrate(option);
-					}}>{option === 1 ? 'Normal' : `${option}×`}</MenuItem
+					}}>{option === 1 ? t('magpie-video-speed-normal') : t('magpie-video-speed-rate', { rate: option })}</MenuItem
 				>
 			{/each}
 		{/snippet}
 	</MenuButton>
 	{#if pictureInPicture}
-		<button type="button" class="icon-button" aria-label="Picture in picture" onclick={onpicture} {@attach tooltip('Picture in picture')}>
+		<button type="button" class="icon-button" aria-label={t('magpie-video-picture-in-picture')} onclick={onpicture} {@attach tooltip(t('magpie-video-picture-in-picture'))}>
 			<PictureInPicture2 size={17} />
 		</button>
 	{/if}
 	<button
 		type="button"
 		class="icon-button"
-		aria-label={chrome.fullscreen ? 'Leave fullscreen' : 'Fullscreen'}
+		aria-label={chrome.fullscreen ? t('magpie-video-leave-fullscreen') : t('magpie-video-fullscreen')}
 		onclick={() => chrome.setFullscreen(!chrome.fullscreen)}
-		{@attach tooltip(chrome.fullscreen ? 'Leave fullscreen' : 'Fullscreen')}
+		{@attach tooltip(chrome.fullscreen ? t('magpie-video-leave-fullscreen') : t('magpie-video-fullscreen'))}
 	>
 		{#if chrome.fullscreen}<Minimize size={17} />{:else}<Maximize size={17} />{/if}
 	</button>

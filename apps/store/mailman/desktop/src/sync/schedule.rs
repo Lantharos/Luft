@@ -1,10 +1,12 @@
 use std::sync::OnceLock;
 use std::time::Duration;
 
+use luft_i18n::t;
 use parking_lot::{Condvar, Mutex};
 
 use super::Engine;
 use crate::events::CHANGED;
+use crate::l10n::L10N;
 use crate::store::now;
 
 const TICK: i64 = 30;
@@ -59,9 +61,11 @@ fn tick(engine: &Engine) {
             continue;
         }
         if let Ok(thread) = shared.store.nudge(&reminder.message_id) {
-            shared
-                .notifier
-                .show("No reply yet", &reminder.subject, thread);
+            shared.notifier.show(
+                &t!(L10N, "mailman-notify-no-reply"),
+                &reminder.subject,
+                thread,
+            );
             shared.events.emit(CHANGED, account.id);
         }
     }

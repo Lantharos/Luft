@@ -3,6 +3,7 @@ import { EditorView, type ViewUpdate } from '@codemirror/view';
 import { loadLanguage } from '@luft/ui/code';
 import type { Document } from '#lib/documents/document.svelte.js';
 import { indentationExtension } from './indentation';
+import { phrases } from './phrases';
 import { baseExtensions } from './setup';
 
 export interface Cursor {
@@ -64,6 +65,7 @@ export class Editor {
 			selection: cursor && EditorSelection.single(clamp(cursor.anchor), clamp(cursor.head)),
 			extensions: [
 				baseExtensions,
+				phrases(),
 				language.of([]),
 				indentation.of(indentationExtension(document.indentation)),
 				wrapping.of(wrapExtension(this.#wrap)),

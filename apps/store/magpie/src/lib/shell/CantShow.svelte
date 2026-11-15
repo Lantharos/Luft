@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Item } from '#lib/bindings.js';
 	import { showInFolder } from '#lib/bridge/index.js';
 	import OpenWithMenu from './OpenWithMenu.svelte';
@@ -14,7 +15,7 @@
 		{/if}
 		<div class="mt-4 flex flex-wrap justify-center gap-2">
 			<OpenWithMenu path={item.path} />
-			<button type="button" class="button" onclick={() => showInFolder(item.path)}>Show in folder</button>
+			<button type="button" class="button" onclick={() => showInFolder(item.path)}>{t('magpie-show-in-folder')}</button>
 		</div>
 	</div>
 </div>

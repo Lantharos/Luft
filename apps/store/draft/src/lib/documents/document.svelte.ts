@@ -1,4 +1,5 @@
 import type { EditorState, Text } from '@codemirror/state';
+import { t } from '@luft/i18n';
 import { basename } from '@luft/ui';
 import type { Stat } from '#lib/bindings.js';
 import type { Indentation } from '#lib/editor/indentation.js';
@@ -30,7 +31,7 @@ export class Document {
 
 	get name() {
 		if (this.path) return basename(this.path);
-		return this.untitled > 1 ? `Untitled ${this.untitled}` : 'Untitled';
+		return this.untitled > 1 ? t('draft-untitled-numbered', { number: this.untitled }) : t('draft-untitled');
 	}
 
 	get format() {

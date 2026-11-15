@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { appearance, bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
@@ -58,7 +59,7 @@
 	let showQuote = $state(false);
 	let templates = $state<Template[]>([]);
 
-	let title = $derived(composition.subject.trim() || (composition.inReplyTo ? 'Reply' : 'New message'));
+	let title = $derived(composition.subject.trim() || (composition.inReplyTo ? t('mailman-compose-reply') : t('mailman-compose-new')));
 	let reminder = $derived(REMINDERS.find((option) => option.seconds === composition.remindAfter));
 
 	function send(at: number | null = null) {
@@ -80,10 +81,10 @@
 
 	async function saveTemplate() {
 		const content = editor?.content();
-		if (!content || content.empty) return toasts.show('Write something first');
+		if (!content || content.empty) return toasts.show(t('mailman-compose-write-first'));
 		const name = composition.subject.trim() || content.text.split('\n')[0].slice(0, 40);
 		await commands.saveTemplate({ id: null, name, body: content.source });
-		toasts.show(`Saved “${name}” as a template`);
+		toasts.show(t('mailman-compose-template-saved', { name }));
 	}
 
 	function keydown(event: KeyboardEvent) {
@@ -106,37 +107,37 @@
 	<div bind:this={sheet} class="sheet">
 		<header class="flex h-12 flex-none items-center gap-1 pr-2 pl-5">
 			<p class="min-w-0 flex-1 truncate text-[14px] font-semibold">{title}</p>
-			<button type="button" class="icon-button small" aria-label={composer.expanded ? 'Shrink' : 'Enlarge'} onclick={() => (composer.expanded = !composer.expanded)}>
+			<button type="button" class="icon-button small" aria-label={composer.expanded ? t('mailman-compose-shrink') : t('mailman-compose-enlarge')} onclick={() => (composer.expanded = !composer.expanded)}>
 				{#if composer.expanded}<Minimize size={15} />{:else}<Maximize size={15} />{/if}
 			</button>
-			<button type="button" class="icon-button small" aria-label="Close" onclick={close} {@attach tooltip('Close and keep as draft')}>
+			<button type="button" class="icon-button small" aria-label={t('mailman-compose-close')} onclick={close} {@attach tooltip(t('mailman-compose-close-tooltip'))}>
 				<X size={17} />
 			</button>
 		</header>
 		<div class="fields">
 			<SenderField {composition} onchoose={(identity) => editor?.replaceSignature(composer.signature(identity.id))} />
-			<RecipientField label="To" bind:addresses={composition.to} autofocus={!composition.to.length}>
+			<RecipientField label={t('mailman-compose-to')} bind:addresses={composition.to} autofocus={!composition.to.length}>
 				{#snippet trailing()}
 					{#if !composition.showCopies}
-						<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip('Ctrl+Shift+C')}>Cc Bcc</button>
+						<button type="button" class="plain-button copies" tabindex="-1" onclick={() => (composition.showCopies = true)} {@attach tooltip(t('mailman-compose-copies-tooltip'))}>{t('mailman-compose-copies')}</button>
 					{/if}
 				{/snippet}
 			</RecipientField>
 			{#if composition.showCopies}
-				<RecipientField label="Cc" bind:addresses={composition.cc} />
-				<RecipientField label="Bcc" bind:addresses={composition.bcc} />
+				<RecipientField label={t('mailman-compose-cc')} bind:addresses={composition.cc} />
+				<RecipientField label={t('mailman-compose-bcc')} bind:addresses={composition.bcc} />
 			{/if}
-			<ComposeField label="Subject">
-				<input class="subject" bind:value={composition.subject} aria-label="Subject" onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
+			<ComposeField label={t('mailman-compose-subject')}>
+				<input class="subject" bind:value={composition.subject} aria-label={t('mailman-compose-subject')} onkeydown={(event) => event.key === 'Enter' && (event.preventDefault(), editor?.focus())} />
 			</ComposeField>
 		</div>
 		{#key composition.key}
-			<Editor bind:this={editor} html={composition.body} placeholder="Write something. **bold**, *italic*, - lists and > quotes work as you type." autofocus={composition.to.length > 0} onsend={() => send()} />
+			<Editor bind:this={editor} html={composition.body} placeholder={t('mailman-compose-placeholder')} autofocus={composition.to.length > 0} onsend={() => send()} />
 		{/key}
 		{#if composition.quote}
 			<div class="px-5 pb-2">
 				<button type="button" class="plain-button quote-toggle" onclick={() => (showQuote = !showQuote)}>
-					<Quote size={15} />{showQuote ? 'Hide quoted text' : 'Show quoted text'}
+					<Quote size={15} />{showQuote ? t('mailman-compose-hide-quoted') : t('mailman-compose-show-quoted')}
 				</button>
 				{#if showQuote}
 					<div class="quote soft-scroll"><QuotedMail html={composition.quote} /></div>
@@ -150,58 +151,58 @@
 						<Paperclip size={14} class="flex-none text-[var(--text-muted)]" />
 						<span class="truncate">{attachment.name}</span>
 						{#if attachment.size}<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>{/if}
-						<button type="button" aria-label="Remove {attachment.name}" onclick={() => (composition.attachments = composition.attachments.filter((candidate) => candidate !== attachment))}><X size={13} /></button>
+						<button type="button" aria-label={t('mailman-compose-remove', { name: attachment.name })} onclick={() => (composition.attachments = composition.attachments.filter((candidate) => candidate !== attachment))}><X size={13} /></button>
 					</span>
 				{/each}
 			</div>
 		{/if}
 		<footer class="flex h-[58px] flex-none items-center gap-1 px-3">
 			<div class="send">
-				<button type="button" class="button primary main" disabled={composer.sending} onclick={() => send()} {@attach tooltip('Send (Ctrl+Enter)')}>Send</button>
-				<MenuButton label="Send later" class="button primary chevron" align="start">
+				<button type="button" class="button primary main" disabled={composer.sending} onclick={() => send()} {@attach tooltip(t('mailman-compose-send-tooltip'))}>{t('mailman-compose-send')}</button>
+				<MenuButton label={t('mailman-compose-send-later')} class="button primary chevron" align="start">
 					{#snippet trigger()}<ChevronDown size={16} />{/snippet}
 					{#snippet children(closeMenu)}
 						{#each SEND_LATER as moment (moment.id)}
 							{@const at = moment.at()}
 							<MenuItem onclick={() => (closeMenu(), send(at))}>
-								<span class="flex-1">{moment.label}</span><span class="text-[12px] text-[var(--text-muted)]">{weekdayTime(at)}</span>
+								<span class="flex-1">{moment.label()}</span><span class="text-[12px] text-[var(--text-muted)]">{weekdayTime(at)}</span>
 							</MenuItem>
 						{/each}
 					{/snippet}
 				</MenuButton>
 			</div>
-			<MenuButton label="Remind me" class={['icon-button', reminder && 'on']} align="start">
+			<MenuButton label={t('mailman-compose-remind')} class={['icon-button', reminder && 'on']} align="start">
 				{#snippet trigger()}<Bell size={17} />{/snippet}
 				{#snippet children(closeMenu)}
-					<p class="px-2.5 pt-1 pb-1.5 text-[12px] text-[var(--text-muted)]">Bring this back if nobody replies</p>
+					<p class="px-2.5 pt-1 pb-1.5 text-[12px] text-[var(--text-muted)]">{t('mailman-compose-remind-hint')}</p>
 					{#each REMINDERS as option (option.seconds)}
-						<MenuItem checked={composition.remindAfter === option.seconds} onclick={() => (closeMenu(), (composition.remindAfter = composition.remindAfter === option.seconds ? null : option.seconds))}>{option.label}</MenuItem>
+						<MenuItem checked={composition.remindAfter === option.seconds} onclick={() => (closeMenu(), (composition.remindAfter = composition.remindAfter === option.seconds ? null : option.seconds))}>{option.label()}</MenuItem>
 					{/each}
 				{/snippet}
 			</MenuButton>
-			<button type="button" class="icon-button" aria-label="Attach files" onclick={() => void attach()} {@attach tooltip('Attach files')}><Paperclip size={17} /></button>
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-attach')} onclick={() => void attach()} {@attach tooltip(t('mailman-compose-attach'))}><Paperclip size={17} /></button>
 			<span class="divider"></span>
-			<button type="button" class="icon-button" aria-label="Bold" onclick={() => editor?.command('bold')} {@attach tooltip('Bold (Ctrl+B)')}><Bold size={16} /></button>
-			<button type="button" class="icon-button" aria-label="Italic" onclick={() => editor?.command('italic')} {@attach tooltip('Italic (Ctrl+I)')}><Italic size={16} /></button>
-			<button type="button" class="icon-button" aria-label="List" onclick={() => editor?.command('insertUnorderedList')} {@attach tooltip('List')}><List size={16} /></button>
-			<button type="button" class="icon-button" aria-label="Link" onclick={() => editor?.command('link')} {@attach tooltip('Link (Ctrl+K)')}><Link size={16} /></button>
-			<MenuButton label="Templates" class="plain-button templates" align="start" onpointerdown={() => void loadTemplates()}>
-				{#snippet trigger()}Templates{/snippet}
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-bold')} onclick={() => editor?.command('bold')} {@attach tooltip(t('mailman-compose-bold-tooltip'))}><Bold size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-italic')} onclick={() => editor?.command('italic')} {@attach tooltip(t('mailman-compose-italic-tooltip'))}><Italic size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-list')} onclick={() => editor?.command('insertUnorderedList')} {@attach tooltip(t('mailman-compose-list'))}><List size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-link')} onclick={() => editor?.command('link')} {@attach tooltip(t('mailman-compose-link-tooltip'))}><Link size={16} /></button>
+			<MenuButton label={t('mailman-compose-templates')} class="plain-button templates" align="start" onpointerdown={() => void loadTemplates()}>
+				{#snippet trigger()}{t('mailman-compose-templates')}{/snippet}
 				{#snippet children(closeMenu)}
 					{#each templates as template (template.id)}
 						<MenuItem onclick={() => (closeMenu(), editor?.insert(template.body))}>{template.name}</MenuItem>
 					{:else}
-						<p class="px-2.5 py-2 text-[12.5px] text-[var(--text-muted)]">Save a message you write often and insert it here.</p>
+						<p class="px-2.5 py-2 text-[12.5px] text-[var(--text-muted)]">{t('mailman-compose-templates-empty')}</p>
 					{/each}
 					<MenuSeparator />
-					<MenuItem onclick={() => (closeMenu(), void saveTemplate())}>Save this as a template</MenuItem>
+					<MenuItem onclick={() => (closeMenu(), void saveTemplate())}>{t('mailman-compose-save-template')}</MenuItem>
 				{/snippet}
 			</MenuButton>
 			<span class="flex-1"></span>
 			{#if reminder}
-				<span class="mr-1 text-[12px] text-[var(--text-muted)]">Reminder {reminder.label.toLowerCase()}</span>
+				<span class="mr-1 text-[12px] text-[var(--text-muted)]">{reminder.chip()}</span>
 			{/if}
-			<button type="button" class="icon-button" aria-label="Discard" onclick={() => composer.discard()} {@attach tooltip('Discard')}><Trash size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('mailman-compose-discard')} onclick={() => composer.discard()} {@attach tooltip(t('mailman-compose-discard'))}><Trash size={16} /></button>
 		</footer>
 	</div>
 </div>

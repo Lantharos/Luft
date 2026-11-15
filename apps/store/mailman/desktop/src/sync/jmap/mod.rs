@@ -8,11 +8,13 @@ use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_i18n::t;
 use serde_json::{Map, Value, json};
 
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
 use crate::accounts::{Login, SignInError};
+use crate::l10n::L10N;
 use crate::protocols::jmap::{CORE, Client, MAIL};
 use crate::store::{Delivery, Flag, Mailbox, Outgoing, RemoteFolder, Role};
 use mail::Changes;
@@ -53,7 +55,7 @@ impl JmapRemote {
         )?;
         let state = responses[0]["state"]
             .as_str()
-            .ok_or("The server didn't say what changed")?
+            .ok_or_else(|| t!(L10N, "mailman-error-no-changes"))?
             .to_owned();
         self.remember(state.clone());
         Ok(state)
@@ -80,8 +82,7 @@ impl JmapRemote {
         {
             Some(failure) => Err(failure["description"]
                 .as_str()
-                .unwrap_or("The server refused the change")
-                .to_owned()),
+                .map_or_else(|| t!(L10N, "mailman-error-change-refused"), str::to_owned)),
             None => Ok(()),
         }
     }
@@ -95,7 +96,7 @@ impl JmapRemote {
         responses[0]["created"]["new"]["id"]
             .as_str()
             .map(str::to_owned)
-            .ok_or_else(|| "The server didn't keep the message".into())
+            .ok_or_else(|| t!(L10N, "mailman-error-message-not-kept"))
     }
 
     fn mailboxes(&self) -> Result<Vec<Value>, String> {
@@ -235,12 +236,12 @@ impl Remote for JmapRemote {
                 let source = context
                     .store
                     .mailbox(*from)?
-                    .ok_or("That folder no longer exists")?
+                    .ok_or_else(|| t!(L10N, "mailman-error-folder-missing"))?
                     .remote;
                 let target = context
                     .store
                     .mailbox(*to)?
-                    .ok_or("That folder no longer exists")?
+                    .ok_or_else(|| t!(L10N, "mailman-error-folder-missing"))?
                     .remote;
                 let messages = ops::resolve(context.store, *from, messages)?;
                 let update = messages
@@ -270,7 +271,7 @@ impl Remote for JmapRemote {
                 let target = context
                     .store
                     .mailbox(*mailbox)?
-                    .ok_or("That folder no longer exists")?
+                    .ok_or_else(|| t!(L10N, "mailman-error-folder-missing"))?
                     .remote;
                 let raw = STANDARD.decode(raw).map_err(|error| error.to_string())?;
                 let keywords = if *draft {

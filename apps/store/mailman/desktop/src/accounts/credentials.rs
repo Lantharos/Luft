@@ -3,11 +3,13 @@ use std::sync::Arc;
 
 use luft_app::block_on;
 use luft_app::dbus::secrets;
+use luft_i18n::t;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
 use super::{Account, Login, SignInError, oauth};
 use crate::APP_ID;
+use crate::l10n::L10N;
 use crate::store::now;
 
 const REFRESH_MARGIN: i64 = 120;
@@ -73,7 +75,7 @@ impl Credentials {
         let provider = account
             .config
             .oauth
-            .ok_or("This account has no sign-in provider")?;
+            .ok_or_else(|| t!(L10N, "mailman-error-no-provider"))?;
         let tokens = oauth::refresh(provider, &refresh)?;
         let login = Login::Bearer {
             username: account.config.username.clone(),
@@ -95,9 +97,8 @@ impl Credentials {
         if let Some(secret) = self.cache.lock().get(&account) {
             return Ok(secret.clone());
         }
-        let stored = block_on(secrets::load(APP_ID, &key(account)))?.ok_or_else(|| {
-            SignInError::Refused("The keyring has no password for this account".into())
-        })?;
+        let stored = block_on(secrets::load(APP_ID, &key(account)))?
+            .ok_or_else(|| SignInError::Refused(t!(L10N, "mailman-error-no-password")))?;
         let secret: Secret = serde_json::from_slice(&stored).map_err(|error| error.to_string())?;
         self.cache.lock().insert(account, secret.clone());
         Ok(secret)

@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { errorText } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { commands } from '#lib/bindings.js';
@@ -94,7 +95,7 @@ class Reader {
 		const error = await arrived;
 		if (error) throw new Error(error);
 		const fetched = await commands.messageBody({ id });
-		if (!fetched) throw new Error('This message is still on its way');
+		if (!fetched) throw new Error(t('mailman-reader-arriving'));
 		return fetched;
 	}
 

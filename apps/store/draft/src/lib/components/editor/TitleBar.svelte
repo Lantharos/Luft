@@ -1,6 +1,7 @@
 <script lang="ts">
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import { t } from '@luft/i18n';
 	import { tooltip, WindowControls } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';
 	import TabStrip from './TabStrip.svelte';
@@ -14,10 +15,10 @@
 		<button
 			type="button"
 			class="icon-button"
-			aria-label={settings.sidebar ? 'Hide sidebar' : 'Show sidebar'}
+			aria-label={settings.sidebar ? t('draft-sidebar-hide') : t('draft-sidebar-show')}
 			aria-pressed={settings.sidebar}
 			onclick={() => app.settings.update({ sidebar: !settings.sidebar })}
-			{@attach tooltip(settings.sidebar ? 'Hide sidebar' : 'Show sidebar')}
+			{@attach tooltip(settings.sidebar ? t('draft-sidebar-hide') : t('draft-sidebar-show'))}
 		>
 			<PanelLeft size={17} />
 		</button>
@@ -27,10 +28,10 @@
 		<button
 			type="button"
 			class={['icon-button', settings.preview && 'is-on']}
-			aria-label="Preview"
+			aria-label={t('draft-preview')}
 			aria-pressed={settings.preview}
 			onclick={() => app.togglePreview()}
-			{@attach tooltip('Preview')}
+			{@attach tooltip(t('draft-preview'))}
 		>
 			<BookOpen size={17} />
 		</button>

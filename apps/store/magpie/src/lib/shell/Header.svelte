@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { parent, tooltip, WindowControls } from '@luft/ui';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -22,19 +23,19 @@
 		<button
 			type="button"
 			class="icon-button"
-			aria-label={chrome.sidebar ? 'Hide sidebar' : 'Show sidebar'}
+			aria-label={chrome.sidebar ? t('magpie-header-hide-sidebar') : t('magpie-header-show-sidebar')}
 			aria-pressed={chrome.sidebar}
 			onclick={() => chrome.toggleSidebar()}
-			{@attach tooltip(chrome.sidebar ? 'Hide sidebar' : 'Show sidebar')}
+			{@attach tooltip(chrome.sidebar ? t('magpie-header-hide-sidebar') : t('magpie-header-show-sidebar'))}
 		>
 			<PanelLeft size={18} />
 		</button>
 		{#if library.current}
-			<button type="button" class="icon-button" aria-label="Back to folder" onclick={() => library.close()} {@attach tooltip('Back to folder')}>
+			<button type="button" class="icon-button" aria-label={t('magpie-header-back')} onclick={() => library.close()} {@attach tooltip(t('magpie-header-back'))}>
 				<ChevronLeft size={19} />
 			</button>
 		{:else if library.folder && library.folder !== '/'}
-			<button type="button" class="icon-button" aria-label="Enclosing folder" onclick={() => library.browse(parent(library.folder!))} {@attach tooltip('Enclosing folder')}>
+			<button type="button" class="icon-button" aria-label={t('magpie-header-enclosing')} onclick={() => library.browse(parent(library.folder!))} {@attach tooltip(t('magpie-header-enclosing'))}>
 				<ArrowUp size={18} />
 			</button>
 		{/if}

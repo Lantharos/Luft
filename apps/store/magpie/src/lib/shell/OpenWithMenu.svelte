@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, MenuButton, MenuItem } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { App } from '#lib/bindings.js';
@@ -15,8 +16,8 @@
 </script>
 
 {#if apps?.length}
-	<MenuButton class="button" label="Open with another app" align="start">
-		{#snippet trigger()}Open with…{/snippet}
+	<MenuButton class="button" label={t('magpie-open-with-label')} align="start">
+		{#snippet trigger()}{t('magpie-open-with')}{/snippet}
 		{#snippet children(close)}
 			{#each apps ?? [] as app (app.id)}
 				<MenuItem

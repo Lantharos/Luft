@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ActionRow, Dialog, Row, Section, Segmented, Switch } from '@luft/ui';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash from '@lucide/svelte/icons/trash-2';
@@ -15,7 +16,7 @@
 
 	let { onclose, onadd }: Props = $props();
 
-	const UNDO = [5, 10, 20, 30].map((seconds) => ({ value: seconds, label: `${seconds} s` }));
+	let undo = $derived([5, 10, 20, 30].map((seconds) => ({ value: seconds, label: t('mailman-settings-seconds', { seconds }) })));
 
 	let templates = $state<Template[]>([]);
 
@@ -34,46 +35,46 @@
 	}
 </script>
 
-<Dialog title="Settings" wide {onclose}>
+<Dialog title={t('mailman-settings-title')} wide {onclose}>
 	<div class="flex flex-col gap-6">
-		<Section title="Accounts">
+		<Section title={t('mailman-settings-accounts')}>
 			{#each mail.accounts as account (account.id)}
 				<AccountRow {account} />
 			{/each}
-			<ActionRow title="Add an account" description="Gmail, Outlook, Fastmail, iCloud or any IMAP or JMAP server" icon={Plus} onclick={onadd} />
+			<ActionRow title={t('mailman-settings-add-account')} description={t('mailman-settings-add-account-description')} icon={Plus} onclick={onadd} />
 		</Section>
-		<Section title="Inbox">
-			<Row title="Screener" description="New senders wait until you let them in">
-				<Switch checked={mail.settings.screener} label="Screener" onchange={(screener) => void change({ screener })} />
+		<Section title={t('mailman-settings-inbox')}>
+			<Row title={t('mailman-settings-screener')} description={t('mailman-settings-screener-description')}>
+				<Switch checked={mail.settings.screener} label={t('mailman-settings-screener')} onchange={(screener) => void change({ screener })} />
 			</Row>
-			<Row title="Bundles" description="Newsletters, receipts and updates, summed up above the inbox">
-				<Switch checked={mail.settings.bundles} label="Bundles" onchange={(bundles) => void change({ bundles })} />
-			</Row>
-		</Section>
-		<Section title="Writing">
-			<Row title="Time to undo sending">
-				<Segmented options={UNDO} value={mail.settings.undoSeconds} label="Time to undo sending" onchange={(undoSeconds) => void change({ undoSeconds })} />
+			<Row title={t('mailman-settings-bundles')} description={t('mailman-settings-bundles-description')}>
+				<Switch checked={mail.settings.bundles} label={t('mailman-settings-bundles')} onchange={(bundles) => void change({ bundles })} />
 			</Row>
 		</Section>
-		<Section title="Reading">
-			<Row title="Darken bright messages" description="Designed newsletters follow the dark style too">
-				<Switch checked={mail.settings.darkMail} label="Darken bright messages" onchange={(darkMail) => void change({ darkMail })} />
+		<Section title={t('mailman-settings-writing')}>
+			<Row title={t('mailman-settings-undo')}>
+				<Segmented options={undo} value={mail.settings.undoSeconds} label={t('mailman-settings-undo')} onchange={(undoSeconds) => void change({ undoSeconds })} />
 			</Row>
-			<Row title="Notifications" description="For new mail from people you know">
-				<Switch checked={mail.settings.notifications} label="Notifications" onchange={(notifications) => void change({ notifications })} />
+		</Section>
+		<Section title={t('mailman-settings-reading')}>
+			<Row title={t('mailman-settings-dark-mail')} description={t('mailman-settings-dark-mail-description')}>
+				<Switch checked={mail.settings.darkMail} label={t('mailman-settings-dark-mail')} onchange={(darkMail) => void change({ darkMail })} />
+			</Row>
+			<Row title={t('mailman-settings-notifications')} description={t('mailman-settings-notifications-description')}>
+				<Switch checked={mail.settings.notifications} label={t('mailman-settings-notifications')} onchange={(notifications) => void change({ notifications })} />
 			</Row>
 		</Section>
 		{#if templates.length}
-			<Section title="Templates">
+			<Section title={t('mailman-settings-templates')}>
 				{#each templates as template (template.id)}
 					<Row title={template.name}>
-						<button type="button" class="icon-button" aria-label="Delete {template.name}" onclick={() => void removeTemplate(template.id)}><Trash size={16} /></button>
+						<button type="button" class="icon-button" aria-label={t('mailman-settings-delete-template', { name: template.name })} onclick={() => void removeTemplate(template.id)}><Trash size={16} /></button>
 					</Row>
 				{/each}
 			</Section>
 		{/if}
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('mailman-settings-done')}</button>
 	{/snippet}
 </Dialog>

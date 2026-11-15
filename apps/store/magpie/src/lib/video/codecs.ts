@@ -1,3 +1,4 @@
+import { i18n, t } from '@luft/i18n';
 import type { VideoInfo } from '#lib/bindings.js';
 
 const PROBES: Record<string, string> = {
@@ -34,6 +35,6 @@ export function playable(info: VideoInfo) {
 
 export function explain(info: VideoInfo | null) {
 	const unplayable = unsupported(info);
-	if (!unplayable.length) return "This video can't be played.";
-	return `This video uses ${unplayable.join(' and ')}, which Magpie can't play.`;
+	if (!unplayable.length) return t('magpie-video-cant-play');
+	return t('magpie-video-unsupported', { codecs: new Intl.ListFormat([i18n.locale], { type: 'conjunction' }).format(unplayable) });
 }

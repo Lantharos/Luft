@@ -2,8 +2,11 @@ use std::path::{Path, PathBuf};
 
 use luft_app::file_manager;
 use luft_app::portal::{self, FileChooser, uri_path};
+use luft_i18n::t;
 use serde::Deserialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 pub struct Open {
@@ -37,7 +40,7 @@ fn paths(uris: Vec<String>) -> Vec<String> {
 
 pub async fn choose_files(Open { folder }: Open) -> Result<Vec<String>, String> {
     FileChooser {
-        title: "Open",
+        title: &t!(L10N, "draft-dialog-open"),
         multiple: true,
         current_folder: folder.as_deref(),
         ..FileChooser::default()
@@ -49,7 +52,7 @@ pub async fn choose_files(Open { folder }: Open) -> Result<Vec<String>, String> 
 
 pub async fn choose_folder(Open { folder }: Open) -> Result<Option<String>, String> {
     FileChooser {
-        title: "Open Folder",
+        title: &t!(L10N, "draft-dialog-open-folder"),
         directory: true,
         current_folder: folder.as_deref(),
         ..FileChooser::default()
@@ -61,7 +64,7 @@ pub async fn choose_folder(Open { folder }: Open) -> Result<Option<String>, Stri
 
 pub async fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, String> {
     FileChooser {
-        title: "Save As",
+        title: &t!(L10N, "draft-dialog-save-as"),
         current_name: Some(&name),
         current_folder: folder.as_deref(),
         ..FileChooser::default()

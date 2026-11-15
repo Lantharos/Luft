@@ -1,19 +1,33 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { list } from '#lib/mail/list.svelte.js';
 
-	const QUIET: Record<string, [string, string]> = {
-		inbox: ['Inbox zero', 'Everything is taken care of.'],
-		screener: ['Nobody new', 'New senders wait here until you let them in.'],
-		later: ['Nothing set aside', 'Press B on a conversation to bring it back when it suits you.'],
-		starred: ['No stars', 'Press S to star what matters.'],
-		drafts: ['No drafts', 'Unfinished messages are kept here.'],
-		sent: ['Nothing sent yet', 'Messages you send show up here.'],
-		archive: ['The archive is empty', 'Press E to archive a conversation.'],
-		junk: ['No junk', 'Messages marked as junk end up here.'],
-		trash: ['Trash is empty', 'Deleted messages stay here for a while.']
-	};
+	function quiet(view: string): [string, string] {
+		switch (view) {
+			case 'inbox':
+				return [t('mailman-empty-inbox-title'), t('mailman-empty-inbox')];
+			case 'screener':
+				return [t('mailman-empty-screener-title'), t('mailman-empty-screener')];
+			case 'later':
+				return [t('mailman-empty-later-title'), t('mailman-empty-later')];
+			case 'starred':
+				return [t('mailman-empty-starred-title'), t('mailman-empty-starred')];
+			case 'drafts':
+				return [t('mailman-empty-drafts-title'), t('mailman-empty-drafts')];
+			case 'sent':
+				return [t('mailman-empty-sent-title'), t('mailman-empty-sent')];
+			case 'archive':
+				return [t('mailman-empty-archive-title'), t('mailman-empty-archive')];
+			case 'junk':
+				return [t('mailman-empty-junk-title'), t('mailman-empty-junk')];
+			case 'trash':
+				return [t('mailman-empty-trash-title'), t('mailman-empty-trash')];
+			default:
+				return [t('mailman-empty-folder-title'), t('mailman-empty-folder')];
+		}
+	}
 
-	let copy = $derived(list.searching ? ['No matches', `Nothing found for “${list.query}”.`] : (QUIET[list.view] ?? ['Nothing here', 'This folder is empty.']));
+	let copy = $derived(list.searching ? [t('mailman-empty-search-title'), t('mailman-empty-search', { query: list.query })] : quiet(list.view));
 </script>
 
 <div class="flex flex-1 flex-col items-center justify-center gap-1.5 px-8 pb-16 text-center">

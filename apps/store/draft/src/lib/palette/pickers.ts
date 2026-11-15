@@ -1,7 +1,8 @@
+import { t } from '@luft/i18n';
 import { languages } from '@luft/ui/code';
 import type { App } from '#lib/app/app.svelte.js';
 import type { Document } from '#lib/documents/document.svelte.js';
-import { ENCODINGS, type LineEnding } from '#lib/documents/encodings.js';
+import { ENCODINGS, encodingTitle, type LineEnding } from '#lib/documents/encodings.js';
 import { reload } from '#lib/documents/opening.js';
 import { save } from '#lib/documents/saving.js';
 import { detectIndentation } from '#lib/editor/indentation.js';
@@ -14,8 +15,8 @@ export function languagePicker(app: App, document: Document) {
 		document.language = language;
 		void app.workspace.editor.applyLanguage(document);
 	};
-	return picker('Choose a language', [
-		{ key: 'plain', label: 'Plain Text', checked: document.language === null, run: choose(null) },
+	return picker(t('draft-pick-language'), [
+		{ key: 'plain', label: t('draft-plain-text'), checked: document.language === null, run: choose(null) },
 		...languages.map((language) => ({
 			key: language.name,
 			label: language.name,
@@ -39,16 +40,16 @@ export function encodingPicker(app: App, document: Document) {
 		document.bom = marked;
 	};
 	const reopenWith = (label: string) => () => void reload(app.workspace, document, label);
-	return picker('Choose an encoding', [
+	return picker(t('draft-pick-encoding'), [
 		...ENCODINGS.map((encoding) => ({
 			key: `save-${encoding.label}`,
-			label: `Save as ${encoding.name}`,
+			label: t('draft-encoding-save', { encoding: encodingTitle(encoding) }),
 			checked: document.encoding === encoding.label && !document.bom,
 			run: () => void saveEncoded(encoding.label, false)
 		})),
-		{ key: 'save-utf-8-bom', label: 'Save as UTF-8 with BOM', checked: document.encoding === 'utf-8' && document.bom, run: () => void saveEncoded('utf-8', true) },
+		{ key: 'save-utf-8-bom', label: t('draft-encoding-save-bom'), checked: document.encoding === 'utf-8' && document.bom, run: () => void saveEncoded('utf-8', true) },
 		...(document.path && !document.dirty
-			? ENCODINGS.map((encoding) => ({ key: `reopen-${encoding.label}`, label: `Reopen as ${encoding.name}`, run: reopenWith(encoding.label) }))
+			? ENCODINGS.map((encoding) => ({ key: `reopen-${encoding.label}`, label: t('draft-encoding-reopen', { encoding: encodingTitle(encoding) }), run: reopenWith(encoding.label) }))
 			: [])
 	]);
 }
@@ -59,9 +60,9 @@ export function lineEndingPicker(app: App, document: Document) {
 		app.workspace.refreshDirty(document);
 		app.workspace.changed();
 	};
-	return picker('Choose line endings', [
-		{ key: 'lf', label: 'LF', detail: 'Linux and macOS', checked: document.lineEnding === 'lf', run: choose('lf') },
-		{ key: 'crlf', label: 'CRLF', detail: 'Windows', checked: document.lineEnding === 'crlf', run: choose('crlf') }
+	return picker(t('draft-pick-line-endings'), [
+		{ key: 'lf', label: 'LF', detail: t('draft-line-endings-lf'), checked: document.lineEnding === 'lf', run: choose('lf') },
+		{ key: 'crlf', label: 'CRLF', detail: t('draft-line-endings-crlf'), checked: document.lineEnding === 'crlf', run: choose('crlf') }
 	]);
 }
 
@@ -78,18 +79,18 @@ export function indentationPicker(app: App, document: Document) {
 		editor.applyIndentation(document);
 	};
 	const { tabs, width } = document.indentation;
-	return picker('Choose indentation', [
-		...WIDTHS.map((size) => ({ key: `tabs-${size}`, label: `Tabs, ${size} wide`, checked: tabs && width === size, run: apply(true, size) })),
-		...WIDTHS.map((size) => ({ key: `spaces-${size}`, label: `${size} spaces`, checked: !tabs && width === size, run: apply(false, size) })),
-		{ key: 'detect', label: 'Detect from content', run: detect }
+	return picker(t('draft-pick-indentation'), [
+		...WIDTHS.map((size) => ({ key: `tabs-${size}`, label: t('draft-indentation-tabs', { width: size }), checked: tabs && width === size, run: apply(true, size) })),
+		...WIDTHS.map((size) => ({ key: `spaces-${size}`, label: t('draft-indentation-spaces', { count: size }), checked: !tabs && width === size, run: apply(false, size) })),
+		{ key: 'detect', label: t('draft-indentation-detect'), run: detect }
 	]);
 }
 
 export function defaultIndentationPicker(app: App) {
 	const { tabs, tabWidth } = app.settings.value;
 	const choose = (useTabs: boolean, width: number) => () => app.settings.update({ tabs: useTabs, tabWidth: width });
-	return picker('Choose indentation for new files', [
-		...WIDTHS.map((size) => ({ key: `tabs-${size}`, label: `Tabs, ${size} wide`, checked: tabs && tabWidth === size, run: choose(true, size) })),
-		...WIDTHS.map((size) => ({ key: `spaces-${size}`, label: `${size} spaces`, checked: !tabs && tabWidth === size, run: choose(false, size) }))
+	return picker(t('draft-pick-default-indentation'), [
+		...WIDTHS.map((size) => ({ key: `tabs-${size}`, label: t('draft-indentation-tabs', { width: size }), checked: tabs && tabWidth === size, run: choose(true, size) })),
+		...WIDTHS.map((size) => ({ key: `spaces-${size}`, label: t('draft-indentation-spaces', { count: size }), checked: !tabs && tabWidth === size, run: choose(false, size) }))
 	]);
 }

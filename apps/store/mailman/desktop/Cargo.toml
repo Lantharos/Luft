@@ -21,6 +21,7 @@ libc.workspace = true
 lol_html.workspace = true
 lettre = { workspace = true, features = ["hostname", "ring", "rustls", "rustls-platform-verifier", "smtp-transport"] }
 luft-app.workspace = true
+luft-i18n.workspace = true
 mail-builder.workspace = true
 mail-parser.workspace = true
 parking_lot.workspace = true

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { useApp } from '#lib/app/context.js';
+	import { shortcutLabel } from '#lib/commands/keys.js';
 
 	const app = useApp();
 
@@ -11,8 +12,8 @@
 	<div class="flex w-[300px] flex-col gap-0.5">
 		{#each actions as action (action.id)}
 			<button type="button" class="welcome-action" onclick={action.run}>
-				<span>{action.title}</span>
-				<span class="text-[var(--text-muted)]">{action.keys?.[0]}</span>
+				<span>{action.title()}</span>
+				<span class="text-[var(--text-muted)]">{action.keys && shortcutLabel(action.keys[0])}</span>
 			</button>
 		{/each}
 	</div>

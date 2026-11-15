@@ -84,12 +84,24 @@ name = "Convertible"
 files = ["apps/store/convertible/**/locales/{lang}/*.ftl"]
 
 [[areas]]
+name = "Draft"
+files = ["apps/store/draft/**/locales/{lang}/*.ftl"]
+
+[[areas]]
 name = "Flatbed"
 files = ["apps/store/flatbed/**/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Heft"
 files = ["apps/store/heft/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Magpie"
+files = ["apps/store/magpie/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Mailman"
+files = ["apps/store/mailman/**/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Meet Luft"

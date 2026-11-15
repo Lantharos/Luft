@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { t } from '@luft/i18n';
 	import type { Summary } from '#lib/mail/list.svelte.js';
 	import { BUNDLES, PRIMARY } from '#lib/mail/views.js';
 
@@ -10,9 +11,11 @@
 
 	let { summary, onopen }: Props = $props();
 
-	let Icon = $derived([...PRIMARY, ...BUNDLES].find((view) => view.id === summary.view)?.icon);
+	let view = $derived([...PRIMARY, ...BUNDLES].find((candidate) => candidate.id === summary.view));
+	let Icon = $derived(view?.icon);
+	let label = $derived(summary.view === 'screener' ? t('mailman-summary-new-senders') : view?.label());
 	let description = $derived(
-		summary.view === 'screener' ? `${summary.count} waiting` : `${summary.count} new`
+		summary.view === 'screener' ? t('mailman-summary-waiting', { count: summary.count }) : t('mailman-summary-new', { count: summary.count })
 	);
 </script>
 
@@ -21,7 +24,7 @@
 		{#if Icon}<Icon size={17} />{/if}
 	</span>
 	<div class="min-w-0 flex-1 text-left">
-		<p class="truncate text-[14px] font-semibold text-[var(--text)]">{summary.label}<span class="ml-2 font-normal text-[var(--text-muted)]">{description}</span></p>
+		<p class="truncate text-[14px] font-semibold text-[var(--text)]">{label}<span class="ml-2 font-normal text-[var(--text-muted)]">{description}</span></p>
 		<p class="truncate text-[12.5px] text-[var(--text-muted)]">{summary.names.join(', ')}</p>
 	</div>
 	<ChevronRight size={17} class="flex-none text-[var(--text-muted)]" />

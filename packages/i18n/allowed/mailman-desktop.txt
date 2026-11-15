@@ -1,0 +1,4 @@
+apps/store/mailman/desktop/src/lib.rs	Mailman
+apps/store/mailman/desktop/src/protocols/jmap.rs	Basic {}
+apps/store/mailman/desktop/src/protocols/jmap.rs	Bearer {token}
+apps/store/mailman/desktop/src/sync/imap/gmail.rs	Bearer {token}

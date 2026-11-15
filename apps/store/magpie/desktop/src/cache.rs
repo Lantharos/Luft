@@ -4,9 +4,13 @@ use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
+use luft_i18n::t;
+
+use crate::l10n::L10N;
+
 pub fn folder(name: &str) -> Result<PathBuf, String> {
     let folder = dirs::cache_dir()
-        .ok_or("There is no cache folder")?
+        .ok_or_else(|| t!(L10N, "magpie-no-cache"))?
         .join("com.lantharos.magpie")
         .join(name);
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;

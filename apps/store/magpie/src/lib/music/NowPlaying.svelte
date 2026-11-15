@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import Pause from '@lucide/svelte/icons/pause';
 	import Play from '@lucide/svelte/icons/play';
@@ -10,11 +11,11 @@
 
 {#if player.track && library.group !== 'audio'}
 	<div class="now-playing">
-		<button type="button" class="flex min-w-0 items-center gap-2" onclick={() => library.open(player.track!.path)} {@attach tooltip('Show music')}>
+		<button type="button" class="flex min-w-0 items-center gap-2" onclick={() => library.open(player.track!.path)} {@attach tooltip(t('magpie-music-show'))}>
 			<Artwork art={player.track.art} size={26} radius={6} />
 			<span class="max-w-[160px] truncate text-[12px] font-medium">{trackTitle(player.track)}</span>
 		</button>
-		<button type="button" class="icon-button" aria-label={player.paused ? 'Play' : 'Pause'} onclick={() => player.toggle()}>
+		<button type="button" class="icon-button" aria-label={player.paused ? t('magpie-music-play') : t('magpie-music-pause')} onclick={() => player.toggle()}>
 			{#if player.paused}<Play size={14} fill="currentColor" />{:else}<Pause size={14} fill="currentColor" />{/if}
 		</button>
 	</div>

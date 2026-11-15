@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { documentState } from '#lib/document/state.svelte.js';
 import { library } from '#lib/library/library.svelte.js';
 import { player } from '#lib/music/player.svelte.js';
@@ -48,7 +49,7 @@ function photo(event: KeyboardEvent, primary: boolean) {
 	const viewport = activePhoto.viewport;
 	const { key } = event;
 	if (key === 'ArrowRight' || key === 'ArrowLeft') library.step(key === 'ArrowRight' ? 1 : -1, slideshow.running);
-	else if (primary && key === 'c' && activePhoto.source) void copyImage(activePhoto.source).then(() => chrome.notify('Copied'));
+	else if (primary && key === 'c' && activePhoto.source) void copyImage(activePhoto.source).then(() => chrome.notify(t('magpie-copied')));
 	else if (key === 'F5') slideshow.start();
 	else if (!viewport) return false;
 	else if (key === '+' || key === '=') viewport.zoomIn();

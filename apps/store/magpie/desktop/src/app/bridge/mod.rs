@@ -5,10 +5,12 @@ use std::path::Path as FilePath;
 use gio::prelude::*;
 use luft_app::portal::{self, FileChooser, Filter};
 use luft_app::{Activation, Commands, Empty, file_manager, share};
+use luft_i18n::t;
 use sabine::SabineWindow;
 
 use crate::app::state::MagpieState;
 use crate::folder::{self, kinds};
+use crate::l10n::L10N;
 use crate::media::{tags, video};
 use crate::mpris::Playback;
 use crate::{apps, font, launch, photo};
@@ -30,16 +32,17 @@ fn register_app(window: SabineWindow, state: &MagpieState) -> SabineWindow {
             Ok(launch::resolve(&activation))
         })
         .command_async("choose_file", |Empty {}| async {
+            let name = t!(L10N, "magpie-dialog-filter");
             let filter = Filter {
-                name: "Photos, videos, music, documents and fonts",
+                name: &name,
                 patterns: kinds::patterns(),
             };
-            let chosen = portal::open_file("Open", filter).await?;
+            let chosen = portal::open_file(&t!(L10N, "magpie-dialog-open"), filter).await?;
             Ok(chosen.and_then(|uri| gio::File::for_uri(&uri).path()))
         })
         .command_async("choose_folder", |Empty {}| async {
             let chooser = FileChooser {
-                title: "Open Folder",
+                title: &t!(L10N, "magpie-dialog-open-folder"),
                 directory: true,
                 ..FileChooser::default()
             };

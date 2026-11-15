@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { ImageDetails, Item } from '#lib/bindings.js';
 	import { openUri } from '#lib/bridge/index.js';
-	import { formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
+	import { formatDate, formatExposure, formatLocation, formatNumber } from '#lib/library/format.js';
 	import { extension } from '#lib/library/kinds.js';
 
 	let { item }: { item: Item } = $props();
@@ -20,21 +21,28 @@
 		const add = (label: string, value: string | null | undefined) => value && rows.push([label, value]);
 		if (details?.width && details.height) {
 			const megapixels = (details.width * details.height) / 1e6;
-			add('Dimensions', `${details.width} × ${details.height} (${megapixels.toFixed(megapixels < 10 ? 1 : 0)} MP)`);
+			add(
+				t('magpie-details-dimensions'),
+				t('magpie-details-dimensions-value', {
+					width: String(details.width),
+					height: String(details.height),
+					megapixels: formatNumber(megapixels, megapixels < 10 ? 1 : 0, true)
+				})
+			);
 		}
-		add('Size', bytes(item.size));
-		add('Type', extension(item.name).toUpperCase());
-		add('Taken', details?.taken ? formatDate(details.taken) : null);
-		add('Modified', formatDate(item.modified));
-		add('Camera', details?.camera);
-		add('Lens', details?.lens);
+		add(t('magpie-details-size'), bytes(item.size));
+		add(t('magpie-details-type'), extension(item.name).toUpperCase());
+		add(t('magpie-details-taken'), details?.taken ? formatDate(details.taken) : null);
+		add(t('magpie-details-modified'), formatDate(item.modified));
+		add(t('magpie-details-camera'), details?.camera);
+		add(t('magpie-details-lens'), details?.lens);
 		const exposure = [
-			details?.aperture && `ƒ/${details.aperture.toLocaleString(undefined, { maximumFractionDigits: 1 })}`,
+			details?.aperture && t('magpie-details-aperture', { aperture: formatNumber(details.aperture, 1) }),
 			details?.exposure && formatExposure(details.exposure),
-			details?.iso && `ISO ${details.iso}`
+			details?.iso && t('magpie-details-iso', { iso: String(details.iso) })
 		].filter(Boolean);
-		add('Exposure', exposure.join('  ·  '));
-		add('Focal length', details?.focalLength ? `${details.focalLength.toLocaleString(undefined, { maximumFractionDigits: 1 })} mm` : null);
+		add(t('magpie-details-exposure'), exposure.join('  ·  '));
+		add(t('magpie-details-focal-length'), details?.focalLength ? t('magpie-details-millimetres', { length: formatNumber(details.focalLength, 1) }) : null);
 		return rows;
 	});
 
@@ -46,7 +54,7 @@
 	}
 </script>
 
-<aside class="details soft-scroll" aria-label="Details">
+<aside class="details soft-scroll" aria-label={t('magpie-photo-details')}>
 	<h2 class="mb-4 truncate text-[15px] font-semibold" {@attach tooltip(item.name)}>{item.name}</h2>
 	<dl class="flex flex-col gap-3.5">
 		{#each rows as [label, value] (label)}
@@ -57,11 +65,11 @@
 		{/each}
 		{#if details?.location}
 			<div>
-				<dt class="text-[12px] text-[var(--text-muted)]">Location</dt>
+				<dt class="text-[12px] text-[var(--text-muted)]">{t('magpie-details-location')}</dt>
 				<dd class="text-[13px] text-[var(--text)]">
-					{formatCoordinate(details.location.latitude, 'N', 'S')}, {formatCoordinate(details.location.longitude, 'E', 'W')}
+					{formatLocation(details.location)}
 				</dd>
-				<button type="button" class="plain-button -ml-3 mt-1" onclick={showOnMap}>Show on map</button>
+				<button type="button" class="plain-button -ml-3 mt-1" onclick={showOnMap}>{t('magpie-details-map')}</button>
 			</div>
 		{/if}
 	</dl>

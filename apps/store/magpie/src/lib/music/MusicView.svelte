@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { formatClock, SeekBar, tooltip, VolumeControl } from '@luft/ui';
 	import AudioWaveform from '@lucide/svelte/icons/audio-waveform';
 	import Pause from '@lucide/svelte/icons/pause';
@@ -27,7 +28,7 @@
 	let artSize = $derived(Math.round(listening ? Math.min(520, height * 0.5, height - 420) : Math.min(360, height * 0.42)));
 	let track = $derived(player.track);
 	let byline = $derived(track ? [trackArtist(track), track.album].filter(Boolean).join(' · ') : '');
-	let repeatLabel = $derived(player.repeat === 'None' ? 'Repeat' : player.repeat === 'Playlist' ? 'Repeat one' : 'Stop repeating');
+	let repeatLabel = $derived(player.repeat === 'None' ? t('magpie-music-repeat') : player.repeat === 'Playlist' ? t('magpie-music-repeat-one') : t('magpie-music-stop-repeating'));
 
 	$effect(() => {
 		const path = item.path;
@@ -92,20 +93,20 @@
 						type="button"
 						class="icon-button"
 						class:on={player.shuffle}
-						aria-label="Shuffle"
+						aria-label={t('magpie-music-shuffle')}
 						aria-pressed={player.shuffle}
 						onclick={() => player.setShuffle(!player.shuffle)}
-						{@attach tooltip('Shuffle')}
+						{@attach tooltip(t('magpie-music-shuffle'))}
 					>
 						<Shuffle size={17} />
 					</button>
-					<button type="button" class="icon-button large" aria-label="Previous" onclick={() => player.previous()} {@attach tooltip('Previous')}>
+					<button type="button" class="icon-button large" aria-label={t('magpie-music-previous')} onclick={() => player.previous()} {@attach tooltip(t('magpie-music-previous'))}>
 						<SkipBack size={20} fill="currentColor" />
 					</button>
-					<button type="button" class="play" aria-label={player.paused ? 'Play' : 'Pause'} onclick={() => player.toggle()}>
+					<button type="button" class="play" aria-label={player.paused ? t('magpie-music-play') : t('magpie-music-pause')} onclick={() => player.toggle()}>
 						{#if player.paused}<Play size={24} fill="currentColor" />{:else}<Pause size={24} fill="currentColor" />{/if}
 					</button>
-					<button type="button" class="icon-button large" aria-label="Next" disabled={!player.hasNext} onclick={() => player.next()} {@attach tooltip('Next')}>
+					<button type="button" class="icon-button large" aria-label={t('magpie-music-next')} disabled={!player.hasNext} onclick={() => player.next()} {@attach tooltip(t('magpie-music-next'))}>
 						<SkipForward size={20} fill="currentColor" />
 					</button>
 					<button
@@ -125,10 +126,10 @@
 						type="button"
 						class="icon-button"
 						class:on={visualizer.on}
-						aria-label="Visualizer"
+						aria-label={t('magpie-music-visualizer')}
 						aria-pressed={visualizer.on}
 						onclick={() => visualizer.toggle()}
-						{@attach tooltip('Visualizer')}
+						{@attach tooltip(t('magpie-music-visualizer'))}
 					>
 						<AudioWaveform size={17} />
 					</button>

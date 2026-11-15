@@ -1,9 +1,12 @@
+use luft_i18n::t;
 use serde::Serialize;
 use skrifa::attribute::Style;
 use skrifa::raw::{FileRef, TableProvider};
 use skrifa::string::StringId;
 use skrifa::{FontRef, MetadataProvider};
 use specta::Type;
+
+use crate::l10n::L10N;
 
 const FIRST_PRINTABLE: u32 = 0x20;
 const DELETE: u32 = 0x7f;
@@ -170,7 +173,7 @@ fn face(index: u32, font: &FontRef) -> FontFace {
 }
 
 fn each<T>(bytes: &[u8], read: impl Fn(u32, &FontRef) -> T) -> Result<Vec<T>, String> {
-    let unreadable = || "This isn't a font Magpie can read".to_string();
+    let unreadable = || t!(L10N, "magpie-font-unreadable");
     let file = FileRef::new(bytes).map_err(|_| unreadable())?;
     let faces: Vec<T> = file
         .fonts()

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import Download from '@lucide/svelte/icons/download';
 	import File from '@lucide/svelte/icons/file';
@@ -26,7 +27,7 @@
 
 	async function save(index: number) {
 		const path = await commands.saveAttachment({ ...source, index }, api.FOREVER).catch(toasts.fail);
-		if (path) toasts.show('Saved', { action: { label: 'Open', run: () => void api.openSaved(path).catch(toasts.fail) } });
+		if (path) toasts.show(t('mailman-reader-saved'), { action: { label: t('mailman-reader-open'), run: () => void api.openSaved(path).catch(toasts.fail) } });
 	}
 </script>
 
@@ -40,7 +41,7 @@
 					<span class="min-w-0 truncate">{attachment.name}</span>
 					<span class="flex-none text-[12px] text-[var(--text-muted)]">{bytes(attachment.size)}</span>
 				</button>
-				<button type="button" class="icon-button save" aria-label="Save" onclick={() => void save(attachment.index)} {@attach tooltip('Save')}>
+				<button type="button" class="icon-button save" aria-label={t('mailman-reader-save')} onclick={() => void save(attachment.index)} {@attach tooltip(t('mailman-reader-save'))}>
 					<Download size={15} />
 				</button>
 			</div>

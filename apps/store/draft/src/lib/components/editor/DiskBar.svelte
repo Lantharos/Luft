@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { useApp } from '#lib/app/context.js';
 	import { keepMine } from '#lib/documents/disk.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
@@ -12,12 +13,12 @@
 
 <div class="disk-bar" role="status">
 	{#if document.disk === 'changed'}
-		<span class="flex-1 truncate">This file changed on disk while you were editing it.</span>
-		<button type="button" class="plain-button" onclick={() => void keepMine(document)}>Keep mine</button>
-		<button type="button" class="button" onclick={() => void reload(app.workspace, document)}>Reload</button>
+		<span class="flex-1 truncate">{t('draft-disk-changed')}</span>
+		<button type="button" class="plain-button" onclick={() => void keepMine(document)}>{t('draft-disk-keep')}</button>
+		<button type="button" class="button" onclick={() => void reload(app.workspace, document)}>{t('draft-disk-reload')}</button>
 	{:else}
-		<span class="flex-1 truncate">This file was deleted or moved.</span>
-		<button type="button" class="button" onclick={() => void save(app.workspace, document)}>Save it again</button>
+		<span class="flex-1 truncate">{t('draft-disk-deleted')}</span>
+		<button type="button" class="button" onclick={() => void save(app.workspace, document)}>{t('draft-disk-save-again')}</button>
 	{/if}
 </div>
 

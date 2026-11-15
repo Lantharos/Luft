@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appWindow, events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
-	import { appearance, fileDrop, GlassShell, plural, Toast } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { appearance, fileDrop, GlassShell, Toast } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import { openPaths } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
@@ -48,10 +49,10 @@
 		return item?.name ?? 'Magpie';
 	});
 	let subtitle = $derived.by(() => {
-		if (browsing) return library.items.length ? plural(library.items.length, 'item', 'items') : null;
-		if (library.group === 'audio') return player.queue.length > 1 ? `${player.position + 1} of ${player.queue.length}` : null;
-		if (library.group === 'document') return documentState.pages ? `Page ${documentState.page} of ${documentState.pages}` : null;
-		if ((library.group === 'visual' || library.group === 'font') && library.siblings.length > 1) return `${library.index + 1} of ${library.siblings.length}`;
+		if (browsing) return library.items.length ? t('magpie-header-items', { count: library.items.length }) : null;
+		if (library.group === 'audio') return player.queue.length > 1 ? t('magpie-header-position', { position: player.position + 1, count: player.queue.length }) : null;
+		if (library.group === 'document') return documentState.pages ? t('magpie-header-page', { page: documentState.page, pages: documentState.pages }) : null;
+		if ((library.group === 'visual' || library.group === 'font') && library.siblings.length > 1) return t('magpie-header-position', { position: library.index + 1, count: library.siblings.length });
 		return null;
 	});
 
@@ -138,12 +139,12 @@
 					<VisualStage {item} />
 				{:else if item && library.group === 'audio'}
 					{#if viewer && chrome.panel && !listening}
-						<SidePanel label="Queue"><QueueList /></SidePanel>
+						<SidePanel label={t('magpie-panel-queue')}><QueueList /></SidePanel>
 					{/if}
 					<div class="min-w-0 flex-1"><MusicView {item} /></div>
 				{:else if item && library.group === 'document'}
 					{#if viewer && chrome.panel}
-						<SidePanel label="Pages"><PageThumbnails /></SidePanel>
+						<SidePanel label={t('magpie-panel-pages')}><PageThumbnails /></SidePanel>
 					{/if}
 					<div class="relative min-w-0 flex-1">
 						{#key item.path}

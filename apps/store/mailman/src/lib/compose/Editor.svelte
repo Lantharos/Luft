@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import * as api from '#lib/bridge/index.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { escapeHtml } from './html';
@@ -130,7 +131,7 @@
 		contenteditable="true"
 		role="textbox"
 		aria-multiline="true"
-		aria-label="Message"
+		aria-label={t('mailman-compose-message')}
 		tabindex="0"
 		spellcheck="true"
 		data-placeholder={placeholder}
@@ -141,7 +142,7 @@
 	{#if linking}
 		<div class="link">
 			<!-- svelte-ignore a11y_autofocus -->
-			<input bind:value={linking.url} placeholder="Paste or type a link, then press Enter" aria-label="Link" autofocus onkeydown={finishLink} onblur={() => (linking = null)} />
+			<input bind:value={linking.url} placeholder={t('mailman-compose-link-placeholder')} aria-label={t('mailman-compose-link-label')} autofocus onkeydown={finishLink} onblur={() => (linking = null)} />
 		</div>
 	{/if}
 </div>

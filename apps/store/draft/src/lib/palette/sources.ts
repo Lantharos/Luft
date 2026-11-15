@@ -1,6 +1,8 @@
+import { t } from '@luft/i18n';
 import { basename, fuzzyMatch, matchItems, type PaletteItem, type PaletteSource, parent, topMatches } from '@luft/ui';
 import type { App } from '#lib/app/app.svelte.js';
 import type { Command } from '#lib/commands/registry.js';
+import { shortcutLabel } from '#lib/commands/keys.js';
 import { openPath } from '#lib/documents/opening.js';
 import { tildify } from '#lib/utils/paths.js';
 
@@ -50,16 +52,21 @@ function lineItems(app: App, query: string): PaletteItem[] {
 	if (!document) return [];
 	const lines = app.workspace.editor.state(document).doc.lines;
 	const [line, column] = query.split(/[:,]/).map((part) => Number.parseInt(part, 10));
-	if (!Number.isFinite(line)) return [{ key: 'line', label: `Type a line number from 1 to ${lines.toLocaleString()}`, run: () => {} }];
+	if (!Number.isFinite(line)) return [{ key: 'line', label: t('draft-line-prompt', { lines }), run: () => {} }];
 	const target = Math.min(Math.max(line, 1), lines);
 	return [
 		{
 			key: 'line',
-			label: Number.isFinite(column) ? `Go to line ${target}, column ${column}` : `Go to line ${target}`,
-			detail: `of ${lines.toLocaleString()}`,
+			label: Number.isFinite(column) ? t('draft-line-go-column', { line: String(target), column: String(column) }) : t('draft-line-go', { line: String(target) }),
+			detail: t('draft-line-of', { lines }),
 			run: () => app.workspace.editor.goTo(target, Number.isFinite(column) ? column : 1)
 		}
 	];
+}
+
+function shortcutOf(command: Command) {
+	const keys = command.keys?.[0] ?? command.editorKeys;
+	return keys && shortcutLabel(keys);
 }
 
 function commandItems(commands: Command[], query: string): PaletteItem[] {
@@ -68,7 +75,7 @@ function commandItems(commands: Command[], query: string): PaletteItem[] {
 	const matched = new Map<string, number[]>();
 	const found = lowered
 		? topMatches(available, LIMIT, (command) => {
-				const match = fuzzyMatch(lowered, command.title);
+				const match = fuzzyMatch(lowered, command.title());
 				if (!match) return null;
 				matched.set(command.id, match.indices);
 				return match.score;
@@ -76,8 +83,8 @@ function commandItems(commands: Command[], query: string): PaletteItem[] {
 		: available;
 	return found.map((command) => ({
 		key: command.id,
-		label: command.title,
-		hint: command.keys?.[0],
+		label: command.title(),
+		hint: shortcutOf(command),
 		labelMatches: matched.get(command.id),
 		run: command.run
 	}));
@@ -85,8 +92,8 @@ function commandItems(commands: Command[], query: string): PaletteItem[] {
 
 export function quickOpen(app: App): PaletteSource {
 	return {
-		placeholder: 'Go to a file',
-		empty: 'No matching files',
+		placeholder: t('draft-palette-placeholder'),
+		empty: t('draft-palette-empty'),
 		items: (query) => {
 			if (query.startsWith(COMMAND_PREFIX)) return commandItems(app.commands, query.slice(COMMAND_PREFIX.length));
 			if (query.startsWith(LINE_PREFIX)) return lineItems(app, query.slice(LINE_PREFIX.length));
@@ -98,7 +105,7 @@ export function quickOpen(app: App): PaletteSource {
 export function picker(placeholder: string, options: PaletteItem[]): PaletteSource {
 	return {
 		placeholder,
-		empty: 'Nothing matches',
+		empty: t('draft-palette-nothing'),
 		items: (query) => matchItems(options, query)
 	};
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ago, relativeDay, tooltip } from '@luft/ui';
 	import Archive from '@lucide/svelte/icons/archive';
 	import Check from '@lucide/svelte/icons/check';
@@ -23,7 +24,7 @@
 	let { row, selected, chosen, onopen, onchoose, onarchive, ontrash, onlater, onmenu }: Props = $props();
 
 	let unread = $derived(row.unread > 0);
-	let name = $derived(row.draft && row.count === 1 ? 'Draft' : row.senderName || row.sender);
+	let name = $derived(row.draft && row.count === 1 ? t('mailman-list-draft') : row.senderName || row.sender);
 	let when = $derived(row.snoozedUntil ? ago(row.snoozedUntil) : relativeDay(row.date));
 
 	function act(event: MouseEvent, run: () => void) {
@@ -68,18 +69,18 @@
 				{/if}
 				<span class="date muted flex-none">{when}</span>
 			</div>
-			<p class="subject truncate">{row.subject || '(no subject)'}</p>
+			<p class="subject truncate">{row.subject || t('mailman-list-no-subject')}</p>
 			<p class="snippet muted truncate">{row.snippet}</p>
 		</div>
 	</div>
 	<div class="actions" data-no-drag>
-		<button type="button" class="icon-button" aria-label="Archive" onclick={(event) => act(event, onarchive)} {@attach tooltip('Archive (E)')}>
+		<button type="button" class="icon-button" aria-label={t('mailman-list-archive')} onclick={(event) => act(event, onarchive)} {@attach tooltip(t('mailman-list-archive-tooltip'))}>
 			<Archive size={16} />
 		</button>
-		<button type="button" class="icon-button" aria-label="Later" onclick={(event) => act(event, () => onlater(event.currentTarget as HTMLElement))} {@attach tooltip('Later (B)')}>
+		<button type="button" class="icon-button" aria-label={t('mailman-list-later')} onclick={(event) => act(event, () => onlater(event.currentTarget as HTMLElement))} {@attach tooltip(t('mailman-list-later-tooltip'))}>
 			<Clock size={16} />
 		</button>
-		<button type="button" class="icon-button" aria-label="Delete" onclick={(event) => act(event, ontrash)} {@attach tooltip('Delete (#)')}>
+		<button type="button" class="icon-button" aria-label={t('mailman-list-delete')} onclick={(event) => act(event, ontrash)} {@attach tooltip(t('mailman-list-delete-tooltip'))}>
 			<Trash size={16} />
 		</button>
 	</div>

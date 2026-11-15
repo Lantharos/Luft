@@ -1,5 +1,7 @@
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
+use crate::l10n::L10N;
 use crate::store::{Flag, Store};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -71,34 +73,30 @@ pub fn give_up(
     operation: &Operation,
     error: &str,
 ) -> Result<Option<GaveUp>, String> {
-    let (verb, messages, resync) = match operation {
+    let (failure, messages, resync) = match operation {
         Operation::Move { from, to, messages } => {
             let moved: Vec<(i64, String)> = messages
                 .iter()
                 .map(|target| (target.id, target.remote.clone()))
                 .collect();
             store.return_moved(*from, *to, &moved)?;
-            ("move", messages, None)
+            ("mailman-error-move-failed", messages, None)
         }
         Operation::Destroy { mailbox, messages } => {
             let ids: Vec<i64> = messages.iter().map(|target| target.id).collect();
             store.return_destroyed(*mailbox, &ids)?;
-            ("delete", messages, Some(*mailbox))
+            ("mailman-error-delete-failed", messages, Some(*mailbox))
         }
         Operation::Append { draft: false, .. } => {
             return Ok(Some(GaveUp {
-                message: format!("Sent, but couldn't save a copy to Sent: {error}"),
+                message: t!(L10N, "mailman-error-copy-not-saved", error = error),
                 resync: None,
             }));
         }
         _ => return Ok(None),
     };
-    let what = match messages.len() {
-        1 => "a message".to_owned(),
-        count => format!("{count} messages"),
-    };
     Ok(Some(GaveUp {
-        message: format!("Couldn't {verb} {what}: {error}"),
+        message: t!(L10N, failure, count = messages.len(), error = error),
         resync,
     }))
 }

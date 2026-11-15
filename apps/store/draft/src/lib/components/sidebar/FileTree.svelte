@@ -3,6 +3,7 @@
 	import ChevronsDownUp from '@lucide/svelte/icons/chevrons-down-up';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
+	import { t } from '@luft/i18n';
 	import { basename, fileDragStart, tooltip, VirtualScroller } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';
 	import { openPath } from '#lib/documents/opening.js';
@@ -26,7 +27,7 @@
 <section class="flex min-h-0 flex-1 flex-col gap-0.5">
 	<div class="flex items-center gap-1 pr-1">
 		<h2 class="sidebar-heading flex-1 truncate" {@attach tooltip(tree.root ?? '')}>{basename(tree.root ?? '')}</h2>
-		<button type="button" class="tree-action" aria-label="Collapse folders" onclick={() => tree.collapseAll()} {@attach tooltip('Collapse folders')}>
+		<button type="button" class="tree-action" aria-label={t('draft-sidebar-collapse')} onclick={() => tree.collapseAll()} {@attach tooltip(t('draft-sidebar-collapse'))}>
 			<ChevronsDownUp size={14} />
 		</button>
 	</div>

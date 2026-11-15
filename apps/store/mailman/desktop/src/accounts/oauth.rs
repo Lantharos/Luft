@@ -5,18 +5,20 @@ use std::time::{Duration, Instant};
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use luft_app::{block_on, portal};
+use luft_i18n::t;
 use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use specta::Type;
 
 use super::SignInError;
+use crate::l10n::L10N;
 use crate::protocols::net;
 use crate::store::now;
 
 const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(300);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
-const FINISHED_PAGE: &str = "<!doctype html><meta charset=utf-8><title>Mailman</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>You're signed in. You can close this tab and go back to Mailman.</p>";
+const SIGNED_IN_HEAD: &str = "<!doctype html><meta charset=utf-8><title>Mailman</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -130,7 +132,11 @@ fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, SignInE
         .post(provider.endpoints().token)
         .send_form(form.iter().copied())
         .map_err(|error| {
-            let message = format!("Signing in failed: {error}");
+            let message = t!(
+                L10N,
+                "mailman-error-sign-in-failed",
+                error = error.to_string()
+            );
             match error {
                 ureq::Error::StatusCode(400 | 401) => SignInError::Refused(message),
                 _ => SignInError::Failed(message),
@@ -155,7 +161,7 @@ fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, SignInE
 pub fn refresh(provider: Provider, refresh_token: &str) -> Result<Tokens, SignInError> {
     let (client_id, secret) = provider
         .client()
-        .ok_or("Signing in with this provider isn't set up")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-provider-not-set-up"))?;
     let mut form = vec![
         ("grant_type", "refresh_token"),
         ("refresh_token", refresh_token),
@@ -174,7 +180,7 @@ pub fn sign_in(
 ) -> Result<Tokens, String> {
     let (client_id, secret) = provider
         .client()
-        .ok_or("Signing in with this provider isn't set up")?;
+        .ok_or_else(|| t!(L10N, "mailman-error-provider-not-set-up"))?;
     let endpoints = provider.endpoints();
     let listener = TcpListener::bind("127.0.0.1:0").map_err(|error| error.to_string())?;
     let redirect = format!(
@@ -246,15 +252,20 @@ fn wait_for_code(listener: &TcpListener, state: &str) -> Result<String, String> 
         }
         let _ = write!(
             stream,
-            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n{FINISHED_PAGE}"
+            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n{SIGNED_IN_HEAD}{}</p>",
+            t!(L10N, "mailman-signed-in-page")
         );
         if let Some(error) = pairs.get("error") {
-            return Err(format!("Signing in was cancelled ({error})"));
+            return Err(t!(
+                L10N,
+                "mailman-error-sign-in-cancelled",
+                error = error.as_str()
+            ));
         }
         return pairs
             .get("code")
             .cloned()
-            .ok_or_else(|| "The sign-in page didn't return a code".into());
+            .ok_or_else(|| t!(L10N, "mailman-error-no-code"));
     }
-    Err("Signing in took too long".into())
+    Err(t!(L10N, "mailman-error-sign-in-timeout"))
 }

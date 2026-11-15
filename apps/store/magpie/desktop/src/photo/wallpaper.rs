@@ -2,8 +2,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use gio::prelude::*;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
@@ -26,7 +29,9 @@ fn library_copy(source: &Path) -> Result<PathBuf, String> {
         return Ok(source.to_path_buf());
     }
     fs::create_dir_all(&folder).map_err(failed)?;
-    let name = source.file_name().ok_or("This file has no name")?;
+    let name = source
+        .file_name()
+        .ok_or_else(|| t!(L10N, "magpie-file-no-name"))?;
     let size = fs::metadata(source).map_err(failed)?.len();
     let stem = source.file_stem().unwrap_or(name).to_string_lossy();
     let extension = source

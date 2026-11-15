@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { dragFiles, tooltip } from '@luft/ui';
 	import X from '@lucide/svelte/icons/x';
 	import { useApp } from '#lib/app/context.js';
@@ -24,7 +25,7 @@
 	}
 </script>
 
-<div class="hidden-scroll flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" role="tablist" aria-label="Open files">
+<div class="hidden-scroll flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" role="tablist" aria-label={t('draft-tabs')}>
 	{#each workspace.documents as document (document.id)}
 		{@const active = document === workspace.active}
 		<div
@@ -49,7 +50,7 @@
 			>
 				<span class="truncate">{document.name}</span>
 			</button>
-			<button type="button" class={['tab-close', document.dirty && 'is-dirty']} aria-label="Close {document.name}" onclick={() => void workspace.close(document)}>
+			<button type="button" class={['tab-close', document.dirty && 'is-dirty']} aria-label={t('draft-tab-close', { name: document.name })} onclick={() => void workspace.close(document)}>
 				<X size={12} class="close-icon" />
 			</button>
 		</div>

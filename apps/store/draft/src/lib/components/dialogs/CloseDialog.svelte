@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';
 	import { save } from '#lib/documents/saving.js';
@@ -10,7 +11,7 @@
 	let title = $derived.by(() => {
 		if (!request) return '';
 		const [first] = request.documents;
-		return request.documents.length === 1 ? `Save changes to “${first.name}”?` : `Save changes to ${request.documents.length} files?`;
+		return request.documents.length === 1 ? t('draft-close-title', { name: first.name }) : t('draft-close-title-files', { count: request.documents.length });
 	});
 
 	async function saveAndClose() {
@@ -28,11 +29,11 @@
 </script>
 
 {#if request}
-	<Dialog {title} description="Your changes will be lost if you don’t save them." onclose={() => request.resolve(false)}>
+	<Dialog {title} description={t('draft-close-description')} onclose={() => request.resolve(false)}>
 		{#snippet actions()}
-			<button type="button" class="button danger mr-auto" onclick={() => request.resolve(true)}>Don’t save</button>
-			<button type="button" class="button" onclick={() => request.resolve(false)}>Cancel</button>
-			<button type="button" class="button primary" disabled={saving} onclick={() => void saveAndClose()}>Save</button>
+			<button type="button" class="button danger mr-auto" onclick={() => request.resolve(true)}>{t('draft-close-discard')}</button>
+			<button type="button" class="button" onclick={() => request.resolve(false)}>{t('draft-close-cancel')}</button>
+			<button type="button" class="button primary" disabled={saving} onclick={() => void saveAndClose()}>{t('draft-close-save')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Segmented } from '@luft/ui';
 	import type { Item } from '#lib/bindings.js';
 	import FontDetails from './FontDetails.svelte';
@@ -9,9 +10,9 @@
 	let { item }: { item: Item } = $props();
 
 	const TABS: { value: Tab; label: string }[] = [
-		{ value: 'preview', label: 'Preview' },
-		{ value: 'characters', label: 'Characters' },
-		{ value: 'details', label: 'Details' }
+		{ value: 'preview', label: t('magpie-font-preview') },
+		{ value: 'characters', label: t('magpie-font-characters') },
+		{ value: 'details', label: t('magpie-font-details') }
 	];
 
 	$effect(() => {
@@ -23,14 +24,14 @@
 	{#if fontState.problem}
 		<div class="grid flex-1 place-items-center p-8 text-center">
 			<div class="flex max-w-[420px] flex-col gap-2">
-				<h2 class="text-[18px] font-semibold">{item.name} can't be shown</h2>
+				<h2 class="text-[18px] font-semibold">{t('magpie-font-cant-show', { name: item.name })}</h2>
 				<p class="text-[13px] text-[var(--text-muted)]">{fontState.problem}</p>
 			</div>
 		</div>
 	{:else if fontState.face}
 		<div class="flex flex-none justify-center pb-2">
 			<div class="w-[340px]">
-				<Segmented label="View" options={TABS} value={fontState.tab} onchange={(tab) => (fontState.tab = tab)} />
+				<Segmented label={t('magpie-font-view')} options={TABS} value={fontState.tab} onchange={(tab) => (fontState.tab = tab)} />
 			</div>
 		</div>
 		{#if fontState.tab === 'preview'}

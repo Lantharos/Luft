@@ -34,8 +34,9 @@ interface ImageEntry {
 
 export type ClipboardEntry = TextEntry | ImageEntry;
 
-const sameEntry = (entry: ClipboardEntry, other: ClipboardEntry) =>
-  entry.kind === 'text' ? other.kind === 'text' && other.text === entry.text : other.kind === 'image' && other.id === entry.id;
+export const entryKey = (entry: ClipboardEntry) => entry.kind === 'text' ? `text:${entry.text}` : `image:${entry.id}`;
+
+const sameEntry = (entry: ClipboardEntry, other: ClipboardEntry) => entryKey(entry) === entryKey(other);
 
 function imageType(mimeTypes: string[]): string | undefined {
   return mimeTypes.includes(PREFERRED_IMAGE_TYPE) ? PREFERRED_IMAGE_TYPE : mimeTypes.find(type => type.startsWith('image/'));

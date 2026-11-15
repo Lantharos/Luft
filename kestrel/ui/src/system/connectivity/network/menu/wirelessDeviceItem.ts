@@ -3,6 +3,8 @@ import NM from 'gi://NM';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
 import * as Main from '../../../../core/main.js';
+import { arrange } from '../../../../shared/motion/arrange.js';
+import { vanish } from '../../../../shared/motion/collapse.js';
 import { ItemSorter } from './itemSorter.js';
 import { NMSectionItem } from './menuItems.js';
 import { canReachInternet, connectionName, MAX_VISIBLE_NETWORKS, NM80211Mode, signalToIcon, ssidToLabel } from './nmUtils.js';
@@ -42,23 +44,23 @@ export class NMWirelessDeviceItem extends NMSectionItem {
       'state-changed', () => this.notify('is-hotspot'),
       'access-point-added', (_device: NM.DeviceWifi, ap: NM.AccessPoint) => {
         this.addAccessPoint(ap);
-        this.updateItemsVisibility();
+        this.arrange();
       },
       'access-point-removed', (_device: NM.DeviceWifi, ap: NM.AccessPoint) => {
         this.removeAccessPoint(ap);
-        this.updateItemsVisibility();
+        this.arrange();
       }, this);
 
     this.bind_property('single-device-mode', this, 'use-submenu', GObject.BindingFlags.INVERT_BOOLEAN);
 
-    Main.sessionMode.connectObject('updated', () => this.updateItemsVisibility(), this);
+    Main.sessionMode.connectObject('updated', () => this.arrange(), this);
 
     for (const ap of this.device.get_access_points()) this.addAccessPoint(ap);
 
     this.activeApChanged();
     this.setActiveConnection(this.device.active_connection);
     this.availableConnectionsChanged();
-    this.updateItemsVisibility();
+    this.arrange();
 
     this.connect('destroy', () => this.networks.forEach(net => net.destroy()));
   }
@@ -133,6 +135,7 @@ export class NMWirelessDeviceItem extends NMSectionItem {
         if (!ap.ssid) return;
         ap.disconnectObject(this);
         this.addAccessPoint(ap);
+        this.arrange();
       }, this);
       return;
     }
@@ -154,12 +157,13 @@ export class NMWirelessDeviceItem extends NMSectionItem {
           if (idx >= 0) this.networks.splice(idx, 1);
 
           this.itemSorter.delete(item);
-          item.destroy();
+          vanish(item);
         },
         this);
 
-      const pos = this.itemSorter.upsert(item);
-      this.section.addMenuItem(item, pos);
+      item.visible = false;
+      this.itemSorter.upsert(item);
+      this.section.addMenuItem(item);
       this.networks.push(added);
     }
 
@@ -176,21 +180,21 @@ export class NMWirelessDeviceItem extends NMSectionItem {
   }
 
   private resortItem(item: NMWirelessNetworkItem): void {
-    const pos = this.itemSorter.upsert(item);
-    this.section.moveMenuItem(item, pos);
-
-    this.updateItemsVisibility();
+    this.itemSorter.upsert(item);
+    this.arrange();
   }
 
-  private updateItemsVisibility(): void {
-    const { hasWindows } = Main.sessionMode;
-
-    let nVisible = 0;
-    for (const item of this.itemSorter) {
-      const { network } = item;
-      item.visible = (hasWindows || network.hasConnections() || network.canAutoconnect()) && nVisible < MAX_VISIBLE_NETWORKS;
-      if (item.visible) nVisible++;
-    }
+  private arrange(): void {
+    arrange(this.section.box, () => {
+      const { hasWindows } = Main.sessionMode;
+      let nVisible = 0;
+      return [...this.itemSorter].map(item => {
+        const { network } = item;
+        const visible = (hasWindows || network.hasConnections() || network.canAutoconnect()) && nVisible < MAX_VISIBLE_NETWORKS;
+        if (visible) nVisible++;
+        return [item, visible];
+      });
+    });
   }
 
   setDeviceName(name: string): void {

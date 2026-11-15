@@ -1,6 +1,6 @@
 import type Clutter from 'gi://Clutter';
 
-import { animateActor, Curve, Duration, Spring, stillMotion } from './motion.js';
+import { animateActor, Spring, stillMotion } from './motion.js';
 
 type Axis = 'x' | 'y';
 
@@ -19,32 +19,48 @@ const start = (actor: Clutter.Actor, axis: Axis) => {
 
 const shown = (actor: Clutter.Actor, axis: Axis) => start(actor, axis) + (axis === 'x' ? actor.translation_x : actor.translation_y);
 
-export function moveRows(container: Clutter.Actor, change: () => void, axis: Axis = 'y', fadeLeaps = false): void {
+const staying = (container: Clutter.Actor) => container.get_children().filter(child => child.visible && !departing.has(child));
+
+function longestRising(values: number[]): Set<number> {
+  const lengths = values.map(() => 1);
+  const previous = values.map(() => -1);
+  values.forEach((value, i) => {
+    for (let j = 0; j < i; j++) {
+      if (values[j] < value && lengths[j] + 1 > lengths[i]) {
+        lengths[i] = lengths[j] + 1;
+        previous[i] = j;
+      }
+    }
+  });
+  const kept = new Set<number>();
+  for (let i = lengths.lastIndexOf(Math.max(...lengths)); i >= 0; i = previous[i]) kept.add(i);
+  return kept;
+}
+
+export function leapers(container: Clutter.Actor, order: Clutter.Actor[]): Set<Clutter.Actor> {
+  if (stillMotion() || !container.mapped) return new Set();
+  const rank = new Map(staying(container).map((child, index) => [child, index]));
+  const kept = order.filter(child => rank.has(child));
+  const rising = longestRising(kept.map(child => rank.get(child)!));
+  return new Set(kept.filter((_, index) => !rising.has(index)));
+}
+
+export function moveRows(container: Clutter.Actor, change: () => void, axis: Axis = 'y', leapt: ReadonlySet<Clutter.Actor> = new Set()): void {
   if (stillMotion() || !container.mapped) {
     change();
     return;
   }
-  const visible = () => container.get_children().filter(child => child.visible);
-  const before = new Map(visible().map((child, index) => [child, { was: shown(child, axis), index }]));
+  const before = new Map(container.get_children().filter(child => child.visible).map(child => [child, shown(child, axis)]));
   change();
-  const order = new Map(visible().map((child, index) => [child, index]));
   const property = axis === 'x' ? 'translation_x' : 'translation_y';
   const pending = new Map<Clutter.Actor, number>();
-  for (const child of container.get_children()) {
-    const earlier = before.get(child);
-    if (!earlier) continue;
-    const { was, index } = earlier;
+  for (const [child, was] of before) {
+    if (leapt.has(child)) continue;
     pending.set(child, child.connect('notify::allocation', () => {
       child.disconnect(pending.get(child)!);
       pending.delete(child);
       const offset = was - start(child, axis);
       if (Math.abs(offset) < 0.5 && !child[property]) return;
-      if (fadeLeaps && order.get(child)! < index) {
-        child.opacity = 0;
-        animateActor(child, { [property]: 0, duration: 0 });
-        animateActor(child, { opacity: 255, delay: Duration.tap, duration: Duration.quick, curve: Curve.decelerate });
-        return;
-      }
       child[property] = offset;
       animateActor(child, { [property]: 0, spring: Spring.snappy });
     }));

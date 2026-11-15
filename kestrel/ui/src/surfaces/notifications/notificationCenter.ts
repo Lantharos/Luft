@@ -3,8 +3,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
-import { CollapseLayout, grow, vanish } from './collapseLayout.js';
-import { moveRows, placeAfter } from '../../shared/motion/rows.js';
+import { CollapseLayout, grow, leap, vanish } from '../../shared/motion/collapse.js';
+import { leapers, moveRows, placeAfter } from '../../shared/motion/rows.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
 import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
@@ -132,6 +132,7 @@ export class NotificationCenter {
     }
     this.scroll.visible = sources.length > 0;
     this.header.visible = sources.length > 0;
+    const leapt = animate ? leapers(this.list, sources.flatMap(source => this.groups.get(source)?.actor ?? [])) : new Set<Clutter.Actor>();
     moveRows(this.list, () => sources.reduce<Clutter.Actor | null>((previous, source) => {
       let group = this.groups.get(source);
       const added = !group;
@@ -141,11 +142,13 @@ export class NotificationCenter {
         this.groups.set(source, group);
         this.list.add_child(group.actor);
       }
-      group.refresh(this.actor.visible, animate && !added);
+      const leaping = leapt.has(group.actor);
+      group.refresh(this.actor.visible, animate && !added && !leaping);
+      if (leaping) leap(group.actor, this.list.width, resized);
       placeAfter(this.list, group.actor, previous);
       if (added && animate) grow(group.actor, this.list.width, resized);
       return group.actor;
-    }, null), 'y', true);
+    }, null), 'y', leapt);
     this.first = sources.length ? this.groups.get(sources[0])!.first : null;
     const current = stage.get_key_focus();
     if (focusInside && (!current || !current.mapped || !this.actor.contains(current))) {

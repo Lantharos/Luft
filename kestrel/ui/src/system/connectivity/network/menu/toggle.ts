@@ -1,9 +1,12 @@
+import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
 import type St from 'gi://St';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
 import * as PopupMenu from '../../../../shared/popups/popupMenu.js';
+import { arrange } from '../../../../shared/motion/arrange.js';
+import { CollapseLayout, vanish } from '../../../../shared/motion/collapse.js';
 import { QuickMenuToggle } from '../../../status/toggles/quickSettings.js';
 import { ItemSorter } from './itemSorter.js';
 import type { NMMenuItem } from './menuItems.js';
@@ -55,6 +58,7 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
   constructor() {
     super();
 
+    this.itemsSection.box.layout_manager = new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL });
     this.menu.addMenuItem(this.itemsSection);
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
@@ -78,8 +82,7 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
     this.client = client;
     this.client?.connectObject('notify::networking-enabled', () => this.sync(), this);
 
-    this.items.forEach(item => item.destroy());
-    this.items.clear();
+    [...this.items.keys()].forEach(key => this.removeItem(key));
 
     if (this.client) this.loadInitialItems(this.client);
     this.sync();
@@ -107,8 +110,11 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
     this.primaryItem?.notify('name');
   }
 
-  private updateItemsVisibility(): void {
-    [...this.itemSorter.itemsByMru()].forEach((item, i) => (item.visible = i < MAX_VISIBLE_NETWORKS));
+  private arrange(): void {
+    arrange(this.itemsSection.box, () => {
+      const kept = new Set([...this.itemSorter.itemsByMru()].slice(0, MAX_VISIBLE_NETWORKS));
+      return [...this.itemSorter].map(item => [item, kept.has(item)]);
+    });
   }
 
   private itemActiveChanged(): void {
@@ -122,8 +128,8 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
   }
 
   private resortItem(item: T): void {
-    const pos = this.itemSorter.upsert(item);
-    this.itemsSection.moveMenuItem(item, pos);
+    this.itemSorter.upsert(item);
+    this.arrange();
   }
 
   addItem(key: K, item: T): void {
@@ -134,8 +140,9 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
       this);
 
     this.items.set(key, item);
-    const pos = this.itemSorter.upsert(item);
-    this.itemsSection.addMenuItem(item, pos);
+    item.visible = false;
+    this.itemSorter.upsert(item);
+    this.itemsSection.addMenuItem(item);
     this.sync();
   }
 
@@ -146,7 +153,7 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
     this.itemSorter.delete(item);
     this.items.delete(key);
 
-    item.destroy();
+    vanish(item);
     this.sync();
   }
 
@@ -171,7 +178,7 @@ export abstract class NMToggle<K, T extends NMMenuItem> extends QuickMenuToggle 
 
   protected sync(): void {
     this.visible = !!this.client?.networking_enabled && this.items.size > 0;
-    this.updateItemsVisibility();
+    this.arrange();
     this.updateChecked();
     this.itemBinding.set_source(this.findPrimaryItem());
   }

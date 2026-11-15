@@ -1,4 +1,5 @@
 import Atk from 'gi://Atk';
+import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
@@ -6,6 +7,8 @@ import St from 'gi://St';
 import { Spinner } from '../../../shared/widgets/animation.js';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as PopupMenu from '../../../shared/popups/popupMenu.js';
+import { arrange } from '../../../shared/motion/arrange.js';
+import { CollapseLayout, vanish } from '../../../shared/motion/collapse.js';
 import { QuickMenuToggle, SystemIndicator } from '../../status/toggles/quickSettings.js';
 
 import { getBluetoothClient, type BluetoothClient } from './client.js';
@@ -27,7 +30,7 @@ class BluetoothDeviceItem extends PopupMenu.PopupBaseMenuItem {
   private readonly subtitle = new St.Label({ style_class: 'device-subtitle' });
   private spinner: Spinner | null = new Spinner(16, { hideOnStop: true });
 
-  constructor(private readonly device: BluetoothDevice, private readonly client: BluetoothClient) {
+  constructor(readonly device: BluetoothDevice, private readonly client: BluetoothClient) {
     super({ style_class: 'bt-device-item' });
 
     const icon = new St.Icon({ style_class: 'popup-menu-icon' });
@@ -41,7 +44,6 @@ class BluetoothDeviceItem extends PopupMenu.PopupBaseMenuItem {
 
     this.spinner!.bind_property('visible', this.subtitle, 'visible', GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN);
 
-    device.bind_property('connectable', this, 'visible', GObject.BindingFlags.SYNC_CREATE);
     device.bind_property('icon', icon, 'icon-name', GObject.BindingFlags.SYNC_CREATE);
     device.bind_property('alias', label, 'text', GObject.BindingFlags.SYNC_CREATE);
     this.connect('destroy', () => (this.spinner = null));
@@ -91,6 +93,7 @@ class BluetoothToggle extends QuickMenuToggle {
   constructor(private readonly client: BluetoothClient) {
     super();
 
+    this.deviceSection.box.layout_manager = new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL });
     this.menu.addMenuItem(this.deviceSection);
 
     this.placeholderItem.label.clutter_text.set({ ellipsize: Pango.EllipsizeMode.NONE, line_wrap: true });
@@ -131,7 +134,7 @@ class BluetoothToggle extends QuickMenuToggle {
   private onActiveChanged(): void {
     this.updatePlaceholder();
 
-    this.deviceItems.forEach(item => item.destroy());
+    this.deviceItems.forEach(item => vanish(item));
     this.deviceItems.clear();
 
     this.sync();
@@ -148,23 +151,27 @@ class BluetoothToggle extends QuickMenuToggle {
     else accessible.add_relationship(Atk.RelationType.DESCRIBED_BY, placeholderAccessible);
   }
 
-  private updateDeviceVisibility(): void {
-    this.deviceSection.actor.visible = [...this.deviceItems.values()].some(item => item.visible);
+  private arrange(order: () => BluetoothDeviceItem[]): void {
+    arrange(this.deviceSection.box, () => order().map(item => [item, item.device.connectable]));
+    this.deviceSection.actor.visible = [...this.deviceItems.values()].some(item => item.device.connectable);
     this.updatePlaceholderRelation();
   }
 
-  private removeDevice(path: string): void {
-    this.deviceItems.get(path)?.destroy();
-    this.deviceItems.delete(path);
+  private placedItems(): BluetoothDeviceItem[] {
+    const items = new Set(this.deviceItems.values());
+    return this.deviceSection.box.get_children().filter((child): child is BluetoothDeviceItem => items.has(child as BluetoothDeviceItem));
+  }
 
-    this.updateDeviceVisibility();
+  private removeDevice(path: string): void {
+    const item = this.deviceItems.get(path);
+    if (!item) return;
+    this.deviceItems.delete(path);
+    vanish(item);
+    this.arrange(() => this.placedItems());
   }
 
   private reorderDeviceItems(): void {
-    for (const [i, dev] of sortedDevices(this.client).entries()) {
-      const item = this.deviceItems.get(dev.objectPath);
-      if (item) this.deviceSection.moveMenuItem(item, i);
-    }
+    this.arrange(() => sortedDevices(this.client).flatMap(dev => this.deviceItems.get(dev.objectPath) ?? []));
   }
 
   private sync(): void {
@@ -175,7 +182,8 @@ class BluetoothToggle extends QuickMenuToggle {
       if (this.deviceItems.has(path)) continue;
 
       const item = new BluetoothDeviceItem(dev, this.client);
-      item.connect('notify::visible', () => this.updateDeviceVisibility());
+      item.visible = false;
+      dev.connectObject('notify::connectable', () => this.arrange(() => this.placedItems()), item);
 
       this.deviceSection.addMenuItem(item);
       this.deviceItems.set(path, item);
@@ -188,7 +196,7 @@ class BluetoothToggle extends QuickMenuToggle {
     else if (nConnected === 1) this.subtitle = connectedDevices[0].alias;
     else this.subtitle = null;
 
-    this.updateDeviceVisibility();
+    this.arrange(() => this.placedItems());
   }
 }
 

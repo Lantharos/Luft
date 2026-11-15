@@ -9,7 +9,9 @@ import { localized, t } from '../../shared/i18n/index.js';
 import { blurSurface } from '../../shared/layout/surface.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/layout/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
-import { ClipboardHistory, TEXT_MIME_TYPES, type ClipboardEntry } from './history.js';
+import { CollapseLayout, grow, leap, vanish } from '../../shared/motion/collapse.js';
+import { leapers, moveRows, placeAfter } from '../../shared/motion/rows.js';
+import { ClipboardHistory, entryKey, TEXT_MIME_TYPES, type ClipboardEntry } from './history.js';
 import type { Thumbnail } from './thumbnail.js';
 
 const PASTE_DELAY_MS = 120;
@@ -35,18 +37,29 @@ function imageContent({ content, width, height, imageWidth, imageHeight }: Thumb
   };
 }
 
+const contentOf = (entry: ClipboardEntry) => entry.kind === 'text' ? textContent(entry.text) : imageContent(entry.thumbnail);
+const looks = (entry: ClipboardEntry) => entry.kind === 'text' ? entry.text : entry.thumbnail;
+
+interface Row {
+  readonly button: St.Button;
+  entry: ClipboardEntry;
+  look: string | Thumbnail;
+}
+
 export class ClipboardPanel {
   readonly actor = new St.BoxLayout({
     name: 'kestrel-clipboard', orientation: Clutter.Orientation.VERTICAL,
     style_class: 'kestrel-popover kestrel-clipboard', visible: false, reactive: true,
   });
-  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-clipboard-list' });
+  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-clipboard-list',
+    layout_manager: new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL }) });
   private readonly scroll = new St.ScrollView({
     hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC, height: 0, y_expand: true, child: this.list,
   });
   private readonly history: ClipboardHistory;
   private dirty = true;
-  private readonly rows = new Map<St.Button, ClipboardEntry>();
+  private relabel = false;
+  private readonly rows = new Map<string, Row>();
   private keyboard: Clutter.VirtualInputDevice | null = null;
   private anchor: Anchor | null = null;
   private above = false;
@@ -60,7 +73,7 @@ export class ClipboardPanel {
     blurSurface(this.actor);
     this.history = new ClipboardHistory(() => {
       this.dirty = true;
-      if (this.actor.visible) this.refresh();
+      if (this.actor.visible) this.refresh(true);
     });
     this.actor.add_child(this.scroll);
     const footer = new St.BoxLayout({ style_class: 'kestrel-clipboard-footer' });
@@ -73,7 +86,7 @@ export class ClipboardPanel {
     footer.add_child(clear);
     this.actor.add_child(footer);
     this.actor.connect('destroy', () => this.history.destroy());
-    localized(this.actor, () => (this.dirty = true));
+    localized(this.actor, () => (this.dirty = this.relabel = true));
   }
 
   get available(): boolean {
@@ -93,8 +106,8 @@ export class ClipboardPanel {
   }
 
   open(): void {
-    this.refresh();
-    this.list.get_first_child()!.grab_key_focus();
+    this.refresh(false);
+    this.focusFirst();
   }
 
   locate(): [number, number] {
@@ -123,45 +136,69 @@ export class ClipboardPanel {
     return Math.min(limit, list + footer + theme.get_length('spacing') + theme.get_vertical_padding());
   }
 
-  private refresh(): void {
+  private refresh(animate: boolean): void {
     if (!this.dirty) return;
     this.dirty = false;
-    const focused = this.rows.get(this.actor.get_stage()?.get_key_focus() as St.Button);
-    this.rows.clear();
-    this.list.destroy_all_children();
-    for (const entry of this.history.entries) this.list.add_child(this.row(entry));
-    if (focused) this.focus(focused);
+    const entries = this.history.entries;
+    const kept = new Set(entries.map(entryKey));
+    const resized = () => this.layoutChanged();
+    const focus = global.stage.get_key_focus();
+    let lostFocus = false;
+    for (const [key, { button }] of this.rows) {
+      if (kept.has(key)) continue;
+      lostFocus ||= button === focus;
+      if (animate) vanish(button, resized);
+      else button.destroy();
+      this.rows.delete(key);
+    }
+    const leapt = animate ? leapers(this.list, entries.flatMap(entry => this.rows.get(entryKey(entry))?.button ?? [])) : new Set<Clutter.Actor>();
+    moveRows(this.list, () => entries.reduce<Clutter.Actor | null>((previous, entry) => {
+      const key = entryKey(entry);
+      let row = this.rows.get(key);
+      const added = !row;
+      if (!row) {
+        row = this.row(entry);
+        this.rows.set(key, row);
+        this.list.add_child(row.button);
+      } else if (this.relabel || row.look !== looks(entry)) {
+        row.button.set(contentOf(entry));
+        row.look = looks(entry);
+      }
+      row.entry = entry;
+      if (leapt.has(row.button)) leap(row.button, this.list.width, resized);
+      placeAfter(this.list, row.button, previous);
+      if (animate && added) grow(row.button, this.list.width, resized);
+      return row.button;
+    }, null), 'y', leapt);
+    this.relabel = false;
+    if (lostFocus) this.focusFirst();
     if (this.actor.visible) this.layoutChanged();
   }
 
-  private focus(entry: ClipboardEntry): void {
-    const row = [...this.rows].find(([, candidate]) => candidate === entry)?.[0] ?? this.list.get_first_child();
-    row?.grab_key_focus();
+  private focusFirst(): void {
+    const [first] = this.history.entries;
+    if (first) this.rows.get(entryKey(first))!.button.grab_key_focus();
   }
 
-  private row(entry: ClipboardEntry): St.Button {
-    const row = new St.Button({
-      x_expand: true, can_focus: true, track_hover: true,
-      ...entry.kind === 'text' ? textContent(entry.text) : imageContent(entry.thumbnail),
-    });
-    row.connect('clicked', () => this.paste(entry));
-    row.connect('key-press-event', (_actor, event) => {
+  private row(entry: ClipboardEntry): Row {
+    const button = new St.Button({ x_expand: true, can_focus: true, track_hover: true, ...contentOf(entry) });
+    const row: Row = { button, entry, look: looks(entry) };
+    button.connect('clicked', () => this.paste(row.entry));
+    button.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
-      this.history.remove(entry);
-      this.list.get_first_child()?.grab_key_focus();
+      this.history.remove(row.entry);
       return Clutter.EVENT_STOP;
     });
-    row.connect('key-focus-in', () => {
-      const [, y] = row.get_transformed_position();
+    button.connect('key-focus-in', () => {
+      const [, y] = button.get_transformed_position();
       const [, top] = this.scroll.get_transformed_position();
       if (y < top) this.scroll.vadjustment.value += y - top;
-      else if (y + row.height > top + this.scroll.height) this.scroll.vadjustment.value += y + row.height - top - this.scroll.height;
+      else if (y + button.height > top + this.scroll.height) this.scroll.vadjustment.value += y + button.height - top - this.scroll.height;
     });
-    this.rows.set(row, entry);
-    this.menus.bind(row, () => [
-      { label: t('clipboard-paste'), run: () => this.paste(entry) },
-      { label: t('clipboard-copy'), run: () => { this.keep(entry); this.close(); } },
-      { label: t('clipboard-remove'), run: () => this.history.remove(entry) },
+    this.menus.bind(button, () => [
+      { label: t('clipboard-paste'), run: () => this.paste(row.entry) },
+      { label: t('clipboard-copy'), run: () => { this.keep(row.entry); this.close(); } },
+      { label: t('clipboard-remove'), run: () => this.history.remove(row.entry) },
     ]);
     return row;
   }

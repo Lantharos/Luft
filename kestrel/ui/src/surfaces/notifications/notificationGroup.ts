@@ -6,8 +6,8 @@ import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
-import { collapse, CollapseLayout, grow, vanish } from './collapseLayout.js';
-import { moveRows, placeAfter } from '../../shared/motion/rows.js';
+import { collapse, CollapseLayout, leap, reveal, vanish } from '../../shared/motion/collapse.js';
+import { leapers, moveRows, placeAfter } from '../../shared/motion/rows.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
 const COLLAPSED_COUNT = 2;
@@ -80,6 +80,7 @@ export class NotificationGroup {
     if (hidden <= 0) this.expanded = false;
     this.more.visible = hidden > 0;
     this.more.label = this.more.accessible_name = this.expanded ? t('notifications-show-less') : t('notifications-more', { count: hidden });
+    const leapt = animate ? leapers(this.list, notifications.flatMap(notification => this.cards.get(notification)?.actor ?? [])) : new Set<Clutter.Actor>();
     moveRows(this.list, () => notifications.reduce<Clutter.Actor | null>((previous, notification, index) => {
       let card = this.cards.get(notification);
       if (!card) {
@@ -89,12 +90,12 @@ export class NotificationGroup {
         this.list.add_child(card.actor);
       }
       card.refresh();
-      const appearing = !card.actor.visible && (this.expanded || index < COLLAPSED_COUNT);
-      card.actor.visible = this.expanded || index < COLLAPSED_COUNT;
       if (acknowledge) notification.acknowledged = true;
+      const shown = this.expanded || index < COLLAPSED_COUNT;
+      if (shown && leapt.has(card.actor)) leap(card.actor, this.list.width, this.resized);
       placeAfter(this.list, card.actor, previous);
-      if (appearing && animate) grow(card.actor, this.list.width, this.resized);
+      reveal(card.actor, shown, animate, this.list.width, this.resized);
       return card.actor;
-    }, null), 'y', true);
+    }, null), 'y', leapt);
   }
 }

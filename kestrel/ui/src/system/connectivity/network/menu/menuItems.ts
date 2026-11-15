@@ -6,6 +6,7 @@ import St from 'gi://St';
 
 import * as KestrelUi from '../../../../kestrelUi.js';
 import * as PopupMenu from '../../../../shared/popups/popupMenu.js';
+import { CollapseLayout } from '../../../../shared/motion/collapse.js';
 import { connectionName } from './nmUtils.js';
 
 export interface ConnectionSection {
@@ -78,6 +79,7 @@ export class NMSectionItem extends NMMenuItem {
     super({ activate: false, can_focus: false });
 
     this.style_class = '';
+    this.section.box.layout_manager = new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL });
     this.add_child(this.mainSection.actor);
 
     this.mainSection.addMenuItem(this.submenuItem);

@@ -4,6 +4,8 @@ import NM from 'gi://NM';
 import * as KestrelUi from '../../../../kestrelUi.js';
 import * as Main from '../../../../core/main.js';
 import * as PopupMenu from '../../../../shared/popups/popupMenu.js';
+import { arrange } from '../../../../shared/motion/arrange.js';
+import { vanish } from '../../../../shared/motion/collapse.js';
 import * as Util from '../../../../core/runtime/util.js';
 import { BroadbandModem } from '../modemManager.js';
 import { ItemSorter } from './itemSorter.js';
@@ -106,8 +108,8 @@ class NMDeviceItem extends NMSectionItem implements ConnectionSection {
   }
 
   private resortItem(item: NMDeviceConnectionItem): void {
-    const pos = this.itemSorter.upsert(item);
-    this.section.moveMenuItem(item, pos);
+    this.itemSorter.upsert(item);
+    this.sync();
   }
 
   private addConnection(connection: NM.RemoteConnection): void {
@@ -122,8 +124,9 @@ class NMDeviceItem extends NMSectionItem implements ConnectionSection {
     this.bind_property('icon-name', item, 'icon-name', GObject.BindingFlags.SYNC_CREATE);
     item.connectObject('notify::name', () => this.resortItem(item), this);
 
-    const pos = this.itemSorter.upsert(item);
-    this.section.addMenuItem(item, pos);
+    item.visible = false;
+    this.itemSorter.upsert(item);
+    this.section.addMenuItem(item);
     this.connectionItems.set(connection, item);
     this.sync();
   }
@@ -134,7 +137,7 @@ class NMDeviceItem extends NMSectionItem implements ConnectionSection {
 
     this.itemSorter.delete(item);
     this.connectionItems.delete(connection);
-    item.destroy();
+    vanish(item);
 
     this.sync();
   }
@@ -148,8 +151,11 @@ class NMDeviceItem extends NMSectionItem implements ConnectionSection {
     const nItems = this.connectionItems.size;
     this.radioMode = nItems > 1;
     this.use_submenu = this.radioMode && !this.singleDeviceMode;
-    this.autoConnectItem.visible = nItems === 0;
-    this.deactivateItem.visible = this.radioMode && this.is_active;
+    arrange(this.section.box, () => [
+      ...[...this.itemSorter].map(item => [item, true] as [PopupMenu.PopupBaseMenuItem, boolean]),
+      [this.autoConnectItem, this.connectionItems.size === 0],
+      [this.deactivateItem, this.radioMode && this.is_active],
+    ]);
   }
 }
 

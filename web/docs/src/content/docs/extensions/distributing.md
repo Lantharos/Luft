@@ -20,7 +20,7 @@ minimum = "1.2"
 
 Versions are ordered the way Luft releases them, every nightly before the release it leads to, so `1.2-nightly.21` comes after `1.1` and before `1.2`. Schelf only installs or updates to a release this Luft is new enough for, and Luft doesn't load one it isn't new enough for, wherever it came from.
 
-To have every release ask the store to run inside the desktop, add `inside = true` there too. Each release then asks for that review by itself once it passes its checks. Only a verified publisher's releases can ask, and the store's answer is still a person's decision for each one.
+To have every release ask the store to run inside the desktop, add `inside = true` there too. Each release then asks for that review by itself once it passes its checks. Only a verified publisher's releases can ask. A person approves the extension once; later releases that ask for no more access and come from the same workflow run inside on that approval, and one that asks for more is reviewed again.
 
 ```toml
 [luft]

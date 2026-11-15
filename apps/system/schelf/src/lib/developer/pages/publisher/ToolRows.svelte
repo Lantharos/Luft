@@ -1,22 +1,23 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
 	import CopyLine from '../../components/CopyLine.svelte';
 	import type { ProjectTool, ShortNameState } from '../../store';
 
 	const SHORT: Record<ShortNameState, string> = {
-		resolves: 'Installs by its short name too',
-		paused: 'Its short name works again once the publisher is verified',
-		free: 'Its short name is free to claim',
-		taken: 'Its short name belongs to another publisher',
-		reserved: 'Its short name is kept for the system'
+		resolves: 'developer-tools-short-resolves',
+		paused: 'developer-tools-short-paused',
+		free: 'developer-tools-short-free',
+		taken: 'developer-tools-short-taken',
+		reserved: 'developer-tools-short-reserved'
 	};
 
 	let { tool, description }: { tool: ProjectTool; description?: string } = $props();
 </script>
 
-<Row title={tool.name} description={description ?? `${tool.address} · ${SHORT[tool.short]}`}>
+<Row title={tool.name} description={description ?? t('developer-tools-facts', { address: tool.address, short: t(SHORT[tool.short]) })}>
 	{#snippet below()}
-		<CopyLine text={tool.install} label="Copy the install line" />
-		<CopyLine text={tool.add} label="Copy the schelf line" />
+		<CopyLine text={tool.install} label={t('developer-tools-copy-install')} />
+		<CopyLine text={tool.add} label={t('developer-tools-copy-schelf')} />
 	{/snippet}
 </Row>

@@ -1,8 +1,10 @@
+use luft_i18n::t;
 use luft_software::apps::{appimage, flatpak};
 use serde::Deserialize;
 use specta::Type;
 
 use super::Source;
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 pub struct Change {
@@ -21,6 +23,6 @@ pub async fn change(Change { id, source, on }: Change) -> Result<(), String> {
     match source {
         Source::AppImage => appimage::set_full_access(&id, on).await,
         Source::Flatpak => flatpak::set_full_access(&id, on).await,
-        _ => Err("Full access is for Flatpak apps and AppImages.".to_owned()),
+        _ => Err(t!(L10N, "core-full-access-kinds")),
     }
 }

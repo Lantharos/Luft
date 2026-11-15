@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import Description from '#lib/components/Description.svelte';
@@ -19,61 +20,61 @@
 	<Description html={`<p>${file.description.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`} />
 {/if}
 
-<Section title="Details">
+<Section title={t('file-details')}>
 	{#if install.publisher}
-		<Row title="Made by"><span class="max-w-[320px] truncate">{install.publisher}</span></Row>
+		<Row title={t('file-made-by')}><span class="max-w-[320px] truncate">{install.publisher}</span></Row>
 	{/if}
 	{#if file.kind === 'package' || file.kind === 'appImage' || file.kind === 'deb'}
 		{#if file.version}
-			<Row title="Version"><span>{file.version}</span></Row>
+			<Row title={t('file-version')}><span>{file.version}</span></Row>
 		{/if}
-		<Row title="Size"><span>{bytes(file.size)}</span></Row>
+		<Row title={t('file-size')}><span>{bytes(file.size)}</span></Row>
 	{/if}
 	{#if file.kind === 'package'}
-		<Row title="License"><span class="max-w-[320px] truncate">{file.license}</span></Row>
+		<Row title={t('file-license')}><span class="max-w-[320px] truncate">{file.license}</span></Row>
 	{/if}
 	{#if file.kind === 'flatpakRef' || file.kind === 'flatpakRepo'}
-		<Row title="Source" description={file.url}><span>{new URL(file.url).host}</span></Row>
+		<Row title={t('file-source')} description={file.url}><span>{new URL(file.url).host}</span></Row>
 	{/if}
 	{#if file.kind === 'flatpakBundle'}
-		<Row title="Size"><span>{bytes(file.size)}</span></Row>
+		<Row title={t('file-size')}><span>{bytes(file.size)}</span></Row>
 		{#if file.runtime}
-			<Row title="Needs" description="Installed from Flathub along with it."><span class="max-w-[320px] truncate">{file.runtime.split('/')[0]}</span></Row>
+			<Row title={t('file-needs')} description={t('file-needs-description')}><span class="max-w-[320px] truncate">{file.runtime.split('/')[0]}</span></Row>
 		{/if}
 		{#if file.origin}
-			<Row title="Updates from" description={file.origin}><span>{new URL(file.origin).host}</span></Row>
+			<Row title={t('file-updates-from')} description={file.origin}><span>{new URL(file.origin).host}</span></Row>
 		{:else}
-			<Row title="Updates" description="Install a newer file when one comes out." />
+			<Row title={t('file-updates')} description={t('file-updates-bundle')} />
 		{/if}
 	{/if}
 	{#if file.kind === 'deb'}
 		<Row
-			title="Installs to"
-			description="A separate space with Ubuntu's software that can read and change your files. The first one downloads Ubuntu, a few hundred megabytes."
+			title={t('file-installs-to')}
+			description={t('file-installs-to-ubuntu')}
 		/>
-		<Row title="Updates" description="From its maker's software source if it adds one. Otherwise, install a newer file." />
+		<Row title={t('file-updates')} description={t('file-updates-deb')} />
 	{/if}
 	{#if file.kind === 'appImage'}
-		<Row title="Installs to" description="Kept up to date when Schelf can."><span>Your account</span></Row>
+		<Row title={t('file-installs-to')} description={t('file-installs-to-appimage')}><span>{t('file-your-account')}</span></Row>
 	{:else if file.kind === 'package' && file.system}
-		<Row title="Installs to" description="For everyone on this computer, updated with Luft."><span>System</span></Row>
+		<Row title={t('file-installs-to')} description={t('file-installs-to-system')}><span>{t('file-system')}</span></Row>
 		{#if source && sourceName}
-			<Row title="Updates from" description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
+			<Row title={t('file-updates-from')} description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
 		{/if}
 	{:else if file.kind === 'package'}
-		<Row title="Installs to" description="For you only. Its commands run in Tern."><span>Your account</span></Row>
+		<Row title={t('file-installs-to')} description={t('file-installs-to-tool')}><span>{t('file-your-account')}</span></Row>
 	{/if}
-	<Row title="File" description={install.path} />
+	<Row title={t('file-file')} description={install.path} />
 </Section>
 
 {#if file.kind === 'package' && source}
 	<p class="px-2 text-[13px] text-[var(--text-muted)]">
-		{file.package} installs from {sourceName}, so it keeps getting updates. {source.added
-			? "It's one of your software sources already."
-			: 'Installing adds it to your software sources.'}
+		{t('file-source-updates', { name: file.package, source: sourceName ?? '' })}
+		{source.added ? t('file-source-added') : t('file-source-adds')}
 	</p>
 {:else if file.kind === 'package' && file.repositoryError}
 	<p class="px-2 text-[13px] text-[var(--text-muted)]">
-		It brings a software source Luft can't use, so it installs by itself and won't get updates. {file.repositoryError}
+		{t('file-source-unusable')}
+		{file.repositoryError}
 	</p>
 {/if}

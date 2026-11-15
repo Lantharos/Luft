@@ -6,6 +6,9 @@ use gio::glib::SpawnFlags;
 use gio::prelude::*;
 use gio_unix::DesktopAppInfo;
 use gio_unix::prelude::DesktopAppInfoExtManual;
+use luft_i18n::t;
+
+use crate::l10n::L10N;
 
 const SETTLE: Duration = Duration::from_secs(4);
 const OUTPUT_LINES: &str = "40";
@@ -40,7 +43,7 @@ pub fn start(info: &DesktopAppInfo, token: Option<&str>) -> Result<Started, Stri
         None::<BorrowedFd>,
     )
     .map_err(|error| error.to_string())?;
-    let pid = pid.ok_or("The app didn't start.")?;
+    let pid = pid.ok_or_else(|| t!(L10N, "desktop-not-started"))?;
     Ok(Started { pid, at })
 }
 

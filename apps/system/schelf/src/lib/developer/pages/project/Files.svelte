@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import CopyLine from '../../components/CopyLine.svelte';
 	import DomainRows from '../../components/DomainRows.svelte';
-	import { PLATFORM_NAMES } from '../../format';
+	import { list, platformName } from '../../format';
 	import { act } from '../../state/act';
 	import { reads } from '../../state/reads';
 	import type { Platform, Project } from '../../store';
@@ -13,16 +14,16 @@
 
 	const app = $derived(project.app);
 	const parts = $derived(Object.entries(app.parts));
-	const systems = (platforms: Platform[]) => [...new Set(platforms.map((platform) => PLATFORM_NAMES[platform]))].join(', ');
+	const systems = (platforms: Platform[]) => list([...new Set(platforms.map(platformName))]);
 
 	async function check() {
-		const checked = await act(commands.developerCheckProjectDomain({ id: app.id }), 'Checked the domain again');
+		const checked = await act(commands.developerCheckProjectDomain({ id: app.id }), t('developer-domain-checked-again'));
 		if (checked) reads.project(app.id).set(checked);
 	}
 </script>
 
 {#if project.tools.length}
-	<Section title="Command-line tools">
+	<Section title={t('developer-page-tools')}>
 		{#each project.tools as tool (tool.name)}
 			<ToolRows {tool} />
 		{/each}
@@ -30,37 +31,37 @@
 {/if}
 
 {#if parts.length}
-	<Section title="Parts">
+	<Section title={t('developer-files-parts')}>
 		{#each parts as [name, part] (name)}
-			<Row title={name} description="{part.files.join(', ')} · {systems(part.platforms)}" truncate>
-				{#if part.tool}<span>Installs {part.tool}</span>{/if}
+			<Row title={name} description={t('developer-files-part', { files: list(part.files), systems: systems(part.platforms) })} truncate>
+				{#if part.tool}<span>{t('developer-files-installs', { tool: part.tool })}</span>{/if}
 			</Row>
 		{/each}
 	</Section>
 {/if}
 
 {#if app.platforms}
-	<Section title="Systems">
+	<Section title={t('developer-files-systems')}>
 		<Row title={systems(app.platforms)} />
 	</Section>
 {/if}
 
-<Section title="Download links">
-	<Row title="Newest release">
-		{#snippet below()}<CopyLine text={project.links.latest} label="Copy the link" />{/snippet}
+<Section title={t('developer-files-links')}>
+	<Row title={t('developer-files-newest')}>
+		{#snippet below()}<CopyLine text={project.links.latest} label={t('developer-copy-link')} />{/snippet}
 	</Row>
-	<Row title="As JSON">
-		{#snippet below()}<CopyLine text={project.links.json} label="Copy the link" />{/snippet}
+	<Row title={t('developer-files-json')}>
+		{#snippet below()}<CopyLine text={project.links.json} label={t('developer-copy-link')} />{/snippet}
 	</Row>
 	{#each project.links.feeds as feed (feed.url)}
-		<Row title="Update feed{feed.part ? ` for ${feed.part}` : ''}">
-			{#snippet below()}<CopyLine text={feed.url} label="Copy the link" />{/snippet}
+		<Row title={feed.part ? t('developer-files-feed-part', { part: feed.part }) : t('developer-files-feed')}>
+			{#snippet below()}<CopyLine text={feed.url} label={t('developer-copy-link')} />{/snippet}
 		</Row>
 	{/each}
 </Section>
 
 {#if app.domain}
-	<Section title="Download domain">
+	<Section title={t('developer-page-domain')}>
 		<DomainRows domain={app.domain} oncheck={check} />
 	</Section>
 {/if}

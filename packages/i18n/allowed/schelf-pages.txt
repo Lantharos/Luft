@@ -1,0 +1,3 @@
+apps/system/schelf/src/lib/pages/installed/Installed.svelte	Flatpak
+apps/system/schelf/src/lib/pages/installed/Installed.svelte	AppImage
+apps/system/schelf/src/lib/pages/sources/Sources.svelte	docker

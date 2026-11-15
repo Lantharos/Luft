@@ -1,8 +1,11 @@
 use std::collections::BTreeMap;
 
+use luft_i18n::t;
 use luft_software::apps::appimage::Declaration;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+use crate::l10n::{L10N, list_of};
 
 /// What an app may use, in Luft's shared permission format. An app that
 /// declares nothing runs in the sandbox every AppImage gets, unless you give
@@ -166,49 +169,62 @@ impl ExtensionAccess {
 }
 
 /// A permission of the extension API in the words Settings uses.
-pub fn permission_title(permission: &str) -> &str {
+pub fn permission_title(permission: &str) -> String {
     match permission {
-        "wallpaper" => "Draw over the wallpaper",
-        "quick-settings" => "Add tiles to quick settings",
-        "taskbar" => "Add buttons to the taskbar",
-        "search" => "Add results to search",
-        "notifications" => "Send notifications",
-        "weather" => "See the weather where you are",
-        "location" => "See roughly where you are",
-        "media" => "See and control what's playing",
-        "popups" => "Show panels and small windows",
-        "typing" => "Type into other apps",
-        "sounds" => "Play sounds",
-        "audio-levels" => "Follow the beat of what's playing",
-        "calls" => "Know when you're in a call",
-        "locked-sounds" => "Keep playing sounds while the screen is locked",
-        "input-sounds" => "Play a sound when you type and click, without seeing your keys",
-        "do-not-disturb" => "Hold back notifications for a while",
-        "screen-effects" => "Draw over and change how your windows and the whole screen look",
-        "clipboard" => "Copy to your clipboard",
-        "file-actions" => "Add to the menu of files and folders in Rover",
-        other => other,
+        "wallpaper" => t!(L10N, "core-access-wallpaper"),
+        "quick-settings" => t!(L10N, "core-access-quick-settings"),
+        "taskbar" => t!(L10N, "core-access-taskbar"),
+        "search" => t!(L10N, "core-access-search"),
+        "notifications" => t!(L10N, "core-access-notifications"),
+        "weather" => t!(L10N, "core-access-weather"),
+        "location" => t!(L10N, "core-access-location"),
+        "media" => t!(L10N, "core-access-media"),
+        "popups" => t!(L10N, "core-access-popups"),
+        "typing" => t!(L10N, "core-access-typing"),
+        "sounds" => t!(L10N, "core-access-sounds"),
+        "audio-levels" => t!(L10N, "core-access-audio-levels"),
+        "calls" => t!(L10N, "core-access-calls"),
+        "locked-sounds" => t!(L10N, "core-access-locked-sounds"),
+        "input-sounds" => t!(L10N, "core-access-input-sounds"),
+        "do-not-disturb" => t!(L10N, "core-access-do-not-disturb"),
+        "screen-effects" => t!(L10N, "core-access-screen-effects"),
+        "clipboard" => t!(L10N, "core-access-clipboard"),
+        "file-actions" => t!(L10N, "core-access-file-actions"),
+        other => other.to_owned(),
+    }
+}
+
+fn permission_needs(permission: &str) -> String {
+    match permission {
+        "wallpaper" => t!(L10N, "core-access-wallpaper-needs"),
+        "quick-settings" => t!(L10N, "core-access-quick-settings-needs"),
+        "taskbar" => t!(L10N, "core-access-taskbar-needs"),
+        "search" => t!(L10N, "core-access-search-needs"),
+        "notifications" => t!(L10N, "core-access-notifications-needs"),
+        "weather" => t!(L10N, "core-access-weather-needs"),
+        "location" => t!(L10N, "core-access-location-needs"),
+        "media" => t!(L10N, "core-access-media-needs"),
+        "popups" => t!(L10N, "core-access-popups-needs"),
+        "typing" => t!(L10N, "core-access-typing-needs"),
+        "sounds" => t!(L10N, "core-access-sounds-needs"),
+        "audio-levels" => t!(L10N, "core-access-audio-levels-needs"),
+        "calls" => t!(L10N, "core-access-calls-needs"),
+        "locked-sounds" => t!(L10N, "core-access-locked-sounds-needs"),
+        "input-sounds" => t!(L10N, "core-access-input-sounds-needs"),
+        "do-not-disturb" => t!(L10N, "core-access-do-not-disturb-needs"),
+        "screen-effects" => t!(L10N, "core-access-screen-effects-needs"),
+        "clipboard" => t!(L10N, "core-access-clipboard-needs"),
+        "file-actions" => t!(L10N, "core-access-file-actions-needs"),
+        "listen" => t!(L10N, "core-access-listen-needs"),
+        other => other.to_owned(),
     }
 }
 
 /// The parts of the extension API a sandbox leaves out, `parts`, as what an
 /// extension couldn't do there.
 pub fn sandbox_lacks(parts: &[String]) -> String {
-    let phrases: Vec<String> = parts
-        .iter()
-        .map(|part| match part.as_str() {
-            "listen" => "take connections from devices on your network".to_owned(),
-            permission => {
-                let title = permission_title(permission);
-                title[..1].to_lowercase() + &title[1..]
-            }
-        })
-        .collect();
-    match phrases.split_last() {
-        Some((last, [])) => last.clone(),
-        Some((last, rest)) => format!("{} and {last}", rest.join(", ")),
-        None => String::new(),
-    }
+    let phrases: Vec<String> = parts.iter().map(|part| permission_needs(part)).collect();
+    list_of(&phrases)
 }
 
 #[cfg(test)]

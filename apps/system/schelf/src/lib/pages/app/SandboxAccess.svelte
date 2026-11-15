@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, errorText, Row, Switch } from '@luft/ui';
 	import { commands, type InstalledApp, type Permissions, type Switch as SandboxSwitch } from '#lib/bindings.js';
 	import { SLOW } from '#lib/bridge/index.js';
@@ -47,27 +48,24 @@
 	}
 </script>
 
-<Row title="Change what it can use" description="Microphone, camera, Downloads and X11. More in Settings, under Apps.">
-	<button type="button" class="button" onclick={() => (open = true)}>Change</button>
+<Row title={t('app-sandbox-change-title')} description={t('app-sandbox-change-description')}>
+	<button type="button" class="button" onclick={() => (open = true)}>{t('app-sandbox-change')}</button>
 </Row>
 
 {#if open}
-	<Dialog title="What {app.name} can use" wide onclose={() => (open = false)}>
+	<Dialog title={t('app-sandbox-title', { name: app.name })} wide onclose={() => (open = false)}>
 		<div class="flex flex-col">
-			<Row title="Microphone" description="Records the microphone and what this computer plays. Applies right away.">
-				<Switch label="Microphone" checked={microphone} disabled={busy} onchange={(on) => change('microphone', on)} />
+			<Row title={t('app-sandbox-microphone')} description={t('app-sandbox-microphone-description')}>
+				<Switch label={t('app-sandbox-microphone')} checked={microphone} disabled={busy} onchange={(on) => change('microphone', on)} />
 			</Row>
-			<Row title="Camera" description="Some apps only find it the next time they open.">
-				<Switch label="Camera" checked={camera} disabled={busy} onchange={(on) => change('camera', on)} />
+			<Row title={t('app-sandbox-camera')} description={t('app-sandbox-camera-description')}>
+				<Switch label={t('app-sandbox-camera')} checked={camera} disabled={busy} onchange={(on) => change('camera', on)} />
 			</Row>
-			<Row title="Downloads folder" description="It can read and change the files there, from the next time it opens. Files you pick always reach it.">
-				<Switch label="Downloads folder" checked={downloads} disabled={busy} onchange={(on) => change('downloads', on)} />
+			<Row title={t('app-sandbox-downloads')} description={t('app-sandbox-downloads-description')}>
+				<Switch label={t('app-sandbox-downloads')} checked={downloads} disabled={busy} onchange={(on) => change('downloads', on)} />
 			</Row>
-			<Row
-				title="Older way of showing windows"
-				description="For older apps that need X11, where apps can see each other’s windows and typing. Applies the next time it opens."
-			>
-				<Switch label="Older way of showing windows" checked={x11} disabled={busy} onchange={(on) => change('x11', on)} />
+			<Row title={t('app-sandbox-x11')} description={t('app-sandbox-x11-description')}>
+				<Switch label={t('app-sandbox-x11')} checked={x11} disabled={busy} onchange={(on) => change('x11', on)} />
 			</Row>
 			{#if problem}
 				<p class="px-4 pt-2 text-[13px] text-[var(--danger)]">{problem}</p>
@@ -76,9 +74,9 @@
 		{#snippet actions()}
 			{#if running && app.desktop}
 				{@const desktop = app.desktop}
-				<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>Restart {app.name}</button>
+				<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>{t('app-restart-named', { name: app.name })}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={() => (open = false)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (open = false)}>{t('app-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

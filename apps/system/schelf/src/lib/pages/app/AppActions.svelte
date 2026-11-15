@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { CatalogApp, InstalledApp, Job, Permissions, StoreDetails } from '#lib/bindings.js';
 	import type { Access } from '#lib/app/permissions.js';
 	import { broadAccess } from '#lib/catalog/flathub.js';
@@ -74,30 +75,28 @@
 		{#if active}
 			<ProgressButton operation={active} large />
 		{:else if installed}
-			<button type="button" class="button large" onclick={() => (removing = true)}>Remove</button>
+			<button type="button" class="button large" onclick={() => (removing = true)}>{t('app-remove')}</button>
 			{#if update && !pulled}
-				<button type="button" class="button large" onclick={updateNow}>Update</button>
+				<button type="button" class="button large" onclick={updateNow}>{t('app-update')}</button>
 			{/if}
 			{#if installed.desktop && !pulled}
-				<button type="button" class="button primary large" onclick={() => opening.open(installed)}>Open</button>
+				<button type="button" class="button primary large" onclick={() => opening.open(installed)}>{t('app-open')}</button>
 			{/if}
 		{:else if listing && (listing.origin !== 'schelf' || store?.installer)}
-			<button type="button" class="button primary large" onclick={install}>Install</button>
+			<button type="button" class="button primary large" onclick={install}>{t('app-install')}</button>
 		{:else if store?.needsLuft}
-			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">Needs Luft {store.needsLuft} or newer. Update Luft in Settings to install it.</p>
+			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">{t('app-needs-luft', { version: store.needsLuft })}</p>
 		{:else if store?.needsReview.length}
-			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">
-				Can be installed once schelf.store approves it to run inside Luft, which it needs to {sandboxLacks(store.needsReview)}.
-			</p>
+			<p class="max-w-[320px] text-right text-[13px] text-[var(--text-muted)]">{t('app-needs-review', { needs: sandboxLacks(store.needsReview) })}</p>
 		{:else if store?.download}
 			{@const file = store.download}
-			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>Download</button>
+			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>{t('app-download')}</button>
 		{/if}
 	</div>
 	{#if installed && store?.needsLuft && !active}
-		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">Its newest version needs Luft {store.needsLuft} or newer.</p>
+		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">{t('app-newest-needs-luft', { version: store.needsLuft })}</p>
 	{:else if store?.luft && !active}
-		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">Runs on Luft {store.luft} and newer</p>
+		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--text-muted)]">{t('app-runs-on-luft', { version: store.luft })}</p>
 	{/if}
 	{#if active && transferred(active)}
 		<p class="text-[12.5px] text-[var(--text-muted)] tabular-nums">{transferred(active)}</p>

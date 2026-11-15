@@ -1,4 +1,7 @@
+use luft_i18n::t;
+
 use super::sources::Origin;
+use crate::l10n::L10N;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Command {
@@ -53,83 +56,35 @@ impl Command {
         }
     }
 
-    pub fn usage(self) -> &'static str {
+    pub fn syntax(self) -> &'static str {
         match self {
-            Self::Install => {
-                "install NAME|FILE...  [--store|--flathub|--fedora|--system] [-y]\n\n\
-                 Installs apps, extensions and command-line tools from schelf.store, a\n\
-                 tool also by its address, such as alice/notes, apps from Flathub and\n\
-                 Fedora, and command-line tools from Fedora into your account, or a .rpm,\n\
-                 .AppImage, .flatpakref or .flatpakrepo file. A name schelf.store has comes\n\
-                 from there, then from Flathub, then from Fedora; when that still leaves a\n\
-                 choice, such as an app and a tool of the same name on schelf.store,\n\
-                 Schelf asks. Apps from schelf.store show what they can use first, and\n\
-                 tools who publishes them.\n\
-                 You can write add instead of install.\n\n\
-                 Fedora packages that bring a service or driver, such as Tailscale, Docker or\n\
-                 libvirt, go into the system itself, where they start with the computer and\n\
-                 are rebuilt with every update of Luft. --system puts any Fedora package\n\
-                 there; --fedora keeps a command-line tool in your toolbox."
-            }
-            Self::Remove => {
-                "remove NAME...  [--store|--flathub|--fedora|--appimage|--system] [-y]\n\n\
-                 Removes apps, extensions, AppImages and command-line tools you installed, and system\n\
-                 packages with everything they added."
-            }
-            Self::Search => {
-                "search QUERY  [--store|--flathub|--fedora]\n\n\
-                 Looks for apps and extensions on schelf.store, apps on Flathub and Fedora,\n\
-                 command-line tools from Fedora, and through the AppImages you have."
-            }
-            Self::Update => {
-                "update [NAME...]  [--store|--flathub|--fedora|--appimage]\n\n\
-                 Updates apps, AppImages and command-line tools. Luft itself updates in\n\
-                 Settings, under Updates."
-            }
-            Self::List => {
-                "list  [--store|--flathub|--fedora|--appimage|--system]\n\n\
-                 Shows what you installed, by where it came from, and the system packages."
-            }
-            Self::Info => {
-                "info NAME  [--store|--flathub|--fedora|--appimage]\n\n\
-                 Shows the details of an app or command-line tool, from every source\n\
-                 that has it."
-            }
-            Self::Trust => {
-                "trust NAME...  [-y]\n\n\
-                 Gives Flatpak apps full access: they can see and change all your files,\n\
-                 read the clipboard in the background, control other apps' windows and\n\
-                 act like apps installed on the system. Only do this for apps you trust.\n\
-                 It asks for an administrator's password and takes effect the next time\n\
-                 the app opens."
-            }
-            Self::Untrust => {
-                "untrust NAME...\n\n\
-                 Takes full access away again and puts apps back in their sandbox."
-            }
-            Self::Give => {
-                "give NAME [DRIVE|FOLDER]  [--read-only]\n\n\
-                 Lets a Flatpak app or an AppImage use one drive or folder from the next\n\
-                 time it opens, without giving it full access. Name a drive as Schelf\n\
-                 shows it, such as Games, or by where it's mounted. A drive goes by the\n\
-                 drive itself, so another one with the same name doesn't get it. Without\n\
-                 a drive or folder, shows what the app has and the drives you can give it."
-            }
-            Self::Take => {
-                "take NAME DRIVE|FOLDER\n\n\
-                 Takes a drive or folder away from an app again, from the next time it opens."
-            }
-            Self::Repo => {
-                "repo add SOURCE  [-y]\n\
-                 \x20      repo remove NAME  [-y]\n\
-                 \x20      repo list\n\n\
-                 Adds a software source for system packages, such as a vendor's RPM\n\
-                 repository: the address of its .repo file, a COPR project as\n\
-                 copr:owner/project, or one Schelf knows by name: 1password, docker,\n\
-                 google-chrome or vscode. Schelf shows the key its packages\n\
-                 are signed with and asks before adding it. Packages from it then install\n\
-                 with --system and update with Luft. Removing a source removes its packages."
-            }
+            Self::Install => "install NAME|FILE...  [--store|--flathub|--fedora|--system] [-y]",
+            Self::Remove => "remove NAME...  [--store|--flathub|--fedora|--appimage|--system] [-y]",
+            Self::Search => "search QUERY  [--store|--flathub|--fedora]",
+            Self::Update => "update [NAME...]  [--store|--flathub|--fedora|--appimage]",
+            Self::List => "list  [--store|--flathub|--fedora|--appimage|--system]",
+            Self::Info => "info NAME  [--store|--flathub|--fedora|--appimage]",
+            Self::Trust => "trust NAME...  [-y]",
+            Self::Untrust => "untrust NAME...",
+            Self::Give => "give NAME [DRIVE|FOLDER]  [--read-only]",
+            Self::Take => "take NAME DRIVE|FOLDER",
+            Self::Repo => "repo add SOURCE  [-y]\n       repo remove NAME  [-y]\n       repo list",
+        }
+    }
+
+    pub fn about(self) -> String {
+        match self {
+            Self::Install => t!(L10N, "cli-usage-install"),
+            Self::Remove => t!(L10N, "cli-usage-remove"),
+            Self::Search => t!(L10N, "cli-usage-search"),
+            Self::Update => t!(L10N, "cli-usage-update"),
+            Self::List => t!(L10N, "cli-usage-list"),
+            Self::Info => t!(L10N, "cli-usage-info"),
+            Self::Trust => t!(L10N, "cli-usage-trust"),
+            Self::Untrust => t!(L10N, "cli-usage-untrust"),
+            Self::Give => t!(L10N, "cli-usage-give"),
+            Self::Take => t!(L10N, "cli-usage-take"),
+            Self::Repo => t!(L10N, "cli-usage-repo"),
         }
     }
 }
@@ -152,9 +107,11 @@ pub fn recognised(first: &str) -> bool {
 }
 
 pub fn parse(arguments: &[String]) -> Result<Request, String> {
-    let (first, rest) = arguments.split_first().ok_or("No command given.")?;
-    let command =
-        Command::named(first).ok_or_else(|| format!("There's no command called {first}."))?;
+    let (first, rest) = arguments
+        .split_first()
+        .ok_or_else(|| t!(L10N, "cli-usage-no-command"))?;
+    let command = Command::named(first)
+        .ok_or_else(|| t!(L10N, "cli-usage-unknown-command", command = first.as_str()))?;
     let mut parsed = Arguments {
         command,
         words: Vec::new(),
@@ -173,9 +130,16 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
                 let origin = Origin::ALL
                     .into_iter()
                     .find(|origin| option.strip_prefix("--") == Some(origin.flag()))
-                    .ok_or_else(|| format!("{} doesn't know {option}.", command.word()))?;
+                    .ok_or_else(|| {
+                        t!(
+                            L10N,
+                            "cli-usage-unknown-option",
+                            command = command.word(),
+                            option = option
+                        )
+                    })?;
                 if parsed.only.is_some_and(|only| only != origin) {
-                    return Err("Choose one source at a time.".into());
+                    return Err(t!(L10N, "cli-usage-one-source"));
                 }
                 parsed.only = Some(origin);
             }
@@ -195,19 +159,24 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
             | Command::Repo
     );
     if needs_words && parsed.words.is_empty() {
-        return Err(format!("{} needs a name.", command.word()));
+        return Err(t!(L10N, "cli-usage-needs-name", command = command.word()));
     }
     if command == Command::Take && parsed.words.len() < 2 {
-        return Err("take needs an app and the drive or folder to take from it.".into());
+        return Err(t!(L10N, "cli-usage-take-needs-place"));
     }
     if command == Command::List && !parsed.words.is_empty() {
-        return Err("list doesn't take names.".into());
+        return Err(t!(L10N, "cli-usage-list-takes-no-names"));
     }
     Ok(Request::Run(parsed))
 }
 
 pub fn usage(program: &str, command: Command) -> String {
-    format!("Usage: {program} {}\n", command.usage())
+    let usage = format!("{program} {}", command.syntax());
+    format!(
+        "{}\n\n{}\n",
+        t!(L10N, "cli-usage", usage = usage),
+        command.about()
+    )
 }
 
 #[cfg(test)]

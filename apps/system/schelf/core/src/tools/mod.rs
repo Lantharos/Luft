@@ -9,12 +9,14 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+use luft_i18n::t;
 use luft_software::http::MISSING;
 use luft_software::progress::Stage;
 use luft_software::task::Task;
 use schelf_publish::tools::{self as names, File, Handle, Release, STORE_TOOL, ToolIndex};
 
 use crate::host;
+use crate::l10n::L10N;
 use crate::store::install::download::{self, Published};
 use crate::store::revocations::{self, Severity};
 use crate::store::signed::{self, Age};
@@ -114,20 +116,23 @@ fn is_schelf(tool: &ToolIndex) -> bool {
 pub fn refused(tool: &Tool) -> Option<String> {
     let name = &tool.index.name;
     if is_schelf(&tool.index) && host::luft() {
-        return Some("Luft comes with schelf, and updates it with the system.".to_owned());
+        return Some(t!(L10N, "core-tool-comes-with-luft"));
     }
     let place = folder().join(name);
     let ours = get(name).is_some_and(|installed| installed.address == tool.index.address);
     if place.exists() && !ours {
-        return Some(format!(
-            "{} is there already, and Schelf didn't put it there.",
-            place.display()
+        return Some(t!(
+            L10N,
+            "core-tool-taken",
+            path = place.display().to_string()
         ));
     }
     tool.offer().is_none().then(|| {
-        format!(
-            "{} has no {} version for this computer.",
-            tool.index.address, tool.channel
+        t!(
+            L10N,
+            "core-tool-no-channel",
+            tool = tool.index.address.as_str(),
+            channel = tool.channel.as_str()
         )
     })
 }
@@ -135,11 +140,12 @@ pub fn refused(tool: &Tool) -> Option<String> {
 fn pulled(tool: &ToolIndex, release: &Release) -> Result<(), String> {
     let list = revocations::refresh().or_else(|error| revocations::current().ok_or(error))?;
     match list.block(&tool.project.id, Some(&release.version)) {
-        Some(block) if block.action == Severity::Block => Err(format!(
-            "schelf.store pulled {} {}: {}",
-            tool.address,
-            release.version,
-            block.note.unwrap_or(block.reason)
+        Some(block) if block.action == Severity::Block => Err(t!(
+            L10N,
+            "core-tool-pulled",
+            tool = tool.address.as_str(),
+            version = release.version.as_str(),
+            reason = block.note.unwrap_or(block.reason)
         )),
         _ => Ok(()),
     }
@@ -185,13 +191,13 @@ impl Fetched {
 /// it now, to install or update it.
 pub fn fetch(address: &str, channel: &str, reason: &str, task: Task) -> Result<Fetched, String> {
     task.progress(Stage::Preparing, None);
-    let tool = find(address, channel)?.ok_or("schelf.store doesn't have it any more.")?;
+    let tool = find(address, channel)?.ok_or_else(|| t!(L10N, "core-tool-gone"))?;
     if let Some(refusal) = refused(&tool) {
         return Err(refusal);
     }
     let (release, file) = tool
         .offer()
-        .ok_or("There's no version of it for this computer.")?;
+        .ok_or_else(|| t!(L10N, "core-tool-no-version"))?;
     pulled(&tool.index, release)?;
     let download = download::published_file(
         &format!("tool-{}", tool.index.name),
@@ -242,7 +248,7 @@ fn place(
 }
 
 pub fn remove(name: &str) -> Result<(), String> {
-    let tool = get(name).ok_or("It isn't installed any more.")?;
+    let tool = get(name).ok_or_else(|| t!(L10N, "core-not-installed"))?;
     match fs::remove_file(&tool.path) {
         Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
             return Err(error.to_string());
@@ -283,7 +289,7 @@ pub fn updates() -> Result<Vec<ToolUpdate>, String> {
 
 /// Downloads the newest release of the installed tool `name`.
 pub fn fetch_update(name: &str, task: Task) -> Result<Fetched, String> {
-    let installed = get(name).ok_or("It isn't installed any more.")?;
+    let installed = get(name).ok_or_else(|| t!(L10N, "core-not-installed"))?;
     fetch(&installed.address, &installed.channel, "update", task)
 }
 

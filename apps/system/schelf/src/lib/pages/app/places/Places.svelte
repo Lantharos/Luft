@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, errorText, Row } from '@luft/ui';
 	import { commands, type GivenDrive, type InstalledApp, type Places, type PluggedDrive } from '#lib/bindings.js';
 	import { SLOW } from '#lib/bridge/index.js';
@@ -13,10 +14,10 @@
 	let problem = $state('');
 	let running = $state(false);
 
-	const driveName = (drive: GivenDrive | PluggedDrive) => drive.label || `${bytes(drive.size)} drive`;
+	const driveName = (drive: GivenDrive | PluggedDrive) => drive.label || t('app-places-drive-unnamed', { size: bytes(drive.size) });
 	const summary = $derived(
 		[...places.drives.map(driveName), ...places.folders.map((folder) => folder.path.split('/').pop() || folder.path)].join(', ') ||
-			'A drive or a folder, without full access.'
+			t('app-places-none')
 	);
 
 	function read() {
@@ -49,44 +50,44 @@
 	}
 </script>
 
-<Row title="Drives and folders" description={summary}>
-	<button type="button" class="button" onclick={() => (open = true)}>Change</button>
+<Row title={t('app-places')} description={summary}>
+	<button type="button" class="button" onclick={() => (open = true)}>{t('app-sandbox-change')}</button>
 </Row>
 
 {#if open}
-	<Dialog title="Drives and folders {app.name} can use" wide onclose={() => (open = false)}>
+	<Dialog title={t('app-places-title', { name: app.name })} wide onclose={() => (open = false)}>
 		<div class="flex flex-col">
-			<Row title="Drives" description="It can use everything on these drives, from the next time it opens.">
-				<button type="button" class="button" disabled={busy} onclick={() => (giving = true)}>Give a drive</button>
+			<Row title={t('app-places-drives')} description={t('app-places-drives-description')}>
+				<button type="button" class="button" disabled={busy} onclick={() => (giving = true)}>{t('app-places-give-drive')}</button>
 			</Row>
 			{#each places.drives as drive (`${drive.uuid} ${drive.drive}`)}
-				<Row title={driveName(drive)} description={!drive.pluggedIn ? 'Not plugged in' : drive.readOnly ? 'Read only' : undefined} truncate>
+				<Row title={driveName(drive)} description={!drive.pluggedIn ? t('app-places-unplugged') : drive.readOnly ? t('app-places-read-only') : undefined} truncate>
 					<button
 						type="button"
 						class="button"
-						aria-label="Stop sharing {driveName(drive)}"
+						aria-label={t('app-places-stop-sharing', { place: driveName(drive) })}
 						disabled={busy}
 						onclick={() => change(() => commands.libraryTakeDrive({ app: app.id, uuid: drive.uuid, drive: drive.drive }, SLOW))}
 					>
-						Remove
+						{t('app-places-remove')}
 					</button>
 				</Row>
 			{/each}
-			<Row title="Folders" description="It can read and change everything in these folders, from the next time it opens.">
+			<Row title={t('app-places-folders')} description={t('app-places-folders-description')}>
 				<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryAddFolder({ id: app.id }, SLOW))}>
-					Add folder
+					{t('app-places-add-folder')}
 				</button>
 			</Row>
 			{#each places.folders as folder (folder.path)}
-				<Row title={folder.path} description={folder.readOnly ? 'Read only' : undefined} truncate>
+				<Row title={folder.path} description={folder.readOnly ? t('app-places-read-only') : undefined} truncate>
 					<button
 						type="button"
 						class="button"
-						aria-label="Stop sharing {folder.path}"
+						aria-label={t('app-places-stop-sharing', { place: folder.path })}
 						disabled={busy}
 						onclick={() => change(() => commands.libraryRemoveFolder({ id: app.id, folder: folder.path }, SLOW))}
 					>
-						Remove
+						{t('app-places-remove')}
 					</button>
 				</Row>
 			{/each}
@@ -97,9 +98,9 @@
 		{#snippet actions()}
 			{#if running && app.desktop}
 				{@const desktop = app.desktop}
-				<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>Restart {app.name}</button>
+				<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>{t('app-restart-named', { name: app.name })}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={() => (open = false)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (open = false)}>{t('app-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

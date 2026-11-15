@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { channelName } from '#lib/account/channels.js';
 	import { openUrl } from '#lib/bridge/index.js';
@@ -15,57 +16,58 @@
 	const latest = $derived(list[0] ?? null);
 	const repository = $derived(app.repository);
 
-	const PRIVACY = {
-		telemetry: { none: 'No usage data', 'opt-in': 'Usage data if people turn it on', 'opt-out': 'Usage data unless people turn it off' },
-		ai: { none: 'no AI features', 'on-device': 'AI on the computer', online: 'online AI features' }
-	} as const;
-
 	function show(release: ReleaseSummary) {
 		navigation.push({ page: 'release', id: app.id, release: release.id, version: release.version });
 	}
 </script>
 
 {#if latest}
-	<Section title="Latest release">
-		<Row title="{latest.version} on {channelName(latest.channel)}" description="Published {day(latest.created_at)}" onclick={() => show(latest)}>
+	<Section title={t('developer-overview-latest')}>
+		<Row title={t('developer-overview-latest-on', { version: latest.version, channel: channelName(latest.channel) })} description={t('developer-overview-published', { date: day(latest.created_at) })} onclick={() => show(latest)}>
 			<Status status={latest.status} />
 		</Row>
 	</Section>
 {/if}
 
-<Section title="On each channel">
+<Section title={t('developer-overview-each-channel')}>
 	{#each project.channels as channel (channel.name)}
 		{@const live = liveOn(list, channel.name)}
 		{#if live}
-			<Row title={channelName(channel.name)} description="{live.version} · {rolloutText(live)}" onclick={() => show(live)}>
-				{#if channel.invite_only}<span>Invite only</span>{/if}
+			<Row title={channelName(channel.name)} description={t('developer-overview-channel-live', { version: live.version, rollout: rolloutText(live) })} onclick={() => show(live)}>
+				{#if channel.invite_only}<span>{t('developer-invite-only')}</span>{/if}
 			</Row>
 		{:else}
-			<Row title={channelName(channel.name)} description={channel.ended_into ? `Ended, its people moved to ${channelName(channel.ended_into)}` : 'Nothing reached anyone yet'} />
+			<Row title={channelName(channel.name)} description={channel.ended_into ? t('developer-overview-channel-ended', { channel: channelName(channel.ended_into) }) : t('developer-overview-channel-empty')} />
 		{/if}
 	{/each}
 </Section>
 
-<Section title="Project">
-	<Row title="Installs this week"><span class="tabular-nums">{count(app.installs_7d)}</span></Row>
-	<Row title="Page" description={project.links.page} truncate>
-		<button type="button" class="button" onclick={() => openUrl(project.links.page)}>Open</button>
+<Section title={t('developer-overview-project')}>
+	<Row title={t('developer-overview-installs-week')}><span class="tabular-nums">{count(app.installs_7d)}</span></Row>
+	<Row title={t('developer-overview-page')} description={project.links.page} truncate>
+		<button type="button" class="button" onclick={() => openUrl(project.links.page)}>{t('developer-overview-open')}</button>
 	</Row>
-	<Row title="Visibility">
-		<span>{app.visibility === 'listed' ? 'Listed' : 'Unlisted'}</span>
+	<Row title={t('developer-overview-visibility')}>
+		<span>{t(app.visibility === 'listed' ? 'developer-overview-listed' : 'developer-overview-unlisted')}</span>
 	</Row>
 	{#if repository}
-		<Row title="Source" description={repository}>
-			<button type="button" class="button" onclick={() => openUrl(`https://github.com/${repository}`)}>Visit</button>
+		<Row title={t('developer-overview-source')} description={repository}>
+			<button type="button" class="button" onclick={() => openUrl(`https://github.com/${repository}`)}>{t('developer-overview-visit')}</button>
 		</Row>
 	{/if}
 	{#each project.trusted_publishers as trusted (trusted.id)}
-		<Row title="Publishes from" description="{trusted.repository}, {trusted.workflow}{trusted.environment ? `, ${trusted.environment}` : ''}" truncate />
+		<Row
+			title={t('developer-overview-publishes-from')}
+			description={trusted.environment
+				? t('developer-overview-workflow-environment', { repository: trusted.repository, workflow: trusted.workflow, environment: trusted.environment })
+				: t('developer-overview-workflow', { repository: trusted.repository, workflow: trusted.workflow })}
+			truncate
+		/>
 	{/each}
 	{#if app.licence}
-		<Row title="Licence"><span>{app.licence}</span></Row>
+		<Row title={t('developer-overview-licence')}><span>{app.licence}</span></Row>
 	{/if}
 	{#if app.privacy}
-		<Row title="Privacy" description="{PRIVACY.telemetry[app.privacy.telemetry]}, {app.privacy.ads ? 'shows ads' : 'no ads'}, {PRIVACY.ai[app.privacy.ai]}" />
+		<Row title={t('developer-overview-privacy')} description={t('developer-overview-privacy-facts', { telemetry: app.privacy.telemetry, ads: app.privacy.ads ? 'yes' : 'no', ai: app.privacy.ai })} />
 	{/if}
 </Section>

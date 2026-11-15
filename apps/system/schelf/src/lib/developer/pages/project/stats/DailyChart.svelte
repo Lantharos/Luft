@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { count, shortCount } from '../../../format';
+	import { t } from '@luft/i18n';
+	import { chartDay, count, shortCount } from '../../../format';
 	import { niceMax, path, ticks, type Day } from './scale';
 
-	let { days, installs }: { days: Day[]; installs: string } = $props();
+	let { days, downloads }: { days: Day[]; downloads: boolean } = $props();
 
 	const SERIES = [
 		{ key: 'installs', color: 'var(--text)' },
@@ -12,7 +13,6 @@
 	const TIP_WIDTH = 160;
 	const TIP_GAP = 12;
 	const PAD = { top: 12, right: 8, bottom: 26, left: 40 };
-	const label = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
 	let width = $state(640);
 	let active = $state<number | null>(null);
@@ -22,10 +22,9 @@
 	const max = $derived(niceMax(Math.max(0, ...days.flatMap((day) => [day.installs, day.updates]))));
 	const x = (index: number) => PAD.left + (days.length > 1 ? (index / (days.length - 1)) * plotWidth : plotWidth / 2);
 	const y = (value: number) => PAD.top + plotHeight - (value / max) * plotHeight;
-	const dayLabel = (day: string) => label.format(new Date(`${day}T00:00:00Z`));
 	const xTicks = $derived(days.length ? [...new Set([0, Math.floor((days.length - 1) / 2), days.length - 1])] : []);
 	const point = $derived(active === null ? null : days[active]);
-	const names = $derived({ installs, updates: 'Updates' });
+	const names = $derived({ installs: t(downloads ? 'developer-stats-downloads' : 'developer-stats-installs'), updates: t('developer-stats-updates') });
 
 	function pointer(event: PointerEvent) {
 		const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -52,11 +51,11 @@
 		bind:clientWidth={width}
 		role="slider"
 		tabindex="0"
-		aria-label="{installs} and updates each day"
+		aria-label={t('developer-stats-chart', { downloads: downloads ? 'yes' : 'no' })}
 		aria-valuemin={0}
 		aria-valuemax={Math.max(0, days.length - 1)}
 		aria-valuenow={active ?? days.length - 1}
-		aria-valuetext={point ? `${dayLabel(point.day)}: ${count(point.installs)} ${installs.toLowerCase()}, ${count(point.updates)} updates` : undefined}
+		aria-valuetext={point ? t('developer-stats-chart-day', { downloads: downloads ? 'yes' : 'no', date: chartDay(point.day), installs: point.installs, updates: point.updates }) : undefined}
 		onpointermove={pointer}
 		onpointerleave={() => (active = null)}
 		onkeydown={keydown}
@@ -68,7 +67,7 @@
 				<text x={PAD.left - 10} y={y(tick)} dy="0.32em" text-anchor="end" class="axis">{shortCount(tick)}</text>
 			{/each}
 			{#each xTicks as index (index)}
-				<text x={x(index)} y={HEIGHT - 6} text-anchor={index === 0 ? 'start' : index === days.length - 1 ? 'end' : 'middle'} class="axis">{dayLabel(days[index].day)}</text>
+				<text x={x(index)} y={HEIGHT - 6} text-anchor={index === 0 ? 'start' : index === days.length - 1 ? 'end' : 'middle'} class="axis">{chartDay(days[index].day)}</text>
 			{/each}
 			{#each SERIES as series (series.key)}
 				<path d={path(days.map((day, index) => [x(index), y(day[series.key])]))} fill="none" stroke={series.color} stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="line" />
@@ -82,7 +81,7 @@
 		</svg>
 		{#if point && active !== null}
 			<div class="tip" style:left="{x(active) + TIP_GAP + TIP_WIDTH > width ? x(active) - TIP_GAP - TIP_WIDTH : x(active) + TIP_GAP}px" role="status">
-				<p class="font-medium">{dayLabel(point.day)}</p>
+				<p class="font-medium">{chartDay(point.day)}</p>
 				{#each SERIES as series (series.key)}
 					<p class="flex items-center justify-between gap-3 text-[var(--text-soft)]">
 						<span class="flex items-center gap-1.5"><span class="swatch" style:background={series.color}></span>{names[series.key]}</span>

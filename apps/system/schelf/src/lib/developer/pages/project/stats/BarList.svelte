@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { count } from '../../../format';
+	import { t } from '@luft/i18n';
+	import { count, percent } from '../../../format';
 
 	let { rows }: { rows: { label: string; value: number }[] } = $props();
 
@@ -18,7 +19,7 @@
 			<p class="flex items-baseline justify-between gap-3 text-[13.5px]">
 				<span class="truncate">{row.label}</span>
 				<span class="tabular-nums text-[var(--text-soft)]">
-					{count(row.value)}<span class="ml-2 inline-block w-9 text-right text-[12px] text-[var(--text-muted)]">{total ? Math.round((row.value / total) * 100) : 0}%</span>
+					{count(row.value)}<span class="ml-2 inline-block w-9 text-right text-[12px] text-[var(--text-muted)]">{percent(total ? (row.value / total) * 100 : 0)}</span>
 				</span>
 			</p>
 			<div class="h-1.5 rounded-full bg-[var(--control)]">
@@ -26,7 +27,7 @@
 			</div>
 		</li>
 	{:else}
-		<li class="text-[13.5px] text-[var(--text-muted)]">Nothing yet</li>
+		<li class="text-[13.5px] text-[var(--text-muted)]">{t('developer-nothing-yet')}</li>
 	{/each}
 </ul>
 

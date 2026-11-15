@@ -2,18 +2,17 @@ use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use luft_software::http;
 use luft_software::progress::Stage;
 use luft_software::task::Task;
 use sha2::{Digest, Sha256};
 
 use crate::catalog::cache;
+use crate::l10n::L10N;
 use crate::store::invited;
 use crate::store::listing::Artifact;
 use crate::store::signed;
-
-const CHANGED: &str =
-    "The download didn't match what schelf.store published, so it wasn't installed.";
 
 fn sha256(path: &Path) -> Result<String, String> {
     let mut file = File::open(path).map_err(|error| error.to_string())?;
@@ -60,7 +59,7 @@ pub fn published_file(
     task: Task,
 ) -> Result<PathBuf, String> {
     if !file.url.starts_with(crate::store::DOWNLOADS) {
-        return Err(CHANGED.into());
+        return Err(t!(L10N, "core-download-changed"));
     }
     let folder = cache::folder().join("store/downloads");
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
@@ -74,7 +73,7 @@ pub fn published_file(
     task.progress(Stage::Installing, None);
     if !matches(&path, file)? {
         let _ = fs::remove_file(&path);
-        return Err(CHANGED.into());
+        return Err(t!(L10N, "core-download-changed"));
     }
     Ok(path)
 }
@@ -96,9 +95,10 @@ pub fn shipped(listing: &Path, artifact: &Artifact) -> Result<PathBuf, String> {
     let name = artifact.url.rsplit('/').next().unwrap_or_default();
     let path = listing.with_file_name(name);
     if !matches(&path, &artifact.published())? {
-        return Err(format!(
-            "{} isn't the file schelf.store published.",
-            path.display()
+        return Err(t!(
+            L10N,
+            "core-download-not-published",
+            path = path.display().to_string()
         ));
     }
     Ok(path)

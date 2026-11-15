@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use luft_software::apps::toolbox::Repositories;
 use luft_software::system::repositories;
 use schelf_core::catalog::tools;
@@ -8,6 +9,7 @@ use crate::install::arguments::Arguments;
 use crate::install::perform::{Plan, Verb, carry_out};
 use crate::install::sources::{Origin, fedora, installed};
 use crate::install::terminal::Ink;
+use crate::l10n::L10N;
 
 const KEY: &str = "system";
 
@@ -27,9 +29,9 @@ pub(super) fn plan(packages: Vec<String>, verb: Verb) -> Plan {
         verb,
         from: (verb == Verb::Install).then(|| {
             if repositories::added_ids().is_empty() {
-                "Fedora into the system".to_owned()
+                t!(L10N, "cli-system-from-fedora")
             } else {
-                "Fedora and your software sources into the system".to_owned()
+                t!(L10N, "cli-system-from-fedora-and-sources")
             }
         }),
     }
@@ -45,9 +47,13 @@ fn package_of(name: &str) -> Result<String, String> {
     for repositories in [Repositories::Fedora, Repositories::Added] {
         if let Some(package) = fedora::providing(repositories, name)? {
             println!(
-                "{} comes from {}.",
-                Ink::stdout().bold(name),
-                Ink::stdout().bold(&package)
+                "{}",
+                t!(
+                    L10N,
+                    "cli-system-comes-from",
+                    command = Ink::stdout().bold(name),
+                    package = Ink::stdout().bold(&package)
+                )
             );
             return Ok(package);
         }
@@ -79,19 +85,13 @@ pub fn install(arguments: &Arguments) -> Exit {
         .into_iter()
         .partition(|name| present.contains(name));
     for name in &already {
-        println!("{} is already a system package.", ink.bold(name));
+        println!("{}", t!(L10N, "cli-system-already", name = ink.bold(name)));
     }
     if wanted.is_empty() {
         return Exit::Done;
     }
-    let note = if wanted.len() == 1 {
-        "It's rebuilt with every update of Luft, and its services start with the computer."
-    } else {
-        "They're rebuilt with every update of Luft, and their services start with the computer."
-    };
-    carry_out(&[plan(wanted, Verb::Install)], &[], |_| {
-        vec![note.to_owned()]
-    })
+    let note = t!(L10N, "cli-system-installed-note", count = wanted.len());
+    carry_out(&[plan(wanted, Verb::Install)], &[], |_| vec![note.clone()])
 }
 
 /// Removes several system packages in one go, since each change rebuilds them all.
@@ -100,8 +100,6 @@ pub fn removal(packages: Vec<String>) -> Plan {
 }
 
 pub fn explain_updates() -> Exit {
-    eprintln!(
-        "System packages update with Luft, in Settings, under Updates. Every update brings their newest versions."
-    );
+    eprintln!("{}", t!(L10N, "cli-system-updates"));
     Exit::Usage
 }

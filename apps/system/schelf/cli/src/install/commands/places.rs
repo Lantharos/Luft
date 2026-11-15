@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::places::{self, Access, Answer, Drive, Known};
 use schelf_core::library::InstalledApp;
 
@@ -9,6 +10,7 @@ use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::sources::installed;
 use crate::install::terminal::{Ink, bytes};
+use crate::l10n::L10N;
 
 /// A drive or folder named on the command line.
 enum Place {
@@ -19,7 +21,7 @@ enum Place {
 
 fn drive_name(label: &str, size: u64) -> String {
     if label.is_empty() {
-        format!("the {} drive", bytes(size))
+        t!(L10N, "cli-places-unnamed-drive", size = bytes(size))
     } else {
         label.to_owned()
     }
@@ -64,9 +66,11 @@ fn list(
     folders: &[(String, Access)],
 ) {
     let ink = Ink::stdout();
+    let read_write = t!(L10N, "cli-places-can-change");
+    let read_only = t!(L10N, "cli-places-can-read");
     let can = |access: Access| match access {
-        Access::ReadWrite => "can read and change it",
-        Access::ReadOnly => "can read it",
+        Access::ReadWrite => &read_write,
+        Access::ReadOnly => &read_only,
     };
     let mut given = false;
     for (known, answer) in held {
@@ -84,7 +88,10 @@ fn list(
         println!("  {}  {}", ink.bold(folder), can(*access));
     }
     if !given {
-        println!("{} has only its sandbox.", ink.bold(&app.name));
+        println!(
+            "{}",
+            t!(L10N, "cli-places-only-sandbox", name = ink.bold(&app.name))
+        );
     }
     let others: Vec<&Drive> = mounted
         .iter()
@@ -95,7 +102,7 @@ fn list(
         })
         .collect();
     if !others.is_empty() {
-        println!("\nDrives you can give it:");
+        println!("\n{}", t!(L10N, "cli-places-drives-to-give"));
         for drive in others {
             let points: Vec<String> = drive
                 .mount_points
@@ -128,8 +135,12 @@ async fn change(app: &InstalledApp, words: &[String], give: bool, access: Access
         };
         let Some(place) = find(word, &mounted, &held) else {
             eprintln!(
-                "There's no drive or folder called {}.",
-                Ink::stderr().bold(word)
+                "{}",
+                t!(
+                    L10N,
+                    "cli-places-nothing-called",
+                    name = Ink::stderr().bold(word)
+                )
             );
             list(app, &mounted, &held, &[]);
             return Ok(Exit::Missing);
@@ -144,8 +155,13 @@ async fn change(app: &InstalledApp, words: &[String], give: bool, access: Access
             }
             (Place::Held(_), true) => {
                 eprintln!(
-                    "{name} isn't plugged in. Plug it in to give it to {}.",
-                    app.name
+                    "{}",
+                    t!(
+                        L10N,
+                        "cli-places-unplugged",
+                        drive = name,
+                        name = app.name.as_str()
+                    )
                 );
                 return Ok(Exit::Missing);
             }
@@ -159,12 +175,15 @@ async fn change(app: &InstalledApp, words: &[String], give: bool, access: Access
                 places::take_folder(connection, &app.id, &folder.to_string_lossy()).await?
             }
         }
+        let app = ink.bold(&app.name);
         let done = match (give, access) {
-            (true, Access::ReadWrite) => format!("{} can use {name}", ink.bold(&app.name)),
-            (true, Access::ReadOnly) => format!("{} can read {name}", ink.bold(&app.name)),
-            (false, _) => format!("{} can't use {name} any more", ink.bold(&app.name)),
+            (true, Access::ReadWrite) => t!(L10N, "cli-places-given", name = app, place = name),
+            (true, Access::ReadOnly) => {
+                t!(L10N, "cli-places-given-read-only", name = app, place = name)
+            }
+            (false, _) => t!(L10N, "cli-places-taken", name = app, place = name),
         };
-        println!("{done} from the next time it opens.");
+        println!("{done}");
         Ok::<Exit, String>(Exit::Done)
     };
     attempt.await.unwrap_or_else(|error| {
@@ -180,7 +199,7 @@ pub fn run(arguments: &Arguments, give: bool) -> Exit {
         return Exit::Usage;
     };
     if words.len() > 1 {
-        eprintln!("Name one drive or folder at a time.");
+        eprintln!("{}", t!(L10N, "cli-places-one-at-a-time"));
         return Exit::Usage;
     }
     let app = match sandboxed_named(name, &installed::all(None), arguments.yes) {

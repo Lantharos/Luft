@@ -5,12 +5,15 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 use std::thread;
 use std::time::Duration;
 
+use luft_i18n::t;
+
 pub use row::{Outcome, Update};
-use row::{Row, State, Stream};
+use row::{Row, Stream};
 
 use super::{Ink, spinner};
 use crate::install::commands::list_of;
 use crate::install::perform::Plan;
+use crate::l10n::L10N;
 
 const FRAME: Duration = Duration::from_millis(80);
 
@@ -24,15 +27,14 @@ struct Shown {
     drawn: usize,
     kept: usize,
     said: Vec<Option<String>>,
+    more: Option<(usize, String)>,
 }
 
 impl Shown {
     fn keep(&mut self, index: usize) {
-        let row = &self.rows[index];
-        let State::Finished(outcome) = &row.state else {
+        let Some((stream, lines)) = self.rows[index].ending(self.out, self.err) else {
             return;
         };
-        let (stream, lines) = row.ending(outcome, self.out, self.err);
         let text: String = lines.iter().map(|line| format!("{line}\n")).collect();
         match stream {
             Stream::Out => {
@@ -65,9 +67,13 @@ impl Shown {
             text.push_str(&row.line(self.err, frame, width));
             text.push_str("\x1b[K\n");
         }
-        if shown < left.len() {
-            let more = format!("  And {} more", left.len() - shown);
-            text.push_str(&format!("{}\x1b[K\n", self.err.dim(more)));
+        let hidden = left.len() - shown;
+        if hidden > 0 {
+            if self.more.as_ref().is_none_or(|(count, _)| *count != hidden) {
+                self.more = Some((hidden, t!(L10N, "cli-board-more", count = hidden)));
+            }
+            let more = self.more.as_ref().map_or("", |(_, more)| more.as_str());
+            text.push_str(&format!("  {}\x1b[K\n", self.err.dim(more)));
         }
         eprint!("{text}");
         let _ = std::io::stderr().flush();
@@ -76,10 +82,12 @@ impl Shown {
 
     fn log(&mut self, index: usize) {
         let said = self.rows[index].said();
-        if said.is_some() && said != self.said[index] {
-            eprintln!("{}", said.as_deref().unwrap_or_default());
+        if let Some(said) = said
+            && self.said[index].as_deref() != Some(said)
+        {
+            eprintln!("{said}");
+            self.said[index] = Some(said.to_owned());
         }
-        self.said[index] = said;
     }
 }
 
@@ -116,7 +124,15 @@ impl Board {
         let one_verb = plans.iter().all(|plan| plan.verb == plans[0].verb);
         if !live && one_verb && rows.len() > 1 {
             let names: Vec<String> = rows.iter().map(|row| row.name().to_owned()).collect();
-            eprintln!("{} {}", plans[0].verb.doing(), list_of(&names));
+            eprintln!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-board-starting",
+                    verb = plans[0].verb.key(),
+                    names = list_of(&names)
+                )
+            );
         }
         let shown = Arc::new(Mutex::new(Shown {
             said: rows.iter().map(|_| None).collect(),
@@ -128,6 +144,7 @@ impl Board {
             frame: 0,
             drawn: 0,
             kept: 0,
+            more: None,
         }));
         if live {
             lock(&shown).draw();
@@ -146,7 +163,7 @@ impl Board {
 
     pub fn finish(&self, index: usize, outcome: Outcome) {
         let mut shown = lock(&self.shown);
-        shown.rows[index].state = State::Finished(outcome);
+        shown.rows[index].finish(outcome);
         if !shown.live {
             shown.keep(index);
         }

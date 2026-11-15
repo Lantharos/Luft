@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ConfirmDialog, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { channelName } from '#lib/account/channels.js';
@@ -27,7 +28,7 @@
 		const request = { id, channel, entry };
 		const access = await act(
 			token ? commands.developerRevokeDownloadToken(request) : commands.developerUninvite(request),
-			token ? `${name} no longer works` : `${name} can't download it any more`
+			t(token ? 'developer-people-revoked' : 'developer-people-removed', { name })
 		);
 		if (!access) return false;
 		reads.people(id, channel).set(access);
@@ -40,21 +41,21 @@
 			{@const tokens = access.tokens.filter((token) => !token.revoked_at)}
 			<Section title={channelName(channel)}>
 				{#each access.invites as invite (invite.id)}
-					<Row title={invite.email} description="Invited by {invite.invited_by}, {day(invite.created_at)}" truncate>
-						<button type="button" class="button" onclick={() => (taking = { channel, entry: invite.id, name: invite.email, token: false })}>Remove</button>
+					<Row title={invite.email} description={t('developer-people-invited-by', { by: invite.invited_by, date: day(invite.created_at) })} truncate>
+						<button type="button" class="button" onclick={() => (taking = { channel, entry: invite.id, name: invite.email, token: false })}>{t('developer-people-remove')}</button>
 					</Row>
 				{:else}
-					<Row title="Nobody yet" />
+					<Row title={t('developer-people-nobody')} />
 				{/each}
-				<Row title="Invite someone">
-					<button type="button" class="button" onclick={() => (inviting = channel)}>Invite</button>
+				<Row title={t('developer-invite-someone')}>
+					<button type="button" class="button" onclick={() => (inviting = channel)}>{t('developer-invite')}</button>
 				</Row>
 			</Section>
 			{#if tokens.length}
-				<Section title="Download tokens">
+				<Section title={t('developer-people-tokens')}>
 					{#each tokens as token (token.id)}
-						<Row title={token.name} description={token.last_used_at ? `Last used ${day(token.last_used_at)}` : 'Not used yet'}>
-							<button type="button" class="button" onclick={() => (taking = { channel, entry: token.id, name: token.name, token: true })}>Revoke</button>
+						<Row title={token.name} description={token.last_used_at ? t('developer-people-last-used', { date: day(token.last_used_at) }) : t('developer-people-not-used')}>
+							<button type="button" class="button" onclick={() => (taking = { channel, entry: token.id, name: token.name, token: true })}>{t('developer-people-revoke')}</button>
 						</Row>
 					{/each}
 				</Section>
@@ -70,9 +71,9 @@
 {#if taking}
 	{@const shown = taking}
 	<ConfirmDialog
-		title={shown.token ? `Revoke ${shown.name}?` : `Remove ${shown.name}?`}
-		description={shown.token ? 'Anything using it stops getting this channel.' : 'They keep what they installed and go back to public releases.'}
-		action={shown.token ? 'Revoke' : 'Remove'}
+		title={t(shown.token ? 'developer-people-revoke-title' : 'developer-people-remove-title', { name: shown.name })}
+		description={t(shown.token ? 'developer-people-revoke-description' : 'developer-people-remove-description')}
+		action={t(shown.token ? 'developer-people-revoke' : 'developer-people-remove')}
 		danger
 		run={() => take(shown)}
 		onclose={() => (taking = null)}

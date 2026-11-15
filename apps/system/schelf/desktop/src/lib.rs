@@ -2,6 +2,7 @@ mod app;
 mod background;
 mod commands;
 mod developer;
+mod l10n;
 mod library;
 mod operations;
 mod windows;

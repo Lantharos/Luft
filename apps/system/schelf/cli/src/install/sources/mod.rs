@@ -7,12 +7,14 @@ pub mod store;
 pub mod system;
 pub mod tools;
 
+use luft_i18n::t;
 use schelf_core::host;
 use schelf_core::library::Source;
 use schelf_core::operations::{Job, Request};
 
 use crate::install::Exit;
 use crate::install::perform::{Plan, Verb};
+use crate::l10n::L10N;
 
 pub use resolve::{Resolved, catalogs, resolve, search};
 
@@ -47,23 +49,23 @@ impl Origin {
         }
     }
 
-    pub fn title(self) -> &'static str {
+    pub fn title(self) -> String {
         match self {
-            Self::Store => "schelf.store",
-            Self::Flathub => "Flathub",
-            Self::Fedora => "Fedora",
-            Self::AppImage => "AppImage",
-            Self::Debian => "a .deb file",
-            Self::System => "System package",
+            Self::Store => "schelf.store".to_owned(),
+            Self::Flathub => "Flathub".to_owned(),
+            Self::Fedora => "Fedora".to_owned(),
+            Self::AppImage => "AppImage".to_owned(),
+            Self::Debian => t!(L10N, "cli-origin-deb"),
+            Self::System => t!(L10N, "cli-origin-system"),
         }
     }
 
-    pub fn heading(self) -> &'static str {
+    pub fn heading(self) -> String {
         match self {
-            Self::AppImage => "AppImages",
-            Self::Debian => "Apps from .deb files",
-            Self::System => "System packages",
-            Self::Store => "Schelf",
+            Self::AppImage => t!(L10N, "cli-heading-appimages"),
+            Self::Debian => t!(L10N, "cli-heading-debs"),
+            Self::System => t!(L10N, "cli-heading-system"),
+            Self::Store => t!(L10N, "cli-heading-store"),
             _ => self.title(),
         }
     }
@@ -113,27 +115,31 @@ impl Catalog {
         }
     }
 
-    pub fn title(self) -> &'static str {
+    pub fn title(self) -> String {
         match self {
-            Self::System => system::TITLE,
+            Self::System => t!(L10N, "cli-catalog-system"),
             _ => self.origin().title(),
         }
     }
 
-    /// Why this computer can't use the catalog, when it can't.
-    pub fn missing(self) -> Option<&'static str> {
+    pub fn usable(self) -> bool {
         match self {
-            Self::Flathub if !host::flatpak() => {
-                Some("Apps from Flathub need Flatpak, which isn't installed here.")
-            }
-            Self::Fedora if !host::luft() => Some(
-                "Fedora's apps and command-line tools need Luft, which this computer doesn't run.",
-            ),
-            Self::System if !host::luft() => {
-                Some("System packages need Luft, which this computer doesn't run.")
-            }
-            _ => None,
+            Self::Flathub => host::flatpak(),
+            Self::Fedora | Self::System => host::luft(),
+            Self::Store | Self::Tools => true,
         }
+    }
+
+    /// Why this computer can't use the catalog, when it can't.
+    pub fn missing(self) -> Option<String> {
+        if self.usable() {
+            return None;
+        }
+        Some(match self {
+            Self::Flathub => t!(L10N, "cli-catalog-needs-flatpak"),
+            Self::Fedora => t!(L10N, "cli-catalog-fedora-needs-luft"),
+            _ => t!(L10N, "cli-needs-luft-system"),
+        })
     }
 
     pub fn search(self, query: &str) -> Result<Vec<Candidate>, String> {
@@ -181,12 +187,12 @@ pub enum Kind {
 }
 
 impl Kind {
-    pub fn describe(self) -> &'static str {
+    pub fn key(self) -> &'static str {
         match self {
-            Self::Desktop => "desktop app",
-            Self::Command => "command-line tool",
-            Self::System => "system package",
-            Self::Extension => "Luft extension",
+            Self::Desktop => "desktop",
+            Self::Command => "command",
+            Self::System => "system",
+            Self::Extension => "extension",
         }
     }
 }
@@ -203,17 +209,25 @@ pub struct Candidate {
 
 impl Candidate {
     pub fn describe(&self) -> String {
-        let id = if self.id == self.name {
-            String::new()
+        let source = self.catalog.title();
+        if self.id == self.name {
+            t!(
+                L10N,
+                "cli-candidate",
+                name = self.name.as_str(),
+                kind = self.kind.key(),
+                source = source
+            )
         } else {
-            format!(" ({})", self.id)
-        };
-        format!(
-            "{}{id}, a {} from {}",
-            self.name,
-            self.kind.describe(),
-            self.catalog.title()
-        )
+            t!(
+                L10N,
+                "cli-candidate-with-id",
+                name = self.name.as_str(),
+                id = self.id.as_str(),
+                kind = self.kind.key(),
+                source = source
+            )
+        }
     }
 
     /// How to install it, and whether that waits for your yes along with the
@@ -228,7 +242,7 @@ impl Candidate {
                 members: Vec::new(),
             },
             verb: Verb::Install,
-            from: Some(self.catalog.title().to_owned()),
+            from: Some(self.catalog.title()),
         };
         Ok((plan, asks))
     }

@@ -4,6 +4,13 @@ const GAP: usize = 2;
 const INDENT: &str = "  ";
 const ELLIPSIS: char = '…';
 
+const MARKS: [(&str, &str, Look); 4] = [
+    ("<b>", "</b>", Look::Bold),
+    ("<dim>", "</dim>", Look::Dim),
+    ("<done>", "</done>", Look::Done),
+    ("<failed>", "</failed>", Look::Failed),
+];
+
 #[derive(Clone, Copy)]
 pub enum Look {
     Plain,
@@ -23,6 +30,31 @@ impl Look {
             Self::Failed => ink.failed(text),
         }
     }
+}
+
+/// The parts of a message marked with `<b>`, `<dim>`, `<done>` or `<failed>`, each with its look.
+pub fn marked(text: &str) -> Vec<(Look, &str)> {
+    let mut parts = Vec::new();
+    let mut rest = text;
+    while let Some((at, open, close, look)) = MARKS
+        .iter()
+        .filter_map(|&(open, close, look)| Some((rest.find(open)?, open, close, look)))
+        .min_by_key(|(at, ..)| *at)
+    {
+        let inside = &rest[at + open.len()..];
+        let Some(end) = inside.find(close) else {
+            break;
+        };
+        if at > 0 {
+            parts.push((Look::Plain, &rest[..at]));
+        }
+        parts.push((look, &inside[..end]));
+        rest = &inside[end + close.len()..];
+    }
+    if !rest.is_empty() {
+        parts.push((Look::Plain, rest));
+    }
+    parts
 }
 
 pub struct Table {

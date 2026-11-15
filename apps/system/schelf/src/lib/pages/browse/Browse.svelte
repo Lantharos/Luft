@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { VirtualScroller } from '@luft/ui';
 	import type { CatalogApp } from '#lib/bindings.js';
 	import AppTile from '#lib/components/AppTile.svelte';
@@ -51,10 +52,10 @@
 		<div class="flex min-h-2 items-center justify-between gap-4 bg-[var(--content)] px-8 pb-3">
 			{#if error}
 				<span class="text-[13px] text-[var(--text-muted)]">{error}</span>
-				<button type="button" class="button" onclick={() => catalog.refresh()}>Try again</button>
+				<button type="button" class="button" onclick={() => catalog.refresh()}>{t('browse-try-again')}</button>
 			{:else if route.page === 'extensions'}
 				<p class="px-1.5 text-[14px] text-[var(--text-soft)]">
-					{loaded && !apps.length ? 'There are no extensions yet.' : 'Extensions add to your desktop, from the wallpaper to quick settings and the taskbar.'}
+					{loaded && !apps.length ? t('browse-no-extensions') : t('browse-extensions')}
 				</p>
 			{/if}
 		</div>

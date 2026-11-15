@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import type { PasteReview } from '#lib/workspace/workspace.svelte.js';
 
@@ -22,7 +23,7 @@
 	}
 </script>
 
-<Dialog title="Paste this text?" wide onclose={cancel}>
+<Dialog title={t('tern-paste-title')} wide onclose={cancel}>
 	<ul class="flex flex-col gap-1 text-[13px] text-[var(--text-soft)]">
 		{#each review.risks as risk (risk)}
 			<li>{risk}</li>
@@ -30,7 +31,7 @@
 	</ul>
 	<pre class="paste-preview soft-scroll">{review.text}</pre>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={cancel}>Cancel</button>
-		<button type="button" class="button primary" onclick={paste}>Paste</button>
+		<button type="button" class="button" onclick={cancel}>{t('tern-paste-cancel')}</button>
+		<button type="button" class="button primary" onclick={paste}>{t('tern-paste-confirm')}</button>
 	{/snippet}
 </Dialog>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount, untrack } from 'svelte';
 	import { activity, appWindow, events } from '@lantharos/sabine';
 	import { GlassShell, appearance, keepWindowState } from '@luft/ui';
@@ -38,7 +39,7 @@
 
 	$effect(() => {
 		if (!workspace.busy) return;
-		const running = activity.begin({ name: 'Running commands' });
+		const running = activity.begin({ name: t('tern-activity-running') });
 		return () => void running.then((handle) => handle.end());
 	});
 

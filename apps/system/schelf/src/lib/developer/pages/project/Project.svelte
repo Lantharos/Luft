@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Segmented } from '@luft/ui';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import Loaded from '../../components/Loaded.svelte';
@@ -23,7 +24,7 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[820px] flex-col gap-7 px-8 pt-2 pb-10">
 		<div class="flex">
-			<Segmented label="Project" value={tab} options={projectTabs(project.data)} onchange={(tab) => navigation.open({ page: 'project', id, tab })} />
+			<Segmented label={t('developer-tabs-label')} value={tab} options={projectTabs(project.data)} onchange={(tab) => navigation.open({ page: 'project', id, tab })} />
 		</div>
 		<Loaded resource={project}>
 			{#snippet children(project)}

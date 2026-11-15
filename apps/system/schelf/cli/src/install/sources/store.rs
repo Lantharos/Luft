@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use luft_i18n::t;
 use luft_software::apps::appimage;
 use schelf_core::operations::Job;
 use schelf_core::store::catalog::{self, Entry, Origin};
@@ -16,6 +17,7 @@ use crate::install::Exit;
 use crate::install::commands::list_of;
 use crate::install::terminal::Ink;
 use crate::install::terminal::prompt;
+use crate::l10n::L10N;
 
 fn kind(entry: &Entry) -> Kind {
     match entry.kind {
@@ -104,20 +106,19 @@ pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
 pub fn access(declared: &Declared) -> Vec<String> {
     let mut access = Vec::new();
     if declared.network {
-        access.push("The internet".to_owned());
+        access.push(t!(L10N, "cli-access-internet"));
     }
     let folder = |name: &str| -> String {
         match name {
-            "home" => "your home folder",
-            "xdg-desktop" => "Desktop",
-            "xdg-documents" => "Documents",
-            "xdg-download" => "Downloads",
-            "xdg-music" => "Music",
-            "xdg-pictures" => "Pictures",
-            "xdg-videos" => "Videos",
-            other => other,
+            "home" => t!(L10N, "cli-access-folder-home"),
+            "xdg-desktop" => t!(L10N, "cli-access-folder-desktop"),
+            "xdg-documents" => t!(L10N, "cli-access-folder-documents"),
+            "xdg-download" => t!(L10N, "cli-access-folder-downloads"),
+            "xdg-music" => t!(L10N, "cli-access-folder-music"),
+            "xdg-pictures" => t!(L10N, "cli-access-folder-pictures"),
+            "xdg-videos" => t!(L10N, "cli-access-folder-videos"),
+            other => other.to_owned(),
         }
-        .to_owned()
     };
     let (looked_at, changed): (Vec<&String>, Vec<&String>) = declared
         .filesystems
@@ -130,42 +131,44 @@ pub fn access(declared: &Declared) -> Vec<String> {
             .collect()
     };
     if !changed.is_empty() {
-        access.push(format!("Your files in {}", list_of(&names(changed))));
+        access.push(t!(
+            L10N,
+            "cli-access-files",
+            folders = list_of(&names(changed))
+        ));
     }
     if !looked_at.is_empty() {
-        access.push(format!(
-            "Your files in {}, to look at but not change",
-            list_of(&names(looked_at))
+        access.push(t!(
+            L10N,
+            "cli-access-files-read-only",
+            folders = list_of(&names(looked_at))
         ));
     }
     for device in &declared.devices {
-        access.push(
-            match device.as_str() {
-                "usb" => "USB devices",
-                "serial" => "Devices on a serial port",
-                _ => "Every device you plug in",
-            }
-            .to_owned(),
-        );
+        access.push(match device.as_str() {
+            "usb" => t!(L10N, "cli-access-usb"),
+            "serial" => t!(L10N, "cli-access-serial"),
+            _ => t!(L10N, "cli-access-devices"),
+        });
     }
     if !declared.talk.is_empty() {
-        access.push(format!("Other apps: {}", declared.talk.join(", ")));
+        access.push(t!(
+            L10N,
+            "cli-access-other-apps",
+            apps = declared.talk.join(", ")
+        ));
     }
     if access.is_empty() {
-        access.push("Nothing beyond its own files".to_owned());
+        access.push(t!(L10N, "cli-access-nothing"));
     }
     access
 }
 
-fn listen_ports(listen: &[ListenPort]) -> String {
+fn listen_ports(listen: &[ListenPort]) -> Vec<String> {
     let mut ports: Vec<u16> = listen.iter().map(|listen| listen.port).collect();
     ports.sort_unstable();
     ports.dedup();
-    ports
-        .iter()
-        .map(u16::to_string)
-        .collect::<Vec<_>>()
-        .join(", ")
+    ports.iter().map(u16::to_string).collect()
 }
 
 /// What an extension may do, in the words Settings uses.
@@ -173,22 +176,29 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
     let mut lines: Vec<String> = access
         .permissions
         .iter()
-        .map(|permission| listing::permission_title(permission).to_owned())
+        .map(|permission| listing::permission_title(permission))
         .collect();
     if !access.network.is_empty() {
-        lines.push(format!("Connect to {}", access.network.join(", ")));
+        lines.push(t!(
+            L10N,
+            "cli-access-connect",
+            hosts = access.network.join(", ")
+        ));
     }
     if !access.listen.is_empty() {
-        lines.push(format!(
-            "Take connections from devices on your network, on port {}",
-            listen_ports(&access.listen)
+        let ports = listen_ports(&access.listen);
+        lines.push(t!(
+            L10N,
+            "cli-access-listen",
+            ports = ports.join(", "),
+            count = ports.len()
         ));
     }
     if access.helper {
-        lines.push("Runs its own program".to_owned());
+        lines.push(t!(L10N, "cli-access-helper"));
     }
     if lines.is_empty() {
-        lines.push("Nothing beyond the basics".to_owned());
+        lines.push(t!(L10N, "cli-access-basics"));
     }
     lines
 }
@@ -217,9 +227,12 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
     let name = ink.bold(listing.name());
     if let Some(access) = &release.extension {
         if listing.runs_in_shell(release) {
-            eprintln!("schelf.store approved {name} to run inside Luft. It can:");
+            eprintln!(
+                "{}",
+                t!(L10N, "cli-store-extension-inside-luft", name = name)
+            );
         } else {
-            eprintln!("{name} runs in a sandbox. It can:");
+            eprintln!("{}", t!(L10N, "cli-store-extension-sandboxed", name = name));
         }
         for line in extension_access(access) {
             eprintln!("  {line}");
@@ -229,34 +242,45 @@ fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> 
     let as_appimage = format == Format::Appimage
         || (format == Format::Sabine && host::sabine_service().is_none());
     if as_appimage && !appimage::sandboxed() {
-        eprintln!(
-            "This computer has no sandbox for apps from schelf.store, so {name} runs with everything you can do."
-        );
+        eprintln!("{}", t!(L10N, "cli-store-no-sandbox", name = name));
         return ASKS_FOR_FULL_ACCESS;
     }
     let declared = release.permissions.as_ref();
     if let Some(declared) =
         declared.filter(|declared| release.sandboxed() && declared.unsandboxed.is_none())
     {
-        eprintln!("{name} can use:");
+        eprintln!("{}", t!(L10N, "cli-store-can-use", name = name));
         for line in access(declared) {
             eprintln!("  {line}");
         }
         return ASKS;
     }
-    let why = declared
-        .and_then(|declared| declared.unsandboxed.as_deref())
-        .map_or_else(String::new, |reason| format!(" It says: {reason}"));
+    let reason = declared.and_then(|declared| declared.unsandboxed.as_deref());
+    let outside = match (format == Format::Appimage, reason) {
+        (false, None) => t!(L10N, "cli-store-unsandboxed", name = name),
+        (false, Some(reason)) => t!(
+            L10N,
+            "cli-store-unsandboxed-because",
+            name = name,
+            reason = reason
+        ),
+        (true, None) => t!(L10N, "cli-store-asks-unsandboxed", name = name),
+        (true, Some(reason)) => t!(
+            L10N,
+            "cli-store-asks-unsandboxed-because",
+            name = name,
+            reason = reason
+        ),
+    };
+    eprintln!("{outside}");
     if format != Format::Appimage {
-        eprintln!("{name} runs outside a sandbox, with everything you can do.{why}");
         return ASKS_FOR_FULL_ACCESS;
     }
-    eprintln!("{name} asks to run outside a sandbox, with everything you can do.{why}");
     let full_access = if yes || !prompt::interactive() {
-        eprintln!("It installs in its sandbox. schelf trust gives it full access if you trust it.");
+        eprintln!("{}", t!(L10N, "cli-store-installs-sandboxed"));
         false
     } else {
-        prompt::agree("Give it full access?")
+        prompt::agree(&t!(L10N, "cli-store-confirm-full-access"))
     };
     Agreement {
         full_access,
@@ -279,9 +303,13 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job, bool), Exit> {
         let following = listing.following(listing.platforms());
         if following.chosen && following.channel != channel::STABLE {
             eprintln!(
-                "{} has no {} version for this computer.",
-                listing.name(),
-                following.channel
+                "{}",
+                t!(
+                    L10N,
+                    "cli-store-no-channel-version",
+                    name = listing.name(),
+                    channel = following.channel.as_str()
+                )
             );
         } else {
             eprintln!("{}", install::unavailable(&listing));

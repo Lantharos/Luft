@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import DomainRows from '../../components/DomainRows.svelte';
@@ -19,13 +20,13 @@
 	$effect(() => domain.watch());
 
 	async function check() {
-		const checked = await act(commands.developerCheckDomain({ publisher: publisher.id }), 'Checked the domain again');
+		const checked = await act(commands.developerCheckDomain({ publisher: publisher.id }), t('developer-domain-checked-again'));
 		if (checked !== null) domain.set(checked);
 	}
 
 	function ask(next: string | null) {
 		choosing = false;
-		const title = next ? `Serve downloads on ${next}` : 'Stop serving downloads on your domain';
+		const title = next ? t('developer-domain-serve', { domain: next }) : t('developer-domain-stop-serving');
 		void approvals.ask(title, [{ type: 'publisher.domain', publisher: publisher.id, domain: next }], () => developer.resources.expire(`domain:${publisher.id}`));
 	}
 </script>
@@ -36,16 +37,16 @@
 			<Section>
 				<DomainRows domain={state} oncheck={manages ? check : undefined} />
 				{#if manages}
-					<Row title="Stop using {state.domain}">
-						<button type="button" class="button" onclick={() => ask(null)}>Stop</button>
+					<Row title={t('developer-domain-stop-using', { domain: state.domain })}>
+						<button type="button" class="button" onclick={() => ask(null)}>{t('developer-domain-stop')}</button>
 					</Row>
 				{/if}
 			</Section>
 		{:else}
 			<Section>
-				<Row title="Download links are on dl.schelf.store">
+				<Row title={t('developer-domain-default')}>
 					{#if manages}
-						<button type="button" class="button" onclick={() => (choosing = true)}>Use a domain</button>
+						<button type="button" class="button" onclick={() => (choosing = true)}>{t('developer-domain-use')}</button>
 					{/if}
 				</Row>
 			</Section>

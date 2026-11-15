@@ -4,8 +4,10 @@ use std::path::PathBuf;
 use std::sync::OnceLock;
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::system::image::Deployments;
 
+use crate::l10n::L10N;
 use crate::store::{device, invited};
 
 pub const STABLE: &str = "stable";
@@ -134,7 +136,7 @@ pub fn follow(id: &str, channel: &str) -> Result<(), String> {
         return Ok(());
     }
     if channel != WITH_SYSTEM && channel != STABLE && !PREVIEWS.contains(&channel) {
-        return Err(format!("Schelf doesn't offer the {channel} channel."));
+        return Err(t!(L10N, "core-channel-unknown", channel = channel));
     }
     let mut channels = chosen();
     remember(&mut channels, id, channel);

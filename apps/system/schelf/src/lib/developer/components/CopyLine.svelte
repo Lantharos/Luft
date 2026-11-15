@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
+	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
 
 	const COPIED_MS = 1600;
@@ -19,7 +20,7 @@
 
 <div class="line">
 	<code class="min-w-0 flex-1 truncate">{text}</code>
-	<IconButton icon={copied ? Check : Copy} label={copied ? 'Copied' : label} onclick={copy} />
+	<IconButton icon={copied ? Check : Copy} label={copied ? t('developer-copied') : label} onclick={copy} />
 </div>
 
 <style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Snippet } from 'svelte';
 	import { Dialog } from '@luft/ui';
 	import type { Access } from '#lib/app/permissions.js';
@@ -51,7 +52,7 @@
 		</div>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" data-autofocus={danger || undefined} onclick={onclose}>Cancel</button>
+		<button type="button" class="button" data-autofocus={danger || undefined} onclick={onclose}>{t('consent-cancel')}</button>
 		<button type="button" class="button {danger ? 'danger' : 'primary'}" onclick={onconfirm}>{confirm}</button>
 	{/snippet}
 </Dialog>

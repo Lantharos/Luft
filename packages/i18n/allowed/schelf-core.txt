@@ -1,0 +1,5 @@
+apps/system/schelf/core/src/files/mod.rs	Flatpak Ref
+apps/system/schelf/core/src/files/mod.rs	Flatpak Repo
+apps/system/schelf/core/src/store/install/download.rs	Bearer {session}
+apps/system/schelf/core/src/store/invited/session.rs	Bearer {token}
+apps/system/schelf/core/src/store/signed/mod.rs	Bearer {session}

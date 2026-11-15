@@ -6,11 +6,14 @@ mod settings;
 use gio::prelude::*;
 use luft_app::apps::{App, custom_icon};
 use luft_app::{Commands, Empty};
+use luft_i18n::t;
 use luft_software::apps::flatpak::{self, Installation, Permissions};
 use sabine::SabineWindow;
 use schelf_core::library::{self, InstalledApp, Source};
 use serde::Deserialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -45,7 +48,7 @@ fn installed() -> Vec<InstalledApp> {
 
 fn launch_desktop(desktop: &str, token: Option<&str>) -> Result<(), String> {
     let info =
-        gio_unix::DesktopAppInfo::new(desktop).ok_or("That app isn't installed any more.")?;
+        gio_unix::DesktopAppInfo::new(desktop).ok_or_else(|| t!(L10N, "desktop-app-gone"))?;
     luft_app::launch::start(info.upcast_ref(), &[], token).map_err(|error| error.to_string())
 }
 

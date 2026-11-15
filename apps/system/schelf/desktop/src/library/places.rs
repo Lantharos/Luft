@@ -1,8 +1,11 @@
 use luft_app::dbus;
 use luft_app::portal::{FileChooser, uri_path};
+use luft_i18n::t;
 use luft_software::apps::places::{self, Access, DriveTarget, GivenDrive, PluggedDrive};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 pub struct App {
@@ -63,8 +66,9 @@ pub async fn take_drive(target: DriveTarget) -> Result<(), String> {
 
 /// Gives the app a folder you pick, and says whether it's open.
 pub async fn add_folder(App { id }: App) -> Result<Option<bool>, String> {
+    let title = t!(L10N, "desktop-choose-folder");
     let chooser = FileChooser {
-        title: "Choose a folder",
+        title: &title,
         directory: true,
         ..FileChooser::default()
     };

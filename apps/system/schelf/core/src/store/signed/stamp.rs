@@ -1,11 +1,11 @@
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
 use luft_store_seal::Stamp;
 
+use crate::l10n::L10N;
 use crate::store::device;
-
-const OLDER: &str = "schelf.store sent an older copy of its list than the one Schelf has.";
 
 /// Takes a copy schelf.store just sent: it has to count still and be no
 /// older than the last one taken, which is then remembered.
@@ -20,7 +20,7 @@ fn accept_in(serials: &Path, stamp: &Stamp, document: &str) -> Result<(), String
         .ok()
         .and_then(|serial| serial.trim().parse::<u64>().ok());
     match known {
-        Some(known) if stamp.serial < known => Err(OLDER.to_owned()),
+        Some(known) if stamp.serial < known => Err(t!(L10N, "core-store-older")),
         Some(known) if stamp.serial == known => Ok(()),
         _ => crate::disk::replace(&path, stamp.serial.to_string().as_bytes())
             .map_err(|error| error.to_string()),

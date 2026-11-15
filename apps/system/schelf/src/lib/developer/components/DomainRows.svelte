@@ -1,14 +1,15 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
 	import type { CustomDomainState } from '../store';
 	import CopyLine from './CopyLine.svelte';
 	import { since } from '../format';
 
 	const STATUS: Record<CustomDomainState['status'], string> = {
-		proving: 'Waiting for the TXT record',
-		connecting: 'Connecting',
-		active: 'Serving download links',
-		paused: 'Paused'
+		proving: 'developer-domain-proving',
+		connecting: 'developer-domain-connecting',
+		active: 'developer-domain-active',
+		paused: 'developer-domain-paused'
 	};
 
 	let { domain, oncheck }: { domain: CustomDomainState; oncheck?: () => Promise<void> } = $props();
@@ -21,13 +22,13 @@
 	}
 </script>
 
-<Row title={domain.domain} description={[STATUS[domain.status], domain.waiting, domain.checked_at ? `checked ${since(domain.checked_at)}` : null].filter(Boolean).join(' · ')}>
+<Row title={domain.domain} description={[t(STATUS[domain.status]), domain.waiting, domain.checked_at ? t('developer-domain-checked', { when: since(domain.checked_at) }) : null].filter(Boolean).join(' · ')}>
 	{#if oncheck && domain.status !== 'active'}
-		<button type="button" class="button" disabled={checking} onclick={check}>Check again</button>
+		<button type="button" class="button" disabled={checking} onclick={check}>{t('developer-domain-check-again')}</button>
 	{/if}
 </Row>
 {#each domain.records as record (record.type + record.name)}
-	<Row title="{record.type} record for {record.name}">
-		{#snippet below()}<CopyLine text={record.value} label="Copy the value" />{/snippet}
+	<Row title={t('developer-domain-record', { type: record.type, name: record.name })}>
+		{#snippet below()}<CopyLine text={record.value} label={t('developer-domain-copy-value')} />{/snippet}
 	</Row>
 {/each}

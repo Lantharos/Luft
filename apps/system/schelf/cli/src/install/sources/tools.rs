@@ -1,9 +1,11 @@
+use luft_i18n::t;
 use schelf_core::operations::Job;
 use schelf_core::tools::{self, STABLE, Tool};
 
 use super::{Candidate, Catalog, Kind};
 use crate::install::Exit;
 use crate::install::terminal::Ink;
+use crate::l10n::L10N;
 
 fn found(name: &str) -> Result<Option<Tool>, String> {
     tools::find(name, STABLE)
@@ -17,7 +19,7 @@ pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
                 .is_some_and(|installed| installed.address == tool.index.address),
             kind: Kind::Command,
             name: tool.index.name.clone(),
-            summary: format!("By {}", tool.publisher()),
+            summary: t!(L10N, "cli-tool-by", publisher = tool.publisher()),
             id: tool.index.address,
         })
         .into_iter()
@@ -41,13 +43,23 @@ pub fn install(address: &str) -> Result<(String, Job), Exit> {
     let name = ink.bold(&tool.index.name);
     if tool.index.publisher.verified {
         eprintln!(
-            "{name} is published by {}, a verified publisher. It runs with everything you can do.",
-            tool.publisher()
+            "{}",
+            t!(
+                L10N,
+                "cli-tool-verified",
+                name = name,
+                publisher = tool.publisher()
+            )
         );
     } else {
         eprintln!(
-            "{name} is published by {}, a publisher schelf.store hasn't verified. It runs with everything you can do, so only install it if you trust them.",
-            tool.publisher()
+            "{}",
+            t!(
+                L10N,
+                "cli-tool-unverified",
+                name = name,
+                publisher = tool.publisher()
+            )
         );
     }
     Ok((

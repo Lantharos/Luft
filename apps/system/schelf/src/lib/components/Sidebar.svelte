@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
 	import Compass from '@lucide/svelte/icons/compass';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
@@ -6,11 +7,11 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import UserRound from '@lucide/svelte/icons/user-round';
 	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
-	import { CATEGORIES } from '#lib/catalog/categories.js';
+	import { CATEGORIES, categoryTitle } from '#lib/catalog/categories.js';
 	import NavItem from '#lib/components/NavItem.svelte';
 	import { developer } from '#lib/developer/state/developer.svelte.js';
 	import { account } from '#lib/state/account.svelte.js';
-	import { activity, percent } from '#lib/format.js';
+	import { namedActivity, percent, percentText } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation, type Route } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -47,17 +48,17 @@
 {/snippet}
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
-	<SearchField variant="sidebar" label="Search apps" bind:value={navigation.query} onkeydown={submit} />
+	<SearchField variant="sidebar" label={t('sidebar-search')} bind:value={navigation.query} onkeydown={submit} />
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		<div class="flex flex-col gap-0.5">
-			{@render item({ page: 'discover' }, 'Discover', Compass)}
-			{@render item({ page: 'installed' }, 'Installed', HardDrive)}
-			{@render item({ page: 'updates' }, 'Updates', RefreshCw, library.updateCount)}
-			{@render item({ page: 'extensions' }, 'Extensions', Puzzle)}
+			{@render item({ page: 'discover' }, t('sidebar-discover'), Compass)}
+			{@render item({ page: 'installed' }, t('sidebar-installed'), HardDrive)}
+			{@render item({ page: 'updates' }, t('sidebar-updates'), RefreshCw, library.updateCount)}
+			{@render item({ page: 'extensions' }, t('sidebar-extensions'), Puzzle)}
 		</div>
 		<div class="flex flex-col gap-0.5">
 			{#each CATEGORIES as category (category.id)}
-				{@render item({ page: 'category', category: category.id }, category.title, category.icon)}
+				{@render item({ page: 'category', category: category.id }, categoryTitle(category.id), category.icon)}
 			{/each}
 		</div>
 	</nav>
@@ -65,19 +66,19 @@
 		{@const value = percent(running)}
 		<div class="activity">
 			<div class="flex items-baseline justify-between gap-2">
-				<span class="truncate">{activity(running)} {running.title}</span>
+				<span class="truncate">{namedActivity(running)}</span>
 				{#if value !== null}
-					<span class="tabular-nums text-[var(--sidebar-text-muted)]">{value}%</span>
+					<span class="tabular-nums text-[var(--sidebar-text-muted)]">{percentText(value)}</span>
 				{/if}
 			</div>
 			<ProgressBar fraction={running.progress?.fraction ?? null} class="h-1 bg-[var(--sidebar-control)]" />
 			{#if remaining > 1}
-				<span class="text-[12px] text-[var(--sidebar-text-muted)]">{remaining - 1} more waiting</span>
+				<span class="text-[12px] text-[var(--sidebar-text-muted)]">{t('operation-more-waiting', { count: remaining - 1 })}</span>
 			{/if}
 		</div>
 	{/if}
 	<NavItem
-		title={account.signedIn ? account.signedIn.name || account.signedIn.email : 'Account'}
+		title={account.signedIn ? account.signedIn.name || account.signedIn.email : t('sidebar-account')}
 		icon={UserRound}
 		onclick={() => (developer.publisher ? developer.enter() : account.show())}
 	/>

@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::task::{CANCELLED, Cancel, Task};
 use schelf_core::operations::Request;
 use schelf_core::operations::bus::SchelfProxy;
@@ -14,6 +15,7 @@ use super::Exit;
 use super::commands::list_of;
 use super::terminal::Ink;
 use super::terminal::board::{Board, Outcome, Update};
+use crate::l10n::L10N;
 
 const AT_ONCE: usize = 3;
 
@@ -26,30 +28,12 @@ pub enum Verb {
 }
 
 impl Verb {
-    pub fn base(self) -> &'static str {
+    pub fn key(self) -> &'static str {
         match self {
             Self::Install => "install",
             Self::AddSource => "add",
             Self::Remove => "remove",
             Self::Update => "update",
-        }
-    }
-
-    pub fn doing(self) -> &'static str {
-        match self {
-            Self::Install => "Installing",
-            Self::AddSource => "Adding",
-            Self::Remove => "Removing",
-            Self::Update => "Updating",
-        }
-    }
-
-    pub fn done(self) -> &'static str {
-        match self {
-            Self::Install => "Installed",
-            Self::AddSource => "Added",
-            Self::Remove => "Removed",
-            Self::Update => "Updated",
         }
     }
 }
@@ -95,10 +79,7 @@ impl Runner {
 
     fn announce(&self) {
         if matches!(self, Self::App(_)) {
-            eprintln!(
-                "{}",
-                Ink::stderr().dim("Schelf is open, so it does this and shows it there.")
-            );
+            eprintln!("{}", Ink::stderr().dim(t!(L10N, "cli-perform-in-app")));
         }
     }
 
@@ -142,8 +123,12 @@ fn exit_of(result: &Result<(), Failure>) -> Exit {
 }
 
 fn summarize(verb: Verb, total: usize, done: &[&str], failed: &[&str], stopped: &[&str]) {
+    let verb = verb.key();
     if failed.is_empty() && stopped.is_empty() {
-        println!("{} all {total}.", Ink::stdout().done(verb.done()));
+        println!(
+            "{}",
+            Ink::stdout().marked(&t!(L10N, "cli-summary-all", verb = verb, count = total))
+        );
         return;
     }
     let ink = Ink::stderr();
@@ -152,20 +137,27 @@ fn summarize(verb: Verb, total: usize, done: &[&str], failed: &[&str], stopped: 
     };
     let mut parts = Vec::new();
     if !done.is_empty() {
-        parts.push(format!("{} {}.", verb.done(), names(done)));
-    }
-    if !failed.is_empty() {
-        parts.push(format!(
-            "{} {}.",
-            ink.failed(format!("Couldn't {}", verb.base())),
-            names(failed)
+        parts.push(t!(
+            L10N,
+            "cli-summary-done",
+            verb = verb,
+            names = names(done)
         ));
     }
+    if !failed.is_empty() {
+        parts.push(ink.marked(&t!(
+            L10N,
+            "cli-summary-failed",
+            verb = verb,
+            names = names(failed)
+        )));
+    }
     if !stopped.is_empty() {
-        parts.push(format!(
-            "Stopped before {} {}.",
-            verb.doing().to_lowercase(),
-            names(stopped)
+        parts.push(t!(
+            L10N,
+            "cli-summary-stopped",
+            verb = verb,
+            names = names(stopped)
         ));
     }
     eprintln!("{}", parts.join(" "));

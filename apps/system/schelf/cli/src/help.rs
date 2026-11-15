@@ -1,33 +1,47 @@
+use luft_i18n::t;
+
 use crate::install::{self, Command};
+use crate::l10n::L10N;
 
-const INSTALLING: &str = "\
-Commands:
-  install NAME|FILE...  Install apps, tools or a file
-  remove NAME...        Remove something you installed
-  search QUERY          Look for apps and tools everywhere
-  update [NAME...]      Update apps, AppImages and tools
-  list                  Show what you installed
-  info NAME             Show details
-  trust NAME...         Give Flatpak apps full access
-  untrust NAME...       Put them back in their sandbox
-  give NAME [PLACE]     Let an app use one drive or folder
-  take NAME PLACE       Take a drive or folder away again
-  repo add|remove|list  Manage software sources for system packages
+const COLUMN: usize = 20;
 
-Options:
-  --store, --flathub, --fedora, --appimage  Use only this source
-  --system              Fedora packages for the whole system, such as services
-  --read-only           Give a drive or folder only to read
-  -y, --yes             Go ahead without asking
-  -h, --help            Show help, also for a command
-  --version             Show the version
-";
+fn rows(rows: &[(&str, String)]) -> String {
+    rows.iter()
+        .map(|(usage, about)| format!("  {usage:COLUMN$}  {about}\n"))
+        .collect()
+}
 
-const EXITS: &str = "\
-Exits 0 when done, 1 on failure, 2 for wrong usage, 3 when something isn't
-there or you aren't signed in, 4 while waiting for a person, 5 when declined
-or expired, and 130 when stopped. Luft itself updates in Settings, under Updates.
-";
+fn installing() -> String {
+    let commands = rows(&[
+        ("install NAME|FILE...", t!(L10N, "cli-help-install")),
+        ("remove NAME...", t!(L10N, "cli-help-remove")),
+        ("search QUERY", t!(L10N, "cli-help-search")),
+        ("update [NAME...]", t!(L10N, "cli-help-update")),
+        ("list", t!(L10N, "cli-help-list")),
+        ("info NAME", t!(L10N, "cli-help-info")),
+        ("trust NAME...", t!(L10N, "cli-help-trust")),
+        ("untrust NAME...", t!(L10N, "cli-help-untrust")),
+        ("give NAME [PLACE]", t!(L10N, "cli-help-give")),
+        ("take NAME PLACE", t!(L10N, "cli-help-take")),
+        ("repo add|remove|list", t!(L10N, "cli-help-repo")),
+    ]);
+    let options = rows(&[
+        (
+            "--store, --flathub, --fedora, --appimage",
+            t!(L10N, "cli-help-option-only"),
+        ),
+        ("--system", t!(L10N, "cli-help-option-system")),
+        ("--read-only", t!(L10N, "cli-help-option-read-only")),
+        ("-y, --yes", t!(L10N, "cli-help-option-yes")),
+        ("-h, --help", t!(L10N, "cli-help-option-help")),
+        ("--version", t!(L10N, "cli-help-option-version")),
+    ]);
+    format!(
+        "{}\n{commands}\n{}\n{options}",
+        t!(L10N, "cli-help-commands"),
+        t!(L10N, "cli-help-options")
+    )
+}
 
 fn publishing() -> String {
     let commands = schelf_publish::commands();
@@ -42,19 +56,24 @@ fn publishing() -> String {
         .map(|(usage, about)| format!("  {usage:width$}{about}\n"))
         .collect();
     format!(
-        "Publishing on schelf.store:\n{lines}\n\
-         Publishing commands also take --json to print the result as JSON and\n\
-         --api ORIGIN to talk to another store.\n"
+        "{}\n{lines}\n{}\n",
+        t!(L10N, "cli-help-publishing"),
+        t!(L10N, "cli-help-publishing-options")
     )
 }
 
 pub fn print(program: &str) -> i32 {
     print!(
-        "Schelf installs apps and command-line tools into your account, and puts\n\
-         your own on schelf.store.\n\n\
-         Usage: {program} COMMAND [OPTIONS]\n\n\
-         {INSTALLING}\n{}\n{EXITS}",
-        publishing()
+        "{}\n\n{}\n\n{}\n{}\n{}\n",
+        t!(L10N, "cli-help-about"),
+        t!(
+            L10N,
+            "cli-usage",
+            usage = format!("{program} COMMAND [OPTIONS]")
+        ),
+        installing(),
+        publishing(),
+        t!(L10N, "cli-help-exits")
     );
     0
 }

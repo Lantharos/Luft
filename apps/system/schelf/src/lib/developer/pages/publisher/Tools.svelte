@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Section } from '@luft/ui';
 	import Loaded from '../../components/Loaded.svelte';
 	import { reads } from '../../state/reads';
@@ -17,11 +18,11 @@
 		{#if list.length}
 			<Section>
 				{#each list as tool (tool.address)}
-					<ToolRows {tool} description="{tool.project_name}{tool.part ? `, its ${tool.part} part` : ''}" />
+					<ToolRows {tool} description={tool.part ? t('developer-tools-part', { project: tool.project_name, part: tool.part }) : tool.project_name} />
 				{/each}
 			</Section>
 		{:else}
-			<p class="px-2 pt-16 text-center text-[14px] text-[var(--text-muted)]">A part with tool = "name" in its schelf.toml makes it a command-line tool.</p>
+			<p class="px-2 pt-16 text-center text-[14px] text-[var(--text-muted)]">{t('developer-tools-empty')}</p>
 		{/if}
 	{/snippet}
 </Loaded>

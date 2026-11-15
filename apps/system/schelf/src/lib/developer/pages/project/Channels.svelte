@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { channelName } from '#lib/account/channels.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -11,13 +12,12 @@
 	let { project, releases }: { project: Project; releases: Resource<Releases> } = $props();
 
 	function facts(channel: Channel) {
-		return [
-			channel.gradual ? 'Reaches people step by step' : 'Reaches everyone at once',
-			channel.keep ? `keeps the last ${channel.keep}` : null,
-			channel.ended_into ? `ended into ${channelName(channel.ended_into)}` : null
-		]
-			.filter(Boolean)
-			.join(', ');
+		return t('developer-channels-facts', {
+			gradual: channel.gradual ? 'yes' : 'no',
+			keep: channel.keep ?? 0,
+			ended: channel.ended_into ? 'yes' : 'no',
+			endedInto: channel.ended_into ? channelName(channel.ended_into) : ''
+		});
 	}
 
 	function show(release: ReleaseSummary) {
@@ -30,21 +30,21 @@
 		{#each project.channels as channel (channel.name)}
 			{@const live = liveOn(list, channel.name)}
 			<Section title={channelName(channel.name)}>
-				<Row title={live ? live.version : 'Nothing yet'} description={facts(channel)} onclick={live ? () => show(live) : undefined}>
+				<Row title={live ? live.version : t('developer-nothing-yet')} description={facts(channel)} onclick={live ? () => show(live) : undefined}>
 					{#if channel.invite_only}
-						<span>Invite only</span>
+						<span>{t('developer-invite-only')}</span>
 					{/if}
 				</Row>
 				{#if live?.status === 'rolling-out'}
 					<Rollout id={project.app.id} release={live} />
 				{/if}
 				{#if channel.invite_only}
-					<Row title="People">
-						<button type="button" class="button" onclick={() => navigation.open({ page: 'project', id: project.app.id, tab: 'people' })}>Show</button>
+					<Row title={t('developer-channels-people')}>
+						<button type="button" class="button" onclick={() => navigation.open({ page: 'project', id: project.app.id, tab: 'people' })}>{t('developer-show')}</button>
 					</Row>
 				{/if}
 			</Section>
 		{/each}
-		<p class="-mt-3 px-2 text-[13px] text-[var(--text-muted)]">Channels are set under [channels] in schelf.toml.</p>
+		<p class="-mt-3 px-2 text-[13px] text-[var(--text-muted)]">{t('developer-channels-where')}</p>
 	{/snippet}
 </Loaded>

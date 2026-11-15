@@ -2,8 +2,17 @@ use std::fs::{self, File};
 use std::io::{self, BufReader, Read, Seek};
 use std::path::Path;
 
-const ONE_PROGRAM: &str = "The download holds more than one program, so it wasn't installed.";
-const NO_PROGRAM: &str = "The download holds no program, so it wasn't installed.";
+use luft_i18n::t;
+
+use crate::l10n::L10N;
+
+fn one_program() -> String {
+    t!(L10N, "core-tool-several-programs")
+}
+
+fn no_program() -> String {
+    t!(L10N, "core-tool-no-program")
+}
 
 /// Puts the one program in `download`, a file of `kind` as the index names
 /// it, at `program`.
@@ -14,9 +23,7 @@ pub fn program(download: &Path, kind: &str, program: &Path) -> Result<(), String
             .map_err(|error| error.to_string()),
         "tarball" => from_tarball(download, program),
         "zip" => from_zip(download, program),
-        kind => Err(format!(
-            "Schelf can't install a tool that comes as a {kind} here."
-        )),
+        kind => Err(t!(L10N, "core-tool-unknown-kind", kind = kind)),
     }
 }
 
@@ -50,11 +57,11 @@ fn from_tarball(download: &Path, program: &Path) -> Result<(), String> {
             }
             _ => {
                 let _ = fs::remove_file(program);
-                return Err(ONE_PROGRAM.into());
+                return Err(one_program());
             }
         }
     }
-    found.then_some(()).ok_or_else(|| NO_PROGRAM.into())
+    found.then_some(()).ok_or_else(no_program)
 }
 
 fn from_zip(download: &Path, program: &Path) -> Result<(), String> {
@@ -67,15 +74,14 @@ fn from_zip(download: &Path, program: &Path) -> Result<(), String> {
         .collect();
     let [only] = files[..] else {
         return Err(if files.is_empty() {
-            NO_PROGRAM
+            no_program()
         } else {
-            ONE_PROGRAM
-        }
-        .into());
+            one_program()
+        });
     };
     let mut entry = archive.by_index(only).map_err(failed)?;
     if !entry.is_file() {
-        return Err(ONE_PROGRAM.into());
+        return Err(one_program());
     }
     let mut output = File::create(program).map_err(|error| error.to_string())?;
     io::copy(&mut entry, &mut output)
@@ -118,7 +124,7 @@ mod tests {
         let installed = folder.path().join("notes");
         assert_eq!(
             program(&download, "tarball", &installed),
-            Err(ONE_PROGRAM.into())
+            Err(one_program())
         );
         assert!(!installed.exists());
     }

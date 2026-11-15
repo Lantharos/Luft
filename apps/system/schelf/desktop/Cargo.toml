@@ -17,6 +17,7 @@ gio-unix = { workspace = true, features = ["v2_58"] }
 libc.workspace = true
 luft-app = { workspace = true, features = ["apps", "launch"] }
 luft-dbus-macros.workspace = true
+luft-i18n.workspace = true
 luft-sandbox.workspace = true
 luft-software = { workspace = true, features = ["default"] }
 sabine.workspace = true

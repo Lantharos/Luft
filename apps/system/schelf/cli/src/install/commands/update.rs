@@ -1,4 +1,5 @@
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::flatpak::Installation;
 use schelf_core::library::Source;
 use schelf_core::operations::{Job, Request};
@@ -10,6 +11,7 @@ use crate::install::perform::{Plan, Verb, carry_out};
 use crate::install::sources::{Origin, installed};
 use crate::install::terminal::Line;
 use crate::install::terminal::{Ink, Look, Table};
+use crate::l10n::L10N;
 
 fn named(update: &AppUpdate, name: &str) -> bool {
     let wanted = name.to_lowercase();
@@ -38,7 +40,7 @@ fn plan(key: String, title: String, job: Job, members: Vec<String>) -> Plan {
 
 fn batch(
     key: &str,
-    what: &str,
+    title: impl FnOnce(usize) -> String,
     updates: &[&AppUpdate],
     job: impl FnOnce(Vec<String>) -> Job,
     of: impl Fn(&AppUpdate) -> String,
@@ -53,7 +55,7 @@ fn batch(
         )),
         _ => Some(plan(
             key.to_owned(),
-            format!("{} {what}", updates.len()),
+            title(updates.len()),
             job(updates.iter().map(|update| of(update)).collect()),
             updates.iter().map(|update| update.key.clone()).collect(),
         )),
@@ -73,18 +75,28 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
             .into_iter()
             .filter(|update| update.installation == Some(installation))
             .collect();
-        let (key, everyone) = match installation {
-            Installation::User => ("flatpak-updates/user", ""),
-            Installation::System => ("flatpak-updates/system", " for everyone"),
+        let key = match installation {
+            Installation::User => "flatpak-updates/user",
+            Installation::System => "flatpak-updates/system",
         };
-        let kinds = if flatpaks.iter().any(|update| update.platform) {
-            "Flatpak apps and runtimes"
-        } else {
-            "Flatpak apps"
+        let runtimes = flatpaks.iter().any(|update| update.platform);
+        let title = |count: usize| match (installation, runtimes) {
+            (Installation::User, false) => t!(L10N, "cli-update-flatpaks", count = count),
+            (Installation::User, true) => {
+                t!(L10N, "cli-update-flatpaks-and-runtimes", count = count)
+            }
+            (Installation::System, false) => {
+                t!(L10N, "cli-update-flatpaks-for-everyone", count = count)
+            }
+            (Installation::System, true) => t!(
+                L10N,
+                "cli-update-flatpaks-and-runtimes-for-everyone",
+                count = count
+            ),
         };
         plans.extend(batch(
             key,
-            &format!("{kinds}{everyone}"),
+            title,
             &flatpaks,
             |references| Job::UpdateFlatpaks {
                 installation,
@@ -96,14 +108,14 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
     let package = |update: &AppUpdate| update.package.clone().unwrap_or_default();
     plans.extend(batch(
         "tool-updates",
-        "command-line tools",
+        |count| t!(L10N, "cli-update-tools", count = count),
         &of(Source::Tool),
         |packages| Job::UpdateTools { packages },
         package,
     ));
     plans.extend(batch(
         "deb-updates",
-        "apps from .deb files",
+        |count| t!(L10N, "cli-update-debs", count = count),
         &of(Source::Debian),
         |packages| Job::UpdateDebs { packages },
         package,
@@ -150,19 +162,19 @@ fn show(updates: &[AppUpdate]) {
         table.row(vec![
             update.name.clone(),
             change,
-            Origin::of(update.source).title().to_owned(),
+            Origin::of(update.source).title(),
         ]);
     }
-    let counted = |count: usize, one: &str, many: &str| {
-        format!("{count} {}", if count == 1 { one } else { many })
+    let heading = if runtimes > 0 {
+        t!(
+            L10N,
+            "cli-update-heading-with-runtimes",
+            count = apps,
+            runtimes = runtimes
+        )
+    } else {
+        t!(L10N, "cli-update-heading", count = apps)
     };
-    let mut heading = counted(apps, "update", "updates");
-    if runtimes > 0 {
-        heading = format!(
-            "{heading}, and {} that apps run on",
-            counted(runtimes, "runtime", "runtimes")
-        );
-    }
     println!("{}", ink.bold(heading));
     table.print(ink);
 }
@@ -176,10 +188,17 @@ fn unknown(names: &[String], updates: &[AppUpdate], only: Option<Origin>) -> Opt
             continue;
         }
         if installed::matching(everything.clone(), name).is_empty() {
-            eprintln!("{} isn't installed.", ink.bold(name));
+            eprintln!("{}", t!(L10N, "cli-not-installed", name = ink.bold(name)));
             exit = Some(Exit::Missing);
         } else {
-            println!("{} is up to date.", Ink::stdout().bold(name));
+            println!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-update-up-to-date",
+                    name = Ink::stdout().bold(name)
+                )
+            );
         }
     }
     exit
@@ -187,7 +206,7 @@ fn unknown(names: &[String], updates: &[AppUpdate], only: Option<Origin>) -> Opt
 
 pub fn run(arguments: &Arguments) -> Exit {
     let line = Line::default();
-    line.say("Checking for updates");
+    line.say(&t!(L10N, "cli-update-checking"));
     let (mut updates, failed) = block_on(updates::find());
     line.clear();
     for failure in &failed {
@@ -209,7 +228,7 @@ pub fn run(arguments: &Arguments) -> Exit {
             return Exit::Failed;
         }
         if arguments.words.is_empty() {
-            println!("Everything is up to date.");
+            println!("{}", t!(L10N, "cli-update-all-up-to-date"));
         }
         return Exit::Done;
     }
@@ -218,15 +237,13 @@ pub fn run(arguments: &Arguments) -> Exit {
         .iter()
         .filter_map(|update| Some((update, update.store.as_ref().filter(|store| store.widens)?)))
     {
-        let change = if store.moves_inside {
-            "was approved to run inside Luft"
+        let name = Ink::stdout().bold(&update.name);
+        let waits = if store.moves_inside {
+            t!(L10N, "cli-update-waits-inside-luft", name = name)
         } else {
-            "asks for more access than you agreed to"
+            t!(L10N, "cli-update-waits-more-access", name = name)
         };
-        println!(
-            "{} {change}, so it waits until you look at it in Schelf.",
-            Ink::stdout().bold(&update.name)
-        );
+        println!("{waits}");
     }
     carry_out(&plans(&updates), &[], |_| Vec::new())
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Block, InstalledApp } from '#lib/bindings.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
 
@@ -13,14 +14,14 @@
 <div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">
 	<div class="flex min-w-0 flex-col gap-1">
 		<span class="text-[14px] font-semibold" class:text-[var(--danger)]={pulled}>
-			{pulled ? `schelf.store pulled ${name}` : `schelf.store has a warning about this version of ${name}`}
+			{t(pulled ? 'app-pulled' : 'app-warning', { name })}
 		</span>
 		<p class="text-[13.5px] text-[var(--text-soft)]">
-			{why}{pulled ? ` It can't start any more. Your files stay until you remove it.` : ''}
+			{pulled ? t('app-pulled-description', { reason: why }) : why}
 		</p>
 	</div>
 	{#if pulled}
-		<button type="button" class="button danger" onclick={() => (removing = true)}>Remove</button>
+		<button type="button" class="button danger" onclick={() => (removing = true)}>{t('app-remove')}</button>
 	{/if}
 </div>
 

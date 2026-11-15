@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, Row, Section, Spinner, TextField } from '@luft/ui';
 	import { commands, type AddedSource, type CheckedSource } from '#lib/bindings.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
@@ -37,7 +38,7 @@
 		error = null;
 		try {
 			const checked = await commands.sourcesFetch({ source: address.trim() }, SLOW);
-			if (checked.added) error = `${checked.described.sources[0]?.name ?? checked.described.file} is already a software source.`;
+			if (checked.added) error = t('sources-already-added', { name: checked.described.sources[0]?.name ?? checked.described.file });
 			else trusting = checked;
 		} catch (reason) {
 			error = String(reason);
@@ -68,34 +69,34 @@
 	const removal = $derived.by(() => {
 		if (!removing) return '';
 		const packages = removing.packages;
-		if (!packages.length) return 'Nothing installed comes from it.';
-		return `This also removes ${packages.join(', ')} from the system, with everything ${packages.length === 1 ? 'it' : 'they'} added.`;
+		if (!packages.length) return t('sources-remove-nothing');
+		return t('sources-remove-packages', { count: packages.length, packages: packages.join(', ') });
 	});
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<p class="px-2 text-[14px] text-[var(--text-soft)]">
-			Software from companies like Docker or 1Password, which becomes part of the system and updates with Luft.
+			{t('sources-intro')}
 		</p>
 
-		<Section title="Add a source" description="Type 1password, docker, google-chrome or vscode, or paste the address its maker gives you.">
-			<Row title="Source">
+		<Section title={t('sources-add-title')} description={t('sources-add-description')}>
+			<Row title={t('sources-source')}>
 				<div class="flex items-center gap-2">
 					<div class="w-[320px]">
 						<TextField
 							bind:value={address}
-							label="Source"
+							label={t('sources-source')}
 							placeholder="docker"
 							disabled={checking}
 							onkeydown={(event) => event.key === 'Enter' && check()}
 						/>
 					</div>
-					<button type="button" class="button primary" disabled={!address.trim() || checking} onclick={check}>{#if checking}<Spinner />Checking{:else}Add{/if}</button>
+					<button type="button" class="button primary" disabled={!address.trim() || checking} onclick={check}>{#if checking}<Spinner />{t('sources-checking')}{:else}{t('sources-add')}{/if}</button>
 				</div>
 			</Row>
-			<Row title="Other kinds of address" description="For sources that give you a file address or a project name.">
-				<button type="button" class="button" onclick={() => (explaining = true)}>Show</button>
+			<Row title={t('sources-other')} description={t('sources-other-description')}>
+				<button type="button" class="button" onclick={() => (explaining = true)}>{t('sources-show')}</button>
 			</Row>
 		</Section>
 		{#if error}
@@ -105,18 +106,18 @@
 		{#if sources === null}
 			<div class="skeleton h-20 w-full"></div>
 		{:else if sources.length}
-			<Section title="Added">
+			<Section title={t('sources-added')}>
 				{#each sources as source (source.file)}
 					{@const operation = operations.forKey(key(source))}
 					<Row
 						title={source.name}
-						description={operation?.state === 'failed' ? operation.error! : [source.url, source.packages.length ? `Installed from it: ${source.packages.join(', ')}` : ''].filter(Boolean).join(' · ')}
+						description={operation?.state === 'failed' ? operation.error! : [source.url, source.packages.length ? t('sources-installed-from', { packages: source.packages.join(', ') }) : ''].filter(Boolean).join(' · ')}
 						truncate
 					>
 						{#if operation && operation.state !== 'failed'}
 							<ProgressButton {operation} />
 						{:else}
-							<button type="button" class="button" onclick={() => (removing = source)}>Remove</button>
+							<button type="button" class="button" onclick={() => (removing = source)}>{t('sources-remove')}</button>
 						{/if}
 					</Row>
 				{/each}
@@ -130,22 +131,22 @@
 {/if}
 
 {#if removing}
-	<Dialog title="Remove {removing.name}?" description={removal} onclose={() => (removing = null)}>
+	<Dialog title={t('sources-remove-title', { name: removing.name })} description={removal} onclose={() => (removing = null)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = null)}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => remove(removing!)}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = null)}>{t('sources-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => remove(removing!)}>{t('sources-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}
 
 {#if explaining}
-	<Dialog title="Other kinds of address" onclose={() => (explaining = false)}>
+	<Dialog title={t('sources-other')} onclose={() => (explaining = false)}>
 		<div class="flex flex-col">
-			<Row title="A .repo file" description="Its full https:// address, from the maker's install instructions." />
-			<Row title="A COPR project" description="Community builds for Fedora, typed like copr:owner/project." />
+			<Row title={t('sources-repo-file')} description={t('sources-repo-file-description')} />
+			<Row title={t('sources-copr')} description={t('sources-copr-description')} />
 		</div>
 		{#snippet actions()}
-			<button type="button" class="button primary" onclick={() => (explaining = false)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (explaining = false)}>{t('sources-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

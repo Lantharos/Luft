@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import { t } from '@luft/i18n';
 import Briefcase from '@lucide/svelte/icons/briefcase';
 import Clapperboard from '@lucide/svelte/icons/clapperboard';
 import Code from '@lucide/svelte/icons/code';
@@ -14,21 +15,33 @@ export type CategoryId = 'office' | 'graphics' | 'audiovideo' | 'game' | 'develo
 
 export interface Category {
 	id: CategoryId;
-	title: string;
 	icon: Component;
 }
 
 export const CATEGORIES: Category[] = [
-	{ id: 'office', title: 'Productivity', icon: Briefcase },
-	{ id: 'graphics', title: 'Graphics & Photos', icon: PenTool },
-	{ id: 'audiovideo', title: 'Audio & Video', icon: Clapperboard },
-	{ id: 'game', title: 'Games', icon: Gamepad2 },
-	{ id: 'development', title: 'Developer Tools', icon: Code },
-	{ id: 'education', title: 'Education', icon: GraduationCap },
-	{ id: 'science', title: 'Science', icon: FlaskConical },
-	{ id: 'network', title: 'Internet', icon: Globe },
-	{ id: 'utility', title: 'Utilities', icon: Wrench },
-	{ id: 'system', title: 'System', icon: Settings2 }
+	{ id: 'office', icon: Briefcase },
+	{ id: 'graphics', icon: PenTool },
+	{ id: 'audiovideo', icon: Clapperboard },
+	{ id: 'game', icon: Gamepad2 },
+	{ id: 'development', icon: Code },
+	{ id: 'education', icon: GraduationCap },
+	{ id: 'science', icon: FlaskConical },
+	{ id: 'network', icon: Globe },
+	{ id: 'utility', icon: Wrench },
+	{ id: 'system', icon: Settings2 }
 ];
 
-export const category = (id: CategoryId) => CATEGORIES.find((entry) => entry.id === id)!;
+const TITLES: Record<CategoryId, string> = {
+	office: 'category-office',
+	graphics: 'category-graphics',
+	audiovideo: 'category-audiovideo',
+	game: 'category-game',
+	development: 'category-development',
+	education: 'category-education',
+	science: 'category-science',
+	network: 'category-network',
+	utility: 'category-utility',
+	system: 'category-system'
+};
+
+export const categoryTitle = (id: CategoryId) => t(TITLES[id]);

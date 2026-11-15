@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { commands, type Permissions } from '#lib/bindings.js';
 import { describe, type Access } from '#lib/app/permissions.js';
 import type { AppDetails, Screenshot } from './types';
@@ -67,7 +68,8 @@ function verified(metadata: Appstream['metadata']): string | null {
 	if (!metadata || String(metadata['flathub::verification::verified']) !== 'true') return null;
 	const website = metadata['flathub::verification::website'];
 	const login = metadata['flathub::verification::login_name'];
-	return `Verified as ${typeof website === 'string' ? website : typeof login === 'string' ? login : 'Flathub'}`;
+	const by = typeof website === 'string' ? website : typeof login === 'string' ? login : null;
+	return by ? t('verified-as', { name: by }) : t('verified-flathub');
 }
 
 export async function details(id: string): Promise<AppDetails> {

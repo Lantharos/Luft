@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { errorText, Row, Section } from '@luft/ui';
 	import { commands, type CustomIcons, type Names } from '#lib/bindings.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -44,22 +45,22 @@
 	}
 </script>
 
-<Section title="Name and icon">
+<Section title={t('app-name-and-icon')}>
 	{#if names}
-		<Row title="Name" description={names.custom ? `A name you chose, instead of “${names.own}”` : 'The one the app comes with'}>
+		<Row title={t('app-name')} description={names.custom ? t('app-name-custom', { name: names.own }) : t('app-name-own')}>
 			<span class="max-w-[220px] truncate text-[var(--text-muted)]">{names.custom ?? names.own}</span>
-			<button type="button" class="button" disabled={busy} onclick={() => (renaming = true)}>Rename</button>
+			<button type="button" class="button" disabled={busy} onclick={() => (renaming = true)}>{t('app-rename')}</button>
 		</Row>
 	{/if}
-	<Row title="Icon" description={custom?.icon ? 'A picture you chose' : 'The one the app comes with'}>
-		<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryChooseIcon({ desktop }))}>Change</button>
+	<Row title={t('app-icon')} description={custom?.icon ? t('app-icon-custom') : t('app-icon-own')}>
+		<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryChooseIcon({ desktop }))}>{t('app-icon-change')}</button>
 	</Row>
-	<Row title="Symbolic icon" description={custom?.symbolic ? 'One you chose, for monochrome icon styles' : 'Drawn from the icon, for monochrome icon styles'}>
-		<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryChooseSymbolicIcon({ desktop }))}>Change</button>
+	<Row title={t('app-symbolic-icon')} description={custom?.symbolic ? t('app-symbolic-custom') : t('app-symbolic-drawn')}>
+		<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryChooseSymbolicIcon({ desktop }))}>{t('app-icon-change')}</button>
 	</Row>
 	{#if custom?.icon || custom?.symbolic}
-		<Row title="Use the app's own icon" description="Puts back the icon it came with">
-			<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryResetIcons({ desktop }))}>Reset</button>
+		<Row title={t('app-icon-reset-title')} description={t('app-icon-reset-description')}>
+			<button type="button" class="button" disabled={busy} onclick={() => change(() => commands.libraryResetIcons({ desktop }))}>{t('app-icon-reset')}</button>
 		</Row>
 	{/if}
 </Section>

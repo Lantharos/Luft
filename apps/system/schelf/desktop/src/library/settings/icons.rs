@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use gio::prelude::*;
+use luft_i18n::t;
 
 use luft_app::apps::{
     custom_icon, has_custom_symbolic, reset_custom_icons, set_custom_icon, set_custom_symbolic,
@@ -8,6 +9,8 @@ use luft_app::apps::{
 use luft_app::portal::{self, Filter};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 pub struct Icon {
@@ -63,16 +66,22 @@ async fn replace(
 }
 
 pub async fn choose(Icon { desktop }: Icon) -> Result<bool, String> {
-    replace("Choose an icon", "Images", &["png", "svg"], |path| {
-        set_custom_icon(&desktop, path)
-    })
+    replace(
+        &t!(L10N, "desktop-choose-icon"),
+        &t!(L10N, "desktop-images"),
+        &["png", "svg"],
+        |path| set_custom_icon(&desktop, path),
+    )
     .await
 }
 
 pub async fn choose_symbolic(Icon { desktop }: Icon) -> Result<bool, String> {
-    replace("Choose a symbolic icon", "SVG images", &["svg"], |path| {
-        set_custom_symbolic(&desktop, path)
-    })
+    replace(
+        &t!(L10N, "desktop-choose-symbolic-icon"),
+        &t!(L10N, "desktop-svg-images"),
+        &["svg"],
+        |path| set_custom_symbolic(&desktop, path),
+    )
     .await
 }
 

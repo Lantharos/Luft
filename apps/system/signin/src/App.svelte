@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { appearance, IconButton, Spinner, WindowControls } from '@luft/ui';
 	import Lock from '@lucide/svelte/icons/lock';
 	import LockOpen from '@lucide/svelte/icons/lock-open';
@@ -26,7 +27,7 @@
 <div class="glass-shell flex-col">
 	<header class="drag-region flex h-[52px] flex-none items-center gap-3 pr-3 pl-4">
 		<span class={['contents', signIn.loading && signIn.shown && '[&_svg]:animate-spin']}>
-			<IconButton icon={RotateCw} label="Reload" onclick={() => signIn.reload()} />
+			<IconButton icon={RotateCw} label={t('signin-reload')} onclick={() => signIn.reload()} />
 		</span>
 		<div class="flex min-w-0 flex-1 items-center gap-2 text-[13px]">
 			{#if signIn.network}
@@ -35,9 +36,9 @@
 			{#if signIn.host}
 				<span class="flex min-w-0 items-center gap-1.5 text-[var(--text-muted)]">
 					{#if signIn.secure}
-						<Lock size={13} class="flex-none" aria-label="Secure connection" />
+						<Lock size={13} class="flex-none" aria-label={t('signin-secure')} />
 					{:else}
-						<LockOpen size={13} class="flex-none text-[var(--danger)]" aria-label="Not secure" />
+						<LockOpen size={13} class="flex-none text-[var(--danger)]" aria-label={t('signin-not-secure')} />
 					{/if}
 					<span class="truncate">{signIn.host}</span>
 				</span>
@@ -46,6 +47,6 @@
 		<WindowControls />
 	</header>
 	<div bind:this={page} class="grid min-h-0 flex-1 place-items-center bg-[var(--content)] text-[13px] text-[var(--text-muted)]">
-		<span class="flex items-center gap-2"><Spinner size={14} />Opening the network's sign-in page</span>
+		<span class="flex items-center gap-2"><Spinner size={14} />{t('signin-opening')}</span>
 	</div>
 </div>

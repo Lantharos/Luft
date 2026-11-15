@@ -1,6 +1,7 @@
 mod bridge;
 mod desktop;
 mod events;
+mod l10n;
 mod launch;
 mod pty;
 mod settings;

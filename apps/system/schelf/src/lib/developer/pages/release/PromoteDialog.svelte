@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Dialog, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { channelName } from '#lib/account/channels.js';
@@ -14,7 +15,7 @@
 
 	async function promote() {
 		busy = true;
-		const promoted = await act(commands.developerPromote({ id, release: release.id, channel }), `${release.version} is on ${channelName(channel)} too`);
+		const promoted = await act(commands.developerPromote({ id, release: release.id, channel }), t('developer-promote-done', { version: release.version, channel: channelName(channel) }));
 		busy = false;
 		if (!promoted) return;
 		changed(id);
@@ -22,10 +23,10 @@
 	}
 </script>
 
-<Dialog title="Offer {release.version} on another channel" {onclose}>
-	<Select label="Channel" options={channels.map((value) => ({ value, label: channelName(value) }))} value={channel} onchange={(value) => (channel = value)} />
+<Dialog title={t('developer-promote-title', { version: release.version })} {onclose}>
+	<Select label={t('developer-promote-channel')} options={channels.map((value) => ({ value, label: channelName(value) }))} value={channel} onchange={(value) => (channel = value)} />
 	{#snippet actions()}
-		<button type="button" class="button" disabled={busy} onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={busy} onclick={promote}>Offer it</button>
+		<button type="button" class="button" disabled={busy} onclick={onclose}>{t('developer-cancel')}</button>
+		<button type="button" class="button primary" disabled={busy} onclick={promote}>{t('developer-promote-offer')}</button>
 	{/snippet}
 </Dialog>

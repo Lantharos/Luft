@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Layers from '@lucide/svelte/icons/layers';
 	import { bytes } from '@luft/ui';
 	import type { AppUpdate } from '#lib/bindings.js';
@@ -14,7 +15,7 @@
 	const active = $derived(operation && operation.state !== 'failed' ? operation : null);
 	const versions = $derived(update.from && update.to && update.from !== update.to ? `${update.from} → ${update.to}` : (update.to ?? update.from));
 	const detail = $derived(
-		operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null, update.store?.movesInside ? 'Approved to run inside Luft' : update.store?.movesOut ? 'No longer approved to run inside Luft' : update.store?.widens ? 'Asks for more access' : null].filter(Boolean).join(' · ')
+		operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null, update.store?.movesInside ? t('updates-moves-inside') : update.store?.movesOut ? t('updates-moves-out') : update.store?.widens ? t('updates-widens') : null].filter(Boolean).join(' · ')
 	);
 
 	function open() {
@@ -37,9 +38,9 @@
 	{#if active}
 		<ProgressButton operation={active} />
 	{:else if update.store?.widens}
-		<button type="button" class="button" onclick={open}>Review</button>
+		<button type="button" class="button" onclick={open}>{t('updates-review')}</button>
 	{:else}
-		<button type="button" class="button" onclick={() => operations.run(update.key, update.name, updateJob(update))}>Update</button>
+		<button type="button" class="button" onclick={() => operations.run(update.key, update.name, updateJob(update))}>{t('updates-update')}</button>
 	{/if}
 </div>
 

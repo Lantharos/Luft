@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import X from '@lucide/svelte/icons/x';
@@ -32,7 +33,7 @@
 {#if shown.length}
 	<div class="strip soft-scroll">
 		{#each shown as shot, index (shot.url)}
-			<button type="button" class="shot" aria-label={shot.caption ?? `Screenshot ${index + 1}`} onclick={() => (open = index)}>
+			<button type="button" class="shot" aria-label={shot.caption ?? t('screenshots-numbered', { number: index + 1 })} onclick={() => (open = index)}>
 				<img src={shot.url} alt={shot.caption ?? ''} loading="lazy" decoding="async" onerror={() => fail(shot.url)} />
 			</button>
 		{/each}
@@ -41,18 +42,18 @@
 
 {#if open !== null && shown[open]}
 	{@const shot = shown[open]}
-	<div class="lightbox" role="dialog" aria-modal="true" aria-label={shot.caption ?? 'Screenshot'}>
-		<button type="button" class="backdrop" aria-label="Close" onclick={() => (open = null)}></button>
+	<div class="lightbox" role="dialog" aria-modal="true" aria-label={shot.caption ?? t('screenshots-one')}>
+		<button type="button" class="backdrop" aria-label={t('screenshots-close')} onclick={() => (open = null)}></button>
 		<figure>
 			<img src={shot.url} alt={shot.caption ?? ''} />
 			{#if shot.caption}
 				<figcaption>{shot.caption}</figcaption>
 			{/if}
 		</figure>
-		<button type="button" class="icon-button large close" aria-label="Close" onclick={() => (open = null)}><X size={18} /></button>
+		<button type="button" class="icon-button large close" aria-label={t('screenshots-close')} onclick={() => (open = null)}><X size={18} /></button>
 		{#if shown.length > 1}
-			<button type="button" class="icon-button large previous" aria-label="Previous screenshot" onclick={() => step(-1)}><ChevronLeft size={20} /></button>
-			<button type="button" class="icon-button large next" aria-label="Next screenshot" onclick={() => step(1)}><ChevronRight size={20} /></button>
+			<button type="button" class="icon-button large previous" aria-label={t('screenshots-previous')} onclick={() => step(-1)}><ChevronLeft size={20} /></button>
+			<button type="button" class="icon-button large next" aria-label={t('screenshots-next')} onclick={() => step(1)}><ChevronRight size={20} /></button>
 		{/if}
 	</div>
 {/if}

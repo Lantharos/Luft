@@ -6,8 +6,6 @@ use schelf_core::operations::Job;
 
 use super::{Candidate, Catalog, Kind};
 
-pub const TITLE: &str = "your software sources";
-
 fn candidates(found: Vec<Available>) -> Vec<Candidate> {
     if found.is_empty() {
         return Vec::new();

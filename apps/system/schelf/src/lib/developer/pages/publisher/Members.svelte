@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import { t } from '@luft/i18n';
 	import { ConfirmDialog, MenuButton, MenuItem, Row, Section } from '@luft/ui';
 	import { commands, type Role } from '#lib/bindings.js';
 	import Loaded from '../../components/Loaded.svelte';
@@ -10,7 +11,7 @@
 	import { reads } from '../../state/reads';
 	import type { DashboardPublisher, Member, SentInvite } from '../../store';
 	import InviteMemberDialog from './InviteMemberDialog.svelte';
-	import { ROLES } from './roles';
+	import { roleName } from './roles';
 
 	let { publisher }: { publisher: DashboardPublisher } = $props();
 
@@ -25,15 +26,15 @@
 	const invitee = (invite: SentInvite) => invite.email ?? `@${invite.github}`;
 
 	function role(member: Member, next: Role) {
-		void approvals.ask(`Make ${member.name} ${ROLES[next].toLowerCase()}`, [{ type: 'member.role', publisher: publisher.id, user: member.user_id, role: next }], settled);
+		void approvals.ask(t('developer-members-make-approval', { name: member.name, role: next }), [{ type: 'member.role', publisher: publisher.id, user: member.user_id, role: next }], settled);
 	}
 
 	function remove(member: Member) {
-		void approvals.ask(`Remove ${member.name}`, [{ type: 'member.remove', publisher: publisher.id, user: member.user_id }], settled);
+		void approvals.ask(t('developer-members-remove-approval', { name: member.name }), [{ type: 'member.remove', publisher: publisher.id, user: member.user_id }], settled);
 	}
 
 	async function revoke(invite: SentInvite) {
-		const left = await act(commands.developerRevokeMemberInvite({ publisher: publisher.id, invite: invite.id }), `Took back ${invitee(invite)}'s invitation`);
+		const left = await act(commands.developerRevokeMemberInvite({ publisher: publisher.id, invite: invite.id }), t('developer-members-taken-back', { who: invitee(invite) }));
 		if (!left) return false;
 		members.set(left);
 	}
@@ -43,33 +44,38 @@
 	{#snippet children(list)}
 		<Section>
 			{#each list.members as member (member.user_id)}
-				<Row title={member.name} description="{member.email} · since {day(member.joined_at)}" truncate>
-					<span>{ROLES[member.role]}</span>
+				<Row title={member.name} description={t('developer-members-since', { email: member.email, date: day(member.joined_at) })} truncate>
+					<span>{roleName(member.role)}</span>
 					{#if manages && member.role !== 'owner'}
-						<MenuButton label="More for {member.name}" class="icon-button" align="end">
+						<MenuButton label={t('developer-members-more', { name: member.name })} class="icon-button" align="end">
 							{#snippet trigger()}<Ellipsis size={18} />{/snippet}
 							{#snippet children(close)}
 								{#each (['admin', 'developer'] as const).filter((next) => next !== member.role) as next (next)}
-									<MenuItem onclick={() => (close(), role(member, next))}>Make {ROLES[next].toLowerCase()}</MenuItem>
+									<MenuItem onclick={() => (close(), role(member, next))}>{t('developer-members-make', { role: next })}</MenuItem>
 								{/each}
-								<MenuItem danger onclick={() => (close(), remove(member))}>Remove</MenuItem>
+								<MenuItem danger onclick={() => (close(), remove(member))}>{t('developer-members-remove')}</MenuItem>
 							{/snippet}
 						</MenuButton>
 					{/if}
 				</Row>
 			{/each}
 			{#if manages}
-				<Row title="Invite someone">
-					<button type="button" class="button" onclick={() => (inviting = true)}>Invite</button>
+				<Row title={t('developer-invite-someone')}>
+					<button type="button" class="button" onclick={() => (inviting = true)}>{t('developer-invite')}</button>
 				</Row>
 			{/if}
 		</Section>
 		{#if list.invites.length}
-			<Section title="Invited">
+			<Section title={t('developer-members-invited')}>
 				{#each list.invites as invite (invite.id)}
-					<Row title={invitee(invite)} description="{ROLES[invite.role]}, until {day(invite.expires_at)}{invite.invited_by ? `, from ${invite.invited_by}` : ''}">
+					<Row
+						title={invitee(invite)}
+						description={invite.invited_by
+							? t('developer-members-invite-facts-by', { role: roleName(invite.role), date: day(invite.expires_at), by: invite.invited_by })
+							: t('developer-members-invite-facts', { role: roleName(invite.role), date: day(invite.expires_at) })}
+					>
 						{#if manages}
-							<button type="button" class="button" onclick={() => (revoking = invite)}>Take back</button>
+							<button type="button" class="button" onclick={() => (revoking = invite)}>{t('developer-members-take-back')}</button>
 						{/if}
 					</Row>
 				{/each}
@@ -84,5 +90,12 @@
 
 {#if revoking}
 	{@const invite = revoking}
-	<ConfirmDialog title="Take back {invitee(invite)}'s invitation?" description="The link in their email stops working." action="Take back" danger run={() => revoke(invite)} onclose={() => (revoking = null)} />
+	<ConfirmDialog
+		title={t('developer-members-take-back-title', { who: invitee(invite) })}
+		description={t('developer-members-take-back-description')}
+		action={t('developer-members-take-back')}
+		danger
+		run={() => revoke(invite)}
+		onclose={() => (revoking = null)}
+	/>
 {/if}

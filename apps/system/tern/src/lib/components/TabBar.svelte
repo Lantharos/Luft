@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { WindowControls, tooltip } from '@luft/ui';
 	import Plus from '@lucide/svelte/icons/plus';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
@@ -20,7 +21,7 @@
 </script>
 
 <header class="tab-bar drag-region">
-	<div class="tab-list" role="tablist" aria-label="Tabs">
+	<div class="tab-list" role="tablist" aria-label={t('tern-tabs')}>
 		{#each workspace.tabs as tab (tab.key)}
 			<div class={['tab', tab === workspace.active && 'is-active', tab.ringing && 'is-ringing']} role="presentation">
 				<button
@@ -33,16 +34,16 @@
 				>
 					<span class="truncate">{tab.title}</span>
 				</button>
-				<button type="button" class="tab-close" aria-label="Close tab" onclick={() => workspace.closeTab(tab)} onauxclick={(event) => middleClose(event, tab)}>
+				<button type="button" class="tab-close" aria-label={t('tern-tab-close')} onclick={() => workspace.closeTab(tab)} onauxclick={(event) => middleClose(event, tab)}>
 					<X size={12} />
 				</button>
 			</div>
 		{/each}
-		<button type="button" class="icon-button" aria-label="New tab" {@attach tooltip('New tab')} onclick={() => workspace.openTab()}>
+		<button type="button" class="icon-button" aria-label={t('tern-tab-new')} {@attach tooltip(t('tern-tab-new'))} onclick={() => workspace.openTab()}>
 			<Plus size={16} />
 		</button>
 	</div>
-	<button type="button" class="icon-button" aria-label="Preferences" {@attach tooltip('Preferences')} onclick={() => (workspace.preferencesOpen = true)}>
+	<button type="button" class="icon-button" aria-label={t('tern-preferences')} {@attach tooltip(t('tern-preferences'))} onclick={() => (workspace.preferencesOpen = true)}>
 		<SlidersHorizontal size={16} />
 	</button>
 	<WindowControls />

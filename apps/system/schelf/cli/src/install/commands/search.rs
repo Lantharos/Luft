@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use schelf_core::library::InstalledApp;
 
 use super::catalog;
@@ -6,9 +7,11 @@ use crate::install::arguments::Arguments;
 use crate::install::sources::{self, Candidate, Origin, installed};
 use crate::install::terminal::Line;
 use crate::install::terminal::{self, Ink, Look, Table};
+use crate::l10n::L10N;
 
 const SHOWN: usize = 10;
 const INSTALLED: &str = "installed";
+const AVAILABLE: &str = "available";
 
 struct Found {
     origin: Origin,
@@ -58,13 +61,18 @@ fn group(origin: Origin, found: &[Found], all: bool) {
     }
     looks.push(Look::Plain);
     let mut table = Table::new(&looks);
+    let installed = t!(L10N, "cli-search-installed");
     for found in found {
         let mut row = vec![found.name.clone()];
         if with_id {
             row.push(found.id.clone());
         }
         if with_mark {
-            row.push(if found.installed { INSTALLED } else { "" }.to_owned());
+            row.push(if found.installed {
+                installed.clone()
+            } else {
+                String::new()
+            });
         }
         row.push(found.summary.clone());
         table.row(row);
@@ -75,9 +83,11 @@ fn group(origin: Origin, found: &[Found], all: bool) {
 fn more(origin: Origin, hidden: usize) {
     println!(
         "  {}",
-        Ink::stdout().dim(format!(
-            "{hidden} more. See them all with --{}.",
-            origin.flag()
+        Ink::stdout().dim(t!(
+            L10N,
+            "cli-search-more",
+            count = hidden,
+            flag = format!("--{}", origin.flag())
         ))
     );
 }
@@ -86,7 +96,7 @@ fn plain(found: &Found) {
     let state = if found.installed {
         INSTALLED
     } else {
-        "available"
+        AVAILABLE
     };
     println!(
         "{}\t{}\t{}\t{state}\t{}",
@@ -104,7 +114,7 @@ pub fn run(arguments: &Arguments) -> Exit {
     };
     let query = arguments.words.join(" ");
     let line = Line::default();
-    line.say(&format!("Searching for {query}"));
+    line.say(&t!(L10N, "cli-search-searching", query = query.as_str()));
     let mut groups: Vec<(Origin, Vec<Found>)> = Vec::new();
     let mut failed = false;
     for (catalog, result) in sources::search(&query, only) {
@@ -115,7 +125,15 @@ pub fn run(arguments: &Arguments) -> Exit {
             )),
             Err(error) => {
                 line.clear();
-                eprintln!("{} can't be searched right now. {error}", catalog.title());
+                eprintln!(
+                    "{}",
+                    t!(
+                        L10N,
+                        "cli-search-failed",
+                        source = catalog.title(),
+                        error = error
+                    )
+                );
                 failed = true;
             }
         }
@@ -143,11 +161,16 @@ pub fn run(arguments: &Arguments) -> Exit {
     });
     if groups.is_empty() {
         if !failed {
-            let places = only.map_or_else(
-                || "anywhere".to_owned(),
-                |catalog| format!("on {}", catalog.title()),
-            );
-            eprintln!("Nothing matches {query} {places}.");
+            let nothing = match only {
+                Some(catalog) => t!(
+                    L10N,
+                    "cli-search-nothing-on",
+                    query = query.as_str(),
+                    source = catalog.title()
+                ),
+                None => t!(L10N, "cli-search-nothing", query = query.as_str()),
+            };
+            eprintln!("{nothing}");
         }
         return if failed { Exit::Failed } else { Exit::Missing };
     }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Shelf from '#lib/components/Shelf.svelte';
 	import type { CatalogApp } from '#lib/bindings.js';
@@ -45,7 +46,7 @@
 	<div class="mx-auto flex w-full max-w-[1040px] flex-col gap-8 px-8 pt-2 pb-10">
 		{#if installed.length}
 			<section class="flex flex-col gap-2">
-				<h2 class="px-1.5 text-[17px] font-semibold">On this computer</h2>
+				<h2 class="px-1.5 text-[17px] font-semibold">{t('search-on-computer')}</h2>
 				<div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-1">
 					{#each installed as app (app.key)}
 						<button type="button" class="result" onclick={() => navigation.push({ page: 'app', target: { installed: app.key }, name: app.name })}>
@@ -60,20 +61,20 @@
 			</section>
 		{/if}
 		{#if extensionsFirst}
-			<Shelf title="Extensions" apps={extensions} />
+			<Shelf title={t('search-extensions')} apps={extensions} />
 		{/if}
 		{#if error}
-			<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Apps can't be searched right now. {error}</p>
+			<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{t('search-apps-failed', { error })}</p>
 		{:else if apps === null || apps.length}
-			<Shelf title="Apps" {apps} />
+			<Shelf title={t('search-apps')} {apps} />
 		{/if}
 		{#if extensions.length && !extensionsFirst}
-			<Shelf title="Extensions" apps={extensions} />
+			<Shelf title={t('search-extensions')} apps={extensions} />
 		{/if}
 		<PackageResults {query} kind="tool" bind:found={tools} />
 		<PackageResults {query} kind="system" bind:found={system} />
 		{#if nothing}
-			<p class="px-1.5 pt-10 text-center text-[15px] text-[var(--text-muted)]">Nothing matches “{query}”.</p>
+			<p class="px-1.5 pt-10 text-center text-[15px] text-[var(--text-muted)]">{t('search-nothing', { query })}</p>
 		{/if}
 	</div>
 </div>

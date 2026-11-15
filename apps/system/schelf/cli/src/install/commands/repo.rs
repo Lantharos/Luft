@@ -1,14 +1,16 @@
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::system::repositories::{self, Described};
 use luft_software::system::system_packages::{self, Origin, Repository};
 use schelf_core::operations::{Job, Request};
 
-use super::list_of;
+use super::{list_of, needs_yes};
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::perform::{Plan, Verb, carry_out};
 use crate::install::terminal::Line;
 use crate::install::terminal::{self, Ink, Look, Table, prompt};
+use crate::l10n::L10N;
 
 /// A fingerprint in the groups of four people compare them in.
 fn grouped(fingerprint: &str) -> String {
@@ -28,14 +30,12 @@ fn show_trust(described: &Described) {
         eprintln!("{}", ink.bold(&source.name));
         eprintln!("  {}", source.url);
     }
-    eprintln!("Its packages are signed with:");
+    eprintln!("{}", t!(L10N, "cli-repo-signed-with"));
     for key in &described.keys {
         eprintln!("  {}", key.user);
         eprintln!("  {}", ink.dim(grouped(&key.fingerprint)));
     }
-    eprintln!(
-        "Packages from it become part of the system, with full access to the computer, and update with Luft. Only add sources you trust."
-    );
+    eprintln!("{}", t!(L10N, "cli-repo-warning"));
 }
 
 pub fn confirm_trust(described: &Described, yes: bool) -> Result<(), Exit> {
@@ -43,9 +43,9 @@ pub fn confirm_trust(described: &Described, yes: bool) -> Result<(), Exit> {
     if yes {
         return Ok(());
     }
-    let question = format!("Add {}?", described.name());
+    let question = t!(L10N, "cli-repo-confirm", name = described.name());
     if !prompt::interactive() {
-        eprintln!("{question} Add --yes to go ahead without being asked.");
+        eprintln!("{}", needs_yes(&question));
         return Err(Exit::Usage);
     }
     if prompt::agree(&question) {
@@ -58,7 +58,7 @@ pub fn confirm_trust(described: &Described, yes: bool) -> Result<(), Exit> {
 fn add(source: &str, yes: bool) -> Exit {
     let ink = Ink::stdout();
     let line = Line::default();
-    line.say(&format!("Fetching {source}"));
+    line.say(&t!(L10N, "cli-repo-fetching", source = source));
     let fetched = repositories::fetch(source).and_then(|draft| {
         let described = block_on(system_packages::describe(&draft))?;
         Ok((draft, described))
@@ -73,8 +73,8 @@ fn add(source: &str, yes: bool) -> Exit {
     };
     if repositories::is_added(&draft) {
         println!(
-            "{} is already a software source.",
-            ink.bold(described.name())
+            "{}",
+            t!(L10N, "cli-repo-already", name = ink.bold(described.name()))
         );
         return Exit::Done;
     }
@@ -84,9 +84,13 @@ fn add(source: &str, yes: bool) -> Exit {
     match block_on(system_packages::add_repository(&draft)) {
         Ok(()) => {
             println!(
-                "Added {}. Install its packages with {}.",
-                ink.bold(described.name()),
-                ink.bold("schelf install --system NAME")
+                "{}",
+                t!(
+                    L10N,
+                    "cli-repo-added",
+                    name = ink.bold(described.name()),
+                    command = ink.bold("schelf install --system NAME")
+                )
             );
             Exit::Done
         }
@@ -117,7 +121,10 @@ fn remove(name: &str, yes: bool) -> Exit {
         }
     };
     let Some(repository) = named(&packages.repositories, name) else {
-        eprintln!("There's no software source called {}.", ink.bold(name));
+        eprintln!(
+            "{}",
+            t!(L10N, "cli-repo-nothing-called", name = ink.bold(name))
+        );
         return Exit::Missing;
     };
     let origin = Origin::Repository(repository.file.clone());
@@ -127,10 +134,11 @@ fn remove(name: &str, yes: bool) -> Exit {
         .map(|package| package.name.clone())
         .collect();
     if !leaving.is_empty() {
-        let question = format!(
-            "Removing {} also removes {} from the system. Go ahead?",
-            repository.name(),
-            list_of(&leaving)
+        let question = t!(
+            L10N,
+            "cli-repo-remove-confirm",
+            name = repository.name(),
+            packages = list_of(&leaving)
         );
         if let Err(exit) = super::confirm(&question, yes) {
             return exit;
@@ -161,8 +169,12 @@ fn list() -> Exit {
     };
     if packages.repositories.is_empty() {
         eprintln!(
-            "No software sources were added. Add one with {}.",
-            Ink::stderr().bold("schelf repo add")
+            "{}",
+            t!(
+                L10N,
+                "cli-repo-none",
+                command = Ink::stderr().bold("schelf repo add")
+            )
         );
         return Exit::Done;
     }
@@ -195,7 +207,14 @@ pub fn run(arguments: &Arguments) -> Exit {
         ("remove" | "rm", [name]) => remove(name, arguments.yes),
         ("list" | "ls", []) => list(),
         _ => {
-            eprintln!("Usage: schelf repo add SOURCE | remove NAME | list");
+            eprintln!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-usage",
+                    usage = "schelf repo add SOURCE | remove NAME | list"
+                )
+            );
             Exit::Usage
         }
     }

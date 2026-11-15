@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { t } from '@luft/i18n';
 	import { Dialog, Spinner } from '@luft/ui';
 	import type { Invitation } from '#lib/bindings.js';
 	import { openUrl } from '#lib/bridge/index.js';
@@ -16,20 +17,20 @@
 	const invitations = $derived(account.state?.invitations ?? []);
 	const publishers = $derived(navigation.developing && developer.publishers.length > 1 ? developer.publishers : []);
 
-	const title = $derived(signedIn ? signedIn.name || signedIn.email : step.step === 'waiting' ? 'Approve in your browser' : 'Sign in to schelf.store');
+	const title = $derived(signedIn ? signedIn.name || signedIn.email : step.step === 'waiting' ? t('account-approve-title') : t('account-sign-in-title'));
 	const description = $derived.by(() => {
 		if (signedIn) return signedIn.name ? signedIn.email : undefined;
 		switch (step.step) {
 			case 'waiting':
-				return 'Check that the page shows this code, then approve it.';
+				return t('account-approve-description');
 			case 'declined':
-				return 'The sign-in was declined in the browser.';
+				return t('account-declined');
 			case 'expired':
-				return 'The code ran out before it was approved.';
+				return t('account-expired');
 			case 'failed':
 				return step.error;
 			default:
-				return 'Get the apps and versions you were invited to try.';
+				return t('account-sign-in-description');
 		}
 	});
 
@@ -78,26 +79,26 @@
 				{/each}
 			</ul>
 		{:else}
-			<p class="text-[13px] text-[var(--text-muted)]">You aren't invited to anything yet.</p>
+			<p class="text-[13px] text-[var(--text-muted)]">{t('account-no-invitations')}</p>
 		{/if}
 	{:else if step.step === 'waiting'}
 		<p class="code">{step.approval.code}</p>
 	{/if}
 	{#snippet actions()}
 		{#if signedIn}
-			<button type="button" class="button" onclick={signOut}>Sign out</button>
-			<button type="button" class="button primary" onclick={() => account.close()}>Done</button>
+			<button type="button" class="button" onclick={signOut}>{t('account-sign-out')}</button>
+			<button type="button" class="button primary" onclick={() => account.close()}>{t('account-done')}</button>
 		{:else if step.step === 'waiting'}
 			{@const page = step.approval.page}
-			<button type="button" class="button" onclick={() => account.close()}>Cancel</button>
-			<button type="button" class="button primary" onclick={() => openUrl(page)}>Open the page again</button>
+			<button type="button" class="button" onclick={() => account.close()}>{t('account-cancel')}</button>
+			<button type="button" class="button primary" onclick={() => openUrl(page)}>{t('account-open-page')}</button>
 		{:else}
-			<button type="button" class="button" onclick={() => account.close()}>Cancel</button>
+			<button type="button" class="button" onclick={() => account.close()}>{t('account-cancel')}</button>
 			<button type="button" class="button primary" disabled={step.step === 'starting'} onclick={() => account.begin()}>
 				{#if step.step === 'starting'}
 					<Spinner size={14} />
 				{/if}
-				{step.step === 'idle' || step.step === 'starting' ? 'Sign in' : 'Try again'}
+				{step.step === 'idle' || step.step === 'starting' ? t('account-sign-in') : t('account-try-again')}
 			</button>
 		{/if}
 	{/snippet}

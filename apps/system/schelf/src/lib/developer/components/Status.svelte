@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { RELEASE_STATUS } from '../format';
+	import { statusLabel, statusTone } from '../format';
 	import type { ReleaseStatus } from '../store';
 
 	let { status }: { status: ReleaseStatus } = $props();
-	const shown = $derived(RELEASE_STATUS[status]);
-</script>
+	</script>
 
-<span class="status {shown.tone}"><span class="dot"></span>{shown.label}</span>
+<span class="status {statusTone(status)}"><span class="dot"></span>{statusLabel(status)}</span>
 
 <style>
 	.status {

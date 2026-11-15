@@ -1,4 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
+import { t } from '@luft/i18n';
 import { duration } from '@luft/ui';
 import type { LaunchRequest } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
@@ -168,7 +169,7 @@ export class Workspace {
 		const tab = this.#tabOf(session);
 		if (!tab || elapsed < LONG_COMMAND_MS || (tab === this.active && document.hasFocus())) return;
 		const took = duration(elapsed / 1000);
-		const body = code === 0 ? `Finished in ${took}` : `Failed after ${took}`;
+		const body = code === 0 ? t('tern-finished', { duration: took }) : t('tern-failed', { duration: took });
 		const notification = new Notification(command || tab.title, { body, tag: tab.key });
 		notification.onclick = () => {
 			const target = this.tabs.find((candidate) => candidate.key === tab.key);

@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use luft_software::system::repositories::Described;
 use schelf_core::files::{self, OpenedFile};
 use schelf_core::library::sources::CheckedSource;
@@ -7,6 +8,7 @@ use schelf_core::operations::{Job, Request};
 use schelf_core::{host, tools};
 
 use crate::install::perform::{Plan, Verb};
+use crate::l10n::L10N;
 
 const EXTENSIONS: [&str; 6] = [
     ".rpm",
@@ -31,18 +33,16 @@ pub fn named(target: &str) -> bool {
 }
 
 /// Why this computer can't install a file like `path`, when it can't.
-fn unsupported(path: &str) -> Option<&'static str> {
+fn unsupported(path: &str) -> Option<String> {
     let lowered = path.to_lowercase();
     let flatpak = [".flatpak", ".flatpakref", ".flatpakrepo"]
         .iter()
         .any(|extension| lowered.ends_with(extension));
     if flatpak && !host::flatpak() {
-        return Some("Flatpak files need Flatpak, which isn't installed here.");
+        return Some(t!(L10N, "cli-file-needs-flatpak"));
     }
     let package = lowered.ends_with(".rpm") || lowered.ends_with(".deb");
-    (package && !host::luft()).then_some(
-        "Package files install through Luft, which this computer doesn't run; use its own package manager for them.",
-    )
+    (package && !host::luft()).then(|| t!(L10N, "cli-file-needs-luft"))
 }
 
 pub struct Prepared {
@@ -92,11 +92,11 @@ fn title(opened: &OpenedFile) -> &str {
 pub fn prepare(target: &str) -> Result<Prepared, String> {
     let path: PathBuf = std::path::absolute(target).map_err(|error| error.to_string())?;
     if !path.is_file() {
-        return Err(format!("There's no file at {target}."));
+        return Err(t!(L10N, "cli-file-missing", path = target));
     }
     let shown = path.to_string_lossy().into_owned();
     if let Some(reason) = unsupported(&shown) {
-        return Err(reason.to_owned());
+        return Err(reason);
     }
     let opened = files::inspect(&shown)?;
     let installed = matches!(
@@ -115,8 +115,13 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
     } = &opened
     {
         eprintln!(
-            "{} is on Flathub too, where it's sandboxed and keeps itself up to date: schelf install {} installs that instead.",
-            flathub.name, flathub.id
+            "{}",
+            t!(
+                L10N,
+                "cli-file-deb-on-flathub",
+                name = flathub.name.as_str(),
+                command = format!("schelf install {}", flathub.id)
+            )
         );
     }
     if let OpenedFile::AppImage {
@@ -126,7 +131,13 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
     } = &opened
     {
         eprintln!(
-            "{name} asks to run outside its sandbox: {reason} It installs in its sandbox, and schelf trust gives it full access if you trust it."
+            "{}",
+            t!(
+                L10N,
+                "cli-file-appimage-unsandboxed",
+                name = name.as_str(),
+                reason = reason.as_str()
+            )
         );
     }
     let verb = if matches!(opened, OpenedFile::FlatpakRepo { .. }) {
@@ -156,7 +167,8 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
     } = &opened
     {
         eprintln!(
-            "It brings a software source Luft can't use, so it's installed by itself and won't get updates. {error}"
+            "{}",
+            t!(L10N, "cli-file-source-unusable", error = error.as_str())
         );
     }
     Ok(Prepared {

@@ -6,11 +6,12 @@
 	import Store from '@lucide/svelte/icons/store';
 	import UsersRound from '@lucide/svelte/icons/users-round';
 	import type { Component } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { selectionPill } from '@luft/ui';
 	import NavItem from '#lib/components/NavItem.svelte';
 	import { account } from '#lib/state/account.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
-	import { PUBLISHER_PAGES, type PublisherPage } from '../pages';
+	import { PUBLISHER_PAGES, publisherPageTitle, type PublisherPage } from '../pages';
 	import { developer } from '../state/developer.svelte';
 	import ProjectMark from './ProjectMark.svelte';
 	import PublisherMark from './PublisherMark.svelte';
@@ -20,7 +21,7 @@
 	const publisher = $derived(developer.publisher);
 	const projects = $derived(publisher ? developer.projects(publisher.id) : null);
 	const root = $derived(navigation.root);
-	const pages = $derived((Object.entries(PUBLISHER_PAGES) as [PublisherPage, string][]).filter(([page]) => page !== 'members' || publisher?.kind === 'organisation'));
+	const pages = $derived(PUBLISHER_PAGES.filter((page) => page !== 'members' || publisher?.kind === 'organisation'));
 	const projectOpen = (id: string) => root.page === 'project' && root.id === id;
 
 	$effect(() => projects?.watch());
@@ -47,9 +48,9 @@
 			{/each}
 		</div>
 		<div class="flex flex-col gap-0.5">
-			{#each pages as [page, title] (page)}
+			{#each pages as page (page)}
 				<NavItem
-					{title}
+					title={publisherPageTitle(page)}
 					icon={PAGE_ICONS[page]}
 					active={root.page === 'publisher' && root.section === page}
 					onclick={() => navigation.open({ page: 'publisher', section: page })}
@@ -57,7 +58,7 @@
 			{/each}
 		</div>
 	</nav>
-	<NavItem title="Back to the store" icon={Store} onclick={() => developer.leave()} />
+	<NavItem title={t('developer-back-to-store')} icon={Store} onclick={() => developer.leave()} />
 </aside>
 
 <style>

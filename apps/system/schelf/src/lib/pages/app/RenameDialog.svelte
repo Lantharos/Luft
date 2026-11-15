@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, errorText, TextField } from '@luft/ui';
 	import { commands, type Names } from '#lib/bindings.js';
@@ -22,10 +23,10 @@
 	}
 </script>
 
-<Dialog title="Rename {names.custom ?? names.own}" description="Leave it empty to use “{names.own}” again." onclose={() => onclose(false)}>
-	<TextField label="Name" bind:value={name} placeholder={names.own} {error} live disabled={busy} onkeydown={(event) => event.key === 'Enter' && save()} />
+<Dialog title={t('app-rename-title', { name: names.custom ?? names.own })} description={t('app-rename-description', { name: names.own })} onclose={() => onclose(false)}>
+	<TextField label={t('app-name')} bind:value={name} placeholder={names.own} {error} live disabled={busy} onkeydown={(event) => event.key === 'Enter' && save()} />
 	{#snippet actions()}
-		<button type="button" class="button" onclick={() => onclose(false)}>Cancel</button>
-		<button type="button" class="button primary" disabled={busy} onclick={save}>Rename</button>
+		<button type="button" class="button" onclick={() => onclose(false)}>{t('app-rename-cancel')}</button>
+		<button type="button" class="button primary" disabled={busy} onclick={save}>{t('app-rename')}</button>
 	{/snippet}
 </Dialog>

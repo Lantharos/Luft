@@ -1,7 +1,8 @@
+use luft_i18n::t;
 use luft_software::apps::toolbox;
 use schelf_core::operations::Job;
 
-use super::{catalog, confirm, list_of, pick};
+use super::{catalog, confirm, either_of, list_of, pick};
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::perform::{Missed, Plan, Verb, carry_out};
@@ -10,42 +11,41 @@ use crate::install::sources::{
 };
 use crate::install::terminal::Line;
 use crate::install::terminal::{Ink, Look, Table};
+use crate::l10n::L10N;
 
 const COMMANDS_SHOWN: usize = 5;
 
 fn nothing(name: &str, only: Option<Catalog>, suggestions: &[Candidate]) {
     let ink = Ink::stderr();
-    let mut places: Vec<&str> = catalogs(only)
+    let mut places: Vec<String> = catalogs(only)
         .into_iter()
         .filter(|catalog| *catalog != Catalog::System)
         .map(Catalog::title)
         .collect();
     places.dedup();
+    let places: Vec<&str> = places.iter().map(String::as_str).collect();
     eprintln!(
-        "There's nothing called {} on {}.",
-        ink.bold(name),
-        places_of(&places)
+        "{}",
+        t!(
+            L10N,
+            "cli-install-nothing-called",
+            name = ink.bold(name),
+            places = either_of(&places)
+        )
     );
     if suggestions.is_empty() {
         return;
     }
-    eprintln!("Close matches:");
+    eprintln!("{}", t!(L10N, "cli-install-close-matches"));
     let mut table = Table::new(&[Look::Bold, Look::Dim, Look::Plain]);
     for candidate in suggestions {
         table.row(vec![
             candidate.id.clone(),
-            candidate.catalog.title().to_owned(),
+            candidate.catalog.title(),
             candidate.summary.clone(),
         ]);
     }
     table.eprint(ink);
-}
-
-fn places_of(places: &[&str]) -> String {
-    match places {
-        [rest @ .., last] if !rest.is_empty() => format!("{} or {last}", rest.join(", ")),
-        _ => places.concat(),
-    }
 }
 
 fn choose(name: &str, found: Vec<Candidate>, yes: bool) -> Result<Candidate, Exit> {
@@ -54,12 +54,13 @@ fn choose(name: &str, found: Vec<Candidate>, yes: bool) -> Result<Candidate, Exi
         .iter()
         .all(|candidate| candidate.catalog.origin() == found[0].catalog.origin())
     {
-        format!(
-            "Name the one you want by its ID or address, such as {}.",
-            found[0].id
+        t!(
+            L10N,
+            "cli-install-name-by-id",
+            example = found[0].id.as_str()
         )
     } else {
-        "Pick one with --store, --flathub or --fedora.".to_owned()
+        t!(L10N, "cli-install-pick-source")
     };
     let chosen = pick(name, &options, yes, &hint)?;
     Ok(found
@@ -77,25 +78,44 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<(Pla
             Exit::Missing
         })?;
         if prepared.installed {
-            println!("{} is already installed.", ink.bold(prepared.plan.name()));
+            println!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-install-already",
+                    name = ink.bold(prepared.plan.name())
+                )
+            );
             return Ok(None);
         }
         if let Some(described) = &prepared.trust {
             eprintln!(
-                "{} gets its updates from a software source of its own:",
-                ink.bold(prepared.plan.name())
+                "{}",
+                t!(
+                    L10N,
+                    "cli-install-own-source",
+                    name = ink.bold(prepared.plan.name())
+                )
             );
             super::repo::confirm_trust(described, yes)?;
         }
         return Ok(Some((prepared.plan, false)));
     }
     let line = Line::default();
-    line.say(&format!("Looking for {target}"));
+    line.say(&t!(L10N, "cli-looking-for", name = target));
     let resolved = resolve(target, only);
     line.clear();
     let candidate = match resolved {
         Err(error) => {
-            eprintln!("Couldn't look for {target}. {error}");
+            eprintln!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-install-look-failed",
+                    name = target,
+                    error = error
+                )
+            );
             return Err(Exit::Failed);
         }
         Ok(Resolved::One(candidate)) => candidate,
@@ -109,14 +129,25 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<(Pla
         && candidate.catalog == Catalog::Fedora
         && fedora::comes_with_luft(&candidate.id)
     {
-        println!("{} comes with Luft.", ink.bold(&candidate.name));
+        println!(
+            "{}",
+            t!(
+                L10N,
+                "cli-install-comes-with-luft",
+                name = ink.bold(&candidate.name)
+            )
+        );
         return Ok(None);
     }
     if candidate.installed {
         println!(
-            "{} is already installed from {}.",
-            ink.bold(&candidate.name),
-            candidate.catalog.title()
+            "{}",
+            t!(
+                L10N,
+                "cli-install-already-from",
+                name = ink.bold(&candidate.name),
+                source = candidate.catalog.title()
+            )
         );
         return Ok(None);
     }
@@ -129,12 +160,19 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<(Pla
             .iter()
             .any(|app| app.id == candidate.id)
         {
-            println!("{} is already a system package.", ink.bold(&candidate.name));
+            println!(
+                "{}",
+                t!(L10N, "cli-system-already", name = ink.bold(&candidate.name))
+            );
             return Ok(None);
         }
         println!(
-            "{} brings a service or driver that only works as part of the system, so it goes there, starts with the computer and updates with Luft.",
-            ink.bold(&candidate.name)
+            "{}",
+            t!(
+                L10N,
+                "cli-install-goes-to-system",
+                name = ink.bold(&candidate.name)
+            )
         );
         return Ok(Some((
             super::system::plan(vec![candidate.id], Verb::Install),
@@ -154,7 +192,7 @@ fn tool_notes(package: &str) -> Vec<String> {
     let mut notes = Vec::new();
     match commands.as_slice() {
         [] => {}
-        [command] => notes.push(format!("Run it as {}.", ink.bold(command))),
+        [command] => notes.push(t!(L10N, "cli-install-run-as", command = ink.bold(command))),
         _ => {
             let shown: Vec<String> = commands
                 .iter()
@@ -162,18 +200,23 @@ fn tool_notes(package: &str) -> Vec<String> {
                 .map(|command| ink.bold(command))
                 .collect();
             let more = commands.len().saturating_sub(COMMANDS_SHOWN);
-            let tail = if more > 0 {
-                format!(", and {more} more")
+            notes.push(if more > 0 {
+                t!(
+                    L10N,
+                    "cli-install-commands-and-more",
+                    commands = list_of(&shown),
+                    count = more
+                )
             } else {
-                String::new()
-            };
-            notes.push(format!("Its commands are {}{tail}.", list_of(&shown)));
+                t!(L10N, "cli-install-commands", commands = list_of(&shown))
+            });
         }
     }
     if fedora::is_library(package, &commands) {
-        notes.push(format!(
-            "It lives in your Toolbox, so build against it inside {}.",
-            ink.bold("toolbox enter")
+        notes.push(t!(
+            L10N,
+            "cli-install-library",
+            command = ink.bold("toolbox enter")
         ));
     }
     notes
@@ -184,23 +227,22 @@ fn notes(plan: &Plan) -> Vec<String> {
     match &plan.request.job {
         Job::InstallTool { package } => tool_notes(package),
         Job::InstallToolFile { .. } => tool_notes(plan.name()),
-        Job::InstallFlathub { id } => vec![format!(
-            "Open it from Start, or run {}.",
-            ink.bold(format!("flatpak run {id}"))
+        Job::InstallFlathub { id } => vec![t!(
+            L10N,
+            "cli-install-open-or-run",
+            command = ink.bold(format!("flatpak run {id}"))
         )],
         Job::InstallFlatpakRef { .. }
         | Job::InstallFlatpakBundle { .. }
         | Job::InstallDeb { .. }
         | Job::InstallAppImage { .. } => {
-            vec!["Open it from Start.".to_owned()]
+            vec![t!(L10N, "cli-install-open")]
         }
         Job::InstallSystemPackageFile {
             repository: Some(_),
             ..
-        } => vec!["It's part of the system now, and updates with Luft.".to_owned()],
-        Job::InstallSystemPackageFile { .. } => vec![
-            "It's part of the system now. It doesn't get updates of its own, so remove it and install a newer file when one comes out.".to_owned(),
-        ],
+        } => vec![t!(L10N, "cli-install-system-file-updates")],
+        Job::InstallSystemPackageFile { .. } => vec![t!(L10N, "cli-install-system-file")],
         _ => Vec::new(),
     }
 }
@@ -229,7 +271,8 @@ pub fn run(arguments: &Arguments) -> Exit {
     }
     if asks {
         let names: Vec<String> = plans.iter().map(|plan| plan.name().to_owned()).collect();
-        if let Err(exit) = confirm(&format!("Install {}?", list_of(&names)), arguments.yes) {
+        let question = t!(L10N, "cli-install-confirm", names = list_of(&names));
+        if let Err(exit) = confirm(&question, arguments.yes) {
             return exit;
         }
     }

@@ -4,11 +4,12 @@
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import Clock from '@lucide/svelte/icons/clock';
 	import type { Component } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';
 	import { channelName } from '#lib/account/channels.js';
 	import { openUrl } from '#lib/bridge/index.js';
 	import Loaded from '../../components/Loaded.svelte';
-	import { CHECK_TITLES, day, PLATFORM_NAMES, RELEASE_STATUS, shipped, type Tone } from '../../format';
+	import { checkTitle, day, platformName, shipped, statusLabel, statusTone, type Tone } from '../../format';
 	import { approvals } from '../../state/approval.svelte';
 	import { changed, reads } from '../../state/reads';
 	import type { Release } from '../../store';
@@ -32,7 +33,7 @@
 	const reviews = (release: Release) => release.timeline.flatMap((step) => (step.kind === 'review' ? [step] : []));
 
 	function insideLuft(release: Release) {
-		void approvals.ask(`Run ${release.version} inside Luft`, [{ type: 'release.inside-luft', app: id, release: release.id }], () => changed(id));
+		void approvals.ask(t('developer-release-inside-luft-approval', { version: release.version }), [{ type: 'release.inside-luft', app: id, release: release.id }], () => changed(id));
 	}
 </script>
 
@@ -42,33 +43,47 @@
 			{#snippet children(release)}
 				{@const reasons = flagged(release)}
 				<Section>
-					<Row title={RELEASE_STATUS[release.status].label} description={release.next ?? undefined} icon={TONE_ICONS[RELEASE_STATUS[release.status].tone]} />
+					<Row title={statusLabel(release.status)} description={release.next ?? undefined} icon={TONE_ICONS[statusTone(release.status)]} />
 					{#if release.status === 'in-review' && reasons.length}
-						<Row title="Why it went to review" description={reasons.map((check) => `${CHECK_TITLES[check.name]}: ${check.summary}`).join('. ')} />
+						<Row
+							title={t('developer-release-why-review')}
+							description={reasons.map((check) => t('developer-release-reason', { check: checkTitle(check.name), summary: check.summary })).join('. ')}
+						/>
 					{/if}
 					{#each reviews(release) as review (review.at)}
-						<Row title={review.decision ? `Reviewed: ${review.decision.replace(/-/g, ' ')}` : 'Waiting for a reviewer'} description={review.reason ?? undefined} />
+						<Row
+							title={review.decision ? t('developer-release-reviewed', { decision: review.decision.replace(/-/g, ' ') }) : t('developer-release-waiting')}
+							description={review.reason ?? undefined}
+						/>
 					{/each}
-					<Row title="On {channelName(release.channel)}" description="Published {day(release.created_at)}{release.approved_by ? `, approved by ${release.approved_by}` : ''}">
+					<Row
+						title={t('developer-release-on', { channel: channelName(release.channel) })}
+						description={release.approved_by
+							? t('developer-release-published-approved', { date: day(release.created_at), by: release.approved_by })
+							: t('developer-overview-published', { date: day(release.created_at) })}
+					>
 						{#if shipped(release) && others(release).length}
-							<button type="button" class="button" onclick={() => (promoting = true)}>Offer on another channel</button>
+							<button type="button" class="button" onclick={() => (promoting = true)}>{t('developer-release-offer-other')}</button>
 						{/if}
 					</Row>
-					<Row title={release.origin === 'oidc' ? 'Built on GitHub Actions' : 'Uploaded by hand'} description={release.commit ? `At ${release.commit.slice(0, 7)}` : undefined}>
+					<Row
+						title={t(release.origin === 'oidc' ? 'developer-release-built' : 'developer-release-by-hand')}
+						description={release.commit ? t('developer-release-commit', { commit: release.commit.slice(0, 7) }) : undefined}
+					>
 						{#if release.run_url}
 							{@const run = release.run_url}
-							<button type="button" class="button" onclick={() => openUrl(run)}>See the build</button>
+							<button type="button" class="button" onclick={() => openUrl(run)}>{t('developer-release-see-build')}</button>
 						{/if}
 					</Row>
 					{#if release.shell?.requestable}
-						<Row title="Run inside Luft">
-							<button type="button" class="button" onclick={() => insideLuft(release)}>Ask</button>
+						<Row title={t('developer-release-inside-luft')}>
+							<button type="button" class="button" onclick={() => insideLuft(release)}>{t('developer-release-ask')}</button>
 						</Row>
 					{/if}
 				</Section>
 
 				{#if shipped(release)}
-					<Section title="Rollout">
+					<Section title={t('developer-release-rollout')}>
 						<Rollout {id} {release} onchange={(next) => reads.release(id, releaseId).set(next)} />
 					</Section>
 				{/if}
@@ -76,14 +91,20 @@
 				<Checks {release} />
 
 				{#if release.notes}
-					<Section title="Release notes">
+					<Section title={t('developer-release-notes')}>
 						<p class="notes">{release.notes}</p>
 					</Section>
 				{/if}
 
-				<Section title="Files">
+				<Section title={t('developer-release-files')}>
 					{#each release.artifacts as file (file.name)}
-						<Row title={file.name} description="{file.part ? `${file.part} for ` : ''}{PLATFORM_NAMES[file.platform]} · {bytes(file.size)}" truncate />
+						<Row
+							title={file.name}
+							description={file.part
+								? t('developer-release-file-part', { part: file.part, platform: platformName(file.platform), size: bytes(file.size) })
+								: t('developer-release-file', { platform: platformName(file.platform), size: bytes(file.size) })}
+							truncate
+						/>
 					{/each}
 				</Section>
 

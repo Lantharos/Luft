@@ -5,24 +5,31 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime};
 
+use luft_i18n::t;
 use luft_software::http::{self, MISSING, OFFLINE};
 
 use super::DOWNLOADS;
 use crate::catalog::cache;
+use crate::l10n::L10N;
 use luft_store_seal::{Expiry, Keys, STORE_KEYS, Seal, Stamp};
 
 const SEAL: &str = ".sig";
 /// What schelf.store answers for something only invited people get when the
 /// session it was asked with is fine but no longer let in.
-pub const NO_ACCESS: &str = "schelf.store no longer lets you in.";
+pub fn no_access() -> String {
+    t!(L10N, "core-store-no-access")
+}
+
 /// What it answers when there's no session it takes, such as one that ended.
-pub const SIGNED_OUT: &str = "Your schelf.store sign-in ended.";
+pub fn session_ended() -> String {
+    t!(L10N, "core-store-signed-out")
+}
 
 /// What a refused request to schelf.store means.
 pub fn refused(error: ureq::Error) -> String {
     match error {
-        ureq::Error::StatusCode(401) => SIGNED_OUT.to_owned(),
-        ureq::Error::StatusCode(403) => NO_ACCESS.to_owned(),
+        ureq::Error::StatusCode(401) => session_ended(),
+        ureq::Error::StatusCode(403) => no_access(),
         error => http::failure(error),
     }
 }
@@ -210,7 +217,9 @@ fn load<T>(
             cached.touch();
             held(OFFLINE.to_owned())
         }
-        Err(error) if [MISSING, NO_ACCESS, SIGNED_OUT].contains(&error.as_str()) => Err(error),
+        Err(error) if error == MISSING || error == no_access() || error == session_ended() => {
+            Err(error)
+        }
         Err(error) => held(error),
     }
 }
@@ -257,7 +266,7 @@ pub struct Sealed {
 pub fn sealed(document: &str) -> Result<Sealed, String> {
     let stored = Cached::of(document)
         .read()
-        .ok_or_else(|| format!("Schelf has no copy of {document} from schelf.store."))?;
+        .ok_or_else(|| t!(L10N, "core-store-no-copy", document = document))?;
     Ok(Sealed {
         body: stored.body,
         seal: stored.seal,

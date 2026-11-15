@@ -1,27 +1,19 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import type { Need } from '#lib/bindings.js';
 	import { opening, type Failed } from '#lib/state/opening.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { failed }: { failed: Failed } = $props();
 
-	const WHAT: Record<Need, string> = {
-		library: 'the library',
-		program: 'the program',
-		perlModule: 'the Perl module',
-		pythonModule: 'the Python module',
-		typelib: 'the GObject bindings of'
-	};
-
 	const failure = $derived(failed.failure);
 	const missing = $derived(failure?.missing ?? null);
-	const needed = $derived(missing ? `${WHAT[missing.kind]} ${missing.name}` : null);
+	const needed = $derived(missing ? t('open-failed-need', { kind: missing.kind, name: missing.name }) : null);
 	const description = $derived.by(() => {
 		if (!failure) return failed.error ?? undefined;
-		if (needed && failure.package) return `It needs ${needed}, which isn't on this computer. The ${failure.package} package has it.`;
-		if (needed) return `It needs ${needed}, which isn't on this computer, and none of the packages Luft can add has it.`;
-		return failure.crashed ? 'It crashed right after it started.' : 'It closed right after it started.';
+		if (needed && failure.package) return t('open-failed-missing-package', { needed, package: failure.package });
+		if (needed) return t('open-failed-missing', { needed });
+		return failure.crashed ? t('open-failed-crashed') : t('open-failed-closed');
 	});
 
 	function add(name: string) {
@@ -30,20 +22,20 @@
 	}
 </script>
 
-<Dialog title="{failed.app.name} didn't start" {description} onclose={() => opening.dismiss()}>
+<Dialog title={t('open-failed-title', { name: failed.app.name })} {description} onclose={() => opening.dismiss()}>
 	{#if failure && !failure.package && failure.output.length}
 		<div class="flex flex-col gap-2">
-			<span class="text-[13px] text-[var(--text-muted)]">The last it wrote before closing:</span>
+			<span class="text-[13px] text-[var(--text-muted)]">{t('open-failed-output')}</span>
 			<pre class="output">{failure.output.join('\n')}</pre>
 		</div>
 	{/if}
 	{#snippet actions()}
 		{#if failure?.package}
 			{@const name = failure.package}
-			<button type="button" class="button" onclick={() => opening.dismiss()}>Cancel</button>
-			<button type="button" class="button primary" onclick={() => add(name)}>Add {name}</button>
+			<button type="button" class="button" onclick={() => opening.dismiss()}>{t('open-failed-cancel')}</button>
+			<button type="button" class="button primary" onclick={() => add(name)}>{t('open-failed-add', { name })}</button>
 		{:else}
-			<button type="button" class="button primary" onclick={() => opening.dismiss()}>Close</button>
+			<button type="button" class="button primary" onclick={() => opening.dismiss()}>{t('open-failed-close')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

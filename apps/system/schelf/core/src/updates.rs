@@ -1,11 +1,13 @@
 use std::collections::HashSet;
 
+use luft_i18n::t;
 use luft_software::apps::flatpak::{self, Installation};
 use luft_software::apps::{debian, toolbox, updates};
 use serde::Serialize;
 use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
+use crate::l10n::L10N;
 use crate::library::Source;
 use crate::store;
 use crate::store::listing::Format;
@@ -221,14 +223,21 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
     let failed = [
-        ("Flathub apps", flatpaks.as_ref().err()),
-        ("command-line tools", tools.as_ref().err()),
-        ("Ubuntu apps", debs.as_ref().err()),
-        ("schelf.store apps", store.as_ref().err()),
-        ("tools from schelf.store", store_tools.as_ref().err()),
+        ("flathub", flatpaks.as_ref().err()),
+        ("tools", tools.as_ref().err()),
+        ("ubuntu", debs.as_ref().err()),
+        ("store", store.as_ref().err()),
+        ("store-tools", store_tools.as_ref().err()),
     ]
     .into_iter()
-    .filter_map(|(source, reason)| Some(format!("Couldn't check your {source}. {}", reason?)))
+    .filter_map(|(source, reason)| {
+        Some(t!(
+            L10N,
+            "core-updates-check-failed",
+            source = source,
+            reason = reason?.as_str()
+        ))
+    })
     .collect();
     let mut apps: Vec<AppUpdate> = flatpaks.unwrap_or_default();
     apps.extend(appimages);

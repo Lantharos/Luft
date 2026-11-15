@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { commands, type ToolSummary } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
@@ -14,16 +15,8 @@
 	let { query, kind, found = $bindable(null) }: { query: string; kind: Kind; found?: number | null } = $props();
 
 	const TEXT: Record<Kind, { title: string; description: string; failed: string }> = {
-		tool: {
-			title: 'Command-line tools',
-			description: 'Installed for you only. You run them in Tern.',
-			failed: "Command-line tools can't be searched right now."
-		},
-		system: {
-			title: 'System add-ons',
-			description: 'From your software sources. They become part of the system and update with Luft.',
-			failed: "Your software sources can't be searched right now."
-		}
+		tool: { title: 'search-tools', description: 'search-tools-description', failed: 'search-tools-failed' },
+		system: { title: 'search-system', description: 'search-system-description', failed: 'search-system-failed' }
 	};
 
 	let tools = $state<ToolSummary[] | null>(null);
@@ -78,12 +71,12 @@
 </script>
 
 {#if error}
-	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{TEXT[kind].failed} {error}</p>
+	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{t(TEXT[kind].failed, { error })}</p>
 {:else if tools === null || tools.length}
 	<section class="flex flex-col gap-2">
 		<div class="flex flex-col gap-0.5 px-1.5">
-			<h2 class="text-[17px] font-semibold">{TEXT[kind].title}</h2>
-			<p class="text-[13px] text-[var(--text-muted)]">{TEXT[kind].description}</p>
+			<h2 class="text-[17px] font-semibold">{t(TEXT[kind].title)}</h2>
+			<p class="text-[13px] text-[var(--text-muted)]">{t(TEXT[kind].description)}</p>
 		</div>
 		{#if tools === null}
 			<div class="flex flex-col gap-1" aria-busy="true">
@@ -107,10 +100,10 @@
 						{#if operation && operation.state !== 'failed'}
 							<ProgressButton {operation} />
 						{:else if installed}
-							<span class="px-3 text-[13px] text-[var(--text-muted)]">Installed</span>
+							<span class="px-3 text-[13px] text-[var(--text-muted)]">{t('search-installed')}</span>
 						{:else}
 							<button type="button" class="button" disabled={checking !== null} onclick={() => install(tool)}>
-								{#if checking === tool.package}<Spinner />{/if}Install
+								{#if checking === tool.package}<Spinner />{/if}{t('search-install')}
 							</button>
 						{/if}
 					</div>

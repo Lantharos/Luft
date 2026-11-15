@@ -1,20 +1,14 @@
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::flatpak;
 use schelf_core::library::{InstalledApp, full_access};
 
-use super::pick;
+use super::{needs_yes, pick};
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::sources::{Origin, installed};
 use crate::install::terminal::{Ink, prompt};
-
-const ABILITIES: [&str; 5] = [
-    "read, change and delete all your files",
-    "use every device, such as USB drives, cameras and game controllers",
-    "read what you copy, even while it's in the background",
-    "read the passwords and keys saved in your keyring, other apps' too",
-    "start any program as you, outside a sandbox",
-];
+use crate::l10n::L10N;
 
 fn sandboxed(app: &InstalledApp) -> bool {
     full_access::offered(app.source)
@@ -31,20 +25,20 @@ pub(super) fn sandboxed_named(
         found.into_iter().partition(sandboxed);
     match (apps.len(), others.first()) {
         (0, None) => {
-            eprintln!("{} isn't installed.", ink.bold(name));
+            eprintln!("{}", t!(L10N, "cli-not-installed", name = ink.bold(name)));
             Err(Exit::Missing)
         }
         (0, Some(app)) => {
             eprintln!(
-                "{} isn't in a sandbox, so it has full access already.",
-                ink.bold(&app.name)
+                "{}",
+                t!(L10N, "cli-trust-not-sandboxed", name = ink.bold(&app.name))
             );
             Err(Exit::Usage)
         }
         (1, _) => Ok(apps.remove(0)),
         _ => {
             let options: Vec<String> = apps.iter().map(installed::describe).collect();
-            let chosen = pick(name, &options, yes, "Name it by its app ID instead.")?;
+            let chosen = pick(name, &options, yes, &t!(L10N, "cli-trust-name-by-id"))?;
             Ok(apps.swap_remove(chosen))
         }
     }
@@ -55,20 +49,31 @@ fn warn(app: &InstalledApp, yes: bool) -> Result<(), Exit> {
         return Ok(());
     }
     let ink = Ink::stderr();
-    eprintln!("With full access, {} can:", ink.bold(&app.name));
-    for ability in ABILITIES {
+    eprintln!(
+        "{}",
+        t!(L10N, "cli-trust-abilities", name = ink.bold(&app.name))
+    );
+    for ability in [
+        t!(L10N, "cli-trust-ability-files"),
+        t!(L10N, "cli-trust-ability-devices"),
+        t!(L10N, "cli-trust-ability-clipboard"),
+        t!(L10N, "cli-trust-ability-keyring"),
+        t!(L10N, "cli-trust-ability-programs"),
+    ] {
         eprintln!("  {ability}");
     }
+    eprintln!("{}", t!(L10N, "cli-trust-warning"));
     eprintln!(
-        "Only give full access to apps you trust. It takes effect the next time the app opens."
+        "{}",
+        t!(
+            L10N,
+            "cli-trust-give-instead",
+            command = format!("schelf give {} PLACE", app.id)
+        )
     );
-    eprintln!(
-        "To let it use one drive or folder, give it just that: schelf give {} PLACE",
-        app.id
-    );
-    let question = format!("Give {} full access?", app.name);
+    let question = t!(L10N, "cli-trust-confirm", name = app.name.as_str());
     if !prompt::interactive() {
-        eprintln!("{question} Add --yes to go ahead without being asked.");
+        eprintln!("{}", needs_yes(&question));
         return Err(Exit::Usage);
     }
     if prompt::agree(&question) {
@@ -81,12 +86,13 @@ fn warn(app: &InstalledApp, yes: bool) -> Result<(), Exit> {
 fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
     let ink = Ink::stdout();
     if block_on(flatpak::has_full_access(&app.id)) == on {
+        let name = ink.bold(&app.name);
         let state = if on {
-            "has full access already"
+            t!(L10N, "cli-trust-already", name = name)
         } else {
-            "doesn't have full access"
+            t!(L10N, "cli-trust-not-trusted", name = name)
         };
-        println!("{} {state}.", ink.bold(&app.name));
+        println!("{state}");
         return Exit::Done;
     }
     if on && let Err(exit) = warn(app, yes) {
@@ -100,15 +106,15 @@ fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
     match block_on(full_access::change(change)) {
         Ok(_) if on => {
             println!(
-                "{} has full access from the next time it opens.",
-                ink.bold(&app.name)
+                "{}",
+                t!(L10N, "cli-trust-given", name = ink.bold(&app.name))
             );
             Exit::Done
         }
         Ok(_) => {
             println!(
-                "{} is back in its sandbox from the next time it opens.",
-                ink.bold(&app.name)
+                "{}",
+                t!(L10N, "cli-trust-taken", name = ink.bold(&app.name))
             );
             Exit::Done
         }
@@ -124,7 +130,7 @@ pub fn run(arguments: &Arguments, on: bool) -> Exit {
         .only
         .is_some_and(|origin| origin != Origin::Flathub && origin != Origin::AppImage)
     {
-        eprintln!("Only Flatpak apps and AppImages run in a sandbox.");
+        eprintln!("{}", t!(L10N, "cli-trust-only-sandboxed"));
         return Exit::Usage;
     }
     let everything = installed::all(None);

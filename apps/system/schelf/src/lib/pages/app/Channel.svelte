@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { errorText, Row, Section, Segmented } from '@luft/ui';
 	import { channelName } from '#lib/account/channels.js';
 	import type { StoreDetails } from '#lib/bindings.js';
@@ -9,8 +10,8 @@
 	let { store, installed, onchange }: { store: StoreDetails; installed: boolean; onchange: (details: AppDetails) => void } = $props();
 
 	const PREVIEWS: Record<string, string> = {
-		beta: 'Previews of the next version. Back up anything important.',
-		nightly: 'Built from the newest code, often daily, and nobody reviews them first. They can break.'
+		beta: 'app-channel-beta',
+		nightly: 'app-channel-nightly'
 	};
 
 	let problem = $state('');
@@ -18,19 +19,22 @@
 
 	const WITH_SYSTEM = 'system';
 
-	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? 'Same as Luft' : channelName(choice) })));
+	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? t('app-channel-with-luft') : channelName(choice) })));
 	const withSystem = $derived(store.choice === WITH_SYSTEM);
 	const ended = $derived(store.endedChannel);
 	const onOtherChannel = $derived(store.releaseChannel !== null && store.releaseChannel !== store.channel);
 	const invited = $derived(store.invited.includes(store.channel));
-	const about = $derived(invited ? `Only people ${store.developer || 'the developer'} invited get these.` : PREVIEWS[store.channel]);
+	const about = $derived.by(() => {
+		if (invited) return store.developer ? t('app-channel-invited', { developer: store.developer }) : t('app-channel-invited-anyone');
+		return store.channel in PREVIEWS ? t(PREVIEWS[store.channel]) : null;
+	});
 	const description = $derived(
 		[
-			ended ? `${channelName(ended)} has ended, so this now follows ${channelName(store.channel)}.` : null,
-			withSystem && !ended ? `Luft is on ${channelName(store.channel)}, so this is too.` : about,
-			onOtherChannel ? `Its newest version right now is the ${store.releaseChannel} one.` : null,
-			installed && ended ? `You keep the version you have until a newer one is out on ${channelName(store.channel)}.` : null,
-			installed && !ended && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null
+			ended ? t('app-channel-ended', { ended: channelName(ended), channel: channelName(store.channel) }) : null,
+			withSystem && !ended ? t('app-channel-luft', { channel: channelName(store.channel) }) : about,
+			onOtherChannel ? t('app-channel-newest', { channel: store.releaseChannel ?? '' }) : null,
+			installed && ended ? t('app-channel-keep-ended', { channel: channelName(store.channel) }) : null,
+			installed && !ended && store.channel !== 'stable' ? t('app-channel-keep-stable') : null
 		]
 			.filter(Boolean)
 			.join(' ') || undefined
@@ -51,9 +55,9 @@
 	}
 </script>
 
-<Section title="Versions">
-	<Row title="Channel" {description}>
-		<Segmented label="Channel" {options} value={store.choice} onchange={choose} />
+<Section title={t('app-versions')}>
+	<Row title={t('app-channel')} {description}>
+		<Segmented label={t('app-channel')} {options} value={store.choice} onchange={choose} />
 	</Row>
 </Section>
 {#if problem}

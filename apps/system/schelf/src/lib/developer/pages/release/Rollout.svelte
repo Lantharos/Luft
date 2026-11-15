@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ConfirmDialog, ProgressBar, Row } from '@luft/ui';
 	import { commands, type Change } from '#lib/bindings.js';
-	import { rolloutText } from '../../format';
+	import { percent as formatPercent, rolloutText } from '../../format';
 	import { act } from '../../state/act';
 	import { approvals } from '../../state/approval.svelte';
 	import { changed, reads } from '../../state/reads';
@@ -31,38 +32,38 @@
 	}
 
 	function rollBack() {
-		void approvals.ask(`Roll back to ${previous?.version}`, [{ type: 'release.rollback', app: id, release: release.id }], () => changed(id));
+		void approvals.ask(t('developer-rollout-roll-back-to', { version: previous?.version ?? '' }), [{ type: 'release.rollback', app: id, release: release.id }], () => changed(id));
 	}
 </script>
 
 <Row title={rolloutText(release)}>
 	{#if !live}
-		<button type="button" class="button" disabled={busy} onclick={() => change({ action: release.rollout_paused ? 'resume' : 'pause' }, release.rollout_paused ? 'Rollout resumed' : `Paused at ${release.rollout_percent}%`)}>
-			{release.rollout_paused ? 'Resume' : 'Pause'}
+		<button type="button" class="button" disabled={busy} onclick={() => change({ action: release.rollout_paused ? 'resume' : 'pause' }, release.rollout_paused ? t('developer-rollout-resumed') : t('developer-rollout-paused', { percent: formatPercent(release.rollout_percent) }))}>
+			{t(release.rollout_paused ? 'developer-rollout-resume' : 'developer-rollout-pause')}
 		</button>
-		<button type="button" class="button" disabled={busy} onclick={() => (setting = true)}>Set percentage</button>
-		<button type="button" class="button" disabled={busy} onclick={() => (everyone = true)}>Release to everyone</button>
+		<button type="button" class="button" disabled={busy} onclick={() => (setting = true)}>{t('developer-rollout-set')}</button>
+		<button type="button" class="button" disabled={busy} onclick={() => (everyone = true)}>{t('developer-rollout-everyone-button')}</button>
 	{/if}
 	{#snippet below()}
-		<ProgressBar fraction={release.rollout_percent / 100} label="Rollout" class="h-1.5" />
+		<ProgressBar fraction={release.rollout_percent / 100} label={t('developer-rollout-progress')} class="h-1.5" />
 	{/snippet}
 </Row>
 {#if previous}
-	<Row title="Roll back to {previous.version}" description="Stops {release.version} for everyone">
-		<button type="button" class="button" onclick={rollBack}>Roll back</button>
+	<Row title={t('developer-rollout-roll-back-to', { version: previous.version })} description={t('developer-rollout-stops', { version: release.version })}>
+		<button type="button" class="button" onclick={rollBack}>{t('developer-rollout-roll-back')}</button>
 	</Row>
 {/if}
 
 {#if setting}
-	<PercentDialog {release} onclose={() => (setting = false)} onset={(percent) => change({ action: 'set', percent }, `${release.version} reaches ${percent}% of people`)} />
+	<PercentDialog {release} onclose={() => (setting = false)} onset={(percent) => change({ action: 'set', percent }, t('developer-rollout-reaches', { version: release.version, percent: formatPercent(percent) }))} />
 {/if}
 
 {#if everyone}
 	<ConfirmDialog
-		title="Release {release.version} to everyone?"
-		description="Everyone gets it with their next update check."
-		action="Release to everyone"
-		run={() => change({ action: 'all' }, `${release.version} is out for everyone`)}
+		title={t('developer-rollout-everyone-title', { version: release.version })}
+		description={t('developer-rollout-everyone-description')}
+		action={t('developer-rollout-everyone-button')}
+		run={() => change({ action: 'all' }, t('developer-rollout-out', { version: release.version }))}
 		onclose={() => (everyone = false)}
 	/>
 {/if}

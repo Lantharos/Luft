@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { CheckedSource } from '#lib/bindings.js';
 
 	let { source }: { source: CheckedSource } = $props();
@@ -19,7 +20,7 @@
 	{/each}
 </div>
 <div class="flex flex-col gap-2">
-	<span class="text-[var(--text-muted)]">Its packages are checked against {source.described.keys.length === 1 ? 'this key' : 'these keys'}:</span>
+	<span class="text-[var(--text-muted)]">{t('source-trust-keys', { count: source.described.keys.length })}</span>
 	{#each source.described.keys as key (key.fingerprint)}
 		<div class="flex min-w-0 flex-col">
 			<span class="truncate">{key.user}</span>

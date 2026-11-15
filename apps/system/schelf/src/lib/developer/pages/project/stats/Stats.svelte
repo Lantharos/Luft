@@ -1,18 +1,15 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Section, Segmented } from '@luft/ui';
 	import Loaded from '../../../components/Loaded.svelte';
-	import { count, PLATFORM_NAMES } from '../../../format';
+	import { count, platformName } from '../../../format';
 	import { reads } from '../../../state/reads';
 	import type { Project } from '../../../store';
 	import BarList from './BarList.svelte';
 	import DailyChart from './DailyChart.svelte';
 	import { everyDay } from './scale';
 
-	const PERIODS = [
-		{ value: 7, label: '7 days' },
-		{ value: 30, label: '30 days' },
-		{ value: 90, label: '90 days' }
-	];
+	const PERIODS = [7, 30, 90];
 
 	let { project }: { project: Project } = $props();
 
@@ -20,13 +17,15 @@
 	let measure = $state<'installs' | 'updates'>('installs');
 
 	const stats = $derived(reads.stats(project.app.id, days));
-	const installs = $derived(project.app.format === 'files' ? 'Downloads' : 'Installs');
+	const downloads = $derived(project.app.format === 'files');
+	const installs = $derived(t(downloads ? 'developer-stats-downloads' : 'developer-stats-installs'));
+	const periods = $derived(PERIODS.map((value) => ({ value, label: t('developer-stats-days', { count: value }) })));
 
 	$effect(() => stats.watch());
 </script>
 
 <div class="-mt-3 -mb-3 flex justify-end">
-	<Segmented label="Period" value={days} options={PERIODS} onchange={(value) => (days = value)} />
+	<Segmented label={t('developer-stats-period')} value={days} options={periods} onchange={(value) => (days = value)} />
 </div>
 
 <Loaded resource={stats}>
@@ -34,29 +33,29 @@
 		{@const busiest = Math.max(0, ...data.days.map((day) => day.installs))}
 		<div class="totals" class:opacity-60={stats.loading}>
 			<p><span class="number">{count(data.total.installs)}</span><span class="label">{installs}</span></p>
-			<p><span class="number">{count(data.total.updates)}</span><span class="label">Updates</span></p>
-			<p><span class="number">{count(busiest)}</span><span class="label">On the busiest day</span></p>
+			<p><span class="number">{count(data.total.updates)}</span><span class="label">{t('developer-stats-updates')}</span></p>
+			<p><span class="number">{count(busiest)}</span><span class="label">{t('developer-stats-busiest')}</span></p>
 		</div>
 		<div class="plot">
-			<DailyChart days={everyDay(data.days, days)} {installs} />
+			<DailyChart days={everyDay(data.days, days)} {downloads} />
 		</div>
 		<div class="flex justify-end">
 			<Segmented
-				label="Measure"
+				label={t('developer-stats-measure')}
 				value={measure}
 				options={[
 					{ value: 'installs', label: installs },
-					{ value: 'updates', label: 'Updates' }
+					{ value: 'updates', label: t('developer-stats-updates') }
 				]}
 				onchange={(value) => (measure = value)}
 			/>
 		</div>
 		<div class="-mt-3 grid grid-cols-2 gap-6">
-			<Section title="By version">
+			<Section title={t('developer-stats-by-version')}>
 				<BarList rows={data.versions.map((row) => ({ label: row.version, value: row[measure] }))} />
 			</Section>
-			<Section title="By system">
-				<BarList rows={data.platforms.map((row) => ({ label: PLATFORM_NAMES[row.platform], value: row[measure] }))} />
+			<Section title={t('developer-stats-by-system')}>
+				<BarList rows={data.platforms.map((row) => ({ label: platformName(row.platform), value: row[measure] }))} />
 			</Section>
 		</div>
 	{/snippet}

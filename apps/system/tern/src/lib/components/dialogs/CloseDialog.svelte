@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import type { CloseReview } from '#lib/workspace/workspace.svelte.js';
 
@@ -9,11 +10,8 @@
 
 	let { review, onclose }: Props = $props();
 
-	let description = $derived(
-		review.programs.length === 1
-			? `${review.programs[0]} is still running and will be stopped.`
-			: `${review.programs.join(', ')} are still running and will be stopped.`
-	);
+	let programs = $derived(new Intl.ListFormat(i18n.formats, { type: 'unit' }).format(review.programs));
+	let description = $derived(t('tern-close-description', { count: review.programs.length, programs }));
 
 	function close() {
 		onclose();
@@ -21,9 +19,9 @@
 	}
 </script>
 
-<Dialog title="Close this terminal?" {description} {onclose}>
+<Dialog title={t('tern-close-title')} {description} {onclose}>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" onclick={close}>Close</button>
+		<button type="button" class="button" onclick={onclose}>{t('tern-close-cancel')}</button>
+		<button type="button" class="button danger" onclick={close}>{t('tern-close-confirm')}</button>
 	{/snippet}
 </Dialog>

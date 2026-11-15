@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bindings.js';
 	import { removeJob } from '#lib/app/jobs.js';
@@ -7,13 +8,13 @@
 	let { app, onclose }: { app: InstalledApp; onclose: () => void } = $props();
 
 	const description = $derived.by(() => {
-		if (app.source === 'extension') return `${app.name} will be removed from your desktop.`;
-		if (app.source === 'appImage') return `${app.name} and its file in ${app.origin} will be deleted, with everything you allowed it.`;
-		if (app.source === 'tool') return `${app.name} and its commands will be removed. Your files stay.`;
-		if (app.source === 'debian') return `${app.name} will be removed from this computer. Your files and settings stay.`;
-		if (app.source === 'system') return `${app.name} is removed for everyone, settings and data included.`;
-		if (app.source === 'flatpak') return `${app.name} will be removed from this computer and loses the drives and folders you gave it. Your files and settings stay.`;
-		return `${app.name} will be removed from this computer. Your files and settings stay.`;
+		if (app.source === 'extension') return t('remove-extension', { name: app.name });
+		if (app.source === 'appImage') return t('remove-appimage', { name: app.name, folder: app.origin });
+		if (app.source === 'tool') return t('remove-tool', { name: app.name });
+		if (app.source === 'debian') return t('remove-app', { name: app.name });
+		if (app.source === 'system') return t('remove-system', { name: app.name });
+		if (app.source === 'flatpak') return t('remove-flatpak', { name: app.name });
+		return t('remove-app', { name: app.name });
 	});
 
 	function remove() {
@@ -22,9 +23,9 @@
 	}
 </script>
 
-<Dialog title="Remove {app.name}?" {description} {onclose}>
+<Dialog title={t('remove-title', { name: app.name })} {description} {onclose}>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" onclick={remove}>Remove</button>
+		<button type="button" class="button" onclick={onclose}>{t('remove-cancel')}</button>
+		<button type="button" class="button danger" onclick={remove}>{t('remove-confirm')}</button>
 	{/snippet}
 </Dialog>

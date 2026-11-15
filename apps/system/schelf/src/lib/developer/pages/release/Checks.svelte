@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
-	import { CHECK_TITLES } from '../../format';
+	import { checkTitle } from '../../format';
 	import type { CheckResult, Release } from '../../store';
 	import CheckDialog from './CheckDialog.svelte';
 	import { CHECK_ICONS } from './checks';
@@ -15,17 +16,17 @@
 </script>
 
 {#if release.checks.length}
-	<Section title="Checks">
+	<Section title={t('developer-checks-title')}>
 		{#each flagged as check (check.name)}
-			<Row title={CHECK_TITLES[check.name]} description={check.summary} icon={CHECK_ICONS[check.status]}>
+			<Row title={checkTitle(check.name)} description={check.summary} icon={CHECK_ICONS[check.status]}>
 				{#if check.detail !== undefined}
-					<button type="button" class="button" onclick={() => (open = check)}>Details</button>
+					<button type="button" class="button" onclick={() => (open = check)}>{t('developer-checks-details')}</button>
 				{/if}
 			</Row>
 		{/each}
 		{#if passed}
-			<Row title={flagged.length ? `${passed} more passed` : `All ${passed} passed`} icon={CHECK_ICONS.passed}>
-				<button type="button" class="button" onclick={() => (all = true)}>Show</button>
+			<Row title={t(flagged.length ? 'developer-checks-more-passed' : 'developer-checks-all-passed', { count: passed })} icon={CHECK_ICONS.passed}>
+				<button type="button" class="button" onclick={() => (all = true)}>{t('developer-show')}</button>
 			</Row>
 		{/if}
 	</Section>

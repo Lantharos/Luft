@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import type { CatalogApp, Collection } from '#lib/bindings.js';
 	import Shelf from '#lib/components/Shelf.svelte';
@@ -8,7 +9,7 @@
 	import { catalog } from '#lib/state/catalog.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
-	import { COLLECTIONS } from '#lib/state/titles.js';
+	import { collectionTitle } from '#lib/state/titles.js';
 	import Spotlight from './Spotlight.svelte';
 
 	const SHELF_SIZE = 6;
@@ -69,12 +70,12 @@
 		{#if offline}
 			<div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">
 				<p class="text-[14px] text-[var(--text-soft)]">
-					schelf.store can't be reached right now. The apps you have are still here.
+					{t('discover-offline')}
 				</p>
-				<button type="button" class="button" onclick={() => catalog.refresh()}>Try again</button>
+				<button type="button" class="button" onclick={() => catalog.refresh()}>{t('discover-try-again')}</button>
 			</div>
 		{:else if empty}
-			<p class="px-1.5 pt-16 text-center text-[15px] text-[var(--text-muted)]">There are no apps here yet. Check back soon.</p>
+			<p class="px-1.5 pt-16 text-center text-[15px] text-[var(--text-muted)]">{t('discover-empty')}</p>
 		{:else}
 			{#if spotlight}
 				<Spotlight listing={spotlight.listing} app={spotlight.app} />
@@ -82,7 +83,7 @@
 				<div class="skeleton h-[240px]"></div>
 			{/if}
 			{#each SHELVES as collection (collection)}
-				<Shelf title={COLLECTIONS[collection]} apps={shelves?.[collection] ?? null} onmore={() => navigation.push({ page: 'collection', collection })} />
+				<Shelf title={collectionTitle(collection)} apps={shelves?.[collection] ?? null} onmore={() => navigation.push({ page: 'collection', collection })} />
 			{/each}
 		{/if}
 	</div>

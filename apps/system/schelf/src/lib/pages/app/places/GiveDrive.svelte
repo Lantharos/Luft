@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import { bytes, Dialog, Row, Switch } from '@luft/ui';
 	import { commands, type InstalledApp, type PluggedDrive } from '#lib/bindings.js';
@@ -13,25 +14,25 @@
 	});
 </script>
 
-<Dialog title="Give {app.name} a drive" {onclose}>
-	<Row title="Only let it read">
-		<Switch label="Only let it read" checked={readOnly} onchange={(on) => (readOnly = on)} />
+<Dialog title={t('app-places-give-title', { name: app.name })} {onclose}>
+	<Row title={t('app-places-read-only-switch')}>
+		<Switch label={t('app-places-read-only-switch')} checked={readOnly} onchange={(on) => (readOnly = on)} />
 	</Row>
 	<div class="list soft-scroll">
 		{#each drives ?? [] as drive (`${drive.uuid} ${drive.drive}`)}
 			<button type="button" class="drive" onclick={() => ongive(drive, readOnly)}>
 				<HardDrive size={20} class="flex-none text-[var(--text-muted)]" />
-				<span class="truncate">{drive.label || `${bytes(drive.size)} drive`}</span>
+				<span class="truncate">{drive.label || t('app-places-drive-unnamed', { size: bytes(drive.size) })}</span>
 				<span class="ml-auto flex-none text-[12.5px] text-[var(--text-muted)]">{bytes(drive.size)}</span>
 			</button>
 		{:else}
 			{#if drives}
-				<p class="empty">No other drives are plugged in</p>
+				<p class="empty">{t('app-places-no-drives')}</p>
 			{/if}
 		{/each}
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
+		<button type="button" class="button" onclick={onclose}>{t('app-places-cancel')}</button>
 	{/snippet}
 </Dialog>
 

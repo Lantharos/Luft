@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { renderMarkdown } from '@luft/ui';
 import { commands, type CatalogApp, type Collection, type StoreDetails } from '#lib/bindings.js';
 import { account } from '#lib/state/account.svelte.js';
@@ -34,7 +35,7 @@ async function fromStore(store: StoreDetails): Promise<AppDetails> {
 		release: store.version ? { version: store.version, date: timestamp(store.published), notes } : null,
 		downloadSize: store.size ?? store.download?.size ?? null,
 		installedSize: null,
-		verified: store.verified ? 'Verified by schelf.store' : null,
+		verified: store.verified ? t('verified-store') : null,
 		permissions: store.access,
 		store
 	};

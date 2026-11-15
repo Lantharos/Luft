@@ -14,6 +14,7 @@ import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import Usb from '@lucide/svelte/icons/usb';
 import Volume2 from '@lucide/svelte/icons/volume-2';
+import { i18n, t } from '@luft/i18n';
 import type { Permissions } from '#lib/bindings.js';
 
 export interface Access {
@@ -24,20 +25,17 @@ export interface Access {
 }
 
 const FOLDERS: Record<string, string> = {
-	'xdg-download': 'Downloads',
-	'xdg-documents': 'Documents',
-	'xdg-pictures': 'Pictures',
-	'xdg-music': 'Music',
-	'xdg-videos': 'Videos',
-	'xdg-desktop': 'Desktop',
-	'xdg-public-share': 'Public',
-	'xdg-templates': 'Templates'
+	'xdg-download': 'permission-folder-downloads',
+	'xdg-documents': 'permission-folder-documents',
+	'xdg-pictures': 'permission-folder-pictures',
+	'xdg-music': 'permission-folder-music',
+	'xdg-videos': 'permission-folder-videos',
+	'xdg-desktop': 'permission-folder-desktop',
+	'xdg-public-share': 'permission-folder-public',
+	'xdg-templates': 'permission-folder-templates'
 };
 
-function listing(names: string[]) {
-	if (names.length < 2) return names.join('');
-	return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
-}
+const listing = (names: string[]) => new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(names);
 
 function files(filesystems: string[]): Access[] {
 	const entries = filesystems.map((entry) => {
@@ -46,27 +44,25 @@ function files(filesystems: string[]): Access[] {
 	});
 	const hidden = ['xdg-run', 'xdg-config', 'xdg-cache', 'xdg-data', '/run/'];
 	const granted = entries.filter((entry) => !entry.denied && !hidden.some((prefix) => entry.place.startsWith(prefix)));
-	const mode = (readOnly: boolean, several = true) => {
-		const what = several ? 'them' : 'it';
-		return readOnly ? `It can look at ${what} but not change ${what}.` : `It can read and change ${what}.`;
-	};
+	const mode = (readOnly: boolean, count = 2) => (readOnly ? t('permission-files-read-only', { count }) : t('permission-files-read-write', { count }));
 	const access: Access[] = [];
 	const host = granted.find((entry) => entry.place === 'host' || entry.place === 'host-os' || entry.place === 'host-etc');
 	if (host) {
-		access.push({ icon: HardDrive, title: 'All files on this computer', description: mode(host.readOnly), notable: true });
+		access.push({ icon: HardDrive, title: t('permission-all-files'), description: mode(host.readOnly), notable: true });
 		return access;
 	}
 	const home = granted.find((entry) => entry.place === 'home' || entry.place === '~');
-	if (home) access.push({ icon: FolderOpen, title: 'Your home folder', description: mode(home.readOnly, false), notable: true });
+	if (home) access.push({ icon: FolderOpen, title: t('permission-home'), description: mode(home.readOnly, 1), notable: true });
 	const folders = granted.filter((entry) => FOLDERS[entry.place]);
 	for (const readOnly of [false, true]) {
 		const group = folders.filter((entry) => entry.readOnly === readOnly);
 		if (!group.length) continue;
-		access.push({ icon: Folder, title: `${listing(group.map((entry) => FOLDERS[entry.place]))} ${group.length > 1 ? 'folders' : 'folder'}`, description: mode(readOnly, group.length > 1), notable: !readOnly });
+		const title = t('permission-folders', { count: group.length, folders: listing(group.map((entry) => t(FOLDERS[entry.place]))) });
+		access.push({ icon: Folder, title, description: mode(readOnly, group.length), notable: !readOnly });
 	}
 	const others = granted.filter((entry) => entry !== home && !FOLDERS[entry.place]);
 	if (others.length) {
-		access.push({ icon: Folder, title: 'Other folders', description: listing(others.map((entry) => entry.place.replace(/^~\//, '~/'))), notable: true });
+		access.push({ icon: Folder, title: t('permission-other-folders'), description: listing(others.map((entry) => entry.place.replace(/^~\//, '~/'))), notable: true });
 	}
 	return access;
 }
@@ -76,32 +72,32 @@ export function describe(permissions: Permissions): Access[] {
 	const has = (list: string[], name: string) => list.includes(name);
 	const bus = [...permissions.sessionBus, ...permissions.systemBus];
 	if (bus.includes('org.freedesktop.Flatpak') || permissions.sockets.includes('system-bus') || permissions.sockets.includes('session-bus')) {
-		access.push({ icon: SquareTerminal, title: 'Runs outside its sandbox', description: 'It can start programs or reach services with your full permissions.', notable: true });
+		access.push({ icon: SquareTerminal, title: t('permission-outside-sandbox'), description: t('permission-outside-sandbox-description'), notable: true });
 	}
 	access.push(...files(permissions.filesystems));
-	if (has(permissions.shared, 'network')) access.push({ icon: Globe, title: 'Internet', description: 'It can go online.', notable: false });
-	if (has(permissions.devices, 'all')) access.push({ icon: Usb, title: 'All devices', description: 'Including cameras, microphones and USB devices.', notable: true });
+	if (has(permissions.shared, 'network')) access.push({ icon: Globe, title: t('permission-internet'), description: t('permission-internet-description'), notable: false });
+	if (has(permissions.devices, 'all')) access.push({ icon: Usb, title: t('permission-all-devices'), description: t('permission-all-devices-description'), notable: true });
 	else {
-		if (has(permissions.devices, 'usb')) access.push({ icon: Usb, title: 'USB devices', description: 'It can use the USB devices plugged into this computer.', notable: true });
-		if (has(permissions.devices, 'serial')) access.push({ icon: Usb, title: 'Serial devices', description: 'It can talk to boards and other devices on a serial port.', notable: true });
-		if (has(permissions.devices, 'input')) access.push({ icon: Gamepad2, title: 'Game controllers', description: 'It can read controllers and other input devices.', notable: false });
+		if (has(permissions.devices, 'usb')) access.push({ icon: Usb, title: t('permission-usb'), description: t('permission-usb-description'), notable: true });
+		if (has(permissions.devices, 'serial')) access.push({ icon: Usb, title: t('permission-serial'), description: t('permission-serial-description'), notable: true });
+		if (has(permissions.devices, 'input')) access.push({ icon: Gamepad2, title: t('permission-input'), description: t('permission-input-description'), notable: false });
 	}
 	if (has(permissions.sockets, 'x11') && !has(permissions.sockets, 'fallback-x11')) {
 		access.push({
 			icon: AppWindow,
-			title: 'Older way of showing windows',
-			description: 'It can use X11, where apps can see each other’s windows and what you type in them.',
+			title: t('permission-x11'),
+			description: t('permission-x11-description'),
 			notable: !has(permissions.sockets, 'wayland')
 		});
 	}
-	if (has(permissions.devices, 'microphone')) access.push({ icon: Mic, title: 'Microphone', description: 'It can record sound, from the microphone and from what this computer plays.', notable: true });
-	if (has(permissions.devices, 'camera')) access.push({ icon: Camera, title: 'Camera', description: 'It can use the cameras of this computer.', notable: true });
-	if (has(permissions.sockets, 'pulseaudio')) access.push({ icon: Volume2, title: 'Sound', description: 'It can play sound and may be able to record it.', notable: false });
-	if (has(permissions.sockets, 'playback')) access.push({ icon: Volume2, title: 'Sound', description: 'It can play sound.', notable: false });
-	if (bus.includes('org.freedesktop.secrets')) access.push({ icon: KeyRound, title: 'Saved passwords', description: 'It can use the passwords stored on this computer.', notable: true });
-	if (has(permissions.sockets, 'ssh-auth') || has(permissions.sockets, 'gpg-agent')) access.push({ icon: KeyRound, title: 'Your keys', description: 'It can use your SSH or GPG keys.', notable: true });
-	if (has(permissions.sockets, 'cups')) access.push({ icon: Printer, title: 'Printers', description: 'It can print directly.', notable: false });
-	if (!access.length) access.push({ icon: ShieldCheck, title: 'No special access', description: 'It runs separated from your files and other apps.', notable: false });
-	else if (permissions.sessionBus.length > 4) access.push({ icon: MessagesSquare, title: 'Talks to other apps', description: `It can reach ${permissions.sessionBus.length} other services on your desktop.`, notable: false });
+	if (has(permissions.devices, 'microphone')) access.push({ icon: Mic, title: t('permission-microphone'), description: t('permission-microphone-description'), notable: true });
+	if (has(permissions.devices, 'camera')) access.push({ icon: Camera, title: t('permission-camera'), description: t('permission-camera-description'), notable: true });
+	if (has(permissions.sockets, 'pulseaudio')) access.push({ icon: Volume2, title: t('permission-sound'), description: t('permission-pulseaudio-description'), notable: false });
+	if (has(permissions.sockets, 'playback')) access.push({ icon: Volume2, title: t('permission-sound'), description: t('permission-playback-description'), notable: false });
+	if (bus.includes('org.freedesktop.secrets')) access.push({ icon: KeyRound, title: t('permission-secrets'), description: t('permission-secrets-description'), notable: true });
+	if (has(permissions.sockets, 'ssh-auth') || has(permissions.sockets, 'gpg-agent')) access.push({ icon: KeyRound, title: t('permission-keys'), description: t('permission-keys-description'), notable: true });
+	if (has(permissions.sockets, 'cups')) access.push({ icon: Printer, title: t('permission-printers'), description: t('permission-printers-description'), notable: false });
+	if (!access.length) access.push({ icon: ShieldCheck, title: t('permission-none'), description: t('permission-none-description'), notable: false });
+	else if (permissions.sessionBus.length > 4) access.push({ icon: MessagesSquare, title: t('permission-session-bus'), description: t('permission-session-bus-description', { count: permissions.sessionBus.length }), notable: false });
 	return access.sort((a, b) => Number(b.notable) - Number(a.notable));
 }

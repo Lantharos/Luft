@@ -10,11 +10,13 @@ mod version;
 use std::collections::BTreeMap;
 use std::path::Path;
 
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::catalog::{Kind, Publisher};
 use super::signed::Age;
 use super::{device, invited};
+use crate::l10n::L10N;
 use channel::Following;
 
 pub use access::{Declared, ExtensionAccess, ListenPort, permission_title, sandbox_lacks, widens};
@@ -326,7 +328,7 @@ pub fn fetch(id: &str, age: Age) -> Result<Listing, String> {
     let (document, bytes) = invited::listing(id, age)?;
     let listing: Listing = serde_json::from_slice(&bytes).map_err(|error| error.to_string())?;
     if !listing.id.eq_ignore_ascii_case(id) {
-        return Err("schelf.store sent another app's listing.".into());
+        return Err(t!(L10N, "core-store-other-listing"));
     }
     Ok(Listing {
         document,

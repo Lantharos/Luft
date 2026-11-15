@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Snippet } from 'svelte';
 	import { Row, Section } from '@luft/ui';
 	import type { Permissions } from '#lib/bindings.js';
@@ -8,7 +9,7 @@
 	const access = $derived(permissions ? describe(permissions) : []);
 </script>
 
-<Section title="What it can access">
+<Section title={t('access-title')}>
 	{#each access as entry (entry.title)}
 		<Row title={entry.title} description={entry.description} icon={entry.icon} />
 	{/each}

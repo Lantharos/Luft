@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 
 	let { name, onclose, oninstall }: { name: string; onclose: () => void; oninstall: () => void } = $props();
@@ -10,10 +11,10 @@
 </script>
 
 <ConsentDialog
-	title="Install {name} for the whole computer?"
-	description="{name} brings a service or driver that only works as part of the system."
-	facts={['Installs for everyone on this computer', 'Starts with the computer', 'Updates with Luft']}
-	confirm="Install"
+	title={t('search-system-title', { name })}
+	description={t('search-system-dialog', { name })}
+	facts={[t('search-system-everyone'), t('search-system-starts'), t('search-system-updates')]}
+	confirm={t('search-install')}
 	onconfirm={install}
 	{onclose}
 />

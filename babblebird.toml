@@ -108,8 +108,16 @@ name = "Meet Luft"
 files = ["apps/store/meet/**/locales/{lang}/*.ftl"]
 
 [[areas]]
+name = "Network Sign-In"
+files = ["apps/system/signin/locales/{lang}/*.ftl"]
+
+[[areas]]
 name = "Soundboard"
 files = ["apps/store/soundboard/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Tern"
+files = ["apps/system/tern/**/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Focus"

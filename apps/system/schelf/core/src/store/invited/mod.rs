@@ -6,12 +6,14 @@ use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use luft_store_seal::invited_document;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::signed::{self, Age, NO_ACCESS, SIGNED_OUT};
+use super::signed::{self, Age, no_access, session_ended};
 use super::{API, DOWNLOADS, device, record};
+use crate::l10n::L10N;
 use follows::{Lost, Notices};
 use session::Account;
 
@@ -109,7 +111,7 @@ pub fn refresh() -> Result<(), String> {
                 .filter_map(Offered::checked)
                 .collect::<Vec<_>>(),
         ),
-        Err(error) if error == SIGNED_OUT => ended(),
+        Err(error) if error == session_ended() => ended(),
         Err(error) => Err(error),
     }
 }
@@ -211,10 +213,12 @@ enum Refusal {
 
 impl Refusal {
     fn of(error: &str) -> Option<Self> {
-        match error {
-            NO_ACCESS => Some(Self::TakenBack),
-            SIGNED_OUT => Some(Self::SignedOut),
-            _ => None,
+        if error == no_access() {
+            Some(Self::TakenBack)
+        } else if error == session_ended() {
+            Some(Self::SignedOut)
+        } else {
+            None
         }
     }
 }
@@ -246,9 +250,7 @@ pub fn session_for(url: &str) -> Result<Option<String>, String> {
     if !url.starts_with(&format!("{DOWNLOADS}{INVITED_FILES}")) {
         return Ok(None);
     }
-    session::token()?
-        .map(Some)
-        .ok_or_else(|| SIGNED_OUT.to_owned())
+    session::token()?.map(Some).ok_or_else(session_ended)
 }
 
 /// What you're told when downloading `id` failed with `error`, after acting
@@ -259,9 +261,7 @@ pub fn turned_down(id: &str, error: String) -> String {
     };
     let name = name_of(id);
     match refused(id, refusal) {
-        Ok(()) if error == NO_ACCESS => {
-            format!("You no longer have access to this version of {name}.")
-        }
+        Ok(()) if error == no_access() => t!(L10N, "core-store-access-lost", name = name),
         Ok(()) => error,
         Err(failure) => failure,
     }
@@ -300,7 +300,7 @@ pub fn poll(interval_ms: u64) -> Result<signin::SignIn, String> {
 mod tests {
     use std::cell::Cell;
 
-    use super::{NO_ACCESS, Read, Refusal, SIGNED_OUT, choose};
+    use super::{Read, Refusal, choose, no_access, session_ended};
 
     const INVITED: &str = "invited/index/v1/apps/io.example.Tide/testers.json";
     const PUBLIC: &str = "index/v1/apps/io.example.Tide.json";
@@ -331,14 +331,14 @@ mod tests {
 
     #[test]
     fn a_taken_back_invitation_goes_back_to_the_public_listing() {
-        let (read, refused) = read(true, Err(NO_ACCESS.to_owned()));
+        let (read, refused) = read(true, Err(no_access()));
         assert_eq!(read.unwrap().0, PUBLIC);
         assert_eq!(refused, Some(Refusal::TakenBack));
     }
 
     #[test]
     fn an_ended_sign_in_goes_back_to_the_public_listing() {
-        let (read, refused) = read(true, Err(SIGNED_OUT.to_owned()));
+        let (read, refused) = read(true, Err(session_ended()));
         assert_eq!(read.unwrap().0, PUBLIC);
         assert_eq!(refused, Some(Refusal::SignedOut));
     }

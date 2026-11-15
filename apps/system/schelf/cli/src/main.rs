@@ -1,12 +1,16 @@
 mod help;
 mod install;
+mod l10n;
 
 use std::io::IsTerminal;
 use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::process::Command;
 
+use luft_i18n::t;
 use schelf_core::host;
+
+use l10n::L10N;
 
 fn program() -> String {
     std::env::args()
@@ -23,7 +27,7 @@ fn program() -> String {
 /// app menu, to the Schelf app.
 fn open_app(app: &Path, arguments: &[String]) -> i32 {
     let error = Command::new(app).args(arguments).exec();
-    eprintln!("Couldn't open Schelf: {error}");
+    eprintln!("{}", t!(L10N, "cli-open-failed", error = error.to_string()));
     install::Exit::Failed as i32
 }
 
@@ -46,7 +50,9 @@ fn run(program: &str, arguments: &[String]) -> i32 {
             Some(app) => open_app(app, arguments),
             None => {
                 eprintln!(
-                    "There's no command called {first}.\nRun {program} --help to see what it can do."
+                    "{}\n{}",
+                    t!(L10N, "cli-usage-unknown-command", command = first.as_str()),
+                    t!(L10N, "cli-usage-see-help", program = program)
                 );
                 install::Exit::Usage as i32
             }

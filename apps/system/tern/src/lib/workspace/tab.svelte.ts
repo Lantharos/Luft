@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { basename } from '@luft/ui';
 import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 import { pane, remove, sessions, split, type Direction, type LayoutNode } from './layout';
@@ -10,7 +11,7 @@ export class Tab {
 	focused = $state<TerminalSession>() as TerminalSession;
 	ringing = $state(false);
 	sessions = $derived(sessions(this.root));
-	title = $derived(this.focused.title || (this.focused.cwd ? basename(this.focused.cwd) : 'Terminal'));
+	title = $derived(this.focused.title || (this.focused.cwd ? basename(this.focused.cwd) : t('tern-tab-untitled')));
 
 	constructor(session: TerminalSession) {
 		this.root = pane(session);

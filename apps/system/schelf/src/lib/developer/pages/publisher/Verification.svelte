@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { openUrl } from '#lib/bridge/index.js';
 	import Loaded from '../../components/Loaded.svelte';
@@ -8,15 +9,15 @@
 	import type { DashboardPublisher, VerificationStatus } from '../../store';
 
 	const STATUS: Record<VerificationStatus, string> = {
-		draft: 'Started, not sent yet',
-		open: 'Waiting for a reviewer',
-		'more-requested': 'The reviewer asked for more',
-		approved: 'Approved',
-		rejected: 'Turned down',
-		revoked: 'Taken back'
+		draft: 'developer-verification-draft',
+		open: 'developer-verification-open',
+		'more-requested': 'developer-verification-more-requested',
+		approved: 'developer-verification-approved',
+		rejected: 'developer-verification-rejected',
+		revoked: 'developer-verification-revoked'
 	};
 
-	const GIVES = ['A check mark next to its name on every page', 'Short tool names, like sch add lumi', 'Extensions that may run inside Luft', 'Download links on its own domain'];
+	const GIVES = ['developer-verification-gives-mark', 'developer-verification-gives-short', 'developer-verification-gives-extensions', 'developer-verification-gives-domain'];
 
 	let { publisher }: { publisher: DashboardPublisher } = $props();
 
@@ -32,24 +33,32 @@
 	{#snippet children(state)}
 		{@const current = state.current}
 		<Section>
-			<Row title={state.verified ? `${publisher.name} is verified` : `${publisher.name} isn't verified`} icon={state.verified ? BadgeCheck : undefined} description={current?.decided_at ? `${STATUS[current.status]} ${day(current.decided_at)}` : current ? STATUS[current.status] : undefined}>
+			<Row
+				title={t(state.verified ? 'developer-verification-verified' : 'developer-verification-unverified', { publisher: publisher.name })}
+				icon={state.verified ? BadgeCheck : undefined}
+				description={current?.decided_at
+					? t('developer-verification-decided', { status: t(STATUS[current.status]), date: day(current.decided_at) })
+					: current
+						? t(STATUS[current.status])
+						: undefined}
+			>
 				{#if publisher.role === 'owner'}
-					<button type="button" class="button" onclick={() => openUrl(page)}>{state.verified ? 'Open in the browser' : current ? 'Continue in the browser' : 'Start in the browser'}</button>
+					<button type="button" class="button" onclick={() => openUrl(page)}>{t(state.verified ? 'developer-verification-open-browser' : current ? 'developer-verification-continue-browser' : 'developer-verification-start-browser')}</button>
 				{/if}
 			</Row>
 			{#if current?.reason}
-				<Row title="The reviewer's reason" description={current.reason} />
+				<Row title={t('developer-verification-reason')} description={current.reason} />
 			{/if}
 			{#if current?.legal_name}
-				<Row title="Legal name"><span>{current.legal_name}</span></Row>
+				<Row title={t('developer-verification-legal-name')}><span>{current.legal_name}</span></Row>
 			{/if}
 			{#each current?.domains ?? [] as domain (domain.name)}
-				<Row title={domain.name} description={domain.proof ? `Proven by ${domain.proof === 'well-known' ? 'a file on the website' : domain.proof === 'dns' ? 'a DNS record' : 'a namespace'}` : 'Not proven yet'} />
+				<Row title={domain.name} description={domain.proof ? t('developer-verification-proven-by', { proof: domain.proof }) : t('developer-not-proven')} />
 			{/each}
 		</Section>
-		<Section title={state.verified ? 'What it gives' : 'What it would give'}>
+		<Section title={t(state.verified ? 'developer-verification-gives' : 'developer-verification-would-give')}>
 			{#each GIVES as give (give)}
-				<Row title={give} />
+				<Row title={t(give)} />
 			{/each}
 		</Section>
 	{/snippet}
@@ -58,9 +67,9 @@
 <Loaded resource={namespaces}>
 	{#snippet children(list)}
 		{#if list.length}
-			<Section title="Namespaces">
+			<Section title={t('developer-verification-namespaces')}>
 				{#each list as namespace (namespace.prefix)}
-					<Row title={namespace.prefix} description={namespace.verified ? `Proven ${namespace.verified_at ? day(namespace.verified_at) : ''}` : 'Not proven yet'} />
+					<Row title={namespace.prefix} description={namespace.verified ? (namespace.verified_at ? t('developer-verification-proven-on', { date: day(namespace.verified_at) }) : t('developer-verification-proven')) : t('developer-not-proven')} />
 				{/each}
 			</Section>
 		{/if}

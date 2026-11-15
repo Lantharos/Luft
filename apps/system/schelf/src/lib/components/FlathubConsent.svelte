@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Access } from '#lib/app/permissions.js';
 	import ConsentDialog from './ConsentDialog.svelte';
 
@@ -6,10 +7,10 @@
 </script>
 
 <ConsentDialog
-	title="Install {name}?"
-	description="{name} runs in a sandbox, but asks for more than most apps need. It can use:"
+	title={t('consent-flathub-title', { name })}
+	description={t('consent-flathub-description', { name })}
 	{access}
-	confirm="Install"
+	confirm={t('consent-install')}
 	{onconfirm}
 	{onclose}
 />

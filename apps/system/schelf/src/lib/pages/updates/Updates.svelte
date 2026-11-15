@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ago, bytes, Section, Spinner } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
@@ -15,14 +16,14 @@
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
 
 	const headline = $derived.by(() => {
-		if (!library.updates) return library.checking ? 'Checking for updates' : 'Updates';
-		if (!updates.length) return failed.length ? 'No updates found' : 'Your apps are up to date';
-		return `${updates.length} ${updates.length === 1 ? 'update' : 'updates'} available`;
+		if (!library.updates) return t(library.checking ? 'updates-checking' : 'updates-title');
+		if (!updates.length) return t(failed.length ? 'updates-none-found' : 'updates-up-to-date');
+		return t('updates-available', { count: updates.length });
 	});
 
 	function batch(key: string, list: AppUpdate[], job: Job) {
 		if (list.length === 1) void operations.run(list[0].key, list[0].name, updateJob(list[0]));
-		else if (list.length) void operations.run(key, `${list.length} apps`, job, list.map((update) => update.key));
+		else if (list.length) void operations.run(key, t('updates-batch', { count: list.length }), job, list.map((update) => update.key));
 	}
 
 	function updateAll() {
@@ -48,9 +49,9 @@
 						{library.error}
 					{:else if library.checking}
 						<Spinner size={13} />
-						Looking at schelf.store, Flathub, your AppImages and your tools
+						{t('updates-looking')}
 					{:else if library.updates}
-						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
+						{updates.length ? t('updates-checked-size', { size: bytes(size), when: ago(library.updates.checked) }) : t('updates-checked', { when: ago(library.updates.checked) })}
 					{/if}
 				</span>
 				{#if !library.checking}
@@ -59,14 +60,14 @@
 					{/each}
 				{/if}
 			</div>
-			<button type="button" class="button" disabled={library.checking} onclick={() => library.check()}>Check now</button>
+			<button type="button" class="button" disabled={library.checking} onclick={() => library.check()}>{t('updates-check-now')}</button>
 			{#if waiting.length > 1}
-				<button type="button" class="button primary" onclick={updateAll}>Update all</button>
+				<button type="button" class="button primary" onclick={updateAll}>{t('updates-update-all')}</button>
 			{/if}
 		</div>
 
 		{#if apps.length}
-			<Section title="Apps">
+			<Section title={t('updates-apps')}>
 				{#each apps as update (update.key)}
 					<UpdateRow {update} />
 				{/each}
@@ -74,7 +75,7 @@
 		{/if}
 
 		{#if tools.length}
-			<Section title="Command-line tools">
+			<Section title={t('updates-tools')}>
 				{#each tools as update (update.key)}
 					<UpdateRow {update} />
 				{/each}
@@ -82,7 +83,7 @@
 		{/if}
 
 		{#if platforms.length}
-			<Section title="App platforms" description="Shared parts that Flatpak apps are built on">
+			<Section title={t('updates-platforms')} description={t('updates-platforms-description')}>
 				{#each platforms as update (update.key)}
 					<UpdateRow {update} />
 				{/each}

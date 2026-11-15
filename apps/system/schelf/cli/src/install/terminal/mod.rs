@@ -6,10 +6,14 @@ mod table;
 
 use std::io::IsTerminal;
 
+use luft_i18n::t;
+
 pub use ink::Ink;
 pub use line::Line;
 use line::spinner;
-pub use table::{Look, Table, truncate};
+pub use table::{Look, Table, marked, truncate};
+
+use crate::l10n::L10N;
 
 const NARROWEST: usize = 40;
 const WIDEST: usize = 120;
@@ -46,11 +50,24 @@ pub fn height() -> usize {
     size().map_or(usize::MAX, |size| usize::from(size.ws_row))
 }
 
+#[derive(Clone, Copy)]
+enum Unit {
+    Kilobytes,
+    Megabytes,
+    Gigabytes,
+    Terabytes,
+}
+
 pub fn bytes(size: u64) -> String {
-    const UNITS: [&str; 4] = ["kB", "MB", "GB", "TB"];
+    const UNITS: [Unit; 4] = [
+        Unit::Kilobytes,
+        Unit::Megabytes,
+        Unit::Gigabytes,
+        Unit::Terabytes,
+    ];
     let mut amount = size as f64;
     if amount < 1000.0 {
-        return format!("{size} bytes");
+        return t!(L10N, "cli-size-bytes", count = size);
     }
     let mut unit = UNITS[0];
     for next in UNITS {
@@ -60,7 +77,13 @@ pub fn bytes(size: u64) -> String {
             break;
         }
     }
-    format!("{amount:.1} {unit}")
+    let amount = format!("{amount:.1}");
+    match unit {
+        Unit::Kilobytes => t!(L10N, "cli-size-kb", amount = amount),
+        Unit::Megabytes => t!(L10N, "cli-size-mb", amount = amount),
+        Unit::Gigabytes => t!(L10N, "cli-size-gb", amount = amount),
+        Unit::Terabytes => t!(L10N, "cli-size-tb", amount = amount),
+    }
 }
 
 fn paragraphs(text: &str) -> Vec<String> {

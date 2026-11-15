@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { SearchField, tooltip } from '@luft/ui';
 	import CaseSensitive from '@lucide/svelte/icons/case-sensitive';
@@ -75,20 +76,20 @@
 
 <div class="search-bar" role="search" onpointerdown={(event) => event.stopPropagation()}>
 	<div class="search-field">
-		<SearchField bind:this={field} bind:value={query} label="Find" onkeydown={keydown} />
+		<SearchField bind:this={field} bind:value={query} label={t('tern-search-find')} onkeydown={keydown} />
 	</div>
 	<span class="search-count">
 		{#if query}
-			{results.count === 0 ? 'No results' : `${results.index + 1} of ${results.count}`}
+			{results.count === 0 ? t('tern-search-none') : t('tern-search-position', { index: results.index + 1, count: results.count })}
 		{/if}
 	</span>
-	<button type="button" class="search-toggle" class:is-on={caseSensitive} aria-pressed={caseSensitive} aria-label="Match case" {@attach tooltip('Match case')} onclick={() => (caseSensitive = !caseSensitive)}>
+	<button type="button" class="search-toggle" class:is-on={caseSensitive} aria-pressed={caseSensitive} aria-label={t('tern-search-match-case')} {@attach tooltip(t('tern-search-match-case'))} onclick={() => (caseSensitive = !caseSensitive)}>
 		<CaseSensitive size={16} />
 	</button>
-	<button type="button" class="search-toggle" class:is-on={regex} aria-pressed={regex} aria-label="Regular expression" {@attach tooltip('Regular expression')} onclick={() => (regex = !regex)}>
+	<button type="button" class="search-toggle" class:is-on={regex} aria-pressed={regex} aria-label={t('tern-search-regex')} {@attach tooltip(t('tern-search-regex'))} onclick={() => (regex = !regex)}>
 		<Regex size={15} />
 	</button>
-	<button type="button" class="search-toggle" aria-label="Previous match" onclick={() => step(-1)}><ChevronUp size={16} /></button>
-	<button type="button" class="search-toggle" aria-label="Next match" onclick={() => step(1)}><ChevronDown size={16} /></button>
-	<button type="button" class="search-toggle" aria-label="Close" onclick={close}><X size={15} /></button>
+	<button type="button" class="search-toggle" aria-label={t('tern-search-previous')} onclick={() => step(-1)}><ChevronUp size={16} /></button>
+	<button type="button" class="search-toggle" aria-label={t('tern-search-next')} onclick={() => step(1)}><ChevronDown size={16} /></button>
+	<button type="button" class="search-toggle" aria-label={t('tern-search-close')} onclick={close}><X size={15} /></button>
 </div>

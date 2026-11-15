@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use schelf_core::library::{InstalledApp, Source};
 
 use super::{confirm, pick};
@@ -6,18 +7,14 @@ use crate::install::arguments::Arguments;
 use crate::install::perform::{Plan, carry_out};
 use crate::install::sources::installed;
 use crate::install::terminal::Ink;
+use crate::l10n::L10N;
 
 fn choose(name: &str, mut found: Vec<InstalledApp>, yes: bool) -> Result<InstalledApp, Exit> {
     if found.len() == 1 {
         return Ok(found.remove(0));
     }
     let options: Vec<String> = found.iter().map(installed::describe).collect();
-    let chosen = pick(
-        name,
-        &options,
-        yes,
-        "Pick one with --flathub, --fedora or --appimage.",
-    )?;
+    let chosen = pick(name, &options, yes, &t!(L10N, "cli-remove-pick-source"))?;
     Ok(found.swap_remove(chosen))
 }
 
@@ -27,7 +24,7 @@ fn prepare(arguments: &Arguments, everything: &[InstalledApp]) -> Result<Vec<Pla
     for name in &arguments.words {
         let found = installed::matching(everything.to_vec(), name);
         if found.is_empty() {
-            eprintln!("{} isn't installed.", ink.bold(name));
+            eprintln!("{}", t!(L10N, "cli-not-installed", name = ink.bold(name)));
             return Err(Exit::Missing);
         }
         chosen.push(choose(name, found, arguments.yes)?);
@@ -38,18 +35,18 @@ fn prepare(arguments: &Arguments, everything: &[InstalledApp]) -> Result<Vec<Pla
     let sandboxed = chosen
         .iter()
         .any(|app| matches!(app.source, Source::Flatpak | Source::AppImage));
-    let warning = match (system.len(), sandboxed) {
-        (0, false) => "",
-        (0, true) => {
-            " Drives and folders you gave it have to be given again if you install it later."
-        }
-        (1, _) => " What it added to /etc and /var goes too.",
-        _ => " What they added to /etc and /var goes too.",
+    let names = super::list_of(&names);
+    let question = match (system.len(), sandboxed) {
+        (0, false) => t!(L10N, "cli-remove-confirm", names = names),
+        (0, true) => t!(L10N, "cli-remove-confirm-places", names = names),
+        (count, _) => t!(
+            L10N,
+            "cli-remove-confirm-system",
+            names = names,
+            count = count
+        ),
     };
-    confirm(
-        &format!("Remove {}?{warning}", super::list_of(&names)),
-        arguments.yes,
-    )?;
+    confirm(&question, arguments.yes)?;
     let mut plans: Vec<Plan> = others.into_iter().map(installed::removal).collect();
     if !system.is_empty() {
         plans.push(super::system::removal(

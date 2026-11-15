@@ -1,9 +1,11 @@
 use std::process::{Command, Stdio};
 
+use luft_i18n::t;
 use luft_software::apps::toolbox::Repositories;
 
+use crate::l10n::L10N;
+
 const DETAILS: &str = "%{name}\t%{evr}\t%{summary}\t%{license}\t%{url}\t%{installsize}\t%{downloadsize}\t%{description}";
-const UNREACHABLE: &str = "Fedora's software sources can't be reached right now.";
 
 pub struct Details {
     pub package: String,
@@ -30,11 +32,11 @@ pub fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<Strin
         .stdin(Stdio::null())
         .stderr(Stdio::null())
         .output()
-        .map_err(|_| UNREACHABLE.to_string())?;
+        .map_err(|_| t!(L10N, "core-fedora-unreachable"))?;
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).into_owned())
     } else {
-        Err(UNREACHABLE.into())
+        Err(t!(L10N, "core-fedora-unreachable"))
     }
 }
 

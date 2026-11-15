@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use luft_software::apps::appimage;
 use luft_software::apps::toolbox::Repositories;
 use schelf_core::library::{InstalledApp, Source};
@@ -13,16 +14,31 @@ use crate::install::sources::{
 };
 use crate::install::terminal::Line;
 use crate::install::terminal::{Ink, Look, Table, bytes, wrap};
+use crate::l10n::L10N;
 
 const INDENT: &str = "  ";
 
-struct Facts(Vec<(&'static str, String)>);
+struct Facts(Vec<(String, String)>);
 
 impl Facts {
-    fn add(&mut self, label: &'static str, value: Option<String>) {
+    fn add(&mut self, label: String, value: Option<String>) {
         if let Some(value) = value.filter(|value| !value.is_empty()) {
             self.0.push((label, value));
         }
+    }
+
+    fn installed(&mut self, installed: Option<&InstalledApp>) {
+        self.add(
+            t!(L10N, "cli-info-installed"),
+            Some(installed.map_or_else(
+                || t!(L10N, "cli-info-no"),
+                |app| {
+                    app.version
+                        .clone()
+                        .unwrap_or_else(|| t!(L10N, "cli-info-yes"))
+                },
+            )),
+        );
     }
 }
 
@@ -35,7 +51,7 @@ fn show(name: &str, summary: &str, facts: Facts, description: &str) {
     println!();
     let mut table = Table::new(&[Look::Dim, Look::Plain]);
     for (label, value) in facts.0 {
-        table.row(vec![label.to_owned(), value]);
+        table.row(vec![label, value]);
     }
     table.print(ink);
     if !description.trim().is_empty() {
@@ -88,25 +104,38 @@ fn flathub_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Strin
     let installed = installed_version(apps, Origin::Flathub, &details.id);
     let mut facts = Facts(Vec::new());
     facts.add(
-        "Source",
-        Some(format!("Flathub, {}", details.kind().describe())),
-    );
-    facts.add("ID", Some(details.id.clone()));
-    facts.add("Version", details.version().map(str::to_owned));
-    facts.add(
-        "Installed",
-        Some(installed.map_or_else(
-            || "no".to_owned(),
-            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        t!(L10N, "cli-info-source"),
+        Some(t!(
+            L10N,
+            "cli-info-source-flathub",
+            kind = details.kind().key()
         )),
     );
+    facts.add(t!(L10N, "cli-info-id"), Some(details.id.clone()));
+    facts.add(
+        t!(L10N, "cli-info-version"),
+        details.version().map(str::to_owned),
+    );
+    facts.installed(installed);
     if let Some(sizes) = sizes {
-        facts.add("Download", Some(bytes(sizes.download_size)));
-        facts.add("Size", Some(bytes(sizes.installed_size)));
+        facts.add(
+            t!(L10N, "cli-info-download"),
+            Some(bytes(sizes.download_size)),
+        );
+        facts.add(t!(L10N, "cli-info-size"), Some(bytes(sizes.installed_size)));
     }
-    facts.add("License", details.project_license.clone());
-    facts.add("Developer", details.developer_name.clone());
-    facts.add("Website", details.homepage().map(str::to_owned));
+    facts.add(
+        t!(L10N, "cli-info-license"),
+        details.project_license.clone(),
+    );
+    facts.add(
+        t!(L10N, "cli-info-developer"),
+        details.developer_name.clone(),
+    );
+    facts.add(
+        t!(L10N, "cli-info-website"),
+        details.homepage().map(str::to_owned),
+    );
     show(
         &details.name,
         &details.summary,
@@ -118,7 +147,7 @@ fn flathub_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Strin
 
 fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
     let details = schelf_core::catalog::fedora::details(Repositories::Fedora, &candidate.id)?
-        .ok_or("Fedora doesn't have it any more.")?;
+        .ok_or_else(|| t!(L10N, "cli-info-gone-from-fedora"))?;
     let installed = installed_version(apps, Origin::Fedora, &details.package);
     let kind = if fedora::graphical(&details.package) {
         Kind::Desktop
@@ -127,22 +156,19 @@ fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), St
     };
     let mut facts = Facts(Vec::new());
     facts.add(
-        "Source",
-        Some(format!("Fedora, {}, in your Toolbox", kind.describe())),
+        t!(L10N, "cli-info-source"),
+        Some(t!(L10N, "cli-info-source-fedora", kind = kind.key())),
     );
-    facts.add("Version", Some(details.version.clone()));
+    facts.add(t!(L10N, "cli-info-version"), Some(details.version.clone()));
+    facts.installed(installed);
     facts.add(
-        "Installed",
-        Some(installed.map_or_else(
-            || "no".to_owned(),
-            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
-        )),
+        t!(L10N, "cli-info-commands"),
+        installed.map(|app| app.commands.join(" ")),
     );
-    facts.add("Commands", installed.map(|app| app.commands.join(" ")));
-    facts.add("Download", Some(bytes(details.download)));
-    facts.add("Size", Some(bytes(details.size)));
-    facts.add("License", Some(details.license.clone()));
-    facts.add("Website", details.homepage.clone());
+    facts.add(t!(L10N, "cli-info-download"), Some(bytes(details.download)));
+    facts.add(t!(L10N, "cli-info-size"), Some(bytes(details.size)));
+    facts.add(t!(L10N, "cli-info-license"), Some(details.license.clone()));
+    facts.add(t!(L10N, "cli-info-website"), details.homepage.clone());
     show(
         &details.package,
         &details.summary,
@@ -159,22 +185,16 @@ fn system_package(
     source: String,
 ) -> Result<(), String> {
     let details = schelf_core::catalog::fedora::details(repositories, &candidate.id)?
-        .ok_or("It isn't available any more.")?;
+        .ok_or_else(|| t!(L10N, "cli-info-gone"))?;
     let installed = installed_version(apps, Origin::System, &details.package);
     let mut facts = Facts(Vec::new());
-    facts.add("Source", Some(source));
-    facts.add("Version", Some(details.version.clone()));
-    facts.add(
-        "Installed",
-        Some(installed.map_or_else(
-            || "no".to_owned(),
-            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
-        )),
-    );
-    facts.add("Download", Some(bytes(details.download)));
-    facts.add("Size", Some(bytes(details.size)));
-    facts.add("License", Some(details.license.clone()));
-    facts.add("Website", details.homepage.clone());
+    facts.add(t!(L10N, "cli-info-source"), Some(source));
+    facts.add(t!(L10N, "cli-info-version"), Some(details.version.clone()));
+    facts.installed(installed);
+    facts.add(t!(L10N, "cli-info-download"), Some(bytes(details.download)));
+    facts.add(t!(L10N, "cli-info-size"), Some(bytes(details.size)));
+    facts.add(t!(L10N, "cli-info-license"), Some(details.license.clone()));
+    facts.add(t!(L10N, "cli-info-website"), details.homepage.clone());
     show(
         &details.package,
         &details.summary,
@@ -186,25 +206,28 @@ fn system_package(
 
 fn installed_app(app: &InstalledApp) {
     let mut facts = Facts(Vec::new());
-    facts.add("Source", Some(Origin::of(app.source).title().to_owned()));
-    facts.add("ID", Some(app.id.clone()));
-    facts.add("Version", app.version.clone());
-    facts.add("Installed", Some("yes".to_owned()));
-    facts.add("Size", Some(bytes(app.size)));
-    facts.add("File", app.path.clone());
+    facts.add(
+        t!(L10N, "cli-info-source"),
+        Some(Origin::of(app.source).title()),
+    );
+    facts.add(t!(L10N, "cli-info-id"), Some(app.id.clone()));
+    facts.add(t!(L10N, "cli-info-version"), app.version.clone());
+    facts.add(
+        t!(L10N, "cli-info-installed"),
+        Some(t!(L10N, "cli-info-yes")),
+    );
+    facts.add(t!(L10N, "cli-info-size"), Some(bytes(app.size)));
+    facts.add(t!(L10N, "cli-info-file"), app.path.clone());
     if app.source == Source::AppImage
         && let Ok(found) = appimage::find(&app.id)
     {
         facts.add(
-            "Updates",
-            Some(
-                if found.updatable {
-                    "automatic"
-                } else {
-                    "none offered"
-                }
-                .to_owned(),
-            ),
+            t!(L10N, "cli-info-updates"),
+            Some(if found.updatable {
+                t!(L10N, "cli-info-updates-automatic")
+            } else {
+                t!(L10N, "cli-info-updates-none")
+            }),
         );
     }
     show(
@@ -224,42 +247,48 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     let details = StoreDetails::new(listing, record.as_ref());
     let mut facts = Facts(Vec::new());
     facts.add(
-        "Source",
-        Some(format!("schelf.store, {}", candidate.kind.describe())),
-    );
-    facts.add("ID", Some(details.id.clone()));
-    facts.add("Version", details.version.clone());
-    facts.add(
-        "Channel",
-        (details.channel != channel::STABLE).then(|| details.channel.clone()),
-    );
-    facts.add(
-        "Installed",
-        Some(installed.map_or_else(
-            || "no".to_owned(),
-            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        t!(L10N, "cli-info-source"),
+        Some(t!(
+            L10N,
+            "cli-info-source-store",
+            kind = candidate.kind.key()
         )),
     );
-    facts.add("Download", details.size.map(bytes));
+    facts.add(t!(L10N, "cli-info-id"), Some(details.id.clone()));
+    facts.add(t!(L10N, "cli-info-version"), details.version.clone());
     facts.add(
-        "File",
+        t!(L10N, "cli-info-channel"),
+        (details.channel != channel::STABLE).then(|| details.channel.clone()),
+    );
+    facts.installed(installed);
+    facts.add(t!(L10N, "cli-info-download"), details.size.map(bytes));
+    facts.add(
+        t!(L10N, "cli-info-file"),
         details
             .download
             .as_ref()
             .map(|download| download.url.clone()),
     );
-    facts.add("License", details.license.clone());
-    facts.add("Developer", Some(details.developer.clone()));
-    facts.add("Website", details.homepage.clone());
-    facts.add("Built", built(&details));
-    facts.add("Runs", runs(&details));
+    facts.add(t!(L10N, "cli-info-license"), details.license.clone());
+    facts.add(
+        t!(L10N, "cli-info-developer"),
+        Some(details.developer.clone()),
+    );
+    facts.add(t!(L10N, "cli-info-website"), details.homepage.clone());
+    facts.add(t!(L10N, "cli-info-built"), built(&details));
+    facts.add(t!(L10N, "cli-info-runs"), runs(&details));
     let access = match (&details.extension, &details.declared) {
         (Some(extension), _) => store::extension_access(extension),
         (None, Some(declared)) if details.access.is_some() => store::access(declared),
-        _ => vec!["Everything you can, outside a sandbox".to_owned()],
+        _ => vec![t!(L10N, "cli-info-access-everything")],
     };
     for (index, line) in access.into_iter().enumerate() {
-        facts.add(if index == 0 { "Can use" } else { "" }, Some(line));
+        let label = if index == 0 {
+            t!(L10N, "cli-info-can-use")
+        } else {
+            String::new()
+        };
+        facts.add(label, Some(line));
     }
     show(
         &details.name,
@@ -272,22 +301,20 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
 
 fn runs(details: &StoreDetails) -> Option<String> {
     if !details.needs_review.is_empty() {
-        return Some(format!(
-            "Not yet: it needs to {}, which only runs inside Luft once schelf.store approves it",
-            listing::sandbox_lacks(&details.needs_review)
+        return Some(t!(
+            L10N,
+            "cli-info-runs-after-review",
+            needs = listing::sandbox_lacks(&details.needs_review)
         ));
     }
     details
         .installer
         .filter(|format| *format == Format::LuftExtension)?;
-    Some(
-        if details.in_shell {
-            "Inside Luft, approved by schelf.store"
-        } else {
-            "In a sandbox"
-        }
-        .to_owned(),
-    )
+    Some(if details.in_shell {
+        t!(L10N, "cli-info-runs-inside-luft")
+    } else {
+        t!(L10N, "cli-info-runs-sandboxed")
+    })
 }
 
 fn built(details: &StoreDetails) -> Option<String> {
@@ -298,45 +325,55 @@ fn built(details: &StoreDetails) -> Option<String> {
             &provenance.repository,
             &provenance.commit,
         ) {
-            (Builder::GithubActions, Some(repository), Some(commit)) => format!(
-                "on GitHub Actions, from {repository} at {}",
-                commit.chars().take(7).collect::<String>()
+            (Builder::GithubActions, Some(repository), Some(commit)) => t!(
+                L10N,
+                "cli-info-built-from",
+                repository = repository.as_str(),
+                commit = commit.chars().take(7).collect::<String>()
             ),
-            (Builder::GithubActions, _, _) => "on GitHub Actions".to_owned(),
-            (Builder::Developer, _, _) => "uploaded by the developer".to_owned(),
+            (Builder::GithubActions, _, _) => t!(L10N, "cli-info-built-on-actions"),
+            (Builder::Developer, _, _) => t!(L10N, "cli-info-built-by-developer"),
         },
     )
 }
 
 fn store_tool(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
-    let tool =
-        tools::find(&candidate.id, tools::STABLE)?.ok_or("It isn't on schelf.store any more.")?;
+    let tool = tools::find(&candidate.id, tools::STABLE)?
+        .ok_or_else(|| t!(L10N, "cli-info-gone-from-store"))?;
     let index = &tool.index;
     let offer = tool.offer();
     let installed = installed_version(apps, Origin::Store, &index.address);
     let mut facts = Facts(Vec::new());
-    facts.add("Source", Some("schelf.store, command-line tool".to_owned()));
-    facts.add("Address", Some(index.address.clone()));
-    facts.add("Version", offer.map(|(release, _)| release.version.clone()));
     facts.add(
-        "Installed",
-        Some(installed.map_or_else(
-            || "no".to_owned(),
-            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        t!(L10N, "cli-info-source"),
+        Some(t!(
+            L10N,
+            "cli-info-source-store",
+            kind = Kind::Command.key()
         )),
     );
-    facts.add("Download", offer.map(|(_, file)| bytes(file.size)));
-    let verified = if index.publisher.verified {
-        "verified"
-    } else {
-        "not verified by schelf.store"
-    };
+    facts.add(t!(L10N, "cli-info-address"), Some(index.address.clone()));
     facts.add(
-        "Publisher",
-        Some(format!("{}, {verified}", index.publisher.name)),
+        t!(L10N, "cli-info-version"),
+        offer.map(|(release, _)| release.version.clone()),
     );
-    facts.add("Source code", index.repository.clone());
-    facts.add("Runs with", Some("Everything you can do".to_owned()));
+    facts.installed(installed);
+    facts.add(
+        t!(L10N, "cli-info-download"),
+        offer.map(|(_, file)| bytes(file.size)),
+    );
+    let publisher = index.publisher.name.as_str();
+    let verified = if index.publisher.verified {
+        t!(L10N, "cli-info-publisher-verified", publisher = publisher)
+    } else {
+        t!(L10N, "cli-info-publisher-unverified", publisher = publisher)
+    };
+    facts.add(t!(L10N, "cli-info-publisher"), Some(verified));
+    facts.add(t!(L10N, "cli-info-source-code"), index.repository.clone());
+    facts.add(
+        t!(L10N, "cli-info-runs-with"),
+        Some(t!(L10N, "cli-info-runs-with-everything")),
+    );
     show(&index.name, "", facts, "");
     Ok(())
 }
@@ -350,14 +387,18 @@ fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Str
             candidate,
             apps,
             Repositories::Fedora,
-            "Fedora, a desktop app in the system for everyone".to_owned(),
+            t!(L10N, "cli-info-source-fedora-desktop"),
         ),
         (Catalog::Fedora, _) => fedora_package(candidate, apps),
         (Catalog::System, _) => system_package(
             candidate,
             apps,
             Repositories::Added,
-            format!("System package, from {}", candidate.catalog.title()),
+            t!(
+                L10N,
+                "cli-info-source-system",
+                source = candidate.catalog.title()
+            ),
         ),
     }
 }
@@ -374,7 +415,7 @@ pub fn run(arguments: &Arguments) -> Exit {
             println!();
         }
         let line = Line::default();
-        line.say(&format!("Looking for {name}"));
+        line.say(&t!(L10N, "cli-looking-for", name = name.as_str()));
         let apps = installed::all(only);
         let mut found: Vec<Candidate> = Vec::new();
         for catalog in &looked_in {
@@ -382,7 +423,15 @@ pub fn run(arguments: &Arguments) -> Exit {
                 Ok(candidates) => found.extend(candidates),
                 Err(error) => {
                     line.clear();
-                    eprintln!("Couldn't look in {}. {error}", catalog.title());
+                    eprintln!(
+                        "{}",
+                        t!(
+                            L10N,
+                            "cli-info-look-failed",
+                            source = catalog.title(),
+                            error = error
+                        )
+                    );
                     exit = exit.max(Exit::Failed);
                 }
             }
@@ -398,7 +447,14 @@ pub fn run(arguments: &Arguments) -> Exit {
             .collect();
         line.clear();
         if found.is_empty() && extra.is_empty() {
-            eprintln!("There's nothing called {}.", Ink::stderr().bold(name));
+            eprintln!(
+                "{}",
+                t!(
+                    L10N,
+                    "cli-info-nothing-called",
+                    name = Ink::stderr().bold(name)
+                )
+            );
             exit = exit.max(Exit::Missing);
             continue;
         }
@@ -409,7 +465,15 @@ pub fn run(arguments: &Arguments) -> Exit {
             }
             first = false;
             if let Err(error) = catalog_entry(candidate, &apps) {
-                eprintln!("Couldn't get the details of {}. {error}", candidate.name);
+                eprintln!(
+                    "{}",
+                    t!(
+                        L10N,
+                        "cli-info-details-failed",
+                        name = candidate.name.as_str(),
+                        error = error
+                    )
+                );
                 exit = exit.max(Exit::Failed);
             }
         }

@@ -21,6 +21,7 @@ import Search from '@lucide/svelte/icons/search';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import ToggleRight from '@lucide/svelte/icons/toggle-right';
 import Volume2 from '@lucide/svelte/icons/volume-2';
+import { i18n, t } from '@luft/i18n';
 import type { ExtensionAccess } from '#lib/bindings.js';
 
 export interface Ability {
@@ -28,44 +29,46 @@ export interface Ability {
 	title: string;
 }
 
-const PERMISSIONS: Record<string, Ability> = {
-	wallpaper: { icon: Image, title: 'Draw over the wallpaper' },
-	'quick-settings': { icon: ToggleRight, title: 'Add tiles to quick settings' },
-	taskbar: { icon: PanelBottom, title: 'Add buttons to the taskbar' },
-	search: { icon: Search, title: 'Add results to search' },
-	notifications: { icon: Bell, title: 'Send notifications' },
-	weather: { icon: CloudSun, title: 'See the weather where you are' },
-	location: { icon: MapPin, title: 'See roughly where you are' },
-	media: { icon: Music, title: "See and control what's playing" },
-	popups: { icon: PanelTop, title: 'Show panels and small windows' },
-	typing: { icon: Keyboard, title: 'Type into other apps' },
-	sounds: { icon: Volume2, title: 'Play sounds' },
-	'audio-levels': { icon: AudioLines, title: "Follow the beat of what's playing" },
-	calls: { icon: Phone, title: "Know when you're in a call" },
-	'locked-sounds': { icon: Lock, title: 'Keep playing sounds while the screen is locked' },
-	'input-sounds': { icon: Keyboard, title: 'Play a sound when you type and click, without seeing your keys' },
-	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' },
-	'screen-effects': { icon: Sparkles, title: 'Draw over and change how your windows and the whole screen look' },
-	clipboard: { icon: Clipboard, title: 'Copy to your clipboard' },
-	'file-actions': { icon: ListPlus, title: 'Add to the menu of files and folders in Rover' }
+const PERMISSIONS: Record<string, { icon: Component; id: string }> = {
+	wallpaper: { icon: Image, id: 'extension-access-wallpaper' },
+	'quick-settings': { icon: ToggleRight, id: 'extension-access-quick-settings' },
+	taskbar: { icon: PanelBottom, id: 'extension-access-taskbar' },
+	search: { icon: Search, id: 'extension-access-search' },
+	notifications: { icon: Bell, id: 'extension-access-notifications' },
+	weather: { icon: CloudSun, id: 'extension-access-weather' },
+	location: { icon: MapPin, id: 'extension-access-location' },
+	media: { icon: Music, id: 'extension-access-media' },
+	popups: { icon: PanelTop, id: 'extension-access-popups' },
+	typing: { icon: Keyboard, id: 'extension-access-typing' },
+	sounds: { icon: Volume2, id: 'extension-access-sounds' },
+	'audio-levels': { icon: AudioLines, id: 'extension-access-audio-levels' },
+	calls: { icon: Phone, id: 'extension-access-calls' },
+	'locked-sounds': { icon: Lock, id: 'extension-access-locked-sounds' },
+	'input-sounds': { icon: Keyboard, id: 'extension-access-input-sounds' },
+	'do-not-disturb': { icon: BellOff, id: 'extension-access-do-not-disturb' },
+	'screen-effects': { icon: Sparkles, id: 'extension-access-screen-effects' },
+	clipboard: { icon: Clipboard, id: 'extension-access-clipboard' },
+	'file-actions': { icon: ListPlus, id: 'extension-access-file-actions' }
 };
 
+const list = (items: string[]) => new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(items);
+
 export function abilities(access: ExtensionAccess): Ability[] {
-	const listed = access.permissions.map((permission) => PERMISSIONS[permission] ?? { icon: ShieldCheck, title: permission });
-	if (access.network.length) listed.push({ icon: Globe, title: `Connect to ${new Intl.ListFormat('en', { type: 'conjunction' }).format(access.network)}` });
+	const listed = access.permissions.map((permission) => {
+		const known = PERMISSIONS[permission];
+		return known ? { icon: known.icon, title: t(known.id) } : { icon: ShieldCheck, title: permission };
+	});
+	if (access.network.length) listed.push({ icon: Globe, title: t('extension-access-network', { hosts: list(access.network) }) });
 	if (access.listen.length) {
-		const ports = [...new Set(access.listen.map((listen) => String(listen.port)))];
-		listed.push({ icon: RadioTower, title: `Take connections from devices on your network, on port ${new Intl.ListFormat('en', { type: 'conjunction' }).format(ports)}` });
+		const ports = [...new Set(access.listen.map((listen) => listen.port))];
+		listed.push({ icon: RadioTower, title: t('extension-access-listen', { count: ports.length, ports: list(ports.map(String)) }) });
 	}
-	if (access.helper) listed.push({ icon: Cpu, title: 'Runs its own program' });
-	return listed.length ? listed : [{ icon: ShieldCheck, title: 'Nothing beyond the basics' }];
+	if (access.helper) listed.push({ icon: Cpu, title: t('extension-access-helper') });
+	return listed.length ? listed : [{ icon: ShieldCheck, title: t('extension-access-basics') }];
 }
 
-export const INSIDE_LUFT_ABILITIES = ["See what you type and what's on the screen", 'Do anything Luft itself can'];
-
-const lowered = (title: string) => title.charAt(0).toLowerCase() + title.slice(1);
+export const insideLuftAbilities = () => [t('extension-inside-luft-input'), t('extension-inside-luft-anything')];
 
 export function sandboxLacks(parts: string[]): string {
-	const phrases = parts.map((part) => (part === 'listen' ? 'take connections from devices on your network' : lowered(PERMISSIONS[part]?.title ?? part)));
-	return new Intl.ListFormat('en', { type: 'conjunction' }).format(phrases);
+	return list(parts.map((part) => (part === 'listen' ? t('extension-access-listen.needs') : PERMISSIONS[part] ? t(`${PERMISSIONS[part].id}.needs`) : part)));
 }

@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, Segmented, TextField } from '@luft/ui';
 	import type { Invitee, Role } from '#lib/bindings.js';
 	import { approvals } from '../../state/approval.svelte';
 	import type { DashboardPublisher } from '../../store';
-	import { ROLES } from './roles';
+	import { roleName } from './roles';
 
 	const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	const GITHUB = /^@?[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
@@ -32,20 +33,20 @@
 		const action = { type: 'member.invite' as const, publisher: publisher.id, to, role };
 		const settled = onsettled;
 		onclose();
-		void approvals.ask(`Invite ${who.trim()}`, [action], settled);
+		void approvals.ask(t('developer-members-invite-approval', { who: who.trim() }), [action], settled);
 	}
 </script>
 
-<Dialog title="Invite to {publisher.name}" {onclose}>
-	<TextField bind:this={field} bind:value={who} label="Email or GitHub username" placeholder="name@example.com or @username" onkeydown={(event) => event.key === 'Enter' && invite()} />
+<Dialog title={t('developer-members-invite-title', { publisher: publisher.name })} {onclose}>
+	<TextField bind:this={field} bind:value={who} label={t('developer-members-who')} placeholder={t('developer-members-who-placeholder')} onkeydown={(event) => event.key === 'Enter' && invite()} />
 	<Segmented
-		label="Role"
+		label={t('developer-members-role')}
 		value={role}
-		options={(['developer', 'admin'] as const).map((value) => ({ value, label: ROLES[value] }))}
+		options={(['developer', 'admin'] as const).map((value) => ({ value, label: roleName(value) }))}
 		onchange={(value) => (role = value)}
 	/>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!to} onclick={invite}>Invite</button>
+		<button type="button" class="button" onclick={onclose}>{t('developer-cancel')}</button>
+		<button type="button" class="button primary" disabled={!to} onclick={invite}>{t('developer-invite')}</button>
 	{/snippet}
 </Dialog>

@@ -6,8 +6,10 @@ use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
 use luft_app::launch::TOKEN_VARIABLES;
 use luft_app::{Activation, Commands, Empty};
+use luft_i18n::t;
 use sabine::{BridgeEvent, PlatformEvent, SabineProcessHandle, SabineWindow, SingleInstancePolicy};
 
+use crate::l10n::L10N;
 use crate::operations::Queue;
 
 const APP_ID: &str = "com.lantharos.schelf";
@@ -138,7 +140,7 @@ impl Windows {
             .installs
             .get(&request)
             .cloned()
-            .ok_or_else(|| "This window has already closed.".into())
+            .ok_or_else(|| t!(L10N, "desktop-window-closed"))
     }
 
     fn forget_installer(&self, request: u32) {

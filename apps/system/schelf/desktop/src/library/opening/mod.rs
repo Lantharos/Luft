@@ -3,6 +3,7 @@ mod watch;
 
 use gio::prelude::*;
 use gio_unix::DesktopAppInfo;
+use luft_i18n::t;
 use luft_software::system::system_packages;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -10,6 +11,8 @@ use specta::Type;
 use diagnosis::Missing;
 use schelf_core::library::Source;
 use watch::Outcome;
+
+use crate::l10n::L10N;
 
 const DBUS_ACTIVATABLE: &str = "DBusActivatable";
 const LAST_LINES: usize = 12;
@@ -34,7 +37,7 @@ pub struct Failure {
 
 /// Starts the app, as a process to follow unless D-Bus started it.
 fn start(desktop: &str, token: Option<&str>) -> Result<Option<watch::Started>, String> {
-    let info = DesktopAppInfo::new(desktop).ok_or("That app isn't installed any more.")?;
+    let info = DesktopAppInfo::new(desktop).ok_or_else(|| t!(L10N, "desktop-app-gone"))?;
     if info.boolean(DBUS_ACTIVATABLE) {
         return luft_app::launch::start(info.upcast_ref(), &[], token)
             .map(|()| None)

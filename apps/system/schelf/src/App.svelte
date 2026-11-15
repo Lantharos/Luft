@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
 	import AccessNotice from '#lib/account/AccessNotice.svelte';
@@ -56,7 +57,7 @@
 	<main class="glass-content">
 		<header class="drag-region flex h-[60px] flex-none items-center gap-3 pr-4 pl-6">
 			{#if depth > 1}
-				<IconButton icon={ChevronLeft} label="Back" large onclick={() => navigation.back()} />
+				<IconButton icon={ChevronLeft} label={t('title-back')} large onclick={() => navigation.back()} />
 			{/if}
 			<h1 class="min-w-0 flex-1 truncate pl-2 text-[20px] font-semibold">{heading}</h1>
 			<WindowControls />

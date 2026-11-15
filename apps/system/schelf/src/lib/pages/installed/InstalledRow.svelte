@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { bytes, MenuButton, MenuItem } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bindings.js';
@@ -18,7 +19,7 @@
 	const update = $derived(library.update(app.key));
 	const detail = $derived.by(() => {
 		if (operation?.state === 'failed') return operation.error;
-		const services = app.services.length ? `Runs ${app.services.join(', ')}` : null;
+		const services = app.services.length ? t('installed-runs', { services: app.services.join(', ') }) : null;
 		const parts = [sourceName(app), app.version, app.size ? bytes(app.size) : null, services];
 		return parts.filter(Boolean).join(' · ');
 	});
@@ -41,26 +42,26 @@
 			<ProgressButton operation={active} />
 		{:else}
 			{#if update}
-				<button type="button" class="button" onclick={updateNow}>Update</button>
+				<button type="button" class="button" onclick={updateNow}>{t('installed-update')}</button>
 			{/if}
 			{#if app.desktop}
-				<button type="button" class="button" onclick={() => opening.open(app)}>Open</button>
+				<button type="button" class="button" onclick={() => opening.open(app)}>{t('installed-open')}</button>
 			{/if}
-			<MenuButton label="More for {app.name}" class="icon-button" align="end">
+			<MenuButton label={t('installed-more', { name: app.name })} class="icon-button" align="end">
 				{#snippet trigger()}<Ellipsis size={18} />{/snippet}
 				{#snippet children(close)}
 					<MenuItem
 						onclick={() => {
 							close();
 							navigation.push({ page: 'app', target: { installed: app.key }, name: app.name });
-						}}>Details</MenuItem
+						}}>{t('installed-details')}</MenuItem
 					>
 					<MenuItem
 						danger
 						onclick={() => {
 							close();
 							onremove(app);
-						}}>Remove</MenuItem
+						}}>{t('installed-remove')}</MenuItem
 					>
 				{/snippet}
 			</MenuButton>

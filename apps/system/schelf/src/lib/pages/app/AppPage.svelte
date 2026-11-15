@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import ShieldOff from '@lucide/svelte/icons/shield-off';
@@ -47,7 +48,7 @@
 	const block = $derived(installed?.listing ? (catalog.installed(installed.listing)?.block ?? null) : null);
 	const extension = $derived(store?.kind === 'extension' || installed?.source === 'extension' || known?.kind === 'extension');
 	const icon = $derived(details?.icon ?? installed?.icon ?? known?.icon ?? null);
-	const from = $derived(listing?.origin === 'flathub' ? 'From Flathub' : listing?.origin === 'fedora' ? 'From Fedora' : null);
+	const from = $derived(listing?.origin === 'flathub' ? t('app-from-flathub') : listing?.origin === 'fedora' ? t('app-from-fedora') : null);
 
 	$effect(() => {
 		asking = askFullAccess;
@@ -100,7 +101,7 @@
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
 				{#if details?.developer || from || withdrawn}
-					{@const rest = [from, withdrawn && 'No longer available on Schelf'].filter(Boolean).join(' · ')}
+					{@const rest = [from, withdrawn && t('app-withdrawn')].filter(Boolean).join(' · ')}
 					<span class="flex min-w-0 items-center gap-1 text-[13px] text-[var(--text-muted)]">
 						{#if details?.developer}
 							<span class="truncate">{details.developer}</span>
@@ -143,7 +144,7 @@
 			{/if}
 			{#if details?.release?.notes}
 				<section class="flex flex-col gap-2">
-					<h3 class="text-[15px] font-semibold">What's new in {details.release.version}</h3>
+					<h3 class="text-[15px] font-semibold">{t('app-whats-new', { version: details.release.version })}</h3>
 					<Description html={details.release.notes} />
 				</section>
 			{/if}
@@ -168,7 +169,7 @@
 			{:else if permissions}
 				<AccessList {permissions} />
 			{:else if store?.extension}
-				<Section title="What it can do" description={store.installer ? (store.inShell ? 'Runs inside Luft, approved by schelf.store' : 'Runs in a sandbox, with only what’s listed') : undefined}>
+				<Section title={t('app-abilities')} description={store.installer ? t(store.inShell ? 'app-abilities-inside-luft' : 'app-abilities-sandboxed') : undefined}>
 					{#each abilities(store.extension) as ability (ability.title)}
 						<Row title={ability.title} icon={ability.icon} />
 					{/each}
@@ -176,10 +177,10 @@
 			{:else if store}
 				<AccessList permissions={null}>
 					<Row
-						title="Full access"
+						title={t('app-full-access')}
 						description={store.declared?.unsandboxed
-							? `It asks to run outside a sandbox: “${store.declared.unsandboxed}”`
-							: 'It runs outside a sandbox, like a program you start yourself.'}
+							? t('app-full-access-declared', { reason: store.declared.unsandboxed })
+							: t('app-full-access-unsandboxed')}
 						icon={ShieldOff}
 					/>
 				</AccessList>

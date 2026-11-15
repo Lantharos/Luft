@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Segmented, Select, VirtualScroller } from '@luft/ui';
 	import type { InstalledApp, Source } from '#lib/bindings.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
@@ -10,29 +11,35 @@
 	type Format = 'any' | 'store' | 'flatpak' | 'appImage' | 'debian';
 
 	const APPS: Source[] = ['flatpak', 'appImage', 'debian', 'sabine'];
-	const FORMATS: { value: Format; label: string }[] = [
-		{ value: 'any', label: 'Every kind' },
-		{ value: 'store', label: 'From schelf.store' },
+	const kinds: { value: Format; label: string }[] = $derived([
+		{ value: 'any', label: t('installed-kind-any') },
+		{ value: 'store', label: t('installed-kind-store') },
 		{ value: 'flatpak', label: 'Flatpak' },
 		{ value: 'appImage', label: 'AppImage' },
 		{ value: 'debian', label: '.deb' }
-	];
+	]);
 
 	const LAYOUT = { itemHeight: 64, gap: 2, padding: { top: 4, left: 28, right: 28, bottom: 40 } };
 
 	const EMPTY: Partial<Record<Filter, string>> = {
-		tool: 'Command-line tools you install from search show up here.',
-		system: 'Drivers and services you add to the system show up here.'
+		tool: 'installed-empty-tools',
+		system: 'installed-empty-system'
 	};
 
-	const NOUNS: Partial<Record<Filter, [string, string]>> = { tool: ['tool', 'tools'], system: ['add-on', 'add-ons'], extension: ['extension', 'extensions'] };
+	const COUNTS: Record<Filter, [string, string]> = {
+		all: ['installed-count-apps', 'installed-count-apps-size'],
+		apps: ['installed-count-apps', 'installed-count-apps-size'],
+		tool: ['installed-count-tools', 'installed-count-tools-size'],
+		system: ['installed-count-system', 'installed-count-system-size'],
+		extension: ['installed-count-extensions', 'installed-count-extensions-size']
+	};
 
 	let filter = $state<Filter>('all');
 	let format = $state<Format>('any');
 	let removing = $state<InstalledApp | null>(null);
 
 	const apps = $derived(library.installed.filter((app) => APPS.includes(app.source)));
-	const formats = $derived(FORMATS.filter(({ value }) => value === 'any' || apps.some((app) => made(app) === value)));
+	const formats = $derived(kinds.filter(({ value }) => value === 'any' || apps.some((app) => made(app) === value)));
 	const shown = $derived.by(() => {
 		if (filter === 'all') return library.installed;
 		if (filter !== 'apps') return library.installed.filter((app) => app.source === filter);
@@ -43,7 +50,10 @@
 		return app.listing || app.source === 'sabine' ? 'store' : (app.source as Format);
 	}
 	const total = $derived(shown.reduce((sum, app) => sum + app.size, 0));
-	const noun = $derived((NOUNS[filter] ?? ['app', 'apps'])[shown.length === 1 ? 0 : 1]);
+	const count = $derived.by(() => {
+		const [plain, sized] = COUNTS[filter];
+		return total ? t(sized, { count: shown.length, size: bytes(total) }) : t(plain, { count: shown.length });
+	});
 
 </script>
 
@@ -51,14 +61,14 @@
 	{#snippet header()}
 		<div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 bg-[var(--content)] px-8 pb-3">
 			<Segmented
-				label="Show"
+				label={t('installed-show')}
 				value={filter}
 				options={[
-					{ value: 'all', label: 'All' },
-					{ value: 'apps', label: 'Apps' },
-					{ value: 'tool', label: 'Command-line tools' },
-					{ value: 'system', label: 'System add-ons' },
-					...(library.installed.some((app) => app.source === 'extension') ? [{ value: 'extension' as const, label: 'Extensions' }] : [])
+					{ value: 'all', label: t('installed-all') },
+					{ value: 'apps', label: t('installed-apps') },
+					{ value: 'tool', label: t('installed-tools') },
+					{ value: 'system', label: t('installed-system') },
+					...(library.installed.some((app) => app.source === 'extension') ? [{ value: 'extension' as const, label: t('installed-extensions') }] : [])
 				]}
 				onchange={(value) => {
 					filter = value;
@@ -67,19 +77,19 @@
 			/>
 			<div class="ml-auto flex items-center gap-3">
 				{#if library.loaded}
-					<span class="whitespace-nowrap text-[13px] text-[var(--text-muted)]">{shown.length} {noun}{total ? ` · ${bytes(total)}` : ''}</span>
+					<span class="whitespace-nowrap text-[13px] text-[var(--text-muted)]">{count}</span>
 				{/if}
 				{#if filter === 'apps' && formats.length > 2}
-					<Select label="Kind of app" options={formats} value={format} onchange={(value) => (format = value)} />
+					<Select label={t('installed-kind')} options={formats} value={format} onchange={(value) => (format = value)} />
 				{/if}
 				{#if filter === 'system'}
-					<button type="button" class="button" onclick={() => navigation.push({ page: 'sources' })}>Software sources</button>
+					<button type="button" class="button" onclick={() => navigation.push({ page: 'sources' })}>{t('installed-sources')}</button>
 				{/if}
 			</div>
 		</div>
 		{#if library.loaded && !shown.length}
 			<p class="px-8 pt-16 text-center text-[14px] text-[var(--text-muted)]">
-				{EMPTY[filter] ?? 'No apps here yet.'}
+				{t(EMPTY[filter] ?? 'installed-empty')}
 			</p>
 		{/if}
 	{/snippet}

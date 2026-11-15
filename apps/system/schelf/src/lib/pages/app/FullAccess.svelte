@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
 	import { commands, type InstalledApp } from '#lib/bindings.js';
 	import { SLOW } from '#lib/bridge/index.js';
-	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
+	import { fullAccessAbilities } from '#lib/app/fullAccess.js';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 
 	let {
@@ -59,30 +60,30 @@
 	const description = $derived(
 		error ??
 			(on
-				? 'It runs outside its sandbox, like a program you start yourself.'
+				? t('app-full-access-on')
 				: reason
-					? `It asks to run without its sandbox: “${reason}” Only turn this on if you trust it.`
-					: 'Takes away its sandbox. For one drive or folder, give it just that instead.')
+					? t('app-full-access-asks', { reason })
+					: t('app-full-access-off'))
 	);
 </script>
 
-<Row title="Full access" {description}>
-	<Switch checked={on} label="Full access" disabled={busy} onchange={(wanted) => (wanted ? (asking = true) : change(false))} />
+<Row title={t('app-full-access')} {description}>
+	<Switch checked={on} label={t('app-full-access')} disabled={busy} onchange={(wanted) => (wanted ? (asking = true) : change(false))} />
 </Row>
 
 {#if open && app.desktop}
 	{@const desktop = app.desktop}
-	<Row title="{app.name} is open" description="Changes apply once it opens again.">
-		<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>Restart</button>
+	<Row title={t('app-restart-title', { name: app.name })} description={t('app-restart-description')}>
+		<button type="button" class="button" disabled={busy} onclick={() => restart(desktop)}>{t('app-restart')}</button>
 	</Row>
 {/if}
 
 {#if asking}
 	<ConsentDialog
-		title="Give {app.name} full access?"
-		description="From the next time it opens, {app.name} can do all of this without asking."
-		facts={FULL_ACCESS_ABILITIES}
-		confirm="Give full access"
+		title={t('app-full-access-consent-title', { name: app.name })}
+		description={t('app-full-access-consent-description', { name: app.name })}
+		facts={fullAccessAbilities()}
+		confirm={t('app-full-access-consent-confirm')}
 		danger
 		onconfirm={() => change(true)}
 		onclose={() => (asking = false)}

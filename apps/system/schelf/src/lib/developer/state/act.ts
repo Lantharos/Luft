@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { errorText } from '@luft/ui';
 import type { Fetched } from '#lib/bindings.js';
 import { developer } from './developer.svelte';
@@ -6,9 +7,9 @@ import type { Problem } from './resource.svelte';
 export function problemText(problem: Problem) {
 	switch (problem.state) {
 		case 'offline':
-			return "You're offline, or schelf.store couldn't be reached.";
+			return t('developer-problem-offline');
 		case 'signedOut':
-			return 'Your schelf.store sign-in ended.';
+			return t('developer-problem-signed-out');
 		case 'failed':
 			return problem.error;
 	}

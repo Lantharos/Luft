@@ -1,6 +1,7 @@
 use futures_util::StreamExt;
 use luft_dbus::runtime::block_on;
 use luft_dbus::{self as dbus, failed};
+use luft_i18n::t;
 use luft_software::progress::{Progress, Stage};
 use luft_software::task::Cancel;
 use schelf_core::operations::bus::{NAME, SchelfProxy};
@@ -10,8 +11,7 @@ use zbus::names::BusName;
 
 use super::{Failure, Report};
 use crate::install::terminal::board::Update;
-
-const CLOSED: &str = "Schelf closed before it finished.";
+use crate::l10n::L10N;
 
 pub async fn connect() -> Option<SchelfProxy<'static>> {
     let connection = dbus::session().await.ok()?;
@@ -73,10 +73,10 @@ async fn follow(
                 }
                 Some(owner) = owners.next() => {
                     if owner.is_none() {
-                        return Err(CLOSED.to_owned());
+                        return Err(t!(L10N, "cli-perform-app-closed"));
                     }
                 }
-                else => return Err(CLOSED.to_owned()),
+                else => return Err(t!(L10N, "cli-perform-app-closed")),
             }
         }
     };

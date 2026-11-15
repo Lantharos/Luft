@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '@luft/i18n';
 	import { Dialog, Spinner } from '@luft/ui';
 	import { problemText } from '../state/act';
 	import { approvals, type Asking } from '../state/approval.svelte';
@@ -14,15 +15,15 @@
 		if (asking.step === 'problem') return problemText(asking.problem);
 		switch (approval?.status) {
 			case 'done':
-				return 'Approved and done.';
+				return t('developer-approval-done');
 			case 'failed':
-				return 'Approved, but not everything happened.';
+				return t('developer-approval-failed');
 			case 'cancelled':
-				return 'The request was cancelled.';
+				return t('developer-approval-cancelled');
 			case 'expired':
-				return 'The request ran out before it was approved.';
+				return t('developer-approval-expired');
 			default:
-				return approval?.passkey ? 'Approve it in your browser with your passkey.' : 'Approve it in your browser.';
+				return t(approval?.passkey ? 'developer-approval-passkey' : 'developer-approval-browser');
 		}
 	});
 </script>
@@ -53,10 +54,10 @@
 	{/if}
 	{#snippet actions()}
 		{#if pending}
-			<button type="button" class="button" onclick={() => approvals.cancel()}>Cancel</button>
-			<button type="button" class="button primary" disabled={!approval} onclick={() => approvals.openPage()}>Open the page again</button>
+			<button type="button" class="button" onclick={() => approvals.cancel()}>{t('developer-cancel')}</button>
+			<button type="button" class="button primary" disabled={!approval} onclick={() => approvals.openPage()}>{t('developer-approval-open-again')}</button>
 		{:else}
-			<button type="button" class="button primary" onclick={() => approvals.close()}>Done</button>
+			<button type="button" class="button primary" onclick={() => approvals.close()}>{t('developer-done')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

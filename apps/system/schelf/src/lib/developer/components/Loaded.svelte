@@ -1,5 +1,6 @@
 <script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
+	import { t } from '@luft/i18n';
 	import CloudOff from '@lucide/svelte/icons/cloud-off';
 	import { problemText } from '../state/act';
 	import type { Resource } from '../state/resource.svelte';
@@ -15,14 +16,14 @@
 
 {#if resource.data !== null}
 	{#if resource.problem?.state === 'offline'}
-		<p class="offline"><CloudOff size={14} />Offline, showing what Schelf read last</p>
+		<p class="offline"><CloudOff size={14} />{t('developer-offline-cached')}</p>
 	{/if}
 	{@render children(resource.data)}
 {:else if resource.problem}
 	<div class="flex flex-col items-center gap-4 px-8 pt-24 text-center">
 		<p class="max-w-[420px] text-[14px] text-[var(--text-muted)]">{problemText(resource.problem)}</p>
 		{#if resource.problem.state !== 'signedOut'}
-			<button type="button" class="button" disabled={resource.loading} onclick={() => resource.refresh()}>Try again</button>
+			<button type="button" class="button" disabled={resource.loading} onclick={() => resource.refresh()}>{t('developer-try-again')}</button>
 		{/if}
 	</div>
 {:else if placeholder}

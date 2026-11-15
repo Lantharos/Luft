@@ -52,4 +52,12 @@ impl Ink {
     pub fn failed(self, text: impl Display) -> String {
         self.paint(&format!("{BOLD};{RED}"), text)
     }
+
+    /// `text` with the parts it marks painted.
+    pub fn marked(self, text: &str) -> String {
+        super::marked(text)
+            .into_iter()
+            .map(|(look, part)| look.paint(self, part))
+            .collect()
+    }
 }

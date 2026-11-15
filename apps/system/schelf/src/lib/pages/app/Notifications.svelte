@@ -1,20 +1,21 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { errorText, Row, Section, Select, Switch } from '@luft/ui';
 	import { commands, type Notifications, type Setting } from '#lib/bindings.js';
 
 	let { desktop }: { desktop: string } = $props();
 
-	const SOUNDS = [
-		{ value: 'automatic', label: 'Automatic' },
-		{ value: 'luft', label: 'Luft’s sound' },
-		{ value: 'app', label: 'The app’s own' },
-		{ value: 'none', label: 'None' }
-	];
-	const DO_NOT_DISTURB = [
-		{ value: 'never', label: 'Never' },
-		{ value: 'urgent', label: 'Urgent only' },
-		{ value: 'always', label: 'Always' }
-	];
+	const sounds = $derived([
+		{ value: 'automatic', label: t('app-notifications-sound-automatic') },
+		{ value: 'luft', label: t('app-notifications-sound-luft') },
+		{ value: 'app', label: t('app-notifications-sound-app') },
+		{ value: 'none', label: t('app-notifications-sound-none') }
+	]);
+	const doNotDisturb = $derived([
+		{ value: 'never', label: t('app-notifications-dnd-never') },
+		{ value: 'urgent', label: t('app-notifications-dnd-urgent') },
+		{ value: 'always', label: t('app-notifications-dnd-always') }
+	]);
 
 	let notifications = $state<Notifications | null>(null);
 	let problem = $state('');
@@ -38,43 +39,43 @@
 </script>
 
 {#if notifications}
-	<Section title="Notifications">
-		<Row title="Allow notifications">
-			<Switch label="Allow notifications" checked={notifications.allowed} onchange={(on) => change({ setting: 'allowed', value: on })} />
+	<Section title={t('app-notifications')}>
+		<Row title={t('app-notifications-allow')}>
+			<Switch label={t('app-notifications-allow')} checked={notifications.allowed} onchange={(on) => change({ setting: 'allowed', value: on })} />
 		</Row>
-		<Row title="Banners" description="Pop up on screen when they arrive" disabled={off}>
-			<Switch label="Banners" checked={notifications.banners} disabled={off} onchange={(on) => change({ setting: 'banners', value: on })} />
+		<Row title={t('app-notifications-banners')} description={t('app-notifications-banners-description')} disabled={off}>
+			<Switch label={t('app-notifications-banners')} checked={notifications.banners} disabled={off} onchange={(on) => change({ setting: 'banners', value: on })} />
 		</Row>
-		<Row title="Sound" description="Automatic stays quiet when the app plays its own sound" disabled={off}>
-			<Select label="Sound" options={SOUNDS} value={notifications.sound} disabled={off} onchange={(value) => change({ setting: 'sound', value })} />
+		<Row title={t('app-notifications-sound')} description={t('app-notifications-sound-description')} disabled={off}>
+			<Select label={t('app-notifications-sound')} options={sounds} value={notifications.sound} disabled={off} onchange={(value) => change({ setting: 'sound', value })} />
 		</Row>
-		<Row title="Allow during Do Not Disturb" description="Urgent means alarms and calls" disabled={off}>
+		<Row title={t('app-notifications-dnd')} description={t('app-notifications-dnd-description')} disabled={off}>
 			<Select
-				label="Allow during Do Not Disturb"
-				options={DO_NOT_DISTURB}
+				label={t('app-notifications-dnd')}
+				options={doNotDisturb}
 				value={notifications.duringDoNotDisturb}
 				disabled={off}
 				onchange={(value) => change({ setting: 'duringDoNotDisturb', value })}
 			/>
 		</Row>
-		<Row title="Keep in the notification list" description="Otherwise they go once their banner closes" disabled={off}>
-			<Switch label="Keep in the notification list" checked={notifications.keptInList} disabled={off} onchange={(on) => change({ setting: 'keptInList', value: on })} />
+		<Row title={t('app-notifications-keep')} description={t('app-notifications-keep-description')} disabled={off}>
+			<Switch label={t('app-notifications-keep')} checked={notifications.keptInList} disabled={off} onchange={(on) => change({ setting: 'keptInList', value: on })} />
 		</Row>
 		<Row
-			title="Show on the lock screen"
-			description={notifications.shownOnLockScreen ? undefined : 'Hidden for every app in Settings, under Privacy'}
+			title={t('app-notifications-lock-screen')}
+			description={notifications.shownOnLockScreen ? undefined : t('app-notifications-lock-screen-hidden')}
 			disabled={off || !notifications.shownOnLockScreen}
 		>
 			<Switch
-				label="Show on the lock screen"
+				label={t('app-notifications-lock-screen')}
 				checked={notifications.lockScreen}
 				disabled={off || !notifications.shownOnLockScreen}
 				onchange={(on) => change({ setting: 'lockScreen', value: on })}
 			/>
 		</Row>
-		<Row title="Show message content on the lock screen" disabled={hiddenOnLockScreen}>
+		<Row title={t('app-notifications-lock-screen-content')} disabled={hiddenOnLockScreen}>
 			<Switch
-				label="Show message content on the lock screen"
+				label={t('app-notifications-lock-screen-content')}
 				checked={notifications.detailsOnLockScreen}
 				disabled={hiddenOnLockScreen}
 				onchange={(on) => change({ setting: 'detailsOnLockScreen', value: on })}

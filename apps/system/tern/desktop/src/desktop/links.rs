@@ -1,3 +1,7 @@
+use luft_i18n::t;
+
+use crate::l10n::L10N;
+
 const OPENABLE_SCHEMES: [&str; 6] = ["http", "https", "file", "mailto", "ftp", "sftp"];
 
 pub fn open(uri: &str, token: Option<&str>) -> Result<(), String> {
@@ -5,9 +9,9 @@ pub fn open(uri: &str, token: Option<&str>) -> Result<(), String> {
         .split_once(':')
         .map(|(scheme, location)| (scheme.to_ascii_lowercase(), location))
         .filter(|(scheme, _)| OPENABLE_SCHEMES.contains(&scheme.as_str()))
-        .ok_or("This kind of link can't be opened")?;
+        .ok_or_else(|| t!(L10N, "tern-desktop-link-unsupported"))?;
     if scheme == "file" && !on_this_computer(location) {
-        return Err("This file is on another computer".to_string());
+        return Err(t!(L10N, "tern-desktop-link-elsewhere"));
     }
     luft_app::launch::open(uri, token).map_err(|error| error.to_string())
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
+	import { t } from '@luft/i18n';
+	import { fullAccessAbilities } from '#lib/app/fullAccess.js';
 	import { describe } from '#lib/app/permissions.js';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
@@ -13,35 +14,35 @@
 </script>
 
 {#if install.asking === 'source' && install.source}
-	<SourceTrustDialog source={install.source} confirm="Add and install" onconfirm={() => install.agree()} onclose={() => install.decline()} />
+	<SourceTrustDialog source={install.source} confirm={t('file-add-and-install')} onconfirm={() => install.agree()} onclose={() => install.decline()} />
 {:else if install.asking === 'unsandboxed' && file?.kind === 'appImage' && file.unsandboxed}
 	<ConsentDialog
-		title="Give {file.name} full access?"
-		description="{file.name} asks to run outside a sandbox: “{file.unsandboxed}” There it can do all of this without asking. You can take full access away on its page later."
-		facts={FULL_ACCESS_ABILITIES}
-		confirm="Install with full access"
+		title={t('file-full-access-title', { name: file.name })}
+		description={t('file-full-access-description', { name: file.name, reason: file.unsandboxed })}
+		facts={fullAccessAbilities()}
+		confirm={t('file-full-access-confirm')}
 		danger
 		onconfirm={() => install.agree()}
 		onclose={() => install.decline()}
 	/>
 {:else if install.asking === 'unverified' && file?.kind === 'package'}
 	<ConsentDialog
-		title="Install {file.package} without checking it?"
-		description="It isn't signed by Fedora or a software source you added. Only install it if you trust whoever gave it to you."
+		title={t('file-unverified-title', { name: file.package })}
+		description={t('file-unverified-description')}
 		facts={file.system
-			? ['Not verified', 'Installs for everyone on this computer', 'Can run as administrator while it installs', "Won't get updates"]
-			: ['Not verified', 'Installs for you only, but can read and change your files', "Won't get updates"]}
-		confirm="Install anyway"
+			? [t('file-unverified-fact'), t('file-for-everyone-fact'), t('file-administrator-fact'), t('file-no-updates-fact')]
+			: [t('file-unverified-fact'), t('file-for-you-fact'), t('file-no-updates-fact')]}
+		confirm={t('file-install-anyway')}
 		danger
 		onconfirm={() => install.agree()}
 		onclose={() => install.decline()}
 	/>
 {:else if install.asking === 'broad' && file?.kind === 'flatpakBundle' && file.permissions}
 	<ConsentDialog
-		title="Install {file.title}?"
-		description="{file.title} runs in a sandbox, but asks for more than most apps need. It can use:"
+		title={t('consent-flathub-title', { name: file.title })}
+		description={t('consent-flathub-description', { name: file.title })}
 		access={describe(file.permissions)}
-		confirm="Install"
+		confirm={t('consent-install')}
 		onconfirm={() => install.agree()}
 		onclose={() => install.decline()}
 	/>

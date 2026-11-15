@@ -5,6 +5,7 @@ pub mod catalog;
 mod disk;
 pub mod files;
 pub mod host;
+mod l10n;
 pub mod library;
 pub mod operations;
 pub mod store;

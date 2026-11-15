@@ -1,8 +1,10 @@
 use luft_app::{Appearance, Commands, Empty, launch};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::windows::Windows;
 
 #[derive(Serialize, Type)]
@@ -21,7 +23,7 @@ struct Link {
 
 fn open_url(Link { url, token }: Link) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
-        return Err("Only web links can be opened.".into());
+        return Err(t!(L10N, "desktop-only-web-links"));
     }
     launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }

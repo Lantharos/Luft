@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import X from '@lucide/svelte/icons/x';
 	import { ProgressBar, Spinner, tooltip } from '@luft/ui';
 	import type { Operation } from '#lib/bindings.js';
-	import { activity, percent } from '#lib/format.js';
+	import { activity, percent, percentText } from '#lib/format.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { operation, large = false }: { operation: Operation; large?: boolean } = $props();
@@ -20,10 +21,10 @@
 		{#if value === null}
 			<Spinner size={14} class="text-[var(--text-muted)]" />
 		{:else}
-			{value}%
+			{percentText(value)}
 		{/if}
 	</span>
-	<button type="button" class="cancel" aria-label="Cancel" {@attach tooltip('Cancel')} onclick={() => operations.cancel(operation.id)}>
+	<button type="button" class="cancel" aria-label={t('progress-cancel')} {@attach tooltip(t('progress-cancel'))} onclick={() => operations.cancel(operation.id)}>
 		<X size={14} />
 	</button>
 </div>

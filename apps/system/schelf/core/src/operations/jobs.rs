@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::flatpak::{self, FLATHUB, Installation, Step};
 use luft_software::apps::{appimage, debian, places, toolbox};
 use luft_software::system::repositories::{self, Draft};
@@ -9,6 +10,7 @@ use luft_software::task::Task;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::store::install::{Consent, Reason};
 use crate::{host, store, tools};
 
@@ -134,9 +136,11 @@ fn settle_flatpaks(task: Task) {
 fn install_flatpak_bundle(path: &Path, task: Task) -> Result<(), String> {
     let flathub = flatpak::ensure_flathub(Installation::User);
     flatpak::install_bundle(Installation::User, path, task).map_err(|error| match flathub {
-        Err(reason) => format!(
-            "{}. Flathub, where its runtime would come from, couldn't be added: {reason}",
-            error.trim_end_matches('.')
+        Err(reason) => t!(
+            L10N,
+            "core-bundle-no-flathub",
+            error = error.trim_end_matches('.'),
+            reason = reason
         ),
         Ok(()) => error,
     })?;

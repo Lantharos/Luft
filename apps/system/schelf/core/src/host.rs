@@ -11,8 +11,6 @@ const SYSTEM_SABINE: &str = "/usr/lib/sabine";
 /// The Schelf app in Luft's image, which also runs AppImages in their sandbox.
 pub const APP: &str = "/usr/lib/sabine/com.lantharos.schelf/schelf";
 
-pub const NEEDS_LUFT: &str = "needs Luft";
-
 /// Whether this computer runs Luft.
 pub fn luft() -> bool {
     static LUFT: OnceLock<bool> = OnceLock::new();

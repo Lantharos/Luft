@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import type { StoreDetails } from '#lib/bindings.js';
-	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
-	import { abilities, INSIDE_LUFT_ABILITIES } from '#lib/app/extensionAccess.js';
+	import { fullAccessAbilities } from '#lib/app/fullAccess.js';
+	import { abilities, insideLuftAbilities } from '#lib/app/extensionAccess.js';
 	import { describe } from '#lib/app/permissions.js';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 
@@ -20,46 +21,46 @@
 		store.extension ? abilities(store.extension).map((ability) => ({ ...ability, description: '', notable: false })) : store.access ? describe(store.access) : null
 	);
 	const reason = $derived(store.declared?.unsandboxed);
-	const verb = $derived(updating ? 'Update' : 'Install');
 	const size = $derived(store.size ?? store.download?.size ?? null);
-	const note = $derived(size ? `${bytes(size)} to download` : undefined);
+	const note = $derived(size ? t('app-consent-size', { size: bytes(size) }) : undefined);
 </script>
 
 {#if movesInside}
 	<ConsentDialog
-		title="Let {store.name} run inside Luft?"
-		description="schelf.store approved {store.name} to run inside Luft instead of in its sandbox. There it can:"
-		facts={INSIDE_LUFT_ABILITIES}
+		title={t('app-consent-inside-title', { name: store.name })}
+		description={t('app-consent-inside-description', { name: store.name })}
+		facts={insideLuftAbilities()}
 		{note}
-		confirm="Run inside Luft"
+		confirm={t('app-consent-inside-confirm')}
 		onconfirm={() => onconfirm(false)}
 		{onclose}
 	/>
 {:else if access}
 	<ConsentDialog
-		title="{verb} {store.name}?"
-		description={updating
-			? `This version of ${store.name} asks for more than before. It can use:`
-			: store.extension
-				? store.inShell
-					? `schelf.store approved ${store.name} to run inside Luft. It can:`
-					: `${store.name} runs in a sandbox. It can only:`
-				: `${store.name} runs in a sandbox. It can use:`}
+		title={t(updating ? 'app-consent-update-title' : 'app-consent-install-title', { name: store.name })}
+		description={t(
+			updating ? 'app-consent-update-description' : store.extension ? (store.inShell ? 'app-consent-approved' : 'app-consent-extension-sandboxed') : 'app-consent-sandboxed',
+			{ name: store.name }
+		)}
 		{access}
 		{note}
-		confirm={verb}
+		confirm={t(updating ? 'app-consent-update' : 'app-consent-install')}
 		onconfirm={() => onconfirm(false)}
 		{onclose}
 	/>
 {:else}
 	<ConsentDialog
-		title="{verb} {store.name} with full access?"
-		description="{reason
-			? `${store.name} asks to run outside a sandbox: “${reason}” There it can do all of this without asking.`
-			: `${store.name} doesn't run in a sandbox, so it can do all of this without asking.`}{store.installer === 'appimage' ? ' You can take full access away on its page later.' : ''}"
-		facts={FULL_ACCESS_ABILITIES}
+		title={t(updating ? 'app-consent-update-full-title' : 'app-consent-install-full-title', { name: store.name })}
+		description={store.installer === 'appimage'
+			? reason
+				? t('app-consent-full-declared-file', { name: store.name, reason })
+				: t('app-consent-full-unsandboxed-file', { name: store.name })
+			: reason
+				? t('app-consent-full-declared', { name: store.name, reason })
+				: t('app-consent-full-unsandboxed', { name: store.name })}
+		facts={fullAccessAbilities()}
 		{note}
-		confirm="{verb} with full access"
+		confirm={t(updating ? 'app-consent-update-full' : 'app-consent-install-full')}
 		danger
 		onconfirm={() => onconfirm(true)}
 		{onclose}

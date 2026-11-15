@@ -10,8 +10,10 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use luft_app::Events;
+use luft_i18n::t;
 use parking_lot::RwLock;
 
+use crate::l10n::L10N;
 use budget::Budget;
 pub use output::{TerminalExited, TerminalOutput};
 use session::Session;
@@ -33,7 +35,7 @@ impl Sessions {
     ) -> Result<u32, String> {
         let id = self.next.fetch_add(1, Ordering::Relaxed) + 1;
         let session = Session::start(id, command, size, events, self.budget.clone())
-            .map_err(|error| format!("Could not start the shell: {error}"))?;
+            .map_err(|error| t!(L10N, "tern-desktop-shell-failed", error = error.to_string()))?;
         self.open.write().insert(id, Arc::new(session));
         Ok(id)
     }

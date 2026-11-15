@@ -1,8 +1,10 @@
+use luft_i18n::t;
 use schelf_core::library::{self, InstalledApp, Source};
 use schelf_core::operations::{Job, Request};
 
 use super::Origin;
 use crate::install::perform::{Plan, Verb};
+use crate::l10n::L10N;
 
 pub fn all(only: Option<Origin>) -> Vec<InstalledApp> {
     library::installed()
@@ -45,14 +47,22 @@ pub fn describe(app: &InstalledApp) -> String {
         .as_deref()
         .filter(|package| *package != app.name)
         .unwrap_or(&app.id);
-    let id = if id == app.name {
-        String::new()
-    } else {
-        format!(" ({id})")
-    };
+    let name = app.name.as_str();
     match app.source {
-        Source::System => format!("{}, a system package", app.name),
-        source => format!("{}{id}, from {}", app.name, Origin::of(source).title()),
+        Source::System => t!(L10N, "cli-installed-system", name = name),
+        source if id == app.name => t!(
+            L10N,
+            "cli-installed-from",
+            name = name,
+            source = Origin::of(source).title()
+        ),
+        source => t!(
+            L10N,
+            "cli-installed-from-with-id",
+            name = name,
+            id = id,
+            source = Origin::of(source).title()
+        ),
     }
 }
 

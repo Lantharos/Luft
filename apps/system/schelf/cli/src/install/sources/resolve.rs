@@ -36,7 +36,7 @@ pub fn catalogs(only: Option<Catalog>) -> Vec<Catalog> {
         || {
             Catalog::ALL
                 .into_iter()
-                .filter(|catalog| catalog.missing().is_none())
+                .filter(|catalog| catalog.usable())
                 .collect()
         },
         |catalog| vec![catalog],

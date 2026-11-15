@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::{appimage, flatpak};
 use luft_software::progress::Stage;
 use luft_software::task::Task;
@@ -18,6 +19,7 @@ use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
 use crate::host;
+use crate::l10n::L10N;
 
 /// What you saw and agreed to before installing or updating a store app.
 #[derive(Deserialize, Serialize, Clone, Debug, Type)]
@@ -47,10 +49,11 @@ impl Reason {
 fn refuse_pulled(listing: &Listing, release: &Release) -> Result<(), String> {
     let list = revocations::refresh().or_else(|error| revocations::current().ok_or(error))?;
     match list.block(&listing.id, Some(&release.version)) {
-        Some(block) if block.action == Severity::Block => Err(format!(
-            "schelf.store pulled {}: {}",
-            listing.name(),
-            block.note.unwrap_or(block.reason)
+        Some(block) if block.action == Severity::Block => Err(t!(
+            L10N,
+            "core-store-pulled",
+            name = listing.name(),
+            reason = block.note.unwrap_or(block.reason)
         )),
         _ => Ok(()),
     }
@@ -61,10 +64,7 @@ fn agreed(listing: &Listing, release: &Release, consent: &Consent) -> Result<(),
         || release.permissions != consent.permissions
         || release.extension != consent.extension
     {
-        return Err(format!(
-            "{} changed since you looked at it. Look at it again before installing.",
-            listing.name()
-        ));
+        return Err(t!(L10N, "core-store-changed", name = listing.name()));
     }
     Ok(())
 }
@@ -146,8 +146,7 @@ fn install_sabine(id: &str, archive: &Path, task: Task) -> Result<String, String
 }
 
 fn sabine_service(arguments: impl FnOnce(&mut Command) -> &mut Command) -> Result<(), String> {
-    let program = host::sabine_service()
-        .ok_or("Sabine apps need Sabine, from github.com/Lantharos/Sabine.")?;
+    let program = host::sabine_service().ok_or_else(|| t!(L10N, "core-store-needs-sabine"))?;
     let output = arguments(&mut Command::new(program))
         .output()
         .map_err(|error| error.to_string())?;
@@ -210,22 +209,29 @@ fn place(
 /// Why this computer can't install anything of `listing`.
 pub fn unavailable(listing: &Listing) -> String {
     if listing.kind == Kind::Extension && !host::luft() {
-        return format!(
-            "{} is an extension for Luft, so it needs Luft.",
-            listing.name()
+        return t!(
+            L10N,
+            "core-store-extension-needs-luft",
+            name = listing.name()
         );
     }
     if let Some(minimum) = listing.needs_luft() {
-        return format!("{} needs Luft {minimum} or newer.", listing.name());
+        return t!(
+            L10N,
+            "core-store-needs-luft",
+            name = listing.name(),
+            version = minimum
+        );
     }
     let waiting = listing.needs_review();
     if waiting.is_empty() {
-        return format!("{} isn't available for this computer.", listing.name());
+        return t!(L10N, "core-store-unavailable", name = listing.name());
     }
-    format!(
-        "{} can be installed once schelf.store approves it to run inside Luft, which it needs to {}.",
-        listing.name(),
-        listing::sandbox_lacks(&waiting)
+    t!(
+        L10N,
+        "core-store-needs-review",
+        name = listing.name(),
+        needs = listing::sandbox_lacks(&waiting)
     )
 }
 
@@ -294,17 +300,13 @@ pub fn fetch(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<
             |installed| listing.update(&installed.version, installed.inside_luft()),
         )
         .ok_or_else(|| unavailable(&listing))?;
-    let offer = match offer.format {
-        Format::Sabine if host::sabine_service().is_none() => {
-            offer.portable(listing.platforms()).ok_or_else(|| {
-                format!(
-                    "{} needs Sabine, from github.com/Lantharos/Sabine.",
-                    listing.name()
-                )
-            })?
-        }
-        _ => offer,
-    };
+    let offer =
+        match offer.format {
+            Format::Sabine if host::sabine_service().is_none() => offer
+                .portable(listing.platforms())
+                .ok_or_else(|| t!(L10N, "core-store-app-needs-sabine", name = listing.name()))?,
+            _ => offer,
+        };
     agreed(&listing, offer.release, consent)?;
     refuse_pulled(&listing, offer.release)?;
     let file = download::verified(&listing.id, offer.artifact, reason.query(), task)
@@ -338,7 +340,7 @@ pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {
     }
     let offer = listing
         .shipped()
-        .ok_or_else(|| format!("{} came without a file for this computer.", listing.name()))?;
+        .ok_or_else(|| t!(L10N, "core-store-no-file", name = listing.name()))?;
     let file = download::shipped(path, offer.artifact)?;
     let full_access = offer
         .release
@@ -356,7 +358,7 @@ pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {
 }
 
 pub fn remove(id: &str) -> Result<(), String> {
-    let installed = record::get(id).ok_or("It isn't installed any more.")?;
+    let installed = record::get(id).ok_or_else(|| t!(L10N, "core-not-installed"))?;
     remove_installed(&installed)?;
     record::forget(id)
 }

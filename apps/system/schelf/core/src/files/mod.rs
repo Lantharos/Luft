@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use luft_dbus::runtime::block_on;
+use luft_i18n::t;
 use luft_software::apps::flatpak::Permissions;
 use luft_software::apps::{appimage, debian, toolbox};
 use luft_software::system::repositories;
@@ -16,6 +17,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::catalog::cache;
+use crate::l10n::L10N;
 use crate::library::sources::CheckedSource;
 use crate::store;
 use crate::store::catalog::Origin;
@@ -141,7 +143,7 @@ fn flatpak_ref(path: &str) -> Result<OpenedFile, String> {
     let id = values
         .get("Name")
         .cloned()
-        .ok_or("This file doesn't name an app.")?;
+        .ok_or_else(|| t!(L10N, "core-file-no-app"))?;
     Ok(OpenedFile::FlatpakRef {
         path: path.to_owned(),
         title: values.get("Title").cloned().unwrap_or_else(|| id.clone()),
@@ -258,19 +260,19 @@ fn save_icon(bytes: &[u8], extension: &str) -> Option<String> {
 }
 
 fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
-    let damaged = "This Flatpak file is damaged or isn't a Flatpak app.";
+    let damaged = || t!(L10N, "core-file-damaged-flatpak");
     let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
     let mapped = unsafe { memmap2::Mmap::map(&file) }.map_err(|error| error.to_string())?;
     let size = mapped.len() as u64;
     let metadata = BundleMetadata(gvariant::entries(
-        gvariant::first_member(&mapped).ok_or(damaged)?,
+        gvariant::first_member(&mapped).ok_or_else(damaged)?,
     ));
-    let reference = metadata.text("ref").ok_or(damaged)?;
+    let reference = metadata.text("ref").ok_or_else(damaged)?;
     let [kind, id, _arch, branch] = reference.split('/').collect::<Vec<_>>()[..] else {
-        return Err(damaged.into());
+        return Err(damaged());
     };
     if kind != "app" {
-        return Err("This Flatpak file holds a runtime, not an app. Apps that need it install it themselves.".into());
+        return Err(t!(L10N, "core-file-runtime"));
     }
     let declared = metadata.text("metadata");
     let runtime = declared.and_then(|keyfile| {
@@ -314,7 +316,7 @@ fn flatpak_repo(path: &str) -> Result<OpenedFile, String> {
     let url = values
         .get("Url")
         .cloned()
-        .ok_or("This file doesn't name a source.")?;
+        .ok_or_else(|| t!(L10N, "core-file-no-source"))?;
     let name = Path::new(path)
         .file_stem()
         .map(|stem| stem.to_string_lossy().to_lowercase())
@@ -351,7 +353,7 @@ fn package(path: &str) -> Result<OpenedFile, String> {
         description,
     ] = text.split('\x1f').collect::<Vec<_>>()[..]
     else {
-        return Err("This package file is damaged or isn't meant for this computer.".into());
+        return Err(t!(L10N, "core-file-damaged-package"));
     };
     let (repository, repository_error) = match repositories::bundled(path)
         .and_then(|draft| draft.map(CheckedSource::check).transpose())
@@ -494,6 +496,6 @@ pub fn inspect(path: &str) -> Result<OpenedFile, String> {
     } else if appimage::is_appimage(Path::new(path)) {
         appimage_file(path)
     } else {
-        Err("Schelf can't install this kind of file.".into())
+        Err(t!(L10N, "core-file-unknown"))
     }
 }

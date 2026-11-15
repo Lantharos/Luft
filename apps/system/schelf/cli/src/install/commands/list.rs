@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use luft_software::apps::flatpak::{FLATHUB, Installation};
 use schelf_core::library::{InstalledApp, Source};
 
@@ -5,6 +6,7 @@ use crate::install::Exit;
 use crate::install::arguments::Arguments;
 use crate::install::sources::{Origin, installed};
 use crate::install::terminal::{self, Ink, Look, Table};
+use crate::l10n::L10N;
 
 fn shown_id(app: &InstalledApp) -> &str {
     app.package.as_deref().unwrap_or(&app.id)
@@ -13,21 +15,21 @@ fn shown_id(app: &InstalledApp) -> &str {
 fn extra(app: &InstalledApp) -> String {
     let mut parts = Vec::new();
     if app.installation == Some(Installation::System) {
-        parts.push("for everyone".to_owned());
+        parts.push(t!(L10N, "cli-list-for-everyone"));
     }
     if app.installation.is_some() && app.origin != FLATHUB {
-        parts.push(format!("from {}", app.origin));
+        parts.push(t!(L10N, "cli-list-from", source = app.origin.as_str()));
     }
     if !app.commands.is_empty() {
         parts.push(app.commands.join(" "));
     }
     if !app.services.is_empty() {
-        parts.push(format!("runs {}", app.services.join(" ")));
+        parts.push(t!(L10N, "cli-list-runs", services = app.services.join(" ")));
     }
     if app.source == Source::System && app.version.is_none() {
-        parts.push("being set up".to_owned());
+        parts.push(t!(L10N, "cli-list-being-set-up"));
     }
-    parts.join(", ")
+    parts.join(&t!(L10N, "cli-list-separator"))
 }
 
 fn group(origin: Origin, apps: &[&InstalledApp]) {
@@ -54,10 +56,13 @@ pub fn run(arguments: &Arguments) -> Exit {
     let apps = installed::all(arguments.only);
     if apps.is_empty() {
         match arguments.only {
-            Some(Origin::AppImage) => eprintln!("No AppImages are installed."),
-            Some(Origin::System) => eprintln!("There are no system packages."),
-            Some(origin) => eprintln!("Nothing from {} is installed.", origin.title()),
-            None => eprintln!("Nothing is installed yet."),
+            Some(Origin::AppImage) => eprintln!("{}", t!(L10N, "cli-list-no-appimages")),
+            Some(Origin::System) => eprintln!("{}", t!(L10N, "cli-list-no-system-packages")),
+            Some(origin) => eprintln!(
+                "{}",
+                t!(L10N, "cli-list-nothing-from", source = origin.title())
+            ),
+            None => eprintln!("{}", t!(L10N, "cli-list-nothing")),
         }
         return Exit::Done;
     }

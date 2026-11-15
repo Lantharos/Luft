@@ -87,7 +87,7 @@ class AppIcons {
   }
 
   get markPaint(): Paint | null {
-    return this.taskbarPaints?.[this.luftStyle] ?? null;
+    return this.taskbarPaints?.tinted ?? null;
   }
 
   private paintOf(app: IconApp, paints = this.paints): Paint | null {

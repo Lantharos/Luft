@@ -11,13 +11,20 @@ const FILE_FORMAT = 1;
 const NAME_LENGTH = 60;
 const same = (one: SettingValue | undefined, other: SettingValue | undefined) => JSON.stringify(one) === JSON.stringify(other);
 
-/** Presets and looks people saved or shared: whole sets of settings picked at once, and "Custom" once anything differs. */
+/**
+ * Presets and looks people saved or shared: whole sets of settings picked at once, and "Custom" once anything differs.
+ * Changes reach it in batches, so it tells its own writes apart from people's and keeps what the settings were before
+ * each batch, which is what Custom brings back.
+ */
 export class Looks {
   private showing: string;
+  private known: Values;
+  private writing = new Map<string, SettingValue>();
   importFailed = false;
 
   constructor(private readonly phosphor: Extension<Granted>) {
     this.showing = phosphor.settings.get<string>('look');
+    this.known = this.current();
   }
 
   get saved(): SavedLook[] {
@@ -28,8 +35,8 @@ export class Looks {
     return Object.fromEntries(Object.keys(DEFAULTS).map(key => [key, this.phosphor.settings.get(key)]));
   }
 
-  private changedFromDefaults(): Values {
-    return Object.fromEntries(Object.entries(this.current()).filter(([key, value]) => !same(value, DEFAULTS[key])));
+  private withoutDefaults(values: Values): Values {
+    return Object.fromEntries(Object.entries(values).filter(([key, value]) => !same(value, DEFAULTS[key])));
   }
 
   private matches(values: Values): boolean {
@@ -39,21 +46,34 @@ export class Looks {
 
   private put(values: Values): void {
     const { settings } = this.phosphor;
-    for (const key of Object.keys(DEFAULTS)) settings.set(key, values[key] ?? DEFAULTS[key]);
+    for (const key of Object.keys(DEFAULTS)) {
+      const value = values[key] ?? DEFAULTS[key];
+      this.writing.set(key, value);
+      settings.set(key, value);
+    }
   }
 
-  /** Follows what changed: picking a look sets everything it decides, and changing one of those afterwards makes it Custom. */
+  /**
+   * Follows a batch of changes: picking a look sets everything it decides, with anything else people changed in the
+   * same moment on top of it, and changing one of those afterwards makes it Custom.
+   */
   changed(keys: ReadonlySet<string>): void {
     const { settings, storage } = this.phosphor;
+    const own = this.writing;
+    this.writing = new Map();
+    const edits = Object.fromEntries([...keys]
+      .filter(key => key in DEFAULTS && !(own.has(key) && same(own.get(key), settings.get(key))))
+      .map(key => [key, settings.get(key)]));
     const look = settings.get<string>('look');
     if (keys.has('look') && look !== this.showing) {
-      if (this.showing === 'custom') storage.set(CUSTOM, this.changedFromDefaults() as Stored);
+      if (this.showing === 'custom') storage.set(CUSTOM, this.withoutDefaults(this.known) as Stored);
       this.showing = look;
-      if (look === 'custom') this.put(storage.get<Values & Stored>(CUSTOM) ?? this.current());
-      else this.put(presetValues(look));
-    } else if (look !== 'custom' && [...keys].some(key => key in DEFAULTS) && !this.matches(presetValues(look))) {
+      this.put({ ...look === 'custom' ? storage.get<Values & Stored>(CUSTOM) ?? this.known : presetValues(look), ...edits });
+      if (look !== 'custom' && Object.keys(edits).length) this.wear('custom');
+    } else if (look !== 'custom' && Object.keys(edits).length && !this.matches(presetValues(look))) {
       this.wear('custom');
     }
+    this.known = this.current();
   }
 
   /** Makes the look picker agree with the settings, such as after an update added settings that differ from the look's. */
@@ -68,7 +88,7 @@ export class Looks {
 
   save(name: string): void {
     const kept = this.saved.filter(look => look.name !== name);
-    this.phosphor.storage.set(SAVED, [...kept, { name, values: this.changedFromDefaults() }] as Stored);
+    this.phosphor.storage.set(SAVED, [...kept, { name, values: this.withoutDefaults(this.current()) }] as Stored);
   }
 
   apply(name: string): void {
@@ -85,7 +105,7 @@ export class Looks {
   /** Saves a look as a small file to share, the one named or what's on now. */
   async share(name?: string): Promise<void> {
     const { t, saveFile } = this.phosphor;
-    const values = name === undefined ? this.changedFromDefaults() : this.saved.find(look => look.name === name)?.values ?? {};
+    const values = name === undefined ? this.withoutDefaults(this.current()) : this.saved.find(look => look.name === name)?.values ?? {};
     const title = name ?? t('look-file-name');
     await saveFile({ title: t('look-share'), name: `${title}.phosphor.json`, text: `${JSON.stringify({ phosphor: FILE_FORMAT, name: title, values }, null, 2)}\n` });
   }

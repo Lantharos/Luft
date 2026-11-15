@@ -181,6 +181,30 @@ async function checkPresets() {
   await choose('look', 'plain');
   await eventually(nothingAttached, 'the plain look leaves nothing on the screen');
   await capture('phosphor-look-plain');
+  await checkQuickChanges();
+}
+
+const settles = (what: string, holds: () => boolean) => eventually(async () => {
+  await settled();
+  return holds();
+}, what);
+
+async function checkQuickChanges() {
+  await choose('look', 'vaporwave');
+  await settles('Vaporwave goes on', () => lookIs('vaporwave'));
+  await choose('border-width', 5);
+  await settles('changing it makes the look Custom', () => lookIs('custom'));
+  await Promise.all([choose('look', 'plain'), choose('screen-grain', 0.3)]);
+  await settles('a change right after picking a look goes on top of it, as Custom', () =>
+    lookIs('custom') && settingIs('screen-grain', 0.3) && settingIs('border', 'off') && settingIs('grade', 'off'));
+  await choose('look', 'terminal');
+  await settles('picking another look puts all of it on', () => lookIs('terminal') && settingIs('desktop-crt', true) && settingIs('screen-grain', 0));
+  await choose('look', 'custom');
+  await settles('Custom brings back exactly what was last had', () => settingIs('screen-grain', 0.3) && settingIs('border', 'off') && settingIs('desktop-crt', false));
+  await Promise.all([choose('look', 'amber'), choose('look', 'neon')]);
+  await settles('two looks picked at once leave the last one, whole', () => lookIs('neon') && settingIs('border', 'neon') && settingIs('desktop-crt', false));
+  await choose('look', 'plain');
+  await eventually(nothingAttached, 'and plain leaves nothing');
 }
 
 function stored(key: string) {

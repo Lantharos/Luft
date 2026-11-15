@@ -5,12 +5,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <gio/gio.h>
 #include <systemd/sd-login.h>
 
+#include "app-start/app-start.h"
 #include "shell-app-scope-private.h"
+#include "shell-development-private.h"
 
 #define CGROUP_ROOT "/sys/fs/cgroup"
 #define SCOPE_TIMEOUT_MS 5000
@@ -21,7 +24,6 @@ struct _ShellAppScope
 {
   grefcount ref;
   char *staging;
-  int staging_procs;
 };
 
 typedef struct
@@ -39,6 +41,7 @@ typedef struct
 } Sweep;
 
 static char oom_score_adjust[16];
+static char file_limit[24];
 static char *staging_root;
 static char *app_slice;
 
@@ -72,11 +75,24 @@ shell_app_scope_reset_oom_score_adjust (void)
 }
 
 void
-shell_app_scope_child_setup (ShellAppScope *scope)
+shell_app_scope_prepare (GAppLaunchContext *context)
 {
-  shell_app_scope_reset_oom_score_adjust ();
-  if (scope->staging_procs >= 0)
-    write_string (scope->staging_procs, "0");
+  g_app_launch_context_unsetenv (context, "GIO_LAUNCH_DESKTOP");
+  if (file_limit[0])
+    g_app_launch_context_setenv (context, KESTREL_APP_FILE_LIMIT, file_limit);
+  if (oom_score_adjust[0])
+    g_app_launch_context_setenv (context, KESTREL_APP_OOM_SCORE_ADJUST, oom_score_adjust);
+}
+
+void
+shell_app_scope_attach (ShellAppScope     *scope,
+                        GAppLaunchContext *context)
+{
+  g_object_set_data_full (G_OBJECT (context), SHELL_APP_SCOPE_KEY,
+                          shell_app_scope_ref (scope),
+                          (GDestroyNotify) shell_app_scope_unref);
+  if (scope->staging)
+    g_app_launch_context_setenv (context, KESTREL_APP_CGROUP, scope->staging);
 }
 
 static void
@@ -325,10 +341,8 @@ shell_app_scope_new (void)
   static guint serial;
   ShellAppScope *scope = g_new0 (ShellAppScope, 1);
   g_autofree char *staging = NULL;
-  g_autofree char *procs = NULL;
 
   g_ref_count_init (&scope->ref);
-  scope->staging_procs = -1;
   if (!staging_root)
     return scope;
 
@@ -336,8 +350,6 @@ shell_app_scope_new (void)
   if (mkdir (staging, 0755) < 0)
     return scope;
 
-  procs = g_build_filename (staging, "cgroup.procs", NULL);
-  scope->staging_procs = open (procs, O_WRONLY | O_CLOEXEC);
   scope->staging = g_steal_pointer (&staging);
   return scope;
 }
@@ -355,8 +367,6 @@ shell_app_scope_unref (ShellAppScope *scope)
   if (!g_ref_count_dec (&scope->ref))
     return;
 
-  if (scope->staging_procs >= 0)
-    close (scope->staging_procs);
   if (scope->staging)
     rmdir (scope->staging);
   g_free (scope->staging);
@@ -415,12 +425,28 @@ own_cgroup (void)
   return g_strconcat (CGROUP_ROOT, g_strchomp (contents + 3), NULL);
 }
 
+static void
+start_apps_through_kestrel (void)
+{
+  const char *build = shell_development_path ("KESTREL_BUILDDIR");
+  g_autofree char *program = build
+    ? g_build_filename (build, "app-start", KESTREL_APP_START, NULL)
+    : g_build_filename (KESTREL_LIBEXECDIR, KESTREL_APP_START, NULL);
+  struct rlimit limit;
+
+  if (getrlimit (RLIMIT_NOFILE, &limit) == 0)
+    g_snprintf (file_limit, sizeof (file_limit), "%llu", (unsigned long long) limit.rlim_cur);
+  g_setenv ("GIO_LAUNCH_DESKTOP", program, TRUE);
+}
+
 void
 shell_app_scope_init (void)
 {
   g_autofree char *own_unit = NULL;
   g_autofree char *cgroup = NULL;
   const char *manager, *manager_end;
+
+  start_apps_through_kestrel ();
 
   if (sd_pid_get_user_unit (getpid (), &own_unit) < 0 || !(cgroup = own_cgroup ()))
     return;

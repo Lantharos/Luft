@@ -88,7 +88,7 @@ The one place Luft writes into `/etc` itself is settling system packages: config
 
 When apps ask for more memory than the computer has, Luft closes the app using the most and keeps the desktop running.
 
-- Every app Kestrel starts gets its own systemd scope, so its memory counts against it and the whole app closes together.
+- Every app Kestrel starts gets its own systemd scope, so its memory counts against it and the whole app closes together. Apps start through `kestrel-app-start`, which joins the launch's group and takes back Kestrel's file limit and memory protection before the app runs, so Kestrel never has to copy itself to start one.
 - systemd-oomd closes the group reclaiming the most when apps, background tasks or containers stall on memory for 10 seconds, or memory and swap are both nearly full.
 - When Kestrel itself stops drawing for 6 seconds while waiting on memory and less than a tenth of memory and swap is left, `kestrel-settings` closes the biggest app or container at once, and again every 10 seconds until Kestrel draws. It listens through the kernel's pressure notifications, so it does no work while there's enough memory. Before that point, Kestrel warns and offers to force quit the biggest app.
 - Kestrel keeps 384 MB that is never reclaimed and up to 640 MB reclaimed last; the session services keep 32 MB each. If the kernel has to pick, apps score 200, Kestrel −900 and the session services −800.

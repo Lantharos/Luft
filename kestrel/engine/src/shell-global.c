@@ -995,6 +995,7 @@ shell_global_create_launch_context_for_app (ShellGlobal *global,
                     NULL);
 
   shell_launch_environment_apply (G_APP_LAUNCH_CONTEXT (context), app);
+  shell_app_scope_prepare (G_APP_LAUNCH_CONTEXT (context));
   return G_APP_LAUNCH_CONTEXT (context);
 }
 

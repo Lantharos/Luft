@@ -18,6 +18,7 @@ subdir('authenticate')
 subdir('wallpaper')
 subdir('sound/decoder')
 subdir('environment')
+subdir('app-start')
 
 typelib_cflags = [
   '-DMUTTER_TYPELIB_DIR="@0@"'.format(mutter_typelibdir),

@@ -5,7 +5,8 @@ use std::os::fd::{AsRawFd, BorrowedFd, FromRawFd, OwnedFd};
 
 use crate::sandbox_info;
 
-const SANDBOX_INFO: &CStr = c"root/.flatpak-info";
+const ROOT: &CStr = c"root";
+const SANDBOX_INFO: &CStr = c".flatpak-info";
 const MOUNTS: &CStr = c"mountinfo";
 const CGROUP: &CStr = c"cgroup";
 const UNIFIED_HIERARCHY: &str = "0::/";
@@ -41,6 +42,20 @@ pub(crate) fn open_folder(pid: u32) -> Option<OwnedFd> {
     (fd >= 0).then(|| unsafe { OwnedFd::from_raw_fd(fd) })
 }
 
+fn open_root(folder: &OwnedFd) -> std::io::Result<OwnedFd> {
+    let fd = unsafe {
+        libc::openat(
+            folder.as_raw_fd(),
+            ROOT.as_ptr(),
+            libc::O_PATH | libc::O_DIRECTORY | libc::O_CLOEXEC,
+        )
+    };
+    if fd < 0 {
+        return Err(std::io::Error::last_os_error());
+    }
+    Ok(unsafe { OwnedFd::from_raw_fd(fd) })
+}
+
 pub(crate) fn open_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<File> {
     let fd = unsafe {
         libc::openat(
@@ -74,7 +89,13 @@ fn mounts_show_no_sandbox(folder: &OwnedFd) -> bool {
 }
 
 fn read_sandbox(folder: &OwnedFd) -> Sandbox {
-    match open_at(folder, SANDBOX_INFO) {
+    let root = match open_root(folder) {
+        Ok(root) => root,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Sandbox::Unreadable,
+        Err(_undumpable) if mounts_show_no_sandbox(folder) => return Sandbox::None,
+        Err(_undumpable) => return Sandbox::Unreadable,
+    };
+    match open_at(&root, SANDBOX_INFO) {
         Ok(file) => read_info(file),
         Err(error) if error.kind() == ErrorKind::NotFound => Sandbox::None,
         Err(_undumpable) if mounts_show_no_sandbox(folder) => Sandbox::None,

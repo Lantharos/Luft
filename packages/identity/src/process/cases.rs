@@ -13,7 +13,7 @@ fn process_folder(cases: &KeyFile, case: &str, folder: &Path) -> OwnedFd {
     let root = folder.join("root");
     if cases.boolean(case, "hidden").unwrap_or(false) {
         fs::write(&root, "").unwrap();
-    } else {
+    } else if !cases.boolean(case, "gone").unwrap_or(false) {
         fs::create_dir(&root).unwrap();
     }
     let info = root.join(".flatpak-info");

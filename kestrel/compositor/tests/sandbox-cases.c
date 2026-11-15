@@ -34,7 +34,7 @@ make_process (GKeyFile   *cases,
   info = g_build_filename (root, ".flatpak-info", NULL);
   if (g_key_file_get_boolean (cases, name, "hidden", NULL))
     write_file (root, "");
-  else
+  else if (!g_key_file_get_boolean (cases, name, "gone", NULL))
     g_mkdir (root, 0700);
 
   if (g_key_file_get_boolean (cases, name, "info-link", NULL))

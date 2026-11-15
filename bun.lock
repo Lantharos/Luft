@@ -512,7 +512,7 @@
     "web/pult": {
       "name": "@luft/pult",
       "dependencies": {
-        "@lantharos/pult": "0.14.0",
+        "@lantharos/pult": "0.15.0",
         "zod": "^4.6.7",
       },
       "devDependencies": {
@@ -883,7 +883,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@lantharos/pult": ["@lantharos/pult@0.14.0", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "croner": "11.0.0", "jiti": "2.7.0" }, "bin": { "pult": "cli.mjs" } }, "sha512-SASidAb5cuKhg6DDUhpzRjuN/HB0oamTuFUrXFZG08wovDwc0xIo+kTq2BtHj8ZJfxai9hMzw09Fk+E3bgqpXw=="],
+    "@lantharos/pult": ["@lantharos/pult@0.15.0", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "jiti": "2.7.0" }, "bin": { "pult": "cli.mjs" } }, "sha512-Z6O7S7J4WYgZbck+PqG4yeSJi42ZmSmOBqB6lecCWrk60vyLnpF2QLuMe+9tlxoiZbxirwoTnc7VudHh9w+/WA=="],
 
     "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#187daad", {}, "Lantharos-Sabine-187daad", "sha512-bcHREeFVGmZ6CikuQBsveoi0ylXoLgldjWDJz3GD6jIeW4kR7Z/4cxV2KsckMbz0Dvml0YbFRqa+Zgg+i/l+Ww=="],
 
@@ -1302,8 +1302,6 @@
     "cosmiconfig": ["cosmiconfig@10.0.1", "", { "dependencies": { "env-paths": "^2.2.1", "js-yaml": "^5.4.1" } }, "sha512-/zvGoYn0y27QTBmK+0B+oPdEPC4fKGUmJsMTQbDjqph00TrkqfVFW/M+C6ya54sYCgHC6QCwK/mI6djt8cEGHQ=="],
 
     "crelt": ["crelt@1.0.7", "", {}, "sha512-aK6BbWfhf4U/wCcLHKPJl/xa6VkVstRaPywWtMKGwuOLc/wZTyQYuoxgvZnNsBvv7Kg3YTBQYYBCggcviQczuA=="],
-
-    "croner": ["croner@11.0.0", "", {}, "sha512-T17ADjdttrVToyzLpLq9Xb9xzcMwpQ/M3Qs9szhh0MVNTbv6NWQ9OFYa2qlzPYXFMn+uoDlnW1IpIv6cAvFtyA=="],
 
     "crossws": ["crossws@0.3.5", "", { "dependencies": { "uncrypto": "^0.1.3" } }, "sha512-ojKiDvcmByhwa8YYqbQI/hg7MEU0NC03+pSdEq4ZUnZR9xXpwk7E43SMNGkn+JxJGPFtNvQ48+vV2p+P1ml5PA=="],
 

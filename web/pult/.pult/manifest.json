@@ -1,4 +1,5 @@
 {
+  "format": 1,
   "project": "luft",
   "environments": [
     "prod"
@@ -186,5 +187,5 @@
   "spaces": [],
   "notify": {},
   "status": null,
-  "version": "85019a74ac4a"
+  "version": "42b12e0f12d7"
 }

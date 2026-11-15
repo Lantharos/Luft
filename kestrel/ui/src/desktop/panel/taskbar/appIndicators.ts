@@ -50,8 +50,8 @@ export class AppIndicators {
     return this.progress.visible;
   }
 
-  update(entry: LauncherEntry, attention: boolean): void {
-    this.badge.visible = entry.countVisible && entry.count > 0;
+  update(entry: LauncherEntry, attention: boolean, badges: boolean): void {
+    this.badge.visible = badges && entry.countVisible && entry.count > 0;
     if (this.badge.visible) this.badge.text = entry.count > 99 ? '99+' : `${entry.count}`;
     this.placeBadge();
     this.progress.visible = entry.progressVisible;

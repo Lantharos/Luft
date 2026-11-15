@@ -1,4 +1,5 @@
 import type Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -42,6 +43,12 @@ async function checkIndicators(panel: Clutter.Actor, window: Meta.Window) {
   await eventually(() => fill.get_parent()!.visible && Math.abs(along(fill) - along(fill.get_parent()!) / 2) <= 1, 'apps show their progress');
   await eventually(() => ofType(firstStyled('kestrel-task-attention', button), St.Widget).visible, 'apps asking for attention are highlighted');
   await capture('taskbar-indicators');
+  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  settings.set_boolean('taskbar-badges', false);
+  await eventually(() => !badge.visible, 'turning badges off hides them');
+  await capture('taskbar-badges-off');
+  settings.set_boolean('taskbar-badges', true);
+  await eventually(() => badge.visible, 'turning badges on shows them again');
   await stop(launcher);
   await eventually(() => !badge.visible, 'indicators clear when the app exits');
 }

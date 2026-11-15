@@ -36,6 +36,9 @@
 		<Row title={t('settings-taskbar-per-workspace')}>
 			<Switch label={t('settings-taskbar-per-workspace')} checked={values['taskbar-windows-per-workspace'] ?? false} onchange={(on) => settings.set('taskbar-windows-per-workspace', on)} />
 		</Row>
+		<Row title={t('settings-taskbar-badges')}>
+			<Switch label={t('settings-taskbar-badges')} checked={values['taskbar-badges'] ?? true} onchange={(on) => settings.set('taskbar-badges', on)} />
+		</Row>
 		{#if displays > 1}
 			<Row title={t('settings-taskbar-every-display')}>
 				<Switch label={t('settings-taskbar-every-display')} checked={everyDisplay} onchange={(on) => settings.set('taskbar-displays', on ? 'all' : 'primary')} />

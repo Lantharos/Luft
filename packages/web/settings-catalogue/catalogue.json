@@ -179,6 +179,12 @@
 			"key": "com.lantharos.kestrel taskbar-windows-per-workspace"
 		},
 		{
+			"id": "taskbar.badges",
+			"page": "taskbar",
+			"title": "settings-taskbar-badges",
+			"key": "com.lantharos.kestrel taskbar-badges"
+		},
+		{
 			"id": "taskbar.every-display",
 			"page": "taskbar",
 			"title": "settings-taskbar-every-display",

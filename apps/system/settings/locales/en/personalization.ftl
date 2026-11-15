@@ -156,6 +156,7 @@ settings-taskbar-hide-windows = When a window touches it
 settings-taskbar-more = More options
 settings-taskbar-show-pinned = Show pinned apps
 settings-taskbar-per-workspace = Only list windows on the current workspace
+settings-taskbar-badges = Show badges on app icons
 settings-taskbar-every-display = Show on every display
 settings-taskbar-per-display = Only list windows on the same display
 

@@ -39,7 +39,7 @@ const TOUCH_SLOT_GAP = 10;
 export const STRIP_HEIGHT = 24;
 
 const KEYS = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
-  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-shown', 'taskbar-start-button',
+  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-badges', 'taskbar-shown', 'taskbar-start-button',
   'start-style', 'pure-black', 'rounded-window-corners'] as const;
 export type TaskbarKey = typeof KEYS[number] | 'taskbar-arrangement' | 'tablet';
 
@@ -76,6 +76,7 @@ class TaskbarPreferences {
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }
   get windowsPerWorkspace(): boolean { return this.settings.get_boolean('taskbar-windows-per-workspace'); }
+  get badges(): boolean { return this.settings.get_boolean('taskbar-badges'); }
   get pureBlack(): boolean { return this.settings.get_boolean('pure-black'); }
 
   watch(watcher: (key: TaskbarKey) => void): () => void {

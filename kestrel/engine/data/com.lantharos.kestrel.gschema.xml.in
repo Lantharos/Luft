@@ -545,6 +545,14 @@
         last window or column.
       </description>
     </key>
+    <key name="taskbar-badges" type="b">
+      <default>true</default>
+      <summary>Show badges on app icons on the taskbar</summary>
+      <description>
+        When enabled, apps that report a count, such as unread messages,
+        show it as a badge on their taskbar icon.
+      </description>
+    </key>
     <key name="taskbar-windows-per-workspace" type="b">
       <default>false</default>
       <summary>Show only the current workspace's windows on the taskbar</summary>

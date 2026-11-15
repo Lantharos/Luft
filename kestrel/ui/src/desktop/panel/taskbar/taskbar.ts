@@ -63,6 +63,7 @@ export class Taskbar {
       () => signals.forEach(id => display.disconnect(id)),
       launcherEntries.watch(appId => { const item = this.items.get(appId); if (item) this.updateIndicator(item); }),
       appIcons.watch(() => this.relayout()),
+      taskbarPreferences.watch(key => { if (key === 'taskbar-badges') refresh(); }),
     );
     whenPixelScaleChanges(this.actor, () => this.relayout());
     this.actor.connect('style-changed', () => appIcons.setTaskbarInk(this.actor.get_theme_node().get_foreground_color().to_string()));
@@ -164,7 +165,7 @@ export class Taskbar {
   private updateIndicator(item: AppItem): void {
     const attention = this.tracker.focus_app !== item.app &&
       this.windowsOf(item.app).some(window => window.demands_attention || window.urgent);
-    item.indicators.update(launcherEntries.get(item.app.id), attention);
+    item.indicators.update(launcherEntries.get(item.app.id), attention, taskbarPreferences.badges);
     this.updateDots(item);
   }
 

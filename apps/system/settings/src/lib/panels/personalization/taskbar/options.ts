@@ -18,6 +18,7 @@ export type TaskbarSettings = {
 	'taskbar-displays': Displays;
 	'taskbar-windows-per-display': boolean;
 	'taskbar-windows-per-workspace': boolean;
+	'taskbar-badges': boolean;
 	'taskbar-shown': boolean;
 	'taskbar-start-button': boolean;
 	'start-style': StartStyle;
@@ -35,6 +36,7 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 	'taskbar-displays',
 	'taskbar-windows-per-display',
 	'taskbar-windows-per-workspace',
+	'taskbar-badges',
 	'taskbar-shown',
 	'taskbar-start-button',
 	'start-style',

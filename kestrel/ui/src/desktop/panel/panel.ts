@@ -1,4 +1,4 @@
-import Clutter from 'gi://Clutter';
+import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
@@ -102,13 +102,6 @@ export class KestrelPanel {
     this.actor.add_child(this.peek.actor);
     this.actor.add_child(this.layout.glide);
     this.actor.connect('notify::allocation', taskbarShapesChanged);
-    const followPointer = (_actor: Clutter.Actor, event: Clutter.Event) => {
-      const destination = event.type() === Clutter.EventType.ENTER ? event.get_source() : event.get_related();
-      this.taskbar.holdSteady(!!destination && this.actor.contains(destination));
-      return Clutter.EVENT_PROPAGATE;
-    };
-    this.actor.connect('enter-event', followPointer);
-    this.actor.connect('leave-event', followPointer);
     for (const edge of ['bottom', 'left', 'top', 'right'] as const) this.struts.set(edge, new St.Widget());
     this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest, () => this.sliders);
     this.launcher = createLauncher(actions.start, this.screen.metrics.button,
@@ -131,7 +124,7 @@ export class KestrelPanel {
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.refreshAfterMotion))],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
-      [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps(true))],
+      [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
       [this.tracker, this.tracker.connect('notify::focus-app', () => {
         this.tablet.collapse();
         afterMotion(this.updateFocusAfterMotion);
@@ -412,7 +405,7 @@ export class KestrelPanel {
     if (APP_KEYS.includes(key)) this.refreshApps();
   }
 
-  private refreshApps(immediate = false): void {
+  private refreshApps(): void {
     const pinned = taskbarPreferences.showPinned ? this.favorites.get_strv('favorite-apps') : [];
     const apps = pinned
       .map(id => this.appSystem.lookup_app(id))
@@ -420,6 +413,6 @@ export class KestrelPanel {
     for (const app of this.appSystem.get_running()) {
       if (!apps.some(shown => shown.id === app.id) && (!this.scoped || this.windowsOf(app).length)) apps.push(app);
     }
-    this.taskbar.update(apps, immediate);
+    this.taskbar.update(apps);
   }
 }

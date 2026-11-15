@@ -347,3 +347,4 @@ options = [
 
 [luft]
 minimum = "1.0-nightly.27"
+inside = true

@@ -7,7 +7,7 @@ use std::path::Path;
 use std::sync::LazyLock;
 
 use regex::Regex;
-use toml::Value;
+use toml::{Table, Value};
 
 use crate::error::Result;
 use crate::project::config::{ConfigPlace, relative};
@@ -78,7 +78,25 @@ fn read_listing_files(
     Ok(Some(value))
 }
 
-fn luft_issues(minimum: Option<&Value>) -> Vec<Issue> {
+fn luft_issues(luft: Option<&Table>) -> Vec<Issue> {
+    let inside = luft
+        .and_then(|luft| luft.get("inside"))
+        .filter(|inside| !inside.is_bool())
+        .map(|_| {
+            Issue::new(
+                Level::Error,
+                "extension.toml",
+                Some("luft.inside"),
+                "luft.inside is true to ask for each release to run inside Luft, or false",
+            )
+        });
+    minimum_issues(luft.and_then(|luft| luft.get("minimum")))
+        .into_iter()
+        .chain(inside)
+        .collect()
+}
+
+fn minimum_issues(minimum: Option<&Value>) -> Vec<Issue> {
     let Some(minimum) = minimum else {
         return vec![
             Issue::new(

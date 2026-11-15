@@ -10,7 +10,7 @@ pub struct ExtensionManifest {
     pub summary: Option<String>,
     pub api: i64,
     pub helper: Option<String>,
-    pub luft: Option<Value>,
+    pub luft: Option<Table>,
 }
 
 pub fn read_extension(text: &str) -> Result<ExtensionManifest> {
@@ -48,10 +48,6 @@ pub fn read_extension(text: &str) -> Result<ExtensionManifest> {
         summary: string("description"),
         api,
         helper: path.map(str::to_owned),
-        luft: file
-            .get("luft")
-            .and_then(Value::as_table)
-            .and_then(|luft| luft.get("minimum"))
-            .cloned(),
+        luft: file.get("luft").and_then(Value::as_table).cloned(),
     })
 }

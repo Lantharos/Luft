@@ -20,6 +20,14 @@ minimum = "1.2"
 
 Versions are ordered the way Luft releases them, every nightly before the release it leads to, so `1.2-nightly.21` comes after `1.1` and before `1.2`. Schelf only installs or updates to a release this Luft is new enough for, and Luft doesn't load one it isn't new enough for, wherever it came from.
 
+To have every release ask the store to run inside the desktop, add `inside = true` there too. Each release then asks for that review by itself once it passes its checks. Only a verified publisher's releases can ask, and the store's answer is still a person's decision for each one.
+
+```toml
+[luft]
+minimum = "1.2"
+inside = true
+```
+
 ## Where Luft keeps them
 
 An extension from Schelf is installed by the system for that account only, where nothing but the system can change it: into `/var/lib/luft/extensions/<uid>/<id>/` when the store approved the release to run inside the desktop, otherwise into `/var/lib/luft/sandboxed-extensions/<uid>/<id>/`. Luft doesn't ship extensions of its own; Seasons and the others come from Schelf too. An extension you put in `~/.local/share/luft/extensions/<id>/` yourself runs in a sandbox, and a copy there of one installed from Schelf is ignored.

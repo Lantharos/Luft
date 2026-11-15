@@ -286,4 +286,15 @@ fn schelf_check_asks_for_the_oldest_luft_the_extension_runs_on() {
         format!("{RAIN}\n[luft]\nminimum = \"1.0-nightly.27\"\n"),
     );
     assert_eq!(luft(), Vec::<String>::new());
+    write(
+        root,
+        "extension.toml",
+        format!("{RAIN}\n[luft]\nminimum = \"1.0-nightly.27\"\ninside = \"yes\"\n"),
+    );
+    assert_eq!(
+        luft(),
+        [
+            "error: extension.toml luft.inside: luft.inside is true to ask for each release to run inside Luft, or false"
+        ]
+    );
 }

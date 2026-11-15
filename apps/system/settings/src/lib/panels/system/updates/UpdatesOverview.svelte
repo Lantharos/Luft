@@ -17,7 +17,6 @@
 
 	let devices = $state<Firmware[]>([]);
 	let deviceName = $state<string>();
-	let systemName = $state<string | null>(null);
 	let preferences = $state<UpdatePolicy | null>(null);
 	let failure = $state<string | null>(null);
 
@@ -43,16 +42,12 @@
 		previous = running;
 	});
 
-	void attempt(commands.updatesLoad);
 	void loadDevices();
 	void commands.updatesPreferences().then((loaded) => (preferences = loaded));
-	void commands.about().then((about) => {
-		deviceName = about.deviceName;
-		systemName = about.system;
-	});
+	void commands.about().then((about) => (deviceName = about.deviceName));
 </script>
 
-<StatusCard system={systemName} overview={info} {activity} {failure} {attempt} />
+<StatusCard system={updates.system} overview={info} {activity} {failure} {attempt} />
 
 {#if info}
 	<PendingImage overview={info.system} {activity} {attempt} />

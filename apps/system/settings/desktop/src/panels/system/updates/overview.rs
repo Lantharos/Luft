@@ -28,14 +28,7 @@ enum Reload {
 
 static RELOAD: Mutex<Reload> = Mutex::new(Reload::Idle);
 
-pub fn load(refresh: Option<Task>) -> Result<(), String> {
-    let refreshed = refresh.is_some();
-    let system = image::load(refresh)?;
-    let checked = if refreshed {
-        Checked::now()?
-    } else {
-        Checked::load()
-    };
+fn publish(system: image::ImageOverview, checked: Checked) {
     state::set_overview(UpdatesOverview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
@@ -44,6 +37,19 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
             .unwrap_or_default(),
         system,
     });
+}
+
+pub fn load(refresh: Option<Task>) -> Result<(), String> {
+    let refreshed = refresh.is_some();
+    if !refreshed {
+        publish(image::known(image::installed()?), Checked::load());
+    }
+    if refreshed || image::checked_on_schedule_since() {
+        publish(
+            image::checked(image::installed()?, refreshed)?,
+            Checked::now()?,
+        );
+    }
     std::thread::spawn(move || {
         let apps = updates::count();
         let waiting = waiting::installed_by_user();

@@ -60,7 +60,7 @@ fn expected_size() -> Option<u64> {
     Found::load().update.map(|update| update.size)
 }
 
-fn checked_on_schedule_since() -> bool {
+pub fn checked_on_schedule_since() -> bool {
     let on_schedule = luft_app::block_on(image::policy())
         .ok()
         .and_then(|policy| policy.checked);
@@ -71,18 +71,20 @@ fn follow(task: Task) -> Result<(), String> {
     luft_app::block_on(image::follow(expected_size(), task))
 }
 
-pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
-    let refreshed = refresh.is_some();
-    let deployments = luft_app::block_on(Deployments::load())?;
-    let update = match refresh {
-        Some(_) => check(&deployments)?,
-        None if checked_on_schedule_since() => {
-            let update = check(&deployments)?;
-            Checked::now()?;
-            update
-        }
-        None => Found::load().update,
-    };
+pub fn installed() -> Result<Deployments, String> {
+    luft_app::block_on(Deployments::load())
+}
+
+pub fn known(deployments: Deployments) -> ImageOverview {
+    overview(deployments, Found::load().update, false)
+}
+
+pub fn checked(deployments: Deployments, refreshed: bool) -> Result<ImageOverview, String> {
+    let update = check(&deployments)?;
+    Ok(overview(deployments, update, refreshed))
+}
+
+fn overview(deployments: Deployments, update: Option<Update>, refreshed: bool) -> ImageOverview {
     let mut status = deployments.status();
     status.current.notes = whats_new(&deployments, &status.current).or(status.current.notes);
     let available = update
@@ -91,12 +93,12 @@ pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
             release: update.release,
             size: update.size,
         });
-    Ok(ImageOverview {
+    ImageOverview {
         status,
         available,
         channel: deployments.channel_choice(),
         offer: switch::offer(deployments, refreshed),
-    })
+    }
 }
 
 pub fn download(task: Task) -> Result<(), String> {

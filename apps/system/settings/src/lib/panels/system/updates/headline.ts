@@ -20,7 +20,7 @@ function systemHeadline({ returning, switching, staged, available }: ImageOvervi
 export function headline(overview: UpdatesOverview | null, activity: Activity) {
 	const running = describe(activity);
 	if (running) return running;
-	if (!overview) return t('settings-updates-checking');
+	if (!overview) return '';
 	return systemHeadline(overview.system) ?? t(overview.checked ? 'settings-updates-up-to-date' : 'settings-updates-never-checked');
 }
 

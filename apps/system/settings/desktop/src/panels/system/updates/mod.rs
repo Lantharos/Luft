@@ -42,13 +42,6 @@ struct ChannelSwitch {
     channel: Channel,
 }
 
-fn load(Empty {}: Empty) -> Result<(), String> {
-    if state::overview().is_none() {
-        overview::reload();
-    }
-    Ok(())
-}
-
 fn scan() {
     luft_app::spawn(image::scan());
 }
@@ -170,13 +163,13 @@ fn open_installed_apps(Token { token }: Token) -> Result<(), String> {
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
     image::watch();
+    overview::reload();
     window
         .bridge_event(&state::ACTIVITY)
         .bridge_event(&state::OVERVIEW)
         .command("updates_status", |Empty {}| {
             Ok::<UpdatesStatus, String>(state::status())
         })
-        .command("updates_load", load)
         .command("updates_check", check)
         .command("updates_download", download)
         .command("updates_cancel", |Empty {}| {

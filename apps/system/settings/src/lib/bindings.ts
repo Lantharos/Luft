@@ -641,7 +641,6 @@ export const commands = {
 	updatesFirmwareInstall: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("updates_firmware_install", params, options),
-	updatesLoad: (options?: CallOptions) => invoke<null>("updates_load", {}, options),
 	updatesOpenApps: (params: {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("updates_open_apps", params, options),
@@ -1956,6 +1955,7 @@ export type UpdatesOverview = {
 };
 
 export type UpdatesStatus = {
+	system: string,
 	overview: UpdatesOverview | null,
 	activity: Activity,
 };

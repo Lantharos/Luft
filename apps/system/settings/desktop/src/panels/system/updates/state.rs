@@ -7,6 +7,7 @@ use sabine::BridgeEvent;
 use serde::Serialize;
 use specta::Type;
 
+use super::super::about::os_release;
 use super::overview::UpdatesOverview;
 
 pub const ACTIVITY: BridgeEvent<Activity> = BridgeEvent::new("updates.activity");
@@ -44,6 +45,7 @@ impl Activity {
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatesStatus {
+    system: String,
     overview: Option<UpdatesOverview>,
     activity: Activity,
 }
@@ -81,6 +83,7 @@ pub fn attach(events: &Events) {
 pub fn status() -> UpdatesStatus {
     let state = state();
     UpdatesStatus {
+        system: os_release(),
         overview: state.overview.clone(),
         activity: state.activity.clone(),
     }

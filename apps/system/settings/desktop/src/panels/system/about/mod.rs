@@ -60,7 +60,7 @@ async fn hostnamed() -> Result<Proxy<'static>, String> {
     .map_err(failed)
 }
 
-fn os_release() -> String {
+pub(super) fn os_release() -> String {
     let release = fs::read_to_string("/etc/os-release").unwrap_or_default();
     let field = |name: &str| {
         release

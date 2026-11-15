@@ -247,7 +247,7 @@ ext.audioLevels.onPlayingChanged(() => (layer.active = ext.audioLevels.playing))
 
 ## Settings page
 
-Without anything else, an extension's page in Settings → Extensions lists the settings its manifest declares. `settingsPage.describe(build)` gives it a page of its own instead: `build` returns sections, each with an optional `title` and `description` and its `items`, and Settings draws them with its own controls. Kestrel calls `build` only while Settings shows the page, when it opens, after a declared setting changes and after `settingsPage.refresh()`. While the extension is off, Settings lists its declared settings.
+Without anything else, an extension's page in Settings → Extensions lists the settings its manifest declares. `settingsPage.describe(build)` gives it a page of its own instead: `build` returns sections, each with an optional `title` and `description` and its `items`, and Settings draws them with its own controls. Kestrel calls `build` only while Settings shows the page, when it opens, after a declared setting changes and after `settingsPage.refresh()`. While the extension is off, Settings shows none of its settings.
 
 | Item | Shows |
 | --- | --- |

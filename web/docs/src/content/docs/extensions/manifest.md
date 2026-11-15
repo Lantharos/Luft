@@ -147,7 +147,7 @@ Values are stored per account. A value that no longer fits after an update, such
 
 An option's `image` is a PNG, JPEG, WebP or SVG in the extension's folder, best at 3:2, showing what the option looks like.
 
-The page Settings shows for an extension lists these settings. An extension that needs more, such as lists of its own or values only it knows, describes a whole page with [`settingsPage`](/extensions/api/#settings-page); the settings declared here keep working inside it, `depends` included, and a section whose settings all hide disappears.
+The page Settings shows for an extension lists these settings while it runs; turned off, it shows only its switch, what it can do and where it's from. An extension that needs more, such as lists of its own or values only it knows, describes a whole page with [`settingsPage`](/extensions/api/#settings-page); the settings declared here keep working inside it, `depends` included, and a section whose settings all hide disappears.
 
 ## Shortcuts
 

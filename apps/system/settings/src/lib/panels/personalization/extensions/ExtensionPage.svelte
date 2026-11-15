@@ -27,14 +27,16 @@
 		{/if}
 	</Section>
 
-	{#if extension.page && extension.state === 'running'}
-		<PageView {extension} />
-	{:else if visible.length}
-		<Section title={t('settings-extensions-settings')}>
-			{#each visible as setting (setting.key)}
-				<SettingRow {extension} {setting} />
-			{/each}
-		</Section>
+	{#if extension.state === 'running'}
+		{#if extension.page}
+			<PageView {extension} />
+		{:else if visible.length}
+			<Section title={t('settings-extensions-settings')}>
+				{#each visible as setting (setting.key)}
+					<SettingRow {extension} {setting} />
+				{/each}
+			</Section>
+		{/if}
 	{/if}
 
 	{#if extension.permissions.length || extension.network.length || extension.listen.length}

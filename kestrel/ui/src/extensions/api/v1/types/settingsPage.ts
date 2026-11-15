@@ -105,7 +105,7 @@ export interface ShortcutDescription {
 export interface SettingsPage {
   /**
    * Describes the page. Kestrel calls `build` only while Settings shows the page: when it opens, after a declared
-   * setting changes, and after {@link refresh}. While the extension is off, Settings lists its declared settings.
+   * setting changes, and after {@link refresh}. While the extension is off, Settings shows none of its settings.
    */
   describe(build: () => readonly PageSection[]): Disposable;
   /** Asks for the page to be built again, when something only the extension knows has changed. */

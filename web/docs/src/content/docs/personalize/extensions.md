@@ -35,7 +35,7 @@ asks:
 
 Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. You find them in [Schelf](/apps/schelf/), such as Seasons, [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult.
 
-**Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**.
+**Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings while it's on, and **Remove**.
 
 ## What an extension can reach
 

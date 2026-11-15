@@ -153,9 +153,37 @@ fn put_in_place(program: &Path, place: &Path) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-/// Installs or updates the tool at `address` from `channel`, as the
-/// signed index lists it now.
-pub fn install(address: &str, channel: &str, reason: &str, task: Task) -> Result<(), String> {
+/// A tool's file, downloaded and checked against the index, ready to put in
+/// place. It's deleted again when it isn't.
+pub struct Fetched {
+    tool: Tool,
+    release: Release,
+    file: File,
+    download: PathBuf,
+}
+
+impl Drop for Fetched {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.download);
+    }
+}
+
+impl Fetched {
+    pub fn place(self) -> Result<(), String> {
+        let placed = place(
+            &self.tool,
+            &self.release,
+            &self.file,
+            &self.download,
+            &folder(),
+        )?;
+        record::put(&self.tool.index.name, placed)
+    }
+}
+
+/// Downloads the tool at `address` from `channel`, as the signed index lists
+/// it now, to install or update it.
+pub fn fetch(address: &str, channel: &str, reason: &str, task: Task) -> Result<Fetched, String> {
     task.progress(Stage::Preparing, None);
     let tool = find(address, channel)?.ok_or("schelf.store doesn't have it any more.")?;
     if let Some(refusal) = refused(&tool) {
@@ -165,9 +193,8 @@ pub fn install(address: &str, channel: &str, reason: &str, task: Task) -> Result
         .offer()
         .ok_or("There's no version of it for this computer.")?;
     pulled(&tool.index, release)?;
-    let name = &tool.index.name;
     let download = download::published_file(
-        &format!("tool-{name}"),
+        &format!("tool-{}", tool.index.name),
         &Published {
             url: &file.url,
             size: file.size,
@@ -176,9 +203,13 @@ pub fn install(address: &str, channel: &str, reason: &str, task: Task) -> Result
         &format!("reason={reason}"),
         task,
     )?;
-    let placed = place(&tool, release, file, &download, &folder());
-    let _ = fs::remove_file(&download);
-    record::put(name, placed?)
+    let (release, file) = (release.clone(), file.clone());
+    Ok(Fetched {
+        tool,
+        release,
+        file,
+        download,
+    })
 }
 
 /// Puts the program in `download`, the file of `release` that was checked
@@ -250,10 +281,10 @@ pub fn updates() -> Result<Vec<ToolUpdate>, String> {
     Ok(found)
 }
 
-/// Updates the installed tool `name`.
-pub fn update(name: &str, task: Task) -> Result<(), String> {
+/// Downloads the newest release of the installed tool `name`.
+pub fn fetch_update(name: &str, task: Task) -> Result<Fetched, String> {
     let installed = get(name).ok_or("It isn't installed any more.")?;
-    install(&installed.address, &installed.channel, "update", task)
+    fetch(&installed.address, &installed.channel, "update", task)
 }
 
 /// Remembers this program as the tool `lantharos/schelf` when the install

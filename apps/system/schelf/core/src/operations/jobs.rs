@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use luft_dbus::runtime::block_on;
-use luft_software::apps::flatpak::{self, FLATHUB, Installation};
+use luft_software::apps::flatpak::{self, FLATHUB, Installation, Step};
 use luft_software::apps::{appimage, debian, places, toolbox};
 use luft_software::system::repositories::{self, Draft};
 use luft_software::system::system_packages;
@@ -176,20 +176,52 @@ impl Job {
         }
     }
 
+    /// Whether the job downloads what it needs before it takes the account's
+    /// software lock, so several can download at once and only change
+    /// things one after another.
+    fn downloads_first(&self) -> bool {
+        matches!(
+            self,
+            Self::InstallFlathub { .. }
+                | Self::InstallStore { .. }
+                | Self::UpdateStore { .. }
+                | Self::UpdateAppImage { .. }
+                | Self::InstallStoreTool { .. }
+                | Self::UpdateStoreTool { .. }
+                | Self::UpdateFlatpaks {
+                    installation: Installation::User,
+                    ..
+                }
+        )
+    }
+
     pub fn run(&self, task: Task) -> Result<(), String> {
-        let _exclusive = task.exclusive()?;
+        let _exclusive = if self.downloads_first() {
+            None
+        } else {
+            Some(task.exclusive()?)
+        };
         match self {
             Self::InstallFlathub { id } => {
-                flatpak::ensure_flathub(Installation::User)?;
-                flatpak::install(Installation::User, FLATHUB, id, task)?;
+                {
+                    let _exclusive = task.exclusive()?;
+                    flatpak::ensure_flathub(Installation::User)?;
+                }
+                flatpak::install(Installation::User, FLATHUB, id, Step::Download, task)?;
+                let _exclusive = task.exclusive()?;
+                flatpak::install(Installation::User, FLATHUB, id, Step::Deploy, task)?;
                 settle_flatpaks(task);
                 Ok(())
             }
             Self::InstallStore { id, consent } => {
-                store::install::install(id, consent, Reason::Install, task)
+                let fetched = store::install::fetch(id, consent, Reason::Install, task)?;
+                let _exclusive = task.exclusive()?;
+                fetched.place(task)
             }
             Self::UpdateStore { id, consent } => {
-                store::install::install(id, consent, Reason::Update, task)
+                let fetched = store::install::fetch(id, consent, Reason::Update, task)?;
+                let _exclusive = task.exclusive()?;
+                fetched.place(task)
             }
             Self::RemoveStore { id } => store::install::remove(id),
             Self::InstallFlatpakRef { path } => {
@@ -236,11 +268,26 @@ impl Job {
                 references,
             } => {
                 let references: Vec<&str> = references.iter().map(String::as_str).collect();
-                flatpak::update(*installation, &references, task)?;
+                let _exclusive = match installation {
+                    Installation::User => {
+                        flatpak::update(*installation, &references, Some(Step::Download), task)?;
+                        let exclusive = task.exclusive()?;
+                        flatpak::update(*installation, &references, Some(Step::Deploy), task)?;
+                        Some(exclusive)
+                    }
+                    Installation::System => {
+                        flatpak::update(*installation, &references, None, task)?;
+                        None
+                    }
+                };
                 settle_flatpaks(task);
                 Ok(())
             }
-            Self::UpdateAppImage { id } => appimage::update(&appimage::find(id)?, task).map(|_| ()),
+            Self::UpdateAppImage { id } => {
+                let staged = appimage::download_update(&appimage::find(id)?, task)?;
+                let _exclusive = task.exclusive()?;
+                staged.apply().map(drop)
+            }
             Self::UpdateTools { packages } => toolbox::update(packages, task),
             Self::InstallSystemPackages { packages } => {
                 block_on(system_packages::install(packages, task))
@@ -267,9 +314,15 @@ impl Job {
                 block_on(system_packages::remove_repository(file, task))
             }
             Self::InstallStoreTool { address, channel } => {
-                tools::install(address, channel, "install", task)
+                let fetched = tools::fetch(address, channel, "install", task)?;
+                let _exclusive = task.exclusive()?;
+                fetched.place()
             }
-            Self::UpdateStoreTool { name } => tools::update(name, task),
+            Self::UpdateStoreTool { name } => {
+                let fetched = tools::fetch_update(name, task)?;
+                let _exclusive = task.exclusive()?;
+                fetched.place()
+            }
             Self::RemoveStoreTool { name } => tools::remove(name),
         }
     }

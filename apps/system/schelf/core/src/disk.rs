@@ -2,10 +2,11 @@ use std::ffi::OsString;
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 
-/// Writes `bytes` to `path` through a hidden file beside it, so readers only
-/// ever see the old contents or the new ones, also after a power cut.
-/// Creates the folder if needed.
+/// Writes `bytes` to `path` through a hidden file of its own beside it, so
+/// readers only ever see the old contents or the new ones, also after a power
+/// cut or while another writer replaces it too. Creates the folder if needed.
 pub fn replace(path: &Path, bytes: &[u8]) -> io::Result<()> {
     if let Some(folder) = path.parent() {
         fs::create_dir_all(folder)?;
@@ -24,8 +25,13 @@ pub fn replace(path: &Path, bytes: &[u8]) -> io::Result<()> {
 }
 
 fn partial(path: &Path) -> PathBuf {
+    static WRITES: AtomicU64 = AtomicU64::new(0);
     let mut name = OsString::from(".");
     name.push(path.file_name().unwrap_or_default());
-    name.push(".partial");
+    name.push(format!(
+        ".{}-{}.partial",
+        std::process::id(),
+        WRITES.fetch_add(1, Ordering::Relaxed)
+    ));
     path.with_file_name(name)
 }

@@ -13,15 +13,50 @@ const VERBS: [(&str, Stage); 3] = [
     ("Uninstalling", Stage::Removing),
 ];
 
+/// One half of installing or updating: fetching what it needs into the
+/// installation's repository, which several can do at once, or putting what
+/// was fetched in place.
+#[derive(Clone, Copy)]
+pub enum Step {
+    Download,
+    Deploy,
+}
+
+impl Step {
+    fn flag(self) -> &'static str {
+        match self {
+            Self::Download => "--no-deploy",
+            Self::Deploy => "--no-pull",
+        }
+    }
+
+    fn stage(self) -> Option<Stage> {
+        match self {
+            Self::Download => Some(Stage::Downloading),
+            Self::Deploy => None,
+        }
+    }
+}
+
 pub fn install(
     installation: Installation,
     remote: &str,
     reference: &str,
+    step: Step,
     task: Task,
 ) -> Result<(), String> {
     let (remote, reference) = (operand(remote)?, operand(reference)?);
-    run(
-        command(installation).args(["install", "-y", "--or-update", "--", remote, reference]),
+    run_as(
+        command(installation).args([
+            "install",
+            "-y",
+            "--or-update",
+            step.flag(),
+            "--",
+            remote,
+            reference,
+        ]),
+        step.stage(),
         task,
     )
 }
@@ -46,15 +81,24 @@ pub fn install_bundle(installation: Installation, file: &Path, task: Task) -> Re
     )
 }
 
-pub fn update(installation: Installation, references: &[&str], task: Task) -> Result<(), String> {
+/// Updates `references`, in one go or in `step`s.
+pub fn update(
+    installation: Installation,
+    references: &[&str],
+    step: Option<Step>,
+    task: Task,
+) -> Result<(), String> {
     let references = references
         .iter()
         .map(|reference| operand(reference))
         .collect::<Result<Vec<_>, _>>()?;
-    run(
+    run_as(
         command(installation)
-            .args(["update", "-y", "--"])
+            .args(["update", "-y"])
+            .args(step.map(Step::flag))
+            .arg("--")
             .args(references),
+        step.and_then(Step::stage),
         task,
     )
 }
@@ -83,6 +127,12 @@ pub fn add_remote(installation: Installation, name: &str, file: &Path) -> Result
 }
 
 pub(super) fn run(command: &mut Command, task: Task) -> Result<(), String> {
+    run_as(command, None, task)
+}
+
+/// Runs `command`, reporting its progress as `stage` when it's given instead of
+/// the stage Flatpak names.
+fn run_as(command: &mut Command, stage: Option<Stage>, task: Task) -> Result<(), String> {
     let mut child = command
         .env("LC_ALL", "C.UTF-8")
         .env_remove("LANGUAGE")
@@ -105,7 +155,7 @@ pub(super) fn run(command: &mut Command, task: Task) -> Result<(), String> {
             libc::kill(pid, libc::SIGTERM);
         },
         || {
-            follow(&mut stdout, task);
+            follow(&mut stdout, stage, task);
             child.wait()
         },
     );
@@ -122,7 +172,7 @@ pub(super) fn run(command: &mut Command, task: Task) -> Result<(), String> {
     }
 }
 
-fn follow(stdout: &mut impl Read, task: Task) {
+fn follow(stdout: &mut impl Read, stage: Option<Stage>, task: Task) {
     let mut buffer = [0u8; 4096];
     let mut line = Vec::new();
     while let Ok(read) = stdout.read(&mut buffer) {
@@ -131,8 +181,8 @@ fn follow(stdout: &mut impl Read, task: Task) {
         }
         for &byte in &buffer[..read] {
             if byte == b'\n' || byte == b'\r' {
-                if let Some((stage, fraction)) = progress(&String::from_utf8_lossy(&line)) {
-                    task.progress(stage, fraction);
+                if let Some((named, fraction)) = progress(&String::from_utf8_lossy(&line)) {
+                    task.progress(stage.unwrap_or(named), fraction);
                 }
                 line.clear();
             } else {

@@ -1,7 +1,7 @@
 pub mod download;
 pub mod extensions;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use luft_dbus::runtime::block_on;
@@ -13,7 +13,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::invited;
-use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release};
+use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -170,9 +170,8 @@ fn remove_installed(installed: &Installed) -> Result<(), String> {
 /// such as from Sabine to an AppImage, the new one replaces the old.
 fn place(
     listing: &Listing,
-    Offer {
-        release, format, ..
-    }: Offer,
+    release: &Release,
+    format: Format,
     file: &Path,
     full_access: bool,
     task: Task,
@@ -208,15 +207,6 @@ fn place(
     }
 }
 
-/// Moves you from `id` to the app that took its place: installs that one as
-/// you agreed to in `consent`, unless you have it already, and removes `id`.
-fn replace(id: &str, replacement: &str, consent: &Consent, task: Task) -> Result<(), String> {
-    if record::get(replacement).is_none() {
-        install(replacement, consent, Reason::Install, task)?;
-    }
-    remove(id)
-}
-
 /// Why this computer can't install anything of `listing`.
 pub fn unavailable(listing: &Listing) -> String {
     if listing.kind == Kind::Extension && !host::luft() {
@@ -239,13 +229,64 @@ pub fn unavailable(listing: &Listing) -> String {
     )
 }
 
-/// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
-/// Updating an app another took the place of moves you to that one.
-pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
+/// The file of a store app's release, downloaded and checked, ready to put in
+/// place. It's deleted again when it isn't.
+struct Downloaded {
+    listing: Listing,
+    release: Release,
+    format: Format,
+    file: PathBuf,
+    full_access: bool,
+}
+
+impl Drop for Downloaded {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.file);
+    }
+}
+
+/// What installing or updating a store app downloaded, before it changes
+/// anything. Updating an app another took the place of brings that one and
+/// removes this one.
+#[derive(Default)]
+pub struct Fetched {
+    download: Option<Downloaded>,
+    replaces: Option<String>,
+}
+
+impl Fetched {
+    pub fn place(self, task: Task) -> Result<(), String> {
+        if let Some(download) = &self.download {
+            place(
+                &download.listing,
+                &download.release,
+                download.format,
+                &download.file,
+                download.full_access,
+                task,
+            )?;
+        }
+        match &self.replaces {
+            Some(id) => remove(id),
+            None => Ok(()),
+        }
+    }
+}
+
+/// Downloads what installing or updating `id` from schelf.store needs, as you
+/// agreed to in `consent`, without changing anything yet.
+pub fn fetch(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<Fetched, String> {
     task.progress(Stage::Preparing, None);
     let listing = listing::fetch(id, Age::Current)?;
     if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
-        return replace(id, &replacement.id, consent, task);
+        let fetched = match record::get(&replacement.id) {
+            Some(_) => Fetched::default(),
+            None => fetch(&replacement.id, consent, Reason::Install, task)?,
+        };
+        return Ok(Fetched {
+            replaces: Some(id.to_owned()),
+            ..fetched
+        });
     }
     let offer = record::get(id)
         .map_or_else(
@@ -268,9 +309,23 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     refuse_pulled(&listing, offer.release)?;
     let file = download::verified(&listing.id, offer.artifact, reason.query(), task)
         .map_err(|error| invited::turned_down(&listing.id, error))?;
-    let placed = place(&listing, offer, &file, consent.full_access, task);
-    let _ = std::fs::remove_file(&file);
-    placed
+    let (release, format) = (offer.release.clone(), offer.format);
+    Ok(Fetched {
+        download: Some(Downloaded {
+            listing,
+            release,
+            format,
+            file,
+            full_access: consent.full_access,
+        }),
+        replaces: None,
+    })
+}
+
+/// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
+/// Updating an app another took the place of moves you to that one.
+pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
+    fetch(id, consent, reason, task)?.place(task)
 }
 
 /// Installs a store app from the copy of its listing and its
@@ -290,7 +345,14 @@ pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {
         .permissions
         .as_ref()
         .is_none_or(|declared| declared.unsandboxed.is_some());
-    place(&listing, offer, &file, full_access, task)
+    place(
+        &listing,
+        offer.release,
+        offer.format,
+        &file,
+        full_access,
+        task,
+    )
 }
 
 pub fn remove(id: &str) -> Result<(), String> {

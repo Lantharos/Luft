@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::Read;
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use serde::Serialize;
 
@@ -115,7 +115,34 @@ fn verified(staging: &Path, available: &Available, key: Option<&[u8]>) -> Result
     bundle::read(staging)
 }
 
-pub fn apply(app: &AppImage, task: Task) -> Result<AppImage, String> {
+/// The newest version of an AppImage, downloaded and checked beside it, ready
+/// to take its place. It's deleted again when it doesn't.
+pub struct Staged {
+    app: AppImage,
+    staging: PathBuf,
+    bundle: Bundle,
+}
+
+impl Drop for Staged {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.staging);
+    }
+}
+
+impl Staged {
+    pub fn apply(self) -> Result<AppImage, String> {
+        fs::rename(&self.staging, &self.app.path).map_err(|error| error.to_string())?;
+        integrate::integrate(&self.app.id, &self.app.path, &self.bundle)?;
+        #[cfg(feature = "sabine")]
+        if let Some(sabine_app) = &self.bundle.sabine_app {
+            sabine_app.record()?;
+        }
+        library::find(&self.app.id)
+    }
+}
+
+/// Downloads and checks the newest version of `app`, without changing it yet.
+pub fn download(app: &AppImage, task: Task) -> Result<Staged, String> {
     task.progress(Stage::Preparing, None);
     let available = check(app)?.ok_or("This app is already up to date.")?;
     let key = signature::key(&app.path);
@@ -125,11 +152,13 @@ pub fn apply(app: &AppImage, task: Task) -> Result<AppImage, String> {
     let bundle = verified(&staging, &available, key.as_deref()).inspect_err(|_| {
         let _ = fs::remove_file(&staging);
     })?;
-    fs::rename(&staging, &app.path).map_err(|error| error.to_string())?;
-    integrate::integrate(&app.id, &app.path, &bundle)?;
-    #[cfg(feature = "sabine")]
-    if let Some(sabine_app) = &bundle.sabine_app {
-        sabine_app.record()?;
-    }
-    library::find(&app.id)
+    Ok(Staged {
+        app: app.clone(),
+        staging,
+        bundle,
+    })
+}
+
+pub fn apply(app: &AppImage, task: Task) -> Result<AppImage, String> {
+    download(app, task)?.apply()
 }

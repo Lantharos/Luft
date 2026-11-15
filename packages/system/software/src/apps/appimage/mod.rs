@@ -25,4 +25,4 @@ pub use integrate::{
     remove, repair, sandboxed,
 };
 pub use library::{AppImage, IconSize, find, list};
-pub use update::{Available, apply as update, check};
+pub use update::{Available, Staged, apply as update, check, download as download_update};

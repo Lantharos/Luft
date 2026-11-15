@@ -3,8 +3,9 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Result, bail};
 use luft_store_seal::Listed;
+use serde::Deserialize;
 
-use super::{replace, root, unpack};
+use super::{MANIFEST, replace, root, unpack};
 
 const IN_SHELL: &str = "/var/lib/luft/extensions";
 const SANDBOXED: &str = "/var/lib/luft/sandboxed-extensions";
@@ -41,23 +42,26 @@ impl Store {
 
     /// Unpacks `archive`, the file of `listed`, in place of any earlier
     /// version of `id`, wherever that was. A release that may not run inside
-    /// the shell never takes the place of one that does.
+    /// the shell never takes the place of another version that does; the
+    /// version itself leaves the shell once the store took back its approval.
     pub fn place(&self, uid: u32, id: &str, listed: &Listed, archive: File) -> Result<()> {
         let (in_shell, sandboxed) = self.accounts(uid);
+        let approved = in_shell.join(id);
         let (folder, other) = if listed.in_shell {
             (in_shell, sandboxed)
         } else {
-            if exists(&in_shell.join(id)) {
+            (sandboxed, in_shell)
+        };
+        replace(&folder, id, |staging| {
+            unpack(archive, staging)?;
+            let unpacked = root(staging)?;
+            if !listed.in_shell && exists(&approved) && version(&approved)? != version(&unpacked)? {
                 bail!(
                     "{id} {} isn't approved to run inside Luft yet, so the approved version stays.",
                     listed.version
                 );
             }
-            (sandboxed, in_shell)
-        };
-        replace(&folder, id, |staging| {
-            unpack(archive, staging)?;
-            root(staging)
+            Ok(unpacked)
         })?;
         remove_folder(&other.join(id))
     }
@@ -67,6 +71,16 @@ impl Store {
         remove_folder(&in_shell.join(id))?;
         remove_folder(&sandboxed.join(id))
     }
+}
+
+#[derive(Deserialize)]
+struct Manifest {
+    version: String,
+}
+
+fn version(folder: &Path) -> Result<String> {
+    let manifest: Manifest = toml::from_str(&fs::read_to_string(folder.join(MANIFEST))?)?;
+    Ok(manifest.version)
 }
 
 fn exists(path: &Path) -> bool {

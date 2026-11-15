@@ -34,6 +34,9 @@ pub struct StoreUpdate {
     /// Whether it's an extension in a sandbox that schelf.store approved to
     /// run inside Luft, where the update moves it.
     pub moves_inside: bool,
+    /// Whether it's an extension inside Luft whose approval schelf.store took
+    /// back, which the update moves into a sandbox.
+    pub moves_out: bool,
 }
 
 fn widens_extension(after: Option<&ExtensionAccess>, before: Option<&ExtensionAccess>) -> bool {
@@ -79,7 +82,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         release,
         artifact,
         format,
-    }) = listing.release(!replacing && installed.inside_luft())
+    }) = listing.update(&installed.version, !replacing && installed.inside_luft())
     else {
         return Ok(None);
     };
@@ -90,8 +93,12 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         && installed.sandboxed
         && listing.runs_in_shell(release)
         && !listing::newer(&installed.version, &release.version);
+    let moves_out = !replacing && installed.inside_luft() && !listing.runs_in_shell(release);
     if pulled
-        || !(replacing || moves_inside || listing::newer(&release.version, &installed.version))
+        || !(replacing
+            || moves_inside
+            || moves_out
+            || listing::newer(&release.version, &installed.version))
     {
         return Ok(None);
     }
@@ -100,6 +107,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
     Ok(Some(StoreUpdate {
         widens: match (installed.format, format) {
             _ if moves_inside => true,
+            _ if moves_out => false,
             _ if replacement_installed => false,
             (from, to) if from != to => true,
             (Format::LuftExtension, _) => widens_extension(
@@ -127,6 +135,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         icon: listing.icon.clone(),
         replacement: replacing.then(|| listing.name().to_owned()),
         moves_inside,
+        moves_out,
         name: installed.name,
         kind: installed.kind,
         format: installed.format,

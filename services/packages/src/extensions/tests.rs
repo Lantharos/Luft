@@ -10,7 +10,7 @@ use super::{root, unpack};
 const ID: &str = "com.example.Clock";
 const UID: u32 = 1000;
 
-fn archive(folder: &Path) -> File {
+fn archive(folder: &Path, version: &str) -> File {
     let path = folder.join("extension.tar.zst");
     let mut builder = tar::Builder::new(
         zstd::Encoder::new(File::create(&path).unwrap(), 3)
@@ -27,7 +27,7 @@ fn archive(folder: &Path) -> File {
     add(
         "com.example.Clock/extension.toml",
         0o666,
-        b"id = \"com.example.Clock\"\n",
+        format!("id = \"com.example.Clock\"\nversion = \"{version}\"\n").as_bytes(),
     );
     add("com.example.Clock/helper", 0o4777, b"#!/bin/sh\n");
     let mut link = tar::Header::new_gnu();
@@ -48,7 +48,7 @@ fn archive(folder: &Path) -> File {
 fn an_unpacked_extension_is_only_writable_by_root_and_keeps_no_link_out() {
     let scratch = tempfile::tempdir().unwrap();
     let into = scratch.path().join("unpacking");
-    unpack(archive(scratch.path()), &into).unwrap();
+    unpack(archive(scratch.path(), "1.0.0"), &into).unwrap();
     let folder = root(&into).unwrap();
     let mode = |name: &str| {
         fs::metadata(folder.join(name))
@@ -83,7 +83,12 @@ fn a_release_not_approved_to_run_inside_the_shell_only_lands_where_it_runs_sandb
     let scratch = tempfile::tempdir().unwrap();
     let store = Store::at(scratch.path());
     store
-        .place(UID, ID, &release("1.0.0", false), archive(scratch.path()))
+        .place(
+            UID,
+            ID,
+            &release("1.0.0", false),
+            archive(scratch.path(), "1.0.0"),
+        )
         .unwrap();
     assert!(manifest(&scratch.path().join("sandboxed-extensions/1000")));
     assert!(!scratch.path().join("extensions/1000").join(ID).exists());
@@ -94,10 +99,20 @@ fn an_approved_update_moves_a_sandboxed_extension_inside_the_shell() {
     let scratch = tempfile::tempdir().unwrap();
     let store = Store::at(scratch.path());
     store
-        .place(UID, ID, &release("1.0.0", false), archive(scratch.path()))
+        .place(
+            UID,
+            ID,
+            &release("1.0.0", false),
+            archive(scratch.path(), "1.0.0"),
+        )
         .unwrap();
     store
-        .place(UID, ID, &release("1.1.0", true), archive(scratch.path()))
+        .place(
+            UID,
+            ID,
+            &release("1.1.0", true),
+            archive(scratch.path(), "1.1.0"),
+        )
         .unwrap();
     assert!(manifest(&scratch.path().join("extensions/1000")));
     assert!(
@@ -114,12 +129,22 @@ fn a_release_not_approved_yet_never_replaces_an_approved_one() {
     let scratch = tempfile::tempdir().unwrap();
     let store = Store::at(scratch.path());
     store
-        .place(UID, ID, &release("1.0.0", true), archive(scratch.path()))
+        .place(
+            UID,
+            ID,
+            &release("1.0.0", true),
+            archive(scratch.path(), "1.0.0"),
+        )
         .unwrap();
     let refused = store
-        .place(UID, ID, &release("1.1.0", false), archive(scratch.path()))
+        .place(
+            UID,
+            ID,
+            &release("1.1.0", false),
+            archive(scratch.path(), "1.1.0"),
+        )
         .unwrap_err();
-    assert!(refused.to_string().contains("approved version stays"));
+    assert!(format!("{refused:#}").contains("approved version stays"));
     assert!(manifest(&scratch.path().join("extensions/1000")));
     assert!(
         !scratch
@@ -128,4 +153,28 @@ fn a_release_not_approved_yet_never_replaces_an_approved_one() {
             .join(ID)
             .exists()
     );
+}
+
+#[test]
+fn an_extension_whose_approval_was_taken_back_leaves_the_shell_for_the_sandbox() {
+    let scratch = tempfile::tempdir().unwrap();
+    let store = Store::at(scratch.path());
+    store
+        .place(
+            UID,
+            ID,
+            &release("1.0.0", true),
+            archive(scratch.path(), "1.0.0"),
+        )
+        .unwrap();
+    store
+        .place(
+            UID,
+            ID,
+            &release("1.0.0", false),
+            archive(scratch.path(), "1.0.0"),
+        )
+        .unwrap();
+    assert!(manifest(&scratch.path().join("sandboxed-extensions/1000")));
+    assert!(!scratch.path().join("extensions/1000").join(ID).exists());
 }

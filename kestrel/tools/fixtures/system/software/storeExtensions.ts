@@ -48,11 +48,18 @@ function unpack(archive: string, folder: string, id: string) {
   }
 }
 
+function approvedVersion(id: string) {
+  const manifest = GLib.build_filenamev([inShellFolder(), id, 'extension.toml']);
+  if (!GLib.file_test(manifest, GLib.FileTest.IS_REGULAR)) return null;
+  return /^version = "(.*)"$/m.exec(new TextDecoder().decode(GLib.file_get_contents(manifest)[1]))?.[1] ?? null;
+}
+
 function install(id: string, listing: Listing, fd: number) {
   const archive = GLib.file_read_link(`/proc/self/fd/${fd}`);
   const release = listed(listing, id, new GLib.Bytes(GLib.file_get_contents(archive)[1]));
   const [folder, other] = release.inShell ? [inShellFolder(), sandboxedFolder()] : [sandboxedFolder(), inShellFolder()];
-  if (!release.inShell && GLib.file_test(GLib.build_filenamev([inShellFolder(), id]), GLib.FileTest.IS_DIR))
+  const approved = approvedVersion(id);
+  if (!release.inShell && approved !== null && approved !== release.version)
     throw new Error(`${id} ${release.version} isn't approved to run inside Luft yet, so the approved version stays.`);
   unpack(archive, folder, id);
   removeFrom(other, id);

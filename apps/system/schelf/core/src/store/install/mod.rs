@@ -247,9 +247,11 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
         return replace(id, &replacement.id, consent, task);
     }
-    let inside_luft = record::get(id).is_some_and(|installed| installed.inside_luft());
-    let offer = listing
-        .release(inside_luft)
+    let offer = record::get(id)
+        .map_or_else(
+            || listing.release(false),
+            |installed| listing.update(&installed.version, installed.inside_luft()),
+        )
         .ok_or_else(|| unavailable(&listing))?;
     let offer = match offer.format {
         Format::Sabine if host::sabine_service().is_none() => {

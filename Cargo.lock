@@ -5954,6 +5954,7 @@ dependencies = [
  "tar",
  "tempfile",
  "tokio",
+ "toml",
  "walkdir",
  "zbus 6.0.0",
  "zstd 0.14.3",

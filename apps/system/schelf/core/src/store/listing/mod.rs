@@ -246,6 +246,32 @@ impl Listing {
         )
     }
 
+    /// Whether schelf.store took back its approval for `version` to run
+    /// inside Luft: it still lists that release, but on no channel may it run
+    /// there.
+    pub fn withdrew(&self, version: &str) -> bool {
+        let mut same = self
+            .releases
+            .iter()
+            .filter(|release| release.version == version)
+            .peekable();
+        same.peek().is_some() && !same.any(|release| self.runs_in_shell(release))
+    }
+
+    /// The release an extension installed at `version` moves to, `inside_luft`
+    /// when it runs there: the newest it may have, or, once schelf.store took
+    /// back the approval of `version`, that same release to run in a sandbox.
+    pub fn update(&self, version: &str, inside_luft: bool) -> Option<Offer<'_>> {
+        if !(inside_luft && self.withdrew(version)) {
+            return self.release(inside_luft);
+        }
+        let platforms = self.platforms();
+        self.releases
+            .iter()
+            .filter(|release| release.version == version)
+            .find_map(|release| Offer::of(release, platforms))
+    }
+
     /// The release a listing shipped with the system holds, whatever its
     /// rollout.
     pub fn shipped(&self) -> Option<Offer<'_>> {

@@ -45,8 +45,8 @@ fn release(version: &str, channel: &str, rollout: u8, artifacts: &[Value]) -> Va
     })
 }
 
-fn listing(format: &str, releases: &[Value]) -> Listing {
-    serde_json::from_value(json!({
+fn document(format: &str, releases: &[Value]) -> Value {
+    json!({
         "version": 1,
         "generated": "2026-11-03T10:00:00.000Z",
         "id": "io.example.Tide",
@@ -66,8 +66,31 @@ fn listing(format: &str, releases: &[Value]) -> Listing {
         "repository": null,
         "distribution": "open",
         "releases": releases
-    }))
-    .expect("the listing parses")
+    })
+}
+
+fn listing(format: &str, releases: &[Value]) -> Listing {
+    serde_json::from_value(document(format, releases)).expect("the listing parses")
+}
+
+fn extension(releases: &[(&str, &str, bool)]) -> Listing {
+    let releases: Vec<Value> = releases
+        .iter()
+        .map(|(version, channel, approved)| {
+            let mut release = release(
+                version,
+                channel,
+                100,
+                &[file("luft", "luft-extension", "extension", "clock.tar.zst")],
+            );
+            release["runs_in_shell"] = json!(approved);
+            release
+        })
+        .collect();
+    let mut document = document("luft-extension", &releases);
+    document["kind"] = json!("extension");
+    document["publisher"]["verified"] = json!(true);
+    serde_json::from_value(document).expect("the listing parses")
 }
 
 fn archive() -> Value {
@@ -424,4 +447,20 @@ fn the_ended_channel_stays_until_the_destination_has_something_for_this_device()
     assert_eq!(following.channel, "beta");
     assert_eq!(following.ended, None);
     assert_eq!(followed_version(&tide, &following), Some("2.0.0-beta.3"));
+}
+
+#[test]
+fn an_extension_whose_approval_was_taken_back_goes_back_into_a_sandbox_at_its_version() {
+    let clock = extension(&[("1.1.0", STABLE, false), ("1.0.0", STABLE, false)]);
+    assert!(clock.withdrew("1.0.0"));
+    let offer = clock.update("1.0.0", true).expect("it has somewhere to go");
+    assert_eq!(offer.release.version, "1.0.0");
+    assert!(!clock.runs_in_shell(offer.release));
+}
+
+#[test]
+fn an_approval_stands_while_any_channel_keeps_it_or_the_release_left_the_listing() {
+    let clock = extension(&[("1.0.0", "nightly", false), ("1.0.0", STABLE, true)]);
+    assert!(!clock.withdrew("1.0.0"));
+    assert!(!clock.withdrew("0.9.0"));
 }

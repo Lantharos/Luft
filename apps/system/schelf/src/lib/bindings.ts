@@ -825,6 +825,11 @@ export type StoreUpdate = {
 	 *  run inside Luft, where the update moves it.
 	 */
 	movesInside: boolean,
+	/**
+	 *  Whether it's an extension inside Luft whose approval schelf.store took
+	 *  back, which the update moves into a sandbox.
+	 */
+	movesOut: boolean,
 };
 
 export type Switch = "downloads" | "x11" | "microphone" | "camera";

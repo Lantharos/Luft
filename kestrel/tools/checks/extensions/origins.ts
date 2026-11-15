@@ -84,6 +84,13 @@ async function checkApprovedUpdate() {
     `a newer release that isn't approved yet doesn't replace the approved one (${refusal})`);
 }
 
+async function checkWithdrawnApproval() {
+  await installFromStore('marker', SANDBOXED_STORE, {version: '1.1.0', approved: false});
+  const sandboxed = await reaches(SANDBOXED_STORE, 'store-sandboxed', 'running', 'once its approval is taken back, the same release moves into a sandbox');
+  require(sandboxed.version === '1.1.0' && !exists(storeFolder(SANDBOXED_STORE)), 'and no copy is left inside the desktop');
+  await eventually(() => sandboxHosts(SANDBOXED_STORE).length > 0, 'it runs in a host of its own again');
+}
+
 async function checkStoreDrawing() {
   await installFromStore('marker', STORE_DRAWING, {version: '1.0.0', approved: false, permissions: ['wallpaper']});
   const drawing = await reaches(STORE_DRAWING, 'store-sandboxed', 'store-only', 'a store release that draws on the wallpaper, not approved to run inside the desktop, waits');
@@ -122,6 +129,7 @@ export async function run() {
     await checkOwnFolder();
     await checkSandboxedStore();
     await checkApprovedUpdate();
+    await checkWithdrawnApproval();
     await checkStoreDrawing();
     await checkOwnNewerLuft();
     await checkNewerLuft();

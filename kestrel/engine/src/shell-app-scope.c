@@ -432,11 +432,17 @@ start_apps_through_kestrel (void)
   g_autofree char *program = build
     ? g_build_filename (build, "app-start", KESTREL_APP_START, NULL)
     : g_build_filename (KESTREL_LIBEXECDIR, KESTREL_APP_START, NULL);
+
+  g_setenv ("GIO_LAUNCH_DESKTOP", program, TRUE);
+}
+
+void
+shell_app_scope_remember_file_limit (void)
+{
   struct rlimit limit;
 
   if (getrlimit (RLIMIT_NOFILE, &limit) == 0)
     g_snprintf (file_limit, sizeof (file_limit), "%llu", (unsigned long long) limit.rlim_cur);
-  g_setenv ("GIO_LAUNCH_DESKTOP", program, TRUE);
 }
 
 void

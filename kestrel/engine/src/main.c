@@ -22,6 +22,7 @@
 #include <elf.h>
 #endif
 
+#include "shell-app-scope-private.h"
 #include "shell-global.h"
 #include "shell-global-private.h"
 #include "st.h"
@@ -637,6 +638,7 @@ main (int argc, char **argv)
 
   shell_profiler_init ();
 
+  shell_app_scope_remember_file_limit ();
   meta_context_raise_rlimit_nofile (context, NULL);
 
   if (!meta_context_start (context, &error))

@@ -7,6 +7,7 @@
 
 typedef struct _ShellAppScope ShellAppScope;
 
+void shell_app_scope_remember_file_limit (void);
 void shell_app_scope_init (void);
 
 ShellAppScope *shell_app_scope_new (void);

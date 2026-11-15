@@ -13,6 +13,7 @@ import type { Monitor } from '../desktop/panel/panel.js';
 import { PanelSet } from '../desktop/panel/panels.js';
 import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
 import { WindowPreviews } from '../desktop/panel/windowPreviews.js';
+import { OverflowPopup } from '../desktop/panel/taskbar/overflow/overflowPopup.js';
 import { TaskView } from '../desktop/taskView/taskView.js';
 import { wallpaperFloor } from '../desktop/wallpaper/floor.js';
 import { wallpaperPictures, watchWallpaperPictures } from '../desktop/wallpaper/pictures.js';
@@ -54,6 +55,7 @@ export class DesktopUi {
   private readonly menus: ContextMenus;
   private readonly workspaces: Workspaces;
   private readonly previews: WindowPreviews;
+  private readonly overflow: OverflowPopup;
   private readonly panels: PanelSet;
   private readonly quick: QuickSettings;
   private readonly taskView: TaskView;
@@ -92,6 +94,7 @@ export class DesktopUi {
       actor => this.panels?.containing(actor)?.edgeOf(actor) ?? null);
     this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);
+    this.overflow = new OverflowPopup(this.menus, actor => monitorAt(...actor.get_transformed_position()), () => this.previews.close());
     this.board = new Board({
       monitors: () => context.layoutManager.monitors,
       primary: () => context.layoutManager.primaryMonitor,
@@ -220,6 +223,8 @@ export class DesktopUi {
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
+    context.layoutManager.addTopChrome(this.overflow.shield);
+    context.layoutManager.addTopChrome(this.overflow.actor);
     this.post = createPost(this.extensions.host);
 
     this.panels = new PanelSet(context.layoutManager, monitor => ({
@@ -229,13 +234,13 @@ export class DesktopUi {
       activateWindow: context.activateWindow,
       stopScreencast: context.stopScreencast,
       arrange: () => this.arrangeTaskbar(),
-    }), this.menus, this.previews, () => {
+    }), this.menus, this.previews, this.overflow, () => {
       place();
       this.syncSession();
     });
     this.quick.updateStatus();
-    const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
-    for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
+    const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible || this.overflow.actor.visible);
+    for (const actor of [this.menus.actor, this.previews.actor, this.overflow.actor]) actor.connect('notify::visible', holdPanels);
     this.disconnectors.push(followUserLanguage());
     this.disconnectors.push(taskbarPreferences.watch(key => {
       if (key === 'taskbar-arrangement' || key === 'tablet') this.followTaskbarEdge();
@@ -293,7 +298,7 @@ export class DesktopUi {
       this.watch(context.screenShield, 'locked', () => clipboard.clear());
     }
     context.registerPanel(this.panels.primary.actor);
-    for (const actor of [this.previews.actor, this.taskView.actor])
+    for (const actor of [this.previews.actor, this.overflow.actor, this.taskView.actor])
       navigateWithKeyboard(actor);
     this.watch(context.layoutManager, 'monitors-changed', () => {
       this.dismissImmediately();
@@ -462,6 +467,7 @@ export class DesktopUi {
 
   dismissImmediately(): void {
     this.surfaces.dismissImmediately();
+    this.overflow.close(true);
   }
 
   lockControls(): LockControls {

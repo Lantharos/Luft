@@ -3,6 +3,7 @@ import { navigateWithKeyboard } from '../../shared/input/keyboardNavigation.js';
 import { KestrelPanel, type Monitor, type PanelActions } from './panel.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import type { WindowPreviews } from './windowPreviews.js';
+import type { OverflowPopup } from './taskbar/overflow/overflowPopup.js';
 import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
 import { WindowOverlap } from './autoHide/windowOverlap.js';
 import { EdgeSwipe } from './tablet/edgeSwipe.js';
@@ -35,6 +36,7 @@ export class PanelSet {
     private readonly actions: (monitor: () => Monitor) => PanelActions,
     private readonly menus: ContextMenus,
     private readonly previews: WindowPreviews,
+    private readonly overflow: OverflowPopup,
     private readonly changed: () => void,
   ) {
     this.primary = this.create(() => layoutManager.primaryMonitor!, layoutManager.primaryMonitor, true);
@@ -203,7 +205,7 @@ export class PanelSet {
   }
 
   private create(monitor: () => Monitor, initial: Monitor | null, primary: boolean): KestrelPanel {
-    const panel = new KestrelPanel(this.actions(monitor), this.menus, this.previews, initial, primary);
+    const panel = new KestrelPanel(this.actions(monitor), this.menus, this.previews, this.overflow, initial, primary);
     panel.arranged = () => {
       this.syncStrut(panel);
       if (panel === this.primary) this.placeCorner();

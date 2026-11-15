@@ -9,7 +9,7 @@ session_timeout=30m
 max_startup_failures=3
 max_sign_ins=8
 inotify_per_session=24
-declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
+declare -A screens=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm [small]=1280x720 [square]=1024x768 [portrait]=800x1280)
 taskbar_positions=(left top right)
 scaled_groups="appearance:glass board:board board:corner board:glass board:touch board:view board:x11 input:scrolling panel:battery panel:markup panel:repaints panel:screenshot"
 edge_groups="taskbar:hiddenTaskbar taskbar:taskbar taskbar:taskbarOptions start:start panel:motion panel:repaints panel:screenshot panel:surfaces"
@@ -19,8 +19,11 @@ declare -A variant_groups=(
   [left]="$edge_groups taskbar:ink tiling:layouts tiling:scrolling tiling:scrollingMotion"
   [top]="$edge_groups tiling:layouts tiling:scrolling"
   [right]="$edge_groups tiling:monitors"
+  [small]="taskbar:overflow tablet:taskbar"
+  [square]="taskbar:overflow"
+  [portrait]="taskbar:overflow"
 )
-two_display_groups=(tiling:monitors system:dimming windows:seeThroughMaterials taskbar:arrangement desktop:playthings restore:monitors)
+two_display_groups=(tiling:monitors system:dimming windows:seeThroughMaterials taskbar:arrangement taskbar:overflow desktop:playthings restore:monitors)
 second_display=1280x720
 
 usage() {
@@ -121,7 +124,7 @@ start_worker() {
     position="$variant"
     captures="$KESTREL_CAPTURE_DIR/taskbar-$variant"
   elif [[ -n "$variant" && "$variant" != default ]]; then
-    capture_size="${laptops[$variant]}"
+    capture_size="${screens[$variant]}"
     captures="$KESTREL_CAPTURE_DIR/$variant"
   fi
   mkdir -p "$captures"

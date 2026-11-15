@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
-  completeArrangement, DEFAULT_ARRANGEMENT, joinedGroups, layIslands, mainEdge, moveBar, moveElement, moveIsland,
+  completeArrangement, DEFAULT_ARRANGEMENT, fitAlong, joinedGroups, layIslands, mainEdge, moveBar, moveElement, moveIsland,
   parseArrangement, presetArrangement, spotTargets, stepElement, stepIsland, storeArrangement, type Arrangement, type IslandFrame, type Spot,
 } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
@@ -85,6 +85,31 @@ describe('editing', () => {
     const arrangement: Arrangement = [{ spot: 'top-end', elements: ['clock'] }, { spot: 'left-center', elements: ['dock'] }, { spot: 'left-end', elements: ['tray'] }];
     expect(mainEdge(arrangement)).toBe('left');
     expect(joinedGroups(arrangement, 'left')).toEqual({ start: [], center: ['dock'], end: ['tray', 'clock'] });
+  });
+});
+
+describe('fitting islands along an edge', () => {
+  const apps = (length: number) => ({ chrome: 8, spacing: 2, parts: [{ id: 'start', length: 40 }, { id: 'dock', length, least: 42 }] });
+  const system = { chrome: 8, spacing: 2, parts: [{ id: 'weather', length: 120, rank: 0 }, { id: 'tray', length: 40, rank: 1 }, { id: 'status', length: 80 }, { id: 'clock', length: 70, rank: 2 }] };
+
+  test('leaves islands that fit as they are and offers the apps the room that is left', () => {
+    const fitted = fitAlong([apps(300), system], 1000, 8);
+    expect(fitted.lengths).toEqual([8 + 40 + 2 + 300, 8 + 120 + 40 + 80 + 70 + 6]);
+    expect(fitted.room.get('dock')).toBe(1000 - 8 - (8 + 40 + 2) - fitted.lengths[1]);
+    expect(fitted.dropped).toEqual([]);
+  });
+
+  test('only the apps give way when there are too many of them', () => {
+    const fitted = fitAlong([apps(1200), system], 1000, 8);
+    expect(fitted.lengths[1]).toBe(8 + 120 + 40 + 80 + 70 + 6);
+    expect(fitted.lengths[0] + 8 + fitted.lengths[1]).toBe(1000);
+    expect(fitted.dropped).toEqual([]);
+  });
+
+  test('folds away extensions, then the tray, then the clock once even the apps can shrink no further', () => {
+    expect(fitAlong([apps(600), system], 310, 8).dropped).toEqual(['weather']);
+    expect(fitAlong([apps(600), system], 260, 8).dropped).toEqual(['weather', 'tray']);
+    expect(fitAlong([apps(600), system], 200, 8).dropped).toEqual(['weather', 'tray', 'clock']);
   });
 });
 

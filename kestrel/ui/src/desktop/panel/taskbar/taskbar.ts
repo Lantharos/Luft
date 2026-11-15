@@ -5,6 +5,8 @@ import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { WindowPreviews } from '../windowPreviews.js';
+import type { OverflowPopup } from './overflow/overflowPopup.js';
+import { AppOverflow } from './overflow/appOverflow.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
@@ -37,14 +39,16 @@ interface AppItem {
 
 export class Taskbar {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-app-slots' });
+  readonly overflow: AppOverflow;
   private readonly items = new Map<string, AppItem>();
+  private apps: Shell.App[] = [];
   private initialized = false;
   private readonly disconnectors: (() => void)[] = [];
   private metrics: TaskbarMetrics = taskbarPreferences.desktop.metrics;
   private edge: Edge = taskbarPreferences.desktop.edge;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
-    private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
+    overflowPopup: OverflowPopup, private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
     private readonly windowsOf: (app: Shell.App) => Meta.Window[],
     private readonly activateWindow: (window: Meta.Window) => void, private readonly open: (app: Shell.App) => void) {
     new TaskbarDrop(this.actor, () => {
@@ -54,12 +58,25 @@ export class Taskbar {
         .filter((item): item is AppItem => !!item && pinned.has(item.app.id))
         .map(item => ({ id: item.app.id, slot: item.slot, button: item.button }));
     }, favorites, () => isVertical(this.edge));
+    this.overflow = new AppOverflow({
+      frame: () => this.frame,
+      icon: app => taskbarAppIcon(app, this.iconSize, this.artworkFill),
+      windowsOf, attention: app => this.attention(app), focused: app => this.tracker.focus_app === app,
+      pinned: app => this.pinned().has(app.id), activate: (app, source) => this.activate(app, source),
+      entries: app => menus.appEntries(app, windowsOf(app), () => open(app)), monitorIndex,
+      changed: () => this.update(this.apps),
+    }, overflowPopup, this.metrics, this.edge);
+    this.actor.add_child(this.overflow.slot);
     const display = global.display;
     const refresh = () => this.updateIndicators();
     const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];
     this.disconnectors.push(
       () => signals.forEach(id => display.disconnect(id)),
-      launcherEntries.watch(appId => { const item = this.items.get(appId); if (item) this.updateIndicator(item); }),
+      launcherEntries.watch(appId => {
+        const item = this.items.get(appId);
+        if (item) this.updateIndicator(item);
+        else this.overflow.recheck(this.apps);
+      }),
       appIcons.watch(() => this.relayout()),
       taskbarPreferences.watch(key => { if (key === 'taskbar-badges') refresh(); }),
     );
@@ -68,6 +85,7 @@ export class Taskbar {
   }
 
   shutdown(): void {
+    this.overflow.stop();
     for (const disconnect of this.disconnectors) disconnect();
     this.disconnectors.length = 0;
   }
@@ -78,6 +96,7 @@ export class Taskbar {
 
   resize(metrics: TaskbarMetrics): void {
     this.metrics = metrics;
+    this.overflow.layout(metrics, this.edge);
     for (const item of this.items.values()) {
       this.layoutItem(item);
       if (!item.removing) animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: Duration.moderate, curve: Curve.settle });
@@ -88,16 +107,23 @@ export class Taskbar {
   reorient(edge: Edge): void {
     this.edge = edge;
     this.actor.orientation = this.vertical ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
-    for (const item of this.items.values()) {
+    this.overflow.layout(this.metrics, edge);
+    for (const [id, item] of this.items) {
       item.slot.remove_all_transitions();
+      if (item.removing) {
+        this.items.delete(id);
+        item.slot.destroy();
+        continue;
+      }
       item.slot.set_size(this.metrics.button, this.metrics.button);
-      if (!item.removing) item.slot[this.lengthKey] = this.slotLength;
+      item.slot[this.lengthKey] = this.slotLength;
       this.layoutItem(item);
       this.updateDots(item);
     }
   }
 
   private relayout(): void {
+    this.overflow.layout(this.metrics, this.edge);
     for (const item of this.items.values()) {
       this.layoutItem(item);
       this.updateDots(item);
@@ -158,16 +184,22 @@ export class Taskbar {
 
   private updateIndicators(): void {
     for (const item of this.items.values()) this.updateIndicator(item);
+    this.overflow.recheck(this.apps);
+  }
+
+  private attention(app: Shell.App): boolean {
+    return launcherEntries.get(app.id).urgent ||
+      (this.tracker.focus_app !== app && this.windowsOf(app).some(window => window.demands_attention || window.urgent));
   }
 
   private updateIndicator(item: AppItem): void {
-    const attention = this.tracker.focus_app !== item.app &&
-      this.windowsOf(item.app).some(window => window.demands_attention || window.urgent);
-    item.indicators.update(launcherEntries.get(item.app.id), attention, taskbarPreferences.badges);
+    item.indicators.update(launcherEntries.get(item.app.id), this.attention(item.app), taskbarPreferences.badges);
     this.updateDots(item);
   }
 
-  update(apps: Shell.App[]): void {
+  update(all: Shell.App[]): void {
+    this.apps = all;
+    const apps = this.overflow.split(all);
     const wanted = new Set(apps.map(app => app.id));
     const pinned = this.pinned();
     for (const [id, item] of this.items) {
@@ -213,6 +245,7 @@ export class Taskbar {
       animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
       animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
     });
+    this.actor.set_child_above_sibling(this.overflow.slot, null);
     this.initialized = true;
     this.updateFocus();
   }
@@ -307,18 +340,19 @@ export class Taskbar {
     });
     this.previews.bind(button, () => item.app, () => this.windowsOf(item.app));
     this.menus.bind(button, () => this.menus.appEntries(item.app, this.windowsOf(item.app), () => this.open(item.app)));
-    button.connect('clicked', () => {
-      const app = item.app;
-      const windows = this.windowsOf(app);
-      if (windows.length > 1) { this.previews.open(button, app, windows, true); return; }
-      this.previews.close();
-      if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
-      else if (windows.length === 1) this.activateWindow(windows[0]);
-      else {
-        launchHistory.record(appKey(app.id));
-        this.open(app);
-      }
-    });
+    button.connect('clicked', () => this.activate(item.app, button));
     return item;
+  }
+
+  private activate(app: Shell.App, source: St.Button): void {
+    const windows = this.windowsOf(app);
+    if (windows.length > 1) { this.previews.open(source, app, windows, true); return; }
+    this.previews.close();
+    if (this.tracker.focus_app === app && windows.length === 1) windows[0].minimize();
+    else if (windows.length === 1) this.activateWindow(windows[0]);
+    else {
+      launchHistory.record(appKey(app.id));
+      this.open(app);
+    }
   }
 }

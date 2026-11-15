@@ -12,6 +12,7 @@ import {fixture, spawn, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {remember} from '../lib/settings.js';
 import {pause, settled} from '../lib/wait.js';
+import {crowding} from './lib/parts.js';
 
 const {require, eventually} = checks('taskbar arrangement');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -93,6 +94,8 @@ async function checkPresets(window: Meta.Window, color: number[]) {
     const shownIslands = islands().map(boxOf);
     require(shownIslands.every((box, index) => shownIslands.every((other, otherIndex) => index === otherIndex || !overlaps(box, other))),
       `the islands of the ${name} arrangement don't overlap`);
+    const crowded = crowding(existing('kestrel-panel'));
+    require(!crowded, `nothing in the ${name} arrangement overlaps${crowded ? ` (${crowded})` : ''}`);
     await capture(`taskbar-preset-${name}`);
     if (!(name in expected)) continue;
     window.maximize();

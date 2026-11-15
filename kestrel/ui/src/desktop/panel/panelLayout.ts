@@ -5,6 +5,7 @@ import { alongOf, layIslands, placeAlong, type Box } from '../../../../../packag
 import { isVertical, rightToLeft } from '../../shared/layout/edge.js';
 import { animateActor, Spring } from '../../shared/motion/motion.js';
 import type { Island } from './islands/islandSet.js';
+import type { IslandFit } from './islands/islandFit.js';
 import { STRIP_HEIGHT, taskbarPreferences, type TaskbarLayout } from './preferences/taskbarPreferences.js';
 
 function naturalSize(child: Clutter.Actor): [number, number] {
@@ -21,6 +22,7 @@ export const PanelLayout = GObject.registerClass(
     screen: () => TaskbarLayout = () => taskbarPreferences.desktop;
     islands: () => readonly Island[] = () => [];
     peek: Clutter.Actor | null = null;
+    fit!: IslandFit;
     readonly glide = new Clutter.Actor({ width: 0, height: 0 });
     private from = new Map<Clutter.Actor, Box>();
     private allocated = new Map<Clutter.Actor, Box>();
@@ -58,7 +60,9 @@ export const PanelLayout = GObject.registerClass(
       const height = allocation.get_height();
       const screen = this.screen();
       const islands = this.islands();
+      this.fit.begin();
       const boxes = screen.joined ? this.alongBar(islands, width, height) : this.onScreen(islands, width, height);
+      this.fit.finish();
       const progress = this.glide.translation_x;
       this.allocated = new Map(islands.map((island, index) => [island.actor, boxes[index]]));
       for (const [actor, box] of this.allocated) {
@@ -69,6 +73,7 @@ export const PanelLayout = GObject.registerClass(
         } : box;
         actor.allocate(actorBox(shown));
       }
+      islands.forEach(island => this.clip(island, this.allocated.get(island.actor)!));
       this.glide.allocate(new Clutter.ActorBox());
       for (const child of container.get_children()) {
         if (!this.allocated.has(child) && child !== this.peek && child !== this.glide) child.allocate(actorBox({ x: 0, y: 0, width, height: STRIP_HEIGHT }));
@@ -91,9 +96,11 @@ export const PanelLayout = GObject.registerClass(
       };
       peek.allocate(actorBox(box(length - peekLength, peekLength, across)));
       const sizes = islands.map(island => naturalSize(island.actor)).map(([w, h]) => vertical ? [h, w] : [w, h]);
-      const starts = placeAlong({ start: inset, end: length - peekLength - inset },
-        islands.map((island, index) => ({ along: alongOf(island.spot), length: sizes[index][0] })), inset, length / 2);
-      return islands.map((_, index) => box(starts[index], sizes[index][0], sizes[index][1]));
+      const span = { start: inset, end: length - peekLength - inset };
+      const settled = islands.every(island => isVertical(island.edge) === vertical);
+      const lengths = settled ? this.fit.lengths(islands, span.end - span.start, inset) : sizes.map(([along]) => along);
+      const starts = placeAlong(span, islands.map((island, index) => ({ along: alongOf(island.spot), length: lengths[index] })), inset, length / 2);
+      return islands.map((_, index) => box(starts[index], lengths[index], sizes[index][1]));
     }
 
     private onScreen(islands: readonly Island[], width: number, height: number): Box[] {
@@ -101,9 +108,21 @@ export const PanelLayout = GObject.registerClass(
       this.peek?.allocate(new Clutter.ActorBox());
       const placed = layIslands(islands.map(island => {
         const [naturalWidth, naturalHeight] = naturalSize(island.actor);
-        return { spot: island.spot, length: isVertical(island.edge) ? naturalHeight : naturalWidth };
-      }), { width, height, thickness, margin, rightToLeft: rightToLeft() });
+        return { island, spot: island.spot, length: isVertical(island.edge) ? naturalHeight : naturalWidth };
+      }), { width, height, thickness, margin, rightToLeft: rightToLeft() },
+      (edgeIslands, span, gap) => this.fit.lengths(edgeIslands.map(({ island }) => island), span, gap));
       return islands.map(island => placed.find(box => box.spot === island.spot)!);
+    }
+
+    private clip({ actor, edge }: Island, { width, height }: Box): void {
+      const vertical = isVertical(edge);
+      const [naturalWidth, naturalHeight] = naturalSize(actor);
+      if (vertical ? height >= naturalHeight : width >= naturalWidth) {
+        if (actor.has_clip) actor.remove_clip();
+        return;
+      }
+      if (vertical) actor.set_clip(-width, 0, 3 * width, height);
+      else actor.set_clip(0, -height, width, 3 * height);
     }
   },
 );

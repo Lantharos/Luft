@@ -6,6 +6,7 @@ import St from 'gi://St';
 
 import { PanelLayout } from './panelLayout.js';
 import type { WindowPreviews } from './windowPreviews.js';
+import type { OverflowPopup } from './taskbar/overflow/overflowPopup.js';
 import { Taskbar } from './taskbar/taskbar.js';
 import { takeDroppedFiles } from './taskbar/fileDrop.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
@@ -27,6 +28,7 @@ import { TaskbarElements } from './elements/panelElements.js';
 import { TRAY_ICON_SIZE } from '../tray/icon.js';
 import { IslandSet, type Island } from './islands/islandSet.js';
 import { IslandShapes, type IslandShape, taskbarShapesChanged } from './islands/shapes.js';
+import { IslandFit } from './islands/islandFit.js';
 import { PanelTablet } from './tablet/panelTablet.js';
 import { alongOf, moveBar } from '../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
@@ -81,8 +83,9 @@ export class KestrelPanel {
   private readonly refreshAfterMotion = () => this.refreshApps();
   private readonly updateFocusAfterMotion = () => this.taskbar.updateFocus();
 
-  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
-    this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
+  constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, overflow: OverflowPopup, public monitor: Monitor | null,
+    readonly primary: boolean) {
+    this.taskbar = new Taskbar(this.tracker, menus, previews, overflow, this.favorites, () => this.monitor?.index ?? -1,
       app => this.windowsOf(app), window => {
         actions.activateWindow(window);
         this.tablet.collapse();
@@ -110,6 +113,7 @@ export class KestrelPanel {
     this.elements = new TaskbarElements(this.launcher.button, this.taskbar, menus, actions, primary, edge => ({
       vertical: isVertical(edge), thickness: this.screen.metrics.button, button: this.screen.metrics.button, icon: TRAY_ICON_SIZE,
     }));
+    this.layout.fit = new IslandFit(this.elements, this.taskbar.overflow);
     this.islandSet = new IslandSet(this.actor, this.elements, islands => {
       this.surface?.sync();
       for (const island of islands) this.autoHide.follow(island.actor);
@@ -189,6 +193,7 @@ export class KestrelPanel {
   shutdown(): void {
     dropAfterMotion(this.refreshAfterMotion, this.updateFocusAfterMotion);
     this.morph.stop();
+    this.layout.fit.stop();
     this.unwatchPreferences();
     this.workspaceWindows?.destroy();
     this.workspaceWindows = null;

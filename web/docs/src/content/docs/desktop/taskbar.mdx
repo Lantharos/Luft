@@ -11,6 +11,8 @@ asks:
   - { ask: hide badges, to: options }
   - { ask: app icon flashing, to: dots-badges-and-flashes }
   - { ask: dots under icons, to: dots-badges-and-flashes }
+  - { ask: too many apps on taskbar, to: when-apps-dont-fit }
+  - { ask: hidden taskbar apps, to: when-apps-dont-fit }
   - { ask: pin app to taskbar, to: pinning-apps, shared: true }
   - { ask: unpin app, to: pinning-apps }
   - { ask: system tray, to: the-tray }
@@ -43,6 +45,12 @@ The taskbar sits along the bottom of the screen, or wherever you [arrange it](#a
 Clicking an app opens it, switches to its window, or minimizes the window if it's already in front. When an app has several windows, clicking shows them all to choose from.
 
 Pinned apps come first, then any other app that's running.
+
+### When apps don't fit
+
+Start, the tray, the status icons, the clock and what extensions add always keep their size, and your apps make room for them. Apps in the middle of an edge first slide toward the side with more space. When there are still more apps than fit, the last ones go behind an arrow at the end of your apps. Click it, or tap it, for the rest, with the same dots, badges and menus; drag a pinned one onto the taskbar to move it there. The app you're using and apps that want your attention always stay on the taskbar, and the arrow flashes when an app behind it wants your attention.
+
+On a very small screen, where even the clock and status icons barely fit, what extensions add folds away first, then the tray, then the clock.
 
 Hover over an app, or press the arrow key that points away from the taskbar's edge, such as <kbd>Up</kbd> on the bottom, to see **live previews** of its windows, each with a close button.
 

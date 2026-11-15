@@ -6,6 +6,8 @@ taskbar-start = Start
 taskbar-quick-settings = Quick settings
 # Screen-reader label of the clock button that opens notifications and the calendar.
 taskbar-notifications-and-date = Notifications and date
+# Screen-reader label of the button at the end of the taskbar's apps that lists the apps there is no room for.
+taskbar-more-apps = More apps
 # Taskbar right-click menu item and screen-reader label of the corner area that minimizes all windows. "Show" is a verb.
 taskbar-show-desktop = Show desktop
 # Taskbar right-click menu item that opens the system monitor app.

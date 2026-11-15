@@ -20,6 +20,7 @@ export interface Placed {
 export function placeAlong(span: Span, items: Placed[], gap: number, middle = (span.start + span.end) / 2): number[] {
 	const ends = { start: span.start, end: span.end };
 	for (const { along, length } of items) {
+		if (!length) continue;
 		if (along === 'start') ends.start = Math.max(ends.start, span.start + length + gap);
 		if (along === 'end') ends.end = Math.min(ends.end, span.end - length - gap);
 	}
@@ -62,23 +63,32 @@ function bandOf(edge: Edge, { width, height, thickness, margin }: IslandFrame): 
 
 const overlaps = (a: Box, b: Box) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 
-function layEdge(edge: Edge, islands: { spot: Spot; length: number }[], span: Span, frame: IslandFrame): IslandBox[] {
+export interface Sized {
+	spot: Spot;
+	length: number;
+}
+
+export type Fitter<T extends Sized> = (islands: T[], span: number, gap: number) => number[];
+
+function layEdge<T extends Sized>(edge: Edge, islands: T[], span: Span, frame: IslandFrame, fit?: Fitter<T>): IslandBox[] {
 	const band = bandOf(edge, frame);
-	const starts = placeAlong(span, islands.map(({ spot, length }) => ({ along: alongOf(spot), length })), frame.margin);
-	return islands.map(({ spot, length }, index) => {
+	const lengths = fit ? fit(islands, span.end - span.start, frame.margin) : islands.map(({ length }) => length);
+	const starts = placeAlong(span, islands.map(({ spot }, index) => ({ along: alongOf(spot), length: lengths[index] })), frame.margin);
+	return islands.map(({ spot }, index) => {
+		const length = lengths[index];
 		if (isVerticalEdge(edge)) return { spot, edge, x: band.x, y: starts[index], width: band.width, height: length };
 		const x = frame.rightToLeft ? frame.width - starts[index] - length : starts[index];
 		return { spot, edge, x, y: band.y, width: length, height: band.height };
 	});
 }
 
-export function layIslands(islands: { spot: Spot; length: number }[], frame: IslandFrame): IslandBox[] {
+export function layIslands<T extends Sized>(islands: T[], frame: IslandFrame, fit?: Fitter<T>): IslandBox[] {
 	const on = (edge: Edge) => islands.filter(({ spot }) => edgeOf(spot) === edge);
 	const full = (edge: Edge): Span => {
 		const length = isVerticalEdge(edge) ? frame.height : frame.width;
 		return { start: frame.margin, end: length - frame.margin };
 	};
-	const boxes = (['top', 'bottom'] as const).flatMap((edge) => layEdge(edge, on(edge), full(edge), frame));
+	const boxes = (['top', 'bottom'] as const).flatMap((edge) => layEdge(edge, on(edge), full(edge), frame, fit));
 	for (const edge of ['left', 'right'] as const) {
 		const span = full(edge);
 		const first = layEdge(edge, on(edge), span, frame);
@@ -91,7 +101,7 @@ export function layIslands(islands: { spot: Spot; length: number }[], frame: Isl
 			if (horizontal === 'top') span.start = row.y + row.height + frame.margin;
 			else span.end = row.y - frame.margin;
 		}
-		boxes.push(...layEdge(edge, on(edge), span, frame));
+		boxes.push(...layEdge(edge, on(edge), span, frame, fit));
 	}
 	return boxes;
 }

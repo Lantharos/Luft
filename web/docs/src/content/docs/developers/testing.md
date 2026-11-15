@@ -30,7 +30,7 @@ The checks, stand-in services and test clients are TypeScript in `kestrel/tools`
 | `--jobs N` | Up to N sessions at once, by default one per four processors; `--jobs 1` runs every group in one session |
 | `--list` | Lists the groups |
 
-Some groups also run on two laptop panels at their automatic scale, or with the taskbar on another edge, as the groups ending in `+laptop`, `+laptop15`, `+left`, `+top` and `+right`, with their screenshots in folders of their own.
+Some groups also run on two laptop panels at their automatic scale, on small screens, or with the taskbar on another edge, as the groups ending in `+laptop`, `+laptop15`, `+small`, `+square`, `+portrait`, `+left`, `+top` and `+right`, with their screenshots in folders of their own.
 
 Each group has to leave the session as it found it: a group that leaves the screen locked, a dialog open, a setting changed or the displays arranged differently fails, so nothing it changed reaches the groups after it.
 

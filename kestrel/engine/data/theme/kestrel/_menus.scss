@@ -13,6 +13,25 @@
 }
 
 .kestrel-context-menu { @include context-menu; }
+
+.kestrel-app-overflow {
+  @include context-menu;
+
+  .kestrel-overflow-list { spacing: 2px; }
+  .kestrel-overflow-row { padding: 0 14px 0 0; border-radius: 12px; background-color: transparent; box-shadow: none; font-size: 13px; font-weight: 500; transition-duration: $motion-tap; }
+  .kestrel-overflow-row:hover, .kestrel-overflow-row:focus { background-color: fill(0.16); }
+  .kestrel-overflow-row:active { background-color: fill(0.24); }
+  .kestrel-overflow-row.kestrel-closing-selection { background-color: fill(0.16); }
+  .kestrel-overflow-row-content { spacing: 6px; }
+  .kestrel-running-dot { background-color: ink(0.6); }
+  .kestrel-task-progress { background-color: fill(0.18); }
+  .kestrel-task-progress-fill { background-color: ink(); }
+}
+.kestrel-app-overflow-touch {
+  .kestrel-overflow-list { spacing: 4px; }
+  .kestrel-overflow-row { padding-right: 18px; border-radius: 16px; font-size: 15px; }
+  .kestrel-task-attention { border-radius: 16px; }
+}
 .kestrel-hold-cue { border-radius: 999px; background-color: fill(0.2); }
 
 .popup-menu-boxpointer, .candidate-popup-boxpointer {

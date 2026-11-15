@@ -13,6 +13,7 @@ import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {clip} from '../../motion/film.js';
 import {fold, tap, touchDown, touchMove, touchUp} from './lib/touch.js';
+import {crowding} from '../taskbar/lib/parts.js';
 
 const {require, eventually} = checks('tablet taskbar');
 const STRIP = 24;
@@ -105,6 +106,8 @@ async function expandAndCollapse(window: Meta.Window) {
     {notes: 'Swiped up from the bottom edge and past fully open', width: fullWidth()}));
   require(lift < 0.5, `the taskbar stays on the bottom edge while it stretches (lifted ${lift}px)`);
   await eventually(expanded, 'swiping up from the bottom edge expands the taskbar');
+  const crowded = crowding(panel());
+  require(!crowded, `nothing on the tablet taskbar overlaps${crowded ? ` (${crowded})` : ''}`);
   await capture('tablet-expanded');
 
   const app = Shell.WindowTracker.get_default().get_window_app(window);

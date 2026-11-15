@@ -105,7 +105,6 @@ impl Format {
         let mut options = no_options();
         options.insert("label", Variant::from(self.label.as_str()));
         options.insert("update-partition-type", Variant::from(typed));
-        options.insert("tear-down", Variant::from(true));
         if self.filesystem.owned() {
             options.insert("take-ownership", Variant::from(true));
         }
@@ -137,12 +136,15 @@ impl Format {
 }
 
 pub async fn format_volume(block: &str, format: &Format) -> Result<(), String> {
-    mounting::release(block).await?;
+    let objects = udisks::objects().await?;
+    mounting::release_in(&objects, block).await?;
+    let mut options = format.options(true, true);
+    options.extend(mounting::tear_down(&objects, block));
     udisks::run(
         block,
         BLOCK,
         "Format",
-        &(format.filesystem.as_str(), format.options(true, true)),
+        &(format.filesystem.as_str(), options),
     )
     .await?;
     format.remember(block).await
@@ -164,8 +166,7 @@ pub async fn format_drive(
     } else {
         "gpt"
     };
-    let mut options = no_options();
-    options.insert("tear-down", Variant::from(true));
+    let mut options = mounting::tear_down(&objects, block);
     if format.erase {
         options.insert("erase", Variant::from("zero"));
     }

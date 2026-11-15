@@ -5,7 +5,11 @@ use luft_dbus::objects::Objects;
 use zbus::{OwnedVariant, Variant};
 
 use crate::udisks::system::SYSTEM_MOUNTS;
-use crate::udisks::{self, BLOCK, ENCRYPTED, FILESYSTEM, SWAP, no_options, text_bytes};
+use crate::udisks::{
+    self, BLOCK, ENCRYPTED, FILESYSTEM, Options, PARTITION, SWAP, no_options, text_bytes,
+};
+
+type Configuration = Vec<(String, HashMap<String, OwnedVariant>)>;
 
 const SYSTEM_TREES: &[&str] = &[
     "/usr", "/etc", "/boot", "/efi", "/sysroot", "/proc", "/sys", "/dev",
@@ -53,6 +57,35 @@ pub async fn release_in(objects: &Objects, block: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Removing what `/etc/fstab` and `/etc/crypttab` say about a block asks for
+/// an administrator every time, so it is only asked for when they say anything.
+pub fn tear_down(objects: &Objects, block: &str) -> Options<'static> {
+    let mut options = no_options();
+    if configured(objects, block) {
+        options.insert("tear-down", Variant::from(true));
+    }
+    options
+}
+
+fn configured(objects: &Objects, block: &str) -> bool {
+    let listed = |interface: &str, property: &str| {
+        objects
+            .get(block, interface)
+            .and_then(|object| object.get::<Configuration>(property))
+            .is_some_and(|items| !items.is_empty())
+    };
+    let child_of = |interface, link| {
+        objects
+            .implementing(interface)
+            .filter(move |child| child.link(link).as_deref() == Some(block))
+    };
+    listed(BLOCK, "Configuration")
+        || listed(ENCRYPTED, "ChildConfiguration")
+        || child_of(BLOCK, "CryptoBackingDevice")
+            .chain(child_of(PARTITION, "Table"))
+            .any(|child| configured(objects, child.path))
+}
+
 fn resolved(path: &Path) -> PathBuf {
     path.ancestors()
         .find_map(|ancestor| {
@@ -97,7 +130,7 @@ pub async fn set_startup(
     let objects = udisks::objects().await?;
     let target = objects.get(block, BLOCK).ok_or("This volume is gone")?;
     let current = target
-        .get::<Vec<(String, HashMap<String, OwnedVariant>)>>("Configuration")
+        .get::<Configuration>("Configuration")
         .unwrap_or_default()
         .into_iter()
         .find(|(kind, _)| kind == "fstab");

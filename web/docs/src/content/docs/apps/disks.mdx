@@ -48,7 +48,7 @@ Disks shows the drives in your computer and the ones you plug in. Each drive is 
 - **Format by purpose**: *All computers* (exFAT), *Linux only* (ext4), or *Other* for Btrfs, NTFS and FAT32. Optionally encrypt it with a passphrase, or overwrite old data.
 - **Edit partitions**: create, delete, grow, shrink and move them. Changes collect as a plan you can undo, and apply in one step.
 
-Anything that erases data asks first, and erasing a whole drive built into the computer asks you to type the drive's name. You can look at the drive Luft runs from, but the partitions it uses can't be changed, except that Luft itself can grow, shrink and move. Changes that need an administrator ask for your password.
+Anything that erases data asks first, and erasing a whole drive built into the computer asks you to type the drive's name. You can look at the drive Luft runs from, but the partitions it uses can't be changed, except that Luft itself can grow, shrink and move. Formatting a USB drive or memory card asks for no password, or once for ext4. A drive built into the computer asks for an administrator's password once, and once more when it was set to mount at startup.
 
 While Disks is formatting, moving partitions or copying a disk image, the computer doesn't go to sleep, turning it off asks first, and Disks stays open until it's done. Moving a partition keeps track of how far it got: if the power goes out or the drive is unplugged partway, Disks offers to finish the move the next time it opens with that drive connected. Until then the partition can't be opened and the drive can't be changed, but nothing on it is lost.
 

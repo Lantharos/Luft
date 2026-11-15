@@ -1,11 +1,9 @@
-use zbus::Variant;
-
 use crate::mounting;
-use crate::udisks::{self, PARTITION, no_options};
+use crate::udisks::{self, PARTITION};
 
 pub async fn delete(block: &str) -> Result<(), String> {
-    mounting::release(block).await?;
-    let mut options = no_options();
-    options.insert("tear-down", Variant::from(true));
+    let objects = udisks::objects().await?;
+    mounting::release_in(&objects, block).await?;
+    let options = mounting::tear_down(&objects, block);
     udisks::run(block, PARTITION, "Delete", &(options,)).await
 }

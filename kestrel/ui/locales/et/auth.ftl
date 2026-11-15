@@ -25,6 +25,9 @@ lock-screen-suspend = Unerežiim
 lock-screen-restart = Taaskäivita…
 lock-screen-power-off = Lülita välja…
 lock-inhibit-reason = Kestrel peab ekraani lukustama
+usb-protection-refused-title = Uued USB-seadmed on ootel
+usb-protection-refused-body = Luft ei suutnud kinnitada, et just sinu töölaud sai lukust avatud. Klahvistikud ja hiired töötavad endiselt.
+usb-protection-refused-settings = Seadistused
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 

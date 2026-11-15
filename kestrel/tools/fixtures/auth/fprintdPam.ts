@@ -6,8 +6,8 @@ import type {Request} from './framing.js';
 export const MAX_TRIES = 3;
 const FPRINTD = 'net.reactivated.Fprint';
 const DEVICE = 'net.reactivated.Fprint.Device';
-const INSTRUCTION = 'Place your finger on the fingerprint reader';
-const RETRIES: Record<string, string> = {
+export const INSTRUCTION = 'Place your finger on the fingerprint reader';
+export const RETRIES: Record<string, string> = {
   'verify-retry-scan': 'Scan your finger again',
   'verify-swipe-too-short': 'Swipe was too short, try again',
   'verify-finger-not-centered': 'Your finger was not centered, try swiping your finger again',
@@ -25,8 +25,8 @@ export const delay = (milliseconds: number) => new Promise<void>(resolve => GLib
   return GLib.SOURCE_REMOVE;
 }));
 
-function fprintd(path: string, iface: string, method: string, parameters: GLib.Variant | null = null) {
-  return new Promise<GLib.Variant>((resolve, reject) => Gio.DBus.system.call(FPRINTD, path, iface, method, parameters, null,
+function fprintd(bus: Gio.DBusConnection, path: string, iface: string, method: string, parameters: GLib.Variant | null = null) {
+  return new Promise<GLib.Variant>((resolve, reject) => bus.call(FPRINTD, path, iface, method, parameters, null,
     Gio.DBusCallFlags.NONE, -1, null, (connection, result) => {
       try {
         resolve(connection!.call_finish(result));
@@ -48,15 +48,15 @@ export interface Reader {
   stop(): void;
 }
 
-export async function openReader(user: string, closed: Promise<void>): Promise<Reader | null> {
-  const [device] = (await fprintd('/net/reactivated/Fprint/Manager', `${FPRINTD}.Manager`, 'GetDefaultDevice')).deepUnpack<[string]>();
-  const [fingers] = (await fprintd(device, DEVICE, 'ListEnrolledFingers', new GLib.Variant('(s)', [user]))).deepUnpack<[string[]]>();
+export async function openReader(user: string, closed: Promise<void>, bus = Gio.DBus.system): Promise<Reader | null> {
+  const [device] = (await fprintd(bus, '/net/reactivated/Fprint/Manager', `${FPRINTD}.Manager`, 'GetDefaultDevice')).deepUnpack<[string]>();
+  const [fingers] = (await fprintd(bus, device, DEVICE, 'ListEnrolledFingers', new GLib.Variant('(s)', [user]))).deepUnpack<[string[]]>();
   if (!fingers.length)
     return null;
-  await fprintd(device, DEVICE, 'Claim', new GLib.Variant('(s)', [user]));
+  await fprintd(bus, device, DEVICE, 'Claim', new GLib.Variant('(s)', [user]));
   const results: string[] = [];
   let waiting: (() => void) | null = null;
-  let subscription = Gio.DBus.system.signal_subscribe(FPRINTD, DEVICE, 'VerifyStatus', device, null, Gio.DBusSignalFlags.NONE,
+  let subscription = bus.signal_subscribe(FPRINTD, DEVICE, 'VerifyStatus', device, null, Gio.DBusSignalFlags.NONE,
     (_connection, _sender, _path, _iface, _signal, parameters) => {
       results.push(parameters.deepUnpack<[string, boolean]>()[0]);
       waiting?.();
@@ -72,15 +72,15 @@ export async function openReader(user: string, closed: Promise<void>): Promise<R
       return results.shift() ?? null;
     },
     verify: async () => {
-      await fprintd(device, DEVICE, 'VerifyStart', new GLib.Variant('(s)', ['any']));
+      await fprintd(bus, device, DEVICE, 'VerifyStart', new GLib.Variant('(s)', ['any']));
     },
     stop() {
       if (!subscription)
         return;
-      Gio.DBus.system.signal_unsubscribe(subscription);
+      bus.signal_unsubscribe(subscription);
       subscription = 0;
-      fprintd(device, DEVICE, 'VerifyStop').catch(() => {});
-      fprintd(device, DEVICE, 'Release').catch(() => {});
+      fprintd(bus, device, DEVICE, 'VerifyStop').catch(() => {});
+      fprintd(bus, device, DEVICE, 'Release').catch(() => {});
     },
   };
   await reader.verify();

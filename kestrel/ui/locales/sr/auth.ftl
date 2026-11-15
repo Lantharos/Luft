@@ -62,11 +62,8 @@ auth-prompt-show-password = Прикажи лозинку
 
 ## Administrator authentication
 
-polkit-title = Потребна је потврда идентитета
 polkit-administrator = Администратор
-polkit-password = Лозинка
 polkit-cancel = Откажи
-polkit-authenticate = Потврди
 polkit-failed = Није успело. Покушајте поново.
 
 ## Log out, power off and restart dialog

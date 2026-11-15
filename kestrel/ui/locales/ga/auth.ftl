@@ -62,11 +62,8 @@ auth-prompt-show-password = Taispeáin an pasfhocal
 
 ## Administrator authentication
 
-polkit-title = Fíordheimhniú riachtanach
 polkit-administrator = Riarthóir
-polkit-password = Pasfhocal
 polkit-cancel = Cealaigh
-polkit-authenticate = Fíordheimhnigh
 polkit-failed = Níor oibrigh sé sin. Bain triail eile as.
 
 ## Log out, power off and restart dialog

@@ -62,11 +62,8 @@ auth-prompt-show-password = Rodyti slaptažodį
 
 ## Administrator authentication
 
-polkit-title = Reikia patvirtinti tapatybę
 polkit-administrator = Administratorius
-polkit-password = Slaptažodis
 polkit-cancel = Atšaukti
-polkit-authenticate = Patvirtinti
 polkit-failed = Nepavyko. Bandykite dar kartą.
 
 ## Log out, power off and restart dialog

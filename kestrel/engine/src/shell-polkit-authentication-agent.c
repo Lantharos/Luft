@@ -8,8 +8,6 @@
 
 #include "config.h"
 
-#include <pwd.h>
-
 #include "shell-polkit-authentication-agent.h"
 
 #include <glib/gi18n.h>
@@ -150,12 +148,13 @@ shell_polkit_authentication_agent_class_init (ShellPolkitAuthenticationAgentClas
                   NULL, /* accumulator data */
                   NULL, /* marshaller */
                   G_TYPE_NONE,
-                  5,
+                  6,
                   G_TYPE_STRING,
                   G_TYPE_STRING,
                   G_TYPE_STRING,
                   G_TYPE_STRING,
-                  G_TYPE_STRV);
+                  G_TYPE_VARIANT,
+                  G_TYPE_VARIANT);
 
   signals[CANCEL_SIGNAL] =
     g_signal_new ("cancel",
@@ -211,48 +210,39 @@ auth_request_free (AuthRequest *request)
   g_free (request);
 }
 
+static GVariant *
+identity_uids (GList *identities)
+{
+  GVariantBuilder uids;
+  GList *l;
+
+  g_variant_builder_init (&uids, G_VARIANT_TYPE ("au"));
+  for (l = identities; l != NULL; l = l->next)
+    {
+      if (POLKIT_IS_UNIX_USER (l->data))
+        g_variant_builder_add (&uids, "u", polkit_unix_user_get_uid (POLKIT_UNIX_USER (l->data)));
+      else
+        g_warning ("Unsupporting identity of GType %s", g_type_name (G_TYPE_FROM_INSTANCE (l->data)));
+    }
+  return g_variant_builder_end (&uids);
+}
+
+static GVariant *
+details_dict (PolkitDetails *details)
+{
+  g_auto (GStrv) keys = polkit_details_get_keys (details);
+  GVariantBuilder dict;
+  gchar **key;
+
+  g_variant_builder_init (&dict, G_VARIANT_TYPE ("a{ss}"));
+  for (key = keys; key != NULL && *key != NULL; key++)
+    g_variant_builder_add (&dict, "{ss}", *key, polkit_details_lookup (details, *key));
+  return g_variant_builder_end (&dict);
+}
+
 static void
 auth_request_initiate (AuthRequest *request)
 {
-  gchar **user_names;
-  GPtrArray *p;
-  GList *l;
-
-  p = g_ptr_array_new ();
-  for (l = request->identities; l != NULL; l = l->next)
-    {
-      if (POLKIT_IS_UNIX_USER (l->data))
-        {
-          PolkitUnixUser *user = POLKIT_UNIX_USER (l->data);
-          gint uid;
-          gchar buf[4096];
-          struct passwd pwd;
-          struct passwd *ppwd;
-
-          uid = polkit_unix_user_get_uid (user);
-          if (getpwuid_r (uid, &pwd, buf, sizeof (buf), &ppwd) == 0)
-            {
-              if (!g_utf8_validate (pwd.pw_name, -1, NULL))
-                {
-                  g_warning ("Invalid UTF-8 in username for uid %d. Skipping", uid);
-                }
-              else
-                {
-                  g_ptr_array_add (p, g_strdup (pwd.pw_name));
-                }
-            }
-          else
-            {
-              g_warning ("Error looking up user name for uid %d", uid);
-            }
-        }
-      else
-        {
-          g_warning ("Unsupporting identity of GType %s", g_type_name (G_TYPE_FROM_INSTANCE (l->data)));
-        }
-    }
-  g_ptr_array_add (p, NULL);
-  user_names = (gchar **) g_ptr_array_free (p, FALSE);
   g_signal_emit (request->agent,
                  signals[INITIATE_SIGNAL],
                  0, /* detail */
@@ -260,8 +250,8 @@ auth_request_initiate (AuthRequest *request)
                  request->message,
                  request->icon_name,
                  request->cookie,
-                 user_names);
-  g_strfreev (user_names);
+                 identity_uids (request->identities),
+                 details_dict (request->details));
 }
 
 static void auth_request_complete (AuthRequest *request,

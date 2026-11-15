@@ -62,11 +62,8 @@ auth-prompt-show-password = Afișează parola
 
 ## Administrator authentication
 
-polkit-title = Este necesară autentificarea
 polkit-administrator = Administrator
-polkit-password = Parolă
 polkit-cancel = Anulează
-polkit-authenticate = Autentifică
 polkit-failed = Nu a funcționat. Încercați din nou.
 
 ## Log out, power off and restart dialog

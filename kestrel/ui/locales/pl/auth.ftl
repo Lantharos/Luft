@@ -62,11 +62,8 @@ auth-prompt-show-password = Pokaż hasło
 
 ## Administrator authentication
 
-polkit-title = Wymagane uwierzytelnienie
 polkit-administrator = Administrator
-polkit-password = Hasło
 polkit-cancel = Anuluj
-polkit-authenticate = Uwierzytelnij
 polkit-failed = Nie udało się. Spróbuj ponownie.
 
 ## Log out, power off and restart dialog

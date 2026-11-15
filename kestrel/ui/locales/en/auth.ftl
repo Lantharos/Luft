@@ -102,13 +102,15 @@ auth-prompt-show-password = Show password
 
 ## Administrator authentication
 
-polkit-title = Password needed
+# Dialog title when no app is known to be asking
+polkit-allow-title = Allow this change?
+# Dialog title. $app is the name of the app that asks
+polkit-allow-app-title = Allow { $app } to make this change?
 # Shown instead of the user name "root"
 polkit-administrator = Administrator
-polkit-password = Password
 polkit-cancel = Cancel
-# Button
-polkit-authenticate = Continue
+# Button that confirms with the typed password
+polkit-allow = Allow
 # Shown when the password or other authentication was wrong
 polkit-failed = That didn’t work. Try again.
 

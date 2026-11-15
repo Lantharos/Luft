@@ -17,6 +17,8 @@ No prompt shows over the lock screen. Every dialog goes through one gate in Kest
 
 A Kestrel that starts again after a crash holds all input until it knows whether the screen was locked and has put the lock screen back, so nothing typed in between reaches the desktop behind it.
 
+When a change needs an administrator, the prompt leads with the fingerprint if one is enrolled: touch the reader, or choose **Use password instead**, or just start typing, which switches to the password and keeps what you typed. **Use fingerprint** goes back while the reader still listens. After three fingers it doesn't recognize, or when the reader goes away, the prompt asks for the password and says why, with **Try fingerprint again** beside it. When several administrators could allow the change and you aren't one, pick whose password you type.
+
 Prompts name an app only by what can be checked: a sandboxed app by its sandbox's app ID, a program outside a sandbox by the program it runs or the app whose launcher starts it. A name or window class the app chose never shows. When nothing can be checked, the prompt says "An app" with the window's title in quotes.
 
 ## Signing in and unlocking

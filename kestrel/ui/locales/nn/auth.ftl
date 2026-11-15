@@ -62,11 +62,8 @@ auth-prompt-show-password = Vis passord
 
 ## Administrator authentication
 
-polkit-title = Godkjenning krevst
 polkit-administrator = Administrator
-polkit-password = Passord
 polkit-cancel = Avbryt
-polkit-authenticate = Godkjenn
 polkit-failed = Det fungerte ikkje. Prøv igjen.
 
 ## Log out, power off and restart dialog

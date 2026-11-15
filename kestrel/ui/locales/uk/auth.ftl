@@ -62,11 +62,8 @@ auth-prompt-show-password = Показати пароль
 
 ## Administrator authentication
 
-polkit-title = Потрібна автентифікація
 polkit-administrator = Адміністратор
-polkit-password = Пароль
 polkit-cancel = Скасувати
-polkit-authenticate = Підтвердити
 polkit-failed = Не вдалося. Спробуйте ще раз.
 
 ## Log out, power off and restart dialog

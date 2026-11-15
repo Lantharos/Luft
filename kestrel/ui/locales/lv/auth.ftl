@@ -62,11 +62,8 @@ auth-prompt-show-password = Rādīt paroli
 
 ## Administrator authentication
 
-polkit-title = Nepieciešama autentifikācija
 polkit-administrator = Administrators
-polkit-password = Parole
 polkit-cancel = Atcelt
-polkit-authenticate = Autentificēt
 polkit-failed = Neizdevās. Mēģiniet vēlreiz.
 
 ## Log out, power off and restart dialog

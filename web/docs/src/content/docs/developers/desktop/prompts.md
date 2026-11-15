@@ -52,6 +52,12 @@ Review(a(sv) changes) → (b approved, aa{sv} restore, s requester, s error)
 
 It answers only `/usr/bin/luft` from the system image, and refuses with `NotLuft`, `Locked`, `Busy` (another review is open) or `TooMany` (more than five a minute). Kestrel checks every value again against the settings catalogue and reads every current value itself. On approval it makes the system settings in one call to `com.lantharos.Changes1.Apply` on the system bus, which answers only Kestrel and asks polkit for an administrator's password, then the rest with GSettings. `restore` holds what undo puts back. [Who an app is](/security/identity/) explains why a review is shaped this way.
 
+## Administrator permission
+
+Kestrel is the polkit agent. Every request runs the `polkit-1` PAM rules through polkit's own helper, which reports a success to polkitd itself; Kestrel only relays what the conversation asks and what the person types. With `with-fingerprint`, `pam_fprintd` comes first and claims the reader, so a conversation that sends a message before its first question is reading a finger. **Use password instead** starts a second conversation for the same request: its `pam_fprintd` finds the reader taken and hands over to `pam_unix`, which asks for the password while the first conversation keeps listening. Whichever succeeds first completes the request and Kestrel cancels the other. fprintd's `VerifyStatus` results only change what the glyph shows. The typed password lives in the field until it's sent and is never kept afterwards.
+
+The prompt names the app from `polkit.subject-pid` the way every prompt does, and falls back to the action's icon. When the identities polkit offers don't include the person signed in, the prompt lists the administrators, leaving out root unless it's the only one, and asks the first.
+
 ## Drives
 
 `com.lantharos.Kestrel.DriveAccess` at `/com/lantharos/Kestrel/DriveAccess` asks whether a sandboxed app may use a drive it looked for, as [App permissions](/security/app-permissions/#drives-and-folders) describes:

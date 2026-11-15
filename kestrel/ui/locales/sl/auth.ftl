@@ -62,11 +62,8 @@ auth-prompt-show-password = Pokaži geslo
 
 ## Administrator authentication
 
-polkit-title = Potrebno je preverjanje pristnosti
 polkit-administrator = Skrbnik
-polkit-password = Geslo
 polkit-cancel = Prekliči
-polkit-authenticate = Preveri pristnost
 polkit-failed = To ni uspelo. Poskusite znova.
 
 ## Log out, power off and restart dialog

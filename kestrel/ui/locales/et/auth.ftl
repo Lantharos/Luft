@@ -62,11 +62,8 @@ auth-prompt-show-password = Näita salasõna
 
 ## Administrator authentication
 
-polkit-title = Vajalik on autentimine
 polkit-administrator = Administraator
-polkit-password = Salasõna
 polkit-cancel = Loobu
-polkit-authenticate = Autendi
 polkit-failed = See ei õnnestunud. Proovi uuesti.
 
 ## Log out, power off and restart dialog

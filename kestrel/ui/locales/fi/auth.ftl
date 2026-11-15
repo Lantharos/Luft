@@ -62,11 +62,8 @@ auth-prompt-show-password = Näytä salasana
 
 ## Administrator authentication
 
-polkit-title = Tunnistautuminen vaaditaan
 polkit-administrator = Järjestelmänvalvoja
-polkit-password = Salasana
 polkit-cancel = Peruuta
-polkit-authenticate = Tunnistaudu
 polkit-failed = Se ei onnistunut. Yritä uudelleen.
 
 ## Log out, power off and restart dialog

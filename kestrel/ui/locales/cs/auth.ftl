@@ -62,11 +62,8 @@ auth-prompt-show-password = Zobrazit heslo
 
 ## Administrator authentication
 
-polkit-title = Vyžaduje se ověření
 polkit-administrator = Správce
-polkit-password = Heslo
 polkit-cancel = Zrušit
-polkit-authenticate = Ověřit
 polkit-failed = Nepodařilo se. Zkuste to znovu.
 
 ## Log out, power off and restart dialog

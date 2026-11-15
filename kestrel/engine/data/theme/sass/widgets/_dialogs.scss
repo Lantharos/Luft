@@ -108,22 +108,6 @@
   }
 }
 
-/* Polkit Dialog */
-.polkit-dialog-user-layout {
-  text-align: center;
-  spacing: $base_margin * 2;
-  margin-bottom: $base_padding;
-
-  .polkit-dialog-user-label,
-  .polkit-dialog-user-root-label {
-    @extend %title_4;
-  }
-
-  .polkit-dialog-user-root-label {
-    color: $warning_color;
-  }
-}
-
 /* Audio selection dialog */
 .audio-device-selection-dialog {
   min-width: 24em;

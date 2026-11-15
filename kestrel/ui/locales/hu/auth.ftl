@@ -62,11 +62,8 @@ auth-prompt-show-password = Jelszó megjelenítése
 
 ## Administrator authentication
 
-polkit-title = Hitelesítés szükséges
 polkit-administrator = Rendszergazda
-polkit-password = Jelszó
 polkit-cancel = Mégse
-polkit-authenticate = Hitelesítés
 polkit-failed = Ez nem sikerült. Próbálja újra.
 
 ## Log out, power off and restart dialog

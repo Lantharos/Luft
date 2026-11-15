@@ -62,11 +62,8 @@ auth-prompt-show-password = Parolayı göster
 
 ## Administrator authentication
 
-polkit-title = Kimlik doğrulaması gerekiyor
 polkit-administrator = Yönetici
-polkit-password = Parola
 polkit-cancel = İptal
-polkit-authenticate = Doğrula
 polkit-failed = İşe yaramadı. Yeniden deneyin.
 
 ## Log out, power off and restart dialog

@@ -56,6 +56,10 @@ export namespace NM {
   ],
 ] as const;
 
+const ACCOUNTS_UID = [
+  ['get_user_by_id(id: never): User;', 'get_user_by_id(id: number): User;'],
+] as const;
+
 function replaceOnce(text: string, before: string, after: string) {
   const [head, ...rest] = text.split(before);
   if (rest.length !== 1) {
@@ -73,4 +77,5 @@ async function patch(output: string, file: string, replacements: readonly (reado
 export async function applyGjsOverrides(output: string) {
   await patch(output, 'gio-2.0.d.ts', GIO_EXPORTED_OBJECT);
   await patch(output, 'nm-1.0.d.ts', NM_NUMERIC_NAMES);
+  await patch(output, 'accountsservice-1.0.d.ts', ACCOUNTS_UID);
 }

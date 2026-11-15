@@ -62,11 +62,8 @@ auth-prompt-show-password = Uri l-password
 
 ## Administrator authentication
 
-polkit-title = Hija meħtieġa l-awtentikazzjoni
 polkit-administrator = Amministratur
-polkit-password = Password
 polkit-cancel = Ikkanċella
-polkit-authenticate = Awtentika
 polkit-failed = Ma ħadimx. Erġa’ pprova.
 
 ## Log out, power off and restart dialog

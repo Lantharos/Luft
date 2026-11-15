@@ -1,4 +1,4 @@
-import type Gio from 'gi://Gio';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type {Publish} from '../bus.js';
@@ -38,7 +38,15 @@ const RETRIES = ['verify-retry-scan', 'verify-swipe-too-short', 'verify-finger-n
 export function publishFingerprint(publish: Publish, calls: string[]) {
   const enrolled = new Map<string, string[]>();
   let claimant = GLib.get_user_name();
+  let holder: string | null = null;
+  let holderWatch = 0;
   let verifying = false;
+  const release = () => {
+    if (holderWatch) Gio.bus_unwatch_name(holderWatch);
+    holder = null;
+    holderWatch = 0;
+    verifying = false;
+  };
   const fingersOf = (user: string) => {
     const name = user || claimant;
     if (!enrolled.has(name))
@@ -51,13 +59,24 @@ export function publishFingerprint(publish: Publish, calls: string[]) {
   device = publish(DEVICE, {
     'scan-type': 'press',
     'num-enroll-stages': STAGES,
-    Claim: (user: string) => {
+    ClaimAsync: ([user]: [string], invocation: Gio.DBusMethodInvocation) => {
+      const sender = invocation.get_sender()!;
+      if (holder && holder !== sender) {
+        invocation.return_dbus_error('net.reactivated.Fprint.Error.AlreadyInUse', 'Device was already claimed');
+        return;
+      }
+      release();
+      holder = sender;
+      holderWatch = Gio.bus_watch_name_on_connection(invocation.get_connection(), sender, Gio.BusNameWatcherFlags.NONE, null,
+        () => sender === holder && release());
       claimant = user || GLib.get_user_name();
       calls.push('fingerprint Claim');
+      invocation.return_value(null);
     },
-    Release: () => {
-      verifying = false;
+    ReleaseAsync: (_: [], invocation: Gio.DBusMethodInvocation) => {
+      if (invocation.get_sender() === holder) release();
       calls.push('fingerprint Release');
+      invocation.return_value(null);
     },
     ListEnrolledFingers: (user: string) => fingersOf(user),
     DeleteEnrolledFinger: (finger: string) => fingersOf('').splice(fingersOf('').indexOf(finger), 1),

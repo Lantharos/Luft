@@ -62,11 +62,8 @@ auth-prompt-show-password = Sýna lykilorð
 
 ## Administrator authentication
 
-polkit-title = Auðkenningar krafist
 polkit-administrator = Stjórnandi
-polkit-password = Lykilorð
 polkit-cancel = Hætta við
-polkit-authenticate = Auðkenna
 polkit-failed = Þetta tókst ekki. Reyndu aftur.
 
 ## Log out, power off and restart dialog

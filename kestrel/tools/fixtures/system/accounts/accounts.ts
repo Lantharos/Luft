@@ -57,7 +57,10 @@ export function publishAccounts(publish: Publish) {
       icon: avatar('mara', [0.93, 0.56, 0.32])},
     {name: 'theo', realName: 'Theo Brandt', uid: 2002, loginTime: now - 90 * HOUR, administrator: false, icon: ''},
   ].map(person => ({...person, path: `${ACCOUNTS_PATH}/User${person.uid}`}));
-  for (const person of people) {
+  const neverSignedIn = [
+    {name: 'ines', realName: 'Ines Okafor', uid: 2003, loginTime: 0, administrator: true, icon: '', path: `${ACCOUNTS_PATH}/User2003`},
+  ];
+  for (const person of [...people, ...neverSignedIn]) {
     const account = {
       ...user(person),
       SetLanguage: (language: string) => {
@@ -81,7 +84,7 @@ export function publishAccounts(publish: Publish) {
     AutomaticLoginUsers: [],
     ListCachedUsers: () => people.map(person => person.path),
     FindUserByName: (name: string) => found(name === GLib.get_user_name() ? me : people.find(person => person.name === name), name),
-    FindUserById: (uid: number) => found(people.find(person => person.uid === uid), uid),
+    FindUserById: (uid: number) => found([...people, ...neverSignedIn].find(person => person.uid === uid), uid),
     GetUsersLanguages: () => ['en_US.UTF-8'],
   }, ACCOUNTS_PATH);
 }

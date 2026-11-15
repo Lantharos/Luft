@@ -483,7 +483,7 @@ export namespace AccountsService {
 
         get_user(username: string): User;
 
-        get_user_by_id(id: never): User;
+        get_user_by_id(id: number): User;
 
         goto_login_session(): boolean;
 

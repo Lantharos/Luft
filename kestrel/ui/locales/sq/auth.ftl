@@ -62,11 +62,8 @@ auth-prompt-show-password = Shfaq fjalëkalimin
 
 ## Administrator authentication
 
-polkit-title = Kërkohet vërtetimi
 polkit-administrator = Administratori
-polkit-password = Fjalëkalimi
 polkit-cancel = Anulo
-polkit-authenticate = Vërteto
 polkit-failed = Na vjen keq, nuk funksionoi. Provo sërish.
 
 ## Log out, power off and restart dialog

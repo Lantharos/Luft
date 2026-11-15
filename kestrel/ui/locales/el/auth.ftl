@@ -62,11 +62,8 @@ auth-prompt-show-password = Εμφάνιση κωδικού πρόσβασης
 
 ## Administrator authentication
 
-polkit-title = Απαιτείται έλεγχος ταυτότητας
 polkit-administrator = Διαχειριστής
-polkit-password = Κωδικός πρόσβασης
 polkit-cancel = Ακύρωση
-polkit-authenticate = Έλεγχος ταυτότητας
 polkit-failed = Δεν λειτούργησε. Δοκιμάστε ξανά.
 
 ## Log out, power off and restart dialog

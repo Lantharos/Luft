@@ -1447,7 +1447,7 @@ export namespace Shell {
             /** @signal */
             cancel: () => void;
             /** @signal */
-            initiate: (object: string, p0: string, p1: string, p2: string, p3: string[]) => void;
+            initiate: (object: string, p0: string, p1: string, p2: string, p3: GLib.Variant, p4: GLib.Variant) => void;
         }
 
         // Constructor properties interface

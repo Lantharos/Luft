@@ -62,11 +62,8 @@ auth-prompt-show-password = Wachtwoord tonen
 
 ## Administrator authentication
 
-polkit-title = Verificatie vereist
 polkit-administrator = Beheerder
-polkit-password = Wachtwoord
 polkit-cancel = Annuleren
-polkit-authenticate = Verifiëren
 polkit-failed = Dat werkte niet. Probeer het opnieuw.
 
 ## Log out, power off and restart dialog

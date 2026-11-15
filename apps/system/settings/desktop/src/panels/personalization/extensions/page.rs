@@ -104,6 +104,12 @@ pub enum PageItem {
         value: Option<String>,
         items: Vec<PageItem>,
     },
+    Page {
+        key: String,
+        title: String,
+        value: Option<String>,
+        sections: Vec<PageSection>,
+    },
 }
 
 #[derive(Deserialize, Serialize, specta::Type)]

@@ -135,13 +135,13 @@ export interface Link {
 }
 
 export function resolveLink(target: string): Link | null {
-	const [name, section] = target
+	const [name, ...section] = target
 		.replace(/^kestrel-settings:(\/\/)?/, '')
 		.split(/[?#]/)[0]
 		.toLowerCase()
 		.split('/');
 	const panel = PANELS.find((candidate) => candidate.id === name);
-	return panel ? { panel: name as PanelId, section: section || null } : null;
+	return panel ? { panel: name as PanelId, section: section.join('/') || null } : null;
 }
 
 export function titleOf(panel: Panel, hardware: Hardware) {

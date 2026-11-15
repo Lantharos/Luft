@@ -48,7 +48,14 @@ export function pageBuilder(folders: readonly string[], settings: ReadonlySet<st
   }));
   const control = (item: Plain, where: string) => ({ title: text(item.title, `${where}.title`), description: optionalText(item.description, `${where}.description`) });
 
-  const describe = (entry: PageItem, where: string, grouped = false): Plain => {
+  const sectionsOf = (sections: readonly { title?: string; description?: string; items: readonly PageItem[] }[], where: string, inPage: boolean) =>
+    sections.slice(0, SECTION_LIMIT).map((section, index) => ({
+      title: optionalText(section.title, `${where}[${index}].title`),
+      description: optionalText(section.description, `${where}[${index}].description`),
+      items: section.items.slice(0, ITEM_LIMIT).map((item, number) => describe(item, `${where}[${index}].items[${number}]`, false, inPage)),
+    }));
+
+  const describe = (entry: PageItem, where: string, grouped = false, inPage = false): Plain => {
     const item = entry as unknown as Plain;
     if ('setting' in item) {
       const key = text(item.setting, `${where}.setting`);
@@ -96,6 +103,15 @@ export function pageBuilder(folders: readonly string[], settings: ReadonlySet<st
           actions: actions(row.actions, `${where}.items[${index}]`),
         })),
       };
+      case 'page': {
+        if (grouped || inPage) throw new Error(`${where} is a subpage inside a group or another subpage`);
+        const key = text(item.key, `${where}.key`);
+        if (!ELEMENT_KEY.test(key)) throw new Error(`${where}.key must be lowercase letters, digits and dashes`);
+        return {
+          type: 'page', key, title: text(item.title, `${where}.title`), value: optionalText(item.value, `${where}.value`),
+          sections: sectionsOf(item.sections as PageSection[], `${where}.sections`, true),
+        };
+      }
       case 'group': {
         if (grouped) throw new Error(`${where} is a group inside a group`);
         return {
@@ -109,11 +125,6 @@ export function pageBuilder(folders: readonly string[], settings: ReadonlySet<st
 
   return (sections: readonly PageSection[]): BuiltPage => {
     if (!Array.isArray(sections)) throw new Error('A settings page is a list of sections');
-    const described = sections.slice(0, SECTION_LIMIT).map((section, index) => ({
-      title: optionalText(section.title, `sections[${index}].title`),
-      description: optionalText(section.description, `sections[${index}].description`),
-      items: section.items.slice(0, ITEM_LIMIT).map((item: PageItem, number: number) => describe(item, `sections[${index}].items[${number}]`)),
-    }));
-    return { json: JSON.stringify(described), callbacks };
+    return { json: JSON.stringify(sectionsOf(sections, 'sections', false)), callbacks };
   };
 }

@@ -75,6 +75,10 @@ class Extensions {
 		return () => this.#shownPages.delete(id);
 	}
 
+	indexPages() {
+		for (const extension of this.list ?? []) if (extension.state === 'running' && !(extension.id in this.pages)) void this.loadPage(extension.id);
+	}
+
 	async loadPage(id: string) {
 		this.pages[id] = await commands.extensionsPage({ id }).catch(() => []);
 	}
@@ -115,7 +119,46 @@ export function shownSections(extension: Extension, sections: PageSection[]): Pa
 
 export function showing(extension: Extension, item: PageItem): boolean {
 	if (item.type === 'group') return item.items.some((inner) => showing(extension, inner));
+	if (item.type === 'page') return item.sections.some((section) => section.items.some((inner) => showing(extension, inner)));
 	if (item.type !== 'setting') return true;
 	const declared = extension.settings.find((setting) => setting.key === item.key);
 	return !!declared && shown(extension, declared);
 }
+
+export type Subpage = Extract<PageItem, { type: 'page' }>;
+
+export const subpageOf = (sections: PageSection[], key: string): Subpage | null =>
+	sections.flatMap((section) => section.items).find((item): item is Subpage => item.type === 'page' && item.key === key) ?? null;
+
+const holds = (items: PageItem[], key: string): boolean =>
+	items.some((item) => (item.type === 'setting' && item.key === key) || (item.type === 'group' && holds(item.items, key)));
+
+/** Where a declared setting shows: on the extension's page, on one of its subpages, or nowhere when its page leaves it out. */
+function placeOf(id: string, key: string): string | null {
+	const sections = extensions.pages[id];
+	const link = `extensions/${id.toLowerCase()}`;
+	if (!sections?.length) return link;
+	if (sections.some((section) => holds(section.items, key))) return link;
+	const page = sections
+		.flatMap((section) => section.items)
+		.find((item): item is Subpage => item.type === 'page' && item.sections.some((section) => holds(section.items, key)));
+	return page ? `${link}/${page.key}` : null;
+}
+
+export interface FoundOption {
+	title: string;
+	where: string;
+	link: string;
+}
+
+export function searchOptions(query: string): FoundOption[] {
+	const needle = query.trim().toLocaleLowerCase();
+	return (extensions.list ?? []).flatMap((extension) => {
+		if (extension.state !== 'running') return [];
+		return extension.settings.flatMap((setting) => {
+			const link = !setting.hidden && shown(extension, setting) && setting.label.toLocaleLowerCase().includes(needle) ? placeOf(extension.id, setting.key) : null;
+			return link ? [{ title: setting.label, where: extension.name, link }] : [];
+		});
+	});
+}
+

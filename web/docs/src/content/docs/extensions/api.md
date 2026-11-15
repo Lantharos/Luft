@@ -262,6 +262,7 @@ Without anything else, an extension's page in Settings → Extensions lists the 
 | `{ type: 'list', items, empty? }` | Rows of `{ title, description?, image?, actions? }`, where actions are `{ label, danger?, onActivate() }` |
 | `{ type: 'text', text }` | A paragraph |
 | `{ type: 'sprite', title, description?, image, cell, columns, frames, rate, checked?, onToggled?, actions? }` | A row with a small animation at its start: `frames` of a sheet of `cell` pixel frames, `columns` wide, looping `rate` times a second, with an optional switch and buttons |
+| `{ type: 'page', key, title, value?, sections }` | A row that opens a page of its own, the way Settings' own pages open, for an area with many settings. `value` is what the row shows at its end, such as what's on there. Its sections hold every item but another page; `kestrel-settings:extensions/<id>/<key>` opens it, and searching Settings finds the declared settings on it |
 | `{ type: 'group', title, description?, value?, items }` | A row that opens a dialog with more items, for what would crowd the page, such as the finer controls of one effect or a list people manage. It shows while any of its items does, and can't hold another group |
 | `{ type: 'taskbar-place', element }` | Where one of its taskbar elements sits, by its key. People choose it there on a taskbar that's one bar; with separate islands it points them to editing the taskbar |
 

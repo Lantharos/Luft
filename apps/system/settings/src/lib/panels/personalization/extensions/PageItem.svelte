@@ -4,6 +4,7 @@
 	import type { Extension, PageItem } from '#lib/bindings.js';
 	import RowValue from '#lib/components/RowValue.svelte';
 	import { percent } from '#lib/format.js';
+	import { app } from '#lib/state/app.svelte.js';
 	import { extensions, showing, shown } from './extensions.svelte';
 	import ImageChoice from './ImageChoice.svelte';
 	import PageGroup from './PageGroup.svelte';
@@ -106,6 +107,13 @@
 	</div>
 {:else if item.type === 'taskbar-place'}
 	<TaskbarPlace element={item.element} />
+{:else if item.type === 'page'}
+	{@const key = item.key}
+	{#if showing(extension, item)}
+		<Row title={item.title} onclick={() => (app.section = `${extension.id.toLowerCase()}/${key}`)}>
+			{#if item.value}<RowValue text={item.value} />{/if}
+		</Row>
+	{/if}
 {:else if item.type === 'group'}
 	{#if showing(extension, item)}
 		<PageGroup {extension} group={item} />

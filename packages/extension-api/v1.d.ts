@@ -1612,7 +1612,26 @@ export interface PageSection {
  * the extension keeps itself, and their callbacks run in the extension. Images are files in the extension's folder or
  * data folder.
  */
-export type PageItem = PageGroupItem | PageGroup;
+export type PageItem = PageGroupItem | PageGroup | PageSubpage;
+
+/** A section of a {@link PageSubpage}, which holds every item but another subpage. */
+export interface SubpageSection {
+  title?: string;
+  items: readonly (PageGroupItem | PageGroup)[];
+}
+
+/**
+ * A row that opens a page of its own, the way Settings' own pages open, for an area of an extension with many
+ * settings. `key` names it in links, such as `kestrel-settings:extensions/com.example.clock/alarms`, and in search.
+ */
+export interface PageSubpage {
+  type: 'page';
+  key: string;
+  title: string;
+  /** What the row shows at its end, such as what's on there now. */
+  value?: string;
+  sections: readonly SubpageSection[];
+}
 
 /** What a {@link PageGroup} can hold: every item but another group. */
 export type PageGroupItem =

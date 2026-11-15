@@ -3,7 +3,8 @@
 	import { ConfirmDialog, Row, Section, Switch } from '@luft/ui';
 	import type { Extension } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { extensions, shown } from './extensions.svelte';
+	import { app } from '#lib/state/app.svelte.js';
+	import { extensions, shown, subpageOf } from './extensions.svelte';
 	import PageView from './PageView.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import { origin, PERMISSIONS, summary } from './status';
@@ -13,60 +14,73 @@
 
 	let removing = $state(false);
 	let visible = $derived(extension.settings.filter((setting) => !setting.hidden && shown(extension, setting)));
+	let page = $derived(extensions.pages[extension.id] ?? []);
+	let subpageKey = $derived(app.section?.split('/')[1]);
+	let subpage = $derived(subpageKey && extension.state === 'running' ? subpageOf(page, subpageKey) : null);
+
+	$effect(() => {
+		if (extension.page) return extensions.showPage(extension.id);
+	});
 </script>
 
 <SubPage title={extension.name} {onclose}>
-	<Section>
-		<Row title={t('settings-extensions-enabled')} description={summary(extension)}>
-			{#if extension.state !== 'invalid'}
-				<Switch label={t('settings-extensions-on', { name: extension.name })} checked={extension.enabled} onchange={(on) => extensions.setEnabled(extension, on)} />
-			{/if}
-		</Row>
-		{#if extension.problem && extension.state !== 'running'}
-			<Row title={t('settings-extensions-problem')} description={extension.problem} />
-		{/if}
-	</Section>
-
-	{#if extension.state === 'running'}
-		{#if extension.page}
-			<PageView {extension} />
-		{:else if visible.length}
-			<Section title={t('settings-extensions-settings')}>
-				{#each visible as setting (setting.key)}
-					<SettingRow {extension} {setting} />
-				{/each}
-			</Section>
-		{/if}
-	{/if}
-
-	{#if extension.permissions.length || extension.network.length || extension.listen.length}
-		<Section title={t('settings-extensions-permissions')}>
-			{#each extension.permissions as permission (permission)}
-				<Row title={PERMISSIONS[permission] ? t(PERMISSIONS[permission]) : permission} />
-			{/each}
-			{#if extension.network.length}
-				<Row title={t('settings-extensions-permission-network', { hosts: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.network) })} />
-			{/if}
-			{#if extension.listen.length}
-				<Row
-					title={t('settings-extensions-permission-listen', {
-						count: extension.listen.length,
-						ports: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.listen.map(String))
-					})}
-				/>
+	{#if subpage}
+		<SubPage title={subpage.title} onclose={() => (app.section = extension.id.toLowerCase())}>
+			<PageView {extension} sections={subpage.sections} />
+		</SubPage>
+	{:else}
+		<Section>
+			<Row title={t('settings-extensions-enabled')} description={summary(extension)}>
+				{#if extension.state !== 'invalid'}
+					<Switch label={t('settings-extensions-on', { name: extension.name })} checked={extension.enabled} onchange={(on) => extensions.setEnabled(extension, on)} />
+				{/if}
+			</Row>
+			{#if extension.problem && extension.state !== 'running'}
+				<Row title={t('settings-extensions-problem')} description={extension.problem} />
 			{/if}
 		</Section>
-	{/if}
 
-	<UnreviewedSection {extension} />
-
-	<Section>
-		<Row title={origin(extension)} description={t('settings-extensions-installed', { version: extension.version })} />
-		{#if extension.ignored.length}
-			<Row title={t('settings-extensions-ignored', { count: extension.ignored.length })} description={extension.ignored.join(', ')} />
+		{#if extension.state === 'running'}
+			{#if extension.page}
+				<PageView {extension} sections={page} />
+			{:else if visible.length}
+				<Section title={t('settings-extensions-settings')}>
+					{#each visible as setting (setting.key)}
+						<SettingRow {extension} {setting} />
+					{/each}
+				</Section>
+			{/if}
 		{/if}
-		<Row title={t('settings-extensions-remove')} onclick={() => (removing = true)} />
-	</Section>
+
+		{#if extension.permissions.length || extension.network.length || extension.listen.length}
+			<Section title={t('settings-extensions-permissions')}>
+				{#each extension.permissions as permission (permission)}
+					<Row title={PERMISSIONS[permission] ? t(PERMISSIONS[permission]) : permission} />
+				{/each}
+				{#if extension.network.length}
+					<Row title={t('settings-extensions-permission-network', { hosts: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.network) })} />
+				{/if}
+				{#if extension.listen.length}
+					<Row
+						title={t('settings-extensions-permission-listen', {
+							count: extension.listen.length,
+							ports: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.listen.map(String))
+						})}
+					/>
+				{/if}
+			</Section>
+		{/if}
+
+		<UnreviewedSection {extension} />
+
+		<Section>
+			<Row title={origin(extension)} description={t('settings-extensions-installed', { version: extension.version })} />
+			{#if extension.ignored.length}
+				<Row title={t('settings-extensions-ignored', { count: extension.ignored.length })} description={extension.ignored.join(', ')} />
+			{/if}
+			<Row title={t('settings-extensions-remove')} onclick={() => (removing = true)} />
+		</Section>
+	{/if}
 </SubPage>
 
 {#if removing}

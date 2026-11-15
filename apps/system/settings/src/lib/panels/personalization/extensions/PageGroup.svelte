@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, Row } from '@luft/ui';
+	import { Dialog, listMotion, Row } from '@luft/ui';
 	import type { Extension, PageItem as Item } from '#lib/bindings.js';
 	import RowValue from '#lib/components/RowValue.svelte';
 	import PageItem from './PageItem.svelte';
@@ -20,7 +20,7 @@
 
 {#if open}
 	<Dialog title={group.title} wide onclose={close}>
-		<div class="row-group">
+		<div class="row-group" {@attach listMotion}>
 			{#each group.items as item, number (number)}
 				<PageItem {extension} {item} />
 			{/each}

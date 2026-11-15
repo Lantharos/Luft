@@ -8,7 +8,7 @@
 
 	void extensions.load();
 
-	let opened = $derived(app.section ? extensions.find(app.section) : null);
+	let opened = $derived(app.section ? extensions.find(app.section.split('/')[0]) : null);
 </script>
 
 {#if opened}

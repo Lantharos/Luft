@@ -3,16 +3,25 @@
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
 	import type { Hardware } from '#lib/bindings.js';
-	import { iconOf, search, shownGroups, titleOf, type Found } from '#lib/panels/registry.js';
+	import { iconOf, PANELS, search, shownGroups, titleOf, type Found } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import SidebarProgress from '#lib/panels/system/updates/SidebarProgress.svelte';
+	import { extensions, searchOptions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
 
 	let nav = $state<HTMLElement>();
 	let present = $derived(hardware.present);
 	let searching = $derived(app.query.trim() !== '');
 	let found = $derived(present && searching ? search(app.query, present) : []);
+	let options = $derived(searching ? searchOptions(app.query) : []);
+	let extensionsPanel = $derived(PANELS.find((panel) => panel.id === 'extensions')!);
+
+	$effect(() => {
+		if (!searching) return;
+		void extensions.load();
+		extensions.indexPages();
+	});
 	let groups = $derived(present && !searching ? shownGroups(present) : []);
 
 	$effect(() => {
@@ -29,6 +38,7 @@
 		if (event.key !== 'Enter') return;
 		const [first] = found;
 		if (first) app.open(first.panel.id);
+		else if (options.length) app.open(options[0].link);
 	}
 </script>
 
@@ -56,6 +66,17 @@
 	</button>
 {/snippet}
 
+{#snippet extensionOption(title: string, where: string, link: string, present: Hardware)}
+	{@const Icon = iconOf(extensionsPanel, present)}
+	<button type="button" class="nav-item" onclick={() => app.open(link)}>
+		<Icon size={18} class="flex-none" />
+		<span class="flex min-w-0 flex-col">
+			<span class="truncate text-[13.5px] leading-tight">{title}</span>
+			<span class="truncate text-[12px] leading-tight text-[var(--sidebar-text-muted)]">{where}</span>
+		</span>
+	</button>
+{/snippet}
+
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
 	<SearchField variant="sidebar" label={t('settings-search')} bind:value={app.query} onkeydown={openFirst} />
 	<nav bind:this={nav} class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
@@ -73,10 +94,13 @@
 					{#each found as result (`${result.panel.id} ${result.setting}`)}
 						{@render item(result, present)}
 					{/each}
+					{#each options as option (`${option.link} ${option.title}`)}
+						{@render extensionOption(option.title, option.where, option.link, present)}
+					{/each}
 				</section>
 			{/if}
 		{/if}
-		{#if searching && present && !found.length}
+		{#if searching && present && !found.length && !options.length}
 			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">{t('settings-search-empty')}</p>
 		{/if}
 	</nav>

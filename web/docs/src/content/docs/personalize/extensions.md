@@ -23,7 +23,6 @@ asks:
   - { ask: spotify theme, to: tailor }
   - { ask: vesktop theme, to: tailor }
   - { ask: discord theme, to: tailor }
-  - { ask: steam theme, to: tailor }
   - { ask: white noise, to: soundscapes }
   - { ask: brown noise, to: soundscapes }
   - { ask: rain sounds, to: soundscapes }
@@ -85,7 +84,6 @@ Tailor dresses other apps in Luft's look: the colors of your wallpaper, your fon
 
 - **Spotify** needs [Spicetify](https://spicetify.app) installed first, and follows the desktop while it's open. Spotify has to be installed for your account, which is how Schelf installs it. One that's installed for everyone on the computer can't be changed, and Tailor says so and offers to open Spotify in Schelf.
 - **Vesktop** gets a theme that follows the desktop while it's open. The first time, quit it once, from its tray icon too, so the theme can be turned on.
-- **Steam** picks up the look each time it opens, and keeps it after updates. Store and community pages stay as they are.
 
 Both the Flatpak and the regular versions of these apps work.
 

@@ -1,6 +1,6 @@
 import type { Extension, PageItem, PageSection } from '@luft/extension-api';
 
-export const APPS = ['spotify', 'steam', 'vesktop'] as const;
+export const APPS = ['spotify', 'vesktop'] as const;
 export type AppId = (typeof APPS)[number];
 export type Status = { state: string; detail?: string };
 export type States = Partial<Record<AppId, Status>>;
@@ -22,11 +22,6 @@ const messages = ({ t }: Extension<'helper'>): Record<AppId, Record<string, stri
     restart: t('spotify-restart'),
     ready: t('spotify-ready'),
     connected: t('spotify-connected'),
-  },
-  steam: {
-    'first-run': t('steam-first-run'),
-    failed: t('steam-failed'),
-    ready: t('steam-ready'),
   },
   vesktop: {
     'first-run': t('vesktop-first-run'),

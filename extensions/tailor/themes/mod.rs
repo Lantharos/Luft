@@ -1,5 +1,4 @@
 mod spotify;
-mod steam;
 mod vesktop;
 
 use std::error::Error;
@@ -74,7 +73,6 @@ pub fn all(home: &Home, events: &Sender<Event>) -> Vec<Box<dyn Theme>> {
             assets.join("spotify"),
             events.clone(),
         )),
-        Box::new(steam::Steam::new(home.clone(), assets.join("steam"))),
         Box::new(vesktop::Vesktop::new(
             home.clone(),
             assets.join("vesktop/fonts.css"),

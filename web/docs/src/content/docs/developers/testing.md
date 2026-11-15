@@ -97,7 +97,7 @@ KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg KEST
 | Convertible | `convertible-format-light` and `-dark` |
 | Flatbed | `flatbed-scans-light` and `-dark`, scanning a contract from a stand-in scanner |
 | Heft | `heft-split-light` and `-dark`, a textbook beside handwritten notes, at 200% |
-| Keystrokes, Soundscapes, Strays and Tailor settings | `settings-extension-<name>`, with Tailor dressing stand-ins for Spotify, Steam and Vesktop |
+| Keystrokes, Soundscapes, Strays and Tailor settings | `settings-extension-<name>`, with Tailor dressing stand-ins for Spotify and Vesktop |
 | Phosphor settings | `store-settings` from `desktop:phosphorStore` |
 
 Each is turned into the store's WebP with `cwebp -q 80`, keeping the file's name.

@@ -17,7 +17,6 @@ default = []
 hidden = true
 options = [
   { value = "spotify", label = "spotify" },
-  { value = "steam", label = "steam" },
   { value = "vesktop", label = "vesktop" },
 ]
 
@@ -28,14 +27,6 @@ label = "spotify"
 default = true
 depends = "found"
 when = ["spotify"]
-
-[[settings]]
-key = "steam"
-type = "switch"
-label = "steam"
-default = true
-depends = "found"
-when = ["steam"]
 
 [[settings]]
 key = "vesktop"

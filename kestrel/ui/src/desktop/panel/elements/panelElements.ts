@@ -103,7 +103,6 @@ export class TaskbarElements implements PanelElements {
     });
     localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
     this.clockButton.connect('clicked', actions.notifications);
-    pressable(this.clockButton, this.clock.actor);
     menus.bind(this.clockButton, () => [
       { label: t('taskbar-date-time-settings'), run: () => menus.settings('language') },
     ]);

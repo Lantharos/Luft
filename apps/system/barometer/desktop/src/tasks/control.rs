@@ -152,50 +152,61 @@ fn signal_handles(handles: Vec<Handle>, signal: Signal) -> Result<(), String> {
     luft_app::block_on(client::signal(&denied, signal.number()))
 }
 
-pub fn renice(PriorityRequest { pid, nice }: PriorityRequest) -> Result<(), String> {
-    if pid == 0 {
-        return Err(io::Error::from(io::ErrorKind::InvalidInput).to_string());
-    }
+pub fn renice_process(PriorityRequest { pid, nice }: PriorityRequest) -> Result<(), String> {
+    renice(&[pid], nice)
+}
+
+pub fn renice(pids: &[u32], nice: i32) -> Result<(), String> {
     let nice = nice.clamp(-20, 19);
-    let Some(start) = start_of(pid) else {
-        return Ok(());
-    };
-    for thread in threads(pid) {
-        if unsafe { libc::setpriority(libc::PRIO_PROCESS, thread, nice) } == 0 {
+    let mut denied = Vec::new();
+    for &pid in pids.iter().filter(|pid| **pid > 0) {
+        let Some(start) = start_of(pid) else {
             continue;
-        }
-        let error = io::Error::last_os_error();
-        match error.raw_os_error() {
-            Some(libc::ESRCH) => {}
-            Some(libc::EPERM | libc::EACCES) => {
-                return luft_app::block_on(client::set_priority((pid, start), nice));
+        };
+        for thread in threads(pid) {
+            if unsafe { libc::setpriority(libc::PRIO_PROCESS, thread, nice) } == 0 {
+                continue;
             }
-            _ => return Err(error.to_string()),
+            let error = io::Error::last_os_error();
+            match error.raw_os_error() {
+                Some(libc::ESRCH) => {}
+                Some(libc::EPERM | libc::EACCES) => {
+                    denied.push((pid, start));
+                    break;
+                }
+                _ => return Err(error.to_string()),
+            }
         }
     }
-    Ok(())
+    if denied.is_empty() {
+        return Ok(());
+    }
+    luft_app::block_on(client::set_priority(&denied, nice))
 }
 
 pub fn signal_scopes(scopes: &[PathBuf], signal: Signal) -> Result<(), String> {
-    let control = |file: &str, value: &str| {
-        scopes
-            .iter()
-            .try_for_each(|scope| fs::write(scope.join(file), value))
-            .map_err(|error| error.to_string())
+    let control = match signal {
+        Signal::Kill => Some(("cgroup.kill", "1")),
+        Signal::Stop => Some(("cgroup.freeze", "1")),
+        Signal::Continue => Some(("cgroup.freeze", "0")),
+        Signal::End => None,
     };
-    match signal {
-        Signal::Kill => control("cgroup.kill", "1"),
-        Signal::Stop => control("cgroup.freeze", "1"),
-        Signal::Continue => control("cgroup.freeze", "0"),
-        Signal::End => signal_handles(
-            scopes
-                .iter()
-                .flat_map(|scope| members(scope))
-                .filter_map(|pid| Handle::open(pid).ok())
-                .collect(),
-            signal,
-        ),
+    let mut handles = Vec::new();
+    for scope in scopes {
+        if let Some((file, value)) = control {
+            match fs::write(scope.join(file), value) {
+                Ok(()) => continue,
+                Err(error) if error.kind() == io::ErrorKind::PermissionDenied => {}
+                Err(error) => return Err(error.to_string()),
+            }
+        }
+        handles.extend(
+            members(scope)
+                .into_iter()
+                .filter_map(|pid| Handle::open(pid).ok()),
+        );
     }
+    signal_handles(handles, signal)
 }
 
 pub fn stop_scopes(mut scopes: Vec<PathBuf>) -> Result<(), String> {

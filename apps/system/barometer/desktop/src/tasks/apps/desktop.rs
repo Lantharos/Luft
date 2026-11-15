@@ -9,12 +9,17 @@ use crate::system::procfile::unescape_hex;
 
 const CHROMIUM_SCOPE: &str = "org.chromium.Chromium";
 const PSEUDO: &str = "unit:";
+const EXTENSION: &str = "extension-";
 const SABINE_RUNTIME_UNIT: &str = "sabine-runtime@";
 const SABINE_RUNTIME: &str = "sabine:runtime";
 const SABINE_ICON: &str = "com.lantharos.sabine";
 
 pub fn is_desktop_app(key: &str) -> bool {
-    !key.starts_with(PSEUDO) && key != SABINE_RUNTIME
+    !key.contains(':')
+}
+
+pub fn is_shared(key: &str) -> bool {
+    key == SABINE_RUNTIME
 }
 
 #[derive(Serialize, Clone, Type)]
@@ -79,6 +84,12 @@ impl Unit {
     }
 }
 
+fn pseudo_name(id: &str) -> &str {
+    id.strip_prefix(EXTENSION)
+        .and_then(|extension| extension.rsplit('.').next())
+        .unwrap_or(id)
+}
+
 #[derive(Default)]
 pub struct Apps {
     keys: HashMap<String, Option<String>>,
@@ -128,10 +139,18 @@ impl Apps {
         let key = format!("{PSEUDO}{id}");
         self.infos.entry(key.clone()).or_insert_with(|| AppInfo {
             key: key.clone(),
-            name: id.to_owned(),
+            name: pseudo_name(id).to_owned(),
             icon: None,
         });
         key
+    }
+
+    pub fn named(&mut self, key: &str, name: String) {
+        self.infos.entry(key.to_owned()).or_insert_with(|| AppInfo {
+            key: key.to_owned(),
+            name,
+            icon: None,
+        });
     }
 
     pub fn info(&self, key: &str) -> Option<&AppInfo> {

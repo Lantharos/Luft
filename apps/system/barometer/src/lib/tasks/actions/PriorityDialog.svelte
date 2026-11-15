@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Dialog, Slider } from '@luft/ui';
-	import { tasks } from './actions.svelte';
+	import { tasks, type Target } from './actions.svelte';
 
 	interface Props {
-		pid: number;
-		name: string;
+		target: Target;
 		nice: number;
 	}
 
@@ -16,7 +15,7 @@
 		{ value: 15, label: 'Lowest' }
 	];
 
-	let { pid, name, nice }: Props = $props();
+	let { target, nice }: Props = $props();
 
 	let value = $state(0);
 	let saving = $state(false);
@@ -27,13 +26,13 @@
 
 	async function apply() {
 		saving = true;
-		await tasks.setPriority(pid, value);
+		await tasks.setPriority(target, value);
 		saving = false;
 	}
 </script>
 
 <Dialog
-	title={`Priority of ${name}`}
+	title={`Priority of ${target.title}`}
 	description="Higher priority gets it more processor time when others want it too. Above normal asks for your password."
 	onclose={() => (tasks.priority = null)}
 >

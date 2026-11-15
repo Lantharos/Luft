@@ -1,21 +1,22 @@
-import type { AppUsage, Catalog, Details, Devices, Signal, Tick } from '#lib/bindings.js';
+import type { AppInfo, Catalog, Details, Devices, Entry, Signal, Tick } from '#lib/bindings.js';
 import { encode } from '../rows';
 import type { SystemBackend, View } from '../types';
 import { advance, apps, createProcesses } from './processes';
 import { devices, tick } from './system';
 
 const PRELOADED = 240;
+const UNIT = 'cgroup:';
 
 let interval = 1000;
 let history = 60;
-let view: View = { page: '', visible: false, reset: false, expanded: [], disk: true, gpu: true };
+let view: View = { page: '', visible: false, reset: false, expanded: [], system: false, everything: false, disk: true, gpu: true };
 let timer: ReturnType<typeof setInterval> | undefined;
 const ticks: Tick[] = [];
 const processes = createProcesses(Date.now());
 const background = new Set(['com.lantharos.mailman.desktop']);
 const listeners = {
 	tick: [] as ((tick: Tick) => void)[],
-	apps: [] as ((apps: AppUsage[]) => void)[],
+	entries: [] as ((entries: Entry[]) => void)[],
 	catalog: [] as ((catalog: Catalog) => void)[],
 	processes: [] as ((rows: Float32Array) => void)[]
 };
@@ -34,30 +35,38 @@ function step() {
 	while (ticks.length && ticks[0].time < next.time - history * 1000) ticks.shift();
 	if (!view.visible) return;
 	listeners.tick.forEach((listener) => listener(next));
-	if (view.page === 'apps' || view.page === 'processes') sendTasks();
+	if (view.page === 'processes') sendTasks();
 }
 
 function shown() {
-	return view.page === 'apps' ? processes.filter((process) => process.app && view.expanded.includes(process.app)) : processes;
+	return view.everything ? processes : processes.filter((process) => view.expanded.includes(process.app ?? ''));
+}
+
+function owners(): AppInfo[] {
+	const known = new Map(apps.map((app) => [app.key, app]));
+	return [...new Set(processes.map((process) => process.app ?? ''))].map((key) => known.get(key) ?? { key, name: key.split('/').at(-1)!.replace('.service', ''), icon: null });
 }
 
 function sendTasks() {
 	advance(processes, interval / 1000);
-	if (view.page === 'apps') {
-		const usage = apps.map((app) => usageOf(app.key, app.name)).filter((app) => app.processes > 0);
-		listeners.apps.forEach((listener) => listener(usage));
-	}
+	const list = owners()
+		.map((app) => entryOf(app))
+		.filter((entry) => entry.processes > 0 && (entry.group !== 'system' || view.system || view.everything));
+	listeners.entries.forEach((listener) => listener(list));
 	const rows = encode(shown());
 	listeners.processes.forEach((listener) => listener(rows));
 }
 
-function usageOf(key: string, name: string): AppUsage {
+function entryOf({ key, name, icon }: AppInfo): Entry {
 	const members = processes.filter((process) => process.app === key);
+	const desktop = !key.includes(':');
+	const windowed = desktop && !background.has(key);
 	const sum = (pick: (process: (typeof members)[number]) => number) => members.reduce((total, process) => total + pick(process), 0);
 	return {
 		key,
 		name,
-		icon: null,
+		icon,
+		group: windowed ? 'apps' : desktop ? 'background' : 'system',
 		cpu: sum((process) => process.cpu),
 		memory: sum((process) => process.memory),
 		read: sum((process) => process.read),
@@ -71,7 +80,9 @@ function usageOf(key: string, name: string): AppUsage {
 		processes: members.length,
 		threads: sum((process) => process.threads),
 		paused: members.length > 0 && members.every((process) => process.state === 'T'),
-		background: background.has(key)
+		responding: true,
+		main: members[0]?.pid ?? null,
+		windows: windowed ? [{ pid: members[0]?.pid ?? 0, title: name, responding: true }] : []
 	};
 }
 
@@ -109,7 +120,7 @@ function details(pid: number): Details {
 		threads: process.threads,
 		nice: process.nice,
 		started: process.started,
-		cgroup: process.app ? `/user.slice/user-1000.slice/user@1000.service/app.slice/app-kestrel-${process.app.replace('.desktop', '')}-${pid}.scope` : '/system.slice',
+		cgroup: process.app?.startsWith(UNIT) ? process.app.slice(UNIT.length) : `/user.slice/user-1000.slice/user@1000.service/app.slice/app-kestrel-${process.app?.replace('.desktop', '')}-${pid}.scope`,
 		container: process.app === 'com.spotify.Client.desktop' ? 'Flatpak' : null,
 		openFiles: process.uid === 0 ? null : 40 + (pid % 90),
 		oomScore: 668,
@@ -126,8 +137,8 @@ function details(pid: number): Details {
 export const sample: SystemBackend = {
 	view: async (next) => {
 		view = next;
-		if (!view.visible || (view.page !== 'apps' && view.page !== 'processes')) return;
-		sendCatalog({ reset: true, added: processes.map(({ base: _base, ...entry }) => entry), removed: [], apps });
+		if (!view.visible || view.page !== 'processes') return;
+		sendCatalog({ reset: true, added: processes.map(({ base: _base, ...entry }) => entry), removed: [], apps: owners() });
 		setTimeout(sendTasks, 300);
 	},
 	configure: async (nextInterval, nextHistory) => {
@@ -152,9 +163,12 @@ export const sample: SystemBackend = {
 		const process = processes.find((candidate) => candidate.pid === pid);
 		if (process) process.nice = nice;
 	},
+	priorityApp: async (key, nice) => {
+		for (const process of processes) if (process.app === key) process.nice = nice;
+	},
 	onTick: (callback) => void listeners.tick.push(callback),
 	onDevices: () => {},
-	onApps: (callback) => void listeners.apps.push(callback),
+	onEntries: (callback) => void listeners.entries.push(callback),
 	onCatalog: (callback) => void listeners.catalog.push(callback),
 	onProcesses: (callback) => void listeners.processes.push(callback)
 };

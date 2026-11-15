@@ -20,13 +20,25 @@ asks:
 
 Barometer is the system monitor. Open it with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd>, or from the taskbar's right-click menu.
 
+## Apps and processes
+
+**Processes** lists what's running in three groups, the way the desktop started it:
+
+- **Apps** are everything with a window. Each app is one row, a browser included, and expanding it shows its windows and processes.
+- **Background** holds what you started or installed that has no window: apps that keep running after you close them, such as Mailman checking for new mail, extensions, and helpers like Flatpak's.
+- **System** holds Luft's own services, Kestrel and the rest of the system. It starts folded.
+
+An app's processor, memory and disk use count every process it started, read from the system's own accounting for the app, so memory several processes share is counted once. Services that work for several apps at once, such as the audio server and the portals, are listed on their own under System or Background rather than under any one app.
+
+Sorting by a column sorts within each group. The list button next to the search field shows every process in one list instead, and Barometer remembers which you chose. The columns, PID and user among them, are in the header's right-click menu. Search finds apps and processes by name, command or PID, and you can start typing anywhere in the list.
+
+An app that stopped answering is marked **Not responding**.
+
 ## Stopping apps and processes
 
-- **End**, **Force quit**, pause, resume and change the priority of apps and processes. Processes of other users and of the system ask for an administrator's password first. When an app isn't closing, Barometer offers to wait or force it.
-- Apps are grouped the way the desktop started them, with their processor, memory, disk and graphics use. Expand an app to see its processes.
-- Apps that keep running after you close their last window, such as Mailman checking for new mail, are listed under **Running in the background**. **Open** brings their window back, and **Stop** quits them, forcing them if they haven't quit after five seconds.
-- The process table can be sorted and searched, and its columns chosen from the header's right-click menu.
-- Process details show the command line, working folder, user, parent, threads, open files, control group and a breakdown of memory.
+- **End**, **Force quit**, pause, resume and change the priority of an app, which applies to all its processes, or of a single process under it. Processes of other users and of the system ask for an administrator's password first. When something isn't closing, Barometer offers to wait or force it.
+- Apps under **Background** have **Open**, which brings their window back, and **Stop**, which quits them, forcing them if they haven't quit after five seconds.
+- Details show a process's command line, working folder, user, parent, threads, open files, control group and a breakdown of memory. An app's details are those of its main process.
 
 ## Performance
 
@@ -38,8 +50,9 @@ In its preferences you can change how often it updates and how much history the 
 
 | Shortcut | Does |
 | --- | --- |
-| <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search apps or processes |
-| <kbd>Right</kbd> / <kbd>Left</kbd> | Show or hide an app's processes |
-| <kbd>Enter</kbd> | Show an app's processes, or a process's details |
+| <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search apps and processes |
+| <kbd>Up</kbd> / <kbd>Down</kbd> | Move through the list |
+| <kbd>Right</kbd> / <kbd>Left</kbd> | Expand or fold an app or a group |
+| <kbd>Enter</kbd> | Expand an app, or show a process's details |
 | <kbd>Delete</kbd> | End the selected app or process |
 | <kbd>Shift</kbd>+<kbd>Delete</kbd> | Force quit |

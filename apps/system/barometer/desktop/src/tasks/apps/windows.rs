@@ -1,10 +1,12 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use futures_util::StreamExt;
 use luft_app::dbus;
 use luft_dbus_macros::introspect;
 use parking_lot::{Mutex, MutexGuard};
+use serde::Serialize;
+use specta::Type;
 use zbus::proxy;
 
 #[introspect]
@@ -14,33 +16,51 @@ use zbus::proxy;
     default_path = "/com/lantharos/Kestrel/OpenWindows"
 )]
 trait Kestrel {
-    fn list(&self) -> zbus::Result<HashMap<String, Vec<u32>>>;
+    fn list(&self) -> zbus::Result<HashMap<String, Vec<(u32, String, bool)>>>;
 
     #[zbus(signal)]
     fn changed(&self) -> zbus::Result<()>;
 }
 
-pub struct Windowed {
-    apps: HashSet<String>,
-    pids: HashSet<u32>,
+#[derive(Serialize, Clone, Type)]
+pub struct Window {
+    pub pid: u32,
+    pub title: String,
+    pub responding: bool,
 }
+
+pub struct Windowed(HashMap<String, Vec<Window>>);
 
 impl Windowed {
-    pub fn shows(&self, key: &str, members: &[u32]) -> bool {
-        self.apps.contains(key) || members.iter().any(|pid| self.pids.contains(pid))
+    pub fn apps(&self) -> impl Iterator<Item = (&str, &[Window])> {
+        self.0
+            .iter()
+            .map(|(app, windows)| (app.as_str(), windows.as_slice()))
     }
 }
 
-impl From<HashMap<String, Vec<u32>>> for Windowed {
-    fn from(apps: HashMap<String, Vec<u32>>) -> Self {
-        Self {
-            pids: apps.values().flatten().copied().collect(),
-            apps: apps.into_keys().collect(),
-        }
+impl From<HashMap<String, Vec<(u32, String, bool)>>> for Windowed {
+    fn from(listed: HashMap<String, Vec<(u32, String, bool)>>) -> Self {
+        Self(
+            listed
+                .into_iter()
+                .map(|(app, windows)| {
+                    let windows = windows
+                        .into_iter()
+                        .map(|(pid, title, responding)| Window {
+                            pid,
+                            title,
+                            responding,
+                        })
+                        .collect();
+                    (app, windows)
+                })
+                .collect(),
+        )
     }
 }
 
-/// The apps Kestrel shows a window for, kept current from its change signal.
+/// The windows Kestrel shows, by app, kept current from its change signal.
 /// Stays unknown when Kestrel can't tell.
 #[derive(Clone, Default)]
 pub struct OpenWindows(Arc<Mutex<Option<Windowed>>>);

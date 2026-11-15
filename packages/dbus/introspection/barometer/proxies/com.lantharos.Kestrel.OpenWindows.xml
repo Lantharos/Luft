@@ -1,7 +1,7 @@
 <node>
   <interface name="com.lantharos.Kestrel.OpenWindows">
     <method name="List">
-      <arg type="a{sau}" direction="out"/>
+      <arg type="a{sa(usb)}" direction="out"/>
     </method>
     <signal name="Changed">
     </signal>

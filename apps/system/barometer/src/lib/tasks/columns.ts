@@ -59,7 +59,9 @@ export const COLUMNS: Column[] = [
 	{ id: 'command', label: 'Command', width: 280, numeric: false, value: (row) => row.command ?? '', text: (row) => row.command ?? '' }
 ];
 
-export const APP_COLUMN_IDS = ['cpu', 'memory', 'read', 'write', 'readTotal', 'writeTotal', 'gpu', 'vram', 'encoder', 'decoder', 'threads'];
+const GROUP_COLUMNS = new Set(['cpu', 'memory', 'read', 'write', 'readTotal', 'writeTotal', 'gpu', 'vram', 'encoder', 'decoder', 'threads']);
+
+export const sharedByGroups = (column: Column) => GROUP_COLUMNS.has(column.id);
 
 export function columnsFor(ids: string[]) {
 	return COLUMNS.filter((column) => ids.includes(column.id));

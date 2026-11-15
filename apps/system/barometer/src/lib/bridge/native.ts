@@ -32,9 +32,10 @@ export const native: Backend = {
 	openApp: (key, token) => commands.appOpen({ key, token }),
 	stopApp: (key) => commands.appStop({ key }),
 	priority: (pid, nice) => commands.processPriority({ pid, nice }, AUTHENTICATION),
+	priorityApp: (key, nice) => commands.appPriority({ key, nice }, AUTHENTICATION),
 	onTick: (callback) => batched(events.barometerTick, callback),
 	onDevices: (callback) => batched(events.barometerDevices, callback),
-	onApps: (callback) => batched(events.barometerApps, callback),
+	onEntries: (callback) => batched(events.barometerEntries, callback),
 	onCatalog: (callback) => batched(events.barometerCatalog, callback),
 	onProcesses: (callback) => batched(events.barometerProcesses, (bytes) => callback(floats(bytes)))
 };

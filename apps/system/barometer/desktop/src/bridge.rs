@@ -1,4 +1,4 @@
-use luft_app::{Appearance, Commands, Empty};
+use luft_app::{Activation, Appearance, Commands, Empty};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::{Map, Value};
@@ -13,6 +13,7 @@ struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
     settings: Option<Map<String, Value>>,
+    activation: Activation,
 }
 
 pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
@@ -24,6 +25,7 @@ pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
             Ok(AppState {
                 appearance: Appearance::current().await,
                 settings: settings::read(),
+                activation: Activation::current_process(),
             })
         })
         .command("settings_write", settings::write)
@@ -33,7 +35,8 @@ pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
         .command("process_details", details::read)
         .with("app_signal", monitor, Monitor::signal_app)
         .with("app_stop", monitor, Monitor::stop_app)
+        .with("app_priority", monitor, Monitor::renice_app)
         .command("app_open", control::open_app)
         .command("process_signal", control::signal_processes)
-        .command("process_priority", control::renice)
+        .command("process_priority", control::renice_process)
 }

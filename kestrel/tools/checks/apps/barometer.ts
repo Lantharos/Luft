@@ -1,8 +1,9 @@
+import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
-import type {LuftApp} from '../lib/apps/luftApp.js';
+import {environment, type LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
-import {rest, type Point} from '../lib/input/input.js';
+import {press as pressKeys, rest, type Point} from '../lib/input/input.js';
 import {spawn, windows, windowShown} from '../lib/processes.js';
 import type {Frame} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
@@ -12,27 +13,83 @@ import {checkPalette, withPalette} from './lib/palette.js';
 const {require, eventually} = checks('Luft app');
 const MAILMAN = 'com.lantharos.mailman';
 const CONTENT = {x: 280, y: 0, width: 840};
-const NAMES = {x: 290, y: 100, width: 250, height: 90};
-const OPEN: Point = [465, 154];
-const STOP: Point = [524, 154];
+const ROWS = {x: 290, y: 100, width: 250, height: 150};
+const MAILMAN_ROW: Point = [309, 192];
+const OPEN: Point = [465, 229];
+const STOP: Point = [524, 229];
+const GROUPED: Point = [510, 30];
+const ALL_PROCESSES: Point = [548, 30];
+const COLUMN_HEADINGS: Point = [450, 76];
 const SETTLE = 3000;
 const REOPEN_TIMEOUT = 15000;
 const SHOW_TIMEOUT = 5000;
+const ANSWER_TIMEOUT = 12000;
 const FORCE_AFTER = 5000;
 const MIB = 1024 * 1024;
+const BY_NAME = {sort: {column: 'name', direction: 'ascending'}};
 
 const decoder = new TextDecoder();
 const read = (path: string) => decoder.decode(GLib.file_get_contents(path)[1]).trim();
 const mailmanWindow = () => windows().find(window => window.get_wm_class() === MAILMAN && windowShown(window));
 const scopeOf = (pid: number) => `/sys/fs/cgroup${read(`/proc/${pid}/cgroup`).split('::')[1]}`;
+const signal = (pid: number, name: string) => spawn(['kill', `-${name}`, String(pid)]).exited;
 
-function shows(barometer: LuftApp, expected: Frame, label: string) {
-  return eventually(async () => (await barometer.frame(barometer.area(NAMES))).looksLike(expected), label, SHOW_TIMEOUT);
+function sortByName() {
+  const folder = GLib.build_filenamev([environment().HOME!, '.config', 'barometer']);
+  GLib.mkdir_with_parents(folder, 0o755);
+  GLib.file_set_contents(GLib.build_filenamev([folder, 'settings.json']), JSON.stringify(BY_NAME));
 }
 
-async function press(barometer: LuftApp, point: Point) {
-  barometer.click(point);
+function rows(barometer: LuftApp) {
+  return barometer.frame(barometer.area(ROWS));
+}
+
+function shows(barometer: LuftApp, expected: Frame, label: string) {
+  return eventually(async () => (await rows(barometer)).looksLike(expected), label, SHOW_TIMEOUT);
+}
+
+async function press(barometer: LuftApp, point: Point, button: number = Clutter.BUTTON_PRIMARY) {
+  barometer.click(point, button);
   rest();
+}
+
+async function save(barometer: LuftApp, name: string) {
+  await pause(SETTLE);
+  (await barometer.settle(() => true, barometer.area(CONTENT))).save(name);
+}
+
+async function checkViews(barometer: LuftApp) {
+  await save(barometer, 'barometer-grouped');
+  await changes(barometer, "Barometer shows Mailman's window and processes under its row", () => press(barometer, MAILMAN_ROW), ROWS);
+  await save(barometer, 'barometer-expanded');
+  await changes(barometer, 'Barometer folds Mailman back into one row', () => press(barometer, MAILMAN_ROW), ROWS);
+  await changes(barometer, 'Barometer lists every process on its own', () => press(barometer, ALL_PROCESSES), ROWS);
+  await save(barometer, 'barometer-flat');
+  await press(barometer, COLUMN_HEADINGS, Clutter.BUTTON_SECONDARY);
+  await save(barometer, 'barometer-columns');
+  pressKeys(Clutter.KEY_Escape);
+  await changes(barometer, 'Barometer groups processes again', () => press(barometer, GROUPED), ROWS);
+}
+
+async function checkNotResponding(barometer: LuftApp) {
+  const window = mailmanWindow()!;
+  const pid = window.get_pid();
+  const ping = () => window.check_alive(global.display.get_current_time_roundtrip());
+  barometer.window.activate(global.get_current_time());
+  await pause(SETTLE);
+  const answering = await rows(barometer);
+  await signal(pid, 'STOP');
+  try {
+    ping();
+    await eventually(() => !window.is_alive, 'Kestrel finds that Mailman stopped answering', ANSWER_TIMEOUT);
+    await eventually(async () => !(await rows(barometer)).looksLike(answering), 'Barometer marks Mailman as not responding', SHOW_TIMEOUT);
+    await save(barometer, 'barometer-not-responding');
+  } finally {
+    await signal(pid, 'CONT');
+  }
+  ping();
+  await eventually(() => window.is_alive, 'Mailman answers Kestrel again', ANSWER_TIMEOUT);
+  await shows(barometer, answering, 'Barometer drops the mark once Mailman answers again');
 }
 
 async function checkBackgroundApps() {
@@ -40,23 +97,25 @@ async function checkBackgroundApps() {
   const mailman = await openApp('mailman', [], {}, {slice});
   try {
     const scope = scopeOf(mailman.pid);
-    const barometer = await openApp('barometer', [], {LUFT_SAMPLE_SYSTEM: null, LUFT_APP_SLICE: GLib.path_get_dirname(scope)});
+    sortByName();
+    const barometer = await openApp('barometer', [], {LUFT_SAMPLE_SYSTEM: null, LUFT_APP_SLICE: GLib.path_get_dirname(scope)}, {slice});
     try {
       rest();
       await pause(SETTLE);
-      const open = await barometer.frame(barometer.area(NAMES));
-      const background = await changes(barometer, 'Barometer lists Mailman as running in the background once its window closes',
-        () => mailman.window.delete(global.get_current_time()), NAMES);
+      await checkViews(barometer);
+      await checkNotResponding(barometer);
+      const open = await rows(barometer);
+      const background = await changes(barometer, 'Barometer moves Mailman under Background once its window closes',
+        () => mailman.window.delete(global.get_current_time()), ROWS);
       require(!mailmanWindow(), 'closing Mailman closes its window');
-      await pause(SETTLE);
-      (await barometer.settle(() => true, barometer.area(CONTENT))).save('barometer-background');
+      await save(barometer, 'barometer-background');
       console.log(`Kestrel Luft app check: Mailman uses ${(Number(read(`${scope}/memory.current`)) / MIB).toFixed(1)} MB in the background`);
       await press(barometer, OPEN);
       const reopened = await eventually(mailmanWindow, "Open brings Mailman's window back", REOPEN_TIMEOUT);
       barometer.window.activate(global.get_current_time());
-      await shows(barometer, open, 'Barometer lists Mailman among the open apps again');
+      await shows(barometer, open, 'Barometer lists Mailman among the apps again');
       reopened.delete(global.get_current_time());
-      await shows(barometer, background, 'closing Mailman again puts it back under Running in the background');
+      await shows(barometer, background, 'closing Mailman again puts it back under Background');
 
       const stopping = GLib.get_monotonic_time();
       await press(barometer, STOP);
@@ -64,7 +123,7 @@ async function checkBackgroundApps() {
       const seconds = (GLib.get_monotonic_time() - stopping) / 1e6;
       require(seconds * 1000 < FORCE_AFTER, `Mailman quits ${seconds.toFixed(1)} s after Stop, before Barometer would force it`);
       await eventually(() => !GLib.file_test(scope, GLib.FileTest.EXISTS), "Mailman's scope and its memory are gone");
-      await eventually(async () => !(await barometer.frame(barometer.area(NAMES))).looksLike(background), 'Barometer no longer lists Mailman', SHOW_TIMEOUT);
+      await eventually(async () => !(await rows(barometer)).looksLike(background), 'Barometer no longer lists Mailman', SHOW_TIMEOUT);
     } finally {
       await barometer.close();
     }

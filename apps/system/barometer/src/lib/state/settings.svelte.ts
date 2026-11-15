@@ -17,10 +17,9 @@ export interface Settings {
 	normalizeCpu: boolean;
 	showCores: boolean;
 	animateGraphs: boolean;
-	processColumns: string[];
-	appColumns: string[];
-	processSort: Sort;
-	appSort: Sort;
+	columns: string[];
+	sort: Sort;
+	flat: boolean;
 }
 
 const DEFAULTS: Settings = {
@@ -32,10 +31,9 @@ const DEFAULTS: Settings = {
 	normalizeCpu: true,
 	showCores: true,
 	animateGraphs: false,
-	processColumns: ['user', 'cpu', 'memory', 'gpu', 'pid'],
-	appColumns: ['cpu', 'memory', 'read', 'write', 'gpu', 'vram'],
-	processSort: { column: 'cpu', direction: 'descending' },
-	appSort: { column: 'cpu', direction: 'descending' }
+	columns: ['cpu', 'memory', 'read', 'write', 'gpu', 'vram'],
+	sort: { column: 'cpu', direction: 'descending' },
+	flat: false
 };
 
 class SettingsStore {

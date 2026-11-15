@@ -196,8 +196,8 @@ impl Prompt {
         Self::on_processes(operation, verb, processes)
     }
 
-    pub fn set_priority(process: Process) -> Self {
-        Self::on_processes("set-priority", "Change the priority of", &[process])
+    pub fn set_priority(processes: &[Process]) -> Self {
+        Self::on_processes("set-priority", "Change the priority of", processes)
     }
 
     pub fn details(&self) -> Details<'_> {

@@ -86,7 +86,7 @@ export function createProcesses(now: number): SampleProcess[] {
 				command: template.command,
 				user: template.user ?? 'mara',
 				uid: template.user ? 0 : 1000,
-				app: template.app ?? null,
+				app: template.app ?? `cgroup:/${template.user ? 'system.slice' : 'user.slice/user-1000.slice/user@1000.service/session.slice'}/${template.name}.service`,
 				started: now / 1000 - 3600 * 3 + pid,
 				cpu,
 				memory: template.memory * MIB,

@@ -7,6 +7,10 @@ export const commands = {
 		key: string,
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("app_open", params, options),
+	appPriority: (params: {
+		key: string,
+		nice: number,
+	}, options?: CallOptions) => invoke<null>("app_priority", params, options),
 	appSignal: (params: {
 		key: string,
 		signal: Signal,
@@ -27,6 +31,8 @@ export const commands = {
 		visible: boolean,
 		reset: boolean,
 		expanded: string[],
+		system: boolean,
+		everything: boolean,
 		disk: boolean,
 		gpu: boolean,
 	}, options?: CallOptions) => invoke<null>("monitor_view", params, options),
@@ -52,12 +58,21 @@ export const events = {
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	barometerApps: (callback: (payload: AppUsage[]) => void) => listen<AppUsage[]>("barometer.apps", callback),
 	barometerCatalog: (callback: (payload: Catalog) => void) => listen<Catalog>("barometer.catalog", callback),
 	barometerDevices: (callback: (payload: Devices) => void) => listen<Devices>("barometer.devices", callback),
+	barometerEntries: (callback: (payload: Entry[]) => void) => listen<Entry[]>("barometer.entries", callback),
 	barometerProcesses: (callback: (payload: Uint8Array) => void) => listen<Uint8Array>("barometer.processes", callback),
 	barometerTick: (callback: (payload: Tick) => void) => listen<Tick>("barometer.tick", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
+};
+
+/**
+ *  The command line an app was started with, either this process's own or the
+ *  one a second launch forwarded as the page's `singleInstance.activate` event.
+ */
+export type Activation = {
+	arguments: string[],
+	workingDirectory: string | null,
 };
 
 export type AppIconStyle = "default" | "tinted" | "clear";
@@ -77,27 +92,8 @@ export type AppInfo = {
 
 export type AppState = {
 	settings: { [key in string]: Value } | null,
+	activation: Activation,
 } & Appearance;
-
-export type AppUsage = {
-	key: string,
-	name: string,
-	icon: string | null,
-	cpu: number,
-	memory: number,
-	read: number,
-	write: number,
-	readTotal: number,
-	writeTotal: number,
-	gpu: number,
-	vram: number,
-	encoder: number,
-	decoder: number,
-	processes: number,
-	threads: number,
-	paused: boolean,
-	background: boolean,
-};
 
 export type Appearance = {
 	palette: Palette | null,
@@ -240,6 +236,29 @@ export type DriveSpace = {
 	mounts: string[],
 };
 
+export type Entry = {
+	key: string,
+	name: string,
+	icon: string | null,
+	group: Group,
+	cpu: number,
+	memory: number,
+	read: number,
+	write: number,
+	readTotal: number,
+	writeTotal: number,
+	gpu: number,
+	vram: number,
+	encoder: number,
+	decoder: number,
+	processes: number,
+	threads: number,
+	paused: boolean,
+	responding: boolean,
+	main: number | null,
+	windows: Window[],
+};
+
 export type GpuInfo = {
 	id: string,
 	name: string,
@@ -268,6 +287,8 @@ export type GpuSample = {
 	decoder: number | null,
 	fan: number | null,
 };
+
+export type Group = "apps" | "background" | "system";
 
 export type IconPaint = {
 	plate: string,
@@ -400,3 +421,9 @@ export type Typography = {
 };
 
 export type Value = null | boolean | number | string | Value[] | { [key in string]: Value };
+
+export type Window = {
+	pid: number,
+	title: string,
+	responding: boolean,
+};

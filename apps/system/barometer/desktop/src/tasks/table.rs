@@ -6,6 +6,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use super::apps::{AppInfo, Scopes};
+use super::groups::key_of_cgroup;
 use super::process::{Opened, Process};
 use super::users::Users;
 use crate::gpu::ProcessGpu;
@@ -129,7 +130,7 @@ impl Table {
         fresh.dedup();
         for pid in &fresh {
             if let Some(process) = self.processes.get_mut(pid) {
-                process.app = scopes.app_of_cgroup(&process.cgroup);
+                process.app = key_of_cgroup(scopes, &process.cgroup);
             }
         }
         self.encode(gpu);

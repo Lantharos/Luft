@@ -4,10 +4,12 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use luft_app::Events;
 
 use super::{Control, Shared};
-use crate::events::{APPS, CATALOG, DEVICES, PROCESSES, TICK};
+use crate::events::{CATALOG, DEVICES, ENTRIES, PROCESSES, TICK};
 use crate::system::System;
-use crate::tasks::apps::{self, AppSampler};
+use crate::tasks::groups::{self, EntrySampler};
 use crate::tasks::{Table, process_ids};
+
+const PAGE: &str = "processes";
 
 const WARM_UP: Duration = Duration::from_millis(300);
 
@@ -22,7 +24,7 @@ struct Sampler<'a> {
     events: &'a Events,
     system: System,
     table: Table,
-    apps: AppSampler,
+    entries: EntrySampler,
     last: Instant,
     next: Instant,
     warm_up: Option<Instant>,
@@ -35,7 +37,7 @@ pub(super) fn run(shared: &Shared, events: &Events, system: System) {
         events,
         system,
         table: Table::new(),
-        apps: AppSampler::new(),
+        entries: EntrySampler::new(),
         last: now,
         next: now + shared.control.lock().interval,
         warm_up: None,
@@ -124,22 +126,20 @@ impl Sampler<'_> {
             return;
         }
         let mut scopes = self.shared.scopes.lock();
-        let (pids, gpu) = if control.page == "apps" {
-            let (mut usage, members) = self.apps.sample(&mut scopes, &self.system.disks());
-            let gpu = if control.gpu {
-                let mut all: Vec<u32> = members.values().flatten().copied().collect();
-                all.sort_unstable();
-                self.system.gpus.processes(&all)
-            } else {
-                HashMap::new()
-            };
-            apps::attach_gpu(&mut usage, &members, &gpu);
-            if let Some(windowed) = self.shared.windows.current().as_ref() {
-                apps::mark_background(&mut usage, &members, windowed);
-            }
-            if emit {
-                self.events.emit(APPS, &usage);
-            }
+        let windows = self.shared.windows.current();
+        let groups::Sampled {
+            mut entries,
+            members,
+        } = self.entries.sample(
+            &mut scopes,
+            windows.as_ref(),
+            &self.system.disks(),
+            control.system || control.everything,
+        );
+        drop(windows);
+        let pids = if control.everything {
+            process_ids()
+        } else {
             let mut expanded: Vec<u32> = control
                 .expanded
                 .iter()
@@ -148,16 +148,19 @@ impl Sampler<'_> {
                 .copied()
                 .collect();
             expanded.sort_unstable();
-            (expanded, gpu)
-        } else {
-            let pids = process_ids();
-            let gpu = if control.gpu {
-                self.system.gpus.processes(&pids)
-            } else {
-                HashMap::new()
-            };
-            (pids, gpu)
+            expanded
         };
+        let gpu = if control.gpu {
+            let mut all: Vec<u32> = members.values().flatten().copied().collect();
+            all.sort_unstable();
+            self.system.gpus.processes(&all)
+        } else {
+            HashMap::new()
+        };
+        groups::attach_gpu(&mut entries, &members, &gpu);
+        if emit {
+            self.events.emit(ENTRIES, &entries);
+        }
         let (catalog, rows) = self.table.sample(&mut scopes, &pids, control.disk, &gpu);
         if !catalog.is_empty() {
             self.events.emit(CATALOG, &catalog);
@@ -169,7 +172,7 @@ impl Sampler<'_> {
 }
 
 fn shows_tasks(control: &Control) -> bool {
-    control.visible && (control.page == "apps" || control.page == "processes")
+    control.visible && control.page == PAGE
 }
 
 fn unix_time() -> u64 {

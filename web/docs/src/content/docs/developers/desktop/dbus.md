@@ -34,7 +34,7 @@ These are on `com.lantharos.Kestrel` on the session bus. Sandboxed apps may only
 
 | Interface and path | Does |
 | --- | --- |
-| `com.lantharos.Kestrel.OpenWindows`, `/com/lantharos/Kestrel/OpenWindows` | `List` returns each app's desktop file ID with the process IDs of its windows; `Changed` follows. Barometer uses it to show apps running in the background |
+| `com.lantharos.Kestrel.OpenWindows`, `/com/lantharos/Kestrel/OpenWindows` | `List` returns each app's desktop file ID with its windows, each as the process ID, title and whether it answers Kestrel's checks; `Changed` follows. Barometer uses it to group apps by window and mark the ones not responding |
 | `com.lantharos.Kestrel.Share`, `/com/lantharos/Kestrel/Share` | `Send(a(sh) files)` opens the Send sheet for files handed over as names and open file descriptors, where people pick a device nearby or an app. Only the app whose window is in front may call it, sandboxed or not, and at most five sheets a minute |
 | `com.lantharos.Kestrel.Sounds`, `/com/lantharos/Kestrel/Sounds` | `Play(s name)` plays a sound of the theme, following the sound switches, at most four a second per caller; sandboxed apps may call it. `Preview` plays regardless of the switches and `Check` says whether a file can be a custom sound, both for Settings |
 | `com.lantharos.Kestrel.DriveAccess`, `/com/lantharos/Kestrel/DriveAccess` | `Ask(h app, s drive) → b` asks whether a sandboxed app may use a drive. Only Schelf may call it; [Kestrel's prompts](/developers/desktop/prompts/#drives) has the rules |

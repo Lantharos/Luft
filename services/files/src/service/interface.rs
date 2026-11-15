@@ -187,14 +187,14 @@ impl Files {
 
     async fn set_priority(
         &self,
-        process: Process,
+        processes: Vec<Process>,
         nice: i32,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        let prompt = Prompt::set_priority(process);
+        let prompt = Prompt::set_priority(&processes);
         self.allowed(connection, &header, PROCESSES, &prompt, move || {
-            Ok(processes::set_priority(process, nice)?)
+            Ok(processes::set_priority(&processes, nice)?)
         })
         .await
     }

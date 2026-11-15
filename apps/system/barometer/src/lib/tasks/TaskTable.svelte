@@ -1,87 +1,83 @@
-<script lang="ts" module>
-	import type { Row } from './columns';
-
-	export interface Item {
-		key: string;
-		row: Row;
-		title: string;
-		icon: string | null;
-		app?: string | null;
-		note?: string;
-		working?: boolean;
-		child?: boolean;
-		expanded?: boolean;
-	}
-
-	export interface Heading {
-		key: string;
-		heading: string;
-	}
-
-	export type Entry = Item | Heading;
-
-	export const isItem = (entry: Entry): entry is Item => !('heading' in entry);
-</script>
-
 <script lang="ts">
 	import { AppIcon, Spinner, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import type { Snippet } from 'svelte';
 	import type { Sort } from '#lib/state/settings.svelte.js';
-	import { template, type Column } from './columns';
+	import { sharedByGroups, template, type Column } from './columns';
 	import { desktopId } from './icons';
 	import TableHeader from './TableHeader.svelte';
+	import type { Node } from './tree/node.svelte';
 
 	interface Props {
-		items: Entry[];
+		items: Node[];
 		columns: Column[];
 		sort: Sort;
 		selected: string | null;
 		label: string;
 		onsort: (column: string) => void;
 		oncolumns: (event: MouseEvent) => void;
-		onselect: (item: Item) => void;
-		onopen: (item: Item) => void;
-		onmenu: (event: MouseEvent, item: Item) => void;
-		ontoggle?: (item: Item) => void;
-		onend: (item: Item, force: boolean) => void;
-		actions?: Snippet<[Item]>;
+		onselect: (node: Node) => void;
+		onopen: (node: Node) => void;
+		onmenu: (event: MouseEvent, node: Node) => void;
+		ontoggle: (node: Node) => void;
+		onend: (node: Node, force: boolean) => void;
+		ontype: (text: string) => void;
+		actions?: Snippet<[Node]>;
 	}
 
-	let { items, columns, sort, selected, label, onsort, oncolumns, onselect, onopen, onmenu, ontoggle, onend, actions }: Props = $props();
+	let { items, columns, sort, selected, label, onsort, oncolumns, onselect, onopen, onmenu, ontoggle, onend, ontype, actions }: Props = $props();
 
 	const LAYOUT = { itemHeight: 36, gap: 1, padding: { top: 4, right: 10, bottom: 20, left: 10 } };
 
 	let scroller = $state<VirtualHandle>();
-	let rows = $derived(items.filter(isItem));
-	let index = $derived(rows.findIndex((item) => item.key === selected));
+	let index = $derived(items.findIndex((node) => node.key === selected));
 
-	function move(offset: number) {
-		const next = rows[Math.min(rows.length - 1, Math.max(0, (index < 0 ? -1 : index) + offset))];
+	export function reveal(key: string) {
+		const at = items.findIndex((node) => node.key === key);
+		if (at >= 0) scroller?.scrollToIndex(at, 'center');
+	}
+
+	function select(at: number) {
+		const next = items[Math.min(items.length - 1, Math.max(0, at))];
 		if (!next) return;
 		onselect(next);
 		scroller?.scrollToIndex(items.indexOf(next));
 	}
 
+	function left(node: Node) {
+		if (node.expanded) ontoggle(node);
+		else if (node.parent) select(items.indexOf(node.parent));
+	}
+
+	function right(node: Node) {
+		if (node.expanded === false) ontoggle(node);
+		else if (node.expanded) select(index + 1);
+	}
+
 	function keydown(event: KeyboardEvent) {
-		const item = rows[index];
+		const node = items[index];
 		const page = scroller?.metrics().pageRows ?? 10;
+		const from = index < 0 ? -1 : index;
 		const keys: Record<string, () => void> = {
-			ArrowDown: () => move(1),
-			ArrowUp: () => move(-1),
-			PageDown: () => move(page),
-			PageUp: () => move(-page),
-			Home: () => move(-rows.length),
-			End: () => move(rows.length),
-			Enter: () => item && onopen(item),
-			Delete: () => item && onend(item, event.shiftKey),
-			ArrowRight: () => item?.expanded === false && ontoggle?.(item),
-			ArrowLeft: () => item?.expanded && ontoggle?.(item)
+			ArrowDown: () => select(from + 1),
+			ArrowUp: () => select(from - 1),
+			PageDown: () => select(from + page),
+			PageUp: () => select(from - page),
+			Home: () => select(0),
+			End: () => select(items.length - 1),
+			Enter: () => node && onopen(node),
+			Delete: () => node && onend(node, event.shiftKey),
+			ArrowRight: () => node && right(node),
+			ArrowLeft: () => node && left(node)
 		};
 		const action = keys[event.key];
-		if (!action) return;
-		event.preventDefault();
-		action();
+		if (action) {
+			event.preventDefault();
+			action();
+		} else if (event.key.length === 1 && event.key !== ' ' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+			event.preventDefault();
+			ontype(event.key);
+		}
 	}
 </script>
 
@@ -94,74 +90,103 @@
 	class="task-table soft-scroll min-h-0 flex-1"
 	style="--table-columns: {template(columns)}"
 	{items}
-	key={(item) => item.key}
+	key={(node) => node.key}
 	layout={LAYOUT}
 	overscan={6}
 	stableOrder
+	animateOrder
 	{header}
-	role="grid"
+	role="treegrid"
 	aria-label={label}
 	tabindex={0}
 	onkeydown={keydown}
 >
-	{#snippet children(entry, index)}
-		{#if isItem(entry)}
-			{@render row(entry, index)}
+	{#snippet children(node, at)}
+		{#if node.kind === 'group'}
+			{@render heading(node, at)}
 		{:else}
-			<div class="group-heading" role="row" aria-rowindex={index + 2}>
-				<span role="rowheader">{entry.heading}</span>
-			</div>
+			{@render row(node, at)}
 		{/if}
 	{/snippet}
 </VirtualScroller>
 
-{#snippet row(item: Item, index: number)}
+{#snippet disclosure(node: Node, label: string)}
+	<button
+		type="button"
+		class="disclosure"
+		class:open={node.expanded}
+		aria-label={label}
+		onpointerdown={(event) => event.stopPropagation()}
+		onclick={() => ontoggle(node)}
+	>
+		<ChevronRight size={15} />
+	</button>
+{/snippet}
+
+{#snippet heading(node: Node, at: number)}
 	<div
-		class="table-grid task-row"
-		aria-rowindex={index + 2}
-		class:selected={item.key === selected}
-		class:child={item.child}
+		class="group-heading"
+		class:selected={node.key === selected}
 		role="row"
 		tabindex="-1"
-		aria-selected={item.key === selected}
-		onpointerdown={() => onselect(item)}
-		ondblclick={() => onopen(item)}
+		aria-rowindex={at + 2}
+		aria-level={1}
+		aria-expanded={node.expanded}
+		aria-selected={node.key === selected}
+		onpointerdown={() => onselect(node)}
+		ondblclick={() => ontoggle(node)}
+	>
+		{@render disclosure(node, node.expanded ? `Hide ${node.title}` : `Show ${node.title}`)}
+		<span role="rowheader">{node.title}</span>
+	</div>
+{/snippet}
+
+{#snippet row(node: Node, at: number)}
+	<div
+		class="table-grid task-row"
+		aria-rowindex={at + 2}
+		aria-level={node.child ? 3 : 2}
+		aria-expanded={node.expanded}
+		class:selected={node.key === selected}
+		class:child={node.child}
+		role="row"
+		tabindex="-1"
+		aria-selected={node.key === selected}
+		onpointerdown={() => onselect(node)}
+		ondblclick={() => onopen(node)}
 		oncontextmenu={(event) => {
 			event.preventDefault();
-			onselect(item);
-			onmenu(event, item);
+			onselect(node);
+			onmenu(event, node);
 		}}
 	>
 		<span class="name">
-			{#if item.expanded !== undefined}
-				<button
-					type="button"
-					class="disclosure"
-					class:open={item.expanded}
-					aria-label={item.expanded ? 'Hide processes' : 'Show processes'}
-					onpointerdown={(event) => event.stopPropagation()}
-					onclick={() => ontoggle?.(item)}
-				>
-					<ChevronRight size={15} />
-				</button>
+			{#if node.expanded !== undefined}
+				{@render disclosure(node, node.expanded ? 'Hide processes' : 'Show processes')}
 			{/if}
-			<AppIcon icon={item.icon} id={desktopId(item.app)} size={item.child ? 18 : 22} />
-			<span class="truncate">{item.title}</span>
-			{#if item.working}<Spinner size={12} class="text-[var(--text-muted)]" />{/if}
-			{#if item.note}
-				<span class="note">{item.note}</span>
+			<AppIcon icon={node.icon} id={desktopId(node.app)} size={node.child ? 18 : 22} />
+			<span class="truncate">{node.title}</span>
+			{#if node.kind === 'entry' && node.count > 1}
+				<span class="count">{node.count}</span>
 			{/if}
-			{@render actions?.(item)}
+			{#if node.working}<Spinner size={12} class="text-[var(--text-muted)]" />{/if}
+			{#if node.note}
+				<span class="note" class:alert={node.note === 'Not responding'}>{node.note}</span>
+			{/if}
+			{@render actions?.(node)}
 		</span>
-		{#each columns as column (column.id)}
-			<span class="cell" class:numeric={column.numeric}>{column.text(item.row)}</span>
-		{/each}
+		{#if node.kind !== 'window'}
+			{#each columns as column (column.id)}
+				<span class="cell" class:numeric={column.numeric}>{node.kind === 'process' || sharedByGroups(column) ? column.text(node.row) : ''}</span>
+			{/each}
+		{/if}
 	</div>
 {/snippet}
 
 <style>
 	:global(.task-table) {
 		outline: none;
+		overflow-anchor: none;
 	}
 
 	:global(.table-grid) {
@@ -183,11 +208,12 @@
 		background: var(--surface);
 	}
 
-	.task-row.selected {
+	.task-row.selected,
+	.group-heading.selected {
 		background: var(--surface-hover);
 	}
 
-	:global(.task-table:focus-visible) .task-row.selected {
+	:global(.task-table:focus-visible) :is(.task-row, .group-heading).selected {
 		box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 60%, transparent);
 	}
 
@@ -207,11 +233,14 @@
 	.group-heading {
 		display: flex;
 		height: 100%;
-		align-items: flex-end;
-		padding: 0 8px 6px;
-		font-size: 12.5px;
-		font-weight: 500;
-		color: var(--text-muted);
+		align-items: center;
+		gap: 10px;
+		border-radius: 10px;
+		padding-inline: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-soft);
+		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.disclosure {
@@ -237,10 +266,16 @@
 		transform: rotate(90deg);
 	}
 
+	.count,
 	.note {
 		flex: none;
 		font-size: 12px;
 		color: var(--text-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.note.alert {
+		color: var(--danger);
 	}
 
 	.cell {

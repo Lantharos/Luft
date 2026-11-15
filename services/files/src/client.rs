@@ -70,8 +70,8 @@ pub async fn signal(processes: &[Process], signal: i32) -> Result<(), String> {
     call("Signal", &(processes, signal)).await
 }
 
-pub async fn set_priority(process: Process, nice: i32) -> Result<(), String> {
-    call("SetPriority", &(process, nice)).await
+pub async fn set_priority(processes: &[Process], nice: i32) -> Result<(), String> {
+    call("SetPriority", &(processes, nice)).await
 }
 
 async fn call<B, R>(method: &str, body: &B) -> Result<R, String>

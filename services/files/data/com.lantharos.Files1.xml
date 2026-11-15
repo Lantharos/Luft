@@ -54,9 +54,10 @@
       <arg name="processes" type="a(ut)" direction="in"/>
       <arg name="signal" type="i" direction="in"/>
     </method>
-    <!-- Sets the niceness, from -20 to 19, of every thread of a process. -->
+    <!-- Sets the niceness, from -20 to 19, of every thread of processes, each given as its number
+         and the clock tick it started on. -->
     <method name="SetPriority">
-      <arg name="process" type="(ut)" direction="in"/>
+      <arg name="processes" type="a(ut)" direction="in"/>
       <arg name="nice" type="i" direction="in"/>
     </method>
   </interface>

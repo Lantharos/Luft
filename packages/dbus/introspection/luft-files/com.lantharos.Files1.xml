@@ -25,7 +25,7 @@
       <arg name="signal" type="i" direction="in"/>
     </method>
     <method name="SetPriority">
-      <arg name="process" type="(ut)" direction="in"/>
+      <arg name="processes" type="a(ut)" direction="in"/>
       <arg name="nice" type="i" direction="in"/>
     </method>
   </interface>

@@ -1,19 +1,24 @@
 import { activationToken } from '@luft/ui';
-import type { Signal } from '#lib/bindings.js';
+import type { Entry, Signal } from '#lib/bindings.js';
 import { app } from '#lib/state/app.svelte.js';
+import { entries } from '#lib/state/entries.svelte.js';
 import { notices } from '#lib/state/notices.svelte.js';
 import { processes } from '#lib/state/processes.svelte.js';
-import { usage } from '#lib/state/usage.svelte.js';
 
 const GRACE_MS = 4000;
 const STOP_GRACE_MS = 6000;
 
 export type Target = { title: string; pids: number[] } | { title: string; app: string };
 
+export interface Priority {
+	target: Target;
+	nice: number;
+}
+
 class Actions {
 	details = $state<number | null>(null);
-	priority = $state<{ pid: number; name: string; nice: number } | null>(null);
-	stuck = $state<Target | null>(null);
+	priority = $state.raw<Priority | null>(null);
+	stuck = $state.raw<Target | null>(null);
 	stopping = $state.raw<ReadonlySet<string>>(new Set());
 
 	async signal(target: Target, signal: Signal) {
@@ -61,10 +66,16 @@ class Actions {
 		await this.signal(target, 'kill');
 	}
 
-	async setPriority(pid: number, nice: number) {
+	async askPriority(entry: Entry) {
+		const main = entry.main === null ? null : await app.backend?.details(entry.main).catch(() => null);
+		this.priority = { target: { title: entry.name, app: entry.key }, nice: main?.nice ?? 0 };
+	}
+
+	async setPriority(target: Target, nice: number) {
 		if (!app.backend) return;
 		try {
-			await app.backend.priority(pid, nice);
+			if ('app' in target) await app.backend.priorityApp(target.app, nice);
+			else await Promise.all(target.pids.map((pid) => app.backend?.priority(pid, nice)));
 			this.priority = null;
 		} catch (error) {
 			notices.fail(error);
@@ -72,7 +83,7 @@ class Actions {
 	}
 
 	#running(target: Target) {
-		return 'app' in target ? usage.apps.some((candidate) => candidate.key === target.app) : target.pids.some((pid) => this.#alive(pid));
+		return 'app' in target ? entries.find(target.app) !== undefined : target.pids.some((pid) => this.#alive(pid));
 	}
 
 	#listed(pids: number[]) {

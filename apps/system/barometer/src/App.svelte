@@ -1,14 +1,20 @@
 <script lang="ts">
-	import { appearance, GlassShell, page, Toast } from '@luft/ui';
+	import { appearance, GlassShell, PageMotion, Toast } from '@luft/ui';
 	import { onMount } from 'svelte';
+	import { resources } from '#lib/resources/registry.js';
 	import ResourcePage from '#lib/resources/ResourcePage.svelte';
+	import PageSwitch from '#lib/shell/PageSwitch.svelte';
 	import Sidebar from '#lib/shell/Sidebar.svelte';
-	import { app } from '#lib/state/app.svelte.js';
+	import { app, TASKS } from '#lib/state/app.svelte.js';
 	import { notices } from '#lib/state/notices.svelte.js';
 	import { monitor } from '#lib/state/monitor.svelte.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import DialogHost from '#lib/tasks/actions/DialogHost.svelte';
-	import AppsView from '#lib/tasks/apps/AppsView.svelte';
-	import ProcessesView from '#lib/tasks/processes/ProcessesView.svelte';
+	import TasksView from '#lib/tasks/TasksView.svelte';
+
+	const motion = new PageMotion();
+
+	let order = $derived(app.page === TASKS ? 0 : 1 + (monitor.devices ? resources(monitor.devices, settings.value.showVirtual).findIndex((resource) => resource.id === app.page) : 0));
 
 	onMount(() => {
 		void app.start();
@@ -21,17 +27,16 @@
 
 <GlassShell>
 	<Sidebar />
-	<main class="glass-content">
+	<main class="glass-content relative isolate">
+		<div class="pointer-events-none absolute inset-0 overflow-hidden" {@attach motion.layer}></div>
 		{#key app.page}
-			<div class="flex min-h-0 flex-1 flex-col" in:page>
-				{#if app.page === 'apps'}
-					<AppsView />
-				{:else if app.page === 'processes'}
-					<ProcessesView />
+			<PageSwitch {motion} {order}>
+				{#if app.page === TASKS}
+					<TasksView />
 				{:else if monitor.devices}
 					<ResourcePage page={app.page} devices={monitor.devices} />
 				{/if}
-			</div>
+			</PageSwitch>
 		{/key}
 	</main>
 </GlassShell>

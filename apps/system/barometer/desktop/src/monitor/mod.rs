@@ -12,8 +12,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::system::{Devices, System, Tick};
-use crate::tasks::apps::{OpenWindows, Scopes};
+use crate::tasks::apps::{OpenWindows, Scopes, members};
 use crate::tasks::control::{self, Signal};
+use crate::tasks::groups::unit_path;
 
 const DEFAULT_INTERVAL: Duration = Duration::from_secs(1);
 const DEFAULT_HISTORY: Duration = Duration::from_secs(60);
@@ -24,6 +25,8 @@ struct Control {
     visible: bool,
     page: String,
     expanded: Vec<String>,
+    system: bool,
+    everything: bool,
     disk: bool,
     gpu: bool,
     interval: Duration,
@@ -52,6 +55,8 @@ pub struct View {
     visible: bool,
     reset: bool,
     expanded: Vec<String>,
+    system: bool,
+    everything: bool,
     disk: bool,
     gpu: bool,
 }
@@ -65,6 +70,12 @@ pub struct AppSignal {
 #[derive(Deserialize, Type)]
 pub struct AppKey {
     key: String,
+}
+
+#[derive(Deserialize, Type)]
+pub struct AppPriority {
+    key: String,
+    nice: i32,
 }
 
 #[derive(Deserialize, Type)]
@@ -91,6 +102,8 @@ impl Monitor {
                 visible: false,
                 page: String::new(),
                 expanded: Vec::new(),
+                system: false,
+                everything: false,
                 disk: true,
                 gpu: true,
                 interval: DEFAULT_INTERVAL,
@@ -123,11 +136,17 @@ impl Monitor {
     pub fn view(&self, view: View) -> Result<(), String> {
         let mut control = self.0.control.lock();
         control.entering |= view.visible
-            && (!control.visible || control.page != view.page || control.expanded != view.expanded);
+            && (!control.visible
+                || control.page != view.page
+                || control.expanded != view.expanded
+                || control.system != view.system
+                || control.everything != view.everything);
         control.reset |= view.reset;
         control.visible = view.visible;
         control.page = view.page;
         control.expanded = view.expanded;
+        control.system = view.system;
+        control.everything = view.everything;
         control.disk = view.disk;
         control.gpu = view.gpu;
         control.changed = true;
@@ -143,7 +162,19 @@ impl Monitor {
         control::stop_scopes(self.scopes_of(&key))
     }
 
+    pub fn renice_app(&self, AppPriority { key, nice }: AppPriority) -> Result<(), String> {
+        let pids: Vec<u32> = self
+            .scopes_of(&key)
+            .iter()
+            .flat_map(|scope| members(scope))
+            .collect();
+        control::renice(&pids, nice)
+    }
+
     fn scopes_of(&self, key: &str) -> Vec<PathBuf> {
+        if let Some(path) = unit_path(key) {
+            return vec![path];
+        }
         let mut scopes = self.0.scopes.lock();
         let names: Vec<String> = scopes
             .names()

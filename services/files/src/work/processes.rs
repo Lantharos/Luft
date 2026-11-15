@@ -32,11 +32,17 @@ pub fn signal(processes: &[Process], signal: Signal) -> io::Result<()> {
     Ok(())
 }
 
-pub fn set_priority(process: Process, nice: i32) -> io::Result<()> {
+pub fn set_priority(processes: &[Process], nice: i32) -> io::Result<()> {
+    let nice = nice.clamp(LEAST_NICE, NICEST);
+    processes
+        .iter()
+        .try_for_each(|process| set_process_priority(*process, nice))
+}
+
+fn set_process_priority(process: Process, nice: i32) -> io::Result<()> {
     let Some((pid, _handle)) = held(process)? else {
         return Ok(());
     };
-    let nice = nice.clamp(LEAST_NICE, NICEST);
     let Ok(threads) = fs::read_dir(format!("/proc/{}/task", pid.as_raw_nonzero())) else {
         return Ok(());
     };

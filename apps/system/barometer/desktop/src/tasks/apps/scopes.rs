@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -7,20 +7,37 @@ use crate::tasks::process::{Stat, read_cgroup};
 
 const ANCESTORS: usize = 16;
 const APP_SLICE_OVERRIDE: &str = "LUFT_APP_SLICE";
+pub const CGROUPS: &str = "/sys/fs/cgroup";
+const NEARBY_SLICES: [&str; 2] = ["app.slice", "background.slice"];
 
 pub struct Scopes {
     root: PathBuf,
     marker: String,
+    nearby: Vec<String>,
     apps: Apps,
     resolved: HashMap<String, Option<String>>,
 }
 
 impl Scopes {
     pub fn new() -> Self {
-        let root = std::env::var_os(APP_SLICE_OVERRIDE).map_or_else(app_slice, PathBuf::from);
-        let slice = root.file_name().unwrap_or_default().to_string_lossy();
+        let overridden = std::env::var_os(APP_SLICE_OVERRIDE).map(PathBuf::from);
+        let root = overridden.clone().unwrap_or_else(app_slice);
+        let within = format!(
+            "/{}",
+            root.strip_prefix(CGROUPS)
+                .unwrap_or(&root)
+                .to_string_lossy()
+        );
+        let nearby = match overridden {
+            Some(_) => vec![within.clone()],
+            None => NEARBY_SLICES
+                .iter()
+                .map(|slice| format!("{}/{slice}", manager()))
+                .collect(),
+        };
         Self {
-            marker: format!("/{slice}/"),
+            marker: format!("{within}/"),
+            nearby,
             root,
             apps: Apps::default(),
             resolved: HashMap::new(),
@@ -43,6 +60,10 @@ impl Scopes {
         names
     }
 
+    pub fn nearby(&self) -> &[String] {
+        &self.nearby
+    }
+
     pub fn path(&self, name: &str) -> PathBuf {
         self.root.join(name)
     }
@@ -51,7 +72,14 @@ impl Scopes {
         self.apps.info(key)
     }
 
-    pub fn forget(&mut self, alive: &[String]) {
+    pub fn name(&mut self, key: &str, name: String) {
+        self.apps.named(key, name);
+    }
+
+    pub fn keep<'a>(&mut self, cgroups: impl Iterator<Item = &'a str>) {
+        let alive: HashSet<String> = cgroups
+            .filter_map(|cgroup| relative(cgroup, &self.marker))
+            .collect();
         self.resolved.retain(|name, _| alive.contains(name));
     }
 
@@ -125,11 +153,13 @@ impl Scopes {
     }
 }
 
-fn app_slice() -> PathBuf {
+fn manager() -> String {
     let uid = unsafe { libc::getuid() };
-    PathBuf::from(format!(
-        "/sys/fs/cgroup/user.slice/user-{uid}.slice/user@{uid}.service/app.slice"
-    ))
+    format!("/user.slice/user-{uid}.slice/user@{uid}.service")
+}
+
+fn app_slice() -> PathBuf {
+    PathBuf::from(format!("{CGROUPS}{}/app.slice", manager()))
 }
 
 fn units(directory: &Path) -> Vec<String> {
@@ -151,7 +181,7 @@ fn children(directory: &Path) -> Vec<String> {
 }
 
 fn relative(cgroup: &str, marker: &str) -> Option<String> {
-    let (_, rest) = cgroup.split_once(marker)?;
+    let rest = cgroup.strip_prefix(marker)?;
     let mut parts = rest.split('/');
     let first = parts.next()?;
     Some(if first.ends_with(".slice") {

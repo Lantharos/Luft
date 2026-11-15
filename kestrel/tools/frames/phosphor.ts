@@ -12,7 +12,11 @@ import type {FrameRecorder, Interaction} from './recorder.js';
 type Choice = boolean | number | string;
 
 const EXTRA_WINDOWS = 12;
-const OFF: Record<string, Choice> = {border: 'off', 'border-motion': 'still', overlay: 'off', 'desktop-crt': false, 'crt-curvature': 0, 'crt-flicker': false, bloom: 0, 'chromatic-aberration': 0, grade: 'off', invert: 'off', 'shadow-boost': 0};
+const OFF: Record<string, Choice> = {
+  border: 'off', 'border-motion': 'still', overlay: 'off', shadow: 'off', unfocused: 'off', 'desktop-crt': false, 'crt-curvature': 0, 'crt-flicker': false, bloom: 0,
+  'chromatic-aberration': 0, grade: 'off', invert: 'off', 'shadow-boost': 0, palette: 'off', pixelate: 1, stylize: 'off', vhs: false, 'glitch-bursts': false,
+  'screen-grain': 0, 'screen-grain-moving': false, 'screen-vignette': 0,
+};
 
 const slideFiles = (recorder: FrameRecorder) => slideWindow(findWindow((window: Meta.Window) => !!window.get_title()?.startsWith('Files'))!, recorder);
 const opened: Process[] = [];
@@ -74,6 +78,12 @@ export const phosphorInteractions: Interaction[] = [
   measured('screen grade and shadows', {grade: 'teal-orange', 'shadow-boost': 0.4}),
   measured('screen bloom', {bloom: 0.5}),
   measured('screen chromatic aberration', {'chromatic-aberration': 0.5}),
+  measured('neon borders and soft shadows on every window', {border: 'neon', shadow: 'soft'}),
+  measured('background windows without colour', {unfocused: 'desaturate'}),
+  measured('screen VHS', {vhs: true}),
+  measured('screen palette with dithering and pixels', {palette: 'sixteen', pixelate: 3}),
+  measured('screen halftone', {stylize: 'halftone'}),
+  measured('screen grain and vignette', {'screen-grain': 0.5, 'screen-grain-moving': true, 'screen-vignette': 0.5}),
   {...measured('everything on the screen', {'desktop-crt': true, 'crt-curvature': 0.5, 'crt-flicker': true, grade: 'teal-orange', 'shadow-boost': 0.4, bloom: 0.5}), finish: async () => {
     await apply({});
     await closeMore();

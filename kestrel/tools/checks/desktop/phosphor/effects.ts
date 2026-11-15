@@ -17,12 +17,16 @@ export interface Handle {
   dispose(): void;
 }
 
+export interface FilterHandle extends Handle {
+  play(milliseconds: number): void;
+}
+
 export interface Shaders {
   problems: {label: string; problem: string; detail: string}[];
   check(source: {kind: string; shader: string}): string | null;
   windowShader(shader: string): Handle;
   overlay(shader: string): Handle;
-  filter(shader: string, options?: object): Handle;
+  filter(shader: string, options?: object): FilterHandle;
   surfaces(shader: string, surfaces: string[]): Handle;
   transition(shader: string, kinds: string[], duration: number): Handle;
   turnBackOn(): void;

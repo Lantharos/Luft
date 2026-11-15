@@ -18,6 +18,7 @@ import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
 import { onLocaleChanged } from '../shared/i18n/index.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion/motion.js';
 import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
+import { stagger } from '../shared/motion/stagger.js';
 import { raiseSurface, SURFACE_GAP } from '../shared/layout/surface.js';
 import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
@@ -225,8 +226,10 @@ export class Surfaces {
     if (surface === 'snap') this.snapLayouts.prepareOpen();
     this.place();
     if (opening) {
+      const offset = this.slideOffset(actor);
       actor.opacity = 0;
-      actor.set(reducedMotion() ? { translation_x: 0, translation_y: 0 } : this.slideOffset(actor));
+      actor.set(reducedMotion() ? { translation_x: 0, translation_y: 0 } : offset);
+      stagger(actor, [offset.translation_x, offset.translation_y]);
     }
     this.reveal(actor);
 

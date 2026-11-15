@@ -27,6 +27,8 @@ const APPS: &str = "com.lantharos.firewall.apps";
 const ANYWHERE: &str = "com.lantharos.firewall.apps-anywhere";
 const POST: (&str, &str) = ("kestrel-post.service", "/usr/libexec/kestrel-post");
 const KESTREL: (&str, &str) = ("kestrel.service", "/usr/bin/kestrel");
+const SETTINGS: &str = "/usr/lib/sabine/com.lantharos.settings/settings";
+const CHOSEN_IN: &str = "chosen-in";
 const HOME: &str = "home";
 const PUBLIC: &str = "public";
 
@@ -78,11 +80,32 @@ async fn authorize(
     action: &str,
     question: &str,
 ) -> Result<(), Error> {
-    if polkit::is_authorized_to(connection, header, action, &Details::message(question)).await? {
+    authorize_with(connection, header, action, Details::message(question)).await
+}
+
+async fn authorize_with(
+    connection: &Connection,
+    header: &Header<'_>,
+    action: &str,
+    details: Details<'_>,
+) -> Result<(), Error> {
+    if polkit::is_authorized_to(connection, header, action, &details).await? {
         Ok(())
     } else {
         Err(Error::not_authorized())
     }
+}
+
+/// Where the person answered for an app: Kestrel's question, or Settings.
+async fn chosen_in(connection: &Connection, header: &Header<'_>) -> Option<&'static str> {
+    if session_unit(connection, header, KESTREL).await.is_ok() {
+        return caller::luft_program(connection, header, &[KESTREL.1])
+            .await
+            .map(|_| "kestrel");
+    }
+    caller::luft_program(connection, header, &[SETTINGS])
+        .await
+        .map(|_| "settings")
 }
 
 async fn user(connection: &Connection, header: &Header<'_>) -> Result<u32, Error> {
@@ -290,7 +313,11 @@ impl Service {
                 ),
             ),
         };
-        authorize(connection, &header, action, &question).await?;
+        let mut details = Details::message(&question);
+        if let Some(place) = chosen_in(connection, &header).await {
+            details = details.with(CHOSEN_IN, place);
+        }
+        authorize_with(connection, &header, action, details).await?;
         let mut firewall = self.firewall.lock().await;
         if firewall.decisions().get(&owner).copied() != allowed {
             return Err(Error::Failed(

@@ -1,0 +1,11 @@
+// Administrators at the computer allow an app without a password when they
+// answered for it in Kestrel's question or in Settings. Any other caller,
+// opening ports and making a network a home network still ask.
+polkit.addRule(function (action, subject) {
+    var apps = ["com.lantharos.firewall.apps", "com.lantharos.firewall.apps-anywhere"];
+    var places = ["kestrel", "settings"];
+    if (apps.indexOf(action.id) >= 0 && places.indexOf(action.lookup("chosen-in")) >= 0 && subject.local && subject.active && subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
+});

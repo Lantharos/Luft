@@ -62,6 +62,7 @@ export { default as WriteDownDialog } from './security/recovery/WriteDownDialog.
 
 export { springTiming } from './motion/easing';
 export { listMotion, reorder } from './motion/lists';
+export { PageMotion } from './motion/pages';
 export { selectionPill } from './motion/pill';
 export { revealContents } from './motion/reveal';
 export { dialog, fade, menu, page, toast } from './motion/transitions';

@@ -205,6 +205,24 @@ async function checkSavedLooks() {
   await choose('look', 'plain');
 }
 
+async function subpageValue(key: string) {
+  return ((await pageItems()).find(item => item.type === 'page' && (item as {key?: string}).key === key) as {value?: string} | undefined)?.value;
+}
+
+async function checkSubpages() {
+  const keys = (await pageItems()).filter(item => item.type === 'page').map(item => (item as {key?: string}).key);
+  require(['windows', 'motion', 'apps', 'filters', 'color', 'surfaces'].every(key => keys.includes(key)), 'each area of the page opens on a page of its own');
+  await choose('look', 'plain');
+  await eventually(async () => await subpageValue('windows') === 'Off', 'with nothing on, Windows says so');
+  await choose('border', 'neon');
+  await eventually(async () => await subpageValue('windows') === 'Neon tube', 'one window effect on is named');
+  await choose('shadow', 'hard');
+  await eventually(async () => await subpageValue('windows') === '2 on', 'and several are counted');
+  await wear([['open-effect', 'glitch'], ['close-effect', 'glitch']]);
+  await eventually(async () => await subpageValue('motion') === 'Glitch', 'opening and closing the same way counts once');
+  await choose('look', 'plain');
+}
+
 async function checkSafety() {
   await choose('look', 'vhs');
   await eventually(() => attachedEffects().views > 0, 'the VHS look is on');
@@ -233,6 +251,7 @@ export async function run() {
     await checkFilters();
     await checkPresets();
     await checkSavedLooks();
+    await checkSubpages();
     await checkSafety();
     require(!anyTurnedOff(), 'every new effect compiles and stays fast enough');
   } finally {

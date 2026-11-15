@@ -48,11 +48,14 @@ const value = (input: boolean | number | string | string[]) => {
   return typeof input === 'string' ? new GLib.Variant('s', input) : new GLib.Variant('as', input);
 };
 
-interface Section {items: {type?: string; title?: string; action?: string; options?: {value: string}[]; actions?: {label: string; action: string}[]}[]}
+interface Item {type?: string; title?: string; action?: string; options?: {value: string}[]; actions?: {label: string; action: string}[]; sections?: Section[]}
+interface Section {items: Item[]}
+
+const withSubpages = (sections: Section[]): Item[] => sections.flatMap(section => section.items).flatMap(item => [item, ...withSubpages(item.sections ?? [])]);
 
 export async function pageItems() {
   const reply = await call('com.lantharos.Kestrel', PATH, IFACE, 'Page', new GLib.Variant('(s)', [PHOSPHOR]), '(s)');
-  return (JSON.parse(reply.deepUnpack<[string]>()[0]) as Section[]).flatMap(section => section.items);
+  return withSubpages(JSON.parse(reply.deepUnpack<[string]>()[0]) as Section[]);
 }
 
 export const act = (action: string, value: GLib.Variant) => call('com.lantharos.Kestrel', PATH, IFACE, 'Act', new GLib.Variant('(ssv)', [PHOSPHOR, action, value]));

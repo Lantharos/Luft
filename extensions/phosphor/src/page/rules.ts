@@ -1,4 +1,4 @@
-import type { Extension, PageItem } from '@luft/extension-api';
+import type { Extension, PageGroupItem } from '@luft/extension-api';
 
 import { type AppRules, type Granted, type Part, PARTS } from '../rules.js';
 
@@ -16,12 +16,12 @@ function appName(apps: { id: string; name: string }[], id: string): string {
   return apps.find(app => app.id === id)?.name ?? id;
 }
 
-export function ruleItems(phosphor: Extension<Granted>, rules: AppRules): PageItem[] {
+export function ruleItems(phosphor: Extension<Granted>, rules: AppRules): PageGroupItem[] {
   const { t, screenEffects } = phosphor;
   const apps = screenEffects.apps();
   const free = apps.filter(app => !rules.apps.includes(app.id));
   return [
-    ...PARTS.map((part): PageItem => ({
+    ...PARTS.map((part): PageGroupItem => ({
       type: 'switch', title: t(EVERYWHERE_LABELS[part]), checked: rules.onEverywhere(part),
       onToggled: checked => rules.setEverywhere(part, checked),
     })),

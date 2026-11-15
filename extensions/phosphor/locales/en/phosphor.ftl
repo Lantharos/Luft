@@ -164,7 +164,6 @@ beam = Beam
 shatter = Shatter
 # TV static
 static = Static
-crt-details = Tube
 crt-line-count = Number of lines
 crt-line-thickness = Line thickness
 crt-mask-type = Mask
@@ -176,7 +175,6 @@ mask-slot = Slot mask
 grade-custom = Your own
 # Two colours in place of all others, one for dark parts and one for light parts
 grade-duotone = Duotone
-grade-adjust = Adjust the grade
 # From cooler and bluer to warmer and more orange
 grade-temperature = Temperature
 # From greener to more magenta
@@ -211,4 +209,5 @@ vhs = VHS
 glitch-bursts = Glitches now and then
 glitch-gap = Time between glitches
 section-color = Colour
-section-filters-place = Where filters show
+# How many effects are on in an area of the page, shown at the end of its row
+page-on = { $count } on

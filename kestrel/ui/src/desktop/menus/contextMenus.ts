@@ -10,6 +10,7 @@ import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsLink } from '../../system/settingsPages.js';
+import { showInBarometer } from '../panel/widgets/systemMonitor.js';
 import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
 import { toward, type Edge } from '../../shared/layout/edge.js';
 import { t } from '../../shared/i18n/index.js';
@@ -114,6 +115,8 @@ export class ContextMenus {
         this.favorites.set_strv('favorite-apps', pinned ? ids.filter(id => id !== app.id) : [...ids, app.id]);
       } });
     }
+    const showInMonitor = showInBarometer(app);
+    if (showInMonitor) entries.push({ label: t('window-menu-show-in-barometer'), run: launch(showInMonitor) });
     if (windows.length) entries.push({ label: t('window-menu-close', { count: windows.length }), run: () => {
       if (windows.length === app.get_windows().length) app.request_quit();
       else for (const window of windows) window.delete(global.get_current_time());

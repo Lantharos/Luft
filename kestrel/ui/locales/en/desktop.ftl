@@ -45,6 +45,8 @@ window-menu-maximize = Maximize
 window-menu-unmaximize = Unmaximize
 window-menu-pin = Pin to taskbar
 window-menu-unpin = Unpin from taskbar
+# Opens Barometer, the system monitor, at this app's row.
+window-menu-show-in-barometer = Show in Barometer
 # $count is the number of open windows of the app that this closes.
 window-menu-close = { $count ->
     [one] Close window

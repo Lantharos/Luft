@@ -1,9 +1,11 @@
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::system::{self, procfile::keyed};
 
 use super::process::{Stat, read_cgroup};
@@ -31,7 +33,7 @@ pub struct Details {
     nice: i32,
     started: f64,
     cgroup: String,
-    container: Option<&'static str>,
+    container: Option<String>,
     open_files: Option<usize>,
     oom_score: Option<i32>,
     resident: Option<u64>,
@@ -45,7 +47,7 @@ pub struct Details {
 
 pub fn read(DetailsRequest { pid }: DetailsRequest) -> Result<Details, String> {
     let base = format!("/proc/{pid}");
-    let gone = || "This process has already ended".to_owned();
+    let gone = || t!(L10N, "barometer-process-ended");
     let stat = fs::read(format!("{base}/stat"))
         .ok()
         .and_then(|bytes| Stat::parse(&bytes))
@@ -106,14 +108,14 @@ pub fn read(DetailsRequest { pid }: DetailsRequest) -> Result<Details, String> {
     })
 }
 
-fn container(base: &str, cgroup: &str) -> Option<&'static str> {
+fn container(base: &str, cgroup: &str) -> Option<String> {
     let root = Path::new(base).join("root");
     if root.join(".flatpak-info").exists() {
-        Some("Flatpak")
+        Some("Flatpak".to_owned())
     } else if cgroup.contains("/snap.") {
-        Some("Snap")
+        Some("Snap".to_owned())
     } else if root.join("run/.containerenv").exists() {
-        Some("Container")
+        Some(t!(L10N, "barometer-process-container"))
     } else {
         None
     }

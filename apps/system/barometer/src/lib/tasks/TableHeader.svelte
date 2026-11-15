@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import type { Sort } from '#lib/state/settings.svelte.js';
@@ -28,7 +29,7 @@
 {/snippet}
 
 <div class="table-grid table-header" role="row" tabindex="-1" oncontextmenu={onmenu}>
-	{@render heading('name', 'Name', false)}
+	{@render heading('name', t('barometer-column-name'), false)}
 	{#each columns as column (column.id)}
 		{@render heading(column.id, column.label, column.numeric)}
 	{/each}

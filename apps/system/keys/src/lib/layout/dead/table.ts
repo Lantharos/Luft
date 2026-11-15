@@ -1,4 +1,6 @@
+import { i18n, resolved, t } from '@luft/i18n';
 import { US_LABELS } from '#lib/keyboard/geometry.js';
+import { keyNames } from '#lib/keyboard/names.js';
 import type { DeadKey, Pair, Symbol } from '#lib/bindings.js';
 import type { Levels } from '#lib/layout/levels.js';
 
@@ -54,24 +56,36 @@ function split(word: string): string[] {
 	return prefix ? [prefix, ...split(word.slice(prefix.length))] : [word];
 }
 
-export function standardName(keysym: string) {
+function spelledName(keysym: string) {
 	const name = keysym.replace(/^dead_/, '').split('_').flatMap(split).join(' ');
 	return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-const LEVEL_PREFIX = ['on', 'with Shift on', 'with AltGr on', 'with Shift and AltGr on'];
+const standardNames = resolved(() => new Map<string, string>());
+
+export function standardName(keysym: string) {
+	const names = standardNames();
+	let name = names.get(keysym);
+	if (name === undefined) {
+		name = t('keys-dead-standard', { keysym, spelled: spelledName(keysym) });
+		names.set(keysym, name);
+	}
+	return name;
+}
+
+const places = resolved(() => new Intl.ListFormat(i18n.locale, { type: 'conjunction' }));
 
 function placeName(key: string, levels: Levels, level: number) {
 	const base = levels[0];
-	const label = base.kind !== 'empty' && base.kind !== 'function' && base.text.trim() ? base.text.toUpperCase() : (US_LABELS[key] ?? key);
-	return `${LEVEL_PREFIX[level]} the ${label} key`;
+	const label = base.kind !== 'empty' && base.kind !== 'function' && base.text.trim() ? base.text.toUpperCase() : key === 'SPCE' ? keyNames().space : (US_LABELS[key] ?? key);
+	return t('keys-dead-where', { level, key: label });
 }
 
 export function whereIs(keys: Record<string, Levels>, keysym: string) {
 	const phrases = placements(keys, keysym).map((place) => placeName(place.key, keys[place.key], place.level));
-	if (!phrases.length) return 'Not on a key yet';
-	const sentence = phrases.length === 1 ? phrases[0] : `${phrases.slice(0, -1).join(', ')} and ${phrases.at(-1)}`;
-	return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+	if (!phrases.length) return t('keys-dead-unplaced');
+	const sentence = places().format(phrases);
+	return sentence.charAt(0).toLocaleUpperCase(i18n.locale) + sentence.slice(1);
 }
 
 const OWN_DEAD_FIRST = 0xec40;

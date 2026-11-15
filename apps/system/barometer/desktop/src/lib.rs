@@ -1,6 +1,7 @@
 mod bridge;
 mod events;
 mod gpu;
+mod l10n;
 mod monitor;
 mod settings;
 mod system;

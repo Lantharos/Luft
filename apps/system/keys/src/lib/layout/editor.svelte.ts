@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { History } from '#lib/state/history.svelte.js';
 import { toast } from '#lib/state/toast.svelte.js';
 import { guessGeometry, type Geometry } from '#lib/keyboard/geometry.js';
@@ -114,7 +115,7 @@ export class LayoutEditor {
 
 	async addDead() {
 		const keysym = await this.#freeKeysym();
-		const name = `Dead key ${this.layout.dead.length + 1}`;
+		const name = t('keys-dead-default-name', { number: this.layout.dead.length + 1 });
 		this.#edit('dead:add', () => this.layout.dead.push({ keysym, name, symbol: '◌', spacing: '', pairs: [] }));
 		this.chosenDead = keysym;
 		return keysym;
@@ -168,7 +169,7 @@ export class LayoutEditor {
 		if (!key) return;
 		const added = capitals(key.pairs);
 		if (added.length) this.#edit(`pair:capitals:${keysym}`, () => key.pairs.push(...added));
-		toast.show(added.length ? `Added ${added.length} capital ${added.length === 1 ? 'letter' : 'letters'}` : 'Every letter already has its capital');
+		toast.show(added.length ? t('keys-dead-capitals-added', { count: added.length }) : t('keys-dead-capitals-none'));
 	}
 
 	placesOf(keysym: string) {

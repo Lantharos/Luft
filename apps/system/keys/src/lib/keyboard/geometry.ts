@@ -1,3 +1,5 @@
+import type { KeyName } from './names';
+
 export type Geometry = 'ansi' | 'iso' | 'jis';
 
 export interface Cap {
@@ -5,7 +7,7 @@ export interface Cap {
 	x: number;
 	y: number;
 	width: number;
-	label?: string;
+	label?: KeyName;
 	enter?: boolean;
 }
 
@@ -106,8 +108,7 @@ export const US_LABELS: Record<string, string> = Object.fromEntries([
 	...HOME.map((name, index) => [name, "ASDFGHJKL;'"[index]]),
 	['LSGT', '<'],
 	...BOTTOM.map((name, index) => [name, 'ZXCVBNM,./'[index]]),
-	['AB11', 'ろ'],
-	['SPCE', 'Space']
+	['AB11', 'ろ']
 ]);
 
 export const TYPING = new Set(['TLDE', ...NUMBERS, 'AE13', ...TOP, 'BKSL', ...HOME, 'LSGT', ...BOTTOM, 'AB11', 'SPCE']);
@@ -120,53 +121,53 @@ function modifiers(geometry: Geometry): Cap[] {
 	const y = 4;
 	if (geometry === 'jis') {
 		return [
-			{ name: 'LCTL', x: 0, y, width: 1.25, label: 'Ctrl' },
-			{ name: 'LWIN', x: 1.25, y, width: 1.25, label: 'Super' },
-			{ name: 'LALT', x: 2.5, y, width: 1.25, label: 'Alt' },
-			{ name: 'MUHE', x: 3.75, y, width: 1.25, label: '無変換' },
+			{ name: 'LCTL', x: 0, y, width: 1.25, label: 'ctrl' },
+			{ name: 'LWIN', x: 1.25, y, width: 1.25, label: 'super' },
+			{ name: 'LALT', x: 2.5, y, width: 1.25, label: 'alt' },
+			{ name: 'MUHE', x: 3.75, y, width: 1.25, label: 'muhenkan' },
 			{ name: 'SPCE', x: 5, y, width: 2.5 },
-			{ name: 'HENK', x: 7.5, y, width: 1.25, label: '変換' },
-			{ name: 'HKTG', x: 8.75, y, width: 1.25, label: 'かな' },
-			{ name: 'RALT', x: 10, y, width: 1.25, label: 'Alt' },
-			{ name: 'RWIN', x: 11.25, y, width: 1.25, label: 'Super' },
-			{ name: 'COMP', x: 12.5, y, width: 1.25, label: 'Menu' },
-			{ name: 'RCTL', x: 13.75, y, width: 1.25, label: 'Ctrl' }
+			{ name: 'HENK', x: 7.5, y, width: 1.25, label: 'henkan' },
+			{ name: 'HKTG', x: 8.75, y, width: 1.25, label: 'kana' },
+			{ name: 'RALT', x: 10, y, width: 1.25, label: 'alt' },
+			{ name: 'RWIN', x: 11.25, y, width: 1.25, label: 'super' },
+			{ name: 'COMP', x: 12.5, y, width: 1.25, label: 'menu' },
+			{ name: 'RCTL', x: 13.75, y, width: 1.25, label: 'ctrl' }
 		];
 	}
 	return [
-		{ name: 'LCTL', x: 0, y, width: 1.25, label: 'Ctrl' },
-		{ name: 'LWIN', x: 1.25, y, width: 1.25, label: 'Super' },
-		{ name: 'LALT', x: 2.5, y, width: 1.25, label: 'Alt' },
+		{ name: 'LCTL', x: 0, y, width: 1.25, label: 'ctrl' },
+		{ name: 'LWIN', x: 1.25, y, width: 1.25, label: 'super' },
+		{ name: 'LALT', x: 2.5, y, width: 1.25, label: 'alt' },
 		{ name: 'SPCE', x: 3.75, y, width: 6.25 },
-		{ name: 'RALT', x: 10, y, width: 1.25, label: 'Alt' },
-		{ name: 'RWIN', x: 11.25, y, width: 1.25, label: 'Super' },
-		{ name: 'COMP', x: 12.5, y, width: 1.25, label: 'Menu' },
-		{ name: 'RCTL', x: 13.75, y, width: 1.25, label: 'Ctrl' }
+		{ name: 'RALT', x: 10, y, width: 1.25, label: 'alt' },
+		{ name: 'RWIN', x: 11.25, y, width: 1.25, label: 'super' },
+		{ name: 'COMP', x: 12.5, y, width: 1.25, label: 'menu' },
+		{ name: 'RCTL', x: 13.75, y, width: 1.25, label: 'ctrl' }
 	];
 }
 
 export function caps(geometry: Geometry): Cap[] {
 	const iso = geometry !== 'ansi';
-	const numbers =
+	const numbers: Cap[] =
 		geometry === 'jis'
-			? [...row(['TLDE', ...NUMBERS, 'AE13'], 0, 0), { name: 'BKSP', x: 14, y: 0, width: 1, label: 'Back' }]
-			: [...row(['TLDE', ...NUMBERS], 0, 0), { name: 'BKSP', x: 13, y: 0, width: 2, label: 'Backspace' }];
-	const top = [
-		{ name: 'TAB', x: 0, y: 1, width: 1.5, label: 'Tab' },
+			? [...row(['TLDE', ...NUMBERS, 'AE13'], 0, 0), { name: 'BKSP', x: 14, y: 0, width: 1, label: 'back' }]
+			: [...row(['TLDE', ...NUMBERS], 0, 0), { name: 'BKSP', x: 13, y: 0, width: 2, label: 'backspace' }];
+	const top: Cap[] = [
+		{ name: 'TAB', x: 0, y: 1, width: 1.5, label: 'tab' },
 		...row(TOP, 1.5, 1),
-		iso ? { name: 'RTRN', x: 13.5, y: 1, width: 1.5, label: 'Enter', enter: true } : { name: 'BKSL', x: 13.5, y: 1, width: 1.5 }
+		iso ? { name: 'RTRN', x: 13.5, y: 1, width: 1.5, label: 'enter', enter: true } : { name: 'BKSL', x: 13.5, y: 1, width: 1.5 }
 	];
-	const home = [
-		{ name: 'CAPS', x: 0, y: 2, width: 1.75, label: 'Caps Lock' },
+	const home: Cap[] = [
+		{ name: 'CAPS', x: 0, y: 2, width: 1.75, label: 'capsLock' },
 		...row(HOME, 1.75, 2),
-		iso ? { name: 'BKSL', x: 12.75, y: 2, width: 1 } : { name: 'RTRN', x: 12.75, y: 2, width: 2.25, label: 'Enter' }
+		iso ? { name: 'BKSL', x: 12.75, y: 2, width: 1 } : { name: 'RTRN', x: 12.75, y: 2, width: 2.25, label: 'enter' }
 	];
-	const bottom =
+	const bottom: Cap[] =
 		geometry === 'iso'
-			? [{ name: 'LFSH', x: 0, y: 3, width: 1.25, label: 'Shift' }, ...row(['LSGT', ...BOTTOM], 1.25, 3), { name: 'RTSH', x: 12.25, y: 3, width: 2.75, label: 'Shift' }]
+			? [{ name: 'LFSH', x: 0, y: 3, width: 1.25, label: 'shift' }, ...row(['LSGT', ...BOTTOM], 1.25, 3), { name: 'RTSH', x: 12.25, y: 3, width: 2.75, label: 'shift' }]
 			: geometry === 'jis'
-				? [{ name: 'LFSH', x: 0, y: 3, width: 2.25, label: 'Shift' }, ...row([...BOTTOM, 'AB11'], 2.25, 3), { name: 'RTSH', x: 13.25, y: 3, width: 1.75, label: 'Shift' }]
-				: [{ name: 'LFSH', x: 0, y: 3, width: 2.25, label: 'Shift' }, ...row(BOTTOM, 2.25, 3), { name: 'RTSH', x: 12.25, y: 3, width: 2.75, label: 'Shift' }];
+				? [{ name: 'LFSH', x: 0, y: 3, width: 2.25, label: 'shift' }, ...row([...BOTTOM, 'AB11'], 2.25, 3), { name: 'RTSH', x: 13.25, y: 3, width: 1.75, label: 'shift' }]
+				: [{ name: 'LFSH', x: 0, y: 3, width: 2.25, label: 'shift' }, ...row(BOTTOM, 2.25, 3), { name: 'RTSH', x: 12.25, y: 3, width: 2.75, label: 'shift' }];
 	return [...numbers, ...top, ...home, ...bottom, ...modifiers(geometry)];
 }
 

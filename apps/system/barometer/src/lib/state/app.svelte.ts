@@ -1,4 +1,5 @@
 import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { i18n } from '@luft/i18n';
 import { appearance, keepWindowState } from '@luft/ui';
 import type { Devices } from '#lib/bindings.js';
 import { connect } from '#lib/bridge/index.js';
@@ -29,6 +30,7 @@ class AppStore {
 		this.page = (await restored) ?? this.page;
 		keepWindowState(() => this.page);
 		appearance.start(state);
+		await i18n.ready;
 		settings.load(backend, state.settings);
 		processes.start(backend);
 		entries.start(backend);

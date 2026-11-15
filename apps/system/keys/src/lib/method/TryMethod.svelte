@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ownDeadKeysym } from '#lib/layout/dead/table.js';
 	import { toast } from '#lib/state/toast.svelte.js';
 	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
@@ -80,9 +81,9 @@
 </script>
 
 <div class="flex flex-col gap-2">
-	<TryField bind:this={field} label="Try the input method" placeholder="Type to try" rows={5} onkeydown={keydown} onblur={settle} onabandon={settle} oncleared={settle} />
+	<TryField bind:this={field} label={t('keys-try-method')} placeholder={t('keys-try-method-placeholder')} rows={5} onkeydown={keydown} onblur={settle} onabandon={settle} oncleared={settle} />
 	{#if shown?.candidates.length}
-		<ol class="candidates" aria-label="Candidates">
+		<ol class="candidates" aria-label={t('keys-try-candidates')}>
 			{#each shown.candidates as candidate, index (index)}
 				<li>
 					<button type="button" class="candidate" class:selected={index === shown.selected} onpointerdown={(event) => event.preventDefault()} onclick={() => pick(index)}>
@@ -92,7 +93,7 @@
 				</li>
 			{/each}
 			{#if shown.total > shown.candidates.length}
-				<li class="px-2.5 pt-1 text-[12px] text-[var(--text-muted)]">{shown.first + 1}–{shown.first + shown.candidates.length} of {shown.total}</li>
+				<li class="px-2.5 pt-1 text-[12px] text-[var(--text-muted)]">{t('keys-try-candidates-page', { first: shown.first + 1, last: shown.first + shown.candidates.length, total: shown.total })}</li>
 			{/if}
 		</ol>
 	{/if}

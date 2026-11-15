@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, Spinner, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import type { Snippet } from 'svelte';
@@ -6,7 +7,7 @@
 	import { sharedByGroups, template, type Column } from './columns';
 	import { desktopId } from './icons';
 	import TableHeader from './TableHeader.svelte';
-	import type { Node } from './tree/node.svelte';
+	import { notes, type Node } from './tree/node.svelte';
 
 	interface Props {
 		items: Node[];
@@ -136,7 +137,7 @@
 		onpointerdown={() => onselect(node)}
 		ondblclick={() => ontoggle(node)}
 	>
-		{@render disclosure(node, node.expanded ? `Hide ${node.title}` : `Show ${node.title}`)}
+		{@render disclosure(node, node.expanded ? t('barometer-group-hide', { group: node.title }) : t('barometer-group-show', { group: node.title }))}
 		<span role="rowheader">{node.title}</span>
 	</div>
 {/snippet}
@@ -162,7 +163,7 @@
 	>
 		<span class="name">
 			{#if node.expanded !== undefined}
-				{@render disclosure(node, node.expanded ? 'Hide processes' : 'Show processes')}
+				{@render disclosure(node, node.expanded ? t('barometer-processes-hide') : t('barometer-processes-show'))}
 			{/if}
 			<AppIcon icon={node.icon} id={desktopId(node.app)} size={node.child ? 18 : 22} />
 			<span class="truncate">{node.title}</span>
@@ -171,7 +172,7 @@
 			{/if}
 			{#if node.working}<Spinner size={12} class="text-[var(--text-muted)]" />{/if}
 			{#if node.note}
-				<span class="note" class:alert={node.note === 'Not responding'}>{node.note}</span>
+				<span class="note" class:alert={node.note === 'unresponsive'}>{notes()[node.note]}</span>
 			{/if}
 			{@render actions?.(node)}
 		</span>

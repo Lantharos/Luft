@@ -1,10 +1,12 @@
 use std::collections::HashSet;
 use std::fs;
 
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
 use super::procfile::{read_number, read_text};
+use crate::l10n::L10N;
 
 const CPUS: &str = "/sys/devices/system/cpu";
 
@@ -114,7 +116,7 @@ fn field<'a>(cpuinfo: &'a str, keys: &[&str]) -> Option<&'a str> {
 fn model_name(cpuinfo: &str) -> String {
     field(cpuinfo, &["model name", "Model", "Hardware", "cpu model"])
         .map(|name| name.split_whitespace().collect::<Vec<_>>().join(" "))
-        .unwrap_or_else(|| "Processor".to_owned())
+        .unwrap_or_else(|| t!(L10N, "barometer-cpu-unnamed"))
 }
 
 fn architecture() -> String {

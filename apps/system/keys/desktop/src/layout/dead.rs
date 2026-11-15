@@ -1,6 +1,9 @@
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use xkbcommon::xkb;
+
+use crate::l10n::L10N;
 
 const FIRST: u32 = 0xec40;
 const LAST: u32 = 0xecff;
@@ -29,7 +32,7 @@ pub fn allocate(taken: impl Fn(&str) -> bool) -> Result<String, String> {
     (FIRST..=LAST)
         .map(|value| format!("U{value:04X}"))
         .find(|keysym| !taken(keysym))
-        .ok_or_else(|| "There's no room for more dead keys".into())
+        .ok_or_else(|| t!(L10N, "keys-dead-full"))
 }
 
 pub fn keysym_of(character: char) -> Option<String> {

@@ -1,3 +1,4 @@
+import { resolved, t } from '@luft/i18n';
 import type { Devices, DriveKind, NetworkKind, Tick } from '#lib/bindings.js';
 import { networkRate, percent, share } from '#lib/format.js';
 import type { Line } from '#lib/graph/draw.js';
@@ -14,30 +15,34 @@ export interface Resource {
 
 const NETWORK_FLOOR = 64 * 1024;
 
-export const DRIVE_KINDS: Record<DriveKind, string> = {
-	nvme: 'NVMe SSD',
-	ssd: 'SSD',
-	hdd: 'Hard drive',
-	usb: 'USB drive',
-	sd: 'SD card',
-	emmc: 'Built-in flash',
-	optical: 'Optical drive',
-	loop: 'Disk image',
-	zram: 'Compressed memory',
-	mapper: 'Mapped volume',
-	encrypted: 'Encrypted volume',
-	raid: 'RAID array',
-	virtual: 'Virtual drive'
-};
+export const driveKinds = resolved(
+	(): Record<DriveKind, string> => ({
+		nvme: t('barometer-drive-kind-nvme'),
+		ssd: t('barometer-drive-kind-ssd'),
+		hdd: t('barometer-drive-kind-hdd'),
+		usb: t('barometer-drive-kind-usb'),
+		sd: t('barometer-drive-kind-sd'),
+		emmc: t('barometer-drive-kind-emmc'),
+		optical: t('barometer-drive-kind-optical'),
+		loop: t('barometer-drive-kind-loop'),
+		zram: t('barometer-drive-kind-zram'),
+		mapper: t('barometer-drive-kind-mapper'),
+		encrypted: t('barometer-drive-kind-encrypted'),
+		raid: t('barometer-drive-kind-raid'),
+		virtual: t('barometer-drive-kind-virtual')
+	})
+);
 
-export const NETWORK_KINDS: Record<NetworkKind, string> = {
-	ethernet: 'Ethernet',
-	wifi: 'Wi-Fi',
-	bridge: 'Bridge',
-	vpn: 'VPN',
-	mobile: 'Mobile broadband',
-	virtual: 'Virtual network'
-};
+export const networkKinds = resolved(
+	(): Record<NetworkKind, string> => ({
+		ethernet: t('barometer-network-kind-ethernet'),
+		wifi: t('barometer-network-kind-wifi'),
+		bridge: t('barometer-network-kind-bridge'),
+		vpn: t('barometer-network-kind-vpn'),
+		mobile: t('barometer-network-kind-mobile'),
+		virtual: t('barometer-network-kind-virtual')
+	})
+);
 
 export function byId<T extends { id: string }>(list: T[], id: string) {
 	return list.find((item) => item.id === id);
@@ -48,7 +53,9 @@ export function shortGpuName(name: string) {
 }
 
 function unique(titles: string[]) {
-	return titles.map((title, index) => (titles.indexOf(title) !== titles.lastIndexOf(title) ? `${title} ${titles.slice(0, index + 1).filter((other) => other === title).length}` : title));
+	return titles.map((title, index) =>
+		titles.indexOf(title) !== titles.lastIndexOf(title) ? t('barometer-numbered', { name: title, number: titles.slice(0, index + 1).filter((other) => other === title).length }) : title
+	);
 }
 
 export function resources(devices: Devices, showVirtual: boolean): Resource[] {
@@ -56,18 +63,18 @@ export function resources(devices: Devices, showVirtual: boolean): Resource[] {
 	const networks = devices.networks.filter((network) => showVirtual || !network.virtual);
 	const gpuTitles = unique(devices.gpus.map((gpu) => shortGpuName(gpu.name)));
 	const driveTitles = unique(drives.map((drive) => drive.model ?? drive.name));
-	const networkTitles = unique(networks.map((network) => NETWORK_KINDS[network.kind]));
+	const networkTitles = unique(networks.map((network) => networkKinds()[network.kind]));
 	return [
 		{
 			id: 'cpu',
-			title: 'Processor',
+			title: t('barometer-cpu-title'),
 			max: 100,
 			lines: (ticks) => [{ values: ticks.map((tick) => tick.cpu.usage) }],
 			summary: (tick) => percent(tick.cpu.usage)
 		},
 		{
 			id: 'memory',
-			title: 'Memory',
+			title: t('barometer-memory-title'),
 			max: 100,
 			lines: (ticks) => [{ values: ticks.map((tick) => share(tick.memory.total - tick.memory.available, tick.memory.total)) }],
 			summary: (tick) => percent(share(tick.memory.total - tick.memory.available, tick.memory.total))
@@ -109,7 +116,7 @@ export function resources(devices: Devices, showVirtual: boolean): Resource[] {
 		...devices.batteries.map(
 			(battery): Resource => ({
 				id: battery.id,
-				title: devices.batteries.length > 1 ? `Battery ${battery.name}` : 'Battery',
+				title: devices.batteries.length > 1 ? t('barometer-battery-named', { name: battery.name }) : t('barometer-battery-title'),
 				max: 100,
 				lines: (ticks) => [{ values: ticks.map((tick) => byId(tick.batteries, battery.id)?.charge ?? null) }],
 				summary: (tick) => percent(byId(tick.batteries, battery.id)?.charge ?? null)

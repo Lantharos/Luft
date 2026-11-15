@@ -8,11 +8,13 @@ use std::path::Path;
 
 use luft_app::portal::{self, FileChooser, Filter};
 use luft_app::{Commands, Empty, files};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use specta::Type;
 use tokio::task::spawn_blocking;
 
+use crate::l10n::L10N;
 use crate::sources;
 use definition::Method;
 pub use host::SERVE_FLAG;
@@ -41,10 +43,12 @@ pub fn import_path(path: &Path) -> Result<SavedMethod, String> {
 }
 
 async fn import(Empty {}: Empty) -> Result<Option<SavedMethod>, String> {
+    let title = t!(L10N, "keys-method-import");
+    let name = t!(L10N, "keys-method-files");
     let chosen = portal::open_file(
-        "Import an input method",
+        &title,
         Filter {
-            name: "Input methods",
+            name: &name,
             patterns: vec!["*.toml".into(), "*.mim".into(), "*.txt".into()],
         },
     )
@@ -63,8 +67,9 @@ async fn export(Id { id }: Id) -> Result<bool, String> {
     let text = spawn_blocking(move || definition::load(&id).map(|method| method.to_text()))
         .await
         .map_err(|error| error.to_string())??;
+    let title = t!(L10N, "keys-method-export");
     let chosen = FileChooser {
-        title: "Export input method",
+        title: &title,
         current_name: Some(&file_name),
         ..FileChooser::default()
     }

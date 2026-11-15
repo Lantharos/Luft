@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton } from '@luft/ui';
@@ -50,11 +51,11 @@
 	<Page title={current.layout.name}>
 		{#snippet actions()}
 			{#if custom}
-				<button type="button" class="button" onclick={() => app.select({ kind: 'layout', id })}>Edit</button>
+				<button type="button" class="button" onclick={() => app.select({ kind: 'layout', id })}>{t('keys-view-edit')}</button>
 			{:else}
-				<button type="button" class="button" onclick={() => (app.creating = { kind: 'layout', from: id })}>Make a copy to edit</button>
+				<button type="button" class="button" onclick={() => (app.creating = { kind: 'layout', from: id })}>{t('keys-view-copy')}</button>
 			{/if}
-			<MenuButton label="More" class="icon-button" align="end" minWidth={200}>
+			<MenuButton label={t('keys-more')} class="icon-button" align="end" minWidth={200}>
 				{#snippet trigger()}
 					<Ellipsis size={18} />
 				{/snippet}

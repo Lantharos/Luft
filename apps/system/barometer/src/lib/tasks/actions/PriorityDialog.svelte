@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, Slider } from '@luft/ui';
 	import { tasks, type Target } from './actions.svelte';
 
@@ -7,13 +8,13 @@
 		nice: number;
 	}
 
-	const PRESETS = [
-		{ value: -15, label: 'Highest' },
-		{ value: -5, label: 'High' },
-		{ value: 0, label: 'Normal' },
-		{ value: 5, label: 'Low' },
-		{ value: 15, label: 'Lowest' }
-	];
+	const presets = $derived([
+		{ value: -15, label: t('barometer-priority-highest') },
+		{ value: -5, label: t('barometer-priority-high') },
+		{ value: 0, label: t('barometer-priority-normal') },
+		{ value: 5, label: t('barometer-priority-low') },
+		{ value: 15, label: t('barometer-priority-lowest') }
+	]);
 
 	let { target, nice }: Props = $props();
 
@@ -32,27 +33,27 @@
 </script>
 
 <Dialog
-	title={`Priority of ${target.title}`}
-	description="Higher priority gets it more processor time when others want it too. Above normal asks for your password."
+	title={t('barometer-priority-title', { name: target.title })}
+	description={t('barometer-priority-description')}
 	onclose={() => (tasks.priority = null)}
 >
 	<div class="flex flex-col gap-4">
-		<div class="presets" role="radiogroup" aria-label="Priority">
-			{#each PRESETS as preset (preset.value)}
+		<div class="presets" role="radiogroup" aria-label={t('barometer-priority-presets')}>
+			{#each presets as preset (preset.value)}
 				<button type="button" role="radio" aria-checked={value === preset.value} class:active={value === preset.value} onclick={() => (value = preset.value)}>
 					{preset.label}
 				</button>
 			{/each}
 		</div>
 		<div class="flex items-center gap-4">
-			<Slider label="Niceness" min={-20} max={19} step={1} {value} oninput={(next) => (value = next)} onchange={(next) => (value = next)} />
+			<Slider label={t('barometer-priority-niceness')} min={-20} max={19} step={1} {value} oninput={(next) => (value = next)} onchange={(next) => (value = next)} />
 			<span class="w-10 flex-none text-right tabular-nums">{value}</span>
 		</div>
-		<p class="text-[12px] text-[var(--text-muted)]">Niceness from −20, the highest priority, to 19, the lowest.</p>
+		<p class="text-[12px] text-[var(--text-muted)]">{t('barometer-priority-range')}</p>
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={() => (tasks.priority = null)}>Cancel</button>
-		<button type="button" class="button primary" disabled={saving || value === nice} onclick={apply}>Change</button>
+		<button type="button" class="button" onclick={() => (tasks.priority = null)}>{t('barometer-cancel')}</button>
+		<button type="button" class="button primary" disabled={saving || value === nice} onclick={apply}>{t('barometer-priority-change')}</button>
 	{/snippet}
 </Dialog>
 

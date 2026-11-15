@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
@@ -29,10 +30,10 @@
 <div class="flex min-w-0 flex-col gap-5">
 	<DeadKeyHeader symbol={key.symbol} name={key.name} {where}>
 		<DeadKeyDetails {editor} {key} />
-		<button type="button" class="icon-button" aria-label={placed ? 'Put on another key' : 'Put on a key'} {@attach tooltip(placed ? 'Put on another key' : 'Put on a key')} onclick={putOnKey}>
+		<button type="button" class="icon-button" aria-label={placed ? t('keys-dead-place-again') : t('keys-dead-place')} {@attach tooltip(placed ? t('keys-dead-place-again') : t('keys-dead-place'))} onclick={putOnKey}>
 			<Keyboard size={18} />
 		</button>
-		<MenuButton label="More" class="icon-button" align="end" minWidth={200}>
+		<MenuButton label={t('keys-more')} class="icon-button" align="end" minWidth={200}>
 			{#snippet trigger()}
 				<Ellipsis size={18} />
 			{/snippet}
@@ -41,7 +42,7 @@
 					onclick={() => {
 						close();
 						editor.addCapitals(key.keysym);
-					}}>Add capitals</MenuItem
+					}}>{t('keys-dead-add-capitals')}</MenuItem
 				>
 				<MenuSeparator />
 				<MenuItem
@@ -49,7 +50,7 @@
 					onclick={() => {
 						close();
 						editor.removeDead(key.keysym);
-					}}>Remove dead key</MenuItem
+					}}>{t('keys-dead-remove')}</MenuItem
 				>
 			{/snippet}
 		</MenuButton>

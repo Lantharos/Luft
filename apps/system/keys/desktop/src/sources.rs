@@ -1,4 +1,7 @@
 use gio::prelude::*;
+use luft_i18n::t;
+
+use crate::l10n::L10N;
 
 const SCHEMA: &str = "org.gnome.desktop.input-sources";
 const SOURCES: &str = "sources";
@@ -9,7 +12,7 @@ fn settings() -> Result<gio::Settings, String> {
     gio::SettingsSchemaSource::default()
         .and_then(|source| source.lookup(SCHEMA, true))
         .map(|_| gio::Settings::new(SCHEMA))
-        .ok_or_else(|| "Input sources aren't available here".into())
+        .ok_or_else(|| t!(L10N, "keys-sources-unavailable"))
 }
 
 fn read(settings: &gio::Settings) -> Vec<Source> {

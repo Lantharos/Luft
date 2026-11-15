@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyEditor from './DeadKeyEditor.svelte';
@@ -19,8 +20,8 @@
 {#if empty}
 	<div class="flex flex-col items-center gap-4 pt-16 text-center">
 		<span class="text-[40px] leading-none text-[var(--text-muted)]" aria-hidden="true">ˇ</span>
-		<p class="text-[15px] text-[var(--text-soft)]">No dead keys yet</p>
-		<button type="button" class="button" onclick={() => void editor.addDead()}><Plus size={16} />New dead key</button>
+		<p class="text-[15px] text-[var(--text-soft)]">{t('keys-dead-empty')}</p>
+		<button type="button" class="button" onclick={() => void editor.addDead()}><Plus size={16} />{t('keys-dead-new')}</button>
 	</div>
 {:else}
 	<div class="grid items-start gap-8 min-[1000px]:grid-cols-[200px_minmax(0,1fr)]">

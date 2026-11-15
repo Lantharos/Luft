@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount, tick } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import { Dialog, SearchField, TextField, VirtualScroller, type VirtualHandle } from '@luft/ui';
@@ -33,7 +34,7 @@
 		...app.layouts.map((layout) => ({ key: `user:${layout.id}`, name: layout.name, origin: { kind: 'user', id: layout.id } as Origin })),
 		...system.map((layout) => ({ key: `system:${layout.id}`, name: layout.name, origin: { kind: 'system', id: layout.id } as Origin }))
 	]);
-	let name = $derived(typed ?? (chosen ? `${chosen.name} (custom)` : ''));
+	let name = $derived(typed ?? (chosen ? t('keys-new-layout-default-name', { name: chosen.name }) : ''));
 	let results = $derived.by(() => {
 		const needle = query.trim().toLowerCase();
 		return needle ? choices.filter((choice) => choice.name.toLowerCase().includes(needle)) : choices;
@@ -80,12 +81,12 @@
 	}
 </script>
 
-<Dialog title="New layout" wide {onclose}>
+<Dialog title={t('keys-new-layout')} wide {onclose}>
 	<div class="flex flex-col gap-4">
-		<TextField bind:this={field} label="Name" showLabel bind:value={() => name, (value) => (typed = value)} onkeydown={keydown} />
+		<TextField bind:this={field} label={t('keys-name')} showLabel bind:value={() => name, (value) => (typed = value)} onkeydown={keydown} />
 		<div class="flex flex-col gap-2">
-			<span class="px-1 text-[13px] text-[var(--text-soft)]">Start from</span>
-			<SearchField label="Search layouts" bind:value={query} />
+			<span class="px-1 text-[13px] text-[var(--text-soft)]">{t('keys-new-layout-start-from')}</span>
+			<SearchField label={t('keys-new-layout-search')} bind:value={query} />
 			<VirtualScroller bind:this={list} class="hidden-scroll scroll-fade h-[260px]" items={results} key={(choice) => choice.key} layout={{ itemHeight: 36, gap: 2 }}>
 				{#snippet children(choice)}
 					<button type="button" class="option" aria-selected={chosen?.key === choice.key} role="option" onclick={() => (chosen = choice)} ondblclick={() => void create()}>
@@ -99,9 +100,9 @@
 		</div>
 	</div>
 	{#snippet actions()}
-		<button type="button" class="plain-button mr-auto" onclick={() => void importFile()}>Import a file</button>
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!chosen || !name.trim() || busy} onclick={() => void create()}>Create</button>
+		<button type="button" class="plain-button mr-auto" onclick={() => void importFile()}>{t('keys-import-file')}</button>
+		<button type="button" class="button" onclick={onclose}>{t('keys-cancel')}</button>
+		<button type="button" class="button primary" disabled={!chosen || !name.trim() || busy} onclick={() => void create()}>{t('keys-create')}</button>
 	{/snippet}
 </Dialog>
 

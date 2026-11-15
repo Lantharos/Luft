@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
+use luft_i18n::t;
 use zbus::{Structure, Variant};
 
+use crate::l10n::L10N;
 use crate::method::{Summary, engine_name};
 
 pub const COMPONENT: &str = "com.lantharos.keys.InputMethods";
@@ -62,7 +64,7 @@ pub fn component(methods: &[Summary], exec: String) -> Result<Variant<'static>, 
         "IBusComponent".to_owned(),
         Attachments::new(),
         COMPONENT.to_owned(),
-        "Input methods made with Keys".to_owned(),
+        t!(L10N, "keys-ibus-description"),
         VERSION.to_owned(),
         LICENSE.to_owned(),
         AUTHOR.to_owned(),

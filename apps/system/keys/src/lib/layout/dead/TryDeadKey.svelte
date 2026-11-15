@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import TryField from '#lib/try/TryField.svelte';
 	import type { DeadKey } from '#lib/bindings.js';
@@ -47,4 +48,4 @@
 	}
 </script>
 
-<TryField bind:this={field} label="Try {key.name}" placeholder="Type to try {key.name}" rows={1} onkeydown={keydown} onblur={drop} onabandon={drop} oncleared={() => (pending = null)} />
+<TryField bind:this={field} label={t('keys-try-dead', { name: key.name })} placeholder={t('keys-try-dead-placeholder', { name: key.name })} rows={1} onkeydown={keydown} onblur={drop} onabandon={drop} oncleared={() => (pending = null)} />

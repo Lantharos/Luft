@@ -1,0 +1,2 @@
+apps/system/barometer/desktop/src/lib.rs	Barometer
+apps/system/barometer/desktop/src/system/hwmon.rs	Package id 0

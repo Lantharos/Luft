@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import { Popover, TextField, tooltip } from '@luft/ui';
 	import type { DeadKey } from '#lib/bindings.js';
@@ -20,17 +21,17 @@
 	});
 </script>
 
-<button bind:this={button} type="button" class="icon-button" aria-label="Edit details" aria-expanded={open} {@attach tooltip('Edit details')} onclick={() => (open = !open)}>
+<button bind:this={button} type="button" class="icon-button" aria-label={t('keys-dead-edit-details')} aria-expanded={open} {@attach tooltip(t('keys-dead-edit-details'))} onclick={() => (open = !open)}>
 	<PenLine size={17} />
 </button>
 
 {#if open && button}
-	<Popover anchor={button} label="Details of {key.name}" role="dialog" align="end" minWidth={320} maxHeight={360} onclose={() => (open = false)}>
+	<Popover anchor={button} label={t('keys-dead-details', { name: key.name })} role="dialog" align="end" minWidth={320} maxHeight={360} onclose={() => (open = false)}>
 		<div class="flex flex-col gap-3 p-2.5" data-own-undo>
-			<TextField bind:this={name} label="Name" showLabel bind:value={() => key.name, (value) => editor.updateDead(key.keysym, 'name', value)} />
+			<TextField bind:this={name} label={t('keys-name')} showLabel bind:value={() => key.name, (value) => editor.updateDead(key.keysym, 'name', value)} />
 			<div class="grid grid-cols-2 gap-3">
-				<TextField label="On the key" showLabel bind:value={() => key.symbol, (value) => editor.updateDead(key.keysym, 'symbol', value)} />
-				<TextField label="With Space" showLabel bind:value={() => key.spacing, (value) => editor.updateDead(key.keysym, 'spacing', value)} />
+				<TextField label={t('keys-dead-symbol')} showLabel bind:value={() => key.symbol, (value) => editor.updateDead(key.keysym, 'symbol', value)} />
+				<TextField label={t('keys-dead-spacing')} showLabel bind:value={() => key.spacing, (value) => editor.updateDead(key.keysym, 'spacing', value)} />
 			</div>
 		</div>
 	</Popover>

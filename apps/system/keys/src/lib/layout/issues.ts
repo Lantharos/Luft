@@ -1,4 +1,6 @@
+import { t } from '@luft/i18n';
 import { caps, type Geometry } from '#lib/keyboard/geometry.js';
+import { keyNames, type KeyName } from '#lib/keyboard/names.js';
 import type { DeadKey, Layout } from '#lib/bindings.js';
 import { placements } from './dead/table';
 
@@ -11,7 +13,7 @@ export interface Issue {
 }
 
 const SHOWN_DUPLICATES = 4;
-const SHARED_KEYS: Record<string, string> = { ralt: 'Right Alt', rctrl: 'Right Ctrl', menu: 'Menu', rwin: 'Right Super', caps: 'Caps Lock' };
+const SHARED_KEYS: Record<string, KeyName> = { ralt: 'rightAlt', rctrl: 'rightCtrl', menu: 'menu', rwin: 'rightSuper', caps: 'capsLock' };
 
 export function typeable(layout: Layout) {
 	const characters = new Set<string>();
@@ -37,11 +39,11 @@ export function pairProblems(key: DeadKey, characters: Set<string>) {
 	const seen = new Map<string, number>();
 	key.pairs.forEach((pair, index) => {
 		const length = [...pair.base].length;
-		if (length === 0) problems.set(index, 'Type the key that comes after the dead key');
-		else if (length > 1 || pair.base.codePointAt(0)! > 0xffff) problems.set(index, 'Only one key can follow a dead key');
-		else if (seen.has(pair.base)) problems.set(index, `${pair.base} already has a result`);
-		else if (!pair.text && !pair.next) problems.set(index, 'Type what it makes');
-		else if (!characters.has(pair.base) && pair.base !== ' ') problems.set(index, `No key types ${pair.base}`);
+		if (length === 0) problems.set(index, t('keys-pair-no-key'));
+		else if (length > 1 || pair.base.codePointAt(0)! > 0xffff) problems.set(index, t('keys-pair-one-key'));
+		else if (seen.has(pair.base)) problems.set(index, t('keys-pair-repeated', { key: pair.base }));
+		else if (!pair.text && !pair.next) problems.set(index, t('keys-pair-no-result'));
+		else if (!characters.has(pair.base) && pair.base !== ' ') problems.set(index, t('keys-pair-untypeable', { key: pair.base }));
 		if (length) seen.set(pair.base, index);
 	});
 	return problems;
@@ -51,10 +53,10 @@ function deadIssues(layout: Layout, characters: Set<string>): Issue[] {
 	return layout.dead.flatMap((key) => {
 		const target: Target = { tab: 'dead', keysym: key.keysym };
 		const found: Issue[] = [];
-		if (!placements(layout.keys, key.keysym).length) found.push({ id: `unplaced:${key.keysym}`, text: `${key.name} isn't on a key yet`, target });
-		if (leadsBack(key, layout.dead)) found.push({ id: `loop:${key.keysym}`, text: `${key.name} leads back to itself`, target });
+		if (!placements(layout.keys, key.keysym).length) found.push({ id: `unplaced:${key.keysym}`, text: t('keys-issue-unplaced', { name: key.name }), target });
+		if (leadsBack(key, layout.dead)) found.push({ id: `loop:${key.keysym}`, text: t('keys-issue-loop', { name: key.name }), target });
 		const problems = pairProblems(key, characters).size;
-		if (problems) found.push({ id: `pairs:${key.keysym}`, text: `${key.name} has ${problems === 1 ? 'a result' : `${problems} results`} to look at`, target });
+		if (problems) found.push({ id: `pairs:${key.keysym}`, text: t('keys-issue-pairs', { name: key.name, count: problems }), target });
 		return found;
 	});
 }
@@ -66,7 +68,7 @@ function keyIssues(layout: Layout, geometry: Geometry): Issue[] {
 	if (silent.length) {
 		found.push({
 			id: 'silent',
-			text: silent.length === 1 ? 'A key types nothing' : `${silent.length} keys type nothing`,
+			text: t('keys-issue-silent', { count: silent.length }),
 			target: { tab: 'keys', key: silent[0].name, level: 0 }
 		});
 	}
@@ -81,7 +83,7 @@ function keyIssues(layout: Layout, geometry: Geometry): Issue[] {
 	}
 	const repeated = [...places].filter(([, at]) => new Set(at.map((place) => place.key)).size > 1);
 	for (const [text, at] of repeated.slice(0, SHOWN_DUPLICATES)) {
-		found.push({ id: `twice:${text}`, text: `${text} is on ${at.length} keys`, target: { tab: 'keys', ...at[1] } });
+		found.push({ id: `twice:${text}`, text: t('keys-issue-repeated', { character: text, count: at.length }), target: { tab: 'keys', ...at[1] } });
 	}
 	return found;
 }
@@ -89,7 +91,7 @@ function keyIssues(layout: Layout, geometry: Geometry): Issue[] {
 function settingIssues(layout: Layout, thirdLevel: boolean): Issue[] {
 	const { altgr, compose } = layout.options;
 	if (!thirdLevel || altgr !== compose || !SHARED_KEYS[altgr]) return [];
-	return [{ id: 'shared', text: `AltGr and Compose are both on ${SHARED_KEYS[altgr]}`, target: { tab: 'settings' } }];
+	return [{ id: 'shared', text: t('keys-issue-shared', { key: keyNames()[SHARED_KEYS[altgr]] }), target: { tab: 'settings' } }];
 }
 
 export function issues(layout: Layout, geometry: Geometry, thirdLevel: boolean): Issue[] {

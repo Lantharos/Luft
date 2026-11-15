@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import Keyboard from '#lib/keyboard/Keyboard.svelte';
 	import { app } from '#lib/state/app.svelte.js';
@@ -46,8 +47,8 @@
 <section bind:this={area} class="flex flex-col gap-3">
 	{#if placing}
 		<div class="flex h-8 items-center gap-3 px-1.5 text-[13px] text-[var(--text-soft)]">
-			<span class="min-w-0 flex-1 truncate">Pick a key for {placing.name}</span>
-			<button type="button" class="plain-button" onclick={() => (editor.placing = null)}>Cancel</button>
+			<span class="min-w-0 flex-1 truncate">{t('keys-placing', { name: placing.name })}</span>
+			<button type="button" class="plain-button" onclick={() => (editor.placing = null)}>{t('keys-cancel')}</button>
 		</div>
 	{/if}
 	<Keyboard

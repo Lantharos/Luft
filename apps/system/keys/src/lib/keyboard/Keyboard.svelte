@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { t } from '@luft/i18n';
 	import type { Board } from './board';
 	import { caps, CODES, HEIGHT, WIDTH, type Cap } from './geometry';
 	import KeyCap from './KeyCap.svelte';
+	import { keyNames, type KeyName } from './names';
 
 	interface Props {
 		board: Board;
@@ -42,8 +44,8 @@
 		return cap.y > LOWEST_ROW_BELOW ? `${left};bottom:calc(${100 - (cap.y / HEIGHT) * 100}% + 6px)` : `${left};top:calc(${((cap.y + 1) / HEIGHT) * 100}% + 6px)`;
 	}
 
-	function label(cap: Cap) {
-		return cap.name === 'RALT' && altGr ? 'AltGr' : cap.label;
+	function label(name: string, key: KeyName) {
+		return keyNames()[name === 'RALT' && altGr ? 'altGr' : key];
 	}
 
 	function keydown(event: KeyboardEvent) {
@@ -60,15 +62,15 @@
 	}
 </script>
 
-<div bind:this={element} class="board" role="group" aria-label="Keyboard">
+<div bind:this={element} class="board" role="group" aria-label={t('keys-keyboard')}>
 	{#each shown as cap (cap.name)}
 		<div class="slot" class:enter={cap.enter} style={place(cap)}>
 			{#if cap.label && latchable(cap.name)}
 				<button type="button" class="modifier latch" class:pressed={board.pressed.has(cap.name)} aria-pressed={board.pressed.has(cap.name)} onclick={() => onlatch?.(cap.name)}
-					>{label(cap)}</button
+					>{label(cap.name, cap.label)}</button
 				>
 			{:else if cap.label}
-				<div class="modifier" class:pressed={board.pressed.has(cap.name)}>{label(cap)}</div>
+				<div class="modifier" class:pressed={board.pressed.has(cap.name)}>{label(cap.name, cap.label)}</div>
 			{:else}
 				<KeyCap
 					levels={board.levels(cap.name)}

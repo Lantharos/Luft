@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Redo2 from '@lucide/svelte/icons/redo-2';
 	import Undo2 from '@lucide/svelte/icons/undo-2';
 	import { IconButton } from '@luft/ui';
@@ -13,5 +14,5 @@
 
 <svelte:window onkeydown={undoShortcuts(target)} />
 
-<IconButton icon={Undo2} label="Undo" disabled={!target.history.canUndo} onclick={() => target.undo()} />
-<IconButton icon={Redo2} label="Redo" disabled={!target.history.canRedo} onclick={() => target.redo()} />
+<IconButton icon={Undo2} label={t('keys-undo')} disabled={!target.history.canUndo} onclick={() => target.undo()} />
+<IconButton icon={Redo2} label={t('keys-redo')} disabled={!target.history.canRedo} onclick={() => target.redo()} />

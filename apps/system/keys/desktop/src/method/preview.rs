@@ -1,11 +1,13 @@
 use std::sync::{Arc, Mutex, PoisonError};
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use xkbcommon::xkb;
 
 use super::definition::Method;
 use crate::engine::{Engine, Input, Learned, Response, Session};
+use crate::l10n::L10N;
 
 #[derive(Default)]
 struct Typing {
@@ -86,7 +88,9 @@ impl Preview {
             session,
             learned,
         } = &mut *guard;
-        let engine = engine.as_ref().ok_or("Nothing to try yet")?;
+        let engine = engine
+            .as_ref()
+            .ok_or_else(|| t!(L10N, "keys-method-nothing-to-try"))?;
         let response = act(engine, session, learned);
         let page = engine.page();
         let first = session.cursor() - session.cursor() % page;

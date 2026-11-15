@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -49,14 +50,14 @@
 		<div class="columns heading" class:context data-own-undo>
 			{#if rows.length >= SEARCH_FROM}
 				<div class="search">
-					<SearchField label="Search" bind:value={query} />
+					<SearchField label={t('keys-search')} bind:value={query} />
 				</div>
 			{:else}
-				<span>You type</span>
+				<span>{t('keys-entry-keys')}</span>
 				<span></span>
-				<span>You get</span>
+				<span>{t('keys-entry-text')}</span>
 				{#if context}
-					<span>Only after</span>
+					<span>{t('keys-entry-after')}</span>
 				{/if}
 			{/if}
 			<button type="button" class="icon-button" aria-label={add} {@attach tooltip(add)} onclick={() => void addRow()}><Plus size={18} /></button>
@@ -75,20 +76,20 @@
 					class:context
 					class:repeated={repeated.has(row.uid)}
 					data-uid={row.uid}
-					{@attach repeated.has(row.uid) ? tooltip('Same keys as another entry, only the last one is used') : undefined}
+					{@attach repeated.has(row.uid) ? tooltip(t('keys-entry-repeated')) : undefined}
 				>
-					<TextCell class="font-mono" value={row.keys} label="You type" placeholder="a'" invalid={repeated.has(row.uid)} oninput={edit(row, 'keys')} />
+					<TextCell class="font-mono" value={row.keys} label={t('keys-entry-keys')} placeholder="a'" invalid={repeated.has(row.uid)} oninput={edit(row, 'keys')} />
 					<ArrowRight size={15} class="text-[var(--text-muted)]" />
-					<TextCell value={row.text} label="You get" placeholder="á" oninput={edit(row, 'text')} />
+					<TextCell value={row.text} label={t('keys-entry-text')} placeholder="á" oninput={edit(row, 'text')} />
 					{#if context}
-						<TextCell class="font-mono" value={row.after} label="Only after" placeholder="Anywhere" oninput={edit(row, 'after')} />
+						<TextCell class="font-mono" value={row.after} label={t('keys-entry-after')} placeholder={t('keys-entry-anywhere')} oninput={edit(row, 'after')} />
 					{/if}
-					<IconButton icon={X} label="Remove" onclick={() => editor.remove(table, row.uid)} />
+					<IconButton icon={X} label={t('keys-remove')} onclick={() => editor.remove(table, row.uid)} />
 				</div>
 			{/snippet}
 		</VirtualScroller>
 		{#if !shown.length}
-			<p class="px-3 text-[13px] text-[var(--text-muted)]">No matches</p>
+			<p class="px-3 text-[13px] text-[var(--text-muted)]">{t('keys-no-matches')}</p>
 		{/if}
 	{:else}
 		<div class="flex flex-col items-center gap-4 pt-16 text-center">

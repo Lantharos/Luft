@@ -2,9 +2,11 @@ use std::fmt::Write;
 use std::fs;
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::paths;
 
 const DEFAULT_CANDIDATES: u32 = 9;
@@ -69,7 +71,7 @@ impl Method {
 
     pub fn parse(text: &str) -> Result<Self, String> {
         toml::from_str(text)
-            .map_err(|error| format!("This input method couldn't be read: {}", error.message()))
+            .map_err(|error| t!(L10N, "keys-method-unreadable", detail = error.message()))
     }
 
     pub fn to_text(&self) -> String {

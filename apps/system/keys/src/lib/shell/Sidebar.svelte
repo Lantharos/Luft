@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { selectionPill, tooltip } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
@@ -44,8 +45,8 @@
 
 <aside class="glass-sidebar drag-region px-3 py-4">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto" {@attach selectionPill()}>
-		{@render group('Layouts', 'layout', layouts, 'New layout')}
-		{@render group('Input methods', 'method', methods, 'New input method')}
+		{@render group(t('keys-sidebar-layouts'), 'layout', layouts, t('keys-new-layout'))}
+		{@render group(t('keys-sidebar-methods'), 'method', methods, t('keys-new-method'))}
 	</nav>
 </aside>
 

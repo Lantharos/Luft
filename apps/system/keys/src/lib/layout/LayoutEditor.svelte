@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
 	import ShapeItems from '#lib/keyboard/ShapeItems.svelte';
@@ -20,11 +21,11 @@
 
 	let { id }: Props = $props();
 
-	const TABS: { value: Tab; label: string }[] = [
-		{ value: 'keys', label: 'Keys' },
-		{ value: 'dead', label: 'Dead keys' },
-		{ value: 'settings', label: 'Settings' }
-	];
+	const tabs: { value: Tab; label: string }[] = $derived([
+		{ value: 'keys', label: t('keys-layout-tab-keys') },
+		{ value: 'dead', label: t('keys-layout-tab-dead') },
+		{ value: 'settings', label: t('keys-tab-settings') }
+	]);
 	const TAB_SHORTCUTS: Record<string, Tab> = { Digit1: 'keys', Digit2: 'dead', Digit3: 'settings' };
 
 	let editor = $state<LayoutEditor | null>(null);
@@ -68,13 +69,12 @@
 			<UndoButtons target={current} />
 			<SourceActions
 				selection={{ kind: 'layout', id }}
-				what="layout"
 				onuse={() => commands.layoutUse({ id })}
 				exports={[
-					{ label: 'Export layout file', run: () => commands.layoutExport({ id, format: 'symbols' }) },
-					{ label: 'Export as a complete keymap', run: () => commands.layoutExport({ id, format: 'keymap' }) },
-					...(current.layout.dead.length ? [{ label: 'Export dead keys as a Compose file', run: () => commands.layoutExport({ id, format: 'compose' }) }] : []),
-					{ label: 'Export for Windows', run: () => commands.layoutExport({ id, format: 'klc' }) }
+					{ label: t('keys-layout-export-symbols'), run: () => commands.layoutExport({ id, format: 'symbols' }) },
+					{ label: t('keys-layout-export-keymap'), run: () => commands.layoutExport({ id, format: 'keymap' }) },
+					...(current.layout.dead.length ? [{ label: t('keys-layout-export-compose'), run: () => commands.layoutExport({ id, format: 'compose' }) }] : []),
+					{ label: t('keys-layout-export-klc'), run: () => commands.layoutExport({ id, format: 'klc' }) }
 				]}
 				onremove={remove}
 			>
@@ -85,7 +85,7 @@
 		{/snippet}
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="w-[320px] max-w-full">
-				<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+				<Segmented label={t('keys-tabs')} options={tabs} value={current.tab} onchange={(tab) => (current.tab = tab)} />
 			</div>
 			{#if current.tab === 'keys'}
 				<KeysToolbar editor={current} />

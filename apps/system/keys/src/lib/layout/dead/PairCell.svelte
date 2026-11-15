@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator, TextCell, tooltip } from '@luft/ui';
@@ -36,14 +37,14 @@
 		<ArrowRight size={14} class="flex-none text-[var(--text-muted)]" />
 		<span class="result truncate">{pair.text}</span>
 	{:else}
-		<TextCell value={pair.base} label="Key" placeholder="a" single large invalid={Boolean(problem)} oninput={setBase} />
+		<TextCell value={pair.base} label={t('keys-pair-key')} placeholder="a" single large invalid={Boolean(problem)} oninput={setBase} />
 		<ArrowRight size={14} class="flex-none text-[var(--text-muted)]" />
 		{#if next}
-			<span class="result chained truncate" {@attach tooltip(`Leads into ${next.name}`)}>{next.symbol}</span>
+			<span class="result chained truncate" {@attach tooltip(t('keys-pair-leads-into', { name: next.name }))}>{next.symbol}</span>
 		{:else}
-			<TextCell value={pair.text} label="Makes" placeholder="ž" large oninput={(event) => editor?.updatePair(key.keysym, index, { text: event.currentTarget.value })} />
+			<TextCell value={pair.text} label={t('keys-pair-makes')} placeholder="ž" large oninput={(event) => editor?.updatePair(key.keysym, index, { text: event.currentTarget.value })} />
 		{/if}
-		<MenuButton label="Options" class="more" align="end" minWidth={220}>
+		<MenuButton label={t('keys-pair-options')} class="more" align="end" minWidth={220}>
 			{#snippet trigger()}
 				<Ellipsis size={15} />
 			{/snippet}
@@ -54,7 +55,7 @@
 						onclick={() => {
 							close();
 							editor?.updatePair(key.keysym, index, { next: other.keysym, text: '' });
-						}}>Lead into {other.name}</MenuItem
+						}}>{t('keys-pair-lead-into', { name: other.name })}</MenuItem
 					>
 				{/each}
 				{#if next}
@@ -62,7 +63,7 @@
 						onclick={() => {
 							close();
 							editor?.updatePair(key.keysym, index, { next: undefined });
-						}}>Make text instead</MenuItem
+						}}>{t('keys-pair-make-text')}</MenuItem
 					>
 				{/if}
 				{#if others.length || next}
@@ -73,7 +74,7 @@
 					onclick={() => {
 						close();
 						editor?.removePair(key.keysym, index);
-					}}>Remove</MenuItem
+					}}>{t('keys-remove')}</MenuItem
 				>
 			{/snippet}
 		</MenuButton>

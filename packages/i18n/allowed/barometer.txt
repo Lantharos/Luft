@@ -1,0 +1,4 @@
+apps/system/barometer/src/lib/bridge/sample/system.ts	Samsung SSD 990 PRO 1TB
+apps/system/barometer/src/lib/bridge/sample/system.ts	Realtek Semiconductor Co., Ltd.
+apps/system/barometer/src/lib/bridge/sample/system.ts	Intel Corporation
+apps/system/barometer/src/lib/resources/battery/BatteryPage.svelte	Not charging

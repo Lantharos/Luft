@@ -1,3 +1,6 @@
+use luft_i18n::t;
+
+use crate::l10n::L10N;
 use crate::method::definition::{Entry, Method};
 
 pub fn parse(source: &str, fallback: &str) -> Result<Method, String> {
@@ -56,7 +59,7 @@ pub fn parse(source: &str, fallback: &str) -> Result<Method, String> {
         }
     }
     if ranked.is_empty() {
-        return Err("This file doesn't have a table of words".into());
+        return Err(t!(L10N, "keys-table-no-words"));
     }
     ranked.sort_by_key(|(frequency, _)| std::cmp::Reverse(*frequency));
     method.words = ranked.into_iter().map(|(_, entry)| entry).collect();

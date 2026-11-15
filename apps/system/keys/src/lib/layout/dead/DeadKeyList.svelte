@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { tooltip } from '@luft/ui';
 	import { pairProblems, typeable } from '../issues';
@@ -19,21 +20,21 @@
 		<span class="glyph">{symbol}</span>
 		<span class="min-w-0 flex-1 truncate">{name}</span>
 		{#if problem}
-			<span class="problem" role="img" aria-label="Has results to look at" {@attach tooltip('Has results to look at')}></span>
+			<span class="problem" role="img" aria-label={t('keys-dead-has-problems')} {@attach tooltip(t('keys-dead-has-problems'))}></span>
 		{/if}
 	</button>
 {/snippet}
 
-<nav class="flex flex-col gap-0.5" aria-label="Dead keys">
+<nav class="flex flex-col gap-0.5" aria-label={t('keys-layout-tab-dead')}>
 	{#each editor.layout.dead as key (key.keysym)}
 		{@render item(key.keysym, key.symbol, key.name, pairProblems(key, characters).size > 0)}
 	{/each}
 	<button type="button" class="item add" onclick={() => void editor.addDead()}>
 		<span class="glyph"><Plus size={16} /></span>
-		<span>New dead key</span>
+		<span>{t('keys-dead-new')}</span>
 	</button>
 	{#if editor.systemDead.length}
-		<h3 class="px-3 pt-4 pb-1 text-[13px] font-medium text-[var(--text-muted)]">Standard</h3>
+		<h3 class="px-3 pt-4 pb-1 text-[13px] font-medium text-[var(--text-muted)]">{t('keys-dead-standard-heading')}</h3>
 		{#each editor.systemDead as symbol (symbol.keysym)}
 			{@render item(symbol.keysym, symbol.text, standardName(symbol.keysym), false)}
 		{/each}

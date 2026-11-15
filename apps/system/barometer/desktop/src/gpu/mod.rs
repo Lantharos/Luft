@@ -8,8 +8,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
+use luft_i18n::t;
 use serde::Serialize;
 
+use crate::l10n::L10N;
 use crate::system::hwmon::{self, Sensor};
 use crate::system::procfile::{link_name, read_text, udev_property};
 
@@ -212,7 +214,9 @@ impl Gpu {
 fn pci_name(slot: &str, vendor: &str) -> String {
     let model = udev_property(&format!("+pci:{slot}"), "ID_MODEL_FROM_DATABASE");
     let Some(model) = model else {
-        return format!("{vendor} Graphics").trim().to_owned();
+        return t!(L10N, "barometer-gpu-unnamed", vendor = vendor)
+            .trim()
+            .to_owned();
     };
     let marketing = model
         .split_once('[')

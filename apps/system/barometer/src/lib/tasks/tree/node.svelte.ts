@@ -1,8 +1,18 @@
+import { resolved, t } from '@luft/i18n';
 import type { Entry, Group } from '#lib/bindings.js';
 import type { Process } from '#lib/bridge/rows.js';
 import type { Row } from '../columns';
 
 export type Kind = 'group' | 'entry' | 'window' | 'process';
+export type Note = 'stopping' | 'unresponsive' | 'paused';
+
+export const notes = resolved(
+	(): Record<Note, string> => ({
+		stopping: t('barometer-note-stopping'),
+		unresponsive: t('barometer-note-unresponsive'),
+		paused: t('barometer-note-paused')
+	})
+);
 
 const BLANK: Row = {
 	name: '',
@@ -29,7 +39,7 @@ export class Node {
 	app = $state<string | null>(null);
 	row = $state.raw<Row>(BLANK);
 	count = $state(0);
-	note = $state<string | undefined>();
+	note = $state<Note | undefined>();
 	working = $state(false);
 	expanded = $state<boolean | undefined>();
 	child = $state(false);

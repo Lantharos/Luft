@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import { commands } from '#lib/bindings.js';
 	import type { DeadKey, Symbol } from '#lib/bindings.js';
@@ -26,7 +27,7 @@
 
 <div class="flex min-w-0 flex-col gap-5">
 	<DeadKeyHeader symbol={symbol.text} name={standardName(symbol.keysym)} {where}>
-		<button type="button" class="button" onclick={() => void editor.copySystem(symbol)}>Make an editable copy</button>
+		<button type="button" class="button" onclick={() => void editor.copySystem(symbol)}>{t('keys-dead-copy')}</button>
 	</DeadKeyHeader>
 	{#if table}
 		<PairGrid key={table} readonly />

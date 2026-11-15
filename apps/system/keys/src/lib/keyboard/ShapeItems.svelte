@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
+	import { t } from '@luft/i18n';
 	import { MenuItem } from '@luft/ui';
 	import { GEOMETRIES, type Geometry } from './geometry';
 
@@ -20,7 +21,7 @@
 			onchange(shape.value);
 		}}
 	>
-		<span class="flex-1">{shape.label} keyboard</span>
+		<span class="flex-1">{t('keys-shape', { shape: shape.label })}</span>
 		{#if value === shape.value}
 			<Check size={16} />
 		{/if}

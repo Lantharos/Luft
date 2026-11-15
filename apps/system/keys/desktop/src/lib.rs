@@ -3,6 +3,7 @@ mod characters;
 mod compose;
 mod engine;
 mod ibus;
+mod l10n;
 mod layout;
 mod method;
 mod paths;

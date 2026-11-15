@@ -5,7 +5,10 @@ mod table;
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::definition::Method;
+use crate::l10n::L10N;
 
 pub fn read(path: &Path) -> Result<Method, String> {
     let source = fs::read_to_string(path).map_err(|error| error.to_string())?;
@@ -17,8 +20,6 @@ pub fn read(path: &Path) -> Result<Method, String> {
         Some("mim") => mim::parse(&source, &fallback),
         Some("toml") => Method::parse(&source),
         _ if source.contains("BEGIN_TABLE") => table::parse(&source, &fallback),
-        _ => Err(
-            "Keys can open its own input methods, m17n .mim files and IBus table sources".into(),
-        ),
+        _ => Err(t!(L10N, "keys-method-unknown-file")),
     }
 }

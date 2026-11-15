@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { typedLevel } from '#lib/keyboard/board.js';
-	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
+	import { describe, shown } from '#lib/keyboard/describe.js';
+	import { levelNames, levelShortNames } from '#lib/keyboard/names.js';
 	import type { DeadKey } from '#lib/bindings.js';
 	import type { Levels } from '#lib/layout/levels.js';
 
@@ -29,9 +31,9 @@
 <div class="flex justify-center gap-2">
 	{#each shownLevels as index (index)}
 		{@const symbol = typed[index]}
-		<div class="slot" class:current={level === index} role="img" aria-label="{LEVEL_NAMES[index]}: {names[index]}" {@attach tooltip(names[index])}>
+		<div class="slot" class:current={level === index} role="img" aria-label={t('keys-level-described', { level: levelNames()[index], name: names[index] })} {@attach tooltip(names[index])}>
 			<span class="glyph" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
-			<span class="level">{LEVEL_SHORT_NAMES[index]}</span>
+			<span class="level">{levelShortNames()[index]}</span>
 		</div>
 	{/each}
 </div>

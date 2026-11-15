@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { frequency, percent } from '#lib/format.js';
 	import Graph from '#lib/graph/Graph.svelte';
 	import { monitor } from '#lib/state/monitor.svelte.js';
@@ -10,6 +11,7 @@
 	let { count }: Props = $props();
 
 	let latest = $derived(monitor.latest);
+	let names = $derived(Array.from({ length: count }, (_, core) => t('barometer-cpu-core', { number: core + 1 })));
 	let cores = $derived(Array.from({ length: count }, (_, core) => ({ core, values: monitor.ticks.map((tick) => tick.cpu.cores[core] ?? null) })));
 </script>
 
@@ -17,7 +19,7 @@
 	{#each cores as { core, values } (core)}
 		<div class="flex min-w-0 flex-col gap-1.5">
 			<div class="flex items-baseline justify-between gap-2 px-1 text-[12px]">
-				<span class="text-[var(--text-muted)]">Core {core + 1}</span>
+				<span class="text-[var(--text-muted)]">{names[core]}</span>
 				<span class="tabular-nums">
 					{percent(latest?.cpu.cores[core] ?? null)}
 					{#if latest?.cpu.frequencies}

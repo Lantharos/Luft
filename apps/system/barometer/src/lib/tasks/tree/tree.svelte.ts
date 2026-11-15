@@ -1,3 +1,4 @@
+import { resolved, t } from '@luft/i18n';
 import type { AppInfo, Entry, Group, Window } from '#lib/bindings.js';
 import type { Process } from '#lib/bridge/rows.js';
 import type { Sort } from '#lib/state/settings.svelte.js';
@@ -23,11 +24,11 @@ interface Shown {
 	found: Process[] | null;
 }
 
-const GROUPS: { id: Group; title: string }[] = [
-	{ id: 'apps', title: 'Apps' },
-	{ id: 'background', title: 'Background' },
-	{ id: 'system', title: 'System' }
-];
+const groups = resolved((): { id: Group; title: string }[] => [
+	{ id: 'apps', title: t('barometer-group-apps') },
+	{ id: 'background', title: t('barometer-group-background') },
+	{ id: 'system', title: t('barometer-group-system') }
+]);
 
 const rowOf = (entry: Entry): Row => ({ ...entry, nice: 0, state: entry.paused ? 'T' : 'S', userTime: 0, systemTime: 0 });
 
@@ -71,7 +72,7 @@ export class TaskTree {
 		const children = Map.groupBy(input.processes, (process) => process.app ?? '');
 		const needle = input.query.trim().toLowerCase();
 		const items: Node[] = [];
-		for (const { id, title } of GROUPS) {
+		for (const { id, title } of groups()) {
 			const shown: Shown[] = [];
 			for (const entry of input.entries) {
 				if (entry.group !== id) continue;
@@ -111,7 +112,7 @@ export class TaskTree {
 		node.parent = parent;
 		node.group = entry.group;
 		node.working = ending;
-		node.note = ending ? 'Stopping' : !entry.responding ? 'Not responding' : entry.paused ? 'Paused' : undefined;
+		node.note = ending ? 'stopping' : !entry.responding ? 'unresponsive' : entry.paused ? 'paused' : undefined;
 		return node;
 	}
 
@@ -123,7 +124,7 @@ export class TaskTree {
 		node.entry = entry;
 		node.child = true;
 		node.parent = parent;
-		node.note = window.responding ? undefined : 'Not responding';
+		node.note = window.responding ? undefined : 'unresponsive';
 		return node;
 	}
 
@@ -136,7 +137,7 @@ export class TaskTree {
 		node.process = process;
 		node.child = parent !== null;
 		node.parent = parent;
-		node.note = process.state === 'T' ? 'Paused' : undefined;
+		node.note = process.state === 'T' ? 'paused' : undefined;
 		return node;
 	}
 }

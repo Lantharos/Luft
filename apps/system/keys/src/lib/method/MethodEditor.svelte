@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy, onMount } from 'svelte';
 	import { Segmented } from '@luft/ui';
 	import Page from '#lib/shell/Page.svelte';
@@ -18,12 +19,12 @@
 
 	let { id }: Props = $props();
 
-	const TABS: { value: Tab; label: string }[] = [
-		{ value: 'rules', label: 'Replacements' },
-		{ value: 'words', label: 'Words' },
-		{ value: 'sequences', label: 'Sequences' },
-		{ value: 'settings', label: 'Settings' }
-	];
+	const tabs: { value: Tab; label: string }[] = $derived([
+		{ value: 'rules', label: t('keys-method-tab-rules') },
+		{ value: 'words', label: t('keys-method-tab-words') },
+		{ value: 'sequences', label: t('keys-method-tab-sequences') },
+		{ value: 'settings', label: t('keys-tab-settings') }
+	]);
 	const TAB_SHORTCUTS: Record<string, Tab> = { Digit1: 'rules', Digit2: 'words', Digit3: 'sequences', Digit4: 'settings' };
 
 	let editor = $state<MethodEditor | null>(null);
@@ -62,23 +63,22 @@
 			<UndoButtons target={current} />
 			<SourceActions
 				selection={{ kind: 'method', id }}
-				what="input method"
 				onuse={() => commands.methodUse({ id })}
-				exports={[{ label: 'Export input method', run: () => commands.methodExport({ id }) }]}
+				exports={[{ label: t('keys-method-export'), run: () => commands.methodExport({ id }) }]}
 				onremove={remove}
 			/>
 		{/snippet}
 		<div class="grid items-start gap-8 min-[1100px]:grid-cols-[minmax(0,1fr)_340px]">
 			<div class="flex min-w-0 flex-col gap-6">
 				<div class="w-[440px] max-w-full">
-					<Segmented label="What to edit" options={TABS} value={current.tab} onchange={(tab) => (current.tab = tab)} />
+					<Segmented label={t('keys-tabs')} options={tabs} value={current.tab} onchange={(tab) => (current.tab = tab)} />
 				</div>
 				{#if current.tab === 'rules'}
-					<EntryTable editor={current} table="rules" add="Add replacement" context empty="No replacements yet" />
+					<EntryTable editor={current} table="rules" add={t('keys-method-rules-add')} context empty={t('keys-method-rules-empty')} />
 				{:else if current.tab === 'words'}
-					<EntryTable editor={current} table="words" add="Add word" empty="No words yet" />
+					<EntryTable editor={current} table="words" add={t('keys-method-words-add')} empty={t('keys-method-words-empty')} />
 				{:else if current.tab === 'sequences'}
-					<EntryTable editor={current} table="sequences" add="Add sequence" empty="No sequences yet" />
+					<EntryTable editor={current} table="sequences" add={t('keys-method-sequences-add')} empty={t('keys-method-sequences-empty')} />
 				{:else}
 					<MethodSettings editor={current} />
 				{/if}

@@ -1,11 +1,13 @@
 use std::fs;
 
 use luft_app::files;
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::definition::{self, Method};
 use super::host;
+use crate::l10n::L10N;
 use crate::{paths, sources};
 
 pub const ENGINE_PREFIX: &str = "keys:";
@@ -88,7 +90,7 @@ pub fn open(id: &str) -> Result<SavedMethod, String> {
 pub fn create(mut method: Method) -> Result<SavedMethod, String> {
     method.name = method.name.trim().to_owned();
     if method.name.is_empty() {
-        return Err("Give the input method a name".into());
+        return Err(t!(L10N, "keys-method-unnamed"));
     }
     let id = paths::unique(&paths::slug(&method.name), |candidate| {
         definition::file(candidate).exists()

@@ -1,4 +1,5 @@
 import { appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { i18n } from '@luft/i18n';
 import { appearance, keepWindowState } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Launch, LayoutEntry, Summary, Targets } from '#lib/bindings.js';
@@ -21,6 +22,7 @@ class AppStore {
 	async start() {
 		const [state, restored] = await Promise.all([commands.appState(), appWindow.restoredState<Selection>(), this.refresh()]);
 		appearance.start(state);
+		await i18n.ready;
 		if (state.opened.length) await this.refresh();
 		this.selection ??= (restored && this.exists(restored) ? restored : null) ?? this.first();
 		keepWindowState(() => this.selection);

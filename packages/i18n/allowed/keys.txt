@@ -1,0 +1,10 @@
+apps/system/keys/src/lib/keyboard/geometry.ts	ANSI
+apps/system/keys/src/lib/keyboard/geometry.ts	ISO
+apps/system/keys/src/lib/keyboard/geometry.ts	JIS
+apps/system/keys/src/lib/layout/dead/DeadKeysPane.svelte	ˇ
+apps/system/keys/src/lib/layout/dead/PairCell.svelte	a
+apps/system/keys/src/lib/layout/dead/PairCell.svelte	ž
+apps/system/keys/src/lib/layout/settings/LayoutSettings.svelte	de
+apps/system/keys/src/lib/method/EntryTable.svelte	a'
+apps/system/keys/src/lib/method/EntryTable.svelte	á
+apps/system/keys/src/lib/method/MethodSettings.svelte	eo

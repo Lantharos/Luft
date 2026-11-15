@@ -8,11 +8,13 @@ use std::time::{Duration, Instant};
 use gio::prelude::*;
 use luft_app::launch;
 use luft_files::client::{self, Process};
+use luft_i18n::t;
 use serde::Deserialize;
 use specta::Type;
 
 use super::apps::members;
 use super::process::Stat;
+use crate::l10n::L10N;
 use crate::system;
 
 const STOP_TIMEOUT: Duration = Duration::from_secs(5);
@@ -227,7 +229,8 @@ pub fn stop_scopes(mut scopes: Vec<PathBuf>) -> Result<(), String> {
 }
 
 pub fn open_app(OpenRequest { key, token }: OpenRequest) -> Result<(), String> {
-    let app = gio_unix::DesktopAppInfo::new(&key).ok_or("That app is no longer installed")?;
+    let app = gio_unix::DesktopAppInfo::new(&key)
+        .ok_or_else(|| t!(L10N, "barometer-app-not-installed"))?;
     launch::start(app.upcast_ref(), &[], token.as_deref()).map_err(|error| error.to_string())
 }
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { CODES, PHYSICAL } from '#lib/keyboard/geometry.js';
 	import { toast } from '#lib/state/toast.svelte.js';
 	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
@@ -63,4 +64,4 @@
 	}
 </script>
 
-<TryField bind:this={field} label="Try the layout" placeholder="Type to try the layout" rows={2} onkeydown={keydown} onkeyup={keyup} onfocus={reset} onblur={reset} />
+<TryField bind:this={field} label={t('keys-try-layout')} placeholder={t('keys-try-layout-placeholder')} rows={2} onkeydown={keydown} onkeyup={keyup} onfocus={reset} onblur={reset} />

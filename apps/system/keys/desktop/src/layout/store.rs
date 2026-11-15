@@ -3,6 +3,7 @@ use std::fs;
 use std::path::Path;
 
 use luft_app::files;
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -13,6 +14,7 @@ use super::registry::{self, LayoutEntry};
 use super::symbol::Symbol;
 use super::{Layout, symbols};
 use crate::compose::{self, Reloader, sequences};
+use crate::l10n::L10N;
 use crate::{paths, sources};
 
 const LEVEL_THREE: &str = "level3(";
@@ -118,7 +120,7 @@ pub fn open(id: &str) -> Result<Layout, String> {
     let entry = list()
         .into_iter()
         .find(|entry| entry.id == id)
-        .ok_or("This layout no longer exists")?;
+        .ok_or_else(|| t!(L10N, "keys-layout-gone"))?;
     let text =
         fs::read_to_string(paths::user_symbols().join(id)).map_err(|error| error.to_string())?;
     let meta = meta::load(id).unwrap_or_else(|| Meta {
@@ -201,7 +203,7 @@ pub fn create_from(name: &str, origin: Origin, reloader: &Reloader) -> Result<La
 pub fn create(mut draft: Draft, reloader: &Reloader) -> Result<Layout, String> {
     let name = draft.name.trim().to_owned();
     if name.is_empty() {
-        return Err("Give the layout a name".into());
+        return Err(t!(L10N, "keys-layout-unnamed"));
     }
     rekey(&mut draft)?;
     let layout = Layout {

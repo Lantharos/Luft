@@ -1,0 +1,2 @@
+apps/system/keys/desktop/src/lib.rs	Keys
+apps/system/keys/desktop/src/layout/symbol.rs	Compose

@@ -4,10 +4,12 @@ use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use luft_app::files;
+use luft_i18n::t;
 use xkbcommon::xkb;
 
 use super::keys::{EDITABLE, LEVELS};
 use super::symbol::Symbol;
+use crate::l10n::L10N;
 use crate::paths;
 
 pub type Keys = BTreeMap<String, [Symbol; LEVELS]>;
@@ -49,7 +51,7 @@ pub fn layout(id: &str) -> Result<Compiled, String> {
     let (layout, variant) = id.split_once('+').unwrap_or((id, ""));
     from_names(&context(None), layout, variant)
         .map(|keymap| Compiled { keymap })
-        .ok_or_else(|| format!("The layout {id} couldn't be read"))
+        .ok_or_else(|| t!(L10N, "keys-layout-unreadable", id = id))
 }
 
 pub fn symbols(text: &str) -> Result<Compiled, String> {
@@ -64,7 +66,7 @@ pub fn symbols(text: &str) -> Result<Compiled, String> {
     let _ = fs::remove_dir_all(&directory);
     keymap
         .map(|keymap| Compiled { keymap })
-        .ok_or_else(|| "This layout has a mistake the keyboard can't use".into())
+        .ok_or_else(|| t!(L10N, "keys-layout-invalid"))
 }
 
 pub fn keymap(text: String) -> Result<Compiled, String> {
@@ -75,7 +77,7 @@ pub fn keymap(text: String) -> Result<Compiled, String> {
         xkb::KEYMAP_COMPILE_NO_FLAGS,
     )
     .map(|keymap| Compiled { keymap })
-    .ok_or_else(|| "This keymap couldn't be read".into())
+    .ok_or_else(|| t!(L10N, "keys-keymap-unreadable"))
 }
 
 impl Compiled {

@@ -14,12 +14,14 @@ use std::path::Path;
 
 use luft_app::portal::{self, FileChooser, Filter};
 use luft_app::{Commands, Empty};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tokio::task::spawn_blocking;
 
 use crate::compose::{Reloader, sequences, system};
+use crate::l10n::L10N;
 use crate::{paths, sources};
 use compile::Keys;
 pub use dead::DeadKey;
@@ -102,7 +104,7 @@ fn describe(Describe { keysym, text }: Describe) -> Result<Symbol, String> {
         .as_deref()
         .and_then(Symbol::from_name)
         .or_else(|| text.as_deref().and_then(Symbol::from_text))
-        .ok_or_else(|| "The keyboard can't type that".into())
+        .ok_or_else(|| t!(L10N, "keys-untypeable"))
 }
 
 pub fn import_path(path: &Path, reloader: &Reloader) -> Result<Layout, String> {
@@ -146,10 +148,12 @@ pub fn import_path(path: &Path, reloader: &Reloader) -> Result<Layout, String> {
 }
 
 async fn import(reloader: Reloader, Empty {}: Empty) -> Result<Option<Layout>, String> {
+    let title = t!(L10N, "keys-layout-import");
+    let name = t!(L10N, "keys-layout-files");
     let chosen = portal::open_file(
-        "Import a layout",
+        &title,
         Filter {
-            name: "Keyboard layouts",
+            name: &name,
             patterns: vec!["*".into()],
         },
     )
@@ -188,8 +192,9 @@ async fn export(Export { id, format }: Export) -> Result<bool, String> {
     let (contents, file_name) = spawn_blocking(move || contents(id, format))
         .await
         .map_err(|error| error.to_string())??;
+    let title = t!(L10N, "keys-layout-export");
     let chosen = FileChooser {
-        title: "Export layout",
+        title: &title,
         current_name: Some(&file_name),
         ..FileChooser::default()
     }

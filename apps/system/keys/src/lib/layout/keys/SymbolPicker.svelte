@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { Popover, SearchField, tooltip, VirtualScroller } from '@luft/ui';
 	import { search } from '#lib/characters/characters.js';
 	import { commands } from '#lib/bindings.js';
 	import type { Character, Specials, Symbol } from '#lib/bindings.js';
 	import { EMPTY } from '#lib/layout/levels.js';
-	import { deadSymbol } from '../dead/table';
+	import { deadSymbol, standardName } from '../dead/table';
 	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {
@@ -64,38 +65,38 @@
 	}
 </script>
 
-<Popover {anchor} label="Choose a character" role="dialog" minWidth={360} maxHeight={460} {onclose}>
+<Popover {anchor} label={t('keys-picker')} role="dialog" minWidth={360} maxHeight={460} {onclose}>
 	<div class="flex flex-col gap-3 p-1.5">
-		<SearchField bind:this={field} label="Search characters" bind:value={query} onkeydown={keydown} />
+		<SearchField bind:this={field} label={t('keys-picker-search')} bind:value={query} onkeydown={keydown} />
 		{#if extras && !query}
 			<div class="flex flex-col gap-1.5">
-				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">Your dead keys</h3>
+				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">{t('keys-picker-own-dead')}</h3>
 				<div class="grid grid-cols-8 gap-1">
 					{#each editor.layout.dead as key (key.keysym)}
 						<button type="button" class="cell" aria-label={key.name} {@attach tooltip(key.name)} onclick={() => onpick(deadSymbol(key))}>{key.symbol}</button>
 					{/each}
-					<button type="button" class="cell add" aria-label="New dead key" {@attach tooltip('New dead key')} onclick={() => void newDead()}><Plus size={16} /></button>
+					<button type="button" class="cell add" aria-label={t('keys-dead-new')} {@attach tooltip(t('keys-dead-new'))} onclick={() => void newDead()}><Plus size={16} /></button>
 				</div>
 			</div>
 			<div class="flex flex-col gap-1.5">
-				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">Standard dead keys</h3>
+				<h3 class="px-1 text-[12.5px] text-[var(--text-muted)]">{t('keys-picker-standard-dead')}</h3>
 				<div class="grid grid-cols-8 gap-1">
 					{#each extras.dead as dead (dead.keysym)}
-						<button type="button" class="cell" aria-label={dead.keysym.replace('dead_', 'Dead ').replaceAll('_', ' ')} {@attach tooltip(dead.keysym.replace('dead_', '').replaceAll('_', ' '))} onclick={() => onpick(dead)}>
+						<button type="button" class="cell" aria-label={t('keys-symbol-dead-standard', { name: standardName(dead.keysym) })} {@attach tooltip(standardName(dead.keysym))} onclick={() => onpick(dead)}>
 							{dead.text}
 						</button>
 					{/each}
 				</div>
 			</div>
 			<div class="flex gap-1">
-				<button type="button" class="plain-button flex-1" onclick={() => extras && onpick(extras.compose)}>Compose key</button>
-				<button type="button" class="plain-button flex-1" onclick={() => onpick(EMPTY)}>Nothing</button>
+				<button type="button" class="plain-button flex-1" onclick={() => extras && onpick(extras.compose)}>{t('keys-picker-compose')}</button>
+				<button type="button" class="plain-button flex-1" onclick={() => onpick(EMPTY)}>{t('keys-symbol-nothing')}</button>
 			</div>
 		{/if}
 		{#if named}
 			<button type="button" class="option" onclick={() => named && onpick(named)}>
 				<span class="glyph">{named.kind === 'character' ? named.text : '⌨'}</span>
-				<span class="truncate">The {named.keysym} key</span>
+				<span class="truncate">{t('keys-picker-named', { keysym: named.keysym })}</span>
 			</button>
 		{/if}
 		<VirtualScroller class="hidden-scroll scroll-fade h-[240px]" items={results} key={(character) => character.text} layout={{ itemHeight: 40, gap: 2 }}>

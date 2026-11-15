@@ -1,7 +1,9 @@
 <script lang="ts">
 	import PenLine from '@lucide/svelte/icons/pen-line';
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
+	import { describe, shown } from '#lib/keyboard/describe.js';
+	import { levelNames, levelShortNames } from '#lib/keyboard/names.js';
 	import { commands } from '#lib/bindings.js';
 	import type { Symbol } from '#lib/bindings.js';
 	import { EMPTY } from '#lib/layout/levels.js';
@@ -67,7 +69,7 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 gap-1" role="group" aria-label="What the key types">
+<div class="grid grid-cols-2 gap-1" role="group" aria-label={t('keys-inspector-label')}>
 	{#each ARRANGED as level (level)}
 		{@const symbol = levels[level]}
 		<div class="slot" class:current={editor.level === level} class:placing={editor.placing}>
@@ -75,16 +77,16 @@
 				bind:this={slots[level]}
 				type="button"
 				class="pick"
-				aria-label="{LEVEL_NAMES[level]}: {names[level]}"
-				{@attach tooltip(names[level] ? `${LEVEL_NAMES[level]}: ${names[level]}` : LEVEL_NAMES[level])}
+				aria-label={t('keys-level-described', { level: levelNames()[level], name: names[level] })}
+				{@attach tooltip(names[level] ? t('keys-level-described', { level: levelNames()[level], name: names[level] }) : levelNames()[level])}
 				onclick={() => open(level)}
 				onkeydown={(event) => void keydown(event, level)}
 			>
-				<span class="level">{LEVEL_SHORT_NAMES[level]}</span>
+				<span class="level">{levelShortNames()[level]}</span>
 				<span class="glyph" class:dead={symbol.kind === 'dead'} class:named={symbol.kind === 'function'}>{shown(symbol)}</span>
 			</button>
 			{#if symbol.kind === 'dead' && editor.dead(symbol.keysym)}
-				<button type="button" class="edit" aria-label="Edit {names[level]}" {@attach tooltip('Edit dead key')} onclick={() => editDead(symbol)}><PenLine size={13} /></button>
+				<button type="button" class="edit" aria-label={t('keys-inspector-edit', { name: names[level] })} {@attach tooltip(t('keys-inspector-edit-dead'))} onclick={() => editDead(symbol)}><PenLine size={13} /></button>
 			{/if}
 		</div>
 	{/each}

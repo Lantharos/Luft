@@ -1,8 +1,32 @@
+import { i18n } from '@luft/i18n';
 import { bytes } from '@luft/ui';
 import { settings } from '#lib/state/settings.svelte.js';
 
 const BIT_UNITS = ['bit/s', 'kbit/s', 'Mbit/s', 'Gbit/s', 'Tbit/s'];
-const whole = new Intl.NumberFormat();
+
+let formattersLocale = '';
+let formatters = new Map<string, Intl.NumberFormat>();
+
+function formatter(key: string, options: Intl.NumberFormatOptions) {
+	if (formattersLocale !== i18n.formats) {
+		formattersLocale = i18n.formats;
+		formatters = new Map();
+	}
+	let found = formatters.get(key);
+	if (!found) {
+		found = new Intl.NumberFormat(formattersLocale, options);
+		formatters.set(key, found);
+	}
+	return found;
+}
+
+export function fixed(value: number, digits: number) {
+	return formatter(`fixed:${digits}`, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+}
+
+export function decimal(value: number) {
+	return formatter('decimal', { maximumFractionDigits: 3 }).format(value);
+}
 
 function bits(value: number) {
 	let size = value * 8;
@@ -11,7 +35,7 @@ function bits(value: number) {
 		size /= 1000;
 		unit += 1;
 	}
-	return `${size >= 100 || unit === 0 ? Math.round(size) : size.toFixed(1)} ${BIT_UNITS[unit]}`;
+	return `${fixed(size, size >= 100 || unit === 0 ? 0 : 1)} ${BIT_UNITS[unit]}`;
 }
 
 export function rate(value: number) {
@@ -23,7 +47,8 @@ export function networkRate(value: number) {
 }
 
 export function percent(value: number | null, digits = 0) {
-	return value === null ? '–' : `${Math.max(0, value).toFixed(digits)}%`;
+	if (value === null) return '–';
+	return formatter(`percent:${digits}`, { style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(Math.max(0, value) / 100);
 }
 
 export function share(part: number, total: number) {
@@ -32,16 +57,16 @@ export function share(part: number, total: number) {
 
 export function temperature(celsius: number | null) {
 	if (celsius === null) return '–';
-	return settings.value.temperature === 'fahrenheit' ? `${Math.round((celsius * 9) / 5 + 32)} °F` : `${Math.round(celsius)} °C`;
+	return settings.value.temperature === 'fahrenheit' ? `${count((celsius * 9) / 5 + 32)} °F` : `${count(celsius)} °C`;
 }
 
 export function frequency(megahertz: number | null) {
 	if (!megahertz) return '–';
-	return megahertz >= 1000 ? `${(megahertz / 1000).toFixed(2)} GHz` : `${Math.round(megahertz)} MHz`;
+	return megahertz >= 1000 ? `${fixed(megahertz / 1000, 2)} GHz` : `${count(megahertz)} MHz`;
 }
 
 export function count(value: number) {
-	return whole.format(Math.round(value));
+	return fixed(Math.round(value), 0);
 }
 
 export function cpuTime(seconds: number) {

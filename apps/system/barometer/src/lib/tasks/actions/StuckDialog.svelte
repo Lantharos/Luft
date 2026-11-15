@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { tasks, type Target } from './actions.svelte';
 
@@ -10,12 +11,12 @@
 </script>
 
 <Dialog
-	title={`${target.title} isn't closing`}
-	description="It's still running. Force quitting ends it right away, and anything unsaved in it is lost."
+	title={t('barometer-stuck-title', { name: target.title })}
+	description={t('barometer-stuck-description')}
 	onclose={() => (tasks.stuck = null)}
 >
 	{#snippet actions()}
-		<button type="button" class="button" onclick={() => (tasks.stuck = null)}>Wait</button>
-		<button type="button" class="button danger" onclick={() => tasks.kill(target)}>Force quit</button>
+		<button type="button" class="button" onclick={() => (tasks.stuck = null)}>{t('barometer-stuck-wait')}</button>
+		<button type="button" class="button danger" onclick={() => tasks.kill(target)}>{t('barometer-force-quit')}</button>
 	{/snippet}
 </Dialog>

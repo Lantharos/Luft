@@ -1,4 +1,7 @@
+use luft_i18n::t;
+
 use super::sexp::{self, Expr};
+use crate::l10n::L10N;
 use crate::method::definition::{Entry, Method, Rule};
 
 fn head(expression: &Expr) -> Option<(&str, &[Expr])> {
@@ -126,7 +129,7 @@ pub fn parse(source: &str, fallback: &str) -> Result<Method, String> {
         }
     }
     if method.rules.is_empty() && method.words.is_empty() {
-        return Err("This file doesn't have any rules Keys can use".into());
+        return Err(t!(L10N, "keys-mim-no-rules"));
     }
     Ok(method)
 }

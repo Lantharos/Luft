@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, TextField } from '@luft/ui';
 	import { toast } from '#lib/state/toast.svelte.js';
 	import { commands } from '#lib/bindings.js';
@@ -32,11 +33,11 @@
 	}
 </script>
 
-<Dialog title="New input method" {onclose}>
-	<TextField label="Name" showLabel bind:value={name} placeholder="My input method" onkeydown={keydown} />
+<Dialog title={t('keys-new-method')} {onclose}>
+	<TextField label={t('keys-name')} showLabel bind:value={name} placeholder={t('keys-new-method-placeholder')} onkeydown={keydown} />
 	{#snippet actions()}
-		<button type="button" class="plain-button mr-auto" onclick={() => void run(() => commands.methodImport())}>Import a file</button>
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!name.trim() || busy} onclick={() => void run(() => commands.methodCreate({ name }))}>Create</button>
+		<button type="button" class="plain-button mr-auto" onclick={() => void run(() => commands.methodImport())}>{t('keys-import-file')}</button>
+		<button type="button" class="button" onclick={onclose}>{t('keys-cancel')}</button>
+		<button type="button" class="button primary" disabled={!name.trim() || busy} onclick={() => void run(() => commands.methodCreate({ name }))}>{t('keys-create')}</button>
 	{/snippet}
 </Dialog>

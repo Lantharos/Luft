@@ -17,6 +17,7 @@ gio.workspace = true
 libc.workspace = true
 luft-app = { workspace = true, features = ["ibus", "watch"] }
 luft-dbus-macros.workspace = true
+luft-i18n.workspace = true
 roxmltree.workspace = true
 sabine.workspace = true
 serde.workspace = true

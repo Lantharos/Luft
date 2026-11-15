@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { SearchField, VirtualScroller, type VirtualHandle } from '@luft/ui';
@@ -53,7 +54,7 @@
 <section class="flex flex-col gap-2">
 	{#if key.pairs.length >= SEARCH_FROM}
 		<div data-own-undo>
-			<SearchField label="Search results" bind:value={query} />
+			<SearchField label={t('keys-pair-search')} bind:value={query} />
 		</div>
 	{/if}
 	<div bind:clientWidth={width}>
@@ -71,10 +72,10 @@
 				{/snippet}
 			</VirtualScroller>
 		{:else if key.pairs.length}
-			<p class="px-1.5 py-2 text-[13px] text-[var(--text-muted)]">No matches</p>
+			<p class="px-1.5 py-2 text-[13px] text-[var(--text-muted)]">{t('keys-no-matches')}</p>
 		{/if}
 	</div>
 	{#if editor && !readonly}
-		<button type="button" class="plain-button self-start" onclick={() => void add()}><Plus size={16} />Add a result</button>
+		<button type="button" class="plain-button self-start" onclick={() => void add()}><Plus size={16} />{t('keys-pair-add')}</button>
 	{/if}
 </section>

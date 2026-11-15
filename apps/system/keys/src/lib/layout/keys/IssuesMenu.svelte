@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import { MenuButton, MenuItem } from '@luft/ui';
 	import type { LayoutEditor } from '../editor.svelte';
@@ -20,7 +21,7 @@
 </script>
 
 {#if found.length}
-	<MenuButton label="Worth a look" class="issues-button" align="end" minWidth={280}>
+	<MenuButton label={t('keys-issues')} class="issues-button" align="end" minWidth={280}>
 		{#snippet trigger()}
 			<CircleAlert size={16} />
 			<span>{found.length}</span>

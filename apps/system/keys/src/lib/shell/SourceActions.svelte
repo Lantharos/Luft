@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Snippet } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
@@ -13,14 +14,13 @@
 
 	interface Props {
 		selection: Selection;
-		what: string;
 		onuse: () => Promise<unknown>;
 		exports: Export[];
 		onremove: () => Promise<void>;
 		menu?: Snippet<[() => void]>;
 	}
 
-	let { selection, what, onuse, exports, onremove, menu }: Props = $props();
+	let { selection, onuse, exports, onremove, menu }: Props = $props();
 
 	let confirming = $state(false);
 	let added = $derived(app.inSources(selection));
@@ -41,12 +41,12 @@
 </script>
 
 {#if added}
-	<span class="added" role="img" aria-label="In your input sources" {@attach tooltip('In your input sources')}><Check size={17} /></span>
+	<span class="added" role="img" aria-label={t('keys-in-sources')} {@attach tooltip(t('keys-in-sources'))}><Check size={17} /></span>
 {:else}
-	<button type="button" class="button" onclick={() => void use()}>Add to input sources</button>
+	<button type="button" class="button" onclick={() => void use()}>{t('keys-add-to-sources')}</button>
 {/if}
 
-<MenuButton label="More" class="icon-button" align="end" minWidth={240}>
+<MenuButton label={t('keys-more')} class="icon-button" align="end" minWidth={240}>
 	{#snippet trigger()}
 		<Ellipsis size={18} />
 	{/snippet}
@@ -59,7 +59,7 @@
 			<MenuItem
 				onclick={() => {
 					close();
-					void run(item.run, 'Saved');
+					void run(item.run, t('keys-saved'));
 				}}>{item.label}</MenuItem
 			>
 		{/each}
@@ -69,22 +69,22 @@
 			onclick={() => {
 				close();
 				confirming = true;
-			}}>Delete {what}</MenuItem
+			}}>{t('keys-delete', { kind: selection.kind })}</MenuItem
 		>
 	{/snippet}
 </MenuButton>
 
 {#if confirming}
-	<Dialog title="Delete this {what}?" description="It's removed from your input sources too." onclose={() => (confirming = false)}>
+	<Dialog title={t('keys-delete-title', { kind: selection.kind })} description={t('keys-delete-description')} onclose={() => (confirming = false)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (confirming = false)}>Cancel</button>
+			<button type="button" class="button" onclick={() => (confirming = false)}>{t('keys-cancel')}</button>
 			<button
 				type="button"
 				class="button danger"
 				onclick={() => {
 					confirming = false;
 					void run(onremove);
-				}}>Delete</button
+				}}>{t('keys-delete-confirm')}</button
 			>
 		{/snippet}
 	</Dialog>

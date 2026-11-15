@@ -72,6 +72,14 @@ name = "Schelf"
 files = ["apps/system/schelf/**/locales/{lang}/*.ftl"]
 
 [[areas]]
+name = "Barometer"
+files = ["apps/system/barometer/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Keys"
+files = ["apps/system/keys/**/locales/{lang}/*.ftl"]
+
+[[areas]]
 name = "Convertible"
 files = ["apps/store/convertible/**/locales/{lang}/*.ftl"]
 

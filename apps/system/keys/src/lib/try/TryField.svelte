@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
 	import { TextArea, tooltip } from '@luft/ui';
@@ -151,7 +152,7 @@
 {/snippet}
 
 {#snippet clearing()}
-	<button type="button" class="clear" aria-label="Clear" {@attach tooltip('Clear')} onpointerdown={(event) => event.preventDefault()} onclick={clear}>
+	<button type="button" class="clear" aria-label={t('keys-try-clear')} {@attach tooltip(t('keys-try-clear'))} onpointerdown={(event) => event.preventDefault()} onclick={clear}>
 		<X size={15} />
 	</button>
 {/snippet}

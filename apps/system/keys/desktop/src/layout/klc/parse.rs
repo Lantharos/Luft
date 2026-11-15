@@ -1,6 +1,9 @@
 use std::collections::{BTreeMap, HashMap};
 
+use luft_i18n::t;
+
 use super::scancodes::SCANCODES;
+use crate::l10n::L10N;
 use crate::layout::compile::Keys;
 use crate::layout::dead::{self, DeadKey, Pair};
 use crate::layout::keys::LEVELS;
@@ -195,7 +198,7 @@ fn dead_key(
 pub fn parse(text: &str) -> Result<Klc, String> {
     let raw = read(text);
     if raw.keys.is_empty() {
-        return Err("This file doesn't describe a keyboard layout".into());
+        return Err(t!(L10N, "keys-klc-invalid"));
     }
     let mut keysyms = HashMap::new();
     for (dead, _) in &raw.tables {

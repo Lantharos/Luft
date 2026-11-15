@@ -1,3 +1,4 @@
 /// <reference path="./virtual.d.ts" />
 export { type Args, bcp47, FluentNumber, languageOf, LANGUAGES, LOCALES, match, negotiate, PSEUDO_LOCALE, type Language } from './core.js';
+export { resolved } from './resolved.js';
 export { i18n, t, type Locale } from './store.svelte.js';

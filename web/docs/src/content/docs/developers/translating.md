@@ -80,6 +80,7 @@ Message IDs are stable and name what the message is for, starting with its featu
 - Add a comment above a message whose English is ambiguous: whether "Open" is a verb, where the text shows, what a variable holds.
 - A message about something in progress, such as `Looking for updates`, has no ellipsis, since a spinner beside it already says it's still going. An ellipsis only ends a menu item or button that asks for more before it acts, such as `Print…`.
 - Shortcut labels are built from translatable key names, since German writes Strg for Ctrl.
+- Labels used by code that runs on every refresh, such as table cells or a list rebuilt every second, come from `resolved(() => ({ ... }))` in `@luft/i18n`, which formats them once per language instead of on every call. In a component, a `$derived` object of labels does the same.
 - Log messages and errors meant for developers stay in English.
 
 New strings go into the English file only; translators add the rest.

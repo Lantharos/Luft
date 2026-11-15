@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { plural, SearchField, Segmented } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { SearchField, Segmented } from '@luft/ui';
 	import List from '@lucide/svelte/icons/list';
 	import ListTree from '@lucide/svelte/icons/list-tree';
 	import { tick, untrack } from 'svelte';
@@ -17,10 +18,10 @@
 	import type { Node } from './tree/node.svelte';
 	import { TaskTree } from './tree/tree.svelte';
 
-	const VIEWS: { value: View; label: string }[] = [
-		{ value: 'grouped', label: 'Grouped' },
-		{ value: 'flat', label: 'All processes' }
-	];
+	const views: { value: View; label: string }[] = $derived([
+		{ value: 'grouped', label: t('barometer-view-grouped') },
+		{ value: 'flat', label: t('barometer-view-flat') }
+	]);
 
 	type View = 'grouped' | 'flat';
 
@@ -37,7 +38,8 @@
 	let current = $derived(selected ? tree.find(selected) : undefined);
 	let found = $derived(current ? targetOf(current) : null);
 	let ready = $derived(flat ? processes.ready : entries.ready);
-	let detail = $derived(flat ? plural(processes.list.length, 'process', 'processes') : plural(entries.list.filter((entry) => entry.group === 'apps').length, 'app'));
+	let shownCount = $derived(flat ? processes.list.length : entries.list.filter((entry) => entry.group === 'apps').length);
+	let detail = $derived(flat ? t('barometer-processes-count', { count: shownCount }) : t('barometer-apps-count', { count: shownCount }));
 
 	$effect(() => {
 		const input = {
@@ -108,8 +110,8 @@
 	{@const entry = node.kind === 'entry' && node.entry?.group === 'background' && isDesktopApp(node.entry.key) ? node.entry : null}
 	{#if entry}
 		<span class="ml-auto flex flex-none gap-1.5" role="presentation" onpointerdown={(event) => event.stopPropagation()} ondblclick={(event) => event.stopPropagation()}>
-			<button type="button" class="button row-action" onclick={() => tasks.open(entry.key)}>Open</button>
-			<button type="button" class="button row-action" disabled={tasks.stopping.has(entry.key)} onclick={() => tasks.stop(entry.key)}>Stop</button>
+			<button type="button" class="button row-action" onclick={() => tasks.open(entry.key)}>{t('barometer-open')}</button>
+			<button type="button" class="button row-action" disabled={tasks.stopping.has(entry.key)} onclick={() => tasks.stop(entry.key)}>{t('barometer-stop')}</button>
 		</span>
 	{/if}
 {/snippet}
@@ -122,26 +124,26 @@
 	{/if}
 {/snippet}
 
-<Header title="Processes" detail={ready ? detail : null}>
+<Header title={t('barometer-processes-title')} detail={ready ? detail : null}>
 	<div class="w-[84px]" data-no-drag>
-		<Segmented label="View" options={VIEWS} value={flat ? 'flat' : 'grouped'} item={view} onchange={(next) => settings.update({ flat: next === 'flat' })} />
+		<Segmented label={t('barometer-view')} options={views} value={flat ? 'flat' : 'grouped'} item={view} onchange={(next) => settings.update({ flat: next === 'flat' })} />
 	</div>
 	<div class="w-[200px]" data-no-drag>
-		<SearchField bind:this={search} bind:value={entries.query} label="Search" />
+		<SearchField bind:this={search} bind:value={entries.query} label={t('barometer-search')} />
 	</div>
 	<button type="button" class="button" disabled={!found} data-no-drag onclick={() => current && end(current, false)}>
-		{found && 'app' in found.target ? 'End app' : 'End process'}
+		{found && 'app' in found.target ? t('barometer-end-app') : t('barometer-end-process')}
 	</button>
 </Header>
 
 {#if ready && !tree.items.length && entries.searching}
-	<p class="px-8 pt-6 text-[13px] text-[var(--text-muted)]">Nothing matches “{entries.query}”.</p>
+	<p class="px-8 pt-6 text-[13px] text-[var(--text-muted)]">{t('barometer-search-empty', { query: entries.query })}</p>
 {:else}
 	<TaskTable
 		bind:this={table}
 		items={tree.items}
 		{columns}
-		label="Processes"
+		label={t('barometer-processes-title')}
 		sort={settings.value.sort}
 		{selected}
 		onsort={(column) => settings.update({ sort: toggleSort(settings.value.sort, column) })}

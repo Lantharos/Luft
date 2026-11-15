@@ -3,7 +3,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
-import { CollapseLayout } from './collapseLayout.js';
+import { CollapseLayout, grow, vanish } from './collapseLayout.js';
+import { moveRows, placeAfter } from '../../shared/motion/rows.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
 import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
@@ -97,7 +98,7 @@ export class NotificationCenter {
     if (!this.actor.visible || this.closing || this.refreshIdle) return;
     this.refreshIdle = GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
       this.refreshIdle = 0;
-      if (this.actor.visible) this.refresh();
+      if (this.actor.visible) this.refresh(true);
       return GLib.SOURCE_REMOVE;
     });
   }
@@ -106,11 +107,11 @@ export class NotificationCenter {
     this.closing = false;
     this.dirty = true;
     this.calendar.showToday();
-    this.refresh();
+    this.refresh(false);
   }
   freeze(): void { this.closing = true; }
 
-  refresh(): void {
+  private refresh(animate: boolean): void {
     if (this.closing || !this.dirty) return;
     this.dirty = false;
     const sources = this.tray.getSources()
@@ -122,24 +123,29 @@ export class NotificationCenter {
     const stage = global.stage;
     const focus = stage.get_key_focus();
     const focusInside = !!focus && this.actor.contains(focus);
+    const resized = () => this.layoutChanged();
     for (const [source, group] of this.groups) {
       if (present.has(source)) continue;
-      group.actor.destroy();
+      if (animate) vanish(group.actor, resized);
+      else group.actor.destroy();
       this.groups.delete(source);
     }
     this.scroll.visible = sources.length > 0;
     this.header.visible = sources.length > 0;
-    sources.forEach((source, index) => {
+    moveRows(this.list, () => sources.reduce<Clutter.Actor | null>((previous, source) => {
       let group = this.groups.get(source);
+      const added = !group;
       if (!group) {
         group = new NotificationGroup(source, this.menus, () => this.invalidate(), this.close,
           actor => ensureActorVisibleInScrollView(this.scroll, actor), () => { if (this.actor.visible) this.layoutChanged(); });
         this.groups.set(source, group);
         this.list.add_child(group.actor);
       }
-      group.refresh(this.actor.visible);
-      if (this.list.get_child_at_index(index) !== group.actor) this.list.set_child_at_index(group.actor, index);
-    });
+      group.refresh(this.actor.visible, animate && !added);
+      placeAfter(this.list, group.actor, previous);
+      if (added && animate) grow(group.actor, this.list.width, resized);
+      return group.actor;
+    }, null), 'y', true);
     this.first = sources.length ? this.groups.get(sources[0])!.first : null;
     const current = stage.get_key_focus();
     if (focusInside && (!current || !current.mapped || !this.actor.contains(current))) {

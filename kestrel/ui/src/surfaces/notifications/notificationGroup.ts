@@ -6,7 +6,8 @@ import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
-import { collapse, CollapseLayout } from './collapseLayout.js';
+import { collapse, CollapseLayout, grow, vanish } from './collapseLayout.js';
+import { moveRows, placeAfter } from '../../shared/motion/rows.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
 const COLLAPSED_COUNT = 2;
@@ -62,12 +63,13 @@ export class NotificationGroup {
     return card;
   }
 
-  refresh(acknowledge: boolean): void {
+  refresh(acknowledge: boolean, animate: boolean): void {
     const notifications = this.newest();
     const present = new Set(notifications);
     for (const [notification, card] of this.cards) {
       if (present.has(notification)) continue;
-      card.actor.destroy();
+      if (animate) vanish(card.actor, this.resized);
+      else card.actor.destroy();
       this.cards.delete(notification);
     }
     this.title.text = this.source.title ?? '';
@@ -78,17 +80,21 @@ export class NotificationGroup {
     if (hidden <= 0) this.expanded = false;
     this.more.visible = hidden > 0;
     this.more.label = this.more.accessible_name = this.expanded ? t('notifications-show-less') : t('notifications-more', { count: hidden });
-    notifications.forEach((notification, index) => {
+    moveRows(this.list, () => notifications.reduce<Clutter.Actor | null>((previous, notification, index) => {
       let card = this.cards.get(notification);
       if (!card) {
         card = this.cardFor(notification);
         this.cards.set(notification, card);
+        card.actor.visible = false;
         this.list.add_child(card.actor);
       }
       card.refresh();
+      const appearing = !card.actor.visible && (this.expanded || index < COLLAPSED_COUNT);
       card.actor.visible = this.expanded || index < COLLAPSED_COUNT;
       if (acknowledge) notification.acknowledged = true;
-      if (this.list.get_child_at_index(index) !== card.actor) this.list.set_child_at_index(card.actor, index);
-    });
+      placeAfter(this.list, card.actor, previous);
+      if (appearing && animate) grow(card.actor, this.list.width, this.resized);
+      return card.actor;
+    }, null), 'y', true);
   }
 }

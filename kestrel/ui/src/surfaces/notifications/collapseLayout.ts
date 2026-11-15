@@ -1,21 +1,61 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 
-import { animateActor, Spring } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, Spring, stillMotion } from '../../shared/motion/motion.js';
+import { depart } from '../../shared/motion/rows.js';
 
-const collapsing = new WeakMap<Clutter.Actor, number>();
+const fullHeights = new WeakMap<Clutter.Actor, number>();
+const ARRIVING_SCALE = 0.96;
 
 export function collapse(actor: Clutter.Actor, resized: () => void, collapsed: () => void): void {
+  depart(actor);
+  if (stillMotion()) {
+    collapsed();
+    return;
+  }
   const height = actor.height;
-  collapsing.set(actor, height);
+  fullHeights.set(actor, height);
   actor.height = height;
   actor.connect('notify::height', resized);
   animateActor(actor, { height: 0, spring: Spring.snappy, onComplete: collapsed });
 }
 
+export function vanish(actor: Clutter.Actor, resized: () => void): void {
+  if (!depart(actor)) {
+    actor.destroy();
+    return;
+  }
+  actor.reactive = false;
+  animateActor(actor, { opacity: 0, duration: Duration.quick, curve: Curve.linear });
+  collapse(actor, resized, () => actor.destroy());
+}
+
+export function grow(actor: Clutter.Actor, width: number, resized: () => void): void {
+  actor.opacity = 0;
+  animateActor(actor, { opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
+  if (stillMotion()) return;
+  const height = Math.round(actor.get_preferred_height(width)[1]);
+  fullHeights.set(actor, height);
+  actor.height = 0;
+  actor.clip_to_allocation = true;
+  const id = actor.connect('notify::height', resized);
+  animateActor(actor, {
+    height, spring: Spring.snappy,
+    onStopped: () => actor.disconnect(id),
+    onComplete: () => {
+      fullHeights.delete(actor);
+      actor.height = -1;
+      actor.clip_to_allocation = false;
+    },
+  });
+  actor.set_pivot_point(0.5, 0);
+  actor.set_scale(ARRIVING_SCALE, ARRIVING_SCALE);
+  animateActor(actor, { scale_x: 1, scale_y: 1, spring: Spring.arrive });
+}
+
 function presence(child: Clutter.Actor, height: number): number {
-  const start = collapsing.get(child);
-  return start ? height / start : 1;
+  const full = fullHeights.get(child);
+  return full ? height / full : 1;
 }
 
 export const CollapseLayout = GObject.registerClass(

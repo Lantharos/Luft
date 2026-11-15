@@ -10,7 +10,7 @@ import * as GnomeSession from '../../../session/actions/gnomeSession.js';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Layout from '../../../core/stage/layout.js';
 import * as Main from '../../../core/main.js';
-import { Curve, Duration } from '../../../shared/motion/motion.js';
+import { Curve, Duration, pressable, Spring, stillMotion } from '../../../shared/motion/motion.js';
 import { NotificationMessage } from '../messages/notificationMessage.js';
 
 import { bannerAllowed, heldBack, soundAllowed } from './bannerRules.js';
@@ -431,9 +431,10 @@ export class MessageTray extends St.Widget {
       held: held => this.holdBanner(held),
       dismissed: () => this.notification!.destroy(NotificationDestroyedReason.DISMISSED),
     });
+    pressable(banner);
 
     this.bannerBin.opacity = 0;
-    this.bannerBin.set(toward(edge, BANNER_SLIDE_DISTANCE));
+    this.bannerBin.set(toward(edge, stillMotion() ? 0 : BANNER_SLIDE_DISTANCE));
     this.show();
 
     global.compositor.disable_unredirect();
@@ -456,13 +457,11 @@ export class MessageTray extends St.Widget {
       this.expandBanner(true);
 
     this.notificationState = State.SHOWING;
-    this.bannerBin.remove_all_transitions();
+    this.bannerBin.ease({ opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
     this.bannerBin.ease({
-      opacity: 255,
       translation_x: 0,
       translation_y: 0,
-      duration: Duration.standard,
-      curve: Curve.settle,
+      spring: Spring.arrive,
       onComplete: () => {
         this.notificationState = State.SHOWN;
         this.showNotificationCompleted();
@@ -517,7 +516,7 @@ export class MessageTray extends St.Widget {
     this.notificationState = State.HIDING;
     this.bannerBin.ease({
       opacity: 0,
-      ...toward(this.bannerEdge, BANNER_SLIDE_DISTANCE),
+      ...toward(this.bannerEdge, stillMotion() ? 0 : BANNER_SLIDE_DISTANCE),
       duration: animate ? Duration.moderate : 0,
       curve: Curve.accelerate,
       onComplete: () => {

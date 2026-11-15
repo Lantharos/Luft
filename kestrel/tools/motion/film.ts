@@ -27,10 +27,13 @@ interface SavedFrame {
   gap: number;
 }
 
+export type Area = [x: number, y: number, width: number, height: number];
+
 interface ClipOptions {
   notes?: string;
   timeout?: number;
   width?: number;
+  area?: Area;
 }
 
 export type Clip = (name: string, action: () => unknown, options?: ClipOptions) => Promise<void>;
@@ -52,6 +55,15 @@ function composite(texture: Cogl.Texture) {
         reject(error);
       }
     }));
+}
+
+function cropped(pixbuf: GdkPixbuf.Pixbuf, area: Area | undefined) {
+  if (!area) return pixbuf;
+  const scale = pixbuf.get_width() / global.display.get_monitor_geometry(global.display.get_primary_monitor()).width;
+  const [x, y, width, height] = area.map(value => Math.round(value * scale));
+  const left = Math.max(0, Math.min(x, pixbuf.get_width() - width));
+  const top = Math.max(0, Math.min(y, pixbuf.get_height() - height));
+  return pixbuf.new_subpixbuf(left, top, width, height);
 }
 
 function opaque(pixbuf: GdkPixbuf.Pixbuf, width: number) {
@@ -134,12 +146,12 @@ class Film {
     return this.pool[index];
   }
 
-  async save(dir: string, startedAt: number, notes: string, width: number) {
+  async save(dir: string, startedAt: number, notes: string, width: number, area?: Area) {
     GLib.mkdir_with_parents(dir, 0o755);
     const probes: Float32Array[] = [];
     const frames: SavedFrame[] = [];
     for (const [index, {slot, at}] of this.frames.entries()) {
-      const pixbuf = await composite(slot.texture);
+      const pixbuf = cropped(await composite(slot.texture), area);
       opaque(pixbuf, width).savev(GLib.build_filenamev([dir, `${String(index).padStart(3, '0')}.jpg`]), 'jpeg', ['quality'], ['88']);
       probes.push(luminance(pixbuf));
       frames.push({index, ms: round((at - startedAt) / 1000, 1), progress: 0, step: 0, gap: 0});
@@ -158,7 +170,7 @@ class Film {
 
 const film = new Film();
 
-export async function clip(out: string, name: string, action: () => unknown, {notes = '', timeout = 6000, width = SAVE_WIDTH}: ClipOptions = {}) {
+export async function clip(out: string, name: string, action: () => unknown, {notes = '', timeout = 6000, width, area}: ClipOptions = {}) {
   try {
     film.start();
     global.stage.queue_redraw();
@@ -167,7 +179,7 @@ export async function clip(out: string, name: string, action: () => unknown, {no
     await action();
     await film.quiet(timeout);
     film.stop();
-    const frames = await film.save(GLib.build_filenamev([out, name]), startedAt, notes, width);
+    const frames = await film.save(GLib.build_filenamev([out, name]), startedAt, notes, width ?? (area ? area[2] * 2 : SAVE_WIDTH), area);
     console.log(`Kestrel motion: ${name}, ${frames.length} frames over ${frames.at(-1)?.ms ?? 0} ms`);
   } catch (error) {
     film.stop();

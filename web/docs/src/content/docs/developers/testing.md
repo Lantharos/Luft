@@ -115,7 +115,7 @@ Each is turned into the store's WebP with `cwebp -q 80`, keeping the file's name
 
 ## Motion clips
 
-`motion` records every frame Kestrel paints while surfaces open, close and change their mind half-way, windows minimise and restore, and workspaces switch, also with reduced motion. Each clip goes to its own folder in `clips` in the capture folder, with the frames as pictures and `frames.json` saying when each was painted and how far along it looks. `KESTREL_MOTION_ONLY` picks groups: `surfaces`, `windows`, `board`, `gestures`, `reduced` and `snap`. `kestrel/tools/motion/sheets.py CLIPS` turns each clip into a contact sheet and a video at real speed, with ImageMagick and FFmpeg.
+`motion` records every frame Kestrel paints while surfaces open, close and change their mind half-way, windows minimise, restore, open from the taskbar and snap, workspaces switch, things are pressed, notifications come and go and the taskbar's focus and icons move, also with reduced motion. Each clip goes to its own folder in `clips` in the capture folder, with the frames as pictures and `frames.json` saying when each was painted and how far along it looks; clips of small things are cropped to the area around them at twice the size. `KESTREL_MOTION_ONLY` picks groups: `surfaces`, `windows`, `board`, `gestures`, `reduced`, `snap`, `presses`, `notifications`, `taskbar`, `snaps`, `panels` and `reducedShell`. `kestrel/tools/motion/sheets.py CLIPS` turns each clip into a contact sheet and a video at real speed, with ImageMagick and FFmpeg.
 
 ## What needs a real session
 

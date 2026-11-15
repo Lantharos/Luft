@@ -20,6 +20,7 @@ export async function limitScope(id: string, pid: number): Promise<void> {
     ['MemorySwapMax', new GLib.Variant('t', 0)],
     ['TasksMax', new GLib.Variant('t', MOST_TASKS)],
     ['CPUWeight', new GLib.Variant('t', CPU_WEIGHT)],
+    ['OOMPolicy', GLib.Variant.new_string('continue')],
     ['CollectMode', GLib.Variant.new_string('inactive-or-failed')],
   ];
   try {

@@ -52,7 +52,7 @@ Either way, Luft first tells you what it means and then asks for an administrato
 
 ## When an extension stops working
 
-If an extension stops working, Luft turns it off by itself and tells you. The same happens to the extensions that were running when the desktop had a problem again within two minutes of restarting after one. Turn it back on in Settings once you've updated it, or leave it off.
+If an extension stops working, Luft turns it off by itself and tells you. Shutting down, restarting or logging out never counts. The same happens to the extensions that were running when the desktop had a problem again within two minutes of restarting after one. Turn it back on in Settings once you've updated it, or leave it off.
 
 ## Seasons
 

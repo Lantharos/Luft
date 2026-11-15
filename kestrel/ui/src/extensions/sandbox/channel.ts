@@ -29,7 +29,7 @@ export class Channel {
   private open = true;
 
   constructor(private readonly input: Gio.InputStream, private readonly output: Gio.OutputStream, private readonly limits: Limits, private readonly events: ChannelEvents) {
-    this.read().catch(error => this.close((error as Error).message));
+    this.read().catch(() => this.close());
   }
 
   send(message: object): void {
@@ -62,8 +62,8 @@ export class Channel {
         await this.output.write_all_async(bytes, GLib.PRIORITY_DEFAULT, this.cancellable);
         this.queuedBytes -= bytes.length;
       }
-    } catch (error) {
-      this.close((error as Error).message);
+    } catch {
+      this.close();
     } finally {
       this.writing = false;
     }
@@ -73,7 +73,7 @@ export class Channel {
     while (this.open) {
       const chunk = (await this.input.read_bytes_async(CHUNK, GLib.PRIORITY_DEFAULT, this.cancellable)).toArray();
       if (!chunk.length) {
-        this.close(null);
+        this.close();
         return;
       }
       this.take(chunk);

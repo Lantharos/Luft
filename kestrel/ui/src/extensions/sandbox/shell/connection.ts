@@ -44,6 +44,8 @@ interface Waiting {
   timer: number;
 }
 
+export class StoppedOutside extends Error {}
+
 type Message = Partial<Record<'t' | 'path' | 'name' | 'error', unknown>> & { id?: unknown; ref?: unknown; target?: unknown; args?: unknown; value?: unknown; pending?: unknown };
 
 export class HostConnection {
@@ -55,17 +57,29 @@ export class HostConnection {
   private readonly bytes = new Bucket(8 * 1024 * 1024, 2 * 1024 * 1024);
   private invocations = 0;
   private closed = false;
+  private losing = 0;
   private started: { resolve(): void; reject(error: Error): void; timer: number } | null = null;
 
   constructor(private readonly api: Api, private readonly context: ApiContext, private readonly granted: ReadonlySet<Capability>, private readonly failed: (error: Error) => void) {
     this.process = spawnHost(context);
     this.channel = new Channel(this.process.get_stdout_pipe()!, this.process.get_stdin_pipe()!, LIMITS, {
       line: (text, size) => this.received(text, size),
-      closed: reason => this.fail(reason ?? 'its process closed its connection'),
+      closed: reason => reason ? this.fail(reason) : this.lost(),
     });
-    this.process.wait_async(null, () => {
-      const status = this.process.get_if_exited() ? `exit status ${this.process.get_exit_status()}` : `signal ${this.process.get_term_sig()}`;
-      this.fail(`its process ended with ${status}`);
+    this.process.wait_async(null, () => this.ended());
+  }
+
+  private ended(): void {
+    if (this.process.get_if_signaled()) this.fail(new StoppedOutside(`its sandbox was ended from outside with signal ${this.process.get_term_sig()}`));
+    else this.fail(`its process ended with exit status ${this.process.get_exit_status()}`);
+  }
+
+  private lost(): void {
+    if (this.closed || this.losing) return;
+    this.losing = GLib.timeout_add(GLib.PRIORITY_DEFAULT, STOP_GRACE, () => {
+      this.losing = 0;
+      this.fail('its process closed its connection');
+      return GLib.SOURCE_REMOVE;
     });
   }
 
@@ -106,6 +120,8 @@ export class HostConnection {
 
   private close(error: Error): void {
     this.closed = true;
+    if (this.losing) GLib.source_remove(this.losing);
+    this.losing = 0;
     this.refs.clear();
     for (const waiting of this.waiting.values()) {
       if (waiting.timer) GLib.source_remove(waiting.timer);

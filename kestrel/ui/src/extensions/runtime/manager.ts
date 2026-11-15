@@ -18,6 +18,7 @@ import { askLuftVersion, rememberedLuftVersion } from './installed/runningLuft.j
 import { removeFromStoreFolder } from './installed/storeFolder.js';
 import { removeUnreviewed } from './installed/unreviewed.js';
 import { DeveloperTools } from '../../shared/dbus/developerTools.js';
+import { StoppedOutside } from '../sandbox/shell/connection.js';
 import { runSandboxedTurnedOffHelper, unsupportedInSandbox } from '../sandbox/shell/support.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
@@ -222,8 +223,13 @@ export class ExtensionManager {
   }
 
   private failed(id: string, error: unknown): void {
-    console.warn(`The extension ${id} failed and was turned off: ${error instanceof Error ? `${error.message}\n${error.stack}` : error}`);
     this.instances.get(id)?.stop();
+    if (error instanceof StoppedOutside) {
+      console.log(`The extension ${id} stopped because ${error.message}`);
+      this.changed();
+      return;
+    }
+    console.warn(`The extension ${id} failed and was turned off: ${error instanceof Error ? `${error.message}\n${error.stack}` : error}`);
     this.keepOff(id, { kind: 'error', detail: error instanceof Error ? error.message : String(error) });
     this.notice(id, 'error');
   }

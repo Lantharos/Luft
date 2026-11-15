@@ -12,7 +12,6 @@ function offSection(phosphor: Extension<Granted>): PageSection {
   const shortcut = screenEffects.shortcut;
   return {
     title: t('safety'),
-    description: t('safety-detail'),
     items: [
       { type: 'row', title: t('safety-shortcut'), value: shortcut ?? t('safety-no-shortcut') },
       ...screenEffects.off ? [{ type: 'button' as const, title: t('safety-off'), label: t('safety-turn-on'), onActivate: () => screenEffects.turnBackOn() }] : [],
@@ -38,7 +37,6 @@ function screenSections({ t }: Extension<Granted>): PageSection[] {
   return [
     {
       title: t('section-desktop'),
-      description: t('section-desktop-detail'),
       items: [
         { setting: 'desktop-crt' },
         {
@@ -66,11 +64,10 @@ export function describePage(phosphor: Extension<Granted>, rules: AppRules, look
     offSection(phosphor),
     lookSection(phosphor, looks),
     ...windowSections(phosphor),
-    { title: t('section-rules'), description: t('section-rules-detail'), items: ruleItems(phosphor, rules) },
+    { title: t('section-rules'), items: ruleItems(phosphor, rules) },
     ...screenSections(phosphor),
     {
       title: t('section-surfaces'),
-      description: t('section-surfaces-detail'),
       items: settingItems('surface-lines', 'surface-places', 'surface-color', 'app-lines'),
     },
   ]);

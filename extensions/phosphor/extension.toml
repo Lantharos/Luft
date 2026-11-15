@@ -1,6 +1,6 @@
 id = "com.lantharos.Phosphor"
 name = "Phosphor"
-description = "Rice the whole desktop with one look or your own: borders, glow, shadows, CRT and open and close effects on windows, CRT, VHS, palettes, grades and bloom over the screen, and lines across the taskbar and Luft's apps."
+description = "Rice your windows, screen and taskbar."
 version = "1.1.0"
 api = 1
 permissions = ["screen-effects"]

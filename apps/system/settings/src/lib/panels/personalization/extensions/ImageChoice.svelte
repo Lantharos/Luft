@@ -16,12 +16,18 @@
 	}
 
 	let { label, options, value, onchange }: Props = $props();
+
+	let missing = $state<string[]>([]);
 </script>
 
 <div class="pictures" role="radiogroup" aria-label={label}>
 	{#each options as option (option.value)}
 		<PreviewCard label={option.label} selected={value === option.value} onclick={() => onchange(option.value)}>
-			<img src={fileUrl(option.image)} alt="" decoding="async" />
+			{#if missing.includes(option.image)}
+				<span class="picture missing"></span>
+			{:else}
+				<img class="picture" src={fileUrl(option.image)} alt="" decoding="async" onerror={() => missing.push(option.image)} />
+			{/if}
 		</PreviewCard>
 	{/each}
 </div>
@@ -33,11 +39,15 @@
 		gap: 6px;
 	}
 
-	img {
+	.picture {
 		display: block;
 		width: 100%;
 		aspect-ratio: 3 / 2;
 		border-radius: 12px;
 		object-fit: cover;
+	}
+
+	.missing {
+		background: var(--surface-hover);
 	}
 </style>

@@ -31,7 +31,6 @@ export function lookSection(phosphor: Extension<Granted>, looks: Looks): PageSec
     ...looks.importFailed ? [{ type: 'text' as const, text: t('look-import-failed') }] : [],
   ];
   return {
-    title: t('section-look'),
     items: [
       { setting: 'look' },
       { type: 'group', title: t('looks-yours'), value: saved.length ? `${saved.length}` : undefined, items },

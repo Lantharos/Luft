@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
+import { adjustAnimationTime } from '../../core/runtime/animationUtils.js';
 import { reducedMotion } from '../../shared/motion/motion.js';
 import type { FingerprintState } from './fingerprintState.js';
 import { decelerate, shake } from '../../shared/motion/shake.js';
@@ -32,6 +33,10 @@ const TINT_TIME = 160;
 const TINT_HOLD = 700;
 const RETRY_HOLD = 520;
 const COLLAPSED = 0.12;
+
+export const matchShown = () => FILL_TIME + adjustAnimationTime(CHECK_DELAY + CHECK_TIME);
+
+const still = () => reducedMotion() || !St.Settings.get().enable_animations;
 
 function arc(rx: number, from: Point | null, to: Point | null): Point[] {
   const angle = ([x, y]: Point) => (Math.atan2((y - CENTER[1]) / SQUASH, x - CENTER[0]) + 2 * Math.PI) % (2 * Math.PI);
@@ -89,8 +94,8 @@ class Tween {
   set(target: number, now: number, duration: number, delay = 0): void {
     this.from = this.at(now);
     this.target = target;
-    this.start = now + delay * 1000;
-    this.duration = duration * 1000;
+    this.start = now + adjustAnimationTime(delay);
+    this.duration = adjustAnimationTime(duration);
   }
 
   at(now: number): number {
@@ -203,12 +208,12 @@ export class FingerprintGlyph extends St.DrawingArea {
     this.now = GLib.get_monotonic_time() / 1000;
     const tweens = [...this.fills, ...this.collapses, this.tint, this.check];
     const moving = tweens.some(tween => !tween.done(this.now));
-    if (!moving && (!this.breathing || reducedMotion())) this.frames.stop();
+    if (!moving && (!this.breathing || still())) this.frames.stop();
     this.queue_repaint();
   }
 
   private breath(ridge: number): number {
-    if (!this.breathing || reducedMotion()) return 1;
+    if (!this.breathing || still()) return 1;
     const phase = ((this.now - ridge * BREATH_STAGGER) % BREATH_PERIOD) / BREATH_PERIOD;
     return 0.6 + 0.4 * (0.5 - 0.5 * Math.cos(2 * Math.PI * phase));
   }

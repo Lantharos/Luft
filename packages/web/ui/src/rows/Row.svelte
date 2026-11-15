@@ -15,6 +15,8 @@
 	}
 
 	let { title, description, icon: Icon, disabled = false, truncate = false, expanded, onclick, children, below }: Props = $props();
+
+	const id = $props.id();
 </script>
 
 {#snippet content()}
@@ -25,7 +27,7 @@
 		<div class="text">
 			<span class="title">{title}</span>
 			{#if description}
-				<span class="description" class:truncate>{description}</span>
+				<span id="{id}-description" class="description" class:truncate>{description}</span>
 			{/if}
 		</div>
 		{#if children}
@@ -39,7 +41,18 @@
 
 {#if onclick}
 	<div class="group">
-		<button type="button" class="row interactive" class:attached={below} aria-expanded={expanded} {disabled} {onclick}>{@render content()}</button>
+		<div class="row interactive" class:attached={below} class:disabled>
+			<button
+				type="button"
+				class="opens"
+				aria-label={title}
+				aria-describedby={description ? `${id}-description` : undefined}
+				aria-expanded={expanded}
+				{disabled}
+				{onclick}
+			></button>
+			{@render content()}
+		</div>
 		{#if below}
 			<div class="below detached">{@render below()}</div>
 		{/if}
@@ -72,17 +85,32 @@
 		padding-bottom: 12px;
 	}
 
-	.row.disabled,
-	.row:disabled {
+	.row.disabled {
 		opacity: 0.45;
 	}
 
 	.interactive {
+		position: relative;
 		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
-	.interactive:hover:not(:disabled) {
+	.interactive:has(> .opens:hover:not(:disabled)) {
 		background: var(--surface-hover);
+	}
+
+	.opens {
+		position: absolute;
+		inset: 0;
+		outline-offset: -2px;
+	}
+
+	.interactive > .line {
+		position: relative;
+		pointer-events: none;
+	}
+
+	.interactive .trailing :global(:is(button, a, input, textarea, [tabindex])) {
+		pointer-events: auto;
 	}
 
 	.line {

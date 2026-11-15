@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Dialog, errorText, plural, tooltip } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { Dialog, errorText, tooltip } from '@luft/ui';
 	import { untrack } from 'svelte';
 	import type { FileEntry } from '#lib/bindings.js';
 	import { COLORS, ICONS, tint } from '#lib/features/looks/catalogue.js';
@@ -21,7 +22,7 @@
 	let error = $state<string | null>(null);
 
 	let custom = $derived(entries.some((entry) => folderLooks.look(entry.path)));
-	let title = $derived(entries.length === 1 ? `Icon for “${entries[0].name}”` : `Icon for ${plural(entries.length, 'folder')}`);
+	let title = $derived(entries.length === 1 ? t('rover-look-title-one', { name: entries[0].name }) : t('rover-look-title', { count: entries.length }));
 
 	async function apply(look: { icon: string | null; color: string | null } | null) {
 		try {
@@ -42,16 +43,16 @@
 </script>
 
 <Dialog {title} {onclose}>
-	<div class="colors" role="radiogroup" aria-label="Color">
+	<div class="colors" role="radiogroup" aria-label={t('rover-look-color')}>
 		<button
 			type="button"
 			role="radio"
 			class="swatch"
 			aria-checked={color === null}
-			aria-label="Default"
+			aria-label={t('rover-look-color-default')}
 			style:--swatch="var(--folder)"
 			onclick={() => (color = null)}
-			{@attach tooltip('Default')}
+			{@attach tooltip(t('rover-look-color-default'))}
 		></button>
 		{#each COLORS as option (option.name)}
 			<button
@@ -59,23 +60,23 @@
 				role="radio"
 				class="swatch"
 				aria-checked={color === option.name}
-				aria-label={option.label}
+				aria-label={t(option.label)}
 				style:--swatch={tint(option.name)}
 				onclick={() => (color = option.name)}
-				{@attach tooltip(option.label)}
+				{@attach tooltip(t(option.label))}
 			></button>
 		{/each}
 	</div>
-	<div class="icons" role="radiogroup" aria-label="Icon" style:--tint={tint(color)}>
+	<div class="icons" role="radiogroup" aria-label={t('rover-look-icon')} style:--tint={tint(color)}>
 		{#each Object.entries(ICONS) as [name, option] (name)}
 			<button
 				type="button"
 				role="radio"
 				class="icon-choice"
 				aria-checked={icon === name}
-				aria-label={option.label}
+				aria-label={t(option.label)}
 				onclick={() => (icon = name)}
-				{@attach tooltip(option.label)}
+				{@attach tooltip(t(option.label))}
 			>
 				<option.icon size={20} />
 			</button>
@@ -87,10 +88,11 @@
 
 	{#snippet actions()}
 		{#if custom}
-			<button class="button mr-auto" type="button" onclick={() => apply(null)}>Reset</button>
+			<button class="button mr-auto" type="button" onclick={() => apply(null)}>{t('rover-look-reset')}</button>
 		{/if}
-		<button class="button" type="button" onclick={onclose}>Cancel</button>
-		<button class="button primary" type="button" onclick={save}>Save</button>
+		<button class="button" type="button" onclick={onclose}>{t('rover-cancel')}</button>
+		<button class="button primary" type="button" onclick={save}>{t('rover-look-save')}</button>
+
 	{/snippet}
 </Dialog>
 

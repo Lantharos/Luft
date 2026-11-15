@@ -1,8 +1,10 @@
 pub mod moving;
 
+use crate::l10n::L10N;
 use luft_app::Events;
 use luft_disks::systems::luft;
 use luft_disks::{partitions, resize};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::formatting::{self, Format};
@@ -199,7 +201,7 @@ async fn labelled(block: &str) -> Result<String, String> {
         })
         .filter(|cleartext| objects.get(cleartext.path, FILESYSTEM).is_some())
         .map(|cleartext| cleartext.path.to_owned())
-        .ok_or_else(|| "There's no file system to name".to_owned())
+        .ok_or_else(|| t!(L10N, "disks-plan-no-file-system"))
 }
 
 async fn set_flags(block: &str, bits: &[u8]) -> Result<(), String> {

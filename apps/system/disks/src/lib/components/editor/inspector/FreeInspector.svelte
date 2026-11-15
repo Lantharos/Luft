@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { create } from '#lib/editor/edits.js';
@@ -15,13 +16,13 @@
 	let blocked = $derived(creatable(layout, gap));
 </script>
 
-<section class="inspector" aria-label="Free space">
+<section class="inspector" aria-label={t('disks-free-space')}>
 	<div class="flex min-w-0 flex-1 flex-col pl-1">
-		<h2 class="text-[15px] font-semibold">Free space</h2>
+		<h2 class="text-[15px] font-semibold">{t('disks-free-space')}</h2>
 		<p class="text-[13px] text-[var(--text-muted)]">{blocked ?? bytes(gap.size)}</p>
 	</div>
 	{#if !blocked}
-		<button type="button" class="button primary" disabled={editor.running} onclick={() => create(gap, removable ? 'exfat' : 'ext4')}>New partition</button>
+		<button type="button" class="button primary" disabled={editor.running} onclick={() => create(gap, removable ? 'exfat' : 'ext4')}>{t('disks-editor-new-partition-button')}</button>
 	{/if}
 </section>
 

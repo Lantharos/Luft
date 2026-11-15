@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Lock from '@lucide/svelte/icons/lock';
+	import { t } from '@luft/i18n';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { marks } from '#lib/utils/marks.js';
 
 	let { manager }: { manager: FileManager } = $props();
 
@@ -10,6 +12,11 @@
 		return holding?.foreign && !manager.drives.understood.has(holding.mountPoint) ? holding : undefined;
 	});
 	let command = $derived(drive && `sudo chown -R "$USER": "${drive.mountPoint}"`);
+	let note = $derived.by(() => {
+		if (!drive || !command) return [];
+		const values = marks({ drive: drive.name, command });
+		return values.split(t('rover-drive-foreign', values.args));
+	});
 
 	function copy() {
 		if (command) navigator.clipboard.writeText(command).catch(manager.notify);
@@ -21,11 +28,10 @@
 	<div class="drive-note" role="status">
 		<Lock size={16} class="flex-none text-[var(--text-muted)]" />
 		<p class="min-w-0 flex-1">
-			The files on <strong>{drive.name}</strong> belong to another account, perhaps from a system that was here before, so you can open them but not change them. To make them yours,
-			run <code>{command}</code> in Tern.
+			{#each note as piece, index (index)}{#if piece.key === 'drive'}<strong>{piece.text}</strong>{:else if piece.key === 'command'}<code>{piece.text}</code>{:else}{piece.text}{/if}{/each}
 		</p>
-		<button type="button" class="plain-button" onclick={copy}>Copy command</button>
-		<button type="button" class="plain-button" onclick={() => manager.drives.understood.add(mountPoint)}>Dismiss</button>
+		<button type="button" class="plain-button" onclick={copy}>{t('rover-drive-foreign-copy')}</button>
+		<button type="button" class="plain-button" onclick={() => manager.drives.understood.add(mountPoint)}>{t('rover-dismiss')}</button>
 	</div>
 {/if}
 

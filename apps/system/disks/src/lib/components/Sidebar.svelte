@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, selectionPill } from '@luft/ui';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import DriveIcon from './DriveIcon.svelte';
 </script>
 
 <aside class="glass-sidebar drag-region gap-3 px-3 py-4">
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label="Drives" {@attach selectionPill()}>
+	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label={t('disks-drives')} {@attach selectionPill()}>
 		{#each disks.drives as drive (drive.id)}
 			{@const active = disks.drive?.id === drive.id}
 			<button
@@ -23,7 +24,7 @@
 			</button>
 		{/each}
 		{#if disks.loaded && disks.drives.length === 0}
-			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">No drives found.</p>
+			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">{t('disks-no-drives')}</p>
 		{/if}
 	</nav>
 </aside>

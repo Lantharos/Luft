@@ -1,15 +1,26 @@
 <script lang="ts">
 	import Copy from '@lucide/svelte/icons/copy';
+	import { t } from '@luft/i18n';
 	import { basename } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { CloudConflict, Drive } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { marks } from '#lib/utils/marks.js';
 
 	let { manager }: { manager: FileManager } = $props();
 
-	const PROVIDER_NAMES = { onedrive: 'OneDrive', dropbox: 'Dropbox', icloud: 'iCloud Drive', nextcloud: 'Nextcloud', webdav: 'the server' };
+	const PROVIDER_NAMES = { onedrive: 'OneDrive', dropbox: 'Dropbox', icloud: 'iCloud Drive', nextcloud: 'Nextcloud' };
 
 	let notes = $derived(manager.view === 'home' ? manager.cloud.conflictsIn(manager.currentPath) : []);
+
+	function note(drive: Drive, conflict: CloudConflict) {
+		const names = marks({ file: basename(conflict.path), copy: basename(conflict.copy) });
+		const text =
+			drive.provider === 'webdav'
+				? t('rover-cloud-conflict-server', names.args)
+				: t('rover-cloud-conflict', { ...names.args, provider: PROVIDER_NAMES[drive.provider] });
+		return names.split(text);
+	}
 
 	function show(drive: Drive, conflict: CloudConflict) {
 		manager.selectOnly(`${drive.path}/${conflict.copy}`);
@@ -24,11 +35,11 @@
 	<div class="cloud-note" role="status">
 		<Copy size={16} class="flex-none text-[var(--text-muted)]" />
 		<p class="min-w-0 flex-1">
-			<strong>{basename(conflict.path)}</strong> changed on this computer and in {PROVIDER_NAMES[drive.provider]} at the same time. Both versions are kept;
-			the other one is <strong>{basename(conflict.copy)}</strong>.
+			{#each note(drive, conflict) as piece, index (index)}{#if piece.key}<strong>{piece.text}</strong>{:else}{piece.text}{/if}{/each}
 		</p>
-		<button type="button" class="plain-button" onclick={() => show(drive, conflict)}>Show</button>
-		<button type="button" class="plain-button" onclick={() => dismiss(drive, conflict)}>Dismiss</button>
+		<button type="button" class="plain-button" onclick={() => show(drive, conflict)}>{t('rover-cloud-conflict-show')}</button>
+		<button type="button" class="plain-button" onclick={() => dismiss(drive, conflict)}>{t('rover-dismiss')}</button>
+
 	</div>
 {/each}
 

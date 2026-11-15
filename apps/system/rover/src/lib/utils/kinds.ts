@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { FileEntry } from '#lib/bindings.js';
 
 
@@ -82,30 +83,24 @@ const PREVIEWS: Partial<Record<PreviewKind, string[]>> = {
 
 const PREVIEW_BY_MIME = new Map(Object.entries(PREVIEWS).flatMap(([kind, types]) => types.map((type) => [type, kind as PreviewKind])));
 
-const NAMED_KINDS: Record<string, string> = {
+const BRANDED_KINDS: Record<string, string> = {
 	md: 'Markdown',
-	txt: 'Plain text',
-	pdf: 'PDF document',
 	json: 'JSON',
 	ts: 'TypeScript',
 	js: 'JavaScript',
-	rs: 'Rust source',
-	py: 'Python script',
-	sh: 'Shell script',
-	html: 'Web page',
-	css: 'Stylesheet',
-	svelte: 'Svelte component',
-	svg: 'SVG image',
 	appimage: 'AppImage'
 };
 
-const CATEGORY_LABELS: Partial<Record<FileKind, string>> = {
-	image: 'image',
-	video: 'video',
-	audio: 'audio',
-	archive: 'archive',
-	document: 'document',
-	package: 'package'
+const NAMED_KINDS: Record<string, string> = {
+	txt: 'rover-kind-txt',
+	pdf: 'rover-kind-pdf',
+	rs: 'rover-kind-rs',
+	py: 'rover-kind-py',
+	sh: 'rover-kind-sh',
+	html: 'rover-kind-html',
+	css: 'rover-kind-css',
+	svelte: 'rover-kind-svelte',
+	svg: 'rover-kind-svg'
 };
 
 function isText(mime: string) {
@@ -153,12 +148,14 @@ export function isAppBundle({ mimeType }: KindSource) {
 }
 
 export function kindLabel(entry: LabelSource) {
-	if (entry.isDir) return 'Folder';
+	if (entry.isDir) return t('rover-kind-folder');
 	const extension = (entry.extension ?? '').toLowerCase();
+	const branded = BRANDED_KINDS[extension];
+	if (branded) return branded;
 	const named = NAMED_KINDS[extension];
-	if (named) return named;
-	const category = CATEGORY_LABELS[fileKind(entry)];
-	const label = extension.toUpperCase();
-	if (category) return label ? `${label} ${category}` : category[0].toUpperCase() + category.slice(1);
-	return label ? `${label} file` : 'File';
+	if (named) return t(named);
+	const kind = fileKind(entry);
+	const category = kind === 'folder' || kind === 'code' ? 'file' : kind;
+	return extension ? t('rover-kind-extension', { kind: category, extension: extension.toUpperCase() }) : t('rover-kind', { kind: category });
+
 }

@@ -1,33 +1,31 @@
+import { t } from '@luft/i18n';
 import type { DriveEncryption, Outcome } from './bindings';
 import { percent } from './format';
 
 export const SHORTEST_PASSPHRASE = 8;
 
-function remaining(seconds: number) {
-	if (!seconds) return '';
-	if (seconds < 60) return 'less than a minute left';
-	const minutes = Math.round(seconds / 60);
-	if (minutes < 60) return `about ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} left`;
-	const hours = Math.round(minutes / 60);
-	return `about ${hours} ${hours === 1 ? 'hour' : 'hours'} left`;
-}
 
 export function changing(encryption: DriveEncryption | null) {
 	return Boolean(encryption && encryption.state !== 'on');
 }
 
 export function rowStatus(encryption: DriveEncryption) {
-	const verb = encryption.change === 'decrypt' ? 'Decrypting' : 'Encrypting';
-	if (encryption.state === 'encrypting' || encryption.state === 'decrypting') return `${verb}… ${percent(encryption.progress)}`;
-	if (encryption.state === 'paused') return `${verb} paused`;
-	return `${verb} waits`;
+	const change = encryption.change ?? 'encrypt';
+	if (encryption.state === 'encrypting' || encryption.state === 'decrypting') return t('disks-encryption-row-running', { change, progress: percent(encryption.progress) });
+	if (encryption.state === 'paused') return t('disks-encryption-row-paused', { change });
+	return t('disks-encryption-row-waiting', { change });
 }
 
 export function progressSentence(encryption: DriveEncryption) {
-	const done = `${percent(encryption.progress)} done`;
-	if (encryption.state === 'paused') return `Paused at ${done.replace(' done', '')}. It continues when you resume it.`;
-	if (encryption.state === 'waiting') return `${done}. It continues once the drive is connected and unlocked.`;
-	return [done, remaining(encryption.remaining)].filter(Boolean).join(', ');
+	const progress = percent(encryption.progress);
+	if (encryption.state === 'paused') return t('disks-encryption-paused', { progress });
+	if (encryption.state === 'waiting') return t('disks-encryption-waiting', { progress });
+	const seconds = encryption.remaining;
+	if (!seconds) return t('disks-encryption-progress', { progress });
+	if (seconds < 60) return t('disks-encryption-progress-seconds', { progress });
+	const minutes = Math.round(seconds / 60);
+	if (minutes < 60) return t('disks-encryption-progress-minutes', { progress, count: minutes });
+	return t('disks-encryption-progress-hours', { progress, count: Math.round(minutes / 60) });
 }
 
 export class KeyRequest {
@@ -38,7 +36,7 @@ export class KeyRequest {
 	async run(action: (unlock: string) => Promise<Outcome<unknown>>) {
 		const outcome = await action(this.asking ? this.key : '');
 		if (!('wrongKey' in outcome)) return true;
-		if (this.asking) this.error = 'That passphrase or recovery key doesn’t unlock it';
+		if (this.asking) this.error = t('disks-encryption-wrong-key');
 		this.asking = true;
 		return false;
 	}

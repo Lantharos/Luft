@@ -5,12 +5,14 @@ use std::sync::mpsc::{self, RecvError, Sender};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use luft_app::Events;
+use luft_i18n::t;
 use parking_lot::{Condvar, Mutex, RwLock};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::awake::Awake;
 use crate::app::events::OPERATIONS_CHANGED;
+use crate::l10n::L10N;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;
@@ -270,7 +272,7 @@ impl OperationsQueue {
             Some(OperationStatus::Cancelled) => Err(RecvError),
             _ => receiver.recv(),
         }
-        .map_err(|_| "Operation cancelled".to_string());
+        .map_err(|_| t!(L10N, "rover-operations-cancelled"));
         self.inner.decisions.lock().remove(id);
         self.update(id, true, |operation| operation.conflict = None);
         decision
@@ -281,9 +283,9 @@ impl OperationsQueue {
             .decisions
             .lock()
             .get(id)
-            .ok_or("This question was already answered")?
+            .ok_or_else(|| t!(L10N, "rover-operations-answered"))?
             .send(decision)
-            .map_err(|_| "The operation has already finished".to_string())
+            .map_err(|_| t!(L10N, "rover-operations-finished"))
     }
 
     pub fn finish<T>(&self, id: &str, result: Result<T, String>) -> Result<T, String> {

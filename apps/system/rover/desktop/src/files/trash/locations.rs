@@ -4,10 +4,12 @@ use std::os::unix::fs::MetadataExt;
 use std::path::{Component, Path, PathBuf};
 
 use chrono::{Local, NaiveDateTime};
+use luft_i18n::t;
 use percent_encoding::percent_decode_str;
 use serde::Serialize;
 use specta::Type;
 
+use crate::l10n::L10N;
 use crate::locations::drives;
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -54,7 +56,7 @@ pub(crate) fn trash_locations() -> Result<Vec<TrashLocation>, String> {
 pub(super) fn home_trash() -> Result<PathBuf, String> {
     dirs::data_dir()
         .map(|data| data.join("Trash"))
-        .ok_or_else(|| "Could not find the home trash".to_string())
+        .ok_or_else(|| t!(L10N, "rover-trash-home-missing"))
 }
 
 pub(super) struct TrashTarget {

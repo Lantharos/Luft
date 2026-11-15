@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { t } from '@luft/i18n';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { Popover, Select, Switch, TextField, tooltip } from '@luft/ui';
 	import { renamePartition, retype, setFlag } from '#lib/editor/edits.js';
@@ -38,34 +39,34 @@
 	bind:this={button}
 	type="button"
 	class="icon-button"
-	aria-label="Partition settings"
+	aria-label={t('disks-editor-settings')}
 	aria-haspopup="dialog"
 	aria-expanded={open}
-	{@attach tooltip('Partition settings')}
+	{@attach tooltip(t('disks-editor-settings'))}
 	onclick={() => (open ? close() : (open = true))}
 >
 	<SlidersHorizontal size={17} />
 </button>
 
 {#if open && button}
-	<Popover anchor={button} label="Partition settings" role="dialog" align="end" minWidth={380} maxHeight={460} onclose={close}>
+	<Popover anchor={button} label={t('disks-editor-settings')} role="dialog" align="end" minWidth={380} maxHeight={460} onclose={close}>
 		<div class="contents" {@attach focusFirst}>
 			<div class="setting">
-				<span>Type</span>
-				<Select label="Partition type" options={types} value={type} onchange={(value) => retype(part, value)} />
+				<span>{t('disks-editor-settings-type')}</span>
+				<Select label={t('disks-editor-settings-type-label')} options={types} value={type} onchange={(value) => retype(part, value)} />
 			</div>
 			{#if layout.table === 'gpt'}
 				<div class="setting">
-					<span>Name in the table</span>
+					<span>{t('disks-editor-settings-name')}</span>
 					<div class="w-[160px]" onfocusout={() => renamePartition(part, name)}>
-						<TextField label="Partition name" placeholder="None" bind:value={name} onkeydown={(event) => event.key === 'Enter' && renamePartition(part, name)} />
+						<TextField label={t('disks-editor-settings-name-label')} placeholder={t('disks-editor-settings-name-none')} bind:value={name} onkeydown={(event) => event.key === 'Enter' && renamePartition(part, name)} />
 					</div>
 				</div>
 			{/if}
 			{#each FLAGS[layout.table] as flag (flag.bit)}
 				<div class="setting">
-					<span {@attach tooltip(flag.description)}>{flag.label}</span>
-					<Switch label={flag.label} checked={part.flags.includes(flag.bit)} onchange={(on) => setFlag(part, flag.bit, on)} />
+					<span {@attach tooltip(t(`${flag.message}.description`))}>{t(flag.message)}</span>
+					<Switch label={t(flag.message)} checked={part.flags.includes(flag.bit)} onchange={(on) => setFlag(part, flag.bit, on)} />
 				</div>
 			{/each}
 		</div>

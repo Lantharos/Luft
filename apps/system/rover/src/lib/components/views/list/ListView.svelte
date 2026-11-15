@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, parent, plural, relativeDay, VirtualScroller } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, parent, relativeDay, VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import type { FileEntry, ListColumnId } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
@@ -37,13 +38,13 @@
 
 	function location(entry: FileEntry) {
 		const folder = parent(entry.path);
-		return folder === home ? 'Home' : folder.startsWith(`${home}/`) ? `~${folder.slice(home.length)}` : folder;
+		return folder === home ? t('rover-place-home') : folder.startsWith(`${home}/`) ? `~${folder.slice(home.length)}` : folder;
 	}
 
 	function size(entry: FileEntry) {
 		if (!entry.isDir) return bytes(entry.size);
 		const count = entry.path === DRAFT_PATH ? null : folderCounts.count(entry);
-		return count === null ? '' : plural(count, 'item');
+		return count === null ? '' : t('rover-list-items', { count });
 	}
 
 	function cell(entry: FileEntry, id: ListColumnId) {
@@ -83,7 +84,8 @@
 	{header}
 	{overlay}
 	role="listbox"
-	aria-label="Files"
+	aria-label={t('rover-view-files')}
+
 	aria-multiselectable="true"
 	{@attach measure}
 	{...surface.pointerHandlers()}

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, plural, Spinner } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, Spinner } from '@luft/ui';
 	import { describe } from '#lib/features/cloud.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { projectSummary } from '#lib/vcs/format.js';
@@ -18,16 +19,16 @@
 	);
 	let summary = $derived.by(() => {
 		if (count === 0 && manager.loading.active) return '';
-		if (manager.selection.size === 0) return plural(count, 'item');
-		const selected = `${manager.selection.size} of ${plural(count, 'item')} selected`;
-		return selectedSize > 0 ? `${selected} · ${bytes(selectedSize)}` : selected;
+		if (manager.selection.size === 0) return t('rover-status-items', { count });
+		const selected = { selected: manager.selection.size, count };
+		return selectedSize > 0 ? t('rover-status-selected-size', { ...selected, size: bytes(selectedSize) }) : t('rover-status-selected', selected);
 	});
 	let cloudDrive = $derived(manager.view === 'home' ? manager.cloud.holding(manager.currentPath) : undefined);
 	let drive = $derived(manager.view === 'home' && !cloudDrive ? manager.drives.holding(manager.currentPath) : undefined);
 	let status = $derived.by(() => {
-		if (vcs.busy === 'sync') return 'Syncing';
-		if (vcs.busy === 'save') return 'Committing';
-		if (vcs.error) return 'Version control needs attention';
+		if (vcs.busy === 'sync') return t('rover-vcs-syncing');
+		if (vcs.busy === 'save') return t('rover-vcs-committing');
+		if (vcs.error) return t('rover-vcs-attention');
 		return vcs.lastResult ?? (vcs.project ? projectSummary(vcs.project) : null);
 	});
 </script>
@@ -45,7 +46,8 @@
 			{#if cloudDrive}
 				<span class="truncate">{describe(cloudDrive)}</span>
 			{:else if drive}
-				<span class="shrink-0">{bytes(drive.availableSpace)} free</span>
+				<span class="shrink-0">{t('rover-status-free', { size: bytes(drive.availableSpace) })}</span>
+
 			{/if}
 		{/if}
 	</span>

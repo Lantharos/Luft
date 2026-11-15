@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, Switch, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -31,14 +32,14 @@
 	</div>
 {/snippet}
 
-<Dialog title="Mount “{volumeName(volume)}” at startup" {onclose}>
-	{@render row('Mount for everyone when the computer starts', enabled, (value) => (enabled = value))}
+<Dialog title={t('disks-startup-title', { name: volumeName(volume) })} {onclose}>
+	{@render row(t('disks-startup-enabled'), enabled, (value) => (enabled = value))}
 	{#if enabled}
-		<TextField label="Folder" showLabel bind:value={directory} error={valid ? '' : 'Use a full folder path, such as /mnt/data'} live />
-		{@render row('Read only', readOnly, (value) => (readOnly = value))}
+		<TextField label={t('disks-startup-folder')} showLabel bind:value={directory} error={valid ? '' : t('disks-startup-folder-invalid')} live />
+		{@render row(t('disks-startup-read-only'), readOnly, (value) => (readOnly = value))}
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!valid} onclick={submit}>Save</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button primary" disabled={!valid} onclick={submit}>{t('disks-save')}</button>
 	{/snippet}
 </Dialog>

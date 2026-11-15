@@ -5,6 +5,9 @@ use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
+use crate::l10n::L10N;
 use crate::locations::drives;
 
 pub(super) fn ensure_space(destination: &Path, required_bytes: u64) -> Result<(), String> {
@@ -15,15 +18,26 @@ pub(super) fn ensure_space(destination: &Path, required_bytes: u64) -> Result<()
     if available >= required_bytes {
         return Ok(());
     }
-    let label = drives::drive_for_path(destination)
+    let needed = format_bytes(required_bytes);
+    let available = format_bytes(available);
+    let drive = drives::drive_for_path(destination)
         .map(|drive| drive.name)
-        .or_else(|| file_name(destination))
-        .unwrap_or_else(|| "destination".to_string());
-    Err(format!(
-        "Not enough space on {label}: need {}, available {}",
-        format_bytes(required_bytes),
-        format_bytes(available)
-    ))
+        .or_else(|| file_name(destination));
+    Err(match drive {
+        Some(drive) => t!(
+            L10N,
+            "rover-operations-no-space",
+            drive = drive,
+            needed = needed,
+            available = available
+        ),
+        None => t!(
+            L10N,
+            "rover-operations-no-space-here",
+            needed = needed,
+            available = available
+        ),
+    })
 }
 
 pub(super) fn drive_folder(destination: &Path) -> String {
@@ -63,21 +77,25 @@ pub(super) fn file_name(path: &Path) -> Option<String> {
 
 fn available_space(path: &Path) -> Result<u64, String> {
     let path = CString::new(path.as_os_str().as_bytes())
-        .map_err(|_| "Destination path contains an invalid byte".to_string())?;
+        .map_err(|_| t!(L10N, "rover-operations-invalid-destination"))?;
     let mut stat = MaybeUninit::<libc::statvfs>::uninit();
     if unsafe { libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) } != 0 {
-        return Err("Could not read destination free space".to_string());
+        return Err(t!(L10N, "rover-operations-free-space-unknown"));
     }
     let stat = unsafe { stat.assume_init() };
     Ok(stat.f_bavail * stat.f_frsize)
 }
 
 fn format_bytes(bytes: u64) -> String {
-    const UNITS: [&str; 5] = ["kB", "MB", "GB", "TB", "PB"];
-    match bytes {
-        1 => return "1 byte".to_string(),
-        0..1000 => return format!("{bytes} bytes"),
-        _ => {}
+    const UNITS: [&str; 5] = [
+        "rover-size-kilobytes",
+        "rover-size-megabytes",
+        "rover-size-gigabytes",
+        "rover-size-terabytes",
+        "rover-size-petabytes",
+    ];
+    if bytes < 1000 {
+        return t!(L10N, "rover-size-bytes", count = bytes);
     }
     let mut size = bytes as f64 / 1000.0;
     let mut unit = 0;
@@ -86,5 +104,5 @@ fn format_bytes(bytes: u64) -> String {
         unit += 1;
     }
     let digits = if size >= 100.0 { 0 } else { 1 };
-    format!("{size:.digits$} {}", UNITS[unit])
+    t!(L10N, UNITS[unit], size = format!("{size:.digits$}"))
 }

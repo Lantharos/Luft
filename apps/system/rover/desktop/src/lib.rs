@@ -4,6 +4,7 @@ mod details;
 mod files;
 mod history;
 mod integration;
+mod l10n;
 mod locations;
 mod search;
 

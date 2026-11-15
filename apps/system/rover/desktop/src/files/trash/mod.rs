@@ -4,12 +4,14 @@ mod put;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
 use super::privileged::{self, remove_or_defer, remove_paths};
-use crate::files::text::{items, subject};
+use crate::files::text::first_name;
 use crate::history::{History, Step};
+use crate::l10n::L10N;
 use crate::locations::cloud::is_cloud;
 pub use locations::TrashLocation;
 use locations::parse_trashinfo;
@@ -65,8 +67,18 @@ pub fn move_to_trash(
     queue: &OperationsQueue,
     history: &History,
 ) -> Result<(), String> {
-    let label = format!("Moved {} to the trash", subject(&paths));
-    let undo_label = format!("Put back {}", subject(&paths));
+    let label = t!(
+        L10N,
+        "rover-history-trashed",
+        count = paths.len(),
+        name = first_name(&paths)
+    );
+    let undo_label = t!(
+        L10N,
+        "rover-history-put-back",
+        count = paths.len(),
+        name = first_name(&paths)
+    );
     let mut steps = Vec::new();
     let mut denied = Vec::new();
     let (id, placed) = run_batch(
@@ -76,7 +88,7 @@ pub fn move_to_trash(
         paths,
         |path| {
             if is_cloud(&path) {
-                return Err("Cloud drives have no trash".to_string());
+                return Err(t!(L10N, "rover-trash-cloud"));
             }
             let trashed = put_or_defer(Path::new(&path), &mut denied)?;
             steps.extend(trashed.map(Step::Trashed));
@@ -92,8 +104,8 @@ pub fn move_to_trash(
 }
 
 pub fn restore(ids: Vec<String>, queue: &OperationsQueue, history: &History) -> Result<(), String> {
-    let label = format!("Restored {}", items(ids.len()));
-    let undo_label = format!("Moved {} back to the trash", items(ids.len()));
+    let label = t!(L10N, "rover-history-restored", count = ids.len());
+    let undo_label = t!(L10N, "rover-history-trashed-again", count = ids.len());
     let mut steps = Vec::new();
     let mut denied = Vec::new();
     let locations = trash_locations()?;
@@ -164,7 +176,7 @@ pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
     let locations = trash_locations()?;
     let targets: Vec<String> = match trash_path {
         Some(path) if locations.iter().any(|location| location.path == path) => vec![path],
-        Some(path) => return Err(format!("Unknown trash location: {path}")),
+        Some(path) => return Err(t!(L10N, "rover-trash-unknown-location", path = path)),
         None => locations
             .into_iter()
             .map(|location| location.path)
@@ -204,7 +216,7 @@ struct Located {
 impl Located {
     fn find(id: &str, locations: &[TrashLocation]) -> Result<Self, String> {
         let file = PathBuf::from(id);
-        let invalid = || format!("Invalid trash item: {id}");
+        let invalid = || t!(L10N, "rover-trash-invalid-item", item = id);
         let name = file.file_name().ok_or_else(invalid)?;
         let files_dir = file.parent().ok_or_else(invalid)?;
         if files_dir.file_name().is_none_or(|dir| dir != "files") {
@@ -215,7 +227,7 @@ impl Located {
             .iter()
             .any(|location| Path::new(&location.path) == trash)
         {
-            return Err(format!("Trash item is outside known trash locations: {id}"));
+            return Err(t!(L10N, "rover-trash-outside", item = id));
         }
         let mut info_name = name.to_os_string();
         info_name.push(".trashinfo");
@@ -230,7 +242,13 @@ impl Located {
     fn trashed(self) -> Result<Trashed, String> {
         let original = parse_trashinfo(&self.info, &self.trash)
             .map(|(path, _)| PathBuf::from(path))
-            .ok_or_else(|| format!("Could not find where {} came from", self.file.display()))?;
+            .ok_or_else(|| {
+                t!(
+                    L10N,
+                    "rover-trash-origin-unknown",
+                    path = self.file.display().to_string()
+                )
+            })?;
         Ok(Trashed {
             original,
             file: self.file,

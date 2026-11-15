@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { bytes, Dialog, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -32,9 +33,8 @@
 
 	let guarded = $derived(!volume && builtIn(drive));
 
-	let target = $derived(volume ? `“${volumeName(volume)}” on ${drive.name}` : `${drive.name} (${bytes(drive.size)})`);
 	let loss = $derived(
-		volume ? `Everything on ${target} will be erased.` : `Every partition and everything on ${target} will be erased.`
+		volume ? t('disks-format-partition-loss', { name: volumeName(volume), drive: drive.name }) : t('disks-format-drive-loss', { drive: drive.name, size: bytes(drive.size) })
 	);
 
 	async function submit() {
@@ -48,13 +48,13 @@
 	}
 </script>
 
-<Dialog title={volume ? 'Format partition' : 'Format drive'} description={loss} {onclose}>
+<Dialog title={volume ? t('disks-format-partition-title') : t('disks-format-drive-title')} description={loss} {onclose}>
 	<FormatFields bind:format bind:valid offerErase />
 	{#if guarded}
 		<TypedName name={drive.name} bind:matches={typed} />
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" disabled={!valid || working || (guarded && !typed)} onclick={submit}>{#if working}<Spinner />Formatting{:else}Erase and format{/if}</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button danger" disabled={!valid || working || (guarded && !typed)} onclick={submit}>{#if working}<Spinner />{t('disks-format-working')}{:else}{t('disks-format-action')}{/if}</button>
 	{/snippet}
 </Dialog>

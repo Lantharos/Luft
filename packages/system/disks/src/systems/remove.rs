@@ -1,14 +1,15 @@
+use luft_i18n::t;
 use luft_trust::{Outcome, TRUST};
 use serde::Serialize;
 use specta::Type;
 
 use super::luft::grow;
 use super::{Kind, Role, System, find};
-use crate::partitions;
 use crate::udisks::room::Reach;
 use crate::udisks::snapshot::{self, Drive};
 use crate::udisks::volumes::Segment;
 use crate::udisks::{self, PARTITION};
+use crate::{L10N, partitions};
 
 const WORTH_OFFERING: u64 = 1 << 30;
 const WINDOWS_CHECKS_FIRST: &str = "scheduled for check";
@@ -135,14 +136,13 @@ pub async fn give_back(block: &str, size: u64) -> Result<(), String> {
         .await?
         .get(block, PARTITION)
         .and_then(|partition| partition.get::<u64>("Size"))
-        .ok_or("Windows' partition is gone")?;
+        .ok_or_else(|| t!(L10N, "luft-disks-windows-partition-gone"))?;
     let Err(error) = crate::resize::resize(block, size, false).await else {
         return Ok(());
     };
     udisks::run(block, PARTITION, "Resize", &(before, udisks::no_options())).await?;
     Err(if error.contains(WINDOWS_CHECKS_FIRST) {
-        "Windows wants to check its drive first. Start Windows once, then give it the space."
-            .to_owned()
+        t!(L10N, "luft-disks-windows-check-first")
     } else {
         error
     })
@@ -164,7 +164,7 @@ pub async fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
         .await?
         .into_iter()
         .find(|system| system.id == id)
-        .ok_or("It's already gone")?;
+        .ok_or_else(|| t!(L10N, "luft-disks-system-gone"))?;
     if !system.startups.is_empty() || !system.parts.is_empty() {
         step(Step::Startup);
         remove_startups(&system).await?;

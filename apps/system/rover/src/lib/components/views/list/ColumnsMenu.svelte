@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
+	import { t } from '@luft/i18n';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import { columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 
@@ -31,6 +32,7 @@
 	{/each}
 	<MenuSeparator />
 	<MenuItem onclick={() => choose(columns.reset)}>
-		<span class="flex-1">Reset columns</span>
+		<span class="flex-1">{t('rover-list-reset-columns')}</span>
+
 	</MenuItem>
 </ContextMenu>

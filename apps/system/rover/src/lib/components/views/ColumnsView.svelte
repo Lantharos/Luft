@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ColumnsData } from '#lib/file-manager/view/columns.svelte.js';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import FolderColumn from './FolderColumn.svelte';
@@ -14,7 +15,8 @@
 	});
 </script>
 
-<div bind:this={strip} class="columns-strip soft-scroll" role="group" aria-label="Folder columns">
+<div bind:this={strip} class="columns-strip soft-scroll" role="group" aria-label={t('rover-view-folder-columns')}>
+
 	{#each data.columns as column (column.path)}
 		<FolderColumn {column} entries={column.current ? manager.displayEntries : data.entries(column.path)} />
 	{/each}

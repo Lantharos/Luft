@@ -1,4 +1,6 @@
+use crate::l10n::L10N;
 use luft_app::dbus::objects::Objects;
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use zbus::Variant;
 
@@ -33,15 +35,17 @@ pub async fn plan(block: &str, to: u64, label: &str) -> Result<(String, Move), S
     let objects = udisks::objects().await?;
     let partition = objects
         .get(block, PARTITION)
-        .ok_or("This partition is gone")?;
+        .ok_or_else(|| t!(L10N, "disks-partition-gone"))?;
     let table = partition
         .link("Table")
-        .ok_or("This partition has no table")?;
+        .ok_or_else(|| t!(L10N, "disks-partition-no-table"))?;
     let gpt = objects
         .get(&table, TABLE)
         .and_then(|table| table.get::<String>("Type"))
         .is_some_and(|kind| kind == "gpt");
-    let drive = objects.get(&table, BLOCK).ok_or("This drive is gone")?;
+    let drive = objects
+        .get(&table, BLOCK)
+        .ok_or_else(|| t!(L10N, "disks-drive-gone"))?;
     let plan = Move {
         drive: drive.get("Id").unwrap_or_default(),
         drive_size: drive.get("Size").unwrap_or(0),
@@ -122,7 +126,8 @@ async fn create(table: &str, entry: &Entry, offset: u64) -> Result<String, Strin
 }
 
 pub async fn settle(plan: &Move) -> Result<String, String> {
-    let found = find(&udisks::objects().await?, plan).ok_or("This drive is gone")?;
+    let found =
+        find(&udisks::objects().await?, plan).ok_or_else(|| t!(L10N, "disks-drive-gone"))?;
     if let Some(old) = &found.old {
         udisks::run(old, PARTITION, "Delete", &(no_options(),)).await?;
     }

@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::ops::Range;
 
 use luft_app::dbus::objects::Objects;
@@ -73,24 +75,26 @@ impl Room {
         if self.holds(offset, size) {
             return Ok(());
         }
-        Err(
-            "The drive has changed since this was planned, so that space is no longer free"
-                .to_owned(),
-        )
+        Err(t!(L10N, "disks-guard-space-taken"))
     }
 }
 
 fn writable(objects: &Objects, drive: &Drive) -> Result<(), String> {
     if drive.read_only {
-        return Err(format!("{} can only be read", drive.name));
+        return Err(t!(
+            L10N,
+            "disks-guard-read-only",
+            drive = drive.name.as_str()
+        ));
     }
     let interrupted = moving::interrupted(objects)
         .iter()
         .any(|pending| pending.drive == drive.block);
     if interrupted {
-        return Err(format!(
-            "A move on {} was interrupted and has to finish first",
-            drive.name
+        return Err(t!(
+            L10N,
+            "disks-guard-move-interrupted",
+            drive = drive.name.as_str()
         ));
     }
     Ok(())
@@ -114,9 +118,10 @@ fn display_name(volume: &Volume) -> String {
 fn idle(objects: &Objects, drive: &Drive) -> Result<(), String> {
     writable(objects, drive)?;
     if drive.system {
-        return Err(format!(
-            "The running system uses “{}”, so it can't be erased while it runs",
-            drive.name
+        return Err(t!(
+            L10N,
+            "disks-guard-system-drive",
+            drive = drive.name.as_str()
         ));
     }
     Ok(())
@@ -130,7 +135,7 @@ impl Guard {
             .drives
             .iter()
             .find(|drive| drive.block == table)
-            .ok_or("This drive is gone")?;
+            .ok_or_else(|| t!(L10N, "disks-drive-gone"))?;
         writable(&objects, drive)?;
         Ok(Room::around(drive, None))
     }
@@ -163,7 +168,7 @@ impl Guard {
                     _ => None,
                 })
             })
-            .ok_or("This partition is gone")?;
+            .ok_or_else(|| t!(L10N, "disks-partition-gone"))?;
         writable(objects, drive)?;
         Ok(Self {
             offset: volume.offset,
@@ -180,17 +185,19 @@ impl Guard {
         if self.room.holds(offset, size) {
             return Ok(());
         }
-        Err(format!(
-            "The drive has changed since this was planned, so “{}” no longer fits there",
-            self.name
+        Err(t!(
+            L10N,
+            "disks-guard-no-longer-fits",
+            volume = self.name.as_str()
         ))
     }
 
     pub fn changeable(&self) -> Result<(), String> {
         if self.system {
-            return Err(format!(
-                "The running system uses “{}”, so it can't be changed while it runs",
-                self.name
+            return Err(t!(
+                L10N,
+                "disks-guard-system-volume",
+                volume = self.name.as_str()
             ));
         }
         Ok(())
@@ -199,9 +206,10 @@ impl Guard {
     pub fn movable(&self) -> Result<(), String> {
         self.changeable()?;
         if self.logical {
-            return Err(format!(
-                "“{}” sits inside an extended partition, so it can't be moved",
-                self.name
+            return Err(t!(
+                L10N,
+                "disks-guard-extended-move",
+                volume = self.name.as_str()
             ));
         }
         Ok(())
@@ -209,15 +217,17 @@ impl Guard {
 
     pub fn resizable(&self) -> Result<(), String> {
         if self.logical {
-            return Err(format!(
-                "“{}” sits inside an extended partition, so it can't be resized",
-                self.name
+            return Err(t!(
+                L10N,
+                "disks-guard-extended-resize",
+                volume = self.name.as_str()
             ));
         }
         if self.encrypted {
-            return Err(format!(
-                "“{}” is encrypted, so it can't be resized",
-                self.name
+            return Err(t!(
+                L10N,
+                "disks-guard-encrypted-resize",
+                volume = self.name.as_str()
             ));
         }
         Ok(())

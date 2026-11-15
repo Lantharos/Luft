@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { basename } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Operation, UserDirs } from '#lib/bindings.js';
@@ -14,7 +15,8 @@ export function userFolders(dirs: UserDirs | null): Place[] {
 }
 
 export function mainPlaces(dirs: UserDirs | null): Place[] {
-	return dirs ? [{ path: dirs.home, label: 'Home', icon: 'house' }, ...userFolders(dirs)] : [];
+	return dirs ? [{ path: dirs.home, label: t('rover-place-home'), icon: 'house' }
+, ...userFolders(dirs)] : [];
 }
 
 export class TrashCounter {

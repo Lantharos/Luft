@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Cloud from '@lucide/svelte/icons/cloud';
@@ -14,15 +15,16 @@
 	let { state, density = 'list' }: Props = $props();
 
 	const MARKS: Record<FileState, { icon: Component; label: string }> = {
-		online: { icon: Cloud, label: 'Online only, downloads when opened' },
-		local: { icon: CircleCheck, label: 'On this device' },
-		syncing: { icon: RefreshCw, label: 'Syncing' }
+		online: { icon: Cloud, label: 'rover-cloud-mark-online' },
+		local: { icon: CircleCheck, label: 'rover-cloud-mark-local' },
+		syncing: { icon: RefreshCw, label: 'rover-cloud-mark-syncing' }
 	};
 </script>
 
 {#if state}
 	{@const Icon = MARKS[state].icon}
-	<span class={['cloud-mark', `cloud-mark--${state}`, density === 'grid' && 'cloud-mark--grid']} aria-label={MARKS[state].label} {@attach tooltip(MARKS[state].label)}>
+	<span class={['cloud-mark', `cloud-mark--${state}`, density === 'grid' && 'cloud-mark--grid']} aria-label={t(MARKS[state].label)} {@attach tooltip(t(MARKS[state].label))}>
+
 		<Icon size={density === 'grid' ? 15 : 14} class={state === 'syncing' ? 'animate-spin' : ''} />
 	</span>
 {/if}

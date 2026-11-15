@@ -2,6 +2,7 @@
 	import Server from '@lucide/svelte/icons/server';
 	import X from '@lucide/svelte/icons/x';
 	import { tick } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Checkbox, Dialog, Spinner, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { NetworkPlace } from '#lib/bindings.js';
@@ -49,29 +50,29 @@
 			</span>
 		</button>
 		{#if removable}
-			<button type="button" class="icon-button" aria-label={`Forget ${place.uri}`} onclick={() => manager.network.forgetRecent(place.uri)}>
+			<button type="button" class="icon-button" aria-label={t('rover-connect-forget', { address: place.uri })} onclick={() => manager.network.forgetRecent(place.uri)}>
 				<X size={15} />
 			</button>
 		{/if}
 	</div>
 {/snippet}
 
-<Dialog title="Connect to server" {onclose}>
+<Dialog title={t('rover-connect-title')} {onclose}>
 	<TextField
 		bind:this={field}
-		label="Server address"
-		placeholder="sftp://example.com or smb://server/share"
+		label={t('rover-connect-address')}
+		placeholder={t('rover-connect-address-example')}
 		bind:value={address}
 		onkeydown={(event) => event.key === 'Enter' && connect()}
 	/>
 	<p class="-mt-1 px-1 text-[12.5px] text-[var(--text-muted)]">
-		{protocol ? `Connects with ${protocol}` : 'SFTP, Windows shares (SMB), FTP, WebDAV or NFS'}
+		{protocol ? t('rover-connect-protocol', { protocol }) : t('rover-connect-protocols')}
 	</p>
-	<Checkbox label="Keep in sidebar" checked={keep} onchange={(value) => (keep = value)}>Keep in sidebar</Checkbox>
+	<Checkbox label={t('rover-connect-keep')} checked={keep} onchange={(value) => (keep = value)}>{t('rover-connect-keep')}</Checkbox>
 
 	{#if recent.length > 0}
 		<div class="flex flex-col gap-1.5">
-			<span class="px-1 text-[13px] font-medium text-[var(--text-soft)]">Recent</span>
+			<span class="px-1 text-[13px] font-medium text-[var(--text-soft)]">{t('rover-connect-recent')}</span>
 			<div class="row-group">
 				{#each recent as uri (uri)}
 					{@render server({ name: manager.network.nameFor(uri), uri }, true)}
@@ -82,9 +83,9 @@
 
 	{#if nearby === null || nearby.length > 0}
 		<div class="flex flex-col gap-1.5">
-			<span class="px-1 text-[13px] font-medium text-[var(--text-soft)]">On this network</span>
+			<span class="px-1 text-[13px] font-medium text-[var(--text-soft)]">{t('rover-connect-nearby')}</span>
 			{#if nearby === null}
-				<p class="flex items-center gap-2 px-1 text-[12.5px] text-[var(--text-muted)]"><Spinner size={13} />Looking for servers</p>
+				<p class="flex items-center gap-2 px-1 text-[12.5px] text-[var(--text-muted)]"><Spinner size={13} />{t('rover-connect-looking')}</p>
 			{:else}
 				<div class="row-group">
 					{#each nearby as place (place.uri)}
@@ -96,8 +97,9 @@
 	{/if}
 
 	{#snippet actions()}
-		<button class="button" type="button" onclick={onclose}>Cancel</button>
-		<button class="button primary" type="button" disabled={!uri} onclick={() => connect()}>Connect</button>
+		<button class="button" type="button" onclick={onclose}>{t('rover-cancel')}</button>
+		<button class="button primary" type="button" disabled={!uri} onclick={() => connect()}>{t('rover-connect')}</button>
+
 	{/snippet}
 </Dialog>
 

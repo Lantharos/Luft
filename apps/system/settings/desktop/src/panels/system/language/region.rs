@@ -16,6 +16,7 @@ async fn set_language(LanguageChoice { language }: LanguageChoice) -> Result<(),
     if let Some(tag) = luft_i18n::bcp47(&language) {
         L10N.use_locale(&tag);
         luft_trust::L10N.use_locale(&tag);
+        luft_disks::L10N.use_locale(&tag);
     }
     Ok(())
 }

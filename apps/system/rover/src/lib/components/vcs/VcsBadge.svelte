@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { VcsFileStatus } from '#lib/bindings.js';
-	import { statusMarker } from '#lib/vcs/format.js';
+	import { statusLabel, statusMarker } from '#lib/vcs/format.js';
 
 	interface Props {
 		status: VcsFileStatus | null;
@@ -11,7 +11,8 @@
 </script>
 
 {#if status && status !== 'ignored'}
-	<span class={['vcs-badge', `vcs-badge--${status}`, density === 'grid' ? 'vcs-badge--grid' : '']} aria-label={status}>
+	<span class={['vcs-badge', `vcs-badge--${status}`, density === 'grid' ? 'vcs-badge--grid' : '']} aria-label={statusLabel(status)}>
+
 		{statusMarker(status)}
 	</span>
 {/if}

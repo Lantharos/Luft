@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { ListColumn, ListColumnId, SortBy } from '#lib/bindings.js';
 import { DEFAULT_LIST_COLUMNS, settings } from '#lib/state/settings.svelte.js';
 
@@ -8,11 +9,12 @@ const MIN_WIDTH = 64;
 const MAX_WIDTH = 480;
 
 export const COLUMN_SORT: Record<ListColumnId, SortBy> = { date: 'date', size: 'size', kind: 'type' };
-const LABELS: Record<ListColumnId, string> = { date: 'Modified', size: 'Size', kind: 'Kind' };
+const LABELS: Record<ListColumnId, string> = { date: 'rover-sort-modified', size: 'rover-sort-size', kind: 'rover-sort-kind' };
 
 export function columnLabel(id: ListColumnId, recent: boolean) {
-	return recent && id === 'kind' ? 'Location' : LABELS[id];
+	return recent && id === 'kind' ? t('rover-list-location') : t(LABELS[id]);
 }
+
 
 type Resizing = { id: ListColumnId; width: number };
 

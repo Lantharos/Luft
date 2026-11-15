@@ -1,7 +1,8 @@
 use luft_dbus::objects::Objects;
+use luft_i18n::t;
 
-use crate::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, PARTITION, no_options};
+use crate::{L10N, mounting};
 
 const OFFLINE_SHRINK: u64 = 2;
 const OFFLINE_GROW: u64 = 4;
@@ -45,7 +46,7 @@ impl Contents {
             return if self.usage.is_empty() {
                 Ok(Mode::InPlace)
             } else {
-                Err("Disks can only resize partitions that hold a file system it knows".to_owned())
+                Err(t!(L10N, "luft-disks-resize-unknown-file-system"))
             };
         };
         let (_, flags, _) =
@@ -55,13 +56,21 @@ impl Contents {
         } else {
             (ONLINE_SHRINK, OFFLINE_SHRINK)
         };
-        let direction = if growing { "grow" } else { "shrink" };
         match (flags & online != 0, flags & offline != 0) {
             (true, _) if self.mounted => Ok(Mode::InPlace),
             (_, true) if !self.mounted => Ok(Mode::InPlace),
             (_, true) => Ok(Mode::Unmounted),
             (true, false) => Ok(Mode::Mounted),
-            (false, false) => Err(format!("{kind} file systems can't {direction} here")),
+            (false, false) if growing => Err(t!(
+                L10N,
+                "luft-disks-resize-cannot-grow",
+                kind = kind.as_str()
+            )),
+            (false, false) => Err(t!(
+                L10N,
+                "luft-disks-resize-cannot-shrink",
+                kind = kind.as_str()
+            )),
         }
     }
 
@@ -74,7 +83,7 @@ impl Contents {
                 if repaired {
                     Ok(())
                 } else {
-                    Err("Its file system has problems that couldn't be repaired".to_owned())
+                    Err(t!(L10N, "luft-disks-resize-unrepaired"))
                 }
             }
             _ => Ok(()),
@@ -87,7 +96,7 @@ pub async fn resize(block: &str, size: u64, may_unmount: bool) -> Result<(), Str
     let current = objects
         .get(block, PARTITION)
         .and_then(|partition| partition.get::<u64>("Size"))
-        .ok_or("This partition is gone")?;
+        .ok_or_else(|| t!(L10N, "luft-disks-partition-gone"))?;
     if size == current {
         return Ok(());
     }
@@ -95,7 +104,7 @@ pub async fn resize(block: &str, size: u64, may_unmount: bool) -> Result<(), Str
     let contents = Contents::read(&objects, block);
     let mode = contents.mode(growing).await?;
     if mode == Mode::Unmounted && !may_unmount {
-        return Err("It has to be unmounted to resize, and the system is using it".to_owned());
+        return Err(t!(L10N, "luft-disks-resize-in-use"));
     }
     match mode {
         Mode::Unmounted => mounting::unmount(block).await?,

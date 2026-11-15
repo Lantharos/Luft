@@ -3,9 +3,11 @@ pub mod layout;
 
 use std::collections::HashMap;
 
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
+use crate::L10N;
 use crate::systems::{Role, System};
 use crate::udisks::snapshot::{Drive, Kind, PartitionTable};
 use crate::udisks::volumes::{Segment, Volume};
@@ -108,21 +110,22 @@ pub fn name_of(volume: &Volume) -> String {
     .into_iter()
     .find(|name| !name.is_empty());
     match (name, volume.number) {
-        (Some(name), _) => format!("“{name}”"),
-        (None, Some(number)) => format!("Partition {number}"),
+        (Some(name), _) => t!(L10N, "luft-disks-volume-label", label = name),
+        (None, Some(number)) => t!(L10N, "luft-disks-volume-number", number = number),
         (None, None) => volume.device.clone(),
     }
 }
 
 fn refused(drive: &Drive) -> Option<String> {
     if drive.removable || matches!(drive.kind, Kind::Usb | Kind::Card) {
-        return Some(
-            "Luft only moves to drives inside the computer, which start it more reliably."
-                .to_owned(),
-        );
+        return Some(t!(L10N, "luft-disks-move-internal-only"));
     }
     if drive.read_only {
-        return Some(format!("{} can only be read.", drive.name));
+        return Some(t!(
+            L10N,
+            "luft-disks-move-read-only",
+            drive = drive.name.as_str()
+        ));
     }
     None
 }
@@ -227,13 +230,15 @@ fn erase(drive: &Drive, systems: &[System]) -> Erase {
     });
     let in_use = volumes(drive).find(|volume| volume.in_use_by_system());
     let refused = match (holding, in_use) {
-        (Some(system), _) => Some(format!(
-            "{} is on this drive, so Disks won't erase it for Luft. Make room next to it instead.",
-            system.name
+        (Some(system), _) => Some(t!(
+            L10N,
+            "luft-disks-move-erase-system",
+            system = system.name.as_str()
         )),
-        (None, Some(volume)) => Some(format!(
-            "{} is in use, so this drive can't be erased right now.",
-            name_of(volume)
+        (None, Some(volume)) => Some(t!(
+            L10N,
+            "luft-disks-move-erase-in-use",
+            volume = name_of(volume)
         )),
         (None, None) => None,
     };

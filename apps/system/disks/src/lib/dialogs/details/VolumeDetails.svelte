@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { Drive, Volume } from '#lib/bindings.js';
 	import { openFolder } from '#lib/bridge/index.js';
@@ -19,31 +20,31 @@
 	let contents = $derived(inner(volume));
 	let mounted = $derived(contents.mountPoints.length > 0);
 	let luft = $derived(disks.holdsLuft(volume));
-	let mountedAt = $derived({ label: 'Mounted at', value: contents.mountPoints.map(folderName).join(', '), open: () => void openFolder(contents.mountPoints[0]) });
+	let mountedAt = $derived({ label: t('disks-details-mounted-at'), value: contents.mountPoints.map(folderName).join(', '), open: () => void openFolder(contents.mountPoints[0]) });
 	let facts = $derived(
 		[
-			{ label: 'Format', value: volume.encryption ? encryption() : filesystemName(volume) },
-			{ label: 'Size', value: bytes(volume.size) },
-			luft && { label: 'Holds', value: 'Luft, your files and your apps' },
+			{ label: t('disks-details-format'), value: volume.encryption ? encryption() : filesystemName(volume) },
+			{ label: t('disks-details-size'), value: bytes(volume.size) },
+			luft && { label: t('disks-details-holds'), value: t('disks-details-holds-luft') },
 			mounted && !luft && mountedAt,
-			contents.startup && { label: 'At startup', value: `Mounts at ${contents.startup.directory}` }
+			contents.startup && { label: t('disks-details-startup'), value: t('disks-details-startup-mounts', { folder: contents.startup.directory }) }
 		].filter((fact) => fact !== false && fact !== null)
 	);
 	let technical = $derived(
 		[
-			{ label: 'Device', value: volume.device, mono: true },
-			volume.uuid && { label: 'UUID', value: volume.uuid, mono: true },
-			contents !== volume && contents.uuid && { label: 'Contents UUID', value: contents.uuid, mono: true },
-			volume.partitionType && { label: 'Partition type', value: typeName(volume.partitionType) ?? '' },
-			volume.partitionName && { label: 'Partition name', value: volume.partitionName },
-			volume.number !== null && { label: 'Partition', value: `${volume.number} on ${drive.device}` },
+			{ label: t('disks-details-device'), value: volume.device, mono: true },
+			volume.uuid && { label: t('disks-details-uuid'), value: volume.uuid, mono: true },
+			contents !== volume && contents.uuid && { label: t('disks-details-contents-uuid'), value: contents.uuid, mono: true },
+			volume.partitionType && { label: t('disks-details-partition-type'), value: typeName(volume.partitionType) ?? '' },
+			volume.partitionName && { label: t('disks-details-partition-name'), value: volume.partitionName },
+			volume.number !== null && { label: t('disks-details-partition'), value: t('disks-details-partition-number', { number: volume.number, device: drive.device }) },
 			luft && mountedAt
 		].filter((fact) => fact !== false && fact !== '' && fact !== null)
 	);
 	let more = $state(false);
 
 	function encryption() {
-		return volume.encryption?.cleartext ? `${filesystemName(contents)}, encrypted` : 'Encrypted, locked';
+		return volume.encryption?.cleartext ? t('disks-details-encrypted', { filesystem: filesystemName(contents) }) : t('disks-details-locked');
 	}
 
 	function explore() {
@@ -58,19 +59,19 @@
 	{/if}
 	<Facts {facts} />
 	{#snippet actions()}
-		<button type="button" class="button mr-auto" onclick={() => (more = true)}>Technical details</button>
+		<button type="button" class="button mr-auto" onclick={() => (more = true)}>{t('disks-details-technical')}</button>
 		{#if explorable(volume)}
-			<button type="button" class="button" onclick={explore}>See what’s using space</button>
+			<button type="button" class="button" onclick={explore}>{t('disks-explore')}</button>
 		{/if}
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('disks-done')}</button>
 	{/snippet}
 </Dialog>
 
 {#if more}
-	<Dialog title="Technical details of {volumeName(volume)}" wide onclose={() => (more = false)}>
+	<Dialog title={t('disks-details-technical-title', { name: volumeName(volume) })} wide onclose={() => (more = false)}>
 		<Facts facts={technical} />
 		{#snippet actions()}
-			<button type="button" class="button primary" onclick={() => (more = false)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (more = false)}>{t('disks-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

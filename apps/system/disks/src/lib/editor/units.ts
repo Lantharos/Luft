@@ -1,6 +1,6 @@
+import { i18n } from '@luft/i18n';
 import { MiB } from './model';
 
-const whole = new Intl.NumberFormat();
 const UNITS: Record<string, number> = {
 	b: 1,
 	k: 1000,
@@ -17,7 +17,14 @@ const UNITS: Record<string, number> = {
 	tib: 1024 ** 4
 };
 
+let wholeLocale = '';
+let whole: Intl.NumberFormat;
+
 export function mebibytes(bytes: number) {
+	if (wholeLocale !== i18n.formats) {
+		wholeLocale = i18n.formats;
+		whole = new Intl.NumberFormat(wholeLocale);
+	}
 	return whole.format(Math.round(bytes / MiB));
 }
 

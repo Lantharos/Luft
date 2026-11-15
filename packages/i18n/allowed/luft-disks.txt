@@ -1,0 +1,12 @@
+packages/system/disks/src/systems/detect/mod.rs	Moving box
+packages/system/disks/src/systems/detect/tests.rs	Windows Boot Manager
+packages/system/disks/src/systems/detect/tests.rs	Windows 11 Pro
+packages/system/disks/src/systems/detect/tests.rs	Windows 10
+packages/system/disks/src/systems/detect/tests.rs	Fedora Linux 42
+packages/system/disks/src/systems/names.rs	Arch Linux
+packages/system/disks/src/systems/names.rs	Kali Linux
+packages/system/disks/src/systems/names.rs	Linux Mint
+packages/system/disks/src/systems/names.rs	Red Hat Enterprise Linux
+packages/system/disks/src/systems/names.rs	Rocky Linux
+packages/system/disks/src/systems/names.rs	Zorin OS
+packages/system/disks/src/systems/names.rs	Windows {release}

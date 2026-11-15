@@ -2,9 +2,12 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use luft_app::dbus::{self, failed};
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use zbus::Variant;
+
+use crate::l10n::L10N;
 
 const SERVICE: &str = "com.lantharos.Windows1";
 const PATH: &str = "/com/lantharos/Windows1";
@@ -59,7 +62,7 @@ pub async fn open_windows(device: &str, read_only: bool) -> Result<String, Strin
         .file_name()
         .and_then(|name| name.to_str())
         .filter(|name| name.bytes().all(|byte| byte.is_ascii_alphanumeric()))
-        .ok_or("That isn't a drive")?;
+        .ok_or_else(|| t!(L10N, "rover-drives-not-drive"))?;
     let mut options: HashMap<&str, Variant> = HashMap::new();
     if read_only {
         options.insert("options", Variant::from("ro"));

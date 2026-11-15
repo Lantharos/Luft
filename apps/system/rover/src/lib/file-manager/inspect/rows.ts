@@ -1,4 +1,5 @@
-import { bytes, dateTime, formatClock, parent, plural } from '@luft/ui';
+import { t } from '@luft/i18n';
+import { bytes, dateTime, formatClock, parent } from '@luft/ui';
 import type { FileDetails, FileEntry } from '#lib/bindings.js';
 import { statusLabel } from '#lib/vcs/format.js';
 import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -24,15 +25,15 @@ export function detailRows({ entry, details, media, vcs, home, reveal }: RowSour
 	const rows: (DetailRow | null)[] = [
 		entry.isDir
 			? details?.itemCount != null
-				? { label: 'Contains', value: plural(details.itemCount, 'item') }
+				? { label: t('rover-details-contains'), value: t('rover-details-items', { count: details.itemCount }) }
 				: null
-			: { label: 'Size', value: bytes(entry.size) },
+			: { label: t('rover-details-size'), value: bytes(entry.size) },
 		dimensions(details, media),
-		media?.duration ? { label: 'Duration', value: formatClock(media.duration) } : null,
-		details?.created ? { label: 'Created', value: dateTime(details.created) } : null,
-		entry.modified ? { label: 'Modified', value: dateTime(entry.modified) } : null,
-		{ label: 'Where', value: tildePath(parent(entry.path), home), action: () => reveal(entry) },
-		details?.linkTarget ? { label: 'Points to', value: details.linkTarget } : null,
+		media?.duration ? { label: t('rover-details-duration'), value: formatClock(media.duration) } : null,
+		details?.created ? { label: t('rover-properties-created'), value: dateTime(details.created) } : null,
+		entry.modified ? { label: t('rover-properties-modified'), value: dateTime(entry.modified) } : null,
+		{ label: t('rover-details-where'), value: tildePath(parent(entry.path), home), action: () => reveal(entry) },
+		details?.linkTarget ? { label: t('rover-properties-points-to'), value: details.linkTarget } : null,
 		versionControl(entry, vcs)
 	];
 	return rows.filter((row): row is DetailRow => row !== null);
@@ -40,14 +41,14 @@ export function detailRows({ entry, details, media, vcs, home, reveal }: RowSour
 
 function dimensions(details: FileDetails | null, media: MediaInfo | null): DetailRow | null {
 	const [width, height] = details?.dimensions ?? [media?.width, media?.height];
-	return width && height ? { label: 'Dimensions', value: `${width} × ${height}` } : null;
+	return width && height ? { label: t('rover-properties-dimensions'), value: t('rover-details-dimensions', { width: String(width), height: String(height) }) } : null;
 }
 
 function versionControl(entry: FileEntry, vcs: VcsState): DetailRow | null {
 	const project = vcs.project;
 	if (!project) return null;
 	const status = vcs.statusFor(entry.path, entry.isDir);
-	const state = status && status !== 'ignored' ? statusLabel(status) : status === 'ignored' ? 'Ignored' : 'Unchanged';
-	const where = project.branch ? ` on ${project.branch}` : '';
-	return { label: 'Git', value: `${state}${where}` };
+	const state = status ? statusLabel(status) : t('rover-vcs-status-unchanged');
+	return { label: 'Git', value: project.branch ? t('rover-details-git-branch', { state, branch: project.branch }) : state };
+
 }

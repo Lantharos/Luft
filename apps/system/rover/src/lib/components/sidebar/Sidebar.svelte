@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Clock from '@lucide/svelte/icons/clock';
 	import Trash from '@lucide/svelte/icons/trash';
+	import { t } from '@luft/i18n';
 	import { isInside, SearchField, selectionPill } from '@luft/ui';
 	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
@@ -83,17 +84,17 @@
 
 <aside class="glass-sidebar drag-region sidebar">
 	<div class="sidebar-search">
-		<SearchField bind:this={search} variant="sidebar" label="Search current folder" bind:value={manager.searchQuery} />
+		<SearchField bind:this={search} variant="sidebar" label={t('rover-sidebar-search')} bind:value={manager.searchQuery} />
 	</div>
 
-	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places" {@attach selectionPill('.sidebar-item.is-active')}>
+	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label={t('rover-sidebar-places')} {@attach selectionPill('.sidebar-item.is-active')}>
 		<div class="flex flex-none flex-col gap-px">
 			{#if home}
 				<SidebarItem label={home.label} {...folderItem(home.path)} />
 			{/if}
 			<SidebarItem
 				icon={Clock}
-				label="Recent"
+				label={t('rover-place-recent')}
 				active={manager.view === 'recent'}
 				onclick={() => manager.showView('recent')}
 				onauxclick={(event) => openInTab(event, () => manager.openViewInTab('recent'))}
@@ -105,7 +106,8 @@
 			{#if !chooser}
 				<SidebarItem
 					icon={Trash}
-					label="Trash"
+					label={t('rover-place-trash')}
+
 					active={manager.view === 'trash'}
 					dropping={drag.target?.key === key(TRASH_DROP_PATH)}
 					onclick={() => manager.showView('trash')}

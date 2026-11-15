@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::fs::File;
 use std::os::fd::OwnedFd;
 use std::os::unix::fs::FileExt;
@@ -58,7 +60,7 @@ impl Disk {
         let restored = self.read(0, edges.head.len() as u64)? == edges.head
             && self.read(tail_start, edges.tail.len() as u64)? == edges.tail;
         if !restored {
-            return Err("The start of the moved partition didn't read back the same".to_owned());
+            return Err(t!(L10N, "disks-move-start-mismatch"));
         }
         Ok(())
     }

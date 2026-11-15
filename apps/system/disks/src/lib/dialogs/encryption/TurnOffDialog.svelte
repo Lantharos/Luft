@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, errorText } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Volume } from '#lib/bindings.js';
@@ -34,8 +35,8 @@
 </script>
 
 <Dialog
-	title="Turn off encryption for “{volumeName(volume)}”?"
-	description="Afterwards, anyone who has the drive can read what’s on it."
+	title={t('disks-encryption-turn-off-title', { name: volumeName(volume) })}
+	description={t('disks-encryption-turn-off-description')}
 	{onclose}
 >
 	{#if request.asking}
@@ -45,7 +46,7 @@
 		<p class="px-1 text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" disabled={working} onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" disabled={working || (request.asking && !request.key)} onclick={submit}>Turn off encryption</button>
+		<button type="button" class="button" disabled={working} onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button danger" disabled={working || (request.asking && !request.key)} onclick={submit}>{t('disks-encryption-turn-off')}</button>
 	{/snippet}
 </Dialog>

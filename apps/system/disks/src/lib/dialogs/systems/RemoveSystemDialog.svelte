@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, errorText, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { OtherSystem, Removed } from '#lib/bindings.js';
@@ -8,7 +9,7 @@
 	import { luftRoom } from '#lib/luft.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { systems } from '#lib/state/systems.svelte.js';
-	import { GROW_STEP, plannedSteps, shortName, stepKey } from '#lib/systems.js';
+	import { growStep, plannedSteps, shortName, stepKey } from '#lib/systems.js';
 	import { dialogs } from '../dialogs.svelte';
 	import KeyPrompt from '../encryption/KeyPrompt.svelte';
 	import Steps from './Steps.svelte';
@@ -34,13 +35,13 @@
 	let givingBack = $state(false);
 	let givenBack = $state(false);
 
-	let steps = $derived([...plannedSteps(system), ...(growStarted ? [GROW_STEP] : [])]);
+	let steps = $derived([...plannedSteps(system), ...(growStarted ? [growStep()] : [])]);
 	let drive = $derived(disks.drives.find((candidate) => candidate.id === (removed?.drive ?? system.drive)) ?? null);
 	let room = $derived(drive && removed?.free ? luftRoom(drive, removed.free.offset) : null);
 	let canOpen = $derived(Boolean(system.folder || system.files));
 	let holdsFiles = $derived(system.parts.length > 0 || system.kept !== null);
 	let title = $derived(
-		phase === 'confirm' ? `Remove ${system.name}?` : phase === 'done' ? `${system.name} is gone` : phase === 'failed' ? `${system.name} wasn’t fully removed` : `Removing ${system.name}`
+		t('disks-remove-title', { phase, name: system.name })
 	);
 
 	function contentsOf(block: string) {
@@ -70,7 +71,7 @@
 		error = '';
 		const stop = events.disksSystem((step) => {
 			const key = stepKey(step);
-			if (key === GROW_STEP.key) growStarted = true;
+			if (key === 'grow') growStarted = true;
 			current = key;
 		});
 		try {
@@ -82,7 +83,7 @@
 			if (message === CANCELLED && current === null) {
 				phase = 'confirm';
 			} else {
-				error = message === CANCELLED ? 'Administrator rights are needed to continue.' : message;
+				error = message === CANCELLED ? t('disks-admin-needed') : message;
 				phase = 'failed';
 			}
 		} finally {
@@ -145,14 +146,14 @@
 
 <Dialog {title} wide onclose={close}>
 	{#if phase === 'confirm'}
-		<p class="text-[13.5px] leading-relaxed">{holdsFiles ? 'These are deleted for good, along with everything on them:' : 'This is deleted for good:'}</p>
+		<p class="text-[13.5px] leading-relaxed">{holdsFiles ? t('disks-remove-deleted-files') : t('disks-remove-deleted')}</p>
 		<WhatGoes {system} />
 		{#if system.bitlocker}
-			<p class="text-[13px] leading-relaxed text-[var(--danger)]">Windows is locked with BitLocker, so Luft can’t read its files. They’re gone once it’s removed.</p>
+			<p class="text-[13px] leading-relaxed text-[var(--danger)]">{t('disks-remove-bitlocker')}</p>
 		{:else if canOpen}
 			<div class="flex items-center gap-3">
-				<p class="min-w-0 flex-1 text-[13px] leading-relaxed text-[var(--text-muted)]">Copy anything you want to keep before you remove it.</p>
-				<button type="button" class="button" onclick={openFiles}>Open in Rover</button>
+				<p class="min-w-0 flex-1 text-[13px] leading-relaxed text-[var(--text-muted)]">{t('disks-remove-copy-first')}</p>
+				<button type="button" class="button" onclick={openFiles}>{t('disks-remove-open')}</button>
 			</div>
 		{/if}
 	{:else if phase === 'working' || phase === 'failed'}
@@ -161,27 +162,27 @@
 			<p class="text-[13px] leading-relaxed text-[var(--danger)]">{error}</p>
 		{/if}
 		{#if phase === 'working'}
-			<p class="text-[13px] text-[var(--text-muted)]">Keep the computer on until this is done.</p>
+			<p class="text-[13px] text-[var(--text-muted)]">{t('disks-keep-on')}</p>
 		{/if}
 	{:else if removed}
 		<Steps {steps} current={null} finished failed={false} />
 		{#if removed.grown > 0}
-			<p class="text-[13.5px] leading-relaxed">Luft grew by {bytes(removed.grown)}.</p>
+			<p class="text-[13.5px] leading-relaxed">{t('disks-remove-grown', { size: bytes(removed.grown) })}</p>
 		{/if}
 		{#if request.asking}
-			<p class="text-[13.5px] leading-relaxed">The space right after Luft is free. Enter the disk’s passphrase or recovery key to give it to Luft.</p>
+			<p class="text-[13.5px] leading-relaxed">{t('disks-remove-key')}</p>
 			<KeyPrompt {request} onsubmit={grow} />
 		{/if}
 		{#if givenBack && removed.giveBack}
-			<p class="text-[13.5px] leading-relaxed">Windows has its {bytes(removed.giveBack.size)} back.</p>
+			<p class="text-[13.5px] leading-relaxed">{t('disks-remove-given-back', { size: bytes(removed.giveBack.size) })}</p>
 		{:else if removed.free && removed.giveBack}
 			<p class="text-[13.5px] leading-relaxed">
-				{bytes(removed.free.size)} is free right after Windows. Give it back to Windows, or make it a partition for your files.
+				{t('disks-remove-free-windows', { size: bytes(removed.free.size) })}
 			</p>
 		{:else if removed.free}
 			<p class="text-[13.5px] leading-relaxed">
-				{bytes(removed.free.size)} is free on {drive?.name ?? 'the drive'}.
-				{room ? 'Give it to Luft, or make it a partition for your files.' : 'You can make it a partition for your files.'}
+				{drive ? t('disks-remove-free', { size: bytes(removed.free.size), drive: drive.name }) : t('disks-remove-free-unnamed', { size: bytes(removed.free.size) })}
+				{room ? t('disks-remove-free-luft') : t('disks-remove-free-partition')}
 			</p>
 		{/if}
 		{#if error}
@@ -191,26 +192,26 @@
 
 	{#snippet actions()}
 		{#if phase === 'confirm'}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button danger" onclick={remove}>Remove {shortName(system)}</button>
+			<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+			<button type="button" class="button danger" onclick={remove}>{t('disks-remove-action', { name: shortName(system) })}</button>
 		{:else if phase === 'working'}
-			<button type="button" class="button" disabled><Spinner />Removing</button>
+			<button type="button" class="button" disabled><Spinner />{t('disks-remove-working')}</button>
 		{:else if phase === 'failed'}
-			<button type="button" class="button primary" onclick={onclose}>Close</button>
+			<button type="button" class="button primary" onclick={onclose}>{t('disks-close')}</button>
 		{:else}
 			{#if request.asking}
-				<button type="button" class="button" disabled={growing || !request.key} onclick={grow}>Give Luft the space</button>
+				<button type="button" class="button" disabled={growing || !request.key} onclick={grow}>{t('disks-remove-grow')}</button>
 			{/if}
 			{#if removed?.free && drive && !givenBack}
-				<button type="button" class="button" disabled={givingBack} onclick={makePartition}>Make a partition</button>
+				<button type="button" class="button" disabled={givingBack} onclick={makePartition}>{t('disks-make-partition')}</button>
 			{/if}
 			{#if removed?.giveBack && !givenBack}
-				<button type="button" class="button" disabled={givingBack} onclick={giveBack}>{#if givingBack}<Spinner />{/if}Give to Windows</button>
+				<button type="button" class="button" disabled={givingBack} onclick={giveBack}>{#if givingBack}<Spinner />{/if}{t('disks-remove-give-back')}</button>
 			{/if}
 			{#if room}
-				<button type="button" class="button" onclick={giveLuft}>Give to Luft</button>
+				<button type="button" class="button" onclick={giveLuft}>{t('disks-free-give-luft')}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={onclose}>Done</button>
+			<button type="button" class="button primary" onclick={onclose}>{t('disks-done')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

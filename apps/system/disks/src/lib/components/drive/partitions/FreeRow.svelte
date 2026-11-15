@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive } from '#lib/bindings.js';
@@ -33,25 +34,25 @@
 	onpointerleave={() => (disks.hovered = null)}
 >
 	<span class="dashed" aria-hidden="true"></span>
-	<span class="name">{blank ? 'No partitions' : 'Free space'}</span>
-	<span class="facts">{waiting ? `${bytes(size)}, Luft moves in at the next start` : bytes(size)}</span>
+	<span class="name">{blank ? t('disks-no-partitions') : t('disks-free-space')}</span>
+	<span class="facts">{waiting ? t('disks-free-luft-waiting', { size: bytes(size) }) : bytes(size)}</span>
 	{#if waiting}
 		<button type="button" class="button ml-auto" disabled={calling} onclick={callOff}>
-			{#if calling}<Spinner />{/if}Keep it free
+			{#if calling}<Spinner />{/if}{t('disks-free-keep')}
 		</button>
 	{:else if room && !drive.readOnly}
 		<div class="ml-auto flex gap-2">
-			<button type="button" class="button" onclick={() => dialogs.open({ kind: 'give-luft', drive, offset, size })}>Give to Luft</button>
-			<button type="button" class="button" aria-label="New partition" onclick={() => dialogs.open({ kind: 'create', drive, offset, size })}>New</button>
+			<button type="button" class="button" onclick={() => dialogs.open({ kind: 'give-luft', drive, offset, size })}>{t('disks-free-give-luft')}</button>
+			<button type="button" class="button" aria-label={t('disks-new-partition')} onclick={() => dialogs.open({ kind: 'create', drive, offset, size })}>{t('disks-new')}</button>
 		</div>
 	{:else if !drive.readOnly}
 		<button
 			type="button"
 			class="button ml-auto"
-			aria-label={blank ? undefined : 'New partition'}
+			aria-label={blank ? undefined : t('disks-new-partition')}
 			onclick={() => dialogs.open(blank ? { kind: 'format-drive', drive } : { kind: 'create', drive, offset, size })}
 		>
-			{blank ? 'Format drive…' : 'New'}
+			{blank ? t('disks-action-format-drive') : t('disks-new')}
 		</button>
 	{/if}
 </div>

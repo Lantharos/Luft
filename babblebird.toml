@@ -32,7 +32,7 @@ files = ["kestrel/ui/locales/{lang}/shell.ftl"]
 
 [[areas]]
 name = "App toolkit"
-files = ["packages/web/ui/locales/{lang}/ui.ftl", "packages/system/trust/locales/{lang}/trust.ftl"]
+files = ["packages/web/ui/locales/{lang}/ui.ftl", "packages/system/trust/locales/{lang}/trust.ftl", "packages/system/disks/locales/{lang}/disks.ftl"]
 
 [[areas]]
 name = "Settings"
@@ -78,6 +78,14 @@ files = ["apps/system/barometer/**/locales/{lang}/*.ftl"]
 [[areas]]
 name = "Keys"
 files = ["apps/system/keys/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Rover"
+files = ["apps/system/rover/**/locales/{lang}/*.ftl"]
+
+[[areas]]
+name = "Disks"
+files = ["apps/system/disks/**/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Convertible"

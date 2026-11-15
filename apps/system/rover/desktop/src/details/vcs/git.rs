@@ -1,8 +1,11 @@
 use std::ffi::OsString;
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::command::{args, reading, run_bytes, run_text_with_codes};
 use super::{Statuses, VcsFileStatus, relative_path};
+use crate::l10n::L10N;
 
 #[derive(Default)]
 pub(super) struct Status {
@@ -147,19 +150,19 @@ pub(super) fn sync(root: &Path) -> Result<(), String> {
         .values()
         .any(|status| *status == VcsFileStatus::Conflicted)
     {
-        return Err("Resolve conflicts before syncing".to_string());
+        return Err(t!(L10N, "rover-vcs-conflicts"));
     }
     if status
         .files
         .values()
         .any(|status| *status != VcsFileStatus::Ignored)
     {
-        return Err("Commit or discard changes before syncing".to_string());
+        return Err(t!(L10N, "rover-vcs-uncommitted"));
     }
     let has_upstream = status.ahead.is_some() || status.behind.is_some();
     let (ahead, behind) = (status.ahead.unwrap_or(0), status.behind.unwrap_or(0));
     if ahead > 0 && behind > 0 {
-        return Err("Remote has changes. Pull first from a terminal.".to_string());
+        return Err(t!(L10N, "rover-vcs-behind"));
     }
     if behind > 0 {
         run(root, &["pull", "--rebase"])?;

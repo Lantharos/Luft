@@ -3,6 +3,7 @@
 	import Eject from '@lucide/svelte/icons/eject';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import { t } from '@luft/i18n';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
@@ -42,9 +43,10 @@
 			<button
 				class="sidebar-item__action"
 				type="button"
-				aria-label={`Eject ${device.name}`}
+				aria-label={t('rover-drive-eject-named', { name: device.name })}
 				onclick={() => manager.disconnectNetwork(location.uri)}
-				{@attach tooltip('Eject')}
+				{@attach tooltip(t('rover-drive-eject'))}
+
 			>
 				<Eject size={15} />
 			</button>

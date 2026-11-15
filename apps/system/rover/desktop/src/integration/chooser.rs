@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, OnceLock};
 
+use luft_i18n::t;
 use parking_lot::Mutex;
 use sabine::{SabineProcessHandle, SabineWindow};
 use serde::Serialize;
@@ -9,6 +10,7 @@ use specta::Type;
 use tokio::sync::oneshot;
 
 use crate::APP_NAME;
+use crate::l10n::L10N;
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 #[serde(rename_all = "snake_case")]
@@ -80,7 +82,11 @@ impl Choosers {
         parent: &str,
         closed: impl Fn(u32) + Send + Sync + 'static,
     ) -> Result<oneshot::Receiver<ChooserResponse>, String> {
-        let process = self.inner.process.get().ok_or("Rover is still starting")?;
+        let process = self
+            .inner
+            .process
+            .get()
+            .ok_or_else(|| t!(L10N, "rover-chooser-starting"))?;
         let request = self.inner.last_request.fetch_add(1, Ordering::Relaxed) + 1;
         let title = Some(config.title.as_str())
             .filter(|title| !title.is_empty())
@@ -111,7 +117,7 @@ impl Choosers {
             .lock()
             .get(&request)
             .map(|open| open.config.clone())
-            .ok_or_else(|| "This file chooser has already closed".to_string())
+            .ok_or_else(|| t!(L10N, "rover-chooser-closed"))
     }
 
     /// Answers a chooser. Only its first answer counts, so a window closing

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { PinnedFolder } from '#lib/bindings.js';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
@@ -113,7 +114,7 @@
 <div
 	class={['sidebar-favorites flex flex-col gap-px', receiving && 'is-receiving']}
 	role="group"
-	aria-label="Favorites"
+	aria-label={t('rover-favorites')}
 	ondragenter={groupDragOver}
 	ondragover={groupDragOver}
 	ondragleave={groupDragLeave}
@@ -140,9 +141,9 @@
 				<button
 					class="sidebar-item__action is-reveal"
 					type="button"
-					aria-label={`Remove ${bookmark.name} from Favorites`}
+					aria-label={t('rover-favorites-remove-named', { name: bookmark.name })}
 					onclick={() => bookmarks.unpin(bookmark.path)}
-					{@attach tooltip('Remove from Favorites')}
+					{@attach tooltip(t('rover-menu-remove-favorite'))}
 				>
 					<X size={14} />
 				</button>
@@ -150,7 +151,8 @@
 		</SidebarItem>
 	{/each}
 	{#if receiving && !moving}
-		<p class="sidebar-hint">Drop to add to Favorites</p>
+		<p class="sidebar-hint">{t('rover-favorites-drop')}</p>
+
 	{/if}
 </div>
 

@@ -2,6 +2,8 @@ mod disk;
 mod journal;
 mod layout;
 
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::path::Path;
 
 use luft_app::Events;
@@ -117,7 +119,7 @@ pub async fn finish(events: &Events, id: &str) -> Result<(), String> {
     let journal = Journal::open(&journal::folder(), id).map_err(|error| error.to_string())?;
     let found = layout::find(&udisks::objects().await?, &journal.plan)
         .filter(|found| found.fits(&journal.plan, journal.copied))
-        .ok_or("This drive is gone")?;
+        .ok_or_else(|| t!(L10N, "disks-drive-gone"))?;
     let disk = Disk::open(&found.table).await?;
     carry_out(events, disk, journal).await.map(drop)
 }

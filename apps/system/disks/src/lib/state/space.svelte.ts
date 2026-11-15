@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { commands, events } from '#lib/bindings.js';
 import type { Cleanup, SpaceUpdate } from '#lib/bindings.js';
 import { WAIT } from '#lib/bridge/index.js';
@@ -17,7 +18,7 @@ class Space {
 	title = $derived(this.path.length ? this.label(this.path.at(-1)!, this.path.length - 1) : this.name);
 
 	label(name: string, depth: number) {
-		return this.luft && depth === 0 && name === 'home' ? PART_NAMES.files : name;
+		return this.luft && depth === 0 && name === 'home' ? t(PART_NAMES.files) : name;
 	}
 
 	listen() {

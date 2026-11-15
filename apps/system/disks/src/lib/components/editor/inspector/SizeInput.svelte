@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import { bytes, TextField, tooltip } from '@luft/ui';
 	import { mebibytes, parseSize, unitOf } from '#lib/editor/units.js';
@@ -19,7 +20,7 @@
 	let text = $state('');
 	let fixed = $derived(min >= max);
 	let shown = $derived(exact ? mebibytes(value) : bytes(value));
-	let range = $derived(fixed ? `Stays ${bytes(value)}` : `${bytes(min)} to ${bytes(max)}`);
+	let range = $derived(fixed ? t('disks-editor-size-fixed', { size: bytes(value) }) : t('disks-editor-size-range', { min: bytes(min), max: bytes(max) }));
 
 	$effect.pre(() => {
 		text = shown;
@@ -42,13 +43,13 @@
 </script>
 
 {#snippet unit()}
-	<span class="px-3 text-[13px] leading-7 text-[var(--text-muted)]">MiB</span>
+	<span class="px-3 text-[13px] leading-7 text-[var(--text-muted)]">{t('disks-editor-size-unit')}</span>
 {/snippet}
 
 <div class="min-w-0 flex-1" {@attach tooltip(range)} onfocusin={selectAll} onfocusout={commit}>
 	<TextField
 		bind:this={field}
-		label={exact ? `${label} in MiB` : label}
+		label={exact ? t('disks-editor-size-exact', { label }) : label}
 		inputmode="decimal"
 		disabled={fixed}
 		bind:value={text}

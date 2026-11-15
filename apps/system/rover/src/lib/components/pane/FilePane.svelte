@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { fade } from '@luft/ui';
 	import type { FileEntry } from '#lib/bindings.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
@@ -53,7 +54,8 @@
 
 <section
 	class="pane-stack"
-	aria-label="File browser"
+	aria-label={t('rover-pane-label')}
+
 	ondragover={(event) => (context.chooser ? event.preventDefault() : drag.overEntry(event, undefined, paneKey))}
 	ondrop={(event) => !context.chooser && manager.view === 'home' && drag.drop(event, manager.currentPath)}
 >

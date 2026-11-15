@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { basename, bytes, parent, plural } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { basename, bytes, parent } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import type { FileEntry } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
@@ -28,7 +29,7 @@
 	let folderCount = $derived(selected.filter((item) => item.isDir).length);
 	let drive = $derived(manager.view === 'home' ? manager.drives.holding(manager.currentPath) : undefined);
 	let folderTitle = $derived(
-		manager.view === 'recent' ? 'Recent' : manager.currentPath === manager.homePath ? 'Home' : basename(manager.currentPath) || '/'
+		manager.view === 'recent' ? t('rover-place-recent') : manager.currentPath === manager.homePath ? t('rover-place-home') : basename(manager.currentPath) || '/'
 	);
 
 	$effect(() => inspected.load(entry));
@@ -40,7 +41,14 @@
 		void manager.navigate(folder).then(select);
 	}
 
-	function appear(_node: Element) {
+	function selectionKinds(folders: number, files: number) {
+		if (!files) return t('rover-details-folders', { folders });
+		if (!folders) return t('rover-details-files', { files });
+		return t('rover-details-folders-and-files', { folders, files });
+	}
+
+	function appear(
+_node: Element) {
 		return { duration: 200, easing: cubicOut, css: (t: number) => `opacity: ${t}; scale: ${0.985 + t * 0.015}` };
 	}
 </script>
@@ -60,7 +68,7 @@
 	</dl>
 {/snippet}
 
-<aside class="details-pane soft-scroll" aria-label="Details" transition:appear>
+<aside class="details-pane soft-scroll" aria-label={t('rover-details')} transition:appear>
 	{#if entry}
 		<div class="details-preview">
 			{#key entry.path}
@@ -84,25 +92,21 @@
 			{/each}
 		</div>
 		<div class="details-heading-block">
-			<h2 class="details-title">{plural(selected.length, 'item')}</h2>
-			<p class="details-subtitle">
-				{[folderCount && plural(folderCount, 'folder'), selected.length - folderCount && plural(selected.length - folderCount, 'file')]
-					.filter(Boolean)
-					.join(', ')}
-			</p>
+			<h2 class="details-title">{t('rover-details-items', { count: selected.length })}</h2>
+			<p class="details-subtitle">{selectionKinds(folderCount, selected.length - folderCount)}</p>
 		</div>
-		{@render metadata(totalSize > 0 ? [{ label: 'Size', value: bytes(totalSize) }] : [])}
+		{@render metadata(totalSize > 0 ? [{ label: t('rover-details-size'), value: bytes(totalSize) }] : [])}
 	{:else}
 		<div class="details-preview">
 			<EntryIcon kind={manager.view === 'recent' ? 'file' : 'folder'} size={96} />
 		</div>
 		<div class="details-heading-block">
 			<h2 class="details-title">{folderTitle}</h2>
-			<p class="details-subtitle">{plural(manager.displayEntries.length, 'item')}</p>
+			<p class="details-subtitle">{t('rover-details-items', { count: manager.displayEntries.length })}</p>
 		</div>
 		{@render metadata([
-			...(manager.view === 'home' ? [{ label: 'Where', value: tildePath(manager.currentPath, manager.homePath) }] : []),
-			...(drive ? [{ label: 'Free space', value: `${bytes(drive.availableSpace)} of ${bytes(drive.totalSpace)}` }] : [])
+			...(manager.view === 'home' ? [{ label: t('rover-details-where'), value: tildePath(manager.currentPath, manager.homePath) }] : []),
+			...(drive ? [{ label: t('rover-details-free-space'), value: t('rover-details-free-space-value', { free: bytes(drive.availableSpace), total: bytes(drive.totalSpace) }) }] : [])
 		])}
 	{/if}
 </aside>

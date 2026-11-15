@@ -1,8 +1,11 @@
 use gio::prelude::*;
 use luft_app::apps::App;
 use luft_app::launch;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 const CONVERTER: &str = "com.lantharos.convertible.desktop";
 
@@ -41,7 +44,7 @@ pub fn apps_for(path: &str) -> OpenWithApps {
 }
 
 pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<bool, String> {
-    let app = gio_unix::DesktopAppInfo::new(app).ok_or("This app is no longer installed")?;
+    let app = gio_unix::DesktopAppInfo::new(app).ok_or_else(|| t!(L10N, "rover-apps-missing"))?;
     open_in(app.upcast_ref(), &gio::File::for_path(path), token)
 }
 
@@ -58,8 +61,8 @@ pub fn converter_installed() -> bool {
 }
 
 pub fn convert(paths: &[String], token: Option<&str>) -> Result<(), String> {
-    let app =
-        gio_unix::DesktopAppInfo::new(CONVERTER).ok_or("Convertible is no longer installed")?;
+    let app = gio_unix::DesktopAppInfo::new(CONVERTER)
+        .ok_or_else(|| t!(L10N, "rover-apps-converter-missing"))?;
     let files: Vec<gio::File> = paths.iter().map(gio::File::for_path).collect();
     launch::open_files(app.upcast_ref(), &files, token).map_err(|error| error.to_string())
 }

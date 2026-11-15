@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { commands } from '#lib/bindings.js';
 import type { Drive, Volume } from '#lib/bindings.js';
 import { WAIT, openFolder } from '#lib/bridge/index.js';
@@ -16,7 +17,7 @@ export interface Action {
 	checked?: boolean;
 }
 
-const MOVE_LUFT: Action = { label: 'Move Luft to another drive…', run: () => dialogs.open({ kind: 'move-luft' }) };
+const moveLuft = (): Action => ({ label: t('disks-action-move-luft'), run: () => dialogs.open({ kind: 'move-luft' }) });
 
 function act(volume: Volume, action: () => Promise<unknown>) {
 	void disks.run(volume.block, action);
@@ -31,9 +32,9 @@ function unlock(volume: Volume) {
 
 function imageActions(drive: Drive, block: string, name: string): Action[] {
 	return [
-		{ label: 'Save as disk image…', run: () => dialogs.open({ kind: 'save-image', block, name }) },
+		{ label: t('disks-action-save-image'), run: () => dialogs.open({ kind: 'save-image', block, name }) },
 		{
-			label: 'Restore disk image…',
+			label: t('disks-action-restore-image'),
 			run: () =>
 				void disks.run(block, async () => {
 					const image = await commands.disksImageChoose();
@@ -58,11 +59,11 @@ export function primaryAction(drive: Drive, volume: Volume): Action | null {
 	const contents = inner(volume);
 	const mounted = contents.mountPoints.length > 0;
 	if (isProtected(volume) || drive.readOnly) return null;
-	if (volume.encryption && !volume.encryption.cleartext) return { label: 'Unlock', run: () => unlock(volume) };
+	if (volume.encryption && !volume.encryption.cleartext) return { label: t('disks-action-unlock'), run: () => unlock(volume) };
 	const encryption = disks.encryption(volume);
-	if (encryption && (encryption.state === 'paused' || encryption.state === 'waiting')) return { label: 'Resume', run: () => resume(drive, volume) };
-	if (mounted) return { label: 'Open', run: () => void openFolder(contents.mountPoints[0]) };
-	if (contents.usage === 'filesystem') return { label: 'Mount', run: () => act(volume, () => commands.disksMount({ block: contents.block }, WAIT)) };
+	if (encryption && (encryption.state === 'paused' || encryption.state === 'waiting')) return { label: t('disks-action-resume'), run: () => resume(drive, volume) };
+	if (mounted) return { label: t('disks-action-open'), run: () => void openFolder(contents.mountPoints[0]) };
+	if (contents.usage === 'filesystem') return { label: t('disks-action-mount'), run: () => act(volume, () => commands.disksMount({ block: contents.block }, WAIT)) };
 	return null;
 }
 
@@ -72,47 +73,47 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	const filesystem = contents.usage === 'filesystem';
 	const name = volumeName(volume);
 	const look: Action[] = [];
-	if (mounted && isProtected(volume) && !disks.holdsLuft(volume)) look.push({ label: 'Open', run: () => void openFolder(contents.mountPoints[0]) });
-	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.exploreVolume(volume) });
-	look.push({ label: 'Details', run: () => dialogs.open({ kind: 'details', drive, volume }) });
-	if (luftVolume(drive)?.block === volume.block) return [look, [MOVE_LUFT]];
+	if (mounted && isProtected(volume) && !disks.holdsLuft(volume)) look.push({ label: t('disks-action-open'), run: () => void openFolder(contents.mountPoints[0]) });
+	if (explorable(volume)) look.push({ label: t('disks-explore'), run: () => disks.exploreVolume(volume) });
+	look.push({ label: t('disks-action-details'), run: () => dialogs.open({ kind: 'details', drive, volume }) });
+	if (luftVolume(drive)?.block === volume.block) return [look, [moveLuft()]];
 	if (isProtected(volume) || drive.readOnly) return [look];
 
 	const state: Action[] = [];
-	if (mounted && filesystem) state.push({ label: 'Unmount', run: () => act(volume, () => commands.disksUnmount({ block: contents.block }, WAIT)) });
-	if (volume.encryption?.cleartext) state.push({ label: 'Lock', run: () => act(volume, () => commands.disksLock({ block: volume.block }, WAIT)) });
+	if (mounted && filesystem) state.push({ label: t('disks-action-unmount'), run: () => act(volume, () => commands.disksUnmount({ block: contents.block }, WAIT)) });
+	if (volume.encryption?.cleartext) state.push({ label: t('disks-action-lock'), run: () => act(volume, () => commands.disksLock({ block: volume.block }, WAIT)) });
 
 	const edit: Action[] = [];
 	if (filesystem) {
-		edit.push({ label: 'Rename…', run: () => dialogs.open({ kind: 'label', volume: contents }) });
-		if (!drive.removable) edit.push({ label: 'Mount at startup…', run: () => dialogs.open({ kind: 'startup', volume: contents }) });
+		edit.push({ label: t('disks-action-rename'), run: () => dialogs.open({ kind: 'label', volume: contents }) });
+		if (!drive.removable) edit.push({ label: t('disks-action-startup'), run: () => dialogs.open({ kind: 'startup', volume: contents }) });
 	}
-	if (volume.number !== null && drive.table) edit.push({ label: 'Resize or move…', run: () => editor.open(drive.id, volume.block) });
+	if (volume.number !== null && drive.table) edit.push({ label: t('disks-action-resize'), run: () => editor.open(drive.id, volume.block) });
 
 	const encryption: Action[] = [];
 	const progress = disks.encryption(volume);
 	if (disks.protection.available && volume.encryption) {
-		encryption.push({ label: 'Encryption…', run: () => dialogs.open({ kind: 'encryption', drive, volume }) });
+		encryption.push({ label: t('disks-action-encryption'), run: () => dialogs.open({ kind: 'encryption', drive, volume }) });
 		if (progress?.state === 'encrypting' || progress?.state === 'decrypting') {
-			encryption.push({ label: 'Pause', run: () => act(volume, () => commands.trustPause({ uuid: volume.uuid }, WAIT)) });
+			encryption.push({ label: t('disks-action-pause'), run: () => act(volume, () => commands.trustPause({ uuid: volume.uuid }, WAIT)) });
 		}
 	} else if (disks.protection.available && (filesystem || !contents.usage) && !changing(progress)) {
-		encryption.push({ label: 'Turn on encryption…', run: () => dialogs.open({ kind: 'encrypt', drive, volume }) });
+		encryption.push({ label: t('disks-action-encrypt'), run: () => dialogs.open({ kind: 'encrypt', drive, volume }) });
 	} else if (volume.encryption) {
-		encryption.push({ label: 'Change passphrase…', run: () => dialogs.open({ kind: 'passphrase', volume }) });
-		if (remembered) encryption.push({ label: 'Forget saved passphrase', run: () => act(volume, () => commands.disksForgetPassphrase({ block: volume.block }, WAIT)) });
+		encryption.push({ label: t('disks-action-passphrase'), run: () => dialogs.open({ kind: 'passphrase', volume }) });
+		if (remembered) encryption.push({ label: t('disks-action-forget'), run: () => act(volume, () => commands.disksForgetPassphrase({ block: volume.block }, WAIT)) });
 	}
 
-	const erase: Action[] = [{ label: 'Format…', run: () => dialogs.open({ kind: 'format-volume', drive, volume }), danger: true }];
-	if (volume.number !== null) erase.push({ label: 'Delete partition…', run: () => dialogs.open({ kind: 'delete', drive, volume }), danger: true });
+	const erase: Action[] = [{ label: t('disks-action-format'), run: () => dialogs.open({ kind: 'format-volume', drive, volume }), danger: true }];
+	if (volume.number !== null) erase.push({ label: t('disks-action-delete'), run: () => dialogs.open({ kind: 'delete', drive, volume }), danger: true });
 
 	return [look, state, edit, encryption, imageActions(drive, volume.block, name), erase];
 }
 
 export function driveMenu(drive: Drive): Action[][] {
-	const about: Action[] = [{ label: 'Drive details', run: () => dialogs.open({ kind: 'drive', drive }) }];
-	const edit: Action[] = drive.table && !drive.readOnly ? [{ label: 'Edit partitions…', run: () => editor.open(drive.id) }] : [];
-	if (luftVolume(drive)) return [about, edit, [MOVE_LUFT]];
+	const about: Action[] = [{ label: t('disks-action-drive-details'), run: () => dialogs.open({ kind: 'drive', drive }) }];
+	const edit: Action[] = drive.table && !drive.readOnly ? [{ label: t('disks-action-edit'), run: () => editor.open(drive.id) }] : [];
+	if (luftVolume(drive)) return [about, edit, [moveLuft()]];
 	if (drive.system || drive.readOnly) return [about, edit];
-	return [about, edit, imageActions(drive, drive.block, drive.name), [{ label: 'Format drive…', run: () => dialogs.open({ kind: 'format-drive', drive }), danger: true }]];
+	return [about, edit, imageActions(drive, drive.block, drive.name), [{ label: t('disks-action-format-drive'), run: () => dialogs.open({ kind: 'format-drive', drive }), danger: true }]];
 }

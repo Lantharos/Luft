@@ -2,7 +2,8 @@
 	import File from '@lucide/svelte/icons/file';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Save from '@lucide/svelte/icons/save';
-	import { plural, Select } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { Select } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 
 	interface Props {
@@ -21,12 +22,14 @@
 
 	let config = $derived(chooser.config);
 	let selectionText = $derived.by(() => {
-		if (config.mode === 'save') return 'Save as';
-		if (config.mode === 'save_files') return plural(config.files.length, 'file');
-		if (selectedCount > 0) return `${selectedCount} selected`;
-		return config.directory ? 'Select a folder' : 'Select a file';
+		if (config.mode === 'save') return t('rover-chooser-save-as');
+		if (config.mode === 'save_files') return t('rover-chooser-files', { count: config.files.length });
+		if (selectedCount > 0) return t('rover-chooser-selected', { count: selectedCount });
+		return config.directory ? t('rover-chooser-pick-folder') : t('rover-chooser-pick-file');
 	});
-	let acceptLabel = $derived(config.acceptLabel.trim() || (config.mode === 'save' ? 'Save' : config.mode === 'save_files' ? 'Select' : 'Open'));
+	let acceptLabel = $derived(
+		config.acceptLabel.trim() || (config.mode === 'save' ? t('rover-chooser-save') : config.mode === 'save_files' ? t('rover-chooser-select') : t('rover-open'))
+	);
 	let Icon = $derived(config.mode === 'save' ? Save : config.directory || config.mode === 'save_files' ? FolderOpen : File);
 
 	function focusName(input: HTMLInputElement) {
@@ -61,7 +64,7 @@
 
 	{#if chooser.filter !== null}
 		<Select
-			label="Kind of file"
+			label={t('rover-chooser-filter')}
 			options={config.filters.map((filter, index) => ({ value: index, label: filter.name }))}
 			value={chooser.filter}
 			onchange={(index) => (chooser.filter = index)}
@@ -70,13 +73,13 @@
 
 	{#if config.mode === 'save'}
 		<div class="flex w-[320px] min-w-0 items-center gap-2">
-			<span class="shrink-0 text-[12px] text-[var(--text-muted)]">Name</span>
+			<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{t('rover-chooser-name')}</span>
 			<input
 				{@attach focusName}
 				class="h-10 min-w-0 flex-1 rounded-full bg-[var(--control)] px-4 text-[13px] font-medium text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] placeholder:font-normal placeholder:text-[var(--text-muted)] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_20%,transparent)]"
 				value={chooser.saveName}
-				placeholder="Untitled"
-				aria-label="File name"
+				placeholder={t('rover-chooser-untitled')}
+				aria-label={t('rover-chooser-file-name')}
 				spellcheck="false"
 				autocomplete="off"
 				autocapitalize="off"
@@ -87,7 +90,8 @@
 	{/if}
 
 	<div class="flex shrink-0 items-center gap-2">
-		<button class={[BUTTON, SECONDARY]} type="button" onclick={chooser.cancel}>Cancel</button>
+		<button class={[BUTTON, SECONDARY]} type="button" onclick={chooser.cancel}>{t('rover-cancel')}</button>
+
 		<button class={[BUTTON, PRIMARY]} type="button" disabled={!chooser.canAccept} onclick={() => chooser.submit()}>
 			{acceptLabel}
 		</button>

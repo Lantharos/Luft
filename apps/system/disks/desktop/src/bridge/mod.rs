@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::path::Path;
 
 use gio::prelude::*;
@@ -23,10 +25,6 @@ use requests::{
 };
 
 mod requests;
-
-const CHANGING: &str = "Changing partitions";
-const FORMATTING: &str = "Formatting a drive";
-const REMOVING: &str = "Removing another system";
 
 #[derive(Clone, Default)]
 pub struct State {
@@ -82,7 +80,7 @@ fn register_trust(window: SabineWindow) -> SabineWindow {
              }| async move {
                 Guard::erasable(&block).await?;
                 hold::during(
-                    FORMATTING,
+                    &t!(L10N, "disks-hold-formatting"),
                     encryption_drives::format(&block, format, &recovery_key, auto_unlock),
                 )
                 .await
@@ -161,7 +159,11 @@ fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
             "disks_plan_step",
             state,
             |state, NextStep { step }| async move {
-                hold::during(CHANGING, plan::run(&state.events, step)).await
+                hold::during(
+                    &t!(L10N, "disks-hold-changing"),
+                    plan::run(&state.events, step),
+                )
+                .await
             },
         )
         .command_async("disks_interrupted_moves", |Empty {}| async {
@@ -171,7 +173,11 @@ fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
             "disks_finish_move",
             state,
             |state, PendingMove { id }| async move {
-                hold::during(CHANGING, plan::moving::finish(&state.events, &id)).await
+                hold::during(
+                    &t!(L10N, "disks-hold-changing"),
+                    plan::moving::finish(&state.events, &id),
+                )
+                .await
             },
         )
 }
@@ -184,7 +190,7 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
             state,
             |state, SystemId { id }| async move {
                 hold::during(
-                    REMOVING,
+                    &t!(L10N, "disks-hold-removing"),
                     systems::remove(&id, |step| {
                         state.events.emit(SYSTEM_STEP, step);
                     }),
@@ -202,7 +208,11 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
             "disks_give_luft",
             state,
             |state, Room { offset }| async move {
-                hold::during(CHANGING, luft::give(&state.events, offset)).await
+                hold::during(
+                    &t!(L10N, "disks-hold-changing"),
+                    luft::give(&state.events, offset),
+                )
+                .await
             },
         )
         .command_async("disks_cancel_system_resize", |Empty {}| {
@@ -268,7 +278,11 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
             "disks_format_volume",
             |FormatVolume { block, format }| async move {
                 Guard::erasable(&block).await?;
-                hold::during(FORMATTING, formatting::format_volume(&block, &format)).await
+                hold::during(
+                    &t!(L10N, "disks-hold-formatting"),
+                    formatting::format_volume(&block, &format),
+                )
+                .await
             },
         )
         .command_async(
@@ -281,7 +295,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
              }| async move {
                 Guard::erasable(&block).await?;
                 hold::during(
-                    FORMATTING,
+                    &t!(L10N, "disks-hold-formatting"),
                     formatting::format_drive(&block, size, removable, &format),
                 )
                 .await
@@ -297,7 +311,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
              }| async move {
                 Guard::table(&table).await?.free(offset, size)?;
                 hold::during(
-                    FORMATTING,
+                    &t!(L10N, "disks-hold-formatting"),
                     formatting::create_partition(&table, offset, size, &format, true),
                 )
                 .await

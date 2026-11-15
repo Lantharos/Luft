@@ -5,6 +5,9 @@ use std::process::{Command, Stdio};
 use std::thread;
 
 use gio::prelude::*;
+use luft_i18n::t;
+
+use crate::l10n::L10N;
 
 const TERN: &str = "com.lantharos.tern.desktop";
 
@@ -14,11 +17,11 @@ pub fn open(path: &str, token: Option<&str>) -> Result<(), String> {
         path
     } else {
         path.parent()
-            .ok_or("This folder can't be opened in a terminal")?
+            .ok_or_else(|| t!(L10N, "rover-terminal-no-folder"))?
     };
     let mut working_directory = OsString::from("--working-directory=");
     working_directory.push(folder);
-    let mut command = Command::new(tern().ok_or("Tern isn't installed")?);
+    let mut command = Command::new(tern().ok_or_else(|| t!(L10N, "rover-terminal-missing"))?);
     luft_app::launch::pass_token(&mut command, token);
     command
         .arg(working_directory)
@@ -31,7 +34,7 @@ pub fn open(path: &str, token: Option<&str>) -> Result<(), String> {
         .map(|mut child| {
             thread::spawn(move || child.wait());
         })
-        .map_err(|error| format!("Tern couldn't start: {error}"))
+        .map_err(|error| t!(L10N, "rover-terminal-failed", error = error.to_string()))
 }
 
 fn tern() -> Option<PathBuf> {

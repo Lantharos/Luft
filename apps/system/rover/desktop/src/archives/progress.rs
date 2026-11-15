@@ -2,7 +2,10 @@ use std::cell::Cell;
 use std::io::{self, Read, Seek, SeekFrom};
 use std::path::Path;
 
+use luft_i18n::t;
+
 use crate::files::operations::{OperationStatus, OperationsQueue};
+use crate::l10n::L10N;
 
 pub(super) struct Progress<'a> {
     queue: &'a OperationsQueue,
@@ -23,7 +26,9 @@ impl<'a> Progress<'a> {
 
     pub fn guard(&self) -> io::Result<()> {
         match self.queue.status_once_unpaused(self.id) {
-            Some(OperationStatus::Cancelled) => Err(io::Error::other("Operation cancelled")),
+            Some(OperationStatus::Cancelled) => {
+                Err(io::Error::other(t!(L10N, "rover-operations-cancelled")))
+            }
             _ => Ok(()),
         }
     }

@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
 import { commands } from '#lib/bindings.js';
@@ -69,7 +70,8 @@ export class NetworkState {
 
 	connect = async (typed: string, keep = false) => {
 		const uri = normalizeAddress(typed);
-		if (!uri) throw new Error('That doesn’t look like a server address');
+		if (!uri) throw new Error(t('rover-connect-invalid-address'));
+
 		const known = this.#pathFor(uri);
 		if (known) return known;
 		const location = await this.#mount(uri);

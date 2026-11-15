@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::SystemTime;
 
+use luft_i18n::t;
 use parking_lot::Mutex;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
@@ -12,8 +13,9 @@ use specta::Type;
 
 use super::privileged::{self, is_permission_error};
 use super::rename::valid_name;
-use crate::files::text::quoted;
+use crate::files::text::name_of;
 use crate::history::{History, Step};
+use crate::l10n::L10N;
 use crate::locations::{cloud, drives, network};
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -50,9 +52,9 @@ pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryConten
     let directory = PathBuf::from(&path);
     if !directory.is_dir() {
         return Err(if directory.exists() {
-            format!("Path is not a directory: {path}")
+            t!(L10N, "rover-files-not-folder", path = path.as_str())
         } else {
-            format!("Path does not exist: {path}")
+            t!(L10N, "rover-files-missing", path = path.as_str())
         });
     }
 
@@ -90,7 +92,11 @@ pub fn create_file(path: String, name: String, history: &History) -> Result<File
     {
         Ok(_) => {}
         Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-            return Err(format!("File already exists: {}", file_path.display()));
+            return Err(t!(
+                L10N,
+                "rover-files-file-exists",
+                path = file_path.display().to_string()
+            ));
         }
         Err(error) if is_permission_error(&error) => {
             privileged::make_file(&file_path)?;
@@ -110,11 +116,11 @@ pub fn create_directory(
     match fs::create_dir(&dir_path) {
         Ok(()) => {}
         Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-            return Err(format!("Folder already exists: {}", dir_path.display()));
+            return Err(folder_exists(&dir_path));
         }
         Err(error) if is_permission_error(&error) => {
             if !privileged::make_folder(&dir_path)? {
-                return Err(format!("Folder already exists: {}", dir_path.display()));
+                return Err(folder_exists(&dir_path));
             }
         }
         Err(error) => return Err(error.to_string()),
@@ -123,15 +129,25 @@ pub fn create_directory(
     file_entry(&dir_path).map_err(|error| error.to_string())
 }
 
+fn folder_exists(path: &Path) -> String {
+    t!(
+        L10N,
+        "rover-files-folder-exists",
+        path = path.display().to_string()
+    )
+}
+
 pub fn rename_item(path: String, new_name: String, history: &History) -> Result<FileEntry, String> {
     let old_path = PathBuf::from(path);
-    let parent = old_path.parent().ok_or("Cannot rename the root folder")?;
+    let parent = old_path
+        .parent()
+        .ok_or_else(|| t!(L10N, "rover-files-rename-root"))?;
     let new_path = parent.join(valid_name(&new_name)?);
 
     match super::rename_no_replace(&old_path, &new_path) {
         Ok(()) => {}
         Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-            return Err("An item with that name already exists".to_string());
+            return Err(t!(L10N, "rover-files-name-taken"));
         }
         Err(error) if is_permission_error(&error) => {
             privileged::rename(&old_path, &new_path)?;
@@ -139,11 +155,17 @@ pub fn rename_item(path: String, new_name: String, history: &History) -> Result<
         Err(error) => return Err(error.to_string()),
     }
     history.record(
-        format!("Renamed {} to {}", quoted(&old_path), quoted(&new_path)),
-        format!(
-            "Renamed {} back to {}",
-            quoted(&new_path),
-            quoted(&old_path)
+        t!(
+            L10N,
+            "rover-history-renamed",
+            from = name_of(&old_path),
+            to = name_of(&new_path)
+        ),
+        t!(
+            L10N,
+            "rover-history-renamed-back",
+            from = name_of(&new_path),
+            to = name_of(&old_path)
         ),
         vec![Step::Moved {
             from: old_path,
@@ -156,19 +178,22 @@ pub fn rename_item(path: String, new_name: String, history: &History) -> Result<
 
 fn record_created(path: &Path, history: &History) {
     history.record(
-        format!("Created {}", quoted(path)),
-        format!("Moved {} to the trash", quoted(path)),
+        t!(L10N, "rover-history-created", name = name_of(path)),
+        t!(
+            L10N,
+            "rover-history-trashed",
+            count = 1,
+            name = name_of(path)
+        ),
         vec![Step::Created(path.to_path_buf())],
         false,
     );
 }
 
-pub fn user_dirs() -> Result<UserDirs, String> {
+pub fn user_dirs() -> Option<UserDirs> {
     let display = |path: PathBuf| path.to_string_lossy().into_owned();
-    Ok(UserDirs {
-        home: dirs::home_dir()
-            .map(display)
-            .ok_or("Could not determine home directory")?,
+    Some(UserDirs {
+        home: dirs::home_dir().map(display)?,
         documents: dirs::document_dir().map(display),
         downloads: dirs::download_dir().map(display),
         pictures: dirs::picture_dir().map(display),

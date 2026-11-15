@@ -6,8 +6,11 @@ use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::path::Path;
 
 use gio::prelude::*;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 pub use measure::{Measurement, Measurements};
 
@@ -55,9 +58,9 @@ pub fn set_default_app(path: &str, app: &str) -> Result<(), String> {
         )
         .map_err(|error| error.to_string())?
         .content_type()
-        .ok_or("This kind of file can't have a default app")?;
+        .ok_or_else(|| t!(L10N, "rover-apps-no-default"))?;
     gio_unix::DesktopAppInfo::new(app)
-        .ok_or("This app is no longer installed")?
+        .ok_or_else(|| t!(L10N, "rover-apps-missing"))?
         .set_as_default_for_type(&content_type)
         .map_err(|error| error.to_string())
 }

@@ -1,4 +1,5 @@
-import { bytes, plural } from '@luft/ui';
+import { t } from '@luft/i18n';
+import { bytes } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { Drive, FileEntry } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
@@ -16,10 +17,10 @@ export async function keep(manager: FileManager, entries: FileEntry[]) {
 }
 
 export async function free(manager: FileManager, entries: FileEntry[]) {
-	history.working('Sending changes up before freeing space');
+	history.working(t('rover-cloud-freeing'));
 	try {
 		await commands.cloudFree({ paths: paths(entries) }, { timeoutMs: 600_000 });
-		history.inform(entries.length === 1 ? `${entries[0].name} is online only now` : 'Freed up space');
+		history.inform(entries.length === 1 ? t('rover-cloud-freed-one', { name: entries[0].name }) : t('rover-cloud-freed'));
 	} catch (caught) {
 		history.dismiss();
 		manager.notify(caught);
@@ -30,7 +31,7 @@ export async function copyShareLink(manager: FileManager, entry: FileEntry) {
 	try {
 		const link = await commands.cloudShareLink({ path: entry.path }, { timeoutMs: 60_000 });
 		await navigator.clipboard.writeText(link);
-		history.inform('Share link copied');
+		history.inform(t('rover-cloud-link-copied'));
 	} catch (caught) {
 		manager.notify(caught);
 	}
@@ -41,11 +42,12 @@ export async function openInBrowser(manager: FileManager, entry: FileEntry) {
 }
 
 export function describe(drive: Drive) {
-	if (drive.state === 'signInAgain') return 'Sign in again in Settings';
-	if (drive.state === 'offline') return drive.kept.length ? 'Offline, showing what’s kept on this device' : 'Offline';
-	if (drive.state === 'connecting') return 'Connecting';
-	if (drive.state === 'problem') return drive.problem ?? 'Not connected';
-	if (drive.paused) return drive.paused === 'metered' ? 'Syncing paused on a metered connection' : 'Syncing paused while the battery is low';
-	if (drive.syncing > 0) return `Syncing ${plural(drive.syncing, 'change')}`;
-	return drive.usage ? `${bytes(drive.usage.used)} of ${bytes(drive.usage.total)} used` : null;
+	if (drive.state === 'signInAgain') return t('rover-cloud-sign-in-again');
+	if (drive.state === 'offline') return drive.kept.length ? t('rover-cloud-offline-kept') : t('rover-cloud-offline');
+	if (drive.state === 'connecting') return t('rover-cloud-connecting');
+	if (drive.state === 'problem') return drive.problem ?? t('rover-cloud-not-connected');
+	if (drive.paused) return drive.paused === 'metered' ? t('rover-cloud-paused-metered') : t('rover-cloud-paused-battery');
+	if (drive.syncing > 0) return t('rover-cloud-syncing-changes', { count: drive.syncing });
+	return drive.usage ? t('rover-cloud-usage', { used: bytes(drive.usage.used), total: bytes(drive.usage.total) }) : null;
+
 }

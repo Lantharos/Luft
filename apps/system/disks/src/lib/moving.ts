@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { bytes } from '@luft/ui';
 import type { LuftMove, MoveChoice, MoveDestination, MoveShrink } from './bindings';
 
@@ -36,12 +37,12 @@ export function usable(options: LuftMove, destination: MoveDestination) {
 
 export function driveNote(options: LuftMove, destination: MoveDestination) {
 	if (destination.refused) return destination.refused;
-	if (fits(options, destination, { kind: 'free' })) return `${bytes(destination.free?.size ?? 0)} free`;
+	if (fits(options, destination, { kind: 'free' })) return t('disks-free', { size: bytes(destination.free?.size ?? 0) });
 	const shrink = destination.shrink.find((candidate) => fits(options, destination, { kind: 'shrink', block: candidate.block }));
-	if (shrink) return `Room can be made on ${shrink.name}`;
-	if (!destination.erase.refused && fits(options, destination, { kind: 'erase' })) return 'Can be erased for Luft';
+	if (shrink) return t('disks-move-note-shrink', { name: shrink.name });
+	if (!destination.erase.refused && fits(options, destination, { kind: 'erase' })) return t('disks-move-note-erase');
 	if (destination.erase.refused && destination.size >= options.needs.luft) return destination.erase.refused;
-	return `Too small. Luft needs ${bytes(options.needs.luft)}`;
+	return t('disks-move-note-small', { size: bytes(options.needs.luft) });
 }
 
 export function shrunkSize(shrink: MoveShrink, luft: number) {

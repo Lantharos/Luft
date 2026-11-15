@@ -3,6 +3,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Server from '@lucide/svelte/icons/server';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import { t } from '@luft/i18n';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
@@ -50,9 +51,10 @@
 			<button
 				class="sidebar-item__action"
 				type="button"
-				aria-label={`Disconnect ${location.name}`}
+				aria-label={t('rover-network-disconnect-named', { name: location.name })}
 				onclick={() => manager.disconnectNetwork(location.uri)}
-				{@attach tooltip('Disconnect')}
+				{@attach tooltip(t('rover-network-disconnect'))}
+
 			>
 				<Eject size={15} />
 			</button>

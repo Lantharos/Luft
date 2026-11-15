@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
-	import { Dialog, errorText, plural, Segmented, TextField } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { Dialog, errorText, Segmented, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { ArchiveFormat, FileEntry } from '#lib/bindings.js';
 	import { archiveName } from '#lib/features/archives.js';
@@ -24,7 +25,7 @@
 	let error = $state<string | null>(null);
 
 	let hint = $derived(
-		format === 'zip' ? 'Opens on any computer.' : 'Smaller and faster, for Linux and other Unix systems.'
+		format === 'zip' ? t('rover-compress-zip-hint') : t('rover-compress-tar-hint')
 	);
 	let valid = $derived(name.trim().length > 0 && !name.includes('/'));
 
@@ -43,17 +44,17 @@
 	}
 </script>
 
-<Dialog title={`Compress ${entries.length === 1 ? `“${entries[0].name}”` : plural(entries.length, 'item')}`} {onclose}>
+<Dialog title={entries.length === 1 ? t('rover-compress-title-one', { name: entries[0].name }) : t('rover-compress-title', { count: entries.length })} {onclose}>
 	<TextField
 		bind:this={field}
-		label="Archive name"
-		placeholder="Archive name"
+		label={t('rover-compress-name')}
+		placeholder={t('rover-compress-name')}
 		bind:value={name}
 		invalid={!valid}
 		onkeydown={(event) => event.key === 'Enter' && void submit()}
 	/>
 	<div class="flex flex-col gap-2">
-		<Segmented label="Format" options={FORMATS} value={format} onchange={(value) => (format = value)} />
+		<Segmented label={t('rover-compress-format')} options={FORMATS} value={format} onchange={(value) => (format = value)} />
 		<p class="px-1 text-[12px] text-[var(--text-muted)]">{hint}</p>
 	</div>
 	{#if error}
@@ -61,7 +62,8 @@
 	{/if}
 
 	{#snippet actions()}
-		<button class="button" type="button" onclick={onclose}>Cancel</button>
-		<button class="button primary" type="button" disabled={!valid} onclick={submit}>Compress</button>
+		<button class="button" type="button" onclick={onclose}>{t('rover-cancel')}</button>
+		<button class="button primary" type="button" disabled={!valid} onclick={submit}>{t('rover-compress-confirm')}</button>
+
 	{/snippet}
 </Dialog>

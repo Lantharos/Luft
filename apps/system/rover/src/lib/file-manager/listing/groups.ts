@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { month } from '@luft/ui';
 import type { FileEntry, GroupBy } from '#lib/bindings.js';
 import { fileKind, type FileKind } from '#lib/utils/kinds.js';
@@ -9,15 +10,15 @@ type Bucket = { key: string; label: string; rank: number; entries: FileEntry[] }
 
 const DAY_MS = 86_400_000;
 const KINDS: [FileKind, string][] = [
-	['folder', 'Folders'],
-	['document', 'Documents'],
-	['image', 'Images'],
-	['video', 'Videos'],
-	['audio', 'Audio'],
-	['code', 'Text and code'],
-	['archive', 'Archives'],
-	['package', 'Apps and packages'],
-	['file', 'Other']
+	['folder', 'rover-group-folder'],
+	['document', 'rover-group-document'],
+	['image', 'rover-group-image'],
+	['video', 'rover-group-video'],
+	['audio', 'rover-group-audio'],
+	['code', 'rover-group-code'],
+	['archive', 'rover-group-archive'],
+	['package', 'rover-group-package'],
+	['file', 'rover-group-file']
 ];
 const KIND_RANK = new Map(KINDS.map(([kind], index) => [kind, index]));
 const KIND_LABEL = new Map(KINDS);
@@ -41,7 +42,7 @@ export function groupEntries(entries: FileEntry[], groupBy: GroupBy, oldestFirst
 
 function kindBucket(entry: FileEntry) {
 	const kind = fileKind(entry);
-	return { key: kind, label: KIND_LABEL.get(kind)!, rank: KIND_RANK.get(kind)! };
+	return { key: kind, label: t(KIND_LABEL.get(kind)!), rank: KIND_RANK.get(kind)! };
 }
 
 function dateBucket(oldestFirst: boolean) {
@@ -50,13 +51,14 @@ function dateBucket(oldestFirst: boolean) {
 	const thisYear = now.getFullYear();
 	const direction = oldestFirst ? 1 : -1;
 	const recent: [number, string, string][] = [
-		[today, 'today', 'Today'],
-		[today - DAY_MS, 'yesterday', 'Yesterday'],
-		[today - 7 * DAY_MS, 'week', 'Previous 7 days'],
-		[today - 30 * DAY_MS, 'month', 'Previous 30 days']
+		[today, 'today', t('rover-group-today')],
+		[today - DAY_MS, 'yesterday', t('rover-group-yesterday')],
+		[today - 7 * DAY_MS, 'week', t('rover-group-week')],
+		[today - 30 * DAY_MS, 'month', t('rover-group-month')]
 	];
 	return (entry: FileEntry) => {
-		if (entry.modified === null) return { key: 'unknown', label: 'No date', rank: Infinity };
+		if (entry.modified === null) return { key: 'unknown', label: t('rover-group-no-date'), rank: Infinity };
+
 		const time = entry.modified * 1000;
 		const recently = recent.find(([start]) => time >= start);
 		if (recently) return { key: recently[1], label: recently[2], rank: recently[0] * direction };

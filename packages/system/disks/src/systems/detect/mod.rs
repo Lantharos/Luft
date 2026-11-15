@@ -1,7 +1,10 @@
 use std::collections::HashSet;
 
+use luft_i18n::t;
+
 use super::facts::{EarlierLuft, Facts, OldSystem, OtherStartup};
 use super::{Kind, Part, Role, Startup, System, names};
+use crate::L10N;
 use crate::udisks::snapshot::{Drive, Snapshot};
 use crate::udisks::volumes::{Segment, Volume};
 
@@ -362,7 +365,7 @@ fn earlier_luft(snapshot: &Snapshot, earlier: &EarlierLuft) -> Option<System> {
     Some(System {
         id: "earlier-luft".to_owned(),
         kind: Kind::EarlierLuft,
-        name: "Luft’s earlier copy".to_owned(),
+        name: t!(L10N, "luft-disks-system-earlier-luft"),
         drive: drive.id.clone(),
         size: total(&parts),
         files: None,

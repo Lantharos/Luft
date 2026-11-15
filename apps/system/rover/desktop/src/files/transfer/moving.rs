@@ -2,6 +2,8 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::copy::{copy_to, parent};
 use super::resolve::available_destination;
 use super::tracker::Tracker;
@@ -9,6 +11,7 @@ use crate::files::operations::Resolution;
 use crate::files::privileged::is_permission_error;
 use crate::files::rename_no_replace;
 use crate::history::Step;
+use crate::l10n::L10N;
 
 pub(super) fn move_to(
     source: &Path,
@@ -56,7 +59,9 @@ fn moved(source: &Path, target: PathBuf, tracker: &mut Tracker) -> Result<(), St
 fn merge(source: &Path, target: &Path, tracker: &mut Tracker) -> Result<(), String> {
     for child in fs::read_dir(source).map_err(|error| error.to_string())? {
         let child = child.map_err(|error| error.to_string())?.path();
-        let name = child.file_name().ok_or("Invalid file name")?;
+        let name = child
+            .file_name()
+            .ok_or_else(|| t!(L10N, "rover-files-invalid-file-name"))?;
         move_to(&child, target.join(name), tracker)?;
     }
     tracker.leave(source);

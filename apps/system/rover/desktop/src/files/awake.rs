@@ -1,13 +1,15 @@
 use luft_app::dbus;
+use luft_i18n::t;
 use tokio::sync::watch;
 use zbus::OwnedFd;
+
+use crate::l10n::L10N;
 
 const LOGIN: &str = "org.freedesktop.login1";
 const LOGIN_PATH: &str = "/org/freedesktop/login1";
 const LOGIN_MANAGER: &str = "org.freedesktop.login1.Manager";
 const KEPT: &str = "shutdown:sleep";
 const NAME: &str = "Rover";
-const REASON: &str = "Files are still being copied, moved or deleted";
 
 pub struct Awake(watch::Sender<bool>);
 
@@ -43,7 +45,7 @@ async fn inhibit() -> Option<OwnedFd> {
             LOGIN_PATH,
             Some(LOGIN_MANAGER),
             "Inhibit",
-            &(KEPT, NAME, REASON, "block"),
+            &(KEPT, NAME, t!(L10N, "rover-operations-keep-awake"), "block"),
         )
         .await
         .ok()?

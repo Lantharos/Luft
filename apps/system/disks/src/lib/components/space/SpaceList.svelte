@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import FileIcon from '@lucide/svelte/icons/file';
 	import Files from '@lucide/svelte/icons/files';
 	import Folder from '@lucide/svelte/icons/folder';
@@ -21,7 +22,7 @@
 	const TONES = ['var(--accent)', 'var(--tertiary)', 'var(--secondary)'];
 </script>
 
-<div class="row-group" role="list" aria-label="What's in this folder">
+<div class="row-group" role="list" aria-label={t('disks-space-list')}>
 	{#each tiles as tile (tile.key)}
 		<div class={['row', 'hover-row', hovered === tile.key && 'lit']} role="listitem" onpointerenter={() => onhover(tile.key)} onpointerleave={() => onhover(null)}>
 			<button type="button" class="main" disabled={tile.kind !== 'dir'} onclick={() => onopen(tile)}>
@@ -43,7 +44,7 @@
 			</button>
 			<span class="menu">
 				{#if tile.kind === 'dir' || tile.kind === 'file'}
-					<ActionMenu label="More for {tile.name}" groups={actions(tile)} />
+					<ActionMenu label={t('disks-more', { name: tile.name })} groups={actions(tile)} />
 				{/if}
 			</span>
 		</div>

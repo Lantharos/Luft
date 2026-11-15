@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
@@ -62,7 +63,8 @@
 	animateOrder={view.motion.reordering}
 	{overlay}
 	role="listbox"
-	aria-label="Files"
+	aria-label={t('rover-view-files')}
+
 	aria-multiselectable="true"
 	{@attach zoomOnWheel}
 	{...surface.pointerHandlers()}

@@ -3,11 +3,14 @@ use std::io;
 use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt, symlink};
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::resolve::available_destination;
 use super::tracker::{Mode, Tracker};
 use crate::details::look;
 use crate::files::operations::Resolution;
 use crate::files::privileged::{self, is_permission_error, remove_path};
+use crate::l10n::L10N;
 use luft_files::data;
 
 const PERMISSION_BITS: u32 = 0o777;
@@ -99,7 +102,9 @@ fn fill(source: &Path, target: &Path, placed: Placed, tracker: &mut Tracker) -> 
             tracker.add_item(target)?;
             for child in fs::read_dir(source).map_err(|error| error.to_string())? {
                 let child = child.map_err(|error| error.to_string())?.path();
-                let name = child.file_name().ok_or("Invalid file name")?;
+                let name = child
+                    .file_name()
+                    .ok_or_else(|| t!(L10N, "rover-files-invalid-file-name"))?;
                 copy_to(&child, target.join(name), false, tracker)?;
             }
             let permissions = fs::metadata(source)
@@ -121,7 +126,9 @@ fn merge(source: &Path, target: &Path, tracker: &mut Tracker) -> Result<(), Stri
     tracker.add_item(target)?;
     for child in fs::read_dir(source).map_err(|error| error.to_string())? {
         let child = child.map_err(|error| error.to_string())?.path();
-        let name = child.file_name().ok_or("Invalid file name")?;
+        let name = child
+            .file_name()
+            .ok_or_else(|| t!(L10N, "rover-files-invalid-file-name"))?;
         copy_to(&child, target.join(name), true, tracker)?;
     }
     if tracker.mode == Mode::Move {

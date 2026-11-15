@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import CircleAlert from '@lucide/svelte/icons/circle-alert';
 import Clock from '@lucide/svelte/icons/clock';
 import FolderOpen from '@lucide/svelte/icons/folder-open';
@@ -25,24 +26,25 @@ const MISSING = /does not exist|no such file|os error 2\b/i;
 
 export function emptyStateFor({ manager, chooser }: EntryContext): EmptyStateProps {
 	const back: EmptyAction = manager.tabs.canGoBack
-		? { label: 'Go back', run: manager.goBack }
-		: { label: 'Go home', run: () => manager.navigate(manager.homePath) };
+		? { label: t('rover-empty-go-back'), run: manager.goBack }
+		: { label: t('rover-empty-go-home'), run: () => manager.navigate(manager.homePath) };
 	if (manager.error && PERMISSION.test(manager.error)) {
-		return { icon: Lock, title: 'You can’t open this folder', message: 'You don’t have permission to see what’s inside.', action: back };
+		return { icon: Lock, title: t('rover-empty-denied-title'), message: t('rover-empty-denied-message'), action: back };
 	}
 	if (manager.error && MISSING.test(manager.error)) {
-		return { icon: FolderX, title: 'This folder isn’t here anymore', message: 'It may have been moved, renamed or deleted.', action: back };
+		return { icon: FolderX, title: t('rover-empty-missing-title'), message: t('rover-empty-missing-message'), action: back };
 	}
-	if (manager.error) return { icon: CircleAlert, title: 'This folder couldn’t be opened', message: manager.error, action: back, tone: 'danger' };
+	if (manager.error) return { icon: CircleAlert, title: t('rover-empty-failed-title'), message: manager.error, action: back, tone: 'danger' };
 	if (manager.searchQuery.trim()) {
 		return {
 			icon: Search,
-			title: 'No matches',
-			message: `Nothing here matches “${manager.searchQuery.trim()}”.`,
-			action: { label: 'Clear search', run: () => (manager.searchQuery = '') }
+			title: t('rover-empty-no-matches-title'),
+			message: t('rover-empty-no-matches-message', { query: manager.searchQuery.trim() }),
+			action: { label: t('rover-empty-clear-search'), run: () => (manager.searchQuery = '') }
 		};
 	}
-	if (manager.view === 'recent') return { icon: Clock, title: 'Nothing recent yet', message: 'Files you open show up here.' };
-	if (chooser) return { icon: FolderOpen, title: 'This folder is empty' };
-	return { icon: FolderOpen, title: 'This folder is empty', action: { label: 'New folder', run: () => manager.startCreate('folder') } };
+	if (manager.view === 'recent') return { icon: Clock, title: t('rover-empty-recent-title'), message: t('rover-empty-recent-message') };
+	if (chooser) return { icon: FolderOpen, title: t('rover-empty-folder-title') };
+	return { icon: FolderOpen, title: t('rover-empty-folder-title'), action: { label: t('rover-new-folder'), run: () => manager.startCreate('folder') } };
+
 }

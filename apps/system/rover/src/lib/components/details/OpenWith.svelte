@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon } from '@luft/ui';
 	import type { App, OpenWithApps } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
@@ -31,14 +32,14 @@
 		<AppIcon icon={app.icon} id={app.id} size={primary ? 28 : 22} />
 		<span class="min-w-0 flex-1 truncate">{app.name}</span>
 		{#if primary}
-			<span class="text-[12px] text-[var(--text-muted)]">Open</span>
+			<span class="text-[12px] text-[var(--text-muted)]">{t('rover-open-with-default')}</span>
 		{/if}
 	</button>
 {/snippet}
 
 {#if apps.default || apps.others.length > 0}
-	<section class="details-section" aria-label="Open with">
-		<p class="details-heading">Open with</p>
+	<section class="details-section" aria-label={t('rover-open-with')}>
+		<p class="details-heading">{t('rover-open-with')}</p>
 		{#if apps.default}
 			{@render choice(apps.default, true)}
 		{/if}
@@ -47,7 +48,8 @@
 		{/each}
 		{#if apps.others.length > COLLAPSED_COUNT}
 			<button class="plain-button self-start" type="button" onclick={() => (expanded = !expanded)}>
-				{expanded ? 'Show fewer' : `${apps.others.length - COLLAPSED_COUNT} more`}
+				{expanded ? t('rover-open-with-fewer') : t('rover-open-with-more', { count: apps.others.length - COLLAPSED_COUNT })}
+
 			</button>
 		{/if}
 	</section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -34,11 +35,11 @@
 	}
 </script>
 
-<Dialog title="New partition" {onclose}>
-	<SizeField label="Size" bind:value={length} min={Math.min(SMALLEST, size)} max={size} />
+<Dialog title={t('disks-create-title')} {onclose}>
+	<SizeField label={t('disks-create-size')} bind:value={length} min={Math.min(SMALLEST, size)} max={size} />
 	<FormatFields bind:format bind:valid offerErase={false} />
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>{#if working}<Spinner />Creating{:else}Create{/if}</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>{#if working}<Spinner />{t('disks-create-working')}{:else}{t('disks-create-action')}{/if}</button>
 	{/snippet}
 </Dialog>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, errorText, ProgressBar, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Drive, LuftGift } from '#lib/bindings.js';
@@ -35,24 +36,24 @@
 	let alsoAfter = $derived(growth === 'at-start' && after !== null && after.offset !== offset ? after.size : 0);
 
 	let title = $derived.by(() => {
-		if (phase === 'grown') return `Luft grew by ${bytes(grown)}`;
-		if (phase === 'at-start') return 'Luft grows at the next start';
-		if (phase === 'failed') return 'Luft didn’t get the space';
-		if (gift?.kind === 'refused') return 'Luft can’t take this space';
-		return `Give Luft ${bytes(size + alsoAfter)}?`;
+		if (phase === 'grown') return t('disks-give-grown', { size: bytes(grown) });
+		if (phase === 'at-start') return t('disks-give-at-start');
+		if (phase === 'failed') return t('disks-give-failed');
+		if (gift?.kind === 'refused') return t('disks-give-refused');
+		return t('disks-give-title', { size: bytes(size + alsoAfter) });
 	});
 
 	let moving = $derived.by(() => {
 		if (gift?.kind !== 'move-first') return '';
-		return `First ${gift.name} moves to the other side of the free space, which copies its ${bytes(gift.size)}. Keep the computer on and the drive connected until that’s done, or what’s on ${gift.name} can be lost.`;
+		return `${t('disks-give-move-first', { name: gift.name, size: bytes(gift.size) })} ${t('disks-give-move-first-keep-on', { name: gift.name })}`;
 	});
 
 	let growing = $derived.by(() => {
-		if (growth === 'now') return 'Luft grows into the space right away, while you keep using the computer.';
+		if (growth === 'now') return t('disks-give-now');
 		if (growth !== 'at-start') return '';
-		const copies = used === null ? 'all of Luft’s files' : `all of Luft’s files, about ${bytes(used)}`;
-		const rest = alsoAfter ? `, then grows over the ${bytes(alsoAfter)} free right after it` : ', then grows to fill it';
-		return `Luft moves into the space in front of it the next time the computer starts${rest}. Moving copies ${copies}, which can take an hour or more on a full drive. Keep the computer plugged in; if it turns off partway, Luft carries on at the next start.`;
+		const moves = alsoAfter ? t('disks-give-moves-then-grows', { size: bytes(alsoAfter) }) : t('disks-give-moves-then-fills');
+		const copies = used === null ? t('disks-give-copies') : t('disks-give-copies-size', { size: bytes(used) });
+		return `${moves} ${copies} ${t('disks-give-plugged-in')}`;
 	});
 
 	$effect(() => {
@@ -88,7 +89,7 @@
 			if (message === CANCELLED && !moved) {
 				phase = 'confirm';
 			} else {
-				error = message === CANCELLED ? 'Administrator rights are needed to continue.' : message;
+				error = message === CANCELLED ? t('disks-admin-needed') : message;
 				phase = 'failed';
 			}
 		} finally {
@@ -134,7 +135,7 @@
 
 <Dialog {title} wide onclose={close}>
 	{#if phase === 'loading'}
-		<div class="flex items-center gap-3 text-[13.5px] text-[var(--text-muted)]"><Spinner />Looking at the space next to Luft</div>
+		<div class="flex items-center gap-3 text-[13.5px] text-[var(--text-muted)]"><Spinner />{t('disks-give-loading')}</div>
 	{:else if phase === 'confirm' && gift?.kind === 'refused'}
 		<p class="text-[13.5px] leading-relaxed">{gift.reason}</p>
 	{:else if phase === 'confirm'}
@@ -144,13 +145,13 @@
 		<p class="text-[13.5px] leading-relaxed">{growing}</p>
 	{:else if phase === 'working' && moved}
 		<div class="flex flex-col gap-2">
-			<ProgressBar fraction={moved.total ? moved.copied / moved.total : null} label="Moving the partition next to Luft" />
-			<p class="text-[13px] text-[var(--text-muted)]">{bytes(moved.copied)} of {bytes(moved.total)} copied. Keep the computer on until this is done.</p>
+			<ProgressBar fraction={moved.total ? moved.copied / moved.total : null} label={t('disks-give-moving')} />
+			<p class="text-[13px] text-[var(--text-muted)]">{t('disks-give-copied', { copied: bytes(moved.copied), total: bytes(moved.total) })}</p>
 		</div>
 	{:else if phase === 'working'}
-		<p class="text-[13px] text-[var(--text-muted)]">Keep the computer on until this is done.</p>
+		<p class="text-[13px] text-[var(--text-muted)]">{t('disks-keep-on')}</p>
 	{:else if phase === 'key'}
-		<p class="text-[13.5px] leading-relaxed">Enter the disk’s passphrase or recovery key to give the space to Luft.</p>
+		<p class="text-[13.5px] leading-relaxed">{t('disks-give-key')}</p>
 		<KeyPrompt {request} onsubmit={unlockAndGrow} />
 	{:else if phase === 'at-start'}
 		<p class="text-[13.5px] leading-relaxed">{growing}</p>
@@ -158,28 +159,28 @@
 			<p class="text-[13px] leading-relaxed text-[var(--danger)]">{error}</p>
 		{/if}
 	{:else if phase === 'grown'}
-		<p class="text-[13.5px] leading-relaxed">It has {bytes(luft?.size ?? 0)} now.</p>
+		<p class="text-[13.5px] leading-relaxed">{t('disks-give-has', { size: bytes(luft?.size ?? 0) })}</p>
 	{:else if phase === 'failed'}
 		<p class="text-[13px] leading-relaxed text-[var(--danger)]">{error}</p>
 	{/if}
 
 	{#snippet actions()}
 		{#if phase === 'confirm' && gift?.kind === 'refused'}
-			<button type="button" class="button" onclick={makePartition}>Make a partition</button>
-			<button type="button" class="button primary" onclick={onclose}>Close</button>
+			<button type="button" class="button" onclick={makePartition}>{t('disks-make-partition')}</button>
+			<button type="button" class="button primary" onclick={onclose}>{t('disks-close')}</button>
 		{:else if phase === 'confirm' || phase === 'loading'}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button primary" disabled={phase === 'loading'} onclick={give}>Give to Luft</button>
+			<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+			<button type="button" class="button primary" disabled={phase === 'loading'} onclick={give}>{t('disks-free-give-luft')}</button>
 		{:else if phase === 'working'}
-			<button type="button" class="button" disabled>{#if !moved}<Spinner />{/if}{moved ? 'Moving' : 'Giving'}</button>
+			<button type="button" class="button" disabled>{#if !moved}<Spinner />{/if}{moved ? t('disks-give-working-moving') : t('disks-give-working')}</button>
 		{:else if phase === 'key'}
-			<button type="button" class="button" onclick={onclose}>Later</button>
-			<button type="button" class="button primary" disabled={!request.key} onclick={unlockAndGrow}>Give to Luft</button>
+			<button type="button" class="button" onclick={onclose}>{t('disks-later')}</button>
+			<button type="button" class="button primary" disabled={!request.key} onclick={unlockAndGrow}>{t('disks-free-give-luft')}</button>
 		{:else if phase === 'at-start'}
-			<button type="button" class="button" onclick={onclose}>Later</button>
-			<button type="button" class="button primary" onclick={restart}>Restart now</button>
+			<button type="button" class="button" onclick={onclose}>{t('disks-later')}</button>
+			<button type="button" class="button primary" onclick={restart}>{t('disks-restart')}</button>
 		{:else}
-			<button type="button" class="button primary" onclick={onclose}>Done</button>
+			<button type="button" class="button primary" onclick={onclose}>{t('disks-done')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

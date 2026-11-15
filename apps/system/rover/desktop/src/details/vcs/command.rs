@@ -4,6 +4,10 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::LazyLock;
 
+use luft_i18n::t;
+
+use crate::l10n::L10N;
+
 const READ_ONLY: [&str; 5] = [
     "--no-optional-locks",
     "-c",
@@ -44,7 +48,7 @@ pub(super) fn run_bytes(
     args: Vec<OsString>,
     success_codes: &[i32],
 ) -> Result<Vec<u8>, String> {
-    let executable = find_git().ok_or("Git executable not found")?;
+    let executable = find_git().ok_or_else(|| t!(L10N, "rover-vcs-no-git"))?;
     let output = Command::new(&executable)
         .args(args)
         .current_dir(cwd)
@@ -55,7 +59,14 @@ pub(super) fn run_bytes(
             env::join_paths(SEARCH_PATH.iter()).unwrap_or_default(),
         )
         .output()
-        .map_err(|error| format!("Failed to run Git from {}: {error}", cwd.display()))?;
+        .map_err(|error| {
+            t!(
+                L10N,
+                "rover-vcs-git-failed",
+                folder = cwd.display().to_string(),
+                error = error.to_string()
+            )
+        })?;
     if output
         .status
         .code()

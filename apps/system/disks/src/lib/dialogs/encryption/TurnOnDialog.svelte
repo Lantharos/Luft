@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { EncryptionWizard, errorText, PassphraseFields } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -32,28 +33,28 @@
 	let unlockReady = $derived(usePassphrase ? passphraseReady : auto);
 
 	let titles = $derived({
-		check: blocked ? `“${name}” can’t be encrypted` : reformat ? `“${name}” can only be encrypted by formatting it` : `Encrypt “${name}”`,
-		key: 'Save the recovery key',
-		unlock: 'How it unlocks',
-		summary: reformat ? 'Ready to erase and encrypt' : 'Ready to encrypt'
+		check: blocked ? t('disks-encrypt-blocked', { name }) : reformat ? t('disks-encrypt-reformat', { name }) : t('disks-encrypt-title', { name }),
+		key: t('disks-encrypt-key'),
+		unlock: t('disks-encrypt-unlock'),
+		summary: reformat ? t('disks-encrypt-ready-reformat') : t('disks-encrypt-ready')
 	});
 
 	let descriptions = $derived({
-		check: blocked ? undefined : reformat ? 'This erases everything on it. Copy anything you want to keep first.' : 'Your files stay where they are.',
-		key: 'Keep it somewhere other than this drive and computer.'
+		check: blocked ? undefined : reformat ? t('disks-encrypt-reformat-description') : t('disks-encrypt-description'),
+		key: t('disks-encrypt-key-description')
 	});
 
 	let summary = $derived(
 		(reformat
 			? [
-					`Everything on “${name}” is erased.`,
-					'It’s formatted as ext4 and encrypted.',
-					auto ? (drive.removable ? 'It unlocks by itself when you plug it in here.' : 'It unlocks by itself when this computer starts.') : ''
+					t('disks-encrypt-summary-erased', { name }),
+					t('disks-encrypt-summary-formatted'),
+					auto ? t('disks-encrypt-summary-auto', { drive: drive.removable ? 'removable' : 'built-in' }) : ''
 				]
 			: [
-					'It’s unavailable for a few seconds, then encrypts in the background while you use it.',
-					usePassphrase ? 'Until it’s done, it opens with the recovery key instead of the passphrase.' : '',
-					`Keep the computer plugged in${drive.removable ? ' and the drive connected' : ''}. An interruption only pauses it.`
+					t('disks-encrypt-summary-background'),
+					usePassphrase ? t('disks-encrypt-summary-until-done') : '',
+					t('disks-encrypt-summary-keep-on', { drive: drive.removable ? 'removable' : 'built-in' })
 				]
 		).filter(Boolean)
 	);
@@ -90,8 +91,8 @@
 	onprint={(key) => commands.trustPrintKey({ key, name }, WAIT)}
 	{unlockReady}
 	{summary}
-	finish={reformat ? 'Erase and encrypt' : 'Encrypt'}
-	finishing="Starting"
+	finish={reformat ? t('disks-encrypt-finish-reformat') : t('disks-encrypt-finish')}
+	finishing={t('disks-encrypt-starting')}
 	danger={reformat}
 	onfinish={encrypt}
 	{explain}
@@ -99,23 +100,23 @@
 >
 	{#snippet unlock(next)}
 		<SwitchLine
-			title="Unlock automatically"
-			hint={drive.removable ? 'Opens without asking when you plug it in' : 'Opens without asking when this computer starts'}
+			title={t('disks-encryption-auto-unlock')}
+			hint={t('disks-encryption-auto-unlock.hint', { drive: drive.removable ? 'removable' : 'built-in' })}
 			note={autoAvailable ? undefined : (plan?.autoUnlock ?? '')}
 			checked={auto && autoAvailable}
 			disabled={!autoAvailable}
 			onchange={(checked) => (auto = checked)}
 		/>
 		<SwitchLine
-			title="Use a passphrase"
-			hint={drive.removable ? 'To open it on other computers' : 'Asked for when it doesn’t unlock by itself'}
+			title={t('disks-encrypt-use-passphrase')}
+			hint={t('disks-encrypt-use-passphrase.hint', { drive: drive.removable ? 'removable' : 'built-in' })}
 			checked={usePassphrase}
 			onchange={(checked) => (usePassphrase = checked)}
 		/>
 		{#if usePassphrase}
 			<PassphraseFields bind:passphrase bind:confirmation minimum={SHORTEST_PASSPHRASE} onsubmit={next} />
 		{:else if !auto}
-			<p class="px-1 text-[12.5px] text-[var(--text-muted)]">Choose at least one.</p>
+			<p class="px-1 text-[12.5px] text-[var(--text-muted)]">{t('disks-encrypt-choose')}</p>
 		{/if}
 	{/snippet}
 </EncryptionWizard>

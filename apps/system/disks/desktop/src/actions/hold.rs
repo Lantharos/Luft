@@ -1,8 +1,9 @@
+use crate::l10n::L10N;
 use luft_app::dbus;
+use luft_i18n::t;
 use zbus::OwnedFd;
 
 const APP: &str = "com.lantharos.disks";
-const NAME: &str = "Disks";
 
 const LOGIN: &str = "org.freedesktop.login1";
 const LOGIN_PATH: &str = "/org/freedesktop/login1";
@@ -29,7 +30,7 @@ async fn awake(reason: &str) -> Option<OwnedFd> {
             LOGIN_PATH,
             Some(LOGIN_MANAGER),
             "Inhibit",
-            &(KEPT_AWAKE, NAME, reason, "block"),
+            &(KEPT_AWAKE, t!(L10N, "disks-app-name"), reason, "block"),
         )
         .await
         .ok()?

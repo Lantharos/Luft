@@ -1,4 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
+import { t } from '@luft/i18n';
 import { appearance, basename, errorText, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { AppState, Changes, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
@@ -46,9 +47,9 @@ function placeKey(place: SidebarPlace): string {
 const DUPLICATE_EVENT_MS = 120;
 const NOTICE_MS = 4000;
 const VIEW_TITLES: Record<SidebarView, string> = {
-	home: 'Home',
-	recent: 'Recent',
-	trash: 'Trash'
+	home: 'rover-place-home',
+	recent: 'rover-place-recent',
+	trash: 'rover-place-trash'
 };
 const EMPTY_TRASH: TrashContents = { items: [], locations: [] };
 
@@ -291,7 +292,7 @@ export class FileManager {
 	showView = async (view: SidebarView) => {
 		if (view === 'home') return this.navigate(this.homePath);
 		this.#remember();
-		this.tabs.navigate({ path: this.currentPath || this.homePath, title: VIEW_TITLES[view], view });
+		this.tabs.navigate({ path: this.currentPath || this.homePath, title: t(VIEW_TITLES[view]), view });
 		await this.#enterView(view);
 	};
 
@@ -304,7 +305,7 @@ export class FileManager {
 	openViewInTab = async (view: SidebarView) => {
 		if (view === 'home') return this.openTab(this.homePath);
 		this.#remember();
-		this.tabs.open({ path: this.currentPath || this.homePath, title: VIEW_TITLES[view], view });
+		this.tabs.open({ path: this.currentPath || this.homePath, title: t(VIEW_TITLES[view]), view });
 		await this.#enterView(view);
 	};
 
@@ -381,7 +382,7 @@ export class FileManager {
 
 	openEntry = (entry: Pick<FileEntry, 'path' | 'isDir'>) => {
 		if (entry.isDir) void this.navigate(entry.path);
-		else if (this.cloud.unreachable(entry.path)) this.notify('Connect to the internet to open files that aren’t kept on this device');
+		else if (this.cloud.unreachable(entry.path)) this.notify(t('rover-cloud-unreachable'));
 		else void this.openFile(entry.path);
 	};
 
@@ -486,7 +487,8 @@ export class FileManager {
 	};
 
 	#homeEntry(path: string): TabHistoryEntry {
-		return { path, title: path === this.homePath ? 'Home' : basename(path) || '/', view: 'home' };
+		return { path, title: path === this.homePath ? t('rover-place-home') : basename(path) || '/', view: 'home' };
+
 	}
 
 	#remember() {
@@ -534,5 +536,6 @@ export class FileManager {
 }
 
 export function defaultName(itemType: 'file' | 'folder') {
-	return itemType === 'folder' ? 'New folder' : 'New file.txt';
+	return itemType === 'folder' ? t('rover-default-folder-name') : `${t('rover-default-file-name')}.txt`;
+
 }

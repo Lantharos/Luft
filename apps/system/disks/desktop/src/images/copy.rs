@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -29,10 +31,10 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub fn reason(&self) -> &'static str {
+    pub fn reason(&self) -> String {
         match self {
-            Self::Create { .. } => "Saving a disk image",
-            Self::Restore { .. } => "Writing a disk image",
+            Self::Create { .. } => t!(L10N, "disks-hold-saving-image"),
+            Self::Restore { .. } => t!(L10N, "disks-hold-writing-image"),
         }
     }
 }

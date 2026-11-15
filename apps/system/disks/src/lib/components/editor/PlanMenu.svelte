@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { Popover } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
@@ -17,12 +18,12 @@
 	aria-expanded={open}
 	onclick={() => (open = !open)}
 >
-	{count === 1 ? '1 change' : `${count} changes`}
+	{t('disks-editor-changes', { count })}
 	<ChevronDown size={15} />
 </button>
 
 {#if open && button}
-	<Popover anchor={button} label="Planned changes" role="dialog" align="end" minWidth={340} maxHeight={420} onclose={() => (open = false)}>
+	<Popover anchor={button} label={t('disks-editor-planned')} role="dialog" align="end" minWidth={340} maxHeight={420} onclose={() => (open = false)}>
 		<ol class="flex flex-col">
 			{#each editor.described as step, index (index)}
 				<li class="step">

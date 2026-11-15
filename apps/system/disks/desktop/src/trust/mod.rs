@@ -1,5 +1,7 @@
 pub mod drives;
 
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
@@ -11,8 +13,6 @@ use serde::{Deserialize, Serialize};
 use crate::events::PROTECTION_CHANGED;
 use luft_trust::{DRIVES, Map, TRUST, get, group};
 use specta::Type;
-
-const NEEDS_DEVICE_ENCRYPTION: &str = "Only a computer whose own disk is encrypted can unlock this drive by itself, since the key that unlocks it is kept on that disk.";
 
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
@@ -90,7 +90,7 @@ pub async fn state() -> Result<Protection, String> {
         auto_unlock: if get::<bool>(&disk, "Encrypted").unwrap_or(false) {
             String::new()
         } else {
-            NEEDS_DEVICE_ENCRYPTION.to_owned()
+            t!(L10N, "disks-trust-needs-device-encryption")
         },
         drives: drives
             .iter()

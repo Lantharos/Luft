@@ -5,6 +5,7 @@
 	import Pause from '@lucide/svelte/icons/pause';
 	import Plus from '@lucide/svelte/icons/plus';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import { t } from '@luft/i18n';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';
 	import type { Drive } from '#lib/bindings.js';
@@ -24,9 +25,9 @@
 	let { manager, drag, adding, onopentab }: Props = $props();
 
 	function mark(drive: Drive): { icon: Component; label: string; spinning?: boolean } | null {
-		if (drive.state === 'signInAgain') return { icon: CircleAlert, label: 'Sign in again in Settings' };
-		if (drive.paused) return { icon: Pause, label: drive.paused === 'metered' ? 'Paused on a metered connection' : 'Paused while the battery is low' };
-		if (drive.syncing > 0) return { icon: RefreshCw, label: 'Syncing', spinning: true };
+		if (drive.state === 'signInAgain') return { icon: CircleAlert, label: t('rover-cloud-sign-in-again') };
+		if (drive.paused) return { icon: Pause, label: drive.paused === 'metered' ? t('rover-cloud-sidebar-paused-metered') : t('rover-cloud-sidebar-paused-battery') };
+		if (drive.syncing > 0) return { icon: RefreshCw, label: t('rover-cloud-mark-syncing'), spinning: true };
 		return null;
 	}
 
@@ -35,11 +36,12 @@
 	}
 </script>
 
-<div class="flex flex-none flex-col gap-px" role="group" aria-label="Cloud">
+<div class="flex flex-none flex-col gap-px" role="group" aria-label={t('rover-cloud-heading')}>
 	<div class="sidebar-heading">
-		<span>Cloud</span>
+		<span>{t('rover-cloud-heading')}</span>
 		{#if adding}
-			<button class="sidebar-item__action" type="button" aria-label="Add a cloud account" onclick={add} {@attach tooltip('Add an account')}>
+			<button class="sidebar-item__action" type="button" aria-label={t('rover-cloud-add-account')} onclick={add} {@attach tooltip(t('rover-cloud-add-account-short'))}>
+
 				<Plus size={15} />
 			</button>
 		{/if}

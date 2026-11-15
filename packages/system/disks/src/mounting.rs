@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use std::path::{Component, Path, PathBuf};
 
 use luft_dbus::objects::Objects;
+use luft_i18n::t;
 use zbus::{OwnedVariant, Variant};
 
+use crate::L10N;
 use crate::udisks::system::SYSTEM_MOUNTS;
 use crate::udisks::{
     self, BLOCK, ENCRYPTED, FILESYSTEM, Options, PARTITION, SWAP, no_options, text_bytes,
@@ -101,7 +103,7 @@ fn mountable(directory: &str) -> Result<(), String> {
         .components()
         .all(|part| matches!(part, Component::RootDir | Component::Normal(_)));
     if !typed.is_absolute() || !plain {
-        return Err("Use a full folder path, such as /mnt/data".to_owned());
+        return Err(t!(L10N, "luft-disks-mount-full-path"));
     }
     let real = resolved(typed);
     let covers_system = SYSTEM_MOUNTS.iter().any(|mount| {
@@ -111,10 +113,7 @@ fn mountable(directory: &str) -> Result<(), String> {
         .iter()
         .any(|tree| typed.starts_with(tree) || real.starts_with(tree));
     if covers_system || inside_system {
-        return Err(
-            "The system keeps its own files there. Choose another folder, such as /mnt/data"
-                .to_owned(),
-        );
+        return Err(t!(L10N, "luft-disks-mount-system-folder"));
     }
     Ok(())
 }
@@ -128,7 +127,9 @@ pub async fn set_startup(
         mountable(directory)?;
     }
     let objects = udisks::objects().await?;
-    let target = objects.get(block, BLOCK).ok_or("This volume is gone")?;
+    let target = objects
+        .get(block, BLOCK)
+        .ok_or_else(|| t!(L10N, "luft-disks-volume-gone"))?;
     let current = target
         .get::<Configuration>("Configuration")
         .unwrap_or_default()
@@ -148,7 +149,7 @@ pub async fn set_startup(
     };
     let uuid = target.get::<String>("IdUUID").unwrap_or_default();
     if uuid.is_empty() {
-        return Err("This volume has no identifier to mount it by".to_owned());
+        return Err(t!(L10N, "luft-disks-mount-no-identifier"));
     }
     let options = if read_only {
         "nofail,x-gvfs-show,x-mount.mkdir,ro"

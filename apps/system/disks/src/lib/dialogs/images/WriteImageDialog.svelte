@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Check from '@lucide/svelte/icons/check';
 	import { bytes, Dialog } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -35,18 +36,18 @@
 
 {#if confirming && chosen}
 	<Dialog
-		title="Write “{image.name}” to {chosen.name}?"
-		description="Everything on {chosen.name} ({bytes(chosen.size)}) will be erased and replaced by this {bytes(image.size)} image. This can't be undone."
+		title={t('disks-image-write-confirm', { name: image.name, drive: chosen.name })}
+		description={t('disks-image-write-loss', { drive: chosen.name, size: bytes(chosen.size), image: bytes(image.size) })}
 		{onclose}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (confirming = false)}>Back</button>
-			<button type="button" class="button danger" disabled={working} onclick={submit}>Erase and write</button>
+			<button type="button" class="button" onclick={() => (confirming = false)}>{t('disks-back')}</button>
+			<button type="button" class="button danger" disabled={working} onclick={submit}>{t('disks-restore-action')}</button>
 		{/snippet}
 	</Dialog>
 {:else}
-	<Dialog title="Write “{image.name}” to a drive" {onclose}>
-		<div class="row-group" role="radiogroup" aria-label="Drives">
+	<Dialog title={t('disks-image-write-title', { name: image.name })} {onclose}>
+		<div class="row-group" role="radiogroup" aria-label={t('disks-drives')}>
 			{#each candidates as drive (drive.id)}
 				<button type="button" role="radio" aria-checked={chosen?.id === drive.id} class="choice" onclick={() => (chosenId = drive.id)}>
 					<DriveIcon kind={drive.kind} size={20} />
@@ -57,12 +58,12 @@
 					{/if}
 				</button>
 			{:else}
-				<p class="px-4 py-3 text-[13px] text-[var(--text-muted)]">Plug in a drive of at least {bytes(image.size)}.</p>
+				<p class="px-4 py-3 text-[13px] text-[var(--text-muted)]">{t('disks-image-write-none', { size: bytes(image.size) })}</p>
 			{/each}
 		</div>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button primary" disabled={!chosen} onclick={() => (confirming = true)}>Continue</button>
+			<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+			<button type="button" class="button primary" disabled={!chosen} onclick={() => (confirming = true)}>{t('disks-continue')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

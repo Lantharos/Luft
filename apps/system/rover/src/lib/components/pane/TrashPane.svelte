@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Trash from '@lucide/svelte/icons/trash';
-	import { bytes, parent, plural, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, parent, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
 	import type { TrashItem } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
@@ -25,7 +26,7 @@
 	let items = $derived(manager.trash.items.filter((item) => item.trashPath === activeLocation));
 	let selectedIds = $derived(items.filter((item) => manager.selection.has(item.id)).map((item) => item.id));
 	let locationOptions = $derived(
-		locations.map((location) => ({ value: location.path, label: location.name === 'Home' ? 'Home' : location.name }))
+		locations.map((location) => ({ value: location.path, label: location.name === 'Home' ? t('rover-place-home') : location.name }))
 	);
 
 	function select(item: TrashItem, event: MouseEvent) {
@@ -38,23 +39,24 @@
 	{#if manager.loading.skeleton}
 		<LoadingRows />
 	{:else if !manager.loading.active}
-		<EmptyState icon={Trash} title="Trash is empty" />
+		<EmptyState icon={Trash} title={t('rover-trash-empty')} />
 	{/if}
 {:else}
 	<div class="trash-bar">
 		{#if locationOptions.length > 1 && activeLocation}
-			<Segmented options={locationOptions} value={activeLocation} label="Trash location" onchange={(path) => (chosenLocation = path)} />
+			<Segmented options={locationOptions} value={activeLocation} label={t('rover-trash-location')} onchange={(path) => (chosenLocation = path)} />
 		{:else}
-			<span>{plural(items.length, 'item')}</span>
+			<span>{t('rover-trash-items', { count: items.length })}</span>
 		{/if}
 		<div class="flex gap-2">
 			<button class="button" type="button" disabled={selectedIds.length === 0} onclick={() => manager.actions.restoreTrash(selectedIds)}>
-				Restore
+				{t('rover-trash-restore')}
 			</button>
-			<button class="button danger" type="button" onclick={() => dialogs.emptyTrash(activeLocation)}>Empty trash</button>
+			<button class="button danger" type="button" onclick={() => dialogs.emptyTrash(activeLocation)}>{t('rover-empty-trash')}</button>
 		</div>
 	</div>
-	<VirtualScroller class="entry-scroller soft-scroll" {items} key={(item) => item.id} layout={LAYOUT} role="listbox" aria-label="Trash">
+	<VirtualScroller class="entry-scroller soft-scroll" {items} key={(item) => item.id} layout={LAYOUT} role="listbox" aria-label={t('rover-place-trash')}>
+
 		{#snippet children(item)}
 			<div
 				class={['entry list-grid list-row trash-row', manager.selection.has(item.id) && 'is-selected']}

@@ -31,6 +31,7 @@
 	import Star from '@lucide/svelte/icons/star';
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import { t } from '@luft/i18n';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
 	import type { FileAction, FileActionChoice, FileEntry } from '#lib/bindings.js';
@@ -124,7 +125,7 @@
 	{#if target && choosing}
 		<MenuItem onclick={() => (choosingId = null)}>
 			<ArrowLeft size={16} />
-			<span>Back</span>
+			<span>{t('rover-menu-back')}</span>
 		</MenuItem>
 		<MenuSeparator />
 		{#each choosing.items ?? [] as choice, index (choice.kind === 'choice' ? choice.key : `separator-${index}`)}
@@ -138,60 +139,60 @@
 			{/if}
 		{/each}
 	{:else if target}
-		{@render item(ExternalLink, 'Open', () => manager.openEntry(target))}
+		{@render item(ExternalLink, t('rover-open'), () => manager.openEntry(target))}
 		{#if !target.isDir}
-			{@render item(Eye, 'Quick Look', view.toggleQuickLook)}
+			{@render item(Eye, t('rover-menu-quick-look'), view.toggleQuickLook)}
 		{/if}
 		{#if offersVcs}
-			{@render item(Code, target.isDir ? 'View project changes' : 'View changes', () => viewChanges(target))}
-			{@render item(Check, target.isDir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
+			{@render item(Code, target.isDir ? t('rover-menu-view-project-changes') : t('rover-menu-view-changes'), () => viewChanges(target))}
+			{@render item(Check, target.isDir ? t('rover-menu-commit-changes') : t('rover-menu-commit-file'), () => saveChanges(target))}
 		{/if}
 		{#if target.isDir}
-			{@render item(Plus, 'Open in tab', () => manager.openTab(target.path))}
+			{@render item(Plus, t('rover-menu-open-in-tab'), () => manager.openTab(target.path))}
 		{/if}
 		{#if isMainPlace}
 			{#if inSidebar}
-				{@render item(EyeOff, 'Remove from sidebar', () => hidePlace(target.path))}
+				{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => hidePlace(target.path))}
 			{:else}
-				{@render item(PanelLeft, 'Show in sidebar', () => showPlace(target.path))}
+				{@render item(PanelLeft, t('rover-menu-show-in-sidebar'), () => showPlace(target.path))}
 			{/if}
 		{/if}
 		{#if !isMainPlace || isPinned}
-			{@render item(Star, isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
+			{@render item(Star, isPinned ? t('rover-menu-remove-favorite') : t('rover-menu-add-favorite'), () => bookmarks.togglePinned(target))}
 		{/if}
 		{#if targets.every((entry) => entry.isDir)}
-			{@render item(Palette, 'Change icon…', () => dialogs.look(targets))}
+			{@render item(Palette, t('rover-menu-change-icon'), () => dialogs.look(targets))}
 		{/if}
 		{#if cloudDrive}
 			<MenuSeparator />
 			{#if kept}
-				{@render item(Cloud, 'Free up space', () => cloud.free(manager, targets))}
+				{@render item(Cloud, t('rover-free-up-space'), () => cloud.free(manager, targets))}
 			{:else}
-				{@render item(Download, 'Keep on this device', () => cloud.keep(manager, targets))}
+				{@render item(Download, t('rover-menu-keep-on-device'), () => cloud.keep(manager, targets))}
 			{/if}
 			{#if targets.length === 1 && cloudDrive.shareLinks}
-				{@render item(Link, 'Copy share link', () => cloud.copyShareLink(manager, target))}
+				{@render item(Link, t('rover-menu-copy-share-link'), () => cloud.copyShareLink(manager, target))}
 			{/if}
 			{#if targets.length === 1 && cloudDrive.web}
-				{@render item(Globe, 'Open in browser', () => cloud.openInBrowser(manager, target))}
+				{@render item(Globe, t('rover-menu-open-in-browser'), () => cloud.openInBrowser(manager, target))}
 			{/if}
 		{/if}
 		<MenuSeparator />
-		{@render item(Scissors, 'Cut', manager.actions.cut)}
-		{@render item(Copy, 'Copy', manager.actions.copy)}
-		{@render item(CopyPlus, 'Duplicate', () => tools.duplicate(manager, targets))}
-		{@render item(Link, targets.length > 1 ? 'Copy paths' : 'Copy path', () => tools.copyPaths(manager, targets))}
+		{@render item(Scissors, t('rover-menu-cut'), manager.actions.cut)}
+		{@render item(Copy, t('rover-menu-copy'), manager.actions.copy)}
+		{@render item(CopyPlus, t('rover-menu-duplicate'), () => tools.duplicate(manager, targets))}
+		{@render item(Link, t('rover-menu-copy-paths', { count: targets.length }), () => tools.copyPaths(manager, targets))}
 		<MenuSeparator />
-		{@render item(SquarePen, targets.length > 1 ? 'Rename…' : 'Rename', () => tools.rename(manager, targets))}
-		{@render item(Archive, 'Compress…', () => tools.compress(manager, targets))}
+		{@render item(SquarePen, targets.length > 1 ? t('rover-menu-rename-several') : t('rover-menu-rename'), () => tools.rename(manager, targets))}
+		{@render item(Archive, t('rover-menu-compress'), () => tools.compress(manager, targets))}
 		{#if archives}
-			{@render item(PackageOpen, 'Extract here', () => tools.extract(manager, targets))}
+			{@render item(PackageOpen, t('rover-menu-extract-here'), () => tools.extract(manager, targets))}
 		{/if}
 		{#if manager.converter}
-			{@render item(ArrowLeftRight, 'Convert…', () => tools.convert(manager, targets))}
+			{@render item(ArrowLeftRight, t('rover-menu-convert'), () => tools.convert(manager, targets))}
 		{/if}
 		{#if printable}
-			{@render item(Printer, 'Print…', () => tools.printFiles(manager, targets))}
+			{@render item(Printer, t('rover-menu-print'), () => tools.printFiles(manager, targets))}
 		{/if}
 		{#each added as action (action.id)}
 			<MenuItem onclick={() => openAction(action)}>
@@ -200,34 +201,35 @@
 			</MenuItem>
 		{/each}
 		{#if target.isDir}
-			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}
+			{@render item(Terminal, t('rover-menu-open-in-terminal'), () => tools.openTerminal(manager, target.path))}
 			{#if manager.drives.manageable}
-				{@render item(ChartPie, 'See what’s using space', () => tools.exploreSpace(manager, target.path))}
+				{@render item(ChartPie, t('rover-menu-explore-space'), () => tools.exploreSpace(manager, target.path))}
 			{/if}
 		{/if}
-		{@render item(Info, 'Properties', () => tools.showProperties(targets))}
+		{@render item(Info, t('rover-menu-properties'), () => tools.showProperties(targets))}
 		<MenuSeparator />
-		{@render item(Trash2, cloudDrive ? 'Delete permanently…' : 'Move to trash', manager.actions.trashSelected, true)}
+		{@render item(Trash2, cloudDrive ? t('rover-menu-delete-permanently') : t('rover-menu-move-to-trash'), manager.actions.trashSelected, true)}
 	{:else}
-		{@render item(FolderPlus, 'New folder', () => manager.startCreate('folder'))}
-		{@render item(FilePlus, 'New file', () => manager.startCreate('file'))}
+		{@render item(FolderPlus, t('rover-new-folder'), () => manager.startCreate('folder'))}
+		{@render item(FilePlus, t('rover-new-file'), () => manager.startCreate('file'))}
 		<MenuSeparator />
-		{@render item(Clipboard, 'Paste', manager.actions.paste, false, !manager.canPaste)}
+		{@render item(Clipboard, t('rover-menu-paste'), manager.actions.paste, false, !manager.canPaste)}
 		<MenuSeparator />
-		{@render item(Search, 'Search in this folder', () => tools.searchHere(manager))}
-		{@render item(Terminal, 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
+		{@render item(Search, t('rover-menu-search-here'), () => tools.searchHere(manager))}
+		{@render item(Terminal, t('rover-menu-terminal-here'), () => tools.openTerminal(manager, manager.currentPath))}
 		{#if manager.drives.manageable}
-			{@render item(ChartPie, 'See what’s using space', () => tools.exploreSpace(manager, manager.currentPath))}
+			{@render item(ChartPie, t('rover-menu-explore-space'), () => tools.exploreSpace(manager, manager.currentPath))}
 		{/if}
-		{@render item(Info, 'Properties', () => tools.showPathProperties(manager, manager.currentPath))}
+		{@render item(Info, t('rover-menu-properties'), () => tools.showPathProperties(manager, manager.currentPath))}
 		{#if offersVcs}
 			<MenuSeparator />
-			{@render item(Code, 'View project changes', () => viewChanges(null))}
-			{@render item(Check, 'Commit changes', () => saveChanges(null))}
-			{@render item(RefreshCw, 'Sync project', vcs.sync)}
+			{@render item(Code, t('rover-menu-view-project-changes'), () => viewChanges(null))}
+			{@render item(Check, t('rover-menu-commit-changes'), () => saveChanges(null))}
+			{@render item(RefreshCw, t('rover-menu-sync-project'), vcs.sync)}
 		{:else if vcs.untrusted}
 			<MenuSeparator />
-			{@render item(GitBranch, 'Show Git status…', () => (vcs.asking = true))}
+			{@render item(GitBranch, t('rover-menu-show-git-status'), () => (vcs.asking = true))}
+
 		{/if}
 	{/if}
 </ContextMenu>

@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use luft_trust::Outcome;
 
 use super::passphrases;
@@ -16,7 +18,7 @@ async fn text_of(block: &str, property: &str) -> Option<String> {
 async fn uuid_of(block: &str) -> Result<String, String> {
     text_of(block, "IdUUID")
         .await
-        .ok_or_else(|| "This volume has no identifier".to_owned())
+        .ok_or_else(|| t!(L10N, "disks-volume-no-identifier"))
 }
 
 async fn name_of(block: &str) -> String {
@@ -34,7 +36,7 @@ async fn name_of(block: &str) -> String {
 pub async fn remember(block: &str, passphrase: &str) -> Result<(), String> {
     passphrases::store(&uuid_of(block).await?, &name_of(block).await, passphrase)
         .await
-        .map_err(|_| "The passphrase couldn't be saved in your keyring".to_owned())
+        .map_err(|_| t!(L10N, "disks-passphrase-not-saved"))
 }
 
 async fn forget(block: &str) {

@@ -8,7 +8,8 @@
 	import Upload from '@lucide/svelte/icons/upload';
 	import Usb from '@lucide/svelte/icons/usb';
 	import X from '@lucide/svelte/icons/x';
-	import { basename, bytes, duration, plural } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { basename, bytes, duration } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { exploreSpace } from '#lib/bridge/index.js';
 	import type { Operation } from '#lib/bindings.js';
@@ -54,23 +55,16 @@
 	}
 
 	function title(operation: Operation) {
-		const destination = operation.destinationLabel ? ` to ${operation.destinationLabel}` : '';
+		const kind = operation.opType.toLowerCase();
+		const destination = operation.destinationLabel;
 		if (operation.status === 'Completed') {
-			if (operation.phase === 'SafeToEject') return 'Safe to eject';
-			return { Copy: 'Copied', Move: 'Moved', Trash: 'Moved to trash', Delete: 'Deleted', Compress: 'Compressed', Extract: 'Extracted' }[
-				operation.opType
-			];
+			if (operation.phase === 'SafeToEject') return t('rover-operation-safe-to-eject');
+			return t('rover-operation-done', { operation: kind });
 		}
-		if (operation.phase === 'Finalizing') return `Finalizing writes${destination}`;
-		if (operation.phase === 'Preparing') return 'Preparing';
-		return {
-			Copy: `Copying${destination}`,
-			Move: `Moving${destination}`,
-			Trash: 'Moving to trash',
-			Delete: 'Deleting',
-			Compress: 'Compressing',
-			Extract: 'Extracting'
-		}[operation.opType];
+		if (operation.phase === 'Finalizing') return destination ? t('rover-operation-finalizing-to', { destination }) : t('rover-operation-finalizing');
+		if (operation.phase === 'Preparing') return t('rover-operation-preparing');
+		if (destination && (operation.opType === 'Copy' || operation.opType === 'Move')) return t('rover-operation-running-to', { operation: kind, destination });
+		return t('rover-operation-running', { operation: kind });
 	}
 
 	function icon(operation: Operation) {
@@ -82,9 +76,9 @@
 	}
 
 	function subject(operation: Operation) {
-		if (!isActive(operation)) return operation.status === 'Failed' ? 'Failed' : 'Done';
-		if (operation.phase === 'Finalizing') return operation.destinationIsRemovable ? 'Do not unplug yet' : 'Finishing writes';
-		return operation.currentFile ? basename(operation.currentFile) : 'Preparing';
+		if (!isActive(operation)) return operation.status === 'Failed' ? t('rover-operation-failed') : t('rover-operation-finished-short');
+		if (operation.phase === 'Finalizing') return operation.destinationIsRemovable ? t('rover-operation-do-not-unplug') : t('rover-operation-finishing-writes');
+		return operation.currentFile ? basename(operation.currentFile) : t('rover-operation-preparing');
 	}
 
 	function speed(operation: Operation) {
@@ -94,24 +88,21 @@
 
 	function detail(operation: Operation) {
 		if (operation.status === 'Completed') {
-			if (operation.phase === 'SafeToEject') return operation.opType === 'Move' ? 'Moved successfully' : 'Copied successfully';
-			return operation.totalItems === 1 ? 'Finished' : `${plural(operation.totalItems, 'item')} finished`;
+			if (operation.phase === 'SafeToEject') return operation.opType === 'Move' ? t('rover-operation-moved-safely') : t('rover-operation-copied-safely');
+			return t('rover-operation-finished', { count: operation.totalItems });
 		}
-		if (operation.status === 'Failed') return operation.error ?? 'Failed';
-		if (operation.status === 'Cancelled') return 'Cancelled';
+		if (operation.status === 'Failed') return operation.error ?? t('rover-operation-failed');
+		if (operation.status === 'Cancelled') return t('rover-operation-cancelled');
 		if (operation.phase === 'Finalizing') {
-			return operation.destinationIsRemovable ? 'Finalizing writes. Do not unplug yet.' : 'Finalizing writes';
+			return operation.destinationIsRemovable ? t('rover-operation-finalizing-unplug') : t('rover-operation-finalizing');
 		}
-		if (operation.totalBytes === 0) return `${operation.itemsProcessed} of ${plural(operation.totalItems, 'item')}`;
+		if (operation.totalBytes === 0) return t('rover-operation-items', { done: operation.itemsProcessed, count: operation.totalItems });
 		const rate = speed(operation);
 		const remaining = operation.totalBytes - operation.bytesProcessed;
-		return [
-			`${bytes(operation.bytesProcessed)} of ${bytes(operation.totalBytes)}`,
-			rate > 0 && `${bytes(rate)}/s`,
-			rate > 0 && remaining > 0 && `${duration(remaining / rate)} left`
-		]
-			.filter(Boolean)
-			.join(' · ');
+		const progress = { done: bytes(operation.bytesProcessed), total: bytes(operation.totalBytes) };
+		if (rate <= 0) return t('rover-operation-bytes', progress);
+		if (remaining <= 0) return t('rover-operation-bytes-rate', { ...progress, rate: bytes(rate) });
+		return t('rover-operation-bytes-left', { ...progress, rate: bytes(rate), left: duration(remaining / rate) });
 	}
 </script>
 
@@ -121,7 +112,7 @@
 			{@const Icon = icon(operation)}
 			<section
 				class="pointer-events-auto rounded-[18px] bg-[color-mix(in_oklab,var(--popover)_86%,transparent)] p-3 text-[13px] shadow-[0_20px_60px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] backdrop-blur-2xl"
-				aria-label={`${title(operation)} operation`}
+				aria-label={t('rover-operation-label', { title: title(operation) })}
 			>
 				<div class="flex items-center gap-3">
 					<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)] text-[var(--text-soft)]">
@@ -130,7 +121,7 @@
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center justify-between gap-3 text-[var(--text)]">
 							<span class="truncate">{title(operation)}</span>
-							<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{Math.round(operation.progress * 100)}%</span>
+							<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{t('rover-operation-percent', { percent: Math.round(operation.progress * 100) })}</span>
 						</div>
 						<div class="mt-0.5 truncate text-[12px] text-[var(--text-muted)]">{subject(operation)}</div>
 					</div>
@@ -145,19 +136,20 @@
 					<span class="min-w-0 truncate">{detail(operation)}</span>
 					{#if operation.full}
 						{@const folder = operation.full}
-						<button class="button shrink-0" type="button" onclick={() => exploreSpace(folder).catch(onerror)}>Free up space</button>
+						<button class="button shrink-0" type="button" onclick={() => exploreSpace(folder).catch(onerror)}>{t('rover-free-up-space')}</button>
 					{:else if isActive(operation)}
 						<div class="flex shrink-0 items-center gap-1">
 							{#if operation.status === 'InProgress'}
-								<button class="icon-button" type="button" aria-label="Pause" onclick={() => commands.pauseOperation({ id: operation.id })}>
+								<button class="icon-button" type="button" aria-label={t('rover-operation-pause')} onclick={() => commands.pauseOperation({ id: operation.id })}>
 									<Pause size={14} />
 								</button>
 							{:else}
-								<button class="icon-button" type="button" aria-label="Resume" onclick={() => commands.resumeOperation({ id: operation.id })}>
+								<button class="icon-button" type="button" aria-label={t('rover-operation-resume')} onclick={() => commands.resumeOperation({ id: operation.id })}>
 									<Play size={14} />
 								</button>
 							{/if}
-							<button class="icon-button" type="button" aria-label="Cancel" onclick={() => commands.cancelOperation({ id: operation.id })}>
+							<button class="icon-button" type="button" aria-label={t('rover-cancel')} onclick
+={() => commands.cancelOperation({ id: operation.id })}>
 								<X size={14} />
 							</button>
 						</div>

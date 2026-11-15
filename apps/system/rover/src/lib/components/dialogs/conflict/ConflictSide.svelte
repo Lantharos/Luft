@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { basename, bytes, dateTime, parent, relativeDay, tooltip } from '@luft/ui';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
@@ -25,16 +26,17 @@
 		<div class="min-w-0">
 			<div class="truncate text-[14px] font-medium" {@attach tooltip(item.name)}>{item.name}</div>
 			<div class="truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parent(item.path))}>
-				In {basename(parent(item.path)) || '/'}
+				{t('rover-conflict-in', { folder: basename(parent(item.path)) || '/' })}
 			</div>
 		</div>
 	</div>
 	<dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[13px]">
-		<dt class="text-[var(--text-muted)]">Size</dt>
+		<dt class="text-[var(--text-muted)]">{t('rover-conflict-size')}</dt>
 		<dd class={['truncate text-right', larger ? 'text-[var(--text)]' : 'text-[var(--text-soft)]']}>{bytes(item.size)}</dd>
-		<dt class="text-[var(--text-muted)]">Modified</dt>
+		<dt class="text-[var(--text-muted)]">{t('rover-conflict-modified')}</dt>
 		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} {@attach tooltip(item.modified ? dateTime(item.modified) : '')}>
-			{item.modified ? relativeDay(item.modified) : 'Unknown'}
+			{item.modified ? relativeDay(item.modified) : t('rover-conflict-modified-unknown')}
+
 		</dd>
 	</dl>
 </div>

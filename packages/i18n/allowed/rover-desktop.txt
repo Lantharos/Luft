@@ -1,0 +1,6 @@
+apps/system/rover/desktop/src/main.rs	Rover file chooser portal installed for this user.
+apps/system/rover/desktop/src/main.rs	Could not install the Rover file chooser portal
+apps/system/rover/desktop/src/main.rs	Rover file manager bus failed
+apps/system/rover/desktop/src/main.rs	Rover file manager bus installed for this user.
+apps/system/rover/desktop/src/main.rs	Could not install the Rover file manager bus
+apps/system/rover/desktop/src/integration/mod.rs	Could not find the user data folder

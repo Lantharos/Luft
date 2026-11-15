@@ -13,8 +13,11 @@ use std::process::Command;
 
 use gio::prelude::*;
 use luft_app::launch;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
+
+use crate::l10n::L10N;
 
 #[cfg(test)]
 pub(crate) use mount_table::parse_mountinfo;
@@ -23,7 +26,6 @@ pub use watch::watch_mounts;
 pub use windows::{closed_windows, open_windows};
 
 const DISKS: &str = "com.lantharos.disks.desktop";
-const SYSTEM: &str = "System";
 const GIB: u64 = 1024 * 1024 * 1024;
 const SAMPLE_SYSTEM_SPACE: (u64, u64) = (931 * GIB, 612 * GIB);
 const SAMPLE_DRIVE_SPACE: (u64, u64) = (64 * GIB, 41 * GIB);
@@ -100,7 +102,7 @@ pub fn list_drives() -> Vec<DriveInfo> {
         .values_mut()
         .find(|drive| drive.mount_point == "/")
     {
-        system.name = SYSTEM.into();
+        system.name = t!(L10N, "rover-drives-system");
     }
 
     let mut drives: Vec<DriveInfo> = by_device.into_values().collect();
@@ -123,9 +125,15 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
     let drive = list_drives()
         .into_iter()
         .find(|drive| drive.mount_point == mount_point)
-        .ok_or_else(|| format!("Drive not found: {mount_point}"))?;
+        .ok_or_else(|| {
+            t!(
+                L10N,
+                "rover-drives-not-found",
+                folder = mount_point.as_str()
+            )
+        })?;
     if !drive.can_unmount {
-        return Err(format!("{} can't be unmounted", drive.name));
+        return Err(t!(L10N, "rover-drives-cant-unmount", drive = drive.name));
     }
 
     let attempts: [(&str, [&str; 3]); 3] = [
@@ -140,15 +148,17 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
             Err(error) => errors.push(error),
         }
     }
-    Err(format!(
-        "Could not eject {}: {}",
-        drive.name,
-        errors.join("; ")
+    Err(t!(
+        L10N,
+        "rover-drives-eject-failed",
+        drive = drive.name,
+        error = errors.join("; ")
     ))
 }
 
 fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
-    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    let disks =
+        gio_unix::DesktopAppInfo::new(DISKS).ok_or_else(|| t!(L10N, "rover-drives-no-disks"))?;
     launch::start(disks.upcast_ref(), &[argument], token).map_err(|error| error.to_string())
 }
 
@@ -175,7 +185,12 @@ fn run(program: &str, args: &[&str]) -> Result<(), String> {
     }
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
     Err(if stderr.is_empty() {
-        format!("{program} exited with {}", output.status)
+        t!(
+            L10N,
+            "rover-drives-tool-exited",
+            program = program,
+            status = output.status.to_string()
+        )
     } else {
         format!("{program}: {stderr}")
     })

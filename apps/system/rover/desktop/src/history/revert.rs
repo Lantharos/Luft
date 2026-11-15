@@ -1,11 +1,14 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::Step;
 use crate::files::operations::OperationsQueue;
 use crate::files::privileged::{self, Pair, arrived, create_dir_all, is_permission_error};
 use crate::files::trash::{self, Trashed};
 use crate::files::{rename_no_replace, transfer};
+use crate::l10n::L10N;
 
 /// Steps this account may not take back itself, kept until the rest is done
 /// so an administrator is asked once for each kind.
@@ -80,9 +83,11 @@ fn relocate(from: &Path, to: &Path, queue: &OperationsQueue, id: &str) -> Result
     }
     match rename_no_replace(from, to) {
         Ok(()) => Ok(true),
-        Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {
-            Err(format!("{} already exists", to.display()))
-        }
+        Err(error) if error.kind() == io::ErrorKind::AlreadyExists => Err(t!(
+            L10N,
+            "rover-files-already-exists",
+            name = to.display().to_string()
+        )),
         Err(error) if error.raw_os_error() == Some(libc::EXDEV) => {
             transfer::relocate(from, to, queue, id).map(|()| true)
         }

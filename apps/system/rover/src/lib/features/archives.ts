@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { FileEntry } from '#lib/bindings.js';
 
 
@@ -13,7 +14,8 @@ export function isArchive(name: string) {
 }
 
 export function archiveName(entries: Pick<FileEntry, 'name' | 'isDir'>[]) {
-	if (entries.length !== 1) return 'Archive';
+	if (entries.length !== 1) return t('rover-compress-default-name');
+
 	const [{ name, isDir }] = entries;
 	const dot = name.lastIndexOf('.');
 	return isDir || dot <= 0 ? name : name.slice(0, dot);

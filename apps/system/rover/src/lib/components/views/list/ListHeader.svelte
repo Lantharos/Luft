@@ -2,6 +2,7 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import { on } from 'svelte/events';
+	import { t } from '@luft/i18n';
 	import type { ListColumnId, SortBy } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { COLUMN_SORT, columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
@@ -106,7 +107,7 @@
 		aria-disabled={recent}
 		onclick={() => sort('name')}
 	>
-		<span class="truncate">Name</span>
+		<span class="truncate">{t('rover-sort-name')}</span>
 		{@render direction('name')}
 	</button>
 	{#each columns.shown as column (column.id)}
@@ -128,7 +129,8 @@
 				class="list-resize"
 				role="separator"
 				aria-orientation="vertical"
-				aria-label={`Resize ${columnLabel(column.id, recent)}`}
+				aria-label={t('rover-list-resize', { column: columnLabel(column.id, recent) })}
+
 				onpointerdown={(event) => startResize(event, column.id, column.width)}
 			></span>
 			<span class="truncate">{columnLabel(column.id, recent)}</span>

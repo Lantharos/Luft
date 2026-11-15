@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import { Checkbox, Dialog, errorText, PasswordField, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -29,7 +30,7 @@
 		error = '';
 		try {
 			const outcome = await commands.disksUnlock({ block: volume.block, passphrase, remember }, WAIT);
-			if ('wrongKey' in outcome) error = 'That passphrase isn’t right';
+			if ('wrongKey' in outcome) error = t('disks-unlock-wrong');
 			else onclose();
 		} catch (caught) {
 			const message = errorText(caught);
@@ -40,11 +41,11 @@
 	}
 </script>
 
-<Dialog title="Unlock “{volumeName(volume)}”" {onclose}>
-	<PasswordField bind:this={field} label="Passphrase" bind:value={passphrase} {error} live autocomplete="current-password" onkeydown={(event) => event.key === 'Enter' && submit()} />
-	<Checkbox label="Remember in my keyring" checked={remember} onchange={(value) => (remember = value)}>Remember in my keyring</Checkbox>
+<Dialog title={t('disks-unlock-title', { name: volumeName(volume) })} {onclose}>
+	<PasswordField bind:this={field} label={t('disks-passphrase')} bind:value={passphrase} {error} live autocomplete="current-password" onkeydown={(event) => event.key === 'Enter' && submit()} />
+	<Checkbox label={t('disks-remember')} checked={remember} onchange={(value) => (remember = value)}>{t('disks-remember')}</Checkbox>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!passphrase || working} onclick={submit}>{#if working}<Spinner />Unlocking{:else}Unlock{/if}</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button primary" disabled={!passphrase || working} onclick={submit}>{#if working}<Spinner />{t('disks-unlock-working')}{:else}{t('disks-action-unlock')}{/if}</button>
 	{/snippet}
 </Dialog>

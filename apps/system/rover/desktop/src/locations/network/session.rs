@@ -6,6 +6,7 @@ use std::sync::mpsc;
 use gio::glib;
 use gio::prelude::*;
 use luft_app::Events;
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -13,6 +14,7 @@ use super::discover;
 use super::mounts::{self, NetworkLocation, PluggedDevice};
 use crate::app::events::{NETWORK_ASK as ASK, NETWORK_CHANGED as CHANGED};
 use crate::app::settings::NetworkPlace;
+use crate::l10n::L10N;
 
 static NEXT_REQUEST: AtomicU32 = AtomicU32::new(1);
 
@@ -108,7 +110,7 @@ impl Session {
         self.context.invoke(move || work(sender));
         receiver
             .recv()
-            .map_err(|_| "The network connection stopped".to_owned())
+            .map_err(|_| t!(L10N, "rover-network-stopped"))
     }
 
     pub fn locations(&self) -> Vec<NetworkLocation> {

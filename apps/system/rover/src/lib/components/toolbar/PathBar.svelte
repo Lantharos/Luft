@@ -8,6 +8,7 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import Trash from '@lucide/svelte/icons/trash';
 	import Usb from '@lucide/svelte/icons/usb';
+	import { t } from '@luft/i18n';
 	import { isInside } from '@luft/ui';
 	import { untrack, type Component } from 'svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -30,10 +31,10 @@
 
 	type Crumb = { path: string; label: string; icon?: Component };
 
-	const VIEW_CRUMBS: Record<'recent' | 'trash', Crumb> = {
-		recent: { path: '', label: 'Recent', icon: Clock },
-		trash: { path: '', label: 'Trash', icon: Trash }
-	};
+	let viewCrumbs: Record<'recent' | 'trash', Crumb> = $derived({
+		recent: { path: '', label: t('rover-place-recent'), icon: Clock },
+		trash: { path: '', label: t('rover-place-trash'), icon: Trash }
+	});
 
 	const completion = new PathCompletion(() => manager.homePath);
 
@@ -44,15 +45,15 @@
 
 	let root = $derived.by((): Crumb => {
 		const path = manager.currentPath;
-		if (isInside(path, manager.homePath)) return { path: manager.homePath, label: 'Home', icon: House };
+		if (isInside(path, manager.homePath)) return { path: manager.homePath, label: t('rover-place-home'), icon: House };
 		const remote = manager.network.holding(path);
 		if (remote) return { path: remote.path, label: remote.name, icon: remote.device ? Smartphone : Server };
 		const drive = manager.drives.holding(path);
-		if (!drive) return { path: '/', label: 'Computer', icon: HardDrive };
+		if (!drive) return { path: '/', label: t('rover-place-computer'), icon: HardDrive };
 		return { path: drive.mountPoint, label: drive.name, icon: drive.isRemovable ? Usb : HardDrive };
 	});
 	let crumbs = $derived.by((): Crumb[] => {
-		if (manager.view !== 'home') return [VIEW_CRUMBS[manager.view]];
+		if (manager.view !== 'home') return [viewCrumbs[manager.view]];
 		const segments = pathSegments(manager.currentPath).filter((segment) => segment.path.length > root.path.length);
 		return [root, ...segments.map((segment) => ({ path: segment.path, label: segment.name }))];
 	});
@@ -120,7 +121,7 @@
 			{@attach focusInput}
 			class="path-input"
 			value={draft}
-			aria-label="Location"
+			aria-label={t('rover-path-location')}
 			spellcheck="false"
 			autocomplete="off"
 			oninput={(event) => {
@@ -131,7 +132,7 @@
 			onblur={() => (view.editingPath = false)}
 		/>
 		{#if completion.candidates.length > 0}
-			<div class="path-candidates soft-scroll" role="listbox" aria-label="Matching folders" tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
+			<div class="path-candidates soft-scroll" role="listbox" aria-label={t('rover-path-matching')} tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
 				{#each completion.candidates as name, index (name)}
 					<button
 						class={['path-candidate', index === completion.index && 'is-active']}
@@ -152,7 +153,7 @@
 			bind:clientWidth={trailWidth}
 			class={['path-trail hidden-scroll', clipped && 'is-clipped']}
 			role="group"
-			aria-label="Location"
+			aria-label={t('rover-path-location')}
 			onscroll={() => (clipped = (trail?.scrollLeft ?? 0) > 0)}
 		>
 			{#each crumbs as crumb, index (crumb.path || crumb.label)}
@@ -176,7 +177,8 @@
 			{/each}
 		</div>
 		{#if manager.view === 'home'}
-			<button class="path-edit-area" type="button" aria-label="Edit location" onclick={() => (view.editingPath = true)}></button>
+			<button class="path-edit-area" type="button" aria-label={t('rover-path-edit')}
+ onclick={() => (view.editingPath = true)}></button>
 		{/if}
 	{/if}
 </div>

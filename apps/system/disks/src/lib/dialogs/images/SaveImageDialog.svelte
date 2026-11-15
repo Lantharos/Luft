@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -36,17 +37,17 @@
 	}
 </script>
 
-<Dialog title="Save as disk image" {onclose}>
-	<TextField label="File name" showLabel bind:value={file} onkeydown={(event) => event.key === 'Enter' && submit()} />
+<Dialog title={t('disks-image-save-title')} {onclose}>
+	<TextField label={t('disks-image-file')} showLabel bind:value={file} onkeydown={(event) => event.key === 'Enter' && submit()} />
 	<div class="flex items-center justify-between gap-3 px-1">
 		<div class="flex min-w-0 flex-col">
-			<span class="text-[13px] text-[var(--text-soft)]">Folder</span>
+			<span class="text-[13px] text-[var(--text-soft)]">{t('disks-image-folder')}</span>
 			<span class="truncate text-[13px] text-[var(--text-muted)]">{folder}</span>
 		</div>
-		<button type="button" class="button" onclick={change}>Change…</button>
+		<button type="button" class="button" onclick={change}>{t('disks-image-change-folder')}</button>
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>Save</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>{t('disks-save')}</button>
 	{/snippet}
 </Dialog>

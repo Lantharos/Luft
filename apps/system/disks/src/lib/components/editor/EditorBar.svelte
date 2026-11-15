@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { place } from '#lib/editor/edits.js';
@@ -79,15 +80,15 @@
 	{#each segments as segment, index (segment.key)}
 		{@const placed = fitted.placed[index]}
 		{@const part = segment.part}
-		{@const name = part ? part.title : 'Free space'}
+		{@const name = part ? part.title : t('disks-free-space')}
 		<button
 			type="button"
 			class={['segment', index === segments.length - 1 && 'last', !part && 'free', part?.pending && 'pending', index === chosen && 'chosen', index === chosen && movable && 'movable']}
 			style:left="{placed.left}px"
 			style:width="{placed.width}px"
 			style:--tone={part ? (tones.get(part.key) ?? 'var(--accent)') : undefined}
-			aria-label="{name}, {bytes(segment.span.size)}"
-			{@attach tooltip(`${name} · ${bytes(segment.span.size)}`)}
+			aria-label={t('disks-segment', { name, size: bytes(segment.span.size) })}
+			{@attach tooltip(t('disks-segment.tooltip', { name, size: bytes(segment.span.size) }))}
 			onclick={() => editor.select(segment.key)}
 			onpointerdown={(event) => index === chosen && movable && grab(event, 'move')}
 		>
@@ -97,7 +98,7 @@
 			{#if placed.width >= LABELLED}
 				<span class="label">
 					{#if part}<span class="name">{part.title}</span>{/if}
-					<span>{bytes(segment.span.size)}{part ? '' : ' free'}</span>
+					<span>{part ? bytes(segment.span.size) : t('disks-free', { size: bytes(segment.span.size) })}</span>
 				</span>
 			{/if}
 		</button>

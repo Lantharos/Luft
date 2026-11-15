@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { Drive } from '#lib/bindings.js';
 	import { driveKindName } from '#lib/format.js';
@@ -11,17 +12,15 @@
 
 	let { drive, onclose }: Props = $props();
 
-	const TABLES = { gpt: 'GUID (GPT)', dos: 'Master Boot Record' };
-
 	let facts = $derived(
 		[
-			{ label: 'Kind', value: driveKindName(drive) },
-			{ label: 'Size', value: `${bytes(drive.size)} (${drive.size.toLocaleString()} bytes)` },
-			drive.model && { label: 'Model', value: drive.model },
-			drive.serial && { label: 'Serial number', value: drive.serial, mono: true },
-			{ label: 'Device', value: drive.device, mono: true },
-			{ label: 'Partition table', value: drive.table ? TABLES[drive.table] : 'None' },
-			drive.readOnly && { label: 'Access', value: 'Read only' }
+			{ label: t('disks-details-kind'), value: driveKindName(drive) },
+			{ label: t('disks-details-size'), value: t('disks-details-size-bytes', { size: bytes(drive.size), count: drive.size }) },
+			drive.model && { label: t('disks-details-model'), value: drive.model },
+			drive.serial && { label: t('disks-details-serial'), value: drive.serial, mono: true },
+			{ label: t('disks-details-device'), value: drive.device, mono: true },
+			{ label: t('disks-details-table'), value: t('disks-details-table-kind', { table: drive.table ?? 'none' }) },
+			drive.readOnly && { label: t('disks-details-access'), value: t('disks-details-read-only') }
 		].filter((fact) => fact !== false && fact !== '')
 	);
 </script>
@@ -29,6 +28,6 @@
 <Dialog title={drive.name} wide {onclose}>
 	<Facts {facts} />
 	{#snippet actions()}
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('disks-done')}</button>
 	{/snippet}
 </Dialog>

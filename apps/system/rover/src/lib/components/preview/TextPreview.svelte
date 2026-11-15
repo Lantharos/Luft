@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { RemoteImagesNotice, renderMarkdown } from '@luft/ui';
 	import { highlight } from '@luft/ui/code';
 	import type { FileEntry } from '#lib/bindings.js';
@@ -71,7 +72,8 @@
 </script>
 
 {#if result && 'binary' in result}
-	<p class="preview-note">This file can’t be shown as text.</p>
+	<p class="preview-note">{t('rover-preview-binary')}</p>
+
 {:else if html}
 	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>
 		{#if heldBack && full}

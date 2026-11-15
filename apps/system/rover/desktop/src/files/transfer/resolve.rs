@@ -2,8 +2,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
+use luft_i18n::t;
+
 use super::space::path_size;
 use crate::files::operations::{Conflict, ConflictItem, Decision, OperationsQueue, Resolution};
+use crate::l10n::L10N;
 
 #[derive(Default)]
 pub(super) struct Resolver {
@@ -57,9 +60,10 @@ impl Resolver {
             (resolution, _) => resolution,
         };
         if resolution == Resolution::Replace && source.starts_with(target) {
-            return Err(format!(
-                "{} can't replace a folder that contains it",
-                source.display()
+            return Err(t!(
+                L10N,
+                "rover-operations-contains-it",
+                path = source.display().to_string()
             ));
         }
         if apply_to_all {
@@ -77,7 +81,9 @@ impl Resolver {
 }
 
 pub(crate) fn available_destination(source: &Path, destination: &Path) -> Result<PathBuf, String> {
-    let name = source.file_name().ok_or("Invalid source path")?;
+    let name = source
+        .file_name()
+        .ok_or_else(|| t!(L10N, "rover-files-invalid-source"))?;
     let stem = source
         .file_stem()
         .unwrap_or(name)

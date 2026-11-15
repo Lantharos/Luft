@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { MoveDestination } from '#lib/bindings.js';
 	import TypedName from '../format/TypedName.svelte';
@@ -15,9 +16,9 @@
 	let typed = $state(false);
 </script>
 
-<Dialog title="Erase {destination.name} for Luft?" wide onclose={onback}>
+<Dialog title={t('disks-move-erase-title', { name: destination.name })} wide onclose={onback}>
 	{#if destination.erase.contents.length}
-		<p class="text-[13.5px] leading-relaxed">These are deleted for good, along with everything on them:</p>
+		<p class="text-[13.5px] leading-relaxed">{t('disks-remove-deleted-files')}</p>
 		<ul class="row-group">
 			{#each destination.erase.contents as part (part.name)}
 				<li class="line">
@@ -27,17 +28,17 @@
 			{/each}
 		</ul>
 	{:else}
-		<p class="text-[13.5px] leading-relaxed">Nothing on it can be read now, and whatever is still on it is gone for good once it’s erased.</p>
+		<p class="text-[13.5px] leading-relaxed">{t('disks-move-erase-unreadable')}</p>
 	{/if}
-	<p class="text-[13.5px] leading-relaxed">Luft then gets all {bytes(destination.erase.luft)} of it, and moves there the next time the computer starts.</p>
+	<p class="text-[13.5px] leading-relaxed">{t('disks-move-erase-then', { size: bytes(destination.erase.luft) })}</p>
 
 	{#if guarded}
 		<TypedName name={destination.name} bind:matches={typed} />
 	{/if}
 
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onback}>Back</button>
-		<button type="button" class="button danger" disabled={guarded && !typed} onclick={onerase}>Erase and move Luft</button>
+		<button type="button" class="button" onclick={onback}>{t('disks-back')}</button>
+		<button type="button" class="button danger" disabled={guarded && !typed} onclick={onerase}>{t('disks-move-erase-action')}</button>
 	{/snippet}
 </Dialog>
 

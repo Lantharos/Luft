@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import { PasswordField } from '@luft/ui';
 	import type { KeyRequest } from '#lib/encryption.svelte.js';
@@ -19,7 +20,7 @@
 
 <PasswordField
 	bind:this={field}
-	label="Passphrase or recovery key"
+	label={t('disks-encryption-key-prompt')}
 	bind:value={request.key}
 	error={request.error}
 	live

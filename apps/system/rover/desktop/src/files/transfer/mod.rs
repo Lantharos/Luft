@@ -12,9 +12,12 @@ use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::thread;
 
+use luft_i18n::t;
+
 use super::operations::{OperationPhase, OperationType, OperationsQueue, Resolution};
-use crate::files::text::{quoted, subject};
+use crate::files::text::{first_name, name_of};
 use crate::history::{History, Step};
+use crate::l10n::L10N;
 use resolve::Resolver;
 pub(crate) use resolve::available_destination;
 pub(crate) use space::path_size;
@@ -35,8 +38,14 @@ pub fn copy_items(
 ) -> Result<String, String> {
     let destination = PathBuf::from(destination);
     let labels = Labels {
-        done: format!("Copied {} to {}", subject(&sources), quoted(&destination)),
-        undone: format!("Removed {}", copies(&sources)),
+        done: t!(
+            L10N,
+            "rover-history-copied",
+            count = sources.len(),
+            name = first_name(&sources),
+            folder = name_of(&destination)
+        ),
+        undone: copies_removed(&sources),
     };
     let plan = sources
         .into_iter()
@@ -64,11 +73,22 @@ pub fn move_items(
         .filter(|source| Path::new(source).parent() != Some(destination.as_path()))
         .collect();
     if sources.is_empty() {
-        return Err("These items are already in this folder".to_string());
+        return Err(t!(L10N, "rover-operations-already-here"));
     }
     let labels = Labels {
-        done: format!("Moved {} to {}", subject(&sources), quoted(&destination)),
-        undone: format!("Moved {} back", subject(&sources)),
+        done: t!(
+            L10N,
+            "rover-history-moved",
+            count = sources.len(),
+            name = first_name(&sources),
+            folder = name_of(&destination)
+        ),
+        undone: t!(
+            L10N,
+            "rover-history-moved-back",
+            count = sources.len(),
+            name = first_name(&sources)
+        ),
     };
     let plan = sources
         .into_iter()
@@ -90,8 +110,13 @@ pub fn duplicate_items(
     history: &History,
 ) -> Result<String, String> {
     let labels = Labels {
-        done: format!("Duplicated {}", subject(&paths)),
-        undone: format!("Removed {}", copies(&paths)),
+        done: t!(
+            L10N,
+            "rover-history-duplicated",
+            count = paths.len(),
+            name = first_name(&paths)
+        ),
+        undone: copies_removed(&paths),
     };
     let plan = paths
         .into_iter()
@@ -127,10 +152,10 @@ fn start(
 ) -> Result<String, String> {
     for (source, destination) in &plan {
         if !destination.is_dir() {
-            return Err("Destination must be a folder".to_string());
+            return Err(t!(L10N, "rover-operations-not-folder"));
         }
         if destination.starts_with(source) {
-            return Err("A folder cannot be placed inside itself".to_string());
+            return Err(t!(L10N, "rover-operations-inside-itself"));
         }
     }
     let op_type = match mode {
@@ -202,7 +227,7 @@ fn target(source: &Path, destination: &Path) -> Result<PathBuf, String> {
     source
         .file_name()
         .map(|name| destination.join(name))
-        .ok_or_else(|| "Invalid source path".to_string())
+        .ok_or_else(|| t!(L10N, "rover-files-invalid-source"))
 }
 
 fn finalize(tracker: &mut Tracker) -> Result<(), String> {
@@ -228,9 +253,11 @@ fn finalize(tracker: &mut Tracker) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-fn copies(paths: &[String]) -> String {
-    match paths {
-        [path] => format!("the copy of {}", quoted(Path::new(path))),
-        _ => format!("{} copies", paths.len()),
-    }
+fn copies_removed(paths: &[String]) -> String {
+    t!(
+        L10N,
+        "rover-history-copies-removed",
+        count = paths.len(),
+        name = first_name(paths)
+    )
 }

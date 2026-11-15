@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Lock from '@lucide/svelte/icons/lock';
 	import { bytes, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -27,7 +28,7 @@
 	let busy = $derived(disks.busy.has(volume.block) || Boolean(job));
 	let primary = $derived(primaryAction(drive, volume));
 	let menu = $derived(volumeMenu(drive, volume, remembered));
-	let facts = $derived([locked ? 'Encrypted' : filesystemName(contents), bytes(volume.size)].join(' · '));
+	let facts = $derived([locked ? t('disks-filesystem-encrypted') : filesystemName(contents), bytes(volume.size)].join(' · '));
 	let encryption = $derived(disks.encryption(volume));
 	let status = $derived(
 		job
@@ -35,7 +36,7 @@
 			: encryption && changing(encryption)
 				? rowStatus(encryption)
 				: contents.used !== null
-					? `${bytes(Math.max(0, volume.size - contents.used))} free`
+					? t('disks-free', { size: bytes(Math.max(0, volume.size - contents.used)) })
 					: ''
 	);
 
@@ -55,12 +56,12 @@
 		<UsageRing {tone} share={usedShare(volume)} {locked} />
 		<span class="name">{volumeName(volume)}</span>
 		{#if volume.encryption && !locked}
-			<Lock size={13} class="flex-none text-[var(--text-muted)]" aria-label="Encrypted" />
+			<Lock size={13} class="flex-none text-[var(--text-muted)]" aria-label={t('disks-filesystem-encrypted')} />
 		{/if}
 		<span class="facts">{facts}</span>
 	</button>
 	<div class="actions">
-		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
+		<ActionMenu label={t('disks-more', { name: volumeName(volume) })} groups={menu} disabled={busy} />
 		{#if job && job.progress === null}<Spinner size={14} class="text-[var(--text-muted)]" />{/if}
 		{#if status}
 			<span class="status">{status}</span>

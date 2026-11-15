@@ -4,6 +4,8 @@ mod reclaim;
 mod tree;
 mod walk;
 
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -143,7 +145,7 @@ impl Explorer {
         self.0
             .lock()
             .clone()
-            .ok_or_else(|| "Nothing is being measured".to_owned())
+            .ok_or_else(|| t!(L10N, "disks-space-not-measuring"))
     }
 
     pub fn start(&self, events: &Events, path: &str) -> Result<SpaceUpdate, String> {
@@ -166,7 +168,7 @@ impl Explorer {
         let path = path.canonicalize().map_err(|error| error.to_string())?;
         let metadata = std::fs::metadata(&path).map_err(|error| error.to_string())?;
         if !metadata.is_dir() {
-            return Err("Only folders can be measured".to_owned());
+            return Err(t!(L10N, "disks-space-folders-only"));
         }
         let name = path.file_name().unwrap_or(path.as_os_str()).to_owned();
         let cancelled = Arc::default();
@@ -205,10 +207,14 @@ impl Explorer {
 
     pub fn trash(&self, components: Vec<String>) -> Result<SpaceUpdate, String> {
         let scan = self.current()?;
-        let (parent, path) = scan.location(&components).ok_or("It's no longer there")?;
-        let name = components.last().ok_or("Nothing to move")?;
+        let (parent, path) = scan
+            .location(&components)
+            .ok_or_else(|| t!(L10N, "disks-space-gone"))?;
+        let name = components
+            .last()
+            .ok_or_else(|| t!(L10N, "disks-space-nothing-to-move"))?;
         if parent.measuring(name) {
-            return Err("Wait until this folder has been measured".to_owned());
+            return Err(t!(L10N, "disks-space-still-measuring"));
         }
         gio::File::for_path(&path)
             .trash(gio::Cancellable::NONE)
@@ -222,7 +228,9 @@ impl Explorer {
 
     pub fn clean(&self, what: Cleanup) -> Result<(), String> {
         let scan = self.current()?;
-        let places = scan.places.ok_or("Nothing here can be cleaned up")?;
+        let places = scan
+            .places
+            .ok_or_else(|| t!(L10N, "disks-space-nothing-to-clean"))?;
         places.clean(what)
     }
 
@@ -231,7 +239,9 @@ impl Explorer {
         if components.is_empty() {
             return file_manager::show_folder(&scan.path, token).await;
         }
-        let (parent, path) = scan.location(&components).ok_or("It's no longer there")?;
+        let (parent, path) = scan
+            .location(&components)
+            .ok_or_else(|| t!(L10N, "disks-space-gone"))?;
         let folder = components
             .last()
             .is_some_and(|name| parent.find(std::slice::from_ref(name)).is_some());

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import type { OtherSystem } from '#lib/bindings.js';
 	import { orderedParts, partName, startupName } from '#lib/systems.js';
@@ -11,7 +12,7 @@
 
 	let lines = $derived([
 		...[...orderedParts(system)].reverse().map((part) => ({ key: part.block, name: partName(system, part), size: bytes(part.size) })),
-		...(system.kept === null ? [] : [{ key: 'kept', name: `${system.name}’s files`, size: bytes(system.kept) }]),
+		...(system.kept === null ? [] : [{ key: 'kept', name: t('disks-system-files', { name: system.name }), size: bytes(system.kept) }]),
 		...(system.startups.length ? [{ key: 'startup', name: startupName(system), size: '' }] : [])
 	]);
 </script>

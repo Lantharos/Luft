@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { FileEntry } from '#lib/bindings.js';
 	import InlineNameField from '#lib/components/pane/InlineNameField.svelte';
 	import { defaultName, type FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -22,7 +23,8 @@
 	<InlineNameField
 		class={fieldClass}
 		value={draft.value}
-		label={draft.itemType === 'folder' ? 'Folder name' : 'File name'}
+		label={draft.itemType === 'folder' ? t('rover-name-field-folder') : t('rover-chooser-file-name')}
+
 		unchangedValue={creating ? defaultName(draft.itemType) : entry.name}
 		placeholder={creating ? defaultName(draft.itemType) : ''}
 		selectStem={entry.isFile}

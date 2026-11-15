@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { PartKind, SpaceView } from '#lib/bindings.js';
 
 export type TileKind = 'dir' | 'file' | 'other' | 'rest' | 'part';
@@ -15,8 +16,6 @@ export interface Tile {
 	part?: PartKind;
 }
 
-const count = (value: number, one: string, many: string) => `${value.toLocaleString()} ${value === 1 ? one : many}`;
-
 export function tilesOf(view: SpaceView): Tile[] {
 	let folders = 0;
 	const tiles: Tile[] = view.children.map((item) => {
@@ -27,7 +26,7 @@ export function tilesOf(view: SpaceView): Tile[] {
 				name: item.name,
 				label: item.name,
 				size: item.size,
-				detail: item.done ? count(item.items, 'item', 'items') : '',
+				detail: item.done ? t('disks-space-items', { count: item.items }) : '',
 				inner: item.inner,
 				done: item.done,
 				tone: folders++ % 3
@@ -40,7 +39,7 @@ export function tilesOf(view: SpaceView): Tile[] {
 			key: 'other',
 			kind: 'other',
 			name: '',
-			label: count(item.count, 'small file', 'small files'),
+			label: t('disks-space-small-files', { count: item.count }),
 			size: item.size,
 			detail: '',
 			inner: [],
@@ -53,7 +52,7 @@ export function tilesOf(view: SpaceView): Tile[] {
 			key: 'rest',
 			kind: 'rest',
 			name: '',
-			label: count(view.hiddenCount, 'smaller item', 'smaller items'),
+			label: t('disks-space-smaller-items', { count: view.hiddenCount }),
 			size: view.hiddenSize,
 			detail: '',
 			inner: [],

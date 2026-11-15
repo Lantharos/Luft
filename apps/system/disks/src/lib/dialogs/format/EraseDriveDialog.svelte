@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, Spinner } from '@luft/ui';
 	import TypedName from './TypedName.svelte';
 
@@ -27,7 +28,7 @@
 <Dialog {title} {description} onclose={() => !working && onclose()}>
 	<TypedName {name} bind:matches />
 	{#snippet actions()}
-		<button type="button" class="button" disabled={working} onclick={onclose}>Cancel</button>
+		<button type="button" class="button" disabled={working} onclick={onclose}>{t('disks-cancel')}</button>
 		<button type="button" class="button danger" disabled={!matches || working} onclick={confirm}>{#if working}<Spinner />{/if}{action}</button>
 	{/snippet}
 </Dialog>

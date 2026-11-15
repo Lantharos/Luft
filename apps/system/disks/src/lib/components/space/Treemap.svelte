@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { appearance } from '@luft/ui';
 	import { mix, readPalette, type Palette } from './colors';
 	import { FIRST_LINE, layoutLabel, LINE, NAME_FONT, PADDING, SIZE_FONT, type Label } from './labels';
@@ -120,7 +121,7 @@
 		class:pointer={hovered?.startsWith('dir:')}
 		style:width="{width}px"
 		style:height="{HEIGHT}px"
-		aria-label="Sizes of what's in this folder"
+		aria-label={t('disks-space-map')}
 		onpointermove={(event) => onhover(hit(event)?.key ?? null)}
 		onpointerleave={() => onhover(null)}
 		onclick={(event) => {

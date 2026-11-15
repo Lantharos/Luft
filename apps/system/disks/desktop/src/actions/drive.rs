@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use zbus::OwnedObjectPath;
 
 use super::mounting;
@@ -13,7 +15,9 @@ pub async fn safely_remove(drive: &str, block: &str) -> Result<(), String> {
         mounting::release_in(&objects, partition.as_str()).await?;
     }
     mounting::release_in(&objects, block).await?;
-    let info = objects.get(drive, DRIVE).ok_or("This drive is gone")?;
+    let info = objects
+        .get(drive, DRIVE)
+        .ok_or_else(|| t!(L10N, "disks-drive-gone"))?;
     if info.flag("CanPowerOff") {
         udisks::run(drive, DRIVE, "PowerOff", &(no_options(),)).await
     } else {
@@ -28,7 +32,7 @@ async fn health_interface(drive: &str) -> Result<&'static str, String> {
     } else if objects.get(drive, NVME).is_some() {
         Ok(NVME)
     } else {
-        Err("This drive can't test itself".to_owned())
+        Err(t!(L10N, "disks-drive-no-selftest"))
     }
 }
 

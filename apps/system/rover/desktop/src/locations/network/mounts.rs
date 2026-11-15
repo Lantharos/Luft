@@ -1,12 +1,14 @@
 use std::sync::mpsc;
 
 use gio::prelude::*;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
+use crate::l10n::L10N;
+
 const DEVICE_SCHEMES: &[&str] = &["mtp", "gphoto2", "afc"];
 const APPLE_SCHEME: &str = "afc";
-const UNTRUSTED: &str = "Unlock your iPhone and tap Trust";
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -71,7 +73,7 @@ pub fn explain_connect(uri: &str, error: &gio::glib::Error) -> String {
     let refused = error.matches(gio::IOErrorEnum::ConnectionRefused)
         || error.matches(gio::IOErrorEnum::PermissionDenied);
     if refused && gio::File::for_uri(uri).uri_scheme().as_deref() == Some(APPLE_SCHEME) {
-        return UNTRUSTED.to_owned();
+        return t!(L10N, "rover-network-untrusted");
     }
     explain(error)
 }
@@ -80,7 +82,7 @@ pub fn locate(file: &gio::File) -> Result<NetworkLocation, String> {
     let mount = file
         .find_enclosing_mount(gio::Cancellable::NONE)
         .map_err(|error| explain(&error))?;
-    let mut place = location(&mount).ok_or("This location can't be opened as a folder")?;
+    let mut place = location(&mount).ok_or_else(|| t!(L10N, "rover-network-not-folder"))?;
     if let Some(path) = file.path() {
         place.path = path.to_string_lossy().into_owned();
     }

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, plural, Row, Section, Spinner } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, Row, Section, Spinner } from '@luft/ui';
 	import type { Amount, Cleanup, Reclaim } from '#lib/bindings.js';
 	import { showInRover } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
@@ -13,14 +14,14 @@
 	let { reclaim }: Props = $props();
 
 	const PLACES: { what: Cleanup; title: string; description: (amount: Amount) => string; action: string }[] = [
-		{ what: 'trash', title: 'Trash', description: () => 'Things you deleted, kept until the trash is emptied', action: 'Empty' },
+		{ what: 'trash', title: 'disks-reclaim-trash', description: () => t('disks-reclaim-trash.description'), action: 'disks-reclaim-trash-action' },
 		{
 			what: 'downloads',
-			title: 'Downloads older than 30 days',
-			description: (amount) => (amount.measured && amount.items ? `${plural(amount.items, 'item')} that haven’t changed in a month` : 'Nothing in Downloads is that old'),
-			action: 'Move to trash'
+			title: 'disks-reclaim-downloads',
+			description: (amount) => (amount.measured && amount.items ? t('disks-reclaim-downloads.description', { count: amount.items }) : t('disks-reclaim-downloads-none')),
+			action: 'disks-reclaim-downloads-action'
 		},
-		{ what: 'caches', title: 'App caches', description: () => 'Copies apps keep to open faster and make again when needed', action: 'Clear' }
+		{ what: 'caches', title: 'disks-reclaim-caches', description: () => t('disks-reclaim-caches.description'), action: 'disks-reclaim-caches-action' }
 	];
 
 	let places = $derived(PLACES.flatMap((place) => (reclaim[place.what] ? [{ ...place, amount: reclaim[place.what]! }] : [])));
@@ -29,27 +30,27 @@
 	const name = (path: string[]) => path.at(-1) ?? '';
 </script>
 
-<Section title="Free up space">
+<Section title={t('disks-reclaim')}>
 	{#each places as { what, title, description, action, amount } (what)}
-		<Row {title} description={description(amount)}>
+		<Row title={t(title)} description={description(amount)}>
 			<span class="size">
 				{#if !amount.measured}<Spinner size={13} />{/if}
 				{bytes(amount.size)}
 			</span>
 			<button type="button" class="button" disabled={!amount.measured || amount.size === 0} onclick={() => dialogs.open({ kind: 'clean', what, size: amount.size, items: amount.items })}>
-				{action}
+				{t(action)}
 			</button>
 		</Row>
 	{/each}
 </Section>
 
 {#if reclaim.largest.length}
-	<Section title="Largest files">
+	<Section title={t('disks-reclaim-largest')}>
 		{#each reclaim.largest as file (file.path.join('/'))}
 			<Row title={name(file.path)} description={folder(file.path)} truncate>
 				<span class="size">{bytes(file.size)}</span>
-				<button type="button" class="button" onclick={() => dialogs.open({ kind: 'trash', path: file.path, name: name(file.path), size: file.size, folder: false })}>Move to trash</button>
-				<ActionMenu label="More for {name(file.path)}" groups={[[{ label: 'Show in Rover', run: () => void showInRover(file.path).catch((caught) => disks.fail(caught)) }]]} />
+				<button type="button" class="button" onclick={() => dialogs.open({ kind: 'trash', path: file.path, name: name(file.path), size: file.size, folder: false })}>{t('disks-reclaim-largest-trash')}</button>
+				<ActionMenu label={t('disks-more', { name: name(file.path) })} groups={[[{ label: t('disks-space-show'), run: () => void showInRover(file.path).catch((caught) => disks.fail(caught)) }]]} />
 			</Row>
 		{/each}
 	</Section>

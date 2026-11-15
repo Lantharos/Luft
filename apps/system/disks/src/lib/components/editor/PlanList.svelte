@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
 	import { percent } from '#lib/format.js';
@@ -18,7 +19,7 @@
 		})
 	);
 	let moving = $derived(editor.progress && editor.progress.total > 0 ? editor.progress.copied / editor.progress.total : null);
-	let heading = $derived(editor.running ? 'Applying changes' : editor.outcome?.error ? 'Some changes weren’t made' : 'All changes were made');
+	let heading = $derived(t('disks-editor-outcome', { state: editor.running ? 'running' : editor.outcome?.error ? 'failed' : 'done' }));
 </script>
 
 {#if sentences.length}

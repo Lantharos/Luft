@@ -8,11 +8,13 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 
 use luft_app::Events;
+use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
 
 use crate::app::events::VCS_STATUS;
 use crate::app::settings::Settings;
+use crate::l10n::L10N;
 
 static NEXT_STATUS_ID: AtomicU64 = AtomicU64::new(1);
 
@@ -68,7 +70,7 @@ pub fn root(path: String, settings: &Settings) -> Option<VcsRoot> {
 pub fn trust(root: String, settings: &mut Settings) -> Result<(), String> {
     let root = find_root(Path::new(&root))
         .filter(|found| found.as_path() == Path::new(&root))
-        .ok_or("No versioned project found")?;
+        .ok_or_else(|| t!(L10N, "rover-vcs-no-project"))?;
     let root = root.to_string_lossy().into_owned();
     if !settings.trusted_folders.contains(&root) {
         settings.trusted_folders.push(root);
@@ -117,7 +119,7 @@ pub fn save(
     settings: &Settings,
 ) -> Result<(), String> {
     if message.trim().is_empty() {
-        return Err("Message is required".to_string());
+        return Err(t!(L10N, "rover-vcs-message-required"));
     }
     let root = project_root(&root, settings)?;
     let files: Vec<String> = files
@@ -135,11 +137,15 @@ pub fn sync(root: String, settings: &Settings) -> Result<(), String> {
 
 fn project_root(root: &str, settings: &Settings) -> Result<PathBuf, String> {
     if !Path::new(root).is_dir() {
-        return Err(format!("Project folder no longer exists: {root}"));
+        return Err(t!(L10N, "rover-vcs-folder-gone", folder = root));
     }
-    let root = find_root(Path::new(root)).ok_or("No versioned project found")?;
+    let root = find_root(Path::new(root)).ok_or_else(|| t!(L10N, "rover-vcs-no-project"))?;
     if !trust::is_trusted(&root, settings) {
-        return Err(format!("{} isn't a trusted folder", root.display()));
+        return Err(t!(
+            L10N,
+            "rover-vcs-untrusted",
+            folder = root.display().to_string()
+        ));
     }
     Ok(root)
 }

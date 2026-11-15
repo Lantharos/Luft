@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
@@ -6,14 +8,10 @@ use crate::actions::formatting::{self, Format};
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, ROOT, SERVICE, bytes_text};
 use luft_app::dbus::{self, objects};
+use luft_app::recovery::Sheet;
 use luft_trust::{self as client, DRIVES, Outcome, TRUST};
 use specta::Type;
 
-const EXPLANATION: [&str; 3] = [
-    "If this drive asks for a recovery key, type this key to unlock it.",
-    "Keep it somewhere other than the drive and this computer,",
-    "such as on paper or in a password manager.",
-];
 const MOUNT_WAIT: Duration = Duration::from_secs(5);
 
 #[derive(Serialize, Deserialize, Type)]
@@ -38,14 +36,14 @@ pub async fn device_of(block: &str) -> Result<String, String> {
         .get(block, BLOCK)
         .and_then(|target| target.get::<Vec<u8>>("Device"))
         .map(bytes_text)
-        .ok_or_else(|| "This partition is gone".to_owned())
+        .ok_or_else(|| t!(L10N, "disks-partition-gone"))
 }
 
 pub async fn check(block: &str) -> Result<DriveCheck, String> {
     let (method, checks, auto_unlock): (String, Vec<(String, bool, String)>, String) =
         client::call(&DRIVES, "Check", &(device_of(block).await?,)).await?;
     Ok(DriveCheck {
-        method: super::parse(method).ok_or("Disks can't tell how to encrypt this drive")?,
+        method: super::parse(method).ok_or_else(|| t!(L10N, "disks-trust-unknown-method"))?,
         checks: checks.into_iter().map(client::Check::from).collect(),
         auto_unlock,
     })
@@ -182,20 +180,29 @@ pub async fn show_recovery_key(uuid: &str) -> Result<String, String> {
     client::call(&DRIVES, "ShowRecoveryKey", &(uuid,)).await
 }
 
-fn sheet<'a>(key: &'a str, name: &str) -> luft_app::recovery::Sheet<'a> {
-    luft_app::recovery::Sheet {
+fn sheet<'a>(key: &'a str, name: &str, explanation: &'a [&'a str]) -> Sheet<'a> {
+    Sheet {
         key,
-        name: format!("{name} on {}", luft_app::recovery::computer()),
-        explanation: &EXPLANATION,
+        name: t!(
+            L10N,
+            "disks-recovery-sheet-name",
+            drive = name,
+            computer = luft_app::recovery::computer()
+        ),
+        explanation,
     }
 }
 
 pub async fn save_key(key: &str, name: &str) -> Result<bool, String> {
-    sheet(key, name)
-        .save(&format!("Recovery key for {name}.txt"))
+    let explanation = t!(L10N, "disks-recovery-explanation");
+    let lines: Vec<&str> = explanation.lines().collect();
+    sheet(key, name, &lines)
+        .save(&t!(L10N, "disks-recovery-file-name", drive = name))
         .await
 }
 
 pub async fn print_key(key: &str, name: &str) -> Result<bool, String> {
-    sheet(key, name).print().await
+    let explanation = t!(L10N, "disks-recovery-explanation");
+    let lines: Vec<&str> = explanation.lines().collect();
+    sheet(key, name, &lines).print().await
 }

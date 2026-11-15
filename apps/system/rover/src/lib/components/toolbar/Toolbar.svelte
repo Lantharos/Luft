@@ -7,6 +7,7 @@
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import List from '@lucide/svelte/icons/list';
 	import PanelRight from '@lucide/svelte/icons/panel-right';
+	import { t } from '@luft/i18n';
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
 	import type { Component } from 'svelte';
 	import type { ViewMode } from '#lib/bindings.js';
@@ -29,38 +30,39 @@
 
 	let { manager, drag, view, vcs, chooser }: Props = $props();
 
-	const VIEW_MODES: { value: ViewMode; label: string; icon: Component }[] = [
-		{ value: 'list', label: 'List', icon: List },
-		{ value: 'grid', label: 'Grid', icon: LayoutGrid },
-		{ value: 'columns', label: 'Columns', icon: Columns3 }
-	];
-	const MODE_ICONS = Object.fromEntries(VIEW_MODES.map((mode) => [mode.value, mode.icon])) as Record<ViewMode, Component>;
+	const MODE_ICONS: Record<ViewMode, Component> = { list: List, grid: LayoutGrid, columns: Columns3 };
+
+	let viewModes: { value: ViewMode; label: string }[] = $derived([
+		{ value: 'list', label: t('rover-view-list') },
+		{ value: 'grid', label: t('rover-view-grid') },
+		{ value: 'columns', label: t('rover-view-columns') }
+	]);
 
 	let browsing = $derived(manager.view === 'home');
 </script>
 
 <header class="toolbar drag-region">
 	<div class="flex shrink-0 items-center gap-0.5">
-		<button class="icon-button" type="button" aria-label="Back" disabled={!manager.tabs.canGoBack} onclick={manager.goBack} {@attach tooltip('Back')}>
+		<button class="icon-button" type="button" aria-label={t('rover-toolbar-back')} disabled={!manager.tabs.canGoBack} onclick={manager.goBack} {@attach tooltip(t('rover-toolbar-back'))}>
 			<ChevronLeft size={19} />
 		</button>
 		<button
 			class="icon-button"
 			type="button"
-			aria-label="Forward"
+			aria-label={t('rover-toolbar-forward')}
 			disabled={!manager.tabs.canGoForward}
 			onclick={manager.goForward}
-			{@attach tooltip('Forward')}
+			{@attach tooltip(t('rover-toolbar-forward'))}
 		>
 			<ChevronRight size={19} />
 		</button>
 		<button
 			class="icon-button"
 			type="button"
-			aria-label="Parent folder"
+			aria-label={t('rover-toolbar-parent')}
 			disabled={!browsing || manager.currentPath === '/'}
 			onclick={manager.goUp}
-			{@attach tooltip('Parent folder')}
+			{@attach tooltip(t('rover-toolbar-parent'))}
 		>
 			<ArrowUp size={17} />
 		</button>
@@ -74,7 +76,7 @@
 				class={['vcs-chip', vcs.panelOpen && 'is-on']}
 				type="button"
 				onclick={() => (vcs.panelOpen = !vcs.panelOpen)}
-				{@attach tooltip('Changes')}
+				{@attach tooltip(t('rover-vcs-changes'))}
 			>
 				<GitBranch size={15} />
 				<span class="truncate">{vcs.project.branch ?? 'Git'}</span>
@@ -84,7 +86,7 @@
 			</button>
 		{/if}
 		{#if browsing}
-			<Segmented options={VIEW_MODES} value={manager.viewMode} label="View" onchange={manager.setViewMode}>
+			<Segmented options={viewModes} value={manager.viewMode} label={t('rover-view')} onchange={manager.setViewMode}>
 				{#snippet item(option)}
 					{@const Icon = MODE_ICONS[option.value]}
 					<Icon size={16} />
@@ -98,10 +100,11 @@
 		<button
 			class={['icon-button', view.detailsOpen && 'is-on']}
 			type="button"
-			aria-label="Details"
+			aria-label={t('rover-details')}
 			aria-pressed={view.detailsOpen}
 			onclick={view.toggleDetails}
-			{@attach tooltip('Details')}
+			{@attach tooltip(t('rover-details'))}
+
 		>
 			<PanelRight size={17} />
 		</button>

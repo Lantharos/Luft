@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Drive } from '#lib/bindings.js';
 	import { segmentKey } from '#lib/state/disks.svelte.js';
 	import FreeRow from './FreeRow.svelte';
@@ -14,7 +15,7 @@
 	let palette = $derived(tones(drive));
 </script>
 
-<div class="row-group" role="list" aria-label="Partitions">
+<div class="row-group" role="list" aria-label={t('disks-partitions')}>
 	{#each drive.segments as segment (segmentKey(segment))}
 		{#if segment.kind === 'volume'}
 			<PartitionRow {drive} volume={segment} tone={palette.get(segment.block) ?? 'var(--accent)'} />

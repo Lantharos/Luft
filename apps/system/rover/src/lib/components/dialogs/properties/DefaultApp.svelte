@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, errorText, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { OpenWithApps } from '#lib/bindings.js';
@@ -38,8 +39,8 @@
 	<div class="flex items-center gap-3">
 		<AppIcon icon={apps.default?.icon ?? null} id={apps.default?.id} size={28} />
 		<Select
-			label="Opens with"
-			placeholder="Choose an app"
+			label={t('rover-properties-opens-with')}
+			placeholder={t('rover-properties-choose-app')}
 			value={apps.default?.id ?? ''}
 			options={choices}
 			onchange={choose}
@@ -49,5 +50,6 @@
 		<p class="text-[12px] text-[var(--danger)]">{error}</p>
 	{/if}
 {:else if apps}
-	<span class="text-[var(--text-muted)]">No installed app opens this kind of file</span>
+	<span class="text-[var(--text-muted)]">{t('rover-properties-no-app')}</span>
+
 {/if}

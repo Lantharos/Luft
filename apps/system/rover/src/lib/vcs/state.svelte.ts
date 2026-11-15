@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { errorText } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { VcsFileStatus, VcsProject, VcsStatusEvent } from '#lib/bindings.js';
@@ -123,7 +124,7 @@ export class VcsState {
 		await this.#run('save', async () => {
 			await commands.vcsSave({ root: project.root, message, files: files.map((path) => absolutePath(project.root, path)) });
 			this.saveDialogOpen = false;
-			this.lastResult = 'Committed';
+			this.lastResult = t('rover-vcs-committed');
 		});
 	};
 
@@ -132,7 +133,8 @@ export class VcsState {
 		if (!project) return;
 		await this.#run('sync', async () => {
 			await commands.vcsSync({ root: project.root });
-			this.lastResult = 'Synced';
+			this.lastResult = t('rover-vcs-synced');
+
 		});
 	};
 

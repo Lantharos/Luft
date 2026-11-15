@@ -1,5 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
@@ -31,17 +32,20 @@
 		transition:fade={{ duration: 160 }}
 		onpointerdown={(event) => event.target === event.currentTarget && close()}
 	>
-		<div class="quicklook" role="dialog" aria-label={`Preview of ${entry.name}`} in:pop out:fade={{ duration: 120 }}>
+		<div class="quicklook" role="dialog" aria-label={t('rover-quicklook-label', { name: entry.name })} in:pop out:fade={{ duration: 120 }}>
 			<header class="quicklook-header">
 				<EntryIcon kind={fileKind(entry)} size={28} {...entryArt(entry)} />
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-[14px] font-medium text-[var(--text)]">{entry.name}</p>
 					<p class="truncate text-[12px] text-[var(--text-muted)]">
-						{kindLabel(entry)}{entry.isDir ? '' : ` · ${bytes(entry.size)}`} · {position} of {count}
+						{entry.isDir
+							? t('rover-quicklook-folder-subtitle', { kind: kindLabel(entry), position, count })
+							: t('rover-quicklook-file-subtitle', { kind: kindLabel(entry), size: bytes(entry.size), position, count })}
 					</p>
 				</div>
-				<button class="button" type="button" onclick={() => manager.openEntry(entry)}>Open</button>
-				<button class="icon-button" type="button" aria-label="Close" onclick={close} {@attach tooltip('Close')}>
+				<button class="button" type="button" onclick={() => manager.openEntry(entry)}>{t('rover-open')}</button>
+				<button class="icon-button" type="button" aria-label={t('rover-close')} onclick={close} {@attach tooltip(t('rover-close'))}>
+
 					<X size={17} />
 				</button>
 			</header>

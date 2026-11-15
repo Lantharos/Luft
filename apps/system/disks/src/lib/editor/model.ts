@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { Drive, PartitionTable, Volume } from '#lib/bindings.js';
 import { inner, volumeName } from '#lib/format.js';
 
@@ -117,7 +118,7 @@ export function apply(layout: Layout, step: Step): Layout {
 				system: false,
 				logical: inside(layout.extended, step),
 				replaced: true,
-				title: step.label || step.name || 'New partition'
+				title: step.label || step.name || t('disks-editor-new-partition')
 			};
 			return { ...layout, parts: sorted([...layout.parts, created]) };
 		}
@@ -175,8 +176,8 @@ export function gaps(layout: Layout): Span[] {
 }
 
 export function creatable(layout: Layout, gap: Span) {
-	if (layout.table === 'gpt') return layout.parts.length < GPT_ENTRIES ? null : 'This drive’s partition table has no room for another partition.';
+	if (layout.table === 'gpt') return layout.parts.length < GPT_ENTRIES ? null : t('disks-editor-table-full');
 	if (inside(layout.extended, gap)) return null;
 	const primaries = layout.parts.filter((candidate) => !candidate.logical).length + (layout.extended ? 1 : 0);
-	return primaries < DOS_PRIMARIES ? null : 'An MBR partition table holds at most four partitions.';
+	return primaries < DOS_PRIMARIES ? null : t('disks-editor-mbr-full');
 }

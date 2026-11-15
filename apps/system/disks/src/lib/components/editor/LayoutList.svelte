@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { gaps, type Layout, type Span } from '#lib/editor/model.js';
-	import { FILESYSTEM_NAMES } from '#lib/format.js';
+	import { filesystemLabel } from '#lib/format.js';
 
 	interface Props {
 		layout: Layout;
@@ -19,18 +20,18 @@
 				(part): Row => ({
 					key: part.key,
 					name: part.title,
-					kind: part.locked ? 'Encrypted' : part.filesystem ? (FILESYSTEM_NAMES[part.filesystem] ?? part.filesystem) : 'No file system',
+					kind: part.locked ? t('disks-filesystem-encrypted') : part.filesystem ? filesystemLabel(part.filesystem) : t('disks-editor-no-filesystem'),
 					span: part,
 					tone: tones.get(part.key) ?? null,
 					pending: part.pending
 				})
 			),
-			...gaps(layout).map((gap): Row => ({ key: `free:${gap.offset}`, name: 'Free space', kind: '', span: gap, tone: null, pending: false }))
+			...gaps(layout).map((gap): Row => ({ key: `free:${gap.offset}`, name: t('disks-free-space'), kind: '', span: gap, tone: null, pending: false }))
 		].sort((a, b) => a.span.offset - b.span.offset)
 	);
 </script>
 
-<div class="row-group" role="listbox" aria-label="Partitions and free space">
+<div class="row-group" role="listbox" aria-label={t('disks-editor-layout')}>
 	{#each rows as row (row.key)}
 		<button
 			type="button"

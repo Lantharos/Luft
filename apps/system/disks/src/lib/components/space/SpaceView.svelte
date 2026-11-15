@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { bytes, Spinner, tooltip } from '@luft/ui';
 	import { showInRover } from '#lib/bridge/index.js';
@@ -19,10 +20,10 @@
 	let crumbs = $derived(space.path.length || space.luft ? [space.name, ...space.path.map((name, depth) => space.label(name, depth))] : [update?.root ?? space.name]);
 	let status = $derived.by(() => {
 		if (!update) return '';
-		const unreadable = update.unreadable && !parts ? ` · ${update.unreadable.toLocaleString()} ${update.unreadable === 1 ? 'folder' : 'folders'} couldn't be read` : '';
-		if (update.scanning) return `Measuring ${update.totalItems.toLocaleString()} items${unreadable}`;
+		const unreadable = update.unreadable && !parts ? [t('disks-space-unreadable', { count: update.unreadable })] : [];
+		if (update.scanning) return [t('disks-space-measuring', { count: update.totalItems }), ...unreadable].join(' · ');
 		if (parts) return bytes(parts.reduce((sum, part) => sum + part.size, 0));
-		return view ? `${bytes(view.size)} in ${view.items.toLocaleString()} items${unreadable}` : '';
+		return view ? [t('disks-space-total', { size: bytes(view.size), count: view.items }), ...unreadable].join(' · ') : '';
 	});
 
 	function open(tile: Tile) {
@@ -31,9 +32,9 @@
 
 	function actions(tile: Tile): Action[][] {
 		const path = [...space.path, tile.name];
-		const show: Action = { label: 'Show in Rover', run: () => void showInRover(path).catch((caught) => disks.fail(caught)) };
+		const show: Action = { label: t('disks-space-show'), run: () => void showInRover(path).catch((caught) => disks.fail(caught)) };
 		if (tile.part) return [[show]];
-		const trash: Action = { label: 'Move to trash…', danger: true, run: () => dialogs.open({ kind: 'trash', path, name: tile.name, size: tile.size, folder: tile.kind === 'dir' }) };
+		const trash: Action = { label: t('disks-space-trash'), danger: true, run: () => dialogs.open({ kind: 'trash', path, name: tile.name, size: tile.size, folder: tile.kind === 'dir' }) };
 		return [[show], tile.done ? [trash] : []];
 	}
 </script>
@@ -42,7 +43,7 @@
 
 <section class="flex flex-col gap-5">
 	<div class="flex min-h-9 items-center gap-2 px-1.5">
-		<nav class="flex min-w-0 flex-1 items-center gap-1 text-[14px] text-[var(--text-muted)]" aria-label="Folders">
+		<nav class="flex min-w-0 flex-1 items-center gap-1 text-[14px] text-[var(--text-muted)]" aria-label={t('disks-space-folders')}>
 			{#each crumbs as crumb, index (index)}
 				{#if index > 0}
 					<span aria-hidden="true">›</span>
@@ -58,7 +59,7 @@
 			{#if update?.scanning}<Spinner size={13} />{/if}
 			{status}
 		</span>
-		<button type="button" class="icon-button" aria-label="Measure again" disabled={update?.scanning} {@attach tooltip('Measure again')} onclick={() => space.refresh()}>
+		<button type="button" class="icon-button" aria-label={t('disks-space-refresh')} disabled={update?.scanning} {@attach tooltip(t('disks-space-refresh'))} onclick={() => space.refresh()}>
 			<RefreshCw size={17} />
 		</button>
 	</div>
@@ -66,7 +67,7 @@
 		<Treemap {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} />
 		<SpaceList {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} {actions} />
 	{:else if view}
-		<p class="px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">This folder is empty.</p>
+		<p class="px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">{t('disks-space-empty')}</p>
 	{/if}
 	{#if update?.reclaim && !space.path.length}
 		<Reclaim reclaim={update.reclaim} />

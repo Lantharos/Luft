@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { FileEntry } from '#lib/bindings.js';
 
 
@@ -37,10 +38,11 @@ export function previewRenames(entries: FileEntry[], siblings: FileEntry[], opti
 }
 
 function problemFor(name: string, counts: Map<string, number>, taken: Set<string>) {
-	if (!name.trim() || name === '.' || name === '..') return 'Empty name';
-	if (name.includes('/')) return 'Names can’t contain /';
-	if ((counts.get(name) ?? 0) > 1) return 'Used more than once';
-	if (taken.has(name)) return 'Already in this folder';
+	if (!name.trim() || name === '.' || name === '..') return t('rover-rename-problem-empty');
+	if (name.includes('/')) return t('rover-rename-problem-slash');
+	if ((counts.get(name) ?? 0) > 1) return t('rover-rename-problem-repeated');
+	if (taken.has(name)) return t('rover-rename-problem-taken');
+
 	return null;
 }
 

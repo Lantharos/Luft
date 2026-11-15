@@ -10,10 +10,12 @@ use std::time::{Duration, Instant};
 
 use ignore::{WalkBuilder, WalkState};
 use luft_app::Events;
+use luft_i18n::t;
 use serde::Serialize;
 
 use crate::app::events::SEARCH_RESULTS;
 use crate::files::entries::{FileEntry, file_entry};
+use crate::l10n::L10N;
 use crate::locations::cloud;
 pub use matcher::SearchQuery;
 use matcher::{Found, Matcher};
@@ -67,7 +69,7 @@ impl Search {
         let matcher = Matcher::new(&query)?;
         let root = PathBuf::from(&query.root);
         if !root.is_dir() {
-            return Err("This folder can't be searched".to_string());
+            return Err(t!(L10N, "rover-search-unsearchable"));
         }
         let id = self.inner.next_id.fetch_add(1, Ordering::Relaxed);
         self.inner.current.store(id, Ordering::Release);

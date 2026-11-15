@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, dateTime, Dialog, errorText, parent, plural, Spinner } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, dateTime, Dialog, errorText, parent, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import { exploreSpace } from '#lib/bridge/index.js';
 	import type { DriveInfo, FileDetails, FileEntry, Measurement, Ownership } from '#lib/bindings.js';
@@ -22,8 +23,8 @@
 	let single = $derived(entries.length === 1 ? entries[0] : null);
 	let measured = $derived(!drive && (entries.some((entry) => entry.isDir) || entries.length > 1));
 	let locations = $derived(new Set(entries.map((entry) => parent(entry.path))));
-	let title = $derived(drive?.name ?? single?.name ?? plural(entries.length, 'item'));
-	let kind = $derived(drive ? 'Drive' : single ? (details?.kind ?? '') : describeMix(entries));
+	let title = $derived(drive?.name ?? single?.name ?? t('rover-properties-items', { count: entries.length }));
+	let kind = $derived(drive ? t('rover-properties-kind-drive') : single ? (details?.kind ?? '') : describeMix(entries));
 	let octal = $derived(ownership ? (ownership.mode & 0o777).toString(8).padStart(3, '0') : '');
 
 	$effect(() => {
@@ -54,16 +55,18 @@
 	function describeMix(items: FileEntry[]) {
 		const folders = items.filter((item) => item.isDir).length;
 		const files = items.length - folders;
-		return [folders && plural(folders, 'folder'), files && plural(files, 'file')].filter(Boolean).join(' and ');
+		if (!files) return t('rover-properties-kind-folders', { folders });
+		if (!folders) return t('rover-properties-kind-files', { files });
+		return t('rover-properties-kind-mixed', { folders, files });
 	}
 
 	function sizeText() {
-		if (drive) return `${bytes(drive.usedSpace)} used of ${bytes(drive.totalSpace)}`;
-		if (!measured) return single ? `${bytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
-		if (!measurement) return 'Measuring';
-		const contents = plural(measurement.files, 'file');
-		const folders = measurement.folders > 0 ? `, ${plural(measurement.folders, 'folder')}` : '';
-		return `${bytes(measurement.bytes)} · ${contents}${folders}`;
+		if (drive) return t('rover-properties-drive-size', { used: bytes(drive.usedSpace), total: bytes(drive.totalSpace) });
+		if (!measured) return single ? t('rover-properties-file-size', { size: bytes(single.size), bytes: single.size }) : '';
+		if (!measurement) return t('rover-properties-measuring');
+		const size = bytes(measurement.bytes);
+		if (measurement.folders > 0) return t('rover-properties-contents-folders', { size, files: measurement.files, folders: measurement.folders });
+		return t('rover-properties-contents', { size, files: measurement.files });
 	}
 
 	async function changeMode(mode: number) {
@@ -92,18 +95,18 @@
 
 <Dialog {title} wide {onclose}>
 	<dl class="grid grid-cols-[112px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-[13px]">
-		{@render row('Kind', kind)}
-		{@render row('Size', sizeText(), measured && !measurement?.done)}
-		{@render row('Free', drive ? bytes(drive.availableSpace) : '')}
-		{@render row('Location', locations.size === 1 ? [...locations][0] : 'Several folders')}
+		{@render row(t('rover-properties-kind'), kind)}
+		{@render row(t('rover-properties-size'), sizeText(), measured && !measurement?.done)}
+		{@render row(t('rover-properties-free'), drive ? bytes(drive.availableSpace) : '')}
+		{@render row(t('rover-properties-location'), locations.size === 1 ? [...locations][0] : t('rover-properties-several-folders'))}
 		{#if single}
-			{@render row('Points to', details?.linkTarget ?? '')}
-			{@render row('Dimensions', details?.dimensions ? `${details.dimensions[0]} × ${details.dimensions[1]} pixels` : '')}
-			{@render row('Created', details?.created ? dateTime(details.created) : '')}
-			{@render row('Modified', single.modified ? dateTime(single.modified) : '')}
-			{@render row('Opened', details?.accessed ? dateTime(details.accessed) : '')}
+			{@render row(t('rover-properties-points-to'), details?.linkTarget ?? '')}
+			{@render row(t('rover-properties-dimensions'), details?.dimensions ? t('rover-properties-pixels', { width: String(details.dimensions[0]), height: String(details.dimensions[1]) }) : '')}
+			{@render row(t('rover-properties-created'), details?.created ? dateTime(details.created) : '')}
+			{@render row(t('rover-properties-modified'), single.modified ? dateTime(single.modified) : '')}
+			{@render row(t('rover-properties-opened'), details?.accessed ? dateTime(details.accessed) : '')}
 			{#if ownership}
-				{@render row('Owner', `${ownership.owner} · group ${ownership.group}`)}
+				{@render row(t('rover-properties-owner'), t('rover-properties-owner-value', { owner: ownership.owner, group: ownership.group }))}
 			{/if}
 		{/if}
 	</dl>
@@ -111,19 +114,19 @@
 	{#if single && ownership}
 		<div class="flex flex-col gap-2 pt-2">
 			<div class="flex items-baseline justify-between text-[13px]">
-				<span class="font-medium">Permissions</span>
+				<span class="font-medium">{t('rover-properties-permissions')}</span>
 				<span class="font-mono text-[12px] text-[var(--text-muted)]">{octal}</span>
 			</div>
 			<PermissionGrid mode={ownership.mode} folder={single.isDir} editable={ownership.editable} onchange={changeMode} />
 			{#if !ownership.editable}
-				<p class="text-[12px] text-[var(--text-muted)]">Only {ownership.owner} can change these.</p>
+				<p class="text-[12px] text-[var(--text-muted)]">{t('rover-properties-owner-only', { owner: ownership.owner })}</p>
 			{/if}
 		</div>
 	{/if}
 
 	{#if single && !single.isDir}
 		<div class="flex flex-col gap-2 pt-2 text-[13px]">
-			<span class="font-medium">Opens with</span>
+			<span class="font-medium">{t('rover-properties-opens-with')}</span>
 			<DefaultApp path={single.path} />
 		</div>
 	{/if}
@@ -135,8 +138,9 @@
 	{#snippet actions()}
 		{#if drive}
 			{@const folder = drive.mountPoint}
-			<button class="button" type="button" onclick={() => exploreSpace(folder).then(onclose, (caught) => (error = errorText(caught)))}>Free up space</button>
+			<button class="button" type="button" onclick={() => exploreSpace(folder).then(onclose, (caught) => (error = errorText(caught)))}>{t('rover-free-up-space')}</button>
 		{/if}
-		<button class="button" type="button" onclick={onclose}>Done</button>
+		<button class="button" type="button" onclick={onclose}>{t('rover-properties-done')}</button>
+
 	{/snippet}
 </Dialog>

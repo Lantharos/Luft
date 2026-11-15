@@ -1,3 +1,5 @@
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
@@ -89,7 +91,7 @@ pub async fn load(uuid: &str) -> Option<String> {
 pub async fn store(uuid: &str, name: &str, passphrase: &str) -> Result<(), String> {
     delete(uuid).await;
     let session = session().await?;
-    let label = format!("Encryption passphrase for {name}");
+    let label = t!(L10N, "disks-passphrase-keyring-label", volume = name);
     let attributes = HashMap::from([("xdg:schema", SCHEMA), (UUID, uuid)]);
     let properties = HashMap::from([
         (

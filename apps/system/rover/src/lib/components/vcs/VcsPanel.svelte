@@ -5,6 +5,7 @@
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { projectSummary, statusLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
+	import { t } from '@luft/i18n';
 	import { Spinner } from '@luft/ui';
 
 	interface Props {
@@ -27,17 +28,17 @@
 {#if vcs.panelOpen && vcs.project}
 	<aside
 		class="flex h-full w-[400px] min-w-[340px] max-w-[42vw] shrink-0 flex-col bg-[var(--raised)] text-[var(--text)] shadow-[inset_1px_0_0_var(--hairline),inset_0_1px_0_var(--hairline)]"
-		aria-label="Version Control"
+		aria-label={t('rover-vcs-panel')}
 	>
 		<header class="flex h-12 shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
 			<div class="min-w-0">
-				<div class="text-[14px] font-medium">Changes</div>
+				<div class="text-[14px] font-medium">{t('rover-vcs-changes')}</div>
 				<div class="truncate text-[12px] text-[var(--text-muted)]">{projectSummary(vcs.project)}</div>
 			</div>
 			<button
 				class="icon-button"
 				type="button"
-				aria-label="Collapse version control"
+				aria-label={t('rover-vcs-collapse')}
 				onclick={() => (vcs.panelOpen = false)}
 			>
 				<ChevronRight size={16} />
@@ -46,23 +47,33 @@
 
 		<div class="grid gap-3 px-4 py-4 shadow-[inset_0_-1px_0_var(--hairline)]">
 			<div class="grid gap-1">
-				<div class="text-[14px] font-medium">Git repository</div>
+				<div class="text-[14px] font-medium">{t('rover-vcs-repository')}</div>
 				{#if vcs.project.branch}
 					<div class="text-[12px] text-[var(--text-muted)]">
-						Branch: {vcs.project.branch}
+						{t('rover-vcs-branch', { branch: vcs.project.branch })}
 					</div>
 				{/if}
 				<div class="text-[12px] text-[var(--text-muted)]">
-					{vcs.project.changedCount} changed {vcs.project.changedCount === 1 ? 'file' : 'files'}
 					{#if vcs.project.addedCount || modifiedCount || vcs.project.deletedCount}
-						· {vcs.project.addedCount} added · {modifiedCount} modified · {vcs.project.deletedCount} deleted
+						{t('rover-vcs-changed-files-counts', {
+							count: vcs.project.changedCount,
+							added: vcs.project.addedCount,
+							modified: modifiedCount,
+							deleted: vcs.project.deletedCount
+						})}
+					{:else}
+						{t('rover-vcs-changed-files', { count: vcs.project.changedCount })}
 					{/if}
 				</div>
 				{#if vcs.project.ahead || vcs.project.behind}
 					<div class="text-[12px] text-[var(--text-muted)]">
-						{#if vcs.project.ahead}Ahead {vcs.project.ahead}{/if}
-						{#if vcs.project.ahead && vcs.project.behind} · {/if}
-						{#if vcs.project.behind}Behind {vcs.project.behind}{/if}
+						{#if vcs.project.ahead && vcs.project.behind}
+							{t('rover-vcs-ahead-behind', { ahead: vcs.project.ahead, behind: vcs.project.behind })}
+						{:else if vcs.project.ahead}
+							{t('rover-vcs-ahead', { count: vcs.project.ahead })}
+						{:else if vcs.project.behind}
+							{t('rover-vcs-behind', { count: vcs.project.behind })}
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -75,13 +86,13 @@
 					onclick={() => vcs.openSaveDialog()}
 				>
 					<Check size={16} />
-					<span>Commit</span>
+					<span>{t('rover-vcs-commit')}</span>
 				</button>
 				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={() => vcs.sync()}>
 					<RefreshCw size={16} />
-					<span>Sync</span>
+					<span>{t('rover-vcs-sync')}</span>
 				</button>
-				<button class="icon-button large" type="button" aria-label="Refresh VCS status" onclick={vcs.refresh}>
+				<button class="icon-button large" type="button" aria-label={t('rover-vcs-refresh')} onclick={vcs.refresh}>
 					<RefreshCw size={16} />
 				</button>
 			</div>
@@ -94,9 +105,9 @@
 		</div>
 
 		<div class="grid min-h-0 flex-1 grid-rows-[minmax(128px,38%)_minmax(0,1fr)]">
-			<section class="soft-scroll min-h-0 overflow-auto px-3 py-3" aria-label="Changed files">
+			<section class="soft-scroll min-h-0 overflow-auto px-3 py-3" aria-label={t('rover-vcs-changed-files-label')}>
 				{#if vcs.changedFiles.length === 0}
-					<div class="grid h-full place-items-center text-[13px] text-[var(--text-muted)]">No local changes</div>
+					<div class="grid h-full place-items-center text-[13px] text-[var(--text-muted)]">{t('rover-vcs-no-changes')}</div>
 				{:else}
 					<div class="grid gap-3">
 						{#each vcs.changeGroups as group (group.status)}
@@ -125,13 +136,14 @@
 				{/if}
 			</section>
 
-			<section class="soft-scroll min-h-0 overflow-auto bg-[var(--content)] px-4 py-3 shadow-[inset_0_1px_0_var(--hairline)]" aria-label="Diff preview">
+			<section class="soft-scroll min-h-0 overflow-auto bg-[var(--content)] px-4 py-3 shadow-[inset_0_1px_0_var(--hairline)]" aria-label={t('rover-vcs-diff')}>
 				{#if vcs.isDiffLoading}
-					<div class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />Loading the changes</div>
+					<div class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />{t('rover-vcs-diff-loading')}</div>
 				{:else if vcs.diff}
 					<pre class="whitespace-pre-wrap break-words font-mono text-[12px] leading-5 text-[var(--text-soft)]">{vcs.diff}</pre>
 				{:else}
-					<div class="text-[13px] text-[var(--text-muted)]">Select a file to preview changes</div>
+					<div class="text-[13px] text-[var(--text-muted)]">{t('rover-vcs-diff-empty')}</div>
+
 				{/if}
 			</section>
 		</div>

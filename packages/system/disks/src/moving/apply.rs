@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_i18n::t;
 use luft_trust::{Map, TRUST, get, group};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -8,7 +9,7 @@ use super::{Destination, Needs, destinations, shrink_candidates};
 use crate::systems::System;
 use crate::udisks::snapshot::{self, Drive};
 use crate::udisks::volumes::Segment;
-use crate::{mounting, resize, systems, udisks};
+use crate::{L10N, mounting, resize, systems, udisks};
 
 #[derive(Serialize, Type)]
 #[serde(rename = "MoveState", rename_all = "camelCase")]
@@ -113,7 +114,7 @@ async fn free_after(drive: &str, block: &str) -> Result<(u64, u64), String> {
     let drive = drives
         .iter()
         .find(|candidate| candidate.id == drive)
-        .ok_or("That drive isn't there anymore")?;
+        .ok_or_else(|| t!(L10N, "luft-disks-move-drive-gone"))?;
     let end = drive
         .segments
         .iter()
@@ -121,7 +122,7 @@ async fn free_after(drive: &str, block: &str) -> Result<(u64, u64), String> {
             Segment::Volume(volume) if volume.block == block => Some(volume.offset + volume.size),
             _ => None,
         })
-        .ok_or("That partition isn't there anymore")?;
+        .ok_or_else(|| t!(L10N, "luft-disks-move-partition-gone"))?;
     drive
         .segments
         .iter()
@@ -131,7 +132,7 @@ async fn free_after(drive: &str, block: &str) -> Result<(u64, u64), String> {
             }
             _ => None,
         })
-        .ok_or_else(|| "No space came free after it".to_owned())
+        .ok_or_else(|| t!(L10N, "luft-disks-move-no-space-after"))
 }
 
 async fn ask(drive: &str, offset: u64, size: u64) -> Result<(), String> {

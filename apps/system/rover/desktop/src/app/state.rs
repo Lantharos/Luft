@@ -48,7 +48,7 @@ pub struct AppState {
 impl RoverState {
     pub fn new() -> Self {
         let events = Events::default();
-        let user_dirs = entries::user_dirs().ok();
+        let user_dirs = entries::user_dirs();
         let queue = OperationsQueue::new(events.clone());
         Self {
             history: History::new(events.clone(), queue.clone()),

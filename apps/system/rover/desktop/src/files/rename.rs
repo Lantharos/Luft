@@ -2,12 +2,13 @@ use std::collections::HashSet;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use serde::Deserialize;
 use specta::Type;
 
 use super::rename_no_replace;
-use crate::files::text::items;
 use crate::history::{History, Step};
+use crate::l10n::L10N;
 
 #[derive(Deserialize, Type)]
 pub struct Renaming {
@@ -26,7 +27,7 @@ pub fn batch_rename(renamings: Vec<Renaming>, history: &History) -> Result<(), S
             && !sources.contains(to.as_path())
             && !same_file_case(to, &sources)
         {
-            return Err(format!("{} already exists", display_name(to)));
+            return Err(already_exists(to));
         }
     }
     let staged = pairs.iter().any(|(_, to)| to.symlink_metadata().is_ok());
@@ -43,8 +44,8 @@ pub fn batch_rename(renamings: Vec<Renaming>, history: &History) -> Result<(), S
         return Err(error);
     }
     history.record(
-        format!("Renamed {}", items(pairs.len())),
-        format!("Restored the names of {}", items(pairs.len())),
+        t!(L10N, "rover-history-renamed-many", count = pairs.len()),
+        t!(L10N, "rover-history-names-restored", count = pairs.len()),
         steps,
         true,
     );
@@ -54,7 +55,7 @@ pub fn batch_rename(renamings: Vec<Renaming>, history: &History) -> Result<(), S
 pub(super) fn valid_name(name: &str) -> Result<&str, String> {
     let name = name.trim();
     if name.is_empty() || name == "." || name == ".." || name.contains('/') {
-        return Err(format!("{name:?} isn't a valid name"));
+        return Err(t!(L10N, "rover-files-invalid-name", name = name));
     }
     Ok(name)
 }
@@ -67,10 +68,10 @@ fn plan(renamings: Vec<Renaming>) -> Result<Vec<(PathBuf, PathBuf)>, String> {
         let from = PathBuf::from(path);
         let to = from
             .parent()
-            .ok_or("The root folder can't be renamed")?
+            .ok_or_else(|| t!(L10N, "rover-files-renaming-root"))?
             .join(name);
         if !targets.insert(to.clone()) {
-            return Err(format!("More than one item would be named {name}"));
+            return Err(t!(L10N, "rover-files-same-name", name = name));
         }
         if from != to {
             pairs.push((from, to));
@@ -97,7 +98,7 @@ fn stage(pairs: &[(PathBuf, PathBuf)], steps: &mut Vec<Step>) -> Result<(), Stri
 
 fn apply(from: &Path, to: &Path, steps: &mut Vec<Step>) -> Result<(), String> {
     rename_no_replace(from, to).map_err(|error| match error.kind() {
-        io::ErrorKind::AlreadyExists => format!("{} already exists", display_name(to)),
+        io::ErrorKind::AlreadyExists => already_exists(to),
         _ => format!("{}: {error}", display_name(from)),
     })?;
     steps.push(Step::Moved {
@@ -120,6 +121,14 @@ fn same_file_case(target: &Path, sources: &HashSet<&Path>) -> bool {
     sources
         .iter()
         .any(|source| source.to_string_lossy().to_lowercase() == lowered)
+}
+
+fn already_exists(path: &Path) -> String {
+    t!(
+        L10N,
+        "rover-files-already-exists",
+        name = display_name(path)
+    )
 }
 
 fn display_name(path: &Path) -> String {

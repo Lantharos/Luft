@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { place } from '#lib/editor/edits.js';
 	import { neighbours, type Limits } from '#lib/editor/limits.js';
 	import { end, type Layout, type Part } from '#lib/editor/model.js';
@@ -21,9 +22,9 @@
 
 <div class="flex gap-2">
 	<div class="flex min-w-0 flex-1 flex-col gap-1.5">
-		<span class="caption">Free before</span>
+		<span class="caption">{t('disks-editor-free-before')}</span>
 		<SizeInput
-			label="Free space before"
+			label={t('disks-editor-free-before-label')}
 			exact
 			value={before}
 			min={limits.movable ? limits.before - around.before : limits.movesAtStart ? 0 : before}
@@ -32,13 +33,13 @@
 		/>
 	</div>
 	<div class="flex min-w-0 flex-1 flex-col gap-1.5">
-		<span class="caption">Size</span>
-		<SizeInput label="Size" exact {focused} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
+		<span class="caption">{t('disks-editor-size')}</span>
+		<SizeInput label={t('disks-editor-size')} exact {focused} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
 	</div>
 	<div class="flex min-w-0 flex-1 flex-col gap-1.5">
-		<span class="caption">Free after</span>
+		<span class="caption">{t('disks-editor-free-after')}</span>
 		<SizeInput
-			label="Free space after"
+			label={t('disks-editor-free-after-label')}
 			exact
 			value={after}
 			min={around.after - part.offset - largest}

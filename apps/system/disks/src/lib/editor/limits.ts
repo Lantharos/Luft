@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { Support } from '#lib/bindings.js';
 import { alignUp, end, MiB, type Layout, type Part } from './model';
 
@@ -61,21 +62,21 @@ export function limitsOf(layout: Layout, part: Part, support: (filesystem: strin
 	const movable = !part.system && !part.logical;
 	const movesAtStart = part.system && !part.logical && size.grow && part.offset - before >= SMALLEST_MOVE;
 	if (movesAtStart) {
-		notes.push('The running system uses this partition. It grows or shrinks at its end right away, and moves into the free space in front of it the next time the computer starts.');
+		notes.push(t('disks-editor-note-system-moves'));
 	} else if (part.system) {
 		notes.push(
 			size.grow || size.shrink
-				? 'The running system uses this partition, so it can only grow or shrink in place.'
-				: 'The running system uses this partition, so it can’t be changed while it runs.'
+				? t('disks-editor-note-system-in-place')
+				: t('disks-editor-note-system-fixed')
 		);
 	} else if (part.logical) {
-		notes.push('It sits inside an extended partition, so it stays where it is.');
+		notes.push(t('disks-editor-note-logical'));
 	}
-	if (part.encrypted && !part.replaced && !part.system) notes.push('Encrypted partitions keep their size. Moving one keeps it encrypted.');
+	if (part.encrypted && !part.replaced && !part.system) notes.push(t('disks-editor-note-encrypted'));
 	else if (!part.pending && !part.replaced && part.usage === 'filesystem' && part.used === null && !part.system)
-		notes.push('Mount it to see how far it can shrink.');
-	else if (part.usage && part.usage !== 'filesystem' && !part.encrypted) notes.push('Disks can’t resize what’s on it, only move it.');
-	if (!part.system && part.mounted) notes.push('It’s unmounted while it changes, if it has to be.');
+		notes.push(t('disks-editor-note-mount'));
+	else if (part.usage && part.usage !== 'filesystem' && !part.encrypted) notes.push(t('disks-editor-note-unknown-contents'));
+	if (!part.system && part.mounted) notes.push(t('disks-editor-note-unmounts'));
 	const grows = size.grow && !part.logical;
 	const start = movable || movesAtStart ? before : part.offset;
 	const stop = movable || grows ? after : end(part);

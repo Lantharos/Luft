@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { appWindow } from '@lantharos/sabine';
-	import { bytes, ConfirmDialog, Dialog, plural, RecoveryKeyDialog } from '@luft/ui';
+	import { bytes, ConfirmDialog, Dialog, RecoveryKeyDialog } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Volume } from '#lib/bindings.js';
 	import { WAIT } from '#lib/bridge/index.js';
@@ -34,17 +35,9 @@
 	let stoppable = $derived(disks.image && !disks.image.finished && !editor.running && [...disks.busy].every((key) => key === disks.image?.block) ? disks.image : null);
 
 	const CLEAN = {
-		trash: { title: 'Empty the trash?', action: 'Empty trash', description: (size: number) => `Everything in it, ${bytes(size)}, will be deleted for good.` },
-		downloads: {
-			title: 'Move old downloads to the trash?',
-			action: 'Move to trash',
-			description: (size: number, items: number) => `${plural(items, 'item')} in Downloads ${items === 1 ? 'hasn’t' : 'haven’t'} changed in over 30 days. They take up ${bytes(size)}, freed once the trash is emptied.`
-		},
-		caches: {
-			title: 'Clear app caches?',
-			action: 'Clear caches',
-			description: (size: number) => `This frees up to ${bytes(size)}. Some apps may open slower the next time.`
-		}
+		trash: { title: 'disks-clean-trash', action: 'disks-clean-trash-action', description: 'disks-clean-trash-description' },
+		downloads: { title: 'disks-clean-downloads', action: 'disks-clean-downloads-action', description: 'disks-clean-downloads-description' },
+		caches: { title: 'disks-clean-caches', action: 'disks-clean-caches-action', description: 'disks-clean-caches-description' }
 	};
 
 	async function stopAndClose() {
@@ -94,8 +87,8 @@
 	<RecoveryKeyDialog
 		{key}
 		{fresh}
-		title="Recovery key for “{name}”"
-		description="Keep a copy somewhere other than this drive and computer."
+		title={t('disks-recovery-key-title', { name })}
+		description={t('disks-recovery-key-description')}
 		onsave={() => commands.trustSaveKey({ key, name }, WAIT)}
 		onprint={() => commands.trustPrintKey({ key, name }, WAIT)}
 		onclose={dialogs.close}
@@ -110,9 +103,9 @@
 	<ApplyDialog name={editor.drive?.name ?? ''} onclose={dialogs.close} />
 {:else if dialog?.kind === 'discard-plan'}
 	<ConfirmDialog
-		title="Discard the planned changes?"
-		description="Nothing on the drive has changed yet."
-		action="Discard"
+		title={t('disks-discard-title')}
+		description={t('disks-discard-description')}
+		action={t('disks-discard-action')}
 		danger
 		run={async () => editor.close()}
 		onclose={dialogs.close}
@@ -132,9 +125,9 @@
 {:else if dialog?.kind === 'delete'}
 	{@const { drive, volume } = dialog}
 	<ConfirmDialog
-		title="Delete “{volumeName(volume)}”?"
-		description="The partition and all {bytes(volume.size)} on it will be removed from {drive.name}. This can't be undone."
-		action="Delete partition"
+		title={t('disks-delete-title', { name: volumeName(volume) })}
+		description={t('disks-delete-description', { size: bytes(volume.size), drive: drive.name })}
+		action={t('disks-delete-action')}
 		danger
 		run={() => disks.run(volume.block, () => commands.disksDeletePartition({ block: volume.block }, WAIT))}
 		onclose={dialogs.close}
@@ -142,43 +135,41 @@
 {:else if dialog?.kind === 'trash'}
 	{@const { path, name, size, folder } = dialog}
 	<ConfirmDialog
-		title="Move “{name}” to the trash?"
-		description="{folder ? 'It and everything in it take' : 'It takes'} up {bytes(size)}, freed once the trash is emptied."
-		action="Move to trash"
+		title={t('disks-trash-title', { name })}
+		description={t('disks-trash-description', { kind: folder ? 'folder' : 'file', size: bytes(size) })}
+		action={t('disks-trash-action')}
 		danger
 		run={() => space.trash(path)}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'clean'}
 	{@const { what, size, items } = dialog}
-	<ConfirmDialog title={CLEAN[what].title} description={CLEAN[what].description(size, items)} action={CLEAN[what].action} danger run={() => space.clean(what)} onclose={dialogs.close} />
+	<ConfirmDialog title={t(CLEAN[what].title)} description={t(CLEAN[what].description, { size: bytes(size), count: items })} action={t(CLEAN[what].action)} danger run={() => space.clean(what)} onclose={dialogs.close} />
 {:else if dialog?.kind === 'restore'}
 	{@const { drive, block, target, image } = dialog}
 	{@const whole = block === drive.block}
-	{@const description = `Everything on ${whole ? `${drive.name} (${bytes(drive.size)})` : `“${target}” on ${drive.name}`} will be replaced by the ${bytes(image.size)} image. This can't be undone.`}
+	{@const description = whole
+		? t('disks-restore-drive', { drive: drive.name, size: bytes(drive.size), image: bytes(image.size) })
+		: t('disks-restore-partition', { name: target, drive: drive.name, image: bytes(image.size) })}
 	{@const run = () => disks.run(block, () => commands.disksImageRestore({ block, path: image.path }, WAIT))}
 	{#if whole && builtIn(drive)}
-		<EraseDriveDialog name={drive.name} title="Write “{image.name}”?" {description} action="Erase and write" {run} onclose={dialogs.close} />
+		<EraseDriveDialog name={drive.name} title={t('disks-restore-title', { name: image.name })} {description} action={t('disks-restore-action')} {run} onclose={dialogs.close} />
 	{:else}
-		<ConfirmDialog title="Write “{image.name}”?" {description} action="Erase and write" danger {run} onclose={dialogs.close} />
+		<ConfirmDialog title={t('disks-restore-title', { name: image.name })} {description} action={t('disks-restore-action')} danger {run} onclose={dialogs.close} />
 	{/if}
 {:else if dialog?.kind === 'finish-move'}
 	<FinishMoveDialog move={dialog.move} onclose={dialogs.close} />
 {:else if dialog?.kind === 'still-working'}
 	<Dialog
-		title="Disks is still working"
-		description={stoppable
-			? stoppable.restoring
-				? 'A disk image is still being written. Stopping now leaves the drive partly written, and the image has to be written again.'
-				: 'A disk image is still being saved. Stopping now leaves it unfinished.'
-			: 'It can close once this is finished. Stopping partway could leave the drive unreadable.'}
+		title={t('disks-still-working')}
+		description={t('disks-still-working-description', { work: stoppable ? (stoppable.restoring ? 'writing' : 'saving') : 'other' })}
 		onclose={dialogs.close}
 	>
 		{#snippet actions()}
 			{#if stoppable}
-				<button type="button" class="button danger" onclick={stopAndClose}>Stop</button>
+				<button type="button" class="button danger" onclick={stopAndClose}>{t('disks-still-working-stop')}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={dialogs.close}>Keep going</button>
+			<button type="button" class="button primary" onclick={dialogs.close}>{t('disks-still-working-keep')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

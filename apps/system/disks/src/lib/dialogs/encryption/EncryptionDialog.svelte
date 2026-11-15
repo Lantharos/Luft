@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, errorText } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Outcome, Volume } from '#lib/bindings.js';
@@ -30,15 +31,15 @@
 	let encryption = $derived(disks.encryption(volume));
 	let busy = $derived(changing(encryption));
 	let protection = $derived(disks.protection);
-	let autoReason = $derived(!protection.available ? 'Encrypting drives isn’t available on this computer.' : protection.autoUnlock);
+	let autoReason = $derived(!protection.available ? t('disks-encryption-unavailable') : protection.autoUnlock);
 	let description = $derived(encryption && busy ? progressSentence(encryption) : undefined);
-	let unlocksWhen = $derived(drive.removable ? 'Opens without asking when you plug it in' : 'Opens without asking when this computer starts');
+	let unlocksWhen = $derived(t('disks-encryption-auto-unlock.hint', { drive: drive.removable ? 'removable' : 'built-in' }));
 	let title = $derived(
 		encryption?.state === 'encrypting' || (busy && encryption?.change === 'encrypt')
-			? `Encrypting “${name}”`
+			? t('disks-encryption-title-encrypting', { name })
 			: busy
-				? `Decrypting “${name}”`
-				: `“${name}” is encrypted`
+				? t('disks-encryption-title-decrypting', { name })
+				: t('disks-encryption-title', { name })
 	);
 
 	$effect(() => {
@@ -99,7 +100,7 @@
 
 <Dialog {title} {description} onclose={() => !working && onclose()}>
 	<SwitchLine
-		title="Unlock automatically"
+		title={t('disks-encryption-auto-unlock')}
 		hint={unlocksWhen}
 		note={autoReason || undefined}
 		checked={encryption?.autoUnlock ?? false}
@@ -107,20 +108,20 @@
 		onchange={setAutoUnlock}
 	/>
 	{#if protection.available}
-		<Line title="Recovery key" hint="Opens it when nothing else does">
+		<Line title={t('disks-encryption-recovery-key')} hint={t('disks-encryption-recovery-key.hint')}>
 			{#if encryption?.recoveryKeyStored}
-				<button type="button" class="button" disabled={working} onclick={showKey}>Show…</button>
+				<button type="button" class="button" disabled={working} onclick={showKey}>{t('disks-encryption-recovery-key-show')}</button>
 			{:else}
-				<button type="button" class="button" disabled={working || busy} onclick={addKey}>New key…</button>
+				<button type="button" class="button" disabled={working || busy} onclick={addKey}>{t('disks-encryption-recovery-key-new')}</button>
 			{/if}
 		</Line>
 	{/if}
-	<Line title="Passphrase" hint="Unlocks it here and on other computers">
-		<button type="button" class="button" disabled={working || busy} onclick={() => dialogs.open({ kind: 'passphrase', volume })}>Change…</button>
+	<Line title={t('disks-encryption-passphrase')} hint={t('disks-encryption-passphrase.hint')}>
+		<button type="button" class="button" disabled={working || busy} onclick={() => dialogs.open({ kind: 'passphrase', volume })}>{t('disks-encryption-passphrase-change')}</button>
 	</Line>
 	{#if remembered}
-		<Line title="Saved in your keyring" hint="Unlocking it here needs no typing">
-			<button type="button" class="button" disabled={working} onclick={() => attempt(() => commands.disksForgetPassphrase({ block: volume.block }, WAIT).then(() => (remembered = false)))}>Forget</button>
+		<Line title={t('disks-encryption-saved')} hint={t('disks-encryption-saved.hint')}>
+			<button type="button" class="button" disabled={working} onclick={() => attempt(() => commands.disksForgetPassphrase({ block: volume.block }, WAIT).then(() => (remembered = false)))}>{t('disks-encryption-forget')}</button>
 		</Line>
 	{/if}
 	{#if request.asking && pending}
@@ -132,17 +133,17 @@
 	{/if}
 	{#snippet actions()}
 		{#if protection.available && !busy && !drive.removable}
-			<button type="button" class="button danger mr-auto" disabled={working} onclick={() => dialogs.open({ kind: 'turn-off', volume })}>Turn off encryption…</button>
+			<button type="button" class="button danger mr-auto" disabled={working} onclick={() => dialogs.open({ kind: 'turn-off', volume })}>{t('disks-encryption-turn-off-more')}</button>
 		{/if}
 		{#if encryption?.state === 'encrypting' || encryption?.state === 'decrypting'}
-			<button type="button" class="button" disabled={working} onclick={pause}>Pause</button>
+			<button type="button" class="button" disabled={working} onclick={pause}>{t('disks-action-pause')}</button>
 		{:else if busy}
-			<button type="button" class="button" disabled={working} onclick={resume}>Resume</button>
+			<button type="button" class="button" disabled={working} onclick={resume}>{t('disks-action-resume')}</button>
 		{/if}
 		{#if request.asking && pending}
 			{@const action = pending}
-			<button type="button" class="button" disabled={working || !request.key} onclick={() => keyed(action)}>Continue</button>
+			<button type="button" class="button" disabled={working || !request.key} onclick={() => keyed(action)}>{t('disks-continue')}</button>
 		{/if}
-		<button type="button" class="button primary" disabled={working} onclick={onclose}>Done</button>
+		<button type="button" class="button primary" disabled={working} onclick={onclose}>{t('disks-done')}</button>
 	{/snippet}
 </Dialog>

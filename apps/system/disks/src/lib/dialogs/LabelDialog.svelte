@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -23,10 +24,10 @@
 	}
 </script>
 
-<Dialog title="Rename “{volumeName(volume)}”" {onclose}>
-	<TextField label="Name" bind:value={label} error={label.length > limit ? `Up to ${limit} characters for this format` : ''} live onkeydown={(event) => event.key === 'Enter' && submit()} />
+<Dialog title={t('disks-rename-title', { name: volumeName(volume) })} {onclose}>
+	<TextField label={t('disks-name')} bind:value={label} error={label.length > limit ? t('disks-name-limit', { limit }) : ''} live onkeydown={(event) => event.key === 'Enter' && submit()} />
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!valid} onclick={submit}>Rename</button>
+		<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+		<button type="button" class="button primary" disabled={!valid} onclick={submit}>{t('disks-rename-action')}</button>
 	{/snippet}
 </Dialog>

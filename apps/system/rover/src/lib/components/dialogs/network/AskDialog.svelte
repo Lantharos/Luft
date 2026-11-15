@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Checkbox, Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { NetworkAsk } from '#lib/bindings.js';
@@ -42,13 +43,13 @@
 </script>
 
 {#if ask.kind === 'password'}
-	<Dialog title="Sign in" description={lines.length > 1 ? lines.slice(1).join(' ') : lines[0]} onclose={cancel}>
+	<Dialog title={t('rover-ask-title')} description={lines.length > 1 ? lines.slice(1).join(' ') : lines[0]} onclose={cancel}>
 		{#if ask.anonymous}
 			<Segmented
-				label="Sign in as"
+				label={t('rover-ask-as')}
 				options={[
-					{ value: 'user', label: 'Registered user' },
-					{ value: 'guest', label: 'Guest' }
+					{ value: 'user', label: t('rover-ask-as-user') },
+					{ value: 'guest', label: t('rover-ask-as-guest') }
 				]}
 				value={guest}
 				onchange={(value) => (guest = value)}
@@ -56,25 +57,26 @@
 		{/if}
 		{#if guest === 'user'}
 			{#if ask.needsUser}
-				<TextField bind:this={userField} label="Username" showLabel bind:value={user} autocomplete="username" />
+				<TextField bind:this={userField} label={t('rover-ask-username')} showLabel bind:value={user} autocomplete="username" />
 			{/if}
 			{#if ask.needsDomain}
-				<TextField label="Domain" showLabel bind:value={domain} />
+				<TextField label={t('rover-ask-domain')} showLabel bind:value={domain} />
 			{/if}
 			{#if ask.needsPassword}
-				<PasswordField bind:this={passwordField} label="Password" showLabel bind:value={password} autocomplete="current-password" onkeydown={(event) => event.key === 'Enter' && signIn()} />
+				<PasswordField bind:this={passwordField} label={t('rover-ask-password')} showLabel bind:value={password} autocomplete="current-password" onkeydown={(event) => event.key === 'Enter' && signIn()} />
 			{/if}
 			{#if ask.saving}
-				<Checkbox label="Remember password" checked={remember} onchange={(value) => (remember = value)}>Remember password</Checkbox>
+				<Checkbox label={t('rover-ask-remember')} checked={remember} onchange={(value) => (remember = value)}>{t('rover-ask-remember')}</Checkbox>
 			{/if}
 		{/if}
 		{#snippet actions()}
-			<button class="button" type="button" onclick={cancel}>Cancel</button>
-			<button class="button primary" type="button" onclick={signIn}>Connect</button>
+			<button class="button" type="button" onclick={cancel}>{t('rover-cancel')}</button>
+			<button class="button primary" type="button" onclick={signIn}>{t('rover-connect')}</button>
 		{/snippet}
 	</Dialog>
 {:else}
-	<Dialog title={lines[0] ?? 'Connect to server'} description={lines.slice(1).join(' ')} onclose={cancel}>
+	<Dialog title={lines[0] ?? t('rover-connect-title')}
+ description={lines.slice(1).join(' ')} onclose={cancel}>
 		{#snippet actions()}
 			{#each ask.choices.toReversed() as choice, index (choice)}
 				{@const value = ask.choices.length - 1 - index}

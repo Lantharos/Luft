@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { parent, tooltip } from '@luft/ui';
 	import type { SearchResult } from '#lib/bindings.js';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
@@ -27,7 +28,8 @@
 	}
 </script>
 
-<ol bind:this={list} class="flex flex-col" role="listbox" aria-label="Results">
+<ol bind:this={list} class="flex flex-col" role="listbox" aria-label={t('rover-search-results-label')}>
+
 	{#each results as result, index (result.path)}
 		{@const Icon = KIND_ICONS[fileKind(result)]}
 		<li role="option" aria-selected={index === highlighted}>

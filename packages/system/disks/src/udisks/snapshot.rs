@@ -1,4 +1,5 @@
 use luft_dbus::objects::{Object, Objects};
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -6,6 +7,7 @@ use super::health::{self, Health};
 use super::room::{self, Room};
 use super::volumes::{self, Segment, Span};
 use super::{BLOCK, DRIVE, JOB, LOOP, PARTITION, TABLE, bytes_text, system};
+use crate::L10N;
 
 #[derive(Serialize, Type)]
 pub struct Snapshot {
@@ -184,7 +186,7 @@ fn name(vendor: &str, model: &str, kind: Kind, objects: &Objects, block: &Object
             .map(bytes_text)
             .unwrap_or_default();
         return std::path::Path::new(&backing).file_name().map_or_else(
-            || "Disk image".to_owned(),
+            || t!(L10N, "luft-disks-drive-image"),
             |file| file.to_string_lossy().into_owned(),
         );
     }

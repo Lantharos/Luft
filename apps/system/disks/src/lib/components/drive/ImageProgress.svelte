@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { ImageProgress } from '#lib/bindings.js';
@@ -12,27 +13,23 @@
 
 	let share = $derived(progress.total > 0 ? Math.min(1, progress.copied / progress.total) : 0);
 	let title = $derived(
-		progress.finished
-			? progress.restoring
-				? 'Disk image written'
-				: 'Disk image saved'
-			: progress.restoring
-				? 'Writing disk image'
-				: 'Saving disk image'
+		t('disks-image-progress', { direction: progress.restoring ? 'writing' : 'saving', finished: progress.finished ? 'yes' : 'no' })
 	);
 	let description = $derived(
 		progress.finished
-			? `${bytes(progress.copied)} copied`
-			: `${bytes(progress.copied)} of ${bytes(progress.total)}${progress.rate > 0 ? ` · ${bytes(progress.rate)}/s` : ''}`
+			? t('disks-image-copied', { size: bytes(progress.copied) })
+			: progress.rate > 0
+				? t('disks-image-progress-rate', { copied: bytes(progress.copied), total: bytes(progress.total), rate: bytes(progress.rate) })
+				: t('disks-image-progress-total', { copied: bytes(progress.copied), total: bytes(progress.total) })
 	);
 </script>
 
 <Section>
 	<Row {title} {description}>
 		{#if progress.finished}
-			<button type="button" class="button" onclick={() => (disks.image = null)}>Done</button>
+			<button type="button" class="button" onclick={() => (disks.image = null)}>{t('disks-done')}</button>
 		{:else}
-			<button type="button" class="button" onclick={() => commands.disksImageCancel()}>Cancel</button>
+			<button type="button" class="button" onclick={() => commands.disksImageCancel()}>{t('disks-cancel')}</button>
 		{/if}
 		{#snippet below()}
 			<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -25,7 +26,7 @@
 	});
 
 	let editing = $derived(!space.root && editor.active ? editor.layout : null);
-	let title = $derived(space.root ? space.title : editing ? `Partitions on ${disks.drive?.name}` : (disks.drive?.name ?? 'Disks'));
+	let title = $derived(space.root ? space.title : editing ? t('disks-editor-title', { drive: disks.drive?.name ?? '' }) : (disks.drive?.name ?? 'Disks'));
 
 	let working = $derived(editor.running || disks.busy.size > 0 || (disks.image !== null && !disks.image.finished));
 
@@ -46,7 +47,7 @@
 	<main class="glass-content">
 		<header class="drag-region flex h-[60px] flex-none items-center gap-2 pr-4 {space.root || editing ? 'pl-6' : 'pl-8'}">
 			{#if space.root || editing}
-				<IconButton icon={ChevronLeft} label="Back" large disabled={editor.running} onclick={back} />
+				<IconButton icon={ChevronLeft} label={t('disks-back')} large disabled={editor.running} onclick={back} />
 			{/if}
 			<h1 class="min-w-0 flex-1 truncate text-[20px] font-semibold">{title}</h1>
 			{#if editing}

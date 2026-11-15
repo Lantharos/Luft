@@ -3,6 +3,7 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Usb from '@lucide/svelte/icons/usb';
+	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import type { DriveInfo } from '#lib/bindings.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -26,15 +27,14 @@
 	let ejecting = $derived(manager.drives.ejecting.has(drive.mountPoint));
 	let used = $derived(drive.totalSpace === 0 ? 0 : Math.min(1, drive.usedSpace / drive.totalSpace));
 	let key = $derived(dropKey('sidebar', drive.mountPoint));
-	let summary = $derived(`${bytes(drive.availableSpace)} free of ${bytes(drive.totalSpace)}`);
-	let unmount = $derived(drive.isRemovable ? 'Eject' : 'Unmount');
+	let summary = $derived(t('rover-drive-summary', { free: bytes(drive.availableSpace), total: bytes(drive.totalSpace) }));
 </script>
 
 <SidebarItem
 	class="sidebar-item--drive"
 	icon={ejecting ? RefreshCw : drive.isRemovable ? Usb : HardDrive}
 	spinning={ejecting}
-	label={ejecting ? `${drive.name} · ${drive.isRemovable ? 'Ejecting' : 'Unmounting'}` : drive.name}
+	label={ejecting ? (drive.isRemovable ? t('rover-drive-ejecting', { name: drive.name }) : t('rover-drive-unmounting', { name: drive.name })) : drive.name}
 	{active}
 	dropping={drag.target?.key === key}
 	disabled={ejecting}
@@ -57,9 +57,10 @@
 				class="sidebar-item__action"
 				type="button"
 				disabled={ejecting}
-				aria-label={`${unmount} ${drive.name}`}
+				aria-label={drive.isRemovable ? t('rover-drive-eject-named', { name: drive.name }) : t('rover-drive-unmount-named', { name: drive.name })}
 				onclick={() => manager.ejectDrive(drive)}
-				{@attach tooltip(unmount)}
+				{@attach tooltip(drive.isRemovable ? t('rover-drive-eject') : t('rover-drive-unmount'))}
+
 			>
 				<Eject size={15} />
 			</button>

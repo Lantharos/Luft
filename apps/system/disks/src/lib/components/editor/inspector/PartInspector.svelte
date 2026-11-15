@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -8,7 +9,7 @@
 	import { format, place, remove, rename } from '#lib/editor/edits.js';
 	import type { Limits } from '#lib/editor/limits.js';
 	import type { Layout, Part } from '#lib/editor/model.js';
-	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '#lib/format.js';
+	import { filesystemLabel, LABEL_LIMITS } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import ExactSize from './ExactSize.svelte';
 	import PartitionSettings from './PartitionSettings.svelte';
@@ -37,12 +38,12 @@
 	let fresh = $derived(part.pending || part.replaced);
 	let lastIsCreate = $derived(editor.steps.at(-1)?.kind === 'create' && editor.steps.at(-1)?.key === part.key);
 	let contents = $derived([
-		...(fresh ? [] : [{ value: KEEP, label: 'Keep what’s on it' }]),
+		...(fresh ? [] : [{ value: KEEP, label: t('disks-editor-keep') }]),
 		...FILESYSTEMS.filter((filesystem) => disks.support(filesystem)?.available ?? true).map((filesystem) => ({
 			value: filesystem as string,
-			label: fresh ? FILESYSTEM_NAMES[filesystem] : `Erase as ${FILESYSTEM_NAMES[filesystem]}`
+			label: fresh ? filesystemLabel(filesystem) : t('disks-editor-erase-as', { filesystem: filesystemLabel(filesystem) })
 		})),
-		...(part.pending && lastIsCreate ? [{ value: EMPTY, label: 'No file system' }] : [])
+		...(part.pending && lastIsCreate ? [{ value: EMPTY, label: t('disks-editor-no-filesystem') }] : [])
 	]);
 	const created = untrack(() => part.pending && lastIsCreate);
 	let chosen = $derived(fresh ? part.filesystem || EMPTY : KEEP);
@@ -51,8 +52,8 @@
 	let largest = $derived(Math.min(limits.largest, limits.after - part.offset));
 	let facts = $derived(
 		[
-			part.pending ? 'New' : part.locked ? 'Locked' : part.filesystem ? (FILESYSTEM_NAMES[part.filesystem] ?? part.filesystem) : 'No file system',
-			part.used !== null && !part.replaced && `${bytes(part.used)} used`
+			part.pending ? t('disks-editor-new') : part.locked ? t('disks-editor-locked') : part.filesystem ? filesystemLabel(part.filesystem) : t('disks-editor-no-filesystem'),
+			part.used !== null && !part.replaced && t('disks-used', { size: bytes(part.used) })
 		]
 			.filter(Boolean)
 			.join(' · ')
@@ -79,30 +80,30 @@
 		<span class="flex-1"></span>
 		{#if changeable}
 			<PartitionSettings {layout} {part} />
-			<button type="button" class="icon-button delete" aria-label="Delete" {@attach tooltip('Delete')} onclick={() => remove(part)}>
+			<button type="button" class="icon-button delete" aria-label={t('disks-editor-delete')} {@attach tooltip(t('disks-editor-delete'))} onclick={() => remove(part)}>
 				<Trash2 size={17} />
 			</button>
 		{/if}
 	</header>
 
 	<div class="fields">
-		<span class="label">Size</span>
-		<SizeInput label="Size" focused={created} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
-		<button type="button" class="button" {@attach tooltip('Exact sizes and space around it, in MiB')} onclick={() => (exact = true)}>Exact…</button>
+		<span class="label">{t('disks-editor-size')}</span>
+		<SizeInput label={t('disks-editor-size')} focused={created} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
+		<button type="button" class="button" {@attach tooltip(t('disks-editor-exact.tooltip'))} onclick={() => (exact = true)}>{t('disks-editor-exact')}</button>
 
 		{#if changeable}
-			<span class="label">Format</span>
+			<span class="label">{t('disks-editor-format')}</span>
 			<div class="col-span-2">
-				<Select label="Format" options={contents} value={chosen} onchange={chooseContents} />
+				<Select label={t('disks-editor-format')} options={contents} value={chosen} onchange={chooseContents} />
 			</div>
 			{#if named}
-				<span class="label">Name</span>
+				<span class="label">{t('disks-editor-name')}</span>
 				<div class="col-span-2" onfocusout={commitLabel}>
 					<TextField
-						label="Name"
-						placeholder="Untitled"
+						label={t('disks-editor-name')}
+						placeholder={t('disks-untitled')}
 						bind:value={label}
-						error={label.length > limit ? `Up to ${limit} characters` : ''}
+						error={label.length > limit ? t('disks-editor-name-limit', { limit }) : ''}
 						live
 						onkeydown={(event) => event.key === 'Enter' && commitLabel()}
 					/>
@@ -113,10 +114,10 @@
 </section>
 
 {#if exact}
-	<Dialog title="Exact size of {part.title}" wide onclose={() => (exact = false)}>
+	<Dialog title={t('disks-editor-exact-title', { name: part.title })} wide onclose={() => (exact = false)}>
 		<ExactSize {layout} {part} {limits} focused />
 		{#snippet actions()}
-			<button type="button" class="button primary" onclick={() => (exact = false)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (exact = false)}>{t('disks-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

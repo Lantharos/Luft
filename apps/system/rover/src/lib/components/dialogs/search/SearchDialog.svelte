@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { basename, Dialog, parent, plural, SearchField, Spinner } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { basename, Dialog, parent, SearchField, Spinner } from '@luft/ui';
 	import type { SearchResult } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
@@ -19,11 +20,11 @@
 	let highlighted = $state(0);
 	let shown = $derived(search.ordered.slice(0, SHOWN));
 	let status = $derived.by(() => {
-		if (!search.text.trim()) return 'Type to search this folder and everything inside it';
-		if (search.running) return search.results.length > 0 ? `${plural(search.results.length, 'result')} so far` : 'Searching';
-		if (search.results.length === 0) return 'Nothing matches';
-		const count = plural(search.results.length, 'result');
-		return search.truncated || search.results.length > SHOWN ? `Showing the first ${shown.length} of ${count}, refine to narrow it down` : count;
+		const count = search.results.length;
+		if (!search.text.trim()) return t('rover-search-start');
+		if (search.running) return count > 0 ? t('rover-search-so-far', { count }) : t('rover-search-searching');
+		if (count === 0) return t('rover-search-nothing');
+		return search.truncated || count > SHOWN ? t('rover-search-truncated', { shown: shown.length, count }) : t('rover-search-results', { count });
 	});
 
 	$effect(() => {
@@ -65,8 +66,8 @@
 	}
 </script>
 
-<Dialog title={`Search in ${basename(search.root) || search.root}`} wide onclose={search.close}>
-	<SearchField bind:this={field} label="Name or text" large bind:value={search.text} onkeydown={keydown} />
+<Dialog title={t('rover-search-title', { folder: basename(search.root) || search.root })} wide onclose={search.close}>
+	<SearchField bind:this={field} label={t('rover-search-field')} large bind:value={search.text} onkeydown={keydown} />
 	<SearchFilters online={Boolean(manager.cloud.holding(search.root))} />
 	<div class="soft-scroll -mx-2 h-[min(420px,50vh)] overflow-y-auto px-2">
 		<SearchResults
@@ -84,6 +85,7 @@
 	</p>
 
 	{#snippet actions()}
-		<button class="button" type="button" onclick={search.close}>Close</button>
+		<button class="button" type="button" onclick={search.close}>{t('rover-close')}</button>
+
 	{/snippet}
 </Dialog>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import { t } from '@luft/i18n';
 	import { Dialog, errorText } from '@luft/ui';
 	import type { WindowsDrive } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -40,21 +41,22 @@
 
 {#if asking}
 	<Dialog
-		title="Windows is still asleep"
-		description="It was hibernated or shut down with Fast Startup, so its drive opens read-only. To change files on it, start Windows and hold Shift while you choose Shut down."
+		title={t('rover-windows-asleep-title')}
+		description={t('rover-windows-asleep-description')}
 		onclose={() => (asking = false)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (asking = false)}>Cancel</button>
-			<button type="button" class="button primary" onclick={() => open(true)}>Open read-only</button>
+			<button type="button" class="button" onclick={() => (asking = false)}>{t('rover-cancel')}</button>
+			<button type="button" class="button primary" onclick={() => open(true)}>{t('rover-windows-open-read-only')}</button>
 		{/snippet}
 	</Dialog>
 {/if}
 
 {#if problem}
-	<Dialog title="{drive.name} couldn’t be opened" description={problem} onclose={() => (problem = '')}>
+	<Dialog title={t('rover-windows-failed', { name: drive.name })} description={problem} onclose={() => (problem = '')}>
 		{#snippet actions()}
-			<button type="button" class="button primary" onclick={() => (problem = '')}>OK</button>
+			<button type="button" class="button primary" onclick={() => (problem = '')}>{t('rover-ok')}</button>
+
 		{/snippet}
 	</Dialog>
 {/if}

@@ -1,12 +1,15 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::resolve::Resolver;
 use super::space::{file_name, path_items, path_size};
 use crate::files::operations::{OperationStatus, OperationsQueue, Resolution};
 use crate::files::privileged::{self, Pair, arrived, remove_path, remove_paths};
 use crate::files::trash;
 use crate::history::Step;
+use crate::l10n::L10N;
 use crate::locations::drives;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -69,7 +72,7 @@ impl<'a> Tracker<'a> {
 
     pub fn guard(&self) -> Result<(), String> {
         match self.queue.status_once_unpaused(self.id) {
-            Some(OperationStatus::Cancelled) => Err("Operation cancelled".to_string()),
+            Some(OperationStatus::Cancelled) => Err(t!(L10N, "rover-operations-cancelled")),
             _ => Ok(()),
         }
     }

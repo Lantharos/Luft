@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { Dialog, tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Health } from '#lib/bindings.js';
 	import { WAIT } from '#lib/bridge/index.js';
-	import { duration, healthAdvice, selftestResult } from '#lib/format.js';
+	import { duration, healthAdvice, percent, selftestResult, temperature } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import Facts from './Facts.svelte';
 
@@ -21,10 +22,10 @@
 	let done = $derived(testing && health.selftest.remaining !== null ? 100 - health.selftest.remaining : null);
 	let facts = $derived(
 		[
-			health.temperature !== null && { label: 'Temperature', value: `${Math.round(health.temperature)} °C` },
-			health.powerOnHours !== null && { label: 'Powered on for', value: duration(health.powerOnHours) },
-			health.badSectors > 0 && { label: 'Unreadable sectors', value: String(health.badSectors) },
-			{ label: 'Self-test', value: testing ? `Running${done !== null ? `, ${done}% done` : ''}` : (selftestResult(health.selftest.status) ?? 'Never run') }
+			health.temperature !== null && { label: t('disks-health-temperature'), value: temperature(health.temperature) },
+			health.powerOnHours !== null && { label: t('disks-health-powered-on'), value: duration(health.powerOnHours) },
+			health.badSectors > 0 && { label: t('disks-health-bad-sectors'), value: health.badSectors.toLocaleString(i18n.formats) },
+			{ label: t('disks-health-selftest'), value: testing ? (done !== null ? t('disks-health-selftest-running-progress', { progress: percent(done / 100) }) : t('disks-health-selftest-running')) : (selftestResult(health.selftest.status) ?? t('disks-health-selftest-never')) }
 		].filter((fact) => fact !== false)
 	);
 
@@ -33,7 +34,7 @@
 	}
 </script>
 
-<Dialog title={health.state === 'good' ? 'This drive is healthy' : 'This drive needs attention'} description={healthAdvice(health)} {onclose}>
+<Dialog title={t('disks-health-dialog-title', { state: health.state })} description={healthAdvice(health)} {onclose}>
 	<Facts {facts} />
 	{#if testing && done !== null}
 		<div class="mx-1 h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
@@ -42,11 +43,11 @@
 	{/if}
 	{#snippet actions()}
 		{#if testing}
-			<button type="button" class="button mr-auto" disabled={busy} onclick={() => disks.run(key, () => commands.disksSelftestStop({ drive: drive.id }, WAIT))}>Stop test</button>
+			<button type="button" class="button mr-auto" disabled={busy} onclick={() => disks.run(key, () => commands.disksSelftestStop({ drive: drive.id }, WAIT))}>{t('disks-health-stop-test')}</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={() => test(false)} {@attach tooltip('A couple of minutes, while you keep using it')}>Quick test</button>
-			<button type="button" class="button mr-auto" disabled={busy} onclick={() => test(true)} {@attach tooltip('Can take hours, while you keep using it')}>Full test</button>
+			<button type="button" class="button" disabled={busy} onclick={() => test(false)} {@attach tooltip(t('disks-health-quick-test.tooltip'))}>{t('disks-health-quick-test')}</button>
+			<button type="button" class="button mr-auto" disabled={busy} onclick={() => test(true)} {@attach tooltip(t('disks-health-full-test.tooltip'))}>{t('disks-health-full-test')}</button>
 		{/if}
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('disks-done')}</button>
 	{/snippet}
 </Dialog>

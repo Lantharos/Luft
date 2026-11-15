@@ -5,6 +5,7 @@ const CHOSEN: &str = "/run/luft-installer/language";
 fn use_locale(requested: &str) {
     L10N.use_locale(requested);
     luft_trust::L10N.use_locale(requested);
+    luft_disks::L10N.use_locale(requested);
 }
 
 pub fn restore() {

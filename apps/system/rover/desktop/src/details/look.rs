@@ -5,9 +5,12 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 
 use luft_app::Commands;
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+use crate::l10n::L10N;
 
 const ATTRIBUTE: &CStr = c"user.luft.look";
 const LONGEST: usize = 64;
@@ -114,11 +117,9 @@ fn write(path: &Path, look: Option<&FolderLook>) -> io::Result<()> {
 
 fn explain(error: &io::Error) -> String {
     match error.raw_os_error() {
-        Some(libc::ENOTSUP) => "This drive can’t keep folder icons".to_owned(),
-        Some(libc::EPERM | libc::EACCES) => {
-            "Only the folder’s owner can change its icon".to_owned()
-        }
-        Some(libc::EROFS) => "This drive is read-only".to_owned(),
+        Some(libc::ENOTSUP) => t!(L10N, "rover-look-unsupported"),
+        Some(libc::EPERM | libc::EACCES) => t!(L10N, "rover-look-not-owner"),
+        Some(libc::EROFS) => t!(L10N, "rover-look-read-only"),
         _ => error.to_string(),
     }
 }

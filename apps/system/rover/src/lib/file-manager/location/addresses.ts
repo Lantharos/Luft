@@ -1,17 +1,18 @@
+import { t } from '@luft/i18n';
 const SCHEME = /^([a-z][a-z0-9+.-]*):\/\//i;
 const ALIASES: Record<string, string> = { ssh: 'sftp', http: 'dav', https: 'davs', webdav: 'dav', webdavs: 'davs' };
 const NAMES: Record<string, string> = {
-	sftp: 'SFTP',
-	smb: 'Windows file sharing (SMB)',
-	ftp: 'FTP',
-	ftps: 'FTP with encryption',
-	dav: 'WebDAV',
-	davs: 'WebDAV with encryption',
-	nfs: 'NFS',
-	afp: 'Apple file sharing',
-	mtp: 'Phone or camera',
-	gphoto2: 'Camera',
-	afc: 'iPhone or iPad'
+	sftp: 'rover-protocol-sftp',
+	smb: 'rover-protocol-smb',
+	ftp: 'rover-protocol-ftp',
+	ftps: 'rover-protocol-ftps',
+	dav: 'rover-protocol-dav',
+	davs: 'rover-protocol-davs',
+	nfs: 'rover-protocol-nfs',
+	afp: 'rover-protocol-afp',
+	mtp: 'rover-protocol-mtp',
+	gphoto2: 'rover-protocol-gphoto2',
+	afc: 'rover-protocol-afc'
 };
 
 export function looksRemote(text: string) {
@@ -36,7 +37,9 @@ export function normalizeAddress(text: string) {
 
 export function protocolName(uri: string) {
 	const scheme = SCHEME.exec(uri)?.[1].toLowerCase();
-	return scheme ? (NAMES[scheme] ?? scheme.toUpperCase()) : null;
+	if (!scheme) return null;
+	const name = NAMES[scheme];
+	return name ? t(name) : scheme.toUpperCase();
 }
 
 export function addressName(uri: string) {
@@ -44,7 +47,8 @@ export function addressName(uri: string) {
 		const url = new URL(uri);
 		const path = decodeURIComponent(url.pathname).replace(/\/+$/, '');
 		const folder = path.split('/').filter(Boolean).at(-1);
-		return folder ? `${folder} on ${url.host}` : url.host;
+		return folder ? t('rover-address-name', { folder, host: url.host }) : url.host;
+
 	} catch {
 		return uri;
 	}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import type { Drive, Segment } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
@@ -27,7 +28,7 @@
 		<button
 			type="button"
 			tabindex="-1"
-			aria-label="{segmentName(segment)}, {bytes(segment.size)}"
+			aria-label={t('disks-segment', { name: segmentName(segment), size: bytes(segment.size) })}
 			class={['segment', segment.kind === 'free' && 'free', disks.hovered === key && 'lit', disks.hovered && disks.hovered !== key && 'dim']}
 			style:flex-grow={segment.size}
 			style:--tone={segment.kind === 'volume' ? palette.get(segment.block) : undefined}

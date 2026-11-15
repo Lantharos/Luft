@@ -5,10 +5,12 @@ use std::os::unix::fs::DirBuilderExt;
 use std::path::{Path, PathBuf};
 
 use chrono::Local;
+use luft_i18n::t;
 
 use super::locations::trash_for;
 use crate::files::privileged::{self, Pair, arrived, create_dir_all, is_permission_error};
 use crate::files::{rename_no_replace, uri_path};
+use crate::l10n::L10N;
 
 #[derive(Debug, Clone)]
 pub struct Trashed {
@@ -23,7 +25,7 @@ pub fn put(path: &Path) -> Result<Trashed, String> {
         Some(trashed) => Ok(trashed),
         None => put_denied(&denied)?
             .pop()
-            .ok_or_else(|| "This item couldn't be moved to the trash".to_string()),
+            .ok_or_else(|| t!(L10N, "rover-trash-failed")),
     }
 }
 
@@ -57,7 +59,7 @@ pub fn put_denied(denied: &[PathBuf]) -> Result<Vec<Trashed>, String> {
 fn place(path: &Path) -> io::Result<Trashed> {
     let name = path
         .file_name()
-        .ok_or_else(|| io::Error::other("This item can't be moved to the trash"))?;
+        .ok_or_else(|| io::Error::other(t!(L10N, "rover-trash-impossible")))?;
     let target = trash_for(path).map_err(io::Error::other)?;
     let files = target.trash.join("files");
     let info = target.trash.join("info");
@@ -132,9 +134,11 @@ pub fn restore_or_defer(item: &Trashed, denied: &mut Vec<Trashed>) -> Result<boo
             let _ = fs::remove_file(&item.info);
             Ok(true)
         }
-        Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {
-            Err(format!("{} already exists", item.original.display()))
-        }
+        Err(error) if error.kind() == io::ErrorKind::AlreadyExists => Err(t!(
+            L10N,
+            "rover-files-already-exists",
+            name = item.original.display().to_string()
+        )),
         Err(error) if is_permission_error(&error) => {
             denied.push(item.clone());
             Ok(false)

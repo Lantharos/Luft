@@ -7,11 +7,14 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::thread;
 
+use luft_i18n::t;
+
 use crate::files::operations::{OperationPhase, OperationType, OperationsQueue};
 use crate::files::privileged::remove_path;
-use crate::files::text::{quoted, subject};
+use crate::files::text::{first_name, name_of};
 use crate::files::transfer::{available_destination, path_size};
 use crate::history::{History, Step};
+use crate::l10n::L10N;
 pub use compress::ArchiveFormat;
 use progress::Progress;
 
@@ -25,7 +28,7 @@ pub fn compress(
 ) -> Result<String, String> {
     let name = name.trim();
     if name.is_empty() || name.contains('/') {
-        return Err("Choose a name for the archive".to_string());
+        return Err(t!(L10N, "rover-archives-name-needed"));
     }
     let destination = PathBuf::from(destination);
     let file_name = format!("{name}.{}", format.extension());
@@ -53,8 +56,19 @@ pub fn compress(
         });
         if let Ok(target) = &result {
             history.record(
-                format!("Compressed {} into {}", subject(&paths), quoted(target)),
-                format!("Moved {} to the trash", quoted(target)),
+                t!(
+                    L10N,
+                    "rover-history-compressed",
+                    count = paths.len(),
+                    name = first_name(&paths),
+                    archive = name_of(target)
+                ),
+                t!(
+                    L10N,
+                    "rover-history-trashed",
+                    count = 1,
+                    name = name_of(target)
+                ),
                 vec![Step::Created(target.clone())],
                 false,
             );
@@ -77,7 +91,7 @@ pub fn extract(
             let path = PathBuf::from(path);
             extract::detect(&path)
                 .map(|(format, stem)| (path.clone(), format, stem))
-                .ok_or_else(|| format!("{} isn't an archive Rover can open", quoted(&path)))
+                .ok_or_else(|| t!(L10N, "rover-archives-unknown", name = name_of(&path)))
         })
         .collect::<Result<Vec<_>, String>>()?;
     let id = queue.start(
@@ -123,8 +137,13 @@ pub fn extract(
                 .collect(),
         );
         history.record(
-            format!("Extracted {}", subject(&paths)),
-            "Moved the extracted files to the trash".to_string(),
+            t!(
+                L10N,
+                "rover-history-extracted",
+                count = paths.len(),
+                name = first_name(&paths)
+            ),
+            t!(L10N, "rover-history-extracted-trashed"),
             created.into_iter().map(Step::Created).collect(),
             false,
         );

@@ -9,6 +9,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Star from '@lucide/svelte/icons/star';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import { t } from '@luft/i18n';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
 	import { commands } from '#lib/bindings.js';
@@ -81,57 +82,58 @@
 {/snippet}
 
 <ContextMenu at={menu} onclose={() => (manager.placeMenu = null)}>
-	{@render item(ExternalLink, 'Open', open)}
+	{@render item(ExternalLink, t('rover-open'), open)}
 	{#if opensFolder}
-		{@render item(Plus, 'Open in new tab', openInTab)}
+		{@render item(Plus, t('rover-place-open-in-new-tab'), openInTab)}
 	{/if}
 	{#if place.kind === 'drive' && place.drive.canUnmount}
 		{@const drive = place.drive}
-		{@render item(Eject, drive.isRemovable ? 'Eject' : 'Unmount', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mountPoint))}
+		{@render item(Eject, drive.isRemovable ? t('rover-drive-eject') : t('rover-drive-unmount'), () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mountPoint))}
 	{/if}
 	{#if place.kind === 'drive' && manager.drives.manageable}
 		{@const drive = place.drive}
-		{@render item(HardDrive, 'Manage drive…', () => api.manageDrive(drive.mountPoint).catch(manager.notify))}
+		{@render item(HardDrive, t('rover-drive-manage'), () => api.manageDrive(drive.mountPoint).catch(manager.notify))}
 	{/if}
 	{#if place.kind === 'network'}
 		{@const entry = place.entry}
 		{#if entry.location}
 			{@const location = entry.location}
-			{@render item(Eject, 'Disconnect', () => manager.disconnectNetwork(location.uri))}
+			{@render item(Eject, t('rover-network-disconnect'), () => manager.disconnectNetwork(location.uri))}
 		{/if}
 		{#if entry.saved}
-			{@render item(Star, 'Remove from sidebar', () => manager.network.forget(entry.place.uri))}
+			{@render item(Star, t('rover-menu-remove-from-sidebar'), () => manager.network.forget(entry.place.uri))}
 		{:else}
-			{@render item(Star, 'Keep in sidebar', () => manager.network.save(entry.place))}
+			{@render item(Star, t('rover-connect-keep'), () => manager.network.save(entry.place))}
 		{/if}
 		<MenuSeparator />
-		{@render item(Globe, 'Connect to server…', () => dialogs.connect())}
+		{@render item(Globe, t('rover-connect-to-server'), () => dialogs.connect())}
 	{/if}
 	{#if place.kind === 'folder'}
 		{@const folder = place.path}
-		{@render item(EyeOff, 'Remove from sidebar', () => hidePlace(folder))}
+		{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => hidePlace(folder))}
 	{/if}
 	{#if place.kind === 'favorite'}
 		{@const bookmark = place.bookmark}
-		{@render item(Star, 'Remove from Favorites', () => bookmarks.unpin(bookmark.path))}
+		{@render item(Star, t('rover-menu-remove-favorite'), () => bookmarks.unpin(bookmark.path))}
 	{/if}
 	{#if (place.kind === 'folder' || place.kind === 'favorite') && opensFolder && path}
 		{@const folder = path}
-		{@render item(Palette, 'Change icon…', () => changeIcon(folder).catch(manager.notify))}
+		{@render item(Palette, t('rover-menu-change-icon'), () => changeIcon(folder).catch(manager.notify))}
 	{/if}
 	{#if inMainGroup && hiddenPlaces.length > 0}
 		<MenuSeparator />
 		{#each hiddenPlaces as hidden (hidden.path)}
-			{@render item(folderLooks.art(hidden.path).icon, `Show ${hidden.label}`, () => showPlace(hidden.path))}
+			{@render item(folderLooks.art(hidden.path).icon, t('rover-place-show', { name: hidden.label }), () => showPlace(hidden.path))}
 		{/each}
 	{/if}
 	{#if place.kind === 'trash'}
 		<MenuSeparator />
-		{@render item(Trash2, 'Empty trash', emptyTrash, true, trash.count === 0)}
+		{@render item(Trash2, t('rover-empty-trash'), emptyTrash, true, trash.count === 0)}
 	{/if}
 	{#if path}
 		{@const target = path}
 		<MenuSeparator />
-		{@render item(Info, 'Properties', () => showPathProperties(manager, target))}
+		{@render item(Info, t('rover-menu-properties'), () =>
+ showPathProperties(manager, target))}
 	{/if}
 </ContextMenu>

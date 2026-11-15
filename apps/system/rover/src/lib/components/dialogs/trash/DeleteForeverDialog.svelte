@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 
 	interface Props {
@@ -9,7 +10,7 @@
 
 	let { count, onconfirm, onclose }: Props = $props();
 
-	let title = $derived(count === 1 ? 'Delete this item for good?' : `Delete ${count} items for good?`);
+	let title = $derived(t('rover-delete-forever-title', { count }));
 
 	function confirm() {
 		onconfirm();
@@ -17,9 +18,10 @@
 	}
 </script>
 
-<Dialog {title} description="This can't be undone." {onclose}>
+<Dialog {title} description={t('rover-delete-forever-description')} {onclose}>
 	{#snippet actions()}
-		<button class="button" type="button" onclick={onclose}>Cancel</button>
-		<button class="button danger" type="button" onclick={confirm}>Delete</button>
+		<button class="button" type="button" onclick={onclose}>{t('rover-cancel')}</button>
+		<button class="button danger" type="button" onclick={confirm}>{t('rover-delete-forever-confirm')}</button>
+
 	{/snippet}
 </Dialog>

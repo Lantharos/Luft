@@ -2,6 +2,7 @@
 	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Spinner, TextField } from '@luft/ui';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -48,14 +49,14 @@
 
 {#if vcs.saveDialogOpen && vcs.project}
 	<div class="fixed inset-0 z-[90] grid place-items-center bg-black/28 px-4">
-		<button class="absolute inset-0 h-full w-full" type="button" aria-label="Cancel" onclick={close}></button>
+		<button class="absolute inset-0 h-full w-full" type="button" aria-label={t('rover-cancel')} onclick={close}></button>
 		<section
 			class="relative z-10 flex max-h-[min(680px,calc(100dvh-32px))] w-[520px] max-w-full flex-col rounded-[18px] bg-[var(--raised)] text-[var(--text)] shadow-[0_24px_80px_var(--shadow-soft),inset_0_1px_0_var(--hairline)]"
-			aria-label="Commit changes"
+			aria-label={t('rover-menu-commit-changes')}
 		>
 			<header class="flex h-[52px] shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
-				<div class="text-[14px] font-medium">Commit changes</div>
-				<button class="icon-button large" type="button" aria-label="Close" onclick={close}>
+				<div class="text-[14px] font-medium">{t('rover-menu-commit-changes')}</div>
+				<button class="icon-button large" type="button" aria-label={t('rover-close')} onclick={close}>
 					<X size={16} />
 				</button>
 			</header>
@@ -63,17 +64,17 @@
 			<div class="grid gap-4 px-4 py-4">
 				<TextField
 					bind:this={field}
-					label="Message"
+					label={t('rover-vcs-message')}
 					showLabel
-					placeholder="Describe your changes"
+					placeholder={t('rover-vcs-message-placeholder')}
 					bind:value={message}
 					onkeydown={(event) => event.key === 'Enter' && submit()}
 				/>
 
 				<div class="grid gap-2">
 					<div class="flex items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
-						<span>Files</span>
-						<span>{selected.length} selected</span>
+						<span>{t('rover-vcs-files')}</span>
+						<span>{t('rover-chooser-selected', { count: selected.length })}</span>
 					</div>
 					<div class="soft-scroll max-h-[280px] overflow-auto rounded-[14px] bg-[var(--content)] p-1 shadow-[inset_0_0_0_1px_var(--hairline)]">
 						{#each files as file (file.path)}
@@ -108,9 +109,10 @@
 			</div>
 
 			<footer class="flex shrink-0 justify-end gap-2 px-4 py-4 shadow-[inset_0_1px_0_var(--hairline)]">
-				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={close}>Cancel</button>
+				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={close}>{t('rover-cancel')}</button>
 				<button class="button large" type="button" disabled={!canSubmit} onclick={submit}>
-					{#if vcs.busy === 'save'}<Spinner />Committing{:else}Commit{/if}
+					{#if vcs.busy === 'save'}<Spinner />{t('rover-vcs-committing')}{:else}{t('rover-vcs-commit')}{/if}
+
 				</button>
 			</footer>
 		</section>

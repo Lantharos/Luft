@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, errorText, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { LuftMove, MoveDestination } from '#lib/bindings.js';
@@ -39,11 +40,11 @@
 	});
 
 	let title = $derived.by(() => {
-		if (phase === 'waiting') return 'Luft moves at the next start';
-		if (phase === 'failed' && options?.state.failed) return `Luft didn’t move to ${options.state.failedTo}`;
-		if (phase === 'failed') return 'Luft can’t move right now';
-		if (phase === 'place' || phase === 'confirm') return `Move Luft to ${destination?.name}`;
-		return 'Move Luft to another drive';
+		if (phase === 'waiting') return t('disks-move-waiting-title');
+		if (phase === 'failed' && options?.state.failed) return t('disks-move-failed-title', { drive: options.state.failedTo });
+		if (phase === 'failed') return t('disks-move-refused-title');
+		if (phase === 'place' || phase === 'confirm') return t('disks-move-to', { drive: destination?.name ?? '' });
+		return t('disks-move-title');
 	});
 
 	function placeKey(candidate: Place) {
@@ -57,17 +58,17 @@
 	}
 
 	function placeTitle(candidate: Place) {
-		if (candidate.kind === 'free') return 'Use the free space';
-		if (candidate.kind === 'erase') return `Erase ${destination?.name}`;
-		return `Make room on ${destination?.shrink.find((item) => item.block === candidate.block)?.name}`;
+		if (candidate.kind === 'free') return t('disks-move-place-free');
+		if (candidate.kind === 'erase') return t('disks-move-place-erase', { drive: destination?.name ?? '' });
+		return t('disks-move-place-shrink', { name: destination?.shrink.find((item) => item.block === candidate.block)?.name ?? '' });
 	}
 
 	function placeNote(candidate: Place) {
 		if (!destination) return '';
 		const room = largest(destination, candidate);
-		if (candidate.kind === 'erase') return destination.erase.refused ?? 'Everything on it is deleted, and Luft gets the whole drive';
-		if (candidate.kind === 'free') return `${bytes(destination.free?.size ?? 0)} free, room for Luft to have up to ${bytes(room)}`;
-		return room >= needs ? `It shrinks to make room, keeping its files. Luft can have up to ${bytes(room)}` : `It can only make ${bytes(room)} of room`;
+		if (candidate.kind === 'erase') return destination.erase.refused ?? t('disks-move-place-erase-note');
+		if (candidate.kind === 'free') return t('disks-move-place-free-note', { free: bytes(destination.free?.size ?? 0), room: bytes(room) });
+		return room >= needs ? t('disks-move-place-shrink-note', { room: bytes(room) }) : t('disks-move-place-shrink-small', { room: bytes(room) });
 	}
 
 	async function load() {
@@ -151,14 +152,14 @@
 {:else}
 	<Dialog {title} wide onclose={close}>
 		{#if phase === 'loading'}
-			<div class="flex items-center gap-3 text-[13.5px] text-[var(--text-muted)]"><Spinner />Looking at your drives</div>
+			<div class="flex items-center gap-3 text-[13.5px] text-[var(--text-muted)]"><Spinner />{t('disks-move-loading')}</div>
 		{:else if phase === 'drive' && options}
 			<p class="text-[13.5px] leading-relaxed">
-				Luft needs {bytes(needs)} on the other drive. Your files, apps and settings come along, about {bytes(options.needs.copies)} in all.
+				{t('disks-move-needs', { size: bytes(needs) })} {t('disks-move-copies', { size: bytes(options.needs.copies) })}
 			</p>
 			{#if options.destinations.length}
 				<Options
-					label="Drives"
+					label={t('disks-drives')}
 					items={options.destinations}
 					key={(item) => item.drive}
 					chosen={destination?.drive ?? null}
@@ -174,10 +175,10 @@
 					{/snippet}
 				</Options>
 			{:else}
-				<p class="text-[13.5px] leading-relaxed text-[var(--text-muted)]">There’s no other drive in this computer to move Luft to.</p>
+				<p class="text-[13.5px] leading-relaxed text-[var(--text-muted)]">{t('disks-move-no-drives')}</p>
 			{/if}
 		{:else if phase === 'place' && destination}
-			<Options label="Where on {destination.name}" items={places} key={placeKey} chosen={place ? placeKey(place) : null} disabled={placeDisabled} onchoose={choosePlace}>
+			<Options label={t('disks-move-where', { drive: destination.name })} items={places} key={placeKey} chosen={place ? placeKey(place) : null} disabled={placeDisabled} onchoose={choosePlace}>
 				{#snippet row(item)}
 					<span class="flex min-w-0 flex-col">
 						<span class={['text-[14px] font-medium', item.kind === 'erase' && !placeDisabled(item) && 'text-[var(--danger)]']}>{placeTitle(item)}</span>
@@ -186,27 +187,29 @@
 				{/snippet}
 			</Options>
 			{#if place && place.kind !== 'erase' && most > needs}
-				<SizeField bind:value={luft} min={needs} max={most} label="Space for Luft" />
+				<SizeField bind:value={luft} min={needs} max={most} label={t('disks-move-space')} />
 			{/if}
 		{:else if phase === 'confirm' && destination && place && options}
 			{#if shrink}
-				<p class="text-[13.5px] leading-relaxed">First, {shrink.name} shrinks to {bytes(shrunkSize(shrink, luft))}. Its files stay as they are.</p>
+				<p class="text-[13.5px] leading-relaxed">{t('disks-move-shrink-first', { name: shrink.name, size: bytes(shrunkSize(shrink, luft)) })} {t('disks-move-shrink-files')}</p>
 			{/if}
 			<p class="text-[13.5px] leading-relaxed">
-				Luft moves to {destination.name} the next time the computer starts, with {bytes(place.kind === 'erase' ? destination.erase.luft : luft)} of space. Copying
-				your files, apps and settings, about {bytes(options.needs.copies)}, takes from a few minutes to an hour on a full drive. Keep the computer on and plugged in
-				until Luft starts from {destination.name}.
+				{t('disks-move-confirm-moves', { drive: destination.name, size: bytes(place.kind === 'erase' ? destination.erase.luft : luft) })}
+				{t('disks-move-confirm-copying', { size: bytes(options.needs.copies) })}
+				{t('disks-move-confirm-keep-on', { drive: destination.name })}
 			</p>
 			<p class="text-[13.5px] leading-relaxed">
-				{encrypted ? 'The new copy is encrypted the same way and opens with the same recovery key. ' : ''}The copy on {here?.name ?? 'this drive'} keeps working
-				until Luft has started from {destination.name}. Then you can remove it here.
+				{encrypted ? t('disks-move-confirm-encrypted') : ''}
+				{here ? t('disks-move-confirm-old-copy', { here: here.name, drive: destination.name }) : t('disks-move-confirm-old-copy-here', { drive: destination.name })}
+				{t('disks-move-confirm-remove')}
 			</p>
 		{:else if phase === 'working'}
-			<p class="text-[13px] text-[var(--text-muted)]">Keep the computer on until this is done.</p>
+			<p class="text-[13px] text-[var(--text-muted)]">{t('disks-keep-on')}</p>
 		{:else if phase === 'waiting' && options}
 			<p class="text-[13.5px] leading-relaxed">
-				Luft moves to {options.state.to} the next time the computer starts. The startup shows how far it is; keep the computer on and plugged in until Luft starts
-				from there. If it turns off partway, Luft carries on where it left off at the next start.
+				{t('disks-move-waiting', { drive: options.state.to })}
+				{t('disks-move-waiting-keep-on')}
+				{t('disks-move-waiting-partway')}
 			</p>
 			{#if error}
 				<p class="text-[13px] leading-relaxed text-[var(--danger)]">{error}</p>
@@ -214,7 +217,7 @@
 		{:else if phase === 'failed'}
 			{#if options?.state.failed}
 				<p class="text-[13.5px] leading-relaxed">{options.state.failed}</p>
-				<p class="text-[13.5px] leading-relaxed text-[var(--text-muted)]">Luft stayed where it was, and took back what it had made on {options.state.failedTo}.</p>
+				<p class="text-[13.5px] leading-relaxed text-[var(--text-muted)]">{t('disks-move-failed', { drive: options.state.failedTo })}</p>
 			{:else}
 				<p class="text-[13.5px] leading-relaxed">{error || options?.refused}</p>
 			{/if}
@@ -222,30 +225,30 @@
 
 		{#snippet actions()}
 			{#if phase === 'drive'}
-				<button type="button" class="button" onclick={onclose}>Cancel</button>
-				<button type="button" class="button primary" disabled={!destination} onclick={() => (phase = 'place')}>Continue</button>
+				<button type="button" class="button" onclick={onclose}>{t('disks-cancel')}</button>
+				<button type="button" class="button primary" disabled={!destination} onclick={() => (phase = 'place')}>{t('disks-continue')}</button>
 			{:else if phase === 'place'}
-				<button type="button" class="button" onclick={() => (phase = 'drive')}>Back</button>
-				<button type="button" class="button primary" disabled={!place} onclick={() => (phase = place?.kind === 'erase' ? 'erase' : 'confirm')}>Continue</button>
+				<button type="button" class="button" onclick={() => (phase = 'drive')}>{t('disks-back')}</button>
+				<button type="button" class="button primary" disabled={!place} onclick={() => (phase = place?.kind === 'erase' ? 'erase' : 'confirm')}>{t('disks-continue')}</button>
 			{:else if phase === 'confirm'}
-				<button type="button" class="button" onclick={() => (phase = 'place')}>Back</button>
-				<button type="button" class="button primary" onclick={move}>Move Luft</button>
+				<button type="button" class="button" onclick={() => (phase = 'place')}>{t('disks-back')}</button>
+				<button type="button" class="button primary" onclick={move}>{t('disks-move-action')}</button>
 			{:else if phase === 'working' || phase === 'loading'}
-				<button type="button" class="button" disabled>{#if phase === 'working'}<Spinner />Preparing{:else}Cancel{/if}</button>
+				<button type="button" class="button" disabled>{#if phase === 'working'}<Spinner />{t('disks-move-preparing')}{:else}{t('disks-cancel')}{/if}</button>
 			{:else if phase === 'waiting'}
 				{#if options?.state.stage === 'waiting'}
-					<button type="button" class="button" onclick={callOff}>Call off</button>
+					<button type="button" class="button" onclick={callOff}>{t('disks-move-call-off')}</button>
 				{/if}
-				<button type="button" class="button" onclick={onclose}>Later</button>
-				<button type="button" class="button primary" onclick={restart}>Restart now</button>
+				<button type="button" class="button" onclick={onclose}>{t('disks-later')}</button>
+				<button type="button" class="button primary" onclick={restart}>{t('disks-restart')}</button>
 			{:else if options?.state.failed}
-				<button type="button" class="button" onclick={dismiss}>Close</button>
-				<button type="button" class="button primary" onclick={tryAgain}>Try again</button>
+				<button type="button" class="button" onclick={dismiss}>{t('disks-close')}</button>
+				<button type="button" class="button primary" onclick={tryAgain}>{t('disks-try-again')}</button>
 			{:else if error && destination}
-				<button type="button" class="button" onclick={onclose}>Close</button>
-				<button type="button" class="button primary" onclick={() => ((error = ''), (phase = 'place'))}>Back</button>
+				<button type="button" class="button" onclick={onclose}>{t('disks-close')}</button>
+				<button type="button" class="button primary" onclick={() => ((error = ''), (phase = 'place'))}>{t('disks-back')}</button>
 			{:else}
-				<button type="button" class="button primary" onclick={onclose}>Close</button>
+				<button type="button" class="button primary" onclick={onclose}>{t('disks-close')}</button>
 			{/if}
 		{/snippet}
 	</Dialog>

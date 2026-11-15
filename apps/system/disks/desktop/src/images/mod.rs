@@ -1,5 +1,7 @@
 pub mod copy;
 
+use crate::l10n::L10N;
+use luft_i18n::t;
 use std::fs::File;
 use std::os::fd::OwnedFd;
 use std::path::Path;
@@ -76,7 +78,7 @@ impl Imaging {
         destination: &Path,
     ) -> Result<(), String> {
         if destination.exists() {
-            return Err("A file with that name is already there".to_owned());
+            return Err(t!(L10N, "disks-image-exists"));
         }
         let size = udisks::objects()
             .await?
@@ -99,8 +101,9 @@ impl Imaging {
     }
 
     pub async fn choose_folder(&self) -> Result<Option<String>, String> {
+        let title = t!(L10N, "disks-image-choose-folder");
         let chosen = FileChooser {
-            title: "Choose a folder",
+            title: &title,
             directory: true,
             ..FileChooser::default()
         }
@@ -113,18 +116,18 @@ impl Imaging {
     }
 
     pub async fn choose(&self) -> Result<Option<ChosenImage>, String> {
+        let name = t!(L10N, "disks-image-filter");
         let filter = Filter {
-            name: "Disk images",
+            name: &name,
             patterns: IMAGE_PATTERNS
                 .iter()
                 .map(|pattern| pattern.to_string())
                 .collect(),
         };
-        let Some(uri) = portal::open_file("Choose a disk image", filter).await? else {
+        let Some(uri) = portal::open_file(&t!(L10N, "disks-image-choose"), filter).await? else {
             return Ok(None);
         };
-        let path =
-            portal::uri_path(&uri).ok_or("Disk images can only be opened from local folders")?;
+        let path = portal::uri_path(&uri).ok_or_else(|| t!(L10N, "disks-image-not-local"))?;
         ChosenImage::read(&path).map(Some)
     }
 
@@ -137,7 +140,7 @@ impl Imaging {
             .unwrap_or(0);
         let size = input.metadata().map_err(|error| error.to_string())?.len();
         if size > capacity {
-            return Err("This image is bigger than the space it would be written to".to_owned());
+            return Err(t!(L10N, "disks-image-too-big"));
         }
         let partitions = objects
             .get(block, TABLE)
@@ -171,7 +174,7 @@ impl Imaging {
         {
             let mut running = self.running.lock();
             if running.is_some() {
-                return Err("Another disk image is still being copied".to_owned());
+                return Err(t!(L10N, "disks-image-busy"));
             }
             *running = Some(cancelled.clone());
         }
@@ -179,7 +182,7 @@ impl Imaging {
         let events = events.clone();
         let block = block.to_owned();
         std::thread::spawn(move || {
-            let _hold = luft_app::block_on(Hold::take(direction.reason()));
+            let _hold = luft_app::block_on(Hold::take(&direction.reason()));
             copy::run(&events, &block, direction, &cancelled);
             *running.lock() = None;
         });

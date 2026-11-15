@@ -1,30 +1,31 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Select, Switch } from '@luft/ui';
 	import { search, type KindFilter, type ModifiedFilter, type SizeFilter } from '#lib/features/search.svelte.js';
 
-	const KINDS: { value: KindFilter; label: string }[] = [
-		{ value: 'any', label: 'Any kind' },
-		{ value: 'folder', label: 'Folders' },
-		{ value: 'document', label: 'Documents' },
-		{ value: 'image', label: 'Images' },
-		{ value: 'video', label: 'Videos' },
-		{ value: 'audio', label: 'Audio' },
-		{ value: 'archive', label: 'Archives' },
-		{ value: 'code', label: 'Code' }
-	];
-	const MODIFIED: { value: ModifiedFilter; label: string }[] = [
-		{ value: 'any', label: 'Any time' },
-		{ value: 'day', label: 'Past day' },
-		{ value: 'week', label: 'Past week' },
-		{ value: 'month', label: 'Past month' },
-		{ value: 'year', label: 'Past year' }
-	];
-	const SIZES: { value: SizeFilter; label: string }[] = [
-		{ value: 'any', label: 'Any size' },
-		{ value: 'small', label: 'Under 1 MB' },
-		{ value: 'medium', label: '1 to 100 MB' },
-		{ value: 'large', label: 'Over 100 MB' }
-	];
+	let kinds: { value: KindFilter; label: string }[] = $derived([
+		{ value: 'any', label: t('rover-search-kind-any') },
+		{ value: 'folder', label: t('rover-search-kind-folder') },
+		{ value: 'document', label: t('rover-search-kind-document') },
+		{ value: 'image', label: t('rover-search-kind-image') },
+		{ value: 'video', label: t('rover-search-kind-video') },
+		{ value: 'audio', label: t('rover-search-kind-audio') },
+		{ value: 'archive', label: t('rover-search-kind-archive') },
+		{ value: 'code', label: t('rover-search-kind-code') }
+	]);
+	let modified: { value: ModifiedFilter; label: string }[] = $derived([
+		{ value: 'any', label: t('rover-search-modified-any') },
+		{ value: 'day', label: t('rover-search-modified-day') },
+		{ value: 'week', label: t('rover-search-modified-week') },
+		{ value: 'month', label: t('rover-search-modified-month') },
+		{ value: 'year', label: t('rover-search-modified-year') }
+	]);
+	let sizes: { value: SizeFilter; label: string }[] = $derived([
+		{ value: 'any', label: t('rover-search-size-any') },
+		{ value: 'small', label: t('rover-search-size-small') },
+		{ value: 'medium', label: t('rover-search-size-medium') },
+		{ value: 'large', label: t('rover-search-size-large') }
+	]);
 
 	interface Props {
 		online: boolean;
@@ -39,11 +40,12 @@
 </script>
 
 <div class="flex flex-wrap items-center gap-2">
-	<Select label="Kind" options={KINDS} value={search.kind} onchange={(value) => update(() => (search.kind = value))} />
-	<Select label="Modified" options={MODIFIED} value={search.modified} onchange={(value) => update(() => (search.modified = value))} />
-	<Select label="Size" options={SIZES} value={search.size} onchange={(value) => update(() => (search.size = value))} />
+	<Select label={t('rover-search-kind')} options={kinds} value={search.kind} onchange={(value) => update(() => (search.kind = value))} />
+	<Select label={t('rover-search-modified')} options={modified} value={search.modified} onchange={(value) => update(() => (search.modified = value))} />
+	<Select label={t('rover-search-size')} options={sizes} value={search.size} onchange={(value) => update(() => (search.size = value))} />
 	<label class="ml-auto flex items-center gap-2.5 text-[13px] text-[var(--text-soft)]">
-		<span>Look inside files</span>
-		<Switch label="Look inside files" checked={search.contents && !online} disabled={online} onchange={(value) => update(() => (search.contents = value))} />
+		<span>{t('rover-search-contents')}</span>
+		<Switch label={t('rover-search-contents')}
+ checked={search.contents && !online} disabled={online} onchange={(value) => update(() => (search.contents = value))} />
 	</label>
 </div>

@@ -209,11 +209,7 @@ settings-see-through-description = Masaüstünün bu uygulamaların pencerelerin
 settings-see-through-app = { $app } yarı saydam
 settings-see-through-add = Uygulama ekle
 settings-see-through-add-title = Bir uygulamayı yarı saydam yap
-settings-see-through-shows = Arkada görünen
-settings-see-through-shows-everything = Arkadaki her şey
-settings-see-through-shows-wallpaper = Yalnızca duvar kâğıdı
 settings-see-through-amount = Ne kadar saydam
-settings-see-through-blur = Arkadakini bulanıklaştır
 settings-see-through-text = Metni katı tut
 settings-see-through-text-description = Yalnızca pencerenin arka planı saydamlaşır
 

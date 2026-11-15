@@ -215,11 +215,7 @@ settings-see-through-description = Plocha prosvítá okny těchto aplikací. Zap
 settings-see-through-app = Průhledné: { $app }
 settings-see-through-add = Přidat aplikaci
 settings-see-through-add-title = Zprůhlednit aplikaci
-settings-see-through-shows = Co prosvítá
-settings-see-through-shows-everything = Vše za oknem
-settings-see-through-shows-wallpaper = Jen tapeta
 settings-see-through-amount = Míra průhlednosti
-settings-see-through-blur = Rozmazat pozadí
 settings-see-through-text = Ponechat text plný
 settings-see-through-text-description = Průhledné bude jen pozadí okna
 

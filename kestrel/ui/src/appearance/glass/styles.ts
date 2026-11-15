@@ -9,9 +9,7 @@ import { WallpaperFrost, type FrostKind } from '../../core/stage/background/wall
 import { PlaybackConditions } from '../../desktop/wallpaper/conditions.js';
 import { repaintWallpaperGlass, setGlassStyle, type GlassKind } from './kestrelGlass.js';
 
-type ChosenKind = Exclude<GlassKind, 'see-through'>;
-
-const KINDS: ChosenKind[] = ['taskbar', 'surfaces', 'windows'];
+const KINDS: GlassKind[] = ['taskbar', 'surfaces', 'windows', 'see-through'];
 const MARIS_COVERAGE = 0.8;
 
 class FrostPieces {
@@ -55,7 +53,7 @@ export class GlassStyles {
     this.sync();
   }
 
-  private chosen(kind: ChosenKind): Meta.GlassStyle {
+  private chosen(kind: GlassKind): Meta.GlassStyle {
     return this.settings.get_string(kind) === 'maris' ? Meta.GlassStyle.MARIS : Meta.GlassStyle.LUCA;
   }
 
@@ -65,7 +63,7 @@ export class GlassStyles {
   }
 
   private shellStyle(kind: GlassKind, wallpaperOnly: boolean): Shell.BlurStyle {
-    if (kind !== 'see-through' && this.chosen(kind) === Meta.GlassStyle.MARIS)
+    if (this.chosen(kind) === Meta.GlassStyle.MARIS)
       return this.wide.ready ? Shell.BlurStyle.MARIS : Shell.BlurStyle.LUCA;
     return wallpaperOnly && this.blurred.ready ? Shell.BlurStyle.WALLPAPER : Shell.BlurStyle.LUCA;
   }
@@ -74,7 +72,7 @@ export class GlassStyles {
     const wallpaperOnly = this.wallpaperOnly();
     this.blurred.want(wallpaperOnly);
     this.wide.want(KINDS.some(kind => this.chosen(kind) === Meta.GlassStyle.MARIS) || global.compositor.get_maris_requested());
-    for (const kind of [...KINDS, 'see-through'] as const) setGlassStyle(kind, this.shellStyle(kind, wallpaperOnly));
+    for (const kind of KINDS) setGlassStyle(kind, this.shellStyle(kind, wallpaperOnly));
     global.compositor.set_glass(this.chosen('windows'), this.chosen('surfaces'), wallpaperOnly);
   }
 

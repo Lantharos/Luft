@@ -240,10 +240,14 @@
 			]
 		},
 		{
-			"id": "windows.see-through-blur",
+			"id": "windows.see-through-material",
 			"page": "windows",
-			"title": "settings-see-through-blur",
-			"key": "com.lantharos.kestrel see-through-blur"
+			"title": "settings-see-through-material",
+			"key": "com.lantharos.kestrel.glass see-through",
+			"options": [
+				{ "value": "luca", "label": "settings-appearance-glass-luca" },
+				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+			]
 		},
 		{
 			"id": "windows.see-through-text",

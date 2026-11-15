@@ -215,11 +215,7 @@ settings-see-through-description = Робочий стіл просвічує к
 settings-see-through-app = Напівпрозоре: { $app }
 settings-see-through-add = Додати застосунок
 settings-see-through-add-title = Зробити застосунок напівпрозорим
-settings-see-through-shows = Що видно
-settings-see-through-shows-everything = Усе, що позаду
-settings-see-through-shows-wallpaper = Лише шпалери
 settings-see-through-amount = Наскільки прозоро
-settings-see-through-blur = Розмивати те, що позаду
 settings-see-through-text = Залишати текст чітким
 settings-see-through-text-description = Напівпрозорим стає лише тло вікна
 

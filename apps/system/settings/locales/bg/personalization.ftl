@@ -209,11 +209,7 @@ settings-see-through-description = Работният плот прозира п
 settings-see-through-app = Прозрачно { $app }
 settings-see-through-add = Добавяне на приложение
 settings-see-through-add-title = Прозрачно приложение
-settings-see-through-shows = Какво прозира
-settings-see-through-shows-everything = Всичко отзад
-settings-see-through-shows-wallpaper = Само тапета
 settings-see-through-amount = Колко прозрачно
-settings-see-through-blur = Размазване на фона
 settings-see-through-text = Плътен текст
 settings-see-through-text-description = Само фонът на прозореца става прозрачен
 

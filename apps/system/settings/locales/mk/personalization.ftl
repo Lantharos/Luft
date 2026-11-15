@@ -209,11 +209,7 @@ settings-see-through-description = Работната површина се гл
 settings-see-through-app = Проѕирно: { $app }
 settings-see-through-add = Додај апликација
 settings-see-through-add-title = Направи ја апликацијата проѕирна
-settings-see-through-shows = Што се гледа
-settings-see-through-shows-everything = Сè што е зад
-settings-see-through-shows-wallpaper = Само позадината
 settings-see-through-amount = Колку проѕирно
-settings-see-through-blur = Замати го она зад
 settings-see-through-text = Задржи го текстот полн
 settings-see-through-text-description = Проѕирна станува само позадината на прозорецот
 

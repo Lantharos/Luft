@@ -209,11 +209,7 @@ settings-see-through-description = Deixa veure l'escriptori a través de les fin
 settings-see-through-app = { $app } translúcida
 settings-see-through-add = Afegeix una aplicació
 settings-see-through-add-title = Fes translúcida una aplicació
-settings-see-through-shows = Què es veu
-settings-see-through-shows-everything = Tot el que hi ha darrere
-settings-see-through-shows-wallpaper = Només el fons de pantalla
 settings-see-through-amount = Com de translúcides
-settings-see-through-blur = Difumina el que hi ha al darrere
 settings-see-through-text = Mantén el text sòlid
 settings-see-through-text-description = Només el fons de la finestra es torna translúcid
 

@@ -215,11 +215,7 @@ settings-see-through-description = Darbalaukis matosi pro šių programų langus
 settings-see-through-app = Permatoma: { $app }
 settings-see-through-add = Pridėti programą
 settings-see-through-add-title = Padaryti programą permatomą
-settings-see-through-shows = Kas matosi kiaurai
-settings-see-through-shows-everything = Viskas, kas už
-settings-see-through-shows-wallpaper = Tik fono paveikslėlis
 settings-see-through-amount = Kiek permatoma
-settings-see-through-blur = Sulieti tai, kas už
 settings-see-through-text = Palikti tekstą ryškų
 settings-see-through-text-description = Permatomas tampa tik lango fonas
 

@@ -1,5 +1,4 @@
 import Cairo from 'cairo';
-import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
@@ -21,11 +20,13 @@ type LogicalMonitor = [number, number, number, number, boolean, [string, string,
 type CurrentState = [number, MonitorState[], LogicalMonitor[], Properties];
 type Layout = [number, number, number, number, boolean, [string, string, Properties][]];
 
-const {require, eventually} = checks('see-through to the wallpaper');
+const {require, eventually} = checks('see-through window materials');
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-const KESTREL_KEYS = ['see-through-apps', 'see-through-shows', 'see-through-blur', 'see-through-opacity'];
+const KESTREL_KEYS = ['see-through-apps', 'see-through-opacity'];
+const GLASS_KEYS = ['see-through', 'luca-blurs'];
 const BACKGROUND_KEYS = ['picture-uri', 'picture-uri-dark'];
 const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
 const BEHIND = 'See-through behind';
@@ -99,9 +100,9 @@ async function scaleSecondDisplay() {
   };
 }
 
-function wallpaperBackdrop(window: Meta.Window) {
+function backdropStyle(window: Meta.Window) {
   const actor = window.get_compositor_private<Meta.WindowActor>()!;
-  return actor.get_children().find(child => child.name === 'kestrel-see-through-wallpaper') as (Clutter.Actor & {covered: boolean}) | undefined;
+  return actor.get_children().map(child => child.get_effect('backdrop')).find(effect => effect instanceof Shell.BlurEffect)?.style;
 }
 
 function shareApart(a: Frame, b: Frame) {
@@ -133,6 +134,16 @@ async function lookWithAndWithout(tern: Meta.Window, behind: Meta.Window) {
   return {over, alone, apart: shareApart(over, alone)};
 }
 
+async function captureOverAndAlone(tern: Meta.Window, behind: Meta.Window, name: string) {
+  behind.unminimize();
+  tern.raise();
+  await settled();
+  await capture(`${name}-over-window`);
+  behind.minimize();
+  await settled();
+  await capture(`${name}-over-wallpaper`);
+}
+
 async function changesTo(tern: Meta.Window, before: Frame, act: () => void, label: string) {
   act();
   await eventually(async () => shareApart(await captureFrame(inside(tern)), before) > DIFFERENT, label, 10000);
@@ -161,45 +172,46 @@ export async function run() {
       await eventually(() => tern.get_compositor_private<Meta.WindowActor>()!.get_children().some(child => child.get_effect('see-through')), 'Tern turns see-through');
 
       const everything = await lookWithAndWithout(tern, behind);
-      require(everything.apart > DIFFERENT, `showing everything behind lets the window underneath show through (${Math.round(everything.apart * 100)}% apart)`);
-      behind.unminimize();
-      await capture('see-through-everything-behind');
+      require(everything.apart > DIFFERENT, `Luca lets the window underneath show through (${Math.round(everything.apart * 100)}% apart)`);
+      await captureOverAndAlone(tern, behind, 'see-through-luca-dark');
 
-      kestrel.set_string('see-through-shows', 'wallpaper');
-      await eventually(() => wallpaperBackdrop(tern)?.covered, 'the window shows a still copy of the wallpaper');
+      glass.set_string('luca-blurs', 'wallpaper');
+      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.WALLPAPER, 'Luca that blurs only the wallpaper shows the frosted wallpaper');
       const wallpaper = await lookWithAndWithout(tern, behind);
-      require(wallpaper.apart < SAME, `showing only the wallpaper hides the window underneath (${Math.round(wallpaper.apart * 1000) / 10}% apart)`);
-      require(shareApart(wallpaper.over, everything.over) > DIFFERENT, 'showing only the wallpaper looks different from showing everything behind');
-      behind.unminimize();
-      tern.raise();
-      await capture('see-through-only-wallpaper');
-
-      await changesTo(tern, wallpaper.alone, () => kestrel.set_boolean('see-through-blur', false), 'turning blur off shows the wallpaper sharp');
-      kestrel.set_boolean('see-through-blur', true);
-      await settled();
+      require(wallpaper.apart < SAME, `Luca that blurs only the wallpaper hides the window underneath (${Math.round(wallpaper.apart * 1000) / 10}% apart)`);
+      require(shareApart(wallpaper.over, everything.over) > DIFFERENT, 'blurring only the wallpaper looks different from blurring everything behind');
+      await captureOverAndAlone(tern, behind, 'see-through-luca-wallpaper-dark');
 
       const darkLook = await captureFrame(inside(tern));
       await changesTo(tern, darkLook, () => background.set_string('picture-uri-dark', writePicture('changed', PICTURES.changed)), 'the window follows a new wallpaper');
-      const changedLook = await captureFrame(inside(tern));
-      await changesTo(tern, changedLook, () => interfaceSettings.set_string('color-scheme', 'default'), 'the window follows the light wallpaper in the light style');
-      await capture('see-through-only-wallpaper-light');
 
       tern.maximize();
       await settled();
       const maximized = await lookWithAndWithout(tern, behind);
       require(maximized.apart < SAME, `a maximized see-through window still shows only the wallpaper (${Math.round(maximized.apart * 1000) / 10}% apart)`);
-      behind.unminimize();
-      tern.raise();
-      await capture('see-through-only-wallpaper-maximized');
       tern.unmaximize();
       await settled();
+      const lucaLook = await captureFrame(inside(tern));
 
-      kestrel.set_string('see-through-shows', 'everything');
-      await eventually(() => !wallpaperBackdrop(tern), 'showing everything behind again drops the still wallpaper');
+      glass.set_string('see-through', 'maris');
+      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.MARIS, 'Maris shows the surface colour over the wide wallpaper');
+      const maris = await lookWithAndWithout(tern, behind);
+      require(maris.apart < SAME, `Maris hides the window underneath (${Math.round(maris.apart * 1000) / 10}% apart)`);
+      require(shareApart(maris.alone, lucaLook) > DIFFERENT, 'Maris looks different from Luca');
+      await captureOverAndAlone(tern, behind, 'see-through-maris-dark');
+
+      await changesTo(tern, maris.alone, () => interfaceSettings.set_string('color-scheme', 'default'), 'Maris follows the light style');
+      await captureOverAndAlone(tern, behind, 'see-through-maris-light');
+
+      glass.set_string('see-through', 'luca');
+      glass.set_string('luca-blurs', 'everything');
+      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.LUCA, 'Luca blurs everything behind again');
+      await captureOverAndAlone(tern, behind, 'see-through-luca-light');
     }));
   } finally {
     await scaled?.restore();
     for (const key of KESTREL_KEYS) kestrel.reset(key);
+    for (const key of GLASS_KEYS) glass.reset(key);
     for (const [key, value] of savedBackground) background.set_string(key, value);
     interfaceSettings.set_string('color-scheme', scheme);
     GLib.unlink(TERN_SETTINGS);

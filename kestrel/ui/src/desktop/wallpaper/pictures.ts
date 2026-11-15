@@ -12,8 +12,8 @@ function changed(): void {
   for (const listener of listeners) listener();
 }
 
-export function showsWallpaper(actor: Clutter.Actor, underWindows: boolean): () => void {
-  const picture = { actor, underWindows };
+export function showsWallpaper(actor: Clutter.Actor): () => void {
+  const picture = { actor, underWindows: true };
   pictures.add(picture);
   const destroyed = actor.connect('destroy', () => forget());
   const forget = () => {

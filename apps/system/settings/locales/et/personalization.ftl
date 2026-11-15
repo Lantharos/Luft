@@ -212,11 +212,7 @@ settings-see-through-description = Töölaud paistab nende rakenduste akende kau
 settings-see-through-app = Läbipaistev { $app }
 settings-see-through-add = Lisa rakendus
 settings-see-through-add-title = Muuda rakendus läbipaistvaks
-settings-see-through-shows = Mis paistab läbi
-settings-see-through-shows-everything = Kõik tagapool
-settings-see-through-shows-wallpaper = Ainult taustapilt
 settings-see-through-amount = Kui läbipaistev
-settings-see-through-blur = Hägusta tagapoolset
 settings-see-through-text = Hoia tekst täis
 settings-see-through-text-description = Läbipaistvaks muutub ainult akna taust
 

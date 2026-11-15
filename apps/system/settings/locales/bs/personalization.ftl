@@ -212,11 +212,7 @@ settings-see-through-description = Radna površina se vidi kroz prozore ovih apl
 settings-see-through-app = Providno: { $app }
 settings-see-through-add = Dodaj aplikaciju
 settings-see-through-add-title = Učini aplikaciju providnom
-settings-see-through-shows = Šta se vidi
-settings-see-through-shows-everything = Sve iza
-settings-see-through-shows-wallpaper = Samo pozadina
 settings-see-through-amount = Koliko providno
-settings-see-through-blur = Zamuti ono iza
 settings-see-through-text = Zadrži tekst punim
 settings-see-through-text-description = Samo pozadina prozora postaje providna
 

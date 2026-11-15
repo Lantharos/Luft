@@ -209,11 +209,7 @@ settings-see-through-description = Η επιφάνεια εργασίας φαί
 settings-see-through-app = Διαφανές { $app }
 settings-see-through-add = Προσθήκη εφαρμογής
 settings-see-through-add-title = Διαφανής εφαρμογή
-settings-see-through-shows = Τι φαίνεται
-settings-see-through-shows-everything = Ό,τι είναι πίσω
-settings-see-through-shows-wallpaper = Μόνο η ταπετσαρία
 settings-see-through-amount = Πόσο διαφανή
-settings-see-through-blur = Θόλωμα του φόντου
 settings-see-through-text = Συμπαγές κείμενο
 settings-see-through-text-description = Μόνο το φόντο του παραθύρου γίνεται διαφανές
 

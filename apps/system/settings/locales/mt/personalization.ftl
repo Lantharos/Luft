@@ -218,11 +218,7 @@ settings-see-through-description = Ħalli d-desktop jidher minn ġot-twieqi ta�
 settings-see-through-app = { $app } trasparenti
 settings-see-through-add = Żid app
 settings-see-through-add-title = Agħmel app trasparenti
-settings-see-through-shows = X’jidher minn ġo fih
-settings-see-through-shows-everything = Kollox li hemm wara
-settings-see-through-shows-wallpaper = L-isfond biss
 settings-see-through-amount = Kemm trasparenti
-settings-see-through-blur = Ċajpar dak li hemm wara
 settings-see-through-text = Żomm it-test solidu
 settings-see-through-text-description = L-isfond tat-tieqa biss isir trasparenti
 

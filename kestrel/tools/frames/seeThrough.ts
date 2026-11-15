@@ -11,15 +11,16 @@ import {settled} from '../checks/lib/wait.js';
 import {slideWindow} from './glass.js';
 import type {FrameRecorder, Interaction} from './recorder.js';
 
-type Shows = 'everything' | 'wallpaper';
+type Look = {material: 'luca' | 'maris'; lucaBlurs: 'everything' | 'wallpaper'};
 
-const KEYS = ['see-through-apps', 'see-through-shows'];
+const GLASS_KEYS = ['see-through', 'luca-blurs'];
 const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 
 let tern: LuftApp | null = null;
 
-async function seeThroughTern(shows: Shows) {
+async function seeThroughTern({material, lucaBlurs}: Look) {
   if (!tern) {
     GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
     GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
@@ -27,7 +28,8 @@ async function seeThroughTern(shows: Shows) {
   }
   const app = Shell.WindowTracker.get_default().get_window_app(tern.window)!;
   settings.set_strv('see-through-apps', [app.get_id()]);
-  settings.set_string('see-through-shows', shows);
+  glass.set_string('see-through', material);
+  glass.set_string('luca-blurs', lucaBlurs);
   const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
   tern.window.move_resize_frame(true, area.x + 120, area.y + 60, 900, 600);
   tern.window.raise();
@@ -35,7 +37,8 @@ async function seeThroughTern(shows: Shows) {
 }
 
 async function closeTern() {
-  for (const key of KEYS) settings.reset(key);
+  settings.reset('see-through-apps');
+  for (const key of GLASS_KEYS) glass.reset(key);
   await tern?.close();
   tern = null;
   GLib.unlink(TERN_SETTINGS);
@@ -43,12 +46,13 @@ async function closeTern() {
 
 const behind = (recorder: FrameRecorder) => slideWindow(findWindow((window: Meta.Window) => !!window.get_title()?.startsWith('Files'))!, recorder);
 
-const interactions = (shows: Shows, label: string): Interaction[] => [
-  {name: `see-through window moving, ${label}`, prepare: () => seeThroughTern(shows), act: recorder => slideWindow(tern!.window, recorder), finish: closeTern},
-  {name: `window moving behind a see-through window, ${label}`, prepare: () => seeThroughTern(shows), act: behind, finish: closeTern},
+const interactions = (look: Look, label: string): Interaction[] => [
+  {name: `see-through window moving, ${label}`, prepare: () => seeThroughTern(look), act: recorder => slideWindow(tern!.window, recorder), finish: closeTern},
+  {name: `window moving behind a see-through window, ${label}`, prepare: () => seeThroughTern(look), act: behind, finish: closeTern},
 ];
 
 export const seeThroughInteractions: Interaction[] = [
-  ...interactions('everything', 'everything behind'),
-  ...interactions('wallpaper', 'only the wallpaper'),
+  ...interactions({material: 'luca', lucaBlurs: 'everything'}, 'Luca'),
+  ...interactions({material: 'luca', lucaBlurs: 'wallpaper'}, 'Luca over the wallpaper'),
+  ...interactions({material: 'maris', lucaBlurs: 'everything'}, 'Maris'),
 ];

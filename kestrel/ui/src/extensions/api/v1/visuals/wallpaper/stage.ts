@@ -94,7 +94,7 @@ export class LayerStage {
       group.get_parent()?.remove_child(group);
       parent.add_child(group);
       this.forgetPicture?.();
-      this.forgetPicture = video ? showsWallpaper(group, true) : null;
+      this.forgetPicture = video ? showsWallpaper(group) : null;
     }
     if (video) global.window_group.set_child_above_sibling(group, video);
   }

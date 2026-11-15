@@ -20,7 +20,7 @@ declare -A variant_groups=(
   [top]="$edge_groups tiling:layouts tiling:scrolling"
   [right]="$edge_groups tiling:monitors"
 )
-two_display_groups=(tiling:monitors system:dimming windows:seeThroughWallpaper taskbar:arrangement desktop:playthings restore:monitors)
+two_display_groups=(tiling:monitors system:dimming windows:seeThroughMaterials taskbar:arrangement desktop:playthings restore:monitors)
 second_display=1280x720
 
 usage() {

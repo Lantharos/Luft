@@ -69,7 +69,7 @@ export class FrostedWallpaper {
   private readonly radius: number;
   private readonly source: Clutter.Actor;
   private readonly widget: St.Widget;
-  private readonly blur: Shell.BlurEffect | null;
+  private readonly blur: Shell.BlurEffect;
   private readonly manager: BackgroundManager;
   private generation = 0;
 
@@ -77,7 +77,7 @@ export class FrostedWallpaper {
     const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
     const { x, y, width, height } = monitor;
     this.radius = frost.radius * scaleFactor;
-    this.blur = this.radius ? new Shell.BlurEffect({ brightness: frost.brightness, saturation: frost.saturation, radius: this.radius }) : null;
+    this.blur = new Shell.BlurEffect({ brightness: frost.brightness, saturation: frost.saturation, radius: this.radius });
 
     this.source = new Clutter.Actor({ x, y, width, height, opacity: 0 });
     this.widget = new St.Widget({ width, height });
@@ -126,7 +126,7 @@ export class FrostedWallpaper {
     }
     await settled(this.widget);
     if (generation !== this.generation) return;
-    if (this.blur) this.widget.add_effect(this.blur);
+    this.widget.add_effect(this.blur);
     this.source.opacity = 255;
     void this.freeze(generation, key);
   }
@@ -145,7 +145,7 @@ export class FrostedWallpaper {
   private paintSmall(): Cogl.Texture | null {
     const painted = Shell.texture_file_paint_actor(this.source);
     const { downscale } = this.frost;
-    if (!painted || downscale === 1) return painted;
+    if (!painted) return null;
     const { x, y, width, height } = this.monitor;
     const small = new Clutter.Actor({ x, y, width: Math.ceil(width / downscale), height: Math.ceil(height / downscale), opacity: 0 });
     small.set_content(Clutter.TextureContent.new_from_texture(painted, null));
@@ -169,7 +169,7 @@ export class FrostedWallpaper {
 
   private reveal(texture: Cogl.Texture): void {
     this.show(texture);
-    if (this.blur?.get_actor()) this.widget.remove_effect(this.blur);
+    if (this.blur.get_actor()) this.widget.remove_effect(this.blur);
     this.source.opacity = 0;
   }
 

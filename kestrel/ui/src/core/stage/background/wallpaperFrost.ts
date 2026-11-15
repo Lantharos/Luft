@@ -4,12 +4,11 @@ import St from 'gi://St';
 import * as Main from '../../main.js';
 import { FrostedWallpaper, type Frost, type FrostMonitor } from './frost.js';
 
-export type FrostKind = 'blurred' | 'wide' | 'sharp';
+export type FrostKind = 'blurred' | 'wide';
 
 const FROSTS: Record<FrostKind, Frost> = {
   blurred: { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null },
   wide: { name: 'wide', radius: 300, downscale: 32, brightness: 1, saturation: 1, wash: null },
-  sharp: { name: 'sharp', radius: 0, downscale: 1, brightness: 1, saturation: 1, wash: null },
 };
 
 export interface WallpaperPiece {
@@ -43,17 +42,11 @@ export class WallpaperFrost {
   private readonly theme = St.ThemeContext.get_for_stage(global.stage);
   private readonly signals: [{ disconnect(id: number): void }, number][];
 
-  constructor(private kind: FrostKind, private readonly changed: () => void) {
+  constructor(private readonly kind: FrostKind, private readonly changed: () => void) {
     this.signals = [
       [this.theme, this.theme.connect('notify::scale-factor', () => this.rebuild())],
       [Main.layoutManager, Main.layoutManager.connect('monitors-changed', () => this.rebuild())],
     ];
-    this.rebuild();
-  }
-
-  setKind(kind: FrostKind): void {
-    if (kind === this.kind) return;
-    this.kind = kind;
     this.rebuild();
   }
 

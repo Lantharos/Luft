@@ -215,11 +215,7 @@ settings-see-through-description = Pulpit prześwituje przez okna tych aplikacji
 settings-see-through-app = Przezroczyste: { $app }
 settings-see-through-add = Dodaj aplikację
 settings-see-through-add-title = Uczyń aplikację przezroczystą
-settings-see-through-shows = Co prześwituje
-settings-see-through-shows-everything = Wszystko z tyłu
-settings-see-through-shows-wallpaper = Tylko tapeta
 settings-see-through-amount = Stopień przezroczystości
-settings-see-through-blur = Rozmyj to, co z tyłu
 settings-see-through-text = Zachowaj pełny tekst
 settings-see-through-text-description = Przezroczyste staje się tylko tło okna
 

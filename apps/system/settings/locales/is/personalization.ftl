@@ -209,11 +209,7 @@ settings-see-through-description = Láttu skjáborðið sjást í gegnum glugga 
 settings-see-through-app = Gegnsætt { $app }
 settings-see-through-add = Bæta við forriti
 settings-see-through-add-title = Gera forrit gegnsætt
-settings-see-through-shows = Hvað sést í gegn
-settings-see-through-shows-everything = Allt fyrir aftan
-settings-see-through-shows-wallpaper = Aðeins bakgrunnsmyndin
 settings-see-through-amount = Hversu gegnsætt
-settings-see-through-blur = Móða það sem er á bak við
 settings-see-through-text = Halda texta heilum
 settings-see-through-text-description = Aðeins bakgrunnur gluggans verður gegnsær
 

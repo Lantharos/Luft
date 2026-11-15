@@ -218,11 +218,7 @@ settings-see-through-description = Lig don deasc taispeáint trí fhuinneoga na 
 settings-see-through-app = { $app } tréshoilseach
 settings-see-through-add = Cuir aip leis
 settings-see-through-add-title = Déan aip tréshoilseach
-settings-see-through-shows = Cad a fheictear tríd
-settings-see-through-shows-everything = Gach a bhfuil taobh thiar
-settings-see-through-shows-wallpaper = An cúlbhrat amháin
 settings-see-through-amount = Cé chomh tréshoilseach
-settings-see-through-blur = Doiléirigh a bhfuil taobh thiar
 settings-see-through-text = Coinnigh an téacs soladach
 settings-see-through-text-description = Ní théann ach cúlra na fuinneoige tréshoilseach
 

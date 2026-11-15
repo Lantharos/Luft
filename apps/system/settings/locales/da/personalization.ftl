@@ -209,11 +209,7 @@ settings-see-through-description = Lad skrivebordet skinne igennem disse apps' v
 settings-see-through-app = Gennemsigtig { $app }
 settings-see-through-add = Tilføj en app
 settings-see-through-add-title = Gør en app gennemsigtig
-settings-see-through-shows = Vis igennem
-settings-see-through-shows-everything = Alt bagved
-settings-see-through-shows-wallpaper = Kun baggrundsbilledet
 settings-see-through-amount = Hvor gennemsigtig
-settings-see-through-blur = Slør det bagvedliggende
 settings-see-through-text = Bevar teksten fast
 settings-see-through-text-description = Kun vinduets baggrund bliver gennemsigtig
 

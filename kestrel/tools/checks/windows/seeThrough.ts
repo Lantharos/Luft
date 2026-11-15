@@ -12,7 +12,7 @@ import {withApp} from '../apps/lib/apps.js';
 
 const {require, eventually} = checks('see-through windows');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const KEYS = ['see-through-apps', 'see-through-keep-text', 'see-through-blur'];
+const KEYS = ['see-through-apps', 'see-through-keep-text'];
 const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
 const TEXT = 'Text stays solid while the background lets the desktop through';
 const LAUNCHES = 6;
@@ -39,7 +39,6 @@ export async function run() {
       await settled();
       await capture('see-through');
       settings.set_boolean('see-through-keep-text', false);
-      settings.set_boolean('see-through-blur', false);
       await settled();
       await capture('see-through-whole-window');
       settings.reset('see-through-apps');

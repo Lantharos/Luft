@@ -209,11 +209,7 @@ settings-see-through-description = Laat het bureaublad door de vensters van deze
 settings-see-through-app = { $app } doorschijnend
 settings-see-through-add = App toevoegen
 settings-see-through-add-title = Een app doorschijnend maken
-settings-see-through-shows = Wat doorschijnt
-settings-see-through-shows-everything = Alles erachter
-settings-see-through-shows-wallpaper = Alleen de achtergrond
 settings-see-through-amount = Hoe doorschijnend
-settings-see-through-blur = Wat erachter ligt vervagen
 settings-see-through-text = Tekst dekkend houden
 settings-see-through-text-description = Alleen de achtergrond van het venster wordt doorschijnend
 

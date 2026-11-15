@@ -35,7 +35,7 @@ export class Renderer {
     this.mapId = global.window_manager.connect('map', (_wm, actor: Meta.WindowActor) => {
       if (!this.windows.has(actor.meta_window!)) return;
       this.place(actor.meta_window!);
-      showsWallpaper(actor, true);
+      showsWallpaper(actor);
       actor.opacity = 0;
       animateActor(actor, { opacity: 255, duration: Duration.slow, curve: Curve.gentle });
     });

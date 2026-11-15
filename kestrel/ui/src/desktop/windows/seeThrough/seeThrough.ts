@@ -2,19 +2,14 @@ import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
-import type Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurBackdrop } from '../../../appearance/glass/kestrelGlass.js';
-import { showsWallpaper } from '../../wallpaper/pictures.js';
 import { SeeThroughEffect } from './seeThroughEffect.js';
-import { WallpaperBackdrop } from './wallpaperBackdrop.js';
-import { WallpaperFrost } from '../../../core/stage/background/wallpaperFrost.js';
 
 const APPS = 'see-through-apps';
-const SHOWS = 'see-through-shows';
-const LOOK_KEYS = ['see-through-opacity', 'see-through-blur', 'see-through-keep-text', SHOWS, 'rounded-window-corners'];
+const LOOK_KEYS = ['see-through-opacity', 'see-through-keep-text', 'rounded-window-corners'];
 const EFFECT = 'see-through';
 const WINDOW_RADIUS = 15;
 const SEE_THROUGH_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
@@ -24,7 +19,6 @@ const APP_SIGNALS = ['shown', 'notify::wm-class', 'notify::gtk-application-id'] 
 const holdsSurfaces = (actor: Clutter.Actor) => (actor.constructor as typeof GObject.Object).$gtype.name.startsWith('MetaSurface');
 
 const settings = () => new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-const showsWallpaperOnly = (chosen: Gio.Settings) => chosen.get_string(SHOWS) === 'wallpaper';
 
 function appIdOf(window: Meta.Window): string | null {
   const app = Shell.WindowTracker.get_default().get_window_app(window);
@@ -52,64 +46,19 @@ export function toggleSeeThrough(window: Meta.Window): void {
   chosen.set_strv(APPS, apps.includes(appId) ? apps.filter(app => app !== appId) : [...apps, appId]);
 }
 
-interface Backdrop {
-  readonly actor: Clutter.Actor;
-  sync(settings: Gio.Settings): void;
-  place(frame: Mtk.Rectangle, x: number, y: number, radius: number): void;
-  moved(frame: Mtk.Rectangle, radius: number): void;
-}
-
-class LiveBackdrop implements Backdrop {
-  readonly actor = new St.Widget();
-  private readonly blur = blurBackdrop(this.actor, 0, 'see-through');
-
-  sync(settings: Gio.Settings): void {
-    this.blur.enabled = settings.get_boolean('see-through-blur');
-  }
-
-  place(frame: Mtk.Rectangle, x: number, y: number, radius: number): void {
-    this.actor.set_position(x, y);
-    this.actor.set_size(frame.width, frame.height);
-    this.blur.set_property('corner-radius', radius);
-  }
-
-  moved(): void {}
-}
-
-class WallpaperOnlyBackdrop implements Backdrop {
-  readonly actor = new WallpaperBackdrop({ name: 'kestrel-see-through-wallpaper' });
-
-  constructor(private readonly frost: () => WallpaperFrost) {
-    showsWallpaper(this.actor, false);
-  }
-
-  sync(): void {}
-
-  place(frame: Mtk.Rectangle, x: number, y: number, radius: number): void {
-    this.actor.set_position(x, y);
-    this.actor.set_size(frame.width, frame.height);
-    this.moved(frame, radius);
-  }
-
-  moved(frame: Mtk.Rectangle, radius: number): void {
-    this.actor.cover(this.frost().pieces, frame, radius);
-  }
-}
-
 class SeeThroughWindow {
   private readonly effect = new SeeThroughEffect();
-  private backdrop: Backdrop | null = null;
+  private readonly backdrop = new St.Widget();
+  private readonly blur = blurBackdrop(this.backdrop, 0, 'see-through');
   private readonly signals: number[];
   private readonly surfacesSignals: number[];
   private surfaces: Clutter.Actor | null = null;
 
-  constructor(private readonly window: Meta.Window, private readonly actor: Meta.WindowActor, private readonly settings: Gio.Settings, private readonly frost: () => WallpaperFrost) {
+  constructor(private readonly window: Meta.Window, private readonly actor: Meta.WindowActor, private readonly settings: Gio.Settings) {
+    actor.insert_child_at_index(this.backdrop, 0);
     this.surfacesSignals = (['child-added', 'child-removed'] as const).map(signal => actor.connect(signal, () => this.followSurfaces()));
     this.followSurfaces();
-    this.signals = [
-      ...WINDOW_SIGNALS.map(signal => window.connect(signal, () => this.place())),
-      window.connect('position-changed', () => this.backdrop!.moved(window.get_frame_rect(), this.radius)),
-    ];
+    this.signals = WINDOW_SIGNALS.map(signal => window.connect(signal, () => this.place()));
     this.sync();
   }
 
@@ -123,13 +72,6 @@ class SeeThroughWindow {
 
   sync(): void {
     this.effect.setLook(this.settings.get_double('see-through-opacity'), this.settings.get_boolean('see-through-keep-text'));
-    const wallpaperOnly = showsWallpaperOnly(this.settings);
-    if (!this.backdrop || this.backdrop instanceof WallpaperOnlyBackdrop !== wallpaperOnly) {
-      this.backdrop?.actor.destroy();
-      this.backdrop = wallpaperOnly ? new WallpaperOnlyBackdrop(this.frost) : new LiveBackdrop();
-      this.actor.insert_child_at_index(this.backdrop.actor, 0);
-    }
-    this.backdrop.sync(this.settings);
     this.place();
   }
 
@@ -139,7 +81,9 @@ class SeeThroughWindow {
     const x = frame.x - buffer.x;
     const y = frame.y - buffer.y;
     this.effect.setFrame(x, y, frame.width, frame.height, buffer.width, buffer.height);
-    this.backdrop!.place(frame, x, y, this.radius);
+    this.backdrop.set_position(x, y);
+    this.backdrop.set_size(frame.width, frame.height);
+    this.blur.set_property('corner-radius', this.radius);
   }
 
   private get radius(): number {
@@ -151,7 +95,7 @@ class SeeThroughWindow {
     for (const signal of this.signals) this.window.disconnect(signal);
     for (const signal of this.surfacesSignals) this.actor.disconnect(signal);
     this.surfaces?.remove_effect_by_name(EFFECT);
-    this.backdrop!.actor.destroy();
+    this.backdrop.destroy();
   }
 }
 
@@ -161,35 +105,14 @@ export class SeeThroughWindows {
   private readonly watched = new Map<Meta.Window, number[]>();
   private readonly settingsSignals: number[];
   private readonly createdSignal: number;
-  private frost: WallpaperFrost | null = null;
 
   constructor() {
     this.settingsSignals = [
-      this.settings.connect(`changed::${APPS}`, () => {
-        this.syncFrost();
-        this.watched.forEach((_signals, window) => this.sync(window));
-      }),
-      ...LOOK_KEYS.map(key => this.settings.connect(`changed::${key}`, () => {
-        this.syncFrost();
-        this.treated.forEach(treatment => treatment.sync());
-      })),
+      this.settings.connect(`changed::${APPS}`, () => this.watched.forEach((_signals, window) => this.sync(window))),
+      ...LOOK_KEYS.map(key => this.settings.connect(`changed::${key}`, () => this.treated.forEach(treatment => treatment.sync()))),
     ];
-    this.syncFrost();
     this.createdSignal = global.display.connect('window-created', (_display, window: Meta.Window) => this.watch(window));
     for (const actor of global.get_window_actors()) this.watch(actor.meta_window!);
-  }
-
-  private syncFrost(): void {
-    const wanted = showsWallpaperOnly(this.settings) && this.settings.get_strv(APPS).length > 0;
-    const kind = this.settings.get_boolean('see-through-blur') ? 'blurred' : 'sharp';
-    if (!wanted) {
-      this.frost?.destroy();
-      this.frost = null;
-    } else if (this.frost) {
-      this.frost.setKind(kind);
-    } else {
-      this.frost = new WallpaperFrost(kind, () => this.treated.forEach(treatment => treatment.place()));
-    }
   }
 
   private watch(window: Meta.Window): void {
@@ -203,7 +126,7 @@ export class SeeThroughWindows {
     const actor = window.get_compositor_private<Meta.WindowActor>();
     const wanted = !!actor && canBeSeeThrough(window) && chosenIn(this.settings, window);
     const treatment = this.treated.get(window);
-    if (wanted && !treatment) this.treated.set(window, new SeeThroughWindow(window, actor!, this.settings, () => this.frost!));
+    if (wanted && !treatment) this.treated.set(window, new SeeThroughWindow(window, actor!, this.settings));
     if (!wanted && treatment) {
       treatment.destroy();
       this.treated.delete(window);
@@ -221,6 +144,5 @@ export class SeeThroughWindows {
     for (const window of [...this.watched.keys()]) this.forget(window);
     for (const signal of this.settingsSignals) this.settings.disconnect(signal);
     global.display.disconnect(this.createdSignal);
-    this.frost?.destroy();
   }
 }

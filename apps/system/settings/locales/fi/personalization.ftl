@@ -209,11 +209,7 @@ settings-see-through-description = Työpöytä näkyy näiden sovellusten ikkuno
 settings-see-through-app = Läpikuultava { $app }
 settings-see-through-add = Lisää sovellus
 settings-see-through-add-title = Tee sovelluksesta läpikuultava
-settings-see-through-shows = Mitä näkyy läpi
-settings-see-through-shows-everything = Kaikki taustalla oleva
-settings-see-through-shows-wallpaper = Vain taustakuva
 settings-see-through-amount = Kuinka läpikuultava
-settings-see-through-blur = Sumenna taustalla oleva
 settings-see-through-text = Pidä teksti kiinteänä
 settings-see-through-text-description = Vain ikkunan tausta muuttuu läpikuultavaksi
 

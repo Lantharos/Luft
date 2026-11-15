@@ -279,11 +279,8 @@ settings-see-through-description = Let the desktop show through these apps’ wi
 settings-see-through-app = See-through { $app }
 settings-see-through-add = Add an app
 settings-see-through-add-title = Make an app see-through
-settings-see-through-shows = Show through
-settings-see-through-shows-everything = Everything behind
-settings-see-through-shows-wallpaper = Only the wallpaper
+settings-see-through-material = Material
 settings-see-through-amount = How see-through
-settings-see-through-blur = Blur what's behind
 settings-see-through-text = Keep text solid
 settings-see-through-text-description = Only the window's background turns see-through
 

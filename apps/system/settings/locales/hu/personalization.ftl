@@ -209,11 +209,7 @@ settings-see-through-description = Az asztal átlátszik ezeknek az alkalmazáso
 settings-see-through-app = Áttetsző: { $app }
 settings-see-through-add = Alkalmazás hozzáadása
 settings-see-through-add-title = Alkalmazás áttetszővé tétele
-settings-see-through-shows = Mi látszik át
-settings-see-through-shows-everything = Minden mögötte
-settings-see-through-shows-wallpaper = Csak a háttérkép
 settings-see-through-amount = Mennyire áttetsző
-settings-see-through-blur = A mögötte lévő elmosása
 settings-see-through-text = Tömör szöveg
 settings-see-through-text-description = Csak az ablak háttere lesz áttetsző
 

@@ -209,11 +209,7 @@ settings-see-through-description = Lässt den Schreibtisch durch die Fenster die
 settings-see-through-app = { $app } durchscheinend
 settings-see-through-add = App hinzufügen
 settings-see-through-add-title = App durchscheinend machen
-settings-see-through-shows = Durchscheinen lassen
-settings-see-through-shows-everything = Alles dahinter
-settings-see-through-shows-wallpaper = Nur das Hintergrundbild
 settings-see-through-amount = Wie durchscheinend
-settings-see-through-blur = Dahinterliegendes weichzeichnen
 settings-see-through-text = Text deckend lassen
 settings-see-through-text-description = Nur der Hintergrund des Fensters scheint durch
 

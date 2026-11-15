@@ -209,11 +209,7 @@ settings-see-through-description = Deja ver el escritorio a través de las venta
 settings-see-through-app = { $app } translúcida
 settings-see-through-add = Añadir una aplicación
 settings-see-through-add-title = Hacer translúcida una aplicación
-settings-see-through-shows = Qué se ve
-settings-see-through-shows-everything = Todo lo de detrás
-settings-see-through-shows-wallpaper = Solo el fondo de pantalla
 settings-see-through-amount = Cuánta translucidez
-settings-see-through-blur = Desenfocar lo de detrás
 settings-see-through-text = Mantener el texto sólido
 settings-see-through-text-description = Solo el fondo de la ventana se vuelve translúcido
 

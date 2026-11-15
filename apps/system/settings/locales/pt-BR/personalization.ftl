@@ -209,11 +209,7 @@ settings-see-through-description = Deixa a área de trabalho aparecer através d
 settings-see-through-app = { $app } translúcido
 settings-see-through-add = Adicionar um app
 settings-see-through-add-title = Deixar um app translúcido
-settings-see-through-shows = O que aparece
-settings-see-through-shows-everything = Tudo o que está atrás
-settings-see-through-shows-wallpaper = Só o papel de parede
 settings-see-through-amount = Quão translúcido
-settings-see-through-blur = Desfocar o que está atrás
 settings-see-through-text = Manter o texto sólido
 settings-see-through-text-description = Só o fundo da janela fica translúcido
 

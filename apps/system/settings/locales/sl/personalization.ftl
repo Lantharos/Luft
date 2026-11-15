@@ -215,11 +215,7 @@ settings-see-through-description = Namizje se vidi skozi okna teh aplikacij. Vkl
 settings-see-through-app = Prosojno: { $app }
 settings-see-through-add = Dodaj aplikacijo
 settings-see-through-add-title = Naredi aplikacijo prosojno
-settings-see-through-shows = Kaj se vidi
-settings-see-through-shows-everything = Vse zadaj
-settings-see-through-shows-wallpaper = Samo ozadje
 settings-see-through-amount = Kako prosojno
-settings-see-through-blur = Zamegli tisto zadaj
 settings-see-through-text = Ohrani polno besedilo
 settings-see-through-text-description = Prosojno postane le ozadje okna
 

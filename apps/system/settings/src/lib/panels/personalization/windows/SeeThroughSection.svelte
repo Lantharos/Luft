@@ -7,25 +7,25 @@
 	import { percent } from '#lib/format.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import ChooseAppDialog from '#lib/panels/system/apps/ChooseAppDialog.svelte';
+	import { GLASS_SCHEMA, type Glass, type GlassStyle } from '../appearance/glass.js';
 
 	type SeeThrough = {
 		'see-through-apps': string[];
 		'see-through-opacity': number;
-		'see-through-shows': 'everything' | 'wallpaper';
-		'see-through-blur': boolean;
 		'see-through-keep-text': boolean;
 	};
 
-	const look = useSettings<SeeThrough>(KESTREL_SCHEMA, ['see-through-apps', 'see-through-opacity', 'see-through-shows', 'see-through-blur', 'see-through-keep-text']);
+	const look = useSettings<SeeThrough>(KESTREL_SCHEMA, ['see-through-apps', 'see-through-opacity', 'see-through-keep-text']);
+	const glass = useSettings<Pick<Glass, 'see-through'>>(GLASS_SCHEMA, ['see-through']);
 
 	let installed = $state<App[]>([]);
 	let adding = $state(false);
 
 	let ids = $derived(look.values['see-through-apps'] ?? []);
 	let amount = $derived(1 - (look.values['see-through-opacity'] ?? 0.7));
-	let shows = $derived([
-		{ value: 'everything' as const, label: t('settings-see-through-shows-everything') },
-		{ value: 'wallpaper' as const, label: t('settings-see-through-shows-wallpaper') }
+	let materials = $derived<{ value: GlassStyle; label: string }[]>([
+		{ value: 'luca', label: t('settings-appearance-glass-luca') },
+		{ value: 'maris', label: t('settings-appearance-glass-maris') }
 	]);
 	let apps = $derived(ids.map((id) => installed.find((app) => app.id === id) ?? { id, name: id, icon: null }));
 
@@ -57,8 +57,8 @@
 
 {#if apps.length}
 	<Section>
-		<Row title={t('settings-see-through-shows')}>
-			<Segmented label={t('settings-see-through-shows')} options={shows} value={look.values['see-through-shows'] ?? 'everything'} onchange={(value) => look.set('see-through-shows', value)} />
+		<Row title={t('settings-see-through-material')}>
+			<Segmented label={t('settings-see-through-material')} options={materials} value={glass.values['see-through'] ?? 'luca'} onchange={(material) => glass.set('see-through', material)} />
 		</Row>
 		<Row title={t('settings-see-through-amount')}>
 			<span class="w-11 text-right tabular-nums">{percent(amount)}</span>
@@ -72,9 +72,6 @@
 					onchange={(next) => look.set('see-through-opacity', opacityFor(next))}
 				/>
 			{/snippet}
-		</Row>
-		<Row title={t('settings-see-through-blur')}>
-			<Switch label={t('settings-see-through-blur')} checked={look.values['see-through-blur'] ?? true} onchange={(on) => look.set('see-through-blur', on)} />
 		</Row>
 		<Row title={t('settings-see-through-text')} description={t('settings-see-through-text-description')}>
 			<Switch label={t('settings-see-through-text')} checked={look.values['see-through-keep-text'] ?? true} onchange={(on) => look.set('see-through-keep-text', on)} />

@@ -209,11 +209,7 @@ settings-see-through-description = Lëre desktopin të duket përmes dritareve t
 settings-see-through-app = { $app } e tejdukshme
 settings-see-through-add = Shto një aplikacion
 settings-see-through-add-title = Bëje një aplikacion të tejdukshëm
-settings-see-through-shows = Çfarë duket
-settings-see-through-shows-everything = Gjithçka pas
-settings-see-through-shows-wallpaper = Vetëm sfondi
 settings-see-through-amount = Sa e tejdukshme
-settings-see-through-blur = Turbullo atë që është pas
 settings-see-through-text = Mbaje tekstin të plotë
 settings-see-through-text-description = Vetëm sfondi i dritares bëhet i tejdukshëm
 

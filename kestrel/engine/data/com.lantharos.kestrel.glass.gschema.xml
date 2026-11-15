@@ -25,6 +25,11 @@
       <summary>How the glass of app windows looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper.</description>
     </key>
+    <key name="see-through" enum="com.lantharos.kestrel.GlassStyle">
+      <default>'luca'</default>
+      <summary>How the glass behind see-through windows looks</summary>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper.</description>
+    </key>
     <key name="luca-blurs" enum="com.lantharos.kestrel.LucaBlurs">
       <default>'everything'</default>
       <summary>What Luca glass blurs</summary>

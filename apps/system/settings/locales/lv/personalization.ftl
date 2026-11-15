@@ -212,11 +212,7 @@ settings-see-through-description = Darbvirsma redzama cauri šo lietotņu logiem
 settings-see-through-app = Caurspīdīgs: { $app }
 settings-see-through-add = Pievienot lietotni
 settings-see-through-add-title = Padarīt lietotni caurspīdīgu
-settings-see-through-shows = Kas redzams cauri
-settings-see-through-shows-everything = Viss aizmugurē
-settings-see-through-shows-wallpaper = Tikai fona attēls
 settings-see-through-amount = Cik caurspīdīgs
-settings-see-through-blur = Aizmiglot to, kas aizmugurē
 settings-see-through-text = Saglabāt tekstu necaurspīdīgu
 settings-see-through-text-description = Caurspīdīgs kļūst tikai loga fons
 

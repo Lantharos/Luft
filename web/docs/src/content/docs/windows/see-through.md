@@ -11,13 +11,12 @@ asks:
   - blur behind windows
 ---
 
-Any app can have see-through windows: the window's background lets what's behind it show, blurred like frosted glass, while its text, icons and pictures stay solid.
+Any app can have see-through windows: the window's background turns to glass, while its text, icons and pictures stay solid.
 
 To turn it on for an app, right-click its title bar (or press <kbd>Alt</kbd>+<kbd>Space</kbd>) and choose **See-through**. Choose it again to turn it off. Settings, under Windows, lists the apps you've chosen, adds more and sets the look for all of them:
 
-- **Show through** picks what you see: **Everything behind**, including the windows underneath, or **Only the wallpaper**, as if no other windows were open. Showing only the wallpaper keeps a window calm to read over and is lighter on your computer, since the wallpaper is blurred once rather than on every frame.
-- **How see-through** sets how much of the desktop shows through.
-- **Blur what's behind** blurs it, so text stays easy to read.
+- **Material** picks the glass, the same two as on the [Glass page](/personalize/appearance/#glass). **Luca** blurs whatever is behind the window, the windows underneath included, or only the wallpaper while **Luca blurs only the wallpaper** is on, which keeps a window calm to read over and costs almost nothing to draw. **Maris** is the desktop's surface colour with a hint of the wallpaper's colours.
+- **How see-through** sets how much of the glass shows through the window's background.
 - **Keep text solid** keeps everything that stands out from the window's background solid. Turn it off to make the whole window see-through, text included.
 
 Luft finds a window's background by looking at its edges, so it works with apps that don't support transparency themselves. Parts that share the background's color, such as a picture with the same shade, can show through too.

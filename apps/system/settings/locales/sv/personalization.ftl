@@ -209,11 +209,7 @@ settings-see-through-description = Låt skrivbordet synas genom fönstren i de h
 settings-see-through-app = Genomskinlig { $app }
 settings-see-through-add = Lägg till en app
 settings-see-through-add-title = Gör en app genomskinlig
-settings-see-through-shows = Visa igenom
-settings-see-through-shows-everything = Allt bakom
-settings-see-through-shows-wallpaper = Bara bakgrundsbilden
 settings-see-through-amount = Hur genomskinlig
-settings-see-through-blur = Gör det bakomliggande suddigt
 settings-see-through-text = Behåll texten heltäckande
 settings-see-through-text-description = Bara fönstrets bakgrund blir genomskinlig
 

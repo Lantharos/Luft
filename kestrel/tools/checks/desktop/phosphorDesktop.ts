@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import type Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -235,28 +234,6 @@ async function checkFlickerCost(window: Meta.Window) {
   await eventually(nothingAttached, 'and it comes off');
 }
 
-async function checkSeeThroughWindows(window: Meta.Window) {
-  const app = Shell.WindowTracker.get_default().get_window_app(window)!.get_id()!;
-  kestrel.set_string('see-through-shows', 'wallpaper');
-  kestrel.set_double('see-through-opacity', 0.5);
-  kestrel.set_strv('see-through-apps', [app]);
-  await settled();
-  await pause(500);
-  const {x, y, width, height} = window.get_frame_rect();
-  const area = {x: x + 40, y: y + 80, width: width - 80, height: height - 120};
-  const plain = await renderedFrame(area);
-  await desktopOnly();
-  const layers = attachedEffects().layers;
-  await settled();
-  await pause(250);
-  const filtered = await renderedFrame(area);
-  filtered.save('phosphor-desktop-see-through');
-  require(layers >= 3 && filtered.pixelsApart(plain, 8) > 0, 'the frozen wallpaper behind a see-through window is filtered too');
-  await choose('invert', 'off');
-  await eventually(nothingAttached, 'and it comes off');
-  for (const key of ['see-through-apps', 'see-through-shows', 'see-through-opacity']) kestrel.reset(key);
-}
-
 async function checkCaptures() {
   const plain = await captureFrame(screen());
   await desktopOnly();
@@ -324,7 +301,6 @@ export async function run() {
     const window = await checkWindowsStayTheirOwn();
     await checkMovingWindows(window);
     await checkFlickerCost(window);
-    await checkSeeThroughWindows(window);
     await checkCaptures();
     await checkOnePicture();
   } finally {

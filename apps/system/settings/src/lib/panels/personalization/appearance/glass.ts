@@ -8,6 +8,7 @@ export type Glass = {
 	taskbar: GlassStyle;
 	surfaces: GlassStyle;
 	windows: GlassStyle;
+	'see-through': GlassStyle;
 	'luca-blurs': LucaBlurs;
 	'wallpaper-on-power-saver': boolean;
 };

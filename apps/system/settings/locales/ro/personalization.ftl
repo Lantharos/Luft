@@ -212,11 +212,7 @@ settings-see-through-description = Lasă desktopul să se vadă prin ferestrele 
 settings-see-through-app = { $app } translucidă
 settings-see-through-add = Adaugă o aplicație
 settings-see-through-add-title = Fă o aplicație translucidă
-settings-see-through-shows = Ce se vede
-settings-see-through-shows-everything = Tot ce e în spate
-settings-see-through-shows-wallpaper = Doar imaginea de fundal
 settings-see-through-amount = Cât de translucidă
-settings-see-through-blur = Estompează ce e în spate
 settings-see-through-text = Păstrează textul opac
 settings-see-through-text-description = Doar fundalul ferestrei devine translucid
 

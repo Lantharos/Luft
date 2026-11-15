@@ -6,17 +6,18 @@ import {changes} from '../../lib/apps.js';
 import {scrollToEnd} from '../navigation.js';
 
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const KEYS = ['see-through-apps', 'see-through-shows'];
+const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 
 export async function checkSeeThrough(app: LuftApp) {
   try {
     kestrel.set_strv('see-through-apps', ['com.lantharos.tern.desktop']);
     await settled();
-    (await scrollToEnd(app, await app.settle(() => true))).save('settings-see-through-everything');
-    await changes(app, 'settings shows that see-through windows show only the wallpaper', () => kestrel.set_string('see-through-shows', 'wallpaper'));
-    (await app.settle(() => true)).save('settings-see-through-wallpaper');
+    (await scrollToEnd(app, await app.settle(() => true))).save('settings-see-through-luca');
+    await changes(app, 'settings shows that see-through windows use Maris', () => glass.set_string('see-through', 'maris'));
+    (await app.settle(() => true)).save('settings-see-through-maris');
   } finally {
-    for (const key of KEYS) kestrel.reset(key);
+    kestrel.reset('see-through-apps');
+    glass.reset('see-through');
     await settled();
   }
 }

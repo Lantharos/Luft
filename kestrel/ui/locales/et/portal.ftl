@@ -2,6 +2,7 @@
 
 portal-cancel = Loobu
 portal-allow = Luba
+portal-deny = Ära luba
 portal-share = Jaga
 portal-unknown-app-subject = See rakendus
 portal-unknown-app-object = see rakendus

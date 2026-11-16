@@ -1,0 +1,11 @@
+extension-name = Meeldetuletused
+extension-description = Sünnipäevad, ülesanded ja eesmärgid tegumiribal - kuvatuna seni, kuni sa küsimustele ei vasta
+reminders = Meeldetuletused
+shortcut-open = Ava meeldetuletused
+section-birthdays = Sünnipäevad ja tähtpäevad
+section-goals = Eesmärgid
+section-taskbar = Tegumiriba
+section-calendars = Kalendrid
+section-calendars-note = Sinu meeldetuletused püsivad selles arvutis seni, kuni sa neid ise ei ekspordi
+export = Ekspordi
+export-button = Ekspordi ics-failina

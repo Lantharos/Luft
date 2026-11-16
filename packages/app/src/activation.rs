@@ -22,7 +22,11 @@ pub struct Activation {
 impl From<&SingleInstanceActivation> for Activation {
     fn from(activation: &SingleInstanceActivation) -> Self {
         Self {
-            arguments: activation.arguments.clone(),
+            arguments: activation
+                .arguments
+                .iter()
+                .map(|argument| argument.to_string_lossy().into_owned())
+                .collect(),
             working_directory: activation.working_directory.clone(),
         }
     }

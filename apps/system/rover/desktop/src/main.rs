@@ -29,7 +29,7 @@ const COMMANDS: [Command; 3] = [
 ];
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
     if sabine::dispatch_host_mode_from_args(&args) {
         return;
     }

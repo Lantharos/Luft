@@ -14,6 +14,7 @@ import { EDGE_MARGIN, insetBy, middleAt, type Anchor, type Depths } from '../sha
 import type { Box } from '../shared/layout/box.js';
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
+import { shellSurfaces } from '../desktop/windows/shellSurfaces.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
 import { onLocaleChanged } from '../shared/i18n/index.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion/motion.js';
@@ -24,7 +25,6 @@ import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
 import type { NotificationCenter } from './notifications/notificationCenter.js';
 import type { QuickSettings } from './quickSettings/quickSettings.js';
-import { StandaloneQuickSettings } from './quickSettings/standalone.js';
 import type { StartSurface } from './start/startSurface.js';
 
 export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
@@ -71,7 +71,6 @@ export class Surfaces {
   private keepsComposited = false;
   private readonly created: Partial<LazySurfaces> = {};
   private readonly outdated = new Set<keyof LazySurfaces>();
-  private readonly standaloneQuick = new StandaloneQuickSettings((width, height) => this.quickPosition(width, height));
 
   constructor(private readonly parts: SurfaceParts) {
     this.cover.connect('button-press-event', () => {
@@ -79,6 +78,10 @@ export class Surfaces {
       return Clutter.EVENT_STOP;
     });
     for (const surface of [parts.quick, parts.clipboard]) this.adopt(surface);
+    shellSurfaces.placement = {
+      position: (width, height) => this.quickPosition(width, height),
+      slide: () => toward(this.parts.taskbar.anchor('quick', this.pointerMonitor()).edge, PANEL_SLIDE),
+    };
     this.watchVisibility(parts.taskView.actor);
     this.layer.connect('destroy', onLocaleChanged(() => this.dropOutdated(true)));
   }
@@ -193,9 +196,9 @@ export class Surfaces {
     const { previews, board, taskView } = this.parts;
     if (!this.parts.canInteract()) return;
     previews.close();
-    if (surface === 'quick' && this.standaloneQuick.available) {
+    if (surface === 'quick' && shellSurfaces.available) {
       this.close();
-      this.standaloneQuick.toggle();
+      shellSurfaces.toggle();
       return;
     }
     const popup = this.popupFor(surface);

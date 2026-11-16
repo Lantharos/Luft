@@ -3,9 +3,9 @@ use std::os::fd::OwnedFd;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Receiver};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
-use rustix::event::{EventfdFlags, PollFd, PollFlags, eventfd, poll};
+use rustix::event::{EventfdFlags, PollFd, PollFlags, Timespec, eventfd, poll};
 use rustix::io::{read, write};
 
 use crate::icons::Icons;
@@ -16,6 +16,7 @@ use crate::ui::{Element, Ui};
 use crate::wayland::{Event, Wayland, Window};
 
 const ESCAPE: u32 = 1;
+const UNSEEN_FRAME: Duration = Duration::from_millis(100);
 
 /// A surface of the shell: state, the elements that show it and what
 /// messages do to it.
@@ -23,27 +24,7 @@ pub trait App: 'static {
     type Message: Clone + Send + 'static;
 
     fn view(&self) -> Element<Self::Message>;
-    fn update(&mut self, message: Self::Message, surface: &mut Surface);
-}
-
-/// Whether the surface is on screen.
-#[derive(Default)]
-pub struct Surface {
-    open: bool,
-}
-
-impl Surface {
-    pub fn is_open(&self) -> bool {
-        self.open
-    }
-
-    pub fn open(&mut self) {
-        self.open = true;
-    }
-
-    pub fn close(&mut self) {
-        self.open = false;
-    }
+    fn update(&mut self, message: Self::Message);
 }
 
 /// Hands messages to the app from other threads.
@@ -75,18 +56,9 @@ pub struct Options {
     pub icons: Vec<PathBuf>,
 }
 
-struct Shown {
-    target: Option<Target>,
-    window: Window,
-    configured: bool,
-    focused: bool,
-    dirty: bool,
-    awaiting_frame: bool,
-    size: (i32, i32),
-    stats: Stats,
-}
-
-/// Runs the app until the display goes away.
+/// Runs the app until the display goes away. Its surface lives the whole
+/// time: Kestrel shows and hides it, and it stays drawn while hidden so it is
+/// there the moment it is shown.
 pub fn run<A: App>(options: Options, start: impl FnOnce(Sender<A::Message>) -> A) -> ! {
     let mut wayland = Wayland::connect();
     let mut gpu = Gpu::new();
@@ -101,50 +73,30 @@ pub fn run<A: App>(options: Options, start: impl FnOnce(Sender<A::Message>) -> A
         messages,
         wake: wake.clone(),
     });
-    let mut surface = Surface::default();
-    let mut shown: Option<Shown> = None;
-    let mut scale = 1.0_f32;
-    let report = env::var_os("KESTREL_SHELL_STATS").is_some();
     let display = wayland
         .fd()
         .try_clone_to_owned()
         .expect("the display's socket");
+    let report = env::var_os("KESTREL_SHELL_STATS").is_some();
+
+    let mut target: Option<Target> = None;
+    let window = Window::open(&wayland, options.app_id);
+    let mut scale = 1.0_f32;
+    let mut size = (0, 0);
+    let mut configured = false;
+    let mut focused = false;
+    let mut dirty = true;
+    let mut awaited: Option<Instant> = None;
+    let mut stats = Stats::default();
 
     loop {
-        let mut changed = false;
         while let Ok(message) = inbox.try_recv() {
-            app.update(message, &mut surface);
-            changed = true;
-        }
-        match (&mut shown, surface.open) {
-            (None, true) => {
-                shown = Some(Shown {
-                    target: None,
-                    window: Window::open(&wayland, options.app_id),
-                    configured: false,
-                    focused: false,
-                    dirty: true,
-                    awaiting_frame: false,
-                    size: (0, 0),
-                    stats: Stats::new(),
-                });
-            }
-            (Some(open), false) => {
-                if report {
-                    open.stats.report();
-                }
-                shown = None;
-                ui.reset();
-            }
-            (Some(open), true) => open.dirty |= changed,
-            (None, false) => {}
+            app.update(message);
+            dirty = true;
         }
 
-        if let Some(open) = &mut shown
-            && open.configured
-            && open.dirty
-            && !open.awaiting_frame
-        {
+        let unseen = awaited.is_some_and(|since| since.elapsed() >= UNSEEN_FRAME);
+        if configured && dirty && (awaited.is_none() || unseen) {
             let started = Instant::now();
             let root = app.view();
             let frame = ui.frame(
@@ -156,53 +108,64 @@ pub fn run<A: App>(options: Options, start: impl FnOnce(Sender<A::Message>) -> A
                 &mut gpu,
                 &mut scene,
             );
-            let size = (options.width.round() as i32, frame.height.ceil() as i32);
+            let logical = (options.width.round() as i32, frame.height.ceil() as i32);
             let pixels = (
-                (size.0 as f32 * scale).round() as u32,
-                (size.1 as f32 * scale).round() as u32,
+                (logical.0 as f32 * scale).round() as u32,
+                (logical.1 as f32 * scale).round() as u32,
             );
-            if open.size != size {
-                open.size = size;
-                open.window.resize(&wayland, size.0, size.1);
+            if size != logical {
+                size = logical;
+                window.resize(&wayland, logical.0, logical.1);
             }
-            match &mut open.target {
+            match &mut target {
                 Some(target) => gpu.resize(target, pixels.0, pixels.1),
                 None => {
-                    let (display, window) = open.window.handles(&wayland);
-                    open.target = Some(unsafe { gpu.target(display, window, pixels.0, pixels.1) });
+                    let (display, surface) = window.handles(&wayland);
+                    target = Some(unsafe { gpu.target(display, surface, pixels.0, pixels.1) });
                 }
             }
-            open.window.request_frame(&wayland);
-            gpu.draw(open.target.as_ref().expect("a target"), &scene);
-            open.dirty = frame.animating;
-            open.awaiting_frame = true;
-            open.stats.frame(started.elapsed());
+            window.request_frame(&wayland);
+            gpu.draw(target.as_ref().expect("a target"), &scene);
+            dirty = frame.animating;
+            awaited = Some(started);
+            stats.frame(started.elapsed());
         }
 
+        let patience = (dirty && !unseen)
+            .then(|| awaited.map(|since| UNSEEN_FRAME.saturating_sub(since.elapsed())))
+            .flatten();
         let events = wayland.exchange(|| {
             let mut ready = [
                 PollFd::new(&display, PollFlags::IN),
                 PollFd::new(&*wake, PollFlags::IN),
             ];
-            poll(&mut ready, None).expect("something to wait for");
+            let timeout = patience.map(|patience| Timespec {
+                tv_sec: 0,
+                tv_nsec: patience.as_nanos() as i64,
+            });
+            poll(&mut ready, timeout.as_ref()).expect("something to wait for");
             if !ready[1].revents().is_empty() {
                 let _ = read(&*wake, &mut [0; 8]);
             }
             !ready[0].revents().is_empty()
         });
         for event in events {
-            let Some(open) = &mut shown else { break };
             let message = match event {
                 Event::Configured { active } => {
-                    if open.focused && !active {
-                        surface.close();
+                    if focused && !active {
+                        window.hide();
+                        ui.reset();
+                        if report {
+                            stats.report();
+                        }
+                        stats = Stats::default();
                     }
-                    open.focused = active;
-                    open.configured = true;
+                    focused = active;
+                    configured = true;
                     None
                 }
                 Event::CloseRequested | Event::Key { code: ESCAPE } => {
-                    surface.close();
+                    window.hide();
                     None
                 }
                 Event::Key { .. } => None,
@@ -218,17 +181,17 @@ pub fn run<A: App>(options: Options, start: impl FnOnce(Sender<A::Message>) -> A
                 Event::Pressed => ui.pressed(),
                 Event::Released => ui.released(),
                 Event::FrameDone => {
-                    open.awaiting_frame = false;
+                    awaited = None;
                     continue;
                 }
                 Event::Presented(at) => {
-                    open.stats.presented(at);
+                    stats.presented(at);
                     continue;
                 }
             };
-            open.dirty = true;
+            dirty = true;
             if let Some(message) = message {
-                app.update(message, &mut surface);
+                app.update(message);
             }
         }
     }

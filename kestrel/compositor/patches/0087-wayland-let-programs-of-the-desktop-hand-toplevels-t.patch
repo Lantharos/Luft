@@ -1,0 +1,227 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Mon, 16 Nov 2026 10:08:51 +0100
+Subject: [PATCH] wayland: let programs of the desktop hand toplevels to the
+ shell as its surfaces
+
+A surface of the desktop that lives in a program of its own, such as
+quick settings, has to be there the frame the shell wants it, so it
+cannot be a toplevel that is created each time it opens and placed after
+it maps. kestrel_window_state_v1 version 3 lets a client hand a toplevel
+to the shell: the window starts minimized, is on every workspace and in
+no window list, is left where the shell puts it, and can be minimized
+although it skips the taskbar, so the shell shows and hides it by
+unminimizing and minimizing it while the client keeps it drawn.
+
+The state object now has the version of the manager it comes from.
+
+Upstream-Status: luft-only Kestrel's private kestrel_window_v1 protocol
+---
+ src/core/window-private.h                  |  3 ++
+ src/core/window.c                          | 41 +++++++++++++++++++++-
+ src/meta/window.h                          |  6 ++++
+ src/wayland/meta-wayland-kestrel-window.c  | 16 +++++++++
+ src/wayland/meta-wayland-versions.h        |  2 +-
+ src/wayland/protocol/kestrel-window-v1.xml | 18 ++++++++--
+ 6 files changed, 82 insertions(+), 4 deletions(-)
+
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index 9d2b94a0e50c62bd8bc41ead9ec3843e35660f90..f1881d4a8c6ece65833cbf8c965fa506f9779f34 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -515,6 +515,9 @@ struct _MetaWindow
+   guint skip_pager : 1;
+   guint skip_from_window_list : 1;
+ 
++  /* A surface of the desktop that the shell places, shows and hides */
++  guint shell_surface : 1;
++
+   /* TRUE if client set these */
+   guint wm_state_above : 1;
+   guint wm_state_below : 1;
+diff --git a/src/core/window.c b/src/core/window.c
+index 50342c797309a28010a18eaa16fd8a2caa7bc517..5bee955a34e3ad504164edf6863a5c3193f7d2e6 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -6412,7 +6412,7 @@ meta_window_recalc_features (MetaWindow *window)
+ 
+   /* To prevent users from losing windows, let's prevent users from
+    * minimizing skip-taskbar windows through the window decorations. */
+-  if (window->skip_taskbar)
++  if (window->skip_taskbar && !window->shell_surface)
+     window->has_minimize_func = FALSE;
+ 
+   meta_topic (META_DEBUG_WINDOW_OPS,
+@@ -9292,6 +9292,45 @@ meta_window_show_in_window_list (MetaWindow *window)
+   meta_window_recalc_features (window);
+ }
+ 
++/**
++ * meta_window_make_shell_surface
++ * @window: A #MetaWindow
++ *
++ * Hands this window to the shell as one of the desktop's own surfaces. It
++ * starts hidden, is on every workspace and in no window list, and is left
++ * where the shell puts it. The shell shows and hides it by unminimizing and
++ * minimizing it.
++ */
++void
++meta_window_make_shell_surface (MetaWindow *window)
++{
++  g_return_if_fail (META_IS_WINDOW (window));
++
++  if (window->shell_surface)
++    return;
++
++  window->shell_surface = TRUE;
++  window->placed = TRUE;
++  window->skip_from_window_list = TRUE;
++  meta_window_recalc_features (window);
++  meta_window_stick (window);
++  meta_window_minimize (window);
++}
++
++/**
++ * meta_window_is_shell_surface
++ * @window: A #MetaWindow
++ *
++ * Returns: whether this window is one of the desktop's own surfaces
++ */
++gboolean
++meta_window_is_shell_surface (MetaWindow *window)
++{
++  g_return_val_if_fail (META_IS_WINDOW (window), FALSE);
++
++  return window->shell_surface;
++}
++
+ /**
+  * meta_window_inhibit_mapped
+  * @window: A #MetaWindow
+diff --git a/src/meta/window.h b/src/meta/window.h
+index b8b011e003ea51b00fa74b6446544d4a3f4dcc1c..5fe94ce3926baf4df0b3b63bcc9a70354a694d8f 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -516,6 +516,12 @@ META_EXPORT
+ void meta_window_set_unmaximize_flags (MetaWindow        *window,
+                                        MetaMaximizeFlags  directions);
+ 
++META_EXPORT
++void meta_window_make_shell_surface (MetaWindow *window);
++
++META_EXPORT
++gboolean meta_window_is_shell_surface (MetaWindow *window);
++
+ META_EXPORT
+ void meta_window_inhibit_mapped (MetaWindow *window);
+ 
+diff --git a/src/wayland/meta-wayland-kestrel-window.c b/src/wayland/meta-wayland-kestrel-window.c
+index f85198ecdfab0fc68a213702120741a2eae20da0..163f37f810f0f41b76c677dcd2d33477625b091d 100644
+--- a/src/wayland/meta-wayland-kestrel-window.c
++++ b/src/wayland/meta-wayland-kestrel-window.c
+@@ -37,6 +37,7 @@ typedef struct _MetaWaylandKestrelWindowState
+   gulong window_created_handler_id;
+   gboolean skip_window_list;
+   gboolean keep_above;
++  gboolean shell_surface;
+ } MetaWaylandKestrelWindowState;
+ 
+ struct _MetaWaylandKestrelWindowManager
+@@ -125,6 +126,8 @@ on_window_created (MetaDisplay                   *display,
+     apply_skip_window_list (window, TRUE);
+   if (state->keep_above)
+     apply_keep_above (window, TRUE);
++  if (state->shell_surface)
++    meta_window_make_shell_surface (window);
+ }
+ 
+ static void
+@@ -181,6 +184,18 @@ window_state_unset_keep_above (struct wl_client   *client,
+   update_keep_above (wl_resource_get_user_data (resource), FALSE);
+ }
+ 
++static void
++window_state_set_shell_surface (struct wl_client   *client,
++                                struct wl_resource *resource)
++{
++  MetaWaylandKestrelWindowState *state = wl_resource_get_user_data (resource);
++  MetaWindow *window = window_of (state);
++
++  state->shell_surface = TRUE;
++  if (window)
++    meta_window_make_shell_surface (window);
++}
++
+ static const struct kestrel_window_state_v1_interface
+   meta_wayland_kestrel_window_state_interface = {
+   window_state_destroy,
+@@ -188,6 +203,7 @@ static const struct kestrel_window_state_v1_interface
+   window_state_unset_skip_window_list,
+   window_state_set_keep_above,
+   window_state_unset_keep_above,
++  window_state_set_shell_surface,
+ };
+ 
+ static void
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index c27c8bb9b11d13790db66363090ccfd85f489c34..ba91951ad60354df9500b4069802f34d046d4650 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -72,7 +72,7 @@
+ #define META_WL_FIXES_VERSION 1
+ #define META_WP_POINTER_WARP_VERSION 1
+ #define META_EXT_BACKGROUND_EFFECT_V1_VERSION 1
+-#define META_KESTREL_WINDOW_V1_VERSION 2
++#define META_KESTREL_WINDOW_V1_VERSION 3
+ #define META_KESTREL_GLASS_V1_VERSION 1
+ #define META_ZXDG_DECORATION_MANAGER_V1_VERSION 2
+ #define META_EXT_IDLE_NOTIFIER_V1_VERSION 2
+diff --git a/src/wayland/protocol/kestrel-window-v1.xml b/src/wayland/protocol/kestrel-window-v1.xml
+index ed1e55719e64a0144d46ef3ed2f399acfddc3d3e..c39ec4a6dd937bc908f7c20664c3933b49474fab 100644
+--- a/src/wayland/protocol/kestrel-window-v1.xml
++++ b/src/wayland/protocol/kestrel-window-v1.xml
+@@ -23,7 +23,7 @@
+     DEALINGS IN THE SOFTWARE.
+   </copyright>
+ 
+-  <interface name="kestrel_window_manager_v1" version="2">
++  <interface name="kestrel_window_manager_v1" version="3">
+     <description summary="window placement requests for toplevels">
+       Lets a client keep a toplevel out of the desktop's window lists, such as
+       the taskbar and the window switcher, and keep it above other windows.
+@@ -33,6 +33,9 @@
+       From version 2, the compositor lets people resize a toplevel that draws
+       nothing outside its window geometry from just outside its edges, so such
+       clients need no resize area of their own over their content.
++
++      From version 3, a program of the desktop itself can hand a toplevel to
++      the shell as one of its surfaces.
+     </description>
+ 
+     <enum name="error">
+@@ -56,7 +59,7 @@
+     </request>
+   </interface>
+ 
+-  <interface name="kestrel_window_state_v1" version="1">
++  <interface name="kestrel_window_state_v1" version="3">
+     <description summary="placement state of one toplevel">
+       Requests take effect immediately and last until they are undone or the
+       object is destroyed, which returns the toplevel to its default state.
+@@ -85,5 +88,16 @@
+     <request name="unset_keep_above">
+       <description summary="stack the toplevel normally again"/>
+     </request>
++
++    <request name="set_shell_surface" since="3">
++      <description summary="hand the toplevel to the shell as one of its surfaces">
++        The toplevel becomes a surface of the desktop, such as quick
++        settings. It starts hidden and is on every workspace and in no list
++        of windows. The shell places it and shows and hides it, and the
++        client keeps it drawn while it is hidden, so it is there the moment
++        it is shown. The client asks for it to be hidden with
++        xdg_toplevel.set_minimized. This lasts for the life of the toplevel.
++      </description>
++    </request>
+   </interface>
+ </protocol>

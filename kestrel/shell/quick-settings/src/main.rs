@@ -8,7 +8,7 @@ mod view;
 use std::env;
 use std::path::PathBuf;
 
-use kestrel_toolkit::app::{App, Options, Sender, Surface, run};
+use kestrel_toolkit::app::{App, Options, Sender, run};
 use kestrel_toolkit::ui::Element;
 
 use sources::settings::Settings;
@@ -24,7 +24,6 @@ const ICON_FOLDERS: [&str; 2] = [
 
 #[derive(Clone)]
 pub enum Message {
-    Toggle,
     Dark(bool),
     Quiet(bool),
     Profile(String),
@@ -55,10 +54,8 @@ impl App for QuickSettings {
         view::surface(self)
     }
 
-    fn update(&mut self, message: Message, surface: &mut Surface) {
+    fn update(&mut self, message: Message) {
         match message {
-            Message::Toggle if surface.is_open() => surface.close(),
-            Message::Toggle => surface.open(),
             Message::Dark(dark) => self.dark = dark,
             Message::Quiet(quiet) => self.quiet = quiet,
             Message::Profile(profile) => self.profile = Some(profile),

@@ -4278,6 +4278,8 @@ export namespace Meta {
 
         is_screen_sized(): boolean;
 
+        is_shell_surface(): boolean;
+
         is_skip_taskbar(): boolean;
 
         is_unconstrained(): boolean;
@@ -4295,6 +4297,8 @@ export namespace Meta {
         make_above(): void;
 
         make_fullscreen(): void;
+
+        make_shell_surface(): void;
 
         maximize(): void;
 

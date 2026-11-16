@@ -6,7 +6,6 @@ import {existing} from '../checks/lib/actors.js';
 import {press, rest, type} from '../checks/lib/input/input.js';
 import {settled, waitUntil} from '../checks/lib/wait.js';
 import GLib from 'gi://GLib';
-import {call} from '../checks/lib/dbus.js';
 import {repository, spawn} from '../checks/lib/processes.js';
 import {eachFrame, measured, type Interaction} from './recorder.js';
 
@@ -22,8 +21,8 @@ async function startStandalone() {
   if (standalone || !GLib.getenv('KESTREL_STANDALONE_QUICK')) return;
   standalone = true;
   spawn([repository('target', 'release', 'kestrel-quick-settings')], {env: {KESTREL_ICON_PATH: repository('kestrel', 'engine', 'data', 'icons')}});
-  await waitUntil(async () => (await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
-    new GLib.Variant('(s)', ['com.lantharos.Kestrel.QuickSettings']), '(b)')).recursiveUnpack<[boolean]>()[0], 'standalone quick settings is on the bus');
+  await waitUntil(() => global.display.list_all_windows().some(window => window.get_wm_class() === 'com.lantharos.kestrel.quicksettings' && window.minimized),
+    'standalone quick settings is ready');
 }
 
 const closed = (style = 'menu') => async () => {

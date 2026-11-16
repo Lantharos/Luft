@@ -4,31 +4,29 @@ import type Meta from 'gi://Meta';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
-import {call} from '../lib/dbus.js';
 import {click, moveBy, moveTo, pressButton, releaseButton, rest} from '../lib/input/input.js';
-import {findWindow, repository, spawn, stop} from '../lib/processes.js';
+import {repository, spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('standalone quick settings');
 
 const APP_ID = 'com.lantharos.kestrel.quicksettings';
-const NAME = 'com.lantharos.Kestrel.QuickSettings';
 const PADDING = 14;
 const TILE = {width: 192, height: 97, gap: 8};
 
-const surface = () => findWindow(window => window.get_wm_class() === APP_ID);
+const surface = () => global.display.list_all_windows().find(window => window.get_wm_class() === APP_ID) ?? null;
 
 async function open(): Promise<Meta.Window> {
   toggleSurface('quick');
-  const window = await eventually(surface, 'the program shows quick settings');
+  const window = await eventually(() => surface()?.minimized === false && surface(), 'Kestrel shows the program\'s quick settings');
   await settled();
   return window;
 }
 
 async function close() {
   toggleSurface('quick');
-  await eventually(() => !surface(), 'the program takes quick settings away');
+  await eventually(() => surface()?.minimized, 'Kestrel hides them again');
   await settled();
 }
 
@@ -46,8 +44,7 @@ export async function run() {
   const notifications = new Gio.Settings({schema_id: 'org.gnome.desktop.notifications'});
   const scheme = interfaceSettings.get_string('color-scheme');
   try {
-    await eventually(async () => (await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
-      new GLib.Variant('(s)', [NAME]), '(b)')).recursiveUnpack<[boolean]>()[0], 'the program is on the bus');
+    await eventually(() => surface()?.minimized, 'the program hands Kestrel its surface, which stays hidden');
 
     let window = await open();
     const frame = window.get_frame_rect();
@@ -93,6 +90,7 @@ export async function run() {
       window = await open();
       await close();
     }
+    await pause(200);
     require(true, 'quick settings opened and closed six times');
   } finally {
     interfaceSettings.set_string('color-scheme', scheme);

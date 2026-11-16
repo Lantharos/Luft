@@ -14,7 +14,7 @@ glib.workspace = true
 kestrel-toolkit.workspace = true
 libpulse-binding.workspace = true
 tokio = { workspace = true, features = ["rt", "sync"] }
-zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [lints]
 workspace = true

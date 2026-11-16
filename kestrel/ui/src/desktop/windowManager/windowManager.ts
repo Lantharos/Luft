@@ -23,6 +23,7 @@ import { TilePreview } from './tilePreview.js';
 import { WindowMenuManager } from './windowMenu.js';
 import { WindowDimming } from './effects/dimmer.js';
 import { MinimizeEffects } from './effects/minimize.js';
+import { shellSurfaces } from '../windows/shellSurfaces.js';
 import { WindowMorphs } from './effects/morph.js';
 import { OpenCloseEffects } from './effects/openClose.js';
 import { WorkspaceAnimationController } from './workspaces/animation.js';
@@ -76,8 +77,14 @@ export class WindowManager {
     shellwm.connect('show-tile-preview', (_shellwm, window, tileRect, monitorIndex) => this.showTilePreview(window, tileRect, monitorIndex));
     shellwm.connect('hide-tile-preview', () => this.hideTilePreview());
     shellwm.connect('show-window-menu', (_shellwm, window, menu, rect) => this.windowMenuManager.showWindowMenuForWindow(window, menu, rect));
-    shellwm.connect('minimize', (_shellwm, actor) => this.minimizeEffects.minimize(actor));
-    shellwm.connect('unminimize', (_shellwm, actor) => this.minimizeEffects.unminimize(actor));
+    shellwm.connect('minimize', (_shellwm, actor) => {
+      if (shellSurfaces.owns(actor)) shellSurfaces.conceal(actor, () => shellwm.completed_minimize(actor));
+      else this.minimizeEffects.minimize(actor);
+    });
+    shellwm.connect('unminimize', (_shellwm, actor) => {
+      if (shellSurfaces.owns(actor)) shellSurfaces.reveal(actor, () => shellwm.completed_unminimize(actor));
+      else this.minimizeEffects.unminimize(actor);
+    });
     shellwm.connect('size-change', (_shellwm, actor, _change, oldFrameRect) => this.sizeChangeWindow(actor, oldFrameRect));
     shellwm.connect('map', (_shellwm, actor) => this.mapWindow(actor));
     shellwm.connect('destroy', (_shellwm, actor) => this.destroyWindow(actor));
@@ -247,6 +254,10 @@ export class WindowManager {
   }
 
   private mapWindow(actor: Meta.WindowActor): void {
+    if (shellSurfaces.owns(actor)) {
+      shellSurfaces.reveal(actor, () => this.shellwm.completed_map(actor));
+      return;
+    }
     const window = actor.meta_window!;
     let windowType = window.get_window_type();
     window.connectObject('notify::window-type', () => {
@@ -275,6 +286,10 @@ export class WindowManager {
   }
 
   private destroyWindow(actor: Meta.WindowActor): void {
+    if (shellSurfaces.owns(actor)) {
+      this.shellwm.completed_destroy(actor);
+      return;
+    }
     const window = actor.meta_window!;
     window.disconnectObject(actor);
 

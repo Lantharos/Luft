@@ -23,12 +23,19 @@
     DEALINGS IN THE SOFTWARE.
   </copyright>
 
-  <interface name="kestrel_window_manager_v1" version="1">
+  <interface name="kestrel_window_manager_v1" version="3">
     <description summary="window placement requests for toplevels">
       Lets a client keep a toplevel out of the desktop's window lists, such as
       the taskbar and the window switcher, and keep it above other windows.
       Palettes, launchers and tray popups use these. Sandboxed clients do not
       see this global.
+
+      From version 2, the compositor lets people resize a toplevel that draws
+      nothing outside its window geometry from just outside its edges, so such
+      clients need no resize area of their own over their content.
+
+      From version 3, a program of the desktop itself can hand a toplevel to
+      the shell as one of its surfaces.
     </description>
 
     <enum name="error">
@@ -52,7 +59,7 @@
     </request>
   </interface>
 
-  <interface name="kestrel_window_state_v1" version="1">
+  <interface name="kestrel_window_state_v1" version="3">
     <description summary="placement state of one toplevel">
       Requests take effect immediately and last until they are undone or the
       object is destroyed, which returns the toplevel to its default state.
@@ -80,6 +87,17 @@
 
     <request name="unset_keep_above">
       <description summary="stack the toplevel normally again"/>
+    </request>
+
+    <request name="set_shell_surface" since="3">
+      <description summary="hand the toplevel to the shell as one of its surfaces">
+        The toplevel becomes a surface of the desktop, such as quick
+        settings. It starts hidden and is on every workspace and in no list
+        of windows. The shell places it and shows and hides it, and the
+        client keeps it drawn while it is hidden, so it is there the moment
+        it is shown. The client asks for it to be hidden with
+        xdg_toplevel.set_minimized. This lasts for the life of the toplevel.
+      </description>
     </request>
   </interface>
 </protocol>

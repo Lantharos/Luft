@@ -78,7 +78,7 @@ impl Wayland {
             viewporter: list.bind(&handle, 1..=1, ()).expect("wp_viewporter"),
             scales: list.bind(&handle, 1..=1, ()).ok(),
             effects: list.bind(&handle, 1..=1, ()).ok(),
-            windows: list.bind(&handle, 1..=1, ()).ok(),
+            windows: list.bind(&handle, 3..=3, ()).ok(),
             glass: list.bind(&handle, 1..=1, ()).ok(),
             presentation: list.bind(&handle, 1..=2, ()).ok(),
         };

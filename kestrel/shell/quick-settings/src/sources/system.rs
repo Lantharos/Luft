@@ -3,7 +3,7 @@ use std::thread;
 use futures_util::StreamExt;
 use kestrel_toolkit::app::Sender;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
-use zbus::{Connection, Proxy, connection, interface};
+use zbus::{Connection, Proxy};
 
 use crate::Message;
 
@@ -13,8 +13,6 @@ const ACTIVE_PROFILE: &str = "ActiveProfile";
 const NETWORK: &str = "org.freedesktop.NetworkManager";
 const NETWORK_PATH: &str = "/org/freedesktop/NetworkManager";
 const PRIMARY_CONNECTION: &str = "PrimaryConnectionType";
-const NAME: &str = "com.lantharos.Kestrel.QuickSettings";
-const PATH: &str = "/com/lantharos/Kestrel/QuickSettings";
 
 pub fn next_profile(profile: &str) -> &'static str {
     match profile {
@@ -24,17 +22,7 @@ pub fn next_profile(profile: &str) -> &'static str {
     }
 }
 
-struct Remote(Sender<Message>);
-
-#[interface(name = "com.lantharos.Kestrel.QuickSettings")]
-impl Remote {
-    fn toggle(&self) {
-        self.0.send(Message::Toggle);
-    }
-}
-
-/// What quick settings reads from the system over D-Bus, and the name the
-/// taskbar opens it through.
+/// What quick settings reads from the system over D-Bus.
 pub struct System {
     profiles: UnboundedSender<&'static str>,
 }
@@ -48,12 +36,6 @@ impl System {
                 .build()
                 .expect("a runtime");
             runtime.block_on(async {
-                let _remote = connection::Builder::session()
-                    .name(NAME)
-                    .serve_at(PATH, Remote(messages.clone()))
-                    .build()
-                    .await
-                    .expect("the quick settings name on the session bus");
                 let Ok(system) = Connection::system().await else {
                     return std::future::pending().await;
                 };

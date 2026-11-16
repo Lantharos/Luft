@@ -15,8 +15,8 @@ use super::Wayland;
 use super::protocols::glass::kestrel_glass_v1::{KestrelGlassV1, Role};
 use super::protocols::window::kestrel_window_state_v1::KestrelWindowStateV1;
 
-/// A surface of the shell: a toplevel Kestrel keeps out of its window lists
-/// and above other windows, with glass behind all of it.
+/// A surface of the shell: a toplevel handed to Kestrel, which places it,
+/// shows and hides it and keeps it above windows, with glass behind all of it.
 pub struct Window {
     surface: WlSurface,
     role: XdgSurface,
@@ -46,7 +46,7 @@ impl Window {
             .map(|effects| effects.get_background_effect(&surface, handle, ()));
         let placement = globals.windows.as_ref().map(|windows| {
             let placement = windows.get_window_state(&toplevel, handle, ());
-            placement.set_skip_window_list();
+            placement.set_shell_surface();
             placement.set_keep_above();
             placement
         });
@@ -82,6 +82,11 @@ impl Window {
             effect.set_blur_region(Some(&region));
             region.destroy();
         }
+    }
+
+    /// Asks Kestrel to take the surface off the screen.
+    pub fn hide(&self) {
+        self.toplevel.set_minimized();
     }
 
     pub fn request_frame(&self, wayland: &Wayland) {

@@ -62,7 +62,7 @@ Schelf fills that in itself, in every installation, from the extension points in
 
 ### Sabine and installed apps
 
-Luft's apps run on Sabine's system-wide runtime. Sabine has its own releases, which reach the nightlies first and stable with the next promotion, and the image build fails when its Sabine wouldn't run one of the image's own apps. On a running system, Sabine holds back an update of itself that would stop an installed app, until that app is updated or removed, and Settings names the app.
+Luft's apps run on Sabine's system-wide runtime. Sabine has its own releases, which reach the nightlies first and stable with the next promotion, and the image build fails when its Sabine wouldn't run one of the image's own apps. On a running system, Sabine holds back an update of itself that would stop an installed app, until that app is updated or removed, and Schelf names the apps under Updates.
 
 A Sabine app from schelf.store that updates while it runs keeps working. Each version installs into a folder of its own, which stays until no process runs that version, so an open window can still open more windows. An app running in the background with no window open, such as Mailman, finishes what it is doing and starts again on the new version by itself, and opening an app that still runs an older version in the background starts the new one in its place. Apps in the image change only with the image, at the next restart.
 

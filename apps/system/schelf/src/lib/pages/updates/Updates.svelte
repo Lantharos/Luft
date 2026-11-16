@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { t } from '@luft/i18n';
-	import { ago, bytes, Section, Spinner } from '@luft/ui';
+	import { i18n, t } from '@luft/i18n';
+	import Layers from '@lucide/svelte/icons/layers';
+	import { ago, bytes, Row, Section, Spinner } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -13,6 +14,7 @@
 	const platforms = $derived(updates.filter((update) => update.platform));
 	const waiting = $derived(updates.filter((update) => !operations.forKey(update.key) || operations.forKey(update.key)?.state === 'failed'));
 	const failed = $derived(library.updates?.failed ?? []);
+	const sabine = $derived(library.updates?.sabine ?? null);
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
 
 	const headline = $derived.by(() => {
@@ -87,6 +89,16 @@
 				{#each platforms as update (update.key)}
 					<UpdateRow {update} />
 				{/each}
+			</Section>
+		{/if}
+
+		{#if sabine}
+			<Section>
+				<Row
+					icon={Layers}
+					title={t('updates-sabine-waiting', { version: sabine.version })}
+					description={t('updates-sabine-waiting-for', { apps: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(sabine.apps) })}
+				/>
 			</Section>
 		{/if}
 	</div>

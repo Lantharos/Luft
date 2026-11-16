@@ -8,14 +8,12 @@ use specta::Type;
 use super::image;
 use super::state;
 use super::store::Checked;
-use super::waiting::{self, SabineWait};
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdatesOverview {
     checked: Option<u64>,
     apps: Option<usize>,
-    sabine: Vec<SabineWait>,
     pub system: image::ImageOverview,
 }
 
@@ -32,9 +30,6 @@ fn publish(system: image::ImageOverview, checked: Checked) {
     state::set_overview(UpdatesOverview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
-        sabine: state::overview()
-            .map(|overview| overview.sabine)
-            .unwrap_or_default(),
         system,
     });
 }
@@ -52,11 +47,7 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
     }
     std::thread::spawn(move || {
         let apps = updates::count();
-        let waiting = waiting::installed_by_user();
-        state::edit_overview(|overview| {
-            overview.apps = Some(apps);
-            overview.sabine = waiting;
-        });
+        state::edit_overview(|overview| overview.apps = Some(apps));
     });
     Ok(())
 }

@@ -390,3 +390,7 @@ updates-widens = Asks for more access
 # Verb: opens the app's page to look at what changed
 updates-review = Review
 updates-update = Update
+# $version is a Sabine version, such as 0.97. Sabine is what many apps run on.
+updates-sabine-waiting = Sabine { $version } is waiting
+# $apps lists the apps holding it back, such as Draft, Flatbed and Mailman
+updates-sabine-waiting-for = Update or remove { $apps } to get it

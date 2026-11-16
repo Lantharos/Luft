@@ -644,9 +644,6 @@ export const commands = {
 	updatesOpenApps: (params: {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("updates_open_apps", params, options),
-	updatesOpenInstalledApps: (params: {
-		token?: string | null,
-	}, options?: CallOptions) => invoke<null>("updates_open_installed_apps", params, options),
 	updatesPreferences: (options?: CallOptions) => invoke<UpdatePolicy>("updates_preferences", {}, options),
 	updatesRestart: (options?: CallOptions) => invoke<null>("updates_restart", {}, options),
 	updatesRollback: (options?: CallOptions) => invoke<null>("updates_rollback", {}, options),
@@ -1738,11 +1735,6 @@ export type Route = {
 	metric: number | null,
 };
 
-export type SabineWait = {
-	name: string,
-	update: boolean,
-};
-
 export type SandboxDevice = "usb" | "serial";
 
 export type SandboxSwitch = "internet" | "downloads" | "x11" | "microphone" | "camera";
@@ -1951,7 +1943,6 @@ export type UpdatePolicy = {
 export type UpdatesOverview = {
 	checked: number | null,
 	apps: number | null,
-	sabine: SabineWait[],
 	system: ImageOverview,
 };
 

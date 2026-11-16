@@ -5,7 +5,6 @@ mod notice;
 mod overview;
 mod state;
 mod store;
-mod waiting;
 
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
@@ -25,7 +24,6 @@ use luft_i18n::t;
 use crate::L10N;
 
 const APP_UPDATES: &str = "schelf:updates";
-const INSTALLED_APPS: &str = "schelf:installed";
 
 #[derive(Deserialize, Type)]
 struct FirmwareDevice {
@@ -156,10 +154,6 @@ fn open_apps(Token { token }: Token) -> Result<(), String> {
     launch::open(APP_UPDATES, token.as_deref()).map_err(|error| error.to_string())
 }
 
-fn open_installed_apps(Token { token }: Token) -> Result<(), String> {
-    launch::open(INSTALLED_APPS, token.as_deref()).map_err(|error| error.to_string())
-}
-
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
     image::watch();
@@ -186,5 +180,4 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("updates_preferences", policy)
         .command_async("updates_set_preferences", system_image::set_policy)
         .command("updates_open_apps", open_apps)
-        .command("updates_open_installed_apps", open_installed_apps)
 }

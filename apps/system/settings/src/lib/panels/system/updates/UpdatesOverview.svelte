@@ -5,7 +5,7 @@
 	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { reportProblem } from '../about/api';
-	import { firmware, openApps, openInstalledApps } from './api';
+	import { firmware, openApps } from './api';
 	import AutomaticRows from './AutomaticRows.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
 	import ChannelRow from './image/ChannelRow.svelte';
@@ -60,13 +60,6 @@
 		description={apps === null ? undefined : t('settings-updates-apps-count', { count: apps })}
 		onclick={openApps}
 	/>
-	{#each info?.sabine ?? [] as app (app.name)}
-		<Row
-			title={t('settings-updates-sabine-waiting', { app: app.name })}
-			description={app.update ? t('settings-updates-sabine-update-ready', { app: app.name }) : t('settings-updates-sabine-update-or-remove', { app: app.name })}
-			onclick={app.update ? openApps : openInstalledApps}
-		/>
-	{/each}
 	<Row title={t('settings-about-report')} description={t('settings-about-report-description')} onclick={reportProblem} />
 </Section>
 

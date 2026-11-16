@@ -14,6 +14,29 @@ struct Updates {
     apps: Vec<AppUpdate>,
     checked: u64,
     failed: Vec<String>,
+    sabine: Option<SabineHold>,
+}
+
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+struct SabineHold {
+    version: String,
+    apps: Vec<String>,
+}
+
+/// The Sabine release waiting for apps the person installed to update.
+fn sabine_hold() -> Option<SabineHold> {
+    let held = sabine_service::held_system_update()?;
+    let apps = held
+        .apps
+        .into_iter()
+        .filter(|app| !app.system)
+        .map(|app| app.name)
+        .collect::<Vec<_>>();
+    (!apps.is_empty()).then_some(SabineHold {
+        version: held.version,
+        apps,
+    })
 }
 
 /// Flatpak apps by the name and icon their menu entries give them.
@@ -38,6 +61,7 @@ async fn check(Empty {}: Empty) -> Result<Updates, String> {
             .duration_since(UNIX_EPOCH)
             .map_or(0, |time| time.as_secs()),
         failed,
+        sabine: sabine_hold(),
     })
 }
 

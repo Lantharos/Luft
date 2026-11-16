@@ -21,6 +21,7 @@ luft-i18n.workspace = true
 luft-sandbox.workspace = true
 luft-software = { workspace = true, features = ["default"] }
 sabine.workspace = true
+sabine-service.workspace = true
 schelf-core.workspace = true
 schelf-publish.workspace = true
 serde.workspace = true

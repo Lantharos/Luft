@@ -710,6 +710,11 @@ export type RepositoryDraft = {
 
 export type Role = "owner" | "admin" | "developer";
 
+export type SabineHold = {
+	version: string,
+	apps: string[],
+};
+
 /**
  *  What an installed AppImage's sandbox opens to it, and why it asked to run
  *  without one, if it did.
@@ -866,4 +871,5 @@ export type Updates = {
 	apps: AppUpdate[],
 	checked: number,
 	failed: string[],
+	sabine: SabineHold | null,
 };

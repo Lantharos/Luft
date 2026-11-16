@@ -78,6 +78,8 @@ fn full_access_declared() -> Declared {
         filesystems: Vec::new(),
         devices: Vec::new(),
         talk: Vec::new(),
+        own: Vec::new(),
+        pipewire: false,
         unsandboxed: Some(String::new()),
     }
 }

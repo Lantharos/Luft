@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use luft_i18n::t;
 use luft_identity::permissions::{
-    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
+    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO, OWN,
     READ_ONLY_FOLDERS, X11,
 };
 use luft_software::apps::appimage;
@@ -68,6 +68,7 @@ pub struct Grants {
     pub microphone: bool,
     pub camera: bool,
     pub bus: Vec<String>,
+    pub own: Vec<String>,
     /// Where the drives it was given are mounted now.
     pub drives: Vec<(PathBuf, Access)>,
     /// The drives mounted now that it was never asked about.
@@ -92,6 +93,7 @@ impl Grants {
             network,
             downloads,
             bus,
+            own,
             x11,
             microphone,
             camera,
@@ -105,6 +107,7 @@ impl Grants {
             permissions::values(connection, &NETWORK, id),
             permissions::values(connection, &DOWNLOADS, id),
             permissions::values(connection, &BUS, id),
+            permissions::values(connection, &OWN, id),
             permissions::allowed(connection, &X11, id),
             permissions::allowed(connection, &MICROPHONE, id),
             permissions::allowed(connection, &CAMERA, id),
@@ -126,6 +129,7 @@ impl Grants {
             network: given(network)?.first().map(String::as_str) != Some(NO),
             downloads: given(downloads)?.first().map(String::as_str) != Some(NO),
             bus: given(bus)?,
+            own: given(own)?,
             x11,
             microphone,
             camera,

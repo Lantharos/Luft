@@ -19,7 +19,7 @@ imageproc.workspace = true
 jpeg-encoder = { workspace = true, features = ["simd"] }
 libc.workspace = true
 libloading.workspace = true
-luft-app = { workspace = true, features = ["camera", "settings"] }
+luft-app = { workspace = true, features = ["camera", "folders", "settings"] }
 mdns-sd.workspace = true
 pdf-writer.workspace = true
 rayon.workspace = true

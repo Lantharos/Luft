@@ -16,7 +16,7 @@ A Sabine app says what it needs in `Sabine.toml`, in Flatpak's words:
 network = true
 filesystems = ["xdg-documents", "xdg-download:ro"]
 devices = ["usb"]
-talk = ["org.mpris.MediaPlayer2.notes"]
+own = ["org.mpris.MediaPlayer2.notes"]
 x11 = false
 microphone = true
 camera = false
@@ -30,9 +30,11 @@ camera = false
 | `microphone` | `false` | It records sound, from a microphone or from what the computer plays |
 | `camera` | `false` | It uses cameras. An app that only uses the camera portal can leave this out and is asked the first time |
 | `x11` | `false` | It draws through X11, which is shown before it installs |
-| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray and Kestrel's palette, sounds and Send sheet |
+| `own` | none | Session bus names it answers to, such as its media player. Names of the desktop's own services, and every media player at once, are refused |
+| `pipewire` | `false` | It speaks to PipeWire itself. Every app in Schelf's sandbox reaches PipeWire, where Luft notices when it records; a Sabine app outside it needs this to |
+| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray and Kestrel's palette, sounds and Send sheet. `name@/object/path` reaches only that object of the name |
 
-`talk` refuses names that would let an app widen its own sandbox, such as the permission store's, Flatpak's and systemd's, and Kestrel's, whose other services are for Luft's own apps.
+`talk` refuses names that would let an app widen its own sandbox, such as the permission store's, Flatpak's and systemd's, and Kestrel's, whose other services are for Luft's own apps. Kestrel's palette, sounds and Send sheet can be named as objects, such as `com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance`, which a Sabine app needs when it holds itself to its declaration outside Schelf's sandbox; Schelf's sandbox gives them to every app anyway.
 
 An app that can't work in a sandbox says so, with a reason the person reads before allowing it:
 
@@ -64,7 +66,7 @@ Every permission lives in the desktop portal's permission store, one table per k
 | `full-access` | Sandboxed apps that count as you; an AppImage given full access runs without its sandbox |
 | `background-clipboard` | Apps that may use the clipboard in the background. 1Password, KeePassXC and Bitwarden get yes unless answered no |
 | `keyring-items` | Which saved items a sandboxed app may use, one entry per item |
-| `sandbox` | The `folders` and `read-only-folders` of any sandboxed app, an AppImage's `devices`, extra `bus` names, and `network`, `downloads` and `x11` switches, and `flatpak-places`, what Luft last wrote into a Flatpak's overrides |
+| `sandbox` | The `folders` and `read-only-folders` of any sandboxed app, an AppImage's `devices`, extra `bus` names and the names it may `own`, and `network`, `downloads` and `x11` switches, and `flatpak-places`, what Luft last wrote into a Flatpak's overrides |
 | `drives` | One entry per drive an app was given or refused, named after its filesystem's UUID and the drive it's on, with `read-write`, `read-only` or `no` for each app |
 | `devices` | `microphone` and `camera`, which the camera portal shares |
 | `location`, `background`, `notifications` and others | What apps asked for through the desktop portal |

@@ -11,11 +11,10 @@ rust-version.workspace = true
 name = "soundboard_lib"
 
 [dependencies]
-dirs.workspace = true
 getrandom.workspace = true
 gstreamer.workspace = true
 gstreamer-app.workspace = true
-luft-app = { workspace = true, features = ["settings"] }
+luft-app = { workspace = true, features = ["folders", "settings"] }
 luft-i18n.workspace = true
 memmap2.workspace = true
 parking_lot.workspace = true

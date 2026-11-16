@@ -35,11 +35,7 @@ static SCANNING_HELPER_PID: AtomicU32 = AtomicU32::new(0);
 const STOP_WAIT: Duration = Duration::from_secs(6);
 
 fn config_folder() -> PathBuf {
-    dirs::state_dir()
-        .or_else(dirs::data_local_dir)
-        .unwrap_or_else(std::env::temp_dir)
-        .join(crate::APP_ID)
-        .join("sane")
+    luft_app::folders::state(crate::APP_ID).join("sane")
 }
 
 fn config_path() -> String {

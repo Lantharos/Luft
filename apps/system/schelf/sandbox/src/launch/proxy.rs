@@ -3,6 +3,8 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 
+use luft_software::apps::appimage::talk_target;
+
 use super::folder::Folder;
 use super::{BWRAP, fds};
 
@@ -48,14 +50,21 @@ fn session_bus() -> Result<PathBuf, String> {
         .ok_or_else(|| "The session bus isn't at a path this sandbox can reach.".to_owned())
 }
 
-fn rules(id: &str, talk: &[String]) -> Vec<String> {
+fn rules(id: &str, talk: &[String], own: &[String]) -> Vec<String> {
     let mut rules = vec![
         "--filter".to_owned(),
         format!("--own={id}"),
         format!("--own={id}.*"),
     ];
+    rules.extend(own.iter().map(|name| format!("--own={name}")));
     rules.extend(TALK.iter().map(|name| format!("--talk={name}")));
-    rules.extend(talk.iter().map(|name| format!("--talk={name}")));
+    rules.extend(talk.iter().flat_map(|entry| match talk_target(entry) {
+        (name, None) => vec![format!("--talk={name}")],
+        (name, Some(path)) => vec![
+            format!("--call={name}=*@{path}"),
+            format!("--broadcast={name}=*@{path}"),
+        ],
+    }));
     rules.extend(PALETTE_CALLS.iter().map(|method| {
         format!("--call={KESTREL}=org.freedesktop.DBus.Properties.{method}@{PALETTE_PATH}")
     }));
@@ -67,7 +76,13 @@ fn rules(id: &str, talk: &[String]) -> Vec<String> {
 }
 
 impl Proxy {
-    pub fn start(folder: &Folder, info: &Path, id: &str, talk: &[String]) -> Result<Self, String> {
+    pub fn start(
+        folder: &Folder,
+        info: &Path,
+        id: &str,
+        talk: &[String],
+        own: &[String],
+    ) -> Result<Self, String> {
         let bus = session_bus()?;
         let socket = folder.proxy().join(SOCKET);
         let (ready, proxy_end) = fds::pipe()?;
@@ -94,7 +109,7 @@ impl Proxy {
             .args(["--", DBUS_PROXY, &format!("--fd={READY_FD}")])
             .arg(format!("unix:path={}", bus.display()))
             .arg(&socket)
-            .args(rules(id, talk))
+            .args(rules(id, talk, own))
             .stdin(Stdio::null());
         fds::pass(&mut command, &proxy_end, READY_FD);
         let child = command

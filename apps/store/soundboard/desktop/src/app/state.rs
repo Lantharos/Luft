@@ -57,9 +57,7 @@ pub struct SoundboardState {
 }
 
 fn data_folder() -> PathBuf {
-    dirs::data_dir()
-        .expect("the system has a data folder")
-        .join(crate::APP_ID)
+    luft_app::folders::data(crate::APP_ID)
 }
 
 impl SoundboardState {

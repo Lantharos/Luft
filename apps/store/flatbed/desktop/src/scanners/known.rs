@@ -1,19 +1,26 @@
 use std::collections::BTreeMap;
+use std::path::PathBuf;
 use std::sync::Mutex;
 
 use super::escl::Pin;
 
-const FILE: &str = "com.lantharos.flatbed/scanners.json";
+const FILE: &str = "scanners.json";
+
+fn path() -> PathBuf {
+    luft_app::folders::config(crate::APP_ID).join(FILE)
+}
 
 static CERTIFICATES: Mutex<Option<BTreeMap<String, String>>> = Mutex::new(None);
 
 fn change<T>(change: impl FnOnce(&mut BTreeMap<String, String>) -> T) -> T {
     let mut certificates = CERTIFICATES.lock().expect("known scanners lock");
-    change(certificates.get_or_insert_with(|| luft_app::settings::load(FILE).unwrap_or_default()))
+    change(
+        certificates.get_or_insert_with(|| luft_app::settings::read(&path()).unwrap_or_default()),
+    )
 }
 
 fn save(certificates: &BTreeMap<String, String>) {
-    if let Err(error) = luft_app::settings::save(FILE, certificates) {
+    if let Err(error) = luft_app::settings::write(&path(), certificates) {
         eprintln!("flatbed: couldn't remember a scanner's certificate: {error}");
     }
 }

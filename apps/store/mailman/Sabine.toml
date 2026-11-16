@@ -29,7 +29,7 @@ provider = "schelf"
 
 [sandbox]
 network = true
-talk = ["com.lantharos.Keyring1"]
+talk = ["com.lantharos.Keyring1", "com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance", "com.lantharos.Kestrel@/com/lantharos/Kestrel/Sounds"]
 
 [bindings]
 path = "src/lib/bindings.ts"

@@ -26,6 +26,7 @@ provider = "schelf"
 network = true
 filesystems = ["xdg-pictures:ro", "xdg-download:ro"]
 devices = ["usb"]
+talk = ["com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance", "com.lantharos.Kestrel@/com/lantharos/Kestrel/Share"]
 
 [bindings]
 path = "src/lib/bindings.ts"

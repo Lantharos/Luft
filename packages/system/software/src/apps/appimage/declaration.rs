@@ -23,8 +23,27 @@ const MICROPHONE: &str = "microphone";
 const CAMERA: &str = "camera";
 const DOWNLOADS: &str = "xdg-download";
 const HOME: &str = "home";
+const KESTREL: &str = "com.lantharos.Kestrel";
+/// The objects of Kestrel every sandbox reaches already: its palette, its
+/// Send sheet and its sound theme.
+const KESTREL_FOR_EVERY_APP: [&str; 3] = [
+    "/com/lantharos/Kestrel/Appearance",
+    "/com/lantharos/Kestrel/Share",
+    "/com/lantharos/Kestrel/Sounds",
+];
+/// Name spaces of the desktop's own services, which an app that owned a name
+/// in them could stand in for.
+const DESKTOP_NAMESPACES: [&str; 6] = [
+    "org.freedesktop",
+    "org.gnome",
+    "org.kde",
+    "com.canonical",
+    "org.ayatana",
+    "org.a11y",
+];
+const PLAYERS: &str = "org.mpris.MediaPlayer2";
 const REFUSED_NAMES: [&str; 6] = [
-    "com.lantharos.Kestrel",
+    KESTREL,
     "org.freedesktop.impl.portal",
     "org.freedesktop.portal.Flatpak",
     "org.freedesktop.Flatpak",
@@ -40,6 +59,10 @@ pub struct Declaration {
     pub filesystems: Vec<String>,
     pub devices: Vec<String>,
     pub talk: Vec<String>,
+    /// Session bus names it owns, such as its media player.
+    pub own: Vec<String>,
+    /// Whether it speaks to PipeWire itself, which every sandbox reaches.
+    pub pipewire: bool,
     /// Whether it draws through X11, where apps see each other's windows
     /// and typing.
     pub x11: bool,
@@ -58,6 +81,8 @@ impl Default for Declaration {
             filesystems: Vec::new(),
             devices: Vec::new(),
             talk: Vec::new(),
+            own: Vec::new(),
+            pipewire: false,
             x11: false,
             microphone: false,
             camera: false,
@@ -82,6 +107,10 @@ struct Table {
     #[serde(default)]
     talk: Vec<String>,
     #[serde(default)]
+    own: Vec<String>,
+    #[serde(default)]
+    pipewire: bool,
+    #[serde(default)]
     x11: bool,
     #[serde(default)]
     microphone: bool,
@@ -103,9 +132,28 @@ pub fn is_manifest(path: &Path) -> bool {
             .is_some_and(|folder| folder == Path::new(SABINE_APPS))
 }
 
-/// Whether an app may be given `name` on the session bus: names that would let
-/// it widen its own sandbox are never given.
-fn callable(name: &str) -> bool {
+/// The bus name a `talk` entry reaches, and the one object on it when the
+/// entry is scoped to an object, as `name@/object/path`.
+pub fn talk_target(entry: &str) -> (&str, Option<&str>) {
+    match entry.split_once('@') {
+        Some((name, path)) => (name, Some(path)),
+        None => (entry, None),
+    }
+}
+
+/// Whether every sandbox reaches what `entry` names already.
+pub fn given_to_every_app(entry: &str) -> bool {
+    matches!(talk_target(entry), (KESTREL, Some(path)) if KESTREL_FOR_EVERY_APP.contains(&path))
+}
+
+/// Whether an app may be given `entry` on the session bus: names that would
+/// let it widen its own sandbox are never given, apart from Kestrel's objects
+/// every sandbox reaches.
+fn callable(entry: &str) -> bool {
+    if given_to_every_app(entry) {
+        return true;
+    }
+    let (name, path) = talk_target(entry);
     let bare = name.strip_suffix(".*").unwrap_or(name);
     let elements: Vec<&str> = bare.split('.').collect();
     let valid = elements.len() >= 2
@@ -117,10 +165,42 @@ fn callable(name: &str) -> bool {
                     .all(|character| character.is_ascii_alphanumeric() || "_-".contains(character))
         });
     valid
+        && path.is_none_or(|path| bare == name && object_path(path))
         && !REFUSED_NAMES.iter().any(|refused| {
             bare == *refused
                 || bare.starts_with(&format!("{refused}."))
                 || refused.starts_with(&format!("{bare}."))
+        })
+}
+
+/// Whether an app may own `name`: never a name of the desktop's own
+/// services, nor every media player's at once.
+fn ownable(name: &str) -> bool {
+    let bare = name.strip_suffix(".*").unwrap_or(name);
+    let overlaps = |namespace: &str| {
+        bare == namespace
+            || bare.starts_with(&format!("{namespace}."))
+            || namespace.starts_with(&format!("{bare}."))
+    };
+    let every_player =
+        bare != name && (bare == PLAYERS || PLAYERS.starts_with(&format!("{bare}.")));
+    talk_target(name).1.is_none()
+        && callable(name)
+        && !DESKTOP_NAMESPACES
+            .iter()
+            .any(|namespace| overlaps(namespace))
+        && !every_player
+}
+
+fn object_path(path: &str) -> bool {
+    path == "/"
+        || path.strip_prefix('/').is_some_and(|elements| {
+            elements.split('/').all(|element| {
+                !element.is_empty()
+                    && element
+                        .chars()
+                        .all(|character| character.is_ascii_alphanumeric() || character == '_')
+            })
         })
 }
 
@@ -162,11 +242,16 @@ impl Declaration {
         if let Some(name) = table.talk.iter().find(|name| !callable(name)) {
             return Err(format!("{name} isn't a name an app can be given."));
         }
+        if let Some(name) = table.own.iter().find(|name| !ownable(name)) {
+            return Err(format!("{name} isn't a name an app can own."));
+        }
         Ok(Self {
             network: table.network.unwrap_or(true),
             filesystems: table.filesystems,
             devices: table.devices,
             talk: table.talk,
+            own: table.own,
+            pipewire: table.pipewire,
             x11: table.x11,
             microphone: table.microphone,
             camera: table.camera,
@@ -220,9 +305,17 @@ impl Declaration {
                 )
                 .collect(),
             filesystems,
-            session_bus: self.talk.clone(),
+            session_bus: self.extra_talk().chain(self.own.iter().cloned()).collect(),
             system_bus: Vec::new(),
         }
+    }
+
+    /// The names it calls beyond what every sandbox reaches.
+    pub fn extra_talk(&self) -> impl Iterator<Item = String> {
+        self.talk
+            .iter()
+            .filter(|entry| !given_to_every_app(entry))
+            .cloned()
     }
 
     /// The folders it asked for, and whether it may change them.
@@ -294,5 +387,30 @@ mod tests {
         }
         assert!(callable("org.mpris.MediaPlayer2.*"));
         assert!(callable("org.freedesktop.FileManager1"));
+    }
+
+    #[test]
+    fn talk_scoped_to_one_object() {
+        assert!(callable("org.example.Shell@/org/example/Shell/Appearance"));
+        assert!(callable(
+            "com.lantharos.Kestrel@/com/lantharos/Kestrel/Sounds"
+        ));
+        for entry in [
+            "com.lantharos.Kestrel@/com/lantharos/Kestrel/DriveAccess",
+            "org.freedesktop.systemd1@/org/freedesktop/systemd1",
+            "org.example.*@/org/example",
+            "org.example.Shell@org/example",
+            "org.example.Shell@/org/example/",
+        ] {
+            assert!(!callable(entry), "{entry}");
+        }
+        let declaration = Declaration::read(
+            "[sandbox]\ntalk = [\"com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance\", \"org.example.Shell@/org/example/Shell\"]\n",
+        )
+        .unwrap();
+        assert_eq!(
+            declaration.permissions().session_bus,
+            ["org.example.Shell@/org/example/Shell"]
+        );
     }
 }

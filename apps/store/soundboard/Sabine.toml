@@ -26,6 +26,7 @@ provider = "schelf"
 network = false
 microphone = true
 filesystems = ["home:ro"]
+talk = ["com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance"]
 
 [bindings]
 path = "src/lib/bindings.ts"

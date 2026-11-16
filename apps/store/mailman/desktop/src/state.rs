@@ -33,15 +33,11 @@ pub struct AppState {
 }
 
 pub fn data_folder() -> PathBuf {
-    dirs::data_dir()
-        .expect("there is a data folder")
-        .join(APP_ID)
+    luft_app::folders::data(APP_ID)
 }
 
 pub fn cache_folder() -> PathBuf {
-    dirs::cache_dir()
-        .expect("there is a cache folder")
-        .join(APP_ID)
+    luft_app::folders::cache(APP_ID)
 }
 
 impl MailmanState {

@@ -7,6 +7,8 @@ use std::process::Child;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
+use luft_software::apps::appimage::talk_target;
+
 const SERVER_WAIT: Duration = Duration::from_secs(10);
 const QUIT_WAIT: Duration = Duration::from_secs(20);
 const UNSANDBOXED_APP: &str = "unsandboxed";
@@ -221,14 +223,21 @@ impl Folder {
         &self,
         id: &str,
         talk: impl IntoIterator<Item = &'a str>,
+        own: &[String],
     ) -> Result<PathBuf, String> {
         let path = self.path.join("flatpak-info");
         let instance = instance_id();
         let mut info = format!(
             "[Application]\nname={id}\n\n[Instance]\ninstance-id={instance}\nsession-bus-proxy=true\n\n[Session Bus Policy]\n{id}=own\n{id}.*=own\n"
         );
-        for name in talk {
+        for name in talk
+            .into_iter()
+            .filter(|entry| talk_target(entry).1.is_none())
+        {
             info.push_str(&format!("{name}=talk\n"));
+        }
+        for name in own {
+            info.push_str(&format!("{name}=own\n"));
         }
         fs::write(&path, info).map_err(|error| error.to_string())?;
         Ok(path)

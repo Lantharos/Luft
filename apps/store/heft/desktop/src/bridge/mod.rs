@@ -2,6 +2,8 @@ mod files;
 mod hand;
 mod params;
 
+use std::path::PathBuf;
+
 use luft_app::portal::{self, FileChooser, Filter, uri_path};
 use luft_app::{Commands, Empty, settings};
 use sabine::SabineWindow;
@@ -20,10 +22,10 @@ fn paths(uris: Vec<String>) -> Vec<String> {
 
 const SETTINGS: [&str; 2] = ["settings", "state"];
 
-fn settings_file(name: &str) -> Result<String, String> {
+fn settings_file(name: &str) -> Result<PathBuf, String> {
     SETTINGS
         .contains(&name)
-        .then(|| format!("com.lantharos.heft/{name}.json"))
+        .then(|| luft_app::folders::config(crate::APP_ID).join(format!("{name}.json")))
         .ok_or_else(|| format!("{name} is not a settings file"))
 }
 
@@ -115,9 +117,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     .command_async("open_pen_settings", open_pen_settings)
     .command_async("pen_hand", |Empty {}| hand::pen_hand())
     .command("settings_load", |Name { name }| {
-        Ok(settings::load::<Value>(&settings_file(&name)?))
+        Ok(settings::read::<Value>(&settings_file(&name)?))
     })
     .command("settings_save", |Settings { name, value }| {
-        settings::save(&settings_file(&name)?, &value)
+        settings::write(&settings_file(&name)?, &value)
     })
 }

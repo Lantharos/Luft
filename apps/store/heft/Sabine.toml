@@ -27,7 +27,7 @@ provider = "schelf"
 network = false
 microphone = true
 filesystems = ["xdg-documents", "xdg-download:ro", "xdg-pictures:ro"]
-talk = ["com.lantharos.Handwriting1", "com.lantharos.Language1", "com.lantharos.Speech1", "com.lantharos.Transcription1"]
+talk = ["com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance", "com.lantharos.Handwriting1", "com.lantharos.Language1", "com.lantharos.Speech1", "com.lantharos.Transcription1"]
 
 [bindings]
 path = "src/lib/bindings.ts"

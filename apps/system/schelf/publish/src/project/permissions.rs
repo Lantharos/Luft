@@ -46,14 +46,23 @@ pub fn describe_permissions(permissions: Option<&Permissions>) -> Vec<String> {
     if permissions.microphone {
         lines.push("Uses the microphone".into());
     }
+    if permissions.pipewire {
+        lines.push("Uses the sound server itself, which can also record".into());
+    }
     if permissions.camera {
         lines.push("Uses the camera".into());
     }
     if permissions.x11 {
         lines.push("Shows its windows through X11".into());
     }
-    for name in &permissions.talk {
-        lines.push(format!("Talks to {name}"));
+    for entry in &permissions.talk {
+        lines.push(match entry.split_once('@') {
+            Some((name, object)) => format!("Talks to {object} of {name}"),
+            None => format!("Talks to {entry}"),
+        });
+    }
+    for name in &permissions.own {
+        lines.push(format!("Answers as {name}"));
     }
     lines
 }

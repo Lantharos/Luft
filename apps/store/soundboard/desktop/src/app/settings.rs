@@ -1,9 +1,15 @@
+use std::path::PathBuf;
+
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::audio::engine::Mix;
 
-const FILE: &str = "com.lantharos.soundboard/settings.json";
+const FILE: &str = "settings.json";
+
+fn path() -> PathBuf {
+    luft_app::folders::config(crate::APP_ID).join(FILE)
+}
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize, Type)]
 #[serde(default, rename_all = "camelCase")]
@@ -16,10 +22,10 @@ pub struct Settings {
 
 impl Settings {
     pub fn load() -> Self {
-        luft_app::settings::load(FILE).unwrap_or_default()
+        luft_app::settings::read(&path()).unwrap_or_default()
     }
 
     pub fn save(&self) -> Result<(), String> {
-        luft_app::settings::save(FILE, self)
+        luft_app::settings::write(&path(), self)
     }
 }

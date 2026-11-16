@@ -12,12 +12,14 @@ use std::sync::{LazyLock, OnceLock};
 use luft_app::{Backdrop, Events, GlassWindow};
 use sabine::{BridgeEvent, SabineProcessHandle, SabineWindow, WindowVisibility};
 
+pub const APP_ID: &str = "com.lantharos.heft";
+
 const WINDOW: GlassWindow = GlassWindow {
     title: "Heft",
     size: (1280, 820),
     min_size: (560, 480),
     sidebar_width: 280,
-    single_instance: Some("com.lantharos.heft"),
+    single_instance: Some(APP_ID),
     backdrop: Backdrop::WINDOW,
 };
 

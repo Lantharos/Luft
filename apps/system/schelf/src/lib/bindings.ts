@@ -397,6 +397,8 @@ export type Declared = {
 	filesystems: string[],
 	devices: string[],
 	talk: string[],
+	own: string[],
+	pipewire: boolean,
 	x11: boolean,
 	microphone: boolean,
 	camera: boolean,

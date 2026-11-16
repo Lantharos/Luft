@@ -3,7 +3,7 @@ use std::path::Path;
 
 use luft_dbus as dbus;
 use luft_identity::permissions::{
-    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
+    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO, OWN,
     Permission, READ_ONLY_FOLDERS, X11, YES,
 };
 use zbus::Connection;
@@ -41,12 +41,13 @@ async fn given(connection: &Connection, permission: &Permission, id: &str) -> Re
         == Some(YES))
 }
 
-const EVERYTHING: [&Permission; 10] = [
+const EVERYTHING: [&Permission; 11] = [
     &FULL_ACCESS,
     &FOLDERS,
     &READ_ONLY_FOLDERS,
     &DEVICES,
     &BUS,
+    &OWN,
     &NETWORK,
     &DOWNLOADS,
     &X11,
@@ -101,7 +102,14 @@ pub async fn grant(id: &str, declaration: &Declaration, full_access: bool) -> Re
     store(connection, &FOLDERS, id, &changed).await?;
     store(connection, &READ_ONLY_FOLDERS, id, &read_only).await?;
     store(connection, &DEVICES, id, &declaration.devices).await?;
-    store(connection, &BUS, id, &declaration.talk).await?;
+    store(
+        connection,
+        &BUS,
+        id,
+        &declaration.extra_talk().collect::<Vec<_>>(),
+    )
+    .await?;
+    store(connection, &OWN, id, &declaration.own).await?;
     let offline = if declaration.network {
         Vec::new()
     } else {
@@ -214,11 +222,12 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
         return Ok(());
     }
     let connection = dbus::session().await?;
-    let (changed, read_only, devices, talk) = futures_util::try_join!(
+    let (changed, read_only, devices, talk, own) = futures_util::try_join!(
         held(connection, &FOLDERS, id),
         held(connection, &READ_ONLY_FOLDERS, id),
         held(connection, &DEVICES, id),
         held(connection, &BUS, id),
+        held(connection, &OWN, id),
     )?;
     let (changed_before, read_only_before) = folder_names(before);
     let (changed_after, read_only_after) = folder_names(after);
@@ -236,13 +245,18 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
             .iter()
             .any(|held| held == device || held == ALL_DEVICES)
     });
-    let still_talk = narrowed(&talk, &before.talk, &after.talk, |name| {
-        reaches(&talk, name)
-    });
+    let still_talk = narrowed(
+        &talk,
+        &before.extra_talk().collect::<Vec<_>>(),
+        &after.extra_talk().collect::<Vec<_>>(),
+        |name| reaches(&talk, name),
+    );
+    let still_own = narrowed(&own, &before.own, &after.own, |name| reaches(&own, name));
     store(connection, &FOLDERS, id, &still_changed).await?;
     store(connection, &READ_ONLY_FOLDERS, id, &still_read).await?;
     store(connection, &DEVICES, id, &still_devices).await?;
     store(connection, &BUS, id, &still_talk).await?;
+    store(connection, &OWN, id, &still_own).await?;
     if !after.x11 {
         store(connection, &X11, id, &[]).await?;
     }
@@ -262,12 +276,13 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
 /// What the app's sandbox opens to it, in Flatpak's words.
 pub async fn granted(id: &str) -> Result<Permissions, String> {
     let connection = dbus::session().await?;
-    let (folders, read_only, devices, network, talk, downloads, x11, microphone, camera) = futures_util::try_join!(
+    let (folders, read_only, devices, network, talk, own, downloads, x11, microphone, camera) = futures_util::try_join!(
         held(connection, &FOLDERS, id),
         held(connection, &READ_ONLY_FOLDERS, id),
         held(connection, &DEVICES, id),
         held(connection, &NETWORK, id),
         held(connection, &BUS, id),
+        held(connection, &OWN, id),
         held(connection, &DOWNLOADS, id),
         given(connection, &X11, id),
         given(connection, &MICROPHONE, id),
@@ -282,6 +297,8 @@ pub async fn granted(id: &str) -> Result<Permissions, String> {
             .collect(),
         devices,
         talk,
+        own,
+        pipewire: false,
         x11,
         microphone,
         camera,

@@ -164,9 +164,9 @@ fn sandbox(
     let talk = proxy::TALK
         .into_iter()
         .chain(grants.bus.iter().map(String::as_str));
-    let info = folder.write_sandbox_info(&app.id, talk)?;
+    let info = folder.write_sandbox_info(&app.id, talk, &grants.own)?;
     let mounted = mount::Image::mount(&app.image, &folder.mount_point())?;
-    let proxy = proxy::Proxy::start(folder, &info, &app.id, &grants.bus)?;
+    let proxy = proxy::Proxy::start(folder, &info, &app.id, &grants.bus, &grants.own)?;
     let display = wayland::SecurityContext::create(&folder.wayland_socket(), &app.id)?;
     profile::write_accounts(&folder.accounts())?;
     let x11 = if grants.x11 {

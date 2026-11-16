@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use luft_i18n::t;
-use luft_software::apps::appimage::Declaration;
+use luft_software::apps::appimage::{Declaration, given_to_every_app, talk_target};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -16,6 +16,10 @@ pub struct Declared {
     pub filesystems: Vec<String>,
     pub devices: Vec<String>,
     pub talk: Vec<String>,
+    #[serde(default)]
+    pub own: Vec<String>,
+    #[serde(default)]
+    pub pipewire: bool,
     #[serde(default)]
     pub x11: bool,
     #[serde(default)]
@@ -33,6 +37,8 @@ impl Declared {
             filesystems: Vec::new(),
             devices: Vec::new(),
             talk: Vec::new(),
+            own: Vec::new(),
+            pipewire: false,
             x11: false,
             microphone: false,
             camera: false,
@@ -46,6 +52,8 @@ impl Declared {
             filesystems: self.filesystems.clone(),
             devices: self.devices.clone(),
             talk: self.talk.clone(),
+            own: self.own.clone(),
+            pipewire: self.pipewire,
             x11: self.x11,
             microphone: self.microphone,
             camera: self.camera,
@@ -73,6 +81,7 @@ impl Declared {
         if self.unsandboxed.is_some()
             || (self.network && !before.network)
             || (self.x11 && !before.x11)
+            || (self.pipewire && !before.pipewire)
             || (self.microphone && !before.microphone)
             || (self.camera && !before.camera)
         {
@@ -95,15 +104,32 @@ impl Declared {
                 .devices
                 .iter()
                 .any(|device| !before.devices.contains(device));
-        let covered = |name: &str| {
+        let covered = |entry: &str| {
+            if given_to_every_app(entry) {
+                return true;
+            }
+            let (name, path) = talk_target(entry);
             before.talk.iter().any(|held| {
+                let (held, held_path) = talk_target(held);
+                (held_path.is_none() || held_path == path)
+                    && (held == name
+                        || held
+                            .strip_suffix('*')
+                            .is_some_and(|prefix| name.starts_with(prefix)))
+            })
+        };
+        let owned = |name: &str| {
+            before.own.iter().any(|held| {
                 held == name
                     || held
                         .strip_suffix('*')
                         .is_some_and(|prefix| name.starts_with(prefix))
             })
         };
-        folder_widens || device_widens || self.talk.iter().any(|name| !covered(name))
+        folder_widens
+            || device_widens
+            || self.talk.iter().any(|name| !covered(name))
+            || self.own.iter().any(|name| !owned(name))
     }
 }
 
@@ -238,6 +264,8 @@ mod tests {
             filesystems: owned(filesystems),
             devices: owned(devices),
             talk: owned(talk),
+            own: Vec::new(),
+            pipewire: false,
             x11: false,
             microphone: false,
             camera: false,

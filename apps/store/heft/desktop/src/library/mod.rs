@@ -15,10 +15,7 @@ pub fn root() -> Result<PathBuf, String> {
 }
 
 pub fn state_folder() -> Result<PathBuf, String> {
-    Ok(dirs::state_dir()
-        .or_else(dirs::data_local_dir)
-        .ok_or("There is no state folder")?
-        .join("com.lantharos.heft"))
+    Ok(luft_app::folders::state(crate::APP_ID))
 }
 
 pub fn resolve(relative: &str) -> Result<PathBuf, String> {

@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::Mutex;
 
 use serde::{Deserialize, Serialize};
@@ -5,7 +6,7 @@ use specta::Type;
 
 use crate::document;
 
-const FILE: &str = "com.lantharos.flatbed/settings.json";
+const FILE: &str = "settings.json";
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -103,18 +104,22 @@ fn default_languages() -> Vec<String> {
 
 static CURRENT: Mutex<Option<Settings>> = Mutex::new(None);
 
+fn path() -> PathBuf {
+    luft_app::folders::config(crate::APP_ID).join(FILE)
+}
+
 pub fn current() -> Settings {
     CURRENT
         .lock()
         .expect("settings lock")
-        .get_or_insert_with(|| luft_app::settings::load(FILE).unwrap_or_default())
+        .get_or_insert_with(|| luft_app::settings::read(&path()).unwrap_or_default())
         .clone()
 }
 
 pub fn update(change: impl FnOnce(&mut Settings)) -> Result<Settings, String> {
     let mut settings = current();
     change(&mut settings);
-    luft_app::settings::save(FILE, &settings)?;
+    luft_app::settings::write(&path(), &settings)?;
     *CURRENT.lock().expect("settings lock") = Some(settings.clone());
     Ok(settings)
 }

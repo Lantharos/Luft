@@ -11,7 +11,7 @@ const STOP_ALL: &str = "stop-all";
 const QUIT: &str = "quit";
 
 fn icon_file() -> Option<PathBuf> {
-    let path = dirs::cache_dir()?.join(APP_ID).join("tray.png");
+    let path = luft_app::folders::cache(APP_ID).join("tray.png");
     std::fs::create_dir_all(path.parent()?).ok()?;
     std::fs::write(&path, ICON).ok()?;
     Some(path)

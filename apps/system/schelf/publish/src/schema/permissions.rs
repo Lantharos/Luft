@@ -20,11 +20,22 @@ const REFUSED_NAMES: [&str; 5] = [
     "org.freedesktop.systemd1",
     "org.freedesktop.DBus",
 ];
-const SANDBOX_KEYS: [&str; 9] = [
+const DESKTOP_NAMESPACES: [&str; 6] = [
+    "org.freedesktop",
+    "org.gnome",
+    "org.kde",
+    "com.canonical",
+    "org.ayatana",
+    "org.a11y",
+];
+const PLAYERS: &str = "org.mpris.MediaPlayer2";
+const SANDBOX_KEYS: [&str; 11] = [
     "network",
     "filesystems",
     "devices",
     "talk",
+    "own",
+    "pipewire",
     "x11",
     "microphone",
     "camera",
@@ -39,6 +50,8 @@ pub struct Permissions {
     pub filesystems: Vec<String>,
     pub devices: Vec<String>,
     pub talk: Vec<String>,
+    pub own: Vec<String>,
+    pub pipewire: bool,
     pub x11: bool,
     pub microphone: bool,
     pub camera: bool,
@@ -52,6 +65,8 @@ impl Default for Permissions {
             filesystems: Vec::new(),
             devices: Vec::new(),
             talk: Vec::new(),
+            own: Vec::new(),
+            pipewire: false,
             x11: false,
             microphone: false,
             camera: false,
@@ -60,8 +75,47 @@ impl Default for Permissions {
     }
 }
 
-/// Whether an app may be given the bus name `name`.
-pub fn callable(name: &str) -> bool {
+fn object_path(path: &str) -> bool {
+    path == "/"
+        || path.strip_prefix('/').is_some_and(|elements| {
+            elements.split('/').all(|element| {
+                !element.is_empty()
+                    && element
+                        .chars()
+                        .all(|character| character.is_ascii_alphanumeric() || character == '_')
+            })
+        })
+}
+
+/// Whether an app may be given `entry`, a bus name or one object of one as
+/// `name@/object/path`.
+pub fn callable(entry: &str) -> bool {
+    match entry.split_once('@') {
+        Some((name, path)) => !name.ends_with(".*") && object_path(path) && callable_name(name),
+        None => callable_name(entry),
+    }
+}
+
+/// Whether an app may own `name`: never a name of the desktop's own
+/// services, nor every media player's at once.
+pub fn ownable(name: &str) -> bool {
+    let bare = name.strip_suffix(".*").unwrap_or(name);
+    let overlaps = |namespace: &str| {
+        bare == namespace
+            || bare.starts_with(&format!("{namespace}."))
+            || namespace.starts_with(&format!("{bare}."))
+    };
+    let every_player =
+        bare != name && (bare == PLAYERS || PLAYERS.starts_with(&format!("{bare}.")));
+    !name.contains('@')
+        && callable_name(name)
+        && !DESKTOP_NAMESPACES
+            .iter()
+            .any(|namespace| overlaps(namespace))
+        && !every_player
+}
+
+fn callable_name(name: &str) -> bool {
     let bare = name.strip_suffix(".*").unwrap_or(name);
     let elements: Vec<&str> = bare.split('.').collect();
     let valid = elements.len() >= 2
@@ -168,6 +222,16 @@ fn sandbox(checker: &mut Checker, value: &Value) -> Option<Permissions> {
             "isn't a name an app can be given.",
         )
     });
+    let own = names(checker, table, &path, "own", |checker, path, value| {
+        refusing(
+            checker,
+            path,
+            value,
+            ownable,
+            "isn't a name an app can own.",
+        )
+    });
+    let pipewire = flag(checker, table, &path, "pipewire");
     let x11 = flag(checker, table, &path, "x11");
     let microphone = flag(checker, table, &path, "microphone");
     let camera = flag(checker, table, &path, "camera");
@@ -199,6 +263,8 @@ fn sandbox(checker: &mut Checker, value: &Value) -> Option<Permissions> {
         filesystems: filesystems?,
         devices: devices?,
         talk: talk?,
+        own: own?,
+        pipewire: pipewire?,
         x11: x11?,
         microphone: microphone?,
         camera: camera?,
@@ -247,6 +313,8 @@ mod tests {
                 filesystems: vec!["xdg-documents".into(), "xdg-download:ro".into()],
                 devices: vec!["usb".into()],
                 talk: vec!["org.mpris.MediaPlayer2.notes".into()],
+                own: Vec::new(),
+                pipewire: false,
                 x11: false,
                 microphone: true,
                 camera: false,

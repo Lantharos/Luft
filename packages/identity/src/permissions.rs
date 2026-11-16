@@ -68,6 +68,12 @@ pub const BUS: Permission = Permission {
     id: "bus",
 };
 
+/// Session bus names an AppImage's sandbox may own besides its app id.
+pub const OWN: Permission = Permission {
+    table: "sandbox",
+    id: "own",
+};
+
 /// AppImages whose sandbox also gets the session's X11 display, with `yes`.
 pub const X11: Permission = Permission {
     table: "sandbox",

@@ -39,11 +39,7 @@ static DOCUMENT: LazyLock<Mutex<Document>> = LazyLock::new(Default::default);
 static SOURCES: Mutex<VecDeque<(String, Arc<RgbImage>)>> = Mutex::new(VecDeque::new());
 
 pub fn folder() -> PathBuf {
-    dirs::state_dir()
-        .or_else(dirs::data_local_dir)
-        .unwrap_or_else(std::env::temp_dir)
-        .join(crate::APP_ID)
-        .join("document")
+    luft_app::folders::state(crate::APP_ID).join("document")
 }
 
 fn manifest() -> PathBuf {

@@ -14,7 +14,7 @@ mod update;
 
 pub use blocked::{blocked, set_blocked};
 pub use bundle::{Bundle, Icon, icons, read as inspect};
-pub use declaration::Declaration;
+pub use declaration::{Declaration, given_to_every_app, talk_target};
 pub use elf::{is_appimage, payload_offset};
 #[cfg(feature = "system")]
 pub use full_access::set_full_access;

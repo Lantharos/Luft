@@ -102,6 +102,11 @@ foreach prefix : ['kestrel-', 'luft-']
 endforeach
 
 install_data('kestrel-session.target', 'kestrel-setup.target', install_dir: systemduserunitdir)
+install_symlink(
+  'org.freedesktop.IBus.session.generic.service',
+  install_dir: systemduserunitdir / 'graphical-session.target.wants',
+  pointing_to: '../org.freedesktop.IBus.session.generic.service',
+)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
 install_data('kestrel.portal', 'kestrel-portal.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
 install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir: servicedir)

@@ -1,4 +1,3 @@
-use futures_util::{Stream, StreamExt};
 use zbus::{Connection, OwnedVariant, Proxy};
 
 use crate::service::Service;
@@ -37,38 +36,6 @@ pub async fn on_battery(connection: &Connection) -> bool {
         .and_then(|reply| reply.body().deserialize::<OwnedVariant>().ok())
         .and_then(|value| bool::try_from(value).ok())
         .unwrap_or(false)
-}
-
-/// Whether the computer runs on its battery, now and every time that
-/// changes. Ends when the system bus goes.
-pub async fn on_battery_changes(
-    connection: &Connection,
-) -> Result<impl Stream<Item = bool> + use<>, String> {
-    let upower = Proxy::new(connection, UPOWER.name, UPOWER.path, UPOWER.interface)
-        .await
-        .map_err(crate::failed)?;
-    let changes = upower.receive_property_changed::<bool>("OnBattery").await;
-    let now = on_battery(connection).await;
-    Ok(futures_util::stream::once(async move { now })
-        .chain(changes.filter_map(|change| async move { change.get().await.ok() })))
-}
-
-/// Whether the computer has a battery, such as a laptop.
-pub async fn has_battery(connection: &Connection) -> bool {
-    match Proxy::new(
-        connection,
-        DISPLAY_DEVICE.name,
-        DISPLAY_DEVICE.path,
-        DISPLAY_DEVICE.interface,
-    )
-    .await
-    {
-        Ok(display) => display
-            .get_property::<bool>("IsPresent")
-            .await
-            .unwrap_or(false),
-        Err(_) => false,
-    }
 }
 
 /// Whether the computer runs on a battery that's below 30% and not charging.

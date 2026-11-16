@@ -45,7 +45,6 @@ export const commands = {
 	}, options?: CallOptions) => invoke<Written<Notes>>("notes_write", params, options),
 	openPenSettings: (options?: CallOptions) => invoke<null>("open_pen_settings", {}, options),
 	penHand: (options?: CallOptions) => invoke<Hand>("pen_hand", {}, options),
-	powerState: (options?: CallOptions) => invoke<PowerState>("power_state", {}, options),
 	recordingLength: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<number>("recording_length", params, options),
@@ -107,7 +106,6 @@ export const events = {
 	handwritingChanged: (callback: (payload: null) => void) => listen<null>("handwriting.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	languageChanged: (callback: (payload: null) => void) => listen<null>("language.changed", callback),
-	powerBattery: (callback: (payload: boolean) => void) => listen<boolean>("power.battery", callback),
 	recordingFailed: (callback: (payload: string) => void) => listen<string>("recording.failed", callback),
 	recordingLevel: (callback: (payload: number) => void) => listen<number>("recording.level", callback),
 	speechChanged: (callback: (payload: null) => void) => listen<null>("speech.changed", callback),
@@ -274,11 +272,6 @@ export type Point = {
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";
-
-export type PowerState = {
-	battery: boolean,
-	onBattery: boolean,
-};
 
 export type Question = {
 	question: string,

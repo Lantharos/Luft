@@ -1,4 +1,4 @@
-import { commands, events } from '#lib/bindings.js';
+import { events, system, type PowerSource } from '@lantharos/sabine';
 import { settings } from '#lib/app/settings.svelte.js';
 import type { Processing } from './model';
 
@@ -8,13 +8,16 @@ class Power {
 	private waiting: (() => void)[] = [];
 
 	async start() {
-		const state = await commands.powerState();
-		this.battery = state.battery;
-		this.onBattery = state.onBattery;
-		return events.powerBattery((onBattery) => {
-			this.onBattery = onBattery;
-			if (!onBattery) this.waiting.splice(0).forEach((wake) => wake());
-		});
+		const stop = events.powerSourceChanged((source) => this.apply(source));
+		const { source } = await system.power();
+		if (source) this.apply(source);
+		return stop;
+	}
+
+	private apply(source: PowerSource) {
+		this.battery = source.batteryLevel !== null;
+		this.onBattery = source.onBattery;
+		if (!source.onBattery) this.waiting.splice(0).forEach((wake) => wake());
 	}
 
 	get defaultProcessing(): Processing {

@@ -1,3 +1,4 @@
+import { events as sabineEvents } from '@lantharos/sabine';
 import { SvelteMap } from 'svelte/reactivity';
 import { commands, events, type LanguageModel, type Model } from '#lib/bindings.js';
 import { activity } from '#lib/input/activity.js';
@@ -41,7 +42,7 @@ class Processing {
 		const stops = [
 			events.speechChanged(() => void this.refresh()),
 			events.languageChanged(() => void this.refresh()),
-			events.powerBattery(() => this.kick())
+			sabineEvents.powerSourceChanged(() => this.kick())
 		];
 		void this.refresh();
 		return () => stops.forEach((stop) => stop());

@@ -24,6 +24,7 @@ import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
 import type { NotificationCenter } from './notifications/notificationCenter.js';
 import type { QuickSettings } from './quickSettings/quickSettings.js';
+import { StandaloneQuickSettings } from './quickSettings/standalone.js';
 import type { StartSurface } from './start/startSurface.js';
 
 export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
@@ -70,6 +71,7 @@ export class Surfaces {
   private keepsComposited = false;
   private readonly created: Partial<LazySurfaces> = {};
   private readonly outdated = new Set<keyof LazySurfaces>();
+  private readonly standaloneQuick = new StandaloneQuickSettings((width, height) => this.quickPosition(width, height));
 
   constructor(private readonly parts: SurfaceParts) {
     this.cover.connect('button-press-event', () => {
@@ -166,6 +168,13 @@ export class Surfaces {
     this.clipToFloor();
   }
 
+  private quickPosition(width: number, height: number): [number, number] {
+    const monitor = this.pointerMonitor();
+    const anchor = this.parts.taskbar.anchor('quick', monitor);
+    const length = isVertical(anchor.edge) ? height : width;
+    return dock(this.freeArea(monitor), anchor.edge, width, height, middleAt(anchor, length), anchor.align ? 0 : EDGE_MARGIN);
+  }
+
   followTasks(): SwipeTrack {
     const { taskView } = this.parts;
     const opening = this.current !== 'tasks';
@@ -184,6 +193,11 @@ export class Surfaces {
     const { previews, board, taskView } = this.parts;
     if (!this.parts.canInteract()) return;
     previews.close();
+    if (surface === 'quick' && this.standaloneQuick.available) {
+      this.close();
+      this.standaloneQuick.toggle();
+      return;
+    }
     const popup = this.popupFor(surface);
     if (popup && !popup.available) return;
     if (popup) monitor = this.current === surface ? this.surfaceMonitor() : this.monitorAt(...popup.locate()) ?? monitor;

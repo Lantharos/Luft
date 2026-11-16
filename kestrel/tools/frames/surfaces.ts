@@ -4,7 +4,10 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 
 import {existing} from '../checks/lib/actors.js';
 import {press, rest, type} from '../checks/lib/input/input.js';
-import {settled} from '../checks/lib/wait.js';
+import {settled, waitUntil} from '../checks/lib/wait.js';
+import GLib from 'gi://GLib';
+import {call} from '../checks/lib/dbus.js';
+import {repository, spawn} from '../checks/lib/processes.js';
 import {eachFrame, measured, type Interaction} from './recorder.js';
 
 type Surface = Parameters<typeof toggleSurface>[0];
@@ -14,7 +17,17 @@ const SURFACES = [
 ] satisfies [string, Surface, string?][];
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
+let standalone = false;
+async function startStandalone() {
+  if (standalone || !GLib.getenv('KESTREL_STANDALONE_QUICK')) return;
+  standalone = true;
+  spawn([repository('target', 'release', 'kestrel-quick-settings')], {env: {KESTREL_ICON_PATH: repository('kestrel', 'engine', 'data', 'icons')}});
+  await waitUntil(async () => (await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
+    new GLib.Variant('(s)', ['com.lantharos.Kestrel.QuickSettings']), '(b)')).recursiveUnpack<[boolean]>()[0], 'standalone quick settings is on the bus');
+}
+
 const closed = (style = 'menu') => async () => {
+  await startStandalone();
   if (shell.get_string('start-style') !== style) shell.set_string('start-style', style);
   dismissImmediately();
   rest();

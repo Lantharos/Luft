@@ -1,0 +1,26 @@
+[package]
+name = "kestrel-toolkit"
+description = "The windowing, drawing, text and layout the shell's own surfaces are built from"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bytemuck.workspace = true
+parley.workspace = true
+pollster.workspace = true
+raw-window-handle.workspace = true
+resvg.workspace = true
+rustix = { workspace = true, features = ["event"] }
+swash.workspace = true
+taffy.workspace = true
+wayland-backend = { workspace = true, features = ["client_system"] }
+wayland-client.workspace = true
+wayland-protocols = { workspace = true, features = ["client", "staging", "unstable"] }
+wayland-scanner.workspace = true
+wgpu.workspace = true
+
+[lints]
+workspace = true

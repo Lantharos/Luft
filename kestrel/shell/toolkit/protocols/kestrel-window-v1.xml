@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="kestrel_window_v1">
+  <copyright>
+    Copyright © 2026 Lantharos
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice (including the next
+    paragraph) shall be included in all copies or substantial portions of the
+    Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+  <interface name="kestrel_window_manager_v1" version="1">
+    <description summary="window placement requests for toplevels">
+      Lets a client keep a toplevel out of the desktop's window lists, such as
+      the taskbar and the window switcher, and keep it above other windows.
+      Palettes, launchers and tray popups use these. Sandboxed clients do not
+      see this global.
+    </description>
+
+    <enum name="error">
+      <entry name="already_requested" value="0"
+             summary="the toplevel already has a window state object"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the manager">
+        Destroying the manager leaves window state objects it created intact.
+      </description>
+    </request>
+
+    <request name="get_window_state">
+      <description summary="get the window state object of a toplevel">
+        Creates the window state object of a toplevel. A toplevel can have
+        only one; asking again is an already_requested error.
+      </description>
+      <arg name="id" type="new_id" interface="kestrel_window_state_v1"/>
+      <arg name="toplevel" type="object" interface="xdg_toplevel"/>
+    </request>
+  </interface>
+
+  <interface name="kestrel_window_state_v1" version="1">
+    <description summary="placement state of one toplevel">
+      Requests take effect immediately and last until they are undone or the
+      object is destroyed, which returns the toplevel to its default state.
+      The toplevel keeps the state when it is unmapped and mapped again.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="return the toplevel to its default state"/>
+    </request>
+
+    <request name="set_skip_window_list">
+      <description summary="leave the toplevel out of window lists">
+        The toplevel no longer appears in the taskbar, the window switcher or
+        other lists of windows.
+      </description>
+    </request>
+
+    <request name="unset_skip_window_list">
+      <description summary="show the toplevel in window lists again"/>
+    </request>
+
+    <request name="set_keep_above">
+      <description summary="keep the toplevel above other windows"/>
+    </request>
+
+    <request name="unset_keep_above">
+      <description summary="stack the toplevel normally again"/>
+    </request>
+  </interface>
+</protocol>

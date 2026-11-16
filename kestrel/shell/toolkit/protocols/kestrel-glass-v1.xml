@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="kestrel_glass_v1">
+  <copyright>
+    Copyright © 2026 Lantharos
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice (including the next
+    paragraph) shall be included in all copies or substantial portions of the
+    Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+  <interface name="kestrel_glass_manager_v1" version="1">
+    <description summary="the material of a surface's glass">
+      Glass is the part of a surface a client asks to blur through
+      ext_background_effect_v1. Kestrel draws it as one of two materials:
+      Luca, a blur of what is behind the surface or only of the wallpaper,
+      and Maris, the desktop's surface colour over a wide blur of the
+      wallpaper that covers most of it.
+
+      Through a glass object, a client says what kind of surface the glass
+      belongs to and which material it would like, and hears which material
+      the glass has. A client draws its own tint over Luca glass, and none
+      over Maris glass, whose surface colour is already the whole surface.
+    </description>
+
+    <enum name="error">
+      <entry name="glass_exists" value="0"
+             summary="the surface already has a glass object"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the manager">
+        Destroying the manager leaves glass objects it created intact.
+      </description>
+    </request>
+
+    <request name="get_glass">
+      <description summary="get the glass object of a surface">
+        Creates the glass object of a surface. A surface can have only one;
+        asking again is a glass_exists error. The compositor sends the
+        material event right away.
+      </description>
+      <arg name="id" type="new_id" interface="kestrel_glass_v1"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+  </interface>
+
+  <interface name="kestrel_glass_v1" version="1">
+    <description summary="the glass of one surface">
+      Requests take effect immediately and last until they are changed or
+      the object is destroyed, which returns the surface to a window that
+      follows the person's choice.
+    </description>
+
+    <enum name="role">
+      <entry name="window" value="0"
+             summary="the base of a window, such as its sidebar"/>
+      <entry name="transient" value="1"
+             summary="a transient surface, such as a popover, a menu or a palette"/>
+    </enum>
+
+    <enum name="preference">
+      <entry name="user" value="0"
+             summary="the material the person chose for this kind of surface"/>
+      <entry name="luca" value="1" summary="Luca"/>
+      <entry name="maris" value="2" summary="Maris"/>
+    </enum>
+
+    <enum name="material">
+      <entry name="luca" value="0"
+             summary="a blur of what is behind, or of the wallpaper only"/>
+      <entry name="maris" value="1"
+             summary="the surface colour over a wide blur of the wallpaper"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="return the surface to a window following the person"/>
+    </request>
+
+    <request name="set_role">
+      <description summary="say what kind of surface the glass belongs to">
+        Windows follow the person's choice for app windows, transient
+        surfaces their choice for panels and menus. The default is window.
+      </description>
+      <arg name="role" type="uint" enum="role"/>
+    </request>
+
+    <request name="set_preference">
+      <description summary="ask for a material">
+        Maris is always granted. Luca is granted too, and then blurs only the
+        wallpaper whenever the person's Luca glass does, such as while the
+        power saver is on. The default is user.
+      </description>
+      <arg name="preference" type="uint" enum="preference"/>
+    </request>
+
+    <event name="material">
+      <description summary="the material the glass has">
+        Sent when the object is created and whenever the material changes.
+      </description>
+      <arg name="material" type="uint" enum="material"/>
+    </event>
+  </interface>
+</protocol>

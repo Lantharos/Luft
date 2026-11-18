@@ -68,7 +68,7 @@ pub fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<Strin
         return Ok(String::new());
     };
     let architectures = format!("--arch=noarch,{}", std::env::consts::ARCH);
-    let output = Command::new("dnf")
+    let output = Command::new("dnf5")
         .args(["repoquery", "--quiet", "--latest-limit=1"])
         .args(choice)
         .arg(architectures)

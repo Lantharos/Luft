@@ -164,7 +164,7 @@ pub fn download(
         )
     });
     let unavailable = resolve(
-        Command::new("dnf")
+        Command::new("dnf5")
             .arg(format!("--installroot={}", root.display()))
             .arg(format!("--releasever={release}"))
             .arg(format!(
@@ -227,7 +227,7 @@ pub fn download(
 /// The package in Fedora or the added sources that provides `capability`, such as a library's
 /// `libfoo.so.1()(64bit)` or `perl(Foo::Bar)`, from the metadata the last build downloaded.
 pub fn provider(capability: &str) -> Result<Option<String>> {
-    let output = run(Command::new("dnf")
+    let output = run(Command::new("dnf5")
         .arg(format!("--setopt=cachedir={DNF_CACHE}"))
         .arg(format!("--setopt=reposdir={FEDORA},{FOLDER}"))
         .args([

@@ -81,6 +81,16 @@ pub fn install(arguments: &Arguments) -> Exit {
             return Exit::Failed;
         }
     };
+    let in_luft = fedora::on_system(&packages.iter().map(String::as_str).collect::<Vec<_>>());
+    let (with_luft, packages): (Vec<String>, Vec<String>) = packages
+        .into_iter()
+        .partition(|name| in_luft.contains(name));
+    for name in &with_luft {
+        println!(
+            "{}",
+            t!(L10N, "cli-install-comes-with-luft", name = ink.bold(name))
+        );
+    }
     let (already, wanted): (Vec<String>, Vec<String>) = packages
         .into_iter()
         .partition(|name| present.contains(name));

@@ -27,7 +27,7 @@ const GRAPHICAL: [&str; 14] = [
     "qt6-qtbase-gui",
 ];
 
-fn on_system(packages: &[&str]) -> HashSet<String> {
+pub fn on_system(packages: &[&str]) -> HashSet<String> {
     if packages.is_empty() {
         return HashSet::new();
     }
@@ -106,17 +106,27 @@ pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     Ok(with_apps(apps, candidates(tool.into_iter().collect())))
 }
 
-/// The package that brings the command `name`, for people who ask for a command rather than
-/// the package it's in, such as avahi-browse from avahi-tools.
-pub fn providing(repositories: Repositories, name: &str) -> Result<Option<String>, String> {
-    if !name
-        .chars()
+fn capability(name: &str) -> bool {
+    name.starts_with('/') || name.contains('(')
+}
+
+fn command_name(name: &str) -> bool {
+    name.chars()
         .all(|character| character.is_ascii_alphanumeric() || "-_.+".contains(character))
-    {
+}
+
+/// The package that brings the command `name`, for people who ask for a command rather than
+/// the package it's in, such as avahi-browse from avahi-tools, or that provides a capability
+/// such as `pkgconfig(gtk4)` or `/usr/bin/meson`.
+pub fn providing(repositories: Repositories, name: &str) -> Result<Option<String>, String> {
+    let provides = if capability(name) {
+        format!("--whatprovides={name}")
+    } else if command_name(name) {
+        format!("--whatprovides=/usr/bin/{name},/usr/sbin/{name}")
+    } else {
         return Ok(None);
-    }
-    let paths = format!("--whatprovides=/usr/bin/{name},/usr/sbin/{name}");
-    let text = repoquery(repositories, &["--queryformat", "%{name}\n", &paths])?;
+    };
+    let text = repoquery(repositories, &["--queryformat", "%{name}\n", &provides])?;
     Ok(text
         .lines()
         .map(str::trim)

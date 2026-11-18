@@ -159,7 +159,9 @@ $ dnf install ripgrep
 Luft installs this with Schelf. Install ripgrep? [Y/n]
 ```
 
-Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list`, and `dnf provides` work normally.
+Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list`, `dnf provides`, `dnf repoquery` and `dnf download` work normally.
+
+Install scripts work too. `dnf install` in a script, as in `sudo dnf install -y gcc make`, installs exactly those packages from Fedora as system packages, and `.rpm` files and their addresses the way opening them would. Like dnf, it only asks first without `-y`. With `sudo`, Schelf still works as you, and asks for an administrator's password only when the packages need one.
 
 ### Installing into /usr/local
 
@@ -178,4 +180,4 @@ Choose **Change** next to **Icon** to pick a PNG or SVG image. Luft draws the gl
 
 ## What doesn't work
 
-`dnf install` doesn't change the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` offers Schelf instead, and why system packages sit beside the image rather than inside it. Drivers and the rest of the system come with Luft's updates.
+`dnf install` doesn't change the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` hands over to Schelf, and why system packages sit beside the image rather than inside it. Drivers and the rest of the system come with Luft's updates.

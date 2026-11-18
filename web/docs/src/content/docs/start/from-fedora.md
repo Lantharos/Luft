@@ -52,6 +52,6 @@ The old system is kept as a btrfs subvolume called `old-system` until you remove
 | Packages from RPM Fusion and COPR | Luft's image already plays every common video and audio format. Other repositories, such as a COPR project, can be added as [software sources](/system/system-packages/#software-sources) |
 | GNOME | [Kestrel](/desktop/overview/), Luft's own desktop. GNOME apps keep working |
 
-Typing `dnf install` out of habit still works: Luft asks whether to install it with Schelf instead.
+Typing `dnf install` out of habit still works: Luft asks whether to install it with Schelf instead. Install scripts that run `sudo dnf install -y` get their packages as system packages, without a question.
 
 Packages from RPM Fusion, COPR and other third-party repositories don't come over, and neither do system-wide Flatpak apps. Reinstall those from Schelf.

@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Day-to-day work happens in test sessions that change nothing on the computer, on Fedora 45 or in a Fedora 45 [toolbox](https://containertoolbx.org) on Luft.
+Day-to-day work happens in test sessions that change nothing on the computer, on Luft itself or on Fedora 45.
 
 ## What you need
 
@@ -16,7 +16,7 @@ sudo dnf builddep mutter
 sudo dnf install $(cat os/image/packages/build.txt) greetd gstreamer1-plugin-gtk4
 ```
 
-Luft itself ships a `sabine` command at `/usr/bin/sabine`, the version its apps are built with, which Luft's updates keep current. When several are on the computer, the newest one runs, so an older `~/.cargo/bin/sabine` hands over to the image's. `SABINE_CLI_PINNED=1` keeps a `sabine` on its own version. A toolbox has its own `/usr` and only sees the image's command as `/run/host/usr/bin/sabine`; in a Fedora toolbox, `sudo ln -s /run/host/usr/lib/sabine /usr/lib/sabine` makes it the toolbox's too.
+Luft itself ships a `sabine` command at `/usr/bin/sabine`, the version its apps are built with, which Luft's updates keep current. When several are on the computer, the newest one runs, so an older `~/.cargo/bin/sabine` hands over to the image's. `SABINE_CLI_PINNED=1` keeps a `sabine` on its own version.
 
 ## Kestrel
 
@@ -73,7 +73,7 @@ os/dev/layer.sh reset                    # back to the signed image
 | `services` | The installer, updater, system packages, sleep, accounts, speech and Windows services |
 | `app-NAME` | The app called NAME in `apps/system` or `apps/store` |
 
-Run it on Luft itself rather than in a toolbox, from a clone of this repository; Luft already has the Git and Podman it needs. The first `apply` downloads the base and sets up the builder, which takes a while and around 8 GB of space; later ones only rebuild what changed. It asks for your password to lay the build over `/usr`, refreshes the system's caches, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.
+Run it on Luft itself, from a clone of this repository; Luft already has the Git and Podman it needs. The first `apply` downloads the base and sets up the builder, which takes a while and around 8 GB of space; later ones only rebuild what changed. It asks for your password to lay the build over `/usr`, refreshes the system's caches, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.
 
 The build stays across restarts. When Luft updates, the next start takes it off and says so, since a build made for the previous version would hide the update's own files; run `apply` again to put it back on the new version. It goes over [system packages](/system/system-packages/) the same way, and both stay merged.
 

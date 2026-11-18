@@ -50,10 +50,6 @@ write_release_facts() {
     install -Dm644 /dev/stdin /usr/share/luft/release
 }
 
-configure_toolbox() {
-  printf '[general]\ndistro = "fedora"\nrelease = "%s"\n' "$fedora" >/etc/containers/toolbox.conf
-}
-
 configure_security() {
   local module modules=()
   for module in /usr/share/selinux/packages/luft-*.cil; do
@@ -148,7 +144,6 @@ write_os_release
 write_base_image
 write_release_facts
 enable_units
-configure_toolbox
 configure_security
 check_typelibs
 check_sabine_apps

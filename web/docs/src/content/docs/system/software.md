@@ -16,7 +16,6 @@ asks:
   - { ask: install deb, to: apps-from-deb-files }
   - { ask: ubuntu app, to: apps-from-deb-files }
   - { ask: install command line tool, to: command-line-tools }
-  - { ask: toolbox, to: command-line-tools }
   - { ask: gcc, to: command-line-tools }
   - { ask: install rpm, to: command-line-tools, shared: true }
   - { ask: install an app, shared: true }
@@ -160,7 +159,7 @@ $ dnf install ripgrep
 Luft installs this with Schelf. Install ripgrep? [Y/n]
 ```
 
-Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.
+Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list`, and `dnf provides` work normally.
 
 ## App names and icons
 

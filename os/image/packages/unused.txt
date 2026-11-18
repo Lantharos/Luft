@@ -34,4 +34,5 @@ sos
 sssd*
 stalld
 tiwilink-firmware
+toolbox
 WALinuxAgent-udev

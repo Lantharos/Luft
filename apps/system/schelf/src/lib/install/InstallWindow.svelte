@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, GlassShell, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, Spinner, WindowControls } from '@luft/ui';
 	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
 	import { FileInstall } from '#lib/files/install.svelte.js';
 	import { opening } from '#lib/state/opening.svelte.js';
@@ -29,8 +29,10 @@
 		<div class="absolute top-3 right-4 z-10">
 			<WindowControls minimizable={false} maximizable={false} />
 		</div>
-		{#if install}
+		{#if install?.file || install?.error}
 			<Installer {install} />
+		{:else}
+			<div class="flex min-h-0 flex-1 items-center justify-center text-[var(--text-muted)]"><Spinner size={22} /></div>
 		{/if}
 	</main>
 </GlassShell>

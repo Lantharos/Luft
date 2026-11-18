@@ -9,7 +9,7 @@
 
 	interface Props {
 		install: FileInstall;
-		phase: 'unreadable' | 'loading' | 'running' | 'failed' | 'done' | 'ready';
+		phase: 'unreadable' | 'running' | 'failed' | 'done' | 'ready';
 		running: Operation | null;
 		retry: () => void;
 		onremove: () => void;

@@ -25,7 +25,7 @@
 	const failure = $derived(candidates.find((operation) => operation?.state === 'failed') ?? null);
 	const done = $derived(install.finished || install.finishedFromListing);
 	const doneName = $derived(install.finishedFromListing && install.listed ? install.listed.listing.name : install.name);
-	const phase = $derived(install.error ? 'unreadable' : !file ? 'loading' : running ? 'running' : failure ? 'failed' : done ? 'done' : 'ready');
+	const phase = $derived(install.error ? 'unreadable' : running ? 'running' : failure ? 'failed' : done ? 'done' : 'ready');
 
 	const byline = $derived.by(() => {
 		const { publisher, version } = install;
@@ -59,13 +59,9 @@
 
 <div class="flex min-h-0 flex-1 flex-col p-7 pb-6">
 	<div class="drag-region flex items-center gap-4 pr-8">
-		{#if phase === 'loading'}
-			<div class="skeleton size-[72px] flex-none"></div>
-		{:else}
-			<AppArt icon={install.icon} size={72} source={file?.kind === 'package' ? (file.system ? 'system' : 'tool') : null} />
-		{/if}
+		<AppArt icon={install.icon} size={72} source={file?.kind === 'package' ? (file.system ? 'system' : 'tool') : null} />
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<h1 class="truncate text-[21px] font-semibold">{phase === 'unreadable' || phase === 'loading' ? fileName : install.name}</h1>
+			<h1 class="truncate text-[21px] font-semibold">{phase === 'unreadable' ? fileName : install.name}</h1>
 			{#if byline && phase !== 'unreadable'}
 				<span class="truncate text-[13px] text-[var(--text-muted)]">{byline}</span>
 			{/if}

@@ -14,7 +14,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 
 ## Build
 
-Install Mutter's build dependencies (`sudo dnf builddep mutter`), then from the repository root:
+Install the build dependencies as [Building Luft](https://docs.luft.computer/developers/building/#what-you-need) says, then from the repository root:
 
 ```sh
 kestrel/compositor/build.sh

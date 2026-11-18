@@ -1,0 +1,7 @@
+edk2-ovmf
+greetd
+gstreamer1-plugin-gtk4
+jq
+qemu-img
+qemu-system-x86
+swtpm

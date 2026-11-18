@@ -26,10 +26,11 @@ Everything lives in `/var`, so going back to an earlier version keeps the list a
 4. Check every package against the keys of where it came from and no others: Fedora's against Fedora's keys, each source's against the keys it was added with. One source's key can't vouch for a package from Fedora or from another source. Package files installed by themselves are checked against their digests, as `dnf install ./file.rpm` does.
 5. Install with `rpm` inside a bubblewrap sandbox whose whole file system is the build root: no network, its own namespaces, a fresh `/tmp` and `/run`, only harmless devices, no `/proc` or `/sys`, and only the capabilities that write files, with the bounding set narrowed so a file capability a scriptlet sets can't hand more back.
 6. Copy out only the files the packages own, plus what scriptlets made in `/usr` and `/opt` that's new to the system, such as the `/usr/bin` links Electron apps make to their programs in `/opt`. A file that would differ from one in the system is refused, and one that's identical is left out, so the extension never hides part of Luft. `/usr/local` is a link to `/var/usrlocal`, which belongs to the administrator: a package with files there is refused, since a folder in the extension would hide the link, and scriptlets find its folders made as at startup, but what they put there stays in the build root.
-7. Move files under `/etc` and `/var` to `/usr/share/factory` in the extension, with their owner and mode noted. Repository files and keys a package brings are left out: sources are only added with a confirmation.
-8. Declare the users and groups the packages made in a sysusers.d file that comes first, with the IDs they have on the computer.
-9. Turn services on with `systemctl preset`. Fedora's presets decide for the packages they mention; services of requested packages they don't mention are turned on, and those of dependencies they don't mention stay off until something starts them.
-10. Label everything with the build root's SELinux file contexts and make the EROFS image, which keeps the labels.
+7. Point links that `alternatives` made through `/etc/alternatives`, such as binutils' `/usr/bin/ld`, straight at the program chosen in the build root, since `/etc` isn't part of the extension.
+8. Move files under `/etc` and `/var` to `/usr/share/factory` in the extension, with their owner and mode noted. Repository files and keys a package brings are left out: sources are only added with a confirmation.
+9. Declare the users and groups the packages made in a sysusers.d file that comes first, with the IDs they have on the computer.
+10. Turn services on with `systemctl preset`. Fedora's presets decide for the packages they mention; services of requested packages they don't mention are turned on, and those of dependencies they don't mention stay off until something starts them.
+11. Label everything with the build root's SELinux file contexts and make the EROFS image, which keeps the labels.
 
 Extensions are merged without `nosuid`, so setuid and setgid helpers such as Chromium's sandbox or 1Password's work.
 

@@ -9,11 +9,19 @@ Day-to-day work happens in test sessions that change nothing on the computer, on
 
 ## What you need
 
-Install [Bun](https://bun.sh), Rust and the [Sabine](https://github.com/Lantharos/Sabine) CLI, then the build dependencies:
+Install [Bun](https://bun.sh), Rust and the [Sabine](https://github.com/Lantharos/Sabine) CLI, then the build dependencies. On Luft, they become [system packages](/system/system-packages/), in one go:
+
+```sh
+os/dev/dependencies.sh
+```
+
+It installs `os/image/packages/build.txt`, the compilers and libraries the image's parts are built with, `os/dev/packages.txt`, what the [virtual machines](/developers/testing-vms/#virtual-machines) need, and the packages Fedora builds Mutter with. Some of them bring services or helpers that run as root, so it asks for an administrator's password once. Like any system package, they update by themselves and are built again for every update of Luft. Packages that already come with Luft are skipped, and any that can't be added are listed under Installed, System in Schelf, with why.
+
+On Fedora 45:
 
 ```sh
 sudo dnf builddep mutter
-sudo dnf install $(cat os/image/packages/build.txt) greetd gstreamer1-plugin-gtk4
+sudo dnf install $(cat os/image/packages/build.txt os/dev/packages.txt)
 ```
 
 Luft itself ships a `sabine` command at `/usr/bin/sabine`, the version its apps are built with, which Luft's updates keep current. When several are on the computer, the newest one runs, so an older `~/.cargo/bin/sabine` hands over to the image's. `SABINE_CLI_PINNED=1` keeps a `sabine` on its own version.

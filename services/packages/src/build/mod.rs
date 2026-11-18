@@ -276,6 +276,7 @@ fn attempt(
     stage::merged(&layout, &rpms)?;
     let placed = stage::placed(&layout, &rpms)?;
     made::made(&layout, &rpms)?;
+    made::alternatives(&layout)?;
     accounts::settle(&stage_folder, &accounts, &seeded)?;
     let selinux_modules = selinux::ship(&policy_before, &root, &stage_folder, || {
         install::rebuild_policy(&root, &rpms_folder)

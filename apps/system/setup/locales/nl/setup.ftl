@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, net als eerst gekoppeld bij het opstarten
 setup-replace-keeps-hostname = De naam van de computer, { $hostname }, en de SSH-sleutels
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } opdrachtregelprogramma dat je hebt geïnstalleerd, in een Toolbox nadat je je aanmeldt
-   *[other] { $count } opdrachtregelprogramma’s die je hebt geïnstalleerd, in een Toolbox nadat je je aanmeldt
-}
 setup-replace-keeps-old = { $system } start niet meer. De systeembestanden blijven bewaard als old-system tot je ze verwijdert in Schijven of Instellingen.
 setup-replace-erases-system = De systeempartitie van { $system } wordt gewist. Je bestanden staan op een eigen partitie en blijven zoals ze zijn.
 setup-replace-clears-boot = De /boot-partitie wordt leeggemaakt voor de opstartbestanden van Luft.

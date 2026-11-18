@@ -159,13 +159,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, feistithe ag an tosú mar a bhí
 setup-replace-keeps-hostname = Ainm an ríomhaire, { $hostname }, agus a eochracha SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } uirlis líne na n-orduithe a shuiteáil tú, i Toolbox tar éis duit síniú isteach
-    [two] { $count } uirlis líne na n-orduithe a shuiteáil tú, i Toolbox tar éis duit síniú isteach
-    [few] { $count } uirlis líne na n-orduithe a shuiteáil tú, i Toolbox tar éis duit síniú isteach
-    [many] { $count } n-uirlis líne na n-orduithe a shuiteáil tú, i Toolbox tar éis duit síniú isteach
-   *[other] { $count } uirlis líne na n-orduithe a shuiteáil tú, i Toolbox tar éis duit síniú isteach
-}
 setup-replace-keeps-old = Ní thosóidh { $system } níos mó. Coinneofar a chomhaid chórais mar old-system go dtí go mbainfidh tú iad san aip Dioscaí nó sna Socruithe.
 setup-replace-erases-system = Glanfar deighilt chórais { $system }. Tá do chomhaid ar a ndeighilt féin agus fanfaidh siad mar atá siad.
 setup-replace-clears-boot = Glanfar a dheighilt /boot chun comhaid tosaithe Luft a choinneáil.

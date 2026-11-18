@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, som tilsluttes ved opstart som før
 setup-replace-keeps-hostname = Computerens navn, { $hostname }, og dens SSH-nøgler
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } kommandolinjeværktøj, du har installeret, i en Toolbox, når du har logget ind
-   *[other] { $count } kommandolinjeværktøjer, du har installeret, i en Toolbox, når du har logget ind
-}
 setup-replace-keeps-old = { $system } kan ikke længere starte. Systemfilerne gemmes som old-system, indtil du fjerner dem i Diske eller Indstillinger.
 setup-replace-erases-system = Systempartitionen for { $system } slettes. Dine filer ligger på deres egen partition og forbliver, som de er.
 setup-replace-clears-boot = Systemets /boot-partition ryddes, så den kan rumme Lufts opstartsfiler.

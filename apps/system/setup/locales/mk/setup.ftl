@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, кои се приклучуваат при стартување како досега
 setup-replace-keeps-hostname = Името на компјутерот, { $hostname }, и неговите SSH-клучеви
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } алатка за командна линија што ја инсталиравте, во Toolbox по најавата
-   *[other] { $count } алатки за командна линија што ги инсталиравте, во Toolbox по најавата
-}
 setup-replace-keeps-old = Системот { $system } повеќе не се стартува. Неговите системски датотеки се чуваат како old-system додека не ги отстраните во Дискови или Поставки.
 setup-replace-erases-system = Системската партиција на { $system } се брише. Вашите датотеки се на посебна партиција и остануваат какви што се.
 setup-replace-clears-boot = Неговата партиција /boot се празни за да ги собере датотеките за стартување на Luft.

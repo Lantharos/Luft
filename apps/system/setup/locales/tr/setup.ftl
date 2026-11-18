@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, eskisi gibi başlangıçta bağlanır
 setup-replace-keeps-hostname = Bilgisayarın adı ({ $hostname }) ve SSH anahtarları
-setup-replace-keeps-tools = { $count ->
-    [one] Yüklediğiniz { $count } komut satırı aracı, oturum açtıktan sonra bir Toolbox içinde
-   *[other] Yüklediğiniz { $count } komut satırı aracı, oturum açtıktan sonra bir Toolbox içinde
-}
 setup-replace-keeps-old = { $system } artık başlamaz. Sistem dosyaları, siz Diskler’den ya da Ayarlar’dan kaldırana kadar old-system olarak saklanır.
 setup-replace-erases-system = { $system } sisteminin sistem bölümü silinir. Dosyalarınız kendi bölümlerindedir ve olduğu gibi kalır.
 setup-replace-clears-boot = /boot bölümü, Luft’un başlangıç dosyalarını tutmak için temizlenir.

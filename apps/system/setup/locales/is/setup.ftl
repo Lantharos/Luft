@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, sem tengjast við ræsingu eins og áður
 setup-replace-keeps-hostname = Heiti tölvunnar, { $hostname }, og SSH-lyklar hennar
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } skipanalínutól sem þú settir upp, í Toolbox eftir að þú skráir þig inn
-   *[other] { $count } skipanalínutól sem þú settir upp, í Toolbox eftir að þú skráir þig inn
-}
 setup-replace-keeps-old = { $system } hættir að ræsast. Kerfisskrár þess eru geymdar sem old-system þar til þú fjarlægir þær í forritinu Diskar eða í Stillingum.
 setup-replace-erases-system = Kerfisdisksneiðinni fyrir { $system } er eytt. Skrárnar þínar eru á sérstakri disksneið og haldast óbreyttar.
 setup-replace-clears-boot = /boot-disksneið þess er hreinsuð til að rúma ræsiskrár Luft.

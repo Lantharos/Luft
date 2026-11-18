@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, monterte ved oppstart som før
 setup-replace-keeps-hostname = Namnet på datamaskinen, { $hostname }, og SSH-nøklane
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } kommandolinjeverktøy du installerte, i ein Toolbox etter at du har logga inn
-   *[other] { $count } kommandolinjeverktøy du installerte, i ein Toolbox etter at du har logga inn
-}
 setup-replace-keeps-old = { $system } blir ikkje starta lenger. Systemfilene blir tekne vare på som old-system til du fjernar dei i Diskar eller Innstillingar.
 setup-replace-erases-system = Systempartisjonen til { $system } blir sletta. Filene dine ligg på ein eigen partisjon og blir verande som dei er.
 setup-replace-clears-boot = /boot-partisjonen blir tømd, så han kan halde oppstartsfilene til Luft.

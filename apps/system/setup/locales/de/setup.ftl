@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, wie bisher beim Start eingebunden
 setup-replace-keeps-hostname = Der Name des Computers, { $hostname }, und seine SSH-Schlüssel
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } installiertes Befehlszeilentool, nach der Anmeldung in einer Toolbox
-   *[other] { $count } installierte Befehlszeilentools, nach der Anmeldung in einer Toolbox
-}
 setup-replace-keeps-old = { $system } startet nicht mehr. Seine Systemdateien bleiben als old-system erhalten, bis du sie in Datenträger oder Einstellungen entfernst.
 setup-replace-erases-system = Die Systempartition von { $system } wird gelöscht. Deine Dateien liegen auf einer eigenen Partition und bleiben, wie sie sind.
 setup-replace-clears-boot = Seine /boot-Partition wird geleert, um die Startdateien von Luft aufzunehmen.

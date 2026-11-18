@@ -11,8 +11,8 @@ usage() {
   cat <<'USAGE'
 Usage: apps/store/meet/vm/iso.sh
 
-Builds a Luft ISO with this checkout's installer, Install Luft, trustd, live start-up
-and Toolbox builder on top of localhost/luft-system:45 and :45-nvidia (made by
+Builds a Luft ISO with this checkout's installer, Install Luft, trustd and live
+start-up on top of localhost/luft-system:45 and :45-nvidia (made by
 os/image/build.sh, and named after LUFT_IMAGE_NAME like it), so Meet Luft and
 Install Luft can be tried against them without building the whole image. It
 carries the QEMU guest agent, so os/vm/control.py can run commands in the live
@@ -35,14 +35,11 @@ stage_changes() {
   bun "$luft/os/image/parts/components/install.ts" "$stage/root" apps/system/setup/installer security
   (cd "$luft" && bun install --frozen-lockfile)
   sabine install --bundle --system-wide --root "$stage/root" "$luft/apps/system/setup"
-  install -Dm755 "$luft/os/image/files/usr/libexec/luft-carried-tools" "$stage/root/usr/libexec/luft-carried-tools"
-  install -Dm644 -t "$stage/root/usr/lib/systemd/user" "$luft/os/image/files/usr/lib/systemd/user/luft-carried-tools.service"
   cat >"$stage/Containerfile" <<'CONTAINERFILE'
 ARG BASE
 FROM ${BASE}
 COPY root/ /
-RUN systemctl --global enable luft-carried-tools.service && \
-    systemctl enable luft-installer-expire-setup.service trustd-system-disk.service && \
+RUN systemctl enable luft-installer-expire-setup.service trustd-system-disk.service && \
     dnf install -y qemu-guest-agent && dnf clean all && \
     echo '(typepermissive virt_qemu_ga_t)' >/tmp/guest-agent.cil && semodule -i /tmp/guest-agent.cil && rm /tmp/guest-agent.cil
 CONTAINERFILE

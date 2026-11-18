@@ -3,29 +3,15 @@ use std::path::Path;
 
 use serde::Deserialize;
 
-use super::release::Family;
-
 const DNF_STATE: &str = "usr/lib/sysimage/libdnf5";
-const PACMAN_LOCAL: &str = "var/lib/pacman/local";
 const FEDORA_REPOSITORIES: [&str; 4] = [
     "fedora",
     "updates",
     "updates-testing",
     "fedora-cisco-openh264",
 ];
-const SYSTEM_PACKAGES: [&str; 10] = [
-    "filesystem",
-    "dnf",
-    "dnf5",
-    "base",
-    "base-devel",
-    "linux",
-    "linux-lts",
-    "linux-zen",
-    "pacman",
-    "efibootmgr",
-];
-const SYSTEM_PREFIXES: [&str; 11] = [
+const SYSTEM_PACKAGES: [&str; 4] = ["filesystem", "dnf", "dnf5", "efibootmgr"];
+const SYSTEM_PREFIXES: [&str; 10] = [
     "kernel",
     "kmod-",
     "akmod-",
@@ -36,7 +22,6 @@ const SYSTEM_PREFIXES: [&str; 11] = [
     "livesys-",
     "systemd-boot",
     "linux-firmware",
-    "-ucode",
 ];
 
 #[derive(Deserialize)]
@@ -75,7 +60,7 @@ fn name_of_nevra(nevra: &str) -> Option<&str> {
     Some(without_release.rsplit_once('-')?.0)
 }
 
-pub fn dnf(reasons: &str, origins: &str) -> Vec<String> {
+fn dnf(reasons: &str, origins: &str) -> Vec<String> {
     let Ok(reasons) = toml::from_str::<Reasons>(reasons) else {
         return Vec::new();
     };
@@ -100,49 +85,12 @@ pub fn dnf(reasons: &str, origins: &str) -> Vec<String> {
         .collect()
 }
 
-pub fn pacman(descriptions: &[String]) -> Vec<String> {
-    descriptions
-        .iter()
-        .filter_map(|description| {
-            let mut name = None;
-            let mut dependency = false;
-            let mut lines = description.lines();
-            while let Some(line) = lines.next() {
-                match line {
-                    "%NAME%" => name = lines.next(),
-                    "%REASON%" => dependency = lines.next() == Some("1"),
-                    _ => {}
-                }
-            }
-            name.filter(|name| !dependency && kept(name))
-                .map(str::to_owned)
-        })
-        .collect::<BTreeSet<_>>()
-        .into_iter()
-        .collect()
-}
-
-fn read_pacman(root: &Path) -> Vec<String> {
-    let Ok(entries) = std::fs::read_dir(root.join(PACMAN_LOCAL)) else {
-        return Vec::new();
-    };
-    let descriptions: Vec<String> = entries
-        .flatten()
-        .filter_map(|entry| std::fs::read_to_string(entry.path().join("desc")).ok())
-        .collect();
-    pacman(&descriptions)
-}
-
-pub fn read(root: &Path, family: Family) -> Vec<String> {
-    match family {
-        Family::Fedora => {
-            let state = root.join(DNF_STATE);
-            let file = |name: &str| std::fs::read_to_string(state.join(name)).unwrap_or_default();
-            dnf(&file("packages.toml"), &file("nevras.toml"))
-        }
-        Family::Arch => read_pacman(root),
-        Family::Other => Vec::new(),
-    }
+/// The packages someone installed on a Fedora system from Fedora's own repositories, without
+/// what makes the system itself.
+pub fn read(root: &Path) -> Vec<String> {
+    let state = root.join(DNF_STATE);
+    let file = |name: &str| std::fs::read_to_string(state.join(name)).unwrap_or_default();
+    dnf(&file("packages.toml"), &file("nevras.toml"))
 }
 
 #[cfg(test)]
@@ -169,15 +117,5 @@ version = "1.0"
 "discord-0.0.98-1.x86_64" = {from_repo = "discord"}
 "#;
         assert_eq!(dnf(reasons, origins), ["htop", "ripgrep"]);
-    }
-
-    #[test]
-    fn arch_keeps_explicit_packages() {
-        let descriptions = [
-            "%NAME%\nneovim\n\n%VERSION%\n0.11.4-1\n".to_owned(),
-            "%NAME%\nlibuv\n\n%REASON%\n1\n".to_owned(),
-            "%NAME%\nlinux\n\n%VERSION%\n6.17\n".to_owned(),
-        ];
-        assert_eq!(pacman(&descriptions), ["neovim"]);
     }
 }

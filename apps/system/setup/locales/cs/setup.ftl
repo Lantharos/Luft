@@ -155,12 +155,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives } – připojované při spuštění jako dřív
 setup-replace-keeps-hostname = Název počítače { $hostname } a jeho klíče SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } nainstalovaný nástroj příkazového řádku, po přihlášení v prostředí Toolbox
-    [few] { $count } nainstalované nástroje příkazového řádku, po přihlášení v prostředí Toolbox
-    [many] { $count } nainstalovaného nástroje příkazového řádku, po přihlášení v prostředí Toolbox
-   *[other] { $count } nainstalovaných nástrojů příkazového řádku, po přihlášení v prostředí Toolbox
-}
 setup-replace-keeps-old = { $system } se přestane spouštět. Jeho systémové soubory zůstanou jako old-system, dokud je neodstraníte v aplikaci Disky nebo v Nastavení.
 setup-replace-erases-system = Systémový oddíl, na kterém je { $system }, se vymaže. Vaše soubory jsou na vlastním oddílu a zůstanou, jak jsou.
 setup-replace-clears-boot = Jeho oddíl /boot se vyprázdní pro spouštěcí soubory Luftu.

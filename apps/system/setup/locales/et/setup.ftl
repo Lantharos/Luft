@@ -149,11 +149,6 @@ setup-replace-keeps-networks =
     }
 setup-replace-keeps-drives = { $drives }, mis ühendatakse käivitamisel nagu varem
 setup-replace-keeps-hostname = Arvuti nimi { $hostname } ja selle SSH-võtmed
-setup-replace-keeps-tools =
-    { $count ->
-        [one] { $count } sinu installitud käsureatööriist, mis on pärast sisselogimist Toolboxis
-       *[other] { $count } sinu installitud käsureatööriista, mis on pärast sisselogimist Toolboxis
-    }
 setup-replace-keeps-old = { $system } ei käivitu enam. Selle süsteemifailid jäävad alles kaustas old-system, kuni eemaldad need rakenduses Kettad või Sätetes.
 setup-replace-erases-system = Süsteemi { $system } süsteemipartitsioon kustutatakse. Sinu failid on eraldi partitsioonil ja jäävad nii, nagu on.
 setup-replace-clears-boot = Selle /boot-partitsioon tühjendatakse Lufti käivitusfailide jaoks.

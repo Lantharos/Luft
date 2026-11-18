@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, të montuar në nisje si më parë
 setup-replace-keeps-hostname = Emri i kompjuterit, { $hostname }, dhe çelësat e tij SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } mjet i rreshtit të komandave që instalove, në një Toolbox pasi të hysh
-   *[other] { $count } mjete të rreshtit të komandave që instalove, në një Toolbox pasi të hysh
-}
 setup-replace-keeps-old = { $system } nuk niset më. Skedarët e tij të sistemit ruhen si old-system derisa t’i heqësh te Disqet ose Cilësimet.
 setup-replace-erases-system = Ndarja e sistemit të { $system } fshihet. Skedarët e tu janë në ndarjen e tyre dhe mbeten siç janë.
 setup-replace-clears-boot = Ndarja /boot e tij pastrohet për të mbajtur skedarët e nisjes së Luft.

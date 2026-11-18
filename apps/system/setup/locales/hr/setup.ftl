@@ -151,11 +151,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, montirani pri pokretanju kao i dosad
 setup-replace-keeps-hostname = Naziv računala, { $hostname }, i njegovi SSH ključevi
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } alat naredbenog retka koji ste instalirali, u Toolboxu nakon prijave
-    [few] { $count } alata naredbenog retka koja ste instalirali, u Toolboxu nakon prijave
-   *[other] { $count } alata naredbenog retka koje ste instalirali, u Toolboxu nakon prijave
-}
 setup-replace-keeps-old = { $system } se više ne pokreće. Njegove sistemske datoteke čuvaju se kao old-system dok ih ne uklonite u Diskovima ili Postavkama.
 setup-replace-erases-system = Sistemska particija sustava { $system } briše se. Vaše su datoteke na zasebnoj particiji i ostaju kakve jesu.
 setup-replace-clears-boot = Njegova particija /boot prazni se za Luftove datoteke za pokretanje.

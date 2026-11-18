@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, montati all’avvio come prima
 setup-replace-keeps-hostname = Il nome del computer, { $hostname }, e le sue chiavi SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } strumento da riga di comando che hai installato, in una Toolbox dopo l’accesso
-   *[other] { $count } strumenti da riga di comando che hai installato, in una Toolbox dopo l’accesso
-}
 setup-replace-keeps-old = { $system } non si avvia più. I suoi file di sistema vengono conservati come old-system finché non li rimuovi in Dischi o nelle Impostazioni.
 setup-replace-erases-system = La partizione di sistema di { $system } viene cancellata. I tuoi file si trovano su una partizione a parte e restano come sono.
 setup-replace-clears-boot = La sua partizione /boot viene svuotata per ospitare i file di avvio di Luft.

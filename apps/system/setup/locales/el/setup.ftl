@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, με προσάρτηση κατά την εκκίνηση όπως πριν
 setup-replace-keeps-hostname = Το όνομα του υπολογιστή, { $hostname }, και τα κλειδιά SSH του
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } εργαλείο γραμμής εντολών που εγκαταστήσατε, σε ένα Toolbox μετά τη σύνδεση
-   *[other] { $count } εργαλεία γραμμής εντολών που εγκαταστήσατε, σε ένα Toolbox μετά τη σύνδεση
-}
 setup-replace-keeps-old = Το { $system } δεν θα ξεκινά πια. Τα αρχεία συστήματός του διατηρούνται ως old-system μέχρι να τα αφαιρέσετε από τους Δίσκους ή τις Ρυθμίσεις.
 setup-replace-erases-system = Το διαμέρισμα συστήματος του { $system } διαγράφεται. Τα αρχεία σας βρίσκονται σε δικό τους διαμέρισμα και μένουν όπως είναι.
 setup-replace-clears-boot = Το διαμέρισμα /boot του συστήματος αδειάζει για να χωρέσει τα αρχεία εκκίνησης του Luft.

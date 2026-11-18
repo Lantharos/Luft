@@ -1,6 +1,6 @@
 ---
 title: Replacing another Linux
-description: Put Luft in place of a Linux system and keep your files, accounts, network and command-line tools.
+description: Put Luft in place of a Linux system and keep your files, accounts, network and the packages you installed from Fedora.
 sidebar:
   order: 6
 asks:
@@ -30,7 +30,7 @@ You can start from a [USB stick](/start/usb-stick/), or from the running system 
 | Network | Saved connections, Wi-Fi passwords included |
 | The computer | Its name and SSH host keys, so other machines still recognise it |
 | Other drives | Drives the old system mounted at startup are mounted again, under `/var/mnt` unless they were already under `/var` or `/home` |
-| Command-line tools | Packages you installed with dnf from Fedora's own repositories, or with pacman, are rebuilt in a [Toolbox](/system/software/#command-line-tools) container when you first sign in. Enter it with `toolbox enter fedora` (or `arch`) |
+| Packages | Packages you installed with dnf from Fedora's own repositories are added again as [system packages](/system/system-packages/) once Luft is online after its first start |
 
 Because your home folder stays, so does everything in it: documents, app settings, Flatpak apps you installed for your own account, and your shell configuration.
 

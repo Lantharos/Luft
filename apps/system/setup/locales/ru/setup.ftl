@@ -155,12 +155,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives } — подключаются при запуске, как и раньше
 setup-replace-keeps-hostname = Имя компьютера ({ $hostname }) и его ключи SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } установленный вами инструмент командной строки — в Toolbox после входа
-    [few] { $count } установленных вами инструмента командной строки — в Toolbox после входа
-    [many] { $count } установленных вами инструментов командной строки — в Toolbox после входа
-   *[other] { $count } установленного вами инструмента командной строки — в Toolbox после входа
-}
 setup-replace-keeps-old = Система { $system } больше не будет запускаться. Её системные файлы сохранятся в папке old-system, пока вы не удалите их в приложении Диски или в Настройках.
 setup-replace-erases-system = Системный раздел { $system } будет стёрт. Ваши файлы находятся на отдельном разделе и останутся как есть.
 setup-replace-clears-boot = Раздел /boot будет очищен для загрузочных файлов Luft.

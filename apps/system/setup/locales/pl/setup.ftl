@@ -155,12 +155,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, montowane przy uruchamianiu tak jak dotąd
 setup-replace-keeps-hostname = Nazwa komputera ({ $hostname }) i jego klucze SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } zainstalowane narzędzie wiersza poleceń, dostępne po zalogowaniu w kontenerze Toolbox
-    [few] { $count } zainstalowane narzędzia wiersza poleceń, dostępne po zalogowaniu w kontenerze Toolbox
-    [many] { $count } zainstalowanych narzędzi wiersza poleceń, dostępnych po zalogowaniu w kontenerze Toolbox
-   *[other] { $count } zainstalowanego narzędzia wiersza poleceń, dostępnego po zalogowaniu w kontenerze Toolbox
-}
 setup-replace-keeps-old = System { $system } przestanie się uruchamiać. Jego pliki systemowe zostaną zachowane w folderze old-system, dopóki nie usuniesz ich w aplikacji Dyski lub w Ustawieniach.
 setup-replace-erases-system = Partycja z systemem { $system } zostanie wymazana. Twoje pliki znajdują się na osobnej partycji i pozostaną bez zmian.
 setup-replace-clears-boot = Partycja /boot zostanie wyczyszczona, aby pomieścić pliki rozruchowe systemu Luft.

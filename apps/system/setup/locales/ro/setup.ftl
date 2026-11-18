@@ -151,11 +151,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, montate la pornire ca înainte
 setup-replace-keeps-hostname = Numele computerului, { $hostname }, și cheile lui SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } instrument de linie de comandă pe care l-ați instalat, într-un Toolbox după conectare
-    [few] { $count } instrumente de linie de comandă pe care le-ați instalat, într-un Toolbox după conectare
-   *[other] { $count } de instrumente de linie de comandă pe care le-ați instalat, într-un Toolbox după conectare
-}
 setup-replace-keeps-old = { $system } nu va mai porni. Fișierele lui de sistem se păstrează în old-system până le eliminați din Discuri sau Setări.
 setup-replace-erases-system = Partiția de sistem din { $system } se șterge. Fișierele sunt pe o partiție separată și rămân neschimbate.
 setup-replace-clears-boot = Partiția /boot se golește pentru a primi fișierele de pornire ale sistemului Luft.

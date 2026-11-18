@@ -151,11 +151,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, kas startēšanas laikā tiek pievienoti tāpat kā līdz šim
 setup-replace-keeps-hostname = Datora nosaukums { $hostname } un tā SSH atslēgas
-setup-replace-keeps-tools = { $count ->
-    [zero] { $count } jūsu instalēti komandrindas rīki, pēc pierakstīšanās pieejami vidē Toolbox
-    [one] { $count } jūsu instalēts komandrindas rīks, pēc pierakstīšanās pieejams vidē Toolbox
-   *[other] { $count } jūsu instalēti komandrindas rīki, pēc pierakstīšanās pieejami vidē Toolbox
-}
 setup-replace-keeps-old = { $system } vairs netiek palaista. Tās sistēmas faili tiek saglabāti kā old-system, līdz tos noņemsiet lietotnē Diski vai Iestatījumos.
 setup-replace-erases-system = Sistēmas { $system } sistēmas nodalījums tiek izdzēsts. Jūsu faili atrodas atsevišķā nodalījumā un paliek neskarti.
 setup-replace-clears-boot = Tās /boot nodalījums tiek iztīrīts, lai tajā glabātu Luft startēšanas failus.

@@ -245,9 +245,9 @@ setup-replace-keeps-networks = { $count ->
 setup-replace-keeps-drives = { $drives }, mounted at startup as before
 # $hostname is the computer's network name
 setup-replace-keeps-hostname = The computer’s name, { $hostname }, and its SSH keys
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } command-line tool you installed, in a Toolbox after you sign in
-   *[other] { $count } command-line tools you installed, in a Toolbox after you sign in
+setup-replace-keeps-packages = { $count ->
+    [one] { $count } package you installed from Fedora, added again once Luft is online
+   *[other] { $count } packages you installed from Fedora, added again once Luft is online
 }
 # $system is the name of the Linux system being replaced. "old-system" is a folder name, keep it as it is
 setup-replace-keeps-old = { $system } stops starting. Its system files are kept as old-system until you remove them in Disks or Settings.

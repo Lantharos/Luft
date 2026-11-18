@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, indításkor a korábbiak szerint csatolva
 setup-replace-keeps-hostname = A számítógép neve ({ $hostname }) és az SSH-kulcsai
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } telepített parancssori eszköz, bejelentkezés után egy Toolboxban
-   *[other] { $count } telepített parancssori eszköz, bejelentkezés után egy Toolboxban
-}
 setup-replace-keeps-old = { $system } többé nem indul el. A rendszerfájljai old-system néven megmaradnak, amíg el nem távolítja őket a Lemezek vagy a Beállítások alkalmazásban.
 setup-replace-erases-system = { $system } rendszerpartíciója törlődik. A saját fájljai külön partíción vannak, és változatlanok maradnak.
 setup-replace-clears-boot = A /boot partíciója kiürül, hogy elférjenek rajta a Luft indítófájljai.

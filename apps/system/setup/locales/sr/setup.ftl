@@ -151,11 +151,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, који се као и до сада монтирају при покретању
 setup-replace-keeps-hostname = Назив рачунара, { $hostname }, и његови SSH кључеви
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } алат за командну линију који сте инсталирали, у окружењу Toolbox након пријаве
-    [few] { $count } алата за командну линију које сте инсталирали, у окружењу Toolbox након пријаве
-   *[other] { $count } алата за командну линију које сте инсталирали, у окружењу Toolbox након пријаве
-}
 setup-replace-keeps-old = Систем { $system } се више не покреће. Његове системске датотеке чувају се као old-system док их не уклоните у апликацији Дискови или у Подешавањима.
 setup-replace-erases-system = Системска партиција система { $system } се брише. Ваше датотеке су на засебној партицији и остају нетакнуте.
 setup-replace-clears-boot = Његова партиција /boot се празни за датотеке којима се Luft покреће.

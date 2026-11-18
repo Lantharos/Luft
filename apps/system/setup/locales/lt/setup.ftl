@@ -156,12 +156,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives } – prijungiami paleidžiant, kaip ir anksčiau
 setup-replace-keeps-hostname = Kompiuterio vardas { $hostname } ir jo SSH raktai
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } jūsų įdiegtas komandinės eilutės įrankis – prisijungus, Toolbox aplinkoje
-    [few] { $count } jūsų įdiegti komandinės eilutės įrankiai – prisijungus, Toolbox aplinkoje
-    [many] { $count } jūsų įdiegto komandinės eilutės įrankio – prisijungus, Toolbox aplinkoje
-   *[other] { $count } jūsų įdiegtų komandinės eilutės įrankių – prisijungus, Toolbox aplinkoje
-}
 setup-replace-keeps-old = { $system } nebebus paleidžiama. Jos sistemos failai lieka aplanke old-system, kol jų nepašalinsite programoje Diskai arba Nustatymuose.
 setup-replace-erases-system = Ištrinamas sistemos { $system } skaidinys. Jūsų failai yra atskirame skaidinyje ir lieka nepakeisti.
 setup-replace-clears-boot = Jos /boot skaidinys išvalomas, kad jame tilptų Luft paleidimo failai.

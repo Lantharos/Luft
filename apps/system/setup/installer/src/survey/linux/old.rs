@@ -74,7 +74,11 @@ pub fn read(root: &Path) -> OldSystem {
             name.ends_with(".nmconnection")
         }),
         host_keys: files(&root.join(SSH), |name| name.starts_with(HOST_KEY)),
-        packages: packages::read(root, release.family),
+        packages: if release.fedora {
+            packages::read(root)
+        } else {
+            Vec::new()
+        },
         release,
     }
 }

@@ -159,13 +159,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, immuntati fl-istartjar bħal qabel
 setup-replace-keeps-hostname = L-isem tal-kompjuter, { $hostname }, u ċ-ċwievet SSH tiegħu
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } għodda tal-command line li installajt, f’Toolbox wara li tidħol
-    [two] { $count } għodod tal-command line li installajt, f’Toolbox wara li tidħol
-    [few] { $count } għodod tal-command line li installajt, f’Toolbox wara li tidħol
-    [many] { $count } għodda tal-command line li installajt, f’Toolbox wara li tidħol
-   *[other] { $count } għodda tal-command line li installajt, f’Toolbox wara li tidħol
-}
 setup-replace-keeps-old = { $system } ma tibqax tibda. Il-fajls tas-sistema tagħha jinżammu bħala old-system sakemm tneħħihom f’Diski jew fis-Settings.
 setup-replace-erases-system = Il-partizzjoni tas-sistema ta’ { $system } titħassar. Il-fajls tiegħek jinsabu fuq partizzjoni għalihom u jibqgħu kif inhuma.
 setup-replace-clears-boot = Il-partizzjoni /boot tagħha titbattal biex iżżomm il-fajls tal-istartjar ta’ Luft.

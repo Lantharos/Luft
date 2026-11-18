@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, monteras vid start som förut
 setup-replace-keeps-hostname = Datorns namn, { $hostname }, och dess SSH-nycklar
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } kommandoradsverktyg som du har installerat, i en Toolbox när du har loggat in
-   *[other] { $count } kommandoradsverktyg som du har installerat, i en Toolbox när du har loggat in
-}
 setup-replace-keeps-old = { $system } startar inte längre. Systemfilerna sparas som old-system tills du tar bort dem i Diskar eller Inställningar.
 setup-replace-erases-system = Systempartitionen för { $system } raderas. Dina filer ligger på en egen partition och förblir som de är.
 setup-replace-clears-boot = Dess /boot-partition töms för att rymma Lufts startfiler.

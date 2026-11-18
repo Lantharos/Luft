@@ -1,13 +1,12 @@
 ---
 title: Moving to Luft from Fedora
-description: Replace a Fedora installation with Luft and keep your home folder, accounts, network and command-line tools.
+description: Replace a Fedora installation with Luft and keep your home folder, accounts, network and the packages you installed.
 sidebar:
   order: 8
 asks:
   - switch from fedora
   - upgrade fedora to luft
   - { ask: keep my files from fedora, to: what-stays }
-  - { ask: toolbox enter fedora, to: what-stays }
   - { ask: where did my dnf packages go, to: what-stays }
   - { ask: dnf install, to: whats-different, shared: true }
   - { ask: sudo dnf upgrade, to: whats-different }
@@ -34,7 +33,7 @@ Replacing works with Fedora Workstation's default layout, btrfs with separate `r
 - **Every account**, with the same user name, IDs and password.
 - **Network connections**, Wi-Fi passwords included, plus the computer's name and SSH host keys.
 - **Other drives** that Fedora mounted at startup.
-- **Command-line tools** you installed with dnf from Fedora's repositories. They're rebuilt in a Toolbox container called `fedora` when you first sign in; `toolbox enter fedora` takes you there.
+- **Packages** you installed with dnf from Fedora's repositories, such as command-line tools and services. Luft adds them again as [system packages](/system/system-packages/) once it's online after its first start, and Schelf lists any it couldn't, with why.
 
 The old system is kept as a btrfs subvolume called `old-system` until you remove it, so its files are still there if you need something. [Removing the old system](/system/remove-other-systems/) frees its space.
 
@@ -43,15 +42,15 @@ The old system is kept as a btrfs subvolume called `old-system` until you remove
 | On Fedora | On Luft |
 | --- | --- |
 | `sudo dnf install` a desktop app | `schelf install`, or [Schelf](/apps/schelf/), installs it from Flathub or as an AppImage |
-| `sudo dnf install` a command-line tool | `schelf install` puts it in a Toolbox container and makes its commands available everywhere, or use `toolbox enter` yourself |
-| `sudo dnf install` a `-devel` package | `schelf install` puts it in the Toolbox, so build inside `toolbox enter` |
+| `sudo dnf install` a command-line tool or a `-devel` package | `schelf install` adds it to the system, without a password unless it changes how the system works |
+| `sudo dnf install` a service, such as Tailscale | `schelf install` adds it to the system after an administrator's password, and it starts with the computer |
 | `sudo dnf remove`, `dnf search` | `schelf remove`, `schelf search` |
-| `sudo dnf upgrade` | Settings, under System. The new version installs at the next restart, and the one before stays to go back to. `schelf update` updates apps and tools |
+| `sudo dnf upgrade` | Settings, under System. The new version installs at the next restart, and the one before stays to go back to. Packages you added update by themselves, and `schelf update` updates them and your apps now |
 | `dnf info`, `dnf list`, `dnf provides` | Work the same |
-| `man` and GRUB's tools on the computer itself | In the Toolbox. Luft starts without GRUB and leaves manual pages out of the system; `toolbox enter` has them |
-| Packages from RPM Fusion and COPR | Luft's image already plays every common video and audio format. Tools from other repositories can go in a Toolbox |
+| `man` and GRUB's tools | Luft starts without GRUB and leaves manual pages out of the system |
+| Packages from RPM Fusion and COPR | Luft's image already plays every common video and audio format. Other repositories, such as a COPR project, can be added as [software sources](/system/system-packages/#software-sources) |
 | GNOME | [Kestrel](/desktop/overview/), Luft's own desktop. GNOME apps keep working |
 
 Typing `dnf install` out of habit still works: Luft asks whether to install it with Schelf instead.
 
-Packages from RPM Fusion, COPR and other third-party repositories don't come over into the Toolbox, and neither do system-wide Flatpak apps. Reinstall those from Schelf.
+Packages from RPM Fusion, COPR and other third-party repositories don't come over, and neither do system-wide Flatpak apps. Reinstall those from Schelf.

@@ -30,7 +30,6 @@
 	"os/image/files/usr/lib/dracut/modules.d/90luft-added-files/luft-added-files.service": 9.4,
 	"os/image/files/usr/lib/systemd/system/luft-dev-layer.service": 1.1,
 	"os/image/files/usr/lib/systemd/system/luft-rescue-seal.service": 1.4,
-	"os/image/files/usr/lib/systemd/user/luft-carried-tools.service": 9.2,
 	"os/image/files/usr/lib/systemd/user/luft-dev-layer-notice.service": 5.7,
 	"os/iso/live/files/usr/lib/dracut/modules.d/90luft-live/luft-live-root.service": 9.1,
 	"os/iso/live/files/usr/lib/systemd/system/luft-live-logs-shutdown.service": 7.4,

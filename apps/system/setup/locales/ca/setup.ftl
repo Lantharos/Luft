@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, muntats en arrencar com abans
 setup-replace-keeps-hostname = El nom de l’ordinador, { $hostname }, i les seves claus SSH
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } eina de línia d’ordres que heu instal·lat, en un Toolbox després d’iniciar la sessió
-   *[other] { $count } eines de línia d’ordres que heu instal·lat, en un Toolbox després d’iniciar la sessió
-}
 setup-replace-keeps-old = { $system } deixa d’iniciar-se. Els seus fitxers de sistema es conserven com a old-system fins que els suprimiu a Discs o a la Configuració.
 setup-replace-erases-system = S’esborra la partició del sistema de { $system }. Els vostres fitxers són en una partició pròpia i es queden com estan.
 setup-replace-clears-boot = Es buida la partició /boot per guardar-hi els fitxers d’arrencada de Luft.

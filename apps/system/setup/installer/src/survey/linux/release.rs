@@ -1,17 +1,9 @@
 use std::collections::HashMap;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Family {
-    Fedora,
-    Arch,
-    Other,
-}
-
 pub struct Release {
     pub name: String,
-    pub id: String,
-    pub version: String,
-    pub family: Family,
+    /// Whether it's Fedora or a system made from it, whose packages Luft can install too.
+    pub fedora: bool,
 }
 
 fn fields(text: &str) -> HashMap<&str, String> {
@@ -23,27 +15,15 @@ fn fields(text: &str) -> HashMap<&str, String> {
 
 pub fn parse(text: &str) -> Release {
     let fields = fields(text);
-    let id = fields
-        .get("ID")
-        .cloned()
-        .unwrap_or_else(|| "linux".to_owned());
-    let like = fields.get("ID_LIKE").cloned().unwrap_or_default();
-    let family_of = |name: &str| id == name || like.split_whitespace().any(|kind| kind == name);
+    let id = fields.get("ID").map_or("linux", String::as_str);
+    let like = fields.get("ID_LIKE").map_or("", String::as_str);
     Release {
         name: fields
             .get("PRETTY_NAME")
             .or_else(|| fields.get("NAME"))
             .cloned()
             .unwrap_or_else(|| "Linux".to_owned()),
-        version: fields.get("VERSION_ID").cloned().unwrap_or_default(),
-        family: if family_of("fedora") {
-            Family::Fedora
-        } else if family_of("arch") {
-            Family::Arch
-        } else {
-            Family::Other
-        },
-        id,
+        fedora: id == "fedora" || like.split_whitespace().any(|kind| kind == "fedora"),
     }
 }
 
@@ -52,13 +32,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn knows_fedora_and_arch_and_their_relatives() {
+    fn knows_fedora_and_its_relatives() {
         let fedora = parse(
             "NAME=\"Fedora Linux\"\nVERSION_ID=45\nID=fedora\nPRETTY_NAME=\"Fedora Linux 45 (Workstation Edition)\"\n",
         );
-        assert_eq!(fedora.family, Family::Fedora);
+        assert!(fedora.fedora);
         assert_eq!(fedora.name, "Fedora Linux 45 (Workstation Edition)");
-        assert_eq!(parse("ID=endeavouros\nID_LIKE=arch\n").family, Family::Arch);
-        assert_eq!(parse("ID=ubuntu\nID_LIKE=debian\n").family, Family::Other);
+        assert!(parse("ID=nobara\nID_LIKE=\"rhel centos fedora\"\n").fedora);
+        assert!(!parse("ID=endeavouros\nID_LIKE=arch\n").fedora);
     }
 }

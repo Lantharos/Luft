@@ -147,10 +147,6 @@ setup-replace-keeps-networks = { $count ->
 }
 setup-replace-keeps-drives = { $drives }, liitetään käynnistyksessä kuten ennenkin
 setup-replace-keeps-hostname = Tietokoneen nimi { $hostname } ja sen SSH-avaimet
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } asentamasi komentorivityökalu, Toolbox-säilössä kirjautumisen jälkeen
-   *[other] { $count } asentamaasi komentorivityökalua, Toolbox-säilössä kirjautumisen jälkeen
-}
 setup-replace-keeps-old = { $system } ei enää käynnisty. Sen järjestelmätiedostot säilytetään nimellä old-system, kunnes poistat ne Levyt-sovelluksessa tai Asetuksissa.
 setup-replace-erases-system = { $system } -järjestelmän osio tyhjennetään. Tiedostosi ovat omalla osiollaan ja pysyvät ennallaan.
 setup-replace-clears-boot = Sen /boot-osio tyhjennetään Luftin käynnistystiedostoja varten.

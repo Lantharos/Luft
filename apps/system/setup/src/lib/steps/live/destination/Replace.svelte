@@ -15,7 +15,7 @@
 			system.networks > 0 && t('setup-replace-keeps-networks', { count: system.networks }),
 			system.drives.length > 0 && t('setup-replace-keeps-drives', { drives: new Intl.ListFormat(i18n.locale).format(system.drives) }),
 			system.hostname && t('setup-replace-keeps-hostname', { hostname: system.hostname }),
-			system.packages > 0 && t('setup-replace-keeps-tools', { count: system.packages })
+			system.packages > 0 && t('setup-replace-keeps-packages', { count: system.packages })
 		].filter((line): line is string => !!line)
 	);
 

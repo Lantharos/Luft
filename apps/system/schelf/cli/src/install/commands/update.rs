@@ -117,7 +117,7 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
         "deb-updates",
         |count| t!(L10N, "cli-update-debs", count = count),
         &of(Source::Debian),
-        |packages| Job::UpdateDebs { packages },
+        |_| Job::UpdateDebs,
         package,
     ));
     plans.extend(

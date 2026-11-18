@@ -13,7 +13,7 @@ export function updateJob(update: AppUpdate): Job {
 	if (update.store) return { kind: 'updateStore', id: update.store.id, consent: update.store.consent };
 	if (update.source === 'flatpak') return { kind: 'updateFlatpaks', installation: update.installation!, references: [update.reference!] };
 	if (update.source === 'system') return { kind: 'updateSystemPackages' };
-	if (update.source === 'debian') return { kind: 'updateDebs', packages: [update.package!] };
+	if (update.source === 'debian') return { kind: 'updateDebs' };
 	if (update.source === 'storeTool') return { kind: 'updateStoreTool', name: update.id };
 	return { kind: 'updateAppImage', id: update.id };
 }

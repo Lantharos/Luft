@@ -94,6 +94,7 @@ Otherwise, **Install the .deb anyway** installs it into Ubuntu 26.04, kept in yo
 
 - It isn't sandboxed: it can read and change everything in your home folder, as it would on Ubuntu. The rest of the computer is at `/run/host`, and `flatpak-spawn --host` runs a command there.
 - Packages that add their maker's software source when installed, as many do, get updates in Schelf. Others stay at their version until you open a newer file.
+- Updating them also brings Ubuntu's own packages up to date, with their security fixes. When only those changed, Schelf shows Ubuntu 26.04 under Updates, with the app platforms.
 - Apps that need drivers or system services of their own don't work this way.
 
 ## Command-line tools

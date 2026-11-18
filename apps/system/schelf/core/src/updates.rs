@@ -125,9 +125,10 @@ fn system() -> Result<Vec<AppUpdate>, String> {
         .collect())
 }
 
-fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
+fn debs(updates: debian::Updates) -> Vec<AppUpdate> {
     let apps = debian::installed();
-    updates
+    let mut rows: Vec<AppUpdate> = updates
+        .apps
         .into_iter()
         .map(|update| {
             let app = apps.iter().find(|app| app.package == update.package);
@@ -148,7 +149,26 @@ fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
                 store: None,
             }
         })
-        .collect()
+        .collect();
+    if rows.is_empty() && updates.ubuntu {
+        rows.push(AppUpdate {
+            key: "deb/ubuntu".to_owned(),
+            source: Source::Debian,
+            id: "ubuntu".to_owned(),
+            desktop: None,
+            name: debian::ORIGIN.to_owned(),
+            icon: None,
+            from: None,
+            to: None,
+            size: 0,
+            platform: true,
+            installation: None,
+            reference: None,
+            package: None,
+            store: None,
+        });
+    }
+    rows
 }
 
 fn from_store(updates: Vec<StoreUpdate>) -> Vec<AppUpdate> {

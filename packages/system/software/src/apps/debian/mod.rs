@@ -77,37 +77,49 @@ pub fn remove(package: &str, task: Task) -> Result<(), String> {
     installed::save(&apps)
 }
 
-/// Newer versions from the software sources some packages add when installed, such as a vendor's.
-pub fn updates() -> Result<Vec<Update>, String> {
+pub struct Updates {
+    pub apps: Vec<Update>,
+    pub ubuntu: bool,
+}
+
+/// Newer versions of the apps, from the software sources some packages add when installed, such
+/// as a vendor's, and whether Ubuntu's own packages have newer versions too.
+pub fn updates() -> Result<Updates, String> {
     let apps = installed();
+    let mut updates = Updates {
+        apps: Vec::new(),
+        ubuntu: false,
+    };
     if apps.is_empty() {
-        return Ok(Vec::new());
+        return Ok(updates);
     }
     ubuntu::quietly(&["update"])?;
     let listed = ubuntu::query(&["apt", "list", "--upgradable"])?;
-    Ok(listed
-        .lines()
-        .filter_map(|line| {
-            // name/suite new-version arch [upgradable from: old-version]
-            let (name, rest) = line.split_once('/')?;
-            let app = apps.iter().find(|app| app.package == name)?;
-            let to = rest.split_whitespace().nth(1)?.to_owned();
-            Some(Update {
+    // name/suite new-version arch [upgradable from: old-version]
+    for (name, rest) in listed.lines().filter_map(|line| line.split_once('/')) {
+        let Some(app) = apps.iter().find(|app| app.package == name) else {
+            updates.ubuntu = true;
+            continue;
+        };
+        if let Some(to) = rest.split_whitespace().nth(1) {
+            updates.apps.push(Update {
                 package: app.package.clone(),
                 from: app.version.clone(),
-                to,
-            })
-        })
-        .collect())
+                to: to.to_owned(),
+            });
+        }
+    }
+    Ok(updates)
 }
 
-pub fn update(packages: &[String], task: Task) -> Result<(), String> {
-    let mut arguments = vec!["install", "--only-upgrade", "--"];
-    for package in packages {
-        arguments.push(operand(package)?);
+/// Brings all of Ubuntu's packages up to date, the apps' along with the rest.
+pub fn update(task: Task) -> Result<(), String> {
+    ubuntu::apt(&["update"], Stage::Preparing, task)?;
+    ubuntu::apt(&["upgrade", "--with-new-pkgs"], Stage::Installing, task)?;
+    for app in installed() {
+        if installed::details(&app.package)?.version != app.version {
+            record(&app.package, None)?;
+        }
     }
-    ubuntu::apt(&arguments, Stage::Installing, task)?;
-    packages
-        .iter()
-        .try_for_each(|package| record(package, None).map(drop))
+    Ok(())
 }

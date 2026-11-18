@@ -55,9 +55,7 @@ pub enum Job {
     RemoveDeb {
         package: String,
     },
-    UpdateDebs {
-        packages: Vec<String>,
-    },
+    UpdateDebs,
     AddFlatpakRepo {
         path: PathBuf,
         name: String,
@@ -159,7 +157,7 @@ impl Job {
             | Self::RemoveStoreTool { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdateStore { .. }
-            | Self::UpdateDebs { .. }
+            | Self::UpdateDebs
             | Self::UpdateAppImage { .. }
             | Self::UpdateSystemPackages
             | Self::UpdateStoreTool { .. } => Action::Update,
@@ -222,7 +220,7 @@ impl Job {
             Self::InstallFlatpakBundle { path } => install_flatpak_bundle(path, task),
             Self::InstallDeb { path } => debian::install(path, task).map(drop),
             Self::RemoveDeb { package } => debian::remove(package, task),
-            Self::UpdateDebs { packages } => debian::update(packages, task),
+            Self::UpdateDebs => debian::update(task),
             Self::AddFlatpakRepo { path, name } => {
                 flatpak::add_remote(Installation::User, name, path)
             }

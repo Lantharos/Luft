@@ -24,9 +24,8 @@ function job(opened: OpenedFile, fullAccess: boolean): Job {
 	if (opened.kind === 'flatpakBundle') return { kind: 'installFlatpakBundle', path: opened.path };
 	if (opened.kind === 'deb') return { kind: 'installDeb', path: opened.path };
 	if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
-	if (opened.kind === 'package' && opened.system)
+	if (opened.kind === 'package')
 		return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
-	if (opened.kind === 'package') return { kind: 'installToolFile', path: opened.path };
 	return { kind: 'installAppImage', path: opened.path, fullAccess };
 }
 
@@ -53,8 +52,7 @@ async function listed(id: string): Promise<Listed | null> {
 function existing(file: OpenedFile, name: string): InstalledApp | null {
 	if (file.kind === 'flatpakRef' || file.kind === 'flatpakBundle') return library.flatpak(file.id);
 	if (file.kind === 'deb') return library.deb(file.package);
-	if (file.kind === 'package' && file.system) return library.system(file.package);
-	if (file.kind === 'package') return library.tool(file.package);
+	if (file.kind === 'package') return library.system(file.package);
 	if (file.kind === 'appImage') return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
 	return null;
 }

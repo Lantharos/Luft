@@ -74,9 +74,6 @@ fn removal_job(app: &InstalledApp) -> Job {
                 .unwrap_or(luft_software::apps::flatpak::Installation::User),
             reference: app.reference.clone().unwrap_or_default(),
         },
-        Source::Tool => Job::RemoveTool {
-            package: app.package.clone().unwrap_or_default(),
-        },
         Source::AppImage | Source::Sabine | Source::Extension => match &app.listing {
             Some(id) => Job::RemoveStore { id: id.clone() },
             None => Job::RemoveAppImage { id: app.id.clone() },

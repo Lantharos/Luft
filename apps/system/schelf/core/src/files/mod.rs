@@ -9,7 +9,7 @@ use std::process::{Command, Stdio};
 use luft_dbus::runtime::block_on;
 use luft_i18n::t;
 use luft_software::apps::flatpak::Permissions;
-use luft_software::apps::{appimage, debian, toolbox};
+use luft_software::apps::{appimage, debian};
 use luft_software::system::repositories;
 use luft_software::system::system_packages;
 use quick_xml::events::Event;
@@ -74,7 +74,6 @@ pub enum OpenedFile {
         vendor: Option<String>,
         size: u64,
         installed: bool,
-        system: bool,
         desktop: Option<String>,
         repository: Option<CheckedSource>,
         repository_error: Option<String>,
@@ -362,13 +361,8 @@ fn package(path: &str) -> Result<OpenedFile, String> {
         Err(error) => (None, Some(error)),
     };
     let desktop = repositories::desktop_entry(path)?;
-    let system = repository.is_some() || desktop.is_some();
-    let installed = if system {
-        block_on(system_packages::list())
-            .is_ok_and(|packages| packages.requested.iter().any(|known| known == name))
-    } else {
-        toolbox::installed().iter().any(|tool| tool.package == name)
-    };
+    let installed = block_on(system_packages::list())
+        .is_ok_and(|packages| packages.requested.iter().any(|known| known == name));
     Ok(OpenedFile::Package {
         path: path.to_owned(),
         package: name.to_owned(),
@@ -380,7 +374,6 @@ fn package(path: &str) -> Result<OpenedFile, String> {
         vendor: (vendor != "(none)").then(|| vendor.to_owned()),
         size: size.parse().unwrap_or(0),
         installed,
-        system,
         desktop,
         repository,
         repository_error,

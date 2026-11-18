@@ -17,6 +17,12 @@ impl Error {
 impl From<anyhow::Error> for Error {
     fn from(error: anyhow::Error) -> Self {
         eprintln!("{error:#}");
+        if error
+            .downcast_ref::<crate::changes::NotApproved>()
+            .is_some()
+        {
+            return Self::not_authorized();
+        }
         Self::Failed(error.to_string())
     }
 }

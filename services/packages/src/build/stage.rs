@@ -8,8 +8,9 @@ use std::process::Command;
 use anyhow::{Result, bail};
 use walkdir::WalkDir;
 
-use super::checks::{Place, place};
-use super::rpm::{File, Rpm};
+use super::resolve::Refused;
+use super::resolve::checks::{Place, place};
+use super::resolve::rpm::{File, Rpm};
 use super::units;
 use crate::command::run;
 use crate::state::manifest::Placed;
@@ -79,11 +80,14 @@ fn fate(layout: &Layout, rpm: &Rpm, file: &File) -> Result<Fate> {
         _ => false,
     };
     if !shared {
-        bail!(
-            "{} would replace {}, which is part of Luft.",
-            rpm.name,
-            file.path
-        );
+        return Err(Refused {
+            package: rpm.name.clone(),
+            reason: format!(
+                "{} would replace {}, which is part of Luft.",
+                rpm.name, file.path
+            ),
+        }
+        .into());
     }
     Ok(Fate::Shared)
 }

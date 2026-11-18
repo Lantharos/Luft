@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
@@ -24,7 +24,10 @@ pub struct Package {
     pub requested: bool,
     pub units: Vec<String>,
     pub apps: Vec<String>,
+    pub commands: Vec<String>,
     pub origin: Origin,
+    /// Whether it only adds what runs with the rights of whoever starts it.
+    pub plain: bool,
 }
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug, PartialEq, Eq)]
@@ -42,9 +45,11 @@ pub struct Placed {
     pub mode: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug, PartialEq, Eq)]
 pub struct Build {
     pub requested: BTreeSet<String>,
+    /// Requested packages the build couldn't have, with why.
+    pub left_out: BTreeMap<String, String>,
     pub packages: Vec<Package>,
     pub enabled: Vec<String>,
     pub placed: Vec<Placed>,
@@ -53,6 +58,8 @@ pub struct Build {
     pub udev_rules: bool,
     pub libraries: bool,
     pub selinux_modules: Vec<String>,
+    /// What in the build changes what the system does as root or who may do what.
+    pub privileges: BTreeSet<String>,
 }
 
 impl Build {

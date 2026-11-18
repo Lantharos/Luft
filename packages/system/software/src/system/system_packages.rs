@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::File;
 
 use futures_util::future::{Either, select};
@@ -35,7 +36,9 @@ pub struct Package {
     pub requested: bool,
     pub units: Vec<String>,
     pub apps: Vec<String>,
+    pub commands: Vec<String>,
     pub origin: Origin,
+    pub plain: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -63,10 +66,13 @@ impl Repository {
 /// The packages added to the system, merged over it as a system extension, and the
 /// repositories they can come from besides Fedora.
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct SystemPackages {
     pub requested: Vec<String>,
     pub packages: Vec<Package>,
     pub services: Vec<String>,
+    /// Requested packages the running system's build couldn't have, with why.
+    pub left_out: BTreeMap<String, String>,
     pub pending: bool,
     pub repositories: Vec<Repository>,
 }
@@ -75,6 +81,10 @@ impl SystemPackages {
     /// The packages asked for, without what they brought along.
     pub fn requested(&self) -> impl Iterator<Item = &Package> {
         self.packages.iter().filter(|package| package.requested)
+    }
+
+    pub fn package(&self, name: &str) -> Option<&Package> {
+        self.packages.iter().find(|package| package.name == name)
     }
 
     /// Where a package came from, in words.
@@ -161,6 +171,15 @@ pub async fn install(names: &[String], task: Task<'_>) -> Result<(), String> {
 pub async fn install_file(path: &str, task: Task<'_>) -> Result<(), String> {
     let file = File::open(path).map_err(|error| error.to_string())?;
     rebuild("InstallFile", &(Fd::from(&file),), task).await
+}
+
+/// Brings the system packages up to their newest versions now, rather than at the next check
+/// for updates.
+pub async fn update() -> Result<(), String> {
+    PACKAGES
+        .change::<_, ()>("Update", &())
+        .await
+        .map_err(|error| dbus::explain(&error))
 }
 
 /// Removes system packages and everything they brought, leaving the system as it was before.

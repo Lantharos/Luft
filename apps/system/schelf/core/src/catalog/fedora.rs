@@ -1,7 +1,5 @@
-use std::process::{Command, Stdio};
-
 use luft_i18n::t;
-use luft_software::apps::toolbox::Repositories;
+use luft_software::system::catalog::{self, Repositories, without_epoch};
 
 use crate::l10n::L10N;
 
@@ -19,29 +17,7 @@ pub struct Details {
 }
 
 pub fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<String, String> {
-    let Some(choice) = repositories.option() else {
-        return Ok(String::new());
-    };
-    let architectures = format!("--arch=noarch,{}", std::env::consts::ARCH);
-    let output = Command::new("dnf")
-        .args(["repoquery", "--quiet", "--latest-limit=1"])
-        .args(choice)
-        .arg(architectures)
-        .args(arguments)
-        .env("LC_ALL", "C.UTF-8")
-        .stdin(Stdio::null())
-        .stderr(Stdio::null())
-        .output()
-        .map_err(|_| t!(L10N, "core-fedora-unreachable"))?;
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(t!(L10N, "core-fedora-unreachable"))
-    }
-}
-
-fn without_epoch(version: &str) -> &str {
-    version.split_once(':').map_or(version, |(_, rest)| rest)
+    catalog::repoquery(repositories, arguments).map_err(|_| t!(L10N, "core-fedora-unreachable"))
 }
 
 /// The details of `package` from Fedora, or from the repositories that were added for system

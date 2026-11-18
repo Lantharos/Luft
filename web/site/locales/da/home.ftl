@@ -98,7 +98,6 @@ home-question-windows-answer = Ja. Luft kan bo ved siden af Windows, og du vælg
 home-question-try = Kan jeg prøve det først?
 home-question-try-answer = Ja. Meet Luft genstarter i Luft én gang uden at installere noget, og ved næste genstart er du tilbage i Windows eller dit Linux. Et USB-stik virker på samme måde.
 home-question-apps = Hvad med mine apps?
-home-question-apps-answer = Schelf installerer apps fra Flathub og AppImages og holder dem opdaterede. Helium følger med som browser og kan skiftes ud med en hvilken som helst anden. Kommandolinjeværktøjer kommer i en Toolbox-container, som Schelf også styrer.
 home-question-updates = Hvordan virker opdateringer?
 home-question-updates-answer = Hele systemet opdateres på én gang, i baggrunden, og skifter over ved næste genstart. Hvis noget ikke er i orden, er den forrige version ét valg væk, når computeren starter.
 home-question-ready = Er det klar?

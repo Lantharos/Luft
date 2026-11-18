@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use luft_dbus::runtime::block_on;
 use luft_i18n::t;
 use luft_software::apps::flatpak::{self, FLATHUB, Installation, Step};
-use luft_software::apps::{appimage, debian, places, toolbox};
+use luft_software::apps::{appimage, debian, places};
 use luft_software::system::repositories::{self, Draft};
 use luft_software::system::system_packages;
 use luft_software::task::Task;
@@ -67,21 +67,12 @@ pub enum Job {
         /// Whether you let an app that asks to run unsandboxed do so.
         full_access: bool,
     },
-    InstallTool {
-        package: String,
-    },
-    InstallToolFile {
-        path: String,
-    },
     RemoveFlatpak {
         installation: Installation,
         reference: String,
     },
     RemoveAppImage {
         id: String,
-    },
-    RemoveTool {
-        package: String,
     },
     UpdateFlatpaks {
         installation: Installation,
@@ -90,9 +81,7 @@ pub enum Job {
     UpdateAppImage {
         id: String,
     },
-    UpdateTools {
-        packages: Vec<String>,
-    },
+    UpdateSystemPackages,
     InstallSystemPackages {
         packages: Vec<String>,
     },
@@ -158,8 +147,6 @@ impl Job {
             | Self::InstallDeb { .. }
             | Self::AddFlatpakRepo { .. }
             | Self::InstallAppImage { .. }
-            | Self::InstallTool { .. }
-            | Self::InstallToolFile { .. }
             | Self::InstallSystemPackages { .. }
             | Self::InstallSystemPackageFile { .. }
             | Self::InstallStoreTool { .. } => Action::Install,
@@ -167,7 +154,6 @@ impl Job {
             | Self::RemoveStore { .. }
             | Self::RemoveDeb { .. }
             | Self::RemoveAppImage { .. }
-            | Self::RemoveTool { .. }
             | Self::RemoveSystemPackages { .. }
             | Self::RemoveRepository { .. }
             | Self::RemoveStoreTool { .. } => Action::Remove,
@@ -175,7 +161,7 @@ impl Job {
             | Self::UpdateStore { .. }
             | Self::UpdateDebs { .. }
             | Self::UpdateAppImage { .. }
-            | Self::UpdateTools { .. }
+            | Self::UpdateSystemPackages
             | Self::UpdateStoreTool { .. } => Action::Update,
         }
     }
@@ -251,8 +237,6 @@ impl Job {
                     *full_access,
                 ))
             }
-            Self::InstallTool { package } => toolbox::install(package, task),
-            Self::InstallToolFile { path } => toolbox::install_file(path, task),
             Self::RemoveFlatpak {
                 installation,
                 reference,
@@ -266,7 +250,6 @@ impl Job {
                 }
             }
             Self::RemoveAppImage { id } => appimage::remove(id),
-            Self::RemoveTool { package } => toolbox::remove(package, task),
             Self::UpdateFlatpaks {
                 installation,
                 references,
@@ -292,7 +275,7 @@ impl Job {
                 let _exclusive = task.exclusive()?;
                 staged.apply().map(drop)
             }
-            Self::UpdateTools { packages } => toolbox::update(packages, task),
+            Self::UpdateSystemPackages => block_on(system_packages::update()),
             Self::InstallSystemPackages { packages } => {
                 block_on(system_packages::install(packages, task))
             }

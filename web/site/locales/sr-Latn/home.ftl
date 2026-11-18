@@ -99,7 +99,6 @@ home-question-windows-answer = Da. Luft može da stoji pored sistema Windows, a 
 home-question-try = Mogu li da ga isprobam pre instalacije?
 home-question-try-answer = Da. Meet Luft se jednom ponovo pokreće u Luft bez instaliranja bilo čega, a sledeće pokretanje vas vraća u Windows ili vaš Linux. USB fleš radi na isti način.
 home-question-apps = Šta je sa mojim aplikacijama?
-home-question-apps-answer = Schelf instalira aplikacije sa servisa Flathub i u formatu AppImage i održava ih ažurnim. Kao pregledač stiže Helium, a možete ga zameniti bilo kojim drugim. Alatke komandne linije idu u Toolbox kontejner kojim takođe upravlja Schelf.
 home-question-updates = Kako rade ažuriranja?
 home-question-updates-answer = Ceo sistem se ažurira odjednom, u pozadini, i prelazi na novu verziju pri sledećem ponovnom pokretanju. Ako nešto nije u redu, prethodna verzija je na jedan izbor pri pokretanju računara.
 home-question-ready = Da li je spreman?

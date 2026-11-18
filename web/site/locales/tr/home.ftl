@@ -98,7 +98,6 @@ home-question-windows-answer = Evet. Luft, Windows’un yanında durabilir ve ha
 home-question-try = Yüklemeden önce deneyebilir miyim?
 home-question-try-answer = Evet. Meet Luft hiçbir şey yüklemeden bir kez Luft’ta yeniden başlatır, bir sonraki yeniden başlatmada Windows’a ya da Linux’unuza dönersiniz. USB bellek de aynı şekilde çalışır.
 home-question-apps = Peki uygulamalarım?
-home-question-apps-answer = Schelf, Flathub’dan uygulamaları ve AppImage’ları yükler ve güncel tutar. Tarayıcı olarak Helium gelir, dilediğiniz başka bir tarayıcıyla değiştirebilirsiniz. Komut satırı araçları, yine Schelf’in yönettiği bir Toolbox kapsayıcısına yüklenir.
 home-question-updates = Güncellemeler nasıl çalışır?
 home-question-updates-answer = Tüm sistem arka planda tek seferde güncellenir ve bir sonraki yeniden başlatmada devreye girer. Bir şey yolunda gitmezse önceki sürüm, bilgisayar açılırken bir seçim uzaklıktadır.
 home-question-ready = Hazır mı?

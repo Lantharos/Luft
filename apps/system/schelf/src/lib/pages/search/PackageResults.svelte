@@ -1,36 +1,26 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { commands, type ToolSummary } from '#lib/bindings.js';
+	import { commands, type PackageSummary } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { SLOW } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
-	import { Spinner } from '@luft/ui';
-	import SystemDialog from './SystemDialog.svelte';
 
-	type Kind = 'tool' | 'system';
+	let { query, found = $bindable(null) }: { query: string; found?: number | null } = $props();
 
-	let { query, kind, found = $bindable(null) }: { query: string; kind: Kind; found?: number | null } = $props();
-
-	const TEXT: Record<Kind, { title: string; description: string; failed: string }> = {
-		tool: { title: 'search-tools', description: 'search-tools-description', failed: 'search-tools-failed' },
-		system: { title: 'search-system', description: 'search-system-description', failed: 'search-system-failed' }
-	};
-
-	let tools = $state<ToolSummary[] | null>(null);
+	let packages = $state<PackageSummary[] | null>(null);
 	let error = $state<string | null>(null);
-	let checking = $state<string | null>(null);
-	let forSystem = $state<ToolSummary | null>(null);
 
 	$effect(() => {
 		const current = query;
-		tools = null;
+		packages = null;
 		error = null;
-		(kind === 'tool' ? commands.toolsSearch({ query: current }, SLOW) : commands.systemSearch({ query: current }, SLOW))
+		commands
+			.packagesSearch({ query: current }, SLOW)
 			.then((result) => {
-				if (current === query) tools = result;
+				if (current === query) packages = result;
 			})
 			.catch((reason) => {
 				if (current === query) error = String(reason);
@@ -38,47 +28,32 @@
 	});
 
 	$effect(() => {
-		found = error ? null : (tools?.length ?? null);
+		found = error ? null : (packages?.length ?? null);
 	});
 
-	const key = (tool: ToolSummary) => `${kind}/${tool.package}`;
-	const installedAs = (tool: ToolSummary) =>
-		kind === 'tool' ? (library.tool(tool.package) ?? library.system(tool.package)) : library.system(tool.package);
+	const key = (found: PackageSummary) => `system/${found.package}`;
 
-	function run(tool: ToolSummary, intoSystem: boolean) {
-		const operation = operations.forKey(key(tool));
+	function install(found: PackageSummary) {
+		const operation = operations.forKey(key(found));
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
-		void operations.run(
-			key(tool),
-			tool.package,
-			intoSystem ? { kind: 'installSystemPackages', packages: [tool.package] } : { kind: 'installTool', package: tool.package }
-		);
+		void operations.run(key(found), found.package, { kind: 'installSystemPackages', packages: [found.package] });
 	}
 
-	async function install(tool: ToolSummary) {
-		if (kind === 'system') return run(tool, true);
-		checking = tool.package;
-		const needsSystem = await commands.toolNeedsSystem({ package: tool.package }, SLOW).catch(() => false);
-		checking = null;
-		if (needsSystem) forSystem = tool;
-		else run(tool, false);
-	}
-
-	function open(tool: ToolSummary) {
-		const installed = installedAs(tool);
+	function open(found: PackageSummary) {
+		const installed = library.system(found.package);
 		if (installed) navigation.push({ page: 'app', target: { installed: installed.key }, name: installed.name });
 	}
 </script>
 
 {#if error}
-	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{t(TEXT[kind].failed, { error })}</p>
-{:else if tools === null || tools.length}
+	<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{t('search-packages-failed', { error })}</p>
+{:else if packages === null || packages.length}
 	<section class="flex flex-col gap-2">
 		<div class="flex flex-col gap-0.5 px-1.5">
-			<h2 class="text-[17px] font-semibold">{t(TEXT[kind].title)}</h2>
-			<p class="text-[13px] text-[var(--text-muted)]">{t(TEXT[kind].description)}</p>
+			<h2 class="text-[17px] font-semibold">{t('search-packages')}</h2>
+			<p class="text-[13px] text-[var(--text-muted)]">{t('search-packages-description')}</p>
 		</div>
-		{#if tools === null}
+		{#if packages === null}
 			<div class="flex flex-col gap-1" aria-busy="true">
 				{#each { length: 3 } as _, index (index)}
 					<div class="skeleton h-[60px] w-full"></div>
@@ -86,15 +61,15 @@
 			</div>
 		{:else}
 			<div class="flex flex-col gap-0.5">
-				{#each tools as tool (tool.package)}
-					{@const operation = operations.forKey(key(tool))}
-					{@const installed = installedAs(tool)}
+				{#each packages as found (found.package)}
+					{@const operation = operations.forKey(key(found))}
+					{@const installed = library.system(found.package)}
 					<div class="row">
-						<button type="button" class="main" disabled={!installed} onclick={() => open(tool)}>
-							<AppArt icon={null} source={kind} size={40} />
+						<button type="button" class="main" disabled={!installed} onclick={() => open(found)}>
+							<AppArt icon={null} source="system" size={40} />
 							<span class="flex min-w-0 flex-col gap-0.5">
-								<span class="truncate text-[14px] font-medium text-[var(--text)]">{tool.package}</span>
-								<span class="truncate text-[12.5px]" class:failed={operation?.state === 'failed'}>{operation?.state === 'failed' ? operation.error : tool.summary}</span>
+								<span class="truncate text-[14px] font-medium text-[var(--text)]">{found.package}</span>
+								<span class="truncate text-[12.5px]" class:failed={operation?.state === 'failed'}>{operation?.state === 'failed' ? operation.error : found.summary}</span>
 							</span>
 						</button>
 						{#if operation && operation.state !== 'failed'}
@@ -102,20 +77,13 @@
 						{:else if installed}
 							<span class="px-3 text-[13px] text-[var(--text-muted)]">{t('search-installed')}</span>
 						{:else}
-							<button type="button" class="button" disabled={checking !== null} onclick={() => install(tool)}>
-								{#if checking === tool.package}<Spinner />{/if}{t('search-install')}
-							</button>
+							<button type="button" class="button" onclick={() => install(found)}>{t('search-install')}</button>
 						{/if}
 					</div>
 				{/each}
 			</div>
 		{/if}
 	</section>
-{/if}
-
-{#if forSystem}
-	{@const tool = forSystem}
-	<SystemDialog name={tool.package} onclose={() => (forSystem = null)} oninstall={() => run(tool, true)} />
 {/if}
 
 <style>

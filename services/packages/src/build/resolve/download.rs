@@ -1,15 +1,16 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use serde::Deserialize;
 
-use super::DNF_CACHE;
+use super::super::DNF_CACHE;
 use crate::command::{failure, run};
 use crate::repositories::{self, FOLDER, KEYS};
 use crate::state::manifest::Origin;
+use crate::state::remove_folder;
 use crate::state::requested::Requested;
 use crate::state::sources::Sources;
 
@@ -98,25 +99,21 @@ fn keep(downloads: &[(String, PathBuf)]) -> Result<()> {
     Ok(())
 }
 
-/// Runs dnf, naming the package it couldn't find when that's why it failed.
-fn resolve(command: &mut Command) -> Result<()> {
+/// Runs dnf, which leaves out what it can't find or install, and returns the names it
+/// found nothing called.
+fn resolve(command: &mut Command) -> Result<BTreeSet<String>> {
     let output = command
         .stdin(Stdio::null())
         .output()
         .context("Starting dnf")?;
-    if output.status.success() {
-        return Ok(());
+    if !output.status.success() {
+        return Err(failure("dnf", &output.stderr));
     }
-    let errors = String::from_utf8_lossy(&output.stderr);
-    match errors
+    Ok(String::from_utf8_lossy(&output.stderr)
         .lines()
-        .find_map(|line| line.trim().strip_prefix("No match for argument: "))
-    {
-        Some(name) => Err(anyhow!(
-            "There's no package called {name} in Fedora or the software sources that were added."
-        )),
-        None => Err(failure("dnf", &output.stderr)),
-    }
+        .filter_map(|line| line.trim().strip_prefix("No match for argument: "))
+        .map(str::to_owned)
+        .collect())
 }
 
 /// Puts a package file installed by itself where the stored transaction names it, since dnf
@@ -137,21 +134,36 @@ fn store_file(sources: &Sources, at: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Downloads the packages in `requested` and what they need into `store`, resolved against the
-/// build root's own packages, and says where each came from. Packages kept from earlier builds
-/// aren't downloaded again; rpm checks them like any other when it installs them.
+pub struct Downloaded {
+    pub origins: HashMap<PathBuf, Origin>,
+    pub unavailable: BTreeSet<String>,
+}
+
+/// Downloads the packages in `wanted` and what they need into `store`, resolved against the
+/// build root's own packages, without the packages in `excluded`, and says where each came
+/// from. What can't be found, or can't be installed without an excluded package, is left
+/// out. Packages kept from earlier builds aren't downloaded again; rpm checks them like any
+/// other when it installs them.
 pub fn download(
     root: &Path,
     release: &str,
-    requested: &Requested,
+    wanted: &Requested,
+    excluded: &BTreeSet<String>,
     sources: &Sources,
     store: &Path,
-) -> Result<HashMap<PathBuf, Origin>> {
-    let wanted = requested.iter().map(|name| match sources.files.get(name) {
+) -> Result<Downloaded> {
+    remove_folder(store)?;
+    let names = wanted.iter().map(|name| match sources.files.get(name) {
         Some(file) => file.as_os_str().to_owned(),
         None => name.into(),
     });
-    resolve(
+    let excluding = (!excluded.is_empty()).then(|| {
+        format!(
+            "--setopt=*.excludepkgs={}",
+            excluded.iter().cloned().collect::<Vec<_>>().join(",")
+        )
+    });
+    let unavailable = resolve(
         Command::new("dnf")
             .arg(format!("--installroot={}", root.display()))
             .arg(format!("--releasever={release}"))
@@ -169,14 +181,17 @@ pub fn download(
                 "--setopt=countme=False",
                 "--assumeyes",
                 "--quiet",
-                "install",
             ])
+            .args(excluding)
+            .args(["install", "--skip-unavailable", "--skip-broken"])
             .arg(format!("--store={}", store.display()))
-            .args(wanted),
+            .args(names),
     )?;
-    let stored: Stored = serde_json::from_slice(
-        &fs::read(store.join("transaction.json")).context("Reading the planned packages")?,
-    )?;
+    let stored = match fs::read(store.join("transaction.json")) {
+        Ok(text) => serde_json::from_slice(&text)?,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Stored { rpms: Vec::new() },
+        Err(error) => return Err(error).context("Reading the planned packages"),
+    };
     let owners = repositories::owners(&sources.repositories);
     let mut origins = HashMap::new();
     let mut downloads = Vec::new();
@@ -203,7 +218,10 @@ pub fn download(
         origins.insert(path, origin);
     }
     keep(&downloads)?;
-    Ok(origins)
+    Ok(Downloaded {
+        origins,
+        unavailable,
+    })
 }
 
 /// The package in Fedora or the added sources that provides `capability`, such as a library's

@@ -11,7 +11,6 @@
 	type Format = 'any' | 'store' | 'flatpak' | 'appImage' | 'debian';
 
 	const APPS: Source[] = ['flatpak', 'appImage', 'debian', 'sabine'];
-	const TOOLS: Source[] = ['tool', 'storeTool'];
 	const kinds: { value: Format; label: string }[] = $derived([
 		{ value: 'any', label: t('installed-kind-any') },
 		{ value: 'store', label: t('installed-kind-store') },
@@ -41,7 +40,7 @@
 	const apps = $derived(library.installed.filter((app) => APPS.includes(app.source)));
 	const formats = $derived(kinds.filter(({ value }) => value === 'any' || apps.some((app) => made(app) === value)));
 	const shown = $derived.by(() => {
-		if (filter === 'tool') return library.installed.filter((app) => TOOLS.includes(app.source));
+		if (filter === 'tool') return library.installed.filter((app) => app.source === 'storeTool');
 		if (filter !== 'apps') return library.installed.filter((app) => app.source === filter);
 		return format === 'any' ? apps : apps.filter((app) => made(app) === format);
 	});

@@ -1,7 +1,7 @@
 use luft_dbus::runtime::block_on;
-use luft_software::apps::toolbox::{Available, Repositories};
+use luft_software::system::catalog::{Available, Repositories};
 use luft_software::system::system_packages;
-use schelf_core::catalog::tools;
+use schelf_core::catalog::packages;
 use schelf_core::operations::Job;
 
 use super::{Candidate, Catalog, Kind};
@@ -27,12 +27,12 @@ fn candidates(found: Vec<Available>) -> Vec<Candidate> {
 }
 
 pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
-    tools::search_in(Repositories::Added, query).map(candidates)
+    packages::search_in(Repositories::Added, query).map(candidates)
 }
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     Ok(candidates(
-        tools::find_in(Repositories::Added, name)?
+        packages::find_in(Repositories::Added, name)?
             .into_iter()
             .collect(),
     ))

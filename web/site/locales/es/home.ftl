@@ -96,7 +96,6 @@ home-question-windows-answer = Sí. Luft puede convivir con Windows y tú eliges
 home-question-try = ¿Puedo probarlo antes de instalarlo?
 home-question-try-answer = Sí. Meet Luft reinicia una vez en Luft sin instalar nada, y el siguiente reinicio te devuelve a Windows o a tu Linux. Con una memoria USB funciona igual.
 home-question-apps = ¿Y mis aplicaciones?
-home-question-apps-answer = Schelf instala aplicaciones de Flathub y AppImage, y las mantiene actualizadas. Helium viene como navegador y se puede cambiar por cualquier otro. Las herramientas de línea de comandos van a un contenedor de Toolbox que Schelf también gestiona.
 home-question-updates = ¿Cómo funcionan las actualizaciones?
 home-question-updates-answer = Todo el sistema se actualiza de una vez, en segundo plano, y cambia a la nueva versión en el siguiente reinicio. Si algo no va bien, la versión anterior está a una elección de distancia al arrancar el ordenador.
 home-question-ready = ¿Está listo?

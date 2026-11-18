@@ -62,7 +62,6 @@ fn job(opened: &OpenedFile) -> Job {
         OpenedFile::Package {
             path,
             package,
-            system: true,
             repository,
             ..
         } => Job::InstallSystemPackageFile {
@@ -70,7 +69,6 @@ fn job(opened: &OpenedFile) -> Job {
             package: package.clone(),
             repository: repository.as_ref().map(|bundled| bundled.draft.clone()),
         },
-        OpenedFile::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
         OpenedFile::AppImage { path, .. } => Job::InstallAppImage {
             path: path.into(),
             full_access: false,

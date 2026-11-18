@@ -1,3 +1,4 @@
+pub mod catalog;
 #[cfg(feature = "image")]
 pub mod image;
 pub mod repositories;

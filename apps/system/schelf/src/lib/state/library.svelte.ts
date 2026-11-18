@@ -51,10 +51,6 @@ class Library {
 		return this.installed.find((app) => app.source === 'flatpak' && app.id === id) ?? null;
 	}
 
-	tool(name: string) {
-		return this.installed.find((app) => app.source === 'tool' && app.package === name) ?? null;
-	}
-
 	deb(name: string) {
 		return this.installed.find((app) => app.source === 'debian' && app.package === name) ?? null;
 	}

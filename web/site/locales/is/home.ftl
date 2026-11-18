@@ -96,7 +96,6 @@ home-question-windows-answer = Já. Luft getur verið við hlið Windows og þú
 home-question-try = Get ég prófað það áður en ég set það upp?
 home-question-try-answer = Já. Meet Luft endurræsir einu sinni í Luft án þess að setja neitt upp, og næsta endurræsing fer aftur í Windows eða Linux-kerfið þitt. USB-lykill virkar á sama hátt.
 home-question-apps = En forritin mín?
-home-question-apps-answer = Schelf setur upp forrit frá Flathub og AppImage og heldur þeim uppfærðum. Helium fylgir sem vafri og þú getur skipt honum út fyrir hvaða vafra sem er. Skipanalínutól fara í Toolbox-gám sem Schelf sér líka um.
 home-question-updates = Hvernig virka uppfærslur?
 home-question-updates-answer = Allt kerfið uppfærist í einu, í bakgrunni, og skiptir yfir við næstu endurræsingu. Ef eitthvað er ekki í lagi er fyrri útgáfan einu vali frá þegar tölvan ræsist.
 home-question-ready = Er það tilbúið?

@@ -90,7 +90,6 @@ operation-more-waiting = { $count ->
 source-store = schelf.store
 source-store-extension = Extension from schelf.store
 source-file = Installed from a file
-source-tool = Command-line tool
 source-store-tool = Command-line tool from schelf.store
 source-ubuntu = Made for Ubuntu
 source-system = Part of the system
@@ -234,7 +233,6 @@ remove-title = Remove { $name }?
 remove-extension = { $name } will be removed from your desktop.
 # $folder is the folder the app's file is kept in
 remove-appimage = { $name } and its file in { $folder } will be deleted, with everything you allowed it.
-remove-tool = { $name } and its commands will be removed. Your files stay.
 remove-app = { $name } will be removed from this computer. Your files and settings stay.
 remove-system = { $name } is removed for everyone, settings and data included.
 remove-flatpak = { $name } will be removed from this computer and loses the drives and folders you gave it. Your files and settings stay.
@@ -287,7 +285,6 @@ file-unverified-description = It isn't signed by Fedora or a software source you
 file-unverified-fact = Not verified
 file-for-everyone-fact = Installs for everyone on this computer
 file-administrator-fact = Can run as administrator while it installs
-file-for-you-fact = Installs for you only, but can read and change your files
 file-no-updates-fact = Won't get updates
 file-install-anyway = Install anyway
 
@@ -311,7 +308,6 @@ file-installs-to = Installs to
 file-installs-to-ubuntu = A separate space with Ubuntu's software that can read and change your files. The first one downloads Ubuntu, a few hundred megabytes.
 file-installs-to-appimage = Kept up to date when { -schelf } can.
 file-installs-to-system = For everyone on this computer, updated with { -luft }.
-file-installs-to-tool = For you only. Its commands run in Tern.
 file-your-account = Your account
 # Installs for the whole computer, as opposed to your account
 file-system = System

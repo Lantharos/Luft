@@ -257,7 +257,7 @@ installed-kind-store = From schelf.store
 installed-sources = Software sources
 installed-empty = No apps here yet.
 installed-empty-tools = Command-line tools you install from search show up here.
-installed-empty-system = Drivers and services you add to the system show up here.
+installed-empty-system = Packages you install from Fedora and your software sources show up here.
 # How many are shown, under the filter that's picked
 installed-count-apps = { $count ->
     [one] { $count } app
@@ -311,20 +311,12 @@ search-apps = Apps
 search-apps-failed = Apps can't be searched right now. { $error }
 # $query is what was typed into search
 search-nothing = Nothing matches “{ $query }”.
-search-tools = Command-line tools
-search-tools-description = Installed for you only. You run them in Tern.
-search-tools-failed = Command-line tools can't be searched right now. { $error }
-search-system = System add-ons
-search-system-description = From your software sources. They become part of the system and update with { -luft }.
-search-system-failed = Your software sources can't be searched right now. { $error }
+search-packages = Packages
+search-packages-description = From Fedora and your software sources, for everyone on this computer.
+# $error says why
+search-packages-failed = Packages can't be searched right now. { $error }
 search-installed = Installed
 search-install = Install
-# $name is a package's name
-search-system-title = Install { $name } for the whole computer?
-search-system-dialog = { $name } brings a service or driver that only works as part of the system.
-search-system-everyone = Installs for everyone on this computer
-search-system-starts = Starts with the computer
-search-system-updates = Updates with { -luft }
 
 ## Software sources
 
@@ -381,7 +373,7 @@ updates-checked-size = { $size } to download · Checked { $when }
 updates-check-now = Check now
 updates-update-all = Update all
 updates-apps = Apps
-updates-tools = Command-line tools
+updates-system = System packages
 updates-platforms = App platforms
 updates-platforms-description = Shared parts that Flatpak apps are built on
 updates-moves-inside = Approved to run inside { -luft }

@@ -99,7 +99,6 @@ home-question-windows-answer = Is féidir. Is féidir le Luft a bheith taobh le 
 home-question-try = An féidir liom triail a bhaint as roimh shuiteáil?
 home-question-try-answer = Is féidir. Atosaíonn Meet Luft isteach i Luft uair amháin, gan aon rud a shuiteáil, agus filleann an chéad atosú eile ar Windows nó ar do Linux. Oibríonn cipín USB ar an mbealach céanna.
 home-question-apps = Agus mo chuid aipeanna?
-home-question-apps-answer = Suiteálann Schelf aipeanna ó Flathub agus AppImage, agus coinníonn sé cothrom le dáta iad. Tagann Helium mar an brabhsálaí agus is féidir aon cheann eile a chur ina áit. Téann uirlisí líne na n-orduithe isteach i gcoimeádán Toolbox a bhainistíonn Schelf freisin.
 home-question-updates = Conas a oibríonn nuashonruithe?
 home-question-updates-answer = Nuashonraítear an córas ar fad le chéile, sa chúlra, agus athraíonn sé ag an gcéad atosú eile. Mura bhfuil rud éigin i gceart, tá an leagan roimhe rogha amháin uait nuair a thosaíonn an ríomhaire.
 home-question-ready = An bhfuil sé réidh?

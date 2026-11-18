@@ -39,12 +39,6 @@ pub fn flatpak() -> bool {
     *FLATPAK.get_or_init(|| on_path("flatpak").is_some())
 }
 
-/// Whether Toolbox is installed, which command-line tools from Fedora live in.
-pub fn toolbox() -> bool {
-    static TOOLBOX: OnceLock<bool> = OnceLock::new();
-    *TOOLBOX.get_or_init(|| on_path("toolbox").is_some())
-}
-
 fn user_sabine() -> PathBuf {
     std::env::var_os("XDG_DATA_HOME")
         .filter(|path| !path.is_empty())

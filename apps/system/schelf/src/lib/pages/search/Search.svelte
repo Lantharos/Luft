@@ -15,8 +15,7 @@
 
 	let remote = $state<CatalogApp[] | null>(null);
 	let error = $state<string | null>(null);
-	let tools = $state<number | null>(null);
-	let system = $state<number | null>(null);
+	let packages = $state<number | null>(null);
 
 	const needle = $derived(query.toLowerCase());
 	const installed = $derived(library.installed.filter((app) => app.name.toLowerCase().includes(needle)).slice(0, 8));
@@ -38,8 +37,7 @@
 	const apps = $derived(remote?.filter((app) => app.kind === 'app').slice(0, LIMIT) ?? null);
 	const extensions = $derived(remote?.filter((app) => app.kind === 'extension').slice(0, LIMIT) ?? []);
 	const extensionsFirst = $derived(remote?.[0]?.kind === 'extension');
-	const others = $derived(tools === null || system === null ? null : tools + system);
-	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
+	const nothing = $derived(!installed.length && remote?.length === 0 && packages === 0);
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
@@ -71,8 +69,7 @@
 		{#if extensions.length && !extensionsFirst}
 			<Shelf title={t('search-extensions')} apps={extensions} />
 		{/if}
-		<PackageResults {query} kind="tool" bind:found={tools} />
-		<PackageResults {query} kind="system" bind:found={system} />
+		<PackageResults {query} bind:found={packages} />
 		{#if nothing}
 			<p class="px-1.5 pt-10 text-center text-[15px] text-[var(--text-muted)]">{t('search-nothing', { query })}</p>
 		{/if}

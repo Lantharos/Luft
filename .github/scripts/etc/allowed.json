@@ -72,9 +72,6 @@
 	"packages/system/network/src/vpn/plugins.rs": {
 		"/etc/NetworkManager/VPN": "Reads the VPN plugins installed"
 	},
-	"packages/system/software/src/apps/toolbox/container.rs": {
-		"/etc/os-release": "Reads which system it runs on"
-	},
 	"packages/system/software/src/system/repositories/package.rs": {
 		"/etc/yum.repos.d/": "Finds the repository files inside a package file"
 	},
@@ -101,9 +98,6 @@
 		"/etc/passwd": "Reads the users the build root gets",
 		"/etc/group": "Reads the groups the build root gets"
 	},
-	"services/packages/src/build/checks.rs": {
-		"/etc/": "Sorts package files by where they go"
-	},
 	"services/packages/src/build/declared.rs": {
 		"/etc": "Names where packages keep their configuration",
 		"/etc/": "Names where packages keep their configuration"
@@ -111,6 +105,12 @@
 	"services/packages/src/build/mod.rs": {
 		"/etc/ld.so.cache": "Made again at every start from the merged packages, as installing them would, and put back as it was without them",
 		"/etc/ld.so.conf.d/": "Tells whether packages bring libraries"
+	},
+	"services/packages/src/build/plain.rs": {
+		"/etc/": "Tells whether packages change what the system does as root, so an administrator approves them"
+	},
+	"services/packages/src/build/resolve/checks.rs": {
+		"/etc/": "Sorts package files by where they go"
 	},
 	"services/packages/src/build/stage.rs": {
 		"/etc/yum.repos.d/": "Leaves the repository files packages bring out of the extension",

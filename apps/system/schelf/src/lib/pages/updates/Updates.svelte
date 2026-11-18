@@ -9,8 +9,8 @@
 	import UpdateRow from './UpdateRow.svelte';
 
 	const updates = $derived(library.updates?.apps ?? []);
-	const apps = $derived(updates.filter((update) => !update.platform && update.source !== 'tool'));
-	const tools = $derived(updates.filter((update) => update.source === 'tool'));
+	const apps = $derived(updates.filter((update) => !update.platform && update.source !== 'system'));
+	const system = $derived(updates.filter((update) => update.source === 'system'));
 	const platforms = $derived(updates.filter((update) => update.platform));
 	const waiting = $derived(updates.filter((update) => !operations.forKey(update.key) || operations.forKey(update.key)?.state === 'failed'));
 	const failed = $derived(library.updates?.failed ?? []);
@@ -33,8 +33,7 @@
 			const list = waiting.filter((update) => update.source === 'flatpak' && update.installation === installation);
 			batch(`flatpak-updates/${installation}`, list, { kind: 'updateFlatpaks', installation, references: list.map((update) => update.reference!) });
 		}
-		const tools = waiting.filter((update) => update.source === 'tool');
-		batch('tool-updates', tools, { kind: 'updateTools', packages: tools.map((update) => update.package!) });
+		batch('system-updates', waiting.filter((update) => update.source === 'system'), { kind: 'updateSystemPackages' });
 		const debs = waiting.filter((update) => update.source === 'debian');
 		batch('deb-updates', debs, { kind: 'updateDebs', packages: debs.map((update) => update.package!) });
 		for (const update of waiting.filter((update) => (update.source === 'appImage' || update.source === 'storeTool' || update.store) && !update.store?.widens)) void operations.run(update.key, update.name, updateJob(update));
@@ -76,9 +75,9 @@
 			</Section>
 		{/if}
 
-		{#if tools.length}
-			<Section title={t('updates-tools')}>
-				{#each tools as update (update.key)}
+		{#if system.length}
+			<Section title={t('updates-system')}>
+				{#each system as update (update.key)}
 					<UpdateRow {update} />
 				{/each}
 			</Section>

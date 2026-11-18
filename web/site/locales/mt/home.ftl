@@ -101,7 +101,6 @@ home-question-windows-answer = Iva. Luft jista’ jgħix ħdejn Windows u int ta
 home-question-try = Nista’ nipprovah qabel ma ninstallah?
 home-question-try-answer = Iva. Meet Luft jirristartja f’Luft darba waħda, mingħajr ma jinstalla xejn, u r-restart li jmiss imur lura f’Windows jew fil-Linux tiegħek. Drajv USB jaħdem bl-istess mod.
 home-question-apps = U l-apps tiegħi?
-home-question-apps-answer = Schelf jinstalla apps minn Flathub u AppImages, u jżommhom aġġornati. Helium jiġi bħala l-browser u tista’ tibdlu ma’ kwalunkwe ieħor. L-għodod tal-command line jmorru f’kontenitur Toolbox li jmexxih ukoll Schelf.
 home-question-updates = Kif jaħdmu l-aġġornamenti?
 home-question-updates-answer = Is-sistema kollha tiġi aġġornata f’daqqa, fl-isfond, u tidħol fis-seħħ fir-restart li jmiss. Jekk xi ħaġa ma tkunx sew, il-verżjoni ta’ qabel hija għażla waħda ’l bogħod meta jibda l-kompjuter.
 home-question-ready = Lest?

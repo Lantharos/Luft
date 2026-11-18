@@ -14,7 +14,7 @@ use schelf_core::host;
 
 use super::Exit;
 use super::arguments::{Arguments, Command};
-use super::sources::{Catalog, Origin};
+use super::sources::Origin;
 use super::terminal::{Ink, prompt};
 use crate::l10n::L10N;
 
@@ -36,7 +36,6 @@ pub fn run(arguments: &Arguments) -> Exit {
         }
         Command::Give | Command::Take if !luft => needs_luft(t!(L10N, "cli-needs-luft-places")),
         Command::Install if system => system::install(arguments),
-        Command::Update if system => system::explain_updates(),
         Command::Install => install::run(arguments),
         Command::Remove => remove::run(arguments),
         Command::Search => search::run(arguments),
@@ -51,22 +50,21 @@ pub fn run(arguments: &Arguments) -> Exit {
     }
 }
 
-fn catalog(only: Option<Origin>) -> Result<Option<Catalog>, Exit> {
-    match only {
-        None => Ok(None),
-        Some(origin) => {
-            let catalog = origin.catalog().ok_or_else(|| {
-                eprintln!("{}", t!(L10N, "cli-appimage-no-catalog"));
-                Exit::Usage
-            })?;
-            match catalog.missing() {
-                Some(reason) => {
-                    eprintln!("{reason}");
-                    Err(Exit::Missing)
-                }
-                None => Ok(Some(catalog)),
-            }
+/// The source the catalogs were narrowed to, when this computer can look in it.
+fn catalog(only: Option<Origin>) -> Result<Option<Origin>, Exit> {
+    let Some(origin) = only else {
+        return Ok(None);
+    };
+    let catalog = origin.catalogs().next().ok_or_else(|| {
+        eprintln!("{}", t!(L10N, "cli-appimage-no-catalog"));
+        Exit::Usage
+    })?;
+    match catalog.missing() {
+        Some(reason) => {
+            eprintln!("{reason}");
+            Err(Exit::Missing)
         }
+        None => Ok(Some(origin)),
     }
 }
 

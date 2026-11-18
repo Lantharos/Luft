@@ -98,7 +98,6 @@ home-question-windows-answer = Po. Luft mund të jetojë pranë Windows dhe ti z
 home-question-try = A mund ta provoj para se ta instaloj?
 home-question-try-answer = Po. Meet Luft rinis një herë në Luft pa instaluar asgjë, dhe rinisja e ardhshme të kthen te Windows ose Linux-i yt. Një memorie USB funksionon njësoj.
 home-question-apps = Po aplikacionet e mia?
-home-question-apps-answer = Schelf instalon aplikacione nga Flathub dhe AppImage dhe i mban të përditësuara. Helium vjen si shfletues dhe mund ta zëvendësosh me cilindo tjetër. Mjetet e rreshtit të komandave shkojnë në një kontejner Toolbox që e menaxhon po ashtu Schelf.
 home-question-updates = Si funksionojnë përditësimet?
 home-question-updates-answer = I gjithë sistemi përditësohet njëherësh, në sfond, dhe kalon në rinisjen e ardhshme. Nëse diçka nuk shkon, versioni i mëparshëm është një zgjedhje larg kur niset kompjuteri.
 home-question-ready = A është gati?

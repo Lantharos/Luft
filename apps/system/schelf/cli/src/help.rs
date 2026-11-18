@@ -27,7 +27,7 @@ fn installing() -> String {
     ]);
     let options = rows(&[
         (
-            "--store, --flathub, --fedora, --appimage",
+            "--store, --flathub, --appimage",
             t!(L10N, "cli-help-option-only"),
         ),
         ("--system", t!(L10N, "cli-help-option-system")),

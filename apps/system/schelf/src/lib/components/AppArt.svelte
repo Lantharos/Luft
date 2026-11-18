@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AppWindow from '@lucide/svelte/icons/app-window';
 	import Puzzle from '@lucide/svelte/icons/puzzle';
-	import Server from '@lucide/svelte/icons/server';
+	import Package from '@lucide/svelte/icons/package';
 	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 	import { AppIcon } from '@luft/ui';
 	import type { Source } from '#lib/bindings.js';
@@ -23,10 +23,10 @@
 	});
 </script>
 
-{#if source === 'tool' || source === 'storeTool'}
+{#if source === 'storeTool'}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><SquareTerminal size={size * 0.5} /></span>
 {:else if source === 'system'}
-	<span class="fallback" style:width="{size}px" style:height="{size}px"><Server size={size * 0.5} /></span>
+	<span class="fallback" style:width="{size}px" style:height="{size}px"><Package size={size * 0.5} /></span>
 {:else if source === 'extension' && (!icon || broken)}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><Puzzle size={size * 0.5} /></span>
 {:else if remote && !broken}

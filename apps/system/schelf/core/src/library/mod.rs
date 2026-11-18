@@ -6,7 +6,6 @@ pub mod sources;
 mod store;
 mod store_tools;
 mod system;
-mod tools;
 
 use luft_software::apps::flatpak::Installation;
 use serde::{Deserialize, Serialize};
@@ -19,7 +18,6 @@ use crate::host;
 pub enum Source {
     Flatpak,
     AppImage,
-    Tool,
     Debian,
     System,
     Sabine,
@@ -59,7 +57,6 @@ pub fn installed() -> Vec<InstalledApp> {
     let luft = host::luft();
     let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
         let flatpaks = scope.spawn(|| when(host::flatpak(), flatpaks::installed));
-        let tools = scope.spawn(|| when(luft, tools::installed));
         let system = scope.spawn(|| when(luft, system::installed));
         let debs = scope.spawn(|| when(luft, debian::installed));
         let mut apps = appimages::installed();
@@ -67,7 +64,6 @@ pub fn installed() -> Vec<InstalledApp> {
         apps.extend(store_tools::installed());
         apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
-        apps.extend(tools.join().unwrap_or_default());
         apps.extend(system.join().unwrap_or_default());
         apps
     });

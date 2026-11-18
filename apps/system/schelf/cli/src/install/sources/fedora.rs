@@ -2,11 +2,10 @@ use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
 use luft_dbus::runtime::block_on;
-use luft_software::apps::toolbox::{self, Available, Repositories};
+use luft_software::system::catalog::{Available, Repositories};
 use luft_software::system::system_packages;
 use schelf_core::catalog::fedora::repoquery;
-use schelf_core::catalog::tools;
-use schelf_core::operations::Job;
+use schelf_core::catalog::packages;
 use schelf_core::store::catalog::Origin;
 
 use super::{Candidate, Catalog, Kind, store};
@@ -27,11 +26,6 @@ const GRAPHICAL: [&str; 14] = [
     "qt5-qtbase-gui",
     "qt6-qtbase-gui",
 ];
-
-pub fn install(package: &str) -> (String, Job) {
-    let package = package.to_owned();
-    (format!("tool/{package}"), Job::InstallTool { package })
-}
 
 fn on_system(packages: &[&str]) -> HashSet<String> {
     if packages.is_empty() {
@@ -56,15 +50,10 @@ pub fn comes_with_luft(package: &str) -> bool {
     on_system(&[package]).contains(package)
 }
 
-fn installed(packages: &[&str]) -> HashSet<String> {
-    let mut installed = on_system(packages);
-    installed.extend(toolbox::installed().into_iter().map(|tool| tool.package));
-    installed
-}
-
 fn candidates(found: Vec<Available>) -> Vec<Candidate> {
     let names: Vec<&str> = found.iter().map(|tool| tool.package.as_str()).collect();
-    let installed = installed(&names);
+    let mut installed = on_system(&names);
+    installed.extend(in_system());
     found
         .into_iter()
         .map(|tool| Candidate {
@@ -78,8 +67,7 @@ fn candidates(found: Vec<Available>) -> Vec<Candidate> {
         .collect()
 }
 
-/// Fedora's desktop apps from the store's mirror, which install as system
-/// packages, then its command-line tools.
+/// Fedora's desktop apps from the store's mirror, then its other packages.
 fn with_apps(apps: Vec<Candidate>, tools: Vec<Candidate>) -> Vec<Candidate> {
     let packages: HashSet<String> = apps.iter().map(|app| app.id.clone()).collect();
     apps.into_iter()
@@ -99,15 +87,18 @@ fn in_system() -> HashSet<String> {
 
 pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
     let apps = store::search_in(query, Origin::Fedora, &in_system())?;
-    Ok(with_apps(apps, tools::search(query).map(candidates)?))
+    Ok(with_apps(
+        apps,
+        packages::search_in(Repositories::Fedora, query).map(candidates)?,
+    ))
 }
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     let apps = store::find_in(name, Origin::Fedora, &in_system())?;
-    let tool = match tools::find(name)? {
+    let tool = match packages::find_in(Repositories::Fedora, name)? {
         Some(tool) => Some(tool),
         None if apps.is_empty() => match providing(Repositories::Fedora, name)? {
-            Some(package) => tools::find(&package)?,
+            Some(package) => packages::find_in(Repositories::Fedora, &package)?,
             None => None,
         },
         None => None,
@@ -141,11 +132,4 @@ pub fn graphical(package: &str) -> bool {
                 .any(|toolkit| requirement.contains(toolkit))
         })
     })
-}
-
-pub fn is_library(package: &str, commands: &[String]) -> bool {
-    ["-devel", "-static", "-headers", "-libs"]
-        .iter()
-        .any(|suffix| package.ends_with(suffix))
-        || (package.starts_with("lib") && commands.is_empty())
 }

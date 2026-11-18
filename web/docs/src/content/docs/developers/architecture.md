@@ -13,7 +13,7 @@ Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay
 
 - The image is put together from **parts**, each an image named after a hash of its sources, so a build only remakes what changed. [Building Luft](/developers/building/#what-goes-into-a-part) explains how a folder joins a part.
 - It's split into **layers by package**, so an update downloads only the layers whose packages changed. The NVIDIA image is the standard one plus the driver, so they share every layer below it.
-- It's **sealed**: a signed startup image names the image's exact root file system by its composefs digest. Nothing is layered on top on the computer. Apps come from Flatpak and AppImages, command-line tools from Toolbox, and the few Fedora packages that must be part of the system are merged over it as a system extension ([System packages](/developers/system/system-packages/)).
+- It's **sealed**: a signed startup image names the image's exact root file system by its composefs digest. Nothing is layered on top on the computer. Apps come from Flatpak and AppImages, and the Fedora packages someone adds, command-line tools among them, are merged over it as a system extension ([System packages](/developers/system/system-packages/)).
 
 Releases come from tags, and nightly builds from main every night it changed. [Updates and releases](/developers/system/updates/) covers how a computer moves between them.
 
@@ -58,7 +58,7 @@ Luft's apps are built with [Sabine](https://github.com/Lantharos/Sabine): a Svel
 | `packages/app` (`luft-app`) | The native window with its blurred sidebar, single-instance activation, Kestrel's palette, D-Bus, portals, settings files and folder watching |
 | `packages/web/motion` | Motion tokens shared by Kestrel and the apps |
 | `packages/dbus` | D-Bus connections, service properties and named errors |
-| `packages/system/software` | System updates, Flatpak, AppImages and Toolbox, shared by Settings and Schelf |
+| `packages/system/software` | System updates, system packages and Fedora's catalog, Flatpak and AppImages, shared by Settings and Schelf |
 | `packages/system/*` | What Settings and the other apps share for the system: drives, networking, accounts, fingerprints, trustd, Windows on the same computer, choosing the image, and Meet Luft's plans |
 
 ## The services

@@ -100,7 +100,6 @@ home-question-windows-answer = Taip. Luft gali gyventi šalia Windows, o jūs re
 home-question-try = Ar galiu išbandyti prieš diegiant?
 home-question-try-answer = Taip. Meet Luft vieną kartą paleidžia iš naujo į Luft nieko neįdiegusi, o kitas paleidimas grąžina į Windows arba jūsų Linux. USB atmintukas veikia taip pat.
 home-question-apps = O kaip mano programos?
-home-question-apps-answer = Schelf įdiegia programas iš Flathub ir AppImage formatu bei jas atnaujina. Naršyklė yra Helium, ją galima pakeisti bet kuria kita. Komandinės eilutės įrankiai keliauja į Toolbox konteinerį, kurį taip pat tvarko Schelf.
 home-question-updates = Kaip veikia naujinimai?
 home-question-updates-answer = Visa sistema atnaujinama iš karto, fone, ir persijungia kito paleidimo metu. Jei kas nors negerai, paleidžiant kompiuterį ankstesnė versija pasiekiama vienu pasirinkimu.
 home-question-ready = Ar ji jau paruošta?

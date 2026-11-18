@@ -9,7 +9,6 @@ import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
-import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import User from '@lucide/svelte/icons/user';
 import Users from '@lucide/svelte/icons/users';
 import { t } from '@luft/i18n';
@@ -41,7 +40,7 @@ function trust(file: OpenedFile, install: FileInstall): Fact[] {
 			facts.push({ icon: RefreshCw, text: t(install.source.added ? 'install-from-source' : 'install-adds-source', { source: install.sourceName }) });
 		else if (file.repositoryError) facts.push({ icon: ShieldAlert, text: t('install-source-unusable'), warning: true });
 		if (!install.source) facts.push(file.verified ? { icon: ShieldCheck, text: t('install-signed') } : { icon: ShieldAlert, text: t('install-unsigned'), warning: true });
-		facts.push(file.system ? { icon: Users, text: t('install-for-everyone') } : { icon: SquareTerminal, text: t('install-tool') });
+		facts.push({ icon: Users, text: t('install-for-everyone') });
 		return facts;
 	}
 	if (file.kind === 'deb') {

@@ -58,12 +58,12 @@ impl Command {
 
     pub fn syntax(self) -> &'static str {
         match self {
-            Self::Install => "install NAME|FILE...  [--store|--flathub|--fedora|--system] [-y]",
-            Self::Remove => "remove NAME...  [--store|--flathub|--fedora|--appimage|--system] [-y]",
-            Self::Search => "search QUERY  [--store|--flathub|--fedora]",
-            Self::Update => "update [NAME...]  [--store|--flathub|--fedora|--appimage]",
-            Self::List => "list  [--store|--flathub|--fedora|--appimage|--system]",
-            Self::Info => "info NAME  [--store|--flathub|--fedora|--appimage]",
+            Self::Install => "install NAME|FILE...  [--store|--flathub|--system] [-y]",
+            Self::Remove => "remove NAME...  [--store|--flathub|--appimage|--system] [-y]",
+            Self::Search => "search QUERY  [--store|--flathub|--system]",
+            Self::Update => "update [NAME...]  [--store|--flathub|--appimage|--system]",
+            Self::List => "list  [--store|--flathub|--appimage|--system]",
+            Self::Info => "info NAME  [--store|--flathub|--appimage|--system]",
             Self::Trust => "trust NAME...  [-y]",
             Self::Untrust => "untrust NAME...",
             Self::Give => "give NAME [DRIVE|FOLDER]  [--read-only]",
@@ -193,10 +193,10 @@ mod tests {
 
     #[test]
     fn options_go_anywhere_after_the_command() {
-        let parsed = run(&["install", "ripgrep", "--fedora", "-y", "fd-find"]).unwrap();
+        let parsed = run(&["install", "ripgrep", "--system", "-y", "fd-find"]).unwrap();
         assert_eq!(parsed.command, Command::Install);
         assert_eq!(parsed.words, ["ripgrep", "fd-find"]);
-        assert_eq!(parsed.only, Some(Origin::Fedora));
+        assert_eq!(parsed.only, Some(Origin::System));
         assert!(parsed.yes);
     }
 
@@ -208,7 +208,7 @@ mod tests {
 
     #[test]
     fn one_source_at_a_time() {
-        assert!(run(&["list", "--flathub", "--fedora"]).is_err());
+        assert!(run(&["list", "--flathub", "--system"]).is_err());
         assert!(run(&["list", "--flathub", "--flathub"]).is_ok());
     }
 

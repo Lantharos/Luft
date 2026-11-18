@@ -22,17 +22,15 @@ pub use resolve::{Resolved, catalogs, resolve, search};
 pub enum Origin {
     Store,
     Flathub,
-    Fedora,
     AppImage,
     Debian,
     System,
 }
 
 impl Origin {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 5] = [
         Self::Store,
         Self::Flathub,
-        Self::Fedora,
         Self::AppImage,
         Self::Debian,
         Self::System,
@@ -42,7 +40,6 @@ impl Origin {
         match self {
             Self::Store => "store",
             Self::Flathub => "flathub",
-            Self::Fedora => "fedora",
             Self::AppImage => "appimage",
             Self::Debian => "deb",
             Self::System => "system",
@@ -53,7 +50,6 @@ impl Origin {
         match self {
             Self::Store => "schelf.store".to_owned(),
             Self::Flathub => "Flathub".to_owned(),
-            Self::Fedora => "Fedora".to_owned(),
             Self::AppImage => "AppImage".to_owned(),
             Self::Debian => t!(L10N, "cli-origin-deb"),
             Self::System => t!(L10N, "cli-origin-system"),
@@ -74,17 +70,16 @@ impl Origin {
         match source {
             Source::Sabine | Source::Extension | Source::StoreTool => Self::Store,
             Source::Flatpak => Self::Flathub,
-            Source::Tool => Self::Fedora,
             Source::AppImage => Self::AppImage,
             Source::Debian => Self::Debian,
             Source::System => Self::System,
         }
     }
 
-    pub fn catalog(self) -> Option<Catalog> {
+    pub fn catalogs(self) -> impl Iterator<Item = Catalog> {
         Catalog::ALL
             .into_iter()
-            .find(|catalog| catalog.origin() == self)
+            .filter(move |catalog| catalog.origin() == self)
     }
 }
 
@@ -110,13 +105,13 @@ impl Catalog {
         match self {
             Self::Store | Self::Tools => Origin::Store,
             Self::Flathub => Origin::Flathub,
-            Self::Fedora => Origin::Fedora,
-            Self::System => Origin::System,
+            Self::Fedora | Self::System => Origin::System,
         }
     }
 
     pub fn title(self) -> String {
         match self {
+            Self::Fedora => "Fedora".to_owned(),
             Self::System => t!(L10N, "cli-catalog-system"),
             _ => self.origin().title(),
         }
@@ -137,7 +132,6 @@ impl Catalog {
         }
         Some(match self {
             Self::Flathub => t!(L10N, "cli-catalog-needs-flatpak"),
-            Self::Fedora => t!(L10N, "cli-catalog-fedora-needs-luft"),
             _ => t!(L10N, "cli-needs-luft-system"),
         })
     }
@@ -162,18 +156,17 @@ impl Catalog {
         }
     }
 
-    fn install(self, id: &str, kind: Kind, yes: bool) -> Result<(String, Job, bool), Exit> {
+    fn install(self, id: &str, yes: bool) -> Result<(String, Job, bool), Exit> {
         let asked = |(key, job): (String, Job), asks: bool| (key, job, asks);
-        Ok(match (self, kind) {
-            (Self::Store, _) => store::install(id, yes)?,
-            (Self::Tools, _) => asked(tools::install(id)?, true),
-            (Self::Flathub, _) => (
+        Ok(match self {
+            Self::Store => store::install(id, yes)?,
+            Self::Tools => asked(tools::install(id)?, true),
+            Self::Flathub => (
                 format!("flathub:{id}"),
                 Job::InstallFlathub { id: id.to_owned() },
                 false,
             ),
-            (Self::Fedora, Kind::Desktop) | (Self::System, _) => asked(system::install(id), false),
-            (Self::Fedora, _) => asked(fedora::install(id), false),
+            Self::Fedora | Self::System => asked(system::install(id), false),
         })
     }
 }
@@ -233,7 +226,7 @@ impl Candidate {
     /// How to install it, and whether that waits for your yes along with the
     /// rest you asked for.
     pub fn plan(&self, yes: bool) -> Result<(Plan, bool), Exit> {
-        let (key, job, asks) = self.catalog.install(&self.id, self.kind, yes)?;
+        let (key, job, asks) = self.catalog.install(&self.id, yes)?;
         let plan = Plan {
             request: Request {
                 key,

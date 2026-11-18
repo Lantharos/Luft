@@ -1,8 +1,11 @@
 use std::collections::HashSet;
 
+use luft_dbus::runtime::block_on;
 use luft_i18n::t;
 use luft_software::apps::flatpak::{self, Installation};
-use luft_software::apps::{debian, toolbox, updates};
+use luft_software::apps::{debian, updates};
+use luft_software::system::catalog::{self, without_epoch};
+use luft_software::system::system_packages::{self, Origin};
 use serde::Serialize;
 use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
@@ -87,26 +90,39 @@ fn appimages() -> Vec<AppUpdate> {
         .collect()
 }
 
-fn tools(updates: Vec<toolbox::Update>) -> Vec<AppUpdate> {
-    updates
-        .into_iter()
-        .map(|update| AppUpdate {
-            key: format!("tool/{}", update.package),
-            source: Source::Tool,
-            id: update.package.clone(),
-            desktop: None,
-            name: update.package.clone(),
-            icon: None,
-            from: update.from,
-            to: Some(update.to),
-            size: update.size,
-            platform: false,
-            installation: None,
-            reference: None,
-            package: Some(update.package),
-            store: None,
+/// The system packages someone asked for that Fedora or an added source has a newer version
+/// of. Package files only change when another file is opened.
+fn system() -> Result<Vec<AppUpdate>, String> {
+    let packages = block_on(system_packages::list())?;
+    let names: Vec<&str> = packages
+        .requested()
+        .filter(|package| package.origin != Origin::File)
+        .map(|package| package.name.as_str())
+        .collect();
+    let newest = catalog::newest(&names)?;
+    Ok(packages
+        .requested()
+        .filter_map(|package| {
+            let (to, size) = newest.get(&package.name)?;
+            let from = without_epoch(&package.version);
+            (to != from).then(|| AppUpdate {
+                key: format!("system/{}", package.name),
+                source: Source::System,
+                id: package.name.clone(),
+                desktop: package.apps.first().cloned(),
+                name: package.name.clone(),
+                icon: None,
+                from: Some(from.to_owned()),
+                to: Some(to.clone()),
+                size: *size,
+                platform: false,
+                installation: None,
+                reference: None,
+                package: Some(package.name.clone()),
+                store: None,
+            })
         })
-        .collect()
+        .collect())
 }
 
 fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
@@ -211,7 +227,7 @@ fn when(
 pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     let luft = host::luft();
     let flatpaks = spawn_blocking(|| when(host::flatpak(), || flatpak::updates().map(flatpaks)));
-    let tools = spawn_blocking(move || when(luft, || toolbox::updates().map(tools)));
+    let system = spawn_blocking(move || when(luft, system));
     let appimages = spawn_blocking(appimages);
     let debs = spawn_blocking(move || when(luft, || debian::updates().map(debs)));
     let store = spawn_blocking(|| store::updates::find().map(from_store));
@@ -220,11 +236,11 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     let store = joined(store).await;
     let store_tools = joined(store_tools).await;
     let flatpaks = joined(flatpaks).await;
-    let tools = joined(tools).await;
+    let system = joined(system).await;
     let appimages = appimages.await.unwrap_or_default();
     let failed = [
         ("flathub", flatpaks.as_ref().err()),
-        ("tools", tools.as_ref().err()),
+        ("system", system.as_ref().err()),
         ("ubuntu", debs.as_ref().err()),
         ("store", store.as_ref().err()),
         ("store-tools", store_tools.as_ref().err()),
@@ -241,7 +257,7 @@ pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     .collect();
     let mut apps: Vec<AppUpdate> = flatpaks.unwrap_or_default();
     apps.extend(appimages);
-    apps.extend(tools.unwrap_or_default());
+    apps.extend(system.unwrap_or_default());
     apps.extend(debs.unwrap_or_default());
     apps.extend(store.unwrap_or_default());
     apps.extend(store_tools.unwrap_or_default());

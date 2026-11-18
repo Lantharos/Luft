@@ -10,7 +10,7 @@ Luft tells apps apart only where something the app can't fake vouches for it. Ev
 ## Three kinds of caller
 
 - A sandboxed app is its sandbox's app ID. Flatpak and the [AppImage sandbox](/security/app-sandbox/) give every process they start a `.flatpak-info` file at the root of its view of the files, which the process can't change or remove, and the app ID in it is the app.
-- A program outside a sandbox is you. It can read your files, change another program's settings, start it with a library slipped in, or name itself after any app, so no name, path, systemd scope or launcher entry tells such programs apart. Programs from system packages and Toolbox containers are you too.
+- A program outside a sandbox is you. It can read your files, change another program's settings, start it with a library slipped in, or name itself after any app, so no name, path, systemd scope or launcher entry tells such programs apart. Programs from system packages are you too.
 - A sandboxed app with full access is also you. Schelf gives it that with a Flatpak override or by starting the AppImage without its sandbox.
 
 Every service judges a caller the same way: from the kernel's view of the D-Bus connection or socket, with a pidfd pinning the process while it's looked at. A process without `.flatpak-info` is you. One that hides its root from others counts as you only when its mount table, which anyone may read, has nothing at `/.flatpak-info`; otherwise, and when it has already quit or quits while being looked at, it's an unknown sandbox. Sandboxed apps reach the session bus only through a filtering proxy that carries the same marker, so services see the app behind every message, and reach Wayland only through a socket Kestrel tags with the app ID.

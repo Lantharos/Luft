@@ -100,7 +100,6 @@ home-question-windows-answer = Tak. Luft może działać obok systemu Windows, a
 home-question-try = Czy mogę wypróbować go przed instalacją?
 home-question-try-answer = Tak. Meet Luft raz uruchamia komputer w systemie Luft, niczego nie instalując, a przy następnym uruchomieniu wracasz do systemu Windows lub swojego Linuksa. Z pamięcią USB działa to tak samo.
 home-question-apps = A co z moimi aplikacjami?
-home-question-apps-answer = Aplikacja Schelf instaluje aplikacje z serwisu Flathub i w formacie AppImage oraz dba o ich aktualizacje. Domyślną przeglądarką jest Helium, którą można zamienić na dowolną inną. Narzędzia wiersza poleceń trafiają do kontenera Toolbox, którym też zarządza aplikacja Schelf.
 home-question-updates = Jak działają aktualizacje?
 home-question-updates-answer = Cały system aktualizuje się naraz, w tle, a zmiany wchodzą w życie przy następnym uruchomieniu. Jeśli coś jest nie tak, poprzednią wersję można wybrać przy starcie komputera.
 home-question-ready = Czy jest gotowy?

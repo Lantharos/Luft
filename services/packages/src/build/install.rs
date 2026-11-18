@@ -6,7 +6,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 
-use super::rpm::Rpm;
+use super::resolve::rpm::Rpm;
 use super::selinux;
 use crate::command::run;
 use crate::repositories;

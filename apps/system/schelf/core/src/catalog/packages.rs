@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use luft_software::apps::toolbox::{self, Available, Repositories};
+use luft_software::system::catalog::{self, Available, Repositories};
 use luft_software::system::repositories;
 
 use super::cache::Entry;
@@ -24,14 +24,14 @@ fn key(repositories: Repositories) -> String {
 }
 
 fn load(repositories: Repositories, key: &str) -> Result<Vec<Available>, String> {
-    let entry = Entry::new("tools", key);
+    let entry = Entry::new("packages", key);
     if let Some(index) = entry
         .fresh(FRESH_FOR)
         .and_then(|text| serde_json::from_str(&text).ok())
     {
         return Ok(index);
     }
-    match toolbox::available(repositories) {
+    match catalog::available(repositories) {
         Ok(index) => {
             if let Ok(text) = serde_json::to_string(&index) {
                 entry.store(&text);
@@ -62,50 +62,59 @@ fn index(repositories: Repositories) -> Result<Index, String> {
 pub fn find_in(repositories: Repositories, package: &str) -> Result<Option<Available>, String> {
     let index = index(repositories)?;
     Ok(index
-        .binary_search_by(|tool| tool.package.as_str().cmp(package))
+        .binary_search_by(|available| available.package.as_str().cmp(package))
         .ok()
         .map(|position| index[position].clone()))
 }
 
-pub fn find(package: &str) -> Result<Option<Available>, String> {
-    find_in(Repositories::Fedora, package)
-}
-
-fn rank(tool: &Available, needle: &str) -> Option<u8> {
-    let name = tool.package.to_lowercase();
+fn rank(available: &Available, needle: &str) -> Option<u8> {
+    let name = available.package.to_lowercase();
     if name == needle {
         Some(0)
     } else if name.starts_with(needle) {
         Some(1)
     } else if name.contains(needle) {
         Some(2)
-    } else if tool.summary.to_lowercase().contains(needle) {
+    } else if available.summary.to_lowercase().contains(needle) {
         Some(3)
     } else {
         None
     }
 }
 
-pub fn search_in(repositories: Repositories, query: &str) -> Result<Vec<Available>, String> {
-    let needle = query.trim().to_lowercase();
-    if needle.chars().count() < SHORTEST_QUERY {
-        return Ok(Vec::new());
-    }
-    let index = index(repositories)?;
-    let mut found: Vec<(u8, &Available)> = index
-        .iter()
-        .filter_map(|tool| Some((rank(tool, &needle)?, tool)))
+fn ranked<'a>(indexes: impl IntoIterator<Item = &'a Available>, needle: &str) -> Vec<Available> {
+    let mut found: Vec<(u8, &Available)> = indexes
+        .into_iter()
+        .filter_map(|available| Some((rank(available, needle)?, available)))
         .collect();
     found.sort_by(|(a_rank, a), (b_rank, b)| {
         (a_rank, a.package.len(), &a.package).cmp(&(b_rank, b.package.len(), &b.package))
     });
-    Ok(found
+    found.dedup_by(|(_, a), (_, b)| a.package == b.package);
+    found
         .into_iter()
         .take(SHOWN)
-        .map(|(_, tool)| tool.clone())
-        .collect())
+        .map(|(_, available)| available.clone())
+        .collect()
 }
 
+fn needle(query: &str) -> Option<String> {
+    let needle = query.trim().to_lowercase();
+    (needle.chars().count() >= SHORTEST_QUERY).then_some(needle)
+}
+
+pub fn search_in(repositories: Repositories, query: &str) -> Result<Vec<Available>, String> {
+    let Some(needle) = needle(query) else {
+        return Ok(Vec::new());
+    };
+    Ok(ranked(index(repositories)?.iter(), &needle))
+}
+
+/// Packages from Fedora and the added sources whose name or summary has `query`.
 pub fn search(query: &str) -> Result<Vec<Available>, String> {
-    search_in(Repositories::Fedora, query)
+    let Some(needle) = needle(query) else {
+        return Ok(Vec::new());
+    };
+    let (fedora, added) = (index(Repositories::Fedora)?, index(Repositories::Added)?);
+    Ok(ranked(fedora.iter().chain(added.iter()), &needle))
 }

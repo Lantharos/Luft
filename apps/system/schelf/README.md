@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://schelf.store): the store's own apps and extensions, then Flathub's and Fedora's apps from the store's mirror. It installs, updates and removes them, AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../../packages/system/software/README.md).
+Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://schelf.store): the store's own apps and extensions, then Flathub's and Fedora's apps from the store's mirror. It installs, updates and removes them, AppImages, and packages from Fedora, command-line tools among them, as system packages. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../../packages/system/software/README.md).
 
 | Source | Installed for |
 |--------|---------------|
@@ -8,8 +8,7 @@ Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://sche
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/.local/share/luft/appimages`, with a menu entry, icon and automatic updates, running in a sandbox |
 | `.deb` files | Your account, in Ubuntu 26.04 kept in `~/.local/share/luft/ubuntu` and started through bubblewrap, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
-| Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
-| System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](https://docs.luft.computer/developers/system/system-packages/)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
+| Fedora packages, such as command-line tools, and `.rpm` files | Everyone, as system packages merged over Luft's image as a system extension and rebuilt with each update ([how](https://docs.luft.computer/developers/system/system-packages/)), from Fedora and added software sources such as a vendor's RPM repository or a COPR; plain command-line tools without a password |
 
 ## Build and run
 

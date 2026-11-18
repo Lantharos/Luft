@@ -98,7 +98,6 @@ home-question-windows-answer = Igen. A Luft elfér a Windows mellett, és Ön v�
 home-question-try = Kipróbálhatom telepítés előtt?
 home-question-try-answer = Igen. A Meet Luft egyszer újraindít a Luftba, anélkül hogy bármit telepítene, a következő újraindítás pedig visszavisz a Windowsba vagy a Linuxába. A pendrive ugyanígy működik.
 home-question-apps = És az alkalmazásaim?
-home-question-apps-answer = A Schelf a Flathubról és AppImage-ként telepít alkalmazásokat, és naprakészen tartja őket. Böngészőként a Helium érkezik, de bármelyik másikra lecserélhető. A parancssori eszközök egy Toolbox-tárolóba kerülnek, amelyet szintén a Schelf kezel.
 home-question-updates = Hogyan működnek a frissítések?
 home-question-updates-answer = A teljes rendszer egyszerre, a háttérben frissül, és a következő újraindításkor vált át. Ha valami nincs rendben, az előző verzió egyetlen választásnyira van a gép indulásakor.
 home-question-ready = Kész van már?

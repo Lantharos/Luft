@@ -4,10 +4,7 @@ use luft_software::system::system_packages::{self, SystemPackages};
 use super::{InstalledApp, Source};
 
 fn app(name: &str, packages: &SystemPackages) -> InstalledApp {
-    let merged = packages
-        .packages
-        .iter()
-        .find(|package| package.name == name);
+    let merged = packages.package(name);
     let services = merged
         .map(|package| {
             package
@@ -24,7 +21,9 @@ fn app(name: &str, packages: &SystemPackages) -> InstalledApp {
         id: name.to_owned(),
         desktop: merged.and_then(|package| package.apps.first().cloned()),
         name: name.to_owned(),
-        summary: merged.map(|package| package.summary.clone()),
+        summary: merged
+            .map(|package| package.summary.clone())
+            .or_else(|| packages.left_out.get(name).cloned()),
         icon: None,
         version: merged.map(|package| package.version.clone()),
         size: 0,
@@ -36,7 +35,9 @@ fn app(name: &str, packages: &SystemPackages) -> InstalledApp {
         reference: None,
         package: Some(name.to_owned()),
         path: None,
-        commands: Vec::new(),
+        commands: merged
+            .map(|package| package.commands.clone())
+            .unwrap_or_default(),
         services,
         listing: None,
     }

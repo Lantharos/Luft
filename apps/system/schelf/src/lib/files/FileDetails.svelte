@@ -56,13 +56,11 @@
 	{/if}
 	{#if file.kind === 'appImage'}
 		<Row title={t('file-installs-to')} description={t('file-installs-to-appimage')}><span>{t('file-your-account')}</span></Row>
-	{:else if file.kind === 'package' && file.system}
+	{:else if file.kind === 'package'}
 		<Row title={t('file-installs-to')} description={t('file-installs-to-system')}><span>{t('file-system')}</span></Row>
 		{#if source && sourceName}
 			<Row title={t('file-updates-from')} description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
 		{/if}
-	{:else if file.kind === 'package'}
-		<Row title={t('file-installs-to')} description={t('file-installs-to-tool')}><span>{t('file-your-account')}</span></Row>
 	{/if}
 	<Row title={t('file-file')} description={install.path} />
 </Section>

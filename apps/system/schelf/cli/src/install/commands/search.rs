@@ -1,10 +1,10 @@
 use luft_i18n::t;
 use schelf_core::library::InstalledApp;
 
-use super::catalog;
+use super::{catalog, either_of};
 use crate::install::Exit;
 use crate::install::arguments::Arguments;
-use crate::install::sources::{self, Candidate, Origin, installed};
+use crate::install::sources::{self, Candidate, Catalog, Origin, installed};
 use crate::install::terminal::Line;
 use crate::install::terminal::{self, Ink, Look, Table};
 use crate::l10n::L10N;
@@ -119,10 +119,13 @@ pub fn run(arguments: &Arguments) -> Exit {
     let mut failed = false;
     for (catalog, result) in sources::search(&query, only) {
         match result {
-            Ok(found) => groups.push((
-                catalog.origin(),
-                found.into_iter().map(Found::from).collect(),
-            )),
+            Ok(found) => {
+                let found = found.into_iter().map(Found::from);
+                match groups.last_mut() {
+                    Some((origin, group)) if *origin == catalog.origin() => group.extend(found),
+                    _ => groups.push((catalog.origin(), found.collect())),
+                }
+            }
             Err(error) => {
                 line.clear();
                 eprintln!(
@@ -162,12 +165,16 @@ pub fn run(arguments: &Arguments) -> Exit {
     if groups.is_empty() {
         if !failed {
             let nothing = match only {
-                Some(catalog) => t!(
-                    L10N,
-                    "cli-search-nothing-on",
-                    query = query.as_str(),
-                    source = catalog.title()
-                ),
+                Some(origin) => {
+                    let titles: Vec<String> = origin.catalogs().map(Catalog::title).collect();
+                    let titles: Vec<&str> = titles.iter().map(String::as_str).collect();
+                    t!(
+                        L10N,
+                        "cli-search-nothing-on",
+                        query = query.as_str(),
+                        source = either_of(&titles)
+                    )
+                }
                 None => t!(L10N, "cli-search-nothing", query = query.as_str()),
             };
             eprintln!("{nothing}");

@@ -98,7 +98,6 @@ home-question-windows-answer = Voit. Luft voi olla Windowsin rinnalla, ja valits
 home-question-try = Voinko kokeilla ennen asentamista?
 home-question-try-answer = Voit. Meet Luft käynnistää kerran Luftiin asentamatta mitään, ja seuraava käynnistys palaa Windowsiin tai Linuxiisi. USB-tikku toimii samalla tavalla.
 home-question-apps = Entä sovellukseni?
-home-question-apps-answer = Schelf asentaa sovelluksia Flathubista ja AppImage-paketteina ja pitää ne ajan tasalla. Selaimena on Helium, jonka voi vaihtaa mihin tahansa muuhun. Komentorivityökalut menevät Toolbox-säilöön, jota Schelf myös hallitsee.
 home-question-updates = Miten päivitykset toimivat?
 home-question-updates-answer = Koko järjestelmä päivittyy kerralla taustalla, ja muutos tulee voimaan seuraavassa käynnistyksessä. Jos jokin ei ole kunnossa, edellinen versio on yhden valinnan päässä tietokoneen käynnistyessä.
 home-question-ready = Onko se valmis?

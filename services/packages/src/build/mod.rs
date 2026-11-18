@@ -1,10 +1,9 @@
 mod accounts;
-mod checks;
 mod declared;
-mod download;
 mod install;
 mod made;
-mod rpm;
+mod plain;
+mod resolve;
 pub mod selinux;
 mod stage;
 mod units;
@@ -17,13 +16,15 @@ use std::process::Command;
 
 use anyhow::{Context, Result, anyhow};
 
-use crate::changes::Step;
+use crate::changes::{Escalate, Step};
 use crate::command::run;
 use crate::state::manifest::{Build, Package};
 use crate::state::requested::Requested;
 use crate::state::sources::Sources;
 use crate::state::{self, NAME, deployment};
-pub use download::provider;
+use resolve::checks::{self, Place};
+pub use resolve::download::provider;
+use resolve::{Choices, Refused, rpm};
 use stage::Layout;
 
 pub const CACHE: &str = "/var/cache/luft/system-packages";
@@ -148,17 +149,63 @@ fn unchanged(current: &Build, rpms: &[rpm::Rpm]) -> bool {
             .all(|rpm| current.version_of(&rpm.name) == Some(rpm.version.as_str()))
 }
 
-/// Builds the system packages in `requested` for the deployment `digest` into `image`, from
-/// Fedora's repositories for that deployment's version and `sources`, against the packages it
-/// has. Nothing is built when the newest packages are the versions `newer_than` already has.
-pub fn build(
-    digest: &str,
-    requested: &Requested,
-    sources: &Sources,
-    image_path: &Path,
-    newer_than: Option<&Build>,
+/// What a change someone asked for holds the build to: the build the running system has
+/// merged, to tell what the change brings and takes away, and who to ask when that isn't
+/// plain.
+pub struct Gate {
+    pub current: Option<Build>,
+    pub escalate: Escalate,
+}
+
+impl Gate {
+    fn pass(&self, plain: bool, escalated: &mut bool) -> Result<()> {
+        if !plain && !*escalated {
+            (self.escalate)()?;
+            *escalated = true;
+        }
+        Ok(())
+    }
+}
+
+/// A build of the system packages in `requested` for the deployment `digest` into `image`.
+/// Nothing is built when the newest packages are the versions `newer_than` already has. The
+/// packages in `needed` fail the build when they can't be in it; anything else that can't
+/// is left out.
+pub struct Plan<'a> {
+    pub digest: &'a str,
+    pub requested: &'a Requested,
+    pub sources: &'a Sources,
+    pub image: &'a Path,
+    pub newer_than: Option<&'a Build>,
+    pub gate: Option<&'a Gate>,
+    pub needed: &'a [String],
+}
+
+/// Builds the plan from Fedora's repositories for the deployment's version and the sources,
+/// against the packages it has, leaving out what can't be built and trying again.
+pub fn build(plan: &Plan, step: &dyn Fn(Step)) -> Result<Option<Build>> {
+    let mut choices = Choices::needing(plan.needed);
+    let mut escalated = false;
+    loop {
+        let built = attempt(plan, &mut choices, &mut escalated, step);
+        let refused = match &built {
+            Err(error) => error.downcast_ref::<Refused>().cloned(),
+            Ok(_) => None,
+        };
+        match refused {
+            Some(refused) => choices.refuse(&refused, plan.requested)?,
+            None => return built,
+        }
+    }
+}
+
+fn attempt(
+    plan: &Plan,
+    choices: &mut Choices,
+    escalated: &mut bool,
     step: &dyn Fn(Step),
 ) -> Result<Option<Build>> {
+    let requested = plan.requested;
     let mut work = Workspace::new()?;
     let (tree, upper, overlay, root) = (
         work.folder("tree")?,
@@ -169,7 +216,7 @@ pub fn build(
     let stage_folder = work.folder("stage")?;
     let store = work.path.join("store");
     let rpms_folder = store.join("packages");
-    deployment::mount(digest, &tree)?;
+    deployment::mount(plan.digest, &tree)?;
     work.mounted(&tree);
     run(Command::new("mount")
         .args(["-t", "overlay", "overlay", "-o"])
@@ -191,19 +238,27 @@ pub fn build(
     work.mounted(&cache);
 
     let os = os_release(&tree)?;
-    download::offer(&root, sources)?;
+    resolve::download::offer(&root, plan.sources)?;
     step(Step::Downloading);
-    let origins = download::download(&root, &os.version_id, requested, sources, &store)?;
-    let mut rpms = origins
-        .into_iter()
-        .map(|(path, origin)| rpm::query(&path).map(|rpm| rpm::Rpm { origin, ..rpm }))
-        .collect::<Result<Vec<_>>>()?;
-    rpms.sort_by(|left, right| left.name.cmp(&right.name));
-    if newer_than.is_some_and(|current| unchanged(current, &rpms)) {
+    let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
+    let rpms = resolve::resolve(
+        &root,
+        &os.version_id,
+        requested,
+        plan.sources,
+        &store,
+        &base,
+        choices,
+    )?;
+    if plan
+        .newer_than
+        .is_some_and(|current| unchanged(current, &rpms))
+    {
         return Ok(None);
     }
-    let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
-    checks::check(requested, &rpms, &base)?;
+    if let Some(gate) = plan.gate {
+        gate.pass(plain::change(gate.current.as_ref(), &rpms), escalated)?;
+    }
 
     step(Step::Building);
     let made_before = state::footprint()?;
@@ -233,9 +288,7 @@ pub fn build(
     let ghosts = rpms
         .iter()
         .flat_map(|rpm| &rpm.files)
-        .filter(|file| {
-            file.ghost && matches!(checks::place(&file.path), Some(checks::Place::Placed))
-        })
+        .filter(|file| file.ghost && matches!(checks::place(&file.path), Some(Place::Placed)))
         .map(|file| file.path.clone());
     let libraries = placed
         .iter()
@@ -250,8 +303,13 @@ pub fn build(
             .chain(cache),
         names,
     );
+    let privileges = plain::privileges(&stage_folder, &declared, &selinux_modules)?;
+    if let Some(gate) = plan.gate {
+        gate.pass(plain::same(gate.current.as_ref(), &privileges), escalated)?;
+    }
     let build = Build {
         requested: requested.clone(),
+        left_out: choices.left_out.clone(),
         packages: rpms
             .iter()
             .map(|rpm| Package {
@@ -262,7 +320,9 @@ pub fn build(
                 requested: requested.contains(&rpm.name),
                 units: enabled.units.get(&rpm.name).cloned().unwrap_or_default(),
                 apps: rpm.apps(),
+                commands: rpm.commands(),
                 origin: rpm.origin.clone(),
+                plain: plain::package(rpm),
             })
             .collect(),
         enabled: enabled.enabled,
@@ -272,9 +332,10 @@ pub fn build(
         selinux_modules,
         placed,
         declared,
+        privileges,
     };
     label(&root, &stage_folder)?;
-    image(&stage_folder, image_path)?;
+    image(&stage_folder, plan.image)?;
     Ok(Some(build))
 }
 

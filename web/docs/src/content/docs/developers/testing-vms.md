@@ -68,6 +68,7 @@ Checks of single parts live in a `vm` folder next to their code and share `os/vm
 | `security/vm/remote-login/run.sh` | Off by default, who may turn it on and sign in, penalties, going back to an older system | 2 min |
 | `services/crashes/vm/run.sh` | Core dumps and panics become reports for the first person who asks | 1.5 min |
 | `services/packages/vm/run.sh` | An unreviewed extension is copied only with an administrator's approval, out of the account's reach | 1 min |
+| `services/packages/vm/plain/run.sh` | On an installed drive with the network, command-line tools come and go without a password, packages with a service or a setuid program, or whose scriptlets make one, need an administrator either way, and a package that can't be built doesn't hold back the others | 4 min |
 | `services/printers/vm/run.sh` | A network printer and a USB one set themselves up and print | 2 min |
 | `services/sleep/vm/run.sh` | Sleeping and waking, and shutting down instead of sleeping on with a low battery | 14 min |
 | `services/windows/vm/run.sh` | Fast Startup, the clock, Bluetooth pairings and a hibernated Windows on a real NTFS drive | 1 min |

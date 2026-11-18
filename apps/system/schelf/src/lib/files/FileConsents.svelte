@@ -29,9 +29,7 @@
 	<ConsentDialog
 		title={t('file-unverified-title', { name: file.package })}
 		description={t('file-unverified-description')}
-		facts={file.system
-			? [t('file-unverified-fact'), t('file-for-everyone-fact'), t('file-administrator-fact'), t('file-no-updates-fact')]
-			: [t('file-unverified-fact'), t('file-for-you-fact'), t('file-no-updates-fact')]}
+		facts={[t('file-unverified-fact'), t('file-for-everyone-fact'), t('file-administrator-fact'), t('file-no-updates-fact')]}
 		confirm={t('file-install-anyway')}
 		danger
 		onconfirm={() => install.agree()}

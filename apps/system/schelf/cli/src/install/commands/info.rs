@@ -1,6 +1,6 @@
 use luft_i18n::t;
 use luft_software::apps::appimage;
-use luft_software::apps::toolbox::Repositories;
+use luft_software::system::catalog::Repositories;
 use schelf_core::library::{InstalledApp, Source};
 use schelf_core::store::listing::{self, Builder, Format, StoreDetails, channel};
 use schelf_core::store::record;
@@ -145,39 +145,6 @@ fn flathub_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Strin
     Ok(())
 }
 
-fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
-    let details = schelf_core::catalog::fedora::details(Repositories::Fedora, &candidate.id)?
-        .ok_or_else(|| t!(L10N, "cli-info-gone-from-fedora"))?;
-    let installed = installed_version(apps, Origin::Fedora, &details.package);
-    let kind = if fedora::graphical(&details.package) {
-        Kind::Desktop
-    } else {
-        Kind::Command
-    };
-    let mut facts = Facts(Vec::new());
-    facts.add(
-        t!(L10N, "cli-info-source"),
-        Some(t!(L10N, "cli-info-source-fedora", kind = kind.key())),
-    );
-    facts.add(t!(L10N, "cli-info-version"), Some(details.version.clone()));
-    facts.installed(installed);
-    facts.add(
-        t!(L10N, "cli-info-commands"),
-        installed.map(|app| app.commands.join(" ")),
-    );
-    facts.add(t!(L10N, "cli-info-download"), Some(bytes(details.download)));
-    facts.add(t!(L10N, "cli-info-size"), Some(bytes(details.size)));
-    facts.add(t!(L10N, "cli-info-license"), Some(details.license.clone()));
-    facts.add(t!(L10N, "cli-info-website"), details.homepage.clone());
-    show(
-        &details.package,
-        &details.summary,
-        facts,
-        &details.description,
-    );
-    Ok(())
-}
-
 fn system_package(
     candidate: &Candidate,
     apps: &[InstalledApp],
@@ -191,6 +158,12 @@ fn system_package(
     facts.add(t!(L10N, "cli-info-source"), Some(source));
     facts.add(t!(L10N, "cli-info-version"), Some(details.version.clone()));
     facts.installed(installed);
+    facts.add(
+        t!(L10N, "cli-info-commands"),
+        installed
+            .filter(|app| !app.commands.is_empty())
+            .map(|app| app.commands.join(" ")),
+    );
     facts.add(t!(L10N, "cli-info-download"), Some(bytes(details.download)));
     facts.add(t!(L10N, "cli-info-size"), Some(bytes(details.size)));
     facts.add(t!(L10N, "cli-info-license"), Some(details.license.clone()));
@@ -383,13 +356,19 @@ fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Str
         (Catalog::Store, _) => store_app(candidate, apps),
         (Catalog::Tools, _) => store_tool(candidate, apps),
         (Catalog::Flathub, _) => flathub_app(candidate, apps),
-        (Catalog::Fedora, Kind::Desktop) => system_package(
-            candidate,
-            apps,
-            Repositories::Fedora,
-            t!(L10N, "cli-info-source-fedora-desktop"),
-        ),
-        (Catalog::Fedora, _) => fedora_package(candidate, apps),
+        (Catalog::Fedora, kind) => {
+            let kind = if kind == Kind::Desktop || fedora::graphical(&candidate.id) {
+                Kind::Desktop
+            } else {
+                Kind::Command
+            };
+            system_package(
+                candidate,
+                apps,
+                Repositories::Fedora,
+                t!(L10N, "cli-info-source-fedora", kind = kind.key()),
+            )
+        }
         (Catalog::System, _) => system_package(
             candidate,
             apps,
@@ -405,10 +384,7 @@ fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Str
 
 pub fn run(arguments: &Arguments) -> Exit {
     let only = arguments.only;
-    let looked_in: Vec<Catalog> = match only {
-        Some(origin) => origin.catalog().into_iter().collect(),
-        None => catalogs(None),
-    };
+    let looked_in: Vec<Catalog> = catalogs(only);
     let mut exit = Exit::Done;
     for (index, name) in arguments.words.iter().enumerate() {
         if index > 0 {

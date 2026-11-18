@@ -113,7 +113,7 @@ core-tool-by = By { $publisher }
 # $reason is why it couldn't check
 core-updates-check-failed = { $source ->
     [flathub] Couldn't check your Flathub apps. { $reason }
-    [tools] Couldn't check your command-line tools. { $reason }
+    [system] Couldn't check your system packages. { $reason }
     [ubuntu] Couldn't check your Ubuntu apps. { $reason }
     [store] Couldn't check your schelf.store apps. { $reason }
    *[store-tools] Couldn't check your tools from schelf.store. { $reason }

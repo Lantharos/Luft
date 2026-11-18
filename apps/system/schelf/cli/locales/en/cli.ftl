@@ -5,7 +5,7 @@
 ## such as NAME, are typed as they are, so they stay in English.
 
 cli-help-about =
-    { -schelf } installs apps and command-line tools into your account, and puts
+    { -schelf } installs apps, command-line tools and system packages, and puts
     your own on schelf.store.
 # $usage is how the command is typed, such as schelf install NAME
 cli-usage = Usage: { $usage }
@@ -23,7 +23,7 @@ cli-help-give = Let an app use one drive or folder
 cli-help-take = Take a drive or folder away again
 cli-help-repo = Manage software sources for system packages
 cli-help-option-only = Use only this source
-cli-help-option-system = Fedora packages for the whole system, such as services
+cli-help-option-system = Only packages from Fedora and your software sources, which go into the system
 cli-help-option-read-only = Give a drive or folder only to read
 cli-help-option-yes = Go ahead without asking
 cli-help-option-help = Show help, also for a command
@@ -39,32 +39,32 @@ cli-help-exits =
 
 cli-usage-install =
     Installs apps, extensions and command-line tools from schelf.store, a
-    tool also by its address, such as alice/notes, apps from Flathub and
-    Fedora, and command-line tools from Fedora into your account, or a .rpm,
-    {"."}AppImage, .flatpakref or .flatpakrepo file. A name schelf.store has comes
-    from there, then from Flathub, then from Fedora; when that still leaves a
-    choice, such as an app and a tool of the same name on schelf.store,
-    { -schelf } asks. Apps from schelf.store show what they can use first, and
-    tools who publishes them.
+    tool also by its address, such as alice/notes, apps from Flathub, packages
+    from Fedora and your software sources, or a .rpm, .AppImage, .flatpakref or
+    {"."}flatpakrepo file. A name schelf.store has comes from there, then from
+    Flathub, then from Fedora; when that still leaves a choice, such as an app
+    and a tool of the same name on schelf.store, { -schelf } asks. Apps from
+    schelf.store show what they can use first, and tools who publishes them.
     You can write add instead of install.
 
-    Fedora packages that bring a service or driver, such as Tailscale, Docker or
-    libvirt, go into the system itself, where they start with the computer and
-    are rebuilt with every update of { -luft }. --system puts any Fedora package
-    there; --fedora keeps a command-line tool in your toolbox.
+    Packages from Fedora go into the system, for everyone on the computer, and
+    update by themselves. Command-line tools install without a password; those
+    that bring a service, a driver or anything else that changes the system,
+    such as Tailscale, Docker or libvirt, ask for an administrator's. --system
+    installs several in one go and takes a command's name for its package.
 cli-usage-remove =
-    Removes apps, extensions, AppImages and command-line tools you installed, and system
-    packages with everything they added.
+    Removes apps, extensions and AppImages you installed, and system packages
+    with everything they added.
 cli-usage-search =
-    Looks for apps and extensions on schelf.store, apps on Flathub and Fedora,
-    command-line tools from Fedora, and through the AppImages you have.
+    Looks for apps and extensions on schelf.store, apps on Flathub, packages
+    from Fedora and your software sources, and through the AppImages you have.
 cli-usage-update =
-    Updates apps, AppImages and command-line tools. { -luft } itself updates in
-    Settings, under Updates.
+    Updates apps, AppImages, tools and system packages. { -luft } itself updates
+    in Settings, under Updates.
 cli-usage-list = Shows what you installed, by where it came from, and the system packages.
 cli-usage-info =
-    Shows the details of an app or command-line tool, from every source
-    that has it.
+    Shows the details of an app, tool or package, from every source that has
+    it.
 cli-usage-trust =
     Gives Flatpak apps full access: they can see and change all your files,
     read the clipboard in the background, control other apps' windows and
@@ -85,7 +85,7 @@ cli-usage-repo =
     copr:owner/project, or one { -schelf } knows by name: 1password, docker,
     google-chrome or vscode. { -schelf } shows the key its packages
     are signed with and asks before adding it. Packages from it then install
-    with --system and update with { -luft }. Removing a source removes its packages.
+    into the system and update by themselves. Removing a source removes its packages.
 
 ## Mistakes in how a command was typed
 
@@ -109,7 +109,6 @@ cli-needs-luft-sources = Software sources for system packages need { -luft }, wh
 cli-needs-luft-full-access = Full access for Flatpak apps and AppImages needs { -luft }, which this computer doesn't run.
 cli-needs-luft-places = Giving Flatpak apps and AppImages drives and folders needs { -luft }, which this computer doesn't run.
 cli-catalog-needs-flatpak = Apps from Flathub need Flatpak, which isn't installed here.
-cli-catalog-fedora-needs-luft = Fedora's apps and command-line tools need { -luft }, which this computer doesn't run.
 cli-appimage-no-catalog = AppImages have no catalog to look in. Install one from its file, such as ./App.AppImage.
 
 ## Questions
@@ -173,20 +172,18 @@ cli-install-nothing-called = There's nothing called { $name } on { $places }.
 cli-install-close-matches = Close matches:
 # $example is the ID of one of the choices
 cli-install-name-by-id = Name the one you want by its ID or address, such as { $example }.
-cli-install-pick-source = Pick one with --store, --flathub or --fedora.
+cli-install-pick-source = Pick one with --store, --flathub or --system.
 cli-install-already = { $name } is already installed.
 cli-install-already-from = { $name } is already installed from { $source }.
 cli-install-own-source = { $name } gets its updates from a software source of its own:
 # $error says why it couldn't look
 cli-install-look-failed = Couldn't look for { $name }. { $error }
 cli-install-comes-with-luft = { $name } comes with { -luft }.
-cli-install-goes-to-system = { $name } brings a service or driver that only works as part of the system, so it goes there, starts with the computer and updates with { -luft }.
 cli-install-run-as = Run it as { $command }.
 # $commands is a list of the commands a tool brings
 cli-install-commands = Its commands are { $commands }.
 # $count is how many more commands it brings than are named
 cli-install-commands-and-more = Its commands are { $commands }, and { $count } more.
-cli-install-library = It lives in your Toolbox, so build against it inside { $command }.
 cli-install-open-or-run = Open it from Start, or run { $command }.
 cli-install-open = Open it from Start.
 cli-install-system-file-updates = It's part of the system now, and updates with { -luft }.
@@ -259,7 +256,7 @@ cli-access-basics = Nothing beyond the basics
 
 ## remove
 
-cli-remove-pick-source = Pick one with --flathub, --fedora or --appimage.
+cli-remove-pick-source = Pick one with --flathub, --system or --appimage.
 # $names is a list of what's about to be removed
 cli-remove-confirm = Remove { $names }?
 cli-remove-confirm-places = Remove { $names }? Drives and folders you gave it have to be given again if you install it later.
@@ -331,21 +328,19 @@ cli-info-source-flathub = Flathub, { $kind ->
        *[extension] { -luft } extension
     }
 cli-info-source-fedora = Fedora, { $kind ->
-        [desktop] desktop app
-        [command] command-line tool
-        [system] system package
-       *[extension] { -luft } extension
-    }, in your Toolbox
+        [desktop] a desktop app
+        [command] a command-line tool
+        [system] a system package
+       *[extension] a { -luft } extension
+    } in the system for everyone
 cli-info-source-store = schelf.store, { $kind ->
         [desktop] desktop app
         [command] command-line tool
         [system] system package
        *[extension] { -luft } extension
     }
-cli-info-source-fedora-desktop = Fedora, a desktop app in the system for everyone
 # $source is where the package comes from, such as your software sources
 cli-info-source-system = System package, from { $source }
-cli-info-gone-from-fedora = Fedora doesn't have it any more.
 cli-info-gone = It isn't available any more.
 cli-info-gone-from-store = It isn't on schelf.store any more.
 cli-info-access-everything = Everything you can, outside a sandbox
@@ -396,9 +391,9 @@ cli-update-flatpaks-for-everyone = { $count ->
        *[other] { $count } Flatpak apps for everyone
     }
 cli-update-flatpaks-and-runtimes-for-everyone = { $count } Flatpak apps and runtimes for everyone
-cli-update-tools = { $count ->
-        [one] { $count } command-line tool
-       *[other] { $count } command-line tools
+cli-update-system = { $count ->
+        [one] { $count } system package
+       *[other] { $count } system packages
     }
 cli-update-debs = { $count ->
         [one] { $count } app from .deb files
@@ -415,10 +410,9 @@ cli-system-from-fedora = Fedora into the system
 cli-system-from-fedora-and-sources = Fedora and your software sources into the system
 # $count is how many packages were installed
 cli-system-installed-note = { $count ->
-        [one] It's rebuilt with every update of { -luft }, and its services start with the computer.
-       *[other] They're rebuilt with every update of { -luft }, and their services start with the computer.
+        [one] It updates by itself, and its services start with the computer.
+       *[other] They update by themselves, and their services start with the computer.
     }
-cli-system-updates = System packages update with { -luft }, in Settings, under Updates. Every update brings their newest versions.
 
 ## trust and untrust
 

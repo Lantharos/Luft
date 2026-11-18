@@ -27,7 +27,11 @@ fn extra(app: &InstalledApp) -> String {
         parts.push(t!(L10N, "cli-list-runs", services = app.services.join(" ")));
     }
     if app.source == Source::System && app.version.is_none() {
-        parts.push(t!(L10N, "cli-list-being-set-up"));
+        parts.push(
+            app.summary
+                .clone()
+                .unwrap_or_else(|| t!(L10N, "cli-list-being-set-up")),
+        );
     }
     parts.join(&t!(L10N, "cli-list-separator"))
 }

@@ -6,5 +6,4 @@ pub mod flatpak;
 mod operand;
 #[cfg(feature = "system")]
 pub mod places;
-pub mod toolbox;
 pub mod updates;

@@ -6,10 +6,17 @@
     computer, from Fedora, the repositories that were added in
     /var/lib/luft/system-packages/repositories, and package files installed by themselves. Started on demand and stops when idle.
 
-    Install, InstallFile and Remove need com.lantharos.packages.change, AddRepository and
+    Install and Remove need com.lantharos.packages.tools, and com.lantharos.packages.change as
+    well once the service finds, from the packages it resolved and before anything is merged,
+    that the change isn't plain: a package it brings or takes away comes from somewhere other
+    than Fedora's own repositories, or the build gains or loses a unit, device rule, setuid,
+    setgid or file capability program, PAM or NSS module, polkit rule or action, D-Bus system
+    service, sudo setting, policy module, user, group or anything else that changes what the
+    system does as root. InstallFile needs com.lantharos.packages.change, AddRepository and
     RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
     the running system uses the new set; Step tells how far they are. List, Provider and
-    DescribeRepository need nothing. Only root can call Rebuild and Update. InstallExtension and
+    DescribeRepository need nothing. Only root can call Rebuild; Update needs root or
+    com.lantharos.packages.tools. InstallExtension and
     RemoveExtension need com.lantharos.packages.extensions and only change the caller's own folder.
     InstallUnreviewedExtension and AllowExtensionFolder are refused while Developer tools is off and to
     any program but Luft's Settings, and need com.lantharos.packages.unreviewed-extensions every time.
@@ -17,9 +24,10 @@
   -->
   <interface name="com.lantharos.Packages1">
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
-         "requested", "units", "apps": [desktop entries], "origin": "fedora", "file" or
-         {"repository": file}}] merged now,
-         dependencies included, "services": [units turned on], "pending": true when the merged
+         "requested", "units", "apps": [desktop entries], "commands": [names in /usr/bin],
+         "origin": "fedora", "file" or {"repository": file}, "plain"}] merged now,
+         dependencies included, "services": [units turned on], "leftOut": {name: why} for
+         requested packages the merged build couldn't have, "pending": true when the merged
          set isn't the requested one yet, "repositories": [{"file", "sources": [{"id", "name",
          "url"}]}]}. -->
     <method name="List">
@@ -108,8 +116,8 @@
     <method name="Rebuild"/>
     <!-- Builds the packages again for every version on the computer whose packages have newer
          versions out, and has the running system use its new build, or the one before when that
-         fails. com.lantharos.Updater1 calls it when it checks for updates on schedule. Returns
-         when it's done. -->
+         fails. com.lantharos.Updater1 calls it when it checks for updates on schedule, and
+         Schelf when someone updates them. Returns when it's done. -->
     <method name="Update"/>
     <!-- "downloading", "building" or "starting". -->
     <signal name="Step">

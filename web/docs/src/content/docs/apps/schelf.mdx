@@ -51,7 +51,7 @@ Opening a `.flatpak`, `.flatpakref`, `.deb`, `.AppImage` or `.rpm` file opens a 
 
 When the same app is on schelf.store or Flathub, the window says so, with the version there, and offers to install it from there instead, since that copy keeps itself up to date; **Install file** still installs the file. schelf.store comes first when both have it, and the offer is left out when the app can't be recognised by its ID or you're offline.
 
-A desktop app's `.rpm`, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. A `.deb` file's app goes into Ubuntu, kept in your account. [Installing software](/system/software/) explains where each kind goes.
+An `.rpm` file, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. A `.deb` file's app goes into Ubuntu, kept in your account. [Installing software](/system/software/) explains where each kind goes.
 
 ## Apps from schelf.store
 
@@ -77,7 +77,7 @@ Schelf does what the `schelf` command can do by itself, such as pausing a rollou
 
 ## Command-line tools
 
-Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedora into a Toolbox container. Its commands work in [Tern](/apps/tern/) like any other, and its updates appear under Updates.
+Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedora into the system, as a [system package](/system/system-packages/). Its commands work in [Tern](/apps/tern/) like any other, it updates by itself, and it's listed under Installed, System. A tool that only brings programs installs without a password; one that brings a service or anything else that changes the system asks for an administrator's.
 
 Tools published on schelf.store install from the terminal with `schelf add` and their address, such as `alice/notes`, into `~/.local/bin`. Each is one program, checked against what schelf.store signed for it, and it runs with everything you can do, so Schelf says who publishes it before it goes ahead. They show up under Installed and update with your apps.
 

@@ -1,6 +1,6 @@
 # luft-software
 
-The software handling Schelf and Settings share: image updates, system packages, Flatpak, AppImages and command-line tools in a Toolbox container.
+The software handling Schelf and Settings share: image updates, system packages and the Fedora catalog they come from, Flatpak and AppImages.
 
 ## Setup
 

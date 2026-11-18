@@ -1,6 +1,6 @@
 ---
 title: Installing software
-description: Apps from schelf.store and Flathub, AppImages, command-line tools in a Toolbox container, and system packages for services and vendors' apps.
+description: Apps from schelf.store and Flathub, AppImages, and packages from Fedora and the software sources you add, such as command-line tools, services and vendors' apps.
 sidebar:
   order: 3
 asks:
@@ -31,17 +31,16 @@ asks:
   - { ask: why can't i change system files, to: what-doesnt-work }
 ---
 
-Luft's system is a sealed image, so apps and tools live next to it, in your account, where updates to the system can't break them and they can't break the system. The few things that have to be part of the system, such as Tailscale, Docker's daemon or a vendor's app like 1Password, are added as system packages. [Schelf](/apps/schelf/) handles all of them.
+Luft's system is a sealed image, so apps live next to it, in your account, where updates to the system can't break them and they can't break the system. Packages from Fedora, such as command-line tools, Tailscale, Docker's daemon or a vendor's app like 1Password, are added to the system as system packages, without changing the image. [Schelf](/apps/schelf/) handles all of them.
 
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
 | Apps and extensions from schelf.store | Your account: AppImages in their sandbox, apps built with Sabine next to Luft's own, extensions on your desktop | By themselves, a few minutes after you sign in and every six hours |
 | Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
 | AppImages | Your account, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
-| Command-line tools from Fedora | A Toolbox container, with their commands in `~/.local/bin` | In Schelf, under Updates, or `schelf update` |
-| Fedora's desktop apps, and system packages from Fedora and the software sources you add | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
+| Packages from Fedora and the software sources you add: command-line tools, Fedora's desktop apps, services | The system, for everyone on the computer | By themselves whenever Luft looks for updates, or in Schelf, under Updates |
 
-Apps and tools don't need an administrator's password, in Schelf or in the terminal. System packages do.
+Apps and command-line tools from Fedora don't need an administrator's password, in Schelf or in the terminal. Packages that change what the system does, such as a service or a driver, do.
 
 ## Flatpak
 
@@ -73,7 +72,7 @@ A few apps need much more than a drive or a folder, such as password managers th
 
 Apps that keep their whole home in their own folder, such as Steam, get everything too but keep that folder as their home, since finding yours in its place would confuse them. Only give full access to apps you trust. Schelf asks you to confirm, and the app gets its new access the next time it opens; if it's open, Schelf offers to restart it. Until then, opening it again, or a link it handles, goes to the copy that's running. Turning it off puts the app back in its sandbox. An AppImage keeps its settings and data in `~/.var/app/` followed by its ID either way, so nothing it saved goes missing when you switch. For a Flatpak that also undoes changes you made to its permissions with other tools, such as Flatseal.
 
-Command-line tools and system packages don't run in a sandbox, so they have full access already. Settings → Apps lists what every sandboxed app was allowed, and takes any of it away.
+System packages don't run in a sandbox, so they have full access already. Settings → Apps lists what every sandboxed app was allowed, and takes any of it away.
 
 ## AppImages
 
@@ -100,22 +99,15 @@ Otherwise, **Install the .deb anyway** installs it into Ubuntu 26.04, kept in yo
 
 ## Command-line tools
 
-Command-line tools come from Fedora and go into a [Toolbox](https://containertoolbx.org) container called `fedora-toolbox-45`. Search for them in Schelf, or open an `.rpm` file. Each command gets a small launcher in `~/.local/bin`, so it runs in [Tern](/apps/tern/) like any other, without entering the container.
+Command-line tools come from Fedora and become [system packages](/system/system-packages/), for everyone on the computer. Search for them in Schelf, run `schelf install ripgrep`, or open an `.rpm` file. Their commands run in [Tern](/apps/tern/) like Luft's own, and they update by themselves.
 
-Tools that already come with Luft, such as `fastfetch`, run on the system itself, so Schelf says they're installed instead of adding a second copy. If a later version of Luft starts including a tool you installed this way, its launcher steps aside for Luft's.
+A tool that only brings programs, such as `ripgrep`, `htop` or `gh`, installs without a password. One that also changes what the system does, with a service, device rules, a program that runs with more rights than whoever starts it, or a user of its own, asks for an administrator's password, and so do `.rpm` files and packages from software sources you added.
 
-Libraries and `-devel` packages go into the container too, so building against them happens inside it. You can work in the container yourself:
-
-```sh
-toolbox enter                 # a shell inside it, with your home folder
-sudo dnf install gcc make     # inside the container
-```
-
-Toolbox containers share your home folder, so files are where you expect them.
+Compilers, libraries and `-devel` packages install the same way, so `schelf install gcc make` sets up a toolchain. Tools that already come with Luft, such as `fastfetch`, are part of the system, so Schelf says they're installed instead of adding a second copy.
 
 ## System packages
 
-Services that start with the computer, device rules and vendors' apps that only ship as system packages, such as Tailscale, Docker or 1Password, go into the system as [system packages](/system/system-packages/), from Fedora or a software source you add.
+Services that start with the computer, device rules and vendors' apps that only ship as system packages, such as Tailscale, Docker or 1Password, go into the system the same way, as [system packages](/system/system-packages/), from Fedora or a software source you add.
 
 ## In the terminal
 
@@ -128,9 +120,9 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf install ./app.AppImage` | Installs a `.rpm`, `.deb`, `.AppImage`, `.flatpak`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
 | `schelf search image editor` | Looks on schelf.store, Flathub, in Fedora and your software sources at once, and through your AppImages |
-| `schelf update` | Updates apps, AppImages and tools. Luft itself updates in [Settings](/system/updates/) |
+| `schelf update` | Updates apps, AppImages, tools and system packages. Luft itself updates in [Settings](/system/updates/) |
 | `schelf list` | Shows what you installed, by where it came from, and the system packages |
-| `schelf install --system tailscale` | Adds a package to the system, from Fedora or your software sources ([more](/system/system-packages/)) |
+| `schelf install --system tailscale` | Installs only from Fedora or your software sources, several packages in one go, also by a command they bring ([more](/system/system-packages/)) |
 | `schelf repo add copr:scottames/ghostty` | Adds a software source for system packages, after showing its key ([more](/system/system-packages/#software-sources)) |
 | `schelf info gimp` | Shows the details from every place that has it |
 | `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
@@ -139,13 +131,13 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf take steam Games` | Takes a drive or folder away again |
 | `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
-A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store or a tool installs, the command shows what it can use, then asks once for everything you named.
+A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--system` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store or a tool installs, the command shows what it can use, then asks once for everything you named.
 
-Installing, updating or removing several things lists each on a line of its own, with how far its download got, its size and speed, and works on three at a time, starting the next as soon as one finishes. Downloads run side by side; putting things in place goes one at a time, since package managers and your account's apps can only take one change at once. Fedora tools, `.deb` apps, system packages and Flatpak apps for everyone do all their work in that one-at-a-time step. When one fails the rest carry on, the summary at the end names what didn't work, and the command exits with an error.
+Installing, updating or removing several things lists each on a line of its own, with how far its download got, its size and speed, and works on three at a time, starting the next as soon as one finishes. Downloads run side by side; putting things in place goes one at a time, since package managers and your account's apps can only take one change at once. System packages, `.deb` apps and Flatpak apps for everyone do all their work in that one-at-a-time step, and the system packages you name in one command go in together. When one fails the rest carry on, the summary at the end names what didn't work, and the command exits with an error.
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
 
-The same command runs on other Linux systems too, where `curl -fsSL https://schelf.store/install | sh` puts it in `~/.local/bin` and it keeps itself up to date. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, system packages, extensions and full access say they need Luft.
+The same command runs on other Linux systems too, where `curl -fsSL https://schelf.store/install | sh` puts it in `~/.local/bin` and it keeps itself up to date. There it installs apps from schelf.store as AppImages in your account, without a sandbox, and apps from Flathub when Flatpak is installed. Fedora's packages, extensions and full access say they need Luft.
 
 When its output goes to another program instead of a terminal, `search` and `list` print one line per entry with the fields separated by tabs, nothing is coloured, and progress is told one line at a time instead of redrawn. `NO_COLOR` and `TERM=dumb` do the same in a terminal.
 
@@ -165,7 +157,7 @@ Typing `dnf install`, `apt install`, `pacman -S` or `zypper in` asks whether to 
 
 ```
 $ dnf install ripgrep
-Luft installs this with Schelf, into your account. Install ripgrep? [Y/n]
+Luft installs this with Schelf. Install ripgrep? [Y/n]
 ```
 
 Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.

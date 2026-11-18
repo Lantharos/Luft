@@ -1,0 +1,12 @@
+[Unit]
+Description=Check which changes of the system packages need an administrator
+Wants=network-online.target
+After=network-online.target dbus.service polkit.service
+ConditionKernelCommandLine=composefs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-system-packages-check
+
+[Install]
+WantedBy=multi-user.target

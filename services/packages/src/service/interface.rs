@@ -14,11 +14,12 @@ use zbus::{Connection, interface};
 
 use super::error::Error;
 use super::unreviewed::approver;
-use crate::changes::{self, Report, Step};
+use crate::changes::{self, Escalate, NotApproved, Report, Step};
 use crate::extensions::unreviewed::Unreviewed;
 use crate::extensions::{self, Signed};
 
 const CHANGE: &str = "com.lantharos.packages.change";
+const TOOLS: &str = "com.lantharos.packages.tools";
 const SOURCES: &str = "com.lantharos.packages.sources";
 const LONGEST_CAPABILITY: usize = 256;
 const EXTENSIONS: &str = "com.lantharos.packages.extensions";
@@ -26,6 +27,14 @@ const EXTENSIONS: &str = "com.lantharos.packages.extensions";
 fn stopped() -> Error {
     Error::Failed("The system packages service stopped unexpectedly.".to_owned())
 }
+
+enum Event {
+    Step(Step),
+    Escalate(std::sync::mpsc::Sender<bool>),
+}
+
+/// The caller of a change that only needed an administrator if it turned out not to be plain.
+type Approver<'a> = Option<(&'a Connection, &'a Header<'a>)>;
 
 pub struct Packages {
     idle: Arc<Idle>,
@@ -60,11 +69,13 @@ impl Packages {
             .ok_or_else(Error::not_authorized)
     }
 
-    /// Runs `work`, which changes the system packages, reporting its steps.
+    /// Runs `work`, which changes the system packages, reporting its steps. With `approver`,
+    /// the work asks it for com.lantharos.packages.change once it finds the change isn't plain.
     async fn change(
         &self,
         emitter: &SignalEmitter<'_>,
-        work: impl FnOnce(Report) -> anyhow::Result<()> + Send + 'static,
+        approver: Approver<'_>,
+        work: impl FnOnce(Report, Option<Escalate>) -> anyhow::Result<()> + Send + 'static,
     ) -> Result<(), Error> {
         if self.busy.swap(true, Ordering::SeqCst) {
             return Err(Error::Busy(
@@ -72,13 +83,43 @@ impl Packages {
             ));
         }
         let _activity = self.idle.hold();
-        let (sender, mut steps) = mpsc::unbounded_channel();
+        let (sender, mut events) = mpsc::unbounded_channel();
+        let steps = sender.clone();
         let report: Report = Arc::new(move |step: Step| {
-            let _ = sender.send(step);
+            let _ = steps.send(Event::Step(step));
         });
-        let work = tokio::task::spawn_blocking(move || work(report));
-        while let Some(step) = steps.recv().await {
-            let _ = Self::step(emitter, step.name()).await;
+        let escalate = approver.is_some().then(|| -> Escalate {
+            let sender = sender.clone();
+            Arc::new(move || {
+                let (reply, answer) = std::sync::mpsc::channel();
+                sender
+                    .send(Event::Escalate(reply))
+                    .map_err(|_| NotApproved)?;
+                match answer.recv() {
+                    Ok(true) => Ok(()),
+                    _ => Err(NotApproved.into()),
+                }
+            })
+        });
+        drop(sender);
+        let work = tokio::task::spawn_blocking(move || work(report, escalate));
+        while let Some(event) = events.recv().await {
+            match event {
+                Event::Step(step) => {
+                    let _ = Self::step(emitter, step.name()).await;
+                }
+                Event::Escalate(reply) => {
+                    let approved = match approver {
+                        Some((connection, header)) => {
+                            luft_dbus::polkit::is_authorized(connection, header, CHANGE)
+                                .await
+                                .unwrap_or(false)
+                        }
+                        None => false,
+                    };
+                    let _ = reply.send(approved);
+                }
+            }
         }
         let result = work.await;
         self.busy.store(false, Ordering::SeqCst);
@@ -124,7 +165,7 @@ impl Packages {
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
         if luft_identity::caller::uid(connection, &header).await? != Some(0) {
-            return Err(Error::not_authorized());
+            Self::authorize(connection, &header, TOOLS).await?;
         }
         self.blocking(changes::update).await
     }
@@ -136,9 +177,13 @@ impl Packages {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
-        Self::authorize(connection, &header, CHANGE).await?;
-        self.change(&emitter, move |report| changes::change(&names, &[], report))
-            .await
+        Self::authorize(connection, &header, TOOLS).await?;
+        self.change(
+            &emitter,
+            Some((connection, &header)),
+            move |report, escalate| changes::change(&names, &[], escalate, report),
+        )
+        .await
     }
 
     async fn install_file(
@@ -150,7 +195,7 @@ impl Packages {
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, CHANGE).await?;
         let package = File::from(std::os::fd::OwnedFd::from(package));
-        self.change(&emitter, move |report| {
+        self.change(&emitter, None, move |report, _| {
             changes::install_file(package, report)
         })
         .await
@@ -163,9 +208,13 @@ impl Packages {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
-        Self::authorize(connection, &header, CHANGE).await?;
-        self.change(&emitter, move |report| changes::change(&[], &names, report))
-            .await
+        Self::authorize(connection, &header, TOOLS).await?;
+        self.change(
+            &emitter,
+            Some((connection, &header)),
+            move |report, escalate| changes::change(&[], &names, escalate, report),
+        )
+        .await
     }
 
     async fn provider(&self, capability: String) -> Result<String, Error> {
@@ -290,7 +339,7 @@ impl Packages {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, SOURCES).await?;
-        self.change(&emitter, move |report| {
+        self.change(&emitter, None, move |report, _| {
             changes::remove_repository(&file, report)
         })
         .await

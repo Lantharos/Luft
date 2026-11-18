@@ -1,7 +1,7 @@
 use luft_i18n::t;
-use luft_software::apps::toolbox::Repositories;
+use luft_software::system::catalog::Repositories;
 use luft_software::system::repositories;
-use schelf_core::catalog::tools;
+use schelf_core::catalog::packages;
 use schelf_core::operations::{Job, Request};
 
 use crate::install::Exit;
@@ -40,7 +40,7 @@ pub(super) fn plan(packages: Vec<String>, verb: Verb) -> Plan {
 /// The package `name` is, or the one that brings the command `name`.
 fn package_of(name: &str) -> Result<String, String> {
     for repositories in [Repositories::Fedora, Repositories::Added] {
-        if tools::find_in(repositories, name)?.is_some() {
+        if packages::find_in(repositories, name)?.is_some() {
             return Ok(name.to_owned());
         }
     }
@@ -61,8 +61,8 @@ fn package_of(name: &str) -> Result<String, String> {
     Ok(name.to_owned())
 }
 
-/// Fedora packages go into the system itself, so services and udev rules they bring work like
-/// on any Fedora install. They're rebuilt with every update of Luft.
+/// Installs packages from Fedora and the added sources by name, or by a command they bring, in
+/// one change.
 pub fn install(arguments: &Arguments) -> Exit {
     let ink = Ink::stdout();
     let present: Vec<String> = installed::all(Some(Origin::System))
@@ -97,9 +97,4 @@ pub fn install(arguments: &Arguments) -> Exit {
 /// Removes several system packages in one go, since each change rebuilds them all.
 pub fn removal(packages: Vec<String>) -> Plan {
     plan(packages, Verb::Remove)
-}
-
-pub fn explain_updates() -> Exit {
-    eprintln!("{}", t!(L10N, "cli-system-updates"));
-    Exit::Usage
 }

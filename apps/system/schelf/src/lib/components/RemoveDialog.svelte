@@ -10,7 +10,6 @@
 	const description = $derived.by(() => {
 		if (app.source === 'extension') return t('remove-extension', { name: app.name });
 		if (app.source === 'appImage') return t('remove-appimage', { name: app.name, folder: app.origin });
-		if (app.source === 'tool') return t('remove-tool', { name: app.name });
 		if (app.source === 'debian') return t('remove-app', { name: app.name });
 		if (app.source === 'system') return t('remove-system', { name: app.name });
 		if (app.source === 'flatpak') return t('remove-flatpak', { name: app.name });

@@ -100,7 +100,6 @@ home-question-windows-answer = Da. Luft je lahko ob sistemu Windows, vi pa izber
 home-question-try = Ali ga lahko preizkusim pred namestitvijo?
 home-question-try-answer = Da. Meet Luft enkrat znova zažene računalnik v Luft, ne da bi kar koli namestil, naslednji zagon pa vas vrne v Windows ali vaš Linux. Ključek USB deluje enako.
 home-question-apps = Kaj pa moje aplikacije?
-home-question-apps-answer = Schelf namešča aplikacije iz Flathuba in v obliki AppImage ter skrbi, da so posodobljene. Kot brskalnik je priložen Helium, ki ga lahko zamenjate s katerim koli drugim. Orodja ukazne vrstice gredo v vsebnik Toolbox, ki ga prav tako upravlja Schelf.
 home-question-updates = Kako delujejo posodobitve?
 home-question-updates-answer = Ves sistem se posodobi naenkrat, v ozadju, in preklopi ob naslednjem vnovičnem zagonu. Če kaj ni v redu, je prejšnja različica ob zagonu računalnika le en izbor stran.
 home-question-ready = Je pripravljen?

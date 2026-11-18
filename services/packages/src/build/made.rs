@@ -4,7 +4,7 @@ use std::path::Path;
 use anyhow::Result;
 use walkdir::WalkDir;
 
-use super::rpm::Rpm;
+use super::resolve::rpm::Rpm;
 use super::stage::{Layout, copy_files, mirror_folder};
 
 const MERGED: [&str; 2] = ["usr", "opt"];

@@ -99,7 +99,6 @@ home-question-windows-answer = Jā. Luft var atrasties blakus Windows, un jūs i
 home-question-try = Vai varu to izmēģināt pirms instalēšanas?
 home-question-try-answer = Jā. Meet Luft vienreiz restartē sistēmā Luft, neko neinstalējot, un nākamā restartēšana atgriežas Windows vai jūsu Linux. USB zibatmiņa darbojas tāpat.
 home-question-apps = Un manas lietotnes?
-home-question-apps-answer = Schelf instalē lietotnes no Flathub un AppImage formātā un uztur tās atjauninātas. Kā pārlūks ir iekļauts Helium, ko var aizstāt ar jebkuru citu. Komandrindas rīki nonāk Toolbox konteinerā, ko arī pārvalda Schelf.
 home-question-updates = Kā darbojas atjauninājumi?
 home-question-updates-answer = Visa sistēma tiek atjaunināta uzreiz, fonā, un pārslēdzas nākamajā restartēšanā. Ja kaut kas nav kārtībā, iepriekšējā versija ir vienas izvēles attālumā, kad dators startē.
 home-question-ready = Vai tā ir gatava?

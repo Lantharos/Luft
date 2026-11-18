@@ -107,10 +107,10 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
     }
     let package = |update: &AppUpdate| update.package.clone().unwrap_or_default();
     plans.extend(batch(
-        "tool-updates",
-        |count| t!(L10N, "cli-update-tools", count = count),
-        &of(Source::Tool),
-        |packages| Job::UpdateTools { packages },
+        "system-updates",
+        |count| t!(L10N, "cli-update-system", count = count),
+        &of(Source::System),
+        |_| Job::UpdateSystemPackages,
         package,
     ));
     plans.extend(batch(

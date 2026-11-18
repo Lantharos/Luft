@@ -1,7 +1,7 @@
 use luft_app::Commands;
-use luft_software::apps::toolbox::{self, Repositories};
+use luft_software::system::catalog::Repositories;
 use sabine::SabineWindow;
-use schelf_core::catalog::{fedora, flathub, tools};
+use schelf_core::catalog::{fedora, flathub, packages};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -20,7 +20,7 @@ struct Package {
     package: String,
 }
 
-/// A Fedora package's page, from Fedora's software sources.
+/// A package's page, from Fedora or the software source it's in.
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct FedoraDetails {
@@ -33,16 +33,18 @@ struct FedoraDetails {
 }
 
 fn fedora_details(Package { package }: Package) -> Result<Option<FedoraDetails>, String> {
-    Ok(
-        fedora::details(Repositories::Fedora, &package)?.map(|details| FedoraDetails {
-            version: details.version,
-            description: details.description,
-            license: details.license,
-            homepage: details.homepage,
-            size: details.size,
-            download: details.download,
-        }),
-    )
+    let details = match fedora::details(Repositories::Fedora, &package)? {
+        Some(details) => Some(details),
+        None => fedora::details(Repositories::Added, &package)?,
+    };
+    Ok(details.map(|details| FedoraDetails {
+        version: details.version,
+        description: details.description,
+        license: details.license,
+        homepage: details.homepage,
+        size: details.size,
+        download: details.download,
+    }))
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
@@ -52,11 +54,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         })
         .command("flathub_summary", |Listing { id }| flathub::summary(&id))
         .command("fedora_details", fedora_details)
-        .command("tools_search", |Query { query }| tools::search(&query))
-        .command("tool_needs_system", |Package { package }| {
-            toolbox::needs_system(&package)
-        })
-        .command("system_search", |Query { query }| {
-            tools::search_in(Repositories::Added, &query)
+        .command("packages_search", |Query { query }| {
+            packages::search(&query)
         })
 }

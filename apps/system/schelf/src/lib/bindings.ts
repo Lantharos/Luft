@@ -202,6 +202,9 @@ export const commands = {
 		job: Job,
 		members?: string[],
 	}, options?: CallOptions) => invoke<number>("operations_start", params, options),
+	packagesSearch: (params: {
+		query: string,
+	}, options?: CallOptions) => invoke<PackageSummary[]>("packages_search", params, options),
 	sourcesAdd: (params: {
 		draft: RepositoryDraft,
 	}, options?: CallOptions) => invoke<null>("sources_add", params, options),
@@ -233,15 +236,6 @@ export const commands = {
 		query: string,
 	}, options?: CallOptions) => invoke<CatalogApp[]>("store_search", params, options),
 	storeState: (options?: CallOptions) => invoke<StoreState>("store_state", {}, options),
-	systemSearch: (params: {
-		query: string,
-	}, options?: CallOptions) => invoke<ToolSummary[]>("system_search", params, options),
-	toolNeedsSystem: (params: {
-		package: string,
-	}, options?: CallOptions) => invoke<boolean>("tool_needs_system", params, options),
-	toolsSearch: (params: {
-		query: string,
-	}, options?: CallOptions) => invoke<ToolSummary[]>("tools_search", params, options),
 	updatesCheck: (options?: CallOptions) => invoke<Updates>("updates_check", {}, options),
 };
 
@@ -449,7 +443,7 @@ export type Failure = {
 	output: string[],
 };
 
-/**  A Fedora package's page, from Fedora's software sources. */
+/**  A package's page, from Fedora or the software source it's in. */
 export type FedoraDetails = {
 	version: string,
 	description: string,
@@ -542,7 +536,7 @@ export type Invitee = ({ email: string }) & { github?: never } | ({ github: stri
 
 export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore"; id: string; consent: Consent } | { kind: "updateStore"; id: string; consent: Consent } | { kind: "removeStore"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
 /**  Whether you let an app that asks to run unsandboxed do so. */
-fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string } | { kind: "installStoreTool"; address: string; channel: string } | { kind: "updateStoreTool"; name: string } | { kind: "removeStoreTool"; name: string };
+fullAccess: boolean } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateSystemPackages" } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string } | { kind: "installStoreTool"; address: string; channel: string } | { kind: "updateStoreTool"; name: string } | { kind: "removeStoreTool"; name: string };
 
 export type Kind = "app" | "extension";
 
@@ -617,7 +611,7 @@ export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: 
  */
 origin: string | null; 
 /**  What its sandbox opens to it. */
-permissions: Permissions | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; vendor: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; maintainer: string | null; size: number; 
+permissions: Permissions | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; vendor: string | null; size: number; installed: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; maintainer: string | null; size: number; 
 /**  The file name of its main app's menu entry. */
 desktop: string | null; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
 /**  The file name of its menu entry. */
@@ -641,6 +635,11 @@ export type Operation = {
 export type OperationState = "queued" | "running" | "failed";
 
 export type Origin = "schelf" | "flathub" | "fedora";
+
+export type PackageSummary = {
+	package: string,
+	summary: string,
+};
 
 export type Palette = {
 	accent: string,
@@ -740,7 +739,7 @@ export type Severity = "block" | "warn";
 
 export type SignIn = { state: "waiting"; intervalMs: number } | { state: "approved"; account: Account } | { state: "declined" } | { state: "expired" };
 
-export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system" | "sabine" | "extension" | "storeTool";
+export type Source = "flatpak" | "appImage" | "debian" | "system" | "sabine" | "extension" | "storeTool";
 
 export type SourceKey = {
 	fingerprint: string,
@@ -849,11 +848,6 @@ export type StoreUpdate = {
 };
 
 export type Switch = "downloads" | "x11" | "microphone" | "camera";
-
-export type ToolSummary = {
-	package: string,
-	summary: string,
-};
 
 /**  How many bytes of a download arrived, out of how many. */
 export type Transfer = {

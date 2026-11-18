@@ -1,4 +1,4 @@
-use super::{Candidate, Catalog, Kind, fedora};
+use super::{Candidate, Catalog, Kind, Origin, fedora};
 
 const SUGGESTIONS: usize = 2;
 
@@ -31,16 +31,12 @@ fn across<T: Send>(
     })
 }
 
-pub fn catalogs(only: Option<Catalog>) -> Vec<Catalog> {
-    only.map_or_else(
-        || {
-            Catalog::ALL
-                .into_iter()
-                .filter(|catalog| catalog.usable())
-                .collect()
-        },
-        |catalog| vec![catalog],
-    )
+pub fn catalogs(only: Option<Origin>) -> Vec<Catalog> {
+    Catalog::ALL
+        .into_iter()
+        .filter(|catalog| only.is_none_or(|origin| catalog.origin() == origin))
+        .filter(|catalog| catalog.usable())
+        .collect()
 }
 
 fn by_kind(mut found: Vec<Candidate>) -> Resolved {
@@ -62,7 +58,7 @@ fn by_kind(mut found: Vec<Candidate>) -> Resolved {
     }
 }
 
-pub fn resolve(name: &str, only: Option<Catalog>) -> Result<Resolved, String> {
+pub fn resolve(name: &str, only: Option<Origin>) -> Result<Resolved, String> {
     let catalogs = catalogs(only);
     let mut found: Vec<Candidate> = across(&catalogs, |catalog| catalog.find(name))
         .into_iter()
@@ -94,10 +90,7 @@ pub fn resolve(name: &str, only: Option<Catalog>) -> Result<Resolved, String> {
     }
 }
 
-pub fn search(
-    query: &str,
-    only: Option<Catalog>,
-) -> Vec<(Catalog, Result<Vec<Candidate>, String>)> {
+pub fn search(query: &str, only: Option<Origin>) -> Vec<(Catalog, Result<Vec<Candidate>, String>)> {
     let catalogs = catalogs(only);
     let found = across(&catalogs, |catalog| catalog.search(query));
     catalogs.into_iter().zip(found).collect()

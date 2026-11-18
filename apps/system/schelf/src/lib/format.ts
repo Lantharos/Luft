@@ -5,7 +5,6 @@ import type { InstalledApp, Operation } from '#lib/bindings.js';
 export function sourceName({ source, origin, listing }: Pick<InstalledApp, 'source' | 'origin' | 'listing'>) {
 	if (listing) return source === 'extension' ? t('source-store-extension') : t('source-store');
 	if (source === 'appImage') return t('source-file');
-	if (source === 'tool') return t('source-tool');
 	if (source === 'storeTool') return t('source-store-tool');
 	if (source === 'debian') return t('source-ubuntu');
 	if (source === 'system') return origin === 'Fedora' ? t('source-system') : t('source-system-from', { origin });

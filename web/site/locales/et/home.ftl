@@ -88,7 +88,6 @@ home-question-windows-answer = Jah. Luft võib olla Windowsi kõrval ja sina val
 home-question-try = Kas saan enne installimist proovida?
 home-question-try-answer = Jah. Meet Luft taaskäivitab üheks korraks Lufti ilma midagi installimata ja järgmine taaskäivitus viib tagasi Windowsi või sinu Linuxi. USB-mälupulk töötab samamoodi.
 home-question-apps = Aga minu rakendused?
-home-question-apps-answer = Schelf installib rakendusi Flathubist ja AppImage’itena ning hoiab need ajakohasena. Brauserina on kaasas Helium, mille saab vahetada mis tahes muu vastu. Käsurea tööriistad lähevad Toolboxi konteinerisse, mida haldab samuti Schelf.
 home-question-updates = Kuidas värskendused töötavad?
 home-question-updates-answer = Kogu süsteem värskendatakse korraga taustal ja muudatus rakendub järgmisel taaskäivitusel. Kui midagi pole korras, on eelmine versioon arvuti käivitamisel ühe valiku kaugusel.
 home-question-ready = Kas see on valmis?

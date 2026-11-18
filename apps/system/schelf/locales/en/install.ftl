@@ -34,7 +34,6 @@ install-from-source = Keeps getting updates from { $source }
 install-adds-source = Adds { $source } to your software sources
 install-source-unusable = Brings a software source Luft can’t use
 install-for-everyone = Installs for everyone on this computer
-install-tool = For you only, its commands run in Tern
 install-for-you = Installs for you only
 install-ubuntu = Runs in an Ubuntu space that can read and change your files
 install-wrong-computer = Made for a different kind of computer

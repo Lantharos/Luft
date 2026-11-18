@@ -5,7 +5,7 @@ sidebar:
   order: 9
 ---
 
-Every version of Luft is one sealed bootc image with the composefs backend. An update is the next image, staged for the next restart, with the version before kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, command-line tools from a Toolbox container, and the few Fedora packages that must be part of the system are merged over it as [system packages](/developers/system/system-packages/). [How updates work](/system/updates/) is what people see.
+Every version of Luft is one sealed bootc image with the composefs backend. An update is the next image, staged for the next restart, with the version before kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, and the Fedora packages someone adds, command-line tools among them, are merged over it as [system packages](/developers/system/system-packages/). [How updates work](/system/updates/) is what people see.
 
 ## Images
 

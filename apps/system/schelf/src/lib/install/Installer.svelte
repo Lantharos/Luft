@@ -59,7 +59,7 @@
 
 <div class="flex min-h-0 flex-1 flex-col p-7 pb-6">
 	<div class="drag-region flex items-center gap-4 pr-8">
-		<AppArt icon={install.icon} size={72} source={file?.kind === 'package' ? (file.system ? 'system' : 'tool') : null} />
+		<AppArt icon={install.icon} size={72} source={file?.kind === 'package' ? 'system' : null} />
 		<div class="flex min-w-0 flex-1 flex-col gap-1">
 			<h1 class="truncate text-[21px] font-semibold">{phase === 'unreadable' ? fileName : install.name}</h1>
 			{#if byline && phase !== 'unreadable'}

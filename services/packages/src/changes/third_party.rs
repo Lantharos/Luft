@@ -3,12 +3,11 @@ use std::fs::File;
 
 use anyhow::{Result, bail};
 
-use super::{Report, change_locked};
-use crate::activation::linked;
+use super::{Report, change_locked, merged};
 use crate::repositories;
 use crate::state::manifest::{Origin, Package};
 use crate::state::sources::{self, Sources};
-use crate::state::{self, Lock, load};
+use crate::state::{self, Lock};
 
 /// Installs a package file by itself, kept so every version builds it again.
 pub fn install_file(package: File, report: Report) -> Result<()> {
@@ -20,6 +19,7 @@ pub fn install_file(package: File, report: Report) -> Result<()> {
         std::slice::from_ref(&name),
         &[],
         &Sources::current(None),
+        None,
         &report,
     );
     if installed.is_err() {
@@ -52,8 +52,7 @@ pub fn remove_repository(file: &str, report: Report) -> Result<()> {
         bail!("There's no software source called {file}.");
     }
     let from_it = |package: &&Package| package.origin == Origin::Repository(file.to_owned());
-    let merged = linked().and_then(|folder| load(&folder));
-    let packages = merged.map(|build| build.packages).unwrap_or_default();
+    let packages = merged().map(|build| build.packages).unwrap_or_default();
     if packages.iter().any(|package| from_it(&package)) {
         let current = state::requested()?;
         let leaving: Vec<String> = packages
@@ -67,6 +66,7 @@ pub fn remove_repository(file: &str, report: Report) -> Result<()> {
             &[],
             &leaving,
             &Sources::current(Some(file)),
+            None,
             &report,
         )?;
     }

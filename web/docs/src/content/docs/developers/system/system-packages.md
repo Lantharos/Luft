@@ -1,11 +1,11 @@
 ---
 title: How system packages work
-description: How packages from Fedora and added software sources become a system extension built for each version of Luft, without changing the sealed image.
+description: How packages from Fedora and added software sources become a system extension built for each version of Luft, without changing the sealed image, and which changes need an administrator.
 sidebar:
   order: 10
 ---
 
-The packages someone asks for become one [systemd system extension](https://www.freedesktop.org/software/systemd/man/latest/systemd-sysext.html), an EROFS image that systemd lays over `/usr` and `/opt` after the system has started. Each version of Luft on the computer gets its own build, made against exactly that version, so an update or going back never meets packages built for something else. Using them is covered in [System packages](/system/system-packages/); the service is `luft-packages` in `services/packages`.
+The packages someone asks for, command-line tools from Fedora among them, become one [systemd system extension](https://www.freedesktop.org/software/systemd/man/latest/systemd-sysext.html), an EROFS image that systemd lays over `/usr` and `/opt` after the system has started. Each version of Luft on the computer gets its own build, made against exactly that version, so an update or going back never meets packages built for something else. Using them is covered in [System packages](/system/system-packages/); the service is `luft-packages` in `services/packages`.
 
 ## Who does what
 
@@ -22,7 +22,7 @@ Everything lives in `/var`, so going back to an earlier version keeps the list a
 
 1. Mount the version's system read-only from the composefs repository, checked file by file against its digest as the startup image does, with a writable overlay on top.
 2. Resolve with `dnf --installroot` against that version's own package database, using only Fedora's repositories and the added sources, with weak dependencies as on any Fedora. Only what the transaction adds brings its recommendations, so Luft's own set stays as small as it was built.
-3. Refuse what can't be a system package ([below](#whats-refused)).
+3. Leave out what can't be a system package ([below](#whats-refused)), so one package doesn't keep the others from being built. A requested package that's refused, or that dnf finds nothing called, is left out by itself; a refused dependency is excluded with `excludepkgs` and resolved again with `--skip-broken`, which leaves out what needs it. What's left out, and why, is in the build's `left_out` and Schelf's list, and packages a change asks for fail it instead. A conflict with Luft's own files, found after installing, builds again without the package that has it.
 4. Check every package against the keys of where it came from and no others: Fedora's against Fedora's keys, each source's against the keys it was added with. One source's key can't vouch for a package from Fedora or from another source. Package files installed by themselves are checked against their digests, as `dnf install ./file.rpm` does.
 5. Install with `rpm` inside a bubblewrap sandbox whose whole file system is the build root: no network, its own namespaces, a fresh `/tmp` and `/run`, only harmless devices, no `/proc` or `/sys`, and only the capabilities that write files, with the bounding set narrowed so a file capability a scriptlet sets can't hand more back.
 6. Copy out only the files the packages own, plus what scriptlets made in `/usr` and `/opt` that's new to the system, such as the `/usr/bin` links Electron apps make to their programs in `/opt`. A file that would differ from one in the system is refused, and one that's identical is left out, so the extension never hides part of Luft.
@@ -32,6 +32,17 @@ Everything lives in `/var`, so going back to an earlier version keeps the list a
 10. Label everything with the build root's SELinux file contexts and make the EROFS image, which keeps the labels.
 
 Extensions are merged without `nosuid`, so setuid and setgid helpers such as Chromium's sandbox or 1Password's work.
+
+## Who needs a password
+
+`Install` and `Remove` need `com.lantharos.packages.tools`, which the active session at the computer has without a password, and `com.lantharos.packages.change`, `auth_admin_keep`, once the service finds the change isn't plain. `InstallFile` always needs the latter, and adding or removing a source `com.lantharos.packages.sources`. Schelf's view of a package decides nothing: the service looks at what it resolved, twice, before anything is merged.
+
+1. After resolving and before any scriptlet runs, from the packages' headers. Every package the change brings in, or whose source changed, must come from Fedora's own repositories and be plain, and so must every package of the merged build that the change takes away, as noted when it was built. A package is plain when none of its files is setuid, setgid or has file capabilities, it provides no `user()`, `group()` or `groupmember()`, and it has nothing but folders where the system finds what it runs as root or who may do what.
+2. After staging and before the image is made, from the extension itself, since scriptlets can make files no header names. The build notes its privileges: every file in those places, every setuid, setgid or capable file anywhere in it, its users, groups and policy modules. They must be exactly the ones the merged build noted, so a change can neither add nor take away any.
+
+Those places are systemd's folders in `/usr/lib` and `/etc` but for the units and generators of each account; udev, `modules-load.d`, `modprobe.d`, `tmpfiles.d`, `sysctl.d`, `binfmt.d`, `sysusers.d`, `userdb`, `kernel`, dracut, `pam.d`, `security`, `polkit-1` and NetworkManager in both; kernel, PAM and NSS modules, polkit's actions and rules, D-Bus system services and their policy, sudo's plugins, SELinux policy, certificates and the plugins of dnf and rpm in `/usr`; and `nsswitch.conf`, D-Bus, sudo, SELinux, `ld.so`, cron, SysV scripts, logrotate, SSH, certificates and dnf in `/etc`.
+
+The first check asks for the administrator before any of the packages runs, the second catches what scriptlets make. So a program in the session can add Fedora's programs, which run with its own rights, but nothing that runs as root or hands out rights.
 
 ## Merging and settling
 
@@ -62,13 +73,13 @@ Schelf fetches a source as the user, from a `.repo` file's address, `copr:owner/
 
 `AddRepository`, which needs an administrator, checks the same file and keys again and writes it back with only the settings that choose where packages come from, pointing at the keys as they were shown. A source can't change its key later. `RemoveRepository` rebuilds without the source and the packages that came from it, and only then deletes its file and keys.
 
-A package file opened in Schelf becomes a system package when it has a menu entry or brings a repository: a `.repo` file among its files, or one its scriptlets write with `cat > FILE <<EOF`, as 1Password's and Chrome's do. Schelf shows that source like any other, adds it and installs the package by name from it, so later builds take the source's newest version. A desktop app without a source goes in by itself through `InstallFile`, which takes the file as a descriptor and keeps a copy only root can read.
+A package file opened in Schelf becomes a system package. When it brings a repository, a `.repo` file among its files or one its scriptlets write with `cat > FILE <<EOF`, as 1Password's and Chrome's do, Schelf shows that source like any other, adds it and installs the package by name from it, so later builds take the source's newest version. A package without a source goes in by itself through `InstallFile`, which takes the file as a descriptor and keeps a copy only root can read.
 
 ## Updates
 
 When `luft-updater` finishes downloading an update or a switch to the other image, it calls `Rebuild`, and the system packages are built for the staged version before the download reports finished. A restart in the middle stops the build, and the new version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
 
-When the updater checks on its schedule and downloads nothing, it calls `Update`: for every version on the computer, the list is resolved again and rebuilt only when a version changed. The running version's new build goes in the way an install does, restarting services whose package changed, with the build before put back on failure. So fixes from Fedora and added sources arrive as often as Luft looks for updates.
+When the updater checks on its schedule, at most once a day, and downloads nothing, it calls `Update`: for every version on the computer, the list is resolved again and rebuilt only when a version changed. Schelf calls it too when someone updates their system packages, which needs `com.lantharos.packages.tools`; it finds newer versions by asking the computer's own `dnf`, which sees Fedora's repositories and the added sources, for the newest version of each requested package. The running version's new build goes in the way an install does, restarting services whose package changed, with the build before put back on failure. So fixes from Fedora and added sources arrive as often as Luft looks for updates.
 
 ## What's refused
 

@@ -47,6 +47,7 @@ The old system is kept as a btrfs subvolume called `old-system` until you remove
 | `sudo dnf remove`, `dnf search` | `schelf remove`, `schelf search` |
 | `sudo dnf upgrade` | Settings, under System. The new version installs at the next restart, and the one before stays to go back to. Packages you added update by themselves, and `schelf update` updates them and your apps now |
 | `dnf info`, `dnf list`, `dnf provides` | Work the same |
+| Programs in `/usr/local`, from install scripts or built by hand | Work the same, and stay through updates |
 | `man` and GRUB's tools | Luft starts without GRUB and leaves manual pages out of the system |
 | Packages from RPM Fusion and COPR | Luft's image already plays every common video and audio format. Other repositories, such as a COPR project, can be added as [software sources](/system/system-packages/#software-sources) |
 | GNOME | [Kestrel](/desktop/overview/), Luft's own desktop. GNOME apps keep working |

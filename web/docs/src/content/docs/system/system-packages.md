@@ -52,7 +52,7 @@ Some packages can't be system packages, and Schelf says why:
 - **SELinux policy that replaces Luft's own.** Packages may add security policy modules, such as the ones Docker CE loads, and they're rebuilt with every update like the rest, but not ones that replace a module Luft has.
 - **Packages that would replace part of Luft**, such as a newer version of a library the system has. These work again after the next update of Luft.
 
-Everything else that needs the system to be changed, such as files in `/boot` or the startup image, stays out too.
+Everything else that needs the system to be changed, such as files in `/boot` or the startup image, stays out too, and so do files in `/usr/local`, which is [yours](/system/software/#installing-into-usrlocal) to install into by hand.
 
 ## Passwords
 

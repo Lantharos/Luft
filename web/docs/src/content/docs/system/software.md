@@ -161,6 +161,10 @@ Luft installs this with Schelf. Install ripgrep? [Y/n]
 
 Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](/system/system-packages/#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list`, and `dnf provides` work normally.
 
+### Installing into /usr/local
+
+Programs you install by hand, or with an install script such as `curl … | sh`, go into `/usr/local`, as on any Linux. It's kept in `/var/usrlocal`, so they stay through every update and going back to an earlier version of Luft. Only an administrator can write there, and services installed there start with the computer.
+
 ## App names and icons
 
 Any installed app can have a name and an icon of your own. Open the app in Schelf and choose **Rename** next to **Name**; the new name shows in Start, search, the taskbar and the Luft apps, and an empty name brings back the app's own.

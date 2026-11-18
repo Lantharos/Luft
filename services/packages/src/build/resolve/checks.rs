@@ -8,6 +8,7 @@ const KERNEL_MODULES: [&str; 2] = ["/usr/lib/modules/", "/lib/modules/"];
 const MERGED: [&str; 2] = ["/usr/", "/opt/"];
 const PLACED: [&str; 2] = ["/etc/", "/var/"];
 const RUNTIME: [&str; 4] = ["/run/", "/var/run/", "/var/lock/", "/tmp/"];
+const BY_HAND: [&str; 1] = ["/usr/local/"];
 
 pub enum Place {
     Merged,
@@ -16,18 +17,18 @@ pub enum Place {
 }
 
 pub fn place(path: &str) -> Option<Place> {
-    if Path::new(path)
-        .components()
-        .any(|part| part == Component::ParentDir)
-    {
-        return None;
-    }
     let inside = |prefixes: &[&str]| {
         prefixes
             .iter()
             .any(|prefix| path.starts_with(prefix) || path == prefix.trim_end_matches('/'))
     };
-    if inside(&RUNTIME) {
+    if inside(&BY_HAND)
+        || Path::new(path)
+            .components()
+            .any(|part| part == Component::ParentDir)
+    {
+        None
+    } else if inside(&RUNTIME) {
         Some(Place::Runtime)
     } else if inside(&MERGED) {
         Some(Place::Merged)
@@ -122,5 +123,6 @@ mod tests {
     fn refuses_files_outside_what_extensions_and_placing_cover() {
         assert!(refused(&[rpm("odd", &["/boot/odd.img"])]).contains("/boot/odd.img"));
         assert!(refused(&[rpm("odd", &["/usr/../boot/odd.img"])]).contains("/usr/../boot"));
+        assert!(refused(&[rpm("odd", &["/usr/local/bin/odd"])]).contains("/usr/local/bin/odd"));
     }
 }

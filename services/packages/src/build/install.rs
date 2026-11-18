@@ -124,6 +124,16 @@ fn transaction(root: &Path, packages: &Path, level: &str, rpms: &[&Rpm]) -> Resu
     .map(drop)
 }
 
+/// Makes the folders /usr/local leads to, as starting the system does, so scriptlets that put
+/// something there work. What they put there stays in the build root.
+fn make_local_folders(root: &Path) -> Result<()> {
+    run(Command::new("systemd-tmpfiles")
+        .arg(format!("--root={}", root.display()))
+        .args(["--create", "--prefix=/var/usrlocal"]))
+    .context("Making the folders of /usr/local")
+    .map(drop)
+}
+
 /// Builds the build root's policy again from its store, with the packages' modules.
 pub fn rebuild_policy(root: &Path, packages: &Path) -> Result<()> {
     run(sandboxed(root, packages).args(["semodule", "-B"]))
@@ -173,6 +183,7 @@ pub fn install(root: &Path, release: &str, packages: &Path, rpms: &[Rpm]) -> Res
     run(sandboxed(root, packages)
         .args(["rpmkeys", "--import"])
         .args(keys))?;
+    make_local_folders(root)?;
     transaction(root, packages, "all", &signed)?;
     transaction(root, packages, "digest", &files)
 }

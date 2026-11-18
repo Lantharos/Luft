@@ -50,6 +50,13 @@ write_release_facts() {
     install -Dm644 /dev/stdin /usr/share/luft/release
 }
 
+keep_usr_local_in_var() {
+  # shellcheck disable=SC2114
+  rm -rf /usr/local /usr/lib/tmpfiles.d/rpm-ostree-0-integration-opt-usrlocal.conf
+  ln -s ../var/usrlocal /usr/local
+  systemd-tmpfiles --create /usr/lib/tmpfiles.d/luft-usr-local.conf
+}
+
 configure_security() {
   local module modules=()
   for module in /usr/share/selinux/packages/luft-*.cil; do
@@ -144,6 +151,7 @@ write_os_release
 write_base_image
 write_release_facts
 enable_units
+keep_usr_local_in_var
 configure_security
 check_typelibs
 check_sabine_apps

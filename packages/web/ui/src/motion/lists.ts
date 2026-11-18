@@ -43,7 +43,7 @@ function move(row: HTMLElement, from: Place, to: Place) {
 export const listMotion: Attachment<HTMLElement> = (list) => {
 	const ghosts = new WeakSet<Node>();
 	let places = new Map<HTMLElement, Place>();
-	const rows = () => [...list.children].filter((child): child is HTMLElement => child instanceof HTMLElement && !ghosts.has(child));
+	const rows = () => [...list.children].filter((child): child is HTMLElement => child instanceof HTMLElement && !ghosts.has(child) && !child.hasAttribute('popover'));
 
 	const record = () => {
 		const now = new Map(rows().map((row) => [row, placeOf(row)]));

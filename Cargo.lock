@@ -6203,6 +6203,7 @@ dependencies = [
  "tokio",
  "toml",
  "ureq",
+ "uzers",
  "zbus 6.0.0",
  "zstd 0.14.3",
 ]

@@ -1,12 +1,18 @@
 use std::io::{BufRead, BufReader};
+use std::os::fd::AsRawFd;
+use std::os::unix::process::CommandExt;
+use std::path::Path;
 use std::process::{Command, Stdio};
 
-use crate::apps::toolbox::root;
+use super::setup;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
-/// apt-get, with its progress written as status lines to standard error.
-pub fn apt_get(arguments: &[&str]) -> Command {
+pub const UNAVAILABLE: &str = "Ubuntu couldn't start.";
+/// Not standard error, which dpkg would close for the packages' scripts
+const STATUS_FD: i32 = 3;
+
+fn apt_get(tree: &Path, options: &[&str], arguments: &[&str]) -> Command {
     let mut program = vec![
         "env",
         "DEBIAN_FRONTEND=noninteractive",
@@ -14,21 +20,23 @@ pub fn apt_get(arguments: &[&str]) -> Command {
         "--yes",
         "--quiet",
         "-o",
-        "APT::Status-Fd=2",
-        "-o",
         "Dpkg::Use-Pty=0",
     ];
+    program.extend_from_slice(options);
     program.extend_from_slice(arguments);
-    root::command(super::container::NAME, &program)
+    let mut command = super::as_root(tree, &program);
+    command
+        .env("LC_ALL", "C.UTF-8")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null());
+    command
 }
 
 /// Runs apt-get without reporting progress, for checks no one waits on.
 pub fn quietly(arguments: &[&str]) -> Result<(), String> {
-    let output = apt_get(arguments)
-        .env("LC_ALL", "C.UTF-8")
-        .stdin(Stdio::null())
+    let output = apt_get(&super::tree(), &[], arguments)
         .output()
-        .map_err(|_| "Toolbox isn't installed.".to_owned())?;
+        .map_err(|_| UNAVAILABLE.to_owned())?;
     if output.status.success() {
         Ok(())
     } else {
@@ -36,22 +44,44 @@ pub fn quietly(arguments: &[&str]) -> Result<(), String> {
     }
 }
 
-pub fn run(command: &mut Command, working: Stage, task: Task) -> Result<(), String> {
-    let mut child = command
-        .env("LC_ALL", "C.UTF-8")
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|_| "Toolbox isn't installed.".to_owned())?;
+/// Runs apt-get in the Ubuntu at `tree`, then points the files it shares with this computer back at
+/// this computer's, since packages such as tzdata replace them.
+pub fn run(tree: &Path, arguments: &[&str], working: Stage, task: Task) -> Result<(), String> {
+    let status = format!("APT::Status-Fd={STATUS_FD}");
+    let ran = follow_through(apt_get(tree, &["-o", &status], arguments), working, task);
+    setup::share_host_files(tree)?;
+    ran
+}
+
+/// Runs apt-get with its messages and status lines both written to one pipe.
+fn follow_through(mut command: Command, working: Stage, task: Task) -> Result<(), String> {
+    let (output, input) = std::io::pipe().map_err(|error| error.to_string())?;
+    let status = input.as_raw_fd();
+    command.stderr(input.try_clone().map_err(|error| error.to_string())?);
+    unsafe {
+        command.pre_exec(move || {
+            let inherited = if status == STATUS_FD {
+                libc::fcntl(status, libc::F_SETFD, 0)
+            } else {
+                libc::dup2(status, STATUS_FD)
+            };
+            match inherited {
+                -1 => Err(std::io::Error::last_os_error()),
+                _ => Ok(()),
+            }
+        });
+    }
+    let spawned = command.spawn();
+    drop(command);
+    drop(input);
+    let mut child = spawned.map_err(|_| UNAVAILABLE.to_owned())?;
     let pid = child.id() as libc::pid_t;
-    let stderr = child.stderr.take().ok_or("Toolbox didn't start.")?;
     let finished = task.cancel.while_running(
         move || unsafe {
             libc::kill(pid, libc::SIGTERM);
         },
         || {
-            let messages = follow(stderr, working, task);
+            let messages = follow(output, working, task);
             child.wait().map(|status| (status, messages))
         },
     );
@@ -68,9 +98,9 @@ pub fn run(command: &mut Command, working: Stage, task: Task) -> Result<(), Stri
     }
 }
 
-fn follow(stderr: impl std::io::Read, working: Stage, task: Task) -> String {
+fn follow(output: impl std::io::Read, working: Stage, task: Task) -> String {
     let mut seen = String::new();
-    for line in BufReader::new(stderr).lines().map_while(Result::ok) {
+    for line in BufReader::new(output).lines().map_while(Result::ok) {
         // dlstatus:<n>:<percent>:<what> while downloading, pmstatus:<package>:<percent>:<what> while installing
         let mut fields = line.splitn(4, ':');
         let stage = match fields.next() {
@@ -103,9 +133,6 @@ pub fn friendly(messages: &str) -> String {
         .map(|line| line.strip_prefix("E:").unwrap_or(line).trim())
         .unwrap_or_default();
     let lowered = messages.to_lowercase();
-    if lowered.contains("container state improper") {
-        return "Its container is still shutting down. Try again in a minute.".into();
-    }
     if lowered.contains("unmet dependencies") || lowered.contains("but it is not installable") {
         "It needs software that Ubuntu doesn't have, so it can't be installed here.".into()
     } else if lowered.contains("temporary failure resolving")

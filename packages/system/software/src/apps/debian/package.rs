@@ -271,13 +271,17 @@ pub fn inspect(path: &Path) -> Result<Deb, String> {
 }
 
 /// Whether this computer can run a package built for this architecture.
-pub fn runs_here(architecture: &str) -> bool {
-    let here = match std::env::consts::ARCH {
+/// This computer's architecture, as Debian names it.
+pub fn here() -> &'static str {
+    match std::env::consts::ARCH {
         "x86_64" => "amd64",
         "aarch64" => "arm64",
         other => other,
-    };
-    architecture == "all" || architecture == here
+    }
+}
+
+pub fn runs_here(architecture: &str) -> bool {
+    architecture == "all" || architecture == here()
 }
 
 #[cfg(test)]

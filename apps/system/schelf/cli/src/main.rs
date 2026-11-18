@@ -8,6 +8,7 @@ use std::path::Path;
 use std::process::Command;
 
 use luft_i18n::t;
+use luft_software::apps::debian;
 use schelf_core::host;
 
 use l10n::L10N;
@@ -61,9 +62,14 @@ fn run(program: &str, arguments: &[String]) -> i32 {
 }
 
 fn main() {
+    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    if let Some((flag, program)) = arguments.split_first()
+        && flag == debian::LAUNCH
+    {
+        std::process::exit(debian::launch(program));
+    }
     unsafe { libc::signal(libc::SIGPIPE, libc::SIG_DFL) };
     luft_software::apps::appimage::launch_through(host::app().map(Path::to_path_buf));
     schelf_core::tools::adopt_self(env!("CARGO_PKG_VERSION"));
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
     std::process::exit(run(&program(), &arguments));
 }

@@ -2,12 +2,11 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use super::container;
+use super::ubuntu;
 
-const FOLDER: &str = "luft";
-const FILE: &str = "debian.json";
+const FILE: &str = "luft/ubuntu.json";
 
-/// An app installed from a `.deb` file into the Ubuntu container.
+/// An app installed from a `.deb` file into Ubuntu.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DebApp {
@@ -23,7 +22,7 @@ pub struct DebApp {
 }
 
 fn file() -> Option<PathBuf> {
-    Some(dirs::data_dir()?.join(FOLDER).join(FILE))
+    Some(dirs::data_dir()?.join(FILE))
 }
 
 pub fn recorded() -> Vec<DebApp> {
@@ -44,7 +43,7 @@ pub fn save(apps: &[DebApp]) -> Result<(), String> {
 
 pub fn installed() -> Vec<DebApp> {
     let apps = recorded();
-    if apps.is_empty() || !container::exists() {
+    if apps.is_empty() || !ubuntu::exists() {
         return Vec::new();
     }
     apps
@@ -57,7 +56,7 @@ pub struct Details {
 }
 
 pub fn details(package: &str) -> Result<Details, String> {
-    let text = container::query(&[
+    let text = ubuntu::query(&[
         "dpkg-query",
         "--show",
         "--showformat",

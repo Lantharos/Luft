@@ -42,6 +42,16 @@ pub fn text(url: &str) -> Result<String, String> {
     read(agent().get(url).call().map_err(failure)?)
 }
 
+pub fn bytes(url: &str) -> Result<Vec<u8>, String> {
+    agent()
+        .get(url)
+        .call()
+        .map_err(failure)?
+        .into_body()
+        .read_to_vec()
+        .map_err(|_| OFFLINE.to_string())
+}
+
 pub fn read(response: ureq::http::Response<ureq::Body>) -> Result<String, String> {
     let mut body = String::new();
     response

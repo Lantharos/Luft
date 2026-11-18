@@ -2,13 +2,14 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
-use super::container;
+use super::ubuntu;
 
 const APPLICATIONS: &str = "/usr/share/applications/";
 const HICOLOR: &str = "/usr/share/icons/hicolor/";
 const PIXMAPS: &str = "/usr/share/pixmaps/";
 pub const OWNER: &str = "X-Luft-Debian";
 const PREFIX: &str = "ubuntu-";
+const LAUNCHER: &str = "schelf";
 
 fn applications() -> PathBuf {
     dirs::data_dir().unwrap_or_default().join("applications")
@@ -25,7 +26,7 @@ fn owner(entry: &Path) -> Option<String> {
         .find_map(|line| line.strip_prefix(&format!("{OWNER}=")).map(str::to_owned))
 }
 
-/// The menu entry, rewritten to start the app inside the container and to say which package it came from.
+/// The menu entry, rewritten to start the app in Ubuntu and to say which package it came from.
 pub fn rewrite(text: &str, package: &str, icons: &[(String, PathBuf)]) -> String {
     let mut lines = Vec::new();
     for line in text.lines() {
@@ -33,10 +34,7 @@ pub fn rewrite(text: &str, package: &str, icons: &[(String, PathBuf)]) -> String
             continue;
         }
         if let Some(command) = line.strip_prefix("Exec=") {
-            lines.push(format!(
-                "Exec=toolbox run --container {} {command}",
-                container::NAME
-            ));
+            lines.push(format!("Exec={LAUNCHER} {} {command}", ubuntu::LAUNCH));
         } else if let Some(icon) = line
             .strip_prefix("Icon=")
             .filter(|icon| icon.starts_with('/'))
@@ -76,9 +74,9 @@ pub struct Exported {
     pub icon: Option<String>,
 }
 
-/// Copies the package's menu entries and icons out of the container.
+/// Copies the package's menu entries and icons out of Ubuntu.
 pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
-    let listed = container::query(&["dpkg-query", "--listfiles", "--", package])?;
+    let listed = ubuntu::query(&["dpkg-query", "--listfiles", "--", package])?;
     let wanted: Vec<&str> = listed
         .lines()
         .filter(|path| {
@@ -104,13 +102,13 @@ pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
         "--",
     ];
     program.extend(wanted.iter().copied());
-    let mut child = container::run(&program)
+    let mut child = ubuntu::command(&program)
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
         .spawn()
-        .map_err(|_| "Toolbox isn't installed.".to_owned())?;
-    let stdout = child.stdout.take().ok_or("Toolbox didn't start.")?;
+        .map_err(|_| ubuntu::UNAVAILABLE.to_owned())?;
+    let stdout = child.stdout.take().ok_or(ubuntu::UNAVAILABLE)?;
     let mut entries = Vec::new();
     let mut copied: Vec<(String, PathBuf)> = Vec::new();
     for entry in tar::Archive::new(stdout)
@@ -228,7 +226,7 @@ mod tests {
     use super::rewrite;
 
     #[test]
-    fn starts_apps_in_the_container() {
+    fn starts_apps_in_ubuntu() {
         let entry = "[Desktop Entry]\nName=Chrome\nExec=/usr/bin/google-chrome-stable %U\nTryExec=google-chrome-stable\nIcon=/usr/share/pixmaps/chrome.png\n\n[Desktop Action new-window]\nExec=/usr/bin/google-chrome-stable --new-window\n";
         let icons = [(
             "/usr/share/pixmaps/chrome.png".to_owned(),
@@ -237,7 +235,7 @@ mod tests {
         let rewritten = rewrite(entry, "google-chrome-stable", &icons);
         assert_eq!(
             rewritten,
-            "[Desktop Entry]\nX-Luft-Debian=google-chrome-stable\nName=Chrome\nExec=toolbox run --container luft-ubuntu /usr/bin/google-chrome-stable %U\nIcon=/home/me/.local/share/icons/chrome.png\n\n[Desktop Action new-window]\nExec=toolbox run --container luft-ubuntu /usr/bin/google-chrome-stable --new-window\n"
+            "[Desktop Entry]\nX-Luft-Debian=google-chrome-stable\nName=Chrome\nExec=schelf --ubuntu /usr/bin/google-chrome-stable %U\nIcon=/home/me/.local/share/icons/chrome.png\n\n[Desktop Action new-window]\nExec=schelf --ubuntu /usr/bin/google-chrome-stable --new-window\n"
         );
     }
 }

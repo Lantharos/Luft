@@ -1,11 +1,10 @@
-//! Desktop apps from `.deb` files, installed with apt into an Ubuntu toolbox container whose menu entries and
+//! Desktop apps from `.deb` files, installed with apt into Ubuntu kept in your account, whose menu entries and
 //! icons are copied out to the desktop, so they start from Start like any other app.
 
-mod apt;
-mod container;
 mod export;
 mod installed;
 mod package;
+mod ubuntu;
 
 use std::path::Path;
 
@@ -13,9 +12,9 @@ use crate::apps::operand::operand;
 use crate::progress::Stage;
 use crate::task::Task;
 
-pub use container::NAME as container;
 pub use installed::{DebApp, installed};
 pub use package::{Deb, Icon, inspect, runs_here};
+pub use ubuntu::{LAUNCH, ORIGIN, launch};
 
 pub struct Update {
     pub package: String,
@@ -57,26 +56,18 @@ pub fn install(file: &Path, task: Task) -> Result<DebApp, String> {
             deb.architecture
         ));
     }
-    container::ready(task)?;
-    apt::run(&mut apt::apt_get(&["update"]), Stage::Preparing, task)?;
-    let inside = container::inside(file);
+    ubuntu::ready(task)?;
+    ubuntu::apt(&["update"], Stage::Preparing, task)?;
+    let inside = ubuntu::inside(file);
     let inside = inside.to_string_lossy();
     // apt-get only treats it as a file, not a package name, with a path in front
-    apt::run(
-        &mut apt::apt_get(&["install", "--", &inside]),
-        Stage::Installing,
-        task,
-    )?;
+    ubuntu::apt(&["install", "--", &inside], Stage::Installing, task)?;
     record(&deb.package, deb.name.as_deref())
 }
 
 pub fn remove(package: &str, task: Task) -> Result<(), String> {
-    if container::exists() {
-        apt::run(
-            &mut apt::apt_get(&["remove", "--", operand(package)?]),
-            Stage::Removing,
-            task,
-        )?;
+    if ubuntu::exists() {
+        ubuntu::apt(&["remove", "--", operand(package)?], Stage::Removing, task)?;
     }
     let mut apps = installed::recorded();
     if let Some(app) = apps.iter().find(|app| app.package == package) {
@@ -92,8 +83,8 @@ pub fn updates() -> Result<Vec<Update>, String> {
     if apps.is_empty() {
         return Ok(Vec::new());
     }
-    apt::quietly(&["update"])?;
-    let listed = container::query(&["apt", "list", "--upgradable"])?;
+    ubuntu::quietly(&["update"])?;
+    let listed = ubuntu::query(&["apt", "list", "--upgradable"])?;
     Ok(listed
         .lines()
         .filter_map(|line| {
@@ -115,7 +106,7 @@ pub fn update(packages: &[String], task: Task) -> Result<(), String> {
     for package in packages {
         arguments.push(operand(package)?);
     }
-    apt::run(&mut apt::apt_get(&arguments), Stage::Installing, task)?;
+    ubuntu::apt(&arguments, Stage::Installing, task)?;
     packages
         .iter()
         .try_for_each(|package| record(package, None).map(drop))

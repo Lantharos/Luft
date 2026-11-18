@@ -24,7 +24,7 @@ liblzma.workspace = true
 luft-dbus = { workspace = true, optional = true }
 luft-identity = { workspace = true, optional = true }
 luft-variant.workspace = true
-rustix = { workspace = true, features = ["fs"] }
+rustix = { workspace = true, features = ["fs", "process"] }
 sabine-service = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
@@ -35,6 +35,7 @@ tar.workspace = true
 toml.workspace = true
 tokio = { workspace = true, features = ["rt"], optional = true }
 ureq.workspace = true
+uzers.workspace = true
 zstd.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
 

@@ -15,7 +15,7 @@ pub fn installed() -> Vec<InstalledApp> {
             icon: app.icon,
             version: Some(app.version),
             size: app.size,
-            origin: debian::container.to_owned(),
+            origin: debian::ORIGIN.to_owned(),
             installation: None,
             reference: None,
             package: Some(app.package),

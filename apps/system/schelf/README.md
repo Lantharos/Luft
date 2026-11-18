@@ -7,7 +7,7 @@ Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://sche
 | schelf.store | Your account: AppImages in `~/.local/share/luft/appimages` in the AppImage sandbox with the access they declare, Sabine apps through Sabine's service, extensions in `/var/lib/luft/extensions/<uid>` when approved to run inside Luft and in `/var/lib/luft/sandboxed-extensions/<uid>` otherwise, installed by the system packages service |
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/.local/share/luft/appimages`, with a menu entry, icon and automatic updates, running in a sandbox |
-| `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
+| `.deb` files | Your account, in Ubuntu 26.04 kept in `~/.local/share/luft/ubuntu` and started through bubblewrap, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
 | System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](https://docs.luft.computer/developers/system/system-packages/)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
 

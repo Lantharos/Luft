@@ -22,7 +22,6 @@ const ASLEEP_DROP = 40;
 interface MonumentParts {
   time: St.Label;
   date: St.Label;
-  hint: St.Label;
   auth: Clutter.Actor;
   side: Clutter.Actor;
   controls: Clutter.Actor;
@@ -76,7 +75,7 @@ export class MonumentLayout extends Clutter.LayoutManager {
 
   vfunc_allocate(_container: Clutter.Actor, box: Clutter.ActorBox): void {
     const [width, height] = box.get_size();
-    const { time, date, hint, auth, side, controls } = this.parts;
+    const { time, date, auth, side, controls } = this.parts;
     const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
     const margin = (height / scaleFactor >= LARGE_DISPLAY ? LARGE_MARGIN : MARGIN) * scaleFactor;
     const [, , sideWidth, sideHeight] = side.get_preferred_size();
@@ -113,9 +112,6 @@ export class MonumentLayout extends Clutter.LayoutManager {
     const controlsMargin = CONTROLS_MARGIN * scaleFactor;
     place(controls, width - controlsMargin - controlsWidth, height - controlsMargin - controlsHeight);
 
-    const [, , hintWidth] = hint.get_preferred_size();
-    place(hint, (width - hintWidth) / 2, controlsMargin);
-
     this.show(this.progress);
   }
 
@@ -138,12 +134,11 @@ export class MonumentLayout extends Clutter.LayoutManager {
 
   show(progress: number): void {
     this.progress = progress;
-    const { time, date, hint, auth } = this.parts;
+    const { time, date, auth } = this.parts;
     const scale = 1 + (AWAKE_SCALE - 1) * progress;
     time.set({ scale_x: scale, scale_y: scale, translation_y: this.placement.timeLift * progress });
     date.set({ translation_y: this.placement.dateLift * progress, opacity: Math.round(255 * (1 - 0.15 * progress)) });
     const shown = Math.min(1, Math.max(0, progress));
-    hint.set({ opacity: Math.round(255 * (1 - Math.min(1, shown * 2))), visible: shown < 0.5 });
     auth.set({ opacity: Math.round(255 * Math.min(1, shown * 1.6)), translation_y: this.placement.drop * (1 - progress), visible: shown > 0 });
   }
 }

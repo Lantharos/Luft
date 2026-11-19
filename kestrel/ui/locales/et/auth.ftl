@@ -127,6 +127,4 @@ ctrl-alt-tab-unlock = Lukust avamine
 end-session-power-options-title = Mida peaks see arvuti tegema?
 end-session-power-options-description = Sa vajutasid toitenuppu.
 end-session-suspend-button = Unerežiim
-greeter-wake-hint = Sisselogimiseks klõpsa või vajuta ükspuha mis klahvi
-lock-screen-wake-hint = Lukustuse avamiseks klõpsa või vajuta ükspuha mis klahvi
 end-session-awake-reason = Väljalülitamise, uuesti käivitamise või väljalogimise pöördloendus

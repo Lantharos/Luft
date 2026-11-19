@@ -14,15 +14,11 @@ greeter-restart = Restart
 greeter-power-off = Power off
 # Last entry of the account list, for signing in to an account that isn't listed
 greeter-another-account = Another account
-# Shown on the login screen while it rests, before the sign-in prompt comes up
-greeter-wake-hint = Press any key or click to sign in
 
 ## Lock screen
 
 # Screen-reader label of the accessibility menu button
 lock-screen-accessibility = Accessibility
-# Shown on the lock screen while it rests, before the password prompt comes up
-lock-screen-wake-hint = Press any key or click to unlock
 # Screen-reader label of the power menu button
 lock-screen-power = Power
 # Screen-reader label of the battery status. $level is the charge, already formatted as a percentage

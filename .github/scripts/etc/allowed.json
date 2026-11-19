@@ -102,6 +102,9 @@
 		"/etc": "Names where packages keep their configuration",
 		"/etc/": "Names where packages keep their configuration"
 	},
+	"services/packages/src/build/made.rs": {
+		"/etc/alternatives/": "Reads which program the build root chose, to link packages straight at it"
+	},
 	"services/packages/src/build/mod.rs": {
 		"/etc/ld.so.cache": "Made again at every start from the merged packages, as installing them would, and put back as it was without them",
 		"/etc/ld.so.conf.d/": "Tells whether packages bring libraries"

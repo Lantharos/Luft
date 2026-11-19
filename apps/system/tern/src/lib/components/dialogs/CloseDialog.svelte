@@ -14,8 +14,9 @@
 	let description = $derived(t('tern-close-description', { count: review.programs.length, programs }));
 
 	function close() {
+		const { close } = review;
 		onclose();
-		review.close();
+		close();
 	}
 </script>
 

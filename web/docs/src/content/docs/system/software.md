@@ -57,8 +57,6 @@ Flatpak apps and AppImages run in a sandbox: they only see their own files and t
 
 A drive is given as the drive itself, not its name, so another stick called Games doesn't get it, and it keeps working wherever the drive is mounted. The app reaches it directly, as fast as any other app.
 
-Steam's Flatpak currently turns down every drive in Settings → Storage → Add Drive with "This is not a supported location for a Steam library folder", on any system. Valve has fixed it in the Steam beta: choose **Steam Beta Update** under Settings → Interface → Client Beta Participation, let Steam restart, and add the drive.
-
 ### Full access
 
 A few apps need much more than a drive or a folder, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:

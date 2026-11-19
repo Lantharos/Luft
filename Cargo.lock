@@ -1441,6 +1441,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c"
 
 [[package]]
+name = "constant_time_eq"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9eb6feb175df65d0a3ccd3e73484e940d0ac664e8034f0519fd49a93db3071d9"
+dependencies = [
+ "rustversion",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2422,7 +2431,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de671bd27a75a797dc9ae289ba1e77276e75e2026408aab65185384e2d5cd3f6"
 dependencies = [
  "env_filter",
- "jiff",
+ "jiff 0.2.38",
  "log",
 ]
 
@@ -4084,12 +4093,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
-name = "humantime"
-version = "2.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15cdd26707701c53297e2fa6afb323d55fbc1d0810c3aec078ae3ef0424c3c15"
-
-[[package]]
 name = "hybrid-array"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4604,14 +4607,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b2b005715dcbeb0089a3c0dab99f2ff1cc3b2525323552703d648585d342a383"
 dependencies = [
  "defmt",
- "jiff-core",
- "jiff-static",
+ "jiff-core 0.1.1",
+ "jiff-static 0.2.38",
  "jiff-tzdb-platform",
  "log",
  "portable-atomic",
  "portable-atomic-util",
  "serde_core",
  "windows-link",
+]
+
+[[package]]
+name = "jiff"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed5d126d72eb017f10b302e73bdeca446bea405ee449af4d9e7866d6b082d83e"
+dependencies = [
+ "jiff-core 1.0.1",
+ "jiff-static 1.0.1",
+ "log",
+ "portable-atomic",
+ "portable-atomic-util",
+ "serde_core",
 ]
 
 [[package]]
@@ -4625,15 +4642,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "jiff-core"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6b46a105a9874634dd96231021526bf24ca04955a5998c59a9c7666e634b7b8"
+dependencies = [
+ "log",
+]
+
+[[package]]
 name = "jiff-static"
 version = "0.2.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2cc9817253cf7c7ee4684451bd327e88d6f3658014e54a29198625590650695c"
 dependencies = [
- "jiff-core",
+ "jiff-core 0.1.1",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "jiff-static"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0127e9bde3c6130d6169e7d8d68676e4be69c4bf7573c308b6f960a5089c428"
+dependencies = [
+ "jiff-core 1.0.1",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
 ]
 
 [[package]]
@@ -4988,7 +5026,7 @@ dependencies = [
  "http-body-util",
  "hyper",
  "hyper-util",
- "jiff",
+ "jiff 0.2.38",
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
@@ -5063,7 +5101,7 @@ name = "kestrel-watchdog"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "jiff",
+ "jiff 0.2.38",
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
@@ -6392,18 +6430,18 @@ checksum = "ecbdfe44b1bd960b68170b417450a628c43f7cf56bb3c5317e61cb230ee7f226"
 
 [[package]]
 name = "lzma-rust2"
-version = "0.22.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7277c9742229dc25243236d578b6471a798c554512c6f6a04365ec2e87c2a3bb"
-dependencies = [
- "sha2",
-]
-
-[[package]]
-name = "lzma-rust2"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1c46f3fcd2e888afdb01a07efc071cb21300e07c68d32c3e8b01b5c8cb1fcaa"
+
+[[package]]
+name = "lzma-rust2"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef1d73c59a56771343712b22ea5615092c612c16ba291c0979e3105dfeec4890"
+dependencies = [
+ "sha2",
+]
 
 [[package]]
 name = "mach2"
@@ -9075,8 +9113,8 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "sabine"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "accesskit",
  "accesskit_macos",
@@ -9094,8 +9132,8 @@ dependencies = [
  "global-hotkey",
  "glow",
  "glyphon",
- "humantime",
  "image",
+ "jiff 1.0.1",
  "khronos-egl",
  "landlock",
  "libc",
@@ -9146,8 +9184,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "serde",
  "serde_json",
@@ -9158,8 +9196,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-dialog"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "bytemuck",
  "glyphon",
@@ -9174,8 +9212,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -9186,8 +9224,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "block2 0.6.2",
  "dispatch2",
@@ -9217,8 +9255,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "bzip2",
  "flate2",
@@ -9236,8 +9274,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.96.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.96#7e9506a017540392fa323a1ec8e1462abbd55615"
+version = "0.97.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.97#6a5a3f6c92d6e89b1486069d3e84b86844436e08"
 dependencies = [
  "base64 0.23.1",
  "clap",
@@ -9245,7 +9283,7 @@ dependencies = [
  "ed25519-dalek",
  "embed-resource",
  "getrandom 0.4.3",
- "humantime",
+ "jiff 1.0.1",
  "libc",
  "sabine-dialog",
  "sabine-host",
@@ -10329,7 +10367,7 @@ version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c2499c2d826531388872b2268718aed907a39bd785ab0dcfe57fab26283f92e"
 dependencies = [
- "skrifa 0.44.0",
+ "skrifa 0.42.1",
  "yazi",
  "zeno",
 ]
@@ -10937,9 +10975,9 @@ dependencies = [
 
 [[package]]
 name = "typed-path"
-version = "0.12.4"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54ec2755506471f54baf5e4bb5499d8e510cc1caf271270e778a736bd2d7336c"
+checksum = "9ce898823d8cd0f028662d2f349694b1af0a5cc9be83f1d213a00d3147445e1e"
 
 [[package]]
 name = "typenum"
@@ -12878,20 +12916,25 @@ dependencies = [
 
 [[package]]
 name = "zip"
-version = "9.0.5"
+version = "9.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e04976da629d3b04204ba8105b396a193af8ad2583b2c79bfb3ab8af580a11e"
+checksum = "63e50f7b2212e4635244be3c363b53273d159f2523eb7db3096c1d2861c1b603"
 dependencies = [
  "bzip2",
  "chrono",
+ "constant_time_eq",
  "crc32fast",
  "deflate64",
  "flate2",
+ "getrandom 0.4.3",
  "indexmap",
- "lzma-rust2 0.22.0",
+ "libc",
+ "lzma-rust2 0.25.0",
  "memchr",
  "nix",
  "typed-path",
+ "windows-sys 0.61.2",
+ "zeroize",
  "zopfli",
  "zstd 0.14.3",
 ]

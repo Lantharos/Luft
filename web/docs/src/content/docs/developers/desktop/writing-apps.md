@@ -103,7 +103,7 @@ Extend `@luft/ui/tsconfig.base.json` in `tsconfig.json`, and preload `/fonts/Ope
 </GlassShell>
 ```
 
-Keep 16px of padding to the right of `WindowControls`. Inside `GlassShell`, right-clicking a text field or selected text offers cut, copy, paste and select all unless the app opens its own menu.
+Keep 16px of padding to the right of `WindowControls`. Inside `GlassShell`, right-clicking a text field or selected text opens Luft's edit menu, with corrections for a misspelled word and whichever of undo, redo, cut, copy, paste and select all apply there. Sabine only asks for it when the page leaves the `contextmenu` event alone, so an app's own menu, opened from a handler that calls `preventDefault()`, takes its place.
 
 ## Startup state
 

@@ -21,7 +21,7 @@ const DRAG = {steps: 24, interval: 30, hover: 300};
 const AT: Record<string, Point> = {note: [338, 140], inbox: [330, 104], pdf: [330, 104], search: [142, 32]};
 const PLACES: Record<string, {menu: Point; item: Point}> = {home: {menu: [70, 82], item: [141, 265]}, system: {menu: [70, 718], item: [141, 694]}};
 const SEARCH = {x: 12, y: 14, width: 236, height: 36};
-const CUT: Point = [40, 23];
+const CUT: Point = [40, 108];
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Drag check']);
 
 const clipboard = () => new Promise<string | null>(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_, text) => resolve(text)));

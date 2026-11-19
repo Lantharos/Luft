@@ -7,12 +7,11 @@
 
 	interface Props {
 		at: Point;
-		keepFocus?: boolean;
 		onclose: () => void;
 		children: Snippet;
 	}
 
-	let { at, keepFocus = false, onclose, children }: Props = $props();
+	let { at, onclose, children }: Props = $props();
 
 	const ITEMS = '[role^="menuitem"]:not(:disabled)';
 
@@ -35,7 +34,7 @@
 	}
 
 	$effect(() => {
-		if (keepFocus || !placement || !element) return;
+		if (!placement || !element) return;
 		const menu = element;
 		const opener = document.activeElement as HTMLElement | null;
 		menu.focus();

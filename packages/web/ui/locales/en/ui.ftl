@@ -7,10 +7,14 @@ ui-window-close = Close
 
 ## Text editing context menu
 
+ui-edit-undo = Undo
+ui-edit-redo = Redo
 ui-edit-cut = Cut
 ui-edit-copy = Copy
 ui-edit-paste = Paste
 ui-edit-select-all = Select all
+# Stops marking the misspelled word that was right-clicked
+ui-edit-add-to-dictionary = Add to dictionary
 
 ## Form controls
 

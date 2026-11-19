@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { onMount, untrack } from 'svelte';
 	import { activity, appWindow, events } from '@lantharos/sabine';
-	import { GlassShell, appearance, keepWindowState } from '@luft/ui';
+	import { GlassShell, appearance, fileDrop, keepWindowState } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
 	import PasteDialog from '#lib/components/dialogs/PasteDialog.svelte';
@@ -12,6 +12,7 @@
 	import TabBar from '#lib/components/TabBar.svelte';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import { loadFonts } from '#lib/terminal/fonts.js';
+	import { shellWords } from '#lib/terminal/paste.js';
 	import { handleShortcut } from '#lib/workspace/shortcuts.js';
 	import { Workspace, type Folders } from '#lib/workspace/workspace.svelte.js';
 
@@ -57,6 +58,8 @@
 		if (session && !dialogOpen && workspace.searching !== session) session.focus();
 	});
 
+	const drop = fileDrop((paths) => workspace.focused?.paste(`${shellWords(paths)} `));
+
 	function keydown(event: KeyboardEvent) {
 		if (event.defaultPrevented || dialogOpen) return;
 		if (event.target instanceof HTMLElement && event.target.closest('.xterm')) return;
@@ -66,6 +69,8 @@
 
 <svelte:window
 	onkeydown={keydown}
+	ondragover={drop.ondragover}
+	ondrop={drop.ondrop}
 	onpointerdown={(event) => {
 		if (event.target instanceof Element && !event.target.closest('[role="menu"]')) workspace.menu = null;
 	}}

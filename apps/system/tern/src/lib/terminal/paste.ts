@@ -13,3 +13,8 @@ export function pasteRisks(text: string, bracketed: boolean) {
 	if (lines > 1 && !bracketed) risks.unshift(t('tern-paste-lines', { count: lines }));
 	return risks;
 }
+
+const PLAIN_WORD = /^[\w@%+=:,./-]+$/;
+
+export const shellWords = (words: string[]) =>
+	words.map((word) => (PLAIN_WORD.test(word) ? word : `'${word.replaceAll("'", `'\\''`)}'`)).join(' ');

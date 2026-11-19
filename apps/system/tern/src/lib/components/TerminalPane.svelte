@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { fileDrop } from '@luft/ui';
+	import { shellWords } from '#lib/terminal/paste.js';
 	import type { TerminalSession } from '#lib/terminal/session.svelte.js';
 	import type { Workspace } from '#lib/workspace/workspace.svelte.js';
 	import SearchBar from './SearchBar.svelte';
@@ -16,6 +18,11 @@
 	let container = $state<HTMLDivElement>();
 	let flashing = $state(false);
 	let focused = $derived(workspace.focused === session);
+
+	const drop = fileDrop((paths) => {
+		workspace.focusSession(session);
+		session.paste(`${shellWords(paths)} `);
+	});
 
 	$effect(() => {
 		if (!container) return;
@@ -52,6 +59,8 @@
 	class:dimmed={split && !focused}
 	role="presentation"
 	onpointerdown={() => workspace.focusSession(session)}
+	ondragover={drop.ondragover}
+	ondrop={drop.ondrop}
 	oncontextmenu={(event) => {
 		event.preventDefault();
 		workspace.focusSession(session);

@@ -4,7 +4,7 @@ The session service that listens and recognizes speech for dictation, and, start
 
 ## Build
 
-It builds against `onnxruntime-devel`, `vulkan-loader-devel`, `vulkan-headers`, `glslc` and `pipewire-devel`.
+It builds against `onnxruntime-devel` and `pipewire-devel`, and Whisper through [luft-whisper](../../packages/system/whisper), which says what it needs.
 
 ## Testing
 

@@ -15,7 +15,7 @@ pub struct Spoken {
 impl Spoken {
     fn parse(tag: &str) -> Option<Self> {
         let (code, script) = tag.split_once('-').unwrap_or((tag, ""));
-        let id = whisper_rs::get_lang_id(code)? as usize;
+        let id = luft_whisper::language::id(code)?;
         let script = match script {
             "Latn" => Script::Latin,
             "Cyrl" => Script::Cyrillic,
@@ -41,8 +41,7 @@ impl Choice {
     pub fn new(tags: &[String]) -> Self {
         let mut spoken: Vec<Spoken> = tags.iter().filter_map(|tag| Spoken::parse(tag)).collect();
         if spoken.is_empty() {
-            spoken = (0..=whisper_rs::get_lang_max_id())
-                .filter_map(whisper_rs::get_lang_str)
+            spoken = luft_whisper::language::all()
                 .filter_map(Spoken::parse)
                 .collect();
         }
@@ -54,8 +53,7 @@ impl Choice {
             language.ids.extend(
                 kin.iter()
                     .filter(|code| !named.iter().any(|named| named == *code))
-                    .filter_map(|code| whisper_rs::get_lang_id(code))
-                    .map(|id| id as usize),
+                    .filter_map(|code| luft_whisper::language::id(code)),
             );
         }
         Self { spoken }

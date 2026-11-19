@@ -22,7 +22,7 @@ Dictation, transcription, handwriting and note writing run on the computer, each
 | Parakeet TDT 0.6B v3, encoder quantized to 4 bits | The processor, through ONNX Runtime | 25 European languages |
 | Whisper large-v3-turbo, Q5_0 | The graphics card through whisper.cpp and Vulkan, or the processor | The rest |
 
-whisper.cpp needs AVX2, so languages that need Whisper are refused on processors without it. Silero VAD splits speech into stretches that end at a 0.6-second pause, or at the quietest moment once a stretch reaches 25 seconds. A finished stretch is typed at once; the one still being spoken shows as a preview, recognized again as it grows but for at most half the time.
+The service builds whisper.cpp itself, through `packages/system/whisper`, from the release that crate's `upstream.json` names and checked against the checksum there, so moving to a new release is a one-line change. whisper.cpp needs AVX2, so languages that need Whisper are refused on processors without it. Silero VAD splits speech into stretches that end at a 0.6-second pause, or at the quietest moment once a stretch reaches 25 seconds. A finished stretch is typed at once; the one still being spoken shows as a preview, recognized again as it grows but for at most half the time.
 
 Whisper is always given a full 30-second window with the silence trimmed, since the turbo model invents words when shown less or shown silence. When Parakeet falls silent well before the end of a stretch, what follows its last word is recognized again on its own. For languages written in Cyrillic and Latin, the keyboard layout in use picks the script, and the system language decides when the layout says nothing.
 

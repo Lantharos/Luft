@@ -1,0 +1,23 @@
+[package]
+name = "luft-whisper"
+version = "0.1.0"
+description = "Speech recognition with whisper.cpp, built with Vulkan from the release named in upstream.json"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+links = "whisper"
+build = "build/main.rs"
+
+[build-dependencies]
+bindgen.workspace = true
+cmake.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+sha2.workspace = true
+tar.workspace = true
+ureq.workspace = true
+
+[lints]
+workspace = true

@@ -24,6 +24,7 @@ luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 luft-models.workspace = true
 luft-speech.workspace = true
+luft-whisper.workspace = true
 ogg.workspace = true
 opus.workspace = true
 ort = { workspace = true, features = ["api-24", "std"] }
@@ -31,7 +32,6 @@ pipewire.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
-whisper-rs = { workspace = true, features = ["vulkan"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
 [lints]

@@ -46,10 +46,11 @@ impl App {
             .into_iter()
             .find(|info| {
                 info.id().is_some_and(|id| id.eq_ignore_ascii_case(&luft))
-                    || info
-                        .executable()
-                        .file_name()
-                        .is_some_and(|name| name == program)
+                    || info.commandline().is_some()
+                        && info
+                            .executable()
+                            .file_name()
+                            .is_some_and(|name| name == program)
             })
             .and_then(|info| Self::from_info(&info))
     }

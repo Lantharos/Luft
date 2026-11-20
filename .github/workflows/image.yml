@@ -297,6 +297,7 @@ jobs:
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.publish != '[]' }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:

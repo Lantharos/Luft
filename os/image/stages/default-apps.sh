@@ -15,9 +15,9 @@ claimed_types() {
   for entry in "$applications"/com.lantharos.*.desktop; do
     types_of "${entry##*/}" <"$entry"
   done
-  for archive in "$preinstall"/*.tar.gz; do
-    tar --list --gzip --file "$archive" --wildcards '*/usr/share/applications/com.lantharos.*.desktop' | while read -r entry; do
-      tar --extract --gzip --to-stdout --file "$archive" "$entry" | types_of "${entry##*/}"
+  for archive in "$preinstall"/*.tar.*; do
+    tar --list --file "$archive" --wildcards '*/usr/share/applications/com.lantharos.*.desktop' | while read -r entry; do
+      tar --extract --to-stdout --file "$archive" "$entry" | types_of "${entry##*/}"
     done
   done
   printf '%s=net.imput.helium.desktop;\n' "${browser_types[@]}"

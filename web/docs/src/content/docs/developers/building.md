@@ -15,7 +15,7 @@ Install [Bun](https://bun.sh), Rust and the [Sabine](https://github.com/Lantharo
 os/dev/dependencies.sh
 ```
 
-It installs `os/image/packages/build.txt`, the compilers and libraries the image's parts are built with, `os/dev/packages.txt`, what the [virtual machines](/developers/testing-vms/#virtual-machines) need, and the packages Fedora builds Mutter with. Some of them bring services or helpers that run as root, so it asks for an administrator's password once. Like any system package, they update by themselves and are built again for every update of Luft. Packages that already come with Luft are skipped, and any that can't be added are listed under Installed, System in Schelf, with why.
+It installs `os/image/packages/build.txt`, the compilers and libraries the image's parts are built with, `os/dev/packages.txt`, what the [virtual machines](/developers/testing-vms/#virtual-machines) need, and the packages Fedora builds Mutter with. Some of them bring services or helpers that run as root, so it asks for an administrator's password once. Like any system package, they update by themselves and are built again for every update of Luft. Packages that already come with Luft are skipped, and any that can't be added are listed under Installed, Packages in Schelf, with why.
 
 On Fedora 45:
 

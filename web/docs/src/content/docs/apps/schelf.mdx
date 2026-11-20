@@ -41,7 +41,7 @@ Schelf is where you get apps. Its catalog is [schelf.store](https://schelf.store
 
 - Downloads queue up, show how much has arrived and what's left, then the install step, and can be cancelled. Before a schelf.store app installs, its confirmation says what it can use and how much it downloads.
 - Before an app from schelf.store installs, Schelf shows what it can use and asks you. An app that asks to run outside its sandbox gets the full access confirmation instead. When an update asks for more than you agreed to, or would move an extension out of its sandbox to run inside Luft, it waits under Updates until you look at it again. An extension the store no longer approves to run inside Luft moves back into its sandbox without asking.
-- **Installed** lists every app with its size and where it came from. Under System are the [system packages](/system/system-packages/), with the services they run, and **Software sources**, where vendors' package repositories are added and removed.
+- **Installed** lists every app with its size and where it came from. Under Packages are the [system packages](/system/system-packages/), with the services they run, and the command-line tools from schelf.store, along with **Software sources**, where vendors' package repositories are added and removed.
 - **Updates** updates every app in one go. Flatpak runtimes are listed separately, as app platforms.
 - Apps from schelf.store and AppImages update by themselves a few minutes after you sign in, and every six hours after that, but not over a metered connection such as a phone's hotspot. New versions reach computers in stages over a few days, so a bad release can be stopped before everyone has it.
 - Apps from schelf.store get finished versions, the stable channel. When an app also publishes previews, its page lets you switch it to **Beta**, previews of its next version, or **Nightly**, built from its newest code, often every day, which can reach you after only automatic checks. Schelf remembers the choice for that app and only installs versions from the channel you picked. Going back to Stable keeps the version you have until a stable one is newer.
@@ -77,9 +77,9 @@ Schelf does what the `schelf` command can do by itself, such as pausing a rollou
 
 ## Command-line tools
 
-Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedora into the system, as a [system package](/system/system-packages/). Its commands work in [Tern](/apps/tern/) like any other, it updates by itself, and it's listed under Installed, System. A tool that only brings programs installs without a password; one that brings a service or anything else that changes the system asks for an administrator's.
+Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedora into the system, as a [system package](/system/system-packages/). Its commands work in [Tern](/apps/tern/) like any other, it updates by itself, and it's listed under Installed, Packages. A tool that only brings programs installs without a password; one that brings a service or anything else that changes the system asks for an administrator's.
 
-Tools published on schelf.store install from the terminal with `schelf add` and their address, such as `alice/notes`, into `~/.local/bin`. Each is one program, checked against what schelf.store signed for it, and it runs with everything you can do, so Schelf says who publishes it before it goes ahead. They show up under Installed and update with your apps.
+Tools published on schelf.store install from the terminal with `schelf add` and their address, such as `alice/notes`, into `~/.local/bin`. Each is one program, checked against what schelf.store signed for it, and it runs with everything you can do, so Schelf says who publishes it before it goes ahead. They show up under Installed, Packages, and update with your apps.
 
 ## In the terminal
 

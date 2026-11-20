@@ -248,28 +248,22 @@ discover-empty = There are no apps here yet. Check back soon.
 
 installed-show = Show
 installed-apps = Apps
-installed-tools = Command-line tools
-installed-system = System add-ons
+installed-packages = Packages
 installed-extensions = Extensions
 installed-kind = Kind of app
 installed-kind-any = Every kind
 installed-kind-store = From schelf.store
 installed-sources = Software sources
 installed-empty = No apps here yet.
-installed-empty-tools = Command-line tools you install from search show up here.
-installed-empty-system = Packages you install from Fedora and your software sources show up here.
+installed-empty-packages = Tools and packages you install from Fedora, your software sources and schelf.store show up here.
 # How many are shown, under the filter that's picked
 installed-count-apps = { $count ->
     [one] { $count } app
    *[other] { $count } apps
 }
-installed-count-tools = { $count ->
-    [one] { $count } tool
-   *[other] { $count } tools
-}
-installed-count-system = { $count ->
-    [one] { $count } add-on
-   *[other] { $count } add-ons
+installed-count-packages = { $count ->
+    [one] { $count } package
+   *[other] { $count } packages
 }
 installed-count-extensions = { $count ->
     [one] { $count } extension
@@ -280,13 +274,9 @@ installed-count-apps-size = { $count ->
     [one] { $count } app · { $size }
    *[other] { $count } apps · { $size }
 }
-installed-count-tools-size = { $count ->
-    [one] { $count } tool · { $size }
-   *[other] { $count } tools · { $size }
-}
-installed-count-system-size = { $count ->
-    [one] { $count } add-on · { $size }
-   *[other] { $count } add-ons · { $size }
+installed-count-packages-size = { $count ->
+    [one] { $count } package · { $size }
+   *[other] { $count } packages · { $size }
 }
 installed-count-extensions-size = { $count ->
     [one] { $count } extension · { $size }

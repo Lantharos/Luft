@@ -22,7 +22,7 @@ use crate::schema::platforms::PLATFORMS;
 const MAX_BLOCKMAP_BASE64: u64 = 8 * 1024 * 1024;
 
 static SABINE_NAME: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)-(linux|windows|macos)-(x86_64|aarch64)(?:-(appimage|deb|rpm|msi|exe|dmg))?\.(appimage|deb|rpm|msi|exe|dmg|tar\.gz|zip)$").unwrap()
+    Regex::new(r"(?i)-(linux|windows|macos)-(x86_64|aarch64)(?:-(appimage|deb|rpm|msi|exe|dmg))?\.(appimage|deb|rpm|msi|exe|dmg|tar\.zst|zip)$").unwrap()
 });
 static ARCH_IN_NAME: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?i)(?:^|[-_.])(x86_64|amd64|x64|aarch64|arm64)(?:[-_.]|$)").unwrap()
@@ -114,7 +114,7 @@ fn sabine_artifact(
     let platform = format!("{}-{}", found[1].to_lowercase(), found[2].to_lowercase());
     let target = found.get(3).map(|target| target.as_str().to_lowercase());
     let extension = found[4].to_lowercase();
-    if target.is_none() && extension != "tar.gz" && extension != "zip" {
+    if target.is_none() && extension != "tar.zst" && extension != "zip" {
         return Err(format!("{name} has no package kind after its platform"));
     }
     let kind = target.as_deref().map_or("archive", sabine_kind);

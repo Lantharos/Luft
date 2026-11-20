@@ -86,7 +86,7 @@ fn sabine_bundles_read_the_platform_and_kind_from_the_names_sabines_workflow_giv
     let root = folder.path();
     write(
         root,
-        "dist/linux-x86_64/notes-1.0.0-linux-x86_64.tar.gz",
+        "dist/linux-x86_64/notes-1.0.0-linux-x86_64.tar.zst",
         "archive",
     );
     write(
@@ -116,7 +116,7 @@ fn sabine_bundles_read_the_platform_and_kind_from_the_names_sabines_workflow_giv
         found,
         [
             (
-                "notes-1.0.0-linux-x86_64.tar.gz",
+                "notes-1.0.0-linux-x86_64.tar.zst",
                 "linux-x86_64",
                 "archive",
                 Some("bin/notes")

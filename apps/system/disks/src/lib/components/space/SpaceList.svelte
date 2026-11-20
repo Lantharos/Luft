@@ -61,7 +61,7 @@
 	}
 
 	.row.lit {
-		background: color-mix(in oklab, var(--ink) 3%, transparent);
+		background: color-mix(in srgb, var(--ink) 3%, var(--group));
 	}
 
 	.main {

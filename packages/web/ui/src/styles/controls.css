@@ -135,8 +135,22 @@
 		display: flex;
 		flex-direction: column;
 		border-radius: var(--radius-group);
-		background: var(--group);
 		overflow: hidden;
+	}
+
+	.row-group > * {
+		--surface-hover: color-mix(in srgb, var(--ink) 6.5%, var(--group));
+		background-color: var(--group);
+	}
+
+	.row-group > :first-child {
+		border-top-left-radius: var(--radius-group);
+		border-top-right-radius: var(--radius-group);
+	}
+
+	.row-group > :last-child {
+		border-bottom-left-radius: var(--radius-group);
+		border-bottom-right-radius: var(--radius-group);
 	}
 
 	.row-group > * + * {

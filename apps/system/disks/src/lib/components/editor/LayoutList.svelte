@@ -62,7 +62,7 @@
 
 	.row:hover,
 	.row.chosen {
-		background: color-mix(in oklab, var(--ink) 4%, transparent);
+		background: color-mix(in srgb, var(--ink) 4%, var(--group));
 	}
 
 	.dot {

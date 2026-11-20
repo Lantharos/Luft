@@ -1,8 +1,14 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
+import { readProcFile } from '../dbus/processes.js';
+
 const MAX_LINKS = 40;
+const FURTHEST_LAUNCHER = 8;
+const FIELD_CODE = /^%[a-zA-Z]$/;
+const SHELLS = new Set(['bash', 'sh', 'zsh', 'fish', 'dash', 'env', 'nohup', 'timeout', 'sudo']);
 
 export type Identity = { app: string } | { program: string };
 
@@ -19,16 +25,29 @@ function realPath(path: string): string {
   return path;
 }
 
+function launchesSomethingElse(info: Gio.AppInfo): boolean {
+  const [, argv] = GLib.shell_parse_argv(info.get_commandline()!);
+  return argv!.slice(1).some(argument => !FIELD_CODE.test(argument));
+}
+
 let appIdsByProgram: Map<string, string> | null = null;
 
 function installedPrograms(appSystem: Shell.AppSystem): Map<string, string> {
-  const ids = new Map<string, string>();
+  const runs = new Map<string, string>();
+  const launchers = new Map<string, string[]>();
   for (const info of appSystem.get_installed()) {
     const executable = GLib.find_program_in_path(info.get_executable());
     const program = executable && realPath(executable);
-    if (program && !ids.has(program)) ids.set(program, info.get_id()!);
+    if (!program) continue;
+    if (!launchesSomethingElse(info)) {
+      if (!runs.has(program)) runs.set(program, info.get_id()!);
+    } else {
+      launchers.set(program, [...(launchers.get(program) ?? []), info.get_id()!]);
+    }
   }
-  return ids;
+  for (const [program, ids] of launchers)
+    if (ids.length === 1 && !runs.has(program)) runs.set(program, ids[0]);
+  return runs;
 }
 
 function appRunning(program: string): Shell.App | null {
@@ -41,7 +60,7 @@ function appRunning(program: string): Shell.App | null {
   return id ? appSystem.lookup_app(id) : null;
 }
 
-interface VerifiedApp {
+export interface VerifiedApp {
   name: string;
   app: Shell.App | null;
 }
@@ -58,4 +77,24 @@ export function verifiedApp(identity: Identity): VerifiedApp {
 export function verifiedName(pid: number): string | null {
   const identity = identifyProcess(pid);
   return identity && verifiedApp(identity).name;
+}
+
+function parentOf(pid: number): number | null {
+  const stat = readProcFile(`/proc/${pid}/stat`);
+  const parent = Number(stat?.slice(stat.lastIndexOf(') ') + 2).split(' ')[1]);
+  return parent > 1 ? parent : null;
+}
+
+export function* launchers(pid: number): Generator<VerifiedApp> {
+  for (let current = parentOf(pid), steps = 0; current && steps < FURTHEST_LAUNCHER; current = parentOf(current), steps++) {
+    const identity = identifyProcess(current);
+    if (!identity) return;
+    if ('program' in identity && SHELLS.has(GLib.path_get_basename(identity.program))) continue;
+    yield verifiedApp(identity);
+  }
+}
+
+export function launchingApp(pid: number): VerifiedApp | null {
+  for (const launcher of launchers(pid)) if (launcher.app) return launcher;
+  return null;
 }

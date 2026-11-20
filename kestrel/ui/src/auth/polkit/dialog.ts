@@ -8,7 +8,7 @@ import St from 'gi://St';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
-import { identifyProcess, verifiedApp } from '../../shared/apps/identity.js';
+import { identifyProcess, launchingApp, verifiedApp } from '../../shared/apps/identity.js';
 import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
 import { ModalDialog, State } from '../../shared/dialogs/modalDialog.js';
 import type { FingerprintState } from '../prompt/fingerprintState.js';
@@ -40,8 +40,9 @@ function administrators(uids: number[]): number[] {
 }
 
 function header({ message, iconName, details }: Request): MessageDialogContent {
-  const identity = identifyProcess(Number(details['polkit.subject-pid'] ?? 0));
-  const { name, app } = identity ? verifiedApp(identity) : { name: null, app: null };
+  const subject = Number(details['polkit.subject-pid'] ?? 0);
+  const identity = identifyProcess(subject);
+  const { name, app } = launchingApp(subject) ?? (identity ? verifiedApp(identity) : { name: null, app: null });
   const content = new MessageDialogContent({
     title: app ? KestrelUi.t('polkit-allow-app-title', { app: name! }) : KestrelUi.t('polkit-allow-title'),
     description: message,

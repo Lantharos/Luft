@@ -113,7 +113,8 @@ export class PopupFrame {
     }
     if (key === Clutter.KEY_Tab || key === Clutter.KEY_ISO_Left_Tab) {
       const backward = key === Clutter.KEY_ISO_Left_Tab || !!(event.get_state() & Clutter.ModifierType.SHIFT_MASK);
-      this.actor.navigate_focus(global.stage.get_key_focus(), backward ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
+      const focus = global.stage.get_key_focus();
+      this.actor.navigate_focus(focus === this.actor ? null : focus, backward ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
       return Clutter.EVENT_STOP;
     }
     return Clutter.EVENT_PROPAGATE;
@@ -131,7 +132,7 @@ export class PopupFrame {
     animateActor(this.actor, { opacity: 255, translation_x: 0, translation_y: 0, ...OPEN });
     if (!panel) return;
     this.previousFocus = global.stage.get_key_focus();
-    if (!this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false)) this.actor.grab_key_focus();
+    this.actor.grab_key_focus();
     this.watch(global.stage, global.stage.connect('notify::key-focus', () => {
       const focus = global.stage.get_key_focus();
       if (!this.closing && !this.updating && (!focus || !this.actor.contains(focus))) this.close();
@@ -165,8 +166,7 @@ export class PopupFrame {
     }
     this.fit();
     const focus = global.stage.get_key_focus();
-    if (!this.closing && (!focus || !this.actor.contains(focus)) && !this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false))
-      this.actor.grab_key_focus();
+    if (!this.closing && (!focus || !this.actor.contains(focus))) this.actor.grab_key_focus();
   }
 
   close(fade = true): void {

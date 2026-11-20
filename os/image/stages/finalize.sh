@@ -57,11 +57,6 @@ keep_usr_local_in_var() {
   systemd-tmpfiles --create /usr/lib/tmpfiles.d/luft-usr-local.conf
 }
 
-hand_dnf_to_schelf() {
-  ln -sfn ../libexec/luft-package-manager /usr/bin/dnf
-  ln -sfn ../libexec/luft-package-manager /usr/bin/yum
-}
-
 configure_security() {
   local module modules=()
   for module in /usr/share/selinux/packages/luft-*.cil; do
@@ -157,7 +152,6 @@ write_base_image
 write_release_facts
 enable_units
 keep_usr_local_in_var
-hand_dnf_to_schelf
 configure_security
 check_typelibs
 check_sabine_apps

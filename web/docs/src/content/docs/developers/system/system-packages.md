@@ -36,9 +36,9 @@ Extensions are merged without `nosuid`, so setuid and setgid helpers such as Chr
 
 ## dnf on the computer
 
-`/usr/bin/dnf` and `/usr/bin/yum` are `luft-package-manager`, which hands what would change the system to Schelf and runs `dnf5` for everything else: queries, `download`, `makecache` and any command with `--installroot`. In a container, where systemd isn't running, it's plain dnf, so images built on Luft's install packages as usual. Interactive shells route `dnf5`, `apt`, `apt-get`, `pacman` and `zypper` to it too, and `sudo` in front of them runs it without `sudo`.
+`/usr/bin/dnf` and `/usr/bin/yum` are the `schelf` command, which answers as dnf when it's run by that name: what would change the system goes to Schelf, and `dnf5` runs everything else: queries, `download`, `makecache` and any command with `--installroot`. In a container, where systemd isn't running, it's plain dnf, so images built on Luft's install packages as usual. Interactive shells route `dnf5`, `apt`, `apt-get`, `pacman` and `zypper` to it too, and `sudo` in front of them runs it without `sudo`.
 
-On a terminal, `dnf install` asks and then lets `schelf install` choose where each name comes from. With `-y`, or without a terminal, the names are Fedora's, so they go to `schelf install --system` in one change, and package files and their addresses to `schelf install`. Run as root through `sudo` or `pkexec`, it runs again as the account that asked, with that account's session, since Schelf works in an account and polkit decides on that session. Luft's own callers, the build and Schelf's catalog, call `dnf5` directly.
+`dnf install`, `remove` and `search` only look in Fedora and your software sources, and the packages named in one command go in together. Package files and their addresses go to `schelf install`. `apt`, `pacman` and `zypper` are links to it in `/usr/libexec/schelf`, and let Schelf choose where each name comes from, as `schelf install` does. Run as root through `sudo` or `pkexec`, it runs again as the account that asked, with that account's session, since Schelf works in an account and polkit decides on that session. Luft's own callers, the build and Schelf's catalog, call `dnf5` directly.
 
 ## Who needs a password
 

@@ -2,10 +2,10 @@
 [[ $- == *i* ]] || return 0
 
 dnf5() { dnf "$@"; }
-apt() { /usr/libexec/luft-package-manager apt "$@"; }
-apt-get() { /usr/libexec/luft-package-manager apt-get "$@"; }
-pacman() { /usr/libexec/luft-package-manager pacman "$@"; }
-zypper() { /usr/libexec/luft-package-manager zypper "$@"; }
+apt() { /usr/libexec/schelf/apt "$@"; }
+apt-get() { /usr/libexec/schelf/apt-get "$@"; }
+pacman() { /usr/libexec/schelf/pacman "$@"; }
+zypper() { /usr/libexec/schelf/zypper "$@"; }
 
 sudo() {
 	case $1 in

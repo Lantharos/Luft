@@ -71,6 +71,11 @@ pub fn resolve(name: &str, only: Option<Origin>) -> Result<Resolved, String> {
     if found.iter().any(on_store) {
         found.retain(on_store);
     }
+    found.dedup_by(|later, earlier| {
+        later.id == earlier.id
+            && later.catalog.origin() == Origin::System
+            && earlier.catalog.origin() == Origin::System
+    });
     match found.len() {
         0 => {
             let suggestions = across(&catalogs, |catalog| {

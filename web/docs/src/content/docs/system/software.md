@@ -120,7 +120,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf search image editor` | Looks on schelf.store, Flathub, in Fedora and your software sources at once, and through your AppImages |
 | `schelf update` | Updates apps, AppImages, tools and system packages. Luft itself updates in [Settings](/system/updates/) |
 | `schelf list` | Shows what you installed, by where it came from, and the system packages |
-| `schelf install --system tailscale` | Installs only from Fedora or your software sources, several packages in one go, also by a command they bring ([more](/system/system-packages/)) |
+| `dnf install tailscale` | Installs only from Fedora or your software sources, several packages in one go, also by a command they bring ([more](/system/system-packages/)) |
 | `schelf repo add copr:scottames/ghostty` | Adds a software source for system packages, after showing its key ([more](/system/system-packages/#software-sources)) |
 | `schelf info gimp` | Shows the details from every place that has it |
 | `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
@@ -129,7 +129,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf take steam Games` | Takes a drive or folder away again |
 | `schelf publish`, `check`, `login` and the rest | Put your own apps on schelf.store, as its [command reference](https://schelf.store/docs/cli) describes |
 
-A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--system` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store or a tool installs, the command shows what it can use, then asks once for everything you named.
+A name schelf.store has comes from there, and when it has both an app and a tool by that name, Schelf asks which one you mean. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store` or `--flathub` picks the place yourself, `dnf install` takes Fedora's package, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store or a tool installs, the command shows what it can use, then asks once for everything you named.
 
 Installing, updating or removing several things lists each on a line of its own, with how far its download got, its size and speed, and works on three at a time, starting the next as soon as one finishes. Downloads run side by side; putting things in place goes one at a time, since package managers and your account's apps can only take one change at once. System packages, `.deb` apps and Flatpak apps for everyone do all their work in that one-at-a-time step, and the system packages you name in one command go in together. When one fails the rest carry on, the summary at the end names what didn't work, and the command exits with an error.
 

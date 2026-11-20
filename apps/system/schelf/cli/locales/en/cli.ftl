@@ -23,7 +23,6 @@ cli-help-give = Let an app use one drive or folder
 cli-help-take = Take a drive or folder away again
 cli-help-repo = Manage software sources for system packages
 cli-help-option-only = Use only this source
-cli-help-option-system = Only packages from Fedora and your software sources, which go into the system
 cli-help-option-read-only = Give a drive or folder only to read
 cli-help-option-yes = Go ahead without asking
 cli-help-option-help = Show help, also for a command
@@ -50,8 +49,9 @@ cli-usage-install =
     Packages from Fedora go into the system, for everyone on the computer, and
     update by themselves. Command-line tools install without a password; those
     that bring a service, a driver or anything else that changes the system,
-    such as Tailscale, Docker or libvirt, ask for an administrator's. --system
-    installs several in one go and takes a command's name for its package.
+    such as Tailscale, Docker or libvirt, ask for an administrator's. dnf install
+    installs only from Fedora and your software sources, several in one go, and
+    takes a command's name for its package.
 cli-usage-remove =
     Removes apps, extensions and AppImages you installed, and system packages
     with everything they added.
@@ -172,7 +172,7 @@ cli-install-nothing-called = There's nothing called { $name } on { $places }.
 cli-install-close-matches = Close matches:
 # $example is the ID of one of the choices
 cli-install-name-by-id = Name the one you want by its ID or address, such as { $example }.
-cli-install-pick-source = Pick one with --store, --flathub or --system.
+cli-install-pick-source = Pick one with --store or --flathub, or install the package from Fedora with dnf install.
 cli-install-already = { $name } is already installed.
 cli-install-already-from = { $name } is already installed from { $source }.
 cli-install-own-source = { $name } gets its updates from a software source of its own:
@@ -256,7 +256,7 @@ cli-access-basics = Nothing beyond the basics
 
 ## remove
 
-cli-remove-pick-source = Pick one with --flathub, --system or --appimage.
+cli-remove-pick-source = Pick one with --flathub or --appimage, or remove the system package with dnf remove.
 # $names is a list of what's about to be removed
 cli-remove-confirm = Remove { $names }?
 cli-remove-confirm-places = Remove { $names }? Drives and folders you gave it have to be given again if you install it later.
@@ -290,9 +290,10 @@ cli-search-nothing-on = Nothing matches { $query } on { $source }.
 # Beside a search result that's installed
 cli-search-installed = installed
 # $count is how many results aren't shown, and $flag the option that shows them all, such as --flathub
+# $command is an option such as --flathub, or dnf search
 cli-search-more = { $count ->
-        [one] { $count } more. See them all with { $flag }.
-       *[other] { $count } more. See them all with { $flag }.
+        [one] { $count } more. See them all with { $command }.
+       *[other] { $count } more. See them all with { $command }.
     }
 
 ## info
@@ -586,3 +587,21 @@ cli-size-kb = { $amount } kB
 cli-size-mb = { $amount } MB
 cli-size-gb = { $amount } GB
 cli-size-tb = { $amount } TB
+
+## Answering as dnf, apt, pacman and zypper
+
+# $manager is the package manager that was run, such as apt
+cli-manager-not-dnf = Luft is based on Fedora, so it uses dnf instead of { $manager }.
+cli-manager-read-only = The system is read-only, so software comes from Schelf instead:
+# $command is schelf install …
+cli-manager-schelf = { $command } installs apps from Flathub and tools from Fedora,
+# $command is dnf install …
+cli-manager-dnf = { $command } adds any package from Fedora to the system, such as Tailscale.
+cli-manager-updates = Luft updates itself. Updates are in Settings, under Updates.
+# $command is schelf update
+cli-manager-updates-schelf = Apps, AppImages and system packages update with { $command }.
+# $names is a list of packages or files
+cli-manager-install = Luft installs this with Schelf. Install { $names }?
+cli-manager-remove = Luft removes this with Schelf. Remove { $names }?
+cli-manager-search = Luft finds software with Schelf. Search for { $names }?
+cli-manager-sources = Luft adds software sources for system packages with Schelf.

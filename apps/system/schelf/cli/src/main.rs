@@ -71,5 +71,9 @@ fn main() {
     unsafe { libc::signal(libc::SIGPIPE, libc::SIG_DFL) };
     luft_software::apps::appimage::launch_through(host::app().map(Path::to_path_buf));
     schelf_core::tools::adopt_self(env!("CARGO_PKG_VERSION"));
-    std::process::exit(run(&program(), &arguments));
+    let program = program();
+    if let Some(manager) = install::managers::Manager::named(&program) {
+        std::process::exit(install::managers::run(&program, manager, &arguments));
+    }
+    std::process::exit(run(&program, &arguments));
 }

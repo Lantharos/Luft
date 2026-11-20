@@ -87,7 +87,10 @@ fn more(origin: Origin, hidden: usize) {
             L10N,
             "cli-search-more",
             count = hidden,
-            flag = format!("--{}", origin.flag())
+            command = match origin {
+                Origin::System => "dnf search".to_owned(),
+                _ => format!("--{}", origin.flag()),
+            }
         ))
     );
 }

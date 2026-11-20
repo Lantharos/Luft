@@ -1,5 +1,6 @@
 mod arguments;
 mod commands;
+pub mod managers;
 pub mod perform;
 pub mod sources;
 mod terminal;

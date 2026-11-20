@@ -5,3 +5,9 @@ part = "app-schelf"
 
 [links]
 "/usr/bin/sch" = "schelf"
+"/usr/bin/dnf" = "schelf"
+"/usr/bin/yum" = "schelf"
+"/usr/libexec/schelf/apt" = "../../bin/schelf"
+"/usr/libexec/schelf/apt-get" = "../../bin/schelf"
+"/usr/libexec/schelf/pacman" = "../../bin/schelf"
+"/usr/libexec/schelf/zypper" = "../../bin/schelf"

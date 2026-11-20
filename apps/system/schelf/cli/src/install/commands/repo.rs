@@ -89,7 +89,7 @@ fn add(source: &str, yes: bool) -> Exit {
                     L10N,
                     "cli-repo-added",
                     name = ink.bold(described.name()),
-                    command = ink.bold("schelf install --system NAME")
+                    command = ink.bold("dnf install NAME")
                 )
             );
             Exit::Done

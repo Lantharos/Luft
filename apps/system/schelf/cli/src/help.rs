@@ -30,7 +30,6 @@ fn installing() -> String {
             "--store, --flathub, --appimage",
             t!(L10N, "cli-help-option-only"),
         ),
-        ("--system", t!(L10N, "cli-help-option-system")),
         ("--read-only", t!(L10N, "cli-help-option-read-only")),
         ("-y, --yes", t!(L10N, "cli-help-option-yes")),
         ("-h, --help", t!(L10N, "cli-help-option-help")),

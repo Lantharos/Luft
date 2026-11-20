@@ -32,4 +32,4 @@ mapfile -t packages < <(
     providers "$(mutter_needs)"
   } | sort -u
 )
-exec schelf install --system "$@" "${packages[@]}"
+exec dnf install "$@" "${packages[@]}"

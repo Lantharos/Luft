@@ -25,14 +25,14 @@ Everything Schelf installs from Fedora goes into the system as a system package:
 ```sh
 schelf install htop
 schelf install tailscale
-schelf list --system
+schelf list
 schelf remove tailscale
 ```
 
-`--system` installs several packages in one go, and takes a command's name for the package that brings it. For virtual machines with [virt-manager](https://flathub.org/apps/org.virt_manager.virt-manager), add libvirt with its default network and `virsh`:
+`dnf install` installs only from Fedora and your software sources, several packages in one go, and takes a command's name for the package that brings it. For virtual machines with [virt-manager](https://flathub.org/apps/org.virt_manager.virt-manager), add libvirt with its default network and `virsh`:
 
 ```sh
-schelf install --system libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
+dnf install libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
 ```
 
 Luft downloads the packages and what they need, checks the signature on every one against Fedora's keys or those of the source it came from, and adds them to the system without changing Luft itself, so their commands work right away and their services start now and with every start after. Schelf lists them under Installed, Packages, where they can be removed too.
@@ -71,7 +71,7 @@ Vendors that publish Linux apps often keep their own package repository, such as
 schelf repo add https://download.docker.com/linux/fedora/docker-ce.repo
 schelf repo add copr:scottames/ghostty
 schelf repo add 1password                  # also docker, google-chrome, vscode
-schelf install --system docker-ce docker-ce-cli containerd.io
+dnf install docker-ce docker-ce-cli containerd.io
 schelf repo list
 schelf repo remove docker-ce
 ```

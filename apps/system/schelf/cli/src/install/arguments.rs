@@ -58,12 +58,12 @@ impl Command {
 
     pub fn syntax(self) -> &'static str {
         match self {
-            Self::Install => "install NAME|FILE...  [--store|--flathub|--system] [-y]",
-            Self::Remove => "remove NAME...  [--store|--flathub|--appimage|--system] [-y]",
-            Self::Search => "search QUERY  [--store|--flathub|--system]",
-            Self::Update => "update [NAME...]  [--store|--flathub|--appimage|--system]",
-            Self::List => "list  [--store|--flathub|--appimage|--system]",
-            Self::Info => "info NAME  [--store|--flathub|--appimage|--system]",
+            Self::Install => "install NAME|FILE...  [--store|--flathub] [-y]",
+            Self::Remove => "remove NAME...  [--store|--flathub|--appimage] [-y]",
+            Self::Search => "search QUERY  [--store|--flathub]",
+            Self::Update => "update [NAME...]  [--store|--flathub|--appimage]",
+            Self::List => "list  [--store|--flathub|--appimage]",
+            Self::Info => "info NAME  [--store|--flathub|--appimage]",
             Self::Trust => "trust NAME...  [-y]",
             Self::Untrust => "untrust NAME...",
             Self::Give => "give NAME [DRIVE|FOLDER]  [--read-only]",
@@ -129,6 +129,7 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
             option if options && option.starts_with('-') && option.len() > 1 => {
                 let origin = Origin::ALL
                     .into_iter()
+                    .filter(|origin| *origin != Origin::System)
                     .find(|origin| option.strip_prefix("--") == Some(origin.flag()))
                     .ok_or_else(|| {
                         t!(
@@ -193,10 +194,10 @@ mod tests {
 
     #[test]
     fn options_go_anywhere_after_the_command() {
-        let parsed = run(&["install", "ripgrep", "--system", "-y", "fd-find"]).unwrap();
+        let parsed = run(&["install", "ripgrep", "--flathub", "-y", "fd-find"]).unwrap();
         assert_eq!(parsed.command, Command::Install);
         assert_eq!(parsed.words, ["ripgrep", "fd-find"]);
-        assert_eq!(parsed.only, Some(Origin::System));
+        assert_eq!(parsed.only, Some(Origin::Flathub));
         assert!(parsed.yes);
     }
 
@@ -208,7 +209,7 @@ mod tests {
 
     #[test]
     fn one_source_at_a_time() {
-        assert!(run(&["list", "--flathub", "--system"]).is_err());
+        assert!(run(&["list", "--flathub", "--store"]).is_err());
         assert!(run(&["list", "--flathub", "--flathub"]).is_ok());
     }
 

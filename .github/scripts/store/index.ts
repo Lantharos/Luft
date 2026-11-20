@@ -51,7 +51,7 @@ async function plan() {
 async function settled(item: Published, deadline: number): Promise<Release | undefined> {
   const release = (await releases(item.id))!.find((candidate) => candidate.version === item.version && candidate.channel === NIGHTLY);
   const listedNow = async () => (await listed(item.index)).some((candidate) => candidate.version === item.version);
-  if (release && !settling(release) && (!isOut(release) || (await listedNow()))) return release;
+  if (!release || (!settling(release) && (!isOut(release) || (await listedNow())))) return release;
   if (Date.now() > deadline) return release;
   await Bun.sleep(30_000);
   return settled(item, deadline);

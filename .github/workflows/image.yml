@@ -291,9 +291,30 @@ jobs:
           path: dist
           if-no-files-found: error
 
+  store-publisher:
+    name: Schelf for publishing
+    needs: plan
+    if: needs.plan.outputs.publish != '' && needs.plan.outputs.publish != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build schelf
+        run: |
+          rustup update stable && rustup default stable
+          cargo build --release --locked --package schelf-cli
+          install -D --mode 755 target/release/schelf-cli publisher/schelf
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: publisher
+          path: publisher
+          if-no-files-found: error
+
   store-publish:
     name: Publish (${{ matrix.item.name }} ${{ matrix.item.version }})
-    needs: [plan, store-apps, store-tools, store-extensions]
+    needs: [plan, store-publisher, store-apps, store-tools, store-extensions]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.publish != '[]' }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30
@@ -315,8 +336,16 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - uses: Lantharos/Store/publish@aa9cdce301a228f0a02bce7fb54150f06c495f02 # v1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
+          name: publisher
+          path: publisher
+
+      - run: chmod +x publisher/schelf
+
+      - uses: Lantharos/Store/publish@1a33d28970294ac292b34dc8421dff86a1644d84 # v1
+        with:
+          schelf: publisher/schelf
           files: dist/**
           schelf-toml: ${{ matrix.item.folder }}/schelf.toml
           version: ${{ matrix.item.version }}

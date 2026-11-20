@@ -131,7 +131,8 @@ pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
         if path.starts_with(APPLICATIONS) {
             entries.push((path, String::from_utf8_lossy(&bytes).into_owned()));
         } else if let Some(destination) = icon_destination(&path) {
-            let ours = previous.contains(&destination.to_string_lossy().into_owned());
+            let ours = previous.contains(&destination.to_string_lossy().into_owned())
+                || std::fs::read(&destination).is_ok_and(|existing| existing == bytes);
             if destination.exists() && !ours {
                 continue;
             }

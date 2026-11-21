@@ -70,6 +70,7 @@ fn main() {
     }
     unsafe { libc::signal(libc::SIGPIPE, libc::SIG_DFL) };
     luft_software::apps::appimage::launch_through(host::app().map(Path::to_path_buf));
+    schelf_core::store::identify(schelf_core::store::Client::Cli);
     schelf_core::tools::adopt_self(env!("CARGO_PKG_VERSION"));
     let program = program();
     if let Some(manager) = install::managers::Manager::named(&program) {

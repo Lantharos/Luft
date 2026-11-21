@@ -40,7 +40,7 @@ async function stage(destdir: string, versions: string) {
     const release = found?.releases.find((candidate) => candidate.version === version);
     const file = release && artifact(release);
     if (!found || !release || !file) throw new Error(`schelf.store has no ${id} ${version} for this image`);
-    const bytes = new Uint8Array(await (await fetch(file.url)).arrayBuffer());
+    const bytes = new Uint8Array(await (await fetch(`${file.url}?via=image`)).arrayBuffer());
     if (bytes.length !== file.size || createHash('sha256').update(bytes).digest('hex') !== file.sha256) {
       throw new Error(`${file.url} isn't the file schelf.store published for ${id} ${version}`);
     }

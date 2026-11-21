@@ -193,6 +193,11 @@ developer-stats-updates = Updates
 developer-stats-busiest = On the busiest day
 developer-stats-by-version = By version
 developer-stats-by-system = By system
+developer-stats-by-source = By source
+developer-source-app = Schelf
+developer-source-cli = Command line
+developer-source-sabine = The app itself
+developer-source-other = Elsewhere
 # $downloads is yes for a project people download instead of install
 developer-stats-chart = { $downloads ->
     [yes] Downloads and updates each day

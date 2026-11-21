@@ -325,6 +325,12 @@ pub fn stats(app: &str, days: i64) -> Value {
             { "platform": "windows-x86_64", "installs": (installs * 0.17).round(), "updates": (updates * 0.16).round() },
             { "platform": "macos-aarch64", "installs": (installs * 0.08).round(), "updates": (updates * 0.08).round() }
         ],
+        "sources": [
+            { "source": "app", "installs": (installs * 0.58).round(), "updates": (updates * 0.3).round() },
+            { "source": "sabine", "installs": 0, "updates": (updates * 0.62).round() },
+            { "source": "cli", "installs": (installs * 0.09).round(), "updates": (updates * 0.08).round() },
+            { "source": "other", "installs": (installs * 0.33).round(), "updates": 0 }
+        ],
         "total": { "installs": installs, "updates": updates }
     })
 }

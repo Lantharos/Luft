@@ -65,7 +65,7 @@ pub fn published_file(
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(format!("{id}.download"));
     http::save(
-        ask(&format!("{}?{query}", file.url))?,
+        ask(&format!("{}?{query}&via={}", file.url, crate::store::via()))?,
         &path,
         Some(file.size),
         task,

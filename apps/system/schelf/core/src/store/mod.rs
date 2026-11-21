@@ -10,6 +10,7 @@ pub mod signed;
 pub mod updates;
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use luft_dbus::runtime::block_on;
 use luft_software::apps::appimage;
@@ -24,6 +25,28 @@ use signed::Age;
 
 pub const DOWNLOADS: &str = "https://dl.schelf.store/";
 pub const API: &str = "https://schelf.store/api/v1/";
+
+/// Which of Schelf's programs downloads from schelf.store, which counts its installs by it.
+#[derive(Clone, Copy)]
+pub enum Client {
+    App,
+    Cli,
+}
+
+static CLIENT: OnceLock<Client> = OnceLock::new();
+
+pub fn identify(client: Client) {
+    let _ = CLIENT.set(client);
+}
+
+/// The `via` a download from schelf.store carries, naming the program it's for.
+pub(crate) fn via() -> &'static str {
+    match CLIENT.get() {
+        Some(Client::App) => "app",
+        Some(Client::Cli) => "cli",
+        None => "other",
+    }
+}
 
 /// Keeps the AppImages schelf.store pulled from starting and turns its pulled
 /// extensions off. Sabine refuses pulled Sabine apps itself.

@@ -204,10 +204,13 @@ export interface Promoted {
 	release: ReleaseSummary;
 }
 
+export type DownloadSource = 'app' | 'cli' | 'sabine' | 'other';
+
 export interface Stats {
 	days: { day: string; installs: number; updates: number }[];
 	versions: { version: string; installs: number; updates: number }[];
 	platforms: { platform: Platform; installs: number; updates: number }[];
+	sources: { source: DownloadSource; installs: number; updates: number }[];
 	total: { installs: number; updates: number };
 }
 

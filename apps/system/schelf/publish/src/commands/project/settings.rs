@@ -286,7 +286,28 @@ fn stats(args: &mut Args) -> Result<i32> {
         );
     }
     blank();
+    for entry in items(&value["sources"]) {
+        field_in(
+            source_name(text(entry, "source")),
+            &format!(
+                "{} installs, {} updates",
+                entry["installs"], entry["updates"]
+            ),
+            18,
+        );
+    }
+    blank();
     Ok(OK)
+}
+
+fn source_name(source: &str) -> &str {
+    match source {
+        "app" => "Schelf",
+        "cli" => "schelf command",
+        "sabine" => "the app itself",
+        "other" => "elsewhere",
+        source => source,
+    }
 }
 
 pub const VERBS: [Verb; 7] = [

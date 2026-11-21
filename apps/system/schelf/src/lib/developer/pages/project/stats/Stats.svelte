@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Section, Segmented } from '@luft/ui';
 	import Loaded from '../../../components/Loaded.svelte';
-	import { count, platformName } from '../../../format';
+	import { count, platformName, sourceName } from '../../../format';
 	import { reads } from '../../../state/reads';
 	import type { Project } from '../../../store';
 	import BarList from './BarList.svelte';
@@ -50,12 +50,15 @@
 				onchange={(value) => (measure = value)}
 			/>
 		</div>
-		<div class="-mt-3 grid grid-cols-2 gap-6">
+		<div class="-mt-3 grid grid-cols-3 gap-6">
 			<Section title={t('developer-stats-by-version')}>
 				<BarList rows={data.versions.map((row) => ({ label: row.version, value: row[measure] }))} />
 			</Section>
 			<Section title={t('developer-stats-by-system')}>
 				<BarList rows={data.platforms.map((row) => ({ label: platformName(row.platform), value: row[measure] }))} />
+			</Section>
+			<Section title={t('developer-stats-by-source')}>
+				<BarList rows={data.sources.map((row) => ({ label: sourceName(row.source), value: row[measure] }))} />
 			</Section>
 		</div>
 	{/snippet}

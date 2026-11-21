@@ -1,6 +1,6 @@
 import { i18n, t } from '@luft/i18n';
 import { ago, date } from '@luft/ui';
-import type { CheckName, Platform, ReleaseStatus, ReleaseSummary } from './store';
+import type { CheckName, DownloadSource, Platform, ReleaseStatus, ReleaseSummary } from './store';
 
 export type Tone = 'done' | 'active' | 'attention' | 'quiet';
 
@@ -54,6 +54,15 @@ const PLATFORM_NAMES: Record<Platform, string> = {
 };
 
 export const platformName = (platform: Platform) => t(PLATFORM_NAMES[platform]);
+
+const SOURCE_NAMES: Record<DownloadSource, string> = {
+	app: 'developer-source-app',
+	cli: 'developer-source-cli',
+	sabine: 'developer-source-sabine',
+	other: 'developer-source-other'
+};
+
+export const sourceName = (source: DownloadSource) => t(SOURCE_NAMES[source]);
 
 const SHIPPED: ReleaseStatus[] = ['live', 'rolling-out'];
 

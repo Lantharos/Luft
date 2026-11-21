@@ -4,8 +4,7 @@ import type GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { accentColor, fromHex, isNeutral, seedFromPicture, type Rgb } from '../../../../../../appearance/color.js';
-import { luftPaint } from '../../../../../../appearance/icons/paint.js';
+import { accentColor, isNeutral, seedFromPicture, type Rgb } from '../../../../../../appearance/color.js';
 import type { EffectWindow } from '../../../types.js';
 
 const SAMPLED_SIZE = 32;
@@ -44,11 +43,9 @@ function iconColor(appId: string): Promise<Rgb | null> {
   }) as unknown as GObject.Closure));
 }
 
-/** The app's own colour: its shade in Luft's icon palette, or the colour its icon is mostly drawn in. `null` when it has none. */
+/** The app's own colour: the colour its icon is mostly drawn in. `null` when it has none. */
 function appColor({ appId }: EffectWindow): Promise<Rgb | null> {
   if (!appId) return Promise.resolve(null);
-  const shade = luftPaint(appId)?.shade;
-  if (shade) return Promise.resolve(fromHex(shade));
   if (!watching) {
     watching = true;
     Shell.AppSystem.get_default().connect('installed-changed', () => known.clear());

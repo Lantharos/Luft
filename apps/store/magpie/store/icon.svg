@@ -1,10 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#2c1525"/>
-	<g fill="#ffd9f3">
-		<path fill-rule="evenodd" d="M18 15H46A7 7 0 0 1 53 22V42A7 7 0 0 1 46 49H18A7 7 0 0 1 11 42V22A7 7 0 0 1 18 15ZM18.5 19.5A3 3 0 0 0 15.5 22.5V41.5A3 3 0 0 0 18.5 44.5H45.5A3 3 0 0 0 48.5 41.5V22.5A3 3 0 0 0 45.5 19.5Z"/>
+	<defs>
+		<filter id="mp-l" x="-20%" y="-20%" width="140%" height="150%">
+			<feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity=".28"/>
+		</filter>
+		<linearGradient id="mp-s" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffb3e4"/>
+			<stop offset="1" stop-color="#ff7aa8"/>
+		</linearGradient>
+	</defs>
+	<g transform="rotate(-10 30 34)">
+		<rect x="10" y="12" width="36" height="42" rx="3" fill="#f1e4ec"/>
+		<rect x="14" y="16" width="28" height="28" rx="1.5" fill="#b34d95"/>
 	</g>
-	<g fill="#e96bca">
-		<path d="M19 41L26.5 33.5L32 39L37 34L45 41Z"/>
-		<circle cx="40" cy="26.5" r="3"/>
+	<g transform="rotate(7 36 34)" filter="url(#mp-l)">
+		<rect x="18" y="12" width="38" height="45" rx="3" fill="#fffdfd"/>
+		<rect x="22" y="16" width="30" height="30" rx="1.5" fill="url(#mp-s)"/>
+		<circle cx="44" cy="24" r="4" fill="#fff3b0"/>
+		<path d="M22 46v-6l9-9 7 7 4-4 10 10v2Z" fill="#7a2b63"/>
 	</g>
 </svg>

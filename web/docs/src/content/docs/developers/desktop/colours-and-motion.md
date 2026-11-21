@@ -46,7 +46,7 @@ Luft's apps get the palette through [their startup state](/developers/desktop/wr
 | `WallpaperAccentColor` | `s` | The wallpaper's accent, also while White is chosen |
 | `PureBlack` | `b` | Whether the dark style uses pure black |
 | `LightColors`, `DarkColors`, `LightTerminalColors`, `DarkTerminalColors` | `a{ss}` | Roles and terminal colours for each style |
-| `AppIcons` | `a{ss}` | The app icon style, the glyph folder, and the plate, ink, shade and rim colours (`#rrggbbaa`) of tinted, clear and monochrome icons, as `tinted-ink` and so on. With the original style, Luft's own apps draw their glyph on a plate in their own colours from `apps/icons/palette.json` |
+| `AppIcons` | `a{ss}` | The app icon style, the glyph folder, and the plate, ink, shade and rim colours (`#rrggbbaa`) of tinted, clear and monochrome icons, as `tinted-ink` and so on. With the original style every app shows its own icon |
 | `Taskbar` | `s` | JSON describing each taskbar look on the current wallpaper and style |
 
 The same data is written to files shortly after each change:

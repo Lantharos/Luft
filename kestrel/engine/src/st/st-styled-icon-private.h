@@ -13,7 +13,6 @@ typedef struct
   CoglColor shade;
   float rim;
   float corner;
-  float fill;
   gboolean bare;
 } StStyledIconPaint;
 

@@ -3,7 +3,7 @@
 	import Puzzle from '@lucide/svelte/icons/puzzle';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
-	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH } from '@luft/ui';
+	import { AppIcon, appearance, GUST_SCALE, GustIcon, type GustFills } from '@luft/ui';
 	import type { App } from '#lib/bindings.js';
 	import PreviewClock from './PreviewClock.svelte';
 
@@ -14,15 +14,15 @@
 		button: number;
 		icon: number;
 		plate: number;
-		mark: { shade: string; ink: string } | undefined;
+		gust: GustFills | undefined;
 	}
 
-	let { id, vertical, apps, button, icon, plate, mark }: Props = $props();
+	let { id, vertical, apps, button, icon, plate, gust }: Props = $props();
 
 	const RUNNING = 2;
 	const VERTICAL_APPS = 3;
 	let originals = $derived((appearance.appIcons?.style ?? 'default') === 'default');
-	let markSize = $derived(Math.round(button * MARK_SCALE));
+	let gustSize = $derived(Math.round(button * GUST_SCALE));
 	let appIcon = $derived(originals ? icon : plate);
 	let shownApps = $derived(vertical ? apps.slice(0, VERTICAL_APPS) : apps);
 	let small = $derived(plate * 0.62);
@@ -31,13 +31,7 @@
 <span class="element" class:vertical style:--button="{button}px">
 	{#if id === 'gust'}
 		<span class="slot">
-			<span class="mark" style:width="{markSize}px" style:height="{markSize}px">
-				{#each MARK_LAYERS as layer, index (index)}
-					<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={markSize} height={markSize} class:halo={layer.halo} fill={mark?.[layer.fill]}>
-						<path d={layer.path} />
-					</svg>
-				{/each}
-			</span>
+			<span class="gust"><GustIcon fills={gust} size={gustSize} /></span>
 		</span>
 	{:else if id === 'dock'}
 		{#each shownApps as app, index (app.id)}
@@ -88,22 +82,10 @@
 		background: var(--focused);
 	}
 
-	.mark {
-		display: grid;
-		place-items: center;
-	}
-
-	.mark svg {
-		grid-area: 1 / 1;
-	}
-
-	.mark .halo,
+	.gust,
 	.icon {
+		display: grid;
 		filter: var(--icon-halo);
-	}
-
-	.icon {
-		display: grid;
 	}
 
 	.dot {

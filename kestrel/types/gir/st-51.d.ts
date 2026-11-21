@@ -3198,7 +3198,6 @@ export namespace St {
         interface SignalSignatures extends GObject.Object.SignalSignatures {
             "notify::bare": (pspec: GObject.ParamSpec) => void;
             "notify::corner": (pspec: GObject.ParamSpec) => void;
-            "notify::fill": (pspec: GObject.ParamSpec) => void;
             "notify::glyph-names": (pspec: GObject.ParamSpec) => void;
             "notify::ink": (pspec: GObject.ParamSpec) => void;
             "notify::plate": (pspec: GObject.ParamSpec) => void;
@@ -3211,7 +3210,6 @@ export namespace St {
         interface ConstructorProps extends GObject.Object.ConstructorProps, Gio.Icon.ConstructorProps {
             bare: boolean;
             corner: number;
-            fill: number;
             glyph_names: string[];
             glyphNames: string[];
             ink: Cogl.Color;
@@ -3229,8 +3227,6 @@ export namespace St {
         get bare(): boolean;
 
         get corner(): number;
-
-        get fill(): number;
 
         get glyph_names(): string[];
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { appearance, MARK_HEIGHT, MARK_LAYERS, MARK_WIDTH, tooltip, type GlassShading, type Shadow } from '@luft/ui';
+	import { appearance, GustIcon, tooltip, type GlassShading, type Shadow } from '@luft/ui';
 	import {
 		alongOf,
 		edgeOf,
@@ -241,7 +241,7 @@
 						onpointerdown={(event) => arranging.press(event, { element }, boxIn(event.currentTarget))}
 						onkeydown={(event) => arranging.key(event, { element })}
 					>
-						<PreviewElement id={element} {vertical} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} mark={paint?.mark} />
+						<PreviewElement id={element} {vertical} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} gust={paint?.gust} />
 					</button>
 				{/each}
 				<button
@@ -259,20 +259,14 @@
 	{#if arranging.grip && 'element' in arranging.grip}
 		{@const element = arranging.grip.element}
 		<div class="carried island separate" style:left="{arranging.pointer.x - arranging.offset.x}px" style:top="{arranging.pointer.y - arranging.offset.y}px">
-			<PreviewElement id={element} vertical={false} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} mark={paint?.mark} />
+			<PreviewElement id={element} vertical={false} {apps} button={metrics.button} icon={metrics.icon} plate={metrics.plate} gust={paint?.gust} />
 		</div>
 	{/if}
 
 	<div class="corner {edge}" class:vertical={mainVertical} class:shown={!shown} style:--surface={cornerPaint?.surface} style:--ink={cornerPaint?.ink}>
 		{#if present('gust')}
 			<span class="pill round" aria-hidden="true">
-				<span class="mark">
-					{#each MARK_LAYERS as layer, index (index)}
-						<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={14} height={14} class:halo={layer.halo} fill={cornerPaint?.mark[layer.fill]}>
-							<path d={layer.path} />
-						</svg>
-					{/each}
-				</span>
+				<span class="gust"><GustIcon fills={cornerPaint?.gust} size={13} /></span>
 			</span>
 		{/if}
 		<span class="pill">
@@ -548,12 +542,7 @@
 		padding: 0;
 	}
 
-	.mark {
+	.gust {
 		display: grid;
-		place-items: center;
-	}
-
-	.mark svg {
-		grid-area: 1 / 1;
 	}
 </style>

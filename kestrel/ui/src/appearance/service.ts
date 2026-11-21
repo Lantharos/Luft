@@ -150,7 +150,7 @@ export class AppearanceService {
   private paintTaskbar(): boolean {
     const seed = this.seed;
     if (!seed || !this.palette) return false;
-    const taskbar = JSON.stringify(taskbarLooks(seed, this.palette, isDark() ? 'dark' : 'light', this.PureBlack, appIcons.markPaint));
+    const taskbar = JSON.stringify(taskbarLooks(seed, this.palette, isDark() ? 'dark' : 'light', this.PureBlack, appIcons.gustPaint));
     if (taskbar === this.taskbar) return false;
     this.taskbar = taskbar;
     return true;

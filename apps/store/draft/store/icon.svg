@@ -1,11 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#2d1806"/>
-	<g fill="#ffe0c8">
-		<path d="M43.5 15.5a3.5 3.5 0 0 1 5 0l2 2a3.5 3.5 0 0 1 0 5L33 40l-8.5 2.5L27 34Z"/>
-	</g>
-	<g fill="#f59740">
-		<rect x="12.5" y="18.5" width="22" height="5" rx="2.5"/>
-		<rect x="12.5" y="28.5" width="15" height="5" rx="2.5"/>
-		<rect x="12.5" y="38.5" width="9" height="5" rx="2.5"/>
+	<defs>
+		<linearGradient id="df-p" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#fff7f0"/>
+			<stop offset="1" stop-color="#ffe6d2"/>
+		</linearGradient>
+		<linearGradient id="df-c" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffab5c"/>
+			<stop offset="1" stop-color="#ec7a22"/>
+		</linearGradient>
+	</defs>
+	<path d="M15 5h22l12 12v33a6 6 0 0 1-6 6H15a6 6 0 0 1-6-6V11a6 6 0 0 1 6-6Z" fill="url(#df-p)"/>
+	<path d="M37 5v8a4 4 0 0 0 4 4h8Z" fill="#ffc797"/>
+	<rect x="16" y="22" width="20" height="4.5" rx="2.25" fill="#ffc797"/>
+	<rect x="16" y="31" width="13" height="4.5" rx="2.25" fill="#ffc797"/>
+	<g transform="rotate(-45 42 45)">
+		<path d="M22 40.5 14 45l8 4.5Z" fill="#ffe0c8"/>
+		<path d="M14 45l3.2-1.8v3.6Z" fill="#5c2c0c"/>
+		<rect x="22" y="40.5" width="30" height="9" fill="url(#df-c)"/>
+		<rect x="50" y="40.5" width="9" height="9" rx="2.5" fill="#b4531a"/>
 	</g>
 </svg>

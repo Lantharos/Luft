@@ -14,7 +14,7 @@ import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPr
 import { timeText } from './clockText.js';
 
 const MARGIN = 12;
-const MARK_SIZE = 36;
+const GUST_SIZE = 36;
 
 export interface CornerActions {
   gust(): void;
@@ -42,7 +42,7 @@ export class StatusCorner {
   private monitor: Monitor | null = null;
 
   constructor(actions: CornerActions) {
-    this.gustButton = createGustButton(actions.gust, MARK_SIZE, () => this.actor);
+    this.gustButton = createGustButton(actions.gust, GUST_SIZE, () => this.actor);
     this.gustButton.button.add_style_class_name('kestrel-corner-gust kestrel-glass');
     blurSurface(this.gustButton.button, 999, 'taskbar');
     const statusBox = new St.BoxLayout({ style_class: 'kestrel-corner-status' });

@@ -404,27 +404,13 @@ colorize (cairo_surface_t         *surface,
   cairo_surface_mark_dirty (surface);
 }
 
-static int
-plate_size (const StStyledIconPaint *paint,
-            int                      size)
-{
-  float coverage = 1.f - (4.f - G_PI) * paint->corner * paint->corner;
-  float side = size * paint->fill * _st_fitted_icon_shape_extent (coverage);
-
-  if (paint->fill == 0.f)
-    return size;
-  return size - 2 * (int) roundf ((size - side) / 2.f);
-}
-
 int
 _st_styled_icon_glyph_box (const StStyledIconPaint *paint,
                            int                      size)
 {
-  int plate = plate_size (paint, size);
-
   if (paint->bare)
-    return plate;
-  return plate - 2 * (int) round (plate * (1 - GLYPH_BOX) / 2);
+    return size;
+  return size - 2 * (int) round (size * (1 - GLYPH_BOX) / 2);
 }
 
 GdkPixbuf *
@@ -451,14 +437,7 @@ _st_styled_icon_paint (const StStyledIconPaint *paint,
 
   colorize (placed, paint);
   if (!paint->bare)
-    {
-      int plate = plate_size (paint, size);
-
-      cairo_save (cr);
-      cairo_translate (cr, (size - plate) / 2, (size - plate) / 2);
-      draw_plate (cr, paint, plate, scale);
-      cairo_restore (cr);
-    }
+    draw_plate (cr, paint, size, scale);
   cairo_set_source_surface (cr, placed, 0, 0);
   cairo_paint (cr);
   cairo_destroy (cr);

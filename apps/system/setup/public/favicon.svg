@@ -1,10 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#271b17"/>
-	<g fill="#fcdfd6">
-		<path d="M14 40a18 18 0 0 1 36 0Z"/>
-	</g>
-	<g fill="#e3ac9a">
-		<rect x="10" y="44" width="44" height="4" rx="2"/>
-		<rect x="18" y="51" width="28" height="3" rx="1.5" opacity="0.6"/>
+	<defs>
+		<linearGradient id="us-b" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffb894"/>
+			<stop offset="1" stop-color="#e36c47"/>
+		</linearGradient>
+		<linearGradient id="us-m" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#e9edf2"/>
+			<stop offset="1" stop-color="#aab3be"/>
+		</linearGradient>
+	</defs>
+	<rect x="20" y="4" width="24" height="16" rx="3" fill="url(#us-m)"/>
+	<rect x="14" y="18" width="36" height="42" rx="9" fill="url(#us-b)"/>
+	<g transform="translate(22.6 29) scale(0.1)">
+		<path d="M119.718 130.99C159.986 113.061 161.602 43.9304 179.53 84.1989C197.459 124.467 179.349 171.645 139.081 189.574C98.8128 207.503 51.6341 189.393 33.7053 149.125C15.7766 108.856 79.4495 148.919 119.718 130.99Z" fill="#ffd9c8"/>
+		<path d="M78.4133 63.6013C118.682 45.6726 131.515 -28.4531 149.444 11.8151C167.372 52.0837 149.262 99.2624 108.993 117.191C68.7249 135.12 21.5471 117.009 3.61838 76.7409C-14.3103 36.4724 38.1448 81.5298 78.4133 63.6013Z" fill="#fff"/>
 	</g>
 </svg>

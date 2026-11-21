@@ -68,7 +68,8 @@ export { selectionPill } from './motion/pill';
 export { revealContents } from './motion/reveal';
 export { dialog, fade, menu, page, toast } from './motion/transitions';
 
-export { MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, type MarkFills, type MarkLayer } from './taskbar/mark';
+export { GUST_BOX, GUST_ON_DARK, GUST_ON_LIGHT, GUST_PARTS, GUST_PATHS, GUST_SCALE, type GustFill, type GustFills, type GustPart } from './taskbar/gust';
+export { default as GustIcon } from './taskbar/GustIcon.svelte';
 export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint, TaskbarLooks } from './taskbar/looks';
 
 export { default as Spinner } from './notices/Spinner.svelte';

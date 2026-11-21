@@ -3,7 +3,6 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {appIcons, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -19,10 +18,7 @@ const WALLPAPERS = [['lavender', 'Night lavender.jpg', [88, 52, 140]], ['forest'
 const STYLES = ['default', 'tinted', 'clear', 'monochrome'] as const;
 const SCHEMES = [['dark', 'prefer-dark'], ['light', 'default']] as const;
 const PALETTE_TIMEOUT = 10000;
-const appSystem = Shell.AppSystem.get_default();
-const TASKBAR_APP = 'kestrel-app-';
-const APP_BUTTONS = [TASKBAR_APP, 'kestrel-gust-item-'];
-const LUFT_APP = 'com.lantharos.';
+const APP_BUTTONS = ['kestrel-app-', 'kestrel-gust-item-'];
 
 type Paint = ReturnType<typeof appIcons.paintFor>;
 type Inks = Partial<Record<typeof SCHEMES[number][0], string>>;
@@ -53,25 +49,6 @@ const shownIcons = () => [...appIconsIn(named('kestrel-panel')!), ...appIconsIn(
 
 const inkOf = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon ? icon.gicon.ink.to_string() : null;
 
-function shownApps() {
-  return descendants(global.stage).flatMap(button => {
-    const prefix = APP_BUTTONS.find(prefix => button.mapped && button.name?.startsWith(prefix));
-    const id = prefix && button.name!.slice(prefix.length);
-    return id && appSystem.lookup_app(id) ? appIconsIn(button).map(icon => ({id, icon, onTaskbar: prefix === TASKBAR_APP})) : [];
-  });
-}
-
-const plated = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon && !icon.gicon.bare;
-
-function checkLuftApps(setting: string) {
-  const apps = shownApps();
-  const luft = apps.filter(({id}) => id.startsWith(LUFT_APP));
-  const inks = new Map(luft.map(({id, icon}) => [id, inkOf(icon)]));
-  require(luft.length > 0 && luft.length < apps.length && apps.every(app => luft.includes(app) ? plated(app.icon) : inkOf(app.icon) === null),
-    `Luft's own apps draw their glyphs on their own plates beside original icons (${setting})`);
-  require(new Set(inks.values()).size === inks.size, `every Luft app has a colour of its own (${setting})`);
-}
-
 const loaded = (icon: St.Icon) => icon.get_children().some(child => child.content && child.opacity > 0);
 const painted = (icon: St.Icon, paint: Paint) => inkOf(icon) === (paint?.ink ?? null);
 
@@ -85,7 +62,6 @@ async function checkStyles(settings: Gio.Settings, slug: string, scheme: string)
     const icons = shownIcons();
     require(icons.length > 0, `the taskbar and Gust show app icons (${setting})`);
     await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paintFor(icon))), `${style} reaches every taskbar and Gust icon (${setting})`);
-    if (style === 'default') checkLuftApps(setting);
     await capture(`icons-${style}-${scheme}-${slug}`);
   }
   toggleSurface('gust');

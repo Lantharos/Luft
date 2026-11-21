@@ -8,7 +8,7 @@ import St from 'gi://St';
 
 import { fromHex, seedFromColor, type Seed } from '../color.js';
 import { glyphNames } from './glyphs.js';
-import { luftPaint, markPaint, paints, type IconStyle, type Paint, type PaintedStyle } from './paint.js';
+import { paints, type IconStyle, type Paint, type PaintedStyle } from './paint.js';
 
 export interface IconApp {
   get_id(): string | null;
@@ -27,11 +27,11 @@ export function sourceIcon(app: IconApp): Gio.Icon {
   return (id ? appSystem.lookup_app(id)?.get_icon() : null) ?? app.get_icon() ?? FALLBACK;
 }
 
-export function styledIcon(app: IconApp, paint: Paint, square = false, fill = 0): St.StyledIcon {
+export function styledIcon(app: IconApp, paint: Paint, square = false): St.StyledIcon {
   const source = sourceIcon(app);
   return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
-    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim, fill, bare: paint.bare,
+    plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim, bare: paint.bare,
     ...square && !paint.bare ? { corner: 0 } : {},
   });
 }
@@ -48,7 +48,6 @@ class AppIcons {
   private square = !this.settings.get_boolean('rounded-window-corners');
   paints: Record<PaintedStyle, Paint> | null = null;
   taskbarPaints: Record<PaintedStyle, Paint> | null = null;
-  markPaint: Paint | null = null;
 
   constructor() {
     this.settings.connect('changed::app-icon-style', () => this.refresh());
@@ -69,17 +68,21 @@ class AppIcons {
     return () => this.listeners.delete(listener);
   }
 
-  private paintOf(app: IconApp, paints = this.paints): Paint | null {
-    return this.style === 'default' ? luftPaint(app.get_id()) : paints?.[this.style] ?? null;
+  private paintOf(paints = this.paints): Paint | null {
+    return this.style === 'default' ? null : paints?.[this.style] ?? null;
   }
 
-  gicon(app: IconApp, paint = this.paintOf(app), fill = 1): Gio.Icon {
+  gicon(app: IconApp, paint = this.paintOf(), fill = 1): Gio.Icon {
     if (!paint) return new St.FittedIcon({ source: sourceIcon(app), fill });
-    return styledIcon(app, paint, this.square, this.style === 'default' ? fill : 0);
+    return styledIcon(app, paint, this.square);
+  }
+
+  get gustPaint(): Paint | null {
+    return this.paintOf(this.taskbarPaints);
   }
 
   paintFor(icon: St.Icon): Paint | null {
-    return this.paintOf(this.bound.get(icon)!, this.taskbarFills.has(icon) ? this.taskbarPaints : this.paints);
+    return this.paintOf(this.taskbarFills.has(icon) ? this.taskbarPaints : this.paints);
   }
 
   private iconOf(icon: St.Icon): Gio.Icon {
@@ -114,15 +117,13 @@ class AppIcons {
     const taskbarDark = this.accent?.taskbarDark ?? true;
     const painted = seed ? paints(seed, dark) : null;
     const taskbarPainted = seed ? paints(seed, taskbarDark) : null;
-    const mark = seed ? markPaint(seed, taskbarDark) : null;
     const square = !this.settings.get_boolean('rounded-window-corners');
-    if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted, mark]) === JSON.stringify([this.paints, this.taskbarPaints, this.markPaint])) return;
+    if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
     const restyle = style !== this.style || square !== this.square || style !== 'default';
     this.style = style;
     this.square = square;
     this.paints = painted;
     this.taskbarPaints = taskbarPainted;
-    this.markPaint = mark;
     for (const listener of this.listeners) listener();
     if (!restyle) return;
     textureCache.evict_styled_icons();

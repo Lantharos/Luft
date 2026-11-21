@@ -2,7 +2,7 @@ import type { TaskbarLookPaint, TaskbarLooks } from '../../../../../../packages/
 import { toHex, type Seed } from '../../../appearance/color.js';
 import type { Paint } from '../../../appearance/icons/paint.js';
 import type { Palette } from '../../../appearance/palette.js';
-import { markFills } from '../gustButton/shade.js';
+import { gustFills } from '../gustButton/fills.js';
 import { schemeThemes, type Scheme } from './schemeThemes.js';
 import { lookInks, tintsOf, type LookInk } from './taskbarStylesheet.js';
 import { taskbarScheme } from './taskbarScheme.js';
@@ -16,7 +16,7 @@ function lookPaint({ look, surface, backdrops, ink, halo }: LookInk, palette: Pa
     surface: `rgba(${surface.tint.join(', ')}, ${surface.opacity})`,
     glass: surface.glass,
     ink: toHex(theme.ink),
-    mark: markFills(toHex(theme.ink), paint, backdrops),
+    gust: gustFills(toHex(theme.ink), paint, backdrops),
     ...theme.inkFills(),
     focusedDot: palette[ink].colors.primary,
     iconHalo: transparent ? soft.icon : null,

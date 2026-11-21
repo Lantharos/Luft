@@ -1,9 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#0f1e33"/>
-	<g fill="#d7e8fe">
-		<path d="M11 23a6 6 0 0 1 6-6h30a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H17a6 6 0 0 1-6-6Z"/>
-	</g>
-	<g fill="#5299f6">
-		<path d="M15.2 21.4a2.2 2.2 0 0 1 3-.7L32 30.4l13.8-9.7a2.2 2.2 0 0 1 2.5 3.6L33.3 34.8a2.2 2.2 0 0 1-2.6 0L15.7 24.3a2.2 2.2 0 0 1-.5-2.9Z"/>
+	<defs>
+		<clipPath id="mm-c">
+			<rect x="4" y="11" width="56" height="42" rx="6"/>
+		</clipPath>
+		<linearGradient id="mm-l" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#3f88f3"/>
+			<stop offset="1" stop-color="#2d6fe2"/>
+		</linearGradient>
+		<linearGradient id="mm-r" x1="1" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#2b6ce0"/>
+			<stop offset="1" stop-color="#1f57c8"/>
+		</linearGradient>
+		<linearGradient id="mm-d" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#5a9dfb"/>
+			<stop offset="1" stop-color="#3f87f2"/>
+		</linearGradient>
+		<linearGradient id="mm-t" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#a5ccff"/>
+			<stop offset="1" stop-color="#78b0ff"/>
+		</linearGradient>
+	</defs>
+	<g clip-path="url(#mm-c)">
+		<path d="M4 11 34 33 4 53Z" fill="url(#mm-l)"/>
+		<path d="M60 11 30 33 60 53Z" fill="url(#mm-r)"/>
+		<path d="M4 53 32 32 60 53Z" fill="url(#mm-d)"/>
+		<path d="M4 11h56L35.4 30.6a5.5 5.5 0 0 1-6.8 0Z" fill="url(#mm-t)"/>
 	</g>
 </svg>

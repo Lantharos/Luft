@@ -1,10 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#16211e"/>
-	<g fill="#d4ede7">
-		<rect x="10" y="38" width="44" height="13" rx="5.5"/>
-	</g>
-	<g fill="#94c7bc">
-		<rect x="10" y="29.5" width="43" height="5.5" rx="2.75" transform="rotate(22 51.5 32.5)"/>
-		<rect x="17" y="42.25" width="14" height="4.5" rx="2.25"/>
-	</g>
+	<defs>
+		<linearGradient id="fb-b" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#8fdccb"/>
+			<stop offset="1" stop-color="#3fa18c"/>
+		</linearGradient>
+		<linearGradient id="fb-p" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffffff"/>
+			<stop offset="1" stop-color="#e3f3ef"/>
+		</linearGradient>
+	</defs>
+	<rect x="13" y="5" width="38" height="54" rx="5" fill="url(#fb-p)"/>
+	<path d="M13 33h38v21a5 5 0 0 1-5 5H18a5 5 0 0 1-5-5Z" fill="#b5ddd3"/>
+	<rect x="17" y="13" width="22" height="4.5" rx="2.25" fill="#a9d6cb"/>
+	<rect x="17" y="21" width="15" height="4.5" rx="2.25" fill="#a9d6cb"/>
+	<rect x="5" y="28" width="54" height="9" rx="4.5" fill="url(#fb-b)"/>
 </svg>

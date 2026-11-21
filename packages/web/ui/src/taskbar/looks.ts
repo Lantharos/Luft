@@ -1,4 +1,4 @@
-import type { MarkFills } from './mark';
+import type { GustFills } from './gust';
 
 export type TaskbarLook = 'glass' | 'solid' | 'transparent' | 'accent';
 
@@ -26,7 +26,7 @@ export interface TaskbarLookPaint {
 	surface: string;
 	glass: GlassShading | null;
 	ink: string;
-	mark: MarkFills;
+	gust: GustFills;
 	focused: string;
 	dot: string;
 	focusedDot: string;

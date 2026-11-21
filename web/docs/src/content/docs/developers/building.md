@@ -103,7 +103,7 @@ The first build downloads Fedora packages, Mutter's source and the web runtime, 
 
 ### What goes into a part
 
-Every app, service and piece of Kestrel that goes into the image has an `image.toml` next to it, saying which part it belongs to and what it installs. A part's build sees only its components' folders, the crates and `workspace:` packages they depend on, and the workspace's manifests and lockfiles, and its cache key hashes exactly those. Anything else it reads goes in `sources`.
+Every app, service and piece of Kestrel that goes into the image has an `image.toml` next to it, saying which part it belongs to and what it installs. A part's build sees only its components' folders, the crates and `workspace:` packages they depend on, and the workspace's manifests and lockfiles. Its cache key hashes those, with only the parts of `Cargo.lock` and `bun.lock` the part's crates and packages reach, so a dependency change elsewhere doesn't rebuild it. Anything else it reads goes in `sources`.
 
 ```toml
 part = "services"

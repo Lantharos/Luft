@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { reachedLock } from './components/lockfile';
 import { listedTree, partSources } from './components/sources';
 import { prunedWorkspace } from './stages/workspace';
 
 type Stage = { name: string; image: string; instructions: string[] };
 
-const WORKSPACE_FILES = new Set(['Cargo.toml', 'Cargo.lock']);
+const WORKSPACE_FILES = new Set(['Cargo.toml', 'Cargo.lock', 'bun.lock']);
 const SOURCES = 'sources';
 
 const [containerfile, tree, checkout, ...assignments] = process.argv.slice(2);
@@ -123,9 +124,11 @@ function copies(stage: Stage, given: Record<string, string>, part: string) {
 function workspaceFiles(sources: string[]) {
   const copied = (path: string) => objects.has(path) && sources.some((source) => path === source || path.startsWith(`${source}/`));
   const read = (path: string) => readFileSync(join(checkout, path), 'utf8');
+  const files: Record<string, string> = sources.includes('bun.lock') ? { 'bun.lock': reachedLock(read('bun.lock'), sources) } : {};
+  if (!sources.includes('Cargo.toml')) return files;
   const memberManifest = (dir: string) => (copied(`${dir}/Cargo.toml`) ? read(`${dir}/Cargo.toml`) : undefined);
   const workspace = prunedWorkspace(read('Cargo.toml'), read('Cargo.lock'), memberManifest);
-  return { 'Cargo.toml': workspace.manifest, 'Cargo.lock': workspace.lock } as Record<string, string>;
+  return { ...files, 'Cargo.toml': workspace.manifest, 'Cargo.lock': workspace.lock };
 }
 
 function key(part: string, target: string, given: Record<string, string>) {

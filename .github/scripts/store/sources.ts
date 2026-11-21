@@ -1,5 +1,6 @@
 import { $ } from 'bun';
 
+import { reachedLock } from '../../../os/image/parts/components/lockfile';
 import { folderSources, listedTree, type Tree, within } from '../../../os/image/parts/components/sources';
 import { prunedWorkspace } from '../../../os/image/parts/stages/workspace';
 
@@ -25,11 +26,12 @@ function snapshot(commit: string) {
 }
 
 function workspaceFiles({ tree }: Snapshot, sources: string[]): Record<string, string> {
-  if (!sources.includes('Cargo.toml')) return {};
+  const files: Record<string, string> = sources.includes('bun.lock') ? { 'bun.lock': reachedLock(tree.read('bun.lock'), sources) } : {};
+  if (!sources.includes('Cargo.toml')) return files;
   const copied = (path: string) => tree.has(path) && sources.some((source) => within(path, source));
   const member = (dir: string) => (copied(`${dir}/Cargo.toml`) ? tree.read(`${dir}/Cargo.toml`) : undefined);
   const workspace = prunedWorkspace(tree.read('Cargo.toml'), tree.read('Cargo.lock'), member);
-  return { 'Cargo.toml': workspace.manifest, 'Cargo.lock': workspace.lock };
+  return { ...files, 'Cargo.toml': workspace.manifest, 'Cargo.lock': workspace.lock };
 }
 
 export function sourceKey(commit: string, folder: string) {

@@ -82,7 +82,7 @@ export class LockFingerprint {
   }
 
   private sync(): void {
-    const primary = this.fingerprint.listening && this.choice !== 'password';
+    const primary = (this.fingerprint.listening || this.matched) && this.choice !== 'password';
     this.prompt?.setFingerprint(this.fingerprint.state, primary);
   }
 }

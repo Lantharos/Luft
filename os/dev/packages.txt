@@ -1,7 +1,10 @@
 edk2-ovmf
 greetd
 gstreamer1-plugin-gtk4
+ibus-mozc
 jq
 qemu-img
 qemu-system-x86
+rpm-build
 swtpm
+xrdb

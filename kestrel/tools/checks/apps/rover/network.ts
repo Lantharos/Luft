@@ -50,8 +50,7 @@ async function unmount(scheme: string) {
 
 const enter = () => press(Clutter.KEY_Return);
 
-async function acceptCertificate(app: LuftApp, name: string, act: () => unknown) {
-  await changes(app, 'Rover asks whether to trust the certificate', act, DIALOG);
+async function acceptCertificate(app: LuftApp, name: string) {
   (await app.frame()).save(`rover-network-${name}-dark`);
   await changes(app, 'trusting the certificate asks for a password', enter, DIALOG);
   (await app.frame()).save('rover-network-sign-in-dark');
@@ -77,7 +76,8 @@ async function typeAddress(app: LuftApp, address: string, focus: () => unknown) 
 }
 
 async function checkConnections(app: LuftApp, keyring: ScratchKeyring, ports: Ports) {
-  await acceptCertificate(app, 'certificate', () => {});
+  await app.settle(() => true);
+  await acceptCertificate(app, 'certificate');
   signIn({remember: true});
   await eventually(() => mounted('davs'), 'rover opens a davs:// address it was started with, after confirming the certificate and signing in', MOUNT_TIMEOUT);
   (await app.settle(() => true)).save('rover-network-dark');
@@ -93,7 +93,8 @@ async function checkConnections(app: LuftApp, keyring: ScratchKeyring, ports: Po
   await unmount('davs');
   keyring.forget();
   await typeAddress(app, `davs://127.0.0.1:${ports.dav}/docs`, () => app.click(PATH_BAR));
-  await acceptCertificate(app, 'certificate-again', enter);
+  await changes(app, 'Rover asks whether to trust the certificate', enter, DIALOG);
+  await acceptCertificate(app, 'certificate-again');
   signIn({remember: false});
   await eventually(() => mounted('davs'), 'typing an address after clicking the path bar replaces the path and connects', MOUNT_TIMEOUT);
   (await app.settle(() => true)).save('rover-network-docs-dark');

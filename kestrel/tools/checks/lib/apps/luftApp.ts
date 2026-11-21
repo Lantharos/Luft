@@ -100,6 +100,9 @@ function readLines(stream: Gio.InputStream, onLine: (line: string) => void) {
 
 const readJson = (path: string) => JSON.parse(new TextDecoder().decode(GLib.file_get_contents(path)[1]));
 
+const resting = (actor: Meta.WindowActor) =>
+  actor.mapped && actor.opacity === 255 && actor.scale_x === 1 && actor.scale_y === 1 && actor.translation_x === 0 && actor.translation_y === 0;
+
 const alive = (pid: number) => GLib.file_test(`/proc/${pid}`, GLib.FileTest.EXISTS);
 
 function sessionDaemon(): number | null {
@@ -192,7 +195,7 @@ export class LuftApp {
     await this.waitUntil(() => this._painted || this._exited, `${this.name} paints`, LAUNCH_TIMEOUT);
     if (!this._painted) throw new Error(`${this.name} exited before it painted:\n${this.log}`);
     this.window = await this.waitUntil(() => global.get_window_actors()
-      .find(actor => actor.mapped && actor.meta_window?.get_wm_class() === this.id)?.meta_window, `${this.name} shows its window`, SHOW_TIMEOUT);
+      .find(actor => resting(actor) && actor.meta_window?.get_wm_class() === this.id)?.meta_window, `${this.name} shows its window`, SHOW_TIMEOUT);
     this.window.activate(global.get_current_time());
   }
 

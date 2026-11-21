@@ -80,8 +80,10 @@ printer_ready() {
 ulimit -n "$(ulimit -Hn)"
 restore_settings
 mkdir -p "$XDG_RUNTIME_DIR/dconf"
-install -d -m 700 "$KESTREL_APP_RUNTIME_DIR" "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH"
+install -d -m 700 "$KESTREL_APP_RUNTIME_DIR" "$KESTREL_APP_RUNTIME_DIR/pulse" "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH"
 ln -sfn "$XDG_RUNTIME_DIR/dconf" "$KESTREL_APP_RUNTIME_DIR/dconf"
+ln -sfn "$PIPEWIRE_RUNTIME_DIR/pipewire-0" "$KESTREL_APP_RUNTIME_DIR/pipewire-0"
+ln -sfn "$PULSE_RUNTIME_PATH/native" "$KESTREL_APP_RUNTIME_DIR/pulse/native"
 rm -f "$KESTREL_AUTHENTICATE_SOCK" "$KESTREL_READY_SOCK"
 start_system_bus
 export KESTREL_POST_NETWORK="$session/post-network"

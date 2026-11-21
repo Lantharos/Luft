@@ -1,4 +1,4 @@
-import { type Item, platformRunner, sabineTag, storeItems } from './items';
+import { type Item, LUFT_PLATFORM, platformRunner, sabineTag, storeItems } from './items';
 import { isOut, listed, promote, type Release, releases, settling, taken } from './schelf';
 import { changesBetween, head, sourceKey } from './sources';
 import { compareVersions, newest, nextVersion } from './versions';
@@ -43,7 +43,7 @@ async function plan() {
     sabine: sabineTag(),
     apps: pick('app', ['name', 'folder', 'platforms', 'version']),
     tools: JSON.stringify(planned.filter((item) => item.kind === 'tool').flatMap(({ name, folder, version, platforms }) => platforms.split(' ').map((platform) => ({ name, folder, version, platform, runner: platformRunner(platform) })))),
-    extensions: JSON.stringify(planned.filter((item) => item.kind === 'extension').flatMap(({ name, folder, version, runners }) => runners.map((runner) => ({ name, folder, version, runner })))),
+    extensions: JSON.stringify(planned.filter((item) => item.kind === 'extension').map(({ name, folder, version }) => ({ name, folder, version, runner: platformRunner(LUFT_PLATFORM) }))),
     publish: JSON.stringify(planned.map(({ name, id, index, kind, folder, version, notes }) => ({ name, id, index, kind, folder, version, notes }))),
   });
 }

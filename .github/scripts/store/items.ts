@@ -2,15 +2,16 @@ import { readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 
 export type Kind = 'app' | 'extension' | 'tool';
-export type Item = { name: string; folder: string; kind: Kind; id: string; index: string; manifest: string; floor: string; platforms: string; runners: string[] };
+export type Item = { name: string; folder: string; kind: Kind; id: string; index: string; manifest: string; floor: string; platforms: string };
 
-const LINUX = 'linux-x86_64 linux-aarch64';
-const RUNNERS = ['ubuntu-26.04', 'ubuntu-26.04-arm'];
-const PLATFORM_RUNNERS: Record<string, string> = { 'linux-x86_64': RUNNERS[0], 'linux-aarch64': RUNNERS[1] };
+/** Luft itself runs only on 64-bit Intel and AMD, so what only runs inside it, such as extensions, builds for that alone. */
+export const LUFT_PLATFORM = 'linux-x86_64';
+const LINUX = `${LUFT_PLATFORM} linux-aarch64`;
+const PLATFORM_RUNNERS: Record<string, string> = { [LUFT_PLATFORM]: 'ubuntu-26.04', 'linux-aarch64': 'ubuntu-26.04-arm' };
 const PLATFORMS: Record<string, string> = { 'com.lantharos.meet': 'windows-x86_64 linux-x86_64' };
 
 type SchelfToml = { id?: string; project?: string; kind?: Kind; tool?: string; platforms?: string[] };
-type Versioned = { version?: string; app?: { version?: string }; package?: { version?: string }; helper?: object };
+type Versioned = { version?: string; app?: { version?: string }; package?: { version?: string } };
 
 export const platformRunner = (platform: string) => PLATFORM_RUNNERS[platform];
 
@@ -20,14 +21,14 @@ function versionIn(manifest: string) {
   const versioned = toml<Versioned>(manifest);
   const floor = versioned.app?.version ?? versioned.package?.version ?? versioned.version;
   if (!floor) throw new Error(`${manifest} has no version`);
-  return { floor, helper: versioned.helper !== undefined };
+  return floor;
 }
 
 function tool(folder: string, { project, tool: name, platforms }: SchelfToml): Item {
   const [publisher, slug] = project!.split('/');
   const manifest = join(folder, 'Cargo.toml');
   const { floor } = versionIn(manifest);
-  return { name: name!, folder, kind: 'tool', id: `${publisher}.${slug}`, index: `tools/${publisher}/${name}`, manifest, floor, platforms: platforms!.join(' '), runners: platforms!.map(platformRunner) };
+  return { name: name!, folder, kind: 'tool', id: `${publisher}.${slug}`, index: `tools/${publisher}/${name}`, manifest, floor, platforms: platforms!.join(' ') };
 }
 
 
@@ -37,8 +38,8 @@ function item(folder: string): Item {
   const id = schelf.id!;
   const kind = schelf.kind ?? 'app';
   const manifest = join(folder, kind === 'app' ? 'Sabine.toml' : 'extension.toml');
-  const { floor, helper } = versionIn(manifest);
-  return { name: basename(folder), folder, kind, id, index: `apps/${id}`, manifest, floor, platforms: PLATFORMS[id] ?? LINUX, runners: helper ? RUNNERS : RUNNERS.slice(0, 1) };
+  const platforms = kind === 'extension' ? LUFT_PLATFORM : (PLATFORMS[id] ?? LINUX);
+  return { name: basename(folder), folder, kind, id, index: `apps/${id}`, manifest, floor: versionIn(manifest), platforms };
 }
 
 export function storeItems() {

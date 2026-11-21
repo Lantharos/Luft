@@ -13,9 +13,9 @@ const {require, eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
 const SWITCH: Point = [1151, 470];
 const CHANNEL = {x: 507, y: 400, width: 600, height: 110};
-const CONFIRM_STABLE: Point = [844, 514];
-const CONFIRM_NIGHTLY: Point = [844, 503];
-const CANCEL_NIGHTLY: Point = [732, 503];
+const CONFIRM_STABLE: Point = [844, 493];
+const CONFIRM_NIGHTLY: Point = [844, 493];
+const CANCEL_NIGHTLY: Point = [732, 493];
 const CONFIRM_STAY: Point = [844, 482];
 
 type Published = 'yes' | 'no' | 'unknown';

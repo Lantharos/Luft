@@ -1,8 +1,8 @@
-From 7b1b75c34c005d8669fc08cc30edda6fda3ddc0b Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 27 Oct 2026 21:06:15 +0100
-Subject: [PATCH 2/2] composefs: Let the booted deployment follow an image with
- its root
+Subject: [PATCH] composefs: Let the booted deployment follow an image with its
+ root
 
 Publishing the same root filesystem under another reference, as promoting
 a tested build to a release does, gives an image with the booted
@@ -26,10 +26,10 @@ file name.
  4 files changed, 152 insertions(+), 9 deletions(-)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index 8ffb5b27..8cb8c352 100644
+index 9a6de2ce..dc1bc67b 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -560,6 +560,19 @@ pub(crate) fn os_id_from_sort_key(sort_key: &str) -> Option<&str> {
+@@ -557,6 +557,19 @@ pub(crate) fn os_id_from_sort_key(sort_key: &str) -> Option<&str> {
      Some(os_id)
  }
  
@@ -49,7 +49,7 @@ index 8ffb5b27..8cb8c352 100644
  /// Returns the name of the directory where we store Type1 boot entries
  pub(crate) fn get_type1_dir_name(depl_verity: &str) -> String {
      format!("{TYPE1_BOOT_DIR_PREFIX}{depl_verity}")
-@@ -3341,6 +3354,26 @@ mod tests {
+@@ -3373,6 +3386,26 @@ mod tests {
          assert_eq!(filename, "bootc_rhel-9.3.0-0.conf");
      }
  
@@ -198,10 +198,10 @@ index 57055a3d..67a05063 100644
      storage: &Storage,
      digest: &str,
 diff --git a/crates/lib/src/bootc_composefs/switch.rs b/crates/lib/src/bootc_composefs/switch.rs
-index ee5f622d..cdbaf875 100644
+index 336a8859..610a3a60 100644
 --- a/crates/lib/src/bootc_composefs/switch.rs
 +++ b/crates/lib/src/bootc_composefs/switch.rs
-@@ -133,7 +133,7 @@ pub(crate) async fn switch_composefs(
+@@ -149,7 +149,7 @@ pub(crate) async fn switch_composefs(
                  return Ok(());
              }
  
@@ -211,7 +211,7 @@ index ee5f622d..cdbaf875 100644
                      storage,
                      booted_cfs,
 diff --git a/crates/lib/src/bootc_composefs/update.rs b/crates/lib/src/bootc_composefs/update.rs
-index be525a19..d8ba0a68 100644
+index 973dc872..5267a579 100644
 --- a/crates/lib/src/bootc_composefs/update.rs
 +++ b/crates/lib/src/bootc_composefs/update.rs
 @@ -30,7 +30,10 @@ use crate::{
@@ -256,7 +256,7 @@ index be525a19..d8ba0a68 100644
          if is_switch {
              // For `bootc switch`, any digest collision is an error: two images
              // from different sources can produce identical composefs roots and we
-@@ -360,14 +372,29 @@ pub(crate) async fn do_upgrade(
+@@ -369,14 +381,29 @@ pub(crate) async fn do_upgrade(
      }
  
      // If the target image produces the same fs-verity digest as any existing
@@ -287,7 +287,7 @@ index be525a19..d8ba0a68 100644
          anyhow::bail!(
              "Target image has the same fs-verity digest as the existing {:?} deployment.",
              collision.ty,
-@@ -713,7 +740,7 @@ pub(crate) async fn upgrade_composefs(
+@@ -738,7 +765,7 @@ pub(crate) async fn upgrade_composefs(
              )?;
  
              match action {
@@ -296,7 +296,7 @@ index be525a19..d8ba0a68 100644
                      println!("No changes in staged image: {booted_imgref:#}");
                      return Ok(());
                  }
-@@ -745,7 +772,7 @@ pub(crate) async fn upgrade_composefs(
+@@ -770,7 +797,7 @@ pub(crate) async fn upgrade_composefs(
          )?;
  
          match action {
@@ -306,5 +306,5 @@ index be525a19..d8ba0a68 100644
                  return Ok(());
              }
 -- 
-2.53.0
+2.56.1
 

@@ -17,14 +17,14 @@ primary entry with that many tries. A first install has nothing to fall
 back to and gets none, and a rollback writes its entries without
 counters as before.
 ---
- crates/lib/src/bootc_composefs/boot.rs | 36 ++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
+ crates/lib/src/bootc_composefs/boot.rs | 34 +++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index 12d6d18b..68738651 100644
+index dc1bc67b..b149f583 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -546,6 +546,38 @@ pub fn type1_entry_conf_file_name(
+@@ -536,6 +536,38 @@ pub fn type1_entry_conf_file_name(
      format!("{BLS_ENTRY_FILE_PREFIX}{os_id_safe}-{version}-{priority}.conf")
  }
  
@@ -63,24 +63,15 @@ index 12d6d18b..68738651 100644
  /// Generate sort key for the primary (new/upgraded) boot entry.
  /// Format: bootc-{id}-0
  /// Systemd-boot sorts ascending by sort-key, so "0" comes first.
-@@ -1101,7 +1133,7 @@ pub(crate) fn setup_composefs_bls_boot(
-         .with_context(|| format!("Opening {config_path:?}"))?;
- 
-     loader_entries_dir.atomic_write(
--        type1_entry_conf_file_name(&os_id, &bls_config.version(), FILENAME_PRIORITY_PRIMARY),
-+        primary_entry_file_name(&os_id, bls_config.version(), booted_bls.is_some()),
-         bls_config.to_string().as_bytes(),
-     )?;
- 
-@@ -1923,7 +1955,7 @@ fn write_systemd_uki_config(
+@@ -1853,7 +1885,7 @@ fn write_type1_entries(
  
      entries_dir
          .atomic_write(
--            type1_entry_conf_file_name(os_id, &bls_conf.version(), FILENAME_PRIORITY_PRIMARY),
-+            primary_entry_file_name(os_id, bls_conf.version(), booted_bls.is_some()),
-             bls_conf.to_string().as_bytes(),
+-            type1_entry_conf_file_name(os_id, &entry.version(), FILENAME_PRIORITY_PRIMARY),
++            primary_entry_file_name(os_id, entry.version(), booted_bls.is_some()),
+             entry.to_string().as_bytes(),
          )
          .context("Writing conf file")?;
 -- 
-2.56.0
+2.56.1
 

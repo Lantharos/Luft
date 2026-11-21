@@ -1,6 +1,6 @@
 # Upstream pull requests
 
-Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. Both are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.4, and the second builds on the first.
+Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. Both are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.5, and the second builds on the first.
 
 ## Boot entry version
 

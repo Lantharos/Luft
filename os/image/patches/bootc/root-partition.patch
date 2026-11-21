@@ -20,10 +20,10 @@ one, as systemd's block_get_originating() does, and link the partition.
  1 file changed, 23 insertions(+), 5 deletions(-)
 
 diff --git a/crates/initramfs/src/lib.rs b/crates/initramfs/src/lib.rs
-index ed989c57..d2926a26 100644
+index 9690314d..4bf2e7d6 100644
 --- a/crates/initramfs/src/lib.rs
 +++ b/crates/initramfs/src/lib.rs
-@@ -492,6 +492,21 @@
+@@ -527,6 +527,21 @@ pub fn mount_subdir(
      }
  }
  
@@ -45,7 +45,7 @@ index ed989c57..d2926a26 100644
  #[context("GPT workaround")]
  /// Workaround for /dev/gpt-auto-root
  pub fn gpt_workaround() -> Result<()> {
-@@ -504,11 +519,14 @@
+@@ -539,11 +554,14 @@ pub fn gpt_workaround() -> Result<()> {
          Err(e) => Err(e)?,
      };
  
@@ -66,5 +66,5 @@ index ed989c57..d2926a26 100644
      // runs, e.g. by ostree-prepare-root
      // (https://github.com/ostreedev/ostree/pull/3608).
 -- 
-2.56.0
+2.56.1
 

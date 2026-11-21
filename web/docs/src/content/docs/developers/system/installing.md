@@ -26,7 +26,7 @@ The image itself ships only the settings above the tables, such as `smallest-sys
 
 The stick keeps both images in a read-only image store that the live session adds to Podman's storage, so installing needs no network. While bootc unpacks, the installer puts `/var/tmp` on the new drive, because bootc keeps each layer there until it's unpacked and the live session's own changes live in memory. Kernel arguments come from the image's `/usr/lib/bootc/kargs.d` and are sealed into its startup image.
 
-When the drive's EFI system partition is smaller than 1 GB, as Windows' usually is, the installer adds a 2 GB XBOOTLDR partition in front of Luft's for the startup images and boot entries. Luft's image carries a bootc patched to use it, in `os/image/patches/bootc`.
+When the drive's EFI system partition is smaller than 1 GB, as Windows' usually is, the installer adds a 2 GB XBOOTLDR partition in front of Luft's for the startup images and boot entries. bootc uses it for them since 1.17.5.
 
 ## The live session
 

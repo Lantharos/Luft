@@ -4,4 +4,8 @@ export interface DialogWindowFit {
 	fit(width: number, height: number): void;
 }
 
-export const [dialogWindow, provideDialogWindow] = createContext<DialogWindowFit | undefined>();
+const [windowFit, provideDialogWindow, inDialogWindow] = createContext<DialogWindowFit>();
+
+export { provideDialogWindow };
+
+export const dialogWindow = () => (inDialogWindow() ? windowFit() : undefined);

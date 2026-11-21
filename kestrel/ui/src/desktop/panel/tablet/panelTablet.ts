@@ -1,6 +1,6 @@
 import { band } from '../../../shared/layout/edge.js';
 import { animateActor, reducedMotion, Spring } from '../../../shared/motion/motion.js';
-import type { Launcher } from '../launcher/launcher.js';
+import type { GustButton } from '../gustButton/gustButton.js';
 import type { KestrelPanel } from '../panel.js';
 import type { TaskbarSurface } from '../preferences/taskbarLook.js';
 import type { Taskbar } from '../taskbar/taskbar.js';
@@ -14,7 +14,7 @@ interface Shape {
 export class PanelTablet {
   private stopWaiting = () => {};
 
-  constructor(private readonly panel: KestrelPanel, private readonly surface: TaskbarSurface, private readonly launcher: Launcher,
+  constructor(private readonly panel: KestrelPanel, private readonly surface: TaskbarSurface, private readonly gustButton: GustButton,
     private readonly taskbar: Taskbar) {}
 
   stop(): void {
@@ -34,9 +34,9 @@ export class PanelTablet {
 
   private fit(): void {
     const metrics = this.panel.screen.metrics;
-    this.launcher.button.visible = this.panel.screen.startButton;
+    this.gustButton.button.visible = this.panel.screen.gustButtonShown;
     this.panel.arrange();
-    this.launcher.resize(metrics.button);
+    this.gustButton.resize(metrics.button);
     this.taskbar.resize(metrics);
     this.panel.elements.resize();
   }

@@ -10,7 +10,7 @@ Prefer sentences without a person: „A frissítések a következő újraindít�
 
 - Buttons and menu items take the action noun in -ás/-és, as Windows, macOS and GNOME do: „Mentés”, „Megnyitás”, „Újraindítás”, „Rögzítés a tálcán”. Never the imperative („Mentse”) or the infinitive. A few fixed words aren't nouns: „Mégse”, „Tovább”, „Kész”, „Újra”.
 - Results take the past participle: „Mentve”, „Ujjlenyomat hozzáadva.”
-- Lomtár and Start are names and keep their capital. A label named in a sentence keeps its capital and needs no quotation marks: „kapcsolja be a Ne zavarjanak funkciót”.
+- Lomtár is a name and keeps its capital. A label named in a sentence keeps its capital and needs no quotation marks: „kapcsolja be a Ne zavarjanak funkciót”.
 
 ## Typography
 
@@ -25,7 +25,7 @@ Prefer sentences without a person: „A frissítések a következő újraindít�
 
 - Settings, Disks and Install Luft are Beállítások, Lemezek and Luft telepítése.
 - The article follows pronunciation: „a Luft”, „a Rover”. Never write „a(z)”; before a variable whose first sound is unknown, rewrite the sentence so it needs no article.
-- Luft and Kestrel take suffixes normally: „a Luftban”, „a Kestrelben”. For the apps, inflect a noun next to the name: „a Rover alkalmazásban”. Start becomes „a Start menüben”.
+- Luft and Kestrel take suffixes normally: „a Luftban”, „a Kestrelben”. For the apps, inflect a noun next to the name: „a Rover alkalmazásban”.
 - Never attach a suffix to a variable such as `{ $name }`, since harmony depends on the value. Use a colon („Megnyitva: { $name }”) or a following noun: „{ $name } nevű fájlt”.
 
 ## Plurals

@@ -28,7 +28,6 @@ Prefer sentences without a person: „Ажурирања се инсталира
 ## Names
 
 - App names stay in Latin. Settings, Disks and Install Luft are Подешавања, Дискови and Инсталирај Luft.
-- Start is Старт; write „мени Старт“ when it has to decline.
 - Don't decline Latin names; put the kind of thing first: „у апликацији Rover“, „систем Luft“.
 
 ## Plurals

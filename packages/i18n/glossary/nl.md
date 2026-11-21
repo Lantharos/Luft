@@ -25,7 +25,6 @@ Address the reader as je, as Windows and macOS do: “Je kunt dit later wijzigen
 ## Names
 
 - Settings, Disks and Install Luft are Instellingen, Schijven and Luft installeren. Instellingen keeps its capital and takes no article: “in Instellingen”.
-- Start stays Start; “het menu Start” when an article is needed.
 - App names take no article and count as neuter: “Rover is geopend”. When that's awkward: “de app Rover”.
 
 ## Plurals

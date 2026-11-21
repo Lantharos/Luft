@@ -19,7 +19,7 @@ bun run build              # into dist, failing on any broken link
 bun run preview            # the build, served by wrangler as Cloudflare will
 ```
 
-Screenshots come from `kestrel/tools/session.sh capture`. Put them in `src/assets/shots` as WebP; the build makes AVIF and WebP in every size the page needs. `<Shot name="start" />` shows `start.webp`, and `start-light.webp` in the light style.
+Screenshots come from `kestrel/tools/session.sh capture`. Put them in `src/assets/shots` as WebP; the build makes AVIF and WebP in every size the page needs. `<Shot name="gust-panel" />` shows `gust-panel.webp`, and `gust-panel-light.webp` in the light style.
 
 ## Deploy
 

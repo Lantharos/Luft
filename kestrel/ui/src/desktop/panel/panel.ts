@@ -10,7 +10,7 @@ import type { OverflowPopup } from './taskbar/overflow/overflowPopup.js';
 import { Taskbar } from './taskbar/taskbar.js';
 import { takeDroppedFiles } from './taskbar/fileDrop.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
-import { createLauncher, floorAlong, type Launcher } from './launcher/launcher.js';
+import { createGustButton, floorAlong, type GustButton } from './gustButton/gustButton.js';
 import { DesktopPeek } from './widgets/desktopPeek.js';
 import { systemMonitor } from './widgets/systemMonitor.js';
 import { taskbarPreferences, type TaskbarKey, type TaskbarLayout } from './preferences/taskbarPreferences.js';
@@ -35,7 +35,7 @@ import { alongOf, moveBar } from '../../../../../packages/web/ui/src/taskbar/arr
 const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
 const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black', 'rounded-window-corners'];
 const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
-const SURFACE_ELEMENTS: Record<string, string> = { start: 'start', quick: 'status', notifications: 'clock' };
+const SURFACE_ELEMENTS: Record<string, string> = { gust: 'gust', quick: 'status', notifications: 'clock' };
 
 export interface Monitor {
   index: number;
@@ -48,7 +48,7 @@ export interface Monitor {
 type Rect = Omit<Monitor, 'index'>;
 
 export interface PanelActions {
-  start(): void;
+  gust(): void;
   quickSettings(): void;
   notifications(): void;
   activateWindow(window: Meta.Window): void;
@@ -69,7 +69,7 @@ export class KestrelPanel {
   readonly layout = new PanelLayout();
   arranged = () => {};
   private readonly surface: TaskbarSurface;
-  private readonly launcher: Launcher;
+  private readonly gustButton: GustButton;
   private readonly morph: PanelTablet;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
@@ -107,10 +107,10 @@ export class KestrelPanel {
     this.actor.connect('notify::allocation', taskbarShapesChanged);
     for (const edge of ['bottom', 'left', 'top', 'right'] as const) this.struts.set(edge, new St.Widget());
     this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest, () => this.sliders);
-    this.launcher = createLauncher(actions.start, this.screen.metrics.button,
-      () => this.surface?.behind(this.islandSet.islandOf('start')?.actor ?? this.actor) ?? this.actor, floorAlong(this.actor, () => this.screen));
-    this.launcher.button.visible = this.screen.startButton;
-    this.elements = new TaskbarElements(this.launcher.button, this.taskbar, menus, actions, primary, edge => ({
+    this.gustButton = createGustButton(actions.gust, this.screen.metrics.button,
+      () => this.surface?.behind(this.islandSet.islandOf('gust')?.actor ?? this.actor) ?? this.actor, floorAlong(this.actor, () => this.screen));
+    this.gustButton.button.visible = this.screen.gustButtonShown;
+    this.elements = new TaskbarElements(this.gustButton.button, this.taskbar, menus, actions, primary, edge => ({
       vertical: isVertical(edge), thickness: this.screen.metrics.button, button: this.screen.metrics.button, icon: TRAY_ICON_SIZE,
     }));
     this.layout.fit = new IslandFit(this.elements, this.taskbar.overflow);
@@ -122,7 +122,7 @@ export class KestrelPanel {
     takeDroppedFiles(this.actor, picked => this.surface.behind(this.islandSet.containing(picked)?.actor ?? this.actor));
     this.shapes = new IslandShapes(this.actor, this.islandSet, () => this.screen, () => this.surface.radius);
     this.tablet = new TabletTaskbar(this.actor, () => this.islandSet.islands.map(island => island.actor), primary, () => this.autoHide.shown, () => this.screen);
-    this.morph = new PanelTablet(this, this.surface, this.launcher, this.taskbar);
+    this.morph = new PanelTablet(this, this.surface, this.gustButton, this.taskbar);
     this.arrange();
 
     this.externalSignals.push(
@@ -344,7 +344,7 @@ export class KestrelPanel {
 
   buttonFor(surface: string): Clutter.Actor | null {
     switch (surface) {
-      case 'start': return this.launcher.button.visible ? this.launcher.button : null;
+      case 'gust': return this.gustButton.button.visible ? this.gustButton.button : null;
       case 'quick': return this.elements.quickButton;
       case 'notifications': return this.elements.clockButton;
       default: return null;
@@ -360,7 +360,7 @@ export class KestrelPanel {
     const button = surface ? this.buttonFor(surface) : null;
     this.autoHide.setActive(button ? this.edgeOf(button) : null);
     this.tablet.setActive(surface !== null);
-    for (const [name, button] of [['start', this.launcher.button], ['quick', this.elements.quickButton], ['notifications', this.elements.clockButton]] as const) {
+    for (const [name, button] of [['gust', this.gustButton.button], ['quick', this.elements.quickButton], ['notifications', this.elements.clockButton]] as const) {
       if (surface === name) button?.add_style_pseudo_class('active');
       else button?.remove_style_pseudo_class('active');
     }
@@ -400,7 +400,7 @@ export class KestrelPanel {
     if (key === 'taskbar-style' && this.screen.joined !== this.joined) this.rearrange();
     else if (SHAPE_KEYS.includes(key)) {
       const metrics = this.screen.metrics;
-      this.launcher.resize(metrics.button);
+      this.gustButton.resize(metrics.button);
       this.taskbar.resize(metrics);
       this.elements.resize();
       this.place(true);
@@ -410,8 +410,8 @@ export class KestrelPanel {
     if (key === 'taskbar-shown' && this.monitor) this.reserve();
     if (key === 'tablet') this.morph.sync();
     if (key === 'taskbar-windows-per-workspace') this.syncWorkspaceWindows();
-    if (key === 'taskbar-start-button') {
-      this.launcher.button.visible = this.screen.startButton;
+    if (key === 'taskbar-gust-button') {
+      this.gustButton.button.visible = this.screen.gustButtonShown;
       this.rearrange();
     }
     if (APP_KEYS.includes(key)) this.refreshApps();

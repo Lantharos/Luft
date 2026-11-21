@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Žádná nainstalovaná aplikace to neum�
 portal-app-chooser-find = Najít aplikaci
 portal-app-chooser-open = Otevřít
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Přidat tento web mezi aplikace?
-portal-launcher-website-description = { $site } se bude otevírat z nabídky Start ve vlastním okně.
 portal-launcher-title = Přidat mezi aplikace?
-portal-launcher-description = { $appName } chce přidat aplikaci do nabídky Start.
 portal-launcher-name = Název
 portal-launcher-add = Přidat
 

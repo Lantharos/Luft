@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Neviena instalētā lietotne to nevar atv
 portal-app-chooser-find = Atrast lietotni
 portal-app-chooser-open = Atvērt
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Vai pievienot šo vietni jūsu lietotnēm?
-portal-launcher-website-description = { $site } tiks atvērta atsevišķā logā no izvēlnes Start.
 portal-launcher-title = Vai pievienot šo jūsu lietotnēm?
-portal-launcher-description = { $appName } vēlas pievienot lietotni izvēlnei Start.
 portal-launcher-name = Nosaukums
 portal-launcher-add = Pievienot
 

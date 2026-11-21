@@ -115,11 +115,11 @@ async function checkOpening(panel: Clutter.Actor) {
     await capture('window');
     require(before < midway && midway < length(), `the taskbar animates its length as a window opens (${before}, ${midway}, ${length()})`);
 
-    toggleSurface('start');
-    await eventually(() => shown(named('kestrel-start')), 'Start opens over a window');
-    await capture('start-over-window');
-    toggleSurface('start');
-    await eventually(() => !existing('kestrel-start').visible, 'Start closes again');
+    toggleSurface('gust');
+    await eventually(() => shown(named('kestrel-gust-panel')), 'Gust opens over a window');
+    await capture('gust-over-window');
+    toggleSurface('gust');
+    await eventually(() => !existing('kestrel-gust-panel').visible, 'Gust closes again');
 
     window.maximize();
     await eventually(() => window.is_maximized(), 'the window maximizes');

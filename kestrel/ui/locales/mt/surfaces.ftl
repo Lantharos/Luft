@@ -1,100 +1,100 @@
-## Start
+## Gust
 
-start-search-placeholder = Fittex apps, fajls u aktar
-start-search-cut = Aqta’
-start-search-copy = Ikkopja
-start-search-paste = Ippejstja
-start-search-select-all = Agħżel kollox
-start-power = Enerġija u sessjoni
-start-power-close = Agħlaq l-għażliet tal-enerġija
-start-account-settings = Settings tal-kont
-start-apps = Apps
-start-folder-default-name = Fowlder
-start-folder-open = Iftaħ il-fowlder
-start-folder-rename = Ibdel l-isem
-start-folder-ungroup = Ifred l-apps
-start-open = Iftaħ
-start-move-to-apps = Ressaq lejn Apps
+gust-search-placeholder = Fittex apps, fajls u aktar
+gust-search-cut = Aqta’
+gust-search-copy = Ikkopja
+gust-search-paste = Ippejstja
+gust-search-select-all = Agħżel kollox
+gust-power = Enerġija u sessjoni
+gust-power-close = Agħlaq l-għażliet tal-enerġija
+gust-account-settings = Settings tal-kont
+gust-apps = Apps
+gust-folder-default-name = Fowlder
+gust-folder-open = Iftaħ il-fowlder
+gust-folder-rename = Ibdel l-isem
+gust-folder-ungroup = Ifred l-apps
+gust-open = Iftaħ
+gust-move-to-apps = Ressaq lejn Apps
 
-## Start search results
+## Gust search results
 
-start-search-best-match = L-aħjar riżultat
-start-search-group-apps = Apps
-start-search-group-commands = Azzjonijiet tal-apps
-start-search-group-windows = Twieqi miftuħa
-start-search-group-actions = Azzjonijiet
-start-search-group-settings = Settings
-start-search-group-clipboard = Klibbord
-start-search-group-emoji = Emoji
-start-search-group-files = Fajls
-start-search-group-contents = Ġewwa l-fajls
-start-search-group-web = Web
-start-search-web = Fittex fuq il-web għal “{ $query }”
-start-search-clipboard-text = Mill-istorja tal-klibbord
-start-search-clipboard-keywords = klibbord, ikkopjat, kkopjat, storja tal-klibbord, ippejstja, clipboard
-start-search-emoji-insert = Daħħal
-start-search-settings-page = Settings
-start-search-settings-section = Settings: { $page }
-start-search-file-reveal = Uri f’{ $fileManager }
-start-search-file-copy-path = Ikkopja l-post tal-fajl
-start-search-conversion = { $amount } { $from } f’{ $to }
-start-search-calculation = { $expression }, agħfas Enter biex tikkopja
+gust-search-best-match = L-aħjar riżultat
+gust-search-group-apps = Apps
+gust-search-group-commands = Azzjonijiet tal-apps
+gust-search-group-windows = Twieqi miftuħa
+gust-search-group-actions = Azzjonijiet
+gust-search-group-settings = Settings
+gust-search-group-clipboard = Klibbord
+gust-search-group-emoji = Emoji
+gust-search-group-files = Fajls
+gust-search-group-contents = Ġewwa l-fajls
+gust-search-group-web = Web
+gust-search-web = Fittex fuq il-web għal “{ $query }”
+gust-search-clipboard-text = Mill-istorja tal-klibbord
+gust-search-clipboard-keywords = klibbord, ikkopjat, kkopjat, storja tal-klibbord, ippejstja, clipboard
+gust-search-emoji-insert = Daħħal
+gust-search-settings-page = Settings
+gust-search-settings-section = Settings: { $page }
+gust-search-file-reveal = Uri f’{ $fileManager }
+gust-search-file-copy-path = Ikkopja l-post tal-fajl
+gust-search-conversion = { $amount } { $from } f’{ $to }
+gust-search-calculation = { $expression }, agħfas Enter biex tikkopja
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Sa { $date }
-start-search-answer-since = Minn { $date }
-start-search-answer-between = Bejn { $from } u { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Sa { $date }
+gust-search-answer-since = Minn { $date }
+gust-search-answer-between = Bejn { $from } u { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } siegħa
     [two] { $hours } sigħat
     [few] { $hours } sigħat
     [many] { $hours } siegħa
    *[other] { $hours } siegħa
 } ’il quddiem
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } siegħa
     [two] { $hours } sigħat
     [few] { $hours } sigħat
     [many] { $hours } siegħa
    *[other] { $hours } siegħa
 } lura
-start-search-answer-time-same = { $place }, l-istess ħin bħal hawn
-start-search-answer-converted = F’{ $place } meta jkun { $time } f’{ $from }
-start-search-answer-converted-here = Hawn meta jkun { $time } f’{ $from }
-start-search-answer-converted-from-here = F’{ $place } meta jkun { $time } hawn
+gust-search-answer-time-same = { $place }, l-istess ħin bħal hawn
+gust-search-answer-converted = F’{ $place } meta jkun { $time } f’{ $from }
+gust-search-answer-converted-here = Hawn meta jkun { $time } f’{ $from }
+gust-search-answer-converted-from-here = F’{ $place } meta jkun { $time } hawn
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Aqleb għall-modalità skura
-start-search-dark-style-off = Aqleb għall-modalità ċara
-start-search-dark-style-keywords = modalità skura, modalità ċara, skur, ċar, tema skura, tema ċara, dark mode, dark theme, light mode, light theme
-start-search-night-light-on = Ixgħel id-dawl ta’ billejl
-start-search-night-light-off = Itfi d-dawl ta’ billejl
-start-search-night-light-keywords = dawl ta’ billejl, billejl, dawl blu, kuluri sħan, night light, night shift, blue light
-start-search-do-not-disturb-on = Ixgħel Tiddisturbax
-start-search-do-not-disturb-off = Itfi Tiddisturbax
-start-search-do-not-disturb-keywords = tiddisturbax, skiet, sikket in-notifiki, notifiki, fokus, do not disturb, dnd, focus, quiet
-start-search-wifi-on = Ixgħel il-Wi-Fi
-start-search-wifi-off = Itfi l-Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, mingħajr fili, wireless, wlan, internet
-start-search-bluetooth-on = Ixgħel il-Bluetooth
-start-search-bluetooth-off = Itfi l-Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Ixgħel il-modalità tal-ajruplan
-start-search-airplane-mode-off = Itfi l-modalità tal-ajruplan
-start-search-airplane-mode-keywords = modalità tal-ajruplan, ajruplan, titjira, radju, airplane mode, flight mode
-start-search-keep-awake-on = Żomm mixgħul
-start-search-keep-awake-off = Tibqax iżżomm mixgħul
-start-search-keep-awake-keywords = żomm mixgħul, ibqa’ mixgħul, tidħolx f’sospensjoni, keep awake, caffeine
-start-search-lock-keywords = sakkar, sakkar l-iskrin, sakkar il-kompjuter, skrin imsakkar, lock
-start-search-suspend-keywords = sospensjoni, irqad, sleep, standby
-start-search-log-out-keywords = oħroġ, ħruġ, temm is-sessjoni, log out, logout, sign out
-start-search-restart-keywords = irristartja, erġa’ ixgħel, restart, reboot
-start-search-power-off-keywords = itfi, itfi l-kompjuter, agħlaq, shut down, shutdown, power off
+gust-search-dark-style-on = Aqleb għall-modalità skura
+gust-search-dark-style-off = Aqleb għall-modalità ċara
+gust-search-dark-style-keywords = modalità skura, modalità ċara, skur, ċar, tema skura, tema ċara, dark mode, dark theme, light mode, light theme
+gust-search-night-light-on = Ixgħel id-dawl ta’ billejl
+gust-search-night-light-off = Itfi d-dawl ta’ billejl
+gust-search-night-light-keywords = dawl ta’ billejl, billejl, dawl blu, kuluri sħan, night light, night shift, blue light
+gust-search-do-not-disturb-on = Ixgħel Tiddisturbax
+gust-search-do-not-disturb-off = Itfi Tiddisturbax
+gust-search-do-not-disturb-keywords = tiddisturbax, skiet, sikket in-notifiki, notifiki, fokus, do not disturb, dnd, focus, quiet
+gust-search-wifi-on = Ixgħel il-Wi-Fi
+gust-search-wifi-off = Itfi l-Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, mingħajr fili, wireless, wlan, internet
+gust-search-bluetooth-on = Ixgħel il-Bluetooth
+gust-search-bluetooth-off = Itfi l-Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Ixgħel il-modalità tal-ajruplan
+gust-search-airplane-mode-off = Itfi l-modalità tal-ajruplan
+gust-search-airplane-mode-keywords = modalità tal-ajruplan, ajruplan, titjira, radju, airplane mode, flight mode
+gust-search-keep-awake-on = Żomm mixgħul
+gust-search-keep-awake-off = Tibqax iżżomm mixgħul
+gust-search-keep-awake-keywords = żomm mixgħul, ibqa’ mixgħul, tidħolx f’sospensjoni, keep awake, caffeine
+gust-search-lock-keywords = sakkar, sakkar l-iskrin, sakkar il-kompjuter, skrin imsakkar, lock
+gust-search-suspend-keywords = sospensjoni, irqad, sleep, standby
+gust-search-log-out-keywords = oħroġ, ħruġ, temm is-sessjoni, log out, logout, sign out
+gust-search-restart-keywords = irristartja, erġa’ ixgħel, restart, reboot
+gust-search-power-off-keywords = itfi, itfi l-kompjuter, agħlaq, shut down, shutdown, power off
 
 ## Quick settings
 

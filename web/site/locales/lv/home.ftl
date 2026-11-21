@@ -8,9 +8,6 @@ home-look = Apskatīt
 home-desktop-alt = Luft darbvirsma ar atvērtām lietotnēm Rover, Iestatījumi un Tern miglaina meža fonā
 home-intro = Luft ir pilnvērtīga sistēma jūsu datoram, balstīta uz Fedora. Tai ir sava darbvirsma, savas lietotnes un kodols, kas pats sevi uztur veselu, lai jūs varētu nodoties savām ikdienas gaitām.
 
-home-start-heading = Start zina, kur viss atrodas.
-home-start-text = Ierakstiet dažus burtus, un Start atradīs lietotnes, iestatījumus, failus un pat vārdus tajos. Tā rēķina, pārvērš mērvienības un pēc jūsu lūguma ieslēdz tumšo režīmu vai Wi-Fi.
-home-start-alt = Izvēlnē Start meklēts vārds „tumšs“, rezultātos tumšā režīma darbība un atbilstoši iestatījumi
 
 home-essentials-heading = Svarīgākais viena klikšķa attālumā.
 home-essentials-text = Ātrie iestatījumi ir elementi, kurus izkārtojat paši. Paziņojumi ir grupēti pa lietotnēm, un turpat blakus ir atbildes, multivides vadīklas un kalendārs.
@@ -25,7 +22,6 @@ home-all-windows-alt = Visi logi un darbvietas vienā skatā
 
 home-motion-heading = Kustība ar nodomu.
 home-motion-text = Sistēmā Luft viss kustas uz atsperēm, tāpēc kustība var pusceļā mainīt virzienu bez rāviena. Vilkšana seko jūsu pirkstiem un apstājas tur, kur to iecerējāt, un lietotnes atveras ātri jau pirmajā reizē.
-home-motion-clip = Start, ātrie iestatījumi, visi logi un tāfele atveras un aizveras sistēmā Luft
 
 home-wallpapers-heading = Izvēlieties foto. Pārējo paveiks Luft.
 home-wallpapers-text = { $count ->

@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = L-ebda app installata ma tista’ tiftaħ
 portal-app-chooser-find = Sib app
 portal-app-chooser-open = Iftaħ
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Iżżid dan is-sit mal-apps?
-portal-launcher-website-description = { $site } jinfetaħ fit-tieqa tiegħu minn Start.
 portal-launcher-title = Iżżid dan mal-apps?
-portal-launcher-description = { $appName } trid iżżid app ma’ Start.
 portal-launcher-name = Isem
 portal-launcher-add = Żid
 

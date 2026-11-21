@@ -22,14 +22,14 @@ interface Layout {
 type Item = Clutter.Actor & {name: string};
 type Target = () => Clutter.Actor | null | undefined;
 
-const {require, eventually} = checks('Start folder');
-const ITEM = 'kestrel-start-item-';
+const {require, eventually} = checks('Gust folder');
+const ITEM = 'kestrel-gust-item-';
 const DROP_MARKS = ['drop-into', 'drop-before', 'drop-after'];
 const DRAG_STEPS = 12;
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const layout = (): Layout => JSON.parse(settings.get_string('start-layout'));
-const items = () => descendants(existing('kestrel-start')).filter((actor): actor is Item => !!actor.name?.startsWith(ITEM) && actor.mapped);
+const layout = (): Layout => JSON.parse(settings.get_string('gust-layout'));
+const items = () => descendants(existing('kestrel-gust-panel')).filter((actor): actor is Item => !!actor.name?.startsWith(ITEM) && actor.mapped);
 const apps = () => items().filter(button => !button.name.includes('folder:'));
 const idOf = (button: Item) => button.name.replace(ITEM, '');
 const panelApps = () => (named('kestrel-taskbar-dock')?.get_children().map(slot => slot.get_first_child()) ?? []).filter(button => button?.name?.startsWith('kestrel-app-'));
@@ -38,7 +38,7 @@ const taskbarMakesRoom = () => named('kestrel-taskbar-dock')?.get_children().som
 async function dragOnto(sourceOf: Target, targetOf: Target, fraction = 0.5) {
   await settled();
   const [source, target] = [sourceOf(), targetOf()];
-  if (!source || !target) throw new Error('Kestrel Start folder check failed: nothing to drag from or onto');
+  if (!source || !target) throw new Error('Kestrel Gust folder check failed: nothing to drag from or onto');
   const [x, y] = source.get_transformed_position();
   const [targetX, targetY] = target.get_transformed_position();
   const [fromX, fromY, toX, toY] = [x + source.width / 2, y + 24, targetX + target.width * fraction, targetY + Math.min(24, target.height / 2)];
@@ -70,7 +70,7 @@ async function checkCreating() {
   await eventually(() => layout().folders[folder].apps.length === 3, 'dragging into a folder adds an app');
   await dragOnto(folderButton, () => apps()[0], 0.95);
   await eventually(() => layout().items.indexOf(folder) > 0, 'folders can be reordered');
-  await capture('start-folders');
+  await capture('gust-folders');
   return {folder, folderButton, extra};
 }
 
@@ -88,7 +88,7 @@ async function checkInside({folder, folderButton, extra}: Awaited<ReturnType<typ
 
   await dragOnto(() => items()[2], () => items()[0], 0.05);
   await eventually(() => layout().folders[folder].apps[0] === extra, 'apps can be reordered inside folders');
-  await capture('start-folder');
+  await capture('gust-folder');
   await dragOnto(() => items()[0], () => named('kestrel-folder-back'));
   await eventually(() => !layout().folders[folder].apps.includes(extra) && layout().items.includes(extra), 'dragging to Apps moves an app out of its folder');
 }
@@ -102,23 +102,23 @@ async function checkPinning() {
   await settled();
   const unpinned = idOf(apps()[0]);
   await dragOnto(() => apps()[0], () => panelApps()[0], 0.1);
-  await eventually(() => settings.get_strv('favorite-apps')[0] === unpinned, 'dragging an app from Start pins it at the drop position');
+  await eventually(() => settings.get_strv('favorite-apps')[0] === unpinned, 'dragging an app from Gust pins it at the drop position');
   dismissImmediately();
   await dragOnto(() => panelApps()[0], () => panelApps()[2], 0.9);
   await eventually(() => settings.get_strv('favorite-apps').indexOf(unpinned) === 2, 'panel apps can be reordered by dragging');
 }
 
 export async function run() {
-  const original = settings.get_string('start-layout');
+  const original = settings.get_string('gust-layout');
   const favorites = settings.get_strv('favorite-apps');
   try {
-    toggleSurface('start');
-    await waitUntil(() => shown(named('kestrel-start')), 'Start opens');
+    toggleSurface('gust');
+    await waitUntil(() => shown(named('kestrel-gust-panel')), 'Gust opens');
     await checkInside(await checkCreating());
     await checkPinning();
   } finally {
     dismissImmediately();
-    settings.set_string('start-layout', original);
+    settings.set_string('gust-layout', original);
     settings.set_strv('favorite-apps', favorites);
   }
 }

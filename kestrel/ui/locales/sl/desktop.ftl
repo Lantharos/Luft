@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Hitre nastavitve
 taskbar-notifications-and-date = Obvestila in datum
 taskbar-show-desktop = Pokaži namizje
@@ -45,7 +44,6 @@ tray-open-app = Odpri { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Odpri meni Start
 board-show-all-windows = Pokaži vsa okna
 board-quick-settings = Hitre nastavitve
 

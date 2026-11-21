@@ -15,25 +15,25 @@ const EDGE_MARGIN = 12;
 const SURFACE_GAP = 10;
 const DOUBLE_TAP_TIME = 250;
 
-function startInCorner(start: Clutter.Actor, corner: Clutter.Actor) {
+function gustInCorner(gust: Clutter.Actor, corner: Clutter.Actor) {
   const monitor = Main.layoutManager.primaryMonitor!;
   const [, cornerY] = corner.get_transformed_position();
-  return start.visible && start.translation_y === 0 &&
-    Math.round(start.x + start.width) === monitor.x + monitor.width - EDGE_MARGIN &&
-    Math.round(start.y + start.height) === Math.round(cornerY) - SURFACE_GAP;
+  return gust.visible && gust.translation_y === 0 &&
+    Math.round(gust.x + gust.width) === monitor.x + monitor.width - EDGE_MARGIN &&
+    Math.round(gust.y + gust.height) === Math.round(cornerY) - SURFACE_GAP;
 }
 
-async function checkStart(start: Clutter.Actor, corner: Clutter.Actor, dock: Clutter.Actor) {
-  click(named('Open Start', dock)!);
-  await eventually(() => startInCorner(start, corner), 'the Start button in the corner opens Start right above it');
-  await capture('board-start');
+async function checkGust(gust: Clutter.Actor, corner: Clutter.Actor, dock: Clutter.Actor) {
+  click(named('Open Gust', dock)!);
+  await eventually(() => gustInCorner(gust, corner), 'the Gust button in the corner opens Gust right above it');
+  await capture('board-gust');
   press(Clutter.KEY_Escape);
-  await eventually(() => !start.visible, 'Escape closes Start on the board');
+  await eventually(() => !gust.visible, 'Escape closes Gust on the board');
 
   global.display.emit('overlay-key');
-  await eventually(() => startInCorner(start, corner), 'pressing Super once on a board opens Start in the corner');
+  await eventually(() => gustInCorner(gust, corner), 'pressing Super once on a board opens Gust in the corner');
   press(Clutter.KEY_Escape);
-  await eventually(() => !start.visible, 'Escape closes Start again');
+  await eventually(() => !gust.visible, 'Escape closes Gust again');
   await pause(DOUBLE_TAP_TIME);
 }
 
@@ -52,12 +52,12 @@ async function checkApps(dock: Clutter.Actor) {
   await boardResting();
 }
 
-async function checkLeaving(start: Clutter.Actor) {
+async function checkLeaving(gust: Clutter.Actor) {
   const shown = view();
   doubleTapSuper();
   await eventually(() => !board().shown, 'pressing Super twice still leaves the board');
   await settled();
-  require(!start.visible, 'leaving the board leaves Start closed');
+  require(!gust.visible, 'leaving the board leaves Gust closed');
   doubleTapSuper();
   await eventually(() => board().shown && sameView(view(), shown), 'and pressing it twice again comes back to the same view');
 }
@@ -69,15 +69,15 @@ export async function run() {
     board().fitAll();
     await boardResting();
     const corner = named('kestrel-board-corner')!;
-    const start = named('kestrel-start')!;
-    require(corner.visible, 'the corner shows Start, this desktop\'s apps and the status pill on a board');
+    const gust = named('kestrel-gust-panel')!;
+    require(corner.visible, 'the corner shows Gust, this desktop\'s apps and the status pill on a board');
     const tracker = Shell.WindowTracker.get_default();
     const apps = new Set(boardWindows().map(window => tracker.get_window_app(window)));
     const dock = named('kestrel-board-dock', corner)!;
     require(dock.get_child_at_index(1)!.get_n_children() === apps.size, `the corner lists the ${apps.size} apps open on this desktop`);
-    await checkStart(start, corner, dock);
+    await checkGust(gust, corner, dock);
     await checkApps(dock);
-    await checkLeaving(start);
+    await checkLeaving(gust);
   } finally {
     await leaveBoard();
   }

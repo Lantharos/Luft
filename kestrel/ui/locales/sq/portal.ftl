@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Asnjë aplikacion i instaluar nuk e hap d
 portal-app-chooser-find = Gjej një aplikacion
 portal-app-chooser-open = Hap
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Ta shtosh këtë sajt te aplikacionet e tua?
-portal-launcher-website-description = { $site } do të hapet në dritaren e vet nga Fillimi.
 portal-launcher-title = Ta shtosh këtë te aplikacionet e tua?
-portal-launcher-description = { $appName } dëshiron të shtojë një aplikacion te Fillimi.
 portal-launcher-name = Emri
 portal-launcher-add = Shto
 

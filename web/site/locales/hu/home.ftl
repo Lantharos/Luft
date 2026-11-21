@@ -8,9 +8,6 @@ home-look = Körülnézés
 home-desktop-alt = A Luft asztala, rajta a Rover, a Beállítások és a Tern egy ködös erdő előtt
 home-intro = A Luft teljes rendszer a számítógépére, Fedora alapokon. Saját asztala, saját alkalmazásai és egy önmagát épen tartó magja van, így Ön nyugodtan teheti a dolgát.
 
-home-start-heading = A Start tudja, mi hol van.
-home-start-text = Gépeljen be néhány betűt, és a Start megtalálja az alkalmazásokat, beállításokat, fájlokat, sőt a bennük lévő szavakat is. Számol, mértékegységet vált, és kérésre bekapcsolja a sötét módot vagy a Wi-Fit.
-home-start-alt = A Start menü a „sötét” szóra keres, találatként a sötét mód művelettel és a hozzá illő beállításokkal
 
 home-essentials-heading = A lényeg egy kattintásra.
 home-essentials-text = A gyorsbeállítások csempék, amelyeket Ön rendez el. Az értesítések alkalmazásonként csoportosulnak, mellettük pedig ott a válaszadás, a médiavezérlők és a naptár.
@@ -25,7 +22,6 @@ home-all-windows-alt = Minden ablak és munkaterület egy pillantással
 
 home-motion-heading = Minden mozdulatnak célja van.
 home-motion-text = A Luftban minden rugókon mozog, így egy mozdulat félúton is irányt válthat, rántás nélkül. A húzások követik az ujjait, és oda érkeznek, ahová szánta őket, az alkalmazások pedig gyorsan megnyílnak, már elsőre is.
-home-motion-clip = A Start, a gyorsbeállítások, az összes ablak és a tábla nyílik és záródik a Luftban
 
 home-wallpapers-heading = Válasszon egy fotót. A többit a Luft intézi.
 home-wallpapers-text = { $count ->

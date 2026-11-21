@@ -7,9 +7,9 @@ import {renderedFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {areaOf} from '../panel/backdrops/coverage.js';
 import {sweepBackdrops} from '../panel/backdrops/sweep.js';
-import {measureMark} from './launcher/layers.js';
+import {measureMark} from './button/layers.js';
 
-const {require} = checks('Start button');
+const {require} = checks('Gust button');
 const STYLES = ['default', 'tinted', 'clear', 'monochrome'] as const;
 const MIN_BACKDROP_CONTRAST = 2;
 const MIN_PARTNER_CONTRAST = 1.4;
@@ -19,16 +19,16 @@ const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 async function measure(label: string) {
   await settled();
-  const button = ofType(named('Start', named('kestrel-panel')!), St.Button);
+  const button = ofType(named('Gust', named('kestrel-panel')!), St.Button);
   const area = areaOf(button);
-  (await renderedFrame(area)).saveZoomed(`launcher-${label}`, CROP_ZOOM);
+  (await renderedFrame(area)).saveZoomed(`gust-button-${label}`, CROP_ZOOM);
   const mark = await measureMark(button.child!.get_children().filter((layer): layer is St.Widget => layer instanceof St.Widget), area);
   const failures = [
     mark.secondary < MIN_BACKDROP_CONTRAST && `its back layer has ${mark.secondary.toFixed(2)}:1 against the taskbar`,
     mark.partners < MIN_PARTNER_CONTRAST && `its layers differ by only ${mark.partners.toFixed(2)}:1`,
     mark.darker !== mark.lightFront && 'its back layer is not the quieter one',
   ].filter(Boolean);
-  console.log(`Start button ${label}: back ${mark.secondary.toFixed(2)}, front ${mark.primary.toFixed(2)}, between ${mark.partners.toFixed(2)}`);
+  console.log(`Gust button ${label}: back ${mark.secondary.toFixed(2)}, front ${mark.primary.toFixed(2)}, between ${mark.partners.toFixed(2)}`);
   return failures.map(failure => `${label}: ${failure}`);
 }
 
@@ -44,5 +44,5 @@ export async function run() {
   } finally {
     settings.reset('app-icon-style');
   }
-  require(failures.length === 0, `the Start button stands out on every wallpaper and taskbar look${failures.length ? `\n${failures.join('\n')}` : ''}`);
+  require(failures.length === 0, `the Gust button stands out on every wallpaper and taskbar look${failures.length ? `\n${failures.join('\n')}` : ''}`);
 }

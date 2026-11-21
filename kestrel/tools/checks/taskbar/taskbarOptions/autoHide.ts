@@ -35,9 +35,9 @@ export async function checkAlways() {
   pointAway();
   await eventually(hidden, 'the taskbar hides again once the pointer leaves');
   global.display.emit('overlay-key');
-  await eventually(revealed, 'opening Start with Super brings the taskbar back');
-  toggleSurface('start');
-  await eventually(hidden, 'the taskbar hides once Start closes');
+  await eventually(revealed, 'opening Gust with Super brings the taskbar back');
+  toggleSurface('gust');
+  await eventually(hidden, 'the taskbar hides once Gust closes');
 
   set('taskbar-style', 'floating');
   await eventually(() => edgeGap() === 0, 'a floating taskbar that hides itself leaves the whole screen to windows');

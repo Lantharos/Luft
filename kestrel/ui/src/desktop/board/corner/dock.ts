@@ -9,13 +9,13 @@ import { localized, t } from '../../../shared/i18n/index.js';
 const ICON_SIZE = 20;
 
 export interface DockActions {
-  openStart(): void;
+  openGust(): void;
   enterApp(app: Shell.App): void;
 }
 
 export class Dock {
   readonly actor = new St.BoxLayout({ name: 'kestrel-board-dock', style_class: 'kestrel-board-dock kestrel-glass' });
-  private readonly launcher = new St.Button({
+  private readonly gustButton = new St.Button({
     style_class: 'kestrel-board-dock-button',
     can_focus: true,
     child: new St.Icon({ icon_name: 'view-grid-symbolic', style_class: 'kestrel-board-pill-icon' }),
@@ -25,11 +25,11 @@ export class Dock {
   private readonly tracker = Shell.WindowTracker.get_default();
 
   constructor(private readonly actions: DockActions) {
-    localized(this.launcher, () => (this.launcher.accessible_name = t('board-open-start')));
-    this.actor.add_child(this.launcher);
+    localized(this.gustButton, () => (this.gustButton.accessible_name = t('board-open-gust')));
+    this.actor.add_child(this.gustButton);
     this.actor.add_child(this.apps);
     blurSurface(this.actor, 999);
-    this.launcher.connect('clicked', () => actions.openStart());
+    this.gustButton.connect('clicked', () => actions.openGust());
   }
 
   show(windows: readonly Meta.Window[], entered: Meta.Window | null): void {

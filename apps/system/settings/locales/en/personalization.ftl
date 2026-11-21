@@ -68,7 +68,7 @@ settings-appearance-glass-luca = Luca
 settings-appearance-glass-maris = Maris
 settings-appearance-glass-mixed = Mixed
 settings-appearance-glass-taskbar = Taskbar
-settings-appearance-glass-surfaces = Start, panels and menus
+settings-appearance-glass-surfaces = Gust, panels and menus
 settings-appearance-glass-windows = App windows
 settings-appearance-glass-blurs = Luca blurs only the wallpaper
 settings-appearance-glass-power-saver = Wallpaper only in power saver
@@ -100,26 +100,26 @@ settings-appearance-text-size = Text size
 
 # Screen-reader label of the taskbar preview picture
 settings-taskbar-preview = Taskbar preview
-settings-start-section = Start
-# How Start looks: the menu, or Gust, a search bar
-settings-start-style = Style
-settings-start-style-menu = Menu
-# Gust is the name of Start's search bar style, keep it as is
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Search, apps and folders next to the taskbar
-settings-start-style-palette-description = A search bar in the middle of the screen for apps, windows, files and answers
-settings-start-button = Show the Start button
-settings-start-button-description = Super opens Start either way
+# Gust is the name of what Super opens, keep it as is
+settings-gust-section = Gust
+# How Gust looks: a panel next to the taskbar, or a palette, a search bar in the middle of the screen
+settings-gust-look = Look
+settings-gust-look-panel = Panel
+settings-gust-look-palette = Palette
+settings-gust-look-panel-description = Search, apps and folders next to the taskbar
+settings-gust-look-palette-description = A search bar in the middle of the screen for apps, windows, files and answers
+settings-gust-button = Show the Gust button
+settings-gust-button-description = Super opens Gust either way
 # Followed by a list of search engines
-settings-start-web = Search the web with
+settings-gust-web = Search the web with
 settings-taskbar-shown = Show the taskbar
 settings-taskbar-hidden = Hidden
-settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Start
+settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Gust
 # How the taskbar background looks
 settings-taskbar-look = Look
 # Caption above one-click arrangements of the taskbar's parts.
 settings-taskbar-presets = Layouts
-# Start and the apps at the left of a bar along the bottom, status and clock at the right.
+# Gust and the apps at the left of a bar along the bottom, status and clock at the right.
 settings-taskbar-preset-classic = Classic
 settings-taskbar-preset-centered = Centered dock
 # Apps in a dock at the bottom, the status icons and clock at the top right, as on a Mac.
@@ -128,10 +128,10 @@ settings-taskbar-preset-side = Side dock
 # Opens a mode on the desktop for moving the taskbar's parts around the screen.
 settings-taskbar-edit = Edit on the desktop
 settings-taskbar-edit-description = Drag the taskbar's islands and their parts to any edge of the screen
-# Screen-reader label of a group of taskbar parts in the preview. $parts lists them, such as "Start, Apps".
+# Screen-reader label of a group of taskbar parts in the preview. $parts lists them, such as "Gust, Apps".
 settings-taskbar-island = Island with { $parts }
 settings-taskbar-island-move = Drag to move this island
-settings-taskbar-element-start = Start
+settings-taskbar-element-gust = Gust
 # The part of the taskbar with pinned and running apps.
 settings-taskbar-element-dock = Apps
 # The part of the taskbar with icons of apps running in the background.

@@ -8,9 +8,6 @@ home-look = Hidhi një sy
 home-desktop-alt = Desktopi i Luft me Rover, Cilësimet dhe Tern të hapura mbi një pyll me mjegull
 home-intro = Luft është një sistem i plotë për kompjuterin tënd, ndërtuar mbi Fedora. Ka desktopin e vet, aplikacionet e veta dhe një bërthamë që ruhet vetë e paprekur, që ti të merresh me punët e tua.
 
-home-start-heading = Fillimi e di ku është gjithçka.
-home-start-text = Shkruaj disa shkronja dhe Fillimi gjen aplikacione, cilësime, skedarë e madje edhe fjalët brenda tyre. Bën llogari dhe konvertime njësish, dhe aktivizon regjimin e errët ose Wi-Fi kur ia kërkon.
-home-start-alt = Fillimi duke kërkuar “dark”, me veprimin e regjimit të errët dhe cilësimet që përputhen
 
 home-essentials-heading = Gjërat kryesore, një klik larg.
 home-essentials-text = Cilësimet e shpejta janë pllaka që i rendit vetë. Njoftimet grupohen sipas aplikacionit, me përgjigje, kontrolle mediash dhe një kalendar menjëherë pranë tyre.
@@ -25,7 +22,6 @@ home-all-windows-alt = Të gjitha dritaret dhe desktopet me një shikim
 
 home-motion-heading = Lëviz me qëllim.
 home-motion-text = Gjithçka në Luft lëviz mbi susta, ndaj mund të ndryshojë mendje në gjysmë të rrugës pa asnjë tronditje. Rrëshqitjet ndjekin gishtat dhe ndalen aty ku doje, dhe aplikacionet hapen shpejt, edhe herën e parë.
-home-motion-clip = Fillimi, cilësimet e shpejta, të gjitha dritaret me një shikim dhe tabela, duke u hapur e mbyllur në Luft
 
 home-wallpapers-heading = Zgjidh një foto. Pjesën tjetër e bën Luft.
 home-wallpapers-text = { $count ->

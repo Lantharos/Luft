@@ -5,7 +5,7 @@ import type { Pult } from './pult.js';
 
 const SHORTEST = 2;
 
-/** Pult's items in Start's search, while signed in. */
+/** Pult's items in Gust's search, while signed in. */
 export function addSearch(pult: Pult): void {
   const { extension } = pult;
   extension.search.addProvider({

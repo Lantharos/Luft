@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Ātrie iestatījumi
 taskbar-notifications-and-date = Paziņojumi un datums
 taskbar-show-desktop = Rādīt darbvirsmu
@@ -44,7 +43,6 @@ tray-open-app = Atvērt lietotni { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Atvērt izvēlni Start
 board-show-all-windows = Rādīt visus logus
 board-quick-settings = Ātrie iestatījumi
 

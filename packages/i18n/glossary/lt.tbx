@@ -393,13 +393,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="lt">
           <tig>
-            <term>Pradžia</term>
-            <note from="translator">The menu opened with Super or the Luft mark; translated as in Windows; a name, capitalized; in sentences meniu Pradžia, which keeps Pradžia in the nominative</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -932,7 +932,7 @@
         <langSet xml:lang="lt">
           <tig>
             <term>prisegti</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start</note>
+            <note from="translator">verb: keep an app on the taskbar</note>
           </tig>
         </langSet>
       </termEntry>

@@ -34,7 +34,7 @@ export class MediaKeys {
   private readonly custom: CustomShortcuts;
   private readonly lockKeys: LockKeys;
 
-  constructor(private readonly context: Context, openStart: () => void) {
+  constructor(private readonly context: Context, openGust: () => void) {
     this.volume = new VolumeKeys(context.showOsd);
     this.power = new PowerKeys(() => context.sessionMode.isLocked, () => context.screenShield?.openPowerMenu());
     this.devices = new DeviceKeys(context.showOsd);
@@ -79,7 +79,7 @@ export class MediaKeys {
       'media': { modes: DESKTOP, run: () => launch('media') },
       'home': { modes: DESKTOP, run: () => launch('home') },
       'terminal': { modes: DESKTOP, run: () => launch('terminal') },
-      'search': { modes: DESKTOP, run: openStart },
+      'search': { modes: DESKTOP, run: openGust },
       'control-center': { modes: DESKTOP, run: () => openSettings() },
       'screensaver': { modes: UNLESS_UNLOCKING, run: () => this.power.lock() },
       'logout': { modes: DESKTOP, run: () => this.power.logOut() },

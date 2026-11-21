@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Schnelleinstellungen
 taskbar-notifications-and-date = Benachrichtigungen und Datum
 taskbar-show-desktop = Desktop anzeigen
@@ -43,7 +42,6 @@ tray-open-app = { $appName } öffnen
 
 ## Board (tablet window layout)
 
-board-open-start = Start öffnen
 board-show-all-windows = Alle Fenster anzeigen
 board-quick-settings = Schnelleinstellungen
 

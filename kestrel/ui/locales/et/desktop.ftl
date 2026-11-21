@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Kiirseadistused
 taskbar-notifications-and-date = Teavitused ja kuupäev
 taskbar-show-desktop = Kuva töölaud
@@ -44,7 +43,6 @@ tray-open-app = Ava { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Ava Start
 board-show-all-windows = Kuva kõik aknad
 board-quick-settings = Kiirseadistused
 

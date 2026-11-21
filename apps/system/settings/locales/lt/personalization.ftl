@@ -76,18 +76,11 @@ settings-appearance-text-size = Teksto dydis
 ## Taskbar
 
 settings-taskbar-preview = Užduočių juostos peržiūra
-settings-start-section = Pradžia
-settings-start-style = Stilius
-settings-start-style-menu = Meniu
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Paieška, programos ir aplankai šalia užduočių juostos
-settings-start-style-palette-description = Paieškos juosta ekrano viduryje programoms, langams, failams ir atsakymams rasti
-settings-start-button = Rodyti mygtuką Pradžia
-settings-start-button-description = Super bet kuriuo atveju atidaro meniu Pradžia
-settings-start-web = Žiniatinklio paieškos sistema
+settings-gust-look-panel-description = Paieška, programos ir aplankai šalia užduočių juostos
+settings-gust-look-palette-description = Paieškos juosta ekrano viduryje programoms, langams, failams ir atsakymams rasti
+settings-gust-web = Žiniatinklio paieškos sistema
 settings-taskbar-shown = Rodyti užduočių juostą
 settings-taskbar-hidden = Paslėpta
-settings-taskbar-hidden-description = Laikrodis ir būsenos piktogramos lieka kampe, o Super atidaro meniu Pradžia
 settings-taskbar-look = Išvaizda
 settings-taskbar-look-glass = Stiklas
 settings-taskbar-look-solid = Vientisa

@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Αναζήτηση εφαρμογών, αρχείων και άλλων
-start-search-cut = Αποκοπή
-start-search-copy = Αντιγραφή
-start-search-paste = Επικόλληση
-start-search-select-all = Επιλογή όλων
-start-power = Ενέργεια και περίοδος λειτουργίας
-start-power-close = Κλείσιμο επιλογών ενέργειας
-start-account-settings = Ρυθμίσεις λογαριασμού
-start-apps = Εφαρμογές
-start-folder-default-name = Φάκελος
-start-folder-open = Άνοιγμα φακέλου
-start-folder-rename = Μετονομασία
-start-folder-ungroup = Κατάργηση ομαδοποίησης
-start-open = Άνοιγμα
-start-move-to-apps = Μετακίνηση στις Εφαρμογές
+gust-search-placeholder = Αναζήτηση εφαρμογών, αρχείων και άλλων
+gust-search-cut = Αποκοπή
+gust-search-copy = Αντιγραφή
+gust-search-paste = Επικόλληση
+gust-search-select-all = Επιλογή όλων
+gust-power = Ενέργεια και περίοδος λειτουργίας
+gust-power-close = Κλείσιμο επιλογών ενέργειας
+gust-account-settings = Ρυθμίσεις λογαριασμού
+gust-apps = Εφαρμογές
+gust-folder-default-name = Φάκελος
+gust-folder-open = Άνοιγμα φακέλου
+gust-folder-rename = Μετονομασία
+gust-folder-ungroup = Κατάργηση ομαδοποίησης
+gust-open = Άνοιγμα
+gust-move-to-apps = Μετακίνηση στις Εφαρμογές
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Καλύτερη αντιστοιχία
-start-search-group-apps = Εφαρμογές
-start-search-group-commands = Ενέργειες εφαρμογών
-start-search-group-windows = Ανοιχτά παράθυρα
-start-search-group-actions = Ενέργειες
-start-search-group-settings = Ρυθμίσεις
-start-search-group-clipboard = Πρόχειρο
-start-search-group-emoji = Emoji
-start-search-group-files = Αρχεία
-start-search-group-contents = Μέσα σε αρχεία
-start-search-group-web = Διαδίκτυο
-start-search-web = Αναζήτηση στο διαδίκτυο για «{ $query }»
-start-search-clipboard-text = Από το ιστορικό προχείρου
-start-search-clipboard-keywords = πρόχειρο, αντιγραμμένα, αντιγραφή, ιστορικό προχείρου, επικόλληση, clipboard
-start-search-emoji-insert = Εισαγωγή
-start-search-settings-page = Ρυθμίσεις
-start-search-settings-section = Ρυθμίσεις: { $page }
-start-search-file-reveal = Εμφάνιση στο { $fileManager }
-start-search-file-copy-path = Αντιγραφή διαδρομής
-start-search-conversion = { $amount } { $from } σε { $to }
-start-search-calculation = { $expression }, πατήστε Enter για αντιγραφή
+gust-search-best-match = Καλύτερη αντιστοιχία
+gust-search-group-apps = Εφαρμογές
+gust-search-group-commands = Ενέργειες εφαρμογών
+gust-search-group-windows = Ανοιχτά παράθυρα
+gust-search-group-actions = Ενέργειες
+gust-search-group-settings = Ρυθμίσεις
+gust-search-group-clipboard = Πρόχειρο
+gust-search-group-emoji = Emoji
+gust-search-group-files = Αρχεία
+gust-search-group-contents = Μέσα σε αρχεία
+gust-search-group-web = Διαδίκτυο
+gust-search-web = Αναζήτηση στο διαδίκτυο για «{ $query }»
+gust-search-clipboard-text = Από το ιστορικό προχείρου
+gust-search-clipboard-keywords = πρόχειρο, αντιγραμμένα, αντιγραφή, ιστορικό προχείρου, επικόλληση, clipboard
+gust-search-emoji-insert = Εισαγωγή
+gust-search-settings-page = Ρυθμίσεις
+gust-search-settings-section = Ρυθμίσεις: { $page }
+gust-search-file-reveal = Εμφάνιση στο { $fileManager }
+gust-search-file-copy-path = Αντιγραφή διαδρομής
+gust-search-conversion = { $amount } { $from } σε { $to }
+gust-search-calculation = { $expression }, πατήστε Enter για αντιγραφή
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Έως { $date }
-start-search-answer-since = Από { $date }
-start-search-answer-between = Από { $from } έως { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Έως { $date }
+gust-search-answer-since = Από { $date }
+gust-search-answer-between = Από { $from } έως { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } ώρα
    *[other] { $hours } ώρες
 } μπροστά
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } ώρα
    *[other] { $hours } ώρες
 } πίσω
-start-search-answer-time-same = { $place }, ίδια ώρα με εδώ
-start-search-answer-converted = { $place }, όταν είναι { $time } ({ $from })
-start-search-answer-converted-here = Εδώ, όταν είναι { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, όταν είναι { $time } εδώ
+gust-search-answer-time-same = { $place }, ίδια ώρα με εδώ
+gust-search-answer-converted = { $place }, όταν είναι { $time } ({ $from })
+gust-search-answer-converted-here = Εδώ, όταν είναι { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, όταν είναι { $time } εδώ
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Μετάβαση σε σκοτεινή λειτουργία
-start-search-dark-style-off = Μετάβαση σε φωτεινή λειτουργία
-start-search-dark-style-keywords = σκοτεινή λειτουργία, σκοτεινό θέμα, σκοτεινό στυλ, φωτεινή λειτουργία, φωτεινό θέμα, φωτεινό στυλ, dark mode, light mode, θέμα
-start-search-night-light-on = Ενεργοποίηση νυχτερινού φωτισμού
-start-search-night-light-off = Απενεργοποίηση νυχτερινού φωτισμού
-start-search-night-light-keywords = νυχτερινός φωτισμός, νυχτερινό φως, μπλε φως, θερμά χρώματα, night light, night shift
-start-search-do-not-disturb-on = Ενεργοποίηση του «Μην ενοχλείτε»
-start-search-do-not-disturb-off = Απενεργοποίηση του «Μην ενοχλείτε»
-start-search-do-not-disturb-keywords = μην ενοχλείτε, εστίαση, ησυχία, σίγαση ειδοποιήσεων, σιωπή, dnd, do not disturb
-start-search-wifi-on = Ενεργοποίηση Wi-Fi
-start-search-wifi-off = Απενεργοποίηση Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, ασύρματο, ασύρματο δίκτυο, wlan
-start-search-bluetooth-on = Ενεργοποίηση Bluetooth
-start-search-bluetooth-off = Απενεργοποίηση Bluetooth
-start-search-bluetooth-keywords = bluetooth, μπλουτούθ
-start-search-airplane-mode-on = Ενεργοποίηση λειτουργίας πτήσης
-start-search-airplane-mode-off = Απενεργοποίηση λειτουργίας πτήσης
-start-search-airplane-mode-keywords = λειτουργία πτήσης, αεροπλάνο, λειτουργία αεροπλάνου, ασύρματα, airplane mode
-start-search-keep-awake-on = Παραμονή σε εγρήγορση
-start-search-keep-awake-off = Διακοπή παραμονής σε εγρήγορση
-start-search-keep-awake-keywords = παραμονή σε εγρήγορση, εγρήγορση, αποτροπή ύπνου, χωρίς αναστολή, οθόνη ανοιχτή, caffeine
-start-search-lock-keywords = κλείδωμα, κλείδωμα οθόνης, κλείδωμα υπολογιστή, lock
-start-search-suspend-keywords = αναστολή λειτουργίας, ύπνος, αναμονή, sleep, standby
-start-search-log-out-keywords = αποσύνδεση, έξοδος, τέλος περιόδου λειτουργίας, log out, sign out
-start-search-restart-keywords = επανεκκίνηση, επανεκκίνηση υπολογιστή, reboot, restart
-start-search-power-off-keywords = τερματισμός λειτουργίας, τερματισμός, σβήσιμο, κλείσιμο υπολογιστή, shut down, shutdown
+gust-search-dark-style-on = Μετάβαση σε σκοτεινή λειτουργία
+gust-search-dark-style-off = Μετάβαση σε φωτεινή λειτουργία
+gust-search-dark-style-keywords = σκοτεινή λειτουργία, σκοτεινό θέμα, σκοτεινό στυλ, φωτεινή λειτουργία, φωτεινό θέμα, φωτεινό στυλ, dark mode, light mode, θέμα
+gust-search-night-light-on = Ενεργοποίηση νυχτερινού φωτισμού
+gust-search-night-light-off = Απενεργοποίηση νυχτερινού φωτισμού
+gust-search-night-light-keywords = νυχτερινός φωτισμός, νυχτερινό φως, μπλε φως, θερμά χρώματα, night light, night shift
+gust-search-do-not-disturb-on = Ενεργοποίηση του «Μην ενοχλείτε»
+gust-search-do-not-disturb-off = Απενεργοποίηση του «Μην ενοχλείτε»
+gust-search-do-not-disturb-keywords = μην ενοχλείτε, εστίαση, ησυχία, σίγαση ειδοποιήσεων, σιωπή, dnd, do not disturb
+gust-search-wifi-on = Ενεργοποίηση Wi-Fi
+gust-search-wifi-off = Απενεργοποίηση Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, ασύρματο, ασύρματο δίκτυο, wlan
+gust-search-bluetooth-on = Ενεργοποίηση Bluetooth
+gust-search-bluetooth-off = Απενεργοποίηση Bluetooth
+gust-search-bluetooth-keywords = bluetooth, μπλουτούθ
+gust-search-airplane-mode-on = Ενεργοποίηση λειτουργίας πτήσης
+gust-search-airplane-mode-off = Απενεργοποίηση λειτουργίας πτήσης
+gust-search-airplane-mode-keywords = λειτουργία πτήσης, αεροπλάνο, λειτουργία αεροπλάνου, ασύρματα, airplane mode
+gust-search-keep-awake-on = Παραμονή σε εγρήγορση
+gust-search-keep-awake-off = Διακοπή παραμονής σε εγρήγορση
+gust-search-keep-awake-keywords = παραμονή σε εγρήγορση, εγρήγορση, αποτροπή ύπνου, χωρίς αναστολή, οθόνη ανοιχτή, caffeine
+gust-search-lock-keywords = κλείδωμα, κλείδωμα οθόνης, κλείδωμα υπολογιστή, lock
+gust-search-suspend-keywords = αναστολή λειτουργίας, ύπνος, αναμονή, sleep, standby
+gust-search-log-out-keywords = αποσύνδεση, έξοδος, τέλος περιόδου λειτουργίας, log out, sign out
+gust-search-restart-keywords = επανεκκίνηση, επανεκκίνηση υπολογιστή, reboot, restart
+gust-search-power-off-keywords = τερματισμός λειτουργίας, τερματισμός, σβήσιμο, κλείσιμο υπολογιστή, shut down, shutdown
 
 ## Quick settings
 

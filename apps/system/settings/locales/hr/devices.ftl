@@ -281,7 +281,6 @@ settings-keyboard-shortcuts-description = Pregledajte i promijenite prečace ili
 settings-keyboard-copilot = Tipka Copilot
 settings-keyboard-copilot-press = Pritisak
 settings-keyboard-copilot-press-description = Što čini kratak pritisak tipke
-settings-keyboard-copilot-open-start = Otvori Start
 settings-keyboard-copilot-open-app = Otvori aplikaciju
 settings-keyboard-copilot-nothing = Ništa
 settings-keyboard-copilot-app = Aplikacija

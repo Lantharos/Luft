@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Snelle instellingen
 taskbar-notifications-and-date = Meldingen en datum
 taskbar-show-desktop = Bureaublad tonen
@@ -43,7 +42,6 @@ tray-open-app = { $appName } openen
 
 ## Board (tablet window layout)
 
-board-open-start = Start openen
 board-show-all-windows = Alle vensters tonen
 board-quick-settings = Snelle instellingen
 

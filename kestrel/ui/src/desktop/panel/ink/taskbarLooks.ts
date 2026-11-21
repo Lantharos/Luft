@@ -2,7 +2,7 @@ import type { TaskbarLookPaint, TaskbarLooks } from '../../../../../../packages/
 import { toHex, type Seed } from '../../../appearance/color.js';
 import type { Paint } from '../../../appearance/icons/paint.js';
 import type { Palette } from '../../../appearance/palette.js';
-import { markFills } from '../launcher/shade.js';
+import { markFills } from '../gustButton/shade.js';
 import { schemeThemes, type Scheme } from './schemeThemes.js';
 import { lookInks, tintsOf, type LookInk } from './taskbarStylesheet.js';
 import { taskbarScheme } from './taskbarScheme.js';

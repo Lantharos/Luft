@@ -8,7 +8,7 @@
       </choices>
       <default>'search'</default>
       <summary>What a press of the Copilot key does</summary>
-      <description>"search" opens Start with search, "app" opens the app in the app key, "nothing" ignores the press.</description>
+      <description>"search" opens Gust, "app" opens the app in the app key, "nothing" ignores the press.</description>
     </key>
     <key name="hold" type="b">
       <default>true</default>

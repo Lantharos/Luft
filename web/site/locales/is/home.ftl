@@ -6,9 +6,6 @@ home-look = Skoða nánar
 home-desktop-alt = Skjáborð Luft með Rover, Stillingum og Tern opnum yfir skógi í þoku
 home-intro = Luft er heilt stýrikerfi fyrir tölvuna þína, byggt á Fedora. Það er með sitt eigið skjáborð, sín eigin forrit og grunn sem heldur sér alltaf heilum, svo þú getir einbeitt þér að deginum.
 
-home-start-heading = Upphaf veit hvar allt er.
-home-start-text = Sláðu inn nokkra stafi og upphafsvalmyndin finnur forrit, stillingar, skrár og jafnvel orðin inni í þeim. Hún reiknar, breytir einingum og kveikir á dökku útliti eða Wi-Fi þegar þú biður um það.
-home-start-alt = Upphafsvalmyndin að leita að „dökkt“, með aðgerðinni fyrir dökkt útlit og stillingum sem passa
 
 home-essentials-heading = Það helsta, einum smelli frá.
 home-essentials-text = Flýtistillingar eru reitir sem þú raðar eftir þínu höfði. Tilkynningar flokkast eftir forritum, með svörum, margmiðlunarstýringum og dagatali rétt hjá.
@@ -23,7 +20,6 @@ home-all-windows-alt = Allir gluggar og vinnusvæði í einni sjón
 
 home-motion-heading = Hreyfing með tilgang.
 home-motion-text = Allt í Luft hreyfist á gormum, svo það getur skipt um stefnu á miðri leið án þess að rykkja. Strokur fylgja fingrunum og enda þar sem þú ætlaðir, og forrit opnast hratt, líka í fyrsta skipti.
-home-motion-clip = Upphaf, flýtistillingar, allir gluggar í einni sjón og taflan að opnast og lokast í Luft
 
 home-wallpapers-heading = Veldu mynd. Luft sér um restina.
 home-wallpapers-text = { $count ->

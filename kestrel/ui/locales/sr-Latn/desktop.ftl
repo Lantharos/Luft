@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Brza podešavanja
 taskbar-notifications-and-date = Obaveštenja i datum
 taskbar-show-desktop = Prikaži radnu površinu
@@ -44,7 +43,6 @@ tray-open-app = Otvori { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Otvori Start
 board-show-all-windows = Prikaži sve prozore
 board-quick-settings = Brza podešavanja
 

@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Shiko dhe ndrysho shkurtoret ose shto 
 settings-keyboard-copilot = Tasti Copilot
 settings-keyboard-copilot-press = Shtypja
 settings-keyboard-copilot-press-description = Çfarë bën një shtypje e shpejtë e tastit
-settings-keyboard-copilot-open-start = Hap Fillimin
 settings-keyboard-copilot-open-app = Hap një aplikacion
 settings-keyboard-copilot-nothing = Asgjë
 settings-keyboard-copilot-app = Aplikacioni

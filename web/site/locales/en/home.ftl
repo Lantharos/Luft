@@ -10,9 +10,9 @@ home-look = Take a look
 home-desktop-alt = The Luft desktop with Rover, Settings and Tern open over a misty forest
 home-intro = Luft is a complete system for your PC, built on Fedora. It has its own desktop, its own apps and a core that keeps itself in one piece, so you can get on with your day.
 
-home-start-heading = Start knows where everything is.
-home-start-text = Type a few letters and Start finds apps, settings, files and even the words inside them. It does sums and unit conversions, and turns on dark style or Wi-Fi when you ask.
-home-start-alt = Start searching for dark, with the dark style action and matching settings
+home-gust-heading = Gust knows where everything is.
+home-gust-text = Type a few letters and Gust finds apps, settings, files and even the words inside them. It does sums and unit conversions, and turns on dark style or Wi-Fi when you ask.
+home-gust-alt = Gust searching for dark, with the dark style action and matching settings
 
 home-essentials-heading = The essentials, one click away.
 home-essentials-text = Quick settings are tiles you arrange yourself. Notifications group by app, with replies, media controls and a calendar right next to them.
@@ -27,7 +27,7 @@ home-all-windows-alt = Every window and desktop at a glance
 
 home-motion-heading = It moves like it means it.
 home-motion-text = Everything in Luft moves on springs, so it can change its mind halfway without a jolt. Swipes follow your fingers and land where you meant, and apps open quickly, even the first time.
-home-motion-clip = Start, quick settings, every window at a glance and the board, opening and closing in Luft
+home-motion-clip = Gust, quick settings, every window at a glance and the board, opening and closing in Luft
 
 home-wallpapers-heading = Pick a photo. Luft does the rest.
 home-wallpapers-text = { $count ->

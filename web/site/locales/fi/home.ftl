@@ -8,9 +8,6 @@ home-look = Katso lähemmin
 home-desktop-alt = Luftin työpöytä, jolla Rover, Asetukset ja Tern ovat auki sumuisen metsän päällä
 home-intro = Luft on kokonainen järjestelmä PC:llesi, rakennettu Fedoran pohjalle. Siinä on oma työpöytä, omat sovellukset ja ydin, joka pitää itsensä eheänä, joten voit keskittyä päivääsi.
 
-home-start-heading = Start tietää, missä kaikki on.
-home-start-text = Kirjoita muutama kirjain, niin Start löytää sovellukset, asetukset, tiedostot ja jopa niiden sisältämät sanat. Se laskee laskut ja muuntaa yksiköt ja ottaa tumman tilan tai Wi-Fin käyttöön, kun pyydät.
-home-start-alt = Start-valikko hakee sanaa ”tumma”, ja tuloksina ovat tumman tilan toiminto ja siihen liittyvät asetukset
 
 home-essentials-heading = Tärkein yhden napsautuksen päässä.
 home-essentials-text = Pika-asetukset ovat ruutuja, jotka järjestät itse. Ilmoitukset ryhmitellään sovelluksittain, ja vastaukset, mediaohjaimet ja kalenteri ovat aivan vieressä.
@@ -25,7 +22,6 @@ home-all-windows-alt = Kaikki ikkunat ja työtilat yhdellä silmäyksellä
 
 home-motion-heading = Liikettä, jossa on tarkoitus.
 home-motion-text = Kaikki Luftissa liikkuu jousien varassa, joten liike voi vaihtaa suuntaa kesken ilman nykäystä. Pyyhkäisyt seuraavat sormiasi ja päätyvät sinne, minne tarkoitit, ja sovellukset avautuvat nopeasti jo ensimmäisellä kerralla.
-home-motion-clip = Start-valikko, pika-asetukset, kaikki ikkunat ja taulu avautuvat ja sulkeutuvat Luftissa
 
 home-wallpapers-heading = Valitse kuva. Luft hoitaa loput.
 home-wallpapers-text = { $count ->

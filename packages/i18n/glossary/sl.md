@@ -24,7 +24,6 @@ Prefer sentences without a person: „Posodobitve se namestijo ob naslednjem zag
 ## Names
 
 - Settings, Disks and Install Luft are Nastavitve, Diski and Namesti Luft.
-- Start stays Start; write „meni Start“ when it has to decline („v meniju Start“).
 - Don't decline app names; put the kind of thing first: „v aplikaciji Rover“. Luft is masculine and declines when it must (Lufta, Luftu).
 - Names used as modifiers follow the noun: „vmesnik Bluetooth“, „ključek USB“, „naslov IP“.
 

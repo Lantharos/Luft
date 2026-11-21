@@ -74,18 +74,11 @@ settings-appearance-text-size = Μέγεθος κειμένου
 ## Taskbar
 
 settings-taskbar-preview = Προεπισκόπηση γραμμής εργασιών
-settings-start-section = Start
-settings-start-style = Στυλ
-settings-start-style-menu = Μενού
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Αναζήτηση, εφαρμογές και φάκελοι δίπλα στη γραμμή εργασιών
-settings-start-style-palette-description = Μια γραμμή αναζήτησης στη μέση της οθόνης για εφαρμογές, παράθυρα, αρχεία και απαντήσεις
-settings-start-button = Εμφάνιση κουμπιού Start
-settings-start-button-description = Το Super ανοίγει το Start σε κάθε περίπτωση
-settings-start-web = Αναζήτηση στο διαδίκτυο με
+settings-gust-look-panel-description = Αναζήτηση, εφαρμογές και φάκελοι δίπλα στη γραμμή εργασιών
+settings-gust-look-palette-description = Μια γραμμή αναζήτησης στη μέση της οθόνης για εφαρμογές, παράθυρα, αρχεία και απαντήσεις
+settings-gust-web = Αναζήτηση στο διαδίκτυο με
 settings-taskbar-shown = Εμφάνιση γραμμής εργασιών
 settings-taskbar-hidden = Κρυφή
-settings-taskbar-hidden-description = Το ρολόι και τα εικονίδια κατάστασης μένουν σε μια γωνία και το Super ανοίγει το Start
 settings-taskbar-look = Όψη
 settings-taskbar-look-glass = Γυαλί
 settings-taskbar-look-solid = Συμπαγής

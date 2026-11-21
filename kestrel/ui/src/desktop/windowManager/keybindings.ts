@@ -38,7 +38,7 @@ const SWITCHER_KEYS = [
 const SURFACE_KEYS: [string, Shell.ActionMode, () => void][] = [
   ['toggle-message-tray', DESKTOP_AND_POPUPS, () => KestrelUi.toggleSurface('notifications')],
   ['toggle-quick-settings', DESKTOP_AND_POPUPS, () => KestrelUi.toggleSurface('quick')],
-  ['toggle-start', NORMAL, () => KestrelUi.toggleSurface('start')],
+  ['toggle-gust', NORMAL, () => KestrelUi.toggleSurface('gust')],
   ['clipboard-history', NORMAL, () => KestrelUi.toggleSurface('clipboard')],
   ['emoji-picker', NORMAL, () => KestrelUi.toggleSurface('emoji')],
   ['snap-layouts', NORMAL, () => KestrelUi.toggleSurface('snap')],

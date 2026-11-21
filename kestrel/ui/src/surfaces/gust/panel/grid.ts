@@ -3,25 +3,25 @@ import Gio from 'gi://Gio';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 import Shell from 'gi://Shell';
-import { StartLayout } from './layout.js';
+import { GustLayout } from './layout.js';
 import { GridDrag } from './drag.js';
-import { SearchResults } from '../search/results/searchResults.js';
-import type { SearchItem, SearchView } from '../search/item.js';
-import { animateActor, Curve, Duration, liftIcon } from '../../shared/motion/motion.js';
-import { appIcon } from '../../appearance/icons/appIcons.js';
-import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
-import { t } from '../../shared/i18n/index.js';
-import { appName } from '../../shared/apps/names.js';
+import { SearchResults } from '../../search/results/searchResults.js';
+import type { SearchItem, SearchView } from '../../search/item.js';
+import { animateActor, Curve, Duration, liftIcon } from '../../../shared/motion/motion.js';
+import { appIcon } from '../../../appearance/icons/appIcons.js';
+import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import { t } from '../../../shared/i18n/index.js';
+import { appName } from '../../../shared/apps/names.js';
 import { AppHint, appKind } from './appHint.js';
 import { CellRowLayout, CenteredColumnLayout } from './cells.js';
-import { FillLayout } from '../../shared/layout/fill.js';
+import { FillLayout } from '../../../shared/layout/fill.js';
 
 const ICON_SIZE = 36;
 
-export class StartGrid {
+export class GustGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
-  private readonly layout = new StartLayout();
+  private readonly layout = new GustLayout();
   private readonly drag: GridDrag;
   private readonly hint = new AppHint();
   private readonly results: SearchResults;
@@ -170,7 +170,7 @@ export class StartGrid {
     const folder = !this.searchView && this.folder ? this.layout.folder(this.folder) : undefined;
     this.header.visible = !!folder;
     if (!folder) return;
-    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: t('start-apps'), style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
+    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: t('gust-apps'), style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
     back.connect('clicked', () => this.home());
     this.drag.target(back, source => source.folder ? null : () => { this.layout.move(source.id, null); this.folder = null; });
     this.header.add_child(back);
@@ -235,7 +235,7 @@ export class StartGrid {
     name.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     name.clutter_text.line_alignment = Pango.Alignment.CENTER;
     content.add_child(name);
-    const button = new St.Button({ name: `kestrel-start-item-${id}`, style_class: 'kestrel-app-button', child: content, layout_manager: new FillLayout(), width: 92, can_focus: true, track_hover: true, accessible_name: label });
+    const button = new St.Button({ name: `kestrel-gust-item-${id}`, style_class: 'kestrel-app-button', child: content, layout_manager: new FillLayout(), width: 92, can_focus: true, track_hover: true, accessible_name: label });
     button.connect('key-focus-in', () => this.reveal(button));
     const kind = app && appKind(app, label);
     if (kind) this.hint.bind(button, kind);
@@ -247,13 +247,13 @@ export class StartGrid {
     });
     this.menus.bind(button, () => {
       if (folder) return [
-        { label: t('start-folder-open'), run: () => { this.folder = id; this.render(true); } },
-        { label: t('start-folder-rename'), run: () => { this.folder = id; this.render(true); (this.header.get_last_child() as St.Entry).grab_key_focus(); } },
-        { label: t('start-folder-ungroup'), run: () => { this.layout.dissolve(id); this.render(); } },
+        { label: t('gust-folder-open'), run: () => { this.folder = id; this.render(true); } },
+        { label: t('gust-folder-rename'), run: () => { this.folder = id; this.render(true); (this.header.get_last_child() as St.Entry).grab_key_focus(); } },
+        { label: t('gust-folder-ungroup'), run: () => { this.layout.dissolve(id); this.render(); } },
       ];
       const shellApp = Shell.AppSystem.get_default().lookup_app(id);
-      const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: t('start-open'), run: () => this.launch(app!) }];
-      if (this.folder && !this.searchView) entries.push({ label: t('start-move-to-apps'), run: () => { this.layout.move(id, null); this.render(); } });
+      const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: t('gust-open'), run: () => this.launch(app!) }];
+      if (this.folder && !this.searchView) entries.push({ label: t('gust-move-to-apps'), run: () => { this.layout.move(id, null); this.render(); } });
       return entries;
     });
     const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));

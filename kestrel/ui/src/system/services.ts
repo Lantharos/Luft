@@ -75,13 +75,13 @@ export class SystemServices {
   private readonly firewallQuestions: AppQuestions;
   private readonly sharing = new SharingService();
 
-  constructor(context: Context, openStart: () => void) {
+  constructor(context: Context, openGust: () => void) {
     this.titleBars = new TitleBars((window, x, y) =>
       context.showWindowMenu(window, new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: 0, height: 0 })));
     this.portal = PortalBackend.forSession(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
     this.keyring = new SystemPrompts();
-    this.mediaKeys = new MediaKeys(context, openStart);
+    this.mediaKeys = new MediaKeys(context, openGust);
     this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
     this.firewallQuestions = new AppQuestions();
     confirmStartupOnceSettled(context.layoutManager);

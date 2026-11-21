@@ -8,9 +8,6 @@ home-look = Ansehen
 home-desktop-alt = Der Luft-Desktop mit Rover, Einstellungen und Tern über einem nebligen Wald
 home-intro = Luft ist ein komplettes System für deinen PC, gebaut auf Fedora. Mit eigenem Desktop, eigenen Apps und einem Kern, der sich selbst intakt hält – damit du dich um deinen Tag kümmern kannst.
 
-home-start-heading = Start weiß, wo alles ist.
-home-start-text = Tipp ein paar Buchstaben, und Start findet Apps, Einstellungen, Dateien und sogar die Wörter darin. Es löst Rechenaufgaben, wandelt Einheiten um und schaltet den dunklen Modus oder das WLAN ein, wenn du danach fragst.
-home-start-alt = Start sucht nach „dunkel“, mit der Aktion „Dunkler Modus“ und passenden Einstellungen
 
 home-essentials-heading = Das Wichtigste, einen Klick entfernt.
 home-essentials-text = Die Schnelleinstellungen sind Kacheln, die du selbst anordnest. Benachrichtigungen sind nach App gruppiert, mit Antworten, Mediensteuerung und einem Kalender gleich daneben.
@@ -25,7 +22,6 @@ home-all-windows-alt = Alle Fenster und Arbeitsflächen auf einen Blick
 
 home-motion-heading = Bewegung mit Absicht.
 home-motion-text = Alles in Luft bewegt sich auf Federn und kann deshalb mittendrin umkehren, ohne zu ruckeln. Wischgesten folgen deinen Fingern und landen, wo du wolltest, und Apps öffnen sich schnell, sogar beim ersten Mal.
-home-motion-clip = Start, Schnelleinstellungen, alle Fenster auf einen Blick und das Board beim Öffnen und Schließen in Luft
 
 home-wallpapers-heading = Wähl ein Foto. Luft macht den Rest.
 home-wallpapers-text = { $count ->

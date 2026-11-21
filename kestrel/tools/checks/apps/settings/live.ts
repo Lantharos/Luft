@@ -23,7 +23,7 @@ interface Change {
 
 const CHANGES: Change[] = [
   {name: 'taskbar-arrangement', page: 'taskbar', schema: 'com.lantharos.kestrel', key: 'taskbar-arrangement',
-    value: new GLib.Variant('a(sas)', [['bottom-start', ['start', 'dock']], ['bottom-end', ['tray', 'status', 'clock']]]), ignore: PREVIEW_CLOCK},
+    value: new GLib.Variant('a(sas)', [['bottom-start', ['gust', 'dock']], ['bottom-end', ['tray', 'status', 'clock']]]), ignore: PREVIEW_CLOCK},
   {name: 'dark-style', page: 'appearance', schema: 'org.gnome.desktop.interface', key: 'color-scheme', value: new GLib.Variant('s', 'prefer-light')},
   {name: 'reduce-motion', page: 'accessibility', schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', value: new GLib.Variant('s', 'reduce')},
 ];

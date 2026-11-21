@@ -29,7 +29,7 @@ Prefer sentences without a person: „Актуализациите се инст
 ## Names
 
 - App names stay in Latin and never take an article or ending; put the kind of thing first and let it carry the article: „в приложението Rover“, „системата Luft“.
-- Settings, Disks and Install Luft are Настройки, Дискове and Инсталиране на Luft. Start is Старт, and „менюто Старт“ in a sentence.
+- Settings, Disks and Install Luft are Настройки, Дискове and Инсталиране на Luft.
 
 ## Plurals
 

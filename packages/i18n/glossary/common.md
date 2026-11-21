@@ -18,7 +18,7 @@ A message about something in progress, such as "Looking for updates", takes no e
 
 ## Names
 
-- Luft, Kestrel and the apps keep their names: Rover, Magpie, Mailman, Draft, Tern, Schelf, Barometer, Keys, Meet Luft, Helium, Heft, Soundboard, Flatbed and Convertible. So do Flatpak, Secure Boot, TPM and Bluetooth, and Wi-Fi unless your language file names its own word.
+- Luft, Kestrel, Gust and the apps keep their names: Rover, Magpie, Mailman, Draft, Tern, Schelf, Barometer, Keys, Meet Luft, Helium, Heft, Soundboard, Flatbed and Convertible. So do Flatpak, Secure Boot, TPM and Bluetooth, and Wi-Fi unless your language file names its own word.
 - Settings, Disks and Install Luft describe what they are, so they are translated.
 - When a name reads oddly with the language's endings or articles, put the kind of thing first: "the Rover app".
 

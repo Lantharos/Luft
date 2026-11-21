@@ -5,7 +5,7 @@ import {show} from '../apps/settings/navigation.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 
-const SURFACES = ['start', 'quick', 'notifications', 'emoji'] as const;
+const SURFACES = ['gust', 'quick', 'notifications', 'emoji'] as const;
 const SETTINGS_PAGES = ['bluetooth', 'display', 'sound', 'power', 'input', 'appearance', 'taskbar', 'windows', 'accessibility', 'apps', 'privacy', 'security',
   'accounts', 'language', 'system', 'system/about', 'network'];
 

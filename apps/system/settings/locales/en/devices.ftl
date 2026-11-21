@@ -373,7 +373,7 @@ settings-keyboard-copilot = Copilot key
 # What a quick press does (noun)
 settings-keyboard-copilot-press = Press
 settings-keyboard-copilot-press-description = What a quick press of the key does
-settings-keyboard-copilot-open-start = Open Start
+settings-keyboard-copilot-open-gust = Open Gust
 settings-keyboard-copilot-open-app = Open an app
 settings-keyboard-copilot-nothing = Nothing
 settings-keyboard-copilot-app = App
@@ -594,7 +594,7 @@ settings-pen-action-middle = Middle click
 settings-pen-action-eraser = Erase
 settings-pen-action-screenshot = Take a screenshot
 settings-pen-action-notes = Open Heft
-settings-pen-action-start = Open Start
+settings-pen-action-gust = Open Gust
 settings-pen-action-back = Back
 settings-pen-action-forward = Forward
 settings-pen-action-switch-monitor = Switch display

@@ -805,7 +805,7 @@ changes-asked = { $count ->
    *[other] A program wants to change these settings.
 }
 changes-administrator = Approving asks for an administrator’s password next.
-# A setting with the page of Settings it is on, as Settings' search shows it, such as "Taskbar and Start · Size"
+# A setting with the page of Settings it is on, as Settings' search shows it, such as "Taskbar and Gust · Size"
 changes-setting = { $page } · { $setting }
 # A setting going from its current value to the new one, such as "Off → On"
 changes-from-to = { $from } → { $to }

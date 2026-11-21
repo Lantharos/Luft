@@ -394,13 +394,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="mk">
           <tig>
-            <term>Старт</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name, m; in a sentence: менито Старт</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -933,7 +933,7 @@
         <langSet xml:lang="mk">
           <tig>
             <term>закачи</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start</note>
+            <note from="translator">verb: keep an app on the taskbar</note>
           </tig>
         </langSet>
       </termEntry>

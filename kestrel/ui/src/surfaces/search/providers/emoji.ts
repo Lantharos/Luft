@@ -51,8 +51,8 @@ export class EmojiResults {
       preview: { kind: 'glyph', text },
       activate: insert,
       menu: () => [
-        { label: t('start-search-emoji-insert'), run: insert },
-        { label: t('start-search-copy'), run: () => { St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, text); this.close(); } },
+        { label: t('gust-search-emoji-insert'), run: insert },
+        { label: t('gust-search-copy'), run: () => { St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, text); this.close(); } },
       ],
     };
   }

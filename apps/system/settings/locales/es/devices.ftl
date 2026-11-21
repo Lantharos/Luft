@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Consulta y cambia los atajos, o añade
 settings-keyboard-copilot = Tecla Copilot
 settings-keyboard-copilot-press = Pulsación
 settings-keyboard-copilot-press-description = Lo que hace una pulsación breve de la tecla
-settings-keyboard-copilot-open-start = Abrir Inicio
 settings-keyboard-copilot-open-app = Abrir una aplicación
 settings-keyboard-copilot-nothing = Nada
 settings-keyboard-copilot-app = Aplicación

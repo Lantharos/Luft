@@ -17,7 +17,7 @@
     </key>
     <key name="surfaces" enum="com.lantharos.kestrel.GlassStyle">
       <default>'luca'</default>
-      <summary>How the glass of Start, panels and menus looks</summary>
+      <summary>How the glass of Gust, panels and menus looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper. Apps’ popovers and palettes follow it too.</description>
     </key>
     <key name="windows" enum="com.lantharos.kestrel.GlassStyle">

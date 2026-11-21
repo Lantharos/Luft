@@ -142,7 +142,7 @@ export interface DesktopFilter extends ScreenEffectBase {
   play(milliseconds: number): void;
 }
 
-export type EffectSurface = 'taskbar' | 'quick-settings' | 'start' | 'notifications';
+export type EffectSurface = 'taskbar' | 'quick-settings' | 'gust' | 'notifications';
 
 /**
  * Something drawn over Kestrel's own surfaces, such as lines across the taskbar, as {@link WindowOverlayOptions} without a

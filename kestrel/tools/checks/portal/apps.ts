@@ -51,7 +51,7 @@ async function checkDynamicLauncher() {
     target: new GLib.Variant('s', 'https://weather.example.org/today'),
   }]), '(ua{sv})');
   const dialog = await openedDialog('installing a web app asks first');
-  require(showsText('weather.example.org will open in its own window from Start.', dialog), 'web apps name the site they open');
+  require(showsText('weather.example.org will open in its own window from Gust.', dialog), 'web apps name the site they open');
   await capture('portal-web-app');
   ofType(descendants(dialog).find(actor => actor instanceof St.Entry) ?? null, St.Entry).text = 'Forecast';
   click(ofType(labelled('Add', dialog), Clutter.Actor));

@@ -130,7 +130,7 @@ During a session, banners and notification sounds wait. Urgent notifications and
 
 ## Pult
 
-Pult puts how much is waiting in your [Pult](https://pult.sh) inboxes on the taskbar, tells you about urgent items with a notification, and finds your items when you search in Start.
+Pult puts how much is waiting in your [Pult](https://pult.sh) inboxes on the taskbar, tells you about urgent items with a notification, and finds your items when you search in Gust.
 
 To sign in, open Settings → Extensions → Pult and choose **Sign in**. Pult opens in your browser with a code; check that it matches the one in Settings and confirm. The extension can then see your inboxes in every project you're in, but can't change anything, and it keeps its sign-in in your keyring. You can sign it out in Settings, or from Pult under Settings → Security.
 

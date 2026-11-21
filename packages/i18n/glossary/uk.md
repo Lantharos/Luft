@@ -27,7 +27,6 @@ Use Ukrainian words and the 2019 orthography, never Russian calques: увімк�
 ## Names
 
 - Settings, Disks and Install Luft are Параметри, Диски and Встановлення Luft. Параметри declines as a plural noun: «у Параметрах».
-- Start is Пуск, as in Ukrainian Windows. In sentences write меню «Пуск», and меню Пуск in labels and search words, so it doesn't decline.
 - Don't decline app names, Luft or Kestrel; put the kind of thing first: «у програмі Rover», «у системі Luft». That noun decides agreement: «програма Magpie відкрита».
 
 ## Plurals

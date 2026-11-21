@@ -34,9 +34,9 @@ const SHORTEST_EXTRA_QUERY = 2;
 const SHORTEST_CONTENT_QUERY = 3;
 const CONTENT_DELAY = 120;
 const TITLES = {
-  apps: 'start-search-group-apps', commands: 'start-search-group-commands', windows: 'start-search-group-windows',
-  actions: 'start-search-group-actions', settings: 'start-search-group-settings', clipboard: 'start-search-group-clipboard',
-  emoji: 'start-search-group-emoji', files: 'start-search-group-files', contents: 'start-search-group-contents', web: 'start-search-group-web',
+  apps: 'gust-search-group-apps', commands: 'gust-search-group-commands', windows: 'gust-search-group-windows',
+  actions: 'gust-search-group-actions', settings: 'gust-search-group-settings', clipboard: 'gust-search-group-clipboard',
+  emoji: 'gust-search-group-emoji', files: 'gust-search-group-files', contents: 'gust-search-group-contents', web: 'gust-search-group-web',
 } as const satisfies Record<GroupId, string>;
 
 export interface SearchHost {

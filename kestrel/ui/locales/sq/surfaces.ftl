@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Kërko aplikacione, skedarë dhe më shumë
-start-search-cut = Prit
-start-search-copy = Kopjo
-start-search-paste = Ngjit
-start-search-select-all = Përzgjidh të gjitha
-start-power = Energjia dhe seanca
-start-power-close = Mbyll opsionet e energjisë
-start-account-settings = Cilësimet e llogarisë
-start-apps = Aplikacionet
-start-folder-default-name = Dosje
-start-folder-open = Hap dosjen
-start-folder-rename = Riemërto
-start-folder-ungroup = Shpërndaj aplikacionet
-start-open = Hap
-start-move-to-apps = Zhvendos te Aplikacionet
+gust-search-placeholder = Kërko aplikacione, skedarë dhe më shumë
+gust-search-cut = Prit
+gust-search-copy = Kopjo
+gust-search-paste = Ngjit
+gust-search-select-all = Përzgjidh të gjitha
+gust-power = Energjia dhe seanca
+gust-power-close = Mbyll opsionet e energjisë
+gust-account-settings = Cilësimet e llogarisë
+gust-apps = Aplikacionet
+gust-folder-default-name = Dosje
+gust-folder-open = Hap dosjen
+gust-folder-rename = Riemërto
+gust-folder-ungroup = Shpërndaj aplikacionet
+gust-open = Hap
+gust-move-to-apps = Zhvendos te Aplikacionet
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Përputhja më e mirë
-start-search-group-apps = Aplikacionet
-start-search-group-commands = Veprimet e aplikacioneve
-start-search-group-windows = Dritaret e hapura
-start-search-group-actions = Veprimet
-start-search-group-settings = Cilësimet
-start-search-group-clipboard = Kujtesa e fragmenteve
-start-search-group-emoji = Emoji
-start-search-group-files = Skedarët
-start-search-group-contents = Brenda skedarëve
-start-search-group-web = Uebi
-start-search-web = Kërko në ueb për “{ $query }”
-start-search-clipboard-text = Nga historiku i kujtesës së fragmenteve
-start-search-clipboard-keywords = kujtesa e fragmenteve, kopjuar, të kopjuara, historiku i kujtesës, ngjit, clipboard
-start-search-emoji-insert = Fut
-start-search-settings-page = Cilësimet
-start-search-settings-section = Cilësimet – { $page }
-start-search-file-reveal = Shfaq në { $fileManager }
-start-search-file-copy-path = Kopjo shtegun
-start-search-conversion = { $amount } { $from } në { $to }
-start-search-calculation = { $expression }, shtyp Enter për ta kopjuar
+gust-search-best-match = Përputhja më e mirë
+gust-search-group-apps = Aplikacionet
+gust-search-group-commands = Veprimet e aplikacioneve
+gust-search-group-windows = Dritaret e hapura
+gust-search-group-actions = Veprimet
+gust-search-group-settings = Cilësimet
+gust-search-group-clipboard = Kujtesa e fragmenteve
+gust-search-group-emoji = Emoji
+gust-search-group-files = Skedarët
+gust-search-group-contents = Brenda skedarëve
+gust-search-group-web = Uebi
+gust-search-web = Kërko në ueb për “{ $query }”
+gust-search-clipboard-text = Nga historiku i kujtesës së fragmenteve
+gust-search-clipboard-keywords = kujtesa e fragmenteve, kopjuar, të kopjuara, historiku i kujtesës, ngjit, clipboard
+gust-search-emoji-insert = Fut
+gust-search-settings-page = Cilësimet
+gust-search-settings-section = Cilësimet – { $page }
+gust-search-file-reveal = Shfaq në { $fileManager }
+gust-search-file-copy-path = Kopjo shtegun
+gust-search-conversion = { $amount } { $from } në { $to }
+gust-search-calculation = { $expression }, shtyp Enter për ta kopjuar
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Deri më { $date }
-start-search-answer-since = Që nga { $date }
-start-search-answer-between = Nga { $from } deri më { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Deri më { $date }
+gust-search-answer-since = Që nga { $date }
+gust-search-answer-between = Nga { $from } deri më { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } orë
    *[other] { $hours } orë
 } përpara
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } orë
    *[other] { $hours } orë
 } prapa
-start-search-answer-time-same = { $place }, e njëjta orë si këtu
-start-search-answer-converted = Në { $place } kur në { $from } është ora { $time }
-start-search-answer-converted-here = Këtu kur në { $from } është ora { $time }
-start-search-answer-converted-from-here = Në { $place } kur këtu është ora { $time }
+gust-search-answer-time-same = { $place }, e njëjta orë si këtu
+gust-search-answer-converted = Në { $place } kur në { $from } është ora { $time }
+gust-search-answer-converted-here = Këtu kur në { $from } është ora { $time }
+gust-search-answer-converted-from-here = Në { $place } kur këtu është ora { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Kalo te stili i errët
-start-search-dark-style-off = Kalo te stili i çelët
-start-search-dark-style-keywords = stili i errët, regjimi i errët, tema e errët, stili i çelët, regjimi i çelët, tema e çelët, dark mode, light mode
-start-search-night-light-on = Aktivizo dritën e natës
-start-search-night-light-off = Çaktivizo dritën e natës
-start-search-night-light-keywords = drita e natës, dritë blu, ngjyra të ngrohta, night light, night shift
-start-search-do-not-disturb-on = Aktivizo “Mos shqetëso”
-start-search-do-not-disturb-off = Çaktivizo “Mos shqetëso”
-start-search-do-not-disturb-keywords = mos shqetëso, dnd, fokus, qetësi, hesht njoftimet, pa njoftime
-start-search-wifi-on = Aktivizo Wi-Fi
-start-search-wifi-off = Çaktivizo Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, pa tel, rrjet pa tel, wlan
-start-search-bluetooth-on = Aktivizo Bluetooth
-start-search-bluetooth-off = Çaktivizo Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Aktivizo regjimin e aeroplanit
-start-search-airplane-mode-off = Çaktivizo regjimin e aeroplanit
-start-search-airplane-mode-keywords = regjimi i aeroplanit, aeroplan, fluturim, radio, airplane mode
-start-search-keep-awake-on = Mbaje zgjuar
-start-search-keep-awake-off = Mos e mbaj më zgjuar
-start-search-keep-awake-keywords = mbaje zgjuar, qëndro zgjuar, pa gjumë, parandalo gjumin, kafe, caffeine
-start-search-lock-keywords = blloko ekranin, blloko kompjuterin, ekrani i bllokimit
-start-search-suspend-keywords = gjumë, vë në gjumë, pritje, standby
-start-search-log-out-keywords = dil, dalje, mbyll seancën, log out, sign out
-start-search-restart-keywords = rinis, rinis kompjuterin, rindiz, reboot
-start-search-power-off-keywords = fik, fik kompjuterin, fikje, shut down
+gust-search-dark-style-on = Kalo te stili i errët
+gust-search-dark-style-off = Kalo te stili i çelët
+gust-search-dark-style-keywords = stili i errët, regjimi i errët, tema e errët, stili i çelët, regjimi i çelët, tema e çelët, dark mode, light mode
+gust-search-night-light-on = Aktivizo dritën e natës
+gust-search-night-light-off = Çaktivizo dritën e natës
+gust-search-night-light-keywords = drita e natës, dritë blu, ngjyra të ngrohta, night light, night shift
+gust-search-do-not-disturb-on = Aktivizo “Mos shqetëso”
+gust-search-do-not-disturb-off = Çaktivizo “Mos shqetëso”
+gust-search-do-not-disturb-keywords = mos shqetëso, dnd, fokus, qetësi, hesht njoftimet, pa njoftime
+gust-search-wifi-on = Aktivizo Wi-Fi
+gust-search-wifi-off = Çaktivizo Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, pa tel, rrjet pa tel, wlan
+gust-search-bluetooth-on = Aktivizo Bluetooth
+gust-search-bluetooth-off = Çaktivizo Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Aktivizo regjimin e aeroplanit
+gust-search-airplane-mode-off = Çaktivizo regjimin e aeroplanit
+gust-search-airplane-mode-keywords = regjimi i aeroplanit, aeroplan, fluturim, radio, airplane mode
+gust-search-keep-awake-on = Mbaje zgjuar
+gust-search-keep-awake-off = Mos e mbaj më zgjuar
+gust-search-keep-awake-keywords = mbaje zgjuar, qëndro zgjuar, pa gjumë, parandalo gjumin, kafe, caffeine
+gust-search-lock-keywords = blloko ekranin, blloko kompjuterin, ekrani i bllokimit
+gust-search-suspend-keywords = gjumë, vë në gjumë, pritje, standby
+gust-search-log-out-keywords = dil, dalje, mbyll seancën, log out, sign out
+gust-search-restart-keywords = rinis, rinis kompjuterin, rindiz, reboot
+gust-search-power-off-keywords = fik, fik kompjuterin, fikje, shut down
 
 ## Quick settings
 

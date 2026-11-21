@@ -7,7 +7,7 @@ import {descendants, named, ofType} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
-import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
+import {closeGust, groupTitles, openGust, rows, search, titleOf} from '../gust/search/results.js';
 import {copyFolder, developmentFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, setting} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
@@ -57,10 +57,10 @@ async function checkEnabled() {
   const refused = await setSetting(PROBE, 'mood', new GLib.Variant('s', 'grumpy')).then(() => false, () => true);
   require(refused, 'a value the manifest does not offer is refused');
 
-  await openStart();
+  await openGust();
   search('needle');
-  await eventually(() => groupTitles().includes('Probe') && rows().some(row => titleOf(row) === 'Probe found needle'), 'its results show in Start search');
-  closeStart();
+  await eventually(() => groupTitles().includes('Probe') && rows().some(row => titleOf(row) === 'Probe found needle'), 'its results show in Gust search');
+  closeGust();
 }
 
 async function checkDisabledCleansUp() {

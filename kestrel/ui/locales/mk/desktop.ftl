@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Старт
 taskbar-quick-settings = Брзи поставки
 taskbar-notifications-and-date = Известувања и датум
 taskbar-show-desktop = Прикажи ја работната површина
@@ -43,7 +42,6 @@ tray-open-app = Отвори { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Отвори го менито Старт
 board-show-all-windows = Прикажи ги сите прозорци
 board-quick-settings = Брзи поставки
 

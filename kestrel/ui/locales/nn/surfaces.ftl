@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Søk etter appar, filer og meir
-start-search-cut = Klipp ut
-start-search-copy = Kopier
-start-search-paste = Lim inn
-start-search-select-all = Merk alt
-start-power = Straum og økt
-start-power-close = Lukk straumvala
-start-account-settings = Kontoinnstillingar
-start-apps = Appar
-start-folder-default-name = Mappe
-start-folder-open = Opne mappa
-start-folder-rename = Endre namn
-start-folder-ungroup = Løys opp gruppa
-start-open = Opne
-start-move-to-apps = Flytt til Appar
+gust-search-placeholder = Søk etter appar, filer og meir
+gust-search-cut = Klipp ut
+gust-search-copy = Kopier
+gust-search-paste = Lim inn
+gust-search-select-all = Merk alt
+gust-power = Straum og økt
+gust-power-close = Lukk straumvala
+gust-account-settings = Kontoinnstillingar
+gust-apps = Appar
+gust-folder-default-name = Mappe
+gust-folder-open = Opne mappa
+gust-folder-rename = Endre namn
+gust-folder-ungroup = Løys opp gruppa
+gust-open = Opne
+gust-move-to-apps = Flytt til Appar
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Beste treff
-start-search-group-apps = Appar
-start-search-group-commands = Apphandlingar
-start-search-group-windows = Opne vindauge
-start-search-group-actions = Handlingar
-start-search-group-settings = Innstillingar
-start-search-group-clipboard = Utklippstavle
-start-search-group-emoji = Emoji
-start-search-group-files = Filer
-start-search-group-contents = Inni filer
-start-search-group-web = Nett
-start-search-web = Søk på nettet etter «{ $query }»
-start-search-clipboard-text = Frå utklippshistorikken
-start-search-clipboard-keywords = utklippstavle, kopiert, kopier, utklippshistorikk, lim inn, clipboard
-start-search-emoji-insert = Set inn
-start-search-settings-page = Innstillingar
-start-search-settings-section = Innstillingar for { $page }
-start-search-file-reveal = Vis i { $fileManager }
-start-search-file-copy-path = Kopier stigen
-start-search-conversion = { $amount } { $from } i { $to }
-start-search-calculation = { $expression }, trykk Enter for å kopiere
+gust-search-best-match = Beste treff
+gust-search-group-apps = Appar
+gust-search-group-commands = Apphandlingar
+gust-search-group-windows = Opne vindauge
+gust-search-group-actions = Handlingar
+gust-search-group-settings = Innstillingar
+gust-search-group-clipboard = Utklippstavle
+gust-search-group-emoji = Emoji
+gust-search-group-files = Filer
+gust-search-group-contents = Inni filer
+gust-search-group-web = Nett
+gust-search-web = Søk på nettet etter «{ $query }»
+gust-search-clipboard-text = Frå utklippshistorikken
+gust-search-clipboard-keywords = utklippstavle, kopiert, kopier, utklippshistorikk, lim inn, clipboard
+gust-search-emoji-insert = Set inn
+gust-search-settings-page = Innstillingar
+gust-search-settings-section = Innstillingar for { $page }
+gust-search-file-reveal = Vis i { $fileManager }
+gust-search-file-copy-path = Kopier stigen
+gust-search-conversion = { $amount } { $from } i { $to }
+gust-search-calculation = { $expression }, trykk Enter for å kopiere
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Til { $date }
-start-search-answer-since = Sidan { $date }
-start-search-answer-between = Mellom { $from } og { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Til { $date }
+gust-search-answer-since = Sidan { $date }
+gust-search-answer-between = Mellom { $from } og { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } time
    *[other] { $hours } timar
 } føre
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } time
    *[other] { $hours } timar
 } bak
-start-search-answer-time-same = { $place }, same tid som her
-start-search-answer-converted = I { $place } når klokka er { $time } i { $from }
-start-search-answer-converted-here = Her når klokka er { $time } i { $from }
-start-search-answer-converted-from-here = I { $place } når klokka er { $time } her
+gust-search-answer-time-same = { $place }, same tid som her
+gust-search-answer-converted = I { $place } når klokka er { $time } i { $from }
+gust-search-answer-converted-here = Her når klokka er { $time } i { $from }
+gust-search-answer-converted-from-here = I { $place } når klokka er { $time } her
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Byt til mørk modus
-start-search-dark-style-off = Byt til lys modus
-start-search-dark-style-keywords = mørk modus, mørkt tema, mørk stil, lys modus, lyst tema, lys stil, dark mode, dark theme, light mode
-start-search-night-light-on = Slå på nattlys
-start-search-night-light-off = Slå av nattlys
-start-search-night-light-keywords = nattlys, blått lys, varme fargar, varmare fargar, night light, night shift
-start-search-do-not-disturb-on = Slå på Ikkje forstyrr
-start-search-do-not-disturb-off = Slå av Ikkje forstyrr
-start-search-do-not-disturb-keywords = ikkje forstyrr, forstyrr ikkje, dnd, do not disturb, fokus, stille, demp varslingar, slå av varslingar
-start-search-wifi-on = Slå på Wi-Fi
-start-search-wifi-off = Slå av Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, trådlaust, trådlaust nett, wlan
-start-search-bluetooth-on = Slå på Bluetooth
-start-search-bluetooth-off = Slå av Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Slå på flymodus
-start-search-airplane-mode-off = Slå av flymodus
-start-search-airplane-mode-keywords = flymodus, fly, flightmodus, airplane mode, radio
-start-search-keep-awake-on = Hald vaken
-start-search-keep-awake-off = Slutt å halde vaken
-start-search-keep-awake-keywords = hald vaken, ver vaken, koffein, caffeine, hindre kvilemodus, ikkje sov
-start-search-lock-keywords = lås skjermen, lås datamaskinen, låseskjerm, lås
-start-search-suspend-keywords = kvilemodus, kvile, sov, ventemodus, standby, sleep
-start-search-log-out-keywords = logg ut, logg av, avslutt økta, log out, sign out
-start-search-restart-keywords = start på nytt, omstart, start datamaskinen på nytt, reboot, restart
-start-search-power-off-keywords = slå av, avslutt, slå av datamaskinen, shut down, shutdown
+gust-search-dark-style-on = Byt til mørk modus
+gust-search-dark-style-off = Byt til lys modus
+gust-search-dark-style-keywords = mørk modus, mørkt tema, mørk stil, lys modus, lyst tema, lys stil, dark mode, dark theme, light mode
+gust-search-night-light-on = Slå på nattlys
+gust-search-night-light-off = Slå av nattlys
+gust-search-night-light-keywords = nattlys, blått lys, varme fargar, varmare fargar, night light, night shift
+gust-search-do-not-disturb-on = Slå på Ikkje forstyrr
+gust-search-do-not-disturb-off = Slå av Ikkje forstyrr
+gust-search-do-not-disturb-keywords = ikkje forstyrr, forstyrr ikkje, dnd, do not disturb, fokus, stille, demp varslingar, slå av varslingar
+gust-search-wifi-on = Slå på Wi-Fi
+gust-search-wifi-off = Slå av Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, trådlaust, trådlaust nett, wlan
+gust-search-bluetooth-on = Slå på Bluetooth
+gust-search-bluetooth-off = Slå av Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Slå på flymodus
+gust-search-airplane-mode-off = Slå av flymodus
+gust-search-airplane-mode-keywords = flymodus, fly, flightmodus, airplane mode, radio
+gust-search-keep-awake-on = Hald vaken
+gust-search-keep-awake-off = Slutt å halde vaken
+gust-search-keep-awake-keywords = hald vaken, ver vaken, koffein, caffeine, hindre kvilemodus, ikkje sov
+gust-search-lock-keywords = lås skjermen, lås datamaskinen, låseskjerm, lås
+gust-search-suspend-keywords = kvilemodus, kvile, sov, ventemodus, standby, sleep
+gust-search-log-out-keywords = logg ut, logg av, avslutt økta, log out, sign out
+gust-search-restart-keywords = start på nytt, omstart, start datamaskinen på nytt, reboot, restart
+gust-search-power-off-keywords = slå av, avslutt, slå av datamaskinen, shut down, shutdown
 
 ## Quick settings
 

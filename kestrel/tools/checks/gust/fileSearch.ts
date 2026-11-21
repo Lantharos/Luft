@@ -11,9 +11,9 @@ import {press, rightClick} from '../lib/input/input.js';
 import {findWindow, scratch, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
-import {bestTitle, closeStart, descriptionOf, groupTitles, openStart, row, search, withHandler} from './search/results.js';
+import {bestTitle, closeGust, descriptionOf, groupTitles, openGust, row, search, withHandler} from './search/results.js';
 
-const {require, eventually} = checks('Start file search');
+const {require, eventually} = checks('Gust file search');
 const HOME = GLib.get_home_dir();
 const FOLDER = GLib.build_filenamev([HOME, 'Documents', 'Search check']);
 const PLANS = GLib.build_filenamev([FOLDER, 'Harbor plans.txt']);
@@ -73,18 +73,18 @@ function forget(path: string) {
 async function checkRecent() {
   remember(RECENT);
   try {
-    await openStart();
+    await openGust();
     search('quarterly');
     await eventually(() => bestTitle() === 'kestrel-quarterly-report.txt', 'search finds recent files');
   } finally {
-    closeStart();
+    closeGust();
     forget(RECENT);
   }
 }
 
 async function checkNames() {
   await indexed(async () => (await withName('ferry times')).includes(FERRIES), 'the index picks up new files');
-  await openStart();
+  await openGust();
   search('harbor plans');
   await eventually(() => row(`file:${uri(PLANS)}`), 'search finds files by name');
   require(descriptionOf(row(`file:${uri(PLANS)}`)!) === '~/Documents/Search check', 'file results name their folder');
@@ -113,7 +113,7 @@ async function checkNames() {
     press(Clutter.KEY_Return);
     await eventually(() => opened().includes(PLANS), 'Enter opens the file');
   });
-  await openStart();
+  await openGust();
   search('harbor plans');
   await eventually(() => bestTitle() === 'Harbor plans.txt', 'the file is found again');
   await settled();
@@ -131,12 +131,12 @@ async function checkNames() {
 
 async function checkContents() {
   await indexed(async () => (await mentioning('zephyrine')).includes(PLANS), 'the index reads text files');
-  await openStart();
+  await openGust();
   search('zephyrine');
   await eventually(() => row(`file:${uri(PLANS)}`), 'search finds words inside files');
   require(descriptionOf(row(`file:${uri(PLANS)}`)!).includes('zephyrine tide tables'), 'a match inside a file shows the line it is on');
   await capture('search-contents');
-  closeStart();
+  closeGust();
 
   await setBattery({IsPresent: true, OnBattery: true, State: UPOWER_STATE.discharging, Percentage: 80});
   try {
@@ -159,7 +159,7 @@ export async function run() {
     await checkContents();
   } finally {
     search('');
-    closeStart();
+    closeGust();
     removeTree(FOLDER);
   }
 }

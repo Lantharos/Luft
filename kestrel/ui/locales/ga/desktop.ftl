@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Tosaigh
 taskbar-quick-settings = Socruithe tapa
 taskbar-notifications-and-date = Fógraí agus dáta
 taskbar-show-desktop = Taispeáin an deasc
@@ -46,7 +45,6 @@ tray-open-app = Oscail { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Oscail Tosaigh
 board-show-all-windows = Taispeáin gach fuinneog
 board-quick-settings = Socruithe tapa
 

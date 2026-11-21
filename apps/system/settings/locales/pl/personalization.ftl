@@ -76,18 +76,11 @@ settings-appearance-text-size = Rozmiar tekstu
 ## Taskbar
 
 settings-taskbar-preview = Podgląd paska zadań
-settings-start-section = Start
-settings-start-style = Styl
-settings-start-style-menu = Menu
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Wyszukiwanie, aplikacje i foldery obok paska zadań
-settings-start-style-palette-description = Pasek wyszukiwania na środku ekranu do aplikacji, okien, plików i odpowiedzi
-settings-start-button = Pokazuj przycisk Start
-settings-start-button-description = Klawisz Super i tak otwiera menu Start
-settings-start-web = Wyszukiwarka internetowa
+settings-gust-look-panel-description = Wyszukiwanie, aplikacje i foldery obok paska zadań
+settings-gust-look-palette-description = Pasek wyszukiwania na środku ekranu do aplikacji, okien, plików i odpowiedzi
+settings-gust-web = Wyszukiwarka internetowa
 settings-taskbar-shown = Pokazuj pasek zadań
 settings-taskbar-hidden = Ukryty
-settings-taskbar-hidden-description = Zegar i ikony stanu zostają w rogu, a klawisz Super otwiera menu Start
 settings-taskbar-look = Wygląd
 settings-taskbar-look-glass = Szkło
 settings-taskbar-look-solid = Jednolity

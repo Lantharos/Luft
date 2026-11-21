@@ -52,7 +52,7 @@ export class SearchResults {
       actors.push(row.actor);
     };
     if (view.best) {
-      if (titled) actors.push(this.title(t('start-search-best-match')));
+      if (titled) actors.push(this.title(t('gust-search-best-match')));
       add(view.best);
     }
     for (const group of view.groups) {
@@ -115,7 +115,7 @@ export class SearchResults {
   }
 
   private entries(row: Row) {
-    return row.item.menu?.() ?? [{ label: t('start-open'), run: () => row.item.activate() }];
+    return row.item.menu?.() ?? [{ label: t('gust-open'), run: () => row.item.activate() }];
   }
 
   private prune(used: Set<string>): void {

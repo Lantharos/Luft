@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Bunu açabilecek yüklü bir uygulama yok
 portal-app-chooser-find = Uygulama bul
 portal-app-chooser-open = Aç
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Bu web sitesi uygulamalarınıza eklensin mi?
-portal-launcher-website-description = { $site }, Başlat menüsünden kendi penceresinde açılır.
 portal-launcher-title = Bu, uygulamalarınıza eklensin mi?
-portal-launcher-description = { $appName }, Başlat menüsüne bir uygulama eklemek istiyor.
 portal-launcher-name = Ad
 portal-launcher-add = Ekle
 

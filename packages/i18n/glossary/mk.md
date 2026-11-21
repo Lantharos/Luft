@@ -31,7 +31,7 @@ Write standard Macedonian, not Serbian or Bulgarian forms: поставки, д�
 ## Names
 
 - App names stay in Latin and never take an article or ending; put the kind of thing first: „во апликацијата Rover“, „системот Luft“.
-- Settings, Disks and Install Luft are Поставки, Дискови and Инсталирај Luft. Start is Старт, and „менито Старт“ in a sentence.
+- Settings, Disks and Install Luft are Поставки, Дискови and Инсталирај Luft.
 
 ## Plurals
 
@@ -49,7 +49,6 @@ disks-found = { $count ->
 | English | Macedonian | Not | Why |
 | --- | --- | --- | --- |
 | Settings | Поставки | Подесувања | Windows' word, the one most people know |
-| Start | Старт | Почеток | Windows' name for the menu |
 | board | табла | плоча | Reads as a surface to lay things on |
 | All windows | Сите прозорци | Приказ на задачи | What Luft calls the task view |
 | taskbar | лента со задачи | панел | Windows' word |

@@ -89,7 +89,7 @@ export class PanelSet {
       const [, y] = button.get_transformed_position();
       return { edge, target: y + button.get_transformed_size()[1] / 2, align: 0 };
     }
-    if (surface === 'start') return { edge, target: monitor.x + monitor.width / 2, align: 0 };
+    if (surface === 'gust') return { edge, target: monitor.x + monitor.width / 2, align: 0 };
     return rightToLeft() ? { edge, target: monitor.x + EDGE_MARGIN, align: -1 } : { edge, target: monitor.x + monitor.width - EDGE_MARGIN, align: 1 };
   }
 

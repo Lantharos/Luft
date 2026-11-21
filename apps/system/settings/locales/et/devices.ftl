@@ -280,7 +280,6 @@ settings-keyboard-shortcuts-description = Vaata ja muuda kiirklahve või lisa om
 settings-keyboard-copilot = Copiloti klahv
 settings-keyboard-copilot-press = Vajutus
 settings-keyboard-copilot-press-description = Mida teeb klahvi lühike vajutus
-settings-keyboard-copilot-open-start = Ava Start
 settings-keyboard-copilot-open-app = Ava rakendus
 settings-keyboard-copilot-nothing = Mitte midagi
 settings-keyboard-copilot-app = Rakendus

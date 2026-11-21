@@ -6,9 +6,6 @@ home-look = Fes-hi una ullada
 home-desktop-alt = L’escriptori de Luft amb Rover, Configuració i Tern oberts damunt d’un bosc amb boira
 home-intro = Luft és un sistema complet per al vostre PC, basat en Fedora. Té el seu propi escriptori, les seves pròpies aplicacions i un nucli que es manté sempre sencer, perquè pugueu continuar amb el vostre dia.
 
-home-start-heading = Inici sap on és tot.
-home-start-text = Escriviu unes quantes lletres i Inici troba aplicacions, paràmetres, fitxers i fins i tot les paraules que contenen. Fa càlculs i conversions d’unitats, i activa el mode fosc o el Wi-Fi quan l’hi demaneu.
-home-start-alt = Inici cercant «fosc», amb l’acció Mode fosc i els paràmetres que hi coincideixen
 
 home-essentials-heading = L’essencial, a un clic.
 home-essentials-text = La configuració ràpida es compon de mosaics que organitzeu al vostre gust. Les notificacions s’agrupen per aplicació, amb respostes, controls multimèdia i un calendari just al costat.
@@ -23,7 +20,6 @@ home-all-windows-alt = Totes les finestres i els espais de treball d’un cop d�
 
 home-motion-heading = Cada moviment té intenció.
 home-motion-text = A Luft tot es mou sobre molles, així que pot canviar d’idea a mig camí sense sotracs. Els gestos segueixen els vostres dits i s’aturen on volíeu, i les aplicacions s’obren de pressa, fins i tot la primera vegada.
-home-motion-clip = Inici, la configuració ràpida, totes les finestres d’un cop d’ull i el tauler obrint-se i tancant-se a Luft
 
 home-wallpapers-heading = Trieu una foto. Luft fa la resta.
 home-wallpapers-text = { $count ->

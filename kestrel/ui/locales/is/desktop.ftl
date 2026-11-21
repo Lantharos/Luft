@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Upphaf
 taskbar-quick-settings = Flýtistillingar
 taskbar-notifications-and-date = Tilkynningar og dagsetning
 taskbar-show-desktop = Sýna skjáborð
@@ -43,7 +42,6 @@ tray-open-app = Opna { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Opna upphafsvalmynd
 board-show-all-windows = Sýna alla glugga
 board-quick-settings = Flýtistillingar
 

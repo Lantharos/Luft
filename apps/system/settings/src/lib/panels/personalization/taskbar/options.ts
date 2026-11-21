@@ -5,7 +5,7 @@ export type Style = 'bar' | 'floating' | 'separate';
 export type Size = 'compact' | 'normal' | 'large';
 export type AutoHide = 'never' | 'always' | 'windows';
 export type Displays = 'all' | 'primary';
-export type StartStyle = 'menu' | 'palette';
+export type GustLook = 'panel' | 'palette';
 export type WebSearch = 'duckduckgo' | 'google' | 'bing' | 'brave' | 'ecosia' | 'startpage' | 'kagi';
 
 export type TaskbarSettings = {
@@ -20,8 +20,8 @@ export type TaskbarSettings = {
 	'taskbar-windows-per-workspace': boolean;
 	'taskbar-badges': boolean;
 	'taskbar-shown': boolean;
-	'taskbar-start-button': boolean;
-	'start-style': StartStyle;
+	'taskbar-gust-button': boolean;
+	'gust-look': GustLook;
 	'search-web-engine': WebSearch;
 	'favorite-apps': string[];
 };
@@ -38,15 +38,15 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 	'taskbar-windows-per-workspace',
 	'taskbar-badges',
 	'taskbar-shown',
-	'taskbar-start-button',
-	'start-style',
+	'taskbar-gust-button',
+	'gust-look',
 	'search-web-engine',
 	'favorite-apps'
 ];
 
-export const START_STYLES: { value: StartStyle; label: string }[] = [
-	{ value: 'menu', label: 'settings-start-style-menu' },
-	{ value: 'palette', label: 'settings-start-style-palette' }
+export const GUST_LOOKS: { value: GustLook; label: string }[] = [
+	{ value: 'panel', label: 'settings-gust-look-panel' },
+	{ value: 'palette', label: 'settings-gust-look-palette' }
 ];
 
 export const WEB_SEARCH: { value: WebSearch; label: string }[] = [

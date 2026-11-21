@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Katso ja muuta pikanäppäimiä tai li
 settings-keyboard-copilot = Copilot-näppäin
 settings-keyboard-copilot-press = Painallus
 settings-keyboard-copilot-press-description = Mitä näppäimen lyhyt painallus tekee
-settings-keyboard-copilot-open-start = Avaa Start
 settings-keyboard-copilot-open-app = Avaa sovellus
 settings-keyboard-copilot-nothing = Ei mitään
 settings-keyboard-copilot-app = Sovellus

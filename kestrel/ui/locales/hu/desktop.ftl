@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Gyorsbeállítások
 taskbar-notifications-and-date = Értesítések és dátum
 taskbar-show-desktop = Asztal megjelenítése
@@ -43,7 +42,6 @@ tray-open-app = { $appName } megnyitása
 
 ## Board (tablet window layout)
 
-board-open-start = Start megnyitása
 board-show-all-windows = Összes ablak megjelenítése
 board-quick-settings = Gyorsbeállítások
 

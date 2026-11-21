@@ -293,7 +293,6 @@ settings-keyboard-shortcuts-description = Ara u ibdel ix-shortcuts, jew żid tie
 settings-keyboard-copilot = Tast Copilot
 settings-keyboard-copilot-press = Għafsa
 settings-keyboard-copilot-press-description = X’tagħmel għafsa qasira tat-tast
-settings-keyboard-copilot-open-start = Iftaħ Start
 settings-keyboard-copilot-open-app = Iftaħ app
 settings-keyboard-copilot-nothing = Xejn
 settings-keyboard-copilot-app = App

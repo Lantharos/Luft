@@ -33,9 +33,8 @@ import { ClipboardPanel } from '../surfaces/clipboard/panel.js';
 import { EmojiPanel } from '../surfaces/emoji/panel.js';
 import { NotificationCenter } from '../surfaces/notifications/notificationCenter.js';
 import { QuickSettings } from '../surfaces/quickSettings/quickSettings.js';
-import { Palette } from '../surfaces/palette/palette.js';
 import type { SearchHost } from '../surfaces/search/engine.js';
-import { StartMenu } from '../surfaces/start/startMenu.js';
+import { createGust } from '../surfaces/gust/gust.js';
 import { warmHidden } from '../surfaces/prewarm/hidden.js';
 import { prewarmAfterStartup, prewarmSoon, type Step } from '../surfaces/prewarm/queue.js';
 import { Surfaces, type Surface } from '../surfaces/surfaces.js';
@@ -77,14 +76,14 @@ export class DesktopUi {
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private sessionSyncLater = 0;
-  private cancelStartPrewarm = () => {};
+  private cancelGustPrewarm = () => {};
   private arranging: TaskbarEditor | null = null;
   private readonly taskbarService = new TaskbarService(() => this.arrangeTaskbar());
   private draggedWindow: Meta.Window | null = null;
   private readonly syncSessionAfterMotion = () => this.syncSession();
 
   constructor(private readonly context: Context) {
-    this.services = new SystemServices(context, () => this.openStart());
+    this.services = new SystemServices(context, () => this.openGust());
     const close = () => this.surfaces.close();
     const place = () => this.surfaces.place();
     const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
@@ -105,7 +104,7 @@ export class DesktopUi {
       addChrome: actor => context.layoutManager.addChrome(actor),
       setPanelsHidden: hidden => this.panels.suppress(hidden),
       openQuickSettings: () => this.surfaces.toggle('quick'),
-      openStart: () => this.surfaces.toggle('start'),
+      openGust: () => this.surfaces.toggle('gust'),
       changed: () => this.syncSession(),
       canInteract: () => this.canInteract() && !this.surfaces.active,
     });
@@ -127,11 +126,11 @@ export class DesktopUi {
         this.board.showStatus(icons);
       }, this.menus, () => this.takeScreenshot());
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
-    this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
+    this.copilot = new CopilotActions(context, () => this.surfaces.toggle('gust'), text => clipboard.pasteWithoutKeeping(text));
     this.penActions = new PenActions({
       canInteract: () => this.canInteract(),
       takeScreenshot: () => this.takeScreenshot(),
-      toggleStart: () => this.surfaces.toggle('start'),
+      toggleGust: () => this.surfaces.toggle('gust'),
     });
     const searchHost: SearchHost = {
       menus: this.menus,
@@ -162,7 +161,7 @@ export class DesktopUi {
         switch (surface) {
           case 'taskbar': return this.panels.all.flatMap(panel => panel.islandAnchors());
           case 'quick-settings': return [{ actor: this.quick.actor }];
-          case 'start': return [{ actor: this.surfaces.start.actor }];
+          case 'gust': return [{ actor: this.surfaces.gust.actor }];
           case 'notifications': return [{ actor: this.surfaces.notifications.actor }];
         }
       },
@@ -205,7 +204,7 @@ export class DesktopUi {
       previews: this.previews,
       panels: () => this.panels,
       board: this.board,
-      start: () => taskbarPreferences.startStyle === 'palette' ? new Palette(searchHost) : new StartMenu(searchHost),
+      gust: () => createGust(searchHost),
       quick: this.quick,
       notifications: () => new NotificationCenter(context.messageTray, this.menus, place, close),
       clipboard,
@@ -218,7 +217,7 @@ export class DesktopUi {
         depths: monitor => this.taskbarDepths(monitor),
         anchor: (surface, monitor) => this.taskbarAnchor(surface, monitor),
       },
-      startReplaced: () => this.prewarmStart(),
+      gustReplaced: () => this.prewarmGust(),
     });
 
     context.layoutManager.addTopChrome(this.menus.shield);
@@ -228,7 +227,7 @@ export class DesktopUi {
     this.post = createPost(this.extensions.host);
 
     this.panels = new PanelSet(context.layoutManager, monitor => ({
-      start: () => this.surfaces.toggle('start', monitor()),
+      gust: () => this.surfaces.toggle('gust', monitor()),
       quickSettings: () => this.surfaces.toggle('quick', monitor()),
       notifications: () => this.surfaces.toggle('notifications', monitor()),
       activateWindow: context.activateWindow,
@@ -245,7 +244,7 @@ export class DesktopUi {
     this.disconnectors.push(taskbarPreferences.watch(key => {
       if (key === 'taskbar-arrangement' || key === 'tablet') this.followTaskbarEdge();
       if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
-      if (key === 'start-style') this.surfaces.restyleStart();
+      if (key === 'gust-look') this.surfaces.restyleGust();
     }));
 
     context.layoutManager.addTopChrome(this.surfaces.cover);
@@ -315,7 +314,7 @@ export class DesktopUi {
     place();
     this.syncSession();
     this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
-      ...this.startPrewarm(),
+      ...this.gustPrewarm(),
       () => warmHidden(this.quick.actor, { focused: this.quick.actor }),
       () => warmHidden(this.surfaces.notifications.actor, { focused: this.surfaces.notifications.actor, place }),
       () => this.surfaces.emoji.prewarm(),
@@ -402,7 +401,7 @@ export class DesktopUi {
     return this.panels.depthsOn(monitor);
   }
 
-  taskbarAnchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor {
+  taskbarAnchor(surface: 'gust' | 'quick' | 'notifications', monitor: Monitor): Anchor {
     if (this.board.shown) return { edge: 'bottom', target: monitor.x + monitor.width - EDGE_MARGIN, align: 1 };
     return this.panels.anchorFor(surface, monitor);
   }
@@ -422,15 +421,15 @@ export class DesktopUi {
     this.arranging = new TaskbarEditor(this.context.layoutManager, this.panels, () => (this.arranging = null));
   }
 
-  private prewarmStart(): void {
-    this.cancelStartPrewarm();
-    this.cancelStartPrewarm = prewarmSoon(this.startPrewarm());
+  private prewarmGust(): void {
+    this.cancelGustPrewarm();
+    this.cancelGustPrewarm = prewarmSoon(this.gustPrewarm());
   }
 
-  private startPrewarm(): Step[] {
+  private gustPrewarm(): Step[] {
     return [
-      () => this.surfaces.start.reset(),
-      () => warmHidden(this.surfaces.start.actor, { focused: this.surfaces.start.search, place: () => this.surfaces.place() }),
+      () => this.surfaces.gust.reset(),
+      () => warmHidden(this.surfaces.gust.actor, { focused: this.surfaces.gust.search, place: () => this.surfaces.place() }),
     ];
   }
 
@@ -440,7 +439,7 @@ export class DesktopUi {
       this.board.toggle();
       return;
     }
-    this.surfaces.toggle('start');
+    this.surfaces.toggle('gust');
   }
 
   private followFourFingers(direction: SwipeDirection): SwipeTrack | null {
@@ -461,8 +460,8 @@ export class DesktopUi {
     });
   }
 
-  private openStart(): void {
-    if (this.surfaces.active !== 'start') this.surfaces.toggle('start');
+  private openGust(): void {
+    if (this.surfaces.active !== 'gust') this.surfaces.toggle('gust');
   }
 
   dismissImmediately(): void {
@@ -491,7 +490,7 @@ export class DesktopUi {
 
   shutdown(): void {
     for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
-    this.cancelStartPrewarm();
+    this.cancelGustPrewarm();
     if (this.sessionSyncLater) global.compositor.get_laters().remove(this.sessionSyncLater);
     dropAfterMotion(this.syncSessionAfterMotion);
     this.arranging?.cancel();

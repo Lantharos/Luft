@@ -8,7 +8,7 @@ import { localized, onLocaleChanged, t } from '../../../shared/i18n/index.js';
 import { blurSurface } from '../../../shared/layout/surface.js';
 import { dock, isVertical } from '../../../shared/layout/edge.js';
 import { pressable } from '../../../shared/motion/motion.js';
-import { createLauncher, type Launcher } from '../launcher/launcher.js';
+import { createGustButton, type GustButton } from '../gustButton/gustButton.js';
 import type { Monitor } from '../panel.js';
 import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import { timeText } from './clockText.js';
@@ -17,7 +17,7 @@ const MARGIN = 12;
 const MARK_SIZE = 36;
 
 export interface CornerActions {
-  start(): void;
+  gust(): void;
   quickSettings(): void;
   notifications(): void;
 }
@@ -34,7 +34,7 @@ export class StatusCorner {
   readonly actor = new St.BoxLayout({ name: 'kestrel-status-corner', style_class: 'kestrel-status-corner', visible: false });
   private readonly status = new St.BoxLayout({ style_class: 'kestrel-corner-status', y_align: Clutter.ActorAlign.CENTER });
   private readonly time = new St.Label({ style_class: 'kestrel-corner-time', y_align: Clutter.ActorAlign.CENTER });
-  private readonly launcher: Launcher;
+  private readonly gustButton: GustButton;
   private readonly buttons: [St.Button, string][];
   private readonly clock = new WallClock((now, clock) => this.tick(now, clock));
   private readonly forgetLocale = onLocaleChanged(() => this.tick(GLib.DateTime.new_now_local(), this.clock));
@@ -42,9 +42,9 @@ export class StatusCorner {
   private monitor: Monitor | null = null;
 
   constructor(actions: CornerActions) {
-    this.launcher = createLauncher(actions.start, MARK_SIZE, () => this.actor);
-    this.launcher.button.add_style_class_name('kestrel-corner-start kestrel-glass');
-    blurSurface(this.launcher.button, 999, 'taskbar');
+    this.gustButton = createGustButton(actions.gust, MARK_SIZE, () => this.actor);
+    this.gustButton.button.add_style_class_name('kestrel-corner-gust kestrel-glass');
+    blurSurface(this.gustButton.button, 999, 'taskbar');
     const statusBox = new St.BoxLayout({ style_class: 'kestrel-corner-status' });
     statusBox.add_child(this.status);
     statusBox.add_child(new BatteryIndicator(16).actor);
@@ -52,10 +52,10 @@ export class StatusCorner {
     const clock = pill('kestrel-corner-clock', this.time, actions.notifications);
     localized(quick, () => (quick.accessible_name = t('taskbar-quick-settings')));
     localized(clock, () => (clock.accessible_name = t('taskbar-notifications-and-date')));
-    this.buttons = [[this.launcher.button, 'start'], [quick, 'quick'], [clock, 'notifications']];
+    this.buttons = [[this.gustButton.button, 'gust'], [quick, 'quick'], [clock, 'notifications']];
     for (const [button] of this.buttons) this.actor.add_child(button);
-    this.syncStartButton();
-    this.unwatchPreferences = taskbarPreferences.watch(key => { if (key === 'taskbar-start-button') this.syncStartButton(); });
+    this.syncGustButton();
+    this.unwatchPreferences = taskbarPreferences.watch(key => { if (key === 'taskbar-gust-button') this.syncGustButton(); });
     this.actor.connect('notify::width', () => this.reposition());
     this.actor.connect('notify::height', () => this.reposition());
   }
@@ -110,8 +110,8 @@ export class StatusCorner {
     this.actor.destroy();
   }
 
-  private syncStartButton(): void {
-    this.launcher.button.visible = this.screen.startButton;
+  private syncGustButton(): void {
+    this.gustButton.button.visible = this.screen.gustButtonShown;
   }
 
   private size(): [number, number] {

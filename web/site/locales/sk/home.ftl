@@ -8,9 +8,6 @@ home-look = Pozrieť sa
 home-desktop-alt = Pracovná plocha systému Luft s aplikáciami Rover, Nastavenia a Tern otvorenými nad hmlistým lesom
 home-intro = Luft je kompletný systém pre váš počítač, postavený na Fedore. Má vlastné prostredie, vlastné aplikácie a jadro, ktoré sa samo drží pokope, takže sa môžete venovať svojim veciam.
 
-home-start-heading = Start vie, kde čo je.
-home-start-text = Napíšte pár písmen a ponuka Start nájde aplikácie, nastavenia, súbory, ba aj slová v nich. Vie počítať, prevádzať jednotky a na požiadanie zapne tmavý režim alebo Wi-Fi.
-home-start-alt = Ponuka Start hľadá „tmavý“ a ponúka akciu tmavého režimu a zodpovedajúce nastavenia
 
 home-essentials-heading = To hlavné na jedno kliknutie.
 home-essentials-text = Rýchle nastavenia sú dlaždice, ktoré si usporiadate sami. Oznámenia sa zoskupujú podľa aplikácie a hneď vedľa sú odpovede, ovládanie médií a kalendár.
@@ -25,7 +22,6 @@ home-all-windows-alt = Všetky okná a pracovné priestory na jeden pohľad
 
 home-motion-heading = Pohyb, ktorý dáva zmysel.
 home-motion-text = Všetko v systéme Luft sa pohybuje na pružinách, takže môže v polovici pohybu zmeniť smer bez trhnutia. Potiahnutia sledujú vaše prsty a skončia tam, kde ste chceli, a aplikácie sa otvárajú rýchlo, aj prvýkrát.
-home-motion-clip = Ponuka Start, rýchle nastavenia, všetky okná na jeden pohľad a tabuľa pri otváraní a zatváraní v systéme Luft
 
 home-wallpapers-heading = Vyberte fotku. Zvyšok zariadi Luft.
 home-wallpapers-text = { $count ->

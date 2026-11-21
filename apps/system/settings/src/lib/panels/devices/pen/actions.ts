@@ -3,7 +3,7 @@ import { labels } from '../input/shortcuts/keys/accelerator';
 
 export const PEN_SCHEMA = 'com.lantharos.kestrel.pen';
 
-export type PenAction = 'right' | 'middle' | 'eraser' | 'screenshot' | 'notes' | 'start' | 'back' | 'forward' | 'switch-monitor' | 'keybinding' | 'nothing';
+export type PenAction = 'right' | 'middle' | 'eraser' | 'screenshot' | 'notes' | 'gust' | 'back' | 'forward' | 'switch-monitor' | 'keybinding' | 'nothing';
 
 export type ButtonKey = 'button' | 'secondary-button' | 'eraser-button';
 
@@ -44,7 +44,7 @@ const LABELS: Record<PenAction, string> = {
 	eraser: 'settings-pen-action-eraser',
 	screenshot: 'settings-pen-action-screenshot',
 	notes: 'settings-pen-action-notes',
-	start: 'settings-pen-action-start',
+	gust: 'settings-pen-action-gust',
 	back: 'settings-pen-action-back',
 	forward: 'settings-pen-action-forward',
 	'switch-monitor': 'settings-pen-action-switch-monitor',
@@ -53,7 +53,7 @@ const LABELS: Record<PenAction, string> = {
 };
 
 export function actionsFor({ notes, tablet }: ActionChoices, button: ButtonKey): PenAction[] {
-	const all: PenAction[] = ['right', 'middle', 'eraser', 'screenshot', 'notes', 'start', 'back', 'forward', 'switch-monitor', 'keybinding', 'nothing'];
+	const all: PenAction[] = ['right', 'middle', 'eraser', 'screenshot', 'notes', 'gust', 'back', 'forward', 'switch-monitor', 'keybinding', 'nothing'];
 	return all.filter(
 		(action) => (action !== 'notes' || notes) && (action !== 'switch-monitor' || tablet) && (action !== 'eraser' || button !== 'eraser-button')
 	);

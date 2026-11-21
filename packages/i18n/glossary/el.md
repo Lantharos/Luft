@@ -26,7 +26,7 @@ Write modern Greek in the monotonic system and the current standard spelling. Ad
 
 ## Names
 
-- Settings, Disks and Install Luft are nouns like other Greek app names: Ρυθμίσεις, Δίσκοι, Εγκατάσταση Luft. Start stays Start: «το μενού Start».
+- Settings, Disks and Install Luft are nouns like other Greek app names: Ρυθμίσεις, Δίσκοι, Εγκατάσταση Luft.
 - Names in Latin letters don't inflect and take the neuter article: «το Luft», «στο Tern». When the gender or case must be clear: «η εφαρμογή Rover έκλεισε».
 - Windows is plural: «τα Windows».
 

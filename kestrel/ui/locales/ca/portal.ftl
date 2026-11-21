@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Cap aplicació instal·lada no pot obrir 
 portal-app-chooser-find = Cerca una aplicació
 portal-app-chooser-open = Obre
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Voleu afegir aquest lloc web a les aplicacions?
-portal-launcher-website-description = { $site } s’obrirà en una finestra pròpia des d’Inici.
 portal-launcher-title = Voleu afegir-ho a les aplicacions?
-portal-launcher-description = { $appName } vol afegir una aplicació a Inici.
 portal-launcher-name = Nom
 portal-launcher-add = Afegeix
 

@@ -1,122 +1,123 @@
-## Start
+## Gust
+## Gust is the name of what Super opens: a panel next to the taskbar or a search bar. Keep it as is.
 
-# Placeholder of the search field at the top of Start
-start-search-placeholder = Search apps, files and more
-# Context menu of the Start search field
-start-search-cut = Cut
-start-search-copy = Copy
-start-search-paste = Paste
-start-search-select-all = Select all
+# Placeholder of the search field at the top of Gust
+gust-search-placeholder = Search apps, files and more
+# Context menu of the Gust search field
+gust-search-cut = Cut
+gust-search-copy = Copy
+gust-search-paste = Paste
+gust-search-select-all = Select all
 # Screen-reader label of the button that shows the power and session actions
-start-power = Power and session
+gust-power = Power and session
 # Screen-reader label of the same button while the power actions are shown
-start-power-close = Close power options
-# Context menu of the account name at the bottom of Start
-start-account-settings = Account settings
+gust-power-close = Close power options
+# Context menu of the account name at the bottom of Gust
+gust-account-settings = Account settings
 # Button that leads from an app folder back to all apps
-start-apps = Apps
+gust-apps = Apps
 # Name given to a new folder made by dropping one app onto another
-start-folder-default-name = Folder
+gust-folder-default-name = Folder
 # Context menu of an app folder; "Open" is a verb
-start-folder-open = Open folder
-start-folder-rename = Rename
-start-folder-ungroup = Ungroup apps
+gust-folder-open = Open folder
+gust-folder-rename = Rename
+gust-folder-ungroup = Ungroup apps
 # Context menu entry; "Open" is a verb
-start-open = Open
+gust-open = Open
 # Context menu of an app inside a folder: moves it back to the main grid
-start-move-to-apps = Move to Apps
+gust-move-to-apps = Move to Apps
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Best match
-start-search-group-apps = Apps
+gust-search-best-match = Best match
+gust-search-group-apps = Apps
 # Actions an app offers in its menu, such as "New private window"
-start-search-group-commands = App actions
-start-search-group-windows = Open windows
-start-search-group-actions = Actions
-start-search-group-settings = Settings
-start-search-group-clipboard = Clipboard
-start-search-group-emoji = Emoji
-start-search-group-files = Files
+gust-search-group-commands = App actions
+gust-search-group-windows = Open windows
+gust-search-group-actions = Actions
+gust-search-group-settings = Settings
+gust-search-group-clipboard = Clipboard
+gust-search-group-emoji = Emoji
+gust-search-group-files = Files
 # Files whose contents mention the search text
-start-search-group-contents = Inside files
-start-search-group-web = Web
+gust-search-group-contents = Inside files
+gust-search-group-web = Web
 # $query is what was typed
-start-search-web = Search the web for “{ $query }”
+gust-search-web = Search the web for “{ $query }”
 # Description of something copied earlier, found in the clipboard history
-start-search-clipboard-text = From the clipboard history
+gust-search-clipboard-text = From the clipboard history
 # Comma-separated words people might type to list what they copied. They aren't shown
-start-search-clipboard-keywords = clipboard, copied, clipboard history, paste
+gust-search-clipboard-keywords = clipboard, copied, clipboard history, paste
 # Context menu of an emoji: puts it where you're typing
-start-search-emoji-insert = Insert
+gust-search-emoji-insert = Insert
 # Description of a Settings page in search results
-start-search-settings-page = Settings
+gust-search-settings-page = Settings
 # Description of a section inside a Settings page; $page is the page title, such as "Appearance"
-start-search-settings-section = { $page } settings
+gust-search-settings-section = { $page } settings
 # Context menu of a file; $fileManager is the name of the file manager app
-start-search-file-reveal = Show in { $fileManager }
-start-search-file-copy-path = Copy path
+gust-search-file-reveal = Show in { $fileManager }
+gust-search-file-copy-path = Copy path
 # Description of a unit conversion; $amount and $from are what was typed, $to is the target unit symbol
-start-search-conversion = { $amount } { $from } in { $to }
+gust-search-conversion = { $amount } { $from } in { $to }
 # Description of a calculation result; $expression is what was typed
-start-search-calculation = { $expression }, press Enter to copy
+gust-search-calculation = { $expression }, press Enter to copy
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
 # $date is a date, such as "27 March 2027"
-start-search-answer-until = Until { $date }
-start-search-answer-since = Since { $date }
-start-search-answer-between = Between { $from } and { $to }
+gust-search-answer-until = Until { $date }
+gust-search-answer-since = Since { $date }
+gust-search-answer-between = Between { $from } and { $to }
 # The time somewhere else compared with here; $place is a city as typed, such as "Tokyo"
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } hour
    *[other] { $hours } hours
 } ahead
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } hour
    *[other] { $hours } hours
 } behind
-start-search-answer-time-same = { $place }, the same time as here
+gust-search-answer-time-same = { $place }, the same time as here
 # Describes a converted time: the answer is the time in $place when it's $time in $from, such as "In New York when it's 22:00 in London"
-start-search-answer-converted = In { $place } when it’s { $time } in { $from }
-start-search-answer-converted-here = Here when it’s { $time } in { $from }
-start-search-answer-converted-from-here = In { $place } when it’s { $time } here
+gust-search-answer-converted = In { $place } when it’s { $time } in { $from }
+gust-search-answer-converted-here = Here when it’s { $time } in { $from }
+gust-search-answer-converted-from-here = In { $place } when it’s { $time } here
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Switch to dark style
-start-search-dark-style-off = Switch to light style
-start-search-dark-style-keywords = dark style, dark mode, dark theme, light style, light mode, light theme
-start-search-night-light-on = Turn on night light
-start-search-night-light-off = Turn off night light
-start-search-night-light-keywords = night light, night shift, blue light, warm colors
-start-search-do-not-disturb-on = Turn on Do Not Disturb
-start-search-do-not-disturb-off = Turn off Do Not Disturb
-start-search-do-not-disturb-keywords = do not disturb, dnd, focus, quiet, silence notifications, mute notifications
-start-search-wifi-on = Turn on Wi-Fi
-start-search-wifi-off = Turn off Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, wireless, wlan
-start-search-bluetooth-on = Turn on Bluetooth
-start-search-bluetooth-off = Turn off Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Turn on airplane mode
-start-search-airplane-mode-off = Turn off airplane mode
-start-search-airplane-mode-keywords = airplane mode, flight mode, aeroplane mode, radios
-start-search-keep-awake-on = Keep awake
-start-search-keep-awake-off = Stop keeping awake
-start-search-keep-awake-keywords = keep awake, stay awake, caffeine, prevent sleep
-start-search-lock-keywords = lock screen, lock computer
-start-search-suspend-keywords = sleep, suspend, standby
-start-search-log-out-keywords = log out, logout, sign out, sign off, end session
-start-search-restart-keywords = reboot, restart computer
-start-search-power-off-keywords = shut down, shutdown, turn off computer, power down
+gust-search-dark-style-on = Switch to dark style
+gust-search-dark-style-off = Switch to light style
+gust-search-dark-style-keywords = dark style, dark mode, dark theme, light style, light mode, light theme
+gust-search-night-light-on = Turn on night light
+gust-search-night-light-off = Turn off night light
+gust-search-night-light-keywords = night light, night shift, blue light, warm colors
+gust-search-do-not-disturb-on = Turn on Do Not Disturb
+gust-search-do-not-disturb-off = Turn off Do Not Disturb
+gust-search-do-not-disturb-keywords = do not disturb, dnd, focus, quiet, silence notifications, mute notifications
+gust-search-wifi-on = Turn on Wi-Fi
+gust-search-wifi-off = Turn off Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, wireless, wlan
+gust-search-bluetooth-on = Turn on Bluetooth
+gust-search-bluetooth-off = Turn off Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Turn on airplane mode
+gust-search-airplane-mode-off = Turn off airplane mode
+gust-search-airplane-mode-keywords = airplane mode, flight mode, aeroplane mode, radios
+gust-search-keep-awake-on = Keep awake
+gust-search-keep-awake-off = Stop keeping awake
+gust-search-keep-awake-keywords = keep awake, stay awake, caffeine, prevent sleep
+gust-search-lock-keywords = lock screen, lock computer
+gust-search-suspend-keywords = sleep, suspend, standby
+gust-search-log-out-keywords = log out, logout, sign out, sign off, end session
+gust-search-restart-keywords = reboot, restart computer
+gust-search-power-off-keywords = shut down, shutdown, turn off computer, power down
 
 ## Quick settings
 
-# Session actions, shown as buttons in Start and as search results; "Lock" is a verb
+# Session actions, shown as buttons in Gust and as search results; "Lock" is a verb
 quick-settings-lock = Lock
 quick-settings-suspend = Sleep
 quick-settings-log-out = Sign out

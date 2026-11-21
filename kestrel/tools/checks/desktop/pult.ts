@@ -15,7 +15,7 @@ import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
-import {closeStart, openStart, rows, search, titleOf} from '../start/search/results.js';
+import {closeGust, openGust, rows, search, titleOf} from '../gust/search/results.js';
 import {builtFolder, installBuilt, listed, request, rewrite} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Pult');
@@ -89,11 +89,11 @@ async function checkPopup() {
 }
 
 async function checkSearch() {
-  await openStart();
+  await openGust();
   search('refund');
-  await eventually(() => rows().some(row => titleOf(row) === 'Refund failed for order 4821'), 'Start finds Pult items');
+  await eventually(() => rows().some(row => titleOf(row) === 'Refund failed for order 4821'), 'Gust finds Pult items');
   await capture('pult-search');
-  closeStart();
+  closeGust();
 }
 
 async function checkSigningOut(pult: StandInPult, keyring: ScratchKeyring) {

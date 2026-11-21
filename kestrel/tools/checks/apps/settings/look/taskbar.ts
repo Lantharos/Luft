@@ -10,9 +10,9 @@ import {show} from '../navigation.js';
 
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
 const LAYOUTS: [string, string, [string, string[]][]][] = [
-  ['side', 'separate', [['left-center', ['start', 'dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
-  ['mac', 'separate', [['bottom-center', ['start', 'dock']], ['top-end', ['tray', 'status', 'clock']]]],
-  ['start-alone', 'separate', [['bottom-start', ['start']], ['bottom-center', ['dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
+  ['side', 'separate', [['left-center', ['gust', 'dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
+  ['mac', 'separate', [['bottom-center', ['gust', 'dock']], ['top-end', ['tray', 'status', 'clock']]]],
+  ['gust-alone', 'separate', [['bottom-start', ['gust']], ['bottom-center', ['dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
 ];
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
@@ -43,13 +43,13 @@ export async function checkTaskbarLooks(app: LuftApp) {
         await captureEdge(`taskbar-${look}-${scheme}`);
       }
     }
-    for (const [style, shown] of [['palette', true], ['menu', false]] as const) {
-      kestrel.set_string('start-style', style);
+    for (const [look, shown] of [['palette', true], ['panel', false]] as const) {
+      kestrel.set_string('gust-look', look);
       kestrel.set_boolean('taskbar-shown', shown);
       await settled();
-      (await app.settle(() => true)).save(`settings-taskbar-${style}${shown ? '' : '-hidden'}`);
+      (await app.settle(() => true)).save(`settings-taskbar-${look}${shown ? '' : '-hidden'}`);
     }
   } finally {
-    for (const key of ['taskbar-look', 'start-style', 'taskbar-shown']) kestrel.reset(key);
+    for (const key of ['taskbar-look', 'gust-look', 'taskbar-shown']) kestrel.reset(key);
   }
 }

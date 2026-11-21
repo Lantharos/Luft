@@ -20,25 +20,25 @@ const RESTART = 2;
 const UNHURRIED = 3600;
 const COUNTDOWN = 60;
 
-async function checkLockMode(panel: Clutter.Actor, start: Clutter.Actor) {
+async function checkLockMode(panel: Clutter.Actor, gust: Clutter.Actor) {
   Main.sessionMode.pushMode('unlock-dialog');
   try {
-    await eventually(() => !panel.visible && !start.visible, 'lock mode hides the taskbar and Start');
+    await eventually(() => !panel.visible && !gust.visible, 'lock mode hides the taskbar and Gust');
     global.display.emit('overlay-key');
     await nextFrame();
-    require(!start.visible, 'Super cannot open Start while locked');
+    require(!gust.visible, 'Super cannot open Gust while locked');
   } finally {
     Main.sessionMode.popMode('unlock-dialog');
   }
   await eventually(() => panel.visible, 'the taskbar returns after leaving lock mode');
 }
 
-async function checkHeadset(start: Clutter.Actor) {
-  toggleSurface('start');
-  await eventually(() => shown(start), 'Start opens');
+async function checkHeadset(gust: Clutter.Actor) {
+  toggleSurface('gust');
+  await eventually(() => shown(gust), 'Gust opens');
   const {HEADPHONES, HEADSET, MICROPHONE} = Shell.MixerHeadset;
   Shell.Mixer.get_default().emit('headset-changed', HEADPHONES | HEADSET | MICROPHONE);
-  await eventually(() => !start.visible && Main.modalCount > 0, 'plugging in a headset asks what it is, dismissing Start');
+  await eventually(() => !gust.visible && Main.modalCount > 0, 'plugging in a headset asks what it is, dismissing Gust');
   await capture('audio-device-dialog');
   press(Clutter.KEY_Escape);
   await eventually(() => Main.modalCount === 0, 'Escape cancels the audio device question');
@@ -88,9 +88,9 @@ async function checkRestart() {
 
 export async function run() {
   const panel = existing('kestrel-panel');
-  const start = existing('kestrel-start');
-  await checkLockMode(panel, start);
-  await checkHeadset(start);
+  const gust = existing('kestrel-gust-panel');
+  await checkLockMode(panel, gust);
+  await checkHeadset(gust);
   await checkVolumePassword();
   await checkEndSession();
   await checkRestart();

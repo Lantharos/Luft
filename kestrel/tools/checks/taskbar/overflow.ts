@@ -36,14 +36,14 @@ interface Layout {
 }
 
 const LAYOUTS: Layout[] = [
-  {name: 'classic', style: 'bar', islands: [['bottom-start', ['start', 'dock']], ['bottom-end', SYSTEM]]},
-  {name: 'classic-large', style: 'bar', size: 'large', islands: [['bottom-start', ['start', 'dock']], ['bottom-end', [WEATHER, ...SYSTEM]]]},
-  {name: 'centered', style: 'floating', islands: [['bottom-center', ['start', 'dock']], ['bottom-end', [PLAYING, WEATHER, ...SYSTEM]]]},
-  {name: 'separate', style: 'separate', islands: [['bottom-center', ['start', 'dock', PLAYING]], ['bottom-end', [WEATHER, ...SYSTEM]]]},
-  {name: 'apps-alone', style: 'separate', islands: [['bottom-start', ['start']], ['bottom-center', ['dock']], ['bottom-end', [PLAYING, ...SYSTEM]]]},
-  {name: 'top-end', style: 'floating', islands: [['top-start', [WEATHER]], ['top-end', ['start', 'dock', ...SYSTEM]]]},
-  {name: 'left', style: 'bar', islands: [['left-center', ['start', 'dock']], ['left-end', [PLAYING, ...SYSTEM]]]},
-  {name: 'side', style: 'separate', islands: [['left-center', ['start', 'dock']], ['bottom-end', [PLAYING, WEATHER, ...SYSTEM]]]},
+  {name: 'classic', style: 'bar', islands: [['bottom-start', ['gust', 'dock']], ['bottom-end', SYSTEM]]},
+  {name: 'classic-large', style: 'bar', size: 'large', islands: [['bottom-start', ['gust', 'dock']], ['bottom-end', [WEATHER, ...SYSTEM]]]},
+  {name: 'centered', style: 'floating', islands: [['bottom-center', ['gust', 'dock']], ['bottom-end', [PLAYING, WEATHER, ...SYSTEM]]]},
+  {name: 'separate', style: 'separate', islands: [['bottom-center', ['gust', 'dock', PLAYING]], ['bottom-end', [WEATHER, ...SYSTEM]]]},
+  {name: 'apps-alone', style: 'separate', islands: [['bottom-start', ['gust']], ['bottom-center', ['dock']], ['bottom-end', [PLAYING, ...SYSTEM]]]},
+  {name: 'top-end', style: 'floating', islands: [['top-start', [WEATHER]], ['top-end', ['gust', 'dock', ...SYSTEM]]]},
+  {name: 'left', style: 'bar', islands: [['left-center', ['gust', 'dock']], ['left-end', [PLAYING, ...SYSTEM]]]},
+  {name: 'side', style: 'separate', islands: [['left-center', ['gust', 'dock']], ['bottom-end', [PLAYING, WEATHER, ...SYSTEM]]]},
 ];
 
 const ids = Array.from({length: MOST}, (_, index) => `${PREFIX}${index}.desktop`);

@@ -146,7 +146,7 @@ function requireBandsAlong(edges: readonly Edge[]) {
 }
 
 async function arrange(edge: Edge) {
-  kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', [[`${edge}-center`, ['start', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]]));
+  kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', [[`${edge}-center`, ['gust', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]]));
   await pause(FADED_IN_MS);
 }
 

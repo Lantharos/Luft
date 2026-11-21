@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Egyik telepített alkalmazás sem tudja m
 portal-app-chooser-find = Alkalmazás keresése
 portal-app-chooser-open = Megnyitás
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Hozzáadja ezt a webhelyet az alkalmazásaihoz?
-portal-launcher-website-description = { $site } saját ablakban nyílik meg a Start menüből.
 portal-launcher-title = Hozzáadja ezt az alkalmazásaihoz?
-portal-launcher-description = { $appName } egy alkalmazást szeretne hozzáadni a Start menühöz.
 portal-launcher-name = Név
 portal-launcher-add = Hozzáadás
 

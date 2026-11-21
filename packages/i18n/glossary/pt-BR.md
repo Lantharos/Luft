@@ -26,7 +26,6 @@ Use Brazilian words and spelling: tela, arquivo, baixar, usuário, compartilhar,
 
 - Settings, Disks and Install Luft are Configurações, Discos and Instalar o Luft.
 - Names are masculine and take the article: “o Luft”, “do Rover”, “o Rover está aberto”. When a name could read as an ordinary word, add the kind of thing: “o app Keys”, “o app Draft”.
-- Start stays Start: “o menu Start”.
 
 ## Plurals
 

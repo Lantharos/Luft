@@ -26,7 +26,6 @@ Prefer sentences without a person: „Ažuriranja se instaliraju pri sljedećem 
 ## Names
 
 - Settings, Disks and Install Luft are Postavke, Diskovi and Instaliraj Luft.
-- Start stays Start, as in Windows; write „meni Start“ when it has to decline.
 - Don't decline app names; put the kind of thing first: „u aplikaciji Rover“.
 
 ## Plurals

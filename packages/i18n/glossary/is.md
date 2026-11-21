@@ -29,7 +29,6 @@ Prefer native words to loanwords, as Microsoft and Apple do: tölva, skjár, for
 ## Names
 
 - Settings, Disks and Install Luft are Stillingar, Diskar and Setja upp Luft.
-- Start is Upphaf, as in Windows, and upphafsvalmynd in running text: „Opnaðu upphafsvalmyndina“.
 - Don't inflect app names or Luft; put the kind of thing first and inflect that: „í forritinu Rover“, „uppfærslur fyrir Luft“.
 
 ## Plurals

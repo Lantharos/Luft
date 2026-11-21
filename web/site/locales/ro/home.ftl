@@ -6,9 +6,6 @@ home-look = Aruncă o privire
 home-desktop-alt = Desktopul Luft cu aplicațiile Rover, Setări și Tern deschise peste o pădure în ceață
 home-intro = Luft este un sistem complet pentru PC, construit pe Fedora. Are propriul desktop, propriile aplicații și o bază care se menține singură intactă, ca să vă puteți vedea liniștiți de treburi.
 
-home-start-heading = Start știe unde se află totul.
-home-start-text = Tastați câteva litere, iar meniul Start găsește aplicații, setări, fișiere și chiar cuvintele din ele. Face calcule și conversii de unități și activează modul întunecat sau Wi-Fi când îi cereți.
-home-start-alt = Meniul Start caută „întunecat”, cu acțiunea pentru modul întunecat și setările potrivite
 
 home-essentials-heading = Esențialul, la un clic distanță.
 home-essentials-text = Setările rapide sunt butoane pe care le aranjați cum doriți. Notificările se grupează după aplicație, cu răspunsuri, controale media și un calendar chiar lângă ele.
@@ -23,7 +20,6 @@ home-all-windows-alt = Toate ferestrele și spațiile de lucru dintr-o privire
 
 home-motion-heading = Mișcare cu intenție.
 home-motion-text = Totul în Luft se mișcă pe arcuri, așa că se poate răzgândi la jumătatea drumului fără sacadări. Gesturile urmăresc degetele și ajung exact unde ați vrut, iar aplicațiile se deschid repede, chiar și prima dată.
-home-motion-clip = Start, setările rapide, toate ferestrele dintr-o privire și tabla, deschizându-se și închizându-se în Luft
 
 home-wallpapers-heading = Alegeți o fotografie. Luft face restul.
 home-wallpapers-text = { $count ->

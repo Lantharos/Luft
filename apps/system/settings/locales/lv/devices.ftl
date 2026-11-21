@@ -281,7 +281,6 @@ settings-keyboard-shortcuts-description = Skatiet un mainiet īsinājumtaustiņu
 settings-keyboard-copilot = Copilot taustiņš
 settings-keyboard-copilot-press = Nospiešana
 settings-keyboard-copilot-press-description = Ko dara īss taustiņa nospiediens
-settings-keyboard-copilot-open-start = Atvērt Start
 settings-keyboard-copilot-open-app = Atvērt lietotni
 settings-keyboard-copilot-nothing = Neko nedarīt
 settings-keyboard-copilot-app = Lietotne

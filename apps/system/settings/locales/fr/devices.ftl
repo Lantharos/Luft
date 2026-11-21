@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Consultez et modifiez les raccourcis, 
 settings-keyboard-copilot = Touche Copilot
 settings-keyboard-copilot-press = Appui
 settings-keyboard-copilot-press-description = Ce que fait un appui bref sur la touche
-settings-keyboard-copilot-open-start = Ouvrir Start
 settings-keyboard-copilot-open-app = Ouvrir une application
 settings-keyboard-copilot-nothing = Rien
 settings-keyboard-copilot-app = Application

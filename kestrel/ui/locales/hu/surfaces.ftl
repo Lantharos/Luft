@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Alkalmazások, fájlok és egyebek keresése
-start-search-cut = Kivágás
-start-search-copy = Másolás
-start-search-paste = Beillesztés
-start-search-select-all = Összes kijelölése
-start-power = Tápellátás és munkamenet
-start-power-close = Tápellátási lehetőségek bezárása
-start-account-settings = Fiókbeállítások
-start-apps = Alkalmazások
-start-folder-default-name = Mappa
-start-folder-open = Mappa megnyitása
-start-folder-rename = Átnevezés
-start-folder-ungroup = Csoport felbontása
-start-open = Megnyitás
-start-move-to-apps = Áthelyezés az Alkalmazások közé
+gust-search-placeholder = Alkalmazások, fájlok és egyebek keresése
+gust-search-cut = Kivágás
+gust-search-copy = Másolás
+gust-search-paste = Beillesztés
+gust-search-select-all = Összes kijelölése
+gust-power = Tápellátás és munkamenet
+gust-power-close = Tápellátási lehetőségek bezárása
+gust-account-settings = Fiókbeállítások
+gust-apps = Alkalmazások
+gust-folder-default-name = Mappa
+gust-folder-open = Mappa megnyitása
+gust-folder-rename = Átnevezés
+gust-folder-ungroup = Csoport felbontása
+gust-open = Megnyitás
+gust-move-to-apps = Áthelyezés az Alkalmazások közé
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Legjobb találat
-start-search-group-apps = Alkalmazások
-start-search-group-commands = Alkalmazásműveletek
-start-search-group-windows = Megnyitott ablakok
-start-search-group-actions = Műveletek
-start-search-group-settings = Beállítások
-start-search-group-clipboard = Vágólap
-start-search-group-emoji = Emodzsik
-start-search-group-files = Fájlok
-start-search-group-contents = Fájlok tartalmában
-start-search-group-web = Web
-start-search-web = „{ $query }” keresése a weben
-start-search-clipboard-text = A vágólapelőzményekből
-start-search-clipboard-keywords = vágólap, másolt, másolás, vágólapelőzmények, beillesztés, clipboard
-start-search-emoji-insert = Beszúrás
-start-search-settings-page = Beállítások
-start-search-settings-section = Beállítások: { $page }
-start-search-file-reveal = Megjelenítés itt: { $fileManager }
-start-search-file-copy-path = Elérési út másolása
-start-search-conversion = { $amount } { $from } átváltva: { $to }
-start-search-calculation = { $expression }, a másoláshoz nyomja meg az Enter billentyűt
+gust-search-best-match = Legjobb találat
+gust-search-group-apps = Alkalmazások
+gust-search-group-commands = Alkalmazásműveletek
+gust-search-group-windows = Megnyitott ablakok
+gust-search-group-actions = Műveletek
+gust-search-group-settings = Beállítások
+gust-search-group-clipboard = Vágólap
+gust-search-group-emoji = Emodzsik
+gust-search-group-files = Fájlok
+gust-search-group-contents = Fájlok tartalmában
+gust-search-group-web = Web
+gust-search-web = „{ $query }” keresése a weben
+gust-search-clipboard-text = A vágólapelőzményekből
+gust-search-clipboard-keywords = vágólap, másolt, másolás, vágólapelőzmények, beillesztés, clipboard
+gust-search-emoji-insert = Beszúrás
+gust-search-settings-page = Beállítások
+gust-search-settings-section = Beállítások: { $page }
+gust-search-file-reveal = Megjelenítés itt: { $fileManager }
+gust-search-file-copy-path = Elérési út másolása
+gust-search-conversion = { $amount } { $from } átváltva: { $to }
+gust-search-calculation = { $expression }, a másoláshoz nyomja meg az Enter billentyűt
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Eddig: { $date }
-start-search-answer-since = Ettől: { $date }
-start-search-answer-between = Időszak: { $from } – { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Eddig: { $date }
+gust-search-answer-since = Ettől: { $date }
+gust-search-answer-between = Időszak: { $from } – { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } órával előrébb jár
    *[other] { $hours } órával előrébb jár
 }
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } órával hátrébb jár
    *[other] { $hours } órával hátrébb jár
 }
-start-search-answer-time-same = { $place }, ugyanannyi az idő, mint itt
-start-search-answer-converted = { $place }, amikor { $time } van ({ $from })
-start-search-answer-converted-here = Itt, amikor { $time } van ({ $from })
-start-search-answer-converted-from-here = { $place }, amikor itt { $time } van
+gust-search-answer-time-same = { $place }, ugyanannyi az idő, mint itt
+gust-search-answer-converted = { $place }, amikor { $time } van ({ $from })
+gust-search-answer-converted-here = Itt, amikor { $time } van ({ $from })
+gust-search-answer-converted-from-here = { $place }, amikor itt { $time } van
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Váltás sötét módra
-start-search-dark-style-off = Váltás világos módra
-start-search-dark-style-keywords = sötét mód, sötét téma, sötét stílus, világos mód, világos téma, világos stílus, dark mode, light mode
-start-search-night-light-on = Éjszakai fény bekapcsolása
-start-search-night-light-off = Éjszakai fény kikapcsolása
-start-search-night-light-keywords = éjszakai fény, éjszakai mód, kék fény, meleg színek, night light, night shift
-start-search-do-not-disturb-on = Ne zavarjanak bekapcsolása
-start-search-do-not-disturb-off = Ne zavarjanak kikapcsolása
-start-search-do-not-disturb-keywords = ne zavarjanak, fókusz, összpontosítás, csend, értesítések némítása, értesítések elnémítása, do not disturb, dnd
-start-search-wifi-on = Wi-Fi bekapcsolása
-start-search-wifi-off = Wi-Fi kikapcsolása
-start-search-wifi-keywords = wifi, wi-fi, vezeték nélküli, wlan, hálózat
-start-search-bluetooth-on = Bluetooth bekapcsolása
-start-search-bluetooth-off = Bluetooth kikapcsolása
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Repülőgép mód bekapcsolása
-start-search-airplane-mode-off = Repülőgép mód kikapcsolása
-start-search-airplane-mode-keywords = repülőgép mód, repülős üzemmód, repülő, rádiók, airplane mode
-start-search-keep-awake-on = Ébren tartás
-start-search-keep-awake-off = Ébren tartás kikapcsolása
-start-search-keep-awake-keywords = ébren tartás, ébren marad, alvás megakadályozása, koffein, caffeine
-start-search-lock-keywords = zárolás, képernyő zárolása, számítógép zárolása, lezárás
-start-search-suspend-keywords = alvó állapot, alvás, készenlét, sleep
-start-search-log-out-keywords = kijelentkezés, kilépés, munkamenet befejezése, log out, logout
-start-search-restart-keywords = újraindítás, számítógép újraindítása, reboot, restart
-start-search-power-off-keywords = leállítás, kikapcsolás, számítógép kikapcsolása, shutdown
+gust-search-dark-style-on = Váltás sötét módra
+gust-search-dark-style-off = Váltás világos módra
+gust-search-dark-style-keywords = sötét mód, sötét téma, sötét stílus, világos mód, világos téma, világos stílus, dark mode, light mode
+gust-search-night-light-on = Éjszakai fény bekapcsolása
+gust-search-night-light-off = Éjszakai fény kikapcsolása
+gust-search-night-light-keywords = éjszakai fény, éjszakai mód, kék fény, meleg színek, night light, night shift
+gust-search-do-not-disturb-on = Ne zavarjanak bekapcsolása
+gust-search-do-not-disturb-off = Ne zavarjanak kikapcsolása
+gust-search-do-not-disturb-keywords = ne zavarjanak, fókusz, összpontosítás, csend, értesítések némítása, értesítések elnémítása, do not disturb, dnd
+gust-search-wifi-on = Wi-Fi bekapcsolása
+gust-search-wifi-off = Wi-Fi kikapcsolása
+gust-search-wifi-keywords = wifi, wi-fi, vezeték nélküli, wlan, hálózat
+gust-search-bluetooth-on = Bluetooth bekapcsolása
+gust-search-bluetooth-off = Bluetooth kikapcsolása
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Repülőgép mód bekapcsolása
+gust-search-airplane-mode-off = Repülőgép mód kikapcsolása
+gust-search-airplane-mode-keywords = repülőgép mód, repülős üzemmód, repülő, rádiók, airplane mode
+gust-search-keep-awake-on = Ébren tartás
+gust-search-keep-awake-off = Ébren tartás kikapcsolása
+gust-search-keep-awake-keywords = ébren tartás, ébren marad, alvás megakadályozása, koffein, caffeine
+gust-search-lock-keywords = zárolás, képernyő zárolása, számítógép zárolása, lezárás
+gust-search-suspend-keywords = alvó állapot, alvás, készenlét, sleep
+gust-search-log-out-keywords = kijelentkezés, kilépés, munkamenet befejezése, log out, logout
+gust-search-restart-keywords = újraindítás, számítógép újraindítása, reboot, restart
+gust-search-power-off-keywords = leállítás, kikapcsolás, számítógép kikapcsolása, shutdown
 
 ## Quick settings
 

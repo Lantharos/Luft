@@ -12,7 +12,7 @@ import {fold, plugInTouchscreen} from './lib/touch.js';
 
 const {require, eventually} = checks('maximized');
 const SURFACE_SETTLES = 600;
-const SURFACES = ['start', 'quick', 'notifications', 'tasks'] as const;
+const SURFACES = ['gust', 'quick', 'notifications', 'tasks'] as const;
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const workArea = () => Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryMonitor!.index);

@@ -39,11 +39,11 @@ export class FileOpener {
   }
 
   private menu(uri: string, reveal: (() => void) | undefined): MenuEntry[] {
-    const entries: MenuEntry[] = [{ label: t('start-open'), run: () => this.open(uri) }];
+    const entries: MenuEntry[] = [{ label: t('gust-open'), run: () => this.open(uri) }];
     const manager = Gio.AppInfo.get_default_for_type(FOLDER_TYPE, false);
-    if (reveal && manager) entries.push({ label: t('start-search-file-reveal', { fileManager: manager.get_name() }), run: reveal });
+    if (reveal && manager) entries.push({ label: t('gust-search-file-reveal', { fileManager: manager.get_name() }), run: reveal });
     const path = Gio.File.new_for_uri(uri).get_path() ?? uri;
-    entries.push({ label: t('start-search-file-copy-path'), run: () => this.run(() => St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, path)) });
+    entries.push({ label: t('gust-search-file-copy-path'), run: () => this.run(() => St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, path)) });
     return entries;
   }
 

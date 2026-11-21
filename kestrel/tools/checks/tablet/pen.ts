@@ -17,17 +17,17 @@ const SCHEMES: Scheme[] = ['light', 'dark'];
 
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const penSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.pen'});
-const start = () => named('kestrel-start');
+const gust = () => named('kestrel-gust-panel');
 const listed = () => property<[string, string, string][]>('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Pens', 'com.lantharos.Kestrel.Pens', 'Devices');
 
-async function checkStartButton() {
-  penSettings.set_string('secondary-button-action', 'start');
+async function checkGustButton() {
+  penSettings.set_string('secondary-button-action', 'gust');
   try {
     hover([700, 450]);
     await pressButton(BTN_STYLUS2);
-    await eventually(() => shown(start()), 'the upper pen button opens Start when it is set to');
+    await eventually(() => shown(gust()), 'the upper pen button opens Gust when it is set to');
     await pressButton(BTN_STYLUS2);
-    await eventually(() => !shown(start()), 'pressing it again closes Start');
+    await eventually(() => !shown(gust()), 'pressing it again closes Gust');
     leave();
   } finally {
     penSettings.reset('secondary-button-action');
@@ -82,7 +82,7 @@ export async function run() {
   await writeAtOnce();
   await waitUntil(async () => (await listed()).some(([, , kind]) => kind === 'screen'), 'Kestrel lists the virtual pen as a pen on the screen');
   await checkEraserButton();
-  await checkStartButton();
+  await checkGustButton();
   await withApp('settings', [], async app => {
     for (const scheme of SCHEMES) await withScheme(scheme, async () => (await show(app, 'pen')).save(`settings-pen-${scheme}`));
   });

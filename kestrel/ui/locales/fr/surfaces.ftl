@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Rechercher des applications, fichiers et plus encore
-start-search-cut = Couper
-start-search-copy = Copier
-start-search-paste = Coller
-start-search-select-all = Tout sélectionner
-start-power = Alimentation et session
-start-power-close = Fermer les options d’alimentation
-start-account-settings = Paramètres du compte
-start-apps = Applications
-start-folder-default-name = Dossier
-start-folder-open = Ouvrir le dossier
-start-folder-rename = Renommer
-start-folder-ungroup = Dissocier les applications
-start-open = Ouvrir
-start-move-to-apps = Déplacer vers Applications
+gust-search-placeholder = Rechercher des applications, fichiers et plus encore
+gust-search-cut = Couper
+gust-search-copy = Copier
+gust-search-paste = Coller
+gust-search-select-all = Tout sélectionner
+gust-power = Alimentation et session
+gust-power-close = Fermer les options d’alimentation
+gust-account-settings = Paramètres du compte
+gust-apps = Applications
+gust-folder-default-name = Dossier
+gust-folder-open = Ouvrir le dossier
+gust-folder-rename = Renommer
+gust-folder-ungroup = Dissocier les applications
+gust-open = Ouvrir
+gust-move-to-apps = Déplacer vers Applications
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Meilleur résultat
-start-search-group-apps = Applications
-start-search-group-commands = Actions des applications
-start-search-group-windows = Fenêtres ouvertes
-start-search-group-actions = Actions
-start-search-group-settings = Paramètres
-start-search-group-clipboard = Presse-papiers
-start-search-group-emoji = Emojis
-start-search-group-files = Fichiers
-start-search-group-contents = Dans les fichiers
-start-search-group-web = Web
-start-search-web = Rechercher « { $query } » sur le Web
-start-search-clipboard-text = Depuis l’historique du presse-papiers
-start-search-clipboard-keywords = presse-papiers, copié, copiés, historique du presse-papiers, coller, clipboard
-start-search-emoji-insert = Insérer
-start-search-settings-page = Paramètres
-start-search-settings-section = Paramètres – { $page }
-start-search-file-reveal = Afficher dans { $fileManager }
-start-search-file-copy-path = Copier le chemin
-start-search-conversion = { $amount } { $from } en { $to }
-start-search-calculation = { $expression }, appuyez sur Entrée pour copier
+gust-search-best-match = Meilleur résultat
+gust-search-group-apps = Applications
+gust-search-group-commands = Actions des applications
+gust-search-group-windows = Fenêtres ouvertes
+gust-search-group-actions = Actions
+gust-search-group-settings = Paramètres
+gust-search-group-clipboard = Presse-papiers
+gust-search-group-emoji = Emojis
+gust-search-group-files = Fichiers
+gust-search-group-contents = Dans les fichiers
+gust-search-group-web = Web
+gust-search-web = Rechercher « { $query } » sur le Web
+gust-search-clipboard-text = Depuis l’historique du presse-papiers
+gust-search-clipboard-keywords = presse-papiers, copié, copiés, historique du presse-papiers, coller, clipboard
+gust-search-emoji-insert = Insérer
+gust-search-settings-page = Paramètres
+gust-search-settings-section = Paramètres – { $page }
+gust-search-file-reveal = Afficher dans { $fileManager }
+gust-search-file-copy-path = Copier le chemin
+gust-search-conversion = { $amount } { $from } en { $to }
+gust-search-calculation = { $expression }, appuyez sur Entrée pour copier
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Jusqu’au { $date }
-start-search-answer-since = Depuis le { $date }
-start-search-answer-between = Entre le { $from } et le { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Jusqu’au { $date }
+gust-search-answer-since = Depuis le { $date }
+gust-search-answer-between = Entre le { $from } et le { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } heure
    *[other] { $hours } heures
 } d’avance
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } heure
    *[other] { $hours } heures
 } de retard
-start-search-answer-time-same = { $place }, même heure qu’ici
-start-search-answer-converted = À { $place } quand il est { $time } à { $from }
-start-search-answer-converted-here = Ici quand il est { $time } à { $from }
-start-search-answer-converted-from-here = À { $place } quand il est { $time } ici
+gust-search-answer-time-same = { $place }, même heure qu’ici
+gust-search-answer-converted = À { $place } quand il est { $time } à { $from }
+gust-search-answer-converted-here = Ici quand il est { $time } à { $from }
+gust-search-answer-converted-from-here = À { $place } quand il est { $time } ici
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Passer au mode sombre
-start-search-dark-style-off = Passer au mode clair
-start-search-dark-style-keywords = mode sombre, thème sombre, style sombre, mode clair, thème clair, style clair, dark mode, sombre, clair
-start-search-night-light-on = Activer l’éclairage nocturne
-start-search-night-light-off = Désactiver l’éclairage nocturne
-start-search-night-light-keywords = éclairage nocturne, lumière nocturne, mode nuit, lumière bleue, filtre de lumière bleue, couleurs chaudes, night shift
-start-search-do-not-disturb-on = Activer Ne pas déranger
-start-search-do-not-disturb-off = Désactiver Ne pas déranger
-start-search-do-not-disturb-keywords = ne pas déranger, concentration, silence, mode silencieux, couper les notifications, masquer les notifications, dnd
-start-search-wifi-on = Activer le Wi-Fi
-start-search-wifi-off = Désactiver le Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, sans fil, réseau sans fil, wlan
-start-search-bluetooth-on = Activer le Bluetooth
-start-search-bluetooth-off = Désactiver le Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Activer le mode avion
-start-search-airplane-mode-off = Désactiver le mode avion
-start-search-airplane-mode-keywords = mode avion, mode hors ligne, avion, radios
-start-search-keep-awake-on = Maintenir éveillé
-start-search-keep-awake-off = Ne plus maintenir éveillé
-start-search-keep-awake-keywords = maintenir éveillé, rester éveillé, empêcher la veille, éviter la mise en veille, caféine, caffeine
-start-search-lock-keywords = verrouiller, verrouiller l’écran, verrouiller l’ordinateur, écran de verrouillage
-start-search-suspend-keywords = veille, mettre en veille, mise en veille, suspendre
-start-search-log-out-keywords = se déconnecter, déconnexion, fermer la session, quitter la session, log out
-start-search-restart-keywords = redémarrer, redémarrage, redémarrer l’ordinateur, reboot
-start-search-power-off-keywords = éteindre, arrêter, arrêt, extinction, éteindre l’ordinateur, shutdown
+gust-search-dark-style-on = Passer au mode sombre
+gust-search-dark-style-off = Passer au mode clair
+gust-search-dark-style-keywords = mode sombre, thème sombre, style sombre, mode clair, thème clair, style clair, dark mode, sombre, clair
+gust-search-night-light-on = Activer l’éclairage nocturne
+gust-search-night-light-off = Désactiver l’éclairage nocturne
+gust-search-night-light-keywords = éclairage nocturne, lumière nocturne, mode nuit, lumière bleue, filtre de lumière bleue, couleurs chaudes, night shift
+gust-search-do-not-disturb-on = Activer Ne pas déranger
+gust-search-do-not-disturb-off = Désactiver Ne pas déranger
+gust-search-do-not-disturb-keywords = ne pas déranger, concentration, silence, mode silencieux, couper les notifications, masquer les notifications, dnd
+gust-search-wifi-on = Activer le Wi-Fi
+gust-search-wifi-off = Désactiver le Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, sans fil, réseau sans fil, wlan
+gust-search-bluetooth-on = Activer le Bluetooth
+gust-search-bluetooth-off = Désactiver le Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Activer le mode avion
+gust-search-airplane-mode-off = Désactiver le mode avion
+gust-search-airplane-mode-keywords = mode avion, mode hors ligne, avion, radios
+gust-search-keep-awake-on = Maintenir éveillé
+gust-search-keep-awake-off = Ne plus maintenir éveillé
+gust-search-keep-awake-keywords = maintenir éveillé, rester éveillé, empêcher la veille, éviter la mise en veille, caféine, caffeine
+gust-search-lock-keywords = verrouiller, verrouiller l’écran, verrouiller l’ordinateur, écran de verrouillage
+gust-search-suspend-keywords = veille, mettre en veille, mise en veille, suspendre
+gust-search-log-out-keywords = se déconnecter, déconnexion, fermer la session, quitter la session, log out
+gust-search-restart-keywords = redémarrer, redémarrage, redémarrer l’ordinateur, reboot
+gust-search-power-off-keywords = éteindre, arrêter, arrêt, extinction, éteindre l’ordinateur, shutdown
 
 ## Quick settings
 

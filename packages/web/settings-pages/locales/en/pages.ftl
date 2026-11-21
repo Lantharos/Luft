@@ -1,4 +1,4 @@
-# Settings page titles, shown in the Settings sidebar and in Start search results.
+# Settings page titles, shown in the Settings sidebar and in Gust search results.
 # Each page's .keywords are search terms, separated by commas. Translate them into
 # the words people would type when looking for the page; they never show on screen.
 # .copilot-key holds extra search terms used only on computers with a Copilot key.
@@ -25,8 +25,8 @@ settings-page-printers = Printers
     .keywords = printer, print, printing, test page, ink, toner, paper, airprint, scanner, print queue, cups
 settings-page-appearance = Appearance
     .keywords = wallpaper, background, dark, light, style, accent, app icons, tinted, cursor, pointer, mouse pointer, cursor size, text size, animations, fonts, typefaces, install fonts
-settings-page-taskbar = Taskbar and Start
-    .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, layout, islands, edit taskbar, move taskbar, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
+settings-page-taskbar = Taskbar and Gust
+    .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, layout, islands, edit taskbar, move taskbar, start button, start menu, gust, gust button, palette, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
 settings-page-windows = App windows
     .keywords = see-through windows, see-through, transparent windows, translucent, transparency, blur behind windows, arrange windows
 settings-page-extensions = Extensions

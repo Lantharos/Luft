@@ -1,98 +1,98 @@
-## Start
+## Gust
 
-start-search-placeholder = Iščite aplikacije, datoteke in drugo
-start-search-cut = Izreži
-start-search-copy = Kopiraj
-start-search-paste = Prilepi
-start-search-select-all = Izberi vse
-start-power = Napajanje in seja
-start-power-close = Zapri možnosti napajanja
-start-account-settings = Nastavitve računa
-start-apps = Aplikacije
-start-folder-default-name = Mapa
-start-folder-open = Odpri mapo
-start-folder-rename = Preimenuj
-start-folder-ungroup = Razdruži aplikacije
-start-open = Odpri
-start-move-to-apps = Premakni med aplikacije
+gust-search-placeholder = Iščite aplikacije, datoteke in drugo
+gust-search-cut = Izreži
+gust-search-copy = Kopiraj
+gust-search-paste = Prilepi
+gust-search-select-all = Izberi vse
+gust-power = Napajanje in seja
+gust-power-close = Zapri možnosti napajanja
+gust-account-settings = Nastavitve računa
+gust-apps = Aplikacije
+gust-folder-default-name = Mapa
+gust-folder-open = Odpri mapo
+gust-folder-rename = Preimenuj
+gust-folder-ungroup = Razdruži aplikacije
+gust-open = Odpri
+gust-move-to-apps = Premakni med aplikacije
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Najboljše ujemanje
-start-search-group-apps = Aplikacije
-start-search-group-commands = Dejanja aplikacij
-start-search-group-windows = Odprta okna
-start-search-group-actions = Dejanja
-start-search-group-settings = Nastavitve
-start-search-group-clipboard = Odložišče
-start-search-group-emoji = Emodžiji
-start-search-group-files = Datoteke
-start-search-group-contents = V datotekah
-start-search-group-web = Splet
-start-search-web = Išči „{ $query }“ v spletu
-start-search-clipboard-text = Iz zgodovine odložišča
-start-search-clipboard-keywords = odložišče, kopirano, zgodovina odložišča, prilepi, lepljenje, clipboard
-start-search-emoji-insert = Vstavi
-start-search-settings-page = Nastavitve
-start-search-settings-section = Nastavitve – { $page }
-start-search-file-reveal = Pokaži v aplikaciji { $fileManager }
-start-search-file-copy-path = Kopiraj pot
-start-search-conversion = { $amount } { $from } v { $to }
-start-search-calculation = { $expression }, pritisnite Enter za kopiranje
+gust-search-best-match = Najboljše ujemanje
+gust-search-group-apps = Aplikacije
+gust-search-group-commands = Dejanja aplikacij
+gust-search-group-windows = Odprta okna
+gust-search-group-actions = Dejanja
+gust-search-group-settings = Nastavitve
+gust-search-group-clipboard = Odložišče
+gust-search-group-emoji = Emodžiji
+gust-search-group-files = Datoteke
+gust-search-group-contents = V datotekah
+gust-search-group-web = Splet
+gust-search-web = Išči „{ $query }“ v spletu
+gust-search-clipboard-text = Iz zgodovine odložišča
+gust-search-clipboard-keywords = odložišče, kopirano, zgodovina odložišča, prilepi, lepljenje, clipboard
+gust-search-emoji-insert = Vstavi
+gust-search-settings-page = Nastavitve
+gust-search-settings-section = Nastavitve – { $page }
+gust-search-file-reveal = Pokaži v aplikaciji { $fileManager }
+gust-search-file-copy-path = Kopiraj pot
+gust-search-conversion = { $amount } { $from } v { $to }
+gust-search-calculation = { $expression }, pritisnite Enter za kopiranje
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Do datuma { $date }
-start-search-answer-since = Od datuma { $date }
-start-search-answer-between = Med datumoma { $from } in { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Do datuma { $date }
+gust-search-answer-since = Od datuma { $date }
+gust-search-answer-between = Med datumoma { $from } in { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } ura naprej
     [two] { $hours } uri naprej
     [few] { $hours } ure naprej
    *[other] { $hours } ur naprej
 }
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } ura zadaj
     [two] { $hours } uri zadaj
     [few] { $hours } ure zadaj
    *[other] { $hours } ur zadaj
 }
-start-search-answer-time-same = { $place }, enak čas kot tukaj
-start-search-answer-converted = { $place }, ko je { $time } ({ $from })
-start-search-answer-converted-here = Tukaj, ko je { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, ko je tukaj { $time }
+gust-search-answer-time-same = { $place }, enak čas kot tukaj
+gust-search-answer-converted = { $place }, ko je { $time } ({ $from })
+gust-search-answer-converted-here = Tukaj, ko je { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, ko je tukaj { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Preklopi na temni način
-start-search-dark-style-off = Preklopi na svetli način
-start-search-dark-style-keywords = temni način, temna tema, temno, svetli način, svetla tema, svetlo, dark mode, dark theme, light mode
-start-search-night-light-on = Vklopi nočno svetlobo
-start-search-night-light-off = Izklopi nočno svetlobo
-start-search-night-light-keywords = nočna svetloba, nočni način, modra svetloba, tople barve, night light
-start-search-do-not-disturb-on = Vklopi Ne moti
-start-search-do-not-disturb-off = Izklopi Ne moti
-start-search-do-not-disturb-keywords = ne moti, osredotočenost, tiho, utišaj obvestila, izklopi obvestila, do not disturb, dnd
-start-search-wifi-on = Vklopi Wi-Fi
-start-search-wifi-off = Izklopi Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, brezžično omrežje, brezžično, wlan
-start-search-bluetooth-on = Vklopi Bluetooth
-start-search-bluetooth-off = Izklopi Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Vklopi način za letalo
-start-search-airplane-mode-off = Izklopi način za letalo
-start-search-airplane-mode-keywords = način za letalo, letalski način, letalo, radijski oddajniki, airplane mode
-start-search-keep-awake-on = Ohrani budnost
-start-search-keep-awake-off = Izklopi ohranjanje budnosti
-start-search-keep-awake-keywords = ohrani budnost, budnost, prepreči spanje, ne zaspi, kofein, caffeine
-start-search-lock-keywords = zakleni zaslon, zaklepanje, zakleni računalnik
-start-search-suspend-keywords = spanje, stanje spanja, pripravljenost, sleep
-start-search-log-out-keywords = odjava, odjavi se, končaj sejo, izpis, log out, sign out
-start-search-restart-keywords = vnovični zagon, znova zaženi, ponovni zagon, restart, reboot
-start-search-power-off-keywords = zaustavitev sistema, izklop, izklopi računalnik, ugasni, shut down
+gust-search-dark-style-on = Preklopi na temni način
+gust-search-dark-style-off = Preklopi na svetli način
+gust-search-dark-style-keywords = temni način, temna tema, temno, svetli način, svetla tema, svetlo, dark mode, dark theme, light mode
+gust-search-night-light-on = Vklopi nočno svetlobo
+gust-search-night-light-off = Izklopi nočno svetlobo
+gust-search-night-light-keywords = nočna svetloba, nočni način, modra svetloba, tople barve, night light
+gust-search-do-not-disturb-on = Vklopi Ne moti
+gust-search-do-not-disturb-off = Izklopi Ne moti
+gust-search-do-not-disturb-keywords = ne moti, osredotočenost, tiho, utišaj obvestila, izklopi obvestila, do not disturb, dnd
+gust-search-wifi-on = Vklopi Wi-Fi
+gust-search-wifi-off = Izklopi Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, brezžično omrežje, brezžično, wlan
+gust-search-bluetooth-on = Vklopi Bluetooth
+gust-search-bluetooth-off = Izklopi Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Vklopi način za letalo
+gust-search-airplane-mode-off = Izklopi način za letalo
+gust-search-airplane-mode-keywords = način za letalo, letalski način, letalo, radijski oddajniki, airplane mode
+gust-search-keep-awake-on = Ohrani budnost
+gust-search-keep-awake-off = Izklopi ohranjanje budnosti
+gust-search-keep-awake-keywords = ohrani budnost, budnost, prepreči spanje, ne zaspi, kofein, caffeine
+gust-search-lock-keywords = zakleni zaslon, zaklepanje, zakleni računalnik
+gust-search-suspend-keywords = spanje, stanje spanja, pripravljenost, sleep
+gust-search-log-out-keywords = odjava, odjavi se, končaj sejo, izpis, log out, sign out
+gust-search-restart-keywords = vnovični zagon, znova zaženi, ponovni zagon, restart, reboot
+gust-search-power-off-keywords = zaustavitev sistema, izklop, izklopi računalnik, ugasni, shut down
 
 ## Quick settings
 

@@ -72,4 +72,4 @@ Apps are told which you chose, so they can follow it too.
 
 ## Using the keyboard
 
-Every part of the desktop can be used with the keyboard. Arrow keys and <kbd>Tab</kbd> move around Start, Quick settings, notifications and the taskbar, <kbd>Menu</kbd> or <kbd>Shift</kbd>+<kbd>F10</kbd> opens the right-click menu of what has focus, and <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Tab</kbd> moves focus to the taskbar. [Keyboard shortcuts](/desktop/shortcuts/) lists the rest.
+Every part of the desktop can be used with the keyboard. Arrow keys and <kbd>Tab</kbd> move around Gust, Quick settings, notifications and the taskbar, <kbd>Menu</kbd> or <kbd>Shift</kbd>+<kbd>F10</kbd> opens the right-click menu of what has focus, and <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Tab</kbd> moves focus to the taskbar. [Keyboard shortcuts](/desktop/shortcuts/) lists the rest.

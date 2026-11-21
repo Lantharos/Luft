@@ -1,98 +1,98 @@
-## Start
+## Gust
 
-start-search-placeholder = Ieškoti programų, failų ir daugiau
-start-search-cut = Iškirpti
-start-search-copy = Kopijuoti
-start-search-paste = Įklijuoti
-start-search-select-all = Žymėti viską
-start-power = Maitinimas ir seansas
-start-power-close = Uždaryti maitinimo parinktis
-start-account-settings = Paskyros nustatymai
-start-apps = Programos
-start-folder-default-name = Aplankas
-start-folder-open = Atidaryti aplanką
-start-folder-rename = Pervardyti
-start-folder-ungroup = Išgrupuoti programas
-start-open = Atidaryti
-start-move-to-apps = Perkelti į Programas
+gust-search-placeholder = Ieškoti programų, failų ir daugiau
+gust-search-cut = Iškirpti
+gust-search-copy = Kopijuoti
+gust-search-paste = Įklijuoti
+gust-search-select-all = Žymėti viską
+gust-power = Maitinimas ir seansas
+gust-power-close = Uždaryti maitinimo parinktis
+gust-account-settings = Paskyros nustatymai
+gust-apps = Programos
+gust-folder-default-name = Aplankas
+gust-folder-open = Atidaryti aplanką
+gust-folder-rename = Pervardyti
+gust-folder-ungroup = Išgrupuoti programas
+gust-open = Atidaryti
+gust-move-to-apps = Perkelti į Programas
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Geriausias atitikmuo
-start-search-group-apps = Programos
-start-search-group-commands = Programų veiksmai
-start-search-group-windows = Atidaryti langai
-start-search-group-actions = Veiksmai
-start-search-group-settings = Nustatymai
-start-search-group-clipboard = Iškarpinė
-start-search-group-emoji = Jaustukai
-start-search-group-files = Failai
-start-search-group-contents = Failų turinyje
-start-search-group-web = Žiniatinklis
-start-search-web = Ieškoti žiniatinklyje „{ $query }“
-start-search-clipboard-text = Iš iškarpinės istorijos
-start-search-clipboard-keywords = iškarpinė, iskarpine, nukopijuota, kopijuota, iškarpinės istorija, įklijuoti, clipboard
-start-search-emoji-insert = Įterpti
-start-search-settings-page = Nustatymai
-start-search-settings-section = Nustatymai: { $page }
-start-search-file-reveal = Rodyti programoje { $fileManager }
-start-search-file-copy-path = Kopijuoti kelią
-start-search-conversion = { $amount } { $from } į { $to }
-start-search-calculation = { $expression }, paspauskite Enter, kad nukopijuotumėte
+gust-search-best-match = Geriausias atitikmuo
+gust-search-group-apps = Programos
+gust-search-group-commands = Programų veiksmai
+gust-search-group-windows = Atidaryti langai
+gust-search-group-actions = Veiksmai
+gust-search-group-settings = Nustatymai
+gust-search-group-clipboard = Iškarpinė
+gust-search-group-emoji = Jaustukai
+gust-search-group-files = Failai
+gust-search-group-contents = Failų turinyje
+gust-search-group-web = Žiniatinklis
+gust-search-web = Ieškoti žiniatinklyje „{ $query }“
+gust-search-clipboard-text = Iš iškarpinės istorijos
+gust-search-clipboard-keywords = iškarpinė, iskarpine, nukopijuota, kopijuota, iškarpinės istorija, įklijuoti, clipboard
+gust-search-emoji-insert = Įterpti
+gust-search-settings-page = Nustatymai
+gust-search-settings-section = Nustatymai: { $page }
+gust-search-file-reveal = Rodyti programoje { $fileManager }
+gust-search-file-copy-path = Kopijuoti kelią
+gust-search-conversion = { $amount } { $from } į { $to }
+gust-search-calculation = { $expression }, paspauskite Enter, kad nukopijuotumėte
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Iki { $date }
-start-search-answer-since = Nuo { $date }
-start-search-answer-between = Nuo { $from } iki { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Iki { $date }
+gust-search-answer-since = Nuo { $date }
+gust-search-answer-between = Nuo { $from } iki { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } valandą
     [few] { $hours } valandas
     [many] { $hours } valandos
    *[other] { $hours } valandų
 } į priekį
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } valandą
     [few] { $hours } valandas
     [many] { $hours } valandos
    *[other] { $hours } valandų
 } atgal
-start-search-answer-time-same = { $place }, toks pat laikas kaip čia
-start-search-answer-converted = { $place }, kai { $from } – { $time }
-start-search-answer-converted-here = Čia, kai { $from } – { $time }
-start-search-answer-converted-from-here = { $place }, kai čia { $time }
+gust-search-answer-time-same = { $place }, toks pat laikas kaip čia
+gust-search-answer-converted = { $place }, kai { $from } – { $time }
+gust-search-answer-converted-here = Čia, kai { $from } – { $time }
+gust-search-answer-converted-from-here = { $place }, kai čia { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Įjungti tamsųjį režimą
-start-search-dark-style-off = Įjungti šviesųjį režimą
-start-search-dark-style-keywords = tamsusis režimas, tamsus režimas, tamsi tema, tamsus stilius, šviesusis režimas, šviesus režimas, šviesi tema, dark mode, light mode
-start-search-night-light-on = Įjungti naktinę šviesą
-start-search-night-light-off = Išjungti naktinę šviesą
-start-search-night-light-keywords = naktinė šviesa, naktinis režimas, mėlyna šviesa, mėlynoji šviesa, šiltos spalvos, night light, night shift
-start-search-do-not-disturb-on = Įjungti Netrukdyti
-start-search-do-not-disturb-off = Išjungti Netrukdyti
-start-search-do-not-disturb-keywords = netrukdyti, tyla, ramybė, susikaupimas, nutildyti pranešimus, išjungti pranešimus, dnd, do not disturb
-start-search-wifi-on = Įjungti Wi-Fi
-start-search-wifi-off = Išjungti Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, belaidis, bevielis, belaidis tinklas, wlan, internetas
-start-search-bluetooth-on = Įjungti Bluetooth
-start-search-bluetooth-off = Išjungti Bluetooth
-start-search-bluetooth-keywords = bluetooth, mėlynasis dantukas
-start-search-airplane-mode-on = Įjungti lėktuvo režimą
-start-search-airplane-mode-off = Išjungti lėktuvo režimą
-start-search-airplane-mode-keywords = lėktuvo režimas, skrydžio režimas, lėktuvas, radijo ryšys, airplane mode
-start-search-keep-awake-on = Neužmigti
-start-search-keep-awake-off = Leisti kompiuteriui užmigti
-start-search-keep-awake-keywords = neužmigti, budėti, neleisti užmigti, neužmigdyti, ekranas neišsijungia, kofeinas, caffeine
-start-search-lock-keywords = užrakinti, užrakinti ekraną, užrakinti kompiuterį, užrakinimas, lock
-start-search-suspend-keywords = miegas, miego režimas, užmigti, budėjimo režimas, sleep
-start-search-log-out-keywords = atsijungti, atsijungimas, išsiregistruoti, baigti seansą, log out, sign out
-start-search-restart-keywords = paleisti iš naujo, perkrauti, perkrovimas, restart, reboot
-start-search-power-off-keywords = išjungti, išjungti kompiuterį, išjungimas, shut down, shutdown
+gust-search-dark-style-on = Įjungti tamsųjį režimą
+gust-search-dark-style-off = Įjungti šviesųjį režimą
+gust-search-dark-style-keywords = tamsusis režimas, tamsus režimas, tamsi tema, tamsus stilius, šviesusis režimas, šviesus režimas, šviesi tema, dark mode, light mode
+gust-search-night-light-on = Įjungti naktinę šviesą
+gust-search-night-light-off = Išjungti naktinę šviesą
+gust-search-night-light-keywords = naktinė šviesa, naktinis režimas, mėlyna šviesa, mėlynoji šviesa, šiltos spalvos, night light, night shift
+gust-search-do-not-disturb-on = Įjungti Netrukdyti
+gust-search-do-not-disturb-off = Išjungti Netrukdyti
+gust-search-do-not-disturb-keywords = netrukdyti, tyla, ramybė, susikaupimas, nutildyti pranešimus, išjungti pranešimus, dnd, do not disturb
+gust-search-wifi-on = Įjungti Wi-Fi
+gust-search-wifi-off = Išjungti Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, belaidis, bevielis, belaidis tinklas, wlan, internetas
+gust-search-bluetooth-on = Įjungti Bluetooth
+gust-search-bluetooth-off = Išjungti Bluetooth
+gust-search-bluetooth-keywords = bluetooth, mėlynasis dantukas
+gust-search-airplane-mode-on = Įjungti lėktuvo režimą
+gust-search-airplane-mode-off = Išjungti lėktuvo režimą
+gust-search-airplane-mode-keywords = lėktuvo režimas, skrydžio režimas, lėktuvas, radijo ryšys, airplane mode
+gust-search-keep-awake-on = Neužmigti
+gust-search-keep-awake-off = Leisti kompiuteriui užmigti
+gust-search-keep-awake-keywords = neužmigti, budėti, neleisti užmigti, neužmigdyti, ekranas neišsijungia, kofeinas, caffeine
+gust-search-lock-keywords = užrakinti, užrakinti ekraną, užrakinti kompiuterį, užrakinimas, lock
+gust-search-suspend-keywords = miegas, miego režimas, užmigti, budėjimo režimas, sleep
+gust-search-log-out-keywords = atsijungti, atsijungimas, išsiregistruoti, baigti seansą, log out, sign out
+gust-search-restart-keywords = paleisti iš naujo, perkrauti, perkrovimas, restart, reboot
+gust-search-power-off-keywords = išjungti, išjungti kompiuterį, išjungimas, shut down, shutdown
 
 ## Quick settings
 

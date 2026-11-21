@@ -28,10 +28,10 @@ type Box = {x: number; y: number; width: number; height: number};
 type Edge = 'bottom' | 'left' | 'top' | 'right';
 
 const PRESETS: Record<string, {style: string; islands: Arrangement; edges: Edge[]}> = {
-  classic: {style: 'bar', islands: [['bottom-start', ['start', 'dock']], ['bottom-end', SYSTEM]], edges: ['bottom']},
-  centered: {style: 'separate', islands: [['bottom-center', ['start', 'dock']], ['bottom-end', SYSTEM]], edges: ['bottom']},
-  mac: {style: 'separate', islands: [['bottom-center', ['start', 'dock']], ['top-end', SYSTEM]], edges: ['bottom', 'top']},
-  side: {style: 'separate', islands: [['left-center', ['start', 'dock']], ['bottom-end', SYSTEM]], edges: ['left', 'bottom']},
+  classic: {style: 'bar', islands: [['bottom-start', ['gust', 'dock']], ['bottom-end', SYSTEM]], edges: ['bottom']},
+  centered: {style: 'separate', islands: [['bottom-center', ['gust', 'dock']], ['bottom-end', SYSTEM]], edges: ['bottom']},
+  mac: {style: 'separate', islands: [['bottom-center', ['gust', 'dock']], ['top-end', SYSTEM]], edges: ['bottom', 'top']},
+  side: {style: 'separate', islands: [['left-center', ['gust', 'dock']], ['bottom-end', SYSTEM]], edges: ['left', 'bottom']},
 };
 
 const primary = () => Main.layoutManager.primaryMonitor!;
@@ -113,7 +113,7 @@ async function checkPresets(window: Meta.Window, color: number[]) {
   }
 }
 
-async function opensBeside(surface: 'start' | 'quick' | 'notifications', name: string, spot: string, beside: (shown: Box, island: Box) => boolean) {
+async function opensBeside(surface: 'gust' | 'quick' | 'notifications', name: string, spot: string, beside: (shown: Box, island: Box) => boolean) {
   toggleSurface(surface);
   const actor = await eventually(() => {
     const opened = named(name);
@@ -132,12 +132,12 @@ async function checkAnchors() {
   await opensBeside('quick', 'kestrel-quick-settings', 'top-end', below);
   await opensBeside('notifications', 'kestrel-notifications', 'top-end', below);
   await show('side');
-  await opensBeside('start', 'kestrel-start', 'left-center', (shown, at) => shown.x >= at.x + at.width && shown.x <= at.x + at.width + gap + 2);
+  await opensBeside('gust', 'kestrel-gust-panel', 'left-center', (shown, at) => shown.x >= at.x + at.width && shown.x <= at.x + at.width + gap + 2);
 }
 
 async function checkCorner() {
   settings.set_string('taskbar-style', 'separate');
-  arrange([['right-end', ['start', 'dock']], ['bottom-end', SYSTEM]]);
+  arrange([['right-end', ['gust', 'dock']], ['bottom-end', SYSTEM]]);
   await eventually(() => settledIsland('right-end') && settledIsland('bottom-end'), 'islands at the right\'s end and the bottom\'s end show');
   await settled();
   const side = boxOf(island('right-end')!);
@@ -148,15 +148,15 @@ async function checkCorner() {
   await capture('taskbar-corner');
 }
 
-async function checkStartAlone() {
+async function checkGustAlone() {
   settings.set_string('taskbar-style', 'separate');
-  arrange([['bottom-start', ['start']], ['bottom-center', ['dock']], ['bottom-end', SYSTEM]]);
-  await eventually(() => settledIsland('bottom-start') && settledIsland('bottom-center'), 'Start gets an island of its own');
+  arrange([['bottom-start', ['gust']], ['bottom-center', ['dock']], ['bottom-end', SYSTEM]]);
+  await eventually(() => settledIsland('bottom-start') && settledIsland('bottom-center'), 'Gust gets an island of its own');
   await settled();
-  const start = boxOf(island('bottom-start')!);
-  require(Math.abs(start.width - start.height) <= 1, 'Start alone is a little square');
-  await capture('taskbar-start-alone');
-  await opensBeside('start', 'kestrel-start', 'bottom-start', (shown, at) => Math.abs(shown.x - at.x) <= 1 && shown.y + shown.height <= at.y);
+  const gust = boxOf(island('bottom-start')!);
+  require(Math.abs(gust.width - gust.height) <= 1, 'Gust alone is a little square');
+  await capture('taskbar-gust-alone');
+  await opensBeside('gust', 'kestrel-gust-panel', 'bottom-start', (shown, at) => Math.abs(shown.x - at.x) <= 1 && shown.y + shown.height <= at.y);
 }
 
 function nowPlaying() {
@@ -184,7 +184,7 @@ async function checkExtensionElement() {
     await eventually(() => arrangement().some(([spot, elements]) => spot === 'bottom-end' && elements.join() === ['media/now-playing', ...SYSTEM].join()),
       'an extension\'s element joins the tray\'s island, in front of it');
     await eventually(() => named('now-playing-stand-in', island('bottom-end')!)?.mapped, 'and shows there');
-    arrange([['bottom-center', ['start', 'dock', 'media/now-playing']], ['bottom-end', SYSTEM]]);
+    arrange([['bottom-center', ['gust', 'dock', 'media/now-playing']], ['bottom-end', SYSTEM]]);
     await eventually(() => named('now-playing-stand-in', island('bottom-center')!)?.mapped, 'Now playing can sit in the dock\'s island');
     await settled();
     await capture('taskbar-now-playing-in-dock');
@@ -226,10 +226,10 @@ async function checkEditing() {
   await eventually(() => settledIsland('left-center'), 'dragging an island\'s handle to a spot on the left moves it there');
   require(sameIslands(arrangement(), saved), 'nothing is saved while editing');
 
-  await dragTo(existing('kestrel-taskbar-start'), existing('kestrel-arrange-target-top-start'));
-  await eventually(() => named('kestrel-taskbar-start', island('top-start') ?? new St.Widget()), 'dragging Start to an empty spot makes it an island of its own');
-  await dragTo(existing('kestrel-taskbar-start'), existing('kestrel-taskbar-dock'));
-  await eventually(() => named('kestrel-taskbar-start', island('left-center') ?? new St.Widget()) && !island('top-start'),
+  await dragTo(existing('kestrel-taskbar-gust'), existing('kestrel-arrange-target-top-start'));
+  await eventually(() => named('kestrel-taskbar-gust', island('top-start') ?? new St.Widget()), 'dragging Gust to an empty spot makes it an island of its own');
+  await dragTo(existing('kestrel-taskbar-gust'), existing('kestrel-taskbar-dock'));
+  await eventually(() => named('kestrel-taskbar-gust', island('left-center') ?? new St.Widget()) && !island('top-start'),
     'dragging it back onto the dock merges them again');
 
   press(Clutter.KEY_Escape);
@@ -243,10 +243,10 @@ async function checkEditing() {
   await eventually(() => settledIsland('top-center'), 'the arrow keys move the picked island to the next spot that way');
   press(Clutter.KEY_Tab);
   press(Clutter.KEY_Left);
-  await eventually(() => named('kestrel-taskbar-start', island('top-start') ?? new St.Widget()), 'and move a picked element out of its island');
+  await eventually(() => named('kestrel-taskbar-gust', island('top-start') ?? new St.Widget()), 'and move a picked element out of its island');
   press(Clutter.KEY_Return);
   await eventually(() => !taskbarEditor(), 'Return finishes');
-  await eventually(() => sameIslands(arrangement(), [['top-start', ['start']], ['top-center', ['dock']], ['bottom-end', SYSTEM]]),
+  await eventually(() => sameIslands(arrangement(), [['top-start', ['gust']], ['top-center', ['dock']], ['bottom-end', SYSTEM]]),
     'and saves the arrangement');
   await capture('taskbar-edited');
 
@@ -301,7 +301,7 @@ export async function run() {
     await stopAll();
     await checkAnchors();
     await checkCorner();
-    await checkStartAlone();
+    await checkGustAlone();
     await checkExtensionElement();
     await checkEditing();
     await checkDesktopMenu();

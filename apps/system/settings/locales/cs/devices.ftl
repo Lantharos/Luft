@@ -287,7 +287,6 @@ settings-keyboard-shortcuts-description = Zobrazit a změnit zkratky nebo přida
 settings-keyboard-copilot = Klávesa Copilot
 settings-keyboard-copilot-press = Stisk
 settings-keyboard-copilot-press-description = Co udělá krátké stisknutí klávesy
-settings-keyboard-copilot-open-start = Otevřít Start
 settings-keyboard-copilot-open-app = Otevřít aplikaci
 settings-keyboard-copilot-nothing = Nic
 settings-keyboard-copilot-app = Aplikace

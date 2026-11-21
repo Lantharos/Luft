@@ -293,7 +293,6 @@ settings-keyboard-shortcuts-description = Féach ar aicearraí agus athraigh iad
 settings-keyboard-copilot = Eochair Copilot
 settings-keyboard-copilot-press = Brú
 settings-keyboard-copilot-press-description = Cad a dhéanann brú gearr ar an eochair
-settings-keyboard-copilot-open-start = Oscail Tosaigh
 settings-keyboard-copilot-open-app = Oscail aip
 settings-keyboard-copilot-nothing = Faic
 settings-keyboard-copilot-app = Aip

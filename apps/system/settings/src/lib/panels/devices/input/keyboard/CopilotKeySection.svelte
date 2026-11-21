@@ -10,7 +10,7 @@
 	type CopilotKey = { press: Press; app: string; hold: boolean };
 
 	const PRESSES: { value: Press; label: string }[] = [
-		{ value: 'search', label: 'settings-keyboard-copilot-open-start' },
+		{ value: 'search', label: 'settings-keyboard-copilot-open-gust' },
 		{ value: 'app', label: 'settings-keyboard-copilot-open-app' },
 		{ value: 'nothing', label: 'settings-keyboard-copilot-nothing' }
 	];

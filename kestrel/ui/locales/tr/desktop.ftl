@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Başlat
 taskbar-quick-settings = Hızlı ayarlar
 taskbar-notifications-and-date = Bildirimler ve tarih
 taskbar-show-desktop = Masaüstünü göster
@@ -43,7 +42,6 @@ tray-open-app = { $appName } uygulamasını aç
 
 ## Board (tablet window layout)
 
-board-open-start = Başlat menüsünü aç
 board-show-all-windows = Tüm pencereleri göster
 board-quick-settings = Hızlı ayarlar
 

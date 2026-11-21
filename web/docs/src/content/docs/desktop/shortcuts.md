@@ -25,7 +25,7 @@ asks:
 
 | Shortcut | Does |
 | --- | --- |
-| <kbd>Super</kbd> | Start, or [Gust](/desktop/gust/) when chosen. **Open Start** in Settings adds a shortcut of your own |
+| <kbd>Super</kbd> | [Gust](/desktop/gust/). **Open Gust** in Settings adds a shortcut of your own |
 | <kbd>Super</kbd> twice | Turn the workspace into a [board](/windows/board/), or back |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | [All windows](/windows/task-view/) |
 | <kbd>Super</kbd>+<kbd>S</kbd> | Quick settings |
@@ -34,7 +34,7 @@ asks:
 | <kbd>Super</kbd>+<kbd>.</kbd> or <kbd>Super</kbd>+<kbd>;</kbd> | Emoji and symbols |
 | Hold <kbd>Super</kbd>+<kbd>Alt</kbd> | [Dictation](/desktop/dictation/): talk, and let go to type, once it's turned on |
 | <kbd>Super</kbd>+<kbd>Alt</kbd> | Start or stop dictating. It also stops when you stop talking |
-| <kbd>Copilot</kbd> | Start, or the app chosen in Settings |
+| <kbd>Copilot</kbd> | Gust, or the app chosen in Settings |
 | Hold <kbd>Copilot</kbd> | Dictation, like holding <kbd>Super</kbd>+<kbd>Alt</kbd> |
 | <kbd>Super</kbd>+<kbd>I</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>T</kbd> | A new terminal window |

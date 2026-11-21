@@ -37,7 +37,7 @@ export class Calculator {
     if (conversion) {
       const { value, from, to, amount } = conversion;
       return this.item(this.shown(value, to), this.copied(value, to),
-        t('start-search-conversion', { amount: this.conversion.show(amount), from: from.symbol, to: to.symbol }));
+        t('gust-search-conversion', { amount: this.conversion.show(amount), from: from.symbol, to: to.symbol }));
     }
     const value = evaluate(text, true, this.decimal);
     return value === null ? null : this.item(this.calculation.show(value), this.calculation.copy(value), text.trim());
@@ -59,7 +59,7 @@ export class Calculator {
 
   private item(result: string, copy: string, expression: string): SearchItem {
     return {
-      key: 'calculation', title: `= ${result}`, description: t('start-search-calculation', { expression }),
+      key: 'calculation', title: `= ${result}`, description: t('gust-search-calculation', { expression }),
       icon: themedIcon('accessories-calculator-symbolic'),
       activate: () => {
         St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, copy);

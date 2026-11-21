@@ -75,14 +75,14 @@ export async function checkAlignment() {
   const along = (box: {x: number; y: number; width: number; height: number}) =>
     vertical() ? {start: box.y, length: box.height} : {start: box.x, length: box.width};
   arrange(alongEdge(taskbarEdge(), 'start'));
-  await eventually(() => Math.round(along(boxOf(center())).start - along(panelBox()).start) <= 8, 'Start and the apps move to the start of the taskbar');
+  await eventually(() => Math.round(along(boxOf(center())).start - along(panelBox()).start) <= 8, 'Gust and the apps move to the start of the taskbar');
   await captureEdge('taskbar-left');
   arrange(alongEdge(taskbarEdge()));
   const screen = along(primary());
   await eventually(() => {
     const {start, length} = along(boxOf(center()));
     return Math.abs(start + length / 2 - (screen.start + screen.length / 2)) <= 1;
-  }, 'Start and the apps return to the middle');
+  }, 'Gust and the apps return to the middle');
 }
 
 export async function checkLooks() {

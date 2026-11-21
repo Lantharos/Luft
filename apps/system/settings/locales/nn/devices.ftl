@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Sjå og endre snarvegar, eller legg ti
 settings-keyboard-copilot = Copilot-tasten
 settings-keyboard-copilot-press = Trykk
 settings-keyboard-copilot-press-description = Kva eit kort trykk på tasten gjer
-settings-keyboard-copilot-open-start = Opne Start
 settings-keyboard-copilot-open-app = Opne ein app
 settings-keyboard-copilot-nothing = Ingenting
 settings-keyboard-copilot-app = App

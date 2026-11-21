@@ -6,7 +6,7 @@ import {Main, QuickMenuToggle} from 'resource:///com/lantharos/kestrel/kestrel.j
 import {descendants, named, ofType} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
+import {closeGust, groupTitles, openGust, rows, search, titleOf} from '../gust/search/results.js';
 import {install, listed, ownFolder, removeFolder, request, setSetting} from './lib/extensions.js';
 import {hostsOf, installOwn} from './lib/sandbox.js';
 
@@ -58,10 +58,10 @@ async function checkSurfaces() {
   await eventually(() => notified('Hello from the sandbox'), 'clicking the item reaches the host, which sends a notification');
   await setSetting(SANDBOXED, 'on', new GLib.Variant('b', true));
   await eventually(() => (tile() as InstanceType<typeof QuickMenuToggle>).checked, 'a setting changed over D-Bus reaches its toggle');
-  await openStart();
+  await openGust();
   search('needle');
   await eventually(() => groupTitles().includes('Sandboxed') && rows().some(row => titleOf(row) === 'Sandboxed found needle'), 'its search results come back from the host');
-  closeStart();
+  closeGust();
   const sections = await page();
   require(sections.some(section => section.title === 'Probed'), 'its own Settings page is built in the host');
 }

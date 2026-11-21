@@ -74,18 +74,11 @@ settings-appearance-text-size = Размер на текста
 ## Taskbar
 
 settings-taskbar-preview = Преглед на лентата на задачите
-settings-start-section = Старт
-settings-start-style = Стил
-settings-start-style-menu = Меню
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Търсене, приложения и папки до лентата на задачите
-settings-start-style-palette-description = Лента за търсене в средата на екрана за приложения, прозорци, файлове и отговори
-settings-start-button = Показване на бутона Старт
-settings-start-button-description = Super отваря менюто Старт и без него
-settings-start-web = Търсене в интернет чрез
+settings-gust-look-panel-description = Търсене, приложения и папки до лентата на задачите
+settings-gust-look-palette-description = Лента за търсене в средата на екрана за приложения, прозорци, файлове и отговори
+settings-gust-web = Търсене в интернет чрез
 settings-taskbar-shown = Показване на лентата на задачите
 settings-taskbar-hidden = Скрита
-settings-taskbar-hidden-description = Часовникът и иконите за състояние остават в ъгъла, а Super отваря менюто Старт
 settings-taskbar-look = Вид
 settings-taskbar-look-glass = Стъкло
 settings-taskbar-look-solid = Плътен

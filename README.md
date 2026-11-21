@@ -9,7 +9,7 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 ## What makes it different
 
-- **Its own desktop.** Kestrel has a taskbar, Start with search across apps, settings and the text of your files, quick settings, snap layouts, and a board where windows sit side by side on an endless canvas. Its colors come from your wallpaper, and the apps follow.
+- **Its own desktop.** Kestrel has a taskbar, Gust with search across apps, settings and the text of your files, quick settings, snap layouts, and a board where windows sit side by side on an endless canvas. Its colors come from your wallpaper, and the apps follow.
 - **Its own apps.** Settings, Rover for files, Magpie for photos, videos, music and PDFs, Mailman for mail, Draft for text and code, Tern for the terminal, Schelf for everything else from Flathub and AppImages.
 - **Updates you don't think about.** The system updates as a whole at the next restart. If a new version doesn't start, Luft goes back to the one that did.
 - **A startup you can trust.** Secure Boot can stay on, the disk unlocks with the TPM, a keyring keeps your passwords and keys, and new USB devices wait while the screen is locked.
@@ -17,8 +17,8 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 <p>
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/start-light.webp">
-    <img src="web/docs/src/assets/shots/start.webp" alt="Start" width="49%">
+    <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/gust-panel-light.webp">
+    <img src="web/docs/src/assets/shots/gust-panel.webp" alt="Gust" width="49%">
   </picture>
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/quick-settings-light.webp">

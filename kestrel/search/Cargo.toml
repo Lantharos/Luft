@@ -1,6 +1,6 @@
 [package]
 name = "kestrel-search"
-description = "Keeps an index of the files in the home folder for Start"
+description = "Keeps an index of the files in the home folder for Gust"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true

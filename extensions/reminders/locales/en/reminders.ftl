@@ -1,7 +1,7 @@
 # The name of the extension in Settings and the store
 extension-name = Reminders
 extension-description = Birthdays, to-dos and goals in the taskbar, with notifications that come back until you answer them
-# Screen-reader name of the taskbar element and the pop-up, and the heading in Start's search
+# Screen-reader name of the taskbar element and the pop-up, and the heading in Gust's search
 reminders = Reminders
 shortcut-open = Open Reminders
 
@@ -217,7 +217,7 @@ nudge-4 = No rush. Well, a small rush
 nudge-5 = Past you had big plans. Present you can have a snack first
 nudge-6 = Moving the date is allowed, and nobody will know
 
-# Start's search; $title is what would be added
+# Gust's search; $title is what would be added
 search-add = Add reminder: { $title }
 
 expand-on-hover = Show more on hover

@@ -1,98 +1,98 @@
-## Start
+## Gust
 
-start-search-placeholder = Пошук програм, файлів та іншого
-start-search-cut = Вирізати
-start-search-copy = Копіювати
-start-search-paste = Вставити
-start-search-select-all = Виділити все
-start-power = Живлення й сеанс
-start-power-close = Закрити параметри живлення
-start-account-settings = Параметри облікового запису
-start-apps = Програми
-start-folder-default-name = Папка
-start-folder-open = Відкрити папку
-start-folder-rename = Перейменувати
-start-folder-ungroup = Розгрупувати програми
-start-open = Відкрити
-start-move-to-apps = Перемістити до програм
+gust-search-placeholder = Пошук програм, файлів та іншого
+gust-search-cut = Вирізати
+gust-search-copy = Копіювати
+gust-search-paste = Вставити
+gust-search-select-all = Виділити все
+gust-power = Живлення й сеанс
+gust-power-close = Закрити параметри живлення
+gust-account-settings = Параметри облікового запису
+gust-apps = Програми
+gust-folder-default-name = Папка
+gust-folder-open = Відкрити папку
+gust-folder-rename = Перейменувати
+gust-folder-ungroup = Розгрупувати програми
+gust-open = Відкрити
+gust-move-to-apps = Перемістити до програм
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Найкращий збіг
-start-search-group-apps = Програми
-start-search-group-commands = Дії програм
-start-search-group-windows = Відкриті вікна
-start-search-group-actions = Дії
-start-search-group-settings = Параметри
-start-search-group-clipboard = Буфер обміну
-start-search-group-emoji = Емодзі
-start-search-group-files = Файли
-start-search-group-contents = У вмісті файлів
-start-search-group-web = Інтернет
-start-search-web = Шукати в інтернеті «{ $query }»
-start-search-clipboard-text = З журналу буфера обміну
-start-search-clipboard-keywords = буфер обміну, скопійоване, скопійовано, журнал буфера обміну, історія буфера обміну, вставити, clipboard
-start-search-emoji-insert = Вставити
-start-search-settings-page = Параметри
-start-search-settings-section = Параметри: { $page }
-start-search-file-reveal = Показати в { $fileManager }
-start-search-file-copy-path = Копіювати шлях
-start-search-conversion = { $amount } { $from } у { $to }
-start-search-calculation = { $expression }, натисніть Enter, щоб скопіювати
+gust-search-best-match = Найкращий збіг
+gust-search-group-apps = Програми
+gust-search-group-commands = Дії програм
+gust-search-group-windows = Відкриті вікна
+gust-search-group-actions = Дії
+gust-search-group-settings = Параметри
+gust-search-group-clipboard = Буфер обміну
+gust-search-group-emoji = Емодзі
+gust-search-group-files = Файли
+gust-search-group-contents = У вмісті файлів
+gust-search-group-web = Інтернет
+gust-search-web = Шукати в інтернеті «{ $query }»
+gust-search-clipboard-text = З журналу буфера обміну
+gust-search-clipboard-keywords = буфер обміну, скопійоване, скопійовано, журнал буфера обміну, історія буфера обміну, вставити, clipboard
+gust-search-emoji-insert = Вставити
+gust-search-settings-page = Параметри
+gust-search-settings-section = Параметри: { $page }
+gust-search-file-reveal = Показати в { $fileManager }
+gust-search-file-copy-path = Копіювати шлях
+gust-search-conversion = { $amount } { $from } у { $to }
+gust-search-calculation = { $expression }, натисніть Enter, щоб скопіювати
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = До { $date }
-start-search-answer-since = З { $date }
-start-search-answer-between = Між { $from } і { $to }
-start-search-answer-time-ahead = { $place }, на { $hours ->
+gust-search-answer-until = До { $date }
+gust-search-answer-since = З { $date }
+gust-search-answer-between = Між { $from } і { $to }
+gust-search-answer-time-ahead = { $place }, на { $hours ->
     [one] { $hours } годину
     [few] { $hours } години
     [many] { $hours } годин
    *[other] { $hours } години
 } вперед
-start-search-answer-time-behind = { $place }, на { $hours ->
+gust-search-answer-time-behind = { $place }, на { $hours ->
     [one] { $hours } годину
     [few] { $hours } години
     [many] { $hours } годин
    *[other] { $hours } години
 } назад
-start-search-answer-time-same = { $place }, той самий час, що й тут
-start-search-answer-converted = { $place }, коли { $time } ({ $from })
-start-search-answer-converted-here = Тут, коли { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, коли тут { $time }
+gust-search-answer-time-same = { $place }, той самий час, що й тут
+gust-search-answer-converted = { $place }, коли { $time } ({ $from })
+gust-search-answer-converted-here = Тут, коли { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, коли тут { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Увімкнути темний стиль
-start-search-dark-style-off = Увімкнути світлий стиль
-start-search-dark-style-keywords = темний стиль, темний режим, темна тема, світлий стиль, світлий режим, світла тема, dark mode, нічний режим
-start-search-night-light-on = Увімкнути нічне світло
-start-search-night-light-off = Вимкнути нічне світло
-start-search-night-light-keywords = нічне світло, нічний режим, синє світло, теплі кольори, night light, night shift
-start-search-do-not-disturb-on = Увімкнути «Не турбувати»
-start-search-do-not-disturb-off = Вимкнути «Не турбувати»
-start-search-do-not-disturb-keywords = не турбувати, dnd, фокусування, тиша, без звуку, вимкнути сповіщення, приглушити сповіщення
-start-search-wifi-on = Увімкнути Wi-Fi
-start-search-wifi-off = Вимкнути Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, вайфай, бездротова мережа, wlan
-start-search-bluetooth-on = Увімкнути Bluetooth
-start-search-bluetooth-off = Вимкнути Bluetooth
-start-search-bluetooth-keywords = bluetooth, блютуз
-start-search-airplane-mode-on = Увімкнути режим польоту
-start-search-airplane-mode-off = Вимкнути режим польоту
-start-search-airplane-mode-keywords = режим польоту, режим літака, авіарежим, airplane mode, радіомодулі
-start-search-keep-awake-on = Не засинати
-start-search-keep-awake-off = Вимкнути «Не засинати»
-start-search-keep-awake-keywords = не засинати, не вимикати екран, без сну, caffeine, кофеїн, заборонити сплячий режим
-start-search-lock-keywords = заблокувати екран, заблокувати комп’ютер, блокування, екран блокування
-start-search-suspend-keywords = сплячий режим, сон, режим очікування, призупинити, sleep
-start-search-log-out-keywords = вийти, вихід, вийти з системи, завершити сеанс, змінити користувача, log out
-start-search-restart-keywords = перезавантажити, перезавантаження, перезапустити комп’ютер, restart, reboot
-start-search-power-off-keywords = вимкнути, вимкнення, вимкнути комп’ютер, завершити роботу, shutdown
+gust-search-dark-style-on = Увімкнути темний стиль
+gust-search-dark-style-off = Увімкнути світлий стиль
+gust-search-dark-style-keywords = темний стиль, темний режим, темна тема, світлий стиль, світлий режим, світла тема, dark mode, нічний режим
+gust-search-night-light-on = Увімкнути нічне світло
+gust-search-night-light-off = Вимкнути нічне світло
+gust-search-night-light-keywords = нічне світло, нічний режим, синє світло, теплі кольори, night light, night shift
+gust-search-do-not-disturb-on = Увімкнути «Не турбувати»
+gust-search-do-not-disturb-off = Вимкнути «Не турбувати»
+gust-search-do-not-disturb-keywords = не турбувати, dnd, фокусування, тиша, без звуку, вимкнути сповіщення, приглушити сповіщення
+gust-search-wifi-on = Увімкнути Wi-Fi
+gust-search-wifi-off = Вимкнути Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, вайфай, бездротова мережа, wlan
+gust-search-bluetooth-on = Увімкнути Bluetooth
+gust-search-bluetooth-off = Вимкнути Bluetooth
+gust-search-bluetooth-keywords = bluetooth, блютуз
+gust-search-airplane-mode-on = Увімкнути режим польоту
+gust-search-airplane-mode-off = Вимкнути режим польоту
+gust-search-airplane-mode-keywords = режим польоту, режим літака, авіарежим, airplane mode, радіомодулі
+gust-search-keep-awake-on = Не засинати
+gust-search-keep-awake-off = Вимкнути «Не засинати»
+gust-search-keep-awake-keywords = не засинати, не вимикати екран, без сну, caffeine, кофеїн, заборонити сплячий режим
+gust-search-lock-keywords = заблокувати екран, заблокувати комп’ютер, блокування, екран блокування
+gust-search-suspend-keywords = сплячий режим, сон, режим очікування, призупинити, sleep
+gust-search-log-out-keywords = вийти, вихід, вийти з системи, завершити сеанс, змінити користувача, log out
+gust-search-restart-keywords = перезавантажити, перезавантаження, перезапустити комп’ютер, restart, reboot
+gust-search-power-off-keywords = вимкнути, вимкнення, вимкнути комп’ютер, завершити роботу, shutdown
 
 ## Quick settings
 

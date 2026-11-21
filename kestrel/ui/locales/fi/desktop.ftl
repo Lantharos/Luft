@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Pika-asetukset
 taskbar-notifications-and-date = Ilmoitukset ja päivämäärä
 taskbar-show-desktop = Näytä työpöytä
@@ -43,7 +42,6 @@ tray-open-app = Avaa { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Avaa Start-valikko
 board-show-all-windows = Näytä kaikki ikkunat
 board-quick-settings = Pika-asetukset
 

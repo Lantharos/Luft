@@ -40,7 +40,7 @@ async function checkEntering() {
   require(boardWindows().length === 4, 'four windows open on the first desktop');
   require(!noOverlap(), 'the desktop starts with stacked windows');
   await showBoard();
-  require(!named('kestrel-start')!.visible, 'double-tapping Super turns the board on without leaving Start open');
+  require(!named('kestrel-gust-panel')!.visible, 'double-tapping Super turns the board on without leaving Gust open');
   require(boardWindows().every(window => window.unconstrained), 'windows on the board can go anywhere');
   require(noOverlap(), 'no windows overlap on the board');
   await eventually(() => group.scale_x === board().camera.view.scale && group.scale_x <= 1, 'the window group shows the board through one transform');

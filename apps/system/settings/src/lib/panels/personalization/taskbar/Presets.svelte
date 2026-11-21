@@ -14,7 +14,7 @@
 	const HEIGHT = 45;
 	const THICKNESS = 5;
 	const MARGIN = 3;
-	const LENGTHS: Record<string, number> = { start: 5, dock: 22, tray: 3, status: 7, clock: 6 };
+	const LENGTHS: Record<string, number> = { gust: 5, dock: 22, tray: 3, status: 7, clock: 6 };
 
 	function sketch(arrangement: Arrangement, joined: boolean) {
 		const length = (elements: string[]) => elements.reduce((sum, element) => sum + LENGTHS[element], 0);

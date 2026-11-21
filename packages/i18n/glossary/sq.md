@@ -21,7 +21,6 @@ Address the reader with ti, as Windows does in Albanian, since it is friendlier 
 
 ## Names
 
-- Start is Fillimi, because it is used in sentences: “Hap Fillimin”, “Kërko në Fillim”.
 - Settings, Disks and Install Luft are Cilësimet, Disqet and Instalo Luft.
 - App names may take Albanian endings (“Roveri”, “në Rover”).
 

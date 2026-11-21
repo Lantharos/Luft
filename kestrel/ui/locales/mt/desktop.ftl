@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Settings rapidi
 taskbar-notifications-and-date = Notifiki u data
 taskbar-show-desktop = Uri d-desktop
@@ -46,7 +45,6 @@ tray-open-app = Iftaħ { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Iftaħ Start
 board-show-all-windows = Uri t-twieqi kollha
 board-quick-settings = Settings rapidi
 

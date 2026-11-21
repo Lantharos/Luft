@@ -66,7 +66,7 @@ export class AnswerResults {
       case 'span': return [this.duration(found.parts), this.spanDescription(found)];
       case 'date': return [this.fullDate.format(utc(found.date)), this.capitalized(this.relative.format(found.days, 'day'))];
       case 'time': return this.time(found);
-      case 'number': return [`= ${found.percent ? this.percent.format(found.value / 100) : this.decimal.format(found.value)}`, t('start-search-calculation', { expression: text.trim() })];
+      case 'number': return [`= ${found.percent ? this.percent.format(found.value / 100) : this.decimal.format(found.value)}`, t('gust-search-calculation', { expression: text.trim() })];
     }
   }
 
@@ -77,9 +77,9 @@ export class AnswerResults {
   }
 
   private spanDescription({ direction, from, to }: Of<'span'>): string {
-    if (direction === 'until') return t('start-search-answer-until', { date: this.longDate.format(utc(to)) });
-    if (direction === 'since') return t('start-search-answer-since', { date: this.longDate.format(utc(from)) });
-    return t('start-search-answer-between', { from: this.longDate.format(utc(from)), to: this.longDate.format(utc(to)) });
+    if (direction === 'until') return t('gust-search-answer-until', { date: this.longDate.format(utc(to)) });
+    if (direction === 'since') return t('gust-search-answer-since', { date: this.longDate.format(utc(from)) });
+    return t('gust-search-answer-between', { from: this.longDate.format(utc(from)), to: this.longDate.format(utc(to)) });
   }
 
   private clock(zone: string): [Intl.DateTimeFormat, Intl.DateTimeFormat] {
@@ -105,18 +105,18 @@ export class AnswerResults {
     if (from) {
       const title = this.wallTime(instant, at, from);
       const source = this.clock(from.zone)[0].format(instant);
-      const description = !at.place ? t('start-search-answer-converted-here', { time: source, from: from.place })
-        : !from.place ? t('start-search-answer-converted-from-here', { time: source, place: at.place })
-        : t('start-search-answer-converted', { time: source, from: from.place, place: at.place });
+      const description = !at.place ? t('gust-search-answer-converted-here', { time: source, from: from.place })
+        : !from.place ? t('gust-search-answer-converted-from-here', { time: source, place: at.place })
+        : t('gust-search-answer-converted', { time: source, from: from.place, place: at.place });
       return [title, description];
     }
     const title = this.wallTime(instant, at, here);
     if (!at.place) return [title, this.capitalized(this.relative.format(Math.round((instant - Date.now()) / HOUR_MS * 10) / 10, 'hour'))];
     const difference = (zoneOffset(at.zone, instant) - zoneOffset(here.zone, instant)) / 60;
     const hours = Math.abs(difference);
-    const description = difference > 0 ? t('start-search-answer-time-ahead', { place: at.place, hours })
-      : difference < 0 ? t('start-search-answer-time-behind', { place: at.place, hours })
-      : t('start-search-answer-time-same', { place: at.place });
+    const description = difference > 0 ? t('gust-search-answer-time-ahead', { place: at.place, hours })
+      : difference < 0 ? t('gust-search-answer-time-behind', { place: at.place, hours })
+      : t('gust-search-answer-time-same', { place: at.place });
     return [title, description];
   }
 

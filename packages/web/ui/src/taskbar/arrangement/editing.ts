@@ -89,7 +89,7 @@ export interface Preset {
 export const PRESETS: Record<PresetName, Preset> = {
 	classic: {
 		arrangement: [
-			{ spot: 'bottom-start', elements: ['start', 'dock'] },
+			{ spot: 'bottom-start', elements: ['gust', 'dock'] },
 			{ spot: 'bottom-end', elements: [...SYSTEM_ELEMENTS] }
 		],
 		style: 'bar'
@@ -97,14 +97,14 @@ export const PRESETS: Record<PresetName, Preset> = {
 	centered: { arrangement: DEFAULT_ARRANGEMENT, style: null },
 	mac: {
 		arrangement: [
-			{ spot: 'bottom-center', elements: ['start', 'dock'] },
+			{ spot: 'bottom-center', elements: ['gust', 'dock'] },
 			{ spot: 'top-end', elements: [...SYSTEM_ELEMENTS] }
 		],
 		style: 'separate'
 	},
 	side: {
 		arrangement: [
-			{ spot: 'left-center', elements: ['start', 'dock'] },
+			{ spot: 'left-center', elements: ['gust', 'dock'] },
 			{ spot: 'bottom-end', elements: [...SYSTEM_ELEMENTS] }
 		],
 		style: 'separate'
@@ -119,7 +119,7 @@ export type ElementPlace = 'before-apps' | 'after-apps' | 'beside-tray' | 'start
 
 export const ELEMENT_PLACES: ElementPlace[] = ['before-apps', 'after-apps', 'beside-tray', 'start', 'end'];
 
-const APPS = ['start', 'dock'];
+const APPS = ['gust', 'dock'];
 
 export function placeElement(arrangement: Arrangement, element: string, place: ElementPlace): Arrangement {
 	const others = arrangement

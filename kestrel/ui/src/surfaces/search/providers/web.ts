@@ -23,7 +23,7 @@ export class WebSearch {
   item(text: string): SearchItem {
     const engine = ENGINES[this.settings.get_string('search-web-engine')] ?? ENGINES.duckduckgo;
     return {
-      key: 'web', title: t('start-search-web', { query: text }), description: engine.name, icon: themedIcon('web-browser-symbolic'),
+      key: 'web', title: t('gust-search-web', { query: text }), description: engine.name, icon: themedIcon('web-browser-symbolic'),
       activate: () => {
         this.close();
         openUriAsync(`${engine.address}${encodeURIComponent(text)}`)

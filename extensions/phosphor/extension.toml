@@ -782,7 +782,7 @@ min = 1
 options = [
   { value = "taskbar", label = "taskbar" },
   { value = "quick-settings", label = "quick-settings" },
-  { value = "start", label = "start" },
+  { value = "gust", label = "gust" },
   { value = "notifications", label = "notifications" },
 ]
 

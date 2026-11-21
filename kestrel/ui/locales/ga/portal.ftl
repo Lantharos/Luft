@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Níl aon aip suiteáilte in ann é seo a 
 portal-app-chooser-find = Aimsigh aip
 portal-app-chooser-open = Oscail
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Cuir an suíomh gréasáin seo le d’aipeanna?
-portal-launcher-website-description = Osclófar { $site } ina fhuinneog féin ón roghchlár Tosaigh.
 portal-launcher-title = Cuir é seo le d’aipeanna?
-portal-launcher-description = Tá { $appName } ag iarraidh aip a chur sa roghchlár Tosaigh.
 portal-launcher-name = Ainm
 portal-launcher-add = Cuir leis
 

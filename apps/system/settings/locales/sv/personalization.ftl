@@ -74,18 +74,11 @@ settings-appearance-text-size = Textstorlek
 ## Taskbar
 
 settings-taskbar-preview = Förhandsvisning av aktivitetsfältet
-settings-start-section = Start
-settings-start-style = Stil
-settings-start-style-menu = Meny
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Sökning, appar och mappar bredvid aktivitetsfältet
-settings-start-style-palette-description = Ett sökfält mitt på skärmen för appar, fönster, filer och svar
-settings-start-button = Visa Start-knappen
-settings-start-button-description = Super öppnar Start i båda fallen
-settings-start-web = Sök på webben med
+settings-gust-look-panel-description = Sökning, appar och mappar bredvid aktivitetsfältet
+settings-gust-look-palette-description = Ett sökfält mitt på skärmen för appar, fönster, filer och svar
+settings-gust-web = Sök på webben med
 settings-taskbar-shown = Visa aktivitetsfältet
 settings-taskbar-hidden = Dold
-settings-taskbar-hidden-description = Klockan och statusikonerna stannar i ett hörn, och Super öppnar Start
 settings-taskbar-look = Bakgrund
 settings-taskbar-look-glass = Glas
 settings-taskbar-look-solid = Enfärgat

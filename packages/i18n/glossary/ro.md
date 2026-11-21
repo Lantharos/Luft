@@ -25,7 +25,6 @@ Always write ș and ț with the comma below, never the cedilla forms ş and ţ. 
 ## Names
 
 - Settings, Disks and Install Luft are Setări, Discuri and Instalează Luft.
-- Start stays Start; write „meniul Start” when it needs an article or a case.
 - App names and Luft never take articles or case endings; put the kind of thing first: „în aplicația Rover”, „sistemul Luft”.
 
 ## Plurals

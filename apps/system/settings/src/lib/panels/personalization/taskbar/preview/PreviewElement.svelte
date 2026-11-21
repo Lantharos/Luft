@@ -29,7 +29,7 @@
 </script>
 
 <span class="element" class:vertical style:--button="{button}px">
-	{#if id === 'start'}
+	{#if id === 'gust'}
 		<span class="slot">
 			<span class="mark" style:width="{markSize}px" style:height="{markSize}px">
 				{#each MARK_LAYERS as layer, index (index)}

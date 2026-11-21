@@ -1,15 +1,15 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { t } from '../../shared/i18n/index.js';
+import { t } from '../../../shared/i18n/index.js';
 
 interface Folder { name: string; apps: string[]; }
 interface Layout { items: string[]; folders: Record<string, Folder>; }
 
-export class StartLayout {
+export class GustLayout {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private layout: Layout = JSON.parse(this.settings.get_string('start-layout'));
-  private arranged = this.settings.get_user_value('start-layout') !== null;
+  private layout: Layout = JSON.parse(this.settings.get_string('gust-layout'));
+  private arranged = this.settings.get_user_value('gust-layout') !== null;
 
   folder(id: string): Folder | undefined { return this.layout.folders[id]; }
   items(folder: string | null = null): string[] { return folder ? this.folder(folder)?.apps ?? [] : this.layout.items; }
@@ -44,7 +44,7 @@ export class StartLayout {
     const key = `folder:${GLib.uuid_string_random()}`;
     this.layout.items.splice(index, 1, key);
     this.remove(id);
-    this.layout.folders[key] = { name: t('start-folder-default-name'), apps: [target, id] };
+    this.layout.folders[key] = { name: t('gust-folder-default-name'), apps: [target, id] };
     this.save();
   }
 
@@ -80,6 +80,6 @@ export class StartLayout {
   private save(): void {
     this.arranged = true;
     this.prune();
-    this.settings.set_string('start-layout', JSON.stringify(this.layout));
+    this.settings.set_string('gust-layout', JSON.stringify(this.layout));
   }
 }

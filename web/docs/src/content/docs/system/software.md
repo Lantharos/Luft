@@ -73,7 +73,7 @@ System packages don't run in a sandbox, so they have full access already. Settin
 
 ## AppImages
 
-Open an `.AppImage` file and Schelf offers to install it. It keeps it out of your folders, in `~/.local/share/luft/appimages`, and adds it to Start with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
+Open an `.AppImage` file and Schelf offers to install it. It keeps it out of your folders, in `~/.local/share/luft/appimages`, and adds it to Gust with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
 
 AppImages run in a sandbox, like Flatpak apps:
 
@@ -88,7 +88,7 @@ An AppImage that closes right after it starts, or looks for a USB or serial devi
 
 Some apps only come as a `.deb` file, made for Debian and Ubuntu. Open one and Schelf first looks for the same app on Flathub: when it's there, **Install from Flathub** is the better way, sandboxed and keeping itself up to date.
 
-Otherwise, **Install the .deb anyway** installs it into Ubuntu 26.04, kept in your account in `~/.local/share/luft/ubuntu`, along with the Ubuntu software it needs. The first one downloads Ubuntu from Ubuntu's own servers, a few hundred megabytes, and only uses it once it matches what Ubuntu signed. The app gets a place in Start with its own icon and opens as quickly as any other, and links it opens go to your browser.
+Otherwise, **Install the .deb anyway** installs it into Ubuntu 26.04, kept in your account in `~/.local/share/luft/ubuntu`, along with the Ubuntu software it needs. The first one downloads Ubuntu from Ubuntu's own servers, a few hundred megabytes, and only uses it once it matches what Ubuntu signed. The app gets a place in Gust with its own icon and opens as quickly as any other, and links it opens go to your browser.
 
 - It isn't sandboxed: it can read and change everything in your home folder, as it would on Ubuntu. The rest of the computer is at `/run/host`, and `flatpak-spawn --host` runs a command there.
 - Packages that add their maker's software source when installed, as many do, get updates in Schelf. Others stay at their version until you open a newer file.
@@ -168,7 +168,7 @@ Programs you install by hand, or with an install script such as `curl … | sh`,
 
 ## App names and icons
 
-Any installed app can have a name and an icon of your own. Open the app in Schelf and choose **Rename** next to **Name**; the new name shows in Start, search, the taskbar and the Luft apps, and an empty name brings back the app's own.
+Any installed app can have a name and an icon of your own. Open the app in Schelf and choose **Rename** next to **Name**; the new name shows in Gust, search, the taskbar and the Luft apps, and an empty name brings back the app's own.
 
 Choose **Change** next to **Icon** to pick a PNG or SVG image. Luft draws the glyph that the Tinted, Clear and Monochrome icon styles use from it, or you can choose **Change** next to **Symbolic icon** to give it an SVG of your own. **Reset** puts back the icons the app came with. App updates don't replace any of this: names are kept in `~/.local/share/luft/app-names`, icons in `~/.local/share/luft/app-icons` and symbolic icons in `~/.local/share/icons/hicolor/symbolic/apps`.
 

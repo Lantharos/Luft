@@ -22,7 +22,6 @@ Prefer sentences without a person: „Naujinimai bus įdiegti paleidus iš naujo
 ## Names
 
 - Settings, Disks and Install Luft are Nustatymai, Diskai and Įdiegti Luft.
-- Start is Pradžia, as in Windows; write „meniu Pradžia“ so it stays in the nominative.
 - Names are never declined, Windows included; put the kind of thing first and decline that: „programoje Rover“, „vieta sistemai Luft“, „sistemoje Windows“.
 
 ## Plurals

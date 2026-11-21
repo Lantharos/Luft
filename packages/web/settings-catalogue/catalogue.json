@@ -209,25 +209,25 @@
 			"key": "com.lantharos.kestrel taskbar-windows-per-display"
 		},
 		{
-			"id": "start.style",
+			"id": "gust.look",
 			"page": "taskbar",
-			"title": "settings-start-style",
-			"key": "com.lantharos.kestrel start-style",
+			"title": "settings-gust-look",
+			"key": "com.lantharos.kestrel gust-look",
 			"options": [
-				{ "value": "menu", "label": "settings-start-style-menu" },
-				{ "value": "palette", "label": "settings-start-style-palette" }
+				{ "value": "panel", "label": "settings-gust-look-panel" },
+				{ "value": "palette", "label": "settings-gust-look-palette" }
 			]
 		},
 		{
-			"id": "start.button",
+			"id": "gust.button",
 			"page": "taskbar",
-			"title": "settings-start-button",
-			"key": "com.lantharos.kestrel taskbar-start-button"
+			"title": "settings-gust-button",
+			"key": "com.lantharos.kestrel taskbar-gust-button"
 		},
 		{
-			"id": "start.web-search",
+			"id": "gust.web-search",
 			"page": "taskbar",
-			"title": "settings-start-web",
+			"title": "settings-gust-web",
 			"key": "com.lantharos.kestrel search-web-engine",
 			"options": [
 				{ "value": "duckduckgo", "name": "DuckDuckGo" },

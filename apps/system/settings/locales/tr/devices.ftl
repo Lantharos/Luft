@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Kısayolları görün ve değiştirin 
 settings-keyboard-copilot = Copilot tuşu
 settings-keyboard-copilot-press = Kısa basış
 settings-keyboard-copilot-press-description = Tuşa kısa basıldığında ne olacağı
-settings-keyboard-copilot-open-start = Başlat menüsünü aç
 settings-keyboard-copilot-open-app = Bir uygulama aç
 settings-keyboard-copilot-nothing = Hiçbir şey
 settings-keyboard-copilot-app = Uygulama

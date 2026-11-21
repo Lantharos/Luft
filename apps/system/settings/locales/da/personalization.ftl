@@ -74,18 +74,11 @@ settings-appearance-text-size = Tekststørrelse
 ## Taskbar
 
 settings-taskbar-preview = Eksempel på proceslinjen
-settings-start-section = Start
-settings-start-style = Stil
-settings-start-style-menu = Menu
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Søgning, apps og mapper ved siden af proceslinjen
-settings-start-style-palette-description = En søgelinje midt på skærmen til apps, vinduer, filer og svar
-settings-start-button = Vis Start-knappen
-settings-start-button-description = Super åbner Start uanset hvad
-settings-start-web = Søg på nettet med
+settings-gust-look-panel-description = Søgning, apps og mapper ved siden af proceslinjen
+settings-gust-look-palette-description = En søgelinje midt på skærmen til apps, vinduer, filer og svar
+settings-gust-web = Søg på nettet med
 settings-taskbar-shown = Vis proceslinjen
 settings-taskbar-hidden = Skjult
-settings-taskbar-hidden-description = Uret og statusikonerne bliver i et hjørne, og Super åbner Start
 settings-taskbar-look = Udseende
 settings-taskbar-look-glass = Glas
 settings-taskbar-look-solid = Ensfarvet

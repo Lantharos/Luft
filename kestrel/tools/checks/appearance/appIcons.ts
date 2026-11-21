@@ -21,7 +21,7 @@ const SCHEMES = [['dark', 'prefer-dark'], ['light', 'default']] as const;
 const PALETTE_TIMEOUT = 10000;
 const appSystem = Shell.AppSystem.get_default();
 const TASKBAR_APP = 'kestrel-app-';
-const APP_BUTTONS = [TASKBAR_APP, 'kestrel-start-item-'];
+const APP_BUTTONS = [TASKBAR_APP, 'kestrel-gust-item-'];
 const LUFT_APP = 'com.lantharos.';
 
 type Paint = ReturnType<typeof appIcons.paintFor>;
@@ -49,7 +49,7 @@ function inAppButton(actor: Clutter.Actor) {
 
 const appIconsIn = (root: Clutter.Actor) => descendants(root).filter((actor): actor is St.Icon => actor instanceof St.Icon).filter(icon => icon.mapped && inAppButton(icon));
 
-const shownIcons = () => [...appIconsIn(named('kestrel-panel')!), ...appIconsIn(named('kestrel-start')!)];
+const shownIcons = () => [...appIconsIn(named('kestrel-panel')!), ...appIconsIn(named('kestrel-gust-panel')!)];
 
 const inkOf = (icon: St.Icon) => icon.gicon instanceof St.StyledIcon ? icon.gicon.ink.to_string() : null;
 
@@ -77,19 +77,19 @@ const painted = (icon: St.Icon, paint: Paint) => inkOf(icon) === (paint?.ink ?? 
 
 async function checkStyles(settings: Gio.Settings, slug: string, scheme: string) {
   const setting = `${slug}, ${scheme}`;
-  toggleSurface('start');
-  await eventually(() => shown(named('kestrel-start')), 'Start opens');
+  toggleSurface('gust');
+  await eventually(() => shown(named('kestrel-gust-panel')), 'Gust opens');
   for (const style of STYLES) {
     settings.set_string('app-icon-style', style);
     await eventually(() => appIcons.style === style, `${style} icons are chosen (${setting})`);
     const icons = shownIcons();
-    require(icons.length > 0, `the taskbar and Start show app icons (${setting})`);
-    await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paintFor(icon))), `${style} reaches every taskbar and Start icon (${setting})`);
+    require(icons.length > 0, `the taskbar and Gust show app icons (${setting})`);
+    await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paintFor(icon))), `${style} reaches every taskbar and Gust icon (${setting})`);
     if (style === 'default') checkLuftApps(setting);
     await capture(`icons-${style}-${scheme}-${slug}`);
   }
-  toggleSurface('start');
-  await eventually(() => !named('kestrel-start')!.visible, 'Start closes');
+  toggleSurface('gust');
+  await eventually(() => !named('kestrel-gust-panel')!.visible, 'Gust closes');
 }
 
 async function checkWallpaper(settings: Gio.Settings, interfaceSettings: Gio.Settings, slug: string) {

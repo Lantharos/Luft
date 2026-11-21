@@ -264,7 +264,7 @@
 	{/if}
 
 	<div class="corner {edge}" class:vertical={mainVertical} class:shown={!shown} style:--surface={cornerPaint?.surface} style:--ink={cornerPaint?.ink}>
-		{#if present('start')}
+		{#if present('gust')}
 			<span class="pill round" aria-hidden="true">
 				<span class="mark">
 					{#each MARK_LAYERS as layer, index (index)}

@@ -74,18 +74,11 @@ settings-appearance-text-size = Metin boyutu
 ## Taskbar
 
 settings-taskbar-preview = Görev çubuğu önizlemesi
-settings-start-section = Başlat
-settings-start-style = Stil
-settings-start-style-menu = Menü
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Görev çubuğunun yanında arama, uygulamalar ve klasörler
-settings-start-style-palette-description = Ekranın ortasında uygulamalar, pencereler, dosyalar ve yanıtlar için bir arama çubuğu
-settings-start-button = Başlat düğmesini göster
-settings-start-button-description = Super her durumda Başlat menüsünü açar
-settings-start-web = Web arama motoru
+settings-gust-look-panel-description = Görev çubuğunun yanında arama, uygulamalar ve klasörler
+settings-gust-look-palette-description = Ekranın ortasında uygulamalar, pencereler, dosyalar ve yanıtlar için bir arama çubuğu
+settings-gust-web = Web arama motoru
 settings-taskbar-shown = Görev çubuğunu göster
 settings-taskbar-hidden = Gizli
-settings-taskbar-hidden-description = Saat ve durum simgeleri bir köşede kalır, Super de Başlat menüsünü açar
 settings-taskbar-look = Görünüş
 settings-taskbar-look-glass = Cam
 settings-taskbar-look-solid = Düz

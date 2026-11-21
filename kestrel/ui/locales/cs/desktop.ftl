@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Rychlé nastavení
 taskbar-notifications-and-date = Oznámení a datum
 taskbar-show-desktop = Zobrazit plochu
@@ -45,7 +44,6 @@ tray-open-app = Otevřít { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Otevřít nabídku Start
 board-show-all-windows = Zobrazit všechna okna
 board-quick-settings = Rychlé nastavení
 

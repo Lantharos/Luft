@@ -8,9 +8,6 @@ home-look = Göz at
 home-desktop-alt = Sisli bir ormanın üzerinde Rover, Ayarlar ve Tern açıkken Luft masaüstü
 home-intro = Luft, bilgisayarınız için Fedora üzerine kurulu eksiksiz bir sistemdir. Kendi masaüstü, kendi uygulamaları ve kendini hep sağlam tutan bir çekirdeği var; siz de işinize bakarsınız.
 
-home-start-heading = Başlat her şeyin yerini bilir.
-home-start-text = Birkaç harf yazın, Başlat menüsü uygulamaları, ayarları, dosyaları, hatta dosyaların içindeki sözcükleri bulsun. Hesap yapar, birim çevirir ve istediğinizde koyu modu ya da Wi-Fi’ı açar.
-home-start-alt = Başlat menüsünde “dark” araması, koyu mod eylemi ve eşleşen ayarlarla
 
 home-essentials-heading = Önemli olan her şey, bir tık uzakta.
 home-essentials-text = Hızlı ayarlar, kendiniz düzenlediğiniz kutucuklardan oluşur. Bildirimler uygulamaya göre gruplanır; yanıtlar, medya denetimleri ve bir takvim hemen yanlarındadır.
@@ -25,7 +22,6 @@ home-all-windows-alt = Tüm pencereler ve masaüstleri bir bakışta
 
 home-motion-heading = Her hareketi yerinde.
 home-motion-text = Luft’taki her şey yaylarla hareket eder; böylece yarı yolda sarsılmadan fikir değiştirebilir. Kaydırmalar parmaklarınızı izler ve tam istediğiniz yere varır, uygulamalar ilk seferde bile hızla açılır.
-home-motion-clip = Başlat, hızlı ayarlar, tüm pencereler ve tahta, Luft’ta açılıp kapanırken
 
 home-wallpapers-heading = Bir fotoğraf seçin. Gerisini Luft halleder.
 home-wallpapers-text = { $count ->

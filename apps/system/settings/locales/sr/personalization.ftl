@@ -75,18 +75,11 @@ settings-appearance-text-size = Величина текста
 ## Taskbar
 
 settings-taskbar-preview = Преглед траке задатака
-settings-start-section = Старт
-settings-start-style = Стил
-settings-start-style-menu = Мени
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Претрага, апликације и фасцикле уз траку задатака
-settings-start-style-palette-description = Трака за претрагу на средини екрана за апликације, прозоре, датотеке и одговоре
-settings-start-button = Прикажи дугме Старт
-settings-start-button-description = Super свеједно отвара Старт
-settings-start-web = Претражи веб помоћу
+settings-gust-look-panel-description = Претрага, апликације и фасцикле уз траку задатака
+settings-gust-look-palette-description = Трака за претрагу на средини екрана за апликације, прозоре, датотеке и одговоре
+settings-gust-web = Претражи веб помоћу
 settings-taskbar-shown = Прикажи траку задатака
 settings-taskbar-hidden = Скривена
-settings-taskbar-hidden-description = Сат и иконе статуса остају у углу, а Super отвара Старт
 settings-taskbar-look = Изглед
 settings-taskbar-look-glass = Стакло
 settings-taskbar-look-solid = Пуна

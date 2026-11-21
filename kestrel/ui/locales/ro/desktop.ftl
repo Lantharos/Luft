@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Setări rapide
 taskbar-notifications-and-date = Notificări și dată
 taskbar-show-desktop = Afișează desktopul
@@ -44,7 +43,6 @@ tray-open-app = Deschide { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Deschide Start
 board-show-all-windows = Afișează toate ferestrele
 board-quick-settings = Setări rapide
 

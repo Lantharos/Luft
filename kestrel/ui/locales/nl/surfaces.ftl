@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Apps, bestanden en meer zoeken
-start-search-cut = Knippen
-start-search-copy = Kopiëren
-start-search-paste = Plakken
-start-search-select-all = Alles selecteren
-start-power = Energie en sessie
-start-power-close = Energieopties sluiten
-start-account-settings = Accountinstellingen
-start-apps = Apps
-start-folder-default-name = Map
-start-folder-open = Map openen
-start-folder-rename = Naam wijzigen
-start-folder-ungroup = Groepering opheffen
-start-open = Openen
-start-move-to-apps = Verplaatsen naar Apps
+gust-search-placeholder = Apps, bestanden en meer zoeken
+gust-search-cut = Knippen
+gust-search-copy = Kopiëren
+gust-search-paste = Plakken
+gust-search-select-all = Alles selecteren
+gust-power = Energie en sessie
+gust-power-close = Energieopties sluiten
+gust-account-settings = Accountinstellingen
+gust-apps = Apps
+gust-folder-default-name = Map
+gust-folder-open = Map openen
+gust-folder-rename = Naam wijzigen
+gust-folder-ungroup = Groepering opheffen
+gust-open = Openen
+gust-move-to-apps = Verplaatsen naar Apps
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Beste overeenkomst
-start-search-group-apps = Apps
-start-search-group-commands = Acties van apps
-start-search-group-windows = Geopende vensters
-start-search-group-actions = Acties
-start-search-group-settings = Instellingen
-start-search-group-clipboard = Klembord
-start-search-group-emoji = Emoji
-start-search-group-files = Bestanden
-start-search-group-contents = In bestanden
-start-search-group-web = Web
-start-search-web = Op het web zoeken naar “{ $query }”
-start-search-clipboard-text = Uit de klembordgeschiedenis
-start-search-clipboard-keywords = klembord, gekopieerd, kopiëren, klembordgeschiedenis, plakken, clipboard
-start-search-emoji-insert = Invoegen
-start-search-settings-page = Instellingen
-start-search-settings-section = Instellingen voor { $page }
-start-search-file-reveal = Tonen in { $fileManager }
-start-search-file-copy-path = Pad kopiëren
-start-search-conversion = { $amount } { $from } in { $to }
-start-search-calculation = { $expression }, druk op Enter om te kopiëren
+gust-search-best-match = Beste overeenkomst
+gust-search-group-apps = Apps
+gust-search-group-commands = Acties van apps
+gust-search-group-windows = Geopende vensters
+gust-search-group-actions = Acties
+gust-search-group-settings = Instellingen
+gust-search-group-clipboard = Klembord
+gust-search-group-emoji = Emoji
+gust-search-group-files = Bestanden
+gust-search-group-contents = In bestanden
+gust-search-group-web = Web
+gust-search-web = Op het web zoeken naar “{ $query }”
+gust-search-clipboard-text = Uit de klembordgeschiedenis
+gust-search-clipboard-keywords = klembord, gekopieerd, kopiëren, klembordgeschiedenis, plakken, clipboard
+gust-search-emoji-insert = Invoegen
+gust-search-settings-page = Instellingen
+gust-search-settings-section = Instellingen voor { $page }
+gust-search-file-reveal = Tonen in { $fileManager }
+gust-search-file-copy-path = Pad kopiëren
+gust-search-conversion = { $amount } { $from } in { $to }
+gust-search-calculation = { $expression }, druk op Enter om te kopiëren
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Tot { $date }
-start-search-answer-since = Sinds { $date }
-start-search-answer-between = Tussen { $from } en { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Tot { $date }
+gust-search-answer-since = Sinds { $date }
+gust-search-answer-between = Tussen { $from } en { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } uur
    *[other] { $hours } uur
 } voor
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } uur
    *[other] { $hours } uur
 } achter
-start-search-answer-time-same = { $place }, dezelfde tijd als hier
-start-search-answer-converted = In { $place } als het { $time } is in { $from }
-start-search-answer-converted-here = Hier als het { $time } is in { $from }
-start-search-answer-converted-from-here = In { $place } als het hier { $time } is
+gust-search-answer-time-same = { $place }, dezelfde tijd als hier
+gust-search-answer-converted = In { $place } als het { $time } is in { $from }
+gust-search-answer-converted-here = Hier als het { $time } is in { $from }
+gust-search-answer-converted-from-here = In { $place } als het hier { $time } is
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Overschakelen naar donkere modus
-start-search-dark-style-off = Overschakelen naar lichte modus
-start-search-dark-style-keywords = donkere modus, donker thema, donker, lichte modus, licht thema, licht, nachtmodus, dark mode, light mode
-start-search-night-light-on = Nachtlampje inschakelen
-start-search-night-light-off = Nachtlampje uitschakelen
-start-search-night-light-keywords = nachtlampje, nachtlicht, nachtmodus, blauw licht, blauwlichtfilter, warme kleuren, night shift
-start-search-do-not-disturb-on = Niet storen inschakelen
-start-search-do-not-disturb-off = Niet storen uitschakelen
-start-search-do-not-disturb-keywords = niet storen, focus, stil, stilte, meldingen dempen, meldingen uit, dnd, do not disturb
-start-search-wifi-on = Wifi inschakelen
-start-search-wifi-off = Wifi uitschakelen
-start-search-wifi-keywords = wifi, wi-fi, draadloos, draadloos netwerk, wlan
-start-search-bluetooth-on = Bluetooth inschakelen
-start-search-bluetooth-off = Bluetooth uitschakelen
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Vliegtuigmodus inschakelen
-start-search-airplane-mode-off = Vliegtuigmodus uitschakelen
-start-search-airplane-mode-keywords = vliegtuigmodus, vliegmodus, vliegtuigstand, radio’s, draadloos uit
-start-search-keep-awake-on = Wakker houden
-start-search-keep-awake-off = Niet meer wakker houden
-start-search-keep-awake-keywords = wakker houden, wakker blijven, scherm aan houden, slaapstand voorkomen, cafeïne, caffeine
-start-search-lock-keywords = vergrendelen, scherm vergrendelen, computer vergrendelen, vergrendelscherm
-start-search-suspend-keywords = slaapstand, slapen, stand-by, standby
-start-search-log-out-keywords = afmelden, uitloggen, sessie beëindigen, log out, sign out
-start-search-restart-keywords = opnieuw opstarten, herstarten, computer opnieuw opstarten, reboot
-start-search-power-off-keywords = afsluiten, uitschakelen, computer uitzetten, uitzetten, shut down
+gust-search-dark-style-on = Overschakelen naar donkere modus
+gust-search-dark-style-off = Overschakelen naar lichte modus
+gust-search-dark-style-keywords = donkere modus, donker thema, donker, lichte modus, licht thema, licht, nachtmodus, dark mode, light mode
+gust-search-night-light-on = Nachtlampje inschakelen
+gust-search-night-light-off = Nachtlampje uitschakelen
+gust-search-night-light-keywords = nachtlampje, nachtlicht, nachtmodus, blauw licht, blauwlichtfilter, warme kleuren, night shift
+gust-search-do-not-disturb-on = Niet storen inschakelen
+gust-search-do-not-disturb-off = Niet storen uitschakelen
+gust-search-do-not-disturb-keywords = niet storen, focus, stil, stilte, meldingen dempen, meldingen uit, dnd, do not disturb
+gust-search-wifi-on = Wifi inschakelen
+gust-search-wifi-off = Wifi uitschakelen
+gust-search-wifi-keywords = wifi, wi-fi, draadloos, draadloos netwerk, wlan
+gust-search-bluetooth-on = Bluetooth inschakelen
+gust-search-bluetooth-off = Bluetooth uitschakelen
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Vliegtuigmodus inschakelen
+gust-search-airplane-mode-off = Vliegtuigmodus uitschakelen
+gust-search-airplane-mode-keywords = vliegtuigmodus, vliegmodus, vliegtuigstand, radio’s, draadloos uit
+gust-search-keep-awake-on = Wakker houden
+gust-search-keep-awake-off = Niet meer wakker houden
+gust-search-keep-awake-keywords = wakker houden, wakker blijven, scherm aan houden, slaapstand voorkomen, cafeïne, caffeine
+gust-search-lock-keywords = vergrendelen, scherm vergrendelen, computer vergrendelen, vergrendelscherm
+gust-search-suspend-keywords = slaapstand, slapen, stand-by, standby
+gust-search-log-out-keywords = afmelden, uitloggen, sessie beëindigen, log out, sign out
+gust-search-restart-keywords = opnieuw opstarten, herstarten, computer opnieuw opstarten, reboot
+gust-search-power-off-keywords = afsluiten, uitschakelen, computer uitzetten, uitzetten, shut down
 
 ## Quick settings
 

@@ -1,98 +1,98 @@
-## Start
+## Gust
 
-start-search-placeholder = Hľadať aplikácie, súbory a ďalšie
-start-search-cut = Vystrihnúť
-start-search-copy = Kopírovať
-start-search-paste = Prilepiť
-start-search-select-all = Vybrať všetko
-start-power = Napájanie a relácia
-start-power-close = Zavrieť možnosti napájania
-start-account-settings = Nastavenia účtu
-start-apps = Aplikácie
-start-folder-default-name = Priečinok
-start-folder-open = Otvoriť priečinok
-start-folder-rename = Premenovať
-start-folder-ungroup = Zrušiť zoskupenie
-start-open = Otvoriť
-start-move-to-apps = Presunúť do aplikácií
+gust-search-placeholder = Hľadať aplikácie, súbory a ďalšie
+gust-search-cut = Vystrihnúť
+gust-search-copy = Kopírovať
+gust-search-paste = Prilepiť
+gust-search-select-all = Vybrať všetko
+gust-power = Napájanie a relácia
+gust-power-close = Zavrieť možnosti napájania
+gust-account-settings = Nastavenia účtu
+gust-apps = Aplikácie
+gust-folder-default-name = Priečinok
+gust-folder-open = Otvoriť priečinok
+gust-folder-rename = Premenovať
+gust-folder-ungroup = Zrušiť zoskupenie
+gust-open = Otvoriť
+gust-move-to-apps = Presunúť do aplikácií
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Najlepšia zhoda
-start-search-group-apps = Aplikácie
-start-search-group-commands = Akcie aplikácií
-start-search-group-windows = Otvorené okná
-start-search-group-actions = Akcie
-start-search-group-settings = Nastavenia
-start-search-group-clipboard = Schránka
-start-search-group-emoji = Emoji
-start-search-group-files = Súbory
-start-search-group-contents = V obsahu súborov
-start-search-group-web = Web
-start-search-web = Hľadať na webe „{ $query }“
-start-search-clipboard-text = Z histórie schránky
-start-search-clipboard-keywords = schránka, skopírované, história schránky, prilepiť, clipboard
-start-search-emoji-insert = Vložiť
-start-search-settings-page = Nastavenia
-start-search-settings-section = Nastavenia – { $page }
-start-search-file-reveal = Zobraziť v aplikácii { $fileManager }
-start-search-file-copy-path = Kopírovať cestu
-start-search-conversion = { $amount } { $from } na { $to }
-start-search-calculation = { $expression }, stlačením klávesu Enter skopírujete
+gust-search-best-match = Najlepšia zhoda
+gust-search-group-apps = Aplikácie
+gust-search-group-commands = Akcie aplikácií
+gust-search-group-windows = Otvorené okná
+gust-search-group-actions = Akcie
+gust-search-group-settings = Nastavenia
+gust-search-group-clipboard = Schránka
+gust-search-group-emoji = Emoji
+gust-search-group-files = Súbory
+gust-search-group-contents = V obsahu súborov
+gust-search-group-web = Web
+gust-search-web = Hľadať na webe „{ $query }“
+gust-search-clipboard-text = Z histórie schránky
+gust-search-clipboard-keywords = schránka, skopírované, história schránky, prilepiť, clipboard
+gust-search-emoji-insert = Vložiť
+gust-search-settings-page = Nastavenia
+gust-search-settings-section = Nastavenia – { $page }
+gust-search-file-reveal = Zobraziť v aplikácii { $fileManager }
+gust-search-file-copy-path = Kopírovať cestu
+gust-search-conversion = { $amount } { $from } na { $to }
+gust-search-calculation = { $expression }, stlačením klávesu Enter skopírujete
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Do { $date }
-start-search-answer-since = Od { $date }
-start-search-answer-between = Od { $from } do { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Do { $date }
+gust-search-answer-since = Od { $date }
+gust-search-answer-between = Od { $from } do { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] o { $hours } hodinu napred
     [few] o { $hours } hodiny napred
     [many] o { $hours } hodiny napred
    *[other] o { $hours } hodín napred
 }
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] o { $hours } hodinu pozadu
     [few] o { $hours } hodiny pozadu
     [many] o { $hours } hodiny pozadu
    *[other] o { $hours } hodín pozadu
 }
-start-search-answer-time-same = { $place }, rovnaký čas ako tu
-start-search-answer-converted = { $place }, keď je { $time } ({ $from })
-start-search-answer-converted-here = Tu, keď je { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, keď je tu { $time }
+gust-search-answer-time-same = { $place }, rovnaký čas ako tu
+gust-search-answer-converted = { $place }, keď je { $time } ({ $from })
+gust-search-answer-converted-here = Tu, keď je { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, keď je tu { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Prepnúť na tmavý režim
-start-search-dark-style-off = Prepnúť na svetlý režim
-start-search-dark-style-keywords = tmavý režim, tmavý motív, tmavý štýl, svetlý režim, svetlý motív, svetlý štýl, dark mode, dark theme
-start-search-night-light-on = Zapnúť nočné osvetlenie
-start-search-night-light-off = Vypnúť nočné osvetlenie
-start-search-night-light-keywords = nočné osvetlenie, nočný režim, modré svetlo, teplé farby, night light, night shift
-start-search-do-not-disturb-on = Zapnúť Nerušiť
-start-search-do-not-disturb-off = Vypnúť Nerušiť
-start-search-do-not-disturb-keywords = nerušiť, sústredenie, ticho, stíšiť oznámenia, stlmiť oznámenia, vypnúť oznámenia, do not disturb, dnd
-start-search-wifi-on = Zapnúť Wi-Fi
-start-search-wifi-off = Vypnúť Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, bezdrôtová sieť, bezdrôtové pripojenie, wlan
-start-search-bluetooth-on = Zapnúť Bluetooth
-start-search-bluetooth-off = Vypnúť Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Zapnúť režim v lietadle
-start-search-airplane-mode-off = Vypnúť režim v lietadle
-start-search-airplane-mode-keywords = režim v lietadle, letový režim, lietadlo, rádiá, bezdrôtové vysielače
-start-search-keep-awake-on = Nezaspávať
-start-search-keep-awake-off = Povoliť spánok
-start-search-keep-awake-keywords = nezaspávať, nevypínať obrazovku, zabrániť spánku, kofeín, caffeine
-start-search-lock-keywords = zamknúť obrazovku, zamknúť počítač, uzamknúť, uzamknutá obrazovka
-start-search-suspend-keywords = spánok, režim spánku, uspať, pohotovostný režim
-start-search-log-out-keywords = odhlásiť sa, odhlásenie, ukončiť reláciu, log out, logout
-start-search-restart-keywords = reštartovať, reštart, reštartovať počítač, znova spustiť, reboot
-start-search-power-off-keywords = vypnúť, vypnúť počítač, vypnutie, shutdown
+gust-search-dark-style-on = Prepnúť na tmavý režim
+gust-search-dark-style-off = Prepnúť na svetlý režim
+gust-search-dark-style-keywords = tmavý režim, tmavý motív, tmavý štýl, svetlý režim, svetlý motív, svetlý štýl, dark mode, dark theme
+gust-search-night-light-on = Zapnúť nočné osvetlenie
+gust-search-night-light-off = Vypnúť nočné osvetlenie
+gust-search-night-light-keywords = nočné osvetlenie, nočný režim, modré svetlo, teplé farby, night light, night shift
+gust-search-do-not-disturb-on = Zapnúť Nerušiť
+gust-search-do-not-disturb-off = Vypnúť Nerušiť
+gust-search-do-not-disturb-keywords = nerušiť, sústredenie, ticho, stíšiť oznámenia, stlmiť oznámenia, vypnúť oznámenia, do not disturb, dnd
+gust-search-wifi-on = Zapnúť Wi-Fi
+gust-search-wifi-off = Vypnúť Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, bezdrôtová sieť, bezdrôtové pripojenie, wlan
+gust-search-bluetooth-on = Zapnúť Bluetooth
+gust-search-bluetooth-off = Vypnúť Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Zapnúť režim v lietadle
+gust-search-airplane-mode-off = Vypnúť režim v lietadle
+gust-search-airplane-mode-keywords = režim v lietadle, letový režim, lietadlo, rádiá, bezdrôtové vysielače
+gust-search-keep-awake-on = Nezaspávať
+gust-search-keep-awake-off = Povoliť spánok
+gust-search-keep-awake-keywords = nezaspávať, nevypínať obrazovku, zabrániť spánku, kofeín, caffeine
+gust-search-lock-keywords = zamknúť obrazovku, zamknúť počítač, uzamknúť, uzamknutá obrazovka
+gust-search-suspend-keywords = spánok, režim spánku, uspať, pohotovostný režim
+gust-search-log-out-keywords = odhlásiť sa, odhlásenie, ukončiť reláciu, log out, logout
+gust-search-restart-keywords = reštartovať, reštart, reštartovať počítač, znova spustiť, reboot
+gust-search-power-off-keywords = vypnúť, vypnúť počítač, vypnutie, shutdown
 
 ## Quick settings
 

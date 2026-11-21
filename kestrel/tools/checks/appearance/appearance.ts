@@ -90,7 +90,7 @@ async function checkPureBlack(settings: Gio.Settings, interfaceSettings: Gio.Set
   settings.set_boolean('pure-black', true);
   await eventually(async () => (await appearance<Colors>('DarkColors')).surface === '#000000' && await appearance<boolean>('PureBlack'),
     'pure black makes dark surfaces black');
-  await showSurface('start', 'kestrel-start', 'pure-black-start');
+  await showSurface('gust', 'kestrel-gust-panel', 'pure-black-gust');
   settings.reset('pure-black');
   await eventually(async () => !await appearance<boolean>('PureBlack'), 'pure black can be turned off');
 }

@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Ükski installitud rakendus ei saa seda a
 portal-app-chooser-find = Leia rakendus
 portal-app-chooser-open = Ava
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Kas lisada see veebisait rakenduste hulka?
-portal-launcher-website-description = { $site } avaneb menüüst Start omaette aknas.
 portal-launcher-title = Kas lisada see rakenduste hulka?
-portal-launcher-description = { $appName } soovib lisada menüüsse Start rakenduse.
 portal-launcher-name = Nimi
 portal-launcher-add = Lisa
 

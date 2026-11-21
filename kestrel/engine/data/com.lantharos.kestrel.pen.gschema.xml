@@ -14,7 +14,7 @@
     <value nick="eraser" value="7"/>
     <value nick="screenshot" value="8"/>
     <value nick="notes" value="9"/>
-    <value nick="start" value="10"/>
+    <value nick="gust" value="10"/>
     <value nick="nothing" value="11"/>
   </enum>
 

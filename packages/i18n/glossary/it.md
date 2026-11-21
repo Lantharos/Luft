@@ -25,7 +25,6 @@ Address the reader as tu, as Windows and macOS do: “Puoi cambiarlo più tardi 
 
 - Settings, Disks and Install Luft are Impostazioni, Dischi and Installa Luft.
 - Names take no article and are masculine when something agrees: “Luft è aggiornato”, “Rover è aperto”. When the gender sounds odd or an article is needed: “l’app Rover”, “nell’app Tern”.
-- Start is masculine with no article: “in Start”; write “il menu Start” when one is needed.
 - English loanwords (app, file, account, password, emoji, touchpad, firmware) don't change in the plural: “le app”, “i file”. Their gender is in the glossary.
 
 ## Plurals

@@ -28,9 +28,9 @@
 	import { extensions } from '../extensions/extensions.svelte';
 	import { currentWallpaper } from '../wallpaper/current.svelte';
 	import MoreOptions from './MoreOptions.svelte';
-	import { LOOKS, SIZES, START_STYLES, STYLES, TASKBAR_KEYS, WEB_SEARCH, type Look, type TaskbarSettings } from './options';
+	import { LOOKS, SIZES, GUST_LOOKS, STYLES, TASKBAR_KEYS, WEB_SEARCH, type Look, type TaskbarSettings } from './options';
 	import Presets from './Presets.svelte';
-	import StartOptions from './StartOptions.svelte';
+	import GustOptions from './GustOptions.svelte';
 	import TaskbarPreview from './preview/TaskbarPreview.svelte';
 
 	const PREVIEW_APPS = 5;
@@ -45,7 +45,7 @@
 	let values = $derived(taskbar.values);
 	let showPinned = $derived(values['taskbar-show-pinned'] ?? true);
 	let shown = $derived(values['taskbar-shown'] ?? true);
-	let startButton = $derived(values['taskbar-start-button'] ?? true);
+	let gustButton = $derived(values['taskbar-gust-button'] ?? true);
 	let look = $derived(values['taskbar-look'] ?? 'glass');
 	let previewApps = $derived.by(() => {
 		const byId = new Map(installed.map((app) => [app.id, app]));
@@ -71,10 +71,10 @@
 	);
 
 	const present = (element: string) =>
-		element === 'start' ? startButton : BUILT_IN_ELEMENTS.includes(element) || running.some((extension) => element.startsWith(`${extension.id}/`));
+		element === 'gust' ? gustButton : BUILT_IN_ELEMENTS.includes(element) || running.some((extension) => element.startsWith(`${extension.id}/`));
 	const label = (element: string) => {
 		const names: Record<string, string> = {
-			start: t('settings-taskbar-element-start'),
+			gust: t('settings-taskbar-element-gust'),
 			dock: t('settings-taskbar-element-dock'),
 			tray: t('settings-taskbar-element-tray'),
 			status: t('settings-taskbar-element-status'),
@@ -98,8 +98,8 @@
 			return { value: option.value, label: t(option.label), color: `linear-gradient(${surface}, ${surface}), ${behind}` };
 		})
 	);
-	let startSummary = $derived(
-		[t(START_STYLES.find((option) => option.value === (values['start-style'] ?? 'menu'))!.label), WEB_SEARCH.find((option) => option.value === (values['search-web-engine'] ?? 'duckduckgo'))!.label].join(', ')
+	let gustSummary = $derived(
+		[t(GUST_LOOKS.find((option) => option.value === (values['gust-look'] ?? 'panel'))!.label), WEB_SEARCH.find((option) => option.value === (values['search-web-engine'] ?? 'duckduckgo'))!.label].join(', ')
 	);
 
 	const receiveDisplays = (state: Displays) => (displays = state.logical.length);
@@ -115,9 +115,9 @@
 	onDestroy(events.displayChanged(receiveDisplays));
 </script>
 
-{#if app.section === 'start'}
-	<SubPage title={t('settings-start-section')} onclose={() => open(null)}>
-		<StartOptions settings={taskbar} />
+{#if app.section === 'gust'}
+	<SubPage title={t('settings-gust-section')} onclose={() => open(null)}>
+		<GustOptions settings={taskbar} />
 	</SubPage>
 {:else if app.section === 'more'}
 	<SubPage title={t('settings-taskbar-more')} onclose={() => open(null)}>
@@ -166,8 +166,8 @@
 		{#if shown}
 			<Row title={t('settings-taskbar-edit')} description={t('settings-taskbar-edit-description')} icon={Move} onclick={() => commands.taskbarArrange()} />
 		{/if}
-		<Row title={t('settings-start-section')} icon={LayoutGrid} onclick={() => open('start')}>
-			<RowValue text={startSummary} />
+		<Row title={t('settings-gust-section')} icon={LayoutGrid} onclick={() => open('gust')}>
+			<RowValue text={gustSummary} />
 		</Row>
 		<Row title={t('settings-taskbar-more')} icon={SlidersHorizontal} onclick={() => open('more')}>
 			{#if !shown}

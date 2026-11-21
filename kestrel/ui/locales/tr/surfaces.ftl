@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Uygulama, dosya ve daha fazlasını ara
-start-search-cut = Kes
-start-search-copy = Kopyala
-start-search-paste = Yapıştır
-start-search-select-all = Tümünü seç
-start-power = Güç ve oturum
-start-power-close = Güç seçeneklerini kapat
-start-account-settings = Hesap ayarları
-start-apps = Uygulamalar
-start-folder-default-name = Klasör
-start-folder-open = Klasörü aç
-start-folder-rename = Yeniden adlandır
-start-folder-ungroup = Uygulamaları gruptan çıkar
-start-open = Aç
-start-move-to-apps = Uygulamalar’a taşı
+gust-search-placeholder = Uygulama, dosya ve daha fazlasını ara
+gust-search-cut = Kes
+gust-search-copy = Kopyala
+gust-search-paste = Yapıştır
+gust-search-select-all = Tümünü seç
+gust-power = Güç ve oturum
+gust-power-close = Güç seçeneklerini kapat
+gust-account-settings = Hesap ayarları
+gust-apps = Uygulamalar
+gust-folder-default-name = Klasör
+gust-folder-open = Klasörü aç
+gust-folder-rename = Yeniden adlandır
+gust-folder-ungroup = Uygulamaları gruptan çıkar
+gust-open = Aç
+gust-move-to-apps = Uygulamalar’a taşı
 
-## Start search results
+## Gust search results
 
-start-search-best-match = En iyi eşleşme
-start-search-group-apps = Uygulamalar
-start-search-group-commands = Uygulama eylemleri
-start-search-group-windows = Açık pencereler
-start-search-group-actions = Eylemler
-start-search-group-settings = Ayarlar
-start-search-group-clipboard = Pano
-start-search-group-emoji = Emoji
-start-search-group-files = Dosyalar
-start-search-group-contents = Dosyaların içinde
-start-search-group-web = Web
-start-search-web = Web’de “{ $query }” ara
-start-search-clipboard-text = Pano geçmişinden
-start-search-clipboard-keywords = pano, kopyalanan, kopyalananlar, pano geçmişi, yapıştır, clipboard
-start-search-emoji-insert = Ekle
-start-search-settings-page = Ayarlar
-start-search-settings-section = { $page } ayarları
-start-search-file-reveal = { $fileManager } uygulamasında göster
-start-search-file-copy-path = Yolu kopyala
-start-search-conversion = { $amount } { $from }, { $to } cinsinden
-start-search-calculation = { $expression }, kopyalamak için Enter’a basın
+gust-search-best-match = En iyi eşleşme
+gust-search-group-apps = Uygulamalar
+gust-search-group-commands = Uygulama eylemleri
+gust-search-group-windows = Açık pencereler
+gust-search-group-actions = Eylemler
+gust-search-group-settings = Ayarlar
+gust-search-group-clipboard = Pano
+gust-search-group-emoji = Emoji
+gust-search-group-files = Dosyalar
+gust-search-group-contents = Dosyaların içinde
+gust-search-group-web = Web
+gust-search-web = Web’de “{ $query }” ara
+gust-search-clipboard-text = Pano geçmişinden
+gust-search-clipboard-keywords = pano, kopyalanan, kopyalananlar, pano geçmişi, yapıştır, clipboard
+gust-search-emoji-insert = Ekle
+gust-search-settings-page = Ayarlar
+gust-search-settings-section = { $page } ayarları
+gust-search-file-reveal = { $fileManager } uygulamasında göster
+gust-search-file-copy-path = Yolu kopyala
+gust-search-conversion = { $amount } { $from }, { $to } cinsinden
+gust-search-calculation = { $expression }, kopyalamak için Enter’a basın
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = { $date } tarihine kadar
-start-search-answer-since = { $date } tarihinden beri
-start-search-answer-between = { $from } ile { $to } arası
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = { $date } tarihine kadar
+gust-search-answer-since = { $date } tarihinden beri
+gust-search-answer-between = { $from } ile { $to } arası
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } saat
    *[other] { $hours } saat
 } ileride
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } saat
    *[other] { $hours } saat
 } geride
-start-search-answer-time-same = { $place }, burayla aynı saat
-start-search-answer-converted = { $place }, { $from } saati { $time } iken
-start-search-answer-converted-here = Burası, { $from } saati { $time } iken
-start-search-answer-converted-from-here = { $place }, burada saat { $time } iken
+gust-search-answer-time-same = { $place }, burayla aynı saat
+gust-search-answer-converted = { $place }, { $from } saati { $time } iken
+gust-search-answer-converted-here = Burası, { $from } saati { $time } iken
+gust-search-answer-converted-from-here = { $place }, burada saat { $time } iken
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Koyu moda geç
-start-search-dark-style-off = Açık moda geç
-start-search-dark-style-keywords = koyu mod, karanlık mod, koyu tema, karanlık tema, açık mod, aydınlık mod, açık tema, dark mode, light mode
-start-search-night-light-on = Gece ışığını aç
-start-search-night-light-off = Gece ışığını kapat
-start-search-night-light-keywords = gece ışığı, gece modu, mavi ışık, sıcak renkler, night light, night shift
-start-search-do-not-disturb-on = Rahatsız etmeyin özelliğini aç
-start-search-do-not-disturb-off = Rahatsız etmeyin özelliğini kapat
-start-search-do-not-disturb-keywords = rahatsız etmeyin, rahatsız etme, odak, sessiz, bildirimleri sustur, bildirimleri kapat, dnd, do not disturb
-start-search-wifi-on = Wi-Fi’ı aç
-start-search-wifi-off = Wi-Fi’ı kapat
-start-search-wifi-keywords = wifi, wi-fi, kablosuz, kablosuz ağ, wlan
-start-search-bluetooth-on = Bluetooth’u aç
-start-search-bluetooth-off = Bluetooth’u kapat
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Uçak modunu aç
-start-search-airplane-mode-off = Uçak modunu kapat
-start-search-airplane-mode-keywords = uçak modu, uçuş modu, telsizler, kablosuz bağlantılar, airplane mode
-start-search-keep-awake-on = Uyanık tut
-start-search-keep-awake-off = Uyanık tutmayı durdur
-start-search-keep-awake-keywords = uyanık tut, uyku engelle, uykuyu önle, ekranı açık tut, kafein, caffeine
-start-search-lock-keywords = ekranı kilitle, kilit ekranı, bilgisayarı kilitle
-start-search-suspend-keywords = uyku, uyku modu, beklemede, askıya al
-start-search-log-out-keywords = oturumu kapat, çıkış yap, oturumdan çık, oturumu sonlandır, log out, sign out
-start-search-restart-keywords = yeniden başlat, bilgisayarı yeniden başlat, reboot, restart
-start-search-power-off-keywords = kapat, bilgisayarı kapat, sistemi kapat, gücü kapat, shutdown
+gust-search-dark-style-on = Koyu moda geç
+gust-search-dark-style-off = Açık moda geç
+gust-search-dark-style-keywords = koyu mod, karanlık mod, koyu tema, karanlık tema, açık mod, aydınlık mod, açık tema, dark mode, light mode
+gust-search-night-light-on = Gece ışığını aç
+gust-search-night-light-off = Gece ışığını kapat
+gust-search-night-light-keywords = gece ışığı, gece modu, mavi ışık, sıcak renkler, night light, night shift
+gust-search-do-not-disturb-on = Rahatsız etmeyin özelliğini aç
+gust-search-do-not-disturb-off = Rahatsız etmeyin özelliğini kapat
+gust-search-do-not-disturb-keywords = rahatsız etmeyin, rahatsız etme, odak, sessiz, bildirimleri sustur, bildirimleri kapat, dnd, do not disturb
+gust-search-wifi-on = Wi-Fi’ı aç
+gust-search-wifi-off = Wi-Fi’ı kapat
+gust-search-wifi-keywords = wifi, wi-fi, kablosuz, kablosuz ağ, wlan
+gust-search-bluetooth-on = Bluetooth’u aç
+gust-search-bluetooth-off = Bluetooth’u kapat
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Uçak modunu aç
+gust-search-airplane-mode-off = Uçak modunu kapat
+gust-search-airplane-mode-keywords = uçak modu, uçuş modu, telsizler, kablosuz bağlantılar, airplane mode
+gust-search-keep-awake-on = Uyanık tut
+gust-search-keep-awake-off = Uyanık tutmayı durdur
+gust-search-keep-awake-keywords = uyanık tut, uyku engelle, uykuyu önle, ekranı açık tut, kafein, caffeine
+gust-search-lock-keywords = ekranı kilitle, kilit ekranı, bilgisayarı kilitle
+gust-search-suspend-keywords = uyku, uyku modu, beklemede, askıya al
+gust-search-log-out-keywords = oturumu kapat, çıkış yap, oturumdan çık, oturumu sonlandır, log out, sign out
+gust-search-restart-keywords = yeniden başlat, bilgisayarı yeniden başlat, reboot, restart
+gust-search-power-off-keywords = kapat, bilgisayarı kapat, sistemi kapat, gücü kapat, shutdown
 
 ## Quick settings
 

@@ -2,17 +2,17 @@ import AccountsService from 'gi://AccountsService';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { Avatar } from '../../shared/widgets/userWidget.js';
+import { Avatar } from '../../../shared/widgets/userWidget.js';
 
-import { t } from '../../shared/i18n/index.js';
-import { animateActor, Curve, Duration, pressable } from '../../shared/motion/motion.js';
-import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
-import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
-import * as SystemActions from '../../session/actions/systemActions.js';
+import { t } from '../../../shared/i18n/index.js';
+import { animateActor, Curve, Duration, pressable } from '../../../shared/motion/motion.js';
+import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../../quickSettings/sessionActions.js';
+import * as SystemActions from '../../../session/actions/systemActions.js';
 
 const SWAP_DISTANCE = 16;
 
-export class StartFooter {
+export class GustFooter {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-footer' });
   private readonly stack = new St.Widget({ layout_manager: new Clutter.BinLayout(), x_expand: true, clip_to_allocation: true });
   private readonly account = new St.BoxLayout({ style_class: 'kestrel-account', reactive: true, x_expand: true });
@@ -42,7 +42,7 @@ export class StartFooter {
 
     this.powerButton = new St.Button({
       style_class: 'kestrel-icon-button', child: this.toggleIcon,
-      accessible_name: t('start-power'), can_focus: true, track_hover: true,
+      accessible_name: t('gust-power'), can_focus: true, track_hover: true,
     });
     this.powerButton.connect('clicked', () => {
       if (!this.open) SystemActions.getDefault().refresh();
@@ -51,7 +51,7 @@ export class StartFooter {
     pressable(this.powerButton, this.toggleIcon);
     this.actor.add_child(this.powerButton);
 
-    menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('accounts') }]);
+    menus.bind(this.account, () => [{ label: t('gust-account-settings'), run: () => menus.settings('accounts') }]);
   }
 
   get sessionOpen(): boolean { return this.open; }
@@ -60,7 +60,7 @@ export class StartFooter {
     if (this.open === open) return;
     this.open = open;
     this.toggleIcon.icon_name = open ? 'window-close-symbolic' : 'system-shutdown-symbolic';
-    this.powerButton.accessible_name = t(open ? 'start-power-close' : 'start-power');
+    this.powerButton.accessible_name = t(open ? 'gust-power-close' : 'gust-power');
     if (open) this.powerButton.add_style_pseudo_class('checked');
     else this.powerButton.remove_style_pseudo_class('checked');
     const [shown, hidden] = open ? [this.actions, this.account] : [this.account, this.actions];

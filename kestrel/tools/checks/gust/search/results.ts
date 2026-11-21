@@ -8,9 +8,9 @@ import {named, ofType, shown, textOf} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
-export const start = () => named('kestrel-start') ?? named('kestrel-palette');
-export const entry = () => ofType(start()!.get_first_child(), St.Entry);
-const list = () => named('kestrel-search-results', start()!)!;
+export const gust = () => named('kestrel-gust-panel') ?? named('kestrel-gust-palette');
+export const entry = () => ofType(gust()!.get_first_child(), St.Entry);
+const list = () => named('kestrel-search-results', gust()!)!;
 
 export const rows = () => list().get_children().filter((actor): actor is St.Button => actor instanceof St.Button)
   .filter(actor => actor.visible && actor.name?.startsWith('kestrel-search-'));
@@ -22,16 +22,16 @@ export const bestTitle = () => rows()[0] && titleOf(rows()[0]);
 export const groupTitles = () => list().get_children().filter((actor): actor is St.Widget => actor instanceof St.Widget)
   .filter(actor => actor.visible && actor.has_style_class_name('kestrel-search-group')).map(textOf);
 
-export async function openStart() {
+export async function openGust() {
   await settled();
-  if (!shown(start())) toggleSurface('start');
-  await waitUntil(() => shown(start()), 'Start opens');
+  if (!shown(gust())) toggleSurface('gust');
+  await waitUntil(() => shown(gust()), 'Gust opens');
   await settled();
   entry().grab_key_focus();
   await waitUntil(() => entry().clutter_text.has_key_focus(), 'the search field takes the keyboard');
 }
 
-export function closeStart() {
+export function closeGust() {
   dismissImmediately();
 }
 

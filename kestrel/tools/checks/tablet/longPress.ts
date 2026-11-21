@@ -21,7 +21,7 @@ const QUIET = 600;
 
 const menu = () => named('kestrel-context-menu')!;
 const panel = () => named('kestrel-panel')!;
-const start = () => named('kestrel-start')!;
+const gust = () => named('kestrel-gust-panel')!;
 const quick = () => named('kestrel-quick-settings')!;
 const cue = () => named('kestrel-hold-cue');
 const offers = (label: string) => menu().visible && shown(named(label, menu()));
@@ -95,22 +95,22 @@ async function checkDesktop() {
   await dismissByTap();
 }
 
-async function checkStart() {
-  await tap(centerOf(named('Start', panel())!));
-  await eventually(() => shown(start()), 'tapping Start opens it');
+async function checkGust() {
+  await tap(centerOf(named('Gust', panel())!));
+  await eventually(() => shown(gust()), 'tapping Gust opens it');
   await settled();
-  const app = styled('kestrel-app-button', start()).find(button => button.mapped && button.name?.endsWith('.desktop'))!;
-  const shellApp = Shell.AppSystem.get_default().lookup_app(app.name!.replace('kestrel-start-item-', ''))!;
-  await hold(centerOf(app), 'an app in Start', 'Open');
-  require(shown(start()) && shellApp.state === Shell.AppState.STOPPED, 'holding an app in Start leaves Start open without opening the app');
-  await capture('long-press-start');
+  const app = styled('kestrel-app-button', gust()).find(button => button.mapped && button.name?.endsWith('.desktop'))!;
+  const shellApp = Shell.AppSystem.get_default().lookup_app(app.name!.replace('kestrel-gust-item-', ''))!;
+  await hold(centerOf(app), 'an app in Gust', 'Open');
+  require(shown(gust()) && shellApp.state === Shell.AppState.STOPPED, 'holding an app in Gust leaves Gust open without opening the app');
+  await capture('long-press-gust');
   await dismissByTap();
-  if (!shown(start())) toggleSurface('start');
-  await eventually(() => shown(start()), 'Start is open for searching');
+  if (!shown(gust())) toggleSurface('gust');
+  await eventually(() => shown(gust()), 'Gust is open for searching');
   type('files');
-  await eventually(() => named('Rover', start())?.mapped && named('Rover', start()) !== app, 'searching finds Rover');
+  await eventually(() => named('Rover', gust())?.mapped && named('Rover', gust()) !== app, 'searching finds Rover');
   await settled();
-  await hold(centerOf(named('Rover', start())!), 'a search result', 'Open');
+  await hold(centerOf(named('Rover', gust())!), 'a search result', 'Open');
   await dismissByTap();
   dismissImmediately();
 }
@@ -162,7 +162,7 @@ export async function run() {
   await settled();
   await checkTaskbar(settings);
   await checkDesktop();
-  await checkStart();
+  await checkGust();
   await checkNotifications();
   await checkQuickSettings(settings);
 }

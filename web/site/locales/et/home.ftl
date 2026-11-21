@@ -6,9 +6,6 @@ home-get = Hangi Luft
 home-look = Vaata lähemalt
 home-desktop-alt = Lufti töölaud, kus udusel metsataustal on avatud Rover, Seadistused ja Tern
 home-intro = Luft on terviklik süsteem sinu arvutile, mis põhineb Fedoral. Sellel on oma töölaud, oma rakendused ja tuum, mis hoiab end ise tervena, nii et saad oma päevaga edasi minna.
-home-start-heading = Start teab, kus kõik asub.
-home-start-text = Sisesta paar tähte ja Start leiab rakendused, seadistused, failid ja isegi neis olevad sõnad. See arvutab tehteid, teisendab ühikuid ning lülitab soovi korral sisse tumeda kujunduse või Wi-Fi.
-home-start-alt = Menüü Start otsib sõna „tume“, tulemusteks tumeda režiimi toiming ja sobivad seadistused
 home-essentials-heading = Kõik vajalik ühe klõpsu kaugusel.
 home-essentials-text = Kiirseadistused on paanid, mille paigutad ise. Teavitused on rühmitatud rakenduste kaupa ning vastused, meediajuhtelemendid ja kalender on kohe nende kõrval.
 home-quick-settings-alt = Kiirseadistused võrgu, toiterežiimi, tumeda režiimi ja helitugevusega
@@ -20,7 +17,6 @@ home-snap-alt = Paigutusmallid aktiivsele aknale
 home-all-windows-alt = Kõik aknad ja tööalad ühe pilguga
 home-motion-heading = Liigub nii, nagu peab.
 home-motion-text = Kõik Luftis liigub vedrudel, nii et liikumine saab poole pealt suunda muuta ilma tõmblemata. Pühkimised järgivad sinu sõrmi ja jõuavad sinna, kuhu soovisid, ning rakendused avanevad kiiresti, isegi esimesel korral.
-home-motion-clip = Start, kiirseadistused, kõik aknad ja tahvel avanevad ning sulguvad Luftis
 home-wallpapers-heading = Vali foto. Luft teeb ülejäänu.
 home-wallpapers-text =
     { $count ->

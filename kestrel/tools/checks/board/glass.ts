@@ -83,7 +83,7 @@ async function useBoard() {
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Right);
   await boardResting();
   await openFromCorner('Quick settings');
-  await openFromCorner('Open Start');
+  await openFromCorner('Open Gust');
   board().overview();
   await boardResting();
   fourFingerSwipe(60);

@@ -12,7 +12,7 @@ Luft shows itself to other devices only on networks someone called home, and let
 - NetworkManager checks for a working connection, or a sign-in page, by fetching `http://luft.computer/connectivity` every five minutes. The address answers `online` to everyone and sets no cookie.
 - Wi-Fi scans use a random hardware address, and each network sees an address of its own, the same every time, so the computer can't be followed from one network to the next by it. IPv6 connections use temporary addresses.
 - Luft doesn't answer LLMNR, where anyone on the network could answer a lookup and pose as another computer to catch sign-ins. Names still resolve through mDNS, `name.local`, which Avahi answers.
-- Weather for extensions and Start's currency rates come from Luft's own site, `luft.computer/api/weather` and `luft.computer/api/rates`, which pass the question on, so the weather service never sees the computer. Weather requests carry only the position rounded to a tenth of a degree, about ten kilometres, and the site shares one answer between everyone in the same square. Rates take no parameters. Turning off **Weather and currency rates** under Privacy stops both.
+- Weather for extensions and Gust's currency rates come from Luft's own site, `luft.computer/api/weather` and `luft.computer/api/rates`, which pass the question on, so the weather service never sees the computer. Weather requests carry only the position rounded to a tenth of a degree, about ten kilometres, and the site shares one answer between everyone in the same square. Rates take no parameters. Turning off **Weather and currency rates** under Privacy stops both.
 
 ## The firewall
 

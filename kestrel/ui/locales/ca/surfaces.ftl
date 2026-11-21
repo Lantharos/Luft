@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Cerca aplicacions, fitxers i més
-start-search-cut = Retalla
-start-search-copy = Copia
-start-search-paste = Enganxa
-start-search-select-all = Selecciona-ho tot
-start-power = Energia i sessió
-start-power-close = Tanca les opcions d’energia
-start-account-settings = Configuració del compte
-start-apps = Aplicacions
-start-folder-default-name = Carpeta
-start-folder-open = Obre la carpeta
-start-folder-rename = Canvia el nom
-start-folder-ungroup = Desagrupa les aplicacions
-start-open = Obre
-start-move-to-apps = Mou a Aplicacions
+gust-search-placeholder = Cerca aplicacions, fitxers i més
+gust-search-cut = Retalla
+gust-search-copy = Copia
+gust-search-paste = Enganxa
+gust-search-select-all = Selecciona-ho tot
+gust-power = Energia i sessió
+gust-power-close = Tanca les opcions d’energia
+gust-account-settings = Configuració del compte
+gust-apps = Aplicacions
+gust-folder-default-name = Carpeta
+gust-folder-open = Obre la carpeta
+gust-folder-rename = Canvia el nom
+gust-folder-ungroup = Desagrupa les aplicacions
+gust-open = Obre
+gust-move-to-apps = Mou a Aplicacions
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Millor coincidència
-start-search-group-apps = Aplicacions
-start-search-group-commands = Accions d’aplicacions
-start-search-group-windows = Finestres obertes
-start-search-group-actions = Accions
-start-search-group-settings = Configuració
-start-search-group-clipboard = Porta-retalls
-start-search-group-emoji = Emojis
-start-search-group-files = Fitxers
-start-search-group-contents = Dins dels fitxers
-start-search-group-web = Web
-start-search-web = Cerca «{ $query }» al web
-start-search-clipboard-text = De l’historial del porta-retalls
-start-search-clipboard-keywords = porta-retalls, copiat, copiats, historial del porta-retalls, enganxar, enganxa, clipboard
-start-search-emoji-insert = Insereix
-start-search-settings-page = Configuració
-start-search-settings-section = Configuració: { $page }
-start-search-file-reveal = Mostra a { $fileManager }
-start-search-file-copy-path = Copia el camí
-start-search-conversion = { $amount } { $from } en { $to }
-start-search-calculation = { $expression }, premeu Retorn per copiar
+gust-search-best-match = Millor coincidència
+gust-search-group-apps = Aplicacions
+gust-search-group-commands = Accions d’aplicacions
+gust-search-group-windows = Finestres obertes
+gust-search-group-actions = Accions
+gust-search-group-settings = Configuració
+gust-search-group-clipboard = Porta-retalls
+gust-search-group-emoji = Emojis
+gust-search-group-files = Fitxers
+gust-search-group-contents = Dins dels fitxers
+gust-search-group-web = Web
+gust-search-web = Cerca «{ $query }» al web
+gust-search-clipboard-text = De l’historial del porta-retalls
+gust-search-clipboard-keywords = porta-retalls, copiat, copiats, historial del porta-retalls, enganxar, enganxa, clipboard
+gust-search-emoji-insert = Insereix
+gust-search-settings-page = Configuració
+gust-search-settings-section = Configuració: { $page }
+gust-search-file-reveal = Mostra a { $fileManager }
+gust-search-file-copy-path = Copia el camí
+gust-search-conversion = { $amount } { $from } en { $to }
+gust-search-calculation = { $expression }, premeu Retorn per copiar
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Fins al { $date }
-start-search-answer-since = Des del { $date }
-start-search-answer-between = Entre el { $from } i el { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Fins al { $date }
+gust-search-answer-since = Des del { $date }
+gust-search-answer-between = Entre el { $from } i el { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } hora
    *[other] { $hours } hores
 } més
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } hora
    *[other] { $hours } hores
 } menys
-start-search-answer-time-same = { $place }, la mateixa hora que aquí
-start-search-answer-converted = A { $place } quan són les { $time } a { $from }
-start-search-answer-converted-here = Aquí quan són les { $time } a { $from }
-start-search-answer-converted-from-here = A { $place } quan aquí són les { $time }
+gust-search-answer-time-same = { $place }, la mateixa hora que aquí
+gust-search-answer-converted = A { $place } quan són les { $time } a { $from }
+gust-search-answer-converted-here = Aquí quan són les { $time } a { $from }
+gust-search-answer-converted-from-here = A { $place } quan aquí són les { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Canvia al mode fosc
-start-search-dark-style-off = Canvia al mode clar
-start-search-dark-style-keywords = mode fosc, tema fosc, estil fosc, mode clar, tema clar, estil clar, dark mode
-start-search-night-light-on = Activa la llum nocturna
-start-search-night-light-off = Desactiva la llum nocturna
-start-search-night-light-keywords = llum nocturna, llum blava, colors càlids, mode nocturn, night light
-start-search-do-not-disturb-on = Activa No molestis
-start-search-do-not-disturb-off = Desactiva No molestis
-start-search-do-not-disturb-keywords = no molestis, silenci, concentració, silenciar les notificacions, notificacions, dnd
-start-search-wifi-on = Activa el Wi-Fi
-start-search-wifi-off = Desactiva el Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, sense fil, xarxa sense fil, wlan
-start-search-bluetooth-on = Activa el Bluetooth
-start-search-bluetooth-off = Desactiva el Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Activa el mode d’avió
-start-search-airplane-mode-off = Desactiva el mode d’avió
-start-search-airplane-mode-keywords = mode d’avió, mode avió, avió, mode de vol, ràdios
-start-search-keep-awake-on = Mantén actiu
-start-search-keep-awake-off = Deixa de mantenir actiu
-start-search-keep-awake-keywords = mantén actiu, mantenir actiu, no suspendre, evitar la suspensió, pantalla encesa, cafeïna
-start-search-lock-keywords = bloquejar, bloqueja la pantalla, bloquejar l’ordinador, pantalla de bloqueig
-start-search-suspend-keywords = suspendre, suspensió, repòs, dormir
-start-search-log-out-keywords = tancar la sessió, tanca la sessió, sortir, finalitzar la sessió, log out
-start-search-restart-keywords = reiniciar, reinicia, reiniciar l’ordinador, reboot
-start-search-power-off-keywords = apagar, apaga, apagar l’ordinador, aturar, shutdown
+gust-search-dark-style-on = Canvia al mode fosc
+gust-search-dark-style-off = Canvia al mode clar
+gust-search-dark-style-keywords = mode fosc, tema fosc, estil fosc, mode clar, tema clar, estil clar, dark mode
+gust-search-night-light-on = Activa la llum nocturna
+gust-search-night-light-off = Desactiva la llum nocturna
+gust-search-night-light-keywords = llum nocturna, llum blava, colors càlids, mode nocturn, night light
+gust-search-do-not-disturb-on = Activa No molestis
+gust-search-do-not-disturb-off = Desactiva No molestis
+gust-search-do-not-disturb-keywords = no molestis, silenci, concentració, silenciar les notificacions, notificacions, dnd
+gust-search-wifi-on = Activa el Wi-Fi
+gust-search-wifi-off = Desactiva el Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, sense fil, xarxa sense fil, wlan
+gust-search-bluetooth-on = Activa el Bluetooth
+gust-search-bluetooth-off = Desactiva el Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Activa el mode d’avió
+gust-search-airplane-mode-off = Desactiva el mode d’avió
+gust-search-airplane-mode-keywords = mode d’avió, mode avió, avió, mode de vol, ràdios
+gust-search-keep-awake-on = Mantén actiu
+gust-search-keep-awake-off = Deixa de mantenir actiu
+gust-search-keep-awake-keywords = mantén actiu, mantenir actiu, no suspendre, evitar la suspensió, pantalla encesa, cafeïna
+gust-search-lock-keywords = bloquejar, bloqueja la pantalla, bloquejar l’ordinador, pantalla de bloqueig
+gust-search-suspend-keywords = suspendre, suspensió, repòs, dormir
+gust-search-log-out-keywords = tancar la sessió, tanca la sessió, sortir, finalitzar la sessió, log out
+gust-search-restart-keywords = reiniciar, reinicia, reiniciar l’ordinador, reboot
+gust-search-power-off-keywords = apagar, apaga, apagar l’ordinador, aturar, shutdown
 
 ## Quick settings
 

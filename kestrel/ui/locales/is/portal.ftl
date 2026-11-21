@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Ekkert uppsett forrit getur opnað þetta
 portal-app-chooser-find = Finna forrit
 portal-app-chooser-open = Opna
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Bæta þessu vefsvæði við forritin þín?
-portal-launcher-website-description = { $site } opnast í eigin glugga úr upphafsvalmyndinni.
 portal-launcher-title = Bæta þessu við forritin þín?
-portal-launcher-description = { $appName } vill bæta forriti við upphafsvalmyndina.
 portal-launcher-name = Heiti
 portal-launcher-add = Bæta við
 

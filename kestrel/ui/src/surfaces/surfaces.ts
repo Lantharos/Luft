@@ -24,16 +24,16 @@ import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
 import type { NotificationCenter } from './notifications/notificationCenter.js';
 import type { QuickSettings } from './quickSettings/quickSettings.js';
-import type { StartSurface } from './start/startSurface.js';
+import type { GustSurface } from './gust/gust.js';
 
-export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
+export type Surface = 'gust' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const FAR_MARGIN = 14;
 const PANEL_SLIDE = 56;
 
 interface LazySurfaces {
-  start: StartSurface;
+  gust: GustSurface;
   notifications: NotificationCenter;
   emoji: EmojiPanel;
   snapLayouts: SnapLayouts;
@@ -53,12 +53,12 @@ interface SurfaceParts extends SurfaceFactories {
   canInteract: () => boolean;
   syncSession: () => void;
   taskbar: TaskbarPlacement;
-  startReplaced: () => void;
+  gustReplaced: () => void;
 }
 
 interface TaskbarPlacement {
   depths(monitor: Monitor): Depths;
-  anchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor;
+  anchor(surface: 'gust' | 'quick' | 'notifications', monitor: Monitor): Anchor;
 }
 
 export class Surfaces {
@@ -85,8 +85,8 @@ export class Surfaces {
     return this.current;
   }
 
-  get start(): StartSurface {
-    return this.ensure('start');
+  get gust(): GustSurface {
+    return this.ensure('gust');
   }
 
   get notifications(): NotificationCenter {
@@ -102,18 +102,18 @@ export class Surfaces {
   }
 
   all(): St.BoxLayout[] {
-    const { start, notifications, emoji, snapLayouts } = this.created;
+    const { gust, notifications, emoji, snapLayouts } = this.created;
     const { quick, clipboard } = this.parts;
-    return [start, quick, notifications, clipboard, emoji, snapLayouts].flatMap(surface => surface ? [surface.actor] : []);
+    return [gust, quick, notifications, clipboard, emoji, snapLayouts].flatMap(surface => surface ? [surface.actor] : []);
   }
 
   monitorAt(x: number, y: number): Monitor | null {
     return this.parts.context.layoutManager.monitors.find(m => x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height) ?? null;
   }
 
-  restyleStart(): void {
-    if (!this.created.start) return;
-    this.outdated.add('start');
+  restyleGust(): void {
+    if (!this.created.gust) return;
+    this.outdated.add('gust');
     this.dropOutdated(false);
   }
 
@@ -144,8 +144,8 @@ export class Surfaces {
     this.cover.set_size(stage.width, stage.height);
     const area = this.freeArea(monitor);
     const available = area.height - FAR_MARGIN;
-    const { start, notifications, emoji, snapLayouts } = this.created;
-    start?.place({ monitor, area, available, anchor: this.parts.taskbar.anchor('start', monitor) });
+    const { gust, notifications, emoji, snapLayouts } = this.created;
+    gust?.place({ monitor, area, available, anchor: this.parts.taskbar.anchor('gust', monitor) });
 
     for (const [surface, actor, width, height] of [
       ['quick', quick.actor, 420, quick.preferredHeight(420, available)],
@@ -161,7 +161,7 @@ export class Surfaces {
     if (snapLayouts) {
       const [snapWidth, snapHeight] = snapLayouts.size();
       snapLayouts.actor.set_size(snapWidth, snapHeight);
-      snapLayouts.actor.set_position(...dock(area, this.parts.taskbar.anchor('start', monitor).edge, snapWidth, snapHeight, 'center'));
+      snapLayouts.actor.set_position(...dock(area, this.parts.taskbar.anchor('gust', monitor).edge, snapWidth, snapHeight, 'center'));
     }
     this.clipToFloor();
   }
@@ -215,7 +215,7 @@ export class Surfaces {
 
     const actor = this.actorFor(surface);
     this.releaseSelection(actor);
-    if (surface === 'start') this.start.reset();
+    if (surface === 'gust') this.gust.reset();
 
     raiseSurface(this.layer);
     this.layer.set_child_above_sibling(actor, null);
@@ -233,7 +233,7 @@ export class Surfaces {
     }
     this.reveal(actor);
 
-    if (surface === 'start' && (!taskbarPreferences.on(this.surfaceMonitor().index).touch || this.start.focusOnTouch)) this.start.focus();
+    if (surface === 'gust' && (!taskbarPreferences.on(this.surfaceMonitor().index).touch || this.gust.focusOnTouch)) this.gust.focus();
     else if (!popup) actor.grab_key_focus();
   }
 
@@ -312,7 +312,7 @@ export class Surfaces {
       this.outdated.delete(name);
       delete this.created[name];
       actor.destroy();
-      if (name === 'start') this.parts.startReplaced();
+      if (name === 'gust') this.parts.gustReplaced();
     }
   }
 
@@ -372,7 +372,7 @@ export class Surfaces {
 
   private actorFor(surface: PanelSurface): St.BoxLayout {
     switch (surface) {
-      case 'start': return this.start.actor;
+      case 'gust': return this.gust.actor;
       case 'quick': return this.parts.quick.actor;
       case 'notifications': return this.notifications.actor;
       case 'clipboard': return this.parts.clipboard.actor;
@@ -399,9 +399,9 @@ export class Surfaces {
   private slideOffset(actor: Clutter.Actor): Offset {
     const popup = this.popupActor(actor);
     if (popup) return { translation_x: 0, translation_y: popup.slideDistance };
-    const start = this.created.start;
-    const surface = actor === this.parts.quick.actor ? 'quick' : actor === this.created.notifications?.actor ? 'notifications' : 'start';
+    const gust = this.created.gust;
+    const surface = actor === this.parts.quick.actor ? 'quick' : actor === this.created.notifications?.actor ? 'notifications' : 'gust';
     const { edge } = this.parts.taskbar.anchor(surface, this.surfaceMonitor());
-    return actor === start?.actor ? start.slideFrom(edge) : toward(edge, PANEL_SLIDE);
+    return actor === gust?.actor ? gust.slideFrom(edge) : toward(edge, PANEL_SLIDE);
   }
 }

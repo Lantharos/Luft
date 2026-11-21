@@ -31,13 +31,13 @@ portal-app-chooser-find = Find an app
 # Button (verb): opens the file with the chosen app
 portal-app-chooser-open = Open
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Add this website to your apps?
 # $site is a host name such as example.com.
-portal-launcher-website-description = { $site } will open in its own window from Start.
+portal-launcher-website-description = { $site } will open in its own window from Gust.
 portal-launcher-title = Add this to your apps?
-portal-launcher-description = { $appName } wants to add an app to Start.
+portal-launcher-description = { $appName } wants to add an app to Gust.
 # Label of the field holding the new app's name
 portal-launcher-name = Name
 # Button (verb)

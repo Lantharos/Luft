@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Fillimi
 taskbar-quick-settings = Cilësimet e shpejta
 taskbar-notifications-and-date = Njoftimet dhe data
 taskbar-show-desktop = Shfaq desktopin
@@ -49,7 +48,6 @@ tray-open-app = Hap { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Hap Fillimin
 board-show-all-windows = Shfaq të gjitha dritaret
 board-quick-settings = Cilësimet e shpejta
 

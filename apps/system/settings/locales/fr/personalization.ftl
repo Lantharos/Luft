@@ -74,18 +74,11 @@ settings-appearance-text-size = Taille du texte
 ## Taskbar
 
 settings-taskbar-preview = Aperçu de la barre des tâches
-settings-start-section = Start
-settings-start-style = Style
-settings-start-style-menu = Menu
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Recherche, applications et dossiers à côté de la barre des tâches
-settings-start-style-palette-description = Une barre de recherche au milieu de l’écran pour les applications, fenêtres, fichiers et réponses
-settings-start-button = Afficher le bouton Start
-settings-start-button-description = Super ouvre Start dans tous les cas
-settings-start-web = Rechercher sur le Web avec
+settings-gust-look-panel-description = Recherche, applications et dossiers à côté de la barre des tâches
+settings-gust-look-palette-description = Une barre de recherche au milieu de l’écran pour les applications, fenêtres, fichiers et réponses
+settings-gust-web = Rechercher sur le Web avec
 settings-taskbar-shown = Afficher la barre des tâches
 settings-taskbar-hidden = Masquée
-settings-taskbar-hidden-description = L’horloge et les icônes d’état restent dans un coin, et Super ouvre Start
 settings-taskbar-look = Aspect
 settings-taskbar-look-glass = Verre
 settings-taskbar-look-solid = Opaque

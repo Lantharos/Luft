@@ -394,13 +394,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="sq">
           <tig>
-            <term>Fillimi</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name; definite form as a name: hap Fillimin</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -934,7 +934,7 @@
         <langSet xml:lang="sq">
           <tig>
             <term>fiksoj</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start; imperative: fikso</note>
+            <note from="translator">verb: keep an app on the taskbar; imperative: fikso</note>
           </tig>
         </langSet>
       </termEntry>

@@ -13,7 +13,7 @@ import {threads} from '../lib/threads.js';
 import {pause, settled} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {prepareForSleep} from '../lockScreen/lib/sleep.js';
-import {closeStart, descriptionOf, openStart, rows, search, titleOf} from '../start/search/results.js';
+import {closeGust, descriptionOf, openGust, rows, search, titleOf} from '../gust/search/results.js';
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
 import {builtFolder, forgetCrashes, installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
@@ -275,16 +275,16 @@ async function checkSearch() {
   setClock(THURSDAY_NOON);
   seed([reminder('b', {title: "Noor's birthday", kind: 'birthday', when: {day: '2027-03-14', time: null}, repeat: {unit: 'year', every: 1, date: 14}})]);
   await request('Enable', REMINDERS);
-  await openStart();
+  await openGust();
   search('noor');
-  await eventually(() => rows().some(found => titleOf(found) === "Noor's birthday"), 'Start finds a reminder');
+  await eventually(() => rows().some(found => titleOf(found) === "Noor's birthday"), 'Gust finds a reminder');
   search('dentist friday 4pm');
   const add = await eventually(() => rows().find(found => titleOf(found) === 'Add reminder: Dentist'), 'and offers to add one from natural text');
   require(descriptionOf(add).includes('4:00 PM'), 'saying what it understood');
   await capture('reminders-search');
   click(add);
   await eventually(() => saved().some(({title}) => title === 'Dentist') && popup(), 'adding it shows it in the list');
-  closeStart();
+  closeGust();
   press(Clutter.KEY_Escape);
   await eventually(() => !popup(), 'and the list closes');
 }

@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Visa och ändra kortkommandon eller l�
 settings-keyboard-copilot = Copilot-tangenten
 settings-keyboard-copilot-press = Tryck
 settings-keyboard-copilot-press-description = Vad ett kort tryck på tangenten gör
-settings-keyboard-copilot-open-start = Öppna Start
 settings-keyboard-copilot-open-app = Öppna en app
 settings-keyboard-copilot-nothing = Ingenting
 settings-keyboard-copilot-app = App

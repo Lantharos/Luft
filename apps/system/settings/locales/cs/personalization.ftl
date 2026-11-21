@@ -76,18 +76,11 @@ settings-appearance-text-size = Velikost textu
 ## Taskbar
 
 settings-taskbar-preview = Náhled hlavního panelu
-settings-start-section = Start
-settings-start-style = Styl
-settings-start-style-menu = Nabídka
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Hledání, aplikace a složky vedle hlavního panelu
-settings-start-style-palette-description = Vyhledávací pole uprostřed obrazovky pro aplikace, okna, soubory a odpovědi
-settings-start-button = Zobrazovat tlačítko Start
-settings-start-button-description = Klávesa Super otevře nabídku Start v každém případě
-settings-start-web = Webový vyhledávač
+settings-gust-look-panel-description = Hledání, aplikace a složky vedle hlavního panelu
+settings-gust-look-palette-description = Vyhledávací pole uprostřed obrazovky pro aplikace, okna, soubory a odpovědi
+settings-gust-web = Webový vyhledávač
 settings-taskbar-shown = Zobrazovat hlavní panel
 settings-taskbar-hidden = Skrytý
-settings-taskbar-hidden-description = Hodiny a stavové ikony zůstanou v rohu a klávesa Super otevře nabídku Start
 settings-taskbar-look = Vzhled
 settings-taskbar-look-glass = Sklo
 settings-taskbar-look-solid = Plný

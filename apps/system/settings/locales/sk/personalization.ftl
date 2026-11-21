@@ -76,18 +76,11 @@ settings-appearance-text-size = Veľkosť textu
 ## Taskbar
 
 settings-taskbar-preview = Ukážka panela úloh
-settings-start-section = Start
-settings-start-style = Štýl
-settings-start-style-menu = Ponuka
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Vyhľadávanie, aplikácie a priečinky vedľa panela úloh
-settings-start-style-palette-description = Vyhľadávacie pole v strede obrazovky pre aplikácie, okná, súbory a odpovede
-settings-start-button = Zobrazovať tlačidlo Start
-settings-start-button-description = Kláves Super otvorí ponuku Start v každom prípade
-settings-start-web = Webový vyhľadávač
+settings-gust-look-panel-description = Vyhľadávanie, aplikácie a priečinky vedľa panela úloh
+settings-gust-look-palette-description = Vyhľadávacie pole v strede obrazovky pre aplikácie, okná, súbory a odpovede
+settings-gust-web = Webový vyhľadávač
 settings-taskbar-shown = Zobrazovať panel úloh
 settings-taskbar-hidden = Skrytý
-settings-taskbar-hidden-description = Hodiny a stavové ikony zostanú v rohu a kláves Super otvorí ponuku Start
 settings-taskbar-look = Vzhľad
 settings-taskbar-look-glass = Sklo
 settings-taskbar-look-solid = Plný

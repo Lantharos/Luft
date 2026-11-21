@@ -27,7 +27,7 @@ Address the reader as sinä, as macOS, GNOME and KDE do, and leave the pronoun o
 ## Names
 
 - Settings, Disks and Install Luft are Asetukset, Levyt and Asenna Luft.
-- Names written into a string inflect normally: ”Luftin päivitykset”, ”Roverissa”, though ”Rover-sovelluksessa” reads better where the bare ending looks odd. Start becomes ”Start-valikko” when it declines.
+- Names written into a string inflect normally: ”Luftin päivitykset”, ”Roverissa”, though ”Rover-sovelluksessa” reads better where the bare ending looks odd.
 - A name in a variable can't change its ending, so keep it in the nominative: in a compound with a space before the hyphen, since the name may be several words (”{ $app } -sovelluksessa”), or after a colon (”Ei voitu avata: { $name }”).
 
 ## Plurals

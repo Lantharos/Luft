@@ -208,7 +208,7 @@ export interface DesktopFilter extends ScreenEffectBase {
   play(milliseconds: number): void;
 }
 
-export type EffectSurface = 'taskbar' | 'quick-settings' | 'start' | 'notifications';
+export type EffectSurface = 'taskbar' | 'quick-settings' | 'gust' | 'notifications';
 
 /**
  * Something drawn over Kestrel's own surfaces, such as lines across the taskbar, as {@link WindowOverlayOptions} without a
@@ -1190,7 +1190,7 @@ export interface AudioReading {
 }
 
 export interface Search {
-  /** Adds results to Start's search, under the provider's title. */
+  /** Adds results to Gust's search, under the provider's title. */
   addProvider(provider: SearchProvider): Disposable;
 }
 

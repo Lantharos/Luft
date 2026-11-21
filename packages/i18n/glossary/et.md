@@ -26,7 +26,6 @@ Prefer sentences without a person, which the impersonal makes natural: „Värsk
 ## Names
 
 - Settings, Disks and Install Luft are Sätted, Kettad and Lufti installimine. Sätted keeps its capital in every case when it means the app: „lisa hiljem Sätetes“.
-- Start stays Start; write „menüü Start“ when it takes a case ending.
 - Don't inflect app names; put the kind of thing first: „rakenduses Rover“. Luft inflects when it must (Lufti, Luftis).
 - With fourteen cases, keep variables in the nominative: „Tagasi: { $page }“. The object of a command is nominative too, so „Aseta { $finger } andurile“ works.
 

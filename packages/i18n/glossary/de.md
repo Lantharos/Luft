@@ -23,7 +23,7 @@ Address the reader as du, lowercase: „Du kannst das später in den Einstellung
 
 ## Names
 
-- Settings, Disks and Install Luft are Einstellungen, Datenträger and Luft installieren. Start stays Start.
+- Settings, Disks and Install Luft are Einstellungen, Datenträger and Luft installieren.
 - App names are neuter unless the glossary says otherwise: „Rover ist geöffnet“. When a case ending looks odd, write „in der App Rover“.
 
 ## Plurals

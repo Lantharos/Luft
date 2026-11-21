@@ -43,7 +43,7 @@ index cca87fa76f093b5e6f3b967519a839956fd8f9a4..ebcd9eafb8799b100cd5a4b6e04146fb
 +  META_PEN_BUTTON_ACTION_ERASER = G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING + 1,
 +  META_PEN_BUTTON_ACTION_SCREENSHOT,
 +  META_PEN_BUTTON_ACTION_NOTES,
-+  META_PEN_BUTTON_ACTION_START,
++  META_PEN_BUTTON_ACTION_GUST,
 +  META_PEN_BUTTON_ACTION_NOTHING,
 +} MetaPenButtonAction;
 +
@@ -362,7 +362,7 @@ index d86d5ecf30fa23466f3921aefcca4fa082ef4c24..6201c07b4987a80851f09b130e0baa58
          case G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING:
 +        case META_PEN_BUTTON_ACTION_SCREENSHOT:
 +        case META_PEN_BUTTON_ACTION_NOTES:
-+        case META_PEN_BUTTON_ACTION_START:
++        case META_PEN_BUTTON_ACTION_GUST:
 +        case META_PEN_BUTTON_ACTION_NOTHING:
            // button evdev code left as-is, i.e. BTN_STYLUS or whatever
            clutter_button = 0;
@@ -408,7 +408,7 @@ index 222054e8fc62d3c842bc9c0750b345e199083555..0194b6c2729a303279ab9a71367146eb
 +   * MetaDisplay::pen-action:
 +   * @display: the display
 +   * @device: the tablet the pen belongs to
-+   * @action: what the pen's button asks for: "screenshot", "notes" or "start"
++   * @action: what the pen's button asks for: "screenshot", "notes" or "gust"
 +   *
 +   * Emitted when a pen's button is pressed that people set to do something
 +   * the shell does.
@@ -477,8 +477,8 @@ index a969535a8b702c83e9f06db1fc0b57e15a366671..369c4090deada9ef9ff8994e1ffee255
 +    case META_PEN_BUTTON_ACTION_NOTES:
 +      meta_display_notify_pen_action (display, device, "notes");
 +      break;
-+    case META_PEN_BUTTON_ACTION_START:
-+      meta_display_notify_pen_action (display, device, "start");
++    case META_PEN_BUTTON_ACTION_GUST:
++      meta_display_notify_pen_action (display, device, "gust");
 +      break;
 +    default:
 +      g_assert_not_reached ();
@@ -503,7 +503,7 @@ index a969535a8b702c83e9f06db1fc0b57e15a366671..369c4090deada9ef9ff8994e1ffee255
        return TRUE;
 +    case META_PEN_BUTTON_ACTION_SCREENSHOT:
 +    case META_PEN_BUTTON_ACTION_NOTES:
-+    case META_PEN_BUTTON_ACTION_START:
++    case META_PEN_BUTTON_ACTION_GUST:
 +      if (is_press)
 +        notify_pen_action (mapper, device, (MetaPenButtonAction) action);
 +      return TRUE;

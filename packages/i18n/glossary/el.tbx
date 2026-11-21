@@ -394,13 +394,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="el">
           <tig>
-            <term>Start</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name; neuter, το Start, or το μενού Start</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -933,7 +933,7 @@
         <langSet xml:lang="el">
           <tig>
             <term>καρφιτσώνω</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start; on buttons and menu items the noun: Καρφίτσωμα</note>
+            <note from="translator">verb: keep an app on the taskbar; on buttons and menu items the noun: Καρφίτσωμα</note>
           </tig>
         </langSet>
       </termEntry>

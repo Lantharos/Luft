@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Leita að forritum, skrám og fleiru
-start-search-cut = Klippa
-start-search-copy = Afrita
-start-search-paste = Líma
-start-search-select-all = Velja allt
-start-power = Orka og seta
-start-power-close = Loka orkuvalkostum
-start-account-settings = Aðgangsstillingar
-start-apps = Forrit
-start-folder-default-name = Mappa
-start-folder-open = Opna möppu
-start-folder-rename = Endurnefna
-start-folder-ungroup = Leysa upp möppu
-start-open = Opna
-start-move-to-apps = Færa í Forrit
+gust-search-placeholder = Leita að forritum, skrám og fleiru
+gust-search-cut = Klippa
+gust-search-copy = Afrita
+gust-search-paste = Líma
+gust-search-select-all = Velja allt
+gust-power = Orka og seta
+gust-power-close = Loka orkuvalkostum
+gust-account-settings = Aðgangsstillingar
+gust-apps = Forrit
+gust-folder-default-name = Mappa
+gust-folder-open = Opna möppu
+gust-folder-rename = Endurnefna
+gust-folder-ungroup = Leysa upp möppu
+gust-open = Opna
+gust-move-to-apps = Færa í Forrit
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Besta samsvörun
-start-search-group-apps = Forrit
-start-search-group-commands = Aðgerðir í forritum
-start-search-group-windows = Opnir gluggar
-start-search-group-actions = Aðgerðir
-start-search-group-settings = Stillingar
-start-search-group-clipboard = Klippiborð
-start-search-group-emoji = Tjákn
-start-search-group-files = Skrár
-start-search-group-contents = Í skrám
-start-search-group-web = Vefurinn
-start-search-web = Leita á vefnum að „{ $query }“
-start-search-clipboard-text = Úr ferli klippiborðs
-start-search-clipboard-keywords = klippiborð, afritað, afrita, ferill klippiborðs, líma, clipboard
-start-search-emoji-insert = Setja inn
-start-search-settings-page = Stillingar
-start-search-settings-section = { $page } í Stillingum
-start-search-file-reveal = Sýna í { $fileManager }
-start-search-file-copy-path = Afrita slóð
-start-search-conversion = { $amount } { $from } í { $to }
-start-search-calculation = { $expression }, ýttu á Enter til að afrita
+gust-search-best-match = Besta samsvörun
+gust-search-group-apps = Forrit
+gust-search-group-commands = Aðgerðir í forritum
+gust-search-group-windows = Opnir gluggar
+gust-search-group-actions = Aðgerðir
+gust-search-group-settings = Stillingar
+gust-search-group-clipboard = Klippiborð
+gust-search-group-emoji = Tjákn
+gust-search-group-files = Skrár
+gust-search-group-contents = Í skrám
+gust-search-group-web = Vefurinn
+gust-search-web = Leita á vefnum að „{ $query }“
+gust-search-clipboard-text = Úr ferli klippiborðs
+gust-search-clipboard-keywords = klippiborð, afritað, afrita, ferill klippiborðs, líma, clipboard
+gust-search-emoji-insert = Setja inn
+gust-search-settings-page = Stillingar
+gust-search-settings-section = { $page } í Stillingum
+gust-search-file-reveal = Sýna í { $fileManager }
+gust-search-file-copy-path = Afrita slóð
+gust-search-conversion = { $amount } { $from } í { $to }
+gust-search-calculation = { $expression }, ýttu á Enter til að afrita
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Til { $date }
-start-search-answer-since = Frá { $date }
-start-search-answer-between = Milli { $from } og { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Til { $date }
+gust-search-answer-since = Frá { $date }
+gust-search-answer-between = Milli { $from } og { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } klukkustund
    *[other] { $hours } klukkustundum
 } á undan
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } klukkustund
    *[other] { $hours } klukkustundum
 } á eftir
-start-search-answer-time-same = { $place }, sami tími og hér
-start-search-answer-converted = Í { $place } þegar klukkan er { $time } í { $from }
-start-search-answer-converted-here = Hér þegar klukkan er { $time } í { $from }
-start-search-answer-converted-from-here = Í { $place } þegar klukkan er { $time } hér
+gust-search-answer-time-same = { $place }, sami tími og hér
+gust-search-answer-converted = Í { $place } þegar klukkan er { $time } í { $from }
+gust-search-answer-converted-here = Hér þegar klukkan er { $time } í { $from }
+gust-search-answer-converted-from-here = Í { $place } þegar klukkan er { $time } hér
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Skipta yfir í dökkt útlit
-start-search-dark-style-off = Skipta yfir í ljóst útlit
-start-search-dark-style-keywords = dökkt útlit, dökkt þema, dökk stilling, ljóst útlit, ljóst þema, ljós stilling, dark mode, dark theme, light mode
-start-search-night-light-on = Kveikja á næturljósi
-start-search-night-light-off = Slökkva á næturljósi
-start-search-night-light-keywords = næturljós, næturstilling, blátt ljós, hlýir litir, night light, night shift
-start-search-do-not-disturb-on = Kveikja á Ekki trufla
-start-search-do-not-disturb-off = Slökkva á Ekki trufla
-start-search-do-not-disturb-keywords = ekki trufla, ónáðið ekki, einbeiting, næði, hljótt, þagga tilkynningar, fela tilkynningar, do not disturb, dnd
-start-search-wifi-on = Kveikja á Wi-Fi
-start-search-wifi-off = Slökkva á Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, þráðlaust net, þráðlaust, wlan
-start-search-bluetooth-on = Kveikja á Bluetooth
-start-search-bluetooth-off = Slökkva á Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Kveikja á flugstillingu
-start-search-airplane-mode-off = Slökkva á flugstillingu
-start-search-airplane-mode-keywords = flugstilling, flug, flugvél, þráðlaus tenging, airplane mode
-start-search-keep-awake-on = Halda vakandi
-start-search-keep-awake-off = Hætta að halda vakandi
-start-search-keep-awake-keywords = halda vakandi, vaka, koma í veg fyrir svefn, ekki sofna, caffeine, koffín
-start-search-lock-keywords = læsa, læsa skjá, læsa tölvu, læsiskjár
-start-search-suspend-keywords = svefn, sofa, bið, biðstaða, sleep, standby
-start-search-log-out-keywords = skrá út, útskráning, loka setu, log out, sign out
-start-search-restart-keywords = endurræsa, endurræsing, endurræsa tölvu, restart, reboot
-start-search-power-off-keywords = slökkva, slökkva á tölvu, leggja niður, shut down, shutdown, power off
+gust-search-dark-style-on = Skipta yfir í dökkt útlit
+gust-search-dark-style-off = Skipta yfir í ljóst útlit
+gust-search-dark-style-keywords = dökkt útlit, dökkt þema, dökk stilling, ljóst útlit, ljóst þema, ljós stilling, dark mode, dark theme, light mode
+gust-search-night-light-on = Kveikja á næturljósi
+gust-search-night-light-off = Slökkva á næturljósi
+gust-search-night-light-keywords = næturljós, næturstilling, blátt ljós, hlýir litir, night light, night shift
+gust-search-do-not-disturb-on = Kveikja á Ekki trufla
+gust-search-do-not-disturb-off = Slökkva á Ekki trufla
+gust-search-do-not-disturb-keywords = ekki trufla, ónáðið ekki, einbeiting, næði, hljótt, þagga tilkynningar, fela tilkynningar, do not disturb, dnd
+gust-search-wifi-on = Kveikja á Wi-Fi
+gust-search-wifi-off = Slökkva á Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, þráðlaust net, þráðlaust, wlan
+gust-search-bluetooth-on = Kveikja á Bluetooth
+gust-search-bluetooth-off = Slökkva á Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Kveikja á flugstillingu
+gust-search-airplane-mode-off = Slökkva á flugstillingu
+gust-search-airplane-mode-keywords = flugstilling, flug, flugvél, þráðlaus tenging, airplane mode
+gust-search-keep-awake-on = Halda vakandi
+gust-search-keep-awake-off = Hætta að halda vakandi
+gust-search-keep-awake-keywords = halda vakandi, vaka, koma í veg fyrir svefn, ekki sofna, caffeine, koffín
+gust-search-lock-keywords = læsa, læsa skjá, læsa tölvu, læsiskjár
+gust-search-suspend-keywords = svefn, sofa, bið, biðstaða, sleep, standby
+gust-search-log-out-keywords = skrá út, útskráning, loka setu, log out, sign out
+gust-search-restart-keywords = endurræsa, endurræsing, endurræsa tölvu, restart, reboot
+gust-search-power-off-keywords = slökkva, slökkva á tölvu, leggja niður, shut down, shutdown, power off
 
 ## Quick settings
 

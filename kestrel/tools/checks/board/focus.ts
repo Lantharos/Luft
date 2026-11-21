@@ -97,7 +97,7 @@ async function checkEntering(shown: View) {
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Escape);
   await eventually(() => !board().enteredWindow() && sameView(view(), shown), 'Super+Escape returns to the overview it came from');
   await settled();
-  require(!named('kestrel-start')!.visible, 'Super+Escape leaves Start closed');
+  require(!named('kestrel-gust-panel')!.visible, 'Super+Escape leaves Gust closed');
   await eventually(() => boardWindows().every(window => window.get_compositor_private<Meta.WindowActor>().opacity === 255), 'no window stays dimmed in the overview');
 }
 

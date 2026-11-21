@@ -10,7 +10,7 @@ import {centerOf, click, moveBy, press} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
-import {closeStart, openStart} from '../start/search/results.js';
+import {closeGust, openGust} from '../gust/search/results.js';
 import {lockAndWake, lock, unlock} from '../lockScreen/lib/shield.js';
 import {prepareForSleep, screenOn} from '../lockScreen/lib/sleep.js';
 import {takeCalls} from './lib/systemCalls.js';
@@ -65,10 +65,10 @@ async function checkQuestion() {
 }
 
 async function checkOverSurfaces() {
-  await openStart();
-  await asked('with Start open');
+  await openGust();
+  await asked('with Gust open');
   await dismissed();
-  await closeStart();
+  await closeGust();
 }
 
 async function checkFullscreenApp() {

@@ -394,13 +394,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="it">
           <tig>
-            <term>Start</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name; m, il menu Start, in Start</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -933,7 +933,7 @@
         <langSet xml:lang="it">
           <tig>
             <term>aggiungere</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start; Aggiungi alla barra delle applicazioni, Aggiungi a Start</note>
+            <note from="translator">verb: keep an app on the taskbar; Aggiungi alla barra delle applicazioni</note>
           </tig>
         </langSet>
       </termEntry>
@@ -946,7 +946,7 @@
         <langSet xml:lang="it">
           <tig>
             <term>rimuovere</term>
-            <note from="translator">verb; Rimuovi dalla barra delle applicazioni, Rimuovi da Start</note>
+            <note from="translator">verb; Rimuovi dalla barra delle applicazioni</note>
           </tig>
         </langSet>
       </termEntry>

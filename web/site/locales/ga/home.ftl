@@ -6,9 +6,6 @@ home-look = Féach air
 home-desktop-alt = Deasc Luft le Rover, Socruithe agus Tern oscailte os cionn foraoise faoi cheo
 home-intro = Is córas iomlán do do ríomhaire é Luft, bunaithe ar Fedora. Tá a dheasc féin aige, a aipeanna féin agus croí a choinníonn é féin slán, ionas gur féidir leat leanúint ar aghaidh le do lá.
 
-home-start-heading = Tá a fhios ag Tosaigh cá bhfuil gach rud.
-home-start-text = Clóscríobh cúpla litir agus aimsíonn Tosaigh aipeanna, socruithe, comhaid agus fiú na focail iontu. Déanann sé suimeanna agus tiontuithe aonad, agus casann sé air an stíl dhorcha nó Wi-Fi nuair a iarrann tú é.
-home-start-alt = An roghchlár Tosaigh ag cuardach “dorcha”, le gníomh na stíle dorcha agus na socruithe a mheaitseálann
 
 home-essentials-heading = Na bunriachtanais, cliceáil amháin uait.
 home-essentials-text = Is tíleanna iad na Socruithe tapa a shocraíonn tú féin. Grúpáiltear fógraí de réir aipe, le freagraí, rialuithe meán agus féilire díreach in aice leo.
@@ -23,7 +20,6 @@ home-all-windows-alt = Gach fuinneog agus spás oibre in aon amharc amháin
 
 home-motion-heading = Gluaiseacht le brí.
 home-motion-text = Gluaiseann gach rud i Luft ar spriongaí, mar sin is féidir leis a intinn a athrú i lár báire gan phreab. Leanann svaidhpeanna do mhéara agus stopann siad san áit a raibh i gceist agat, agus osclaíonn aipeanna go tapa, fiú an chéad uair.
-home-motion-clip = Tosaigh, Socruithe tapa, gach fuinneog in aon amharc amháin agus an clár, ag oscailt agus ag dúnadh i Luft
 
 home-wallpapers-heading = Roghnaigh grianghraf. Déanfaidh Luft an chuid eile.
 home-wallpapers-text = { $count ->

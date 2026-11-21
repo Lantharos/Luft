@@ -12,7 +12,7 @@ Luft speaks English, Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Dan
 Translating needs no programming and no copy of the repository. It happens on [Babblebird](https://babblebird.dev):
 
 1. Sign in at babblebird.dev and open Luft.
-2. Pick your language, then an area, such as Start and quick settings or one part of Settings.
+2. Pick your language, then an area, such as Gust and quick settings or one part of Settings.
 3. Translate string by string. Babblebird checks each translation, shows the glossary's agreed term for every word it knows, and offers earlier translations of similar strings.
 
 Babblebird collects the changes into one pull request, and they reach the nightly builds once it's merged. Serbian is translated in Cyrillic only: Babblebird writes the Latin script version from it.

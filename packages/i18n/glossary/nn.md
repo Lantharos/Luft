@@ -29,7 +29,6 @@ Address the reader as du, lowercase, as GNOME and KDE do in Nynorsk: «Du kan en
 ## Names
 
 - Settings, Disks and Install Luft are Innstillingar, Diskar and Installer Luft.
-- Start stays Start; «Start-menyen» when it needs a definite form.
 - Names never take the definite ending, so never «Roveren». When a sentence needs one: «appen Rover». Prefer a preposition to the genitive: «vindauget til Rover», «oppdateringar for Luft».
 
 ## Plurals

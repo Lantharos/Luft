@@ -27,8 +27,8 @@ const backdrops = () => descendants(global.stage).flatMap(actor => actor.mapped 
   .filter((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect && effect.mode === Shell.BlurMode.BACKGROUND);
 const taskbarGlass = () => named('kestrel-panel')!.get_effects().find((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect)!;
 
-function startItem() {
-  return descendants(global.stage).find(actor => actor.name?.startsWith('kestrel-start-item-') && actor.mapped)!;
+function gustItem() {
+  return descendants(global.stage).find(actor => actor.name?.startsWith('kestrel-gust-item-') && actor.mapped)!;
 }
 
 async function centerOf(window: Meta.Window) {
@@ -63,11 +63,11 @@ async function glassClient(title: string, glass: string[] = []) {
 
 async function captureSurfaces(name: string) {
   await capture(`glass-${name}-desktop`);
-  toggleSurface('start');
+  toggleSurface('gust');
   await settled();
-  await capture(`glass-${name}-start`);
-  rightClick(startItem());
-  await eventually(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Start');
+  await capture(`glass-${name}-gust`);
+  rightClick(gustItem());
+  await eventually(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Gust');
   await settled();
   await capture(`glass-${name}-menu`);
   dismissImmediately();

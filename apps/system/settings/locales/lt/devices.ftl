@@ -287,7 +287,6 @@ settings-keyboard-shortcuts-description = Peržiūrėkite ir keiskite sparčiuos
 settings-keyboard-copilot = Copilot klavišas
 settings-keyboard-copilot-press = Paspaudimas
 settings-keyboard-copilot-press-description = Kas nutinka trumpai paspaudus klavišą
-settings-keyboard-copilot-open-start = Atidaryti meniu Pradžia
 settings-keyboard-copilot-open-app = Atidaryti programą
 settings-keyboard-copilot-nothing = Nieko
 settings-keyboard-copilot-app = Programa

@@ -8,9 +8,6 @@ home-look = Agħti ħarsa
 home-desktop-alt = Id-desktop ta’ Luft b’Rover, Settings u Tern miftuħa fuq foresta miksija biċ-ċpar
 home-intro = Luft huwa sistema sħiħa għall-kompjuter tiegħek, mibnija fuq Fedora. Għandu d-desktop tiegħu, l-apps tiegħu u qalba li żżomm lilha nfisha sħiħa, biex int tkompli bil-ġurnata tiegħek.
 
-home-start-heading = Start jaf fejn hu kollox.
-home-start-text = Ikteb ftit ittri u Start isib apps, settings, fajls u anke l-kliem ġo fihom. Jagħmel kalkoli u konverżjonijiet ta’ unitajiet, u jixgħel il-modalità skura jew il-Wi-Fi meta titolbu.
-home-start-alt = Start ifittex “dark”, bl-azzjoni tal-modalità skura u settings li jaqblu
 
 home-essentials-heading = L-essenzjali, klikk ’il bogħod.
 home-essentials-text = Is-Settings rapidi huma madum li tirranġa int. In-notifiki jinġabru skont l-app, bi tweġibiet, kontrolli tal-midja u kalendarju eżatt ħdejhom.
@@ -25,7 +22,6 @@ home-all-windows-alt = It-twieqi u d-desktops kollha f’daqqa t’għajn
 
 home-motion-heading = Jiċċaqlaq b’għan.
 home-motion-text = Kollox f’Luft jiċċaqlaq fuq molol, għalhekk jista’ jibdel direzzjoni f’nofs triq mingħajr skossi. Is-swipes isegwu subgħajk u jieqfu fejn ridt, u l-apps jinfetħu malajr, anke l-ewwel darba.
-home-motion-clip = Start, is-Settings rapidi, it-twieqi kollha f’daqqa t’għajn u l-bord, jinfetħu u jingħalqu f’Luft
 
 home-wallpapers-heading = Agħżel ritratt. Il-bqija jagħmlu Luft.
 home-wallpapers-text = { $count ->

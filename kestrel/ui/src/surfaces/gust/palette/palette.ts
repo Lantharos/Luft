@@ -1,16 +1,16 @@
-import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
+import { ensureActorVisibleInScrollView } from '../../../core/runtime/animationUtils.js';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/layout/surface.js';
-import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
-import { SearchEngine, type SearchHost } from '../search/engine.js';
-import { searchField } from '../search/field.js';
-import { watchInstalledApps } from '../search/installedApps.js';
-import type { SearchView } from '../search/item.js';
-import { SearchResults } from '../search/results/searchResults.js';
-import type { StartArea, StartSurface } from '../start/startSurface.js';
-import type { Offset } from '../../shared/layout/edge.js';
+import { blurSurface } from '../../../shared/layout/surface.js';
+import { isControlEnter } from '../../../shared/input/keyboardNavigation.js';
+import { SearchEngine, type SearchHost } from '../../search/engine.js';
+import { searchField } from '../../search/field.js';
+import { watchInstalledApps } from '../../search/installedApps.js';
+import type { SearchView } from '../../search/item.js';
+import { SearchResults } from '../../search/results/searchResults.js';
+import type { GustArea, GustSurface } from '../gust.js';
+import type { Offset } from '../../../shared/layout/edge.js';
 import { PalettePreview } from './preview.js';
 
 const WIDTH = 760;
@@ -22,19 +22,19 @@ const MINIMUM_LIST = 160;
 
 const STEPS = new Map([[Clutter.KEY_Up, -1], [Clutter.KEY_Down, 1], [Clutter.KEY_Page_Up, -PAGE], [Clutter.KEY_Page_Down, PAGE]]);
 
-export class Palette implements StartSurface {
+export class GustPalette implements GustSurface {
   readonly actor = new St.BoxLayout({
-    name: 'kestrel-palette', orientation: Clutter.Orientation.VERTICAL,
-    style_class: 'kestrel-popover kestrel-palette', reactive: true, visible: false,
+    name: 'kestrel-gust-palette', orientation: Clutter.Orientation.VERTICAL,
+    style_class: 'kestrel-popover kestrel-gust-palette', reactive: true, visible: false,
   });
   readonly search: St.Entry;
   readonly focusOnTouch = true;
   private readonly list = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true });
   private readonly scroller = new St.ScrollView({
-    style_class: 'kestrel-palette-scroll', hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
+    style_class: 'kestrel-gust-palette-scroll', hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC,
     x_expand: true, child: this.list,
   });
-  private readonly body = new St.BoxLayout({ style_class: 'kestrel-palette-body', visible: false });
+  private readonly body = new St.BoxLayout({ style_class: 'kestrel-gust-palette-body', visible: false });
   private readonly preview = new PalettePreview();
   private readonly results: SearchResults;
   private readonly engine: SearchEngine;
@@ -42,7 +42,7 @@ export class Palette implements StartSurface {
 
   constructor(host: SearchHost) {
     blurSurface(this.actor);
-    this.search = searchField(host.menus, 'kestrel-search kestrel-palette-search', 20);
+    this.search = searchField(host.menus, 'kestrel-search kestrel-gust-palette-search', 20);
     this.results = new SearchResults(host.menus, actor => ensureActorVisibleInScrollView(this.scroller, actor), { highlighted: item => this.preview.show(item) });
     this.engine = new SearchEngine(host, view => this.show(view));
     this.body.add_child(this.scroller);
@@ -81,7 +81,7 @@ export class Palette implements StartSurface {
     return { translation_x: 0, translation_y: DROP };
   }
 
-  place({ monitor, area }: StartArea): void {
+  place({ monitor, area }: GustArea): void {
     const width = Math.min(WIDTH, area.width - 2 * EDGE_MARGIN);
     const y = Math.max(area.y, monitor.y + Math.round(monitor.height * TOP));
     this.actor.set_width(width);

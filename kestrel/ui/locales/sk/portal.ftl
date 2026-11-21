@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Žiadna nainštalovaná aplikácia to ned
 portal-app-chooser-find = Nájsť aplikáciu
 portal-app-chooser-open = Otvoriť
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Pridať tento web medzi aplikácie?
-portal-launcher-website-description = { $site } sa bude otvárať z ponuky Start vo vlastnom okne.
 portal-launcher-title = Pridať toto medzi aplikácie?
-portal-launcher-description = { $appName } chce pridať aplikáciu do ponuky Start.
 portal-launcher-name = Názov
 portal-launcher-add = Pridať
 

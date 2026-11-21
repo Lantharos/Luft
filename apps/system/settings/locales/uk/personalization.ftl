@@ -76,18 +76,11 @@ settings-appearance-text-size = Розмір тексту
 ## Taskbar
 
 settings-taskbar-preview = Попередній перегляд панелі завдань
-settings-start-section = Пуск
-settings-start-style = Стиль
-settings-start-style-menu = Меню
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Пошук, програми й папки поруч із панеллю завдань
-settings-start-style-palette-description = Рядок пошуку посередині екрана для програм, вікон, файлів і відповідей
-settings-start-button = Показувати кнопку Пуск
-settings-start-button-description = Super у будь-якому разі відкриває меню „Пуск“
-settings-start-web = Шукати в інтернеті за допомогою
+settings-gust-look-panel-description = Пошук, програми й папки поруч із панеллю завдань
+settings-gust-look-palette-description = Рядок пошуку посередині екрана для програм, вікон, файлів і відповідей
+settings-gust-web = Шукати в інтернеті за допомогою
 settings-taskbar-shown = Показувати панель завдань
 settings-taskbar-hidden = Прихована
-settings-taskbar-hidden-description = Годинник і значки стану лишаються в кутку, а Super відкриває меню „Пуск“
 settings-taskbar-look = Оформлення
 settings-taskbar-look-glass = Скло
 settings-taskbar-look-solid = Суцільна

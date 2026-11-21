@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Skoðaðu og breyttu flýtilyklum eða
 settings-keyboard-copilot = Copilot-lykill
 settings-keyboard-copilot-press = Stutt ýting
 settings-keyboard-copilot-press-description = Hvað gerist þegar þú ýtir stutt á lykilinn
-settings-keyboard-copilot-open-start = Opna upphafsvalmynd
 settings-keyboard-copilot-open-app = Opna forrit
 settings-keyboard-copilot-nothing = Ekkert
 settings-keyboard-copilot-app = Forrit

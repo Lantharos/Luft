@@ -22,7 +22,6 @@ Prefer sentences without a person: „Atjauninājumi tiks instalēti pēc restar
 ## Names
 
 - Settings, Disks and Install Luft are Iestatījumi, Diski and Instalēt Luft.
-- Start stays Start; write „izvēlne Start“ to fit a sentence.
 - Names are never declined; put the kind of thing first and decline that: „lietotnē Rover“, „vieta sistēmai Luft“.
 
 ## Plurals

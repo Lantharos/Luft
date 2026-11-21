@@ -132,19 +132,19 @@ async function expandAndCollapse(window: Meta.Window) {
   await eventually(collapsed, 'the taskbar collapses by itself after a while', 2000);
 }
 
-async function start() {
+async function checkGust() {
   await tap(centerOf(strip()!));
-  await eventually(expanded, 'the taskbar expands before opening Start');
-  await tap(centerOf(named('Start', panel())!));
-  await eventually(() => shown(named('kestrel-start')), 'Start opens from the expanded taskbar');
+  await eventually(expanded, 'the taskbar expands before opening Gust');
+  await tap(centerOf(named('Gust', panel())!));
+  await eventually(() => shown(named('kestrel-gust-panel')), 'Gust opens from the expanded taskbar');
   await pause(IDLE_COLLAPSE + 500);
-  require(expanded(), 'the taskbar stays expanded while Start is open');
-  require(!Main.keyboard.visible, 'Start opens without the on-screen keyboard');
-  const startTop = named('kestrel-start')!.get_transformed_position()[1] + named('kestrel-start')!.height;
-  require(startTop <= bottom() - EXPANDED, 'Start sits above the expanded taskbar');
-  await capture('tablet-start');
-  toggleSurface('start');
-  await eventually(collapsed, 'closing Start collapses the taskbar');
+  require(expanded(), 'the taskbar stays expanded while Gust is open');
+  require(!Main.keyboard.visible, 'Gust opens without the on-screen keyboard');
+  const gustTop = named('kestrel-gust-panel')!.get_transformed_position()[1] + named('kestrel-gust-panel')!.height;
+  require(gustTop <= bottom() - EXPANDED, 'Gust sits above the expanded taskbar');
+  await capture('tablet-gust');
+  toggleSurface('gust');
+  await eventually(collapsed, 'closing Gust collapses the taskbar');
 }
 
 async function movesWhileShown(action: () => Promise<unknown>) {
@@ -190,7 +190,7 @@ export async function run() {
     await enter(normal, window);
     await eventually(() => window.get_frame_rect().y + window.get_frame_rect().height === bottom() - STRIP, 'maximized windows reach down to the strip');
     await expandAndCollapse(window);
-    await start();
+    await checkGust();
     const gap = await widestGap(window, () => clip(clips, 'tablet-leave', () => fold(false), {notes: 'Unfolded into a laptop', width: fullWidth()}));
     require(gap < 0.5, `the maximized window stays under the taskbar as it unfolds (gap of ${gap}px)`);
     await eventually(() => resting() && geometry() === normal, 'unfolding restores the normal taskbar exactly');

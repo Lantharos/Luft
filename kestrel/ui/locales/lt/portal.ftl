@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Nė viena įdiegta programa negali to ati
 portal-app-chooser-find = Rasti programą
 portal-app-chooser-open = Atidaryti
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Pridėti šią svetainę prie programų?
-portal-launcher-website-description = Svetainė { $site } bus atidaroma atskirame lange iš meniu Pradžia.
 portal-launcher-title = Pridėti tai prie programų?
-portal-launcher-description = { $appName } nori pridėti programą prie meniu Pradžia.
 portal-launcher-name = Pavadinimas
 portal-launcher-add = Pridėti
 

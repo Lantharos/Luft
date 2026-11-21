@@ -1,100 +1,100 @@
-## Start
+## Gust
 
-start-search-placeholder = Cuardaigh aipeanna, comhaid agus tuilleadh
-start-search-cut = Gearr
-start-search-copy = Cóipeáil
-start-search-paste = Greamaigh
-start-search-select-all = Roghnaigh uile
-start-power = Cumhacht agus seisiún
-start-power-close = Dún na roghanna cumhachta
-start-account-settings = Socruithe cuntais
-start-apps = Aipeanna
-start-folder-default-name = Fillteán
-start-folder-open = Oscail an fillteán
-start-folder-rename = Athainmnigh
-start-folder-ungroup = Díghrúpáil na haipeanna
-start-open = Oscail
-start-move-to-apps = Bog chuig Aipeanna
+gust-search-placeholder = Cuardaigh aipeanna, comhaid agus tuilleadh
+gust-search-cut = Gearr
+gust-search-copy = Cóipeáil
+gust-search-paste = Greamaigh
+gust-search-select-all = Roghnaigh uile
+gust-power = Cumhacht agus seisiún
+gust-power-close = Dún na roghanna cumhachta
+gust-account-settings = Socruithe cuntais
+gust-apps = Aipeanna
+gust-folder-default-name = Fillteán
+gust-folder-open = Oscail an fillteán
+gust-folder-rename = Athainmnigh
+gust-folder-ungroup = Díghrúpáil na haipeanna
+gust-open = Oscail
+gust-move-to-apps = Bog chuig Aipeanna
 
-## Start search results
+## Gust search results
 
-start-search-best-match = An rogha is fearr
-start-search-group-apps = Aipeanna
-start-search-group-commands = Gníomhartha aipeanna
-start-search-group-windows = Fuinneoga oscailte
-start-search-group-actions = Gníomhartha
-start-search-group-settings = Socruithe
-start-search-group-clipboard = Gearrthaisce
-start-search-group-emoji = Emojithe
-start-search-group-files = Comhaid
-start-search-group-contents = Taobh istigh de chomhaid
-start-search-group-web = Gréasán
-start-search-web = Cuardaigh an gréasán do “{ $query }”
-start-search-clipboard-text = Ó stair na gearrthaisce
-start-search-clipboard-keywords = gearrthaisce, cóipeáilte, cóipeáil, stair na gearrthaisce, greamaigh, clipboard
-start-search-emoji-insert = Ionsáigh
-start-search-settings-page = Socruithe
-start-search-settings-section = Socruithe: { $page }
-start-search-file-reveal = Taispeáin i { $fileManager }
-start-search-file-copy-path = Cóipeáil an chonair
-start-search-conversion = { $amount } { $from } mar { $to }
-start-search-calculation = { $expression }, brúigh Enter chun é a chóipeáil
+gust-search-best-match = An rogha is fearr
+gust-search-group-apps = Aipeanna
+gust-search-group-commands = Gníomhartha aipeanna
+gust-search-group-windows = Fuinneoga oscailte
+gust-search-group-actions = Gníomhartha
+gust-search-group-settings = Socruithe
+gust-search-group-clipboard = Gearrthaisce
+gust-search-group-emoji = Emojithe
+gust-search-group-files = Comhaid
+gust-search-group-contents = Taobh istigh de chomhaid
+gust-search-group-web = Gréasán
+gust-search-web = Cuardaigh an gréasán do “{ $query }”
+gust-search-clipboard-text = Ó stair na gearrthaisce
+gust-search-clipboard-keywords = gearrthaisce, cóipeáilte, cóipeáil, stair na gearrthaisce, greamaigh, clipboard
+gust-search-emoji-insert = Ionsáigh
+gust-search-settings-page = Socruithe
+gust-search-settings-section = Socruithe: { $page }
+gust-search-file-reveal = Taispeáin i { $fileManager }
+gust-search-file-copy-path = Cóipeáil an chonair
+gust-search-conversion = { $amount } { $from } mar { $to }
+gust-search-calculation = { $expression }, brúigh Enter chun é a chóipeáil
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Go dtí { $date }
-start-search-answer-since = Ó { $date }
-start-search-answer-between = Idir { $from } agus { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Go dtí { $date }
+gust-search-answer-since = Ó { $date }
+gust-search-answer-between = Idir { $from } agus { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } uair an chloig
     [two] { $hours } uair an chloig
     [few] { $hours } huaire an chloig
     [many] { $hours } n-uaire an chloig
    *[other] { $hours } uair an chloig
 } chun tosaigh
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } uair an chloig
     [two] { $hours } uair an chloig
     [few] { $hours } huaire an chloig
     [many] { $hours } n-uaire an chloig
    *[other] { $hours } uair an chloig
 } ar gcúl
-start-search-answer-time-same = { $place }, an t-am céanna is atá anseo
-start-search-answer-converted = { $place }, nuair atá sé { $time } ({ $from })
-start-search-answer-converted-here = Anseo, nuair atá sé { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, nuair atá sé { $time } anseo
+gust-search-answer-time-same = { $place }, an t-am céanna is atá anseo
+gust-search-answer-converted = { $place }, nuair atá sé { $time } ({ $from })
+gust-search-answer-converted-here = Anseo, nuair atá sé { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, nuair atá sé { $time } anseo
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Athraigh go dtí an stíl dhorcha
-start-search-dark-style-off = Athraigh go dtí an stíl gheal
-start-search-dark-style-keywords = stíl dhorcha, mód dorcha, téama dorcha, stíl gheal, mód geal, téama geal, dark mode, dark theme, light mode
-start-search-night-light-on = Cas air an solas oíche
-start-search-night-light-off = Cas as an solas oíche
-start-search-night-light-keywords = solas oíche, solas gorm, dathanna teo, night light, night shift, blue light
-start-search-do-not-disturb-on = Cas air Ná cuir isteach orm
-start-search-do-not-disturb-off = Cas as Ná cuir isteach orm
-start-search-do-not-disturb-keywords = ná cuir isteach orm, fócas, ciúin, ciúnas, balbhaigh fógraí, ciúnaigh fógraí, do not disturb, dnd, focus
-start-search-wifi-on = Cas air Wi-Fi
-start-search-wifi-off = Cas as Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, gan sreang, líonra gan sreang, wireless, wlan
-start-search-bluetooth-on = Cas air Bluetooth
-start-search-bluetooth-off = Cas as Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Cas air mód eitleáin
-start-search-airplane-mode-off = Cas as mód eitleáin
-start-search-airplane-mode-keywords = mód eitleáin, eitleán, mód eitilte, raidiónna, airplane mode, flight mode
-start-search-keep-awake-on = Coinnigh múscailte
-start-search-keep-awake-off = Ná coinnigh múscailte níos mó
-start-search-keep-awake-keywords = coinnigh múscailte, fan múscailte, ná téigh a chodladh, cosc ar chodladh, caiféin, keep awake, caffeine
-start-search-lock-keywords = scáileán glasála, glasáil, glasáil an ríomhaire, lock screen
-start-search-suspend-keywords = codladh, fuireachas, sleep, standby
-start-search-log-out-keywords = sínigh amach, logáil amach, críochnaigh an seisiún, log out, sign out
-start-search-restart-keywords = atosaigh, atosaigh an ríomhaire, atosú, reboot, restart
-start-search-power-off-keywords = múch, múch an ríomhaire, cas as an ríomhaire, shut down, shutdown, power off
+gust-search-dark-style-on = Athraigh go dtí an stíl dhorcha
+gust-search-dark-style-off = Athraigh go dtí an stíl gheal
+gust-search-dark-style-keywords = stíl dhorcha, mód dorcha, téama dorcha, stíl gheal, mód geal, téama geal, dark mode, dark theme, light mode
+gust-search-night-light-on = Cas air an solas oíche
+gust-search-night-light-off = Cas as an solas oíche
+gust-search-night-light-keywords = solas oíche, solas gorm, dathanna teo, night light, night shift, blue light
+gust-search-do-not-disturb-on = Cas air Ná cuir isteach orm
+gust-search-do-not-disturb-off = Cas as Ná cuir isteach orm
+gust-search-do-not-disturb-keywords = ná cuir isteach orm, fócas, ciúin, ciúnas, balbhaigh fógraí, ciúnaigh fógraí, do not disturb, dnd, focus
+gust-search-wifi-on = Cas air Wi-Fi
+gust-search-wifi-off = Cas as Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, gan sreang, líonra gan sreang, wireless, wlan
+gust-search-bluetooth-on = Cas air Bluetooth
+gust-search-bluetooth-off = Cas as Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Cas air mód eitleáin
+gust-search-airplane-mode-off = Cas as mód eitleáin
+gust-search-airplane-mode-keywords = mód eitleáin, eitleán, mód eitilte, raidiónna, airplane mode, flight mode
+gust-search-keep-awake-on = Coinnigh múscailte
+gust-search-keep-awake-off = Ná coinnigh múscailte níos mó
+gust-search-keep-awake-keywords = coinnigh múscailte, fan múscailte, ná téigh a chodladh, cosc ar chodladh, caiféin, keep awake, caffeine
+gust-search-lock-keywords = scáileán glasála, glasáil, glasáil an ríomhaire, lock screen
+gust-search-suspend-keywords = codladh, fuireachas, sleep, standby
+gust-search-log-out-keywords = sínigh amach, logáil amach, críochnaigh an seisiún, log out, sign out
+gust-search-restart-keywords = atosaigh, atosaigh an ríomhaire, atosú, reboot, restart
+gust-search-power-off-keywords = múch, múch an ríomhaire, cas as an ríomhaire, shut down, shutdown, power off
 
 ## Quick settings
 

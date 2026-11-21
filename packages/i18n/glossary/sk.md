@@ -24,7 +24,6 @@ Prefer sentences without a person: „Aktualizácie sa nainštalujú pri ďalšo
 ## Names
 
 - Settings, Disks and Install Luft are Nastavenia, Disky and Inštalovať Luft.
-- Start stays Start; write „ponuka Start“ when it has to inflect: „v ponuke Start“.
 - Don't inflect app names; put the kind of thing first: „v aplikácii Rover“. Luft and Kestrel inflect as inanimate masculine nouns when they must („do Luftu“, „v Kestreli“).
 - Trademarks follow the noun they describe: „adaptér Bluetooth“, „sieť Wi-Fi“.
 

@@ -38,7 +38,6 @@ Maltese software keeps many English words, and Luft follows Windows in Maltese: 
 
 - Names take no article and don't change: “Rover huwa miftuħ”. When a sentence needs an article or gender: “l-app Rover hija magħluqa”, since app is feminine. Luft is masculine.
 - Settings stays Settings, as in Windows, with the plural article: “fis-Settings”. Disks and Install Luft are Diski and Installa Luft.
-- Start stays Start: “il-menù Start”.
 
 ## Plurals
 
@@ -59,7 +58,6 @@ notifications-count = { $count ->
 | English | Maltese | Not | Why |
 | --- | --- | --- | --- |
 | Settings | Settings | Konfigurazzjoni | Windows in Maltese keeps it in English |
-| Start | Start | Bidu, Ibda | People know the menu as Start, as current Windows has it |
 | taskbar | taskbar | bar tal-kompiti | Windows in Maltese |
 | board | bord | tabella | Short and already Maltese |
 | All windows | It-twieqi kollha | Wiri tal-kompiti | What Luft calls the task view |

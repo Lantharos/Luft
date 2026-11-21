@@ -256,30 +256,30 @@ async function checkEmoji(search: St.Entry) {
   await capture('tablet-keyboard-emoji');
   const emoji = styled('keyboard-key', shownStyled('emoji-page', keyboard()!)!).find(candidate => candidate.mapped)!;
   await tap(centerOf(emoji));
-  await eventually(() => search.get_text() === `q${labelOf(emoji)}`, 'tapping an emoji writes it into the Start search');
+  await eventually(() => search.get_text() === `q${labelOf(emoji)}`, 'tapping an emoji writes it into the Gust search');
   await tap(centerOf(labelled('ABC', emojiPane()!)!));
   await eventually(() => !emojiPane() && shown(labelled('q', keyboard()!)), 'the letters key brings the letters back');
 }
 
-async function checkStart() {
-  toggleSurface('start');
-  const start = named('kestrel-start')!;
-  await eventually(() => shown(start), 'Start opens');
-  const search = descendants(start).find((actor): actor is St.Entry => actor instanceof St.Entry)!;
-  await tapsOpen('the search in Start', centerOf(search));
+async function checkGust() {
+  toggleSurface('gust');
+  const gust = named('kestrel-gust-panel')!;
+  await eventually(() => shown(gust), 'Gust opens');
+  const search = descendants(gust).find((actor): actor is St.Entry => actor instanceof St.Entry)!;
+  await tapsOpen('the search in Gust', centerOf(search));
   await settled();
 
-  require(coversPoint(centerOf(keyboard()!)), 'the on-screen keyboard sits above Start');
-  require(bottomOf(search) <= keyboardTop(), 'the Start search stays visible above the keyboard');
-  require(bottomOf(start) <= keyboardTop(), 'Start makes room for the keyboard');
+  require(coversPoint(centerOf(keyboard()!)), 'the on-screen keyboard sits above Gust');
+  require(bottomOf(search) <= keyboardTop(), 'the Gust search stays visible above the keyboard');
+  require(bottomOf(gust) <= keyboardTop(), 'Gust makes room for the keyboard');
   await tap(centerOf(labelled('q', keyboard()!)!));
-  await eventually(() => search.get_text() === 'q', 'typing on the on-screen keyboard writes into the Start search');
-  require(search.clutter_text.has_key_focus() && keyboardShown(), 'the Start search keeps focus while the keyboard types');
-  await capture('tablet-keyboard-start');
+  await eventually(() => search.get_text() === 'q', 'typing on the on-screen keyboard writes into the Gust search');
+  require(search.clutter_text.has_key_focus() && keyboardShown(), 'the Gust search keeps focus while the keyboard types');
+  await capture('tablet-keyboard-gust');
   await checkEmoji(search);
 
-  await hide('Start closes', () => toggleSurface('start'));
-  await eventually(() => !shown(start), 'Start closes');
+  await hide('Gust closes', () => toggleSurface('gust'));
+  await eventually(() => !shown(gust), 'Gust closes');
 }
 
 async function checkLayers() {
@@ -321,7 +321,7 @@ export async function run() {
     await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND, {tapsBesideField: true});
     await checkToolkit('an Xwayland window', () => gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
       Meta.WindowClientType.X11);
-    await checkStart();
+    await checkGust();
     await checkLayers();
     await checkLockScreen();
     await checkSabine();

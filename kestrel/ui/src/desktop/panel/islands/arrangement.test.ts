@@ -12,8 +12,8 @@ const overlap = (a: { x: number; y: number; width: number; height: number }, b: 
 
 describe('reading a stored arrangement', () => {
   test('keeps each element in the first island that names it and drops unknown spots and empty islands', () => {
-    expect(parseArrangement([['bottom-center', ['start', 'dock']], ['middle', ['tray']], ['top-end', ['dock', 'clock']], ['left-start', []]]))
-      .toEqual([{ spot: 'bottom-center', elements: ['start', 'dock'] }, { spot: 'top-end', elements: ['clock'] }]);
+    expect(parseArrangement([['bottom-center', ['gust', 'dock']], ['middle', ['tray']], ['top-end', ['dock', 'clock']], ['left-start', []]]))
+      .toEqual([{ spot: 'bottom-center', elements: ['gust', 'dock'] }, { spot: 'top-end', elements: ['clock'] }]);
   });
 
   test('merges islands stored twice at one spot', () => {
@@ -21,7 +21,7 @@ describe('reading a stored arrangement', () => {
   });
 
   test('stores and reads back the same arrangement', () => {
-    const arrangement: Arrangement = [{ spot: 'left-center', elements: ['start', 'dock'] }, { spot: 'top-end', elements: ['tray', 'status', 'clock'] }];
+    const arrangement: Arrangement = [{ spot: 'left-center', elements: ['gust', 'dock'] }, { spot: 'top-end', elements: ['tray', 'status', 'clock'] }];
     expect(parseArrangement(storeArrangement(arrangement))).toEqual(arrangement);
   });
 });
@@ -31,12 +31,12 @@ describe('placing elements that are missing', () => {
     expect(completeArrangement(DEFAULT_ARRANGEMENT, ['media/now-playing'])[1].elements).toEqual(['media/now-playing', 'tray', 'status', 'clock']);
   });
 
-  test('puts Start back in front of the dock wherever the dock went', () => {
-    expect(completeArrangement([{ spot: 'left-center', elements: ['dock'] }], ['start'])).toEqual([{ spot: 'left-center', elements: ['start', 'dock'] }]);
+  test('puts Gust back in front of the dock wherever the dock went', () => {
+    expect(completeArrangement([{ spot: 'left-center', elements: ['dock'] }], ['gust'])).toEqual([{ spot: 'left-center', elements: ['gust', 'dock'] }]);
   });
 
   test('gives an element with no neighbours left an island at its usual spot', () => {
-    expect(completeArrangement([{ spot: 'top-center', elements: ['start', 'dock'] }], ['clock'])).toContainEqual({ spot: 'bottom-end', elements: ['clock'] });
+    expect(completeArrangement([{ spot: 'top-center', elements: ['gust', 'dock'] }], ['clock'])).toContainEqual({ spot: 'bottom-end', elements: ['clock'] });
   });
 
   test('a preset keeps extension elements next to the tray', () => {
@@ -48,21 +48,21 @@ describe('placing elements that are missing', () => {
 describe('editing', () => {
   test('moving an island onto another one trades their spots', () => {
     expect(moveIsland(DEFAULT_ARRANGEMENT, 'bottom-center', 'bottom-end')).toEqual([
-      { spot: 'bottom-end', elements: ['start', 'dock'] },
+      { spot: 'bottom-end', elements: ['gust', 'dock'] },
       { spot: 'bottom-center', elements: ['tray', 'status', 'clock'] },
     ]);
   });
 
-  test('moving Start onto a free spot gives it an island of its own', () => {
-    const moved = moveElement(DEFAULT_ARRANGEMENT, 'start', 'bottom-start');
-    expect(moved).toContainEqual({ spot: 'bottom-start', elements: ['start'] });
+  test('moving Gust onto a free spot gives it an island of its own', () => {
+    const moved = moveElement(DEFAULT_ARRANGEMENT, 'gust', 'bottom-start');
+    expect(moved).toContainEqual({ spot: 'bottom-start', elements: ['gust'] });
     expect(moved).toContainEqual({ spot: 'bottom-center', elements: ['dock'] });
   });
 
   test('moving the last element out of an island removes the island', () => {
-    const alone = moveElement(DEFAULT_ARRANGEMENT, 'start', 'top-start');
-    expect(moveElement(alone, 'start', 'bottom-center', 0)).toEqual([
-      { spot: 'bottom-center', elements: ['start', 'dock'] },
+    const alone = moveElement(DEFAULT_ARRANGEMENT, 'gust', 'top-start');
+    expect(moveElement(alone, 'gust', 'bottom-center', 0)).toEqual([
+      { spot: 'bottom-center', elements: ['gust', 'dock'] },
       { spot: 'bottom-end', elements: ['tray', 'status', 'clock'] },
     ]);
   });
@@ -73,9 +73,9 @@ describe('editing', () => {
   });
 
   test('moving a joined bar to another edge keeps each group where it sits along the bar', () => {
-    const groups = [{ spot: 'bottom-start', elements: ['start'] }, { spot: 'bottom-center', elements: ['dock'] }, { spot: 'top-end', elements: ['clock'] }] as Arrangement;
+    const groups = [{ spot: 'bottom-start', elements: ['gust'] }, { spot: 'bottom-center', elements: ['dock'] }, { spot: 'top-end', elements: ['clock'] }] as Arrangement;
     expect(moveBar(groups, 'left')).toEqual([
-      { spot: 'left-start', elements: ['start'] },
+      { spot: 'left-start', elements: ['gust'] },
       { spot: 'left-center', elements: ['dock'] },
       { spot: 'left-end', elements: ['clock'] },
     ]);
@@ -89,7 +89,7 @@ describe('editing', () => {
 });
 
 describe('fitting islands along an edge', () => {
-  const apps = (length: number) => ({ chrome: 8, spacing: 2, parts: [{ id: 'start', length: 40 }, { id: 'dock', length, least: 42 }] });
+  const apps = (length: number) => ({ chrome: 8, spacing: 2, parts: [{ id: 'gust', length: 40 }, { id: 'dock', length, least: 42 }] });
   const system = { chrome: 8, spacing: 2, parts: [{ id: 'weather', length: 120, rank: 0 }, { id: 'tray', length: 40, rank: 1 }, { id: 'status', length: 80 }, { id: 'clock', length: 70, rank: 2 }] };
 
   test('leaves islands that fit as they are and offers the apps the room that is left', () => {
@@ -166,7 +166,7 @@ describe('arranging with the arrow keys', () => {
   });
 
   test('past the end of its island, an element goes to the next spot that way', () => {
-    expect(stepElement(DEFAULT_ARRANGEMENT, 'start', [-1, 0], targets, false, false)).toContainEqual({ spot: 'bottom-start', elements: ['start'] });
+    expect(stepElement(DEFAULT_ARRANGEMENT, 'gust', [-1, 0], targets, false, false)).toContainEqual({ spot: 'bottom-start', elements: ['gust'] });
   });
 
   test('on a joined bar, an island moved to another edge takes the whole bar along', () => {

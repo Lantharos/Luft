@@ -104,7 +104,7 @@ Each is turned into the store's WebP with `cwebp -q 80`, keeping the file's name
 
 ## Frame timing
 
-`frames` opens Start, Gust, quick settings, the notification center, the overview, the emoji picker and the lock screen's prompt once, as they first open after signing in, and then again. It types into Start and Gust, moves, opens and closes windows under glass, enters and zooms a board, tiles windows, steps through a scrolling strip, locks and unlocks, and turns on Phosphor's main effects. Each interaction runs three times for timing and twice more to time the GPU. For each it prints the time to the first frame, missed refreshes, slow frames, CPU, update, layout and GPU time a frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
+`frames` opens both looks of Gust, quick settings, the notification center, the overview, the emoji picker and the lock screen's prompt once, as they first open after signing in, and then again. It types into both looks of Gust, moves, opens and closes windows under glass, enters and zooms a board, tiles windows, steps through a scrolling strip, locks and unlocks, and turns on Phosphor's main effects. Each interaction runs three times for timing and twice more to time the GPU. For each it prints the time to the first frame, missed refreshes, slow frames, CPU, update, layout and GPU time a frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
 
 | Variable | Purpose |
 | --- | --- |

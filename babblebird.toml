@@ -11,7 +11,7 @@ name = "Desktop"
 files = ["kestrel/ui/locales/{lang}/desktop.ftl"]
 
 [[areas]]
-name = "Start and quick settings"
+name = "Gust and quick settings"
 files = ["kestrel/ui/locales/{lang}/surfaces.ftl"]
 
 [[areas]]

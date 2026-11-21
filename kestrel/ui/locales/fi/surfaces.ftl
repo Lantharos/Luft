@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Hae sovelluksia, tiedostoja ja muuta
-start-search-cut = Leikkaa
-start-search-copy = Kopioi
-start-search-paste = Liitä
-start-search-select-all = Valitse kaikki
-start-power = Virta ja istunto
-start-power-close = Sulje virta-asetukset
-start-account-settings = Tilin asetukset
-start-apps = Sovellukset
-start-folder-default-name = Kansio
-start-folder-open = Avaa kansio
-start-folder-rename = Nimeä uudelleen
-start-folder-ungroup = Pura ryhmä
-start-open = Avaa
-start-move-to-apps = Siirrä sovelluksiin
+gust-search-placeholder = Hae sovelluksia, tiedostoja ja muuta
+gust-search-cut = Leikkaa
+gust-search-copy = Kopioi
+gust-search-paste = Liitä
+gust-search-select-all = Valitse kaikki
+gust-power = Virta ja istunto
+gust-power-close = Sulje virta-asetukset
+gust-account-settings = Tilin asetukset
+gust-apps = Sovellukset
+gust-folder-default-name = Kansio
+gust-folder-open = Avaa kansio
+gust-folder-rename = Nimeä uudelleen
+gust-folder-ungroup = Pura ryhmä
+gust-open = Avaa
+gust-move-to-apps = Siirrä sovelluksiin
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Paras vastine
-start-search-group-apps = Sovellukset
-start-search-group-commands = Sovellusten toiminnot
-start-search-group-windows = Avoimet ikkunat
-start-search-group-actions = Toiminnot
-start-search-group-settings = Asetukset
-start-search-group-clipboard = Leikepöytä
-start-search-group-emoji = Emojit
-start-search-group-files = Tiedostot
-start-search-group-contents = Tiedostojen sisältö
-start-search-group-web = Verkko
-start-search-web = Hae verkosta ”{ $query }”
-start-search-clipboard-text = Leikepöydän historiasta
-start-search-clipboard-keywords = leikepöytä, kopioitu, kopioi, leikepöydän historia, liitä, clipboard
-start-search-emoji-insert = Lisää
-start-search-settings-page = Asetukset
-start-search-settings-section = Asetukset: { $page }
-start-search-file-reveal = Näytä { $fileManager } -sovelluksessa
-start-search-file-copy-path = Kopioi polku
-start-search-conversion = { $amount } { $from } yksikkönä { $to }
-start-search-calculation = { $expression }, kopioi painamalla Enter
+gust-search-best-match = Paras vastine
+gust-search-group-apps = Sovellukset
+gust-search-group-commands = Sovellusten toiminnot
+gust-search-group-windows = Avoimet ikkunat
+gust-search-group-actions = Toiminnot
+gust-search-group-settings = Asetukset
+gust-search-group-clipboard = Leikepöytä
+gust-search-group-emoji = Emojit
+gust-search-group-files = Tiedostot
+gust-search-group-contents = Tiedostojen sisältö
+gust-search-group-web = Verkko
+gust-search-web = Hae verkosta ”{ $query }”
+gust-search-clipboard-text = Leikepöydän historiasta
+gust-search-clipboard-keywords = leikepöytä, kopioitu, kopioi, leikepöydän historia, liitä, clipboard
+gust-search-emoji-insert = Lisää
+gust-search-settings-page = Asetukset
+gust-search-settings-section = Asetukset: { $page }
+gust-search-file-reveal = Näytä { $fileManager } -sovelluksessa
+gust-search-file-copy-path = Kopioi polku
+gust-search-conversion = { $amount } { $from } yksikkönä { $to }
+gust-search-calculation = { $expression }, kopioi painamalla Enter
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = { $date } asti
-start-search-answer-since = { $date } lähtien
-start-search-answer-between = Aikaväli { $from } – { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = { $date } asti
+gust-search-answer-since = { $date } lähtien
+gust-search-answer-between = Aikaväli { $from } – { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } tunti
    *[other] { $hours } tuntia
 } edellä
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } tunti
    *[other] { $hours } tuntia
 } jäljessä
-start-search-answer-time-same = { $place }, sama aika kuin täällä
-start-search-answer-converted = { $place }, kun kello on { $time } kohteessa { $from }
-start-search-answer-converted-here = Täällä, kun kello on { $time } kohteessa { $from }
-start-search-answer-converted-from-here = { $place }, kun kello on täällä { $time }
+gust-search-answer-time-same = { $place }, sama aika kuin täällä
+gust-search-answer-converted = { $place }, kun kello on { $time } kohteessa { $from }
+gust-search-answer-converted-here = Täällä, kun kello on { $time } kohteessa { $from }
+gust-search-answer-converted-from-here = { $place }, kun kello on täällä { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Vaihda tummaan tilaan
-start-search-dark-style-off = Vaihda vaaleaan tilaan
-start-search-dark-style-keywords = tumma tila, tumma teema, vaalea tila, vaalea teema, yötila, dark mode, light mode
-start-search-night-light-on = Ota Yövalo käyttöön
-start-search-night-light-off = Poista Yövalo käytöstä
-start-search-night-light-keywords = yövalo, sininen valo, lämpimät värit, yötila, night light
-start-search-do-not-disturb-on = Ota Älä häiritse käyttöön
-start-search-do-not-disturb-off = Poista Älä häiritse käytöstä
-start-search-do-not-disturb-keywords = älä häiritse, keskittyminen, hiljainen, mykistä ilmoitukset, hiljennä ilmoitukset, do not disturb, dnd
-start-search-wifi-on = Kytke Wi-Fi päälle
-start-search-wifi-off = Kytke Wi-Fi pois
-start-search-wifi-keywords = wifi, wi-fi, langaton, langaton verkko, wlan
-start-search-bluetooth-on = Kytke Bluetooth päälle
-start-search-bluetooth-off = Kytke Bluetooth pois
-start-search-bluetooth-keywords = bluetooth, langaton
-start-search-airplane-mode-on = Ota lentokonetila käyttöön
-start-search-airplane-mode-off = Poista lentokonetila käytöstä
-start-search-airplane-mode-keywords = lentokonetila, lentotila, radiot, airplane mode
-start-search-keep-awake-on = Pidä hereillä
-start-search-keep-awake-off = Lopeta hereillä pitäminen
-start-search-keep-awake-keywords = pidä hereillä, pysy hereillä, estä lepotila, kofeiini, caffeine
-start-search-lock-keywords = lukitse, lukitusnäyttö, lukitse tietokone
-start-search-suspend-keywords = lepotila, valmiustila, nukkumaan, sleep
-start-search-log-out-keywords = kirjaudu ulos, uloskirjautuminen, lopeta istunto, log out
-start-search-restart-keywords = käynnistä uudelleen, uudelleenkäynnistys, restart, reboot
-start-search-power-off-keywords = sammuta, sammuta tietokone, virta pois, shutdown
+gust-search-dark-style-on = Vaihda tummaan tilaan
+gust-search-dark-style-off = Vaihda vaaleaan tilaan
+gust-search-dark-style-keywords = tumma tila, tumma teema, vaalea tila, vaalea teema, yötila, dark mode, light mode
+gust-search-night-light-on = Ota Yövalo käyttöön
+gust-search-night-light-off = Poista Yövalo käytöstä
+gust-search-night-light-keywords = yövalo, sininen valo, lämpimät värit, yötila, night light
+gust-search-do-not-disturb-on = Ota Älä häiritse käyttöön
+gust-search-do-not-disturb-off = Poista Älä häiritse käytöstä
+gust-search-do-not-disturb-keywords = älä häiritse, keskittyminen, hiljainen, mykistä ilmoitukset, hiljennä ilmoitukset, do not disturb, dnd
+gust-search-wifi-on = Kytke Wi-Fi päälle
+gust-search-wifi-off = Kytke Wi-Fi pois
+gust-search-wifi-keywords = wifi, wi-fi, langaton, langaton verkko, wlan
+gust-search-bluetooth-on = Kytke Bluetooth päälle
+gust-search-bluetooth-off = Kytke Bluetooth pois
+gust-search-bluetooth-keywords = bluetooth, langaton
+gust-search-airplane-mode-on = Ota lentokonetila käyttöön
+gust-search-airplane-mode-off = Poista lentokonetila käytöstä
+gust-search-airplane-mode-keywords = lentokonetila, lentotila, radiot, airplane mode
+gust-search-keep-awake-on = Pidä hereillä
+gust-search-keep-awake-off = Lopeta hereillä pitäminen
+gust-search-keep-awake-keywords = pidä hereillä, pysy hereillä, estä lepotila, kofeiini, caffeine
+gust-search-lock-keywords = lukitse, lukitusnäyttö, lukitse tietokone
+gust-search-suspend-keywords = lepotila, valmiustila, nukkumaan, sleep
+gust-search-log-out-keywords = kirjaudu ulos, uloskirjautuminen, lopeta istunto, log out
+gust-search-restart-keywords = käynnistä uudelleen, uudelleenkäynnistys, restart, reboot
+gust-search-power-off-keywords = sammuta, sammuta tietokone, virta pois, shutdown
 
 ## Quick settings
 

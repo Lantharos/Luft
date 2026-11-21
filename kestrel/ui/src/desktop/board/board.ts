@@ -49,7 +49,7 @@ interface BoardHost {
   addChrome(actor: Clutter.Actor): void;
   setPanelsHidden(hidden: boolean): void;
   openQuickSettings(): void;
-  openStart(): void;
+  openGust(): void;
   changed(): void;
   canInteract(): boolean;
 }
@@ -93,7 +93,7 @@ export class Board implements BoardActions {
     });
     this.corner = new Corner({
       openQuickSettings: () => host.openQuickSettings(),
-      openStart: () => host.openStart(),
+      openGust: () => host.openGust(),
       overview: () => this.overview(),
       enterApp: app => this.enterApp(app),
     });

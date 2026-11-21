@@ -27,7 +27,6 @@ Address the reader as tú, as Windows and macOS do: «Puedes cambiarlo más tard
 ## Names
 
 - Settings, Disks and Install Luft are Configuración, Discos and Instalar Luft.
-- Start is Inicio, as in Windows: «el menú Inicio», «busca en Inicio».
 - App names don't inflect and take no article on their own: «Rover está abierto». When a sentence needs an article, add the kind of thing: «la aplicación Rover».
 
 ## Plurals
@@ -65,7 +64,7 @@ windows-open = { $count ->
 | clear, erase | borrar | quitar, eliminar | Windows' word for clearing history and erasing a disk |
 | passphrase | frase de contraseña | contraseña | Microsoft's term; apart from the account password |
 | input source | fuente de entrada | origen de entrada | GNOME's word |
-| home folder | carpeta personal | carpeta de inicio | GNOME's word; Inicio is the Start menu |
+| home folder | carpeta personal | carpeta de inicio | GNOME's word |
 | metered connection | conexión de uso medido | conexión medida | Windows' word |
 | driver | controlador | driver | Windows' word |
 | plugged in | enchufado | conectado | Says plainly that it's on mains power |

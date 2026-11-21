@@ -75,18 +75,11 @@ settings-appearance-text-size = Teksta lielums
 ## Taskbar
 
 settings-taskbar-preview = Uzdevumjoslas priekšskatījums
-settings-start-section = Start
-settings-start-style = Stils
-settings-start-style-menu = Izvēlne
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Meklēšana, lietotnes un mapes blakus uzdevumjoslai
-settings-start-style-palette-description = Meklēšanas josla ekrāna vidū lietotnēm, logiem, failiem un atbildēm
-settings-start-button = Rādīt pogu Start
-settings-start-button-description = Taustiņš Super jebkurā gadījumā atver izvēlni Start
-settings-start-web = Tīmekļa meklētājs
+settings-gust-look-panel-description = Meklēšana, lietotnes un mapes blakus uzdevumjoslai
+settings-gust-look-palette-description = Meklēšanas josla ekrāna vidū lietotnēm, logiem, failiem un atbildēm
+settings-gust-web = Tīmekļa meklētājs
 settings-taskbar-shown = Rādīt uzdevumjoslu
 settings-taskbar-hidden = Paslēpta
-settings-taskbar-hidden-description = Pulkstenis un statusa ikonas paliek stūrī, un taustiņš Super atver izvēlni Start
 settings-taskbar-look = Fons
 settings-taskbar-look-glass = Stikls
 settings-taskbar-look-solid = Vienkrāsains

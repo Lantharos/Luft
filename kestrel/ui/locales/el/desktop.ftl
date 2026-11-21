@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Start
 taskbar-quick-settings = Γρήγορες ρυθμίσεις
 taskbar-notifications-and-date = Ειδοποιήσεις και ημερομηνία
 taskbar-show-desktop = Εμφάνιση επιφάνειας εργασίας
@@ -43,7 +42,6 @@ tray-open-app = Άνοιγμα: { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Άνοιγμα του Start
 board-show-all-windows = Εμφάνιση όλων των παραθύρων
 board-quick-settings = Γρήγορες ρυθμίσεις
 

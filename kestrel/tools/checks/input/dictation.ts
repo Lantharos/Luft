@@ -71,7 +71,7 @@ const usesMicrophone = () => {
   const icons = named('kestrel-privacy');
   return icons?.visible && descendants(icons).some(actor => actor instanceof St.Icon && actor.icon_name === 'audio-input-microphone-symbolic');
 };
-const start = () => existing('kestrel-start');
+const gust = () => existing('kestrel-gust-panel');
 const words = (text: string) => text.toLowerCase().split(/[^\p{L}\p{N}']+/u).filter(Boolean);
 const entryText = (window: Meta.Window) => window.title.match(/^Kestrel entry: (.*?)(?: \[.*\])?$/)?.[1] ?? '';
 const preedit = (window: Meta.Window) => window.title.match(/\[(.+)\]$/)?.[1] ?? '';
@@ -135,7 +135,7 @@ function sitsAboveTaskbar(pill: Clutter.Actor) {
 }
 
 async function callSpeech(method: string) {
-  await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', SPEECH, method, method === 'Start' ? new GLib.Variant('(s)', ['us']) : null,
+  await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', SPEECH, method, method === 'Gust' ? new GLib.Variant('(s)', ['us']) : null,
     null, Gio.DBusCallFlags.NONE, -1, null);
 }
 
@@ -186,7 +186,7 @@ async function checkPill() {
   await pause(1000);
   require(entryText(window) === before && !privacy().visible, 'nothing is typed after Escape and the microphone is closed');
 
-  await callSpeech('Start');
+  await callSpeech('Gust');
   await eventually(() => intoRecorder(MICROPHONE, {'node.name': 'pw-record', 'application.id': 'com.lantharos.Speech'}), 'the microphone reaches dictation started elsewhere');
   await eventually(usesMicrophone, 'dictation started by something other than Kestrel shows in the privacy indicator');
   await callSpeech('Cancel');
@@ -209,21 +209,21 @@ async function checkPress(copilotKey: Gio.Settings) {
   copilotKey.set_string('press', 'search');
   holdCopilot();
   releaseCopilot();
-  await eventually(() => shown(start()), 'a press of the Copilot key opens Start');
+  await eventually(() => shown(gust()), 'a press of the Copilot key opens Gust');
   require(!shown(indicator()), 'a press doesn’t start dictating');
   holdCopilot();
   releaseCopilot();
-  await eventually(() => !start().visible, 'another press closes Start again');
+  await eventually(() => !gust().visible, 'another press closes Gust again');
 
   copilotKey.set_boolean('hold', false);
   holdCopilot();
-  await eventually(() => shown(start()), 'with holding turned off, the Copilot key opens Start as soon as it goes down');
+  await eventually(() => shown(gust()), 'with holding turned off, the Copilot key opens Gust as soon as it goes down');
   await pause(HOLD_MS);
   require(!shown(indicator()), 'holding the Copilot key doesn’t dictate when its hold is turned off');
   releaseCopilot();
   holdCopilot();
   releaseCopilot();
-  await eventually(() => !start().visible, 'pressing it again closes Start');
+  await eventually(() => !gust().visible, 'pressing it again closes Gust');
   copilotKey.reset('hold');
 }
 
@@ -251,13 +251,13 @@ async function checkChordKeepsShortcuts() {
   holdKeys(SUPER_ALT);
   releaseKeys(SUPER_ALT);
   await pause(400);
-  require(!shown(start()), 'letting go of Super and Alt doesn’t open Start');
+  require(!shown(gust()), 'letting go of Super and Alt doesn’t open Gust');
   holdKeys(ALT_SUPER);
   tapKey(KEY_J);
   await pause(HOLD_MS);
   releaseKeys(ALT_SUPER);
   await pause(400);
-  require(!shown(indicator()) && !offeredSetup() && !shown(start()), 'Super and Alt with another key, held in either order, leave dictation alone');
+  require(!shown(indicator()) && !offeredSetup() && !shown(gust()), 'Super and Alt with another key, held in either order, leave dictation alone');
   holdKeys([KEY_LEFTALT, KEY_TAB]);
   releaseKeys([KEY_TAB]);
   holdKeys([KEY_LEFTMETA]);
@@ -266,10 +266,10 @@ async function checkChordKeepsShortcuts() {
   await pause(400);
   require(!shown(indicator()) && !offeredSetup(), 'Alt+Tab followed by Super doesn’t dictate');
   tapKey(KEY_LEFTMETA);
-  await eventually(() => shown(start()), 'a press of Super alone still opens Start');
+  await eventually(() => shown(gust()), 'a press of Super alone still opens Gust');
   await pause(SUPER_DOUBLE_TAP_MS);
   tapKey(KEY_LEFTMETA);
-  await eventually(() => !start().visible, 'and closes it again');
+  await eventually(() => !gust().visible, 'and closes it again');
 }
 
 async function scrollOver(window: Meta.Window) {

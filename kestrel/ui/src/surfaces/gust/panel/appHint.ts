@@ -3,10 +3,10 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import * as Main from '../../core/main.js';
-import { PILL, styleSurface } from '../../appearance/glass/kestrelGlass.js';
-import { clamp } from '../../shared/math.js';
-import { Curve, Duration } from '../../shared/motion/motion.js';
+import * as Main from '../../../core/main.js';
+import { PILL, styleSurface } from '../../../appearance/glass/kestrelGlass.js';
+import { clamp } from '../../../shared/math.js';
+import { Curve, Duration } from '../../../shared/motion/motion.js';
 
 const DELAY = 500;
 const GAP = 6;
@@ -17,7 +17,7 @@ export function appKind(app: Gio.AppInfo, name: string): string | null {
 }
 
 export class AppHint {
-  private readonly label = new St.Label({ style_class: 'kestrel-start-hint', visible: false });
+  private readonly label = new St.Label({ style_class: 'kestrel-gust-hint', visible: false });
   private timeout = 0;
   private target: St.Widget | null = null;
 

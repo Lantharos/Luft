@@ -21,40 +21,40 @@ interface Toggle {
 const TOGGLES: Toggle[] = [
   {
     key: 'dark-style', control: source => source.darkMode.quickSettingsItems[0], icon: 'dark-mode-symbolic',
-    turnOn: 'start-search-dark-style-on', turnOff: 'start-search-dark-style-off', keywords: 'start-search-dark-style-keywords',
+    turnOn: 'gust-search-dark-style-on', turnOff: 'gust-search-dark-style-off', keywords: 'gust-search-dark-style-keywords',
   },
   {
     key: 'night-light', control: source => source.nightLight.quickSettingsItems[0], icon: 'night-light-symbolic',
-    turnOn: 'start-search-night-light-on', turnOff: 'start-search-night-light-off', keywords: 'start-search-night-light-keywords',
+    turnOn: 'gust-search-night-light-on', turnOff: 'gust-search-night-light-off', keywords: 'gust-search-night-light-keywords',
   },
   {
     key: 'do-not-disturb', control: source => source.doNotDisturb.quickSettingsItems[0], icon: 'notifications-disabled-symbolic',
-    turnOn: 'start-search-do-not-disturb-on', turnOff: 'start-search-do-not-disturb-off', keywords: 'start-search-do-not-disturb-keywords',
+    turnOn: 'gust-search-do-not-disturb-on', turnOff: 'gust-search-do-not-disturb-off', keywords: 'gust-search-do-not-disturb-keywords',
   },
   {
     key: 'wifi', control: source => source.network.wirelessToggle, icon: 'network-wireless-symbolic',
-    turnOn: 'start-search-wifi-on', turnOff: 'start-search-wifi-off', keywords: 'start-search-wifi-keywords',
+    turnOn: 'gust-search-wifi-on', turnOff: 'gust-search-wifi-off', keywords: 'gust-search-wifi-keywords',
   },
   {
     key: 'bluetooth', control: source => source.bluetooth?.quickSettingsItems[0], icon: 'bluetooth-active-symbolic',
-    turnOn: 'start-search-bluetooth-on', turnOff: 'start-search-bluetooth-off', keywords: 'start-search-bluetooth-keywords',
+    turnOn: 'gust-search-bluetooth-on', turnOff: 'gust-search-bluetooth-off', keywords: 'gust-search-bluetooth-keywords',
   },
   {
     key: 'airplane-mode', control: source => source.rfkill.quickSettingsItems[0], icon: 'airplane-mode-symbolic',
-    turnOn: 'start-search-airplane-mode-on', turnOff: 'start-search-airplane-mode-off', keywords: 'start-search-airplane-mode-keywords',
+    turnOn: 'gust-search-airplane-mode-on', turnOff: 'gust-search-airplane-mode-off', keywords: 'gust-search-airplane-mode-keywords',
   },
   {
     key: 'keep-awake', control: source => source.caffeine.quickSettingsItems[0], icon: 'view-reveal-symbolic',
-    turnOn: 'start-search-keep-awake-on', turnOff: 'start-search-keep-awake-off', keywords: 'start-search-keep-awake-keywords',
+    turnOn: 'gust-search-keep-awake-on', turnOff: 'gust-search-keep-awake-off', keywords: 'gust-search-keep-awake-keywords',
   },
 ];
 
 const SESSION_KEYWORDS = new Map<SessionAction, string>([
-  [LOCK, 'start-search-lock-keywords'],
-  [POWER_ACTIONS[0], 'start-search-suspend-keywords'],
-  [POWER_ACTIONS[1], 'start-search-log-out-keywords'],
-  [POWER_ACTIONS[2], 'start-search-restart-keywords'],
-  [POWER_ACTIONS[3], 'start-search-power-off-keywords'],
+  [LOCK, 'gust-search-lock-keywords'],
+  [POWER_ACTIONS[0], 'gust-search-suspend-keywords'],
+  [POWER_ACTIONS[1], 'gust-search-log-out-keywords'],
+  [POWER_ACTIONS[2], 'gust-search-restart-keywords'],
+  [POWER_ACTIONS[3], 'gust-search-power-off-keywords'],
 ]);
 
 const searchWords = (message: string) => t(message).split(',').map(keyword => keyword.trim()).filter(Boolean);

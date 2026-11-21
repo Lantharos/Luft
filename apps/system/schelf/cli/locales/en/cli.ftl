@@ -184,8 +184,8 @@ cli-install-run-as = Run it as { $command }.
 cli-install-commands = Its commands are { $commands }.
 # $count is how many more commands it brings than are named
 cli-install-commands-and-more = Its commands are { $commands }, and { $count } more.
-cli-install-open-or-run = Open it from Start, or run { $command }.
-cli-install-open = Open it from Start.
+cli-install-open-or-run = Open it from Gust, or run { $command }.
+cli-install-open = Open it from Gust.
 cli-install-system-file-updates = It's part of the system now, and updates with { -luft }.
 cli-install-system-file = It's part of the system now. It doesn't get updates of its own, so remove it and install a newer file when one comes out.
 # $names is a list of what's about to be installed

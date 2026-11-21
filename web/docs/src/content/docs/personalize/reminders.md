@@ -34,7 +34,7 @@ Type it the way you'd say it, in English, in the field at the top. As you type, 
 | stretch in 30 minutes | Half an hour from now |
 | buy stamps | A to-do with no date |
 
-An hour without am or pm is a working hour, so "at 3" means the afternoon and "at 9" the morning. You can also add one from Start: type "dentist friday 4pm" into search and pick **Add reminder**, or search for a reminder you already have.
+An hour without am or pm is a working hour, so "at 3" means the afternoon and "at 9" the morning. You can also add one from Gust: type "dentist friday 4pm" into search and pick **Add reminder**, or search for a reminder you already have.
 
 Click a reminder to snooze it, edit it or delete it. The circle in front of it checks it off, and both can be undone until you close the list. A repeating reminder moves on to its next date when you check it off.
 

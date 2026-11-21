@@ -281,7 +281,6 @@ settings-keyboard-shortcuts-description = Vedeți și schimbați comenzile rapid
 settings-keyboard-copilot = Tasta Copilot
 settings-keyboard-copilot-press = Apăsare
 settings-keyboard-copilot-press-description = Ce face o apăsare scurtă a tastei
-settings-keyboard-copilot-open-start = Deschide meniul Start
 settings-keyboard-copilot-open-app = Deschide o aplicație
 settings-keyboard-copilot-nothing = Nimic
 settings-keyboard-copilot-app = Aplicație

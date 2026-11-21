@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-import { iconPixels, laidOutX, pixelScale } from '../../shared/display/graphics.js';
-import { contentBoxOf } from '../../shared/layout/fill.js';
+import { iconPixels, laidOutX, pixelScale } from '../../../shared/display/graphics.js';
+import { contentBoxOf } from '../../../shared/layout/fill.js';
 
 const spacingOf = (container: Clutter.Actor) => (container as St.Widget).get_theme_node().get_length('spacing');
 const fitted = (child: Clutter.Actor, width: number) => width < 0 ? child.get_preferred_width(-1)[1] : Math.min(child.get_preferred_width(-1)[1], width);

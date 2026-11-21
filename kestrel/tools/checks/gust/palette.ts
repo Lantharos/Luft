@@ -11,9 +11,9 @@ import {centerOf, chord, click, press, rest} from '../lib/input/input.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, settled} from '../lib/wait.js';
-import {bestTitle, closeStart, descriptionOf, row, rows, search, titleOf} from './search/results.js';
+import {bestTitle, closeGust, descriptionOf, row, rows, search, titleOf} from './search/results.js';
 
-const {require, eventually} = checks('Gust');
+const {require, eventually} = checks('Gust palette');
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const keybindings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.keybindings'});
 const RATES = GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'currency-rates.json']);
@@ -21,9 +21,9 @@ const NOTES = GLib.build_filenamev([GLib.get_home_dir(), 'Documents', 'Gust chec
 const WINDOW = 'Harbor timetable';
 const COPIED = 'the ferry leaves at seven sharp';
 
-const palette = () => named('kestrel-palette');
+const palette = () => named('kestrel-gust-palette');
 const entry = () => ofType(palette()!.get_first_child(), St.Entry);
-const preview = () => named('kestrel-palette-preview');
+const preview = () => named('kestrel-gust-palette-preview');
 const clipboard = () => new Promise<string | null>(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_, text) => resolve(text)));
 const highlighted = () => rows().find(actor => actor.child!.get_first_child()!.visible) ?? null;
 const keyed = (prefix: string) => rows().find(actor => actor.name?.startsWith(`kestrel-search-${prefix}`)) ?? null;
@@ -32,7 +32,7 @@ const indexed = async (name: string) => (await call('com.lantharos.Search', '/co
   new GLib.Variant('(su)', [name, 10]), '(a(sbd))')).deepUnpack()[0].some(([path]) => path === NOTES);
 
 async function openWithSuper() {
-  closeStart();
+  closeGust();
   await settled();
   const first: {painted: {mapped: boolean; focused: boolean} | null} = {painted: null};
   const signal = global.stage.connect_after('after-paint', () => {
@@ -48,25 +48,25 @@ async function openWithSuper() {
 }
 
 async function checkOpening() {
-  shell.set_string('start-style', 'palette');
-  await eventually(() => !named('kestrel-start'), 'choosing Gust replaces the Start menu');
+  shell.set_string('gust-look', 'palette');
+  await eventually(() => !named('kestrel-gust-panel'), 'choosing the palette look replaces the panel');
   await openWithSuper();
-  await capture('gust');
+  await capture('gust-palette');
   press(Clutter.KEY_Escape);
   await eventually(() => !shown(palette()), 'Escape closes Gust');
 
-  const launcher = named('Start', named('kestrel-panel')!)!;
-  click(centerOf(launcher));
-  await eventually(() => shown(palette()), 'the Start button opens Gust');
+  const button = named('Gust', named('kestrel-panel')!)!;
+  click(centerOf(button));
+  await eventually(() => shown(palette()), 'the Gust button opens Gust');
   rest();
-  closeStart();
+  closeGust();
 
-  keybindings.set_strv('toggle-start', ['<Super>F9']);
+  keybindings.set_strv('toggle-gust', ['<Super>F9']);
   await settled();
   await chord(Clutter.KEY_Super_L, Clutter.KEY_F9);
-  await eventually(() => shown(palette()), 'the Open Start shortcut opens Gust');
-  keybindings.reset('toggle-start');
-  closeStart();
+  await eventually(() => shown(palette()), 'the Open Gust shortcut opens Gust');
+  keybindings.reset('toggle-gust');
+  closeGust();
 }
 
 async function checkResults() {
@@ -79,7 +79,7 @@ async function checkResults() {
   search(WINDOW.toLowerCase());
   await eventually(() => keyed('window:'), 'open windows are found by title');
   await eventually(() => shown(preview()), 'a window shows a preview');
-  await capture('gust-windows');
+  await capture('gust-palette-windows');
   search('fonts');
   await eventually(() => row('setting:appearance'), 'Settings pages are found');
   search('dark mode');
@@ -151,9 +151,9 @@ export async function run() {
     await checkKeyboard();
     await checkAnswers();
   } finally {
-    closeStart();
-    shell.reset('start-style');
-    keybindings.reset('toggle-start');
+    closeGust();
+    shell.reset('gust-look');
+    keybindings.reset('toggle-gust');
     await stopAll();
     GLib.unlink(NOTES);
     GLib.unlink(RATES);

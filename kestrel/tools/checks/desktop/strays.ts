@@ -205,7 +205,7 @@ async function checkIslands() {
   }, 'wandering, it jumps onto an island', 90000);
   await capture('strays-island');
 
-  kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', [['bottom-center', ['start', 'dock']], ['right-end', ['tray', 'status', 'clock']]]));
+  kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', [['bottom-center', ['gust', 'dock']], ['right-end', ['tray', 'status', 'clock']]]));
   await pause(2000);
   const sideTop = () => named('kestrel-island-right-end')!.get_transformed_position()[1];
   await eventually(async () => {

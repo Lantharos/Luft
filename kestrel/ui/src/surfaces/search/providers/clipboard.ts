@@ -15,7 +15,7 @@ export interface ClipboardSource {
   keep(entry: ClipboardEntry): void;
 }
 
-const searchWords = () => t('start-search-clipboard-keywords').split(',').map(word => fold(word.trim())).filter(Boolean);
+const searchWords = () => t('gust-search-clipboard-keywords').split(',').map(word => fold(word.trim())).filter(Boolean);
 const oneLine = (text: string) => text.trim().replace(/\s+/g, ' ').slice(0, TITLE_LENGTH);
 
 export class ClipboardResults {
@@ -36,7 +36,7 @@ export class ClipboardResults {
     ];
     const common = { key: `clipboard:${index}`, icon: themedIcon('edit-paste-symbolic'), activate: () => this.source.paste(entry), menu };
     return entry.kind === 'text'
-      ? { ...common, title: oneLine(entry.text), description: t('start-search-clipboard-text'), preview: { kind: 'text', text: entry.text } }
-      : { ...common, title: t('clipboard-image', { width: entry.thumbnail.imageWidth, height: entry.thumbnail.imageHeight }), description: t('start-search-clipboard-text'), preview: { kind: 'image', thumbnail: entry.thumbnail } };
+      ? { ...common, title: oneLine(entry.text), description: t('gust-search-clipboard-text'), preview: { kind: 'text', text: entry.text } }
+      : { ...common, title: t('clipboard-image', { width: entry.thumbnail.imageWidth, height: entry.thumbnail.imageHeight }), description: t('gust-search-clipboard-text'), preview: { kind: 'image', thumbnail: entry.thumbnail } };
   }
 }

@@ -11,7 +11,7 @@ Usage: kestrel/tools/session.sh [MODE] [OPTIONS]
 Modes:
   nested        Run Kestrel in a window on the current desktop (default).
   capture       Run the checks headless and save screenshots.
-  performance   Measure startup and Start menu timings headless.
+  performance   Measure startup and Gust timings headless.
   frames        Measure frame times of animations and gestures headless.
   motion        Record every painted frame of animations headless.
   greeter       Run the login screen checks headless.

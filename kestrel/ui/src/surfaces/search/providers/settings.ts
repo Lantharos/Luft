@@ -12,9 +12,9 @@ const BIAS = 0.4;
 
 function description(page: SettingsPage): string {
   const [panel, section] = page.id.split('/');
-  if (!section) return t('start-search-settings-page');
+  if (!section) return t('gust-search-settings-page');
   const parent = SETTINGS_PAGES.find(candidate => candidate.id === panel)!;
-  return t('start-search-settings-section', { page: settingsPageTitle(parent, t) });
+  return t('gust-search-settings-section', { page: settingsPageTitle(parent, t) });
 }
 
 const copilotKeySeen = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.copilot-key' }).get_boolean('seen');

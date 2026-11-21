@@ -9,9 +9,9 @@ import {call} from '../lib/dbus.js';
 import {press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {unlock} from '../lockScreen/lib/shield.js';
-import {bestTitle, closeStart, descriptionOf, entry, openStart, row, rows, search, start, titleOf, withHandler} from './search/results.js';
+import {bestTitle, closeGust, descriptionOf, entry, openGust, row, rows, search, gust, titleOf, withHandler} from './search/results.js';
 
-const {require, eventually} = checks('Start search');
+const {require, eventually} = checks('Gust search');
 const LINK_SCHEME = 'x-scheme-handler/kestrel-settings';
 const END_SESSION = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'] as const;
 const CALCULATIONS = [['2*(3+18)', '= 42', '42'], ['15% of 80', '= 12', '12'], ['80 + 15%', '= 92', '92'], ['(1+2)^3', '= 27', '27'], ['sqrt(16) + 2', '= 6', '6']];
@@ -25,7 +25,7 @@ async function checkKeyboard() {
   press(Clutter.KEY_Down);
   await eventually(() => global.stage.get_key_focus() instanceof St.Button, 'Down in search focuses an app');
   press(Clutter.KEY_Tab);
-  await eventually(() => start()!.contains(global.stage.get_key_focus()!), 'Tab stays in Start');
+  await eventually(() => gust()!.contains(global.stage.get_key_focus()!), 'Tab stays in Gust');
   entry().grab_key_focus();
 }
 
@@ -37,7 +37,7 @@ async function checkCalculator() {
     if (copied !== CALCULATIONS[1][2]) continue;
     press(Clutter.KEY_Return);
     await eventually(async () => await clipboard() === copied, 'Enter copies the result');
-    await openStart();
+    await openGust();
   }
   for (const [conversion, title] of CONVERSIONS) {
     search(conversion);
@@ -59,14 +59,14 @@ async function checkSettings() {
     row('setting:network/vpn')!.emit('clicked', 1);
     await eventually(() => opened().includes('kestrel-settings:network/vpn'), 'a Settings result opens its exact page');
   });
-  await openStart();
+  await openGust();
 }
 
 async function activate(key: string) {
   if (rows()[0] === row(key)) press(Clutter.KEY_Return);
   else row(key)!.emit('clicked', 1);
-  await eventually(() => !start()!.visible, 'an action closes Start');
-  await openStart();
+  await eventually(() => !gust()!.visible, 'an action closes Gust');
+  await openGust();
 }
 
 async function checkToggles() {
@@ -117,7 +117,7 @@ async function checkSession() {
   await eventually(() => Main.screenShield.locked, 'the lock action locks the screen');
   await unlock();
 
-  await openStart();
+  await openGust();
   search('sign out');
   await eventually(() => row('action:can-logout') && titleOf(row('action:can-logout')!) === 'Sign out', 'sign out finds Sign out');
   row('action:can-logout')!.emit('clicked', 1);
@@ -144,17 +144,17 @@ async function checkStability() {
 }
 
 export async function run() {
-  await openStart();
+  await openGust();
   try {
     await checkKeyboard();
     await checkCalculator();
     await checkSettings();
     await checkToggles();
     await checkSession();
-    await openStart();
+    await openGust();
     await checkStability();
   } finally {
     search('');
-    closeStart();
+    closeGust();
   }
 }

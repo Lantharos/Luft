@@ -1,6 +1,6 @@
 # Kestrel
 
-Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Start, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.computer/desktop/overview/).
+Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Gust, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.computer/desktop/overview/).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="../web/docs/src/assets/shots/notification-center-light.webp">
@@ -10,12 +10,12 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | Folder | What it is |
 | --- | --- |
 | [`engine`](engine/README.md) | The native shell in C, started from GNOME Shell 51.0 |
-| `ui` | Everything the shell does on top of the engine, in TypeScript: window management, the lock screen, notifications, the taskbar, Start, quick settings and every other surface |
+| `ui` | Everything the shell does on top of the engine, in TypeScript: window management, the lock screen, notifications, the taskbar, Gust, quick settings and every other surface |
 | [`compositor`](compositor/README.md) | Mutter patch series |
 | `types` | TypeScript types generated from the GIR files of the compositor, the engine and the libraries they use |
 | `session` | `kestrel-session-manager`, the session manager: logging out and shutting down, what apps hold back, idle presence and the screen saver interface |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone, browser profile locks, memory warnings |
-| `search` | `kestrel-search`, the file index behind Start's search |
+| `search` | `kestrel-search`, the file index behind Gust's search |
 | `post` | `kestrel-post`, which sends files to phones and computers nearby and takes what they send |
 | `portal` | `kestrel-portal`, the desktop portal requests that need no compositor: email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown |
 | `greeter` | `kestrel-greeter-service`, which stores the login screen's settings |

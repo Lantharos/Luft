@@ -101,7 +101,7 @@ export function taskbarDepths(monitorIndex = global.display.get_primary_monitor(
   return currentUi?.taskbarDepths(monitorAt(monitorIndex)) ?? NO_DEPTHS;
 }
 
-export function taskbarAnchor(surface: 'start' | 'quick' | 'notifications', monitorIndex = global.display.get_primary_monitor()): Anchor {
+export function taskbarAnchor(surface: 'gust' | 'quick' | 'notifications', monitorIndex = global.display.get_primary_monitor()): Anchor {
   return currentUi?.taskbarAnchor(surface, monitorAt(monitorIndex)) ?? { edge: 'bottom', target: 0, align: 1 };
 }
 

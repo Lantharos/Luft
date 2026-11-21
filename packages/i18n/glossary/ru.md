@@ -29,7 +29,6 @@ Write ё wherever it belongs, as macOS and GNOME do: «ещё», «всё», «�
 ## Names
 
 - Settings, Disks and Install Luft are Настройки, Диски and Установить Luft. Настройки declines normally: «в Настройках».
-- Start is Пуск, as in Windows; write меню «Пуск» in sentences so it doesn't decline.
 - Don't decline app names, Luft or Kestrel; put the kind of thing first: «в приложении Rover», «в системе Luft». That noun decides agreement: «приложение Magpie открыто».
 
 ## Durations

@@ -1,5 +1,5 @@
 //! Desktop apps from `.deb` files, installed with apt into Ubuntu kept in your account, whose menu entries and
-//! icons are copied out to the desktop, so they start from Start like any other app.
+//! icons are copied out to the desktop, so they start from Gust like any other app.
 
 mod export;
 mod installed;

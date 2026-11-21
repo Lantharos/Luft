@@ -1,96 +1,96 @@
-## Start
+## Gust
 
-start-search-placeholder = Caută aplicații, fișiere și altele
-start-search-cut = Decupează
-start-search-copy = Copiază
-start-search-paste = Lipește
-start-search-select-all = Selectează tot
-start-power = Alimentare și sesiune
-start-power-close = Închide opțiunile de alimentare
-start-account-settings = Setări cont
-start-apps = Aplicații
-start-folder-default-name = Folder
-start-folder-open = Deschide folderul
-start-folder-rename = Redenumește
-start-folder-ungroup = Degrupează aplicațiile
-start-open = Deschide
-start-move-to-apps = Mută în Aplicații
+gust-search-placeholder = Caută aplicații, fișiere și altele
+gust-search-cut = Decupează
+gust-search-copy = Copiază
+gust-search-paste = Lipește
+gust-search-select-all = Selectează tot
+gust-power = Alimentare și sesiune
+gust-power-close = Închide opțiunile de alimentare
+gust-account-settings = Setări cont
+gust-apps = Aplicații
+gust-folder-default-name = Folder
+gust-folder-open = Deschide folderul
+gust-folder-rename = Redenumește
+gust-folder-ungroup = Degrupează aplicațiile
+gust-open = Deschide
+gust-move-to-apps = Mută în Aplicații
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Cea mai bună potrivire
-start-search-group-apps = Aplicații
-start-search-group-commands = Acțiuni ale aplicațiilor
-start-search-group-windows = Ferestre deschise
-start-search-group-actions = Acțiuni
-start-search-group-settings = Setări
-start-search-group-clipboard = Clipboard
-start-search-group-emoji = Emoji
-start-search-group-files = Fișiere
-start-search-group-contents = În conținutul fișierelor
-start-search-group-web = Web
-start-search-web = Caută „{ $query }” pe web
-start-search-clipboard-text = Din istoricul clipboardului
-start-search-clipboard-keywords = clipboard, copiat, copiate, istoric clipboard, istoricul clipboardului, lipește, lipire
-start-search-emoji-insert = Inserează
-start-search-settings-page = Setări
-start-search-settings-section = Setări: { $page }
-start-search-file-reveal = Afișează în { $fileManager }
-start-search-file-copy-path = Copiază calea
-start-search-conversion = { $amount } { $from } în { $to }
-start-search-calculation = { $expression }, apăsați Enter pentru a copia
+gust-search-best-match = Cea mai bună potrivire
+gust-search-group-apps = Aplicații
+gust-search-group-commands = Acțiuni ale aplicațiilor
+gust-search-group-windows = Ferestre deschise
+gust-search-group-actions = Acțiuni
+gust-search-group-settings = Setări
+gust-search-group-clipboard = Clipboard
+gust-search-group-emoji = Emoji
+gust-search-group-files = Fișiere
+gust-search-group-contents = În conținutul fișierelor
+gust-search-group-web = Web
+gust-search-web = Caută „{ $query }” pe web
+gust-search-clipboard-text = Din istoricul clipboardului
+gust-search-clipboard-keywords = clipboard, copiat, copiate, istoric clipboard, istoricul clipboardului, lipește, lipire
+gust-search-emoji-insert = Inserează
+gust-search-settings-page = Setări
+gust-search-settings-section = Setări: { $page }
+gust-search-file-reveal = Afișează în { $fileManager }
+gust-search-file-copy-path = Copiază calea
+gust-search-conversion = { $amount } { $from } în { $to }
+gust-search-calculation = { $expression }, apăsați Enter pentru a copia
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Până la { $date }
-start-search-answer-since = Din { $date }
-start-search-answer-between = Între { $from } și { $to }
-start-search-answer-time-ahead = { $place }, cu { $hours ->
+gust-search-answer-until = Până la { $date }
+gust-search-answer-since = Din { $date }
+gust-search-answer-between = Între { $from } și { $to }
+gust-search-answer-time-ahead = { $place }, cu { $hours ->
     [one] { $hours } oră
     [few] { $hours } ore
    *[other] { $hours } de ore
 } înainte
-start-search-answer-time-behind = { $place }, cu { $hours ->
+gust-search-answer-time-behind = { $place }, cu { $hours ->
     [one] { $hours } oră
     [few] { $hours } ore
    *[other] { $hours } de ore
 } în urmă
-start-search-answer-time-same = { $place }, aceeași oră ca aici
-start-search-answer-converted = În { $place } când este ora { $time } în { $from }
-start-search-answer-converted-here = Aici când este ora { $time } în { $from }
-start-search-answer-converted-from-here = În { $place } când aici este ora { $time }
+gust-search-answer-time-same = { $place }, aceeași oră ca aici
+gust-search-answer-converted = În { $place } când este ora { $time } în { $from }
+gust-search-answer-converted-here = Aici când este ora { $time } în { $from }
+gust-search-answer-converted-from-here = În { $place } când aici este ora { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Comută la stilul întunecat
-start-search-dark-style-off = Comută la stilul luminos
-start-search-dark-style-keywords = stil întunecat, mod întunecat, temă întunecată, stil luminos, mod luminos, temă luminoasă, dark mode, light mode
-start-search-night-light-on = Activează Lumina de noapte
-start-search-night-light-off = Dezactivează Lumina de noapte
-start-search-night-light-keywords = lumină de noapte, lumină albastră, culori calde, filtru lumină albastră, night light, night shift
-start-search-do-not-disturb-on = Activează Nu deranjați
-start-search-do-not-disturb-off = Dezactivează Nu deranjați
-start-search-do-not-disturb-keywords = nu deranjați, dnd, concentrare, liniște, silențios, notificări fără sunet, dezactivare notificări
-start-search-wifi-on = Activează Wi-Fi
-start-search-wifi-off = Dezactivează Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, wireless, fără fir, wlan, rețea
-start-search-bluetooth-on = Activează Bluetooth
-start-search-bluetooth-off = Dezactivează Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Activează modul avion
-start-search-airplane-mode-off = Dezactivează modul avion
-start-search-airplane-mode-keywords = mod avion, avion, mod zbor, airplane mode, flight mode, radio
-start-search-keep-awake-on = Menține activ
-start-search-keep-awake-off = Nu mai menține activ
-start-search-keep-awake-keywords = menține activ, rămâi activ, fără repaus, împiedică repausul, ecran pornit, caffeine
-start-search-lock-keywords = blochează ecranul, blocare ecran, blochează computerul, blocare
-start-search-suspend-keywords = repaus, suspendare, standby, sleep
-start-search-log-out-keywords = deconectare, deconectează, ieșire, închide sesiunea, log out, logout, sign out
-start-search-restart-keywords = repornire, repornește, repornește computerul, restart, reboot
-start-search-power-off-keywords = oprire, oprește, închide computerul, oprește computerul, shutdown, shut down
+gust-search-dark-style-on = Comută la stilul întunecat
+gust-search-dark-style-off = Comută la stilul luminos
+gust-search-dark-style-keywords = stil întunecat, mod întunecat, temă întunecată, stil luminos, mod luminos, temă luminoasă, dark mode, light mode
+gust-search-night-light-on = Activează Lumina de noapte
+gust-search-night-light-off = Dezactivează Lumina de noapte
+gust-search-night-light-keywords = lumină de noapte, lumină albastră, culori calde, filtru lumină albastră, night light, night shift
+gust-search-do-not-disturb-on = Activează Nu deranjați
+gust-search-do-not-disturb-off = Dezactivează Nu deranjați
+gust-search-do-not-disturb-keywords = nu deranjați, dnd, concentrare, liniște, silențios, notificări fără sunet, dezactivare notificări
+gust-search-wifi-on = Activează Wi-Fi
+gust-search-wifi-off = Dezactivează Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, wireless, fără fir, wlan, rețea
+gust-search-bluetooth-on = Activează Bluetooth
+gust-search-bluetooth-off = Dezactivează Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Activează modul avion
+gust-search-airplane-mode-off = Dezactivează modul avion
+gust-search-airplane-mode-keywords = mod avion, avion, mod zbor, airplane mode, flight mode, radio
+gust-search-keep-awake-on = Menține activ
+gust-search-keep-awake-off = Nu mai menține activ
+gust-search-keep-awake-keywords = menține activ, rămâi activ, fără repaus, împiedică repausul, ecran pornit, caffeine
+gust-search-lock-keywords = blochează ecranul, blocare ecran, blochează computerul, blocare
+gust-search-suspend-keywords = repaus, suspendare, standby, sleep
+gust-search-log-out-keywords = deconectare, deconectează, ieșire, închide sesiunea, log out, logout, sign out
+gust-search-restart-keywords = repornire, repornește, repornește computerul, restart, reboot
+gust-search-power-off-keywords = oprire, oprește, închide computerul, oprește computerul, shutdown, shut down
 
 ## Quick settings
 

@@ -74,18 +74,11 @@ settings-appearance-text-size = Textastærð
 ## Taskbar
 
 settings-taskbar-preview = Forskoðun verkstiku
-settings-start-section = Upphaf
-settings-start-style = Stíll
-settings-start-style-menu = Valmynd
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Leit, forrit og möppur við hliðina á verkstikunni
-settings-start-style-palette-description = Leitarstika á miðjum skjánum fyrir forrit, glugga, skrár og svör
-settings-start-button = Sýna upphafshnapp
-settings-start-button-description = Super opnar upphafsvalmyndina hvort sem er
-settings-start-web = Leita á vefnum með
+settings-gust-look-panel-description = Leit, forrit og möppur við hliðina á verkstikunni
+settings-gust-look-palette-description = Leitarstika á miðjum skjánum fyrir forrit, glugga, skrár og svör
+settings-gust-web = Leita á vefnum með
 settings-taskbar-shown = Sýna verkstiku
 settings-taskbar-hidden = Falin
-settings-taskbar-hidden-description = Klukkan og stöðutáknin haldast í horni og Super opnar upphafsvalmyndina
 settings-taskbar-look = Ásýnd
 settings-taskbar-look-glass = Gler
 settings-taskbar-look-solid = Heill litur

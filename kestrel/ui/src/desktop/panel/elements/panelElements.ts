@@ -49,7 +49,7 @@ export class TaskbarElements implements PanelElements {
   private readonly extensions = new Map<string, ElementActor>();
   private readonly unwatchExtensions: () => void;
 
-  constructor(private readonly start: St.Button, private readonly dock: Taskbar, menus: ContextMenus, actions: ElementActions,
+  constructor(private readonly gust: St.Button, private readonly dock: Taskbar, menus: ContextMenus, actions: ElementActions,
     primary: boolean, private readonly layout: (edge: Edge) => ElementLayout) {
     this.unwatchExtensions = taskbarElements.watch((entry, added) => {
       if (added) return;
@@ -58,7 +58,7 @@ export class TaskbarElements implements PanelElements {
       this.edges.delete(entry.id);
     });
     if (primary) {
-      start.name = 'kestrel-taskbar-start';
+      gust.name = 'kestrel-taskbar-gust';
       dock.actor.name = 'kestrel-taskbar-dock';
       const trayBox = this.trayBox = new St.BoxLayout({ name: 'kestrel-taskbar-tray', style_class: 'kestrel-panel-status' });
       this.privacy = new PrivacyIndicator(menus, actions.stopScreencast);
@@ -110,7 +110,7 @@ export class TaskbarElements implements PanelElements {
 
   actor(id: string): Clutter.Actor | null {
     switch (id) {
-      case 'start': return this.start.visible ? this.start : null;
+      case 'gust': return this.gust.visible ? this.gust : null;
       case 'dock': return this.dock.actor;
       case 'tray': return this.trayBox;
       case 'status': return this.statusGroup;
@@ -136,7 +136,7 @@ export class TaskbarElements implements PanelElements {
 
   label(id: string): string {
     switch (id) {
-      case 'start': return t('taskbar-start');
+      case 'gust': return t('taskbar-gust');
       case 'dock': return t('taskbar-arrange-dock');
       case 'tray': return t('tray-apps');
       case 'status': return t('taskbar-quick-settings');

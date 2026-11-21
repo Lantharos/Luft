@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Δείτε και αλλάξτε συ�
 settings-keyboard-copilot = Πλήκτρο Copilot
 settings-keyboard-copilot-press = Πάτημα
 settings-keyboard-copilot-press-description = Τι κάνει ένα σύντομο πάτημα του πλήκτρου
-settings-keyboard-copilot-open-start = Άνοιγμα του Start
 settings-keyboard-copilot-open-app = Άνοιγμα εφαρμογής
 settings-keyboard-copilot-nothing = Τίποτα
 settings-keyboard-copilot-app = Εφαρμογή

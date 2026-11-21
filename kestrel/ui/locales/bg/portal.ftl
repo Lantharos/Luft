@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Няма инсталирано прил�
 portal-app-chooser-find = Намери приложение
 portal-app-chooser-open = Отвори
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Да се добави ли този уебсайт към приложенията ви?
-portal-launcher-website-description = { $site } ще се отваря в собствен прозорец от менюто Старт.
 portal-launcher-title = Да се добави ли това към приложенията ви?
-portal-launcher-description = { $appName } иска да добави приложение в менюто Старт.
 portal-launcher-name = Име
 portal-launcher-add = Добави
 

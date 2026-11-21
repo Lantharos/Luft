@@ -13,7 +13,7 @@ import {pause, settled, waitUntil} from '../lib/wait.js';
 const {require} = checks('motion');
 type Surface = Parameters<typeof toggleSurface>[0];
 
-const SURFACES: [Surface, string][] = [['start', 'kestrel-start'], ['quick', 'kestrel-quick-settings'], ['notifications', 'kestrel-notifications']];
+const SURFACES: [Surface, string][] = [['gust', 'kestrel-gust-panel'], ['quick', 'kestrel-quick-settings'], ['notifications', 'kestrel-notifications']];
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
 
 function sample(actor: Clutter.Actor, frames: number, record: (actor: Clutter.Actor) => void) {
@@ -81,11 +81,11 @@ async function checkReducedSurface(surface: Surface, name: string) {
 async function checkClippedAtTaskbar() {
   dismissImmediately();
   await settled();
-  const actor = named('kestrel-start')!;
+  const actor = named('kestrel-gust-panel')!;
   const boundary = nearSide(boxOf(named('kestrel-panel')!));
-  toggleSurface('start');
-  await waitUntil(() => resting(actor), 'start opens', 2000);
-  toggleSurface('start');
+  toggleSurface('gust');
+  await waitUntil(() => resting(actor), 'Gust opens', 2000);
+  toggleSurface('gust');
   const frames: {reach: number; clip: number}[] = [];
   await sample(actor, 6, () => {
     const parent = actor.get_parent()!;
@@ -94,7 +94,7 @@ async function checkClippedAtTaskbar() {
   });
   require(frames.some(frame => beyond(frame.reach, boundary)) && frames.every(frame => Math.abs(frame.clip - boundary) < 1),
     'a closing surface is cut off at the edge of the taskbar');
-  await waitUntil(() => !actor.visible, 'start closes', 2000);
+  await waitUntil(() => !actor.visible, 'Gust closes', 2000);
 }
 
 function springOf(actor: Clutter.Actor) {

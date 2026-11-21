@@ -76,18 +76,11 @@ settings-appearance-text-size = Velikost besedila
 ## Taskbar
 
 settings-taskbar-preview = Predogled opravilne vrstice
-settings-start-section = Start
-settings-start-style = Slog
-settings-start-style-menu = Meni
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Iskanje, aplikacije in mape ob opravilni vrstici
-settings-start-style-palette-description = Iskalna vrstica na sredini zaslona za aplikacije, okna, datoteke in odgovore
-settings-start-button = Pokaži gumb Start
-settings-start-button-description = Tipka Super v vsakem primeru odpre meni Start
-settings-start-web = Spletni iskalnik
+settings-gust-look-panel-description = Iskanje, aplikacije in mape ob opravilni vrstici
+settings-gust-look-palette-description = Iskalna vrstica na sredini zaslona za aplikacije, okna, datoteke in odgovore
+settings-gust-web = Spletni iskalnik
 settings-taskbar-shown = Pokaži opravilno vrstico
 settings-taskbar-hidden = Skrita
-settings-taskbar-hidden-description = Ura in ikone stanja ostanejo v kotu, tipka Super pa odpre meni Start
 settings-taskbar-look = Videz
 settings-taskbar-look-glass = Steklo
 settings-taskbar-look-solid = Polna

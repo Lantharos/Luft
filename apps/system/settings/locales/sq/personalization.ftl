@@ -74,18 +74,11 @@ settings-appearance-text-size = Madhësia e tekstit
 ## Taskbar
 
 settings-taskbar-preview = Pamje paraprake e shiritit të detyrave
-settings-start-section = Fillimi
-settings-start-style = Stili
-settings-start-style-menu = Menyja
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Kërkimi, aplikacionet dhe dosjet pranë shiritit të detyrave
-settings-start-style-palette-description = Një shirit kërkimi në mes të ekranit për aplikacione, dritare, skedarë dhe përgjigje
-settings-start-button = Shfaq butonin e Fillimit
-settings-start-button-description = Super e hap Fillimin gjithsesi
-settings-start-web = Kërko në ueb me
+settings-gust-look-panel-description = Kërkimi, aplikacionet dhe dosjet pranë shiritit të detyrave
+settings-gust-look-palette-description = Një shirit kërkimi në mes të ekranit për aplikacione, dritare, skedarë dhe përgjigje
+settings-gust-web = Kërko në ueb me
 settings-taskbar-shown = Shfaq shiritin e detyrave
 settings-taskbar-hidden = E fshehur
-settings-taskbar-hidden-description = Ora dhe ikonat e gjendjes mbeten në një qoshe, dhe Super hap Fillimin
 settings-taskbar-look = Pamja
 settings-taskbar-look-glass = Xham
 settings-taskbar-look-solid = I plotë

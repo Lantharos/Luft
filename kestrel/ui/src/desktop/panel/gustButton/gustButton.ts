@@ -18,7 +18,7 @@ const WHITE = '#ffffffff';
 const svgIcon = (layer: MarkLayer, fill: string) =>
   Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(markLayerSvg(layer, fill))));
 
-export interface Launcher {
+export interface GustButton {
   button: St.Button;
   resize(size: number): void;
 }
@@ -87,12 +87,12 @@ function animatedMark(button: St.Button, surface: () => St.Widget, backdropOf: B
   }];
 }
 
-export function createLauncher(activate: () => void, size: number, surface: () => St.Widget, backdropOf = wholeFloor): Launcher {
+export function createGustButton(activate: () => void, size: number, surface: () => St.Widget, backdropOf = wholeFloor): GustButton {
   const button = new St.Button({
     style_class: 'kestrel-task-button', clip_to_allocation: true,
     can_focus: true, track_hover: true,
   });
-  localized(button, () => (button.accessible_name = t('taskbar-start')));
+  localized(button, () => (button.accessible_name = t('taskbar-gust')));
   const [mark, resizeMark] = animatedMark(button, surface, backdropOf);
   button.child = mark;
   pressable(button, mark);

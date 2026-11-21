@@ -30,7 +30,7 @@ When the drive's EFI system partition is smaller than 1 GB, as Windows' usually 
 
 ## The live session
 
-The stick's kernel command line has `rd.live.image`, which is how the installer knows where it runs. greetd signs in the passwordless `live` account with `kestrel-session --setup` as its `initial_session`, polkit allows that account everything, and Install Luft appears in Start only there.
+The stick's kernel command line has `rd.live.image`, which is how the installer knows where it runs. greetd signs in the passwordless `live` account with `kestrel-session --setup` as its `initial_session`, polkit allows that account everything, and Install Luft appears in Gust only there.
 
 - Setup's first screen starts from the language, formats, time zone and keyboard layouts Meet Luft wrote into `meet.json`, or else from a Windows it can read on the computer, and from the time zone Fedora's GeoIP service gives once it's online. It only says it guessed when one of these told it something.
 - Changing the language on that screen changes the live account's language through AccountsService, so Kestrel follows, and `UseLanguage` makes the service answer in it too. The service keeps the choice in `/run/luft-installer/language` across its idle restarts.

@@ -62,7 +62,7 @@ Night Light makes colours warmer in the evening, which is easier on the eyes. It
 - **Main display** decides where the tray, status icons and new windows go.
 - <kbd>Super</kbd>+<kbd>P</kbd> switches quickly between mirroring, joining, external only and built-in only, handy when plugging into a projector.
 
-Each display gets its own taskbar, with Start, its apps and the clock, unless you choose otherwise in the [taskbar's options](/desktop/taskbar/#options). Start, Quick settings and notifications open on the display the pointer is on.
+Each display gets its own taskbar, with Gust, its apps and the clock, unless you choose otherwise in the [taskbar's options](/desktop/taskbar/#options). Gust, Quick settings and notifications open on the display the pointer is on.
 
 Move a window to another display by dragging it, with <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows, or with one of the **Move to display** items in the window menu. Only the main display switches [workspaces](/windows/workspaces/); windows on the others stay put. The [board](/windows/board/) uses the main display.
 

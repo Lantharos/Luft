@@ -16,10 +16,10 @@ export const ALONGS: Along[] = ['start', 'center', 'end'];
 export const SPOTS: Spot[] = EDGES.flatMap((edge) => ALONGS.map((along) => spotAt(edge, along)));
 
 export const SYSTEM_ELEMENTS = ['tray', 'status', 'clock'];
-export const BUILT_IN_ELEMENTS = ['start', 'dock', ...SYSTEM_ELEMENTS];
+export const BUILT_IN_ELEMENTS = ['gust', 'dock', ...SYSTEM_ELEMENTS];
 
 export const DEFAULT_ARRANGEMENT: Arrangement = [
-	{ spot: 'bottom-center', elements: ['start', 'dock'] },
+	{ spot: 'bottom-center', elements: ['gust', 'dock'] },
 	{ spot: 'bottom-end', elements: [...SYSTEM_ELEMENTS] }
 ];
 
@@ -79,8 +79,8 @@ export function storeArrangement(arrangement: Arrangement): StoredArrangement {
 }
 
 const HOMES: Record<string, { beside: string[]; after: boolean }> = {
-	start: { beside: ['dock'], after: false },
-	dock: { beside: ['start'], after: true },
+	gust: { beside: ['dock'], after: false },
+	dock: { beside: ['gust'], after: true },
 	tray: { beside: ['status', 'clock'], after: false },
 	status: { beside: ['tray', 'clock'], after: true },
 	clock: { beside: ['status', 'tray'], after: true }

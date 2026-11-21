@@ -394,13 +394,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="ru">
           <tig>
-            <term>Пуск</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name, as in Windows; in sentences меню «Пуск», which needs no inflection</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -933,7 +933,7 @@
         <langSet xml:lang="ru">
           <tig>
             <term>закрепить</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start; button Закрепить</note>
+            <note from="translator">verb: keep an app on the taskbar; button Закрепить</note>
           </tig>
         </langSet>
       </termEntry>

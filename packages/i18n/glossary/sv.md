@@ -22,14 +22,13 @@ Address the reader as du, lowercase, as macOS, Windows, GNOME and KDE do: ”Du 
 - The dash is an en dash with spaces, and without spaces in ranges: 2–4. No em dashes.
 - Percent signs and units take a space: ”57 %”, ”4,5 W”.
 - & in English names becomes och: ”Datum och tid”.
-- Compounds with names, abbreviations or digits take a hyphen: ”Bluetooth-adapter”, ”USB-minne”, ”Start-menyn”.
+- Compounds with names, abbreviations or digits take a hyphen: ”Bluetooth-adapter”, ”USB-minne”.
 - Write ”e-post” and ”Wi-Fi”.
 - Keys follow Swedish keyboards and Windows: Ctrl, Alt, Skift, Enter, Esc, Tabb, Backsteg, Blanksteg. Keys whose English name is printed on them keep it: Delete, Home, End.
 
 ## Names
 
 - Settings, Disks and Install Luft are Inställningar, Diskar and Installera Luft.
-- Start stays Start, and ”Start-menyn” in a sentence, as in Windows.
 - App names don't take the definite ending; use them bare or after appen: ”Rover är öppen”, ”i appen Tern”. The genitive is a plain -s (”Rovers fönster”); names ending in s, such as Keys, need rephrasing: ”fönstret i Keys”. Adjectives agree with app, an en-word: ”Tern är stängd”.
 
 ## Plurals

@@ -18,7 +18,7 @@ const WAKEUP_SAMPLE = 30000;
 const SETTINGS_COMMAND = 'kestrel-setting';
 const SESSION_MANAGER = 'org.gnome.SessionManager';
 const FRAME = 16;
-const START_QUERIES = ['f', 'fi', 'fil', 'files', 'file', 'fi', ''];
+const GUST_QUERIES = ['f', 'fi', 'fil', 'files', 'file', 'fi', ''];
 const EMOJI_QUERIES = ['p', 'pa', 'par', 'part', 'party', 'h', 'he', 'heart', 'smiling face', ''];
 const CLIPBOARD_IMAGES = 16;
 const CLIPBOARD_IMAGE_SIZE = [1920, 1080] as const;
@@ -39,8 +39,8 @@ function processMetrics(pid: number | 'self' = 'self') {
   return {residentMemoryMb: Math.round(residentKb / 1024), secondsSinceLaunch: Number(runningSeconds.toFixed(2))};
 }
 
-const startButtons = (start: Clutter.Actor) => new Set(descendants(start).filter(actor => actor.name?.startsWith('kestrel-start-item-')));
-const startIcons = (start: Clutter.Actor) => [...startButtons(start)].flatMap(descendants).filter(actor => actor instanceof St.Icon);
+const gustButtons = (gust: Clutter.Actor) => new Set(descendants(gust).filter(actor => actor.name?.startsWith('kestrel-gust-item-')));
+const gustIcons = (gust: Clutter.Actor) => [...gustButtons(gust)].flatMap(descendants).filter(actor => actor instanceof St.Icon);
 const iconLoaded = (icon: St.Icon) => icon.get_children().some(child => child.content && child.opacity > 0);
 
 async function dismiss() {
@@ -48,28 +48,28 @@ async function dismiss() {
   await settled();
 }
 
-async function measureStartOpening(label: string) {
-  const start = existing('kestrel-start');
+async function measureGustOpening(label: string) {
+  const gust = existing('kestrel-gust-panel');
   const frames: number[] = [];
   let iconsReady: number | null = null;
   const opened = GLib.get_monotonic_time();
   const painted = global.stage.connect('after-paint', () => {
     const now = GLib.get_monotonic_time();
     frames.push(now);
-    if (iconsReady === null && startIcons(start).every(iconLoaded)) iconsReady = now - opened;
+    if (iconsReady === null && gustIcons(gust).every(iconLoaded)) iconsReady = now - opened;
   });
-  toggleSurface('start');
+  toggleSurface('gust');
   const toggle = GLib.get_monotonic_time() - opened;
   await settled(MEASURE_SETTLE);
   global.stage.disconnect(painted);
   const opening = frames.filter(time => time - opened < OPENING);
   const intervals = opening.slice(1).map((time, index) => time - opening[index]);
   report({
-    startOpening: label,
+    gustOpening: label,
     toggleMs: milliseconds(toggle),
     firstFrameMs: frames.length ? milliseconds(frames[0] - opened) : null,
     iconsReadyMs: iconsReady && milliseconds(iconsReady),
-    icons: startIcons(start).length,
+    icons: gustIcons(gust).length,
     longestFrameMs: milliseconds(Math.max(...intervals)),
     ...processMetrics(),
   });
@@ -127,10 +127,10 @@ async function measureIconStyles() {
     for (const style of ['tinted', 'clear', 'monochrome']) {
       settings.set_string('app-icon-style', style);
       await settled(MEASURE_SETTLE);
-      await measureStartOpening(`${style} first`);
-      await measureStartOpening(`${style} again`);
+      await measureGustOpening(`${style} first`);
+      await measureGustOpening(`${style} again`);
     }
-    toggleSurface('start');
+    toggleSurface('gust');
     await settled(MEASURE_SETTLE);
     for (const style of ['tinted', 'clear', 'monochrome']) {
       const longestStallMs = await longestStall(async () => {
@@ -145,13 +145,13 @@ async function measureIconStyles() {
   }
 }
 
-async function measureStartSearch() {
-  toggleSurface('start');
+async function measureGustSearch() {
+  toggleSurface('gust');
   await settled(MEASURE_SETTLE);
-  const start = existing('kestrel-start');
-  const original = startButtons(start);
-  const {updates, median, p95} = await timeQueries(ofType(start.get_first_child(), St.Entry), START_QUERIES, 20);
-  const current = startButtons(start);
+  const gust = existing('kestrel-gust-panel');
+  const original = gustButtons(gust);
+  const {updates, median, p95} = await timeQueries(ofType(gust.get_first_child(), St.Entry), GUST_QUERIES, 20);
+  const current = gustButtons(gust);
   report({
     searchUpdates: updates,
     searchMedianMs: median,
@@ -394,10 +394,10 @@ export async function run() {
   await dismiss();
   await measureEmojiOpening('again');
   await measureEmojiSearch();
-  await measureStartOpening('first');
-  await measureStartOpening('again');
+  await measureGustOpening('first');
+  await measureGustOpening('again');
   await measureIconStyles();
-  await measureStartSearch();
+  await measureGustSearch();
   await measureNotificationBurst();
   await measureClipboardImages();
   await measureTrayUpdates();

@@ -2,7 +2,7 @@ import type { Action, Icon } from './surfaces.js';
 import type { Disposable } from '../types.js';
 
 export interface Search {
-  /** Adds results to Start's search, under the provider's title. */
+  /** Adds results to Gust's search, under the provider's title. */
   addProvider(provider: SearchProvider): Disposable;
 }
 

@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Nicio aplicație instalată nu poate desc
 portal-app-chooser-find = Găsește o aplicație
 portal-app-chooser-open = Deschide
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Adăugați acest site la aplicații?
-portal-launcher-website-description = { $site } se va deschide din Start, în propria fereastră.
 portal-launcher-title = Adăugați acest element la aplicații?
-portal-launcher-description = { $appName } vrea să adauge o aplicație în Start.
 portal-launcher-name = Nume
 portal-launcher-add = Adaugă
 

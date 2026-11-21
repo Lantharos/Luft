@@ -77,18 +77,11 @@ settings-appearance-text-size = Daqs tat-test
 ## Taskbar
 
 settings-taskbar-preview = Dehra tat-taskbar
-settings-start-section = Start
-settings-start-style = Stil
-settings-start-style-menu = Menù
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Tiftix, apps u fowlders ħdejn it-taskbar
-settings-start-style-palette-description = Bar tat-tiftix f’nofs l-iskrin għal apps, twieqi, fajls u tweġibiet
-settings-start-button = Uri l-buttuna Start
-settings-start-button-description = Super jiftaħ Start xorta waħda
-settings-start-web = Fittex fuq il-web permezz ta’
+settings-gust-look-panel-description = Tiftix, apps u fowlders ħdejn it-taskbar
+settings-gust-look-palette-description = Bar tat-tiftix f’nofs l-iskrin għal apps, twieqi, fajls u tweġibiet
+settings-gust-web = Fittex fuq il-web permezz ta’
 settings-taskbar-shown = Uri t-taskbar
 settings-taskbar-hidden = Moħbija
-settings-taskbar-hidden-description = L-arloġġ u l-ikoni tal-istatus jibqgħu f’kantuniera, u Super jiftaħ Start
 settings-taskbar-look = Stil
 settings-taskbar-look-glass = Ħġieġ
 settings-taskbar-look-solid = Solidu

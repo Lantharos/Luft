@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Consulteu i canvieu les dreceres, o af
 settings-keyboard-copilot = Tecla Copilot
 settings-keyboard-copilot-press = Pulsació
 settings-keyboard-copilot-press-description = Què fa una pulsació curta de la tecla
-settings-keyboard-copilot-open-start = Obre Inici
 settings-keyboard-copilot-open-app = Obre una aplicació
 settings-keyboard-copilot-nothing = Res
 settings-keyboard-copilot-app = Aplicació

@@ -96,7 +96,7 @@ async function checkOneReviewForTheWholeSet() {
   const dialog = await waitUntil(review, 'a set with a system setting opens one review');
   await settled();
   await capture('changes-review');
-  for (const text of ['Change these 4 settings?', 'wants to change these settings.', 'Appearance · Style', 'Light → Dark', 'Taskbar and Start · Size', 'Medium → Large', 'administrator'])
+  for (const text of ['Change these 4 settings?', 'wants to change these settings.', 'Appearance · Style', 'Light → Dark', 'Taskbar and Gust · Size', 'Medium → Large', 'administrator'])
     require(says(text, dialog), `the review shows ${text}`);
   require(!says('luft', dialog), 'the review names who asked, not luft');
   const developer = rowOf(DEVELOPER_TOOLS, dialog);

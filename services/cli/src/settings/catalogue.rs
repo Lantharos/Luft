@@ -138,7 +138,7 @@ impl Setting {
     }
 
     /// Its page and name, as Settings' search shows them, such as
-    /// `Taskbar and Start · Size`.
+    /// `Taskbar and Gust · Size`.
     pub fn full_name(&self) -> String {
         match self.page_name() {
             Some(page) => format!("{page} · {}", self.name()),

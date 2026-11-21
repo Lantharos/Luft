@@ -1,96 +1,96 @@
-## Start
+## Gust
 
-start-search-placeholder = Otsi rakendusi, faile ja muud
-start-search-cut = Lõika
-start-search-copy = Kopeeri
-start-search-paste = Kleebi
-start-search-select-all = Vali kõik
-start-power = Toide ja seanss
-start-power-close = Sulge toitevalikud
-start-account-settings = Konto seadistused
-start-apps = Rakendused
-start-folder-default-name = Kaust
-start-folder-open = Ava kaust
-start-folder-rename = Nimeta ümber
-start-folder-ungroup = Tühista rühmitamine
-start-open = Ava
-start-move-to-apps = Teisalda rakenduste hulka
+gust-search-placeholder = Otsi rakendusi, faile ja muud
+gust-search-cut = Lõika
+gust-search-copy = Kopeeri
+gust-search-paste = Kleebi
+gust-search-select-all = Vali kõik
+gust-power = Toide ja seanss
+gust-power-close = Sulge toitevalikud
+gust-account-settings = Konto seadistused
+gust-apps = Rakendused
+gust-folder-default-name = Kaust
+gust-folder-open = Ava kaust
+gust-folder-rename = Nimeta ümber
+gust-folder-ungroup = Tühista rühmitamine
+gust-open = Ava
+gust-move-to-apps = Teisalda rakenduste hulka
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Parim vaste
-start-search-group-apps = Rakendused
-start-search-group-commands = Rakenduste toimingud
-start-search-group-windows = Avatud aknad
-start-search-group-actions = Toimingud
-start-search-group-settings = Seadistused
-start-search-group-clipboard = Lõikelaud
-start-search-group-emoji = Emojid
-start-search-group-files = Failid
-start-search-group-contents = Failide sisu
-start-search-group-web = Veeb
-start-search-web = Otsi veebist „{ $query }“
-start-search-clipboard-text = Lõikelaua ajaloost
-start-search-clipboard-keywords = lõikelaud, kopeeritud, lõikelaua ajalugu, kleebi, kleepimine, clipboard
-start-search-emoji-insert = Sisesta
-start-search-settings-page = Seadistused
-start-search-settings-section = Seadistused: { $page }
-start-search-file-reveal = Kuva rakenduses { $fileManager }
-start-search-file-copy-path = Kopeeri asukoht
-start-search-conversion = { $amount } { $from } → { $to }
-start-search-calculation = { $expression }, kopeerimiseks vajuta Enter
+gust-search-best-match = Parim vaste
+gust-search-group-apps = Rakendused
+gust-search-group-commands = Rakenduste toimingud
+gust-search-group-windows = Avatud aknad
+gust-search-group-actions = Toimingud
+gust-search-group-settings = Seadistused
+gust-search-group-clipboard = Lõikelaud
+gust-search-group-emoji = Emojid
+gust-search-group-files = Failid
+gust-search-group-contents = Failide sisu
+gust-search-group-web = Veeb
+gust-search-web = Otsi veebist „{ $query }“
+gust-search-clipboard-text = Lõikelaua ajaloost
+gust-search-clipboard-keywords = lõikelaud, kopeeritud, lõikelaua ajalugu, kleebi, kleepimine, clipboard
+gust-search-emoji-insert = Sisesta
+gust-search-settings-page = Seadistused
+gust-search-settings-section = Seadistused: { $page }
+gust-search-file-reveal = Kuva rakenduses { $fileManager }
+gust-search-file-copy-path = Kopeeri asukoht
+gust-search-conversion = { $amount } { $from } → { $to }
+gust-search-calculation = { $expression }, kopeerimiseks vajuta Enter
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Kuni kuupäevani { $date }
-start-search-answer-since = Alates kuupäevast { $date }
-start-search-answer-between = Vahemik { $from } – { $to }
-start-search-answer-time-ahead =
+gust-search-answer-until = Kuni kuupäevani { $date }
+gust-search-answer-since = Alates kuupäevast { $date }
+gust-search-answer-between = Vahemik { $from } – { $to }
+gust-search-answer-time-ahead =
     { $place }, { $hours ->
         [one] { $hours } tund ees
        *[other] { $hours } tundi ees
     }
-start-search-answer-time-behind =
+gust-search-answer-time-behind =
     { $place }, { $hours ->
         [one] { $hours } tund taga
        *[other] { $hours } tundi taga
     }
-start-search-answer-time-same = { $place }, sama aeg mis siin
-start-search-answer-converted = { $place }, kui kell on { $time } ({ $from })
-start-search-answer-converted-here = Siin, kui kell on { $time } ({ $from })
-start-search-answer-converted-from-here = { $place }, kui siin on kell { $time }
+gust-search-answer-time-same = { $place }, sama aeg mis siin
+gust-search-answer-converted = { $place }, kui kell on { $time } ({ $from })
+gust-search-answer-converted-here = Siin, kui kell on { $time } ({ $from })
+gust-search-answer-converted-from-here = { $place }, kui siin on kell { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Lülitu tumedale režiimile
-start-search-dark-style-off = Lülitu heledale režiimile
-start-search-dark-style-keywords = tume režiim, tume teema, tume stiil, hele režiim, hele teema, hele stiil, dark mode, light mode
-start-search-night-light-on = Lülita öövalgus sisse
-start-search-night-light-off = Lülita öövalgus välja
-start-search-night-light-keywords = öövalgus, öörežiim, sinine valgus, soojad värvid, night light
-start-search-do-not-disturb-on = Lülita Ära sega sisse
-start-search-do-not-disturb-off = Lülita Ära sega välja
-start-search-do-not-disturb-keywords = ära sega, keskendumine, vaikus, vaikne, teavituste vaigistamine, vaigista teavitused, dnd
-start-search-wifi-on = Lülita Wi-Fi sisse
-start-search-wifi-off = Lülita Wi-Fi välja
-start-search-wifi-keywords = wifi, wi-fi, traadita, juhtmeta, wlan, võrk
-start-search-bluetooth-on = Lülita Bluetooth sisse
-start-search-bluetooth-off = Lülita Bluetooth välja
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Lülita lennukirežiim sisse
-start-search-airplane-mode-off = Lülita lennukirežiim välja
-start-search-airplane-mode-keywords = lennukirežiim, lennurežiim, raadiod, airplane mode
-start-search-keep-awake-on = Hoia ärkvel
-start-search-keep-awake-off = Lõpeta ärkvel hoidmine
-start-search-keep-awake-keywords = hoia ärkvel, püsi ärkvel, ära maga, unerežiimi vältimine, caffeine
-start-search-lock-keywords = lukusta, lukusta ekraan, lukusta arvuti, lukustuskuva
-start-search-suspend-keywords = unerežiim, uni, ooterežiim, magama
-start-search-log-out-keywords = logi välja, väljalogimine, lõpeta seanss, log out
-start-search-restart-keywords = taaskäivita, taaskäivitus, käivita uuesti, restart
-start-search-power-off-keywords = lülita välja, väljalülitamine, sulge arvuti, toide välja, shut down
+gust-search-dark-style-on = Lülitu tumedale režiimile
+gust-search-dark-style-off = Lülitu heledale režiimile
+gust-search-dark-style-keywords = tume režiim, tume teema, tume stiil, hele režiim, hele teema, hele stiil, dark mode, light mode
+gust-search-night-light-on = Lülita öövalgus sisse
+gust-search-night-light-off = Lülita öövalgus välja
+gust-search-night-light-keywords = öövalgus, öörežiim, sinine valgus, soojad värvid, night light
+gust-search-do-not-disturb-on = Lülita Ära sega sisse
+gust-search-do-not-disturb-off = Lülita Ära sega välja
+gust-search-do-not-disturb-keywords = ära sega, keskendumine, vaikus, vaikne, teavituste vaigistamine, vaigista teavitused, dnd
+gust-search-wifi-on = Lülita Wi-Fi sisse
+gust-search-wifi-off = Lülita Wi-Fi välja
+gust-search-wifi-keywords = wifi, wi-fi, traadita, juhtmeta, wlan, võrk
+gust-search-bluetooth-on = Lülita Bluetooth sisse
+gust-search-bluetooth-off = Lülita Bluetooth välja
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Lülita lennukirežiim sisse
+gust-search-airplane-mode-off = Lülita lennukirežiim välja
+gust-search-airplane-mode-keywords = lennukirežiim, lennurežiim, raadiod, airplane mode
+gust-search-keep-awake-on = Hoia ärkvel
+gust-search-keep-awake-off = Lõpeta ärkvel hoidmine
+gust-search-keep-awake-keywords = hoia ärkvel, püsi ärkvel, ära maga, unerežiimi vältimine, caffeine
+gust-search-lock-keywords = lukusta, lukusta ekraan, lukusta arvuti, lukustuskuva
+gust-search-suspend-keywords = unerežiim, uni, ooterežiim, magama
+gust-search-log-out-keywords = logi välja, väljalogimine, lõpeta seanss, log out
+gust-search-restart-keywords = taaskäivita, taaskäivitus, käivita uuesti, restart
+gust-search-power-off-keywords = lülita välja, väljalülitamine, sulge arvuti, toide välja, shut down
 
 ## Quick settings
 

@@ -2,30 +2,30 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/layout/surface.js';
-import { StartGrid } from './grid.js';
-import { StartFooter } from './footer.js';
-import { SearchEngine, type SearchHost } from '../search/engine.js';
-import { searchField } from '../search/field.js';
-import { watchInstalledApps } from '../search/installedApps.js';
-import { launchApp } from '../search/providers/apps.js';
-import { taskbarPreferences } from '../../desktop/panel/preferences/taskbarPreferences.js';
-import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
-import type { StartArea, StartSurface } from './startSurface.js';
-import { dock, isVertical, toward, type Edge, type Offset } from '../../shared/layout/edge.js';
-import { EDGE_MARGIN, middleAt } from '../../shared/layout/anchor.js';
+import { blurSurface } from '../../../shared/layout/surface.js';
+import { GustGrid } from './grid.js';
+import { GustFooter } from './footer.js';
+import { SearchEngine, type SearchHost } from '../../search/engine.js';
+import { searchField } from '../../search/field.js';
+import { watchInstalledApps } from '../../search/installedApps.js';
+import { launchApp } from '../../search/providers/apps.js';
+import { taskbarPreferences } from '../../../desktop/panel/preferences/taskbarPreferences.js';
+import { isControlEnter } from '../../../shared/input/keyboardNavigation.js';
+import type { GustArea, GustSurface } from '../gust.js';
+import { dock, isVertical, toward, type Edge, type Offset } from '../../../shared/layout/edge.js';
+import { EDGE_MARGIN, middleAt } from '../../../shared/layout/anchor.js';
 
 const WIDTH = 660;
 const HEIGHT = 600;
 const SLIDE = 56;
 
-export class StartMenu implements StartSurface {
+export class GustPanel implements GustSurface {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
-  readonly footer: StartFooter;
+  readonly footer: GustFooter;
   readonly focusOnTouch = false;
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private readonly browser: StartGrid;
+  private readonly browser: GustGrid;
   private readonly searchProvider: SearchEngine;
   private readonly close: () => void;
 
@@ -33,9 +33,9 @@ export class StartMenu implements StartSurface {
     const { menus } = host;
     this.close = host.close;
     this.actor = new St.BoxLayout({
-      name: 'kestrel-start',
+      name: 'kestrel-gust-panel',
       orientation: Clutter.Orientation.VERTICAL,
-      style_class: 'kestrel-popover kestrel-start',
+      style_class: 'kestrel-popover kestrel-gust-panel',
       reactive: true, visible: false,
     });
     blurSurface(this.actor);
@@ -59,13 +59,13 @@ export class StartMenu implements StartSurface {
       height: 0,
       x_expand: true, y_expand: true,
     });
-    this.browser = new StartGrid(scroller, menus, app => this.launch(app));
+    this.browser = new GustGrid(scroller, menus, app => this.launch(app));
     this.searchProvider = new SearchEngine(host, view => this.browser.showResults(view));
     this.actor.add_child(this.browser.header);
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
 
-    this.footer = new StartFooter(host.close, menus);
+    this.footer = new GustFooter(host.close, menus);
     this.actor.add_child(this.footer.actor);
 
     const pinnedChanged = () => this.browser.setPinned(this.readPinned());
@@ -96,7 +96,7 @@ export class StartMenu implements StartSurface {
     return toward(edge, SLIDE);
   }
 
-  place({ area, available, anchor }: StartArea): void {
+  place({ area, available, anchor }: GustArea): void {
     const width = Math.min(WIDTH, area.width - 2 * EDGE_MARGIN);
     const height = Math.min(HEIGHT, available);
     const length = isVertical(anchor.edge) ? height : width;

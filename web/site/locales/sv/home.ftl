@@ -8,9 +8,6 @@ home-look = Ta en titt
 home-desktop-alt = Luft-skrivbordet med Rover, Inställningar och Tern öppna över en dimmig skog
 home-intro = Luft är ett komplett system för din dator, byggt på Fedora. Det har ett eget skrivbord, egna appar och en kärna som håller sig själv hel, så att du kan ägna dig åt din dag.
 
-home-start-heading = Start vet var allt finns.
-home-start-text = Skriv några bokstäver så hittar Start appar, inställningar, filer och till och med orden i dem. Den räknar, omvandlar enheter och slår på mörkt läge eller Wi-Fi när du ber om det.
-home-start-alt = Start söker efter ”mörk”, med åtgärden Mörkt läge och matchande inställningar
 
 home-essentials-heading = Det viktigaste, ett klick bort.
 home-essentials-text = Snabbinställningar är rutor som du ordnar själv. Notiser grupperas per app, med svar, mediekontroller och en kalender precis bredvid.
@@ -25,7 +22,6 @@ home-all-windows-alt = Alla fönster och arbetsytor i en överblick
 
 home-motion-heading = Rörelse med mening.
 home-motion-text = Allt i Luft rör sig på fjädrar, så det kan ändra sig halvvägs utan ryck. Svep följer fingrarna och landar där du tänkt, och appar öppnas snabbt, även första gången.
-home-motion-clip = Start, snabbinställningar, alla fönster i en överblick och tavlan, som öppnas och stängs i Luft
 
 home-wallpapers-heading = Välj ett foto. Luft gör resten.
 home-wallpapers-text = { $count ->

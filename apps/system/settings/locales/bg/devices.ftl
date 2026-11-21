@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Преглед и промяна на 
 settings-keyboard-copilot = Клавиш Copilot
 settings-keyboard-copilot-press = Натискане
 settings-keyboard-copilot-press-description = Какво прави краткото натискане на клавиша
-settings-keyboard-copilot-open-start = Отваряне на менюто Старт
 settings-keyboard-copilot-open-app = Отваряне на приложение
 settings-keyboard-copilot-nothing = Нищо
 settings-keyboard-copilot-app = Приложение

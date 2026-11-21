@@ -25,7 +25,7 @@ Address the reader as vous, lowercase, as macOS, Windows, GNOME and KDE do: « V
 
 ## Names
 
-- Settings, Disks and Install Luft are Paramètres, Disques and Installer Luft. Start stays Start: « le menu Start ».
+- Settings, Disks and Install Luft are Paramètres, Disques and Installer Luft.
 - App names take no article and don't change. Their gender would be that of application, but avoid agreeing with the bare name: « l’application Rover est fermée », not « Rover est fermé ». Luft is masculine: « Luft est à jour ».
 - Elide before a vowel or mute h as usual: « l’application », « d’Helium ».
 

@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Billentyűparancsok megtekintése és 
 settings-keyboard-copilot = Copilot billentyű
 settings-keyboard-copilot-press = Lenyomás
 settings-keyboard-copilot-press-description = Mi történjen a billentyű rövid lenyomásakor
-settings-keyboard-copilot-open-start = Start megnyitása
 settings-keyboard-copilot-open-app = Alkalmazás megnyitása
 settings-keyboard-copilot-nothing = Semmi
 settings-keyboard-copilot-app = Alkalmazás

@@ -5,7 +5,7 @@ export const NOTES_APP = 'com.lantharos.heft.desktop';
 interface PenActionHandlers {
   canInteract(): boolean;
   takeScreenshot(): void;
-  toggleStart(): void;
+  toggleGust(): void;
 }
 
 export class PenActions {
@@ -15,7 +15,7 @@ export class PenActions {
     const run: Record<string, () => void> = {
       screenshot: handlers.takeScreenshot,
       notes: () => Shell.AppSystem.get_default().lookup_app(NOTES_APP)?.activate(),
-      start: handlers.toggleStart,
+      gust: handlers.toggleGust,
     };
     this.signal = global.display.connect('pen-action', (_display, _device, action: string) => {
       if (handlers.canInteract()) run[action]?.();

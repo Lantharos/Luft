@@ -32,7 +32,6 @@ Instructions take the imperative with vós: «Premeu Super+Tab per veure totes l
 ## Names
 
 - Settings, Disks and Install Luft are Configuració, Discs and Instal·la Luft.
-- Start is Inici, as in Catalan Windows: «el menú Inici», «cerqueu a Inici».
 - The wallpaper folder keeps its English name on disk: «la carpeta Wallpapers, dins d’Imatges».
 - App names don't inflect and take no article on their own: «Rover és obert», «obre amb Magpie». When a sentence needs an article or gender: «l’aplicació Rover». Luft never takes an article: «instal·lar Luft».
 

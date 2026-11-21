@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Inici
 taskbar-quick-settings = Configuració ràpida
 taskbar-notifications-and-date = Notificacions i data
 taskbar-show-desktop = Mostra l’escriptori
@@ -43,7 +42,6 @@ tray-open-app = Obre { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Obre Inici
 board-show-all-windows = Mostra totes les finestres
 board-quick-settings = Configuració ràpida
 

@@ -8,9 +8,6 @@ home-look = Pogledaj
 home-desktop-alt = Radna površina sistema Luft sa aplikacijama Rover, Podešavanja i Tern otvorenim iznad maglovite šume
 home-intro = Luft je kompletan sistem za vaš računar, izgrađen na sistemu Fedora. Ima sopstvenu radnu površinu, sopstvene aplikacije i temelj koji sam ostaje netaknut, pa možete da se posvetite svom danu.
 
-home-start-heading = Start zna gde je sve.
-home-start-text = Otkucajte nekoliko slova i Start pronalazi aplikacije, podešavanja, datoteke, pa čak i reči u njima. Računa, pretvara merne jedinice i uključuje tamni režim ili Wi-Fi kad to zatražite.
-home-start-alt = Start pretražuje „tamno“, sa radnjom za tamni režim i odgovarajućim podešavanjima
 
 home-essentials-heading = Najvažnije je na jedan klik.
 home-essentials-text = Brza podešavanja su pločice koje sami raspoređujete. Obaveštenja se grupišu po aplikaciji, a odgovori, kontrole medija i kalendar nalaze se odmah pored njih.
@@ -25,7 +22,6 @@ home-all-windows-alt = Svi prozori i radni prostori na prvi pogled
 
 home-motion-heading = Kreće se s namerom.
 home-motion-text = Sve se u sistemu Luft kreće na oprugama, pa može da se predomisli usred pokreta bez trzaja. Prevlačenja prate vaše prste i završavaju tamo gde ste hteli, a aplikacije se otvaraju brzo, čak i prvi put.
-home-motion-clip = Start, brza podešavanja, svi prozori na prvi pogled i tabla dok se otvaraju i zatvaraju u sistemu Luft
 
 home-wallpapers-heading = Izaberite fotografiju. Luft će uraditi ostalo.
 home-wallpapers-text = { $count ->

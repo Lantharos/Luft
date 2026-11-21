@@ -11,7 +11,7 @@ type TaskbarStyle = 'bar' | 'floating' | 'separate';
 type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';
 type TaskbarDisplays = 'all' | 'primary';
-type StartStyle = 'menu' | 'palette';
+type GustLook = 'panel' | 'palette';
 
 export interface TaskbarMetrics {
   thickness: number;
@@ -39,8 +39,8 @@ const TOUCH_SLOT_GAP = 10;
 export const STRIP_HEIGHT = 24;
 
 const KEYS = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
-  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-badges', 'taskbar-shown', 'taskbar-start-button',
-  'start-style', 'pure-black', 'rounded-window-corners'] as const;
+  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-badges', 'taskbar-shown', 'taskbar-gust-button',
+  'gust-look', 'pure-black', 'rounded-window-corners'] as const;
 export type TaskbarKey = typeof KEYS[number] | 'taskbar-arrangement' | 'tablet';
 
 class TaskbarPreferences {
@@ -71,7 +71,7 @@ class TaskbarPreferences {
   }
 
   get look(): TaskbarLook { return this.settings.get_string('taskbar-look') as TaskbarLook; }
-  get startStyle(): StartStyle { return this.settings.get_string('start-style') as StartStyle; }
+  get gustLook(): GustLook { return this.settings.get_string('gust-look') as GustLook; }
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }
@@ -97,7 +97,7 @@ export class TaskbarLayout {
   get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
   get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
   get shown(): boolean { return this.touch || this.settings.get_boolean('taskbar-shown'); }
-  get startButton(): boolean { return this.touch || this.settings.get_boolean('taskbar-start-button'); }
+  get gustButtonShown(): boolean { return this.touch || this.settings.get_boolean('taskbar-gust-button'); }
 
   get metrics(): TaskbarMetrics {
     if (this.touch) return { ...TOUCH, margin: 0, radius: 0, inset: TOUCH_INSET, gap: TOUCH_SLOT_GAP };

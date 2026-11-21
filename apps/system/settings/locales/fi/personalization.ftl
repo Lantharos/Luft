@@ -74,18 +74,11 @@ settings-appearance-text-size = Tekstin koko
 ## Taskbar
 
 settings-taskbar-preview = Tehtäväpalkin esikatselu
-settings-start-section = Start
-settings-start-style = Tyyli
-settings-start-style-menu = Valikko
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Haku, sovellukset ja kansiot tehtäväpalkin vieressä
-settings-start-style-palette-description = Hakupalkki näytön keskellä sovelluksille, ikkunoille, tiedostoille ja vastauksille
-settings-start-button = Näytä Start-painike
-settings-start-button-description = Super avaa Start-valikon joka tapauksessa
-settings-start-web = Hae verkosta hakukoneella
+settings-gust-look-panel-description = Haku, sovellukset ja kansiot tehtäväpalkin vieressä
+settings-gust-look-palette-description = Hakupalkki näytön keskellä sovelluksille, ikkunoille, tiedostoille ja vastauksille
+settings-gust-web = Hae verkosta hakukoneella
 settings-taskbar-shown = Näytä tehtäväpalkki
 settings-taskbar-hidden = Piilotettu
-settings-taskbar-hidden-description = Kello ja tilakuvakkeet pysyvät kulmassa, ja Super avaa Start-valikon
 settings-taskbar-look = Ulkonäkö
 settings-taskbar-look-glass = Lasi
 settings-taskbar-look-solid = Peittävä

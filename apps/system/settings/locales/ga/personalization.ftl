@@ -77,18 +77,11 @@ settings-appearance-text-size = Méid an téacs
 ## Taskbar
 
 settings-taskbar-preview = Réamhamharc ar an tascbharra
-settings-start-section = Tosaigh
-settings-start-style = Stíl
-settings-start-style-menu = Roghchlár
-settings-start-style-palette = Gust
-settings-start-style-menu-description = Cuardach, aipeanna agus fillteáin in aice leis an tascbharra
-settings-start-style-palette-description = Barra cuardaigh i lár an scáileáin d’aipeanna, d’fhuinneoga, do chomhaid agus d’fhreagraí
-settings-start-button = Taispeáin an cnaipe Tosaigh
-settings-start-button-description = Osclaíonn Super an roghchlár Tosaigh pé scéal é
-settings-start-web = Cuardaigh an gréasán le
+settings-gust-look-panel-description = Cuardach, aipeanna agus fillteáin in aice leis an tascbharra
+settings-gust-look-palette-description = Barra cuardaigh i lár an scáileáin d’aipeanna, d’fhuinneoga, do chomhaid agus d’fhreagraí
+settings-gust-web = Cuardaigh an gréasán le
 settings-taskbar-shown = Taispeáin an tascbharra
 settings-taskbar-hidden = I bhfolach
-settings-taskbar-hidden-description = Fanann an clog agus na deilbhíní stádais i gcúinne, agus osclaíonn Super an roghchlár Tosaigh
 settings-taskbar-look = Dreach
 settings-taskbar-look-glass = Gloine
 settings-taskbar-look-solid = Soladach

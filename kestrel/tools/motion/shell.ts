@@ -124,8 +124,8 @@ async function notifications(clip: Clip) {
 
 const appOf = (window: Meta.Window) => Shell.WindowTracker.get_default().get_window_app(window)?.id;
 
-async function searchStart(name: string) {
-  toggleSurface('start');
+async function searchGust(name: string) {
+  toggleSurface('gust');
   await settled();
   type(name);
   await settled();
@@ -136,15 +136,15 @@ async function unpinnedLaunches(clip: Clip, favorites: Gio.Settings) {
   favorites.set_strv('favorite-apps', saved.filter(id => id !== ROVER));
   try {
     await settled();
-    await searchStart('Rover');
+    await searchGust('Rover');
     await clip('taskbar-launch-unpinned', async () => {
       press(Clutter.KEY_Return);
       await waitForWindow(window => appOf(window) === ROVER, 'Rover opens');
-    }, {notes: 'An unpinned app launched from Start gets an icon and opens out of it', timeout: 8000});
+    }, {notes: 'An unpinned app launched from Gust gets an icon and opens out of it', timeout: 8000});
     for (const window of Shell.AppSystem.get_default().lookup_app(ROVER).get_windows()) window.delete(global.get_current_time());
     await waitUntil(() => !named(`kestrel-app-${ROVER}`), 'Rover leaves the taskbar', 5000);
     await reset();
-    await searchStart('GIMP');
+    await searchGust('GIMP');
     press(Clutter.KEY_Return);
     await waitUntil(() => named(`kestrel-app-${NEVER_OPENS}`)?.mapped, 'GIMP gets an icon while it starts', 2000);
     const icon = existing(`kestrel-app-${NEVER_OPENS}`) as St.Button;
@@ -234,8 +234,8 @@ async function snaps(clip: Clip) {
 
 async function panels(clip: Clip) {
   const {width, height} = global.display.get_monitor_geometry(global.display.get_primary_monitor());
-  const areas = {start: [width / 2 - 420, height - 820, 840, 820] as Area, quick: bottomRight(560, 720), notifications: bottomRight(560, 900)};
-  for (const surface of ['start', 'quick', 'notifications'] as const) {
+  const areas = {gust: [width / 2 - 420, height - 820, 840, 820] as Area, quick: bottomRight(560, 720), notifications: bottomRight(560, 900)};
+  for (const surface of ['gust', 'quick', 'notifications'] as const) {
     await reset();
     await clip(`${surface}-content-arrives`, () => toggleSurface(surface), {notes: 'Content follows the panel in', area: areas[surface]});
   }

@@ -393,13 +393,13 @@
       <termEntry id="29">
         <langSet xml:lang="en">
           <tig>
-            <term>Start</term>
+            <term>Gust</term>
           </tig>
         </langSet>
         <langSet xml:lang="is">
           <tig>
-            <term>Upphaf</term>
-            <note from="translator">The menu opened with Super or the Luft mark; a name, neuter, capitalized; in running text and after prepositions say upphafsvalmynd (feminine): Festa á upphafsvalmynd</note>
+            <term>Gust</term>
+            <note from="translator">What Super and the Luft mark open: a panel next to the taskbar or a search bar; a name, kept as is</note>
           </tig>
         </langSet>
       </termEntry>
@@ -932,7 +932,7 @@
         <langSet xml:lang="is">
           <tig>
             <term>festa</term>
-            <note from="translator">verb: keep an app on the taskbar or in Start; festa á verkstiku</note>
+            <note from="translator">verb: keep an app on the taskbar; festa á verkstiku</note>
           </tig>
         </langSet>
       </termEntry>

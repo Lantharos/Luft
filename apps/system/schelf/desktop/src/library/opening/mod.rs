@@ -46,7 +46,7 @@ fn start(desktop: &str, token: Option<&str>) -> Result<Option<watch::Started>, S
     watch::start(&info, token).map(Some)
 }
 
-/// Starts the app the way the Start menu does. When it closes again within a few seconds, says
+/// Starts the app the way Gust does. When it closes again within a few seconds, says
 /// why, as far as its output tells.
 pub async fn open(
     Opening {

@@ -21,10 +21,10 @@ async function checkSecondaryPanel(monitor: Monitor) {
 
   const panel = existing('kestrel-secondary-panel');
   await eventually(() => panel.visible && within(panel, monitor) && farSide(boxOf(panel)) === farSide(monitor), 'every display has its own taskbar');
-  ofType(named('Start', panel), St.Button).emit('clicked', Clutter.BUTTON_PRIMARY);
-  const start = existing('kestrel-start');
-  await eventually(() => start.visible && within(start, monitor), 'Start opens on the display whose taskbar was used');
-  await capture('secondary-start');
+  ofType(named('Gust', panel), St.Button).emit('clicked', Clutter.BUTTON_PRIMARY);
+  const gust = existing('kestrel-gust-panel');
+  await eventually(() => gust.visible && within(gust, monitor), 'Gust opens on the display whose taskbar was used');
+  await capture('secondary-gust');
   dismissImmediately();
 }
 

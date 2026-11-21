@@ -23,7 +23,7 @@ export function arrange(islands: Arrangement) {
 }
 
 export function alongEdge(edge: Edge, apps: 'center' | 'start' = 'center'): Arrangement {
-  return [[`${edge}-${apps}`, ['start', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]];
+  return [[`${edge}-${apps}`, ['gust', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]];
 }
 
 export const taskbarEdge = () => (arrangement().find(([, elements]) => elements.includes('dock'))?.[0].split('-')[0] ?? 'bottom') as Edge;

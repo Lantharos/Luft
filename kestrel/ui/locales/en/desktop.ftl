@@ -1,7 +1,7 @@
 ## Taskbar
 
-# Screen-reader label of the Start button on the taskbar.
-taskbar-start = Start
+# Screen-reader label of the Gust button on the taskbar.
+taskbar-gust = Gust
 # Screen-reader label of the status area button that opens quick settings.
 taskbar-quick-settings = Quick settings
 # Screen-reader label of the clock button that opens notifications and the calendar.
@@ -72,8 +72,8 @@ tray-open-app = Open { $appName }
 
 ## Board (tablet window layout)
 
-# Screen-reader label of the corner button that opens Start.
-board-open-start = Open Start
+# Screen-reader label of the corner button that opens Gust.
+board-open-gust = Open Gust
 # Screen-reader label of the corner button that shows every open window.
 board-show-all-windows = Show all windows
 # Screen-reader label of the corner pill with the clock and battery.

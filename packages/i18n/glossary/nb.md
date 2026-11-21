@@ -28,7 +28,6 @@ Write moderate, mainstream Bokmål as Windows and macOS do: the -en ending for f
 ## Names
 
 - Settings, Disks and Install Luft are Innstillinger, Disker and Installer Luft.
-- Start stays Start, as in Windows; «Start-menyen» when it needs a definite form.
 - Names never take the definite ending, so never «Roveren». When a sentence needs one: «appen Rover», «i appen Tern». The genitive is a plain -s: «Rovers vindu», «Lufts oppdateringer».
 
 ## Plurals

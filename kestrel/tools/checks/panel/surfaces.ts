@@ -57,18 +57,18 @@ async function checkPowerMenu() {
   require(besideItsButton(named('kestrel-notifications')!, named('Notifications and date', named('kestrel-panel')!)!), 'the notification center opens beside the clock');
   await capture('notification-center');
 
-  toggleSurface('start');
-  const start = named('kestrel-start')!;
-  await eventually(() => shown(start), 'Start opens from the notification center');
+  toggleSurface('gust');
+  const gust = named('kestrel-gust-panel')!;
+  await eventually(() => shown(gust), 'Gust opens from the notification center');
   await settled();
-  require(besideItsButton(start, named('Start', named('kestrel-panel')!)!), 'Start opens beside its button');
-  const footer = start.get_last_child()!;
+  require(besideItsButton(gust, named('Gust', named('kestrel-panel')!)!), 'Gust opens beside its button');
+  const footer = gust.get_last_child()!;
   click(footer.get_last_child()!);
   const sessionActions = () => named('Power off', footer)?.get_parent();
   await eventually(() => sessionActions()?.visible, 'the power button shows the session actions');
   await capture('power-menu');
   press(Clutter.KEY_Escape);
-  await eventually(() => start.visible && !sessionActions()!.visible, 'Escape closes the session actions and keeps Start open');
+  await eventually(() => gust.visible && !sessionActions()!.visible, 'Escape closes the session actions and keeps Gust open');
 }
 
 export async function run() {

@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Cerca app, file e altro
-start-search-cut = Taglia
-start-search-copy = Copia
-start-search-paste = Incolla
-start-search-select-all = Seleziona tutto
-start-power = Alimentazione e sessione
-start-power-close = Chiudi opzioni di alimentazione
-start-account-settings = Impostazioni account
-start-apps = App
-start-folder-default-name = Cartella
-start-folder-open = Apri cartella
-start-folder-rename = Rinomina
-start-folder-ungroup = Separa app
-start-open = Apri
-start-move-to-apps = Sposta in App
+gust-search-placeholder = Cerca app, file e altro
+gust-search-cut = Taglia
+gust-search-copy = Copia
+gust-search-paste = Incolla
+gust-search-select-all = Seleziona tutto
+gust-power = Alimentazione e sessione
+gust-power-close = Chiudi opzioni di alimentazione
+gust-account-settings = Impostazioni account
+gust-apps = App
+gust-folder-default-name = Cartella
+gust-folder-open = Apri cartella
+gust-folder-rename = Rinomina
+gust-folder-ungroup = Separa app
+gust-open = Apri
+gust-move-to-apps = Sposta in App
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Risultato migliore
-start-search-group-apps = App
-start-search-group-commands = Azioni delle app
-start-search-group-windows = Finestre aperte
-start-search-group-actions = Azioni
-start-search-group-settings = Impostazioni
-start-search-group-clipboard = Appunti
-start-search-group-emoji = Emoji
-start-search-group-files = File
-start-search-group-contents = Nei file
-start-search-group-web = Web
-start-search-web = Cerca “{ $query }” sul web
-start-search-clipboard-text = Dalla cronologia degli Appunti
-start-search-clipboard-keywords = appunti, copiato, copiati, cronologia degli appunti, incolla, clipboard
-start-search-emoji-insert = Inserisci
-start-search-settings-page = Impostazioni
-start-search-settings-section = Impostazioni: { $page }
-start-search-file-reveal = Mostra in { $fileManager }
-start-search-file-copy-path = Copia percorso
-start-search-conversion = { $amount } { $from } in { $to }
-start-search-calculation = { $expression }, premi Invio per copiare
+gust-search-best-match = Risultato migliore
+gust-search-group-apps = App
+gust-search-group-commands = Azioni delle app
+gust-search-group-windows = Finestre aperte
+gust-search-group-actions = Azioni
+gust-search-group-settings = Impostazioni
+gust-search-group-clipboard = Appunti
+gust-search-group-emoji = Emoji
+gust-search-group-files = File
+gust-search-group-contents = Nei file
+gust-search-group-web = Web
+gust-search-web = Cerca “{ $query }” sul web
+gust-search-clipboard-text = Dalla cronologia degli Appunti
+gust-search-clipboard-keywords = appunti, copiato, copiati, cronologia degli appunti, incolla, clipboard
+gust-search-emoji-insert = Inserisci
+gust-search-settings-page = Impostazioni
+gust-search-settings-section = Impostazioni: { $page }
+gust-search-file-reveal = Mostra in { $fileManager }
+gust-search-file-copy-path = Copia percorso
+gust-search-conversion = { $amount } { $from } in { $to }
+gust-search-calculation = { $expression }, premi Invio per copiare
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = Fino al { $date }
-start-search-answer-since = Dal { $date }
-start-search-answer-between = Tra il { $from } e il { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = Fino al { $date }
+gust-search-answer-since = Dal { $date }
+gust-search-answer-between = Tra il { $from } e il { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } ora
    *[other] { $hours } ore
 } avanti
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } ora
    *[other] { $hours } ore
 } indietro
-start-search-answer-time-same = { $place }, stessa ora di qui
-start-search-answer-converted = A { $place } quando a { $from } sono le { $time }
-start-search-answer-converted-here = Qui quando a { $from } sono le { $time }
-start-search-answer-converted-from-here = A { $place } quando qui sono le { $time }
+gust-search-answer-time-same = { $place }, stessa ora di qui
+gust-search-answer-converted = A { $place } quando a { $from } sono le { $time }
+gust-search-answer-converted-here = Qui quando a { $from } sono le { $time }
+gust-search-answer-converted-from-here = A { $place } quando qui sono le { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Passa alla modalità scura
-start-search-dark-style-off = Passa alla modalità chiara
-start-search-dark-style-keywords = modalità scura, stile scuro, tema scuro, modalità chiara, stile chiaro, tema chiaro, dark mode
-start-search-night-light-on = Attiva Luce notturna
-start-search-night-light-off = Disattiva Luce notturna
-start-search-night-light-keywords = luce notturna, luce blu, filtro luce blu, colori caldi, night light, night shift
-start-search-do-not-disturb-on = Attiva Non disturbare
-start-search-do-not-disturb-off = Disattiva Non disturbare
-start-search-do-not-disturb-keywords = non disturbare, concentrazione, silenzio, silenzioso, silenzia notifiche, disattiva notifiche, notifiche mute, dnd
-start-search-wifi-on = Attiva Wi-Fi
-start-search-wifi-off = Disattiva Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, wireless, senza fili, wlan, rete
-start-search-bluetooth-on = Attiva Bluetooth
-start-search-bluetooth-off = Disattiva Bluetooth
-start-search-bluetooth-keywords = bluetooth
-start-search-airplane-mode-on = Attiva Modalità aereo
-start-search-airplane-mode-off = Disattiva Modalità aereo
-start-search-airplane-mode-keywords = modalità aereo, modalità volo, aereo, offline, radio
-start-search-keep-awake-on = Mantieni attivo
-start-search-keep-awake-off = Non mantenere più attivo
-start-search-keep-awake-keywords = mantieni attivo, resta attivo, schermo acceso, caffeina, impedisci sospensione, non sospendere
-start-search-lock-keywords = blocca schermo, blocca computer, blocco schermo
-start-search-suspend-keywords = sospendi, sospensione, standby, stop
-start-search-log-out-keywords = esci, disconnetti, disconnessione, logout, termina sessione, cambia utente
-start-search-restart-keywords = riavvia, riavvio, riavvia computer, reboot
-start-search-power-off-keywords = spegni, spegnimento, arresta, arresto, spegni computer, shutdown
+gust-search-dark-style-on = Passa alla modalità scura
+gust-search-dark-style-off = Passa alla modalità chiara
+gust-search-dark-style-keywords = modalità scura, stile scuro, tema scuro, modalità chiara, stile chiaro, tema chiaro, dark mode
+gust-search-night-light-on = Attiva Luce notturna
+gust-search-night-light-off = Disattiva Luce notturna
+gust-search-night-light-keywords = luce notturna, luce blu, filtro luce blu, colori caldi, night light, night shift
+gust-search-do-not-disturb-on = Attiva Non disturbare
+gust-search-do-not-disturb-off = Disattiva Non disturbare
+gust-search-do-not-disturb-keywords = non disturbare, concentrazione, silenzio, silenzioso, silenzia notifiche, disattiva notifiche, notifiche mute, dnd
+gust-search-wifi-on = Attiva Wi-Fi
+gust-search-wifi-off = Disattiva Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, wireless, senza fili, wlan, rete
+gust-search-bluetooth-on = Attiva Bluetooth
+gust-search-bluetooth-off = Disattiva Bluetooth
+gust-search-bluetooth-keywords = bluetooth
+gust-search-airplane-mode-on = Attiva Modalità aereo
+gust-search-airplane-mode-off = Disattiva Modalità aereo
+gust-search-airplane-mode-keywords = modalità aereo, modalità volo, aereo, offline, radio
+gust-search-keep-awake-on = Mantieni attivo
+gust-search-keep-awake-off = Non mantenere più attivo
+gust-search-keep-awake-keywords = mantieni attivo, resta attivo, schermo acceso, caffeina, impedisci sospensione, non sospendere
+gust-search-lock-keywords = blocca schermo, blocca computer, blocco schermo
+gust-search-suspend-keywords = sospendi, sospensione, standby, stop
+gust-search-log-out-keywords = esci, disconnetti, disconnessione, logout, termina sessione, cambia utente
+gust-search-restart-keywords = riavvia, riavvio, riavvia computer, reboot
+gust-search-power-off-keywords = spegni, spegnimento, arresta, arresto, spegni computer, shutdown
 
 ## Quick settings
 

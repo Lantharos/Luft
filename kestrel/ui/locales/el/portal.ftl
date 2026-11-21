@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Καμία εγκατεστημένη ε�
 portal-app-chooser-find = Εύρεση εφαρμογής
 portal-app-chooser-open = Άνοιγμα
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Προσθήκη αυτού του ιστότοπου στις εφαρμογές σας;
-portal-launcher-website-description = Ο ιστότοπος { $site } θα ανοίγει από το Start σε δικό του παράθυρο.
 portal-launcher-title = Προσθήκη στις εφαρμογές σας;
-portal-launcher-description = { $appName } θέλει να προσθέσει μια εφαρμογή στο Start.
 portal-launcher-name = Όνομα
 portal-launcher-add = Προσθήκη
 

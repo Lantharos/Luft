@@ -1,94 +1,94 @@
-## Start
+## Gust
 
-start-search-placeholder = Пребарајте апликации, датотеки и друго
-start-search-cut = Исечи
-start-search-copy = Копирај
-start-search-paste = Залепи
-start-search-select-all = Избери сè
-start-power = Напојување и сесија
-start-power-close = Затвори ги опциите за напојување
-start-account-settings = Поставки за сметката
-start-apps = Апликации
-start-folder-default-name = Папка
-start-folder-open = Отвори ја папката
-start-folder-rename = Преименувај
-start-folder-ungroup = Раздели ги апликациите
-start-open = Отвори
-start-move-to-apps = Премести во Апликации
+gust-search-placeholder = Пребарајте апликации, датотеки и друго
+gust-search-cut = Исечи
+gust-search-copy = Копирај
+gust-search-paste = Залепи
+gust-search-select-all = Избери сè
+gust-power = Напојување и сесија
+gust-power-close = Затвори ги опциите за напојување
+gust-account-settings = Поставки за сметката
+gust-apps = Апликации
+gust-folder-default-name = Папка
+gust-folder-open = Отвори ја папката
+gust-folder-rename = Преименувај
+gust-folder-ungroup = Раздели ги апликациите
+gust-open = Отвори
+gust-move-to-apps = Премести во Апликации
 
-## Start search results
+## Gust search results
 
-start-search-best-match = Најдобро совпаѓање
-start-search-group-apps = Апликации
-start-search-group-commands = Дејства на апликациите
-start-search-group-windows = Отворени прозорци
-start-search-group-actions = Дејства
-start-search-group-settings = Поставки
-start-search-group-clipboard = Клипборд
-start-search-group-emoji = Емоџи
-start-search-group-files = Датотеки
-start-search-group-contents = Во содржината на датотеките
-start-search-group-web = Веб
-start-search-web = Пребарај „{ $query }“ на вебот
-start-search-clipboard-text = Од историјата на клипбордот
-start-search-clipboard-keywords = клипборд, копирано, историја на клипбордот, залепи, clipboard
-start-search-emoji-insert = Вметни
-start-search-settings-page = Поставки
-start-search-settings-section = Поставки: { $page }
-start-search-file-reveal = Прикажи во { $fileManager }
-start-search-file-copy-path = Копирај ја патеката
-start-search-conversion = { $amount } { $from } во { $to }
-start-search-calculation = { $expression }, притиснете Enter за да копирате
+gust-search-best-match = Најдобро совпаѓање
+gust-search-group-apps = Апликации
+gust-search-group-commands = Дејства на апликациите
+gust-search-group-windows = Отворени прозорци
+gust-search-group-actions = Дејства
+gust-search-group-settings = Поставки
+gust-search-group-clipboard = Клипборд
+gust-search-group-emoji = Емоџи
+gust-search-group-files = Датотеки
+gust-search-group-contents = Во содржината на датотеките
+gust-search-group-web = Веб
+gust-search-web = Пребарај „{ $query }“ на вебот
+gust-search-clipboard-text = Од историјата на клипбордот
+gust-search-clipboard-keywords = клипборд, копирано, историја на клипбордот, залепи, clipboard
+gust-search-emoji-insert = Вметни
+gust-search-settings-page = Поставки
+gust-search-settings-section = Поставки: { $page }
+gust-search-file-reveal = Прикажи во { $fileManager }
+gust-search-file-copy-path = Копирај ја патеката
+gust-search-conversion = { $amount } { $from } во { $to }
+gust-search-calculation = { $expression }, притиснете Enter за да копирате
 
-## Answers in Start's search to questions about dates and times.
+## Answers in Gust's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
 
-start-search-answer-until = До { $date }
-start-search-answer-since = Од { $date }
-start-search-answer-between = Од { $from } до { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
+gust-search-answer-until = До { $date }
+gust-search-answer-since = Од { $date }
+gust-search-answer-between = Од { $from } до { $to }
+gust-search-answer-time-ahead = { $place }, { $hours ->
     [one] { $hours } час
    *[other] { $hours } часа
 } понапред
-start-search-answer-time-behind = { $place }, { $hours ->
+gust-search-answer-time-behind = { $place }, { $hours ->
     [one] { $hours } час
    *[other] { $hours } часа
 } поназад
-start-search-answer-time-same = { $place }, исто време како овде
-start-search-answer-converted = Во { $place } кога е { $time } во { $from }
-start-search-answer-converted-here = Овде кога е { $time } во { $from }
-start-search-answer-converted-from-here = Во { $place } кога овде е { $time }
+gust-search-answer-time-same = { $place }, исто време како овде
+gust-search-answer-converted = Во { $place } кога е { $time } во { $from }
+gust-search-answer-converted-here = Овде кога е { $time } во { $from }
+gust-search-answer-converted-from-here = Во { $place } кога овде е { $time }
 
-## Start search actions
+## Gust search actions
 ## The keyword messages are comma-separated words people might type to find the action.
 ## They aren't shown. Keep common English terms in the translation when people would type them too.
 
-start-search-dark-style-on = Префрли на темен режим
-start-search-dark-style-off = Префрли на светол режим
-start-search-dark-style-keywords = темен режим, темна тема, светол режим, светла тема, темно, светло, dark mode, dark theme, light mode
-start-search-night-light-on = Вклучи Ноќно светло
-start-search-night-light-off = Исклучи Ноќно светло
-start-search-night-light-keywords = ноќно светло, ноќен режим, сина светлина, топли бои, night light, night shift
-start-search-do-not-disturb-on = Вклучи Не вознемирувај
-start-search-do-not-disturb-off = Исклучи Не вознемирувај
-start-search-do-not-disturb-keywords = не вознемирувај, фокус, тишина, без известувања, исклучи известувања, утиши известувања, do not disturb, dnd
-start-search-wifi-on = Вклучи Wi-Fi
-start-search-wifi-off = Исклучи Wi-Fi
-start-search-wifi-keywords = wifi, wi-fi, безжична мрежа, безжично, wlan, интернет
-start-search-bluetooth-on = Вклучи Bluetooth
-start-search-bluetooth-off = Исклучи Bluetooth
-start-search-bluetooth-keywords = bluetooth, блутут
-start-search-airplane-mode-on = Вклучи Режим за авион
-start-search-airplane-mode-off = Исклучи Режим за авион
-start-search-airplane-mode-keywords = режим за авион, авионски режим, лет, авион, радио, airplane mode, flight mode
-start-search-keep-awake-on = Вклучи Без спиење
-start-search-keep-awake-off = Исклучи Без спиење
-start-search-keep-awake-keywords = без спиење, остани буден, спречи спиење, не заспивај, екранот вклучен, caffeine, keep awake
-start-search-lock-keywords = заклучи, заклучи екран, заклучен екран, заклучи компјутер, lock
-start-search-suspend-keywords = спиење, режим на спиење, мирување, заспи, sleep, standby
-start-search-log-out-keywords = одјава, одјави се, одјавување, крај на сесијата, излези, log out, sign out
-start-search-restart-keywords = рестартирај, рестартирање, рестартирај компјутер, повторно стартување, restart, reboot
-start-search-power-off-keywords = исклучи, исклучување, исклучи компјутер, изгаси, гаснење, shut down, power off
+gust-search-dark-style-on = Префрли на темен режим
+gust-search-dark-style-off = Префрли на светол режим
+gust-search-dark-style-keywords = темен режим, темна тема, светол режим, светла тема, темно, светло, dark mode, dark theme, light mode
+gust-search-night-light-on = Вклучи Ноќно светло
+gust-search-night-light-off = Исклучи Ноќно светло
+gust-search-night-light-keywords = ноќно светло, ноќен режим, сина светлина, топли бои, night light, night shift
+gust-search-do-not-disturb-on = Вклучи Не вознемирувај
+gust-search-do-not-disturb-off = Исклучи Не вознемирувај
+gust-search-do-not-disturb-keywords = не вознемирувај, фокус, тишина, без известувања, исклучи известувања, утиши известувања, do not disturb, dnd
+gust-search-wifi-on = Вклучи Wi-Fi
+gust-search-wifi-off = Исклучи Wi-Fi
+gust-search-wifi-keywords = wifi, wi-fi, безжична мрежа, безжично, wlan, интернет
+gust-search-bluetooth-on = Вклучи Bluetooth
+gust-search-bluetooth-off = Исклучи Bluetooth
+gust-search-bluetooth-keywords = bluetooth, блутут
+gust-search-airplane-mode-on = Вклучи Режим за авион
+gust-search-airplane-mode-off = Исклучи Режим за авион
+gust-search-airplane-mode-keywords = режим за авион, авионски режим, лет, авион, радио, airplane mode, flight mode
+gust-search-keep-awake-on = Вклучи Без спиење
+gust-search-keep-awake-off = Исклучи Без спиење
+gust-search-keep-awake-keywords = без спиење, остани буден, спречи спиење, не заспивај, екранот вклучен, caffeine, keep awake
+gust-search-lock-keywords = заклучи, заклучи екран, заклучен екран, заклучи компјутер, lock
+gust-search-suspend-keywords = спиење, режим на спиење, мирување, заспи, sleep, standby
+gust-search-log-out-keywords = одјава, одјави се, одјавување, крај на сесијата, излези, log out, sign out
+gust-search-restart-keywords = рестартирај, рестартирање, рестартирај компјутер, повторно стартување, restart, reboot
+gust-search-power-off-keywords = исклучи, исклучување, исклучи компјутер, изгаси, гаснење, shut down, power off
 
 ## Quick settings
 

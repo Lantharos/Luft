@@ -15,7 +15,7 @@ The login screen starts `kestrel-session`, which runs `kestrel-session.target` a
 | --- | --- |
 | `kestrel-session-manager` | `org.gnome.SessionManager` for apps and the shell: inhibitors, registered apps, logging out, restarting and shutting down once Kestrel has asked, idle presence, and `org.freedesktop.ScreenSaver` for players and browsers |
 | `kestrel-settings` | The settings service, started before the shell |
-| `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
+| `kestrel-search` | Indexes the names and text of files in your home folder for Gust, at idle priority |
 | `kestrel-portal` | The portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown; its dialogs open in Kestrel |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |

@@ -19,12 +19,10 @@ portal-app-chooser-nothing-installed = Ingen installeret app kan åbne dette
 portal-app-chooser-find = Find en app
 portal-app-chooser-open = Åbn
 
-## Adding a website or app to Start
+## Adding a website or app to Gust
 
 portal-launcher-website-title = Vil du føje dette websted til dine apps?
-portal-launcher-website-description = { $site } åbnes i sit eget vindue fra Start.
 portal-launcher-title = Vil du føje dette til dine apps?
-portal-launcher-description = { $appName } vil føje en app til Start.
 portal-launcher-name = Navn
 portal-launcher-add = Tilføj
 

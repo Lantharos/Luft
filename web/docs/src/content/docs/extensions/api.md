@@ -299,7 +299,7 @@ Shaders on windows, on whole displays and on the taskbar and panels, for extensi
 | `addWindowShader(options)` | A window's own pixels | A texture for each window |
 | `addWindowTransition(options)` | A window while it opens or closes | Nothing in between |
 | `addDesktopFilter(options)` | A whole display, after everything else | A pass over the display each frame something changes |
-| `addSurfaceOverlay(options)` | The taskbar, Quick Settings, Start or notifications, over what they show | A little shader |
+| `addSurfaceOverlay(options)` | The taskbar, Quick Settings, Gust or notifications, over what they show | A little shader |
 
 Every option list takes a `label`, the effect's name for the notification when Kestrel has to turn it off, and these:
 
@@ -361,7 +361,7 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 
 ## search
 
-`search.addProvider({ title, search(query) })` adds results to Start. `search` returns, or resolves to, results with `title`, `description?`, `icon?` and `activate()`. Start shows the first five under `title` and drops answers to queries that are no longer typed.
+`search.addProvider({ title, search(query) })` adds results to Gust. `search` returns, or resolves to, results with `title`, `description?`, `icon?` and `activate()`. Gust shows the first five under `title` and drops answers to queries that are no longer typed.
 
 ## notifications
 

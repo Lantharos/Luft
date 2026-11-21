@@ -114,7 +114,7 @@ async function checkGamesLeaveSteam() {
   await eventually(() => ['steam_app_12345.desktop', 'steam_app_23456.desktop', 'steam_app_34567.desktop', STEAM_APP].every(id => taskbarButton(id)?.mapped), 'each game has its own taskbar button');
   await capture('taskbar-steam-games');
   require(ofType(taskbarButton('steam_app_12345.desktop'), St.Button).accessible_name === 'Harbour Run™', 'the button is named after the game');
-  require(!Shell.AppSystem.get_default().get_installed().some(info => info.get_id() === 'steam_app_12345.desktop' && info.should_show()), 'games stay out of Start');
+  require(!Shell.AppSystem.get_default().get_installed().some(info => info.get_id() === 'steam_app_12345.desktop' && info.should_show()), 'games stay out of Gust');
   return async () => {
     await Promise.all([library, friends, game, settings, native, unlisted].map(close));
     await Promise.all([steam, flatpak, shortcut].map(stop));

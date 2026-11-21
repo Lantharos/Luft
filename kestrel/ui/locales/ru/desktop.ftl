@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Пуск
 taskbar-quick-settings = Быстрые настройки
 taskbar-notifications-and-date = Уведомления и дата
 taskbar-show-desktop = Показать рабочий стол
@@ -43,7 +42,6 @@ tray-open-app = Открыть { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Открыть меню «Пуск»
 board-show-all-windows = Показать все окна
 board-quick-settings = Быстрые настройки
 

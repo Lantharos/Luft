@@ -1,6 +1,5 @@
 ## Taskbar
 
-taskbar-start = Pradžia
 taskbar-quick-settings = Spartieji nustatymai
 taskbar-notifications-and-date = Pranešimai ir data
 taskbar-show-desktop = Rodyti darbalaukį
@@ -43,7 +42,6 @@ tray-open-app = Atidaryti programą { $appName }
 
 ## Board (tablet window layout)
 
-board-open-start = Atidaryti meniu Pradžia
 board-show-all-windows = Rodyti visus langus
 board-quick-settings = Spartieji nustatymai
 

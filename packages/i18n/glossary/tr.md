@@ -25,7 +25,6 @@ Prefer sentences without a person: “Güncellemeler bir sonraki yeniden başlat
 ## Names
 
 - Settings, Disks and Install Luft are Ayarlar, Diskler and Luft’u yükle.
-- Start is Başlat, as in Windows; when it needs a suffix, write “Başlat menüsünde”.
 - Suffixes follow pronunciation and vowel harmony, after an apostrophe: “Luft’ta”, “Kestrel’de”, “Ayarlar’dan”. The apps' names have no settled pronunciation, so inflect a noun next to them: “Rover uygulamasında”.
 - Never attach a suffix to a variable such as `{ $name }`, since harmony depends on the value. Use a colon (“Açıldı: { $name }”) or a following noun: “{ $app } uygulamasında”, “{ $name } adlı dosya”.
 

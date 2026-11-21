@@ -39,10 +39,10 @@ Kestrel is the desktop shell and login screen:
 | --- | --- |
 | `kestrel/compositor` | A patch series on Mutter 51: rounded corners, the board's transformed window group, blur, variable refresh for games, default display scales, GPU reset recovery and more |
 | `kestrel/engine` | The native shell, forked from GNOME Shell 51: the St toolkit, window management, authentication, the lock screen, screenshots and the D-Bus services apps and portals use |
-| `kestrel/ui` | The taskbar, Start, Quick settings and every other surface, in TypeScript, built into the engine's resources |
+| `kestrel/ui` | The taskbar, Gust, Quick settings and every other surface, in TypeScript, built into the engine's resources |
 | `kestrel/wrapper`, `kestrel/session` | The process that starts Kestrel and keeps its display, and the session manager |
 | `kestrel/settings` | `kestrel-settings`, in place of gnome-settings-daemon: XSETTINGS, Night Light, power, printing and time zones |
-| `kestrel/greeter`, `kestrel/portal`, `kestrel/search`, `kestrel/post` | The login screen's service, the portal backend, the file index behind Start, and Post |
+| `kestrel/greeter`, `kestrel/portal`, `kestrel/search`, `kestrel/post` | The login screen's service, the portal backend, the file index behind Gust, and Post |
 | `kestrel/keyring` | Luft Keyring |
 | `kestrel/watchdog` | Restarts cleanly when the GPU hangs |
 

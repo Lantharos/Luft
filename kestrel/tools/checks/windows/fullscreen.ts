@@ -21,16 +21,16 @@ async function staysShown(actor: Clutter.Actor, label: string) {
   require(hidden === 0, label);
 }
 
-async function checkStart(game: Meta.Window, panel: Clutter.Actor) {
-  const start = named('kestrel-start')!;
+async function checkGust(game: Meta.Window, panel: Clutter.Actor) {
+  const gust = named('kestrel-gust-panel')!;
   press(Clutter.KEY_Super_L);
-  await eventually(() => shown(start), 'Super opens Start over a fullscreen game');
-  await staysShown(start, 'Start stays open over a fullscreen game');
+  await eventually(() => shown(gust), 'Super opens Gust over a fullscreen game');
+  await staysShown(gust, 'Gust stays open over a fullscreen game');
   require(game.is_fullscreen() && global.display.focus_window === game && !panel.visible,
-    'the game stays fullscreen and focused, and the taskbar stays hidden, while Start is open');
-  await capture(`fullscreen-start-${game.title.split(' ').pop()}`);
+    'the game stays fullscreen and focused, and the taskbar stays hidden, while Gust is open');
+  await capture(`fullscreen-gust-${game.title.split(' ').pop()}`);
   press(Clutter.KEY_Escape);
-  await eventually(() => !start.visible, 'Escape closes Start over a fullscreen game');
+  await eventually(() => !gust.visible, 'Escape closes Gust over a fullscreen game');
 }
 
 async function checkTaskView(game: Meta.Window) {
@@ -53,7 +53,7 @@ async function checkGame(backend: string, panel: Clutter.Actor) {
   const game = await waitForWindow(`Kestrel game ${backend}`);
   await eventually(() => game.is_fullscreen() && global.display.focus_window === game, `a ${backend} game goes fullscreen with focus`);
   await eventually(() => !panel.visible, `a fullscreen ${backend} game hides the taskbar`);
-  await checkStart(game, panel);
+  await checkGust(game, panel);
   await checkTaskView(game);
   await stop(process);
   global.workspace_manager.get_workspace_by_index(0)!.activate(global.get_current_time());

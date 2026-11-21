@@ -25,7 +25,7 @@ async function openWindows() {
 async function checkSlide() {
   hold(Clutter.KEY_Super_L);
   press(Clutter.KEY_2);
-  const slide = await waitUntil(switchData, 'the workspaces start sliding');
+  const slide = await waitUntil(switchData, 'the workspaces gust sliding');
   await waitUntil(() => slide.monitors[0].progress >= SLIDE_PROGRESS, 'the workspaces are halfway through the slide');
   (await captureFrame()).save('workspace-slide');
   release(Clutter.KEY_Super_L);
@@ -42,7 +42,7 @@ async function checkScrolling() {
   await eventually(() => switchedTo(1), 'Super+scroll switches workspace');
   release(Clutter.KEY_Super_L);
   await settled();
-  require(!existing('kestrel-start').visible, 'releasing Super after scrolling keeps Start closed');
+  require(!existing('kestrel-gust-panel').visible, 'releasing Super after scrolling keeps Gust closed');
 }
 
 async function checkSwitcher() {

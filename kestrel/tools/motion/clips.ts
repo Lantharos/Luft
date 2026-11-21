@@ -15,7 +15,7 @@ import {shellGroups} from './shell.js';
 type Surface = Parameters<typeof toggleSurface>[0];
 type Move = [direction: number, frames: number, step?: number];
 
-const SURFACES = ['start', 'quick', 'notifications', 'emoji', 'snap', 'tasks'] as const;
+const SURFACES = ['gust', 'quick', 'notifications', 'emoji', 'snap', 'tasks'] as const;
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
 
 async function reset() {
@@ -38,7 +38,7 @@ async function surfaces(clip: Clip, suffix = '') {
     await clip(`${surface}-open${suffix}`, () => toggleSurface(surface));
     await clip(`${surface}-close${suffix}`, () => toggleSurface(surface));
   }
-  for (const surface of ['start', 'quick', 'tasks'] as const) {
+  for (const surface of ['gust', 'quick', 'tasks'] as const) {
     await reset();
     await clip(`${surface}-open-then-close-80ms${suffix}`, toggledTwice(surface, 80), {notes: 'Closed 80 ms into opening'});
     await reset();
@@ -47,11 +47,11 @@ async function surfaces(clip: Clip, suffix = '') {
     await clip(`${surface}-close-then-reopen-60ms${suffix}`, toggledTwice(surface, 60), {notes: 'Opened again 60 ms into closing'});
   }
   await reset();
-  await clip(`start-to-quick-switch${suffix}`, async () => {
-    toggleSurface('start');
+  await clip(`gust-to-quick-switch${suffix}`, async () => {
+    toggleSurface('gust');
     await pause(400);
     toggleSurface('quick');
-  }, {notes: 'Quick settings opened while Start is showing'});
+  }, {notes: 'Quick settings opened while Gust is showing'});
   await reset();
   await stop(window);
 }

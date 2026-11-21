@@ -23,7 +23,6 @@ Prefer sentences without a person, as GNOME and KDE do: „Aktualizacje zostaną
 ## Names
 
 - Settings, Disks and Install Luft are Ustawienia, Dyski and Zainstaluj Luft. Ustawienia declines normally: „w Ustawieniach”.
-- Start stays Start; write „menu Start” so it doesn't decline.
 - Don't decline app names, Luft or Kestrel; put the kind of thing first: „w aplikacji Rover”, „w systemie Luft”, „z systemu Windows”. That noun decides agreement: „aplikacja Magpie jest otwarta”.
 
 ## Plurals

@@ -18,19 +18,19 @@ async function stackGlass() {
   dismissImmediately();
   rest();
   await settled();
-  toggleSurface('start');
+  toggleSurface('gust');
   await settled();
-  rightClick(startItem());
-  await waitUntil(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Start');
+  rightClick(gustItem());
+  await waitUntil(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Gust');
   await settled();
 }
 
-function startItem() {
-  const start = existing('kestrel-start');
+function gustItem() {
+  const gust = existing('kestrel-gust-panel');
   const visit = (actor: Clutter.Actor): Clutter.Actor | undefined =>
-    actor.name?.startsWith('kestrel-start-item-') && actor.mapped ? actor : actor.get_children().map(visit).find(Boolean);
-  const item = visit(start);
-  if (!item) throw new Error('Start shows no items');
+    actor.name?.startsWith('kestrel-gust-item-') && actor.mapped ? actor : actor.get_children().map(visit).find(Boolean);
+  const item = visit(gust);
+  if (!item) throw new Error('Gust shows no items');
   return item;
 }
 

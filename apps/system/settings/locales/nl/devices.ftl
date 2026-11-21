@@ -275,7 +275,6 @@ settings-keyboard-shortcuts-description = Sneltoetsen bekijken en wijzigen, of j
 settings-keyboard-copilot = Copilot-toets
 settings-keyboard-copilot-press = Indrukken
 settings-keyboard-copilot-press-description = Wat er gebeurt als je de toets kort indrukt
-settings-keyboard-copilot-open-start = Start openen
 settings-keyboard-copilot-open-app = Een app openen
 settings-keyboard-copilot-nothing = Niets
 settings-keyboard-copilot-app = App

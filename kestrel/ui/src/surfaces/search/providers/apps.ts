@@ -63,7 +63,7 @@ export class AppResults {
       activate: () => this.launch(app),
       menu: () => {
         const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id()!);
-        return shellApp ? this.menus.appEntries(shellApp) : [{ label: t('start-open'), run: () => this.launch(app) }];
+        return shellApp ? this.menus.appEntries(shellApp) : [{ label: t('gust-open'), run: () => this.launch(app) }];
       },
     };
   }

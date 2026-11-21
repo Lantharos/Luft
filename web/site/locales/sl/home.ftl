@@ -8,9 +8,6 @@ home-look = Oglej si
 home-desktop-alt = Namizje Lufta z aplikacijami Rover, Nastavitve in Tern, odprtimi nad meglenim gozdom
 home-intro = Luft je celovit sistem za vaš računalnik, zgrajen na Fedori. Ima svoje namizje, svoje aplikacije in temelj, ki sam ostaja nedotaknjen, tako da se lahko posvetite svojemu dnevu.
 
-home-start-heading = Start ve, kje je vse.
-home-start-text = Vtipkajte nekaj črk in meni Start najde aplikacije, nastavitve, datoteke in celo besede v njih. Računa, pretvarja enote ter na željo vklopi temni način ali Wi-Fi.
-home-start-alt = Meni Start išče „temno“, z dejanjem za temni način in ustreznimi nastavitvami
 
 home-essentials-heading = Najpomembnejše na en klik.
 home-essentials-text = Hitre nastavitve so ploščice, ki jih razporedite sami. Obvestila so združena po aplikacijah, tik ob njih pa so odgovori, upravljanje predvajanja in koledar.
@@ -25,7 +22,6 @@ home-all-windows-alt = Vsa okna in delovne površine na en pogled
 
 home-motion-heading = Premika se z namenom.
 home-motion-text = Vse v Luftu se premika na vzmeteh, zato si lahko sredi giba premisli brez sunka. Potegi sledijo prstom in pristanejo tam, kjer ste želeli, aplikacije pa se odprejo hitro, tudi prvič.
-home-motion-clip = Meni Start, hitre nastavitve, vsa okna na en pogled in tabla, ko se odpirajo in zapirajo v Luftu
 
 home-wallpapers-heading = Izberite fotografijo. Za ostalo poskrbi Luft.
 home-wallpapers-text = { $count ->

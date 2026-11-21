@@ -6,6 +6,29 @@ use std::{sync::Arc, time::Instant};
 use tokio::sync::Notify;
 use tokio::time::timeout;
 
+static ASKING: AtomicUsize = AtomicUsize::new(0);
+
+/// Keeps a service from counting as idle while polkit asks someone whether
+/// one of its calls may go on, however long they take to answer.
+pub(crate) struct Asking;
+
+impl Asking {
+    pub(crate) fn start() -> Self {
+        ASKING.fetch_add(1, Ordering::SeqCst);
+        Self
+    }
+}
+
+impl Drop for Asking {
+    fn drop(&mut self) {
+        ASKING.fetch_sub(1, Ordering::SeqCst);
+    }
+}
+
+fn asking() -> bool {
+    ASKING.load(Ordering::SeqCst) > 0
+}
+
 #[derive(Default)]
 pub struct Idle {
     active: AtomicUsize,
@@ -24,7 +47,7 @@ impl Idle {
     pub async fn wait(&self, limit: Duration) {
         loop {
             let expired = timeout(limit, self.changed.notified()).await.is_err();
-            if expired && self.active.load(Ordering::SeqCst) == 0 {
+            if expired && self.active.load(Ordering::SeqCst) == 0 && !asking() {
                 return;
             }
         }
@@ -79,7 +102,7 @@ pub async fn until_idle(mut busy: impl FnMut() -> bool) -> std::io::Result<()> {
             _ = terminate.recv() => return Ok(()),
             _ = interrupt.recv() => return Ok(()),
             _ = tick.tick() => {
-                if busy() {
+                if busy() || asking() {
                     idle_since = None;
                 } else if idle_since.get_or_insert_with(Instant::now).elapsed() >= EXIT_WHEN_IDLE_FOR {
                     return Ok(());

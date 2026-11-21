@@ -5,6 +5,8 @@ use zbus::Variant;
 use zbus::message::{Flags, Header};
 use zbus::{Connection, proxy};
 
+use crate::idle::Asking;
+
 const ALLOW_USER_INTERACTION: u32 = 1;
 const MESSAGE: &str = "polkit.message";
 
@@ -79,6 +81,7 @@ pub async fn is_authorized_to(
     } else {
         0
     };
+    let _asking = Asking::start();
     let (authorized, ..) = AuthorityProxy::new(connection)
         .await?
         .check_authorization(&subject, action, &details.0, flags, "")

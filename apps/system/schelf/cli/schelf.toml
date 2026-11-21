@@ -5,5 +5,8 @@ platforms = ["linux-x86_64", "linux-aarch64"]
 licence = "GPL-3.0-or-later"
 repository = "Lantharos/Luft"
 
-[channels.nightly]
+[channels.stable]
 keep = 3
+
+[channels.nightly]
+keep = 2

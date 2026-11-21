@@ -99,11 +99,8 @@ pub fn refine(checker: &mut Checker, manifest: &SchelfToml) {
             full.extend(keys.iter().map(|key| (*key).to_owned()));
             full
         };
-        if name == STABLE && (settings.ended_into.is_some() || settings.keep.is_some()) {
-            checker.issue(
-                &channel(&[]),
-                "stable keeps every release and can't be ended",
-            );
+        if name == STABLE && settings.ended_into.is_some() {
+            checker.issue(&channel(&["ended_into"]), "stable can't be ended");
         }
         if name == STABLE && settings.invite_only == Some(true) {
             checker.issue(

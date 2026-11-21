@@ -8,3 +8,9 @@ repository = "Lantharos/Luft"
 
 [requires]
 extension_api = 1
+
+[channels.stable]
+keep = 3
+
+[channels.nightly]
+keep = 2

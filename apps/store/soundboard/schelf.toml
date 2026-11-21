@@ -8,3 +8,9 @@ repository = "Lantharos/Luft"
 
 [requires]
 sabine = "0.73"
+
+[channels.stable]
+keep = 3
+
+[channels.nightly]
+keep = 2

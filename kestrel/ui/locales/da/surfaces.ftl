@@ -8,13 +8,11 @@ gust-search-select-all = Marker alt
 gust-power = Strøm og session
 gust-power-close = Luk strømindstillinger
 gust-account-settings = Kontoindstillinger
-gust-apps = Apps
 gust-folder-default-name = Mappe
 gust-folder-open = Åbn mappe
 gust-folder-rename = Omdøb
 gust-folder-ungroup = Opløs mappe
 gust-open = Åbn
-gust-move-to-apps = Flyt til Apps
 
 ## Gust search results
 

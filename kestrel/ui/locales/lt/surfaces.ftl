@@ -8,13 +8,11 @@ gust-search-select-all = Žymėti viską
 gust-power = Maitinimas ir seansas
 gust-power-close = Uždaryti maitinimo parinktis
 gust-account-settings = Paskyros nustatymai
-gust-apps = Programos
 gust-folder-default-name = Aplankas
 gust-folder-open = Atidaryti aplanką
 gust-folder-rename = Pervardyti
 gust-folder-ungroup = Išgrupuoti programas
 gust-open = Atidaryti
-gust-move-to-apps = Perkelti į Programas
 
 ## Gust search results
 

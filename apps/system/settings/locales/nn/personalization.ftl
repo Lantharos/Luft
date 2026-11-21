@@ -74,8 +74,6 @@ settings-appearance-text-size = Tekststorleik
 ## Taskbar
 
 settings-taskbar-preview = Førehandsvising av oppgåvelinja
-settings-gust-look-panel-description = Søk, appar og mapper ved sida av oppgåvelinja
-settings-gust-look-palette-description = Eit søkjefelt midt på skjermen for appar, vindauge, filer og svar
 settings-gust-web = Søk på nettet med
 settings-taskbar-shown = Vis oppgåvelinja
 settings-taskbar-hidden = Gøymd

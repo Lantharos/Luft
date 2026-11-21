@@ -74,8 +74,6 @@ settings-appearance-text-size = Taille du texte
 ## Taskbar
 
 settings-taskbar-preview = Aperçu de la barre des tâches
-settings-gust-look-panel-description = Recherche, applications et dossiers à côté de la barre des tâches
-settings-gust-look-palette-description = Une barre de recherche au milieu de l’écran pour les applications, fenêtres, fichiers et réponses
 settings-gust-web = Rechercher sur le Web avec
 settings-taskbar-shown = Afficher la barre des tâches
 settings-taskbar-hidden = Masquée

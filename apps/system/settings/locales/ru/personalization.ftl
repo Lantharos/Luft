@@ -76,8 +76,6 @@ settings-appearance-text-size = Размер текста
 ## Taskbar
 
 settings-taskbar-preview = Предпросмотр панели задач
-settings-gust-look-panel-description = Поиск, приложения и папки рядом с панелью задач
-settings-gust-look-palette-description = Строка поиска в центре экрана для приложений, окон, файлов и ответов
 settings-gust-web = Искать в интернете с помощью
 settings-taskbar-shown = Показывать панель задач
 settings-taskbar-hidden = Скрыта

@@ -8,13 +8,11 @@ gust-search-select-all = Selectează tot
 gust-power = Alimentare și sesiune
 gust-power-close = Închide opțiunile de alimentare
 gust-account-settings = Setări cont
-gust-apps = Aplicații
 gust-folder-default-name = Folder
 gust-folder-open = Deschide folderul
 gust-folder-rename = Redenumește
 gust-folder-ungroup = Degrupează aplicațiile
 gust-open = Deschide
-gust-move-to-apps = Mută în Aplicații
 
 ## Gust search results
 

@@ -8,13 +8,11 @@ gust-search-select-all = Alles auswählen
 gust-power = Energie und Sitzung
 gust-power-close = Energieoptionen schließen
 gust-account-settings = Kontoeinstellungen
-gust-apps = Apps
 gust-folder-default-name = Ordner
 gust-folder-open = Ordner öffnen
 gust-folder-rename = Umbenennen
 gust-folder-ungroup = Gruppierung aufheben
 gust-open = Öffnen
-gust-move-to-apps = Zu „Apps“ verschieben
 
 ## Gust search results
 

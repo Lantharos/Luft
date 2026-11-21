@@ -8,13 +8,11 @@ gust-search-select-all = Roghnaigh uile
 gust-power = Cumhacht agus seisiún
 gust-power-close = Dún na roghanna cumhachta
 gust-account-settings = Socruithe cuntais
-gust-apps = Aipeanna
 gust-folder-default-name = Fillteán
 gust-folder-open = Oscail an fillteán
 gust-folder-rename = Athainmnigh
 gust-folder-ungroup = Díghrúpáil na haipeanna
 gust-open = Oscail
-gust-move-to-apps = Bog chuig Aipeanna
 
 ## Gust search results
 

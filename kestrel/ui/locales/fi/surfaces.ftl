@@ -8,13 +8,11 @@ gust-search-select-all = Valitse kaikki
 gust-power = Virta ja istunto
 gust-power-close = Sulje virta-asetukset
 gust-account-settings = Tilin asetukset
-gust-apps = Sovellukset
 gust-folder-default-name = Kansio
 gust-folder-open = Avaa kansio
 gust-folder-rename = Nimeä uudelleen
 gust-folder-ungroup = Pura ryhmä
 gust-open = Avaa
-gust-move-to-apps = Siirrä sovelluksiin
 
 ## Gust search results
 

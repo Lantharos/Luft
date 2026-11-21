@@ -12,10 +12,12 @@ asks:
   - krunner
   - powertoys run
   - { ask: search bar, to: two-looks }
-  - { ask: find an app, to: apps-and-folders }
-  - { ask: app folders, to: apps-and-folders }
-  - { ask: rearrange apps, to: apps-and-folders }
-  - { ask: pin app to taskbar, to: apps-and-folders, shared: true }
+  - { ask: find an app, to: all-apps }
+  - { ask: app categories, to: all-apps }
+  - { ask: pin app to gust, to: pinned-apps-and-folders }
+  - { ask: app folders, to: pinned-apps-and-folders }
+  - { ask: rearrange apps, to: pinned-apps-and-folders }
+  - { ask: pin app to taskbar, to: pinned-apps-and-folders, shared: true }
   - { ask: shut down, to: shutting-down-restarting-and-signing-out }
   - { ask: turn off computer, to: shutting-down-restarting-and-signing-out }
   - { ask: restart computer, to: shutting-down-restarting-and-signing-out }
@@ -48,21 +50,29 @@ Choose how Gust looks in Settings, Taskbar and Gust, under **Gust**. Both search
 
 | Look | Opens |
 | --- | --- |
-| Panel | Next to the taskbar, with the search field at the top, your apps below it, and your account and power buttons at the bottom |
-| Palette | A single search bar in the middle of the screen. Before you type, it shows the apps you open most and your open windows |
+| Panel | Next to the taskbar, with the search field at the top, your pinned apps below it, and your account and power buttons at the bottom |
+| Palette | In the middle of the screen, with every app and your open windows until you type |
 
-<Shot name="gust-panel" alt="Gust as a panel, with your apps" />
+<Shot name="gust-panel" alt="Gust as a panel, with your pinned apps" />
 
-<Shot name="gust-palette" alt="Gust as a palette, finding an open window, with a preview of it" />
+<Shot name="gust-palette" alt="Gust as a palette, with every app sorted into categories" />
 
-## Apps and folders
+## Pinned apps and folders
 
-The panel lists every app that isn't pinned to the taskbar, from A to Z until you rearrange them; after that it keeps your order and adds new apps at the end. Resting the pointer on an app says what kind of app it is, such as File Manager for Rover.
+The panel shows the apps you pinned to Gust, starting with a few of Luft's own and your browser. These pins are Gust's own; the taskbar keeps its own. Resting the pointer on an app says what kind of app it is, such as File Manager for Rover.
 
+- **Pin an app** with **Pin to Gust** in its right-click menu, in all apps or in search results. On a touchscreen, hold it instead. It goes at the end.
+- **Unpin an app** with **Unpin from Gust** in its menu.
 - **Rearrange** apps by dragging them.
 - **Make a folder** by dragging one app onto another. Name it in the field at the top of the folder.
-- **Take an app out** of a folder by dragging it onto **Apps** at the top, or with **Move to Apps** in its right-click menu. A folder that's empty disappears.
-- **Pin an app** to the taskbar by dragging it there, or with **Pin to taskbar** in its menu. It leaves the panel and comes back when you unpin it. Search still finds pinned apps.
+- **Take an app out** of a folder by dragging it onto **Pinned** at the top, or with **Move out of folder** in its menu. A folder that's empty disappears.
+- **Pin an app to the taskbar** by dragging it there, or with **Pin to taskbar** in its menu.
+
+## All apps
+
+The button next to the search field in the panel lists every app from A to Z; it, or <kbd>Esc</kbd>, goes back to your pinned apps.
+
+The palette shows every app before you type, with categories such as Productivity, Internet and Games along the top. **Open**, right after All, lists your open windows with a preview of each. Typing narrows the apps down as long as the best match is an app, and switches to the full results once it's something else, such as a calculation, a file, a setting or a window. Arrow keys move through the apps, <kbd>Enter</kbd> opens the highlighted one, and <kbd>Tab</kbd> moves to the categories, where the arrow keys pick one.
 
 ## Shutting down, restarting and signing out
 
@@ -98,9 +108,9 @@ Conversions cover length, mass, temperature, data sizes, time, volume and speed.
 | <kbd>Enter</kbd> | Opens the best match, or the highlighted result |
 | <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Shows the file in Rover |
 | <kbd>Down</kbd> or <kbd>Tab</kbd> | Moves into the results in the panel |
-| <kbd>Up</kbd> and <kbd>Down</kbd>, <kbd>Page Up</kbd> and <kbd>Page Down</kbd> | Move through the results in the palette, while the search field keeps the keyboard |
+| <kbd>Up</kbd> and <kbd>Down</kbd>, <kbd>Page Up</kbd> and <kbd>Page Down</kbd> | Move through the results in the palette, while the search field keeps the keyboard; <kbd>Left</kbd> and <kbd>Right</kbd> also move through its apps |
 | <kbd>Menu</kbd>, <kbd>Shift</kbd>+<kbd>F10</kbd> or right-click | More for a result, such as **Show in Rover** or **Copy path** |
-| <kbd>Esc</kbd> | Clears the search, then leaves a folder, then closes Gust |
+| <kbd>Esc</kbd> | Clears the search, then leaves a folder, all apps or a category, then closes Gust |
 
 In the palette, the highlighted result shows a preview on the right when it has one: a live picture of a window, an emoji at full size, a picture or text from the clipboard history, or the answer to a question.
 
@@ -126,7 +136,7 @@ Places are cities and their time zones as you'd write them, including common abb
 
 ## Without the taskbar
 
-The same page in Settings can take away the Gust button or the whole taskbar. Without the taskbar, a small corner at the end of the taskbar's edge, the bottom right unless you moved it, keeps the clock and status icons: the icons open quick settings, the clock opens notifications, and the Luft mark, unless you took it away too, opens Gust. Windows switch with <kbd>Alt</kbd>+<kbd>Tab</kbd>, from [all windows](/windows/task-view/) or from the palette, which lists them as soon as it opens.
+The same page in Settings can take away the Gust button or the whole taskbar. Without the taskbar, a small corner at the end of the taskbar's edge, the bottom right unless you moved it, keeps the clock and status icons: the icons open quick settings, the clock opens notifications, and the Luft mark, unless you took it away too, opens Gust. Windows switch with <kbd>Alt</kbd>+<kbd>Tab</kbd>, from [all windows](/windows/task-view/), from **Open** in the palette, or by typing their title into Gust.
 
 In [tablet mode](/desktop/tablet-mode/), the taskbar and its Gust button always come back, since there may be no keyboard to press <kbd>Super</kbd> on.
 

@@ -15,7 +15,7 @@
 </script>
 
 <Section>
-	<Row title={t('settings-gust-look')} description={t(look === 'palette' ? 'settings-gust-look-palette-description' : 'settings-gust-look-panel-description')}>
+	<Row title={t('settings-gust-look')} description={t(look === 'palette' ? 'settings-gust-look-grid-description' : 'settings-gust-look-pinned-description')}>
 		<Segmented label={t('settings-gust-look')} options={looks} value={look} onchange={(value) => settings.set('gust-look', value)} />
 	</Row>
 	<Row title={t('settings-gust-button')} description={t('settings-gust-button-description')}>

@@ -74,8 +74,6 @@ settings-appearance-text-size = Szövegméret
 ## Taskbar
 
 settings-taskbar-preview = A tálca előnézete
-settings-gust-look-panel-description = Keresés, alkalmazások és mappák a tálca mellett
-settings-gust-look-palette-description = Keresősáv a képernyő közepén alkalmazásokhoz, ablakokhoz, fájlokhoz és válaszokhoz
 settings-gust-web = Webes keresőmotor
 settings-taskbar-shown = Tálca megjelenítése
 settings-taskbar-hidden = Elrejtve

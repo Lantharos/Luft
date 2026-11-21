@@ -17,6 +17,12 @@ import { t } from '../../shared/i18n/index.js';
 
 export type { MenuEntry } from './menuContent.js';
 
+interface AppMenu {
+  windows?: Meta.Window[];
+  open?: () => void;
+  extra?: MenuEntry[];
+}
+
 const MIN_WIDTH = 176;
 const MAX_WIDTH = 420;
 const TRAILING_SPACE = 84;
@@ -90,7 +96,7 @@ export class ContextMenus {
     return target;
   }
 
-  appEntries(app: Shell.App, windows = app.get_windows(), open = () => app.activate()): MenuEntry[] {
+  appEntries(app: Shell.App, { windows = app.get_windows(), open = () => app.activate(), extra = [] }: AppMenu = {}): MenuEntry[] {
     const launch = (action: () => void) => () => { this.dismissShell(); action(); };
     const entries: MenuEntry[] = [{ label: t('window-menu-open'), run: launch(open) }];
     const info = app.get_app_info();
@@ -115,6 +121,7 @@ export class ContextMenus {
         this.favorites.set_strv('favorite-apps', pinned ? ids.filter(id => id !== app.id) : [...ids, app.id]);
       } });
     }
+    entries.push(...extra);
     const showInMonitor = showInBarometer(app);
     if (showInMonitor) entries.push({ label: t('window-menu-show-in-barometer'), run: launch(showInMonitor) });
     if (windows.length) entries.push({ label: t('window-menu-close', { count: windows.length }), run: () => {

@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
+import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import { blurSurface } from '../../../shared/layout/surface.js';
@@ -9,7 +9,8 @@ import { SearchEngine, type SearchHost } from '../../search/engine.js';
 import { searchField } from '../../search/field.js';
 import { watchInstalledApps } from '../../search/installedApps.js';
 import { launchApp } from '../../search/providers/apps.js';
-import { taskbarPreferences } from '../../../desktop/panel/preferences/taskbarPreferences.js';
+import { t } from '../../../shared/i18n/index.js';
+import { pressable } from '../../../shared/motion/motion.js';
 import { isControlEnter } from '../../../shared/input/keyboardNavigation.js';
 import type { GustArea, GustSurface } from '../gust.js';
 import { dock, isVertical, toward, type Edge, type Offset } from '../../../shared/layout/edge.js';
@@ -24,7 +25,11 @@ export class GustPanel implements GustSurface {
   readonly search: St.Entry;
   readonly footer: GustFooter;
   readonly focusOnTouch = false;
-  private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
+  private readonly viewIcon = new St.Icon({ icon_name: 'view-list-bullet-symbolic', icon_size: 16 });
+  private readonly viewButton = new St.Button({
+    name: 'kestrel-gust-view', style_class: 'kestrel-icon-button kestrel-gust-view-button', child: this.viewIcon,
+    accessible_name: t('gust-all-apps'), can_focus: true, track_hover: true,
+  });
   private readonly browser: GustGrid;
   private readonly searchProvider: SearchEngine;
   private readonly close: () => void;
@@ -51,7 +56,10 @@ export class GustPanel implements GustSurface {
     this.search.clutter_text.connect('activate', () => this.browser.firstResult?.activate());
     this.search.clutter_text.connect('key-focus-in', () => this.browser.highlightFirstResult(true));
     this.search.clutter_text.connect('key-focus-out', () => this.browser.highlightFirstResult(false));
-    this.actor.add_child(this.search);
+    const header = new St.BoxLayout({ style_class: 'kestrel-gust-header' });
+    header.add_child(this.search);
+    header.add_child(this.viewButton);
+    this.actor.add_child(header);
     const scroller = new St.ScrollView({
       style_class: 'kestrel-app-scroll',
       hscrollbar_policy: St.PolicyType.NEVER,
@@ -60,7 +68,10 @@ export class GustPanel implements GustSurface {
       x_expand: true, y_expand: true,
     });
     this.browser = new GustGrid(scroller, menus, app => this.launch(app));
-    this.searchProvider = new SearchEngine(host, view => this.browser.showResults(view));
+    this.searchProvider = new SearchEngine(host, view => this.browser.showResults(view), app => [this.browser.pinEntry(app)]);
+    this.browser.hint.bind(this.viewButton, () => this.viewButton.accessible_name);
+    this.viewButton.connect('clicked', () => this.showAll(!this.browser.showingAll));
+    pressable(this.viewButton, this.viewIcon);
     this.actor.add_child(this.browser.header);
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
@@ -68,10 +79,6 @@ export class GustPanel implements GustSurface {
     this.footer = new GustFooter(host.close, menus);
     this.actor.add_child(this.footer.actor);
 
-    const pinnedChanged = () => this.browser.setPinned(this.readPinned());
-    pinnedChanged();
-    const favoritesChanged = this.favorites.connect('changed::favorite-apps', pinnedChanged);
-    const unwatchTaskbar = taskbarPreferences.watch(key => { if (key === 'taskbar-show-pinned') pinnedChanged(); });
     const unwatchApps = watchInstalledApps(apps => {
       this.searchProvider.update(apps);
       this.browser.update(apps);
@@ -79,13 +86,14 @@ export class GustPanel implements GustSurface {
     this.actor.connect('destroy', () => {
       this.searchProvider.destroy();
       unwatchApps();
-      this.favorites.disconnect(favoritesChanged);
-      unwatchTaskbar();
     });
   }
 
-  private readPinned(): Set<string> {
-    return new Set(taskbarPreferences.showPinned ? this.favorites.get_strv('favorite-apps') : []);
+  private showAll(all: boolean): void {
+    this.search.set_text('');
+    this.browser.showAll(all);
+    this.viewIcon.icon_name = all ? 'view-app-grid-symbolic' : 'view-list-bullet-symbolic';
+    this.viewButton.accessible_name = t(all ? 'gust-pinned' : 'gust-all-apps');
   }
 
   focus(): void {
@@ -107,11 +115,12 @@ export class GustPanel implements GustSurface {
     if (this.footer.sessionOpen) { this.footer.setOpen(false); this.focus(); return true; }
     if (this.search.get_text()) { this.search.set_text(''); this.focus(); return true; }
     if (this.browser.home()) { this.focus(); return true; }
+    if (this.browser.showingAll) { this.showAll(false); this.focus(); return true; }
     return false;
   }
   reset(): void {
     this.browser.home();
-    this.search.set_text('');
+    this.showAll(false);
     this.footer.setOpen(false, false);
     this.searchProvider.prepare();
   }

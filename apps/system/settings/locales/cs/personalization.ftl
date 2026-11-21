@@ -76,8 +76,6 @@ settings-appearance-text-size = Velikost textu
 ## Taskbar
 
 settings-taskbar-preview = Náhled hlavního panelu
-settings-gust-look-panel-description = Hledání, aplikace a složky vedle hlavního panelu
-settings-gust-look-palette-description = Vyhledávací pole uprostřed obrazovky pro aplikace, okna, soubory a odpovědi
 settings-gust-web = Webový vyhledávač
 settings-taskbar-shown = Zobrazovat hlavní panel
 settings-taskbar-hidden = Skrytý

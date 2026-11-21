@@ -150,7 +150,7 @@ async function measureGustSearch() {
   await settled(MEASURE_SETTLE);
   const gust = existing('kestrel-gust-panel');
   const original = gustButtons(gust);
-  const {updates, median, p95} = await timeQueries(ofType(gust.get_first_child(), St.Entry), GUST_QUERIES, 20);
+  const {updates, median, p95} = await timeQueries(ofType(descendants(gust).find(actor => actor instanceof St.Entry) ?? null, St.Entry), GUST_QUERIES, 20);
   const current = gustButtons(gust);
   report({
     searchUpdates: updates,

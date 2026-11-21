@@ -8,13 +8,11 @@ gust-search-select-all = Merk alt
 gust-power = Strøm og økt
 gust-power-close = Lukk strømalternativer
 gust-account-settings = Kontoinnstillinger
-gust-apps = Apper
 gust-folder-default-name = Mappe
 gust-folder-open = Åpne mappen
 gust-folder-rename = Gi nytt navn
 gust-folder-ungroup = Løs opp mappen
 gust-open = Åpne
-gust-move-to-apps = Flytt til Apper
 
 ## Gust search results
 

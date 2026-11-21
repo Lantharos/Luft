@@ -74,8 +74,6 @@ settings-appearance-text-size = Textgröße
 ## Taskbar
 
 settings-taskbar-preview = Vorschau der Taskleiste
-settings-gust-look-panel-description = Suche, Apps und Ordner neben der Taskleiste
-settings-gust-look-palette-description = Eine Suchleiste in der Bildschirmmitte für Apps, Fenster, Dateien und Antworten
 settings-gust-web = Im Web suchen mit
 settings-taskbar-shown = Taskleiste anzeigen
 settings-taskbar-hidden = Ausgeblendet

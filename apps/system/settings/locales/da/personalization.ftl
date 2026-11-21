@@ -74,8 +74,6 @@ settings-appearance-text-size = Tekststørrelse
 ## Taskbar
 
 settings-taskbar-preview = Eksempel på proceslinjen
-settings-gust-look-panel-description = Søgning, apps og mapper ved siden af proceslinjen
-settings-gust-look-palette-description = En søgelinje midt på skærmen til apps, vinduer, filer og svar
 settings-gust-web = Søg på nettet med
 settings-taskbar-shown = Vis proceslinjen
 settings-taskbar-hidden = Skjult

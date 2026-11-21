@@ -74,8 +74,6 @@ settings-appearance-text-size = Metin boyutu
 ## Taskbar
 
 settings-taskbar-preview = Görev çubuğu önizlemesi
-settings-gust-look-panel-description = Görev çubuğunun yanında arama, uygulamalar ve klasörler
-settings-gust-look-palette-description = Ekranın ortasında uygulamalar, pencereler, dosyalar ve yanıtlar için bir arama çubuğu
 settings-gust-web = Web arama motoru
 settings-taskbar-shown = Görev çubuğunu göster
 settings-taskbar-hidden = Gizli

@@ -74,8 +74,6 @@ settings-appearance-text-size = Μέγεθος κειμένου
 ## Taskbar
 
 settings-taskbar-preview = Προεπισκόπηση γραμμής εργασιών
-settings-gust-look-panel-description = Αναζήτηση, εφαρμογές και φάκελοι δίπλα στη γραμμή εργασιών
-settings-gust-look-palette-description = Μια γραμμή αναζήτησης στη μέση της οθόνης για εφαρμογές, παράθυρα, αρχεία και απαντήσεις
 settings-gust-web = Αναζήτηση στο διαδίκτυο με
 settings-taskbar-shown = Εμφάνιση γραμμής εργασιών
 settings-taskbar-hidden = Κρυφή

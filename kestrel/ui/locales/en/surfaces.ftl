@@ -14,8 +14,15 @@ gust-power = Power and session
 gust-power-close = Close power options
 # Context menu of the account name at the bottom of Gust
 gust-account-settings = Account settings
-# Button that leads from an app folder back to all apps
-gust-apps = Apps
+# Button that leads from an app folder back to the pinned apps, and screen-reader label of the button that leads from all apps back to them
+gust-pinned = Pinned
+# Screen-reader label and hint of the button next to the search field that lists every app
+gust-all-apps = All apps
+# Shown in place of the pinned apps when none are pinned
+gust-no-pins = No pinned apps
+# Context menu of an app in Gust
+gust-pin = Pin to Gust
+gust-unpin = Unpin from Gust
 # Name given to a new folder made by dropping one app onto another
 gust-folder-default-name = Folder
 # Context menu of an app folder; "Open" is a verb
@@ -24,8 +31,24 @@ gust-folder-rename = Rename
 gust-folder-ungroup = Ungroup apps
 # Context menu entry; "Open" is a verb
 gust-open = Open
-# Context menu of an app inside a folder: moves it back to the main grid
-gust-move-to-apps = Move to Apps
+# Context menu of an app inside a folder: moves it back to the pinned apps
+gust-move-out-of-folder = Move out of folder
+
+## Categories of apps in the palette look of Gust
+
+gust-category-all = All
+# Lists the open windows
+gust-category-open = Open
+gust-category-office = Productivity
+gust-category-graphics = Graphics & Photos
+gust-category-audiovideo = Audio & Video
+gust-category-game = Games
+gust-category-development = Developer Tools
+gust-category-education = Education
+gust-category-science = Science
+gust-category-network = Internet
+gust-category-utility = Utilities
+gust-category-system = System
 
 ## Gust search results
 

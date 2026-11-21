@@ -8,13 +8,11 @@ gust-search-select-all = Agħżel kollox
 gust-power = Enerġija u sessjoni
 gust-power-close = Agħlaq l-għażliet tal-enerġija
 gust-account-settings = Settings tal-kont
-gust-apps = Apps
 gust-folder-default-name = Fowlder
 gust-folder-open = Iftaħ il-fowlder
 gust-folder-rename = Ibdel l-isem
 gust-folder-ungroup = Ifred l-apps
 gust-open = Iftaħ
-gust-move-to-apps = Ressaq lejn Apps
 
 ## Gust search results
 

@@ -74,7 +74,9 @@ async function checkWindowSwitching() {
   await eventually(() => !named('kestrel-gust-panel'), 'Gust replaces the panel look');
   await pause(PAST_DOUBLE_TAP);
   global.display.emit('overlay-key');
-  await eventually(() => shown(gust()) && rows().some(actor => actor.name?.startsWith('kestrel-search-window:')), 'Gust lists the open windows before anything is typed');
+  await eventually(() => shown(gust()), 'Super opens Gust');
+  click(centerOf(existing('kestrel-gust-chip-open', gust()!)));
+  await eventually(() => rows().some(actor => actor.name?.startsWith('kestrel-search-window:')), 'Open lists the open windows');
   await capture('taskbar-hidden-gust-palette');
   const window = ofType(rows().find(actor => actor.name?.startsWith('kestrel-search-window:')) ?? null, St.Button);
   click(centerOf(window));

@@ -37,9 +37,9 @@ export class WindowResults {
     return rank([...entries.values()], search, BIAS, () => 0).slice(0, LIMIT).map(({ entry, score }) => ({ item: this.item(entry), score }));
   }
 
-  recent(limit: number): SearchItem[] {
+  open(): SearchItem[] {
     const tracker = Shell.WindowTracker.get_default();
-    return openWindows().slice(0, limit).map(window => this.item({ window, app: tracker.get_window_app(window) }));
+    return openWindows().map(window => this.item({ window, app: tracker.get_window_app(window) }));
   }
 
   private item({ window, app }: Pick<WindowEntry, 'window' | 'app'>): SearchItem {

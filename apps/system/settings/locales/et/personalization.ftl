@@ -75,8 +75,6 @@ settings-appearance-text-size = Teksti suurus
 ## Taskbar
 
 settings-taskbar-preview = Tegumiriba eelvaade
-settings-gust-look-panel-description = Otsing, rakendused ja kaustad tegumiriba kõrval
-settings-gust-look-palette-description = Otsinguriba ekraani keskel rakenduste, akende, failide ja vastuste jaoks
 settings-gust-web = Otsingumootor
 settings-taskbar-shown = Kuva tegumiriba
 settings-taskbar-hidden = Peidetud

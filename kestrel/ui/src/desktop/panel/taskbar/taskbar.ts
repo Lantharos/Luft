@@ -68,7 +68,7 @@ export class Taskbar {
       icon: app => taskbarAppIcon(app, this.iconSize, this.artworkFill),
       windowsOf, attention: app => this.attention(app), focused: app => this.tracker.focus_app === app,
       pinned: app => this.pinned().has(app.id), activate: (app, source) => this.activate(app, source),
-      entries: app => menus.appEntries(app, windowsOf(app), () => open(app)), monitorIndex,
+      entries: app => menus.appEntries(app, { windows: windowsOf(app), open: () => open(app) }), monitorIndex,
       changed: () => this.update(this.apps),
     }, overflowPopup, this.metrics, this.edge);
     this.actor.add_child(this.overflow.slot);
@@ -413,7 +413,7 @@ export class Taskbar {
       return [-x, -y];
     });
     this.previews.bind(button, () => item.app, () => this.windowsOf(item.app));
-    this.menus.bind(button, () => this.menus.appEntries(item.app, this.windowsOf(item.app), () => this.open(item.app)));
+    this.menus.bind(button, () => this.menus.appEntries(item.app, { windows: this.windowsOf(item.app), open: () => this.open(item.app) }));
     button.connect('clicked', () => this.activate(item.app, button));
     return item;
   }

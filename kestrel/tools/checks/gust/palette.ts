@@ -25,6 +25,11 @@ const palette = () => named('kestrel-gust-palette');
 const entry = () => ofType(palette()!.get_first_child(), St.Entry);
 const preview = () => named('kestrel-gust-palette-preview');
 const clipboard = () => new Promise<string | null>(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_, text) => resolve(text)));
+const sheet = () => named('kestrel-gust-sheet', palette()!)!;
+const cells = () => sheet().get_children().filter((actor): actor is St.Button => actor instanceof St.Button && actor.visible);
+const highlightedCell = () => cells().find(cell => cell.has_style_pseudo_class('highlighted')) ?? null;
+const chip = (category: string) => ofType(named(`kestrel-gust-chip-${category}`, palette()!), St.Button);
+const listShown = () => shown(named('kestrel-search-results', palette()!));
 const highlighted = () => rows().find(actor => actor.child!.get_first_child()!.visible) ?? null;
 const keyed = (prefix: string) => rows().find(actor => actor.name?.startsWith(`kestrel-search-${prefix}`)) ?? null;
 const fullDate = (year: number, month: number, day: number) => new Intl.DateTimeFormat(formatsLocale(), {dateStyle: 'full', timeZone: 'UTC'}).format(Date.UTC(year, month - 1, day));
@@ -51,6 +56,7 @@ async function checkOpening() {
   shell.set_string('gust-look', 'palette');
   await eventually(() => !named('kestrel-gust-panel'), 'choosing the palette look replaces the panel');
   await openWithSuper();
+  await eventually(() => shown(sheet()) && cells().length > 8 && !listShown(), 'with nothing typed, Gust shows every app');
   await capture('gust-palette');
   press(Clutter.KEY_Escape);
   await eventually(() => !shown(palette()), 'Escape closes Gust');
@@ -69,11 +75,80 @@ async function checkOpening() {
   closeGust();
 }
 
+const iconOf = (cell: St.Button) => cell.child!.get_first_child()!;
+const edges = (actor: Clutter.Actor) => {
+  const [x] = actor.get_transformed_position();
+  return [x, x + actor.get_transformed_size()[0]];
+};
+
+function checkAlignment() {
+  const [rowLeft, rowRight] = edges(named('kestrel-gust-chips', palette()!)!.get_parent()!);
+  const edge = edges(chip('all'))[0];
+  const firstRow = cells().filter(cell => cell.get_allocation_box().y1 === cells()[0].get_allocation_box().y1);
+  require(Math.abs(edges(iconOf(firstRow[0]))[0] - edge) < 0.01, 'the first column of apps lines up with All');
+  const full = cells().length > firstRow.length;
+  require(!full || Math.abs(edges(iconOf(firstRow.at(-1)!))[1] - (rowRight - (edge - rowLeft))) < 0.01, 'a full row of apps ends as far in as All starts');
+}
+
+async function checkGrid() {
+  await openWithSuper();
+  const total = cells().length;
+  const names = cells().map(cell => cell.accessible_name);
+  require(names.every((name, index) => !index || names[index - 1].localeCompare(name) <= 0), 'the apps go from A to Z');
+  require(chip('all').checked, 'All is chosen');
+  checkAlignment();
+  require(!highlightedCell(), 'nothing is highlighted before a key is pressed');
+  press(Clutter.KEY_Right);
+  await eventually(() => highlightedCell() === cells()[0], 'an arrow key highlights the first app');
+  press(Clutter.KEY_Right);
+  await eventually(() => highlightedCell() === cells()[1], 'Right highlights the next app');
+  press(Clutter.KEY_Down);
+  await eventually(() => cells().indexOf(highlightedCell()!) > 2, 'Down highlights the app below');
+  require(entry().clutter_text.has_key_focus(), 'arrow keys leave the keyboard in the search field');
+
+  press(Clutter.KEY_Tab);
+  await eventually(() => global.stage.get_key_focus() === chip('all'), 'Tab moves to the categories');
+  press(Clutter.KEY_Right);
+  await eventually(() => chip('open').checked && listShown() && !shown(sheet()) && keyed('window:') && shown(preview()), 'Open, right after All, lists the open windows with a preview');
+  await settled();
+  const rowIcon = rows()[0].child!.get_last_child()!.get_first_child()!;
+  require(Math.abs(edges(rowIcon)[0] - edges(chip('all'))[0]) < 0.01, 'the open windows line up with All');
+  await capture('gust-palette-open');
+  press(Clutter.KEY_Right);
+  const chosen = await eventually(() => chip('open').checked ? null : global.stage.get_key_focus() as St.Button, 'Right chooses the next category');
+  require(chosen.checked && shown(sheet()), 'the focused category is chosen');
+  await eventually(() => cells().length > 0 && cells().length < total, 'a category shows only its apps');
+  await settled();
+  checkAlignment();
+  await capture('gust-palette-category');
+  press(Clutter.KEY_Tab);
+  await eventually(() => entry().clutter_text.has_key_focus(), 'Tab goes back to the search field');
+  press(Clutter.KEY_Escape);
+  await eventually(() => chip('all').checked && cells().length === total && shown(palette()), 'Escape goes back to every app');
+
+  click(centerOf(chip('open')));
+  await eventually(() => chip('open').checked && listShown(), 'clicking Open lists the open windows');
+  rest();
+  press(Clutter.KEY_Return);
+  await eventually(() => !shown(palette()) && global.display.focus_window?.get_title() === WINDOW, 'Enter switches to the highlighted window');
+  await openWithSuper();
+
+  search('tern');
+  await eventually(() => cells()[0]?.name === 'kestrel-gust-app-com.lantharos.tern.desktop' && highlightedCell() === cells()[0] && !listShown(),
+    'typing an app name filters the apps and highlights the best match');
+  search('dark mode');
+  await eventually(() => listShown() && !shown(sheet()) && row('action:dark-style'), 'a query that is more than an app shows results');
+  await settled();
+  await capture('gust-palette-results');
+  search('');
+  await eventually(() => shown(sheet()) && cells().length === total, 'clearing the search shows every app again');
+}
+
 async function checkResults() {
   St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, COPIED);
   await openWithSuper();
   search('settings');
-  await eventually(() => keyed('app:'), 'apps are found');
+  await eventually(() => named('kestrel-gust-app-com.lantharos.settings.desktop', sheet())?.mapped, 'apps are found');
   search('private window');
   await eventually(() => row('command:net.imput.helium.desktop:new-private-window'), 'an app action from its desktop file is found');
   search(WINDOW.toLowerCase());
@@ -104,8 +179,8 @@ async function checkResults() {
 }
 
 async function checkKeyboard() {
-  search('helium');
-  await eventually(() => rows().length > 2, 'several results show');
+  search('dark');
+  await eventually(() => listShown() && rows().length > 2, 'several results show');
   await eventually(() => highlighted() === rows()[0], 'the best match is highlighted');
   press(Clutter.KEY_Down);
   await eventually(() => highlighted() === rows()[1], 'Down highlights the next result');
@@ -147,6 +222,7 @@ export async function run() {
   try {
     await waitForWindow(WINDOW);
     await checkOpening();
+    await checkGrid();
     await checkResults();
     await checkKeyboard();
     await checkAnswers();

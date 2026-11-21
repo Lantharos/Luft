@@ -4,12 +4,12 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {named, ofType, shown, textOf} from '../../lib/actors.js';
+import {descendants, named, ofType, shown, textOf} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
 export const gust = () => named('kestrel-gust-panel') ?? named('kestrel-gust-palette');
-export const entry = () => ofType(gust()!.get_first_child(), St.Entry);
+export const entry = () => ofType(descendants(gust()!).find(actor => actor instanceof St.Entry) ?? null, St.Entry);
 const list = () => named('kestrel-search-results', gust()!)!;
 
 export const rows = () => list().get_children().filter((actor): actor is St.Button => actor instanceof St.Button)

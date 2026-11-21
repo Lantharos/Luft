@@ -77,8 +77,6 @@ settings-appearance-text-size = Daqs tat-test
 ## Taskbar
 
 settings-taskbar-preview = Dehra tat-taskbar
-settings-gust-look-panel-description = Tiftix, apps u fowlders ħdejn it-taskbar
-settings-gust-look-palette-description = Bar tat-tiftix f’nofs l-iskrin għal apps, twieqi, fajls u tweġibiet
 settings-gust-web = Fittex fuq il-web permezz ta’
 settings-taskbar-shown = Uri t-taskbar
 settings-taskbar-hidden = Moħbija

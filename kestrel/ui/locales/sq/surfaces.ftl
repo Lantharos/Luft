@@ -8,13 +8,11 @@ gust-search-select-all = Përzgjidh të gjitha
 gust-power = Energjia dhe seanca
 gust-power-close = Mbyll opsionet e energjisë
 gust-account-settings = Cilësimet e llogarisë
-gust-apps = Aplikacionet
 gust-folder-default-name = Dosje
 gust-folder-open = Hap dosjen
 gust-folder-rename = Riemërto
 gust-folder-ungroup = Shpërndaj aplikacionet
 gust-open = Hap
-gust-move-to-apps = Zhvendos te Aplikacionet
 
 ## Gust search results
 

@@ -8,13 +8,11 @@ gust-search-select-all = Alles selecteren
 gust-power = Energie en sessie
 gust-power-close = Energieopties sluiten
 gust-account-settings = Accountinstellingen
-gust-apps = Apps
 gust-folder-default-name = Map
 gust-folder-open = Map openen
 gust-folder-rename = Naam wijzigen
 gust-folder-ungroup = Groepering opheffen
 gust-open = Openen
-gust-move-to-apps = Verplaatsen naar Apps
 
 ## Gust search results
 

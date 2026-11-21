@@ -8,13 +8,11 @@ gust-search-select-all = Odaberi sve
 gust-power = Napajanje i sesija
 gust-power-close = Zatvori mogućnosti napajanja
 gust-account-settings = Postavke računa
-gust-apps = Aplikacije
 gust-folder-default-name = Mapa
 gust-folder-open = Otvori mapu
 gust-folder-rename = Preimenuj
 gust-folder-ungroup = Razgrupiraj aplikacije
 gust-open = Otvori
-gust-move-to-apps = Premjesti u Aplikacije
 
 ## Gust search results
 

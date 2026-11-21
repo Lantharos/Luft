@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
-import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { launchHistory } from '../../shared/apps/launchHistory.js';
 import type { QuickSettingsSource } from '../quickSettings/quickControls.js';
@@ -26,8 +26,6 @@ import { fold, query, type Query } from './ranking.js';
 
 const FILE_LIMIT = 6;
 const CONTENT_LIMIT = 4;
-const SUGGESTED_APPS = 6;
-const SUGGESTED_WINDOWS = 5;
 const NAME_BIAS = 0.8;
 const SHORTEST_NAME_QUERY = 2;
 const SHORTEST_EXTRA_QUERY = 2;
@@ -88,8 +86,8 @@ export class SearchEngine {
   private sources: number[] = [];
   private preparing = 0;
 
-  constructor(host: SearchHost, private readonly show: (view: SearchView | null) => void) {
-    this.apps = new AppResults(host.menus, host.close);
+  constructor(host: SearchHost, private readonly show: (view: SearchView | null) => void, appEntries: (app: Gio.AppInfo) => MenuEntry[] = () => []) {
+    this.apps = new AppResults(host.menus, host.close, appEntries);
     this.commands = new CommandResults(host.close);
     this.windows = new WindowResults(host.activateWindow, host.close);
     this.actions = new ActionResults(host.quickSettings, host.close);
@@ -140,12 +138,8 @@ export class SearchEngine {
     this.emit(true, true);
   }
 
-  suggestions(): SearchView {
-    const groups: [GroupId, SearchItem[]][] = [
-      ['apps', this.apps.frequent(launchHistory.weigher(), SUGGESTED_APPS)],
-      ['windows', this.windows.recent(SUGGESTED_WINDOWS)],
-    ];
-    return { best: null, groups: groups.filter(([, items]) => items.length).map(([id, items]) => ({ title: t(TITLES[id]), items })), pending: false, fresh: true };
+  openWindows(): SearchView {
+    return { best: null, groups: [{ title: t(TITLES.windows), items: this.windows.open() }], pending: false, fresh: true };
   }
 
   destroy(): void {

@@ -74,8 +74,6 @@ settings-appearance-text-size = Textastærð
 ## Taskbar
 
 settings-taskbar-preview = Forskoðun verkstiku
-settings-gust-look-panel-description = Leit, forrit og möppur við hliðina á verkstikunni
-settings-gust-look-palette-description = Leitarstika á miðjum skjánum fyrir forrit, glugga, skrár og svör
 settings-gust-web = Leita á vefnum með
 settings-taskbar-shown = Sýna verkstiku
 settings-taskbar-hidden = Falin

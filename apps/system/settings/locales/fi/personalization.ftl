@@ -74,8 +74,6 @@ settings-appearance-text-size = Tekstin koko
 ## Taskbar
 
 settings-taskbar-preview = Tehtäväpalkin esikatselu
-settings-gust-look-panel-description = Haku, sovellukset ja kansiot tehtäväpalkin vieressä
-settings-gust-look-palette-description = Hakupalkki näytön keskellä sovelluksille, ikkunoille, tiedostoille ja vastauksille
 settings-gust-web = Hae verkosta hakukoneella
 settings-taskbar-shown = Näytä tehtäväpalkki
 settings-taskbar-hidden = Piilotettu

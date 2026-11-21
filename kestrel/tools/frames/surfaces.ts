@@ -1,8 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {existing} from '../checks/lib/actors.js';
+import {descendants, existing} from '../checks/lib/actors.js';
 import {press, rest, type} from '../checks/lib/input/input.js';
 import {settled} from '../checks/lib/wait.js';
 import {eachFrame, measured, type Interaction} from './recorder.js';
@@ -36,7 +37,7 @@ const typed = () => eachFrame(QUERY.length * 2, step => {
 
 const searching = (look: string, name: string) => async () => {
   await opened('gust', look)();
-  existing(name).get_first_child()?.grab_key_focus();
+  descendants(existing(name)).find(actor => actor instanceof St.Entry)?.grab_key_focus();
 };
 
 export const surfaceInteractions: Interaction[] = [

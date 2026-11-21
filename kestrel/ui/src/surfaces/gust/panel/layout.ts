@@ -8,23 +8,40 @@ interface Layout { items: string[]; folders: Record<string, Folder>; }
 
 export class GustLayout {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private layout: Layout = JSON.parse(this.settings.get_string('gust-layout'));
-  private arranged = this.settings.get_user_value('gust-layout') !== null;
+  private stored = this.settings.get_string('gust-layout');
+  private layout: Layout = JSON.parse(this.stored);
+  private readonly signal: number;
+
+  constructor(changed: () => void) {
+    this.signal = this.settings.connect('changed::gust-layout', () => {
+      const stored = this.settings.get_string('gust-layout');
+      if (stored === this.stored) return;
+      this.stored = stored;
+      this.layout = JSON.parse(stored);
+      changed();
+    });
+  }
+
+  destroy(): void {
+    this.settings.disconnect(this.signal);
+  }
 
   folder(id: string): Folder | undefined { return this.layout.folders[id]; }
   items(folder: string | null = null): string[] { return folder ? this.folder(folder)?.apps ?? [] : this.layout.items; }
 
-  sync(installed: string[]): void {
-    if (!this.arranged) {
-      this.layout.items = [...installed];
-      return;
-    }
-    const available = new Set(installed);
-    for (const folder of Object.values(this.layout.folders)) folder.apps = folder.apps.filter(id => available.has(id));
-    this.layout.items = this.layout.items.filter(id => this.folder(id) || available.has(id));
-    this.prune();
-    const placed = new Set([...this.layout.items, ...Object.values(this.layout.folders).flatMap(folder => folder.apps)]);
-    this.layout.items.push(...installed.filter(id => !placed.has(id)));
+  pinned(id: string): boolean {
+    return this.layout.items.includes(id) || Object.values(this.layout.folders).some(folder => folder.apps.includes(id));
+  }
+
+  pin(id: string): void {
+    if (this.pinned(id)) return;
+    this.layout.items.push(id);
+    this.save();
+  }
+
+  unpin(id: string): void {
+    this.remove(id);
+    this.save();
   }
 
   move(id: string, folder: string | null, target?: string, after = false): void {
@@ -78,8 +95,8 @@ export class GustLayout {
   }
 
   private save(): void {
-    this.arranged = true;
     this.prune();
-    this.settings.set_string('gust-layout', JSON.stringify(this.layout));
+    this.stored = JSON.stringify(this.layout);
+    this.settings.set_string('gust-layout', this.stored);
   }
 }

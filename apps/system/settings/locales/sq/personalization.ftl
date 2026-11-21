@@ -74,8 +74,6 @@ settings-appearance-text-size = Madhësia e tekstit
 ## Taskbar
 
 settings-taskbar-preview = Pamje paraprake e shiritit të detyrave
-settings-gust-look-panel-description = Kërkimi, aplikacionet dhe dosjet pranë shiritit të detyrave
-settings-gust-look-palette-description = Një shirit kërkimi në mes të ekranit për aplikacione, dritare, skedarë dhe përgjigje
 settings-gust-web = Kërko në ueb me
 settings-taskbar-shown = Shfaq shiritin e detyrave
 settings-taskbar-hidden = E fshehur

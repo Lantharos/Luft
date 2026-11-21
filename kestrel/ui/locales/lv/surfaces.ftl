@@ -8,13 +8,11 @@ gust-search-select-all = Atlasīt visu
 gust-power = Barošana un sesija
 gust-power-close = Aizvērt barošanas opcijas
 gust-account-settings = Konta iestatījumi
-gust-apps = Lietotnes
 gust-folder-default-name = Mape
 gust-folder-open = Atvērt mapi
 gust-folder-rename = Pārdēvēt
 gust-folder-ungroup = Atgrupēt lietotnes
 gust-open = Atvērt
-gust-move-to-apps = Pārvietot uz lietotnēm
 
 ## Gust search results
 

@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import Shell from 'gi://Shell';
 
-import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { t } from '../../../shared/i18n/index.js';
 import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
@@ -16,7 +16,7 @@ interface AppEntry extends Searchable {
   app: Gio.AppInfo;
 }
 
-function searchTerms(app: Gio.AppInfo): string[] {
+export function searchTerms(app: Gio.AppInfo): string[] {
   if (!(app instanceof GioUnix.DesktopAppInfo)) return [];
   const keywords = app.get_keywords() ?? [];
   const genericName = app.get_generic_name();
@@ -33,7 +33,7 @@ export function launchApp(app: Gio.AppInfo): void {
 export class AppResults {
   private entries: AppEntry[] = [];
 
-  constructor(private readonly menus: ContextMenus, private readonly close: () => void) {}
+  constructor(private readonly menus: ContextMenus, private readonly close: () => void, private readonly extra: (app: Gio.AppInfo) => MenuEntry[]) {}
 
   update(apps: Gio.AppInfo[]): void {
     this.entries = apps.map(app => searchable({ app }, appKey(app.get_id()!), appName(app), searchTerms(app)));
@@ -41,14 +41,6 @@ export class AppResults {
 
   find(search: Query, launches: (key: string) => number): Ranked[] {
     return rank(this.entries, search, 0, launches).slice(0, LIMIT).map(({ entry, score }) => ({ item: this.item(entry), score }));
-  }
-
-  frequent(launches: (key: string) => number, limit: number): SearchItem[] {
-    return this.entries.map(entry => ({ entry, weight: launches(entry.key) }))
-      .filter(({ weight }) => weight > 0)
-      .sort((a, b) => b.weight - a.weight)
-      .slice(0, limit)
-      .map(({ entry }) => this.item(entry));
   }
 
   private launch(app: Gio.AppInfo): void {
@@ -63,7 +55,8 @@ export class AppResults {
       activate: () => this.launch(app),
       menu: () => {
         const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id()!);
-        return shellApp ? this.menus.appEntries(shellApp) : [{ label: t('gust-open'), run: () => this.launch(app) }];
+        const extra = this.extra(app);
+        return shellApp ? this.menus.appEntries(shellApp, { extra }) : [{ label: t('gust-open'), run: () => this.launch(app) }, ...extra];
       },
     };
   }

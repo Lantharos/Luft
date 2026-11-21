@@ -74,8 +74,6 @@ settings-appearance-text-size = Textstorlek
 ## Taskbar
 
 settings-taskbar-preview = Förhandsvisning av aktivitetsfältet
-settings-gust-look-panel-description = Sökning, appar och mappar bredvid aktivitetsfältet
-settings-gust-look-palette-description = Ett sökfält mitt på skärmen för appar, fönster, filer och svar
 settings-gust-web = Sök på webben med
 settings-taskbar-shown = Visa aktivitetsfältet
 settings-taskbar-hidden = Dold

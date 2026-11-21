@@ -26,7 +26,7 @@ export class AppHint {
     Main.layoutManager.uiGroup.add_child(this.label);
   }
 
-  bind(button: St.Widget, text: string): void {
+  bind(button: St.Widget, text: () => string): void {
     button.connect('notify::hover', () => (button.hover ? this.open(button, text) : this.close(button)));
     button.connect('notify::mapped', () => { if (!button.mapped) this.close(button); });
     button.connect('destroy', () => this.close(button));
@@ -37,13 +37,13 @@ export class AppHint {
     this.label.destroy();
   }
 
-  private open(button: St.Widget, text: string): void {
+  private open(button: St.Widget, text: () => string): void {
     this.cancel();
     this.target = button;
     this.timeout = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, DELAY, () => {
       this.timeout = 0;
       if (!button.mapped) return;
-      this.label.text = text;
+      this.label.text = text();
       const [x, y] = button.get_transformed_position();
       const [buttonWidth, buttonHeight] = button.get_transformed_size();
       const [, width] = this.label.get_preferred_width(-1);

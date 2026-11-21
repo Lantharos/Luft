@@ -8,13 +8,11 @@ gust-search-select-all = Επιλογή όλων
 gust-power = Ενέργεια και περίοδος λειτουργίας
 gust-power-close = Κλείσιμο επιλογών ενέργειας
 gust-account-settings = Ρυθμίσεις λογαριασμού
-gust-apps = Εφαρμογές
 gust-folder-default-name = Φάκελος
 gust-folder-open = Άνοιγμα φακέλου
 gust-folder-rename = Μετονομασία
 gust-folder-ungroup = Κατάργηση ομαδοποίησης
 gust-open = Άνοιγμα
-gust-move-to-apps = Μετακίνηση στις Εφαρμογές
 
 ## Gust search results
 

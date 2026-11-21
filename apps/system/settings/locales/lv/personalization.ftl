@@ -75,8 +75,6 @@ settings-appearance-text-size = Teksta lielums
 ## Taskbar
 
 settings-taskbar-preview = Uzdevumjoslas priekšskatījums
-settings-gust-look-panel-description = Meklēšana, lietotnes un mapes blakus uzdevumjoslai
-settings-gust-look-palette-description = Meklēšanas josla ekrāna vidū lietotnēm, logiem, failiem un atbildēm
 settings-gust-web = Tīmekļa meklētājs
 settings-taskbar-shown = Rādīt uzdevumjoslu
 settings-taskbar-hidden = Paslēpta

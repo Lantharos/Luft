@@ -8,13 +8,11 @@ gust-search-select-all = Összes kijelölése
 gust-power = Tápellátás és munkamenet
 gust-power-close = Tápellátási lehetőségek bezárása
 gust-account-settings = Fiókbeállítások
-gust-apps = Alkalmazások
 gust-folder-default-name = Mappa
 gust-folder-open = Mappa megnyitása
 gust-folder-rename = Átnevezés
 gust-folder-ungroup = Csoport felbontása
 gust-open = Megnyitás
-gust-move-to-apps = Áthelyezés az Alkalmazások közé
 
 ## Gust search results
 

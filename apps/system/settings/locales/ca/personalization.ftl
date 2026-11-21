@@ -74,8 +74,6 @@ settings-appearance-text-size = Mida del text
 ## Taskbar
 
 settings-taskbar-preview = Previsualització de la barra de tasques
-settings-gust-look-panel-description = Cerca, aplicacions i carpetes al costat de la barra de tasques
-settings-gust-look-palette-description = Una barra de cerca al mig de la pantalla per a aplicacions, finestres, fitxers i respostes
 settings-gust-web = Cerca al web amb
 settings-taskbar-shown = Mostra la barra de tasques
 settings-taskbar-hidden = Amagada

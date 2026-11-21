@@ -74,8 +74,6 @@ settings-appearance-text-size = Tekstgrootte
 ## Taskbar
 
 settings-taskbar-preview = Voorbeeld van de taakbalk
-settings-gust-look-panel-description = Zoeken, apps en mappen naast de taakbalk
-settings-gust-look-palette-description = Een zoekbalk midden in het scherm voor apps, vensters, bestanden en antwoorden
 settings-gust-web = Op het web zoeken met
 settings-taskbar-shown = Taakbalk tonen
 settings-taskbar-hidden = Verborgen

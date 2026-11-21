@@ -8,13 +8,11 @@ gust-search-select-all = Tümünü seç
 gust-power = Güç ve oturum
 gust-power-close = Güç seçeneklerini kapat
 gust-account-settings = Hesap ayarları
-gust-apps = Uygulamalar
 gust-folder-default-name = Klasör
 gust-folder-open = Klasörü aç
 gust-folder-rename = Yeniden adlandır
 gust-folder-ungroup = Uygulamaları gruptan çıkar
 gust-open = Aç
-gust-move-to-apps = Uygulamalar’a taşı
 
 ## Gust search results
 

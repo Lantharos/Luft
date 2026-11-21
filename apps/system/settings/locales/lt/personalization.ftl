@@ -76,8 +76,6 @@ settings-appearance-text-size = Teksto dydis
 ## Taskbar
 
 settings-taskbar-preview = Užduočių juostos peržiūra
-settings-gust-look-panel-description = Paieška, programos ir aplankai šalia užduočių juostos
-settings-gust-look-palette-description = Paieškos juosta ekrano viduryje programoms, langams, failams ir atsakymams rasti
 settings-gust-web = Žiniatinklio paieškos sistema
 settings-taskbar-shown = Rodyti užduočių juostą
 settings-taskbar-hidden = Paslėpta

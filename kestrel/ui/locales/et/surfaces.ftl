@@ -8,13 +8,11 @@ gust-search-select-all = Vali kõik
 gust-power = Toide ja seanss
 gust-power-close = Sulge toitevalikud
 gust-account-settings = Konto seadistused
-gust-apps = Rakendused
 gust-folder-default-name = Kaust
 gust-folder-open = Ava kaust
 gust-folder-rename = Nimeta ümber
 gust-folder-ungroup = Tühista rühmitamine
 gust-open = Ava
-gust-move-to-apps = Teisalda rakenduste hulka
 
 ## Gust search results
 

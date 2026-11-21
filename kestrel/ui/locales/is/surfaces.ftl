@@ -8,13 +8,11 @@ gust-search-select-all = Velja allt
 gust-power = Orka og seta
 gust-power-close = Loka orkuvalkostum
 gust-account-settings = Aðgangsstillingar
-gust-apps = Forrit
 gust-folder-default-name = Mappa
 gust-folder-open = Opna möppu
 gust-folder-rename = Endurnefna
 gust-folder-ungroup = Leysa upp möppu
 gust-open = Opna
-gust-move-to-apps = Færa í Forrit
 
 ## Gust search results
 

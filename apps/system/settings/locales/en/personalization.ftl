@@ -106,8 +106,8 @@ settings-gust-section = Gust
 settings-gust-look = Look
 settings-gust-look-panel = Panel
 settings-gust-look-palette = Palette
-settings-gust-look-panel-description = Search, apps and folders next to the taskbar
-settings-gust-look-palette-description = A search bar in the middle of the screen for apps, windows, files and answers
+settings-gust-look-pinned-description = Your pinned apps and folders next to the taskbar
+settings-gust-look-grid-description = Every app in the middle of the screen, sorted into categories
 settings-gust-button = Show the Gust button
 settings-gust-button-description = Super opens Gust either way
 # Followed by a list of search engines

@@ -77,8 +77,6 @@ settings-appearance-text-size = Méid an téacs
 ## Taskbar
 
 settings-taskbar-preview = Réamhamharc ar an tascbharra
-settings-gust-look-panel-description = Cuardach, aipeanna agus fillteáin in aice leis an tascbharra
-settings-gust-look-palette-description = Barra cuardaigh i lár an scáileáin d’aipeanna, d’fhuinneoga, do chomhaid agus d’fhreagraí
 settings-gust-web = Cuardaigh an gréasán le
 settings-taskbar-shown = Taispeáin an tascbharra
 settings-taskbar-hidden = I bhfolach

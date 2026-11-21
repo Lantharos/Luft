@@ -75,8 +75,6 @@ settings-appearance-text-size = Mărime text
 ## Taskbar
 
 settings-taskbar-preview = Previzualizarea barei de activități
-settings-gust-look-panel-description = Căutare, aplicații și foldere lângă bara de activități
-settings-gust-look-palette-description = O bară de căutare în mijlocul ecranului pentru aplicații, ferestre, fișiere și răspunsuri
 settings-gust-web = Caută pe web cu
 settings-taskbar-shown = Afișează bara de activități
 settings-taskbar-hidden = Ascunsă

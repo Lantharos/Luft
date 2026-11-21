@@ -118,8 +118,8 @@
       </description>
     </key>
     <key name="gust-layout" type="s">
-      <default>'{"items":[],"folders":{}}'</default>
-      <summary>Gust's app order and folders</summary>
+      <default>'{"items":["net.imput.helium.desktop","com.lantharos.rover.desktop","com.lantharos.mailman.desktop","com.lantharos.draft.desktop","com.lantharos.magpie.desktop","com.lantharos.tern.desktop","com.lantharos.schelf.desktop","com.lantharos.settings.desktop"],"folders":{}}'</default>
+      <summary>Apps pinned to Gust, in order, and their folders</summary>
     </key>
     <key name="quick-tile-order" type="as">
       <default>[]</default>
@@ -379,9 +379,10 @@
       <default>'panel'</default>
       <summary>How Gust looks</summary>
       <description>
-        'panel' opens Gust next to the taskbar, with its search, apps and
-        folders. 'palette' opens it as a search bar in the middle of the
-        screen. Super and the Gust button open it either way.
+        'panel' opens Gust next to the taskbar, with its search, pinned
+        apps and folders. 'palette' opens it in the middle of the screen,
+        with every app until you type. Super and the Gust button open it
+        either way.
       </description>
     </key>
     <key name="search-web-engine" enum="com.lantharos.kestrel.WebSearch">

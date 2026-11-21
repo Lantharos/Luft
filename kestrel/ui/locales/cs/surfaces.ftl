@@ -8,13 +8,11 @@ gust-search-select-all = Vybrat vše
 gust-power = Napájení a relace
 gust-power-close = Zavřít možnosti napájení
 gust-account-settings = Nastavení účtu
-gust-apps = Aplikace
 gust-folder-default-name = Složka
 gust-folder-open = Otevřít složku
 gust-folder-rename = Přejmenovat
 gust-folder-ungroup = Zrušit seskupení
 gust-open = Otevřít
-gust-move-to-apps = Přesunout do aplikací
 
 ## Gust search results
 

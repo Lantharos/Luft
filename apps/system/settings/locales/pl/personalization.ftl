@@ -76,8 +76,6 @@ settings-appearance-text-size = Rozmiar tekstu
 ## Taskbar
 
 settings-taskbar-preview = Podgląd paska zadań
-settings-gust-look-panel-description = Wyszukiwanie, aplikacje i foldery obok paska zadań
-settings-gust-look-palette-description = Pasek wyszukiwania na środku ekranu do aplikacji, okien, plików i odpowiedzi
 settings-gust-web = Wyszukiwarka internetowa
 settings-taskbar-shown = Pokazuj pasek zadań
 settings-taskbar-hidden = Ukryty

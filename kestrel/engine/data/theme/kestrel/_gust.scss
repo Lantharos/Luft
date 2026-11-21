@@ -12,6 +12,13 @@
 .kestrel-search StIcon { color: ink(0.7); padding-right: 6px; }
 .kestrel-gust-panel .kestrel-search, .kestrel-gust-panel .kestrel-search:focus { background-color: pick(fill(0.13), rgba(0, 0, 0, 0.3)); }
 .kestrel-gust-panel .kestrel-search StLabel.hint-text { color: ink(pick(0.65, 0.72)); }
+.kestrel-gust-header { spacing: 8px; }
+.kestrel-gust-view-button { padding: 0 14px; border-radius: 999px; background-color: pick(fill(0.13), rgba(0, 0, 0, 0.3)); }
+.kestrel-gust-view-button:hover { background-color: pick(fill(0.18), rgba(0, 0, 0, 0.38)); }
+.kestrel-gust-view-button:focus { background-color: pick(fill(0.22), rgba(0, 0, 0, 0.44)); }
+.kestrel-gust-view-button:active { background-color: pick(fill(0.26), rgba(0, 0, 0, 0.5)); }
+.kestrel-gust-empty { font-size: 13px; color: ink(0.6); }
+.kestrel-gust-panel .kestrel-gust-all-apps .kestrel-search-group { padding: 8px 10px 0; font-size: 12px; }
 
 .kestrel-app-grid, .kestrel-search-results { spacing: 4px; }
 .kestrel-app-row { spacing: 8px; }
@@ -35,10 +42,23 @@
 .kestrel-search-result-glyph { font-size: 26px; min-width: 32px; text-align: center; }
 
 .kestrel-gust-palette { padding: 8px; spacing: 4px; border-radius: 28px; }
-.kestrel-gust-palette-search, .kestrel-gust-palette-search:hover, .kestrel-gust-palette-search:focus { background-color: transparent; padding: 14px 16px; font-size: 18px; }
+.kestrel-gust-palette-search, .kestrel-gust-palette-search:hover, .kestrel-gust-palette-search:focus { background-color: transparent; padding: 14px 24px; font-size: 18px; }
 .kestrel-gust-palette-search StIcon { padding-right: 10px; }
 .kestrel-gust-palette-body { spacing: 8px; }
-.kestrel-gust-palette .kestrel-search-group { padding: 10px 10px 2px; font-size: 12px; color: ink(0.65); }
+.kestrel-gust-chips-scroll { -st-hfade-offset: 32px; }
+.kestrel-gust-chips { spacing: 4px; padding: 0 0 6px; }
+.kestrel-gust-chips-inset { width: 20px; }
+.kestrel-gust-chip { padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: ink(0.7); transition-duration: $motion-tap; }
+.kestrel-gust-chip:hover { background-color: fill(0.08); color: ink(); }
+.kestrel-gust-chip:focus { background-color: fill(0.12); color: ink(); }
+.kestrel-gust-chip:checked { background-color: fill(0.16); color: ink(); }
+.kestrel-gust-chip:checked:focus { background-color: fill(0.22); }
+.kestrel-gust-sheet { padding: 0 0 8px; }
+.kestrel-gust-sheet-app { padding: 14px 4px 8px; border-radius: 18px; }
+.kestrel-gust-sheet-app:highlighted { background-color: fill(0.12); }
+.kestrel-gust-sheet-label { max-width: 88px; }
+.kestrel-gust-palette .kestrel-search-group { padding: 10px 24px 2px; font-size: 12px; color: ink(0.65); }
+.kestrel-gust-palette .kestrel-search-result-content { padding: 8px 24px; }
 .kestrel-gust-palette-preview { padding: 16px; spacing: 8px; border-radius: 20px; background-color: fill(0.05); }
 .kestrel-gust-palette-picture { min-height: 120px; }
 .kestrel-gust-palette-glyph { font-size: 88px; }

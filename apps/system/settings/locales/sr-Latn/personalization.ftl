@@ -75,8 +75,6 @@ settings-appearance-text-size = Veličina teksta
 ## Taskbar
 
 settings-taskbar-preview = Pregled trake zadataka
-settings-gust-look-panel-description = Pretraga, aplikacije i fascikle uz traku zadataka
-settings-gust-look-palette-description = Traka za pretragu na sredini ekrana za aplikacije, prozore, datoteke i odgovore
 settings-gust-web = Pretraži veb pomoću
 settings-taskbar-shown = Prikaži traku zadataka
 settings-taskbar-hidden = Skrivena

@@ -7,30 +7,34 @@ import { GustLayout } from './layout.js';
 import { GridDrag } from './drag.js';
 import { SearchResults } from '../../search/results/searchResults.js';
 import type { SearchItem, SearchView } from '../../search/item.js';
+import { appKey } from '../../../shared/apps/launchHistory.js';
 import { animateActor, Curve, Duration, liftIcon } from '../../../shared/motion/motion.js';
 import { appIcon } from '../../../appearance/icons/appIcons.js';
-import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { t } from '../../../shared/i18n/index.js';
 import { appName } from '../../../shared/apps/names.js';
 import { AppHint, appKind } from './appHint.js';
 import { CellRowLayout, CenteredColumnLayout } from './cells.js';
 import { FillLayout } from '../../../shared/layout/fill.js';
+import { AllApps } from './allApps.js';
 
 const ICON_SIZE = 36;
 
 export class GustGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
-  private readonly layout = new GustLayout();
+  readonly hint = new AppHint();
+  private readonly layout = new GustLayout(() => { if (!this.drag.active) this.render(); });
   private readonly drag: GridDrag;
-  private readonly hint = new AppHint();
+  private readonly allApps: AllApps;
+  private readonly empty = new St.Label({ name: 'kestrel-gust-no-pins', text: t('gust-no-pins'), style_class: 'kestrel-gust-empty', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER, y_expand: true, visible: false });
   private readonly results: SearchResults;
   private readonly resultsBox = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true, visible: false });
   private catalogDirty = false;
   private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
   private apps = new Map<string, Gio.AppInfo>();
-  private pinned = new Set<string>();
+  private all = false;
   private searchView: SearchView | null = null;
   private folder: string | null = null;
   private headerKey: string | null = null;
@@ -38,15 +42,17 @@ export class GustGrid {
 
   constructor(private readonly scroller: St.ScrollView, private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {
     scroller.child = this.actor;
-    this.actor.add_child(this.resultsBox);
     this.results = new SearchResults(menus, actor => this.reveal(actor));
+    this.allApps = new AllApps(menus, actor => this.reveal(actor), app => this.appItem(app));
+    for (const child of [this.resultsBox, this.allApps.actor, this.empty]) this.actor.add_child(child);
     this.actor.connect('destroy', () => {
       this.hint.destroy();
+      this.layout.destroy();
       for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
       this.buttons.clear();
     });
     this.drag = new GridDrag(scroller, () => this.render(false, true));
-    this.drag.target(this.actor, source => this.searchView ? null : () => this.layout.move(source.id, this.folder));
+    this.drag.target(this.actor, source => this.searchView || this.all ? null : () => this.layout.move(source.id, this.folder));
   }
 
   update(apps: Gio.AppInfo[]): void {
@@ -54,14 +60,41 @@ export class GustGrid {
     this.catalog = apps;
     const named = apps.map(app => ({ app, name: appName(app) })).sort((a, b) => a.name.localeCompare(b.name));
     this.apps = new Map(named.map(({ app }) => [app.get_id()!, app]));
-    this.layout.sync([...this.apps.keys()]);
+    this.allApps.update(apps);
     this.catalogDirty = true;
     if (!this.drag.active) this.render();
   }
 
-  setPinned(pinned: Set<string>): void {
-    this.pinned = pinned;
-    if (!this.drag.active) this.render();
+  get showingAll(): boolean { return this.all; }
+
+  showAll(all: boolean): void {
+    if (this.all === all) return;
+    this.all = all;
+    if (!this.drag.active) this.render(true);
+  }
+
+  pinEntry(app: Gio.AppInfo): MenuEntry {
+    const id = app.get_id()!;
+    const pinned = this.layout.pinned(id);
+    return { label: t(pinned ? 'gust-unpin' : 'gust-pin'), run: () => {
+      if (pinned) this.layout.unpin(id);
+      else this.layout.pin(id);
+      this.render();
+    } };
+  }
+
+  private appMenu(app: Gio.AppInfo, extra: MenuEntry[] = []): MenuEntry[] {
+    const entries = [this.pinEntry(app), ...extra];
+    const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id()!);
+    return shellApp ? this.menus.appEntries(shellApp, { extra: entries }) : [{ label: t('gust-open'), run: () => this.launch(app) }, ...entries];
+  }
+
+  private appItem(app: Gio.AppInfo): SearchItem {
+    return {
+      key: appKey(app.get_id()!), title: appName(app), description: '', icon: app,
+      activate: () => this.launch(app),
+      menu: () => this.appMenu(app),
+    };
   }
 
   showResults(view: SearchView | null): void {
@@ -100,11 +133,12 @@ export class GustGrid {
 
   private visible(id: string): boolean {
     const folder = this.layout.folder(id);
-    return folder ? folder.apps.some(app => this.apps.has(app) && !this.pinned.has(app)) : this.apps.has(id) && !this.pinned.has(id);
+    return folder ? folder.apps.some(app => this.apps.has(app)) : this.apps.has(id);
   }
 
   private render(animate = false, reorder = false): void {
-    const rows = this.actor.get_children().filter(child => child !== this.resultsBox);
+    const kept = new Set<Clutter.Actor>([this.resultsBox, this.allApps.actor, this.empty]);
+    const rows = this.actor.get_children().filter(child => !kept.has(child));
     const positions = reorder
       ? new Map(rows.flatMap(row => row.get_children()).map(button => [button.name, button.get_transformed_position()]))
       : new Map<string, [number, number]>();
@@ -117,22 +151,24 @@ export class GustGrid {
     if (this.folder && !this.layout.folder(this.folder)) this.folder = null;
     for (const { actor } of this.buttons.values()) actor.get_parent()?.remove_child(actor);
     for (const row of rows) row.destroy();
-    for (const [key, item] of this.buttons) {
-      const id = key;
-      if (!this.apps.has(id) && !this.layout.folder(id)) {
-        item.actor.destroy();
-        this.buttons.delete(key);
-      }
+    for (const [id, item] of this.buttons) {
+      if (this.layout.folder(id) || (this.apps.has(id) && this.layout.pinned(id))) continue;
+      item.actor.destroy();
+      this.buttons.delete(id);
     }
     this.renderHeader();
+    this.resultsBox.visible = !!this.searchView;
     if (this.searchView) {
+      this.allApps.hide();
+      this.empty.hide();
       this.renderResults(this.searchView);
-      this.resultsBox.show();
       return;
     }
-    this.resultsBox.hide();
     this.firstResult = undefined;
-    const ids = this.layout.items(this.folder).filter(id => this.visible(id));
+    if (this.all) this.allApps.show();
+    else this.allApps.hide();
+    const ids = this.all ? [] : this.layout.items(this.folder).filter(id => this.visible(id));
+    this.empty.visible = !this.all && !ids.length;
     for (let index = 0; index < ids.length; index += 6) {
       const row = new St.Widget({ style_class: 'kestrel-app-row', layout_manager: new CellRowLayout(ICON_SIZE) });
       for (let column = 0; column < 6; column++) {
@@ -163,14 +199,14 @@ export class GustGrid {
   }
 
   private renderHeader(): void {
-    const key = this.searchView ? 'search' : this.folder ?? 'root';
+    const key = this.searchView ? 'search' : this.all ? 'all' : this.folder ?? 'root';
     if (this.headerKey === key) return;
     this.headerKey = key;
     this.header.destroy_all_children();
-    const folder = !this.searchView && this.folder ? this.layout.folder(this.folder) : undefined;
+    const folder = !this.searchView && !this.all && this.folder ? this.layout.folder(this.folder) : undefined;
     this.header.visible = !!folder;
     if (!folder) return;
-    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: t('gust-apps'), style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
+    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: t('gust-pinned'), style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
     back.connect('clicked', () => this.home());
     this.drag.target(back, source => source.folder ? null : () => { this.layout.move(source.id, null); this.folder = null; });
     this.header.add_child(back);
@@ -238,7 +274,7 @@ export class GustGrid {
     const button = new St.Button({ name: `kestrel-gust-item-${id}`, style_class: 'kestrel-app-button', child: content, layout_manager: new FillLayout(), width: 92, can_focus: true, track_hover: true, accessible_name: label });
     button.connect('key-focus-in', () => this.reveal(button));
     const kind = app && appKind(app, label);
-    if (kind) this.hint.bind(button, kind);
+    if (kind) this.hint.bind(button, () => kind);
     liftIcon(button, icon);
     button.connect('clicked', () => {
       if (this.drag.active) return;
@@ -251,10 +287,8 @@ export class GustGrid {
         { label: t('gust-folder-rename'), run: () => { this.folder = id; this.render(true); (this.header.get_last_child() as St.Entry).grab_key_focus(); } },
         { label: t('gust-folder-ungroup'), run: () => { this.layout.dissolve(id); this.render(); } },
       ];
-      const shellApp = Shell.AppSystem.get_default().lookup_app(id);
-      const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: t('gust-open'), run: () => this.launch(app!) }];
-      if (this.folder && !this.searchView) entries.push({ label: t('gust-move-to-apps'), run: () => { this.layout.move(id, null); this.render(); } });
-      return entries;
+      const inFolder = this.folder && !this.searchView;
+      return this.appMenu(app!, inFolder ? [{ label: t('gust-move-out-of-folder'), run: () => { this.layout.move(id, null); this.render(); } }] : []);
     });
     const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));
     const mode = (source: { folder: boolean }, x: number) => !this.folder && !source.folder && x > button.width * 0.25 && x < button.width * 0.75

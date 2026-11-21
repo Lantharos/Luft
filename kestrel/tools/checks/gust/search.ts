@@ -23,9 +23,9 @@ const tile = (title: string) => styled('kestrel-control', named('kestrel-quick-s
 async function checkKeyboard() {
   search('');
   press(Clutter.KEY_Down);
-  await eventually(() => global.stage.get_key_focus() instanceof St.Button, 'Down in search focuses an app');
+  const app = await eventually(() => global.stage.get_key_focus() instanceof St.Button && global.stage.get_key_focus(), 'Down in search focuses an app');
   press(Clutter.KEY_Tab);
-  await eventually(() => gust()!.contains(global.stage.get_key_focus()!), 'Tab stays in Gust');
+  await eventually(() => global.stage.get_key_focus() !== app && gust()!.contains(global.stage.get_key_focus()!), 'Tab stays in Gust');
   entry().grab_key_focus();
 }
 

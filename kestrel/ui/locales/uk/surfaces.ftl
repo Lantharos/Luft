@@ -8,13 +8,11 @@ gust-search-select-all = Виділити все
 gust-power = Живлення й сеанс
 gust-power-close = Закрити параметри живлення
 gust-account-settings = Параметри облікового запису
-gust-apps = Програми
 gust-folder-default-name = Папка
 gust-folder-open = Відкрити папку
 gust-folder-rename = Перейменувати
 gust-folder-ungroup = Розгрупувати програми
 gust-open = Відкрити
-gust-move-to-apps = Перемістити до програм
 
 ## Gust search results
 

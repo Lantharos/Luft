@@ -135,7 +135,7 @@ function sitsAboveTaskbar(pill: Clutter.Actor) {
 }
 
 async function callSpeech(method: string) {
-  await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', SPEECH, method, method === 'Gust' ? new GLib.Variant('(s)', ['us']) : null,
+  await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', SPEECH, method, method === 'Start' ? new GLib.Variant('(s)', ['us']) : null,
     null, Gio.DBusCallFlags.NONE, -1, null);
 }
 
@@ -186,7 +186,7 @@ async function checkPill() {
   await pause(1000);
   require(entryText(window) === before && !privacy().visible, 'nothing is typed after Escape and the microphone is closed');
 
-  await callSpeech('Gust');
+  await callSpeech('Start');
   await eventually(() => intoRecorder(MICROPHONE, {'node.name': 'pw-record', 'application.id': 'com.lantharos.Speech'}), 'the microphone reaches dictation started elsewhere');
   await eventually(usesMicrophone, 'dictation started by something other than Kestrel shows in the privacy indicator');
   await callSpeech('Cancel');
@@ -243,15 +243,13 @@ async function checkSetupOffer() {
   dismissNotifications();
   tapChord();
   await eventually(offeredSetup, 'a quick press of Super and Alt starts listening too');
+  await pause(400);
+  require(!shown(gust()), 'letting go of Super and Alt doesn’t open Gust');
   dismissNotifications();
   await stop(service);
 }
 
 async function checkChordKeepsShortcuts() {
-  holdKeys(SUPER_ALT);
-  releaseKeys(SUPER_ALT);
-  await pause(400);
-  require(!shown(gust()), 'letting go of Super and Alt doesn’t open Gust');
   holdKeys(ALT_SUPER);
   tapKey(KEY_J);
   await pause(HOLD_MS);

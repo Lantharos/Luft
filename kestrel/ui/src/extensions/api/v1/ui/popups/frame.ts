@@ -15,6 +15,15 @@ const RISE = 6;
 const OPEN = { duration: Duration.quick, curve: Curve.gentle };
 const CLOSE = { duration: Duration.tap, curve: Curve.accelerate };
 
+function firstEntry(actor: Clutter.Actor): St.Entry | null {
+  if (actor instanceof St.Entry) return actor;
+  for (const child of actor.get_children()) {
+    const entry = child.visible ? firstEntry(child) : null;
+    if (entry) return entry;
+  }
+  return null;
+}
+
 interface FrameOptions {
   kind: 'panel' | 'window';
   title: string;
@@ -132,7 +141,7 @@ export class PopupFrame {
     animateActor(this.actor, { opacity: 255, translation_x: 0, translation_y: 0, ...OPEN });
     if (!panel) return;
     this.previousFocus = global.stage.get_key_focus();
-    this.actor.grab_key_focus();
+    this.takeFocus();
     this.watch(global.stage, global.stage.connect('notify::key-focus', () => {
       const focus = global.stage.get_key_focus();
       if (!this.closing && !this.updating && (!focus || !this.actor.contains(focus))) this.close();
@@ -166,7 +175,11 @@ export class PopupFrame {
     }
     this.fit();
     const focus = global.stage.get_key_focus();
-    if (!this.closing && (!focus || !this.actor.contains(focus))) this.actor.grab_key_focus();
+    if (!this.closing && (!focus || !this.actor.contains(focus))) this.takeFocus();
+  }
+
+  private takeFocus(): void {
+    (firstEntry(this.view.actor) ?? this.actor).grab_key_focus();
   }
 
   close(fade = true): void {

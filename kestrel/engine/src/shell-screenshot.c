@@ -1,5 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
+#include <math.h>
+
 #include <cairo.h>
 #include <clutter/clutter.h>
 #include <cogl/cogl.h>
@@ -359,17 +361,77 @@ write_screenshot_thread (GTask        *result,
     g_task_return_boolean (result, TRUE);
 }
 
+static MtkRectangle
+monitors_around (ShellScreenshot    *screenshot,
+                 const MtkRectangle *rect)
+{
+  MetaDisplay *display = shell_global_get_display (screenshot->global);
+  MtkRectangle around = *rect;
+  int i;
+
+  for (i = 0; i < meta_display_get_n_monitors (display); i++)
+    {
+      MtkRectangle monitor;
+
+      meta_display_get_monitor_geometry (display, i, &monitor);
+      if (mtk_rectangle_overlap (&monitor, rect))
+        mtk_rectangle_union (&around, &monitor, &around);
+    }
+
+  return around;
+}
+
+static gboolean
+paint_area (ClutterStage        *stage,
+            const MtkRectangle  *area,
+            const MtkRectangle  *painted,
+            float                scale,
+            cairo_surface_t     *image,
+            ClutterPaintFlag     paint_flags,
+            GError             **error)
+{
+  CoglContext *cogl =
+    clutter_backend_get_cogl_context (clutter_context_get_backend (clutter_actor_get_context (CLUTTER_ACTOR (stage))));
+  g_autoptr (CoglTexture) texture =
+    cogl_texture_2d_new_with_size (cogl,
+                                   (int) roundf (painted->width * scale),
+                                   (int) roundf (painted->height * scale));
+  g_autoptr (CoglOffscreen) offscreen = cogl_offscreen_new_with_texture (texture);
+  CoglFramebuffer *framebuffer = COGL_FRAMEBUFFER (offscreen);
+  g_autoptr (CoglBitmap) bitmap = NULL;
+
+  if (!cogl_framebuffer_allocate (framebuffer, error))
+    return FALSE;
+
+  clutter_stage_paint_to_framebuffer (stage, framebuffer, painted, scale, NULL, paint_flags);
+
+  bitmap = cogl_bitmap_new_for_data (cogl,
+                                     cairo_image_surface_get_width (image),
+                                     cairo_image_surface_get_height (image),
+                                     COGL_PIXEL_FORMAT_ARGB32_NATIVE,
+                                     cairo_image_surface_get_stride (image),
+                                     cairo_image_surface_get_data (image));
+  cogl_framebuffer_read_pixels_into_bitmap (framebuffer,
+                                            (int) roundf ((area->x - painted->x) * scale),
+                                            (int) roundf ((area->y - painted->y) * scale),
+                                            COGL_READ_PIXELS_COLOR_BUFFER,
+                                            bitmap);
+  return TRUE;
+}
+
 static gboolean
 do_grab_screenshot (ShellScreenshot     *screenshot,
                     int                  x,
                     int                  y,
                     int                  width,
                     int                  height,
+                    gboolean             with_surroundings,
                     ShellScreenshotFlag  flags,
                     GError             **error)
 {
   ClutterStage *stage = shell_global_get_stage (screenshot->global);
   MtkRectangle screenshot_rect = { x, y, width, height };
+  MtkRectangle painted;
   int image_width;
   int image_height;
   float scale;
@@ -402,13 +464,8 @@ do_grab_screenshot (ShellScreenshot     *screenshot,
     paint_flags |= CLUTTER_PAINT_FLAG_FORCE_CURSORS;
   else
     paint_flags |= CLUTTER_PAINT_FLAG_NO_CURSORS;
-  if (!clutter_stage_paint_to_buffer (stage, &screenshot_rect, scale,
-                                      cairo_image_surface_get_data (image),
-                                      cairo_image_surface_get_stride (image),
-                                      COGL_PIXEL_FORMAT_ARGB32_NATIVE,
-                                      NULL,
-                                      paint_flags,
-                                      error))
+  painted = with_surroundings ? monitors_around (screenshot, &screenshot_rect) : screenshot_rect;
+  if (!paint_area (stage, &screenshot_rect, &painted, scale, image, paint_flags, error))
     {
       cairo_surface_destroy (image);
       return FALSE;
@@ -511,7 +568,7 @@ grab_screenshot (ShellScreenshot     *screenshot,
 
   if (!do_grab_screenshot (screenshot,
                            0, 0, width, height,
-                           flags, &error))
+                           FALSE, flags, &error))
     {
       fail_screenshot (screenshot, result, error);
       return;
@@ -999,6 +1056,7 @@ shell_screenshot_screenshot_area (ShellScreenshot     *screenshot,
                            screenshot->screenshot_area.y,
                            screenshot->screenshot_area.width,
                            screenshot->screenshot_area.height,
+                           TRUE,
                            SHELL_SCREENSHOT_FLAG_NONE,
                            &error))
     {
@@ -1153,6 +1211,7 @@ shell_screenshot_pick_color (ShellScreenshot     *screenshot,
                            screenshot->screenshot_area.y,
                            1,
                            1,
+                           FALSE,
                            SHELL_SCREENSHOT_FLAG_NONE,
                            &error))
     {

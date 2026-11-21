@@ -145,7 +145,7 @@ The element has `update(changes)`, `refresh()` to ask for its views again, and `
 | `anchor` | A taskbar item it made, `'pointer'`, a place on the display under the pointer (`'top-left'`, `'top'`, `'top-right'`, `'left'`, `'center'`, `'right'`, `'bottom-left'`, `'bottom'`, `'bottom-right'`), or a point `{ x, y }` |
 | `title` | What screen readers call it, and a window's title |
 | `content` | What it shows, see below |
-| `kind` | `panel`, the default, takes the keyboard while it's open and closes on Escape, a click elsewhere, or when something else opens. `window` floats above the windows without taking the keyboard, has a title and a close button, and can be dragged |
+| `kind` | `panel`, the default, takes the keyboard while it's open, into its first text field if it has one, and closes on Escape, a click elsewhere, or when something else opens. `window` floats above the windows without taking the keyboard, has a title and a close button, and can be dragged |
 | `width` | 200 to 560 pixels; 340 without it. The height follows the content |
 | `chime` | Plays Luft's notification sound as it opens, for something waiting on people, such as a transfer to accept. It stays quiet during Do Not Disturb and when people turned notification sounds off |
 | `onClosed()` | Runs once when it closes, however it closes |

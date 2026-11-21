@@ -5,7 +5,7 @@ import Shell from 'gi://Shell';
 
 import { identifyProcess } from '../../../shared/apps/identity.js';
 import { luftAppPrograms, runsProgram } from '../../../shared/apps/luftApps.js';
-import { callerProcess } from '../../../shared/dbus/processes.js';
+import { callerProcess, readProcFile } from '../../../shared/dbus/processes.js';
 import { identify } from '../../../shared/dbus/sandbox.js';
 import { type Handed, receive, sweep } from './received.js';
 import { openSendSheet, sendSheetOpen } from './sheet.js';
@@ -16,6 +16,7 @@ const INTERFACE = `<node>
     <method name="Send"><arg type="a(sh)" name="files" direction="in"/></method>
   </interface>
 </node>`;
+const BUS_PROXY = 'xdg-dbus-proxy';
 const WINDOW = 60 * GLib.USEC_PER_SEC;
 const SHEETS_PER_WINDOW = 5;
 
@@ -30,6 +31,12 @@ function ownedBy(window: Meta.Window, pid: number): boolean {
   return !!identity && 'program' in identity && !!app && runsProgram(identity.program, luftAppPrograms(app));
 }
 
+function appBehind(pid: number): number {
+  const identity = identifyProcess(pid);
+  if (!identity || !('program' in identity) || GLib.path_get_basename(identity.program) !== BUS_PROXY) return pid;
+  return Number(/^PPid:\s*(\d+)$/m.exec(readProcFile(`/proc/${pid}/status`) ?? '')?.[1] ?? 0);
+}
+
 async function callersWindow(invocation: Invocation): Promise<Meta.Window> {
   const window = global.display.focus_window;
   if (!window) throw new Refused('Only the app in front can send files');
@@ -38,7 +45,7 @@ async function callersWindow(invocation: Invocation): Promise<Meta.Window> {
   if (caller.kind === 'you') {
     const process = await callerProcess(invocation);
     try {
-      if (process?.pid && ownedBy(window, process.pid)) return window;
+      if (process?.pid && ownedBy(window, appBehind(process.pid))) return window;
     } finally {
       process?.close();
     }

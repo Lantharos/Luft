@@ -102,7 +102,7 @@ pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
         "--",
     ];
     program.extend(wanted.iter().copied());
-    let mut child = ubuntu::command(&program)
+    let mut child = ubuntu::tool(&program)
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())

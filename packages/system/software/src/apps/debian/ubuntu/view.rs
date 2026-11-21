@@ -35,7 +35,7 @@ fn runtime_folders() -> Vec<PathBuf> {
 }
 
 /// Your search path, with Ubuntu's own folders, such as the one games go in, after it.
-fn search_path() -> OsString {
+pub(super) fn search_path() -> OsString {
     let yours: Vec<PathBuf> = std::env::var_os("PATH")
         .map(|path| std::env::split_paths(&path).collect())
         .unwrap_or_default();
@@ -75,6 +75,5 @@ pub fn arguments(tree: &Path, home: &Path) -> Vec<OsString> {
     arguments.share("/var/tmp");
     arguments.add("--ro-bind", HOST_FONTS, FONTS);
     arguments.share(home);
-    arguments.add("--setenv", "PATH", search_path());
     arguments.0
 }

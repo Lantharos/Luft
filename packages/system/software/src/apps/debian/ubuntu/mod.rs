@@ -7,7 +7,7 @@ mod base;
 mod setup;
 mod view;
 
-use std::ffi::OsStr;
+use std::ffi::{OsStr, OsString};
 use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -43,25 +43,36 @@ pub fn apt(arguments: &[&str], working: Stage, task: Task) -> Result<(), String>
     apt::run(&tree(), arguments, working, task)
 }
 
-/// Runs a program in Ubuntu as you, the way its apps run.
-pub fn command(program: &[impl AsRef<OsStr>]) -> Command {
+fn command(program: &[impl AsRef<OsStr>], search_path: OsString) -> Command {
     let mut command = Command::new("bwrap");
     command
         .args(view::arguments(&tree(), &home()))
-        .arg("--")
+        .args([
+            OsStr::new("--setenv"),
+            OsStr::new("PATH"),
+            &search_path,
+            OsStr::new("--"),
+        ])
         .args(program);
     command
 }
 
-/// Starts an app from its menu entry, in place of this process.
+/// Runs one of Ubuntu's own programs as you, found only in Ubuntu's system folders, so
+/// nothing in your own search path stands in for it.
+pub fn tool(program: &[impl AsRef<OsStr>]) -> Command {
+    command(program, SEARCH_PATH.into())
+}
+
+/// Starts an app from its menu entry, in place of this process, finding programs the
+/// way its apps do.
 pub fn launch(program: &[String]) -> i32 {
-    let error = command(program).exec();
+    let error = command(program, view::search_path()).exec();
     eprintln!("Couldn't start the app in Ubuntu: {error}");
     1
 }
 
 pub fn query(program: &[&str]) -> Result<String, String> {
-    let output = command(program)
+    let output = tool(program)
         .stdin(Stdio::null())
         .output()
         .map_err(|_| UNAVAILABLE.to_owned())?;

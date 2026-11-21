@@ -24,7 +24,7 @@ Use Croatian words and ijekavian forms: datoteka, mapa, računalo, postavke, zas
 ## Names
 
 - Settings, Disks and Install Luft are Postavke, Diskovi and Instaliraj Luft.
-- Don't decline app names; put the kind of thing first: „u aplikaciji Rover“, „aplikacija Tern je zatvorena“. Luft declines when it must (Lufta, Luftu), but prefer sentences where it doesn't.
+- Don't decline app names; put the kind of thing first: „u aplikaciji Rover“, „aplikacija Draft je zatvorena“. Luft declines when it must (Lufta, Luftu), but prefer sentences where it doesn't.
 
 ## Plurals
 

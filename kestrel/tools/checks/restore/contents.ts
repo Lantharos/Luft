@@ -24,7 +24,7 @@ interface ShownApp {
 const KEPT_FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Field notes', 'Harbor']);
 const ROVER: ShownApp = {name: 'rover', id: 'com.lantharos.rover', opened: Gio.File.new_for_path(KEPT_FOLDER).get_uri(), shows: KEPT_FOLDER};
 const SETTINGS: ShownApp = {name: 'settings', id: 'com.lantharos.settings', opened: 'kestrel-settings:input/shortcuts', shows: '"section":"shortcuts"'};
-const TERN: ShownApp = {name: 'tern', id: 'com.lantharos.tern', opened: '', shows: 'tabs'};
+const TERMINAL: ShownApp = {name: 'terminal', id: 'com.lantharos.terminal', opened: '', shows: 'tabs'};
 const RESTORED = [ROVER, SETTINGS];
 
 interface Data {
@@ -68,7 +68,7 @@ async function closeNormally(app: ShownApp, label: string) {
 }
 
 async function opened() {
-  for (const app of [...RESTORED, TERN]) requireFresh(app.name);
+  for (const app of [...RESTORED, TERMINAL]) requireFresh(app.name);
   GLib.mkdir_with_parents(KEPT_FOLDER, 0o755);
   GLib.file_set_contents(GLib.build_filenamev([KEPT_FOLDER, 'tides.txt']), 'High water at 06:12 and 18:40\n');
   const kept: Record<string, string> = {};
@@ -83,9 +83,9 @@ async function opened() {
     const files = Gio.File.new_for_path(windowsFolder(app)).enumerate_children('unix::mode', Gio.FileQueryInfoFlags.NONE, null);
     require([...files].every(info => (info.get_attribute_uint32('unix::mode') & 0o777) === 0o600), `only the account can read what ${app.name} keeps`);
   }
-  launch(TERN);
-  await shown(TERN, 'before the restart');
-  await closeNormally(TERN, 'before the restart');
+  launch(TERMINAL);
+  await shown(TERMINAL, 'before the restart');
+  await closeNormally(TERMINAL, 'before the restart');
   await eventually(() => sessionRecord()?.windows.filter(window => window.app.startsWith('com.lantharos.')).length === RESTORED.length, 'the record notes the apps still open');
   await capture('restore-contents-before');
   await setStagedUpdate(true);
@@ -102,8 +102,8 @@ async function updated({kept}: Data) {
     (await frameOf(window)).save(`restore-contents-${app.name}-after`);
   }
   await pause(KEPT_TIMEOUT / 2);
-  require(!windowOf(TERN), 'Tern, closed before the restart, stays closed');
-  require(!keptStates(TERN).length, 'nothing Tern showed is left behind');
+  require(!windowOf(TERMINAL), 'Terminal, closed before the restart, stays closed');
+  require(!keptStates(TERMINAL).length, 'nothing Terminal showed is left behind');
   await capture('restore-contents-after');
   await closeNormally(ROVER, 'after the restart');
   launch({...ROVER, opened: ''});

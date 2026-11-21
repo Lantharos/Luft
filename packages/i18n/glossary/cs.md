@@ -25,7 +25,7 @@ Prefer sentences without a person: „Aktualizace se nainstalují při příšt�
 ## Names
 
 - Settings, Disks and Install Luft are Nastavení, Disky and Instalovat Luft.
-- Don't inflect app names; put the kind of thing first: „v aplikaci Rover“, „aplikace Tern byla zavřena“. Luft inflects as a masculine noun when it must (Luftu, s Luftem). Before Windows, add „systém“ when the case would show: „ze systému Windows“.
+- Don't inflect app names; put the kind of thing first: „v aplikaci Rover“, „aplikace Draft byla zavřena“. Luft inflects as a masculine noun when it must (Luftu, s Luftem). Before Windows, add „systém“ when the case would show: „ze systému Windows“.
 
 ## Plurals
 

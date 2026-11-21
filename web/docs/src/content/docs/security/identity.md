@@ -36,7 +36,7 @@ Your environment, from `~/.config/environment.d`, `systemctl --user set-environm
 - Kestrel's units take out every variable in `packages/identity/unsafe.list`. A drop-in for every user unit named `kestrel-*` or `luft-*` takes out the same list, and systemd applies it last, so nothing your systemd holds reaches them.
 - Kestrel's helpers and Luft's user services then start through `luft-launch`, which keeps only the variables in `allowed.list` next to it and sets `PATH` to `/usr/local/bin:/usr/bin`. Helpers D-Bus starts on demand, such as notifications and Rover's file chooser for other apps, run as units of their own for this.
 - Kestrel starts Luft's apps with the same short list. An app is Luft's when its entry is named `com.lantharos.` or its program is under `/usr/lib/sabine/com.lantharos.`.
-- Every other app gets your whole environment, and so do programs Luft's apps start for you, such as a shell in Tern, which take it from your systemd.
+- Every other app gets your whole environment, and so do programs Luft's apps start for you, such as a shell in Terminal, which take it from your systemd.
 - The login screen's Kestrel starts from greetd, whose environment only system configuration sets.
 
 A development build started from `KESTREL_BUILDDIR` also passes the variables in `development.list` to the apps it starts, so test sessions can point them at stand-ins. An installed Kestrel ignores that list, and ignores `KESTREL_BUILDDIR`, `KESTREL_DATADIR` and the other variables that point a build at its own files unless the program running is the `kestrel` inside `KESTREL_BUILDDIR`.

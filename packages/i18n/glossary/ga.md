@@ -23,7 +23,7 @@ Address the reader as tú, as Windows, Microsoft 365, GNOME and KDE do: “Is f�
 ## Names
 
 - Settings, Disks and Install Luft are Socruithe, Dioscaí and Suiteáil Luft. Socruithe takes the article in sentences (“sna Socruithe”), and Disks is named with its kind so it doesn't mutate (“san aip Dioscaí”).
-- Names never take mutations or the genitive: “ar Luft”, “fuinneog Tern”. When a sentence would mutate the name, put the kind of thing first: “san aip Rover”.
+- Names never take mutations or the genitive: “ar Luft”, “fuinneog Draft”. When a sentence would mutate the name, put the kind of thing first: “san aip Rover”.
 
 ## Mutations
 

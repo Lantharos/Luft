@@ -10,7 +10,7 @@ const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 
 export async function checkSeeThrough(app: LuftApp) {
   try {
-    kestrel.set_strv('see-through-apps', ['com.lantharos.tern.desktop']);
+    kestrel.set_strv('see-through-apps', ['com.lantharos.terminal.desktop']);
     await settled();
     (await scrollToEnd(app, await app.settle(() => true))).save('settings-see-through-luca');
     await changes(app, 'settings shows that see-through windows use Maris', () => glass.set_string('see-through', 'maris'));

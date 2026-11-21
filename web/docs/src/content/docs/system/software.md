@@ -97,7 +97,7 @@ Otherwise, **Install the .deb anyway** installs it into Ubuntu 26.04, kept in yo
 
 ## Command-line tools
 
-Command-line tools come from Fedora and become [system packages](/system/system-packages/), for everyone on the computer. Search for them in Schelf, run `schelf install ripgrep`, or open an `.rpm` file. Their commands run in [Tern](/apps/tern/) like Luft's own, and they update by themselves.
+Command-line tools come from Fedora and become [system packages](/system/system-packages/), for everyone on the computer. Search for them in Schelf, run `schelf install ripgrep`, or open an `.rpm` file. Their commands run in [Terminal](/apps/terminal/) like Luft's own, and they update by themselves.
 
 A tool that only brings programs, such as `ripgrep`, `htop` or `gh`, installs without a password. One that also changes what the system does, with a service, device rules, a program that runs with more rights than whoever starts it, or a user of its own, asks for an administrator's password, and so do `.rpm` files and packages from software sources you added.
 

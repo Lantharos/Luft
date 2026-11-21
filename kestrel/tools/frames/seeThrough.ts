@@ -14,41 +14,41 @@ import type {FrameRecorder, Interaction} from './recorder.js';
 type Look = {material: 'luca' | 'maris'; lucaBlurs: 'everything' | 'wallpaper'};
 
 const GLASS_KEYS = ['see-through', 'luca-blurs'];
-const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
+const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 
-let tern: LuftApp | null = null;
+let terminal: LuftApp | null = null;
 
-async function seeThroughTern({material, lucaBlurs}: Look) {
-  if (!tern) {
-    GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
-    GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
-    tern = await openApp('tern', ['-e', 'sh', '-c', 'sleep 600']);
+async function seeThroughTerminal({material, lucaBlurs}: Look) {
+  if (!terminal) {
+    GLib.mkdir_with_parents(GLib.path_get_dirname(TERMINAL_SETTINGS), 0o755);
+    GLib.file_set_contents(TERMINAL_SETTINGS, '{"translucent": false}');
+    terminal = await openApp('terminal', ['-e', 'sh', '-c', 'sleep 600']);
   }
-  const app = Shell.WindowTracker.get_default().get_window_app(tern.window)!;
+  const app = Shell.WindowTracker.get_default().get_window_app(terminal.window)!;
   settings.set_strv('see-through-apps', [app.get_id()]);
   glass.set_string('see-through', material);
   glass.set_string('luca-blurs', lucaBlurs);
   const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
-  tern.window.move_resize_frame(true, area.x + 120, area.y + 60, 900, 600);
-  tern.window.raise();
+  terminal.window.move_resize_frame(true, area.x + 120, area.y + 60, 900, 600);
+  terminal.window.raise();
   await settled();
 }
 
-async function closeTern() {
+async function closeTerminal() {
   settings.reset('see-through-apps');
   for (const key of GLASS_KEYS) glass.reset(key);
-  await tern?.close();
-  tern = null;
-  GLib.unlink(TERN_SETTINGS);
+  await terminal?.close();
+  terminal = null;
+  GLib.unlink(TERMINAL_SETTINGS);
 }
 
 const behind = (recorder: FrameRecorder) => slideWindow(findWindow((window: Meta.Window) => !!window.get_title()?.startsWith('Files'))!, recorder);
 
 const interactions = (look: Look, label: string): Interaction[] => [
-  {name: `see-through window moving, ${label}`, prepare: () => seeThroughTern(look), act: recorder => slideWindow(tern!.window, recorder), finish: closeTern},
-  {name: `window moving behind a see-through window, ${label}`, prepare: () => seeThroughTern(look), act: behind, finish: closeTern},
+  {name: `see-through window moving, ${label}`, prepare: () => seeThroughTerminal(look), act: recorder => slideWindow(terminal!.window, recorder), finish: closeTerminal},
+  {name: `window moving behind a see-through window, ${label}`, prepare: () => seeThroughTerminal(look), act: behind, finish: closeTerminal},
 ];
 
 export const seeThroughInteractions: Interaction[] = [

@@ -221,7 +221,7 @@ mod tests {
     #[test]
     fn names_programs_outside_apps() {
         for unit in [
-            "tern-4242.scope",
+            "terminal-shell-4242.scope",
             "syncthing.service",
             "app-kestrel-org.freedesktop.Unknown-77.scope",
         ] {

@@ -7,7 +7,7 @@ home-get = Get Luft
 # Scrolls down to the screenshots
 home-look = Take a look
 
-home-desktop-alt = The Luft desktop with Rover, Settings and Tern open over a misty forest
+home-desktop-alt = The Luft desktop with Rover, Settings and Terminal open over a misty forest
 home-intro = Luft is a complete system for your PC, built on Fedora. It has its own desktop, its own apps and a core that keeps itself in one piece, so you can get on with your day.
 
 home-gust-heading = Gust knows where everything is.
@@ -45,6 +45,7 @@ home-apps-label = Luft’s apps
 home-app-shot = { $app } ({ $kind })
 home-app-settings-name = Settings
 home-app-disks-name = Disks
+home-app-terminal-name = Terminal
 # What each app is, shown under its name
 home-app-rover = Files
 home-app-rover-detail = Tabs, Quick Look, network drives and your cloud drives, with a sidebar that knows where Windows lives.
@@ -56,8 +57,8 @@ home-app-mailman = Mail
 home-app-mailman-detail = One inbox for every account, a screener for new senders and search that works offline.
 home-app-draft = Text and code
 home-app-draft-detail = Over a hundred languages, multiple cursors and a Markdown preview, and it remembers where you left off.
-home-app-tern = Terminal
-home-app-tern-detail = Tabs and split panes, a nudge when a long command finishes, and colours from your wallpaper.
+home-app-terminal = Terminal
+home-app-terminal-detail = Tabs and split panes, a nudge when a long command finishes, and colours from your wallpaper.
 home-app-schelf = Apps
 home-app-schelf-detail = Thousands of apps from Flathub and AppImages, with permissions explained in plain words.
 home-app-disks = Drives

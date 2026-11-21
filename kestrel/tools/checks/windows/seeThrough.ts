@@ -13,7 +13,7 @@ import {withApp} from '../apps/lib/apps.js';
 const {require, eventually} = checks('see-through windows');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const KEYS = ['see-through-apps', 'see-through-keep-text'];
-const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
+const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const TEXT = 'Text stays solid while the background lets the desktop through';
 const LAUNCHES = 6;
 
@@ -24,16 +24,16 @@ const surfacesSeeThrough = (window: Meta.Window) =>
 async function launchesSeeThrough(appId: string) {
   settings.set_strv('see-through-apps', [appId]);
   for (let launch = 1; launch <= LAUNCHES; launch++)
-    await withApp('tern', ['-e', 'sh', '-c', 'sleep 600'], tern => eventually(() => surfacesSeeThrough(tern.window), `launch ${launch} of a see-through app opens see-through`));
+    await withApp('terminal', ['-e', 'sh', '-c', 'sleep 600'], terminal => eventually(() => surfacesSeeThrough(terminal.window), `launch ${launch} of a see-through app opens see-through`));
 }
 
 export async function run() {
-  GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
-  GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
+  GLib.mkdir_with_parents(GLib.path_get_dirname(TERMINAL_SETTINGS), 0o755);
+  GLib.file_set_contents(TERMINAL_SETTINGS, '{"translucent": false}');
   try {
-    const appId = await withApp('tern', ['-e', 'sh', '-c', `printf '%s\\n' '${TEXT}'; sleep 600`], async tern => {
-      const app = require(Shell.WindowTracker.get_default().get_window_app(tern.window), 'Tern has an app');
-      const seeThrough = () => surfacesSeeThrough(tern.window);
+    const appId = await withApp('terminal', ['-e', 'sh', '-c', `printf '%s\\n' '${TEXT}'; sleep 600`], async terminal => {
+      const app = require(Shell.WindowTracker.get_default().get_window_app(terminal.window), 'Terminal has an app');
+      const seeThrough = () => surfacesSeeThrough(terminal.window);
       settings.set_strv('see-through-apps', [app.get_id()]);
       await eventually(seeThrough, 'choosing an app makes its windows see-through');
       await settled();
@@ -48,6 +48,6 @@ export async function run() {
     await launchesSeeThrough(appId);
   } finally {
     for (const key of KEYS) settings.reset(key);
-    GLib.unlink(TERN_SETTINGS);
+    GLib.unlink(TERMINAL_SETTINGS);
   }
 }

@@ -18,14 +18,14 @@ const HANDLERS: Record<Exclude<Launcher, 'home' | 'calculator' | 'terminal'>, st
   email: 'x-scheme-handler/mailto',
   media: 'audio/x-vorbis+ogg',
 };
-const TERMINAL = 'com.lantharos.tern.desktop';
+const TERMINAL = 'com.lantharos.terminal.desktop';
 
 function firstAppIn(category: string): Shell.App | null {
   const apps = Shell.AppSystem.get_default();
   return apps.get_installed().map(info => apps.lookup_app(info.get_id() ?? '')).find(app => app?.app_info?.get_categories()?.split(';').includes(category)) ?? null;
 }
 
-function ternOrAnotherTerminal(): Shell.App | null {
+function oursOrAnotherTerminal(): Shell.App | null {
   return Shell.AppSystem.get_default().lookup_app(TERMINAL) ?? firstAppIn('TerminalEmulator');
 }
 
@@ -42,7 +42,7 @@ export function launch(launcher: Launcher): void {
     return;
   }
   if (launcher === 'terminal') {
-    ternOrAnotherTerminal()?.open_new_window(-1);
+    oursOrAnotherTerminal()?.open_new_window(-1);
     return;
   }
   if (launcher === 'calculator') {

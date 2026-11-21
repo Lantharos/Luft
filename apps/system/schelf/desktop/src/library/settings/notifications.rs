@@ -147,8 +147,8 @@ mod tests {
     fn files_apps_under_the_name_kestrel_gives_them() {
         assert_eq!(child_of("org.mozilla.Firefox"), "org-mozilla-firefox");
         assert_eq!(
-            child_of("com.lantharos.tern__beta"),
-            "com-lantharos-tern-beta"
+            child_of("com.lantharos.terminal__beta"),
+            "com-lantharos-terminal-beta"
         );
     }
 }

@@ -28,7 +28,7 @@ const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interf
 const KESTREL_KEYS = ['see-through-apps', 'see-through-opacity'];
 const GLASS_KEYS = ['see-through', 'luca-blurs'];
 const BACKGROUND_KEYS = ['picture-uri', 'picture-uri-dark'];
-const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
+const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const BEHIND = 'See-through behind';
 const TEMPORARY = 1;
 const TOLERANCE = 6;
@@ -123,20 +123,20 @@ async function withBehind<T>(use: (behind: Meta.Window) => Promise<T>) {
   }
 }
 
-async function lookWithAndWithout(tern: Meta.Window, behind: Meta.Window) {
+async function lookWithAndWithout(terminal: Meta.Window, behind: Meta.Window) {
   behind.unminimize();
-  tern.raise();
+  terminal.raise();
   await settled();
-  const over = await captureFrame(inside(tern));
+  const over = await captureFrame(inside(terminal));
   behind.minimize();
   await settled();
-  const alone = await captureFrame(inside(tern));
+  const alone = await captureFrame(inside(terminal));
   return {over, alone, apart: shareApart(over, alone)};
 }
 
-async function captureOverAndAlone(tern: Meta.Window, behind: Meta.Window, name: string) {
+async function captureOverAndAlone(terminal: Meta.Window, behind: Meta.Window, name: string) {
   behind.unminimize();
-  tern.raise();
+  terminal.raise();
   await settled();
   await capture(`${name}-over-window`);
   behind.minimize();
@@ -144,16 +144,16 @@ async function captureOverAndAlone(tern: Meta.Window, behind: Meta.Window, name:
   await capture(`${name}-over-wallpaper`);
 }
 
-async function changesTo(tern: Meta.Window, before: Frame, act: () => void, label: string) {
+async function changesTo(terminal: Meta.Window, before: Frame, act: () => void, label: string) {
   act();
-  await eventually(async () => shareApart(await captureFrame(inside(tern)), before) > DIFFERENT, label, 10000);
+  await eventually(async () => shareApart(await captureFrame(inside(terminal)), before) > DIFFERENT, label, 10000);
 }
 
 export async function run() {
   const savedBackground = BACKGROUND_KEYS.map((key): [string, string] => [key, background.get_string(key)]);
   const scheme = interfaceSettings.get_string('color-scheme');
-  GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
-  GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
+  GLib.mkdir_with_parents(GLib.path_get_dirname(TERMINAL_SETTINGS), 0o755);
+  GLib.file_set_contents(TERMINAL_SETTINGS, '{"translucent": false}');
   background.set_string('picture-uri-dark', writePicture('dark', PICTURES.dark));
   background.set_string('picture-uri', writePicture('light', PICTURES.light));
   interfaceSettings.set_string('color-scheme', 'prefer-dark');
@@ -161,52 +161,52 @@ export async function run() {
   try {
     if (Main.layoutManager.monitors.length > 1) scaled = await scaleSecondDisplay();
     const secondWidth = scaled?.width ?? 0;
-    await withBehind(behind => withApp('tern', ['-e', 'sh', '-c', 'sleep 600'], async ({window: tern}) => {
-      const app = require(Shell.WindowTracker.get_default().get_window_app(tern), 'Tern has an app');
+    await withBehind(behind => withApp('terminal', ['-e', 'sh', '-c', 'sleep 600'], async ({window: terminal}) => {
+      const app = require(Shell.WindowTracker.get_default().get_window_app(terminal), 'Terminal has an app');
       const primary = Main.layoutManager.primaryMonitor!;
       const [x, width] = secondWidth ? [primary.x + primary.width - 500, 500 + Math.min(400, secondWidth - 40)] : [primary.x + 200, 900];
-      tern.move_resize_frame(true, x, primary.y + 40, width, 460);
+      terminal.move_resize_frame(true, x, primary.y + 40, width, 460);
       behind.move_frame(true, x - 100, primary.y);
       kestrel.set_double('see-through-opacity', 0.4);
       kestrel.set_strv('see-through-apps', [app.get_id()]);
-      await eventually(() => tern.get_compositor_private<Meta.WindowActor>()!.get_children().some(child => child.get_effect('see-through')), 'Tern turns see-through');
+      await eventually(() => terminal.get_compositor_private<Meta.WindowActor>()!.get_children().some(child => child.get_effect('see-through')), 'Terminal turns see-through');
 
-      const everything = await lookWithAndWithout(tern, behind);
+      const everything = await lookWithAndWithout(terminal, behind);
       require(everything.apart > DIFFERENT, `Luca lets the window underneath show through (${Math.round(everything.apart * 100)}% apart)`);
-      await captureOverAndAlone(tern, behind, 'see-through-luca-dark');
+      await captureOverAndAlone(terminal, behind, 'see-through-luca-dark');
 
       glass.set_string('luca-blurs', 'wallpaper');
-      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.WALLPAPER, 'Luca that blurs only the wallpaper shows the frosted wallpaper');
-      const wallpaper = await lookWithAndWithout(tern, behind);
+      await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.WALLPAPER, 'Luca that blurs only the wallpaper shows the frosted wallpaper');
+      const wallpaper = await lookWithAndWithout(terminal, behind);
       require(wallpaper.apart < SAME, `Luca that blurs only the wallpaper hides the window underneath (${Math.round(wallpaper.apart * 1000) / 10}% apart)`);
       require(shareApart(wallpaper.over, everything.over) > DIFFERENT, 'blurring only the wallpaper looks different from blurring everything behind');
-      await captureOverAndAlone(tern, behind, 'see-through-luca-wallpaper-dark');
+      await captureOverAndAlone(terminal, behind, 'see-through-luca-wallpaper-dark');
 
-      const darkLook = await captureFrame(inside(tern));
-      await changesTo(tern, darkLook, () => background.set_string('picture-uri-dark', writePicture('changed', PICTURES.changed)), 'the window follows a new wallpaper');
+      const darkLook = await captureFrame(inside(terminal));
+      await changesTo(terminal, darkLook, () => background.set_string('picture-uri-dark', writePicture('changed', PICTURES.changed)), 'the window follows a new wallpaper');
 
-      tern.maximize();
+      terminal.maximize();
       await settled();
-      const maximized = await lookWithAndWithout(tern, behind);
+      const maximized = await lookWithAndWithout(terminal, behind);
       require(maximized.apart < SAME, `a maximized see-through window still shows only the wallpaper (${Math.round(maximized.apart * 1000) / 10}% apart)`);
-      tern.unmaximize();
+      terminal.unmaximize();
       await settled();
-      const lucaLook = await captureFrame(inside(tern));
+      const lucaLook = await captureFrame(inside(terminal));
 
       glass.set_string('see-through', 'maris');
-      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.MARIS, 'Maris shows the surface colour over the wide wallpaper');
-      const maris = await lookWithAndWithout(tern, behind);
+      await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.MARIS, 'Maris shows the surface colour over the wide wallpaper');
+      const maris = await lookWithAndWithout(terminal, behind);
       require(maris.apart < SAME, `Maris hides the window underneath (${Math.round(maris.apart * 1000) / 10}% apart)`);
       require(shareApart(maris.alone, lucaLook) > DIFFERENT, 'Maris looks different from Luca');
-      await captureOverAndAlone(tern, behind, 'see-through-maris-dark');
+      await captureOverAndAlone(terminal, behind, 'see-through-maris-dark');
 
-      await changesTo(tern, maris.alone, () => interfaceSettings.set_string('color-scheme', 'default'), 'Maris follows the light style');
-      await captureOverAndAlone(tern, behind, 'see-through-maris-light');
+      await changesTo(terminal, maris.alone, () => interfaceSettings.set_string('color-scheme', 'default'), 'Maris follows the light style');
+      await captureOverAndAlone(terminal, behind, 'see-through-maris-light');
 
       glass.set_string('see-through', 'luca');
       glass.set_string('luca-blurs', 'everything');
-      await eventually(() => backdropStyle(tern) === Shell.BlurStyle.LUCA, 'Luca blurs everything behind again');
-      await captureOverAndAlone(tern, behind, 'see-through-luca-light');
+      await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.LUCA, 'Luca blurs everything behind again');
+      await captureOverAndAlone(terminal, behind, 'see-through-luca-light');
     }));
   } finally {
     await scaled?.restore();
@@ -214,6 +214,6 @@ export async function run() {
     for (const key of GLASS_KEYS) glass.reset(key);
     for (const [key, value] of savedBackground) background.set_string(key, value);
     interfaceSettings.set_string('color-scheme', scheme);
-    GLib.unlink(TERN_SETTINGS);
+    GLib.unlink(TERMINAL_SETTINGS);
   }
 }

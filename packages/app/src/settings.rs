@@ -11,7 +11,7 @@ fn path(name: &str) -> Option<PathBuf> {
 }
 
 /// Reads `name`, a JSON file in the user's configuration folder such as
-/// `"tern/settings.json"`. Missing or unreadable files give `None`.
+/// `"terminal/settings.json"`. Missing or unreadable files give `None`.
 pub fn load<T: DeserializeOwned>(name: &str) -> Option<T> {
     read(&path(name)?)
 }

@@ -26,7 +26,7 @@ Address the reader as du, lowercase, as macOS, Windows, GNOME and KDE do: »Du k
 ## Names
 
 - Settings, Disks and Install Luft are Indstillinger, Diske and Installer Luft.
-- Names never take the definite ending, so never »Roveren». When a sentence needs one: »appen Rover«, »i appen Tern«. The genitive is a plain -s: »Rovers vindue«, »Lufts opdateringer«.
+- Names never take the definite ending, so never »Roveren». When a sentence needs one: »appen Rover«, »i appen Draft«. The genitive is a plain -s: »Rovers vindue«, »Lufts opdateringer«.
 
 ## Plurals
 

@@ -1,7 +1,7 @@
 //! Your environment, as your systemd keeps it for the programs you start.
 //!
 //! Luft's own programs start with only the variables they need, so a program
-//! you start from one of them, such as a shell in Tern or an app opened from
+//! you start from one of them, such as a shell in Terminal or an app opened from
 //! Rover, takes your environment from here instead of from the app.
 
 use zbus::proxy::{Builder, CacheProperties, MethodFlags};

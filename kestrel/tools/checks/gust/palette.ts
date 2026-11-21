@@ -133,8 +133,8 @@ async function checkGrid() {
   await eventually(() => !shown(palette()) && global.display.focus_window?.get_title() === WINDOW, 'Enter switches to the highlighted window');
   await openWithSuper();
 
-  search('tern');
-  await eventually(() => cells()[0]?.name === 'kestrel-gust-app-com.lantharos.tern.desktop' && highlightedCell() === cells()[0] && !listShown(),
+  search('terminal');
+  await eventually(() => cells()[0]?.name === 'kestrel-gust-app-com.lantharos.terminal.desktop' && highlightedCell() === cells()[0] && !listShown(),
     'typing an app name filters the apps and highlights the best match');
   search('dark mode');
   await eventually(() => listShown() && !shown(sheet()) && row('action:dark-style'), 'a query that is more than an app shows results');

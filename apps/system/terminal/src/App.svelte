@@ -1,0 +1,105 @@
+<script lang="ts">
+	import { t } from '@luft/i18n';
+	import { onMount, untrack } from 'svelte';
+	import { activity, appWindow, events } from '@lantharos/sabine';
+	import { GlassShell, appearance, fileDrop, keepWindowState } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
+	import PasteDialog from '#lib/components/dialogs/PasteDialog.svelte';
+	import Preferences from '#lib/components/dialogs/Preferences.svelte';
+	import TerminalMenu from '#lib/components/dialogs/TerminalMenu.svelte';
+	import LayoutView from '#lib/components/LayoutView.svelte';
+	import TabBar from '#lib/components/TabBar.svelte';
+	import { settings } from '#lib/state/settings.svelte.js';
+	import { loadFonts } from '#lib/terminal/fonts.js';
+	import { shellWords } from '#lib/terminal/paste.js';
+	import { handleShortcut } from '#lib/workspace/shortcuts.js';
+	import { Workspace, type Folders } from '#lib/workspace/workspace.svelte.js';
+
+	const workspace = new Workspace();
+	let dialogOpen = $derived(Boolean(workspace.pasteReview || workspace.closeReview || workspace.preferencesOpen));
+
+	onMount(() => {
+		const stops = [
+			events.singleInstance(async (activation) => workspace.openTab(await commands.resolveLaunch(activation)))
+		];
+		void start(stops);
+		return () => stops.forEach((stop) => stop());
+	});
+
+	async function start(stops: (() => void)[]) {
+		const [state, folders] = await Promise.all([commands.appState(), appWindow.restoredState<Folders>(), loadFonts()]);
+		settings.start(state);
+		stops.push(appearance.start(state));
+		const launched = state.launch.directory !== null || state.launch.command !== null;
+		if (state.sessions.length) workspace.adopt(state.sessions);
+		else if (folders?.tabs.length && !launched) workspace.reopen(folders);
+		else workspace.openTab(state.launch);
+		keepWindowState(workspace.folders);
+	}
+
+	$effect(() => {
+		if (!workspace.busy) return;
+		const running = activity.begin({ name: t('terminal-activity-running') });
+		return () => void running.then((handle) => handle.end());
+	});
+
+	$effect(() => {
+		settings.options;
+		untrack(() => workspace.configure());
+	});
+
+	$effect(() => {
+		document.documentElement.dataset.scheme = settings.scheme;
+	});
+
+	$effect(() => {
+		const session = workspace.focused;
+		if (session && !dialogOpen && workspace.searching !== session) session.focus();
+	});
+
+	const drop = fileDrop((paths) => workspace.focused?.paste(`${shellWords(paths)} `));
+
+	function keydown(event: KeyboardEvent) {
+		if (event.defaultPrevented || dialogOpen) return;
+		if (event.target instanceof HTMLElement && event.target.closest('.xterm')) return;
+		handleShortcut(event, workspace);
+	}
+</script>
+
+<svelte:window
+	onkeydown={keydown}
+	ondragover={drop.ondragover}
+	ondrop={drop.ondrop}
+	onpointerdown={(event) => {
+		if (event.target instanceof Element && !event.target.closest('[role="menu"]')) workspace.menu = null;
+	}}
+/>
+
+<div class="h-[100dvh] w-screen overflow-hidden bg-transparent">
+	<GlassShell class="h-full">
+		<div class="workspace" style:--terminal-background={settings.surface}>
+			<TabBar {workspace} />
+			<main class="tab-views">
+				{#each workspace.tabs as tab (tab.key)}
+					<div class="tab-view" class:is-hidden={tab !== workspace.active}>
+						<LayoutView node={tab.root} {workspace} visible={tab === workspace.active} />
+					</div>
+				{/each}
+			</main>
+		</div>
+
+		{#if workspace.menu}
+			<TerminalMenu menu={workspace.menu} {workspace} />
+		{/if}
+		{#if workspace.pasteReview}
+			<PasteDialog review={workspace.pasteReview} onclose={() => (workspace.pasteReview = null)} />
+		{/if}
+		{#if workspace.closeReview}
+			<CloseDialog review={workspace.closeReview} onclose={() => (workspace.closeReview = null)} />
+		{/if}
+		{#if workspace.preferencesOpen}
+			<Preferences onclose={() => (workspace.preferencesOpen = false)} />
+		{/if}
+	</GlassShell>
+</div>

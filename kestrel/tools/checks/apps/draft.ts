@@ -45,12 +45,12 @@ async function typeAndHide(draft: LuftApp) {
   return {typed, hidden: await minimized(draft)};
 }
 
-async function runOutOfSight(tern: LuftApp, palette: Palette) {
+async function runOutOfSight(terminal: LuftApp, palette: Palette) {
   const prompted = (frame: Frame) => frame.share([palette.dark.surface], TERMINAL_TOLERANCE) < 1;
-  require(prompted(await tern.settle(prompted, tern.area(PROMPT_LINE))), 'Tern shows the shell prompt');
-  await changes(tern, 'Tern shows the typed command', () => type('sleep 900'), PROMPT_LINE);
+  require(prompted(await terminal.settle(prompted, terminal.area(PROMPT_LINE))), 'Terminal shows the shell prompt');
+  await changes(terminal, 'Terminal shows the typed command', () => type('sleep 900'), PROMPT_LINE);
   press(Clutter.KEY_Return);
-  return minimized(tern);
+  return minimized(terminal);
 }
 
 async function thaw(draft: LuftApp, typed: Frame) {
@@ -74,17 +74,17 @@ async function checkFreezing(draft: LuftApp, palette: Palette) {
   const power = new Gio.Settings({schema_id: 'com.lantharos.kestrel.power'});
   session.set_uint('idle-delay', 0);
   power.set_boolean('idle-dim', false);
-  let tern: LuftApp | null = null;
+  let terminal: LuftApp | null = null;
   try {
     await showDark(draft, palette);
     const {typed, hidden} = await typeAndHide(draft);
-    tern = await openApp('tern');
-    const ternHidden = await runOutOfSight(tern, palette);
+    terminal = await openApp('terminal');
+    const terminalHidden = await runOutOfSight(terminal, palette);
     await draft.reaches('frozen', hidden, FREEZE_AFTER + FREEZE_MARGIN);
-    require(!tern.lifecycle.some(change => change.state === 'frozen' && change.at >= ternHidden), 'Tern keeps running while a command runs out of sight');
+    require(!terminal.lifecycle.some(change => change.state === 'frozen' && change.at >= terminalHidden), 'Terminal keeps running while a command runs out of sight');
     await thaw(draft, typed);
   } finally {
-    await tern?.close();
+    await terminal?.close();
     session.reset('idle-delay');
     power.reset('idle-dim');
   }

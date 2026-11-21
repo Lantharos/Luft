@@ -27,7 +27,7 @@ export const apps = (t: Translate): App[] => [
 	app('magpie', 'Magpie', t('home-app-magpie'), t('home-app-magpie-detail')),
 	app('mailman', 'Mailman', t('home-app-mailman'), t('home-app-mailman-detail')),
 	app('draft', 'Draft', t('home-app-draft'), t('home-app-draft-detail')),
-	app('tern', 'Tern', t('home-app-tern'), t('home-app-tern-detail')),
+	app('terminal', t('home-app-terminal-name'), t('home-app-terminal'), t('home-app-terminal-detail')),
 	app('schelf', 'Schelf', t('home-app-schelf'), t('home-app-schelf-detail')),
 	app('disks', t('home-app-disks-name'), t('home-app-disks'), t('home-app-disks-detail')),
 	app('barometer', 'Barometer', t('home-app-barometer'), t('home-app-barometer-detail')),

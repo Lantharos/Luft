@@ -28,7 +28,7 @@
 	"apps/system/setup/installer/src/install/configure/networks.rs": {
 		"/etc/NetworkManager/system-connections": "Reads the live system's Wi-Fi networks, to hand them to the installed one as NetworkManager's own configuration"
 	},
-	"apps/system/tern/desktop/src/shell/mod.rs": {
+	"apps/system/terminal/desktop/src/shell/mod.rs": {
 		"/etc/shells": "Reads the shells people can pick"
 	},
 	"kestrel/greeter/data/kestrel-password.service": {

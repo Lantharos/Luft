@@ -149,31 +149,31 @@ async function checkOnlyLuftGetsAReview() {
   require(applied().length === 0, 'the copy changes nothing');
 }
 
-async function installTernAsOnLuft() {
-  const entry = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.tern.desktop']);
-  write(entry, `[Desktop Entry]\nType=Application\nName=Tern\nExec=${appBinary('tern')} %U\nStartupWMClass=com.lantharos.tern\n`);
-  await eventually(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.tern.desktop')?.get_app_info().get_filename()?.startsWith(GLib.get_user_data_dir()),
-    'Kestrel knows Tern by its program, as on Luft', APP_CACHE_REFRESH);
+async function installTerminalAsOnLuft() {
+  const entry = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.terminal.desktop']);
+  write(entry, `[Desktop Entry]\nType=Application\nName=Terminal\nExec=${appBinary('terminal')} %U\nStartupWMClass=com.lantharos.terminal\n`);
+  await eventually(() => Shell.AppSystem.get_default().lookup_app('com.lantharos.terminal.desktop')?.get_app_info().get_filename()?.startsWith(GLib.get_user_data_dir()),
+    'Kestrel knows Terminal by its program, as on Luft', APP_CACHE_REFRESH);
   return () => GLib.unlink(entry);
 }
 
 async function checkOneReviewAtATime() {
-  const exit = scratch('changes', 'tern-exit');
+  const exit = scratch('changes', 'terminal-exit');
   GLib.mkdir_with_parents(GLib.path_get_dirname(exit), 0o755);
-  const uninstall = await installTernAsOnLuft();
+  const uninstall = await installTerminalAsOnLuft();
   try {
-    await reviewFromTern(exit);
+    await reviewFromTerminal(exit);
   } finally {
     uninstall();
   }
 }
 
-async function reviewFromTern(exit: string) {
-  await withApp('tern', ['-e', 'sh', '-c', `'${LUFT}' set security.usb-protection=off; echo $? > '${exit}'; sleep 60`], async () => {
-    const dialog = await waitUntil(review, 'luft run in Tern opens a review');
+async function reviewFromTerminal(exit: string) {
+  await withApp('terminal', ['-e', 'sh', '-c', `'${LUFT}' set security.usb-protection=off; echo $? > '${exit}'; sleep 60`], async () => {
+    const dialog = await waitUntil(review, 'luft run in Terminal opens a review');
     await settled();
     await capture('changes-review-short');
-    require(says('Tern wants to change this setting.', dialog), 'the review names the terminal luft runs in');
+    require(says('Terminal wants to change this setting.', dialog), 'the review names the terminal luft runs in');
     checkGutter(dialog, rowOf(USB, dialog), false);
     const second = await luft(['set', 'updates.channel=stable']);
     require(second.status === UNAVAILABLE && second.stderr.includes('waiting for review'), 'a second set waits until the first is answered');

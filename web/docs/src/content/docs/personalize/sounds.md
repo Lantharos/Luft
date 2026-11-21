@@ -91,7 +91,7 @@ To replace many sounds at once, choose **Use a folder of sounds**. Luft looks in
 5. If the device says **Off**, open **Device profiles** and pick a stereo or surround profile for it.
 6. If Windows is on the same computer, shut it down fully before starting Luft: with Fast Startup, sound chips can start in the state Windows left them. [Installing alongside Windows](/start/alongside-windows/) shows how to turn it off.
 
-Still silent? Run these in [Tern](/apps/tern/) and send us what they print, along with the computer's model:
+Still silent? Run these in [Terminal](/apps/terminal/) and send us what they print, along with the computer's model:
 
 ```sh
 wpctl status

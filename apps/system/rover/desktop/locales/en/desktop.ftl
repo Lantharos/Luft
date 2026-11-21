@@ -165,7 +165,7 @@ rover-network-stopped = The network connection stopped
 
 rover-search-unsearchable = This folder can't be searched
 rover-terminal-no-folder = This folder can't be opened in a terminal
-rover-terminal-missing = Tern isn't installed
-rover-terminal-failed = Tern couldn't start: { $error }
+rover-terminal-missing = Terminal isn't installed
+rover-terminal-failed = Terminal couldn't start: { $error }
 rover-chooser-starting = Rover is still starting
 rover-chooser-closed = This file chooser has already closed

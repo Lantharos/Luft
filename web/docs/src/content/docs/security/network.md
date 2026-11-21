@@ -32,7 +32,7 @@ Public networks get no ping and no discovery: answering would tell everyone in a
 
 ### Apps
 
-The firewall knows which app every listening socket belongs to. Every app runs in a systemd unit of its own under `app.slice`, and its app ID comes from the unit's name: `app-flatpak-ID-N.scope`, `app-kestrel-ID-PID.scope` and their like. A process in any other unit there, such as a shell Tern opened or a `systemd-run` command, is a program, known by the first word of its command line, such as `python3`. Luft's own session services, system services and login sessions are never asked about.
+The firewall knows which app every listening socket belongs to. Every app runs in a systemd unit of its own under `app.slice`, and its app ID comes from the unit's name: `app-flatpak-ID-N.scope`, `app-kestrel-ID-PID.scope` and their like. A process in any other unit there, such as a shell Terminal opened or a `systemd-run` command, is a program, known by the first word of its command line, such as `python3`. Luft's own session services, system services and login sessions are never asked about.
 
 Cgroup BPF programs tell the firewall the moment a socket is bound to a fixed port on an address other than loopback, once the bind worked, when it connects somewhere and so stops listening, and when it closes. They run only on those calls, never for a packet. In the kernel, packets are matched against sets of the app unit's cgroup, protocol and port, so another program in the same unit stays out until it's allowed too.
 

@@ -45,8 +45,8 @@ rover-cloud-conflict-show = Show
 
 ## Drives that belong to another account
 
-# $drive is the drive's name, shown in bold; $command is a terminal command, kept as it is. Tern is Luft's terminal app.
-rover-drive-foreign = The files on { $drive } belong to another account, perhaps from a system that was here before, so you can open them but not change them. To make them yours, run { $command } in Tern.
+# $drive is the drive's name, shown in bold; $command is a terminal command, kept as it is. Terminal is Luft's terminal app.
+rover-drive-foreign = The files on { $drive } belong to another account, perhaps from a system that was here before, so you can open them but not change them. To make them yours, run { $command } in Terminal.
 rover-drive-foreign-copy = Copy command
 
 ## Details pane

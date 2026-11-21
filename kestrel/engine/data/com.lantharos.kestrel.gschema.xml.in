@@ -118,7 +118,7 @@
       </description>
     </key>
     <key name="gust-layout" type="s">
-      <default>'{"items":["net.imput.helium.desktop","com.lantharos.rover.desktop","com.lantharos.mailman.desktop","com.lantharos.draft.desktop","com.lantharos.magpie.desktop","com.lantharos.tern.desktop","com.lantharos.schelf.desktop","com.lantharos.settings.desktop"],"folders":{}}'</default>
+      <default>'{"items":["net.imput.helium.desktop","com.lantharos.rover.desktop","com.lantharos.mailman.desktop","com.lantharos.draft.desktop","com.lantharos.magpie.desktop","com.lantharos.terminal.desktop","com.lantharos.schelf.desktop","com.lantharos.settings.desktop"],"folders":{}}'</default>
       <summary>Apps pinned to Gust, in order, and their folders</summary>
     </key>
     <key name="quick-tile-order" type="as">

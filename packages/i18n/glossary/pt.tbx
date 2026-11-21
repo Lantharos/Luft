@@ -94,20 +94,6 @@
           </tig>
         </langSet>
       </termEntry>
-      <termEntry id="7">
-        <descrip type="Translation needed">No</descrip>
-        <langSet xml:lang="en">
-          <tig>
-            <term>Tern</term>
-          </tig>
-        </langSet>
-        <langSet xml:lang="pt">
-          <tig>
-            <term>Tern</term>
-            <note from="translator">Not translated. App name, the terminal</note>
-          </tig>
-        </langSet>
-      </termEntry>
       <termEntry id="8">
         <descrip type="Translation needed">No</descrip>
         <langSet xml:lang="en">

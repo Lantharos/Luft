@@ -24,7 +24,7 @@ Use European words and grammar only: ecrã, ficheiro, utilizador, partilhar, tra
 ## Names
 
 - Settings, Disks and Install Luft are Definições, Discos and Instalar o Luft, with the plural article in sentences: «nas Definições».
-- Names take the article and are masculine: «o Luft», «no Rover», «o Rover está aberto». When the article sounds odd: «na aplicação Tern».
+- Names take the article and are masculine: «o Luft», «no Rover», «o Rover está aberto». When the article sounds odd: «na aplicação Draft».
 
 ## Plurals
 

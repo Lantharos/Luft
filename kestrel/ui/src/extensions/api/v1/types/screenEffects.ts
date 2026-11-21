@@ -5,7 +5,7 @@ export type ScreenEffectProblem = 'shader' | 'slow';
 
 /** A window as effects see it. */
 export interface EffectWindow {
-  /** The app's desktop file id, such as `com.lantharos.Tern.desktop`, or `null` for a window of no known app. */
+  /** The app's desktop file id, such as `com.lantharos.terminal.desktop`, or `null` for a window of no known app. */
   appId: string | null;
   kind: 'normal' | 'dialog' | 'utility';
   focused: boolean;

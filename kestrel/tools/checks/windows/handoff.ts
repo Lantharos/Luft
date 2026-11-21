@@ -58,12 +58,12 @@ async function checkTerminal() {
   try {
     await openFolder();
     await openTerminalHere(rover);
-    const isTern = (window: Meta.Window) => window.get_pid() !== rover.window.get_pid();
-    const tern = await rover.waitUntil(() => findWindow(isTern), 'Open terminal here opens Tern', OPEN_TIMEOUT);
-    await eventually(() => tern.has_focus(), 'a new Tern window takes focus from Rover');
+    const isTerminal = (window: Meta.Window) => window.get_pid() !== rover.window.get_pid();
+    const terminal = await rover.waitUntil(() => findWindow(isTerminal), 'Open terminal here opens Terminal', OPEN_TIMEOUT);
+    await eventually(() => terminal.has_focus(), 'a new Terminal window takes focus from Rover');
     await openTerminalHere(rover);
-    await eventually(() => focused() && isTern(focused()), 'a running Tern comes to the front for Open terminal here');
-    windows().filter(isTern).forEach(window => window.kill());
+    await eventually(() => focused() && isTerminal(focused()), 'a running Terminal comes to the front for Open terminal here');
+    windows().filter(isTerminal).forEach(window => window.kill());
   } finally {
     await rover.close();
     removeTree(FOLDER);

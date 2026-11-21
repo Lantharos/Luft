@@ -4,13 +4,13 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/desktop-light.webp">
-  <img src="web/docs/src/assets/shots/desktop.webp" alt="The Luft desktop with Rover, Tern and Settings">
+  <img src="web/docs/src/assets/shots/desktop.webp" alt="The Luft desktop with Rover, Terminal and Settings">
 </picture>
 
 ## What makes it different
 
 - **Its own desktop.** Kestrel has a taskbar, Gust with search across apps, settings and the text of your files, quick settings, snap layouts, and a board where windows sit side by side on an endless canvas. Its colors come from your wallpaper, and the apps follow.
-- **Its own apps.** Settings, Rover for files, Magpie for photos, videos, music and PDFs, Mailman for mail, Draft for text and code, Tern for the terminal, Schelf for everything else from Flathub and AppImages.
+- **Its own apps.** Settings, Rover for files, Magpie for photos, videos, music and PDFs, Mailman for mail, Draft for text and code, Terminal for the command line, Schelf for everything else from Flathub and AppImages.
 - **Updates you don't think about.** The system updates as a whole at the next restart. If a new version doesn't start, Luft goes back to the one that did.
 - **A startup you can trust.** Secure Boot can stay on, the disk unlocks with the TPM, a keyring keeps your passwords and keys, and new USB devices wait while the screen is locked.
 - **Easy to try.** Meet Luft gets a Windows or Linux PC ready without a USB stick, and Luft installs next to Windows or in place of another Linux, keeping your files.

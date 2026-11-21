@@ -124,8 +124,8 @@ name = "Soundboard"
 files = ["apps/store/soundboard/**/locales/{lang}/*.ftl"]
 
 [[areas]]
-name = "Tern"
-files = ["apps/system/tern/**/locales/{lang}/*.ftl"]
+name = "Terminal"
+files = ["apps/system/terminal/**/locales/{lang}/*.ftl"]
 
 [[areas]]
 name = "Focus"

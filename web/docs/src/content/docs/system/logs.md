@@ -32,7 +32,7 @@ You're asked about the same problem once per version of Luft. To change your ans
 
 ## Collecting logs
 
-Right after something goes wrong, `luft report` saves most of this in one file, with your name, your computer's name and paths in your home folder taken out ([the luft command](/system/terminal/#logs-and-bug-reports)). These show more. Run them in [Tern](/apps/tern/):
+Right after something goes wrong, `luft report` saves most of this in one file, with your name, your computer's name and paths in your home folder taken out ([the luft command](/system/terminal/#logs-and-bug-reports)). These show more. Run them in [Terminal](/apps/terminal/):
 
 | Command | Shows |
 | --- | --- |
@@ -53,7 +53,7 @@ Settings, under System, **About**, lists the last ten times the graphics driver 
 
 ## No sound from the jacks
 
-When headphones or speakers stay silent in Luft but work in Windows, download [`try-hda-fixups.sh`](https://raw.githubusercontent.com/Lantharos/Luft/main/os/tools/audio/try-hda-fixups.sh) and run `bash try-hda-fixups.sh` in Tern. It asks for your password, tries a few known fixes for Realtek sound chips one after another, plays a tone after each and asks whether you heard it, and puts everything back at the end. Attach the `hda-fixups.txt` it leaves in your home folder to your report.
+When headphones or speakers stay silent in Luft but work in Windows, download [`try-hda-fixups.sh`](https://raw.githubusercontent.com/Lantharos/Luft/main/os/tools/audio/try-hda-fixups.sh) and run `bash try-hda-fixups.sh` in Terminal. It asks for your password, tries a few known fixes for Realtek sound chips one after another, plays a tone after each and asks whether you heard it, and puts everything back at the end. Attach the `hda-fixups.txt` it leaves in your home folder to your report.
 
 If Windows is on the same computer, a dump of how its driver sets up the chip helps too. In Windows, plug the headphones in, open PowerShell as administrator and run:
 

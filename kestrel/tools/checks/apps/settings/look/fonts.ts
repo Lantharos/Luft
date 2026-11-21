@@ -27,11 +27,11 @@ const TIMEOUT = 8000;
 const PADDING = 6;
 
 const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
+const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 
-function startTernOpaque() {
-  GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
-  GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
+function startTerminalOpaque() {
+  GLib.mkdir_with_parents(GLib.path_get_dirname(TERMINAL_SETTINGS), 0o755);
+  GLib.file_set_contents(TERMINAL_SETTINGS, '{"translucent": false}');
 }
 const textWindow = (version: string) => (window: Meta.Window) => window.get_title()?.startsWith(`Kestrel text ${version}:`);
 const chosen = (key: string) => `${CHOSEN[key]} ${SIZE}`;
@@ -66,19 +66,19 @@ interface WindowSurface extends Surface {
 type Frames = Record<string, Frame>;
 
 class Surfaces {
-  readonly apps: {settings: LuftApp; tern: LuftApp};
-  readonly all: {shell: Surface; gtk4: WindowSurface; xwayland: WindowSurface; settings: WindowSurface; sidebar: WindowSurface; tern: WindowSurface};
+  readonly apps: {settings: LuftApp; terminal: LuftApp};
+  readonly all: {shell: Surface; gtk4: WindowSurface; xwayland: WindowSurface; settings: WindowSurface; sidebar: WindowSurface; terminal: WindowSurface};
 
-  constructor(app: LuftApp, tern: LuftApp, gtk4: Meta.Window, xwayland: Meta.Window, clock: St.Label) {
+  constructor(app: LuftApp, terminal: LuftApp, gtk4: Meta.Window, xwayland: Meta.Window, clock: St.Label) {
     const surface = (window: Meta.Window, area: Area): WindowSurface => ({window, area: () => windowArea(window, area)});
-    this.apps = {settings: app, tern};
+    this.apps = {settings: app, terminal};
     this.all = {
       shell: {area: () => actorArea(clock)},
       gtk4: surface(gtk4, {x: 0, y: 40, width: 440, height: 140}),
       xwayland: surface(xwayland, {x: 0, y: 0, width: 440, height: 130}),
       settings: surface(app.window, {x: 380, y: 8, width: 360, height: 48}),
       sidebar: surface(app.window, {x: 12, y: 116, width: 256, height: 200}),
-      tern: surface(tern.window, {x: 0, y: 36, width: 560, height: 28}),
+      terminal: surface(terminal.window, {x: 0, y: 36, width: 560, height: 28}),
     };
   }
 
@@ -119,9 +119,9 @@ async function checkChoosing(app: LuftApp, surfaces: Surfaces, clock: St.Label) 
   await eventually(() => shellFamily() === CHOSEN['font-name'], 'the shell follows a new interface font', TIMEOUT);
   await eventually(titled('4.0', chosen('font-name')), 'a GTK 4 app follows a new interface font', TIMEOUT);
   await eventually(titled('3.0', chosen('font-name')), 'an X11 app under Xwayland follows a new interface font', TIMEOUT);
-  for (const name of ['settings', 'tern'] as const) {
+  for (const name of ['settings', 'terminal'] as const) {
     const changed = await surfaces.settle(name, frame => !frame.looksLike(defaults[name]));
-    require(!changed.looksLike(defaults[name]), `${name} follows a new ${name === 'tern' ? 'monospace' : 'interface'} font`);
+    require(!changed.looksLike(defaults[name]), `${name} follows a new ${name === 'terminal' ? 'monospace' : 'interface'} font`);
   }
   await surfaces.shoot('changed');
 
@@ -130,7 +130,7 @@ async function checkChoosing(app: LuftApp, surfaces: Surfaces, clock: St.Label) 
   await eventually(() => shellFamily() === DEFAULTS['font-name'], `which brings back ${DEFAULTS['font-name']} in the shell`, TIMEOUT);
   await eventually(titled('4.0', `${DEFAULTS['font-name']} ${SIZE}`), 'and in GTK 4 apps', TIMEOUT);
   await eventually(titled('3.0', `${DEFAULTS['font-name']} ${SIZE}`), 'and in X11 apps', TIMEOUT);
-  for (const name of ['settings', 'tern'] as const) {
+  for (const name of ['settings', 'terminal'] as const) {
     const restored = await surfaces.settle(name, frame => frame.looksLike(defaults[name]));
     restored.saveZoomed(`fonts/${name}-reset`, ZOOM);
     require(restored.looksLike(defaults[name]), `${name} draws exactly as before once the fonts are reset`);
@@ -153,19 +153,19 @@ async function checkTextSize(surfaces: Surfaces, clock: St.Label, defaults: Fram
 export async function checkFonts(app: LuftApp) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(output('fonts/shell-default')), 0o755);
   let windows: Process[] = [];
-  startTernOpaque();
+  startTerminalOpaque();
   try {
     await show(app, 'appearance/text');
     windows = [gjs('clients/windows/textWindow.js', ['4.0']), gjs('clients/windows/textWindow.js', ['3.0'], {env: {GDK_BACKEND: 'x11'}})];
-    await withApp('tern', ['-e', 'sh', '-c', `printf '%s\\n' '${TERMINAL_TEXT}'; sleep 600`], async tern => {
+    await withApp('terminal', ['-e', 'sh', '-c', `printf '%s\\n' '${TERMINAL_TEXT}'; sleep 600`], async terminal => {
       const [gtk4, xwayland] = await Promise.all(['4.0', '3.0'].map(version => waitForWindow(textWindow(version), `the GTK ${version} text window opens`)));
       const clock = require(styled('kestrel-clock').find(actor => actor instanceof St.Label), 'the taskbar shows its clock');
-      const surfaces = new Surfaces(app, tern, gtk4, xwayland, clock);
+      const surfaces = new Surfaces(app, terminal, gtk4, xwayland, clock);
       await checkTextSize(surfaces, clock, await checkChoosing(app, surfaces, clock));
     });
   } finally {
     for (const key of [...Object.keys(CHOSEN), 'text-scaling-factor']) settings.reset(key);
     await Promise.all(windows.map(stop));
-    GLib.unlink(TERN_SETTINGS);
+    GLib.unlink(TERMINAL_SETTINGS);
   }
 }

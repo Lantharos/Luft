@@ -12,7 +12,7 @@ asks:
   - { ask: ai agent, to: ai-agents }
 ---
 
-`luft` is Luft's command line. It reads and changes the settings Settings has, by the same names, looks after updates, shows logs, gathers a bug report and helps you build extensions. Run it in [Tern](/apps/tern/) or any terminal; `luft --help` and `luft <command> --help` explain every part.
+`luft` is Luft's command line. It reads and changes the settings Settings has, by the same names, looks after updates, shows logs, gathers a bug report and helps you build extensions. Run it in [Terminal](/apps/terminal/) or any terminal; `luft --help` and `luft <command> --help` explain every part.
 
 ```sh
 luft status

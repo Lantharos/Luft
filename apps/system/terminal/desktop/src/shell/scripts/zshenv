@@ -1,0 +1,23 @@
+if [[ -n ${LUFT_TERMINAL_ZDOTDIR+set} ]]; then
+	ZDOTDIR=$LUFT_TERMINAL_ZDOTDIR
+	unset LUFT_TERMINAL_ZDOTDIR
+else
+	unset ZDOTDIR
+fi
+
+if [[ -r ${ZDOTDIR:-$HOME}/.zshenv ]]; then
+	source ${ZDOTDIR:-$HOME}/.zshenv
+fi
+
+if [[ -o interactive ]]; then
+	autoload -Uz add-zsh-hook
+	__luft_terminal_precmd() {
+		local exit_status=$?
+		print -n "\e]133;D;${exit_status}\a\e]7;file://${HOST}${PWD//\%/%25}\a\e]133;A\a"
+	}
+	__luft_terminal_preexec() {
+		print -n "\e]133;C\a"
+	}
+	add-zsh-hook precmd __luft_terminal_precmd
+	add-zsh-hook preexec __luft_terminal_preexec
+fi

@@ -29,7 +29,7 @@ Address the reader as du, lowercase, as macOS, Windows, GNOME and KDE do: ”Du 
 ## Names
 
 - Settings, Disks and Install Luft are Inställningar, Diskar and Installera Luft.
-- App names don't take the definite ending; use them bare or after appen: ”Rover är öppen”, ”i appen Tern”. The genitive is a plain -s (”Rovers fönster”); names ending in s, such as Keys, need rephrasing: ”fönstret i Keys”. Adjectives agree with app, an en-word: ”Tern är stängd”.
+- App names don't take the definite ending; use them bare or after appen: ”Rover är öppen”, ”i appen Draft”. The genitive is a plain -s (”Rovers fönster”); names ending in s, such as Keys, need rephrasing: ”fönstret i Keys”. Adjectives agree with app, an en-word: ”Draft är stängd”.
 
 ## Plurals
 

@@ -1,1 +1,0 @@
-apps/system/tern/desktop/src/lib.rs	Tern

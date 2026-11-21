@@ -91,7 +91,14 @@
 
 	.interactive {
 		position: relative;
+		border-top-left-radius: inherit;
+		border-top-right-radius: inherit;
 		transition: background-color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.interactive:not(.attached) {
+		border-bottom-left-radius: inherit;
+		border-bottom-right-radius: inherit;
 	}
 
 	.interactive:has(> .opens:hover:not(:disabled)) {

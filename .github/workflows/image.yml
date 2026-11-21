@@ -263,8 +263,12 @@ jobs:
       matrix:
         extension: ${{ fromJSON(needs.plan.outputs.extensions) }}
     runs-on: ${{ matrix.extension.runner }}
+    container: registry.fedoraproject.org/fedora:45
     timeout-minutes: 30
     steps:
+      - name: Install what packing needs
+        run: dnf install --assumeyes --setopt=install_weak_deps=False git-core tar unzip zstd
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: ./.github/actions/bun
@@ -273,7 +277,10 @@ jobs:
 
       - name: Install Rust for a native helper
         if: hashFiles(format('{0}/helper/Cargo.toml', matrix.extension.folder)) != ''
-        run: rustup update stable && rustup default stable
+        run: |
+          dnf install --assumeyes --setopt=install_weak_deps=False gcc rustup
+          rustup-init -y --profile minimal
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Use the version being released
         env:

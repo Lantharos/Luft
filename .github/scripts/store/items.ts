@@ -5,7 +5,7 @@ export type Kind = 'app' | 'extension' | 'tool';
 export type Item = { name: string; folder: string; kind: Kind; id: string; index: string; manifest: string; floor: string; platforms: string; runners: string[] };
 
 const LINUX = 'linux-x86_64 linux-aarch64';
-const RUNNERS = ['ubuntu-24.04', 'ubuntu-24.04-arm'];
+const RUNNERS = ['ubuntu-26.04', 'ubuntu-26.04-arm'];
 const PLATFORM_RUNNERS: Record<string, string> = { 'linux-x86_64': RUNNERS[0], 'linux-aarch64': RUNNERS[1] };
 const PLATFORMS: Record<string, string> = { 'com.lantharos.meet': 'windows-x86_64 linux-x86_64' };
 

@@ -105,6 +105,30 @@ Extend `@luft/ui/tsconfig.base.json` in `tsconfig.json`, and preload `/fonts/Ope
 
 Keep 16px of padding to the right of `WindowControls`. Inside `GlassShell`, right-clicking a text field or selected text opens Luft's edit menu, with corrections for a misspelled word and whichever of undo, redo, cut, copy, paste and select all apply there. Sabine only asks for it when the page leaves the `contextmenu` event alone, so an app's own menu, opened from a handler that calls `preventDefault()`, takes its place.
 
+## Dialog windows
+
+A `Dialog` opens over the page it belongs to. When that page's window is too small for it, open the dialog as a window of its own, attached to its parent: Kestrel keeps it centred over the parent, dims the parent and keeps it from being used until the dialog closes. The parent's page passes `await appWindow.identifier()` to a command that opens the window:
+
+```rust
+window
+    .fixed_size(420, 240)
+    .frameless()
+    .transparent(true)
+    .skip_taskbar(true)
+    .parent_window(parent)
+    .modal(true)
+```
+
+The dialog's page renders the same `Dialog` inside `DialogWindow`, which sizes the window to the dialog and shows it once it fits:
+
+```svelte
+<DialogWindow>
+	<Dialog title={title} onclose={() => appWindow.close()}>…</Dialog>
+</DialogWindow>
+```
+
+Schelf's install window opens its dialogs this way, and gets their answers back through the command that opened them.
+
 ## Startup state
 
 Flatten `luft_app::Appearance` into the app's startup state, and start `@luft/ui`'s `appearance` store from it:

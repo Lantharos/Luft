@@ -58,10 +58,14 @@ function permissions(summary: Summary): Permissions | null {
 	};
 }
 
-export async function broadAccess(id: string, known: Permissions | null = null): Promise<Access[]> {
+export async function broadPermissions(id: string, known: Permissions | null = null): Promise<Permissions | null> {
 	const listed = known ?? permissions(await commands.flathubSummary({ id }).catch((): Summary => ({})));
-	const access = listed ? describe(listed) : [];
-	return access.some((entry) => entry.notable) ? access : [];
+	return listed && describe(listed).some((entry) => entry.notable) ? listed : null;
+}
+
+export async function broadAccess(id: string, known: Permissions | null = null): Promise<Access[]> {
+	const listed = await broadPermissions(id, known);
+	return listed ? describe(listed) : [];
 }
 
 function verified(metadata: Appstream['metadata']): string | null {

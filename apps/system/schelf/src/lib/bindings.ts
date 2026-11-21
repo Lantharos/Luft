@@ -106,6 +106,18 @@ export const commands = {
 	flathubSummary: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").Summary>("flathub_summary", params, options),
+	installDialogAnswer: (params: {
+		dialog: number,
+		answer: boolean,
+	}, options?: CallOptions) => invoke<null>("install_dialog_answer", params, options),
+	installDialogOpen: (params: {
+		request: number,
+		parent?: string | null,
+		dialog: import("#lib/install/dialogs/dialog.js").InstallDialog,
+	}, options?: CallOptions) => invoke<boolean | null>("install_dialog_open", params, options),
+	installDialogState: (params: {
+		dialog: number,
+	}, options?: CallOptions) => invoke<DialogState>("install_dialog_state", params, options),
 	installState: (params: {
 		request: number,
 	}, options?: CallOptions) => invoke<InstallState>("install_state", params, options),
@@ -414,6 +426,11 @@ export type DescribedSource = {
 	name: string,
 	url: string,
 };
+
+export type DialogState = {
+	path: string,
+	dialog: import("#lib/install/dialogs/dialog.js").InstallDialog,
+} & Appearance;
 
 /**  A file to download for an app this computer can't install itself. */
 export type Download = {

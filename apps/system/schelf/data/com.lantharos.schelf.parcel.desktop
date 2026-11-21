@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Parcel
+GenericName=Package Installer
+Exec="schelf" %F
+Icon=com.lantharos.schelf
+Terminal=false
+NoDisplay=true
+StartupNotify=true
+StartupWMClass=com.lantharos.schelf.parcel

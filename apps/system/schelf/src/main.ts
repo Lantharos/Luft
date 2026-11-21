@@ -1,9 +1,14 @@
 import './app.css';
 import { mount } from 'svelte';
 import App from './App.svelte';
+import DialogPage from '#lib/install/dialogs/DialogPage.svelte';
 import InstallWindow from '#lib/install/InstallWindow.svelte';
-import { installRequest } from '#lib/install/start.js';
+import { installRoute } from '#lib/install/start.js';
 
-const request = installRequest();
-if (request === null) mount(App, { target: document.body });
-else mount(InstallWindow, { target: document.body, props: { request } });
+const route = installRoute();
+if (!route) mount(App, { target: document.body });
+else {
+	document.title = 'Parcel';
+	if (route.window === 'dialog') mount(DialogPage, { target: document.body, props: { dialog: route.id } });
+	else mount(InstallWindow, { target: document.body, props: { request: route.id } });
+}

@@ -27,7 +27,10 @@
 
 	async function open(app: InstalledApp, desktop: string | null) {
 		await opening.open(app, desktop);
-		if (!opening.failed) close();
+		const failed = opening.failed;
+		if (!failed) return close();
+		opening.dismiss();
+		await install.ask({ kind: 'openFailed', failed });
 	}
 
 	function openAction(app: InstalledApp | null, desktop: string | null, primary: boolean): Action[] {
@@ -82,7 +85,6 @@
 	const primary = $derived(actions.find((action) => action.primary) ?? null);
 
 	function keys(event: KeyboardEvent) {
-		if (document.querySelector('[role="dialog"]')) return;
 		if (event.key === 'Escape' && !running) close();
 		else if (event.key === 'Enter' && primary && !(event.target instanceof HTMLButtonElement)) {
 			event.preventDefault();

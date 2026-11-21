@@ -7,6 +7,7 @@
 	import { topLayer } from '../menus/topLayer';
 	import { revealContents } from '../motion/reveal';
 	import { dialog, fade } from '../motion/transitions';
+	import { dialogWindow } from './window';
 
 	interface Props {
 		title: string;
@@ -22,6 +23,10 @@
 	const FOCUSABLE = 'a[href], button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
 	const self = Symbol();
+	const fitting = dialogWindow();
+	const still = () => ({ duration: 0 });
+	const backdrop = fitting ? still : fade;
+	const appear = fitting ? still : dialog;
 
 	let panel = $state<HTMLDivElement>();
 	let actionBar = $state<HTMLDivElement>();
@@ -35,6 +40,14 @@
 		const previous = document.activeElement as HTMLElement | null;
 		(actionBar?.querySelector<HTMLElement>('[data-autofocus]') ?? actionBar?.querySelector<HTMLElement>('.primary:not(:disabled)') ?? panel)?.focus();
 		return () => previous?.focus();
+	});
+
+	$effect(() => {
+		if (!fitting || !panel) return;
+		const fitted = panel;
+		const observer = new ResizeObserver(() => fitting.fit(fitted.offsetWidth, fitted.offsetHeight));
+		observer.observe(fitted);
+		return () => observer.disconnect();
 	});
 
 	function trap(event: KeyboardEvent) {
@@ -59,13 +72,14 @@
 <div
 	{@attach topLayer}
 	class="overlay"
+	class:windowed={!!fitting}
 	role="presentation"
 	onpointerdown={(event) => event.target === event.currentTarget && onclose()}
-	in:fade
-	out:fade
+	in:backdrop
+	out:backdrop
 >
-	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap} {@attach revealContents} in:dialog out:dialog>
-		<div class="flex flex-col gap-1.5">
+	<div bind:this={panel} class="dialog" class:wide role="dialog" aria-modal="true" aria-label={title} tabindex="-1" onkeydown={trap} {@attach revealContents} in:appear out:appear>
+		<div class={['flex flex-col gap-1.5', fitting && 'drag-region']}>
 			<h2 class="text-[17px] font-semibold">{title}</h2>
 			{#if description}
 				<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">{description}</p>
@@ -109,6 +123,23 @@
 
 	.wide {
 		width: min(560px, calc(100vw - 48px));
+	}
+
+	.windowed {
+		overflow: hidden;
+		background: none;
+		border-radius: 0;
+	}
+
+	.windowed .dialog {
+		width: 420px;
+		max-height: 640px;
+		border-radius: var(--window-radius);
+		box-shadow: none;
+	}
+
+	.windowed .wide {
+		width: 560px;
 	}
 
 	.body {

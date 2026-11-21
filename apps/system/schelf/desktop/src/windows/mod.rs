@@ -34,7 +34,15 @@ struct Inner {
 struct Open {
     main: bool,
     installs: HashMap<u32, String>,
+    dialogs: HashMap<u32, install::Dialog>,
     page: Option<String>,
+}
+
+fn file_title(path: &str) -> String {
+    std::path::Path::new(path)
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_default()
 }
 
 fn launch_token() -> Option<String> {
@@ -60,6 +68,10 @@ impl Windows {
             .open
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    fn next_request(&self) -> u32 {
+        self.0.last_request.fetch_add(1, Ordering::Relaxed) + 1
     }
 
     fn process(&self) -> &SabineProcessHandle {
@@ -115,11 +127,8 @@ impl Windows {
     }
 
     fn open_installer(&self, path: String) -> Result<(), String> {
-        let request = self.0.last_request.fetch_add(1, Ordering::Relaxed) + 1;
-        let title = std::path::Path::new(&path)
-            .file_name()
-            .map(|name| name.to_string_lossy().into_owned())
-            .unwrap_or_default();
+        let request = self.next_request();
+        let title = file_title(&path);
         self.open().installs.insert(request, path);
         let closed = self.clone();
         let window = SabineWindow::for_current_app()

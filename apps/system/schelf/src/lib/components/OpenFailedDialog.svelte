@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import { opening, type Failed } from '#lib/state/opening.svelte.js';
+	import type { Failed } from '#lib/state/opening.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
-	let { failed }: { failed: Failed } = $props();
+	let { failed, onclose }: { failed: Failed; onclose: () => void } = $props();
 
 	const failure = $derived(failed.failure);
 	const missing = $derived(failure?.missing ?? null);
@@ -18,11 +18,11 @@
 
 	function add(name: string) {
 		void operations.run(failed.app.key, failed.app.name, { kind: 'installSystemPackages', packages: [name] });
-		opening.dismiss();
+		onclose();
 	}
 </script>
 
-<Dialog title={t('open-failed-title', { name: failed.app.name })} {description} onclose={() => opening.dismiss()}>
+<Dialog title={t('open-failed-title', { name: failed.app.name })} {description} {onclose}>
 	{#if failure && !failure.package && failure.output.length}
 		<div class="flex flex-col gap-2">
 			<span class="text-[13px] text-[var(--text-muted)]">{t('open-failed-output')}</span>
@@ -32,10 +32,10 @@
 	{#snippet actions()}
 		{#if failure?.package}
 			{@const name = failure.package}
-			<button type="button" class="button" onclick={() => opening.dismiss()}>{t('open-failed-cancel')}</button>
+			<button type="button" class="button" onclick={onclose}>{t('open-failed-cancel')}</button>
 			<button type="button" class="button primary" onclick={() => add(name)}>{t('open-failed-add', { name })}</button>
 		{:else}
-			<button type="button" class="button primary" onclick={() => opening.dismiss()}>{t('open-failed-close')}</button>
+			<button type="button" class="button primary" onclick={onclose}>{t('open-failed-close')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

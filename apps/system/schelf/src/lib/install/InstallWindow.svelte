@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appearance, GlassShell, Spinner, WindowControls } from '@luft/ui';
-	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
 	import { FileInstall } from '#lib/files/install.svelte.js';
-	import { opening } from '#lib/state/opening.svelte.js';
+	import { openDialog } from './dialogs/dialog.js';
 	import Installer from './Installer.svelte';
 	import { startInstall } from './start.js';
 
@@ -13,7 +12,7 @@
 
 	onMount(() => {
 		void startInstall(request).then((path) => {
-			install = new FileInstall(path);
+			install = new FileInstall(path, (dialog) => openDialog(request, dialog));
 			void install.load();
 		});
 	});
@@ -36,7 +35,3 @@
 		{/if}
 	</main>
 </GlassShell>
-
-{#if opening.failed}
-	<OpenFailedDialog failed={opening.failed} />
-{/if}

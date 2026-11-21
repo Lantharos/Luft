@@ -1,60 +1,44 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
+	import type { OpenedFile } from '#lib/bindings.js';
 	import { fullAccessAbilities } from '#lib/app/fullAccess.js';
 	import { describe } from '#lib/app/permissions.js';
 	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
-	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
-	import StoreConsent from '#lib/pages/app/StoreConsent.svelte';
-	import type { FileInstall } from './install.svelte.js';
+	import type { Consent } from '#lib/files/install.svelte.js';
 
-	let { install }: { install: FileInstall } = $props();
-
-	const file = $derived(install.file);
+	let { consent, file, onconfirm, onclose }: { consent: Consent; file: OpenedFile; onconfirm: () => void; onclose: () => void } = $props();
 </script>
 
-{#if install.asking === 'source' && install.source}
-	<SourceTrustDialog source={install.source} confirm={t('file-add-and-install')} onconfirm={() => install.agree()} onclose={() => install.decline()} />
-{:else if install.asking === 'unsandboxed' && file?.kind === 'appImage' && file.unsandboxed}
+{#if consent === 'source' && file.kind === 'package' && file.repository}
+	<SourceTrustDialog source={file.repository} confirm={t('file-add-and-install')} {onconfirm} {onclose} />
+{:else if consent === 'unsandboxed' && file.kind === 'appImage' && file.unsandboxed}
 	<ConsentDialog
 		title={t('file-full-access-title', { name: file.name })}
 		description={t('file-full-access-description', { name: file.name, reason: file.unsandboxed })}
 		facts={fullAccessAbilities()}
 		confirm={t('file-full-access-confirm')}
 		danger
-		onconfirm={() => install.agree()}
-		onclose={() => install.decline()}
+		{onconfirm}
+		{onclose}
 	/>
-{:else if install.asking === 'unverified' && file?.kind === 'package'}
+{:else if consent === 'unverified' && file.kind === 'package'}
 	<ConsentDialog
 		title={t('file-unverified-title', { name: file.package })}
 		description={t('file-unverified-description')}
 		facts={[t('file-unverified-fact'), t('file-for-everyone-fact'), t('file-administrator-fact'), t('file-no-updates-fact')]}
 		confirm={t('file-install-anyway')}
 		danger
-		onconfirm={() => install.agree()}
-		onclose={() => install.decline()}
+		{onconfirm}
+		{onclose}
 	/>
-{:else if install.asking === 'broad' && file?.kind === 'flatpakBundle' && file.permissions}
+{:else if consent === 'broad' && file.kind === 'flatpakBundle' && file.permissions}
 	<ConsentDialog
 		title={t('consent-flathub-title', { name: file.title })}
 		description={t('consent-flathub-description', { name: file.title })}
 		access={describe(file.permissions)}
 		confirm={t('consent-install')}
-		onconfirm={() => install.agree()}
-		onclose={() => install.decline()}
-	/>
-{/if}
-
-{#if install.askingStore && install.listed?.store}
-	<StoreConsent store={install.listed.store} onconfirm={(fullAccess) => install.agreeToStore(fullAccess)} onclose={() => (install.askingStore = false)} />
-{/if}
-
-{#if install.flathubAccess && install.listed}
-	<FlathubConsent
-		name={install.listed.listing.name}
-		access={install.flathubAccess}
-		onconfirm={() => install.installFromFlathub()}
-		onclose={() => (install.flathubAccess = null)}
+		{onconfirm}
+		{onclose}
 	/>
 {/if}

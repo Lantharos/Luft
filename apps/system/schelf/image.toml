@@ -1,6 +1,7 @@
 part = "app-schelf"
 
 [files]
+"/usr/share/applications/" = ["data/com.lantharos.schelf.parcel.desktop"]
 "/usr/lib/systemd/user/" = [
     "data/luft-app-updates.service",
     "data/luft-app-updates.timer",

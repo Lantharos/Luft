@@ -101,7 +101,7 @@
 </GlassShell>
 
 {#if opening.failed}
-	<OpenFailedDialog failed={opening.failed} />
+	<OpenFailedDialog failed={opening.failed} onclose={() => opening.dismiss()} />
 {/if}
 
 {#if approvals.asking}

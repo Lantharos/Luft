@@ -1,13 +1,15 @@
 import { commands, type CatalogApp, type InstalledApp, type Job, type OpenedFile, type StoreDetails } from '#lib/bindings.js';
 import { storeJob } from '#lib/app/jobs.js';
-import { describe, type Access } from '#lib/app/permissions.js';
-import { broadAccess } from '#lib/catalog/flathub.js';
+import { describe } from '#lib/app/permissions.js';
+import { broadPermissions } from '#lib/catalog/flathub.js';
 import { catalogKey } from '#lib/catalog/types.js';
+import type { InstallDialog } from '#lib/install/dialogs/dialog.js';
 import { library } from '#lib/state/library.svelte.js';
 import { operations } from '#lib/state/operations.svelte.js';
 
 export type Consent = 'source' | 'unverified' | 'unsandboxed' | 'broad';
 export type VersionChange = 'up' | 'none' | 'down';
+export type Ask = (dialog: InstallDialog) => Promise<boolean | null>;
 
 /** The same app on schelf.store or Flathub, which keeps it up to date. */
 export interface Listed {
@@ -19,14 +21,14 @@ export interface Listed {
 const APP_ID = /^[A-Za-z_][\w-]*(\.[A-Za-z_][\w-]*){2,}$/;
 const versions = new Intl.Collator(undefined, { numeric: true });
 
-function job(opened: OpenedFile, fullAccess: boolean): Job {
+function job(opened: OpenedFile): Job {
 	if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
 	if (opened.kind === 'flatpakBundle') return { kind: 'installFlatpakBundle', path: opened.path };
 	if (opened.kind === 'deb') return { kind: 'installDeb', path: opened.path };
 	if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
 	if (opened.kind === 'package')
 		return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
-	return { kind: 'installAppImage', path: opened.path, fullAccess };
+	return { kind: 'installAppImage', path: opened.path, fullAccess: !!opened.unsandboxed };
 }
 
 function appId(file: OpenedFile) {
@@ -63,16 +65,25 @@ export class FileInstall {
 	file = $state<OpenedFile | null>(null);
 	error = $state<string | null>(null);
 	started = $state(false);
-	asking = $state<Consent | null>(null);
 	listed = $state<Listed | null>(null);
 	listedStarted = $state(false);
-	askingStore = $state(false);
-	flathubAccess = $state<Access[] | null>(null);
-	#agreed = new Set<Consent>();
-	#fullAccess = false;
+	#ask: Ask;
+	#asking = false;
 
-	constructor(path: string) {
+	constructor(path: string, ask: Ask) {
 		this.path = path;
+		this.#ask = ask;
+	}
+
+	/** Asks in a dialog, unless one is already open. */
+	async ask(dialog: InstallDialog) {
+		if (this.#asking) return null;
+		this.#asking = true;
+		try {
+			return await this.#ask(dialog);
+		} finally {
+			this.#asking = false;
+		}
 	}
 
 	get key() {
@@ -146,60 +157,32 @@ export class FileInstall {
 		return needed;
 	}
 
-	install() {
+	async install() {
 		const file = this.file;
 		if (!file) return;
-		const asking = this.#needed().find((consent) => !this.#agreed.has(consent));
-		if (asking) {
-			this.asking = asking;
-			return;
-		}
-		this.asking = null;
-		this.#agreed.clear();
+		for (const consent of this.#needed()) if (!(await this.ask({ kind: 'consent', consent, file }))) return;
 		if (this.failed) void operations.cancel(this.failed.id);
 		this.started = true;
-		void operations.run(this.key, this.name, job(file, this.#fullAccess));
+		void operations.run(this.key, this.name, job(file));
 	}
 
-	agree() {
-		if (!this.asking) return;
-		if (this.asking === 'unsandboxed') this.#fullAccess = true;
-		this.#agreed.add(this.asking);
-		this.install();
-	}
-
-	decline() {
-		this.asking = null;
-		this.#agreed.clear();
-	}
-
-	installListed() {
+	async installListed() {
 		const listed = this.listed;
 		if (!listed) return;
-		if (listed.store) this.askingStore = true;
-		else void this.#askForFlathub(listed.listing.id);
+		if (listed.store) {
+			const fullAccess = await this.ask({ kind: 'store', store: listed.store });
+			if (fullAccess !== null) this.#runListed(storeJob(listed.store, fullAccess));
+			return;
+		}
+		const permissions = await broadPermissions(listed.listing.id);
+		if (permissions && !(await this.ask({ kind: 'flathub', name: listed.listing.name, permissions }))) return;
+		this.#runListed({ kind: 'installFlathub', id: listed.listing.id });
 	}
 
 	#runListed(job: Job | null) {
-		this.askingStore = false;
-		this.flathubAccess = null;
 		if (!this.listed || !this.listedKey || !job) return;
 		if (this.listedOperation?.state === 'failed') void operations.cancel(this.listedOperation.id);
 		this.listedStarted = true;
 		void operations.run(this.listedKey, this.listed.listing.name, job);
-	}
-
-	agreeToStore(fullAccess: boolean) {
-		this.#runListed(this.listed?.store ? storeJob(this.listed.store, fullAccess) : null);
-	}
-
-	installFromFlathub() {
-		this.#runListed(this.listed ? { kind: 'installFlathub', id: this.listed.listing.id } : null);
-	}
-
-	async #askForFlathub(id: string) {
-		const access = await broadAccess(id);
-		if (access.length) this.flathubAccess = access;
-		else this.installFromFlathub();
 	}
 }

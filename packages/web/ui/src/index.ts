@@ -19,6 +19,7 @@ export { default as TextField } from './controls/TextField.svelte';
 
 export { default as ConfirmDialog } from './dialogs/ConfirmDialog.svelte';
 export { default as Dialog } from './dialogs/Dialog.svelte';
+export { default as DialogWindow } from './dialogs/DialogWindow.svelte';
 
 export { Curve, Gesture, motionPreference, projection, Role, rubberband, Spring, SpringValue, type SpringToken } from './motion';
 

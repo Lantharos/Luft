@@ -151,7 +151,6 @@ export type GuardedNetwork = {
 	name: string,
 	medium: Medium,
 	networkType: NetworkType | null,
-	connected: boolean,
 };
 
 export type Ip = {
@@ -170,6 +169,7 @@ export type Kind = "wired" | "wifi" | "vpn" | "other";
 export type Known = {
 	connection: string,
 	ssid: string,
+	networkType: NetworkType | null,
 };
 
 export type Link = "connected" | "connecting" | "disconnected" | "unplugged";

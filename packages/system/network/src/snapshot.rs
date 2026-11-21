@@ -7,6 +7,7 @@ use serde::Serialize;
 use specta::Type;
 use zbus::{OwnedObjectPath, OwnedVariant};
 
+use super::firewall::NetworkType;
 use super::profile::Security;
 use super::saved::{self, Kind, Saved};
 use super::{ACCESS_POINT, ACTIVE, DEVICE, MANAGER, MANAGER_PATH, WIRED, WIRELESS};
@@ -105,6 +106,7 @@ pub struct Vpn {
 pub struct Known {
     connection: String,
     ssid: String,
+    network_type: Option<NetworkType>,
 }
 
 #[derive(Serialize, Type)]
@@ -358,6 +360,7 @@ fn known(saved: &[Saved]) -> Vec<Known> {
             Kind::Wifi { ssid } => Some(Known {
                 connection: saved.path.clone(),
                 ssid: String::from_utf8_lossy(ssid).into_owned(),
+                network_type: saved.network_type,
             }),
             _ => None,
         })

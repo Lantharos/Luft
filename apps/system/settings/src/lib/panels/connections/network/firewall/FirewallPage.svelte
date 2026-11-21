@@ -46,10 +46,7 @@
 	const portKey = (port: OpenPort) => `${port.port}/${port.protocol}`;
 	const portList = (ports: number[]) => new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(ports.map(String));
 
-	function describe(network: GuardedNetwork) {
-		if (!network.networkType) return t('settings-network-firewall-unchosen');
-		return network.connected ? t('settings-network-firewall-connected') : undefined;
-	}
+	const describe = (network: GuardedNetwork) => (network.networkType ? undefined : t('settings-network-firewall-unchosen'));
 
 	async function attempt(action: () => Promise<unknown>) {
 		problem = '';
@@ -98,7 +95,7 @@
 				<Segmented label={network.name} options={types} value={network.networkType ?? 'public'} onchange={(networkType) => classify(network, networkType)} />
 			</Row>
 		{:else}
-			<Row title={t('settings-network-firewall-no-networks')} />
+			<Row title={t('settings-network-firewall-offline')} />
 		{/each}
 	</Section>
 

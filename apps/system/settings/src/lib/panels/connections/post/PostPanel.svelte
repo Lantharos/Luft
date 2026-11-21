@@ -22,7 +22,7 @@
 
 	let visibility = $derived<Visibility>(post.values.visibility ?? 'your-devices');
 	let devices = $derived(post.values.devices ?? []);
-	let current = $derived(firewall?.networks.find((network) => network.connected) ?? null);
+	let current = $derived(firewall?.networks[0] ?? null);
 	let publicHere = $derived(visibility !== 'no-one' && current !== null && current.networkType !== 'home');
 
 	let choices = $derived<{ value: Visibility; label: string }[]>([

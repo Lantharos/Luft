@@ -184,7 +184,6 @@ pub struct GuardedNetwork {
     name: String,
     medium: Medium,
     network_type: Option<NetworkType>,
-    connected: bool,
 }
 
 #[derive(Serialize, Type)]
@@ -281,6 +280,7 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
     let mut networks: Vec<GuardedNetwork> = saved::all(&objects)
         .await
         .into_iter()
+        .filter(|saved| connected.contains(&saved.path))
         .filter_map(|saved| {
             let medium = match saved.kind {
                 Kind::Wifi { .. } => Medium::Wifi,
@@ -288,7 +288,6 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
                 Kind::Vpn | Kind::Other => return None,
             };
             Some(GuardedNetwork {
-                connected: connected.contains(&saved.path),
                 connection: saved.path,
                 name: saved.name,
                 medium,
@@ -296,12 +295,7 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
             })
         })
         .collect();
-    networks.sort_by(|left, right| {
-        right
-            .connected
-            .cmp(&left.connected)
-            .then_with(|| left.name.to_lowercase().cmp(&right.name.to_lowercase()))
-    });
+    networks.sort_by_cached_key(|network| network.name.to_lowercase());
     Ok(Some(Firewall {
         networks,
         unclassified: unclassified
@@ -354,9 +348,7 @@ pub async fn close_port(OpenPort { port, protocol, .. }: OpenPort) -> Result<(),
     call("ClosePort", &(port, protocol.name())).await
 }
 
-pub async fn forget_app(
-    ForgetApp { kind, id }: ForgetApp,
-) -> Result<(), String> {
+pub async fn forget_app(ForgetApp { kind, id }: ForgetApp) -> Result<(), String> {
     call("ForgetApp", &(kind.name(), id)).await
 }
 

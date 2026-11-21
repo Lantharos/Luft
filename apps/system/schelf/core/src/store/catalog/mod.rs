@@ -7,13 +7,14 @@ use serde::de::IgnoredAny;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+mod fedora;
+
 use super::device;
 use super::listing::channel;
 use super::signed::{self, Age};
 
 const STORE: &str = "index/v1/catalog.json";
 const FLATHUB: &str = "index/v1/mirror/flathub.json";
-const FEDORA: &str = "index/v1/mirror/fedora.json";
 const FRESH: Duration = Duration::from_secs(6 * 60 * 60);
 const SHORTEST_QUERY: usize = 2;
 
@@ -39,14 +40,14 @@ pub enum Kind {
     Extension,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Publisher {
     pub name: String,
     pub verified: bool,
 }
 
-/// One app or extension as the store's catalog and mirrors list it.
-#[derive(Deserialize)]
+/// One app or extension as the store's catalog, its Flathub mirror or Fedora list it.
+#[derive(Deserialize, Clone)]
 pub struct Entry {
     pub id: String,
     #[serde(default)]
@@ -163,18 +164,28 @@ pub struct Catalog {
 }
 
 impl Catalog {
-    fn merge(lists: [Vec<Entry>; 3]) -> Self {
+    fn merge(store: Vec<Entry>, flathub: Vec<Entry>) -> Self {
         let mut seen = HashSet::new();
         let mut entries = Vec::new();
-        for (origin, list) in [Origin::Schelf, Origin::Flathub, Origin::Fedora]
-            .into_iter()
-            .zip(lists)
-        {
+        for (origin, list) in [(Origin::Schelf, store), (Origin::Flathub, flathub)] {
             for mut entry in list {
                 entry.origin = origin;
                 if entry.runs_here() && seen.insert(entry.id.to_lowercase()) {
                     entries.push(entry);
                 }
+            }
+        }
+        let on_flathub: HashSet<String> = entries
+            .iter()
+            .filter(|entry| entry.origin == Origin::Flathub)
+            .map(|entry| entry.name.to_lowercase())
+            .collect();
+        for entry in fedora::apps() {
+            if !on_flathub.contains(&entry.name.to_lowercase())
+                && entry.runs_here()
+                && seen.insert(entry.id.to_lowercase())
+            {
+                entries.push(entry.clone());
             }
         }
         Self { entries }
@@ -310,18 +321,18 @@ fn load(age: Age) -> Result<Arc<Catalog>, String> {
 }
 
 fn fetch(age: Age) -> Result<Arc<Catalog>, String> {
-    let (store, flathub, fedora) = std::thread::scope(|scope| {
+    let (store, flathub) = std::thread::scope(|scope| {
         let flathub = scope.spawn(|| mirror(FLATHUB, age));
-        let fedora = scope.spawn(|| mirror(FEDORA, age));
+        scope.spawn(fedora::apps);
         let store = list(STORE, age);
         let join = |worker: std::thread::ScopedJoinHandle<'_, _>| {
             worker
                 .join()
                 .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
         };
-        (store, join(flathub), join(fedora))
+        (store, join(flathub))
     });
-    let catalog = Arc::new(Catalog::merge([store?, flathub?, fedora?]));
+    let catalog = Arc::new(Catalog::merge(store?, flathub?));
     *CURRENT
         .write()
         .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(catalog.clone());

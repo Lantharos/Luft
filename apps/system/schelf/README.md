@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://schelf.store): the store's own apps and extensions, then Flathub's and Fedora's apps from the store's mirror. It installs, updates and removes them, AppImages, and packages from Fedora, command-line tools among them, as system packages. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../../packages/system/software/README.md).
+Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://schelf.store): the store's own apps and extensions, then Flathub's apps from the store's mirror, then Fedora's desktop apps from the AppStream data in Luft's image. It installs, updates and removes them, AppImages, and packages from Fedora, command-line tools among them, as system packages. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../../packages/system/software/README.md).
 
 | Source | Installed for |
 |--------|---------------|

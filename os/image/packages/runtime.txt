@@ -3,6 +3,7 @@ adwaita-icon-theme
 alsa-sof-firmware
 alsa-ucm
 alsa-utils
+appstream-data
 at-spi2-core
 avahi
 bluez

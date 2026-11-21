@@ -96,7 +96,7 @@ Opening the folder can be noticed, a glance at the folder holding it can't, and 
 
 ## Trusting the catalog
 
-Schelf reads one catalog from schelf.store: the store's apps, then mirrors of Flathub and Fedora, as the store's [client contract](https://github.com/Lantharos/schelf-store/blob/main/docs/clients.md) describes. Every file is checked before it's read:
+Schelf reads one catalog from schelf.store: the store's apps, then a mirror of Flathub, as the store's [client contract](https://github.com/Lantharos/schelf-store/blob/main/docs/clients.md) describes. Fedora's apps come from the AppStream data in Luft's image, which the image's own signature covers. Every file from schelf.store is checked before it's read:
 
 - Its `.sig` must be made by a store key listed in `trust/v1/store-keys.json`, which the root key built into Schelf must have signed.
 - It carries the `path` it was signed for, so one signed file can't be served in place of another.

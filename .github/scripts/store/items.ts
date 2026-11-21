@@ -4,9 +4,8 @@ import { basename, dirname, join } from 'node:path';
 export type Kind = 'app' | 'extension' | 'tool';
 export type Item = { name: string; folder: string; kind: Kind; id: string; index: string; manifest: string; floor: string; platforms: string };
 
-/** Luft itself runs only on 64-bit Intel and AMD, so what only runs inside it, such as extensions, builds for that alone. */
+/** Luft runs only on 64-bit Intel and AMD, and its apps and extensions build for that alone. Tools name their own platforms. */
 export const LUFT_PLATFORM = 'linux-x86_64';
-const LINUX = `${LUFT_PLATFORM} linux-aarch64`;
 const PLATFORM_RUNNERS: Record<string, string> = { [LUFT_PLATFORM]: 'ubuntu-26.04', 'linux-aarch64': 'ubuntu-26.04-arm' };
 const PLATFORMS: Record<string, string> = { 'com.lantharos.meet': 'windows-x86_64 linux-x86_64' };
 
@@ -38,8 +37,7 @@ function item(folder: string): Item {
   const id = schelf.id!;
   const kind = schelf.kind ?? 'app';
   const manifest = join(folder, kind === 'app' ? 'Sabine.toml' : 'extension.toml');
-  const platforms = kind === 'extension' ? LUFT_PLATFORM : (PLATFORMS[id] ?? LINUX);
-  return { name: basename(folder), folder, kind, id, index: `apps/${id}`, manifest, floor: versionIn(manifest), platforms };
+  return { name: basename(folder), folder, kind, id, index: `apps/${id}`, manifest, floor: versionIn(manifest), platforms: PLATFORMS[id] ?? LUFT_PLATFORM };
 }
 
 export function storeItems() {

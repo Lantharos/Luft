@@ -1,5 +1,7 @@
 ## The small window that opens when you open an app file
 
+install-window-title = Parcel
+
 # Under the app's name; $publisher is who made it, $version the file's version
 install-byline = { $publisher } · { $version }
 install-version = Version { $version }
@@ -74,3 +76,15 @@ install-done-source = The source is added
 # $app is the app's name; the reason follows on the next line
 install-failed = { $app } couldn’t be installed
 install-remove-failed = { $app } couldn’t be removed
+
+file-add-and-install = Add and install
+file-full-access-title = Give { $name } full access?
+file-full-access-description = { $name } asks to run outside a sandbox: “{ $reason }” There it can do all of this without asking. You can take full access away on its page later.
+file-full-access-confirm = Install with full access
+file-unverified-title = Install { $name } without checking it?
+file-unverified-description = It isn't signed by Fedora or a software source you added. Only install it if you trust whoever gave it to you.
+file-unverified-fact = Not verified
+file-for-everyone-fact = Installs for everyone on this computer
+file-administrator-fact = Can run as administrator while it installs
+file-no-updates-fact = Won't get updates
+file-install-anyway = Install anyway

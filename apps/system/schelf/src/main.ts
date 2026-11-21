@@ -7,8 +7,5 @@ import { installRoute } from '#lib/install/start.js';
 
 const route = installRoute();
 if (!route) mount(App, { target: document.body });
-else {
-	document.title = 'Parcel';
-	if (route.window === 'dialog') mount(DialogPage, { target: document.body, props: { dialog: route.id } });
-	else mount(InstallWindow, { target: document.body, props: { request: route.id } });
-}
+else if (route.window === 'dialog') mount(DialogPage, { target: document.body, props: { dialog: route.id } });
+else mount(InstallWindow, { target: document.body, props: { request: route.id } });

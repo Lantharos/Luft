@@ -274,19 +274,8 @@ source-trust-keys = { $count ->
 
 ## Asking before installing an opened file
 
-file-add-and-install = Add and install
-file-full-access-title = Give { $name } full access?
 # $reason is the app's own words for why it needs full access
-file-full-access-description = { $name } asks to run outside a sandbox: “{ $reason }” There it can do all of this without asking. You can take full access away on its page later.
-file-full-access-confirm = Install with full access
 # $name is the package's name
-file-unverified-title = Install { $name } without checking it?
-file-unverified-description = It isn't signed by Fedora or a software source you added. Only install it if you trust whoever gave it to you.
-file-unverified-fact = Not verified
-file-for-everyone-fact = Installs for everyone on this computer
-file-administrator-fact = Can run as administrator while it installs
-file-no-updates-fact = Won't get updates
-file-install-anyway = Install anyway
 
 ## Details of an opened file
 

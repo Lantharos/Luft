@@ -49,7 +49,7 @@ struct Stored {
 #[derive(Deserialize)]
 struct StoredRpm {
     repo_id: String,
-    package_path: String,
+    package_path: Option<String>,
 }
 
 const STORED: &str = "@stored_transaction(";
@@ -196,7 +196,10 @@ pub fn download(
     let mut origins = HashMap::new();
     let mut downloads = Vec::new();
     for rpm in stored.rpms {
-        let path = store.join(&rpm.package_path);
+        let Some(package_path) = rpm.package_path else {
+            continue;
+        };
+        let path = store.join(package_path);
         let repository = rpm
             .repo_id
             .strip_prefix(STORED)

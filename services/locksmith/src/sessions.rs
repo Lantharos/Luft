@@ -4,7 +4,7 @@ use zbus::Connection;
 use crate::dconf::LOCKABLE;
 
 const WRITER: &str = "ca.desrt.dconf.Writer";
-const PATH: &str = "/ca/desrt/dconf/Writer/luft-policy";
+const PATH: &str = "/ca/desrt/dconf/Writer/luft_policy";
 
 /// Has every running session read the locked settings again and hear that each key that can be
 /// locked may have changed, the way `dconf update` tells them about a new system database.

@@ -36,7 +36,7 @@
 	},
 	"kestrel/engine/data/session/kestrel-session.in": {
 		"/etc/dconf/profile/user": "Reads the dconf profile an administrator chose",
-		"/etc/dconf/db/luft-policy": "Reads the settings the policy locks"
+		"/etc/dconf/db/luft_policy": "Reads the settings the policy locks"
 	},
 	"kestrel/settings/src/modules/desktop/xsettings/resources.rs": {
 		"/etc/X11/Xresources": "Reads the system's X resources"
@@ -114,7 +114,7 @@
 		"/etc/dconf/db": "Keeps the settings the policy locks as a dconf system database"
 	},
 	"services/locksmith/src/main.rs": {
-		"/etc/dconf/db/luft-policy": "Keeps the settings the policy locks as a dconf system database"
+		"/etc/dconf/db/luft_policy": "Keeps the settings the policy locks as a dconf system database"
 	},
 	"services/packages/data/luft-system-packages.conf": {
 		"/etc/yum.repos.d": "Keeps dnf's own folders for an administrator's repositories",

@@ -11,7 +11,7 @@ use anyhow::{Context, Result, bail};
 use luft_policy::Policy;
 
 const PUBLISHED: &str = "/run/luft/policy/policy.json";
-const DATABASE: &str = "/etc/dconf/db/luft-policy";
+const DATABASE: &str = "/etc/dconf/db/luft_policy";
 const KEYFILES: &str = "/run/luft/policy/keyfiles";
 const RULES: &str = "/run/polkit-1/rules.d/00-luft-policy.rules";
 

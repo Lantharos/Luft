@@ -120,7 +120,7 @@ Two keys are conveniences rather than locks. AccountsService asks for one permis
 
 ### Desktop settings, accounts and Kestrel
 
-The screen lock and Post's visibility are desktop settings each person keeps in their own dconf database, so a service can't refuse changes to them. Instead, `locksmith.service` compiles the decided values into the dconf system database `/etc/dconf/db/luft-policy`, with each key locked, and Kestrel's session puts that database right after each person's own, so its values are the ones read and the person's own can't be written. `locksmith.path` runs it again whenever a policy folder changes; it marks the old database as replaced and tells running sessions over the system bus, the way `dconf update` does, so the new values reach them at once.
+The screen lock and Post's visibility are desktop settings each person keeps in their own dconf database, so a service can't refuse changes to them. Instead, `locksmith.service` compiles the decided values into the dconf system database `/etc/dconf/db/luft_policy`, with each key locked, and Kestrel's session puts that database right after each person's own, so its values are the ones read and the person's own can't be written. `locksmith.path` runs it again whenever a policy folder changes; it marks the old database as replaced and tells running sessions over the system bus, the way `dconf update` does, so the new values reach them at once.
 
 The same run writes the polkit rule for `accounts` to `/run/polkit-1/rules.d/00-luft-policy.rules`, which polkit reads as soon as it changes, and publishes the whole policy as JSON in `/run/luft/policy/policy.json`, which Kestrel follows for `extensions`.
 

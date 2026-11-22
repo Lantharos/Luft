@@ -14,7 +14,7 @@
 
 {#if code}
 	<div class="flex flex-col items-center gap-1.5">
-		<div class="code" aria-label={t('settings-security-key-code', { code })}>
+		<div class="code select-text" aria-label={t('settings-security-key-code', { code })}>
 			{#each halves as half, index (index)}
 				<span>{half}</span>
 			{/each}

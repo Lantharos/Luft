@@ -83,7 +83,7 @@
 				{#if problem.graphics.length}
 					<p class="text-[13px] text-[var(--text-muted)]">{problem.graphics.join(', ')}</p>
 				{/if}
-				<ul class="flex flex-col gap-1 font-mono text-[12px] leading-relaxed text-[var(--text-muted)]">
+				<ul class="flex flex-col gap-1 font-mono text-[12px] leading-relaxed text-[var(--text-muted)] select-text">
 					{#each problem.evidence as line, index (index)}
 						<li class="break-words">{line}</li>
 					{/each}

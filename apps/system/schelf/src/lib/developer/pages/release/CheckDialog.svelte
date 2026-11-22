@@ -28,14 +28,14 @@
 		<p class="text-[13.5px] text-[var(--text-soft)]">{t(fix)}</p>
 	{/if}
 	{#if pairs}
-		<dl class="detail grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
+		<dl class="detail select-text grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
 			{#each pairs as [label, value] (label)}
 				<dt class="text-[var(--text-muted)]">{label}</dt>
 				<dd class="min-w-0 break-words">{value}</dd>
 			{/each}
 		</dl>
 	{:else}
-		<pre class="detail">{JSON.stringify(check.detail, null, 2)}</pre>
+		<pre class="detail select-text">{JSON.stringify(check.detail, null, 2)}</pre>
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="button primary" onclick={onclose}>{t('developer-done')}</button>

@@ -75,7 +75,7 @@
 		<AppIcon icon={owner?.icon ?? null} id={desktopId(owner?.key)} size={40} />
 		<div class="flex min-w-0 flex-col">
 			<span class="truncate text-[14px] font-medium">{owner?.name ?? name}</span>
-			<span class="text-[12.5px] text-[var(--text-muted)] tabular-nums">{t('barometer-details-process', { pid: String(pid) })}</span>
+			<span class="text-[12.5px] text-[var(--text-muted)] tabular-nums select-text">{t('barometer-details-process', { pid: String(pid) })}</span>
 		</div>
 	</div>
 

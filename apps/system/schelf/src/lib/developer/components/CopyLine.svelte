@@ -19,7 +19,7 @@
 </script>
 
 <div class="line">
-	<code class="min-w-0 flex-1 truncate">{text}</code>
+	<code class="min-w-0 flex-1 truncate select-text">{text}</code>
 	<IconButton icon={copied ? Check : Copy} label={copied ? t('developer-copied') : label} onclick={copy} />
 </div>
 

@@ -82,7 +82,7 @@
 			<p class="text-[13px] text-[var(--text-muted)]">{t('account-no-invitations')}</p>
 		{/if}
 	{:else if step.step === 'waiting'}
-		<p class="code">{step.approval.code}</p>
+		<p class="code select-text">{step.approval.code}</p>
 	{/if}
 	{#snippet actions()}
 		{#if signedIn}

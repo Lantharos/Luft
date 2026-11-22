@@ -37,17 +37,17 @@
 
 <Section title={t('app-details')}>
 	{#if version}
-		<Row title={t('app-version')} description={details?.release?.date ? t('app-released', { date: date(details.release.date) }) : undefined}><span>{version}</span></Row>
+		<Row title={t('app-version')} description={details?.release?.date ? t('app-released', { date: date(details.release.date) }) : undefined}><span class="select-text">{version}</span></Row>
 	{/if}
 	{#if size}
 		<Row title={t('app-size')}><span>{size}</span></Row>
 	{/if}
-	<Row title={t('app-source')} description={installed?.path ?? undefined}><span>{source}</span></Row>
+	<Row title={t('app-source')} description={installed?.path ?? undefined}><span class="select-text">{source}</span></Row>
 	{#if installed?.commands.length}
-		<Row title={t('app-commands')} description={t('app-commands-description')}><span class="max-w-[320px] truncate">{installed.commands.join(', ')}</span></Row>
+		<Row title={t('app-commands')} description={t('app-commands-description')}><span class="max-w-[320px] truncate select-text">{installed.commands.join(', ')}</span></Row>
 	{/if}
 	{#if installed?.services.length}
-		<Row title={t('app-services')} description={t('app-services-description')}><span class="max-w-[320px] truncate">{installed.services.join(', ')}</span></Row>
+		<Row title={t('app-services')} description={t('app-services-description')}><span class="max-w-[320px] truncate select-text">{installed.services.join(', ')}</span></Row>
 	{/if}
 	{#if details?.developer}
 		<Row title={t('app-developer')} description={details.verified ?? undefined}><span class="text-right">{details.developer}</span></Row>

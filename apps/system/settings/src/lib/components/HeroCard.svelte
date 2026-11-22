@@ -25,7 +25,7 @@
 		<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 			<span class="truncate text-[16px] font-semibold">
 				{title}
-				{#if detail}<span class="font-normal text-[var(--text-muted)]">{detail}</span>{/if}
+				{#if detail}<span class="font-normal text-[var(--text-muted)] select-text">{detail}</span>{/if}
 			</span>
 			{#if status}
 				<span class="truncate text-[13.5px] text-[var(--text-muted)]">{status}</span>

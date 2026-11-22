@@ -130,5 +130,6 @@
 		text-align: right;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		user-select: text;
 	}
 </style>

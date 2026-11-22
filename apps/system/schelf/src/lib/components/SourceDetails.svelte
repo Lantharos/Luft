@@ -24,7 +24,7 @@
 	{#each source.described.keys as key (key.fingerprint)}
 		<div class="flex min-w-0 flex-col">
 			<span class="truncate">{key.user}</span>
-			<span class="fingerprint">{grouped(key.fingerprint)}</span>
+			<span class="fingerprint select-text">{grouped(key.fingerprint)}</span>
 		</div>
 	{/each}
 </div>

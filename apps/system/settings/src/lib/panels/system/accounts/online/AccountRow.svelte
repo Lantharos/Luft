@@ -82,10 +82,10 @@
 		<TextField bind:value={name} label={t('settings-accounts-name')} showLabel onkeydown={(event) => event.key === 'Enter' && void saveName()} />
 		<dl class="details">
 			<dt>{t('settings-accounts-folder')}</dt>
-			<dd>{folder}</dd>
+			<dd class="select-text">{folder}</dd>
 			{#if account.server}
 				<dt>{t('settings-accounts-server')}</dt>
-				<dd>{account.server}</dd>
+				<dd class="select-text">{account.server}</dd>
 			{/if}
 			{#if drive?.usage}
 				<dt>{t('settings-accounts-storage')}</dt>

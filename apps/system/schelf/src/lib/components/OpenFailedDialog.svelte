@@ -26,7 +26,7 @@
 	{#if failure && !failure.package && failure.output.length}
 		<div class="flex flex-col gap-2">
 			<span class="text-[13px] text-[var(--text-muted)]">{t('open-failed-output')}</span>
-			<pre class="output">{failure.output.join('\n')}</pre>
+			<pre class="output select-text">{failure.output.join('\n')}</pre>
 		</div>
 	{/if}
 	{#snippet actions()}

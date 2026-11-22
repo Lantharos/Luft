@@ -2,6 +2,8 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, Write};
 
+use luft_policy::Policy;
+
 const STORE: &str = "/var/lib/remoted/choices";
 const SSHD_CONFIG: &str = "/run/remoted/sshd.conf";
 const ENABLED: &str = "enabled";
@@ -42,6 +44,15 @@ impl Choices {
             }
         }
         Ok(choices)
+    }
+
+    /// The choices with what the policy takes away removed: remote login off when it isn't
+    /// allowed, and passwords off when only keys may sign in.
+    pub fn effective(mut self) -> Self {
+        let policy = Policy::load().remote_login;
+        self.enabled &= policy.allowed;
+        self.password_login &= policy.passwords;
+        self
     }
 
     pub fn save(&self) -> io::Result<()> {

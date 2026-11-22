@@ -94,6 +94,12 @@
 		"/etc/passwd": "Reads the names of the people with an account, to take them out of crash reports",
 		"/etc/machine-info": "Reads the computer's name, to take it out of crash reports"
 	},
+	"security/data/remote-login/remoted-policy.path": {
+		"/etc/luft/policy.d": "Follows the policy for remote login when a local administrator changes it"
+	},
+	"security/data/trust/systemd/trustd-policy.path": {
+		"/etc/luft/policy.d": "Follows the policy for device encryption when a local administrator changes it"
+	},
 	"services/locksmith/data/locksmith.path": {
 		"/etc/luft/policy.d": "Locks the settings again when a local administrator changes the policy"
 	},

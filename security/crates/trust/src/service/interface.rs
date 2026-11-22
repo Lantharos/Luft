@@ -96,7 +96,7 @@ impl Trust {
         }
     }
 
-    async fn run<T: Send + 'static>(
+    pub(super) async fn run<T: Send + 'static>(
         &self,
         emitter: &SignalEmitter<'_>,
         work: impl FnOnce() -> anyhow::Result<T> + Send + 'static,
@@ -192,6 +192,9 @@ impl Trust {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, ENCRYPTION).await?;
+        if luft_policy::Policy::load().encryption.required {
+            return Err(Error::managed());
+        }
         self.run(&emitter, disk::encrypting::cancel).await
     }
 

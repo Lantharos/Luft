@@ -1,0 +1,10 @@
+[Unit]
+Description=Follow the policy for device encryption when it changes
+
+[Path]
+PathChanged=/etc/luft/policy.d
+PathChanged=/usr/share/luft/policy.d
+Unit=trustd.service
+
+[Install]
+WantedBy=multi-user.target

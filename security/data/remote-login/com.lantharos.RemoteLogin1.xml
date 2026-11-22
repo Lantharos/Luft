@@ -16,6 +16,11 @@
     sshd, ends every SSH session and closes the port. Letting an account in, passwords or public
     networks need an administrator; going back is allowed for the person at the computer.
 
+    Luft's policy files (luft-policy) can keep remote login off, or allow only keys. Enabled and
+    PasswordLogin then report what the policy leaves, SetEnabled(true) and SetPasswordLogin(true)
+    fail with com.lantharos.RemoteLogin1.Error.Managed, and when the policy changes while sshd
+    runs, the service stops it or takes passwords away at once.
+
     AuthorizedKeys, AddAuthorizedKey and RemoveAuthorizedKey change the caller's own
     ~/.ssh/authorized_keys, as (type, comment, SHA256 fingerprint), and need no password.
     AddAuthorizedKey takes one public key as a .pub file holds it.

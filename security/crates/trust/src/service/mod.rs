@@ -3,6 +3,7 @@ mod drives;
 mod error;
 mod interface;
 mod properties;
+mod required;
 mod shown;
 pub(crate) mod status;
 mod system_disk;
@@ -37,7 +38,16 @@ async fn serve() -> zbus::Result<()> {
         .await?;
     drives::continue_work(&connection).await?;
     system_disk::continue_work(&connection).await?;
-    idle.wait(IDLE_TIMEOUT).await;
+    let trust = connection.object_server().interface::<_, Trust>(PATH).await?;
+    required::follow(&trust).await;
+    tokio::select! {
+        () = idle.wait(IDLE_TIMEOUT) => {}
+        followed = required::keep_following(trust) => {
+            if let Err(error) = followed {
+                eprintln!("Stopped following the policy: {error:#}");
+            }
+        }
+    }
     connection.release_name(NAME).await?;
     Ok(())
 }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Follow the policy for remote login when it changes
+
+[Path]
+PathChanged=/etc/luft/policy.d
+PathChanged=/usr/share/luft/policy.d
+Unit=remoted.service
+
+[Install]
+WantedBy=multi-user.target

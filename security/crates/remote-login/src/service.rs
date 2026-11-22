@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
+use luft_policy::Policy;
 use remoted::choices::Choices;
 use tokio::sync::Mutex;
 use zbus::fdo::{self, DBusProxy};
 use zbus::message::Header;
-use zbus::object_server::SignalEmitter;
+use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{Connection, interface};
 
 use crate::accounts::Account;
@@ -88,6 +89,7 @@ impl RemoteLogin {
         let mut choices = Choices::load()?;
         change(&mut choices);
         choices.save()?;
+        let choices = choices.effective();
         if !choices.enabled {
             return Ok(());
         }
@@ -95,8 +97,36 @@ impl RemoteLogin {
         sshd::reload().await.map_err(Error::Failed)
     }
 
+    /// Stops remote login when the policy no longer allows it, and passwords when only keys
+    /// may sign in, then tells everyone what changed.
+    pub async fn follow_policy(&self, remote_login: &InterfaceRef<Self>) {
+        let _activity = self.idle.hold();
+        let _changing = self.changing.lock().await;
+        let connection = remote_login.signal_emitter().connection();
+        let followed = async {
+            let mut choices = Choices::load()?;
+            if !choices.enabled {
+                return Ok(());
+            }
+            if !Policy::load().remote_login.allowed {
+                return shut(connection, &mut choices).await;
+            }
+            choices.effective().write_sshd_config()?;
+            sshd::reload().await.map_err(Error::Failed)
+        };
+        if let Err(error) = followed.await {
+            eprintln!("Couldn't follow the policy for remote login: {error}");
+        }
+        let emitter = remote_login.signal_emitter();
+        let _ = self.enabled_changed(emitter).await;
+        let _ = self.password_login_changed(emitter).await;
+    }
+
     async fn turn_on(&self, connection: &Connection, header: &Header<'_>) -> Result<(), Error> {
         authorize(connection, header, CONFIGURE).await?;
+        if !Policy::load().remote_login.allowed {
+            return Err(Error::managed());
+        }
         let mut choices = Choices::load()?;
         if choices.enabled {
             return Ok(());
@@ -129,12 +159,15 @@ impl RemoteLogin {
 impl RemoteLogin {
     #[zbus(property)]
     async fn enabled(&self) -> fdo::Result<bool> {
-        Ok(Choices::load().map_err(unreadable)?.enabled)
+        Ok(Choices::load().map_err(unreadable)?.effective().enabled)
     }
 
     #[zbus(property)]
     async fn password_login(&self) -> fdo::Result<bool> {
-        Ok(Choices::load().map_err(unreadable)?.password_login)
+        Ok(Choices::load()
+            .map_err(unreadable)?
+            .effective()
+            .password_login)
     }
 
     #[zbus(property)]
@@ -193,6 +226,9 @@ impl RemoteLogin {
             if allowed { PASSWORDS } else { RESTRICT },
         )
         .await?;
+        if allowed && !Policy::load().remote_login.passwords {
+            return Err(Error::managed());
+        }
         let _changing = self.changing.lock().await;
         self.change_choices(|choices| choices.password_login = allowed)
             .await?;

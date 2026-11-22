@@ -12,6 +12,7 @@ use std::time::Duration;
 use anyhow::bail;
 use luft_dbus::idle::Idle;
 use remoted::choices::Choices;
+use zbus::object_server::InterfaceRef;
 
 use service::{NAME, PATH, RemoteLogin};
 
@@ -22,7 +23,7 @@ fn main() -> anyhow::Result<()> {
     luft_dbus::panics::report();
     match std::env::args().nth(1).as_deref() {
         None => serve(),
-        Some(WRITE_SSHD_CONFIG) => Ok(Choices::load()?.write_sshd_config()?),
+        Some(WRITE_SSHD_CONFIG) => Ok(Choices::load()?.effective().write_sshd_config()?),
         Some(argument) => bail!("Unknown argument {argument}"),
     }
 }
@@ -35,7 +36,23 @@ async fn serve() -> anyhow::Result<()> {
         .name(NAME)
         .build()
         .await?;
-    idle.wait(IDLE_TIMEOUT).await;
+    let remote_login = connection
+        .object_server()
+        .interface::<_, RemoteLogin>(PATH)
+        .await?;
+    remote_login.get().await.follow_policy(&remote_login).await;
+    tokio::select! {
+        () = idle.wait(IDLE_TIMEOUT) => {}
+        followed = follow_policy(&remote_login) => followed?,
+    }
     connection.release_name(NAME).await?;
     Ok(())
+}
+
+async fn follow_policy(remote_login: &InterfaceRef<RemoteLogin>) -> anyhow::Result<()> {
+    let mut policy = luft_policy::Follow::start()?;
+    loop {
+        policy.changed().await?;
+        remote_login.get().await.follow_policy(remote_login).await;
+    }
 }

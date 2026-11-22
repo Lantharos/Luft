@@ -20,7 +20,7 @@ fn generate(normal: &Path, early: &Path) -> io::Result<()> {
     for unit in SOCKET_ACTIVATED {
         link(MASKED, early, unit)?;
     }
-    let choices = Choices::load();
+    let choices = Choices::load().map(Choices::effective);
     if choices.as_ref().is_ok_and(|choices| choices.enabled) {
         link(SSHD_UNIT, &normal.join(STARTUP), SSHD)?;
     } else {

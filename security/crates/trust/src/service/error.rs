@@ -9,12 +9,17 @@ pub enum Error {
     WrongKey(String),
     Unsupported(String),
     Busy(String),
+    Managed(String),
     Failed(String),
 }
 
 impl Error {
     pub fn not_authorized() -> Self {
         Self::NotAuthorized("You aren't allowed to change this.".to_owned())
+    }
+
+    pub fn managed() -> Self {
+        Self::Managed(luft_policy::MANAGED.to_owned())
     }
 
     pub fn busy() -> Self {

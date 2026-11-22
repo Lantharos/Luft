@@ -12,6 +12,7 @@ anyhow.workspace = true
 base64.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
+luft-policy = { workspace = true, features = ["follow"] }
 nix = { workspace = true, features = ["user"] }
 rustix = { workspace = true, features = ["fs", "thread"] }
 sha2.workspace = true

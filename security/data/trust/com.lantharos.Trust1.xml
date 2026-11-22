@@ -70,7 +70,12 @@
       <arg name="recovery_key" type="s" direction="in"/>
       <arg name="passphrase" type="s" direction="in"/>
     </method>
-    <!-- Takes back an EncryptSystemDisk request before the restart that starts it. -->
+    <!--
+      Takes back an EncryptSystemDisk request before the restart that starts it. Fails with
+      com.lantharos.Trust1.Error.Managed while Luft's policy files (luft-policy) require
+      encryption. With that policy and a TPM that unlocks the disk, trustd asks for encryption
+      itself when it starts and when the policy changes, with a recovery key it keeps sealed.
+    -->
     <method name="CancelSystemDiskEncryption"/>
     <!-- Links the TPM again, adds, changes or removes the PIN (pin ""). Returns a new recovery key when the disk had none. -->
     <method name="SetUpTpmUnlock">

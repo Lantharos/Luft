@@ -18,6 +18,7 @@ part = "services"
 ]
 "/usr/share/polkit-1/actions/" = ["data/com.lantharos.packages.policy"]
 "/usr/share/dnf5/libdnf.conf.d/50-luft-system-packages.conf" = "data/luft-system-packages.conf"
+"/usr/lib/tmpfiles.d/luft-system-packages.conf" = "data/luft-system-packages.tmpfiles"
 
 [enable]
 system = [

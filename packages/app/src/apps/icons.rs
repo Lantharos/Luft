@@ -31,19 +31,20 @@ pub fn lookup(name: &str) -> Option<PathBuf> {
 
 fn installed_since(name: &str) -> Option<PathBuf> {
     let bases = icon_bases();
-    FALLBACK_DIRECTORIES.iter().find_map(|directory| {
-        bases.iter().find_map(|base| {
-            EXTENSIONS
+    let file = |folder: &Path| {
+        EXTENSIONS
+            .iter()
+            .map(|extension| folder.join(format!("{name}.{extension}")))
+            .find(|path| path.exists())
+    };
+    FALLBACK_DIRECTORIES
+        .iter()
+        .find_map(|directory| {
+            bases
                 .iter()
-                .map(|extension| {
-                    base.join(FALLBACK_THEME)
-                        .join(directory)
-                        .join("apps")
-                        .join(format!("{name}.{extension}"))
-                })
-                .find(|path| path.exists())
+                .find_map(|base| file(&base.join(FALLBACK_THEME).join(directory).join("apps")))
         })
-    })
+        .or_else(|| file(Path::new(PIXMAPS)))
 }
 
 fn build() -> HashMap<String, PathBuf> {

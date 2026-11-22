@@ -60,7 +60,7 @@ fn take_away(old: Option<&Build>) -> Result<()> {
     let stopped = units::stop_leaving(old, None);
     let unlinked = system::link(None)
         .and_then(|()| system::refresh())
-        .and_then(|()| exports::export(None));
+        .and_then(|()| exports::export(old, None));
     let cleared = state::footprint().and_then(|mut footprint| {
         let cleared = footprint.clear(&Declared::default());
         state::save_footprint(&footprint)?;
@@ -87,7 +87,7 @@ fn apply(
     system::link(Some(&folder(digest, "")))?;
     system::refresh()?;
     system::settle(build)?;
-    exports::export(Some(build))?;
+    exports::export(old, Some(build))?;
     system::create_tmpfiles(build)?;
     if removes(old, build) {
         footprint.clear(&build.declared)?;
@@ -113,7 +113,7 @@ fn restore(
     let stopped = units::stop_leaving(Some(build), old);
     let relinked = relink(digest, old)
         .and_then(|()| system::refresh())
-        .and_then(|()| exports::export(old));
+        .and_then(|()| exports::export(Some(build), old));
     let cleared = footprint
         .clear(&before.with(old.map(|old| &old.declared)))
         .and_then(|()| state::save_footprint(footprint));
@@ -157,6 +157,6 @@ pub fn settle() -> Result<()> {
     footprint.note(&build.declared);
     state::save_footprint(&footprint)?;
     system::settle(&build)?;
-    exports::export(Some(&build))?;
+    exports::export(None, Some(&build))?;
     units::queue_enabled(&build)
 }

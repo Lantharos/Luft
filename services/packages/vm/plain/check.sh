@@ -6,6 +6,7 @@ RULE=/etc/polkit-1/rules.d/50-luft-system-packages-check.rules
 REQUESTED=/var/lib/luft/system-packages/packages
 ACCOUNT=luft
 MISSING=luft-check-no-such-package
+APP_WATCH=/run/luft-system-packages-check-app
 
 report() { echo "luft-system-packages-check: $*" > /dev/ttyS0; }
 fail() {
@@ -133,6 +134,44 @@ made_by_scriptlets() {
   pass "a setuid or capable program a scriptlet makes needs an administrator, coming and going"
 }
 
+watch_app() {
+  runuser -u "$ACCOUNT" -- env XDG_DATA_DIRS=/usr/local/share:/usr/share:/run/luft-system-packages/share gjs -c '
+    const { Gio, GioUnix, GLib } = imports.gi;
+    const monitor = Gio.AppInfoMonitor.get();
+    const say = () => {
+      const app = GioUnix.DesktopAppInfo.new("luft-check-app.desktop");
+      const listed = Gio.AppInfo.get_all().some(info => info.get_id() === "luft-check-app.desktop");
+      printerr(app && listed ? "there" : "gone");
+    };
+    Gio.AppInfo.get_all();
+    monitor.connect("changed", say);
+    say();
+    new GLib.MainLoop(null, false).run();
+  ' 2> "$APP_WATCH" &
+  WATCHER=$!
+}
+
+seen() {
+  for _ in $(seq 40); do
+    [[ "$(tail -n 1 "$APP_WATCH")" == "$1" ]] && return 0
+    sleep 0.25
+  done
+  return 1
+}
+
+app_comes_and_goes() {
+  watch_app
+  seen gone || fail "the session's GIO didn't start: $(cat "$APP_WATCH")"
+  grant change
+  install luft-check-app > /dev/null || fail "installing luft-check-app was refused: $(install luft-check-app 2>&1)"
+  seen there || fail "a running program doesn't see the new app: $(cat "$APP_WATCH")"
+  remove luft-check-app > /dev/null || fail "removing luft-check-app was refused: $(remove luft-check-app 2>&1)"
+  seen gone || fail "a running program still sees the removed app: $(cat "$APP_WATCH")"
+  grant
+  kill "$WATCHER"
+  pass "an app a package brings turns up in running programs and leaves with it"
+}
+
 missing_package() {
   refused "no package called $MISSING" install "$MISSING"
   requested "$MISSING" && fail "$MISSING was asked for"
@@ -170,6 +209,7 @@ administrator_installs
 plain_beside_privileged
 privileged_removal_needs_an_administrator
 made_by_scriptlets
+app_comes_and_goes
 missing_package
 one_left_out
 updates

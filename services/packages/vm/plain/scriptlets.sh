@@ -36,6 +36,29 @@ SPEC
   rpmbuild --quiet -bb --define "_topdir $work/build" "$work/$name.spec"
 }
 
+app() {
+  cat > "$work/luft-check-app.spec" <<SPEC
+Name: luft-check-app
+Version: 1
+Release: 1
+Summary: Brings an app with a menu entry
+License: MIT
+BuildArch: noarch
+
+%description
+Brings a menu entry, as desktop apps do.
+
+%install
+mkdir -p %{buildroot}/usr/share/applications
+printf '[Desktop Entry]\nType=Application\nName=Luft check\nExec=true\nIcon=luft-check-app\n' > %{buildroot}/usr/share/applications/luft-check-app.desktop
+
+%files
+/usr/share/applications/luft-check-app.desktop
+SPEC
+  rpmbuild --quiet -bb --define "_topdir $work/build" "$work/luft-check-app.spec"
+}
+
+app
 package luft-check-setuid 'install -m 4755 /usr/bin/true /usr/libexec/luft-check-setuid'
 package luft-check-capable 'cp /usr/bin/true /usr/libexec/luft-check-capable && setcap cap_net_raw+ep /usr/libexec/luft-check-capable'
 

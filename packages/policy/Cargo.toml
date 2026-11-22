@@ -7,14 +7,21 @@ license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[features]
+follow = ["dep:futures-util", "dep:inotify", "dep:tokio"]
+
 [dependencies]
+futures-util = { workspace = true, optional = true }
+inotify = { workspace = true, features = ["stream"], optional = true }
 luft-variant.workspace = true
 serde.workspace = true
 specta.workspace = true
+tokio = { workspace = true, features = ["time"], optional = true }
 toml.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "time"] }
 
 [lints]
 workspace = true

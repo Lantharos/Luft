@@ -217,6 +217,10 @@ export const commands = {
 	packagesSearch: (params: {
 		query: string,
 	}, options?: CallOptions) => invoke<PackageSummary[]>("packages_search", params, options),
+	policy: (options?: CallOptions) => invoke<Policy>("policy", {}, options),
+	policyAllows: (params: {
+		job: Job,
+	}, options?: CallOptions) => invoke<boolean>("policy_allows", params, options),
 	sourcesAdd: (params: {
 		draft: RepositoryDraft,
 	}, options?: CallOptions) => invoke<null>("sources_add", params, options),
@@ -262,6 +266,7 @@ export const events = {
 	schelfLibrary: (callback: (payload: Finished) => void) => listen<Finished>("schelf.library", callback),
 	schelfOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("schelf.operations", callback),
 	schelfPage: (callback: (payload: null) => void) => listen<null>("schelf.page", callback),
+	schelfPolicy: (callback: (payload: Policy) => void) => listen<Policy>("schelf.policy", callback),
 };
 
 /**  Who is signed in to schelf.store on this computer. */
@@ -274,6 +279,12 @@ export type AccountState = {
 	account: Account | null,
 	invitations: Invitation[],
 	notices: Notices,
+};
+
+export type AccountsPolicy = {
+	add: boolean,
+	administrators: boolean,
+	"automatic-sign-in": boolean,
 };
 
 export type Action = "install" | "remove" | "update";
@@ -294,6 +305,8 @@ export type AppIcons = {
 	clear: IconPaint,
 	monochrome: IconPaint,
 };
+
+export type AppSource = "schelf-store" | "flathub" | "appimage" | "ubuntu";
 
 export type AppState = {
 	page: string | null,
@@ -369,6 +382,12 @@ export type CatalogApp = {
  */
 export type Change = { action: "pause" } | { action: "resume" } | { action: "all" } | { action: "set"; percent: number };
 
+/**
+ *  Which of Luft's releases a computer follows: the stable versions, tagged with the major
+ *  version alone such as `:1`, or the nightly builds, tagged `:1-nightly`.
+ */
+export type Channel = "stable" | "nightly";
+
 /**  A repository and what the system said about it, to be trusted before it's added. */
 export type CheckedSource = {
 	draft: RepositoryDraft,
@@ -387,6 +406,12 @@ export type Consent = {
 };
 
 export type Corners = "rounded" | "square";
+
+export type CrashReportSending = "always" | "never";
+
+export type CrashReportsPolicy = {
+	send: CrashReportSending | null,
+};
 
 export type CustomIcons = {
 	icon: boolean,
@@ -427,6 +452,10 @@ export type DescribedSource = {
 	url: string,
 };
 
+export type DeveloperPolicy = {
+	tools: boolean | null,
+};
+
 export type DialogState = {
 	path: string,
 	dialog: import("#lib/install/dialogs/dialog.js").InstallDialog,
@@ -439,6 +468,10 @@ export type Download = {
 	size: number,
 };
 
+export type EncryptionPolicy = {
+	required: boolean,
+};
+
 /**
  *  What an extension asks for: permissions from the extension API, whether
  *  it runs a program of its own, the hosts it connects to and the ports it
@@ -449,6 +482,10 @@ export type ExtensionAccess = {
 	helper: boolean,
 	network: string[],
 	listen: ListenPort[],
+};
+
+export type ExtensionsPolicy = {
+	unreviewed: boolean,
 };
 
 /**  Why an app closed right after it started. */
@@ -477,6 +514,12 @@ export type Finished = {
 	keys: string[],
 	action: Action,
 	succeeded: boolean,
+};
+
+export type FirewallPolicy = {
+	"home-networks": boolean,
+	"public-access": boolean,
+	"open-ports": boolean,
 };
 
 /**  How Luft installs a store app, and so how it updates and removes it. */
@@ -590,6 +633,10 @@ export type Names = {
 	custom: string | null,
 };
 
+export type NearbySharingPolicy = {
+	"visible-to": Visibility | null,
+};
+
 export type Need = "library" | "program" | "perlModule" | "pythonModule" | "typelib";
 
 /**
@@ -651,6 +698,10 @@ export type Operation = {
 
 export type OperationState = "queued" | "running" | "failed";
 
+export type OrganizationPolicy = {
+	name: string | null,
+};
+
 export type Origin = "schelf" | "flathub" | "fedora";
 
 export type PackageSummary = {
@@ -691,6 +742,26 @@ export type PluggedDrive = {
 	size: number,
 };
 
+/**
+ *  The settings an organization decided for its computers. A value left out stays the
+ *  person's choice; one given is applied by the service that owns the setting, which refuses
+ *  to change it.
+ */
+export type Policy = {
+	organization: OrganizationPolicy,
+	"screen-lock": ScreenLockPolicy,
+	updates: SystemUpdatesPolicy,
+	firewall: FirewallPolicy,
+	software: SoftwarePolicy,
+	developer: DeveloperPolicy,
+	extensions: ExtensionsPolicy,
+	encryption: EncryptionPolicy,
+	accounts: AccountsPolicy,
+	"remote-login": RemoteLoginPolicy,
+	"nearby-sharing": NearbySharingPolicy,
+	"crash-reports": CrashReportsPolicy,
+};
+
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";
 
@@ -706,6 +777,11 @@ export type Provenance = {
 	repository: string | null,
 	commit: string | null,
 	run: string | null,
+};
+
+export type RemoteLoginPolicy = {
+	allowed: boolean,
+	passwords: boolean,
 };
 
 /**  The listed app that took a delisted one's place, and why. */
@@ -745,6 +821,12 @@ export type SchemeColors = {
 	dark: { [key in string]: string },
 };
 
+export type ScreenLockPolicy = {
+	enabled: boolean | null,
+	"screen-off": number | null,
+	"lock-after": number | null,
+};
+
 export type Screenshot = {
 	url: string,
 	caption: string | null,
@@ -755,6 +837,13 @@ export type Setting = { setting: "allowed"; value: boolean } | { setting: "banne
 export type Severity = "block" | "warn";
 
 export type SignIn = { state: "waiting"; intervalMs: number } | { state: "approved"; account: Account } | { state: "declined" } | { state: "expired" };
+
+export type SoftwarePolicy = {
+	"system-packages": boolean,
+	"package-sources": boolean,
+	/**  The only places apps may come from, or all of them when left out. */
+	"app-sources": AppSource[] | null,
+};
 
 export type Source = "flatpak" | "appImage" | "debian" | "system" | "sabine" | "extension" | "storeTool";
 
@@ -866,6 +955,12 @@ export type StoreUpdate = {
 
 export type Switch = "downloads" | "x11" | "microphone" | "camera";
 
+export type SystemUpdatesPolicy = {
+	schedule: UpdateSchedule | null,
+	download: boolean | null,
+	channel: Channel | null,
+};
+
 /**  How many bytes of a download arrived, out of how many. */
 export type Transfer = {
 	done: number,
@@ -878,9 +973,13 @@ export type Typography = {
 	textScale: number,
 };
 
+export type UpdateSchedule = "daily" | "weekly" | "never";
+
 export type Updates = {
 	apps: AppUpdate[],
 	checked: number,
 	failed: string[],
 	sabine: SabineHold | null,
 };
+
+export type Visibility = "no-one" | "your-devices" | "everyone";

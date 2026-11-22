@@ -3,9 +3,11 @@
 	import { t } from '@luft/i18n';
 	import { fade } from '@luft/ui';
 	import type { InstalledApp, Operation } from '#lib/bindings.js';
+	import Managed from '#lib/components/Managed.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import type { FileInstall } from '#lib/files/install.svelte.js';
 	import { opening } from '#lib/state/opening.svelte.js';
+	import { allowance } from '#lib/state/policy.svelte.js';
 
 	interface Props {
 		install: FileInstall;
@@ -24,6 +26,7 @@
 	let { install, phase, running, retry, onremove }: Props = $props();
 
 	const close = () => void appWindow.close();
+	const permit = allowance(() => install.job);
 
 	async function open(app: InstalledApp, desktop: string | null) {
 		await opening.open(app, desktop);
@@ -53,6 +56,7 @@
 		const installed = existing || ((file.kind === 'package' || file.kind === 'deb') && file.installed);
 		if (file.kind === 'deb' && !file.runsHere) return [{ label: t('install-close'), run: close, primary: true }];
 		if (!installed) {
+			if (!permit.allowed) return [{ label: t('install-close'), run: close, primary: true }];
 			if (install.listed) return listedActions();
 			return [{ label: t(file.kind === 'flatpakRepo' ? 'install-add-source' : 'install-install'), run: () => install.install(), primary: true }];
 		}
@@ -100,6 +104,9 @@
 {:else}
 	{#key `${phase}:${!!install.listed}`}
 		<div class="flex items-center gap-2" in:fade>
+			{#if phase === 'ready' && !permit.allowed && !install.existing}
+				<Managed />
+			{/if}
 			{#each actions as action (action.label)}
 				<button type="button" class={['button', action.primary && 'primary']} onclick={action.run}>{action.label}</button>
 			{/each}

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use luft_dbus::runtime::block_on;
 use luft_i18n::t;
+use luft_policy::{AppSource, Policy};
 use luft_software::apps::flatpak::{self, FLATHUB, Installation, Step};
 use luft_software::apps::{appimage, debian, places};
 use luft_software::system::repositories::{self, Draft};
@@ -183,7 +184,34 @@ impl Job {
         )
     }
 
+    /// Whether the policy lets this job add what it adds. Updates and removals always run, so
+    /// what was installed before stays up to date and can go.
+    pub fn allowed_by(&self, policy: &Policy) -> bool {
+        let software = &policy.software;
+        match self {
+            Self::InstallFlathub { .. }
+            | Self::InstallFlatpakRef { .. }
+            | Self::InstallFlatpakBundle { .. } => software.allows(AppSource::Flathub),
+            Self::AddFlatpakRepo { .. } => software.app_sources.is_none(),
+            Self::InstallStore { .. } | Self::InstallStoreTool { .. } => {
+                software.allows(AppSource::SchelfStore)
+            }
+            Self::InstallDeb { .. } => software.allows(AppSource::Ubuntu),
+            Self::InstallAppImage { .. } => software.allows(AppSource::Appimage),
+            Self::InstallSystemPackages { .. } => software.system_packages,
+            Self::InstallSystemPackageFile { repository, .. } => {
+                software.system_packages
+                    && (repository.as_ref().is_none_or(repositories::is_added)
+                        || software.package_sources)
+            }
+            _ => true,
+        }
+    }
+
     pub fn run(&self, task: Task) -> Result<(), String> {
+        if !self.allowed_by(&Policy::load()) {
+            return Err(luft_policy::MANAGED.to_owned());
+        }
         let _exclusive = if self.downloads_first() {
             None
         } else {

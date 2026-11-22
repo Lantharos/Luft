@@ -101,6 +101,7 @@ export class FileInstall {
 		if (id) this.listed = await listed(id).catch(() => null);
 	}
 
+	job = $derived(this.file ? job(this.file) : null);
 	operation = $derived(operations.forKey(this.key));
 	active = $derived(this.operation && this.operation.state !== 'failed' ? this.operation : null);
 	failed = $derived(this.operation?.state === 'failed' ? this.operation : null);

@@ -19,6 +19,7 @@ liblzma.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-i18n.workspace = true
+luft-policy.workspace = true
 luft-software = { workspace = true, features = ["system"] }
 luft-store-seal.workspace = true
 memmap2.workspace = true

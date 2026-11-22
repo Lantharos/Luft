@@ -35,12 +35,14 @@ pub fn run_app() -> ! {
     let queue = Queue::start(events.clone());
     let windows = Windows::new(queue.clone(), events.clone());
     let served = queue.clone();
+    let followed = events.clone();
     luft_app::run(
         &events,
         |window| build_window(window, &queue, &windows),
         move |_| {
             std::thread::spawn(background::integrate_apps);
             luft_app::spawn(serve(served));
+            luft_app::spawn(commands::policy::follow(followed));
         },
     )
 }
@@ -56,6 +58,7 @@ fn build_window(window: SabineWindow, queue: &Queue, windows: &Windows) -> Sabin
     let window = commands::catalog::register(window);
     let window = commands::store::register(window);
     let window = commands::sources::register(window);
+    let window = commands::policy::register(window);
     let window = library::register(window);
     let window = commands::files::register(window);
     let window = commands::updates::register(window);

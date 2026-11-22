@@ -5,6 +5,7 @@
 	import { broadAccess } from '#lib/catalog/flathub.js';
 	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import Managed from '#lib/components/Managed.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
 	import { openUrl } from '#lib/bridge/index.js';
 	import { opening } from '#lib/state/opening.svelte.js';
@@ -12,6 +13,7 @@
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import { storeJob, updateJob } from '#lib/app/jobs.js';
 	import { sandboxLacks } from '#lib/app/extensionAccess.js';
 	import StoreConsent from './StoreConsent.svelte';
@@ -82,6 +84,8 @@
 			{#if installed.desktop && !pulled}
 				<button type="button" class="button primary large" onclick={() => opening.open(installed)}>{t('app-open')}</button>
 			{/if}
+		{:else if listing && !policy.installs(listing.origin)}
+			<Managed />
 		{:else if listing && (listing.origin !== 'schelf' || store?.installer)}
 			<button type="button" class="button primary large" onclick={install}>{t('app-install')}</button>
 		{:else if store?.needsLuft}

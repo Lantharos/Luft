@@ -7,6 +7,7 @@
 	import { SLOW } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 
 	let sources = $state<AddedSource[] | null>(null);
 	let address = $state('');
@@ -81,7 +82,7 @@
 		</p>
 
 		<Section title={t('sources-add-title')} description={t('sources-add-description')}>
-			<Row title={t('sources-source')}>
+			<Row title={t('sources-source')} locked={!policy.addsSources}>
 				<div class="flex items-center gap-2">
 					<div class="w-[320px]">
 						<TextField

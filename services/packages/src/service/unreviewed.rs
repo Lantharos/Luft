@@ -4,6 +4,7 @@ use zbus::message::Header;
 use zbus::proxy::CacheProperties;
 
 use super::error::Error;
+use super::interface::allowed;
 
 const GREETER: &str = "com.lantharos.Greeter1";
 const GREETER_PATH: &str = "/com/lantharos/Greeter1";
@@ -30,6 +31,7 @@ pub async fn approver(
     header: &Header<'_>,
     question: &str,
 ) -> Result<u32, Error> {
+    allowed(|policy| policy.extensions.unreviewed)?;
     if !developer_tools(connection).await.unwrap_or(false) {
         return Err(Error::NotAuthorized(
             "Extensions nobody reviewed only run inside Luft while Developer tools is on."

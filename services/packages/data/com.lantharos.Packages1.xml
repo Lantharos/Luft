@@ -22,7 +22,8 @@
     any program but Luft's Settings, and need com.lantharos.packages.unreviewed-extensions every time.
     RemoveUnreviewedExtension needs nothing. All three only change the caller's own records.
     Luft's policy files (luft-policy) can turn off adding system packages, which refuses Install
-    and InstallFile, and adding software sources, which refuses AddRepository, with
+    and InstallFile, adding software sources, which refuses AddRepository, and extensions nobody
+    reviewed, which refuses InstallUnreviewedExtension and AllowExtensionFolder, with
     com.lantharos.Packages1.Error.Managed.
   -->
   <interface name="com.lantharos.Packages1">

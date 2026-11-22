@@ -64,3 +64,5 @@ export function sources(): Source[] {
 export const unreviewed = (origin: Origin) => origin === 'copy' || origin === 'folder';
 
 export const vouchedFor = (origin: Origin) => origin === 'store' || origin === 'development';
+
+export const reviewed = (origin: Origin) => vouchedFor(origin) || origin === 'store-sandboxed';

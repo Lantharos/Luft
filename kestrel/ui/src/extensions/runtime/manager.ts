@@ -13,11 +13,12 @@ import { CrashGuard } from './crashes/guard.js';
 import { removeTree } from '../api/v1/core/files.js';
 import { dataFolder, discover, findOne, type Installed } from './installed/folders.js';
 import { luftVersionAtLeast } from './installed/luftVersion.js';
-import { unreviewed } from './installed/origins.js';
+import { reviewed, unreviewed } from './installed/origins.js';
 import { askLuftVersion, rememberedLuftVersion } from './installed/runningLuft.js';
 import { removeFromStoreFolder } from './installed/storeFolder.js';
 import { removeUnreviewed } from './installed/unreviewed.js';
 import { DeveloperTools } from '../../shared/dbus/developerTools.js';
+import { Policy } from '../../system/policy.js';
 import { StoppedOutside } from '../sandbox/shell/connection.js';
 import { runSandboxedTurnedOffHelper, unsupportedInSandbox } from '../sandbox/shell/support.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
@@ -30,6 +31,7 @@ export class ExtensionManager {
   readonly store = new ExtensionStore();
   private readonly crashes = new CrashGuard();
   private readonly developerTools = new DeveloperTools();
+  private readonly policy = new Policy();
   private readonly services: RuntimeServices;
   private installed: Installed[] = [];
   private readonly instances = new Map<string, ExtensionInstance>();
@@ -62,6 +64,7 @@ export class ExtensionManager {
       this.store.watchShortcuts(() => this.changed()),
       onLocaleChanged(() => this.restartAll()),
       this.developerTools.watch(() => this.rescan()),
+      this.policy.watch(() => this.sync()),
     ];
     this.rescan();
     for (const id of this.crashes.turnedOffLately)
@@ -83,6 +86,7 @@ export class ExtensionManager {
   }
 
   private runs(installed: Installed): boolean {
+    if (!reviewed(installed.origin) && !this.policy.unreviewedExtensions) return false;
     if (unreviewed(installed.origin) && this.developerTools.known === null) return false;
     return this.fitsLuft(installed) && (installed.inShell || !unsupportedInSandbox(installed.manifest!));
   }
@@ -246,6 +250,7 @@ export class ExtensionManager {
   shutdown(): void {
     for (const disconnect of this.disconnectors) disconnect();
     this.developerTools.destroy();
+    this.policy.destroy();
     for (const id of [...this.instances.keys()]) this.drop(id);
     if (this.snapshots) GLib.rmdir(this.snapshots);
   }

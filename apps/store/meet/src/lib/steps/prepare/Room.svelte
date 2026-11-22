@@ -1,6 +1,6 @@
 <script lang="ts">
 	import HardDrive from '@luft/symbols/icons/hard-drive';
-	import LayoutPanelLeft from '@luft/symbols/icons/layout-panel-left';
+	import Windows from '@luft/symbols/icons/windows';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, SplitBar } from '@luft/ui';
 	import DriveRow from '#lib/components/DriveRow.svelte';
@@ -50,7 +50,7 @@
 			<div class="-mx-2 flex flex-col gap-1" role="radiogroup" aria-label={t('room-places-label')}>
 				{#each session.places as place (place.id)}
 					<DriveRow
-						icon={place.kind === 'windows' ? LayoutPanelLeft : HardDrive}
+						icon={place.kind === 'windows' ? Windows : HardDrive}
 						title={placeTitle(place)}
 						detail={placeDetail(place)}
 						selected={chosen.id === place.id}

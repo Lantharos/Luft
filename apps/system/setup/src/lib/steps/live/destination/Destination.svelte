@@ -2,7 +2,7 @@
 	import { appWindow } from '@lantharos/sabine';
 	import ArrowRightLeft from '@luft/symbols/icons/arrow-right-left';
 	import HardDrive from '@luft/symbols/icons/hard-drive';
-	import LayoutPanelLeft from '@luft/symbols/icons/layout-panel-left';
+	import Windows from '@luft/symbols/icons/windows';
 	import Sparkles from '@luft/symbols/icons/sparkles';
 	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
@@ -131,7 +131,7 @@
 		<div class="-mx-2 flex flex-col gap-1">
 			{#if meet?.space}
 				<Choice
-					icon={meetElsewhere ? HardDrive : LayoutPanelLeft}
+					icon={meetElsewhere ? HardDrive : Windows}
 					title={meetElsewhere ? t('setup-destination-meet-drive-choice', { drive: meetDrive!.name }) : t('setup-destination-meet-choice')}
 					description={meetElsewhere
 						? t('setup-destination-meet-drive-choice-description', { size: bytes(meet.space.size), drive: meetDrive!.name })
@@ -140,7 +140,7 @@
 				/>
 			{:else if windowsDrive}
 				<Choice
-					icon={LayoutPanelLeft}
+					icon={Windows}
 					title={t('setup-destination-alongside-choice', { windows: windowsName(windowsDrive.windows) })}
 					description={t('setup-destination-alongside-choice-description')}
 					onclick={() => open('alongside')}

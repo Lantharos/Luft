@@ -35,7 +35,7 @@ pub struct Layout {
     rename_all_fields = "camelCase"
 )]
 pub enum Step {
-    CopyStartup { from: Span, to: Span },
+    MoveStartup { from: Span, to: Span, uuid: String },
     Shrink { at: u64, size: u64 },
     Create { at: u64, size: u64 },
     Seal { at: u64 },
@@ -138,10 +138,9 @@ fn move_startup(steps: &mut Vec<Step>, startup: &(Span, String), to: u64) {
         offset: to,
         size: from.size,
     };
-    steps.push(Step::CopyStartup { from: *from, to });
-    steps.push(Step::Delete { at: from.offset });
-    steps.push(Step::Rename {
-        at: to.offset,
+    steps.push(Step::MoveStartup {
+        from: *from,
+        to,
         uuid: uuid.clone(),
     });
 }
@@ -275,21 +274,15 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            steps[..3],
-            [
-                Step::CopyStartup {
-                    from: span(100 * GIB, 2 * GIB),
-                    to: span(60 * GIB, 2 * GIB)
-                },
-                Step::Delete { at: 100 * GIB },
-                Step::Rename {
-                    at: 60 * GIB,
-                    uuid: "startup".into()
-                },
-            ]
+            steps[0],
+            Step::MoveStartup {
+                from: span(100 * GIB, 2 * GIB),
+                to: span(60 * GIB, 2 * GIB),
+                uuid: "startup".into()
+            }
         );
         assert_eq!(
-            steps[3],
+            steps[1],
             Step::Create {
                 at: 62 * GIB,
                 size: 40 * GIB
@@ -301,6 +294,48 @@ mod tests {
         }));
         assert_eq!(final_root(&steps), 62 * GIB);
         assert!(!steps.iter().any(|step| matches!(step, Step::Shrink { .. })));
+    }
+
+    #[test]
+    fn luft_takes_all_the_space_windows_left_in_front_of_its_startup_partition() {
+        let sector = 512;
+        let startup = span(850_087_936 * sector, 4_194_304 * sector);
+        let root = span(854_282_240 * sector, 1_146_124_288 * sector);
+        let removed = layout(
+            200 * GIB,
+            Some(span(411_648 * sector, startup.offset - 411_648 * sector)),
+        );
+        let steps = plan(
+            &Layout {
+                root,
+                luks_uuid: Some("luks".into()),
+                startup: Some((startup, "startup".into())),
+                ..removed
+            },
+            Change::Grow,
+        )
+        .unwrap();
+        let moved = span(411_648 * sector, startup.size);
+        assert_eq!(
+            steps[0],
+            Step::MoveStartup {
+                from: startup,
+                to: moved,
+                uuid: "startup".into()
+            }
+        );
+        assert_eq!(
+            steps
+                .iter()
+                .filter(|step| matches!(step, Step::MoveStartup { .. }))
+                .count(),
+            1
+        );
+        assert!(steps.contains(&Step::Grow {
+            at: moved.end(),
+            end: root.end()
+        }));
+        assert_eq!(final_root(&steps), moved.end());
     }
 
     #[test]
@@ -326,9 +361,10 @@ mod tests {
     fn giving_space_back_frees_it_right_after_windows() {
         let steps = plan(&layout(20 * GIB, None), Change::Shrink { bytes: 30 * GIB }).unwrap();
         assert_eq!(final_root(&steps), 132 * GIB);
-        assert!(steps.contains(&Step::CopyStartup {
+        assert!(steps.contains(&Step::MoveStartup {
             from: span(100 * GIB, 2 * GIB),
-            to: span(130 * GIB, 2 * GIB)
+            to: span(130 * GIB, 2 * GIB),
+            uuid: "startup".into()
         }));
         assert_eq!(
             steps[0],

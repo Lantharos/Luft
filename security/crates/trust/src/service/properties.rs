@@ -7,6 +7,7 @@ use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
 use crate::disk::encrypting::Encrypting;
+use crate::disk::layout::Resize;
 use crate::drives::reencrypt::Progress;
 use crate::system::firmware::tpm::Tpm;
 
@@ -88,12 +89,13 @@ fn encrypting(
     }
 }
 
-fn resize(change: Option<Change>) -> &'static str {
-    match change {
+fn resize(state: Option<&Resize>) -> &'static str {
+    match state {
         None => "",
-        Some(Change::Grow) => "grow",
-        Some(Change::Shrink { .. }) => "shrink",
-        Some(Change::Trim { .. }) => "trim",
+        Some(Resize::Underway) => "underway",
+        Some(Resize::Waiting(Change::Grow)) => "grow",
+        Some(Resize::Waiting(Change::Shrink { .. })) => "shrink",
+        Some(Resize::Waiting(Change::Trim { .. })) => "trim",
     }
 }
 
@@ -117,7 +119,7 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         ("OlderRecoveryKey", disk.older_recovery_key.into()),
         ("TpmRefused", disk.tpm_refused.into()),
         ("SecureBootChanged", disk.secure_boot_changed.into()),
-        ("Resize", resize(disk.resize).into()),
+        ("Resize", resize(disk.resize.as_ref()).into()),
         ("Move", moving.stage.unwrap_or_default().into()),
         ("MoveTo", moving.to.as_str().into()),
         (

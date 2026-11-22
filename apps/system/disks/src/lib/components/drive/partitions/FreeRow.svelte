@@ -20,6 +20,8 @@
 	let blank = $derived(!drive.table);
 	let room = $derived(luftRoom(drive, offset));
 	let waiting = $derived(disks.protection.systemResize === 'grow' && room?.reach.kind === 'before');
+	let underway = $derived(disks.protection.systemResize === 'underway' && room !== null);
+	let changeable = $derived(!drive.readOnly && !underway);
 	let calling = $derived(disks.busy.has(key));
 
 	function callOff() {
@@ -35,17 +37,19 @@
 >
 	<span class="dashed" aria-hidden="true"></span>
 	<span class="name">{blank ? t('disks-no-partitions') : t('disks-free-space')}</span>
-	<span class="facts">{waiting ? t('disks-free-luft-waiting', { size: bytes(size) }) : bytes(size)}</span>
+	<span class="facts">
+		{#if waiting}{t('disks-free-luft-waiting', { size: bytes(size) })}{:else if underway}{t('disks-free-luft-underway', { size: bytes(size) })}{:else}{bytes(size)}{/if}
+	</span>
 	{#if waiting}
 		<button type="button" class="button ml-auto" disabled={calling} onclick={callOff}>
 			{#if calling}<Spinner />{/if}{t('disks-free-keep')}
 		</button>
-	{:else if room && !drive.readOnly}
+	{:else if room && changeable}
 		<div class="ml-auto flex gap-2">
 			<button type="button" class="button" onclick={() => dialogs.open({ kind: 'give-luft', drive, offset, size })}>{t('disks-free-give-luft')}</button>
 			<button type="button" class="button" aria-label={t('disks-new-partition')} onclick={() => dialogs.open({ kind: 'create', drive, offset, size })}>{t('disks-new')}</button>
 		</div>
-	{:else if !drive.readOnly}
+	{:else if changeable}
 		<button
 			type="button"
 			class="button ml-auto"

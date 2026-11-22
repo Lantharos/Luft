@@ -3,10 +3,12 @@ Description=Carry on changing Luft's partition, and take back the space Meet Luf
 Documentation=https://docs.luft.computer/developers/system/resizing/
 ConditionKernelCommandLine=!rd.live.image
 After=local-fs.target dbus.service udisks2.service trustd-follow-up.service
+Before=systemd-user-sessions.service
 Wants=udisks2.service
 
 [Service]
-Type=exec
+Type=notify
+TimeoutStartSec=5min
 ExecStart=/usr/bin/trustctl system-disk continue
 SyslogIdentifier=trustd
 Nice=10

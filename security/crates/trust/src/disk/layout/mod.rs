@@ -13,6 +13,7 @@ use super::{SystemDisk, encrypting};
 use crate::errors::{Busy, Unsupported};
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
+use crate::system::host::notify;
 use crate::system::secrets::secret::Secret;
 use journal::{Journal, Working};
 use parts::drive::{self, Disk, Part};
@@ -31,8 +32,9 @@ pub fn claim() -> Result<Working> {
     }
 }
 
-fn run(mut journal: Journal, key: Option<&Secret>) -> Result<()> {
+fn run(mut journal: Journal, key: Option<&Secret>, before: impl Fn(&Step)) -> Result<()> {
     while let Some(step) = journal.steps.get(journal.next) {
+        before(step);
         eprintln!("Changing Luft's partition: {step:?}");
         if let Err(error) = steps::run(&journal.drive, step, key) {
             journal.attempts += 1;
@@ -76,7 +78,25 @@ fn requested() -> Result<Option<Journal>> {
     planned.context("Luft didn't change its size")
 }
 
+fn let_people_in_after_startup(step: &Step) {
+    if !matches!(step, Step::MoveStartup { .. }) {
+        let_people_in();
+    }
+}
+
+fn let_people_in() {
+    if let Err(error) = notify::ready() {
+        eprintln!("Luft couldn't let people sign in yet: {error:#}");
+    }
+}
+
 pub fn continue_at_start() -> Result<()> {
+    let carried_on = carry_on();
+    let_people_in();
+    carried_on
+}
+
+fn carry_on() -> Result<()> {
     if let Err(error) = super::moving::at_start() {
         eprintln!("Luft couldn't take back an unfinished move: {error:#}");
     }
@@ -89,7 +109,7 @@ pub fn continue_at_start() -> Result<()> {
     }
     let key = halves::system_key(&Secret::default()).ok().flatten();
     while let Some(journal) = Journal::load().map_or_else(requested, |journal| Ok(Some(journal)))? {
-        run(journal, key.as_ref())?;
+        run(journal, key.as_ref(), let_people_in_after_startup)?;
     }
     Ok(())
 }
@@ -127,6 +147,18 @@ pub fn grow_at_start() -> Result<()> {
     })
 }
 
+pub enum Resize {
+    Waiting(Change),
+    Underway,
+}
+
+pub fn resize_state(disk: &SystemDisk) -> Option<Resize> {
+    if Journal::load().is_some() {
+        return Some(Resize::Underway);
+    }
+    waiting(disk).map(Resize::Waiting)
+}
+
 pub fn waiting(disk: &SystemDisk) -> Option<Change> {
     let request = requests::windows::waiting()?;
     (blocks::partuuid(&disk.partition)? == request.partition).then_some(request.change)
@@ -159,7 +191,7 @@ fn change_in_place(
     };
     let journal = Journal::new(disk.id.clone(), vec![step]);
     journal.save()?;
-    if let Err(error) = run(journal, key.as_ref()) {
+    if let Err(error) = run(journal, key.as_ref(), |_| {}) {
         Journal::finish();
         return Err(error);
     }

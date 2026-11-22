@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, ensure};
 use luft_meet::resize::STARTUP_TYPE;
 
-use super::drive::{self, Disk};
+use super::drive::{self, Disk, Part};
 use crate::disk::layout::plan::Span;
 use crate::paths;
 use crate::system::host::blocks;
@@ -30,10 +30,22 @@ impl Drop for Mounted {
     }
 }
 
-pub fn copy(disk: &Disk, from: Span, to: Span) -> Result<()> {
-    let Some(old) = disk.at(from.offset) else {
-        return Ok(());
-    };
+pub fn move_to(disk: &Disk, from: Span, to: Span, uuid: &str) -> Result<()> {
+    if let Some(old) = disk.at(from.offset) {
+        copy(disk, old, to)?;
+        old.delete()?;
+    }
+    let disk = drive::read(&disk.id)?;
+    ensure!(
+        disk.at(from.offset).is_none(),
+        "The old startup partition is still in use, so it goes at the next start"
+    );
+    disk.at(to.offset)
+        .context("Luft's new startup partition disappeared")?
+        .set_uuid(uuid)
+}
+
+fn copy(disk: &Disk, old: &Part, to: Span) -> Result<()> {
     if disk.at(to.offset).is_none() {
         disk.create(to, STARTUP_TYPE, NAME)?;
     }

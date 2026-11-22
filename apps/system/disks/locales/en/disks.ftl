@@ -34,6 +34,7 @@ disks-drive-eject = Eject
 disks-partitions = Partitions
 disks-no-partitions = No partitions
 disks-free-luft-waiting = { $size }, Luft moves in at the next start
+disks-free-luft-underway = { $size }, Luft finishes changing its partition at the next start
 # Cancels giving this free space to Luft at the next start.
 disks-free-keep = Keep it free
 disks-free-give-luft = Give to Luft

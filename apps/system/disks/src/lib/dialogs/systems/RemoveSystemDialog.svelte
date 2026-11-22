@@ -37,7 +37,7 @@
 
 	let steps = $derived([...plannedSteps(system), ...(growStarted ? [growStep()] : [])]);
 	let drive = $derived(disks.drives.find((candidate) => candidate.id === (removed?.drive ?? system.drive)) ?? null);
-	let room = $derived(drive && removed?.free ? luftRoom(drive, removed.free.offset) : null);
+	let room = $derived(drive && removed?.free && disks.protection.systemResize !== 'underway' ? luftRoom(drive, removed.free.offset) : null);
 	let canOpen = $derived(Boolean(system.folder || system.files));
 	let holdsFiles = $derived(system.parts.length > 0 || system.kept !== null);
 	let title = $derived(

@@ -95,7 +95,7 @@ fn forget_start_entry(number: u16) -> Result<()> {
 pub fn run(drive: &str, step: &Step, key: Option<&Secret>) -> Result<()> {
     let disk = drive::read(drive)?;
     match step {
-        Step::CopyStartup { from, to } => startup::copy(&disk, *from, *to),
+        Step::MoveStartup { from, to, uuid } => startup::move_to(&disk, *from, *to, uuid),
         Step::Shrink { at, size } => shrink(&disk, *at, *size, key),
         Step::Create { at, size } if disk.at(*at).is_none() => disk.create(
             Span {

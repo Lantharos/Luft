@@ -35,7 +35,7 @@ schelf remove tailscale
 dnf install libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
 ```
 
-Luft downloads the packages and what they need, checks the signature on every one against Fedora's keys or those of the source it came from, and adds them to the system without changing Luft itself, so their commands work right away and their services start now and with every start after. Schelf lists them under Installed, Packages, where they can be removed too.
+Luft downloads the packages and what they need, checks the signature on every one against Fedora's keys or those of the source it came from, and adds them to the system without changing Luft itself, so their commands work right away and their services start now and with every start after. Schelf lists them under Installed, Packages, where they can be removed too. Opening a package's page in Schelf already starts downloading it, unless the connection is metered.
 
 - **Apps come with what they recommend**, as on any Fedora, such as `unpaper` for cleaning up scans in gscan2pdf, and are in Gust as soon as they're installed.
 - **Schelf says when an app can't start.** If an app closes right after you open it, Schelf tells you why. When it's missing a library or a program that a package has, Schelf offers to add that package.

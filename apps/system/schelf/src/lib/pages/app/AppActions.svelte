@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import type { CatalogApp, InstalledApp, Job, Permissions, StoreDetails } from '#lib/bindings.js';
+	import { commands, type CatalogApp, type InstalledApp, type Job, type Permissions, type StoreDetails } from '#lib/bindings.js';
 	import type { Access } from '#lib/app/permissions.js';
 	import { broadAccess } from '#lib/catalog/flathub.js';
 	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
@@ -37,6 +37,11 @@
 	const operation = $derived((installed && operations.forKey(installed.key)) || (listingKey && operations.forKey(listingKey)) || null);
 	const active = $derived(operation && operation.state !== 'failed' ? operation : null);
 	const update = $derived(installed ? library.update(installed.key) : null);
+	const systemPackage = $derived(listing?.origin === 'fedora' && !installed && policy.installs(listing.origin) ? (listing.package ?? listing.id) : null);
+
+	$effect(() => {
+		if (systemPackage) commands.systemPackagesPrepare({ packages: [systemPackage] }).catch(() => {});
+	});
 
 	function run(key: string, job: Job) {
 		if (operation?.state === 'failed') void operations.cancel(operation.id);

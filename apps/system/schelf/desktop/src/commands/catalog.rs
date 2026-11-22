@@ -1,5 +1,6 @@
-use luft_app::Commands;
+use luft_app::{Commands, block_on};
 use luft_software::system::catalog::Repositories;
+use luft_software::system::system_packages;
 use sabine::SabineWindow;
 use schelf_core::catalog::{fedora, flathub, packages};
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,11 @@ struct Query {
 #[derive(Deserialize, Type)]
 struct Package {
     package: String,
+}
+
+#[derive(Deserialize, Type)]
+struct Packages {
+    packages: Vec<String>,
 }
 
 /// A package's page, from Fedora or the software source it's in.
@@ -56,5 +62,8 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("fedora_details", fedora_details)
         .command("packages_search", |Query { query }| {
             packages::search(&query)
+        })
+        .command("system_packages_prepare", |Packages { packages }| {
+            block_on(system_packages::prepare(&packages))
         })
 }

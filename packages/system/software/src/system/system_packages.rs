@@ -161,6 +161,17 @@ async fn rebuild<B: Serialize + DynamicType>(
     }
 }
 
+/// Has the service download what installing the packages would, while someone decides, so the
+/// install starts with everything in place. Returns at once, and never asks for a password.
+pub async fn prepare(names: &[String]) -> Result<(), String> {
+    PACKAGES
+        .proxy()
+        .await?
+        .call::<_, _, ()>("Prepare", &(names,))
+        .await
+        .map_err(|error| dbus::explain(&error))
+}
+
 /// Adds packages to the system. Returns once the running system has them, with their
 /// services started.
 pub async fn install(names: &[String], task: Task<'_>) -> Result<(), String> {

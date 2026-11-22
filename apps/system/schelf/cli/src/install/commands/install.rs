@@ -1,4 +1,6 @@
+use luft_dbus::runtime::block_on;
 use luft_i18n::t;
+use luft_software::system::system_packages;
 use schelf_core::operations::Job;
 
 use super::{catalog, confirm, either_of, list_of, pick};
@@ -226,6 +228,15 @@ fn together(plans: Vec<Plan>) -> Vec<Plan> {
     others
 }
 
+/// Has the system packages downloaded while the question is open.
+fn download_ahead(plans: &[Plan]) {
+    for plan in plans {
+        if let Job::InstallSystemPackages { packages } = &plan.request.job {
+            let _ = block_on(system_packages::prepare(packages));
+        }
+    }
+}
+
 pub fn run(arguments: &Arguments) -> Exit {
     let only = match catalog(arguments.only) {
         Ok(only) => only,
@@ -250,6 +261,7 @@ pub fn run(arguments: &Arguments) -> Exit {
     }
     let plans = together(plans);
     if asks {
+        download_ahead(&plans);
         let names: Vec<String> = plans.iter().map(|plan| plan.name().to_owned()).collect();
         let question = t!(L10N, "cli-install-confirm", names = list_of(&names));
         if let Err(exit) = confirm(&question, arguments.yes) {

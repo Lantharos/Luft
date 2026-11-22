@@ -252,6 +252,9 @@ export const commands = {
 		query: string,
 	}, options?: CallOptions) => invoke<CatalogApp[]>("store_search", params, options),
 	storeState: (options?: CallOptions) => invoke<StoreState>("store_state", {}, options),
+	systemPackagesPrepare: (params: {
+		packages: string[],
+	}, options?: CallOptions) => invoke<null>("system_packages_prepare", params, options),
 	updatesCheck: (options?: CallOptions) => invoke<Updates>("updates_check", {}, options),
 };
 

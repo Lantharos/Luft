@@ -16,6 +16,7 @@ pub struct App {
     pub identity: Identity,
     pub computer_name: String,
     pub config: watch::Sender<Config>,
+    pub decided: watch::Sender<Option<Visibility>>,
     pub home_interfaces: watch::Sender<HashSet<String>>,
     pub devices: Devices,
     pub link: Link,
@@ -38,6 +39,7 @@ impl App {
             identity,
             computer_name,
             config: watch::Sender::new(Config::default()),
+            decided: watch::Sender::new(luft_policy::Policy::load().nearby_sharing.visible_to.map(Visibility::from)),
             home_interfaces: watch::Sender::default(),
             devices: Devices::new(),
             link,
@@ -51,10 +53,10 @@ impl App {
     pub fn configure(&self, config: Config) {
         let alias = config.alias(&self.computer_name);
         let renamed = alias != self.config.borrow().alias(&self.computer_name);
-        let opened = config.visibility != self.config.borrow().visibility;
+        let visible = self.visibility();
         self.link.send(Event::Ready { alias, folder: config.folder() });
         self.config.send_replace(config);
-        if renamed || opened {
+        if renamed || visible != self.visibility() {
             self.scans.notify_one();
         }
     }
@@ -74,8 +76,17 @@ impl App {
         Presence { info: self.info(), port: PORT, protocol: Scheme::Https, announce }
     }
 
+    /// Who can find this computer: what the policy decides, or else what the person chose.
     pub fn visibility(&self) -> Visibility {
-        self.config.borrow().visibility
+        self.decided.borrow().unwrap_or(self.config.borrow().visibility)
+    }
+
+    pub fn decide(&self, decided: Option<Visibility>) {
+        let visible = self.visibility();
+        self.decided.send_replace(decided);
+        if visible != self.visibility() {
+            self.scans.notify_one();
+        }
     }
 
     pub fn trusts(&self, fingerprint: &str) -> bool {

@@ -10,6 +10,16 @@ pub enum Visibility {
     Everyone,
 }
 
+impl From<luft_policy::Visibility> for Visibility {
+    fn from(visibility: luft_policy::Visibility) -> Self {
+        match visibility {
+            luft_policy::Visibility::NoOne => Self::NoOne,
+            luft_policy::Visibility::YourDevices => Self::YourDevices,
+            luft_policy::Visibility::Everyone => Self::Everyone,
+        }
+    }
+}
+
 impl Visibility {
     pub fn parse(name: &str) -> Option<Self> {
         match name {

@@ -19,6 +19,7 @@ jiff.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
+luft-policy = { workspace = true, features = ["follow"] }
 nix = { workspace = true, features = ["fs", "net"] }
 rcgen = { workspace = true, features = ["crypto", "ring"] }
 rustls = { workspace = true, features = ["ring", "std", "tls12"] }

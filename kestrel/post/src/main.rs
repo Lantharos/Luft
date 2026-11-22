@@ -52,10 +52,25 @@ async fn run(identity: Identity) -> zbus::Result<()> {
     tokio::spawn(localsend::server::run(app.clone()));
     tokio::spawn(localsend::discovery::run(app.clone()));
     tokio::spawn(show_devices(app.clone()));
+    tokio::spawn(follow_policy(app.clone()));
     if let Some(system) = system {
         tokio::spawn(firewall::run(app, system));
     }
     std::future::pending().await
+}
+
+async fn follow_policy(app: Arc<App>) {
+    if let Err(error) = follow(&app).await {
+        eprintln!("kestrel-post: stopped following the policy: {error}");
+    }
+}
+
+async fn follow(app: &App) -> std::io::Result<()> {
+    let mut policy = luft_policy::Follow::start()?;
+    loop {
+        let decided = policy.changed().await?.nearby_sharing.visible_to;
+        app.decide(decided.map(Into::into));
+    }
 }
 
 async fn show_devices(app: Arc<App>) {

@@ -19,6 +19,7 @@ pub async fn run(app: Arc<App>, system: Connection) {
     let Ok(firewall) = properties(&system).await else { return };
     let Ok(mut networks) = firewall.receive_properties_changed().await else { return };
     let mut changes = app.config.subscribe();
+    let mut decided = app.decided.subscribe();
     let mut told = None;
     loop {
         let home = home_interfaces(&firewall).await.unwrap_or_default();
@@ -35,6 +36,7 @@ pub async fn run(app: Arc<App>, system: Connection) {
         }
         tokio::select! {
             changed = changes.changed() => if changed.is_err() { return },
+            changed = decided.changed() => if changed.is_err() { return },
             restarted = restarts.next() => match restarted {
                 Some(_) => told = None,
                 None => return,

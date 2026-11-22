@@ -148,16 +148,30 @@ async fn serve() -> anyhow::Result<()> {
         )
         .await?;
     session.request_name(NAME).await?;
+    let mut policy = luft_policy::Follow::start()?;
+    decide(&service, policy.current());
     let network = Network::watch(&system).await?;
     tokio::spawn(follow_collector(system, service.clone(), session.clone()));
-    tokio::spawn(send(service, network, session));
+    tokio::spawn(send(service.clone(), network, session.clone()));
     let mut terminate = signal(SignalKind::terminate())?;
     let mut interrupt = signal(SignalKind::interrupt())?;
-    tokio::select! {
-        _ = terminate.recv() => {}
-        _ = interrupt.recv() => {}
+    loop {
+        tokio::select! {
+            _ = terminate.recv() => return Ok(()),
+            _ = interrupt.recv() => return Ok(()),
+            changed = policy.changed() => {
+                decide(&service, changed?);
+                announce(&session).await?;
+            }
+        }
     }
-    Ok(())
+}
+
+fn decide(service: &Service, policy: &luft_policy::Policy) {
+    service
+        .state()
+        .decide(policy.crash_reports.send.map(Into::into));
+    service.wake.notify_one();
 }
 
 fn main() -> anyhow::Result<()> {

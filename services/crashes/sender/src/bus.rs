@@ -123,6 +123,9 @@ impl Reports {
         choice: String,
     ) -> fdo::Result<()> {
         from_you(connection, &header).await?;
+        if self.service.state().is_decided() {
+            return Err(fdo::Error::AccessDenied(luft_policy::MANAGED.into()));
+        }
         let choice = Choice::parse(&choice)
             .ok_or_else(|| fdo::Error::InvalidArgs("Choose ask, always or never.".into()))?;
         self.service.state().choose(choice);

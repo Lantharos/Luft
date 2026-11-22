@@ -6,6 +6,7 @@
 use std::path::{Path, PathBuf};
 
 use luft_crash_report::{Body, Crash, Sent};
+use luft_policy::CrashReportSending;
 use serde::{Deserialize, Serialize};
 
 const FOLDER: &str = "luft-crash-reports";
@@ -19,6 +20,15 @@ pub enum Choice {
     Ask,
     Always,
     Never,
+}
+
+impl From<CrashReportSending> for Choice {
+    fn from(sending: CrashReportSending) -> Self {
+        match sending {
+            CrashReportSending::Always => Self::Always,
+            CrashReportSending::Never => Self::Never,
+        }
+    }
 }
 
 impl Choice {
@@ -49,6 +59,7 @@ struct Saved {
 pub struct State {
     path: PathBuf,
     saved: Saved,
+    decided: Option<Choice>,
     next_install: String,
 }
 
@@ -82,6 +93,7 @@ impl State {
         Self {
             path,
             saved,
+            decided: None,
             next_install: new_install(),
         }
     }
@@ -100,8 +112,13 @@ impl State {
         }
     }
 
+    /// What happens to new crashes: what the policy decides, or else the person's choice.
     pub fn choice(&self) -> Choice {
-        self.saved.choice
+        self.decided.unwrap_or(self.saved.choice)
+    }
+
+    pub fn is_decided(&self) -> bool {
+        self.decided.is_some()
     }
 
     pub fn waiting(&self) -> Option<&Crash> {
@@ -126,7 +143,7 @@ impl State {
                 continue;
             }
             self.saved.asked.push(key);
-            match self.saved.choice {
+            match self.choice() {
                 Choice::Ask => self.saved.waiting.push(crash),
                 Choice::Always => self.saved.queue.push(crash),
                 Choice::Never => {}
@@ -159,9 +176,23 @@ impl State {
 
     pub fn choose(&mut self, choice: Choice) {
         self.saved.choice = choice;
-        match choice {
+        self.settle();
+    }
+
+    pub fn decide(&mut self, decided: Option<Choice>) {
+        self.decided = decided;
+        self.settle();
+    }
+
+    fn settle(&mut self) {
+        match self.choice() {
             Choice::Always => self.saved.queue.append(&mut self.saved.waiting),
-            Choice::Never => self.saved.waiting.clear(),
+            Choice::Never => {
+                self.saved.waiting.clear();
+                if self.decided.is_some() {
+                    self.saved.queue.clear();
+                }
+            }
             Choice::Ask => {}
         }
         self.save();
@@ -269,5 +300,20 @@ mod tests {
             .map(|crash| crash.report.signature.as_str())
             .collect();
         assert_eq!(queued, ["c"]);
+    }
+
+    #[test]
+    fn a_decided_never_drops_everything_and_the_choice_returns_after() {
+        let folder = tempfile::tempdir().unwrap();
+        let mut state = State::open(folder.path());
+        state.choose(Choice::Always);
+        state.take(vec![crash("a", 1000)], "1.2-nightly.21", 1000);
+        state.decide(Some(Choice::Never));
+        assert_eq!(state.choice(), Choice::Never);
+        assert!(state.queue().is_empty());
+        state.take(vec![crash("b", 1001)], "1.2-nightly.21", 1001);
+        assert!(state.queue().is_empty() && state.waiting().is_none());
+        state.decide(None);
+        assert_eq!(state.choice(), Choice::Always);
     }
 }

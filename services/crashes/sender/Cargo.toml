@@ -16,6 +16,7 @@ luft-crash-report.workspace = true
 luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
+luft-policy = { workspace = true, features = ["follow"] }
 serde.workspace = true
 serde_json.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "signal", "sync", "time"] }

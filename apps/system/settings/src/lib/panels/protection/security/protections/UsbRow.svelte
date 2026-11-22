@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import Usb from '@lucide/svelte/icons/usb';
+	import ShieldCheck from '@luft/symbols/icons/shield-check';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, Row, Select } from '@luft/ui';
 	import type { UsbMode, UsbProtection } from '#lib/bindings.js';

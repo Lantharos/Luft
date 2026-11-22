@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
+	import LockKeyhole from '@luft/symbols/icons/lock-keyhole';
 	import { t } from '@luft/i18n';
 	import { errorText, Row } from '@luft/ui';
 	import type { Disk } from '#lib/bindings.js';

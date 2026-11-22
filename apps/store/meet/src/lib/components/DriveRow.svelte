@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Usb from '@luft/symbols/icons/usb';
 
 	interface Props {
 		icon?: Component<{ size?: number }>;

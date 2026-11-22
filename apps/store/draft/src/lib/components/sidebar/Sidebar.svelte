@@ -1,6 +1,6 @@
 <script lang="ts">
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import Search from '@lucide/svelte/icons/search';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
+	import Search from '@luft/symbols/icons/search';
 	import { t } from '@luft/i18n';
 	import { useApp } from '#lib/app/context.js';
 	import { keyNames } from '#lib/commands/keys.js';

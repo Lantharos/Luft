@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends string | number">
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { t } from '@luft/i18n';
 	import Popover from '../menus/Popover.svelte';
 

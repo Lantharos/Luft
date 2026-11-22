@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Cable from '@lucide/svelte/icons/cable';
+	import Cable from '@luft/symbols/icons/cable';
 	import { t } from '@luft/i18n';
 	import { Spinner, Switch } from '@luft/ui';
 	import { needsPassword, type Network, type WifiNetwork } from '@luft/network';

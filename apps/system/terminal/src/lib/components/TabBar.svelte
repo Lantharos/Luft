@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { WindowControls, tooltip } from '@luft/ui';
-	import Plus from '@lucide/svelte/icons/plus';
-	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
-	import X from '@lucide/svelte/icons/x';
+	import Plus from '@luft/symbols/icons/plus';
+	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
+	import X from '@luft/symbols/icons/x';
 	import type { Tab } from '#lib/workspace/tab.svelte.js';
 	import type { Workspace } from '#lib/workspace/workspace.svelte.js';
 

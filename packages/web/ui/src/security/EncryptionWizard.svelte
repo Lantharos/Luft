@@ -10,8 +10,8 @@
 
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import CircleAlert from '@luft/symbols/icons/circle-alert';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
 	import { t } from '@luft/i18n';
 	import Dialog from '../dialogs/Dialog.svelte';
 	import Spinner from '../notices/Spinner.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Mic from '@lucide/svelte/icons/mic';
-	import MicOff from '@lucide/svelte/icons/mic-off';
+	import Mic from '@luft/symbols/icons/mic';
+	import MicOff from '@luft/symbols/icons/mic-off';
 	import { Select, Slider, Switch, tooltip } from '@luft/ui';
 	import { t } from '@luft/i18n';
 	import { app } from '#lib/state/app.svelte.js';

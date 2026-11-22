@@ -1,5 +1,5 @@
 <script lang="ts">
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { ago, ConfirmDialog, errorText, IconButton, ProgressBar, Row, Section, Segmented, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

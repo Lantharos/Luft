@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import MonitorUp from '@lucide/svelte/icons/monitor-up';
+	import MonitorUp from '@luft/symbols/icons/monitor-up';
 	import { t } from '@luft/i18n';
 	import { ago, AppIcon, ConfirmDialog, ItemRow, Section } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, PageStack, TitleBar, Toast } from '@luft/ui';
 	import AccessNotice from '#lib/account/AccessNotice.svelte';
 	import AccountDialog from '#lib/account/AccountDialog.svelte';

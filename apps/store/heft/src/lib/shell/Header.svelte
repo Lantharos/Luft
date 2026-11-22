@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
-	import Settings from '@lucide/svelte/icons/settings-2';
+	import Settings from '@luft/symbols/icons/settings-2';
 	import { t } from '@luft/i18n';
 	import { IconButton, WindowControls } from '@luft/ui';
 	import SettingsDialog from '#lib/settings/SettingsDialog.svelte';

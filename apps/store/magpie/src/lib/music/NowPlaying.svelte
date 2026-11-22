@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
 	import { library } from '#lib/library/library.svelte.js';
 	import Artwork from './Artwork.svelte';
 	import { player } from './player.svelte';

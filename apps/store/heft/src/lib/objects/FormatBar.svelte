@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Bold from '@lucide/svelte/icons/bold';
-	import Heading from '@lucide/svelte/icons/heading';
-	import List from '@lucide/svelte/icons/list';
-	import ListOrdered from '@lucide/svelte/icons/list-ordered';
+	import Bold from '@luft/symbols/icons/bold';
+	import Heading from '@luft/symbols/icons/heading';
+	import List from '@luft/symbols/icons/list';
+	import ListOrdered from '@luft/symbols/icons/list-ordered';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { Dialog, SearchField } from '@luft/ui';
 	import type { Source } from './sources';
 

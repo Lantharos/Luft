@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import X from '@lucide/svelte/icons/x';
+	import Check from '@luft/symbols/icons/check';
+	import X from '@luft/symbols/icons/x';
 	import type { PlannedStep } from '#lib/systems.js';
 	import { Spinner } from '@luft/ui';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { t } from '@luft/i18n';
 	import { ContextMenu, date, MenuItem, MenuSeparator, Segmented } from '@luft/ui';
 	import { draggable, dropTarget } from '#lib/drag/drag.svelte.js';

@@ -2,11 +2,11 @@
 	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { SearchField, tooltip } from '@luft/ui';
-	import CaseSensitive from '@lucide/svelte/icons/case-sensitive';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import Regex from '@lucide/svelte/icons/regex';
-	import X from '@lucide/svelte/icons/x';
+	import CaseSensitive from '@luft/symbols/icons/case-sensitive';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
+	import ChevronUp from '@luft/symbols/icons/chevron-up';
+	import Regex from '@luft/symbols/icons/regex';
+	import X from '@luft/symbols/icons/x';
 	import type { ISearchOptions } from '@xterm/addon-search';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import { withAlpha } from '#lib/terminal/palette.js';

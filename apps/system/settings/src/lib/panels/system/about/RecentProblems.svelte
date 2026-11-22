@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import MonitorX from '@lucide/svelte/icons/monitor-x';
+	import MonitorX from '@luft/symbols/icons/monitor-x';
 	import { ActionRow, Dialog, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Problem } from '#lib/bindings.js';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import LayoutPanelLeft from '@lucide/svelte/icons/layout-panel-left';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import LayoutPanelLeft from '@luft/symbols/icons/layout-panel-left';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, SplitBar } from '@luft/ui';
 	import DriveRow from '#lib/components/DriveRow.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyEditor from './DeadKeyEditor.svelte';
 	import DeadKeyList from './DeadKeyList.svelte';

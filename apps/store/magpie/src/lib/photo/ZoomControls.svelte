@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import Expand from '@lucide/svelte/icons/expand';
-	import Minus from '@lucide/svelte/icons/minus';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Shrink from '@lucide/svelte/icons/shrink';
+	import Expand from '@luft/symbols/icons/expand';
+	import Minus from '@luft/symbols/icons/minus';
+	import Plus from '@luft/symbols/icons/plus';
+	import Shrink from '@luft/symbols/icons/shrink';
 	import type { Viewport } from './render/viewport.svelte';
 
 	let { viewport }: { viewport: Viewport } = $props();

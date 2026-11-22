@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Check from '@lucide/svelte/icons/check';
-	import X from '@lucide/svelte/icons/x';
+	import Check from '@luft/symbols/icons/check';
+	import X from '@luft/symbols/icons/x';
 	import { percent } from '#lib/format.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { Spinner } from '@luft/ui';

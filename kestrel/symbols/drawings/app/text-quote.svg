@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<path d="M2.4 3v10" fill="none" stroke-width="1.8"/>
+	</g>
+	<g class="shade">
+		<path d="M6 4h7.6M6 8h7.6M6 12h4.8" fill="none" stroke-width="1.8"/>
+	</g>
+</svg>

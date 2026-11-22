@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { bytes, Dialog } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { ChosenImage } from '#lib/bindings.js';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Lock from '@lucide/svelte/icons/lock';
-	import Settings from '@lucide/svelte/icons/settings';
+	import Lock from '@luft/symbols/icons/lock';
+	import Settings from '@luft/symbols/icons/settings';
 	import { t } from '@luft/i18n';
 	import { ActionRow, IconButton, Row, Section, Spinner } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';

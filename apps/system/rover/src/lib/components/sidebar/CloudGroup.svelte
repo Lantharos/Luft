@@ -1,10 +1,10 @@
 <script lang="ts">
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
-	import Cloud from '@lucide/svelte/icons/cloud';
-	import CloudOff from '@lucide/svelte/icons/cloud-off';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Plus from '@lucide/svelte/icons/plus';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import CircleAlert from '@luft/symbols/icons/circle-alert';
+	import Cloud from '@luft/symbols/icons/cloud';
+	import CloudOff from '@luft/symbols/icons/cloud-off';
+	import Pause from '@luft/symbols/icons/pause';
+	import Plus from '@luft/symbols/icons/plus';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { t } from '@luft/i18n';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';

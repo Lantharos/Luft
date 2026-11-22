@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
 	import type { Component } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { t } from '@luft/i18n';
 	import { SearchField, topLayer } from '@luft/ui';
 

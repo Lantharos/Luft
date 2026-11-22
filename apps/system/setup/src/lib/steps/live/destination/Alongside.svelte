@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import TriangleAlert from '@luft/symbols/icons/triangle-alert';
 	import { t } from '@luft/i18n';
 	import { SplitBar } from '@luft/ui';
 	import type { Drive, WindowsVolume } from '#lib/bindings.js';

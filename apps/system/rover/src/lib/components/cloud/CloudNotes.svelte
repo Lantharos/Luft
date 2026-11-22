@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Copy from '@lucide/svelte/icons/copy';
+	import Copy from '@luft/symbols/icons/copy';
 	import { t } from '@luft/i18n';
 	import { basename } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ImageOff from '@lucide/svelte/icons/image-off';
+	import ImageOff from '@luft/symbols/icons/image-off';
 	import type { ClassValue } from 'svelte/elements';
 	import { t } from '@luft/i18n';
 

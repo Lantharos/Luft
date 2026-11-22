@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { t } from '@luft/i18n';
-	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
 	import { Popover, Select, Switch, TextField, tooltip } from '@luft/ui';
 	import { renamePartition, retype, setFlag } from '#lib/editor/edits.js';
 	import type { Layout, Part } from '#lib/editor/model.js';

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import ChevronsDownUp from '@lucide/svelte/icons/chevrons-down-up';
-	import File from '@lucide/svelte/icons/file';
-	import Folder from '@lucide/svelte/icons/folder';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import ChevronsDownUp from '@luft/symbols/icons/chevrons-down-up';
+	import File from '@luft/symbols/icons/file';
+	import Folder from '@luft/symbols/icons/folder';
 	import { t } from '@luft/i18n';
 	import { basename, fileDragStart, tooltip, VirtualScroller } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';

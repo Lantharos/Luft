@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { fade } from '@luft/ui';
 	import { t } from '@luft/i18n';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import X from '@lucide/svelte/icons/x';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import X from '@luft/symbols/icons/x';
 	import type { Screenshot } from '#lib/catalog/types.js';
 
 	let { screenshots }: { screenshots: Screenshot[] } = $props();

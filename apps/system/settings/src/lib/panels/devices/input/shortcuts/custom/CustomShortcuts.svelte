@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import { Row, Section } from '@luft/ui';
 	import CustomDialog from './CustomDialog.svelte';
 	import Keys from '../keys/Keys.svelte';

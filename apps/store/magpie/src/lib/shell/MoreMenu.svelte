@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import type { Snippet } from 'svelte';
 	import { send, showInFolder } from '#lib/bridge/index.js';
 	import { openFile } from '#lib/app/actions.js';

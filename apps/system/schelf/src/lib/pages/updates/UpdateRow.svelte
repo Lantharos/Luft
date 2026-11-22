@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Layers from '@lucide/svelte/icons/layers';
+	import Layers from '@luft/symbols/icons/layers';
 	import { bytes } from '@luft/ui';
 	import type { AppUpdate } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';

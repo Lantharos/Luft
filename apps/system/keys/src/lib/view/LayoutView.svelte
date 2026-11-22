@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { MenuButton } from '@luft/ui';
 	import { PHYSICAL, TYPING } from '#lib/keyboard/geometry.js';
 	import Keyboard from '#lib/keyboard/Keyboard.svelte';

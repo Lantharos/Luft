@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { SearchField, Segmented } from '@luft/ui';
-	import List from '@lucide/svelte/icons/list';
-	import ListTree from '@lucide/svelte/icons/list-tree';
+	import List from '@luft/symbols/icons/list';
+	import ListTree from '@luft/symbols/icons/list-tree';
 	import { tick, untrack } from 'svelte';
 	import Header from '#lib/shell/Header.svelte';
 	import { entries } from '#lib/state/entries.svelte.js';

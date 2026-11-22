@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { menu as sabineMenu, spellcheck, type MenuContext, type MenuRole } from '@lantharos/sabine';
-	import BookPlus from '@lucide/svelte/icons/book-plus';
-	import ClipboardPaste from '@lucide/svelte/icons/clipboard-paste';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Redo2 from '@lucide/svelte/icons/redo-2';
-	import Scissors from '@lucide/svelte/icons/scissors';
-	import SquareDashedText from '@lucide/svelte/icons/square-dashed-text';
-	import Undo2 from '@lucide/svelte/icons/undo-2';
+	import BookPlus from '@luft/symbols/icons/book-plus';
+	import ClipboardPaste from '@luft/symbols/icons/clipboard-paste';
+	import Copy from '@luft/symbols/icons/copy';
+	import Redo2 from '@luft/symbols/icons/redo-2';
+	import Scissors from '@luft/symbols/icons/scissors';
+	import SquareDashedText from '@luft/symbols/icons/square-dashed-text';
+	import Undo2 from '@luft/symbols/icons/undo-2';
 	import { t } from '@luft/i18n';
 	import ContextMenu from './ContextMenu.svelte';
 	import { editorSelectsAll, rememberFocus } from './editing';

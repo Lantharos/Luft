@@ -1,7 +1,7 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Usb from '@lucide/svelte/icons/usb';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { Choice } from '@luft/ui';
 	import type { LuftPage } from '#lib/bindings.js';

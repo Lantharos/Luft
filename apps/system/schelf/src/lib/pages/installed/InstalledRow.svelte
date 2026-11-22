@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { bytes, MenuButton, MenuItem } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';

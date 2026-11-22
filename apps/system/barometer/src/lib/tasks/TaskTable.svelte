@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { AppIcon, Spinner, VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import type { Snippet } from 'svelte';
 	import type { Sort } from '#lib/state/settings.svelte.js';
 	import { sharedByGroups, template, type Column } from './columns';

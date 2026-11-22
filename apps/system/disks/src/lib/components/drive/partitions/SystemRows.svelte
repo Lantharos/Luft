@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Monitor from '@lucide/svelte/icons/monitor';
+	import Monitor from '@luft/symbols/icons/monitor';
 	import { Row } from '@luft/ui';
 	import type { OtherSystem } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';

@@ -16,16 +16,16 @@
 </script>
 
 <script lang="ts">
-	import Eraser from '@lucide/svelte/icons/eraser';
-	import FilePlus from '@lucide/svelte/icons/file-plus-2';
-	import ImagePlus from '@lucide/svelte/icons/image-plus';
-	import NotebookText from '@lucide/svelte/icons/notebook-text';
-	import Lasso from '@lucide/svelte/icons/lasso';
-	import Type from '@lucide/svelte/icons/type';
-	import Redo from '@lucide/svelte/icons/redo-2';
-	import RulerIcon from '@lucide/svelte/icons/ruler';
-	import TextSelect from '@lucide/svelte/icons/text-select';
-	import Undo from '@lucide/svelte/icons/undo-2';
+	import Eraser from '@luft/symbols/icons/eraser';
+	import FilePlus from '@luft/symbols/icons/file-plus-2';
+	import ImagePlus from '@luft/symbols/icons/image-plus';
+	import NotebookText from '@luft/symbols/icons/notebook-text';
+	import Lasso from '@luft/symbols/icons/lasso';
+	import Type from '@luft/symbols/icons/type';
+	import Redo from '@luft/symbols/icons/redo-2';
+	import RulerIcon from '@luft/symbols/icons/ruler';
+	import TextSelect from '@luft/symbols/icons/text-select';
+	import Undo from '@luft/symbols/icons/undo-2';
 	import { t } from '@luft/i18n';
 	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip, type Side } from '@luft/ui';
 	import { colorName } from './colors';

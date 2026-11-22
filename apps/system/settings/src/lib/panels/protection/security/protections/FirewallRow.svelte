@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BrickWallShield from '@lucide/svelte/icons/brick-wall-shield';
+	import BrickWallShield from '@luft/symbols/icons/brick-wall-shield';
 	import { t } from '@luft/i18n';
 	import type { Firewall } from '@luft/network';
 	import { Row } from '@luft/ui';

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import Copy from '@lucide/svelte/icons/copy';
-	import KeyRound from '@lucide/svelte/icons/key-round';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Terminal from '@lucide/svelte/icons/terminal';
-	import Trash from '@lucide/svelte/icons/trash';
+	import Check from '@luft/symbols/icons/check';
+	import Copy from '@luft/symbols/icons/copy';
+	import KeyRound from '@luft/symbols/icons/key-round';
+	import Plus from '@luft/symbols/icons/plus';
+	import Terminal from '@luft/symbols/icons/terminal';
+	import Trash from '@luft/symbols/icons/trash';
 	import { t } from '@luft/i18n';
 	import { ago, ConfirmDialog, errorText, IconButton, Row, Section, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import type { ClassValue } from 'svelte/elements';
 	import { t } from '@luft/i18n';
 	import Dialog from '../dialogs/Dialog.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import House from '@lucide/svelte/icons/house';
-	import X from '@lucide/svelte/icons/x';
+	import House from '@luft/symbols/icons/house';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { session } from '#lib/app/session.svelte.js';

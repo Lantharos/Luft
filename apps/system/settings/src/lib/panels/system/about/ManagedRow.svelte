@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Building from '@lucide/svelte/icons/building-2';
+	import Building from '@luft/symbols/icons/building-2';
 	import { t } from '@luft/i18n';
 	import { Dialog, Row, Section } from '@luft/ui';
 	import { policy } from '#lib/state/policy.svelte.js';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { CatalogApp } from '#lib/bindings.js';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import AppArt from './AppArt.svelte';
@@ -16,7 +16,7 @@
 		<span class="name">{app.name}</span>
 		<span class="summary" class:single={installed}>{app.summary}</span>
 		{#if installed}
-			<span class="installed"><Check size={13} strokeWidth={2.5} />{t('tile-installed')}</span>
+			<span class="installed"><Check size={13} />{t('tile-installed')}</span>
 		{/if}
 	</span>
 </button>

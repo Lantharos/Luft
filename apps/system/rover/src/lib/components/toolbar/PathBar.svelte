@@ -1,13 +1,13 @@
 <script lang="ts">
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Clock from '@lucide/svelte/icons/clock';
-	import Folder from '@lucide/svelte/icons/folder';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import House from '@lucide/svelte/icons/house';
-	import Server from '@lucide/svelte/icons/server';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
-	import Trash from '@lucide/svelte/icons/trash';
-	import Usb from '@lucide/svelte/icons/usb';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import Clock from '@luft/symbols/icons/clock';
+	import Folder from '@luft/symbols/icons/folder';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import House from '@luft/symbols/icons/house';
+	import Server from '@luft/symbols/icons/server';
+	import Smartphone from '@luft/symbols/icons/smartphone';
+	import Trash from '@luft/symbols/icons/trash';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { isInside } from '@luft/ui';
 	import { untrack, type Component } from 'svelte';

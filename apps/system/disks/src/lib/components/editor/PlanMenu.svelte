@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { Popover } from '@luft/ui';
 	import { editor } from '#lib/editor/editor.svelte.js';
 

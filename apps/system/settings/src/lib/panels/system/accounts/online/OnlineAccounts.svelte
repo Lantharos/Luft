@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';

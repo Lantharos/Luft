@@ -1,5 +1,5 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
 	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 	import OptionRow from '#lib/components/OptionRow.svelte';

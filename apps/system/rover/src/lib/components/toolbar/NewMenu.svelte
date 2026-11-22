@@ -1,7 +1,7 @@
 <script lang="ts">
-	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import FolderPlus from '@lucide/svelte/icons/folder-plus';
-	import Plus from '@lucide/svelte/icons/plus';
+	import FilePlus from '@luft/symbols/icons/file-plus';
+	import FolderPlus from '@luft/symbols/icons/folder-plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, tooltip } from '@luft/ui';
 	import { shortcutLabel } from '#lib/utils/shortcuts.js';

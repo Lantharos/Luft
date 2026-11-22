@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
 	import { t } from '@luft/i18n';
-	import CloudOff from '@lucide/svelte/icons/cloud-off';
+	import CloudOff from '@luft/symbols/icons/cloud-off';
 	import { problemText } from '../state/act';
 	import type { Resource } from '../state/resource.svelte';
 

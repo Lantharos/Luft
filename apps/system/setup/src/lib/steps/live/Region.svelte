@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Clock from '@lucide/svelte/icons/clock';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import Languages from '@lucide/svelte/icons/languages';
+	import Clock from '@luft/symbols/icons/clock';
+	import Keyboard from '@luft/symbols/icons/keyboard';
+	import Languages from '@luft/symbols/icons/languages';
 	import { i18n, t } from '@luft/i18n';
 	import Picker from '#lib/components/Picker.svelte';
 	import StepFrame from '#lib/components/StepFrame.svelte';

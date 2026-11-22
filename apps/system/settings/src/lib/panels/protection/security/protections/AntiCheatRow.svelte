@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
+	import Gamepad2 from '@luft/symbols/icons/gamepad-2';
 	import { t } from '@luft/i18n';
 	import { errorText, Row, tooltip } from '@luft/ui';
 	import type { AntiCheat, SigningKey } from '#lib/bindings.js';

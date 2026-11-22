@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Clock from '@lucide/svelte/icons/clock';
-	import Trash from '@lucide/svelte/icons/trash';
+	import Clock from '@luft/symbols/icons/clock';
+	import Trash from '@luft/symbols/icons/trash';
 	import { t } from '@luft/i18n';
 	import { isInside, SearchField, selectionPill } from '@luft/ui';
 	import { folderLooks } from '#lib/features/looks/looks.svelte.js';

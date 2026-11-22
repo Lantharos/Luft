@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { basename, bytes, dateTime, parent, relativeDay, tooltip } from '@luft/ui';
-	import File from '@lucide/svelte/icons/file';
-	import Folder from '@lucide/svelte/icons/folder';
+	import File from '@luft/symbols/icons/file';
+	import Folder from '@luft/symbols/icons/folder';
 	import type { ConflictItem } from '#lib/bindings.js';
 
 	interface Props {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
-	import VolumeX from '@lucide/svelte/icons/volume-x';
+	import Volume2 from '@luft/symbols/icons/volume-2';
+	import VolumeX from '@luft/symbols/icons/volume-x';
 	import { Section, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { AppView, DeviceView } from '#lib/bindings.js';

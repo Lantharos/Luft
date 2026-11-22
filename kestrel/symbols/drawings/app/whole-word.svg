@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="4.9" cy="6.6" r="2" fill="none" stroke-width="1.6"/>
+		<path d="M6.9 4.4v4.4M9.1 2v6.8" fill="none" stroke-width="1.6"/>
+		<circle cx="11.1" cy="6.6" r="2" fill="none" stroke-width="1.6"/>
+	</g>
+	<g class="shade">
+		<path d="M2 11.2v1.8c0 .5.4.8.8.8h10.4c.4 0 .8-.3.8-.8v-1.8" fill="none" stroke-width="1.6"/>
+	</g>
+</svg>

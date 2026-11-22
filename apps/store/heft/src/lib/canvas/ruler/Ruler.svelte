@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
 	import { t } from '@luft/i18n';
 	import { MM } from '#lib/library/model.js';
 	import { pen } from '#lib/input/pen.svelte.js';

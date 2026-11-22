@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Volume from '@lucide/svelte/icons/volume';
-	import Volume1 from '@lucide/svelte/icons/volume-1';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
-	import VolumeX from '@lucide/svelte/icons/volume-x';
+	import Volume from '@luft/symbols/icons/volume';
+	import Volume1 from '@luft/symbols/icons/volume-1';
+	import Volume2 from '@luft/symbols/icons/volume-2';
+	import VolumeX from '@luft/symbols/icons/volume-x';
 	import { t } from '@luft/i18n';
 	import Slider from '../controls/Slider.svelte';
 	import { tooltip } from '../menus/tooltip';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Forward from '@lucide/svelte/icons/forward';
-	import Reply from '@lucide/svelte/icons/reply';
-	import ReplyAll from '@lucide/svelte/icons/reply-all';
+	import Forward from '@luft/symbols/icons/forward';
+	import Reply from '@luft/symbols/icons/reply';
+	import ReplyAll from '@luft/symbols/icons/reply-all';
 	import { t } from '@luft/i18n';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import * as actions from '#lib/mail/actions.js';

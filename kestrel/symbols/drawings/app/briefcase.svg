@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<path d="M5.7 4.6V3.5c0-.7.5-1.2 1.2-1.2h2.2c.7 0 1.2.5 1.2 1.2v1.1" fill="none" stroke-width="1.5"/>
+	</g>
+	<g class="ink">
+		<rect x="1.5" y="4.6" width="13" height="9.4" rx="2"/>
+	</g>
+	<g class="cut">
+		<path d="M1 8.6h4.9M10.1 8.6H15" fill="none" stroke-width="1.1"/>
+		<rect x="6.8" y="7.6" width="2.4" height="2.2" rx="0.6"/>
+	</g>
+</svg>

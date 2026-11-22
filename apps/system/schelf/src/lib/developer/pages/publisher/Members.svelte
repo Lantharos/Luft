@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, MenuButton, MenuItem, Row, Section } from '@luft/ui';
 	import { commands, type Role } from '#lib/bindings.js';

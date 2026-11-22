@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import MonitorUp from '@lucide/svelte/icons/monitor-up';
+	import MonitorUp from '@luft/symbols/icons/monitor-up';
 	import { ActionRow, Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';

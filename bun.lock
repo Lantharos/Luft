@@ -20,8 +20,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -46,8 +46,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -66,8 +66,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -87,8 +87,8 @@
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -108,8 +108,8 @@
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -128,8 +128,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -148,8 +148,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -168,8 +168,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -188,8 +188,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -208,8 +208,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -228,8 +228,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -248,8 +248,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -268,8 +268,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -288,10 +288,10 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
         "@luft/network": "workspace:*",
         "@luft/settings-pages": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -310,9 +310,9 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
         "@luft/network": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -331,8 +331,8 @@
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -358,8 +358,8 @@
         "@xterm/xterm": "^6.0.0",
       },
       "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -385,7 +385,11 @@
       "devDependencies": {
         "@types/bun": "^1.4.3",
         "canvaskit-wasm": "0.42.0",
+        "svelte": "^5.57.1",
         "typescript": "7.0.2",
+      },
+      "peerDependencies": {
+        "svelte": "^5.57.1",
       },
     },
     "kestrel/tools": {
@@ -477,10 +481,10 @@
         "@codemirror/language-data": "^6.5.2",
         "@lantharos/sabine": "github:Lantharos/Sabine#v0.107",
         "@lezer/highlight": "^1.2.5",
-        "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
         "@luft/motion": "workspace:*",
         "@luft/recovery-key": "workspace:*",
+        "@luft/symbols": "workspace:*",
         "markdown-it": "^15.0.2",
       },
       "devDependencies": {
@@ -938,8 +942,6 @@
     "@lezer/xml": ["@lezer/xml@1.0.6", "", { "dependencies": { "@lezer/common": "^1.2.0", "@lezer/highlight": "^1.0.0", "@lezer/lr": "^1.0.0" } }, "sha512-CdDwirL0OEaStFue/66ZmFSeppuL6Dwjlk8qk153mSQwiSH/Dlri4GNymrNWnUmPl2Um7QfV1FO9KFUyX3Twww=="],
 
     "@lezer/yaml": ["@lezer/yaml@1.0.4", "", { "dependencies": { "@lezer/common": "^1.2.0", "@lezer/highlight": "^1.0.0", "@lezer/lr": "^1.4.0" } }, "sha512-2lrrHqxalACEbxIbsjhqGpSW8kWpUKuY6RHgnSAFZa6qK62wvnPxA8hGOwOoDbwHcOFs5M4o27mjGu+P7TvBmw=="],
-
-    "@lucide/svelte": ["@lucide/svelte@1.77.0", "", { "peerDependencies": { "svelte": "^5" } }, "sha512-gXjmQ4VK3Mh/M11Nn/XCeln3XZByR4MxX5o+NMfr/Wg9MQs+BffvXTnW+0WvmjV1u58TXJhXvgJZHrMASUnqow=="],
 
     "@luft/app-icons": ["@luft/app-icons@workspace:apps/icons"],
 

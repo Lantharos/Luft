@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="shade">
+		<rect x="1.5" y="1.5" width="13" height="8" rx="2"/>
+	</g>
+	<g class="ink">
+		<rect x="1.5" y="11.1" width="13" height="3.4" rx="1.4"/>
+	</g>
+</svg>

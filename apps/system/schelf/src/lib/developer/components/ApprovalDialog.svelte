@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import X from '@lucide/svelte/icons/x';
+	import Check from '@luft/symbols/icons/check';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { Dialog, Spinner } from '@luft/ui';
 	import { problemText } from '../state/act';

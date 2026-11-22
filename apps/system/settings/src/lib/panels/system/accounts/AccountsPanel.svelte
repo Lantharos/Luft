@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LogIn from '@lucide/svelte/icons/log-in';
+	import LogIn from '@luft/symbols/icons/log-in';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';

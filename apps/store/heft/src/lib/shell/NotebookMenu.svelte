@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem } from '@luft/ui';
 	import { library } from '#lib/library/library.svelte.js';

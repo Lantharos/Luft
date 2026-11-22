@@ -5,6 +5,9 @@ import type { Layer, Shape } from './drawing.js';
 const ck = await CanvasKitInit();
 const TRANSFORM = /(translate|scale|rotate)\(([^)]*)\)/g;
 const MIRROR = [-1, 0, 16, 0, 1, 0, 0, 0, 1];
+const CENTRE = 8;
+const MARGIN = 0.5;
+const MOST_GROWTH = 1.15;
 
 const round = (value: number) => String(Math.round(value * 100) / 100);
 const roundAll = (text: string) => text.replace(/-?\d*\.?\d+(?:e-?\d+)?/g, value => round(Number(value)));
@@ -48,14 +51,25 @@ function painted(shapes: Shape[]) {
 	return result;
 }
 
-function svgPath(path: Path, mirrored: boolean) {
-	if (!mirrored) return roundAll(path.toSVGString());
+function filling(paths: Path[]) {
+	const reach = Math.max(...paths.flatMap(path => {
+		const [left, top, right, bottom] = path.computeTightBounds();
+		return path.isEmpty() ? [] : [CENTRE - left, CENTRE - top, right - CENTRE, bottom - CENTRE];
+	}));
+	const scale = Math.min(MOST_GROWTH, (CENTRE - MARGIN) / reach);
+	return ck.Matrix.multiply(ck.Matrix.translated(CENTRE, CENTRE), ck.Matrix.scaled(scale, scale), ck.Matrix.translated(-CENTRE, -CENTRE));
+}
+
+function svgPath(path: Path, matrix: number[]) {
 	const builder = new ck.PathBuilder(path);
-	builder.transform(MIRROR);
+	builder.transform(matrix);
 	return roundAll(builder.detachAndDelete().toSVGString());
 }
 
 export function layers(shapes: Shape[], mirrored: boolean) {
-	const { ink, shade } = painted(shapes);
-	return { ink: svgPath(ink, mirrored), shade: svgPath(op(shade, ink, ck.PathOp.Difference), mirrored) };
+	const layered = painted(shapes);
+	const { ink } = layered;
+	const shade = op(layered.shade, ink, ck.PathOp.Difference);
+	const matrix = mirrored ? ck.Matrix.multiply(MIRROR, filling([ink, shade])) : filling([ink, shade]);
+	return { ink: svgPath(ink, matrix), shade: svgPath(shade, matrix) };
 }

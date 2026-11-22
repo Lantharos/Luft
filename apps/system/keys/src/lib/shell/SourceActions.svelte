@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { Snippet } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Check from '@luft/symbols/icons/check';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { Dialog, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import { app, type Selection } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';

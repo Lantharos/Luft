@@ -1,12 +1,12 @@
-import Archive from '@lucide/svelte/icons/archive';
-import Code from '@lucide/svelte/icons/code';
-import File from '@lucide/svelte/icons/file';
-import FileText from '@lucide/svelte/icons/file-text';
-import Folder from '@lucide/svelte/icons/folder';
-import Image from '@lucide/svelte/icons/image';
-import Music from '@lucide/svelte/icons/music';
-import Package from '@lucide/svelte/icons/package';
-import Video from '@lucide/svelte/icons/video';
+import Archive from '@luft/symbols/icons/archive';
+import Code from '@luft/symbols/icons/code';
+import File from '@luft/symbols/icons/file';
+import FileText from '@luft/symbols/icons/file-text';
+import Folder from '@luft/symbols/icons/folder';
+import Image from '@luft/symbols/icons/image';
+import Music from '@luft/symbols/icons/music';
+import Package from '@luft/symbols/icons/package';
+import Video from '@luft/symbols/icons/video';
 import type { Component } from 'svelte';
 import type { FileKind } from '#lib/utils/kinds.js';
 

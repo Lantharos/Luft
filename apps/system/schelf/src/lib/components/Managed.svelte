@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Lock from '@lucide/svelte/icons/lock';
+	import Lock from '@luft/symbols/icons/lock';
 	import { t } from '@luft/i18n';
 </script>
 

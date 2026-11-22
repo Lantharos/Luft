@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Globe from '@lucide/svelte/icons/globe';
-	import Network from '@lucide/svelte/icons/network';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Globe from '@luft/symbols/icons/globe';
+	import Network from '@luft/symbols/icons/network';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, SearchField, Spinner, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Lock from '@lucide/svelte/icons/lock';
-	import Wifi from '@lucide/svelte/icons/wifi';
-	import WifiHigh from '@lucide/svelte/icons/wifi-high';
-	import WifiLow from '@lucide/svelte/icons/wifi-low';
+	import Lock from '@luft/symbols/icons/lock';
+	import Wifi from '@luft/symbols/icons/wifi';
+	import WifiHigh from '@luft/symbols/icons/wifi-high';
+	import WifiLow from '@luft/symbols/icons/wifi-low';
 	import { t } from '@luft/i18n';
 	import { PasswordField, Spinner } from '@luft/ui';
 	import { needsPassword, type WifiNetwork } from '@luft/network';

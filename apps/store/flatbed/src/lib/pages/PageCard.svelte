@@ -2,10 +2,10 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import Crop from '@lucide/svelte/icons/crop';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
-	import Trash from '@lucide/svelte/icons/trash-2';
+	import Crop from '@luft/symbols/icons/crop';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
+	import Trash from '@luft/symbols/icons/trash-2';
 	import type { PageView } from '#lib/bindings.js';
 	import { flatbed } from '#lib/app/flatbed.svelte.js';
 

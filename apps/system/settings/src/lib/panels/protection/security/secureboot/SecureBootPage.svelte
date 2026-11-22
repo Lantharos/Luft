@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import ShieldAlert from '@luft/symbols/icons/shield-alert';
+	import ShieldCheck from '@luft/symbols/icons/shield-check';
 	import { t } from '@luft/i18n';
 	import { errorText, Row, Section, Spinner } from '@luft/ui';
 	import type { Trust } from '#lib/bindings.js';

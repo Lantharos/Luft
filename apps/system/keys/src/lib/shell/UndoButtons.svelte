@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Redo2 from '@lucide/svelte/icons/redo-2';
-	import Undo2 from '@lucide/svelte/icons/undo-2';
+	import Redo2 from '@luft/symbols/icons/redo-2';
+	import Undo2 from '@luft/symbols/icons/undo-2';
 	import { IconButton } from '@luft/ui';
 	import { undoShortcuts, type Undoable } from '#lib/state/history.svelte.js';
 

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import Maximize from '@lucide/svelte/icons/maximize-2';
-	import Minimize from '@lucide/svelte/icons/minimize-2';
-	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
+	import ChevronUp from '@luft/symbols/icons/chevron-up';
+	import Maximize from '@luft/symbols/icons/maximize-2';
+	import Minimize from '@luft/symbols/icons/minimize-2';
+	import PanelLeft from '@luft/symbols/icons/panel-left';
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
 	import { arrangement } from '#lib/app/arrangement.svelte.js';

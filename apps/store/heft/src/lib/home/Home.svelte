@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Archive from '@lucide/svelte/icons/archive';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Trash from '@lucide/svelte/icons/trash-2';
+	import Archive from '@luft/symbols/icons/archive';
+	import Plus from '@luft/symbols/icons/plus';
+	import Trash from '@luft/symbols/icons/trash-2';
 	import { t } from '@luft/i18n';
 	import { Dialog, droppedPaths, relativeDay } from '@luft/ui';
 	import { importBooks } from '#lib/pdf/import.js';

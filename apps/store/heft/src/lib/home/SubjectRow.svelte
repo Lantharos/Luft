@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import PenLine from '@lucide/svelte/icons/pen-line';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
+	import PenLine from '@luft/symbols/icons/pen-line';
+	import Plus from '@luft/symbols/icons/plus';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, IconButton, MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
 	import { session } from '#lib/app/session.svelte.js';

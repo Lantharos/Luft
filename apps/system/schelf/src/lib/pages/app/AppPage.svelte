@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
-	import BadgeCheck from '@lucide/svelte/icons/badge-check';
-	import ShieldOff from '@lucide/svelte/icons/shield-off';
+	import BadgeCheck from '@luft/symbols/icons/badge-check';
+	import ShieldOff from '@luft/symbols/icons/shield-off';
 	import { Row, Section } from '@luft/ui';
 	import { abilities } from '#lib/app/extensionAccess.js';
 	import { commands, type Permissions } from '#lib/bindings.js';

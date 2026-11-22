@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Archive from '@lucide/svelte/icons/archive';
-	import Clock from '@lucide/svelte/icons/clock';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Inbox from '@lucide/svelte/icons/inbox';
-	import Mail from '@lucide/svelte/icons/mail';
-	import Star from '@lucide/svelte/icons/star';
-	import Trash from '@lucide/svelte/icons/trash-2';
+	import Archive from '@luft/symbols/icons/archive';
+	import Clock from '@luft/symbols/icons/clock';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
+	import Inbox from '@luft/symbols/icons/inbox';
+	import Mail from '@luft/symbols/icons/mail';
+	import Star from '@luft/symbols/icons/star';
+	import StarOutline from '@luft/symbols/icons/star-outline';
+	import Trash from '@luft/symbols/icons/trash-2';
 	import * as actions from '#lib/mail/actions.js';
 	import { list } from '#lib/mail/list.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
@@ -46,7 +47,7 @@
 		<Clock size={18} />
 	</button>
 	<button type="button" class="icon-button" class:starred aria-label={starred ? t('mailman-actions-remove-star') : t('mailman-actions-star')} onclick={() => void actions.setStar(threads, !starred)} {@attach tooltip(t('mailman-actions-star-tooltip'))}>
-		<Star size={18} />
+		{#if starred}<Star size={18} />{:else}<StarOutline size={18} />{/if}
 	</button>
 	<button type="button" class="icon-button" aria-label={t('mailman-actions-mark-unread')} onclick={() => void actions.setRead(threads, false)} {@attach tooltip(t('mailman-actions-mark-unread-tooltip'))}>
 		<Mail size={18} />
@@ -77,9 +78,5 @@
 <style>
 	.starred {
 		color: var(--accent);
-	}
-
-	.starred :global(svg) {
-		fill: currentColor;
 	}
 </style>

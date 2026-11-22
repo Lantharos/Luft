@@ -1,7 +1,7 @@
 <script lang="ts">
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import Store from '@lucide/svelte/icons/store';
+	import CircleAlert from '@luft/symbols/icons/circle-alert';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
+	import Store from '@luft/symbols/icons/store';
 	import { t } from '@luft/i18n';
 	import { fade, revealContents } from '@luft/ui';
 	import AppArt from '#lib/components/AppArt.svelte';

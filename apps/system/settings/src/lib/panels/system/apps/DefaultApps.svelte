@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
-	import Archive from '@lucide/svelte/icons/archive';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Film from '@lucide/svelte/icons/film';
-	import Folder from '@lucide/svelte/icons/folder';
-	import Globe from '@lucide/svelte/icons/globe';
-	import Image from '@lucide/svelte/icons/image';
-	import Mail from '@lucide/svelte/icons/mail';
-	import Music from '@lucide/svelte/icons/music';
+	import Archive from '@luft/symbols/icons/archive';
+	import Calendar from '@luft/symbols/icons/calendar';
+	import FileText from '@luft/symbols/icons/file-text';
+	import Film from '@luft/symbols/icons/film';
+	import Folder from '@luft/symbols/icons/folder';
+	import Globe from '@luft/symbols/icons/globe';
+	import Image from '@luft/symbols/icons/image';
+	import Mail from '@luft/symbols/icons/mail';
+	import Music from '@luft/symbols/icons/music';
 	import { AppIcon, Row, Section, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { AppCategory, Handler } from '#lib/bindings.js';

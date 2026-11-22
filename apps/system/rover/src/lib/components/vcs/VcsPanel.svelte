@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { projectSummary, statusLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';

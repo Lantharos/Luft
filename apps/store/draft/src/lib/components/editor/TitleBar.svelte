@@ -1,6 +1,6 @@
 <script lang="ts">
-	import BookOpen from '@lucide/svelte/icons/book-open';
-	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import BookOpen from '@luft/symbols/icons/book-open';
+	import PanelLeft from '@luft/symbols/icons/panel-left';
 	import { t } from '@luft/i18n';
 	import { tooltip, WindowControls } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';

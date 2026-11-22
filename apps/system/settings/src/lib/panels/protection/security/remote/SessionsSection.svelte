@@ -1,5 +1,5 @@
 <script lang="ts">
-	import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone';
+	import MonitorSmartphone from '@luft/symbols/icons/monitor-smartphone';
 	import { t } from '@luft/i18n';
 	import { ago, ConfirmDialog, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

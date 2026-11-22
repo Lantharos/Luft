@@ -1,6 +1,6 @@
 <script lang="ts">
-	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import EthernetPort from '@luft/symbols/icons/ethernet-port';
+	import Smartphone from '@luft/symbols/icons/smartphone';
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';

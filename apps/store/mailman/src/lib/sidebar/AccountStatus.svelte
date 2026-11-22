@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CloudOff from '@lucide/svelte/icons/cloud-off';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import CloudOff from '@luft/symbols/icons/cloud-off';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Account } from '#lib/bindings.js';

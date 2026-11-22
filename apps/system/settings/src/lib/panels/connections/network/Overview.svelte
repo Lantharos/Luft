@@ -1,11 +1,11 @@
 <script lang="ts">
-	import BrickWallShield from '@lucide/svelte/icons/brick-wall-shield';
-	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
-	import Globe from '@lucide/svelte/icons/globe';
-	import Plane from '@lucide/svelte/icons/plane';
-	import Shield from '@lucide/svelte/icons/shield';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
-	import WifiIcon from '@lucide/svelte/icons/wifi';
+	import BrickWallShield from '@luft/symbols/icons/brick-wall-shield';
+	import EthernetPort from '@luft/symbols/icons/ethernet-port';
+	import Globe from '@luft/symbols/icons/globe';
+	import Plane from '@luft/symbols/icons/plane';
+	import Shield from '@luft/symbols/icons/shield';
+	import Smartphone from '@luft/symbols/icons/smartphone';
+	import WifiIcon from '@luft/symbols/icons/wifi';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section, Switch } from '@luft/ui';
 	import type { Network, Wired } from '@luft/network';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { t } from '@luft/i18n';
 	import { Dialog, Spinner } from '@luft/ui';
 	import type { Invitation } from '#lib/bindings.js';

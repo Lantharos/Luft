@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Puzzle from '@lucide/svelte/icons/puzzle';
+	import Puzzle from '@luft/symbols/icons/puzzle';
 
 	let { art, icon, height = null }: { art: string | null; icon: string | null; height?: number | null } = $props();
 

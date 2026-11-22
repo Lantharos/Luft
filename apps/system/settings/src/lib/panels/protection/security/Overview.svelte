@@ -1,9 +1,9 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import KeyRound from '@lucide/svelte/icons/key-round';
-	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import TerminalSquare from '@lucide/svelte/icons/square-terminal';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import KeyRound from '@luft/symbols/icons/key-round';
+	import ShieldAlert from '@luft/symbols/icons/shield-alert';
+	import ShieldCheck from '@luft/symbols/icons/shield-check';
+	import TerminalSquare from '@luft/symbols/icons/square-terminal';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
 	import HeroCard from '#lib/components/HeroCard.svelte';

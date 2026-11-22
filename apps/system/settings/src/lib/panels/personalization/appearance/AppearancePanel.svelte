@@ -1,11 +1,11 @@
 <script lang="ts">
 	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
-	import Image from '@lucide/svelte/icons/image';
-	import Layers from '@lucide/svelte/icons/layers';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import MousePointer2 from '@lucide/svelte/icons/mouse-pointer-2';
-	import Type from '@lucide/svelte/icons/type';
+	import Image from '@luft/symbols/icons/image';
+	import Layers from '@luft/symbols/icons/layers';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
+	import MousePointer2 from '@luft/symbols/icons/mouse-pointer-2';
+	import Type from '@luft/symbols/icons/type';
 	import { appearance, Row, Section, Switch } from '@luft/ui';
 	import RowValue from '#lib/components/RowValue.svelte';
 	import SubPage from '#lib/components/SubPage.svelte';

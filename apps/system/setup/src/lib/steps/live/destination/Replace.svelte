@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Check from '@luft/symbols/icons/check';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { i18n, t } from '@luft/i18n';
 	import type { LinuxSystem } from '#lib/bindings.js';
 	import { install } from '#lib/state/install.svelte.js';

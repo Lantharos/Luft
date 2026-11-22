@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { MenuItem, tooltip } from '@luft/ui';
-	import Minus from '@lucide/svelte/icons/minus';
-	import MoveHorizontal from '@lucide/svelte/icons/move-horizontal';
-	import Plus from '@lucide/svelte/icons/plus';
-	import RectangleVertical from '@lucide/svelte/icons/rectangle-vertical';
-	import Search from '@lucide/svelte/icons/search';
+	import Minus from '@luft/symbols/icons/minus';
+	import MoveHorizontal from '@luft/symbols/icons/move-horizontal';
+	import Plus from '@luft/symbols/icons/plus';
+	import RectangleVertical from '@luft/symbols/icons/rectangle-vertical';
+	import Search from '@luft/symbols/icons/search';
 	import { canPrint, printCurrent } from '#lib/app/actions.js';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import FindBar from './FindBar.svelte';

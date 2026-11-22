@@ -1,6 +1,6 @@
 <script lang="ts">
-	import BookOpen from '@lucide/svelte/icons/book-open';
-	import NotebookText from '@lucide/svelte/icons/notebook-text';
+	import BookOpen from '@luft/symbols/icons/book-open';
+	import NotebookText from '@luft/symbols/icons/notebook-text';
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { session } from '#lib/app/session.svelte.js';

@@ -1,16 +1,16 @@
 import type { Component } from 'svelte';
-import Bluetooth from '@lucide/svelte/icons/bluetooth';
-import Camera from '@lucide/svelte/icons/camera';
-import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
-import Headphones from '@lucide/svelte/icons/headphones';
-import Keyboard from '@lucide/svelte/icons/keyboard';
-import Laptop from '@lucide/svelte/icons/laptop';
-import Monitor from '@lucide/svelte/icons/monitor';
-import Mouse from '@lucide/svelte/icons/mouse';
-import Printer from '@lucide/svelte/icons/printer';
-import Smartphone from '@lucide/svelte/icons/smartphone';
-import Speaker from '@lucide/svelte/icons/speaker';
-import Tablet from '@lucide/svelte/icons/tablet';
+import Bluetooth from '@luft/symbols/icons/bluetooth';
+import Camera from '@luft/symbols/icons/camera';
+import Gamepad2 from '@luft/symbols/icons/gamepad-2';
+import Headphones from '@luft/symbols/icons/headphones';
+import Keyboard from '@luft/symbols/icons/keyboard';
+import Laptop from '@luft/symbols/icons/laptop';
+import Monitor from '@luft/symbols/icons/monitor';
+import Mouse from '@luft/symbols/icons/mouse';
+import Printer from '@luft/symbols/icons/printer';
+import Smartphone from '@luft/symbols/icons/smartphone';
+import Speaker from '@luft/symbols/icons/speaker';
+import Tablet from '@luft/symbols/icons/tablet';
 import type { BluetoothDeviceKind } from '#lib/bindings.js';
 
 export const KIND_ICONS: Record<BluetoothDeviceKind, Component> = {

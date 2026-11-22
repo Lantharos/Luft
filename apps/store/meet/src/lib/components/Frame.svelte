@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import ArrowLeft from '@luft/symbols/icons/arrow-left';
 	import { t } from '@luft/i18n';
 
 	interface Props {

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import FileUp from '@lucide/svelte/icons/file-up';
-	import KeyRound from '@lucide/svelte/icons/key-round';
-	import Settings from '@lucide/svelte/icons/settings';
-	import Shield from '@lucide/svelte/icons/shield';
+	import FileUp from '@luft/symbols/icons/file-up';
+	import KeyRound from '@luft/symbols/icons/key-round';
+	import Settings from '@luft/symbols/icons/settings';
+	import Shield from '@luft/symbols/icons/shield';
 	import { t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Spinner, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';

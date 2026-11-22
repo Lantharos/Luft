@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Cog from '@lucide/svelte/icons/cog';
-	import Send from '@lucide/svelte/icons/send';
-	import X from '@lucide/svelte/icons/x';
+	import Cog from '@luft/symbols/icons/cog';
+	import Send from '@luft/symbols/icons/send';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { AppIcon, IconButton, ItemRow, Row, Section, Select } from '@luft/ui';
 	import type { FirewallAccess, FirewallApp } from '@luft/network';

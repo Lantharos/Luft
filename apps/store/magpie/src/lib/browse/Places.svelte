@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { selectionPill } from '@luft/ui';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Film from '@lucide/svelte/icons/film';
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import Image from '@lucide/svelte/icons/image';
-	import Music from '@lucide/svelte/icons/music';
+	import FileText from '@luft/symbols/icons/file-text';
+	import Film from '@luft/symbols/icons/film';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
+	import Image from '@luft/symbols/icons/image';
+	import Music from '@luft/symbols/icons/music';
 	import { commands } from '#lib/bindings.js';
 	import type { Place } from '#lib/bindings.js';
 	import { library } from '#lib/library/library.svelte.js';

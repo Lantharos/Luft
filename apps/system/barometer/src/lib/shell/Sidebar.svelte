@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { selectionPill } from '@luft/ui';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
 	import { resources } from '#lib/resources/registry.js';
 	import { app, TASKS } from '#lib/state/app.svelte.js';
 	import { monitor } from '#lib/state/monitor.svelte.js';

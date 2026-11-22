@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
-	import ArrowRightLeft from '@lucide/svelte/icons/arrow-right-left';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import LayoutPanelLeft from '@lucide/svelte/icons/layout-panel-left';
-	import Sparkles from '@lucide/svelte/icons/sparkles';
-	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+	import ArrowRightLeft from '@luft/symbols/icons/arrow-right-left';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import LayoutPanelLeft from '@luft/symbols/icons/layout-panel-left';
+	import Sparkles from '@luft/symbols/icons/sparkles';
+	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Spinner } from '@luft/ui';
 	import { commands, type Drive, type Target, type WindowsVolume } from '#lib/bindings.js';

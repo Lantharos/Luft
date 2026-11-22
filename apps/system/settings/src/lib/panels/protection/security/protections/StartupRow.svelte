@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Power from '@lucide/svelte/icons/power';
+	import Power from '@luft/symbols/icons/power';
 	import { t } from '@luft/i18n';
 	import { errorText, Row } from '@luft/ui';
 	import type { SigningKey, Startup } from '#lib/bindings.js';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { Dialog } from '@luft/ui';
 	import KeyCapture from '../input/shortcuts/keys/KeyCapture.svelte';
 

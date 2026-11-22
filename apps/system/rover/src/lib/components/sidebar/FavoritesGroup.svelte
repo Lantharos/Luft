@@ -1,5 +1,5 @@
 <script lang="ts">
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { PinnedFolder } from '#lib/bindings.js';

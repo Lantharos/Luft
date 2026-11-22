@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { fileDragStart, VirtualScroller } from '@luft/ui';
-	import FileText from '@lucide/svelte/icons/file-text';
-	import Folder from '@lucide/svelte/icons/folder';
-	import Music from '@lucide/svelte/icons/music';
-	import Play from '@lucide/svelte/icons/play';
+	import FileText from '@luft/symbols/icons/file-text';
+	import Folder from '@luft/symbols/icons/folder';
+	import Music from '@luft/symbols/icons/music';
+	import Play from '@luft/symbols/icons/play';
 	import type { Folder as FolderEntry, Item } from '#lib/bindings.js';
 	import FontSample from '#lib/font/FontSample.svelte';
 	import { library } from '#lib/library/library.svelte.js';
@@ -29,7 +29,7 @@
 		{#snippet children(entry)}
 			{#if entry.type === 'folder'}
 				<button type="button" class="entry" draggable="true" ondragstart={fileDragStart(entry.folder.path)} onclick={() => library.browse(entry.folder.path)}>
-					<span class="cover folder"><Folder size={42} strokeWidth={1.5} /></span>
+					<span class="cover folder"><Folder size={42} /></span>
 					<span class="name">{entry.folder.name}</span>
 				</button>
 			{:else}
@@ -39,9 +39,9 @@
 						{#if thumbnail}
 							<img src={thumbnail} alt="" draggable="false" decoding="async" />
 						{:else if entry.item.kind === 'audio'}
-							<Music size={36} strokeWidth={1.5} />
+							<Music size={36} />
 						{:else if entry.item.kind === 'document'}
-							<FileText size={36} strokeWidth={1.5} />
+							<FileText size={36} />
 						{:else if entry.item.kind === 'font'}
 							<FontSample path={entry.item.path} />
 						{/if}

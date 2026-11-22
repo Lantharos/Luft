@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
-	import Crop from '@lucide/svelte/icons/crop';
+	import Crop from '@luft/symbols/icons/crop';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { WHOLE, type PageObject } from '#lib/page/objects.js';

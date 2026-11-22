@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Fingerprint from '@lucide/svelte/icons/fingerprint-pattern';
-	import Network from '@lucide/svelte/icons/network';
-	import Terminal from '@lucide/svelte/icons/terminal';
+	import Check from '@luft/symbols/icons/check';
+	import Copy from '@luft/symbols/icons/copy';
+	import Fingerprint from '@luft/symbols/icons/fingerprint-pattern';
+	import Network from '@luft/symbols/icons/network';
+	import Terminal from '@luft/symbols/icons/terminal';
 	import { i18n, t } from '@luft/i18n';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import type { RemoteLogin } from '#lib/bindings.js';

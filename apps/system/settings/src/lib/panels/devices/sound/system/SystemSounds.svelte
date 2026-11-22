@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Play from '@lucide/svelte/icons/play';
+	import Play from '@luft/symbols/icons/play';
 	import { IconButton, Row, Section, Slider, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';

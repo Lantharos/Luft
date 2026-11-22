@@ -1,6 +1,6 @@
 import type { Component } from 'svelte';
-import Cloud from '@lucide/svelte/icons/cloud';
-import Server from '@lucide/svelte/icons/server';
+import Cloud from '@luft/symbols/icons/cloud';
+import Server from '@luft/symbols/icons/server';
 import type { Provider } from '#lib/bindings.js';
 import DropboxMark from './marks/DropboxMark.svelte';
 import ICloudMark from './marks/ICloudMark.svelte';

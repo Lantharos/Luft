@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PrinterIcon from '@lucide/svelte/icons/printer';
+	import PrinterIcon from '@luft/symbols/icons/printer';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';

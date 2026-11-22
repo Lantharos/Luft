@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import Star from '@lucide/svelte/icons/star';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
+	import Star from '@luft/symbols/icons/star';
 	import { bytes, MenuButton, MenuItem, ProgressBar } from '@luft/ui';
 	import type { StoreItem } from '#lib/bindings.js';
 	import { openStorePage } from './api';

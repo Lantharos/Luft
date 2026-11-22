@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Lock from '@lucide/svelte/icons/lock';
+	import Lock from '@luft/symbols/icons/lock';
 	import { t } from '@luft/i18n';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { marks } from '#lib/utils/marks.js';

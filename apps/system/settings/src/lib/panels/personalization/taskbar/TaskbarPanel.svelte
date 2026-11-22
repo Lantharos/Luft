@@ -1,9 +1,9 @@
 <script lang="ts">
 	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import Move from '@lucide/svelte/icons/move';
-	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
+	import Move from '@luft/symbols/icons/move';
+	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
 	import { onDestroy } from 'svelte';
 	import { appearance, Row, Section, Segmented } from '@luft/ui';
 	import {

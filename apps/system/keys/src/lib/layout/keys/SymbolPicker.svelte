@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Plus from '@lucide/svelte/icons/plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import { Popover, SearchField, tooltip, VirtualScroller } from '@luft/ui';
 	import { search } from '#lib/characters/characters.js';
 	import { commands } from '#lib/bindings.js';

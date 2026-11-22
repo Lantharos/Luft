@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 
 	interface Props {
 		checked: boolean;
@@ -23,7 +23,7 @@
 	onclick={() => onchange(!checked)}
 >
 	<span class="box" class:on={checked}>
-		<Check class="mark" size={13} strokeWidth={3} />
+		<Check class="mark" size={13} />
 	</span>
 	{#if children}
 		<span class="text">{@render children()}</span>

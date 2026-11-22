@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="8" cy="8" r="6.6"/>
+	</g>
+	<g class="cut">
+		<path d="M10.9 5.1 9.3 9.3 5.1 10.9 6.7 6.7Z"/>
+		<path d="M10.9 5.1 9.3 9.3 5.1 10.9 6.7 6.7Z" fill="none" stroke-width="1"/>
+	</g>
+	<g class="shade">
+		<path d="M9.3 9.3 5.1 10.9 6.7 6.7Z"/>
+	</g>
+</svg>

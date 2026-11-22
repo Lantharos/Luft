@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
-	import ArrowRight from '@lucide/svelte/icons/arrow-right';
-	import Plus from '@lucide/svelte/icons/plus';
-	import X from '@lucide/svelte/icons/x';
+	import ArrowRight from '@luft/symbols/icons/arrow-right';
+	import Plus from '@luft/symbols/icons/plus';
+	import X from '@luft/symbols/icons/x';
 	import { IconButton, SearchField, TextCell, tooltip, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import type { MethodEditor, Row, Table } from './editor.svelte';
 

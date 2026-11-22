@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Copy from '@lucide/svelte/icons/copy';
-	import PencilLine from '@lucide/svelte/icons/pencil-line';
-	import Printer from '@lucide/svelte/icons/printer';
-	import Save from '@lucide/svelte/icons/save';
+	import Copy from '@luft/symbols/icons/copy';
+	import PencilLine from '@luft/symbols/icons/pencil-line';
+	import Printer from '@luft/symbols/icons/printer';
+	import Save from '@luft/symbols/icons/save';
 	import { t } from '@luft/i18n';
 	import Dialog from '../../dialogs/Dialog.svelte';
 	import { errorText } from '../../text/errors';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
-	import Move from '@lucide/svelte/icons/move';
+	import Move from '@luft/symbols/icons/move';
 	import { commands } from '#lib/bindings.js';
 	import type { Focus } from '#lib/bindings.js';
 	import { objectPosition } from './api';

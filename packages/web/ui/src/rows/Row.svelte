@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Lock from '@lucide/svelte/icons/lock';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import Lock from '@luft/symbols/icons/lock';
 	import { t } from '@luft/i18n';
 
 	interface Props {

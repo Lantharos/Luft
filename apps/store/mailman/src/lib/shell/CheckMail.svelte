@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { mail } from '#lib/mail/mail.svelte.js';

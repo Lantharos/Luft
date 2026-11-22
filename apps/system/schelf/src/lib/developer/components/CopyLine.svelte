@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import Copy from '@lucide/svelte/icons/copy';
+	import Check from '@luft/symbols/icons/check';
+	import Copy from '@luft/symbols/icons/copy';
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
 

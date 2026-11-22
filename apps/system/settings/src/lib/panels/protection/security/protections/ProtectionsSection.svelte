@@ -1,9 +1,9 @@
 <script lang="ts">
-	import CircuitBoard from '@lucide/svelte/icons/circuit-board';
-	import Microchip from '@lucide/svelte/icons/microchip';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import CircuitBoard from '@luft/symbols/icons/circuit-board';
+	import Microchip from '@luft/symbols/icons/microchip';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import ShieldAlert from '@luft/symbols/icons/shield-alert';
+	import ShieldCheck from '@luft/symbols/icons/shield-check';
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';

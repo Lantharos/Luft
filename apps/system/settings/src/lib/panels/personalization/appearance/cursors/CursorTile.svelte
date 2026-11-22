@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { CursorTheme } from '#lib/bindings.js';

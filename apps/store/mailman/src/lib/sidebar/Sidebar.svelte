@@ -2,9 +2,9 @@
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill, tooltip } from '@luft/ui';
-	import PenLine from '@lucide/svelte/icons/pen-line';
-	import Search from '@lucide/svelte/icons/search';
-	import Settings from '@lucide/svelte/icons/settings-2';
+	import PenLine from '@luft/symbols/icons/pen-line';
+	import Search from '@luft/symbols/icons/search';
+	import Settings from '@luft/symbols/icons/settings-2';
 	import type { Account } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { list } from '#lib/mail/list.svelte.js';

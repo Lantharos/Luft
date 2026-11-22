@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
-	import Download from '@lucide/svelte/icons/download';
-	import File from '@lucide/svelte/icons/file';
-	import FileImage from '@lucide/svelte/icons/file-image';
-	import FileText from '@lucide/svelte/icons/file-text';
+	import Download from '@luft/symbols/icons/download';
+	import File from '@luft/symbols/icons/file';
+	import FileImage from '@luft/symbols/icons/file-image';
+	import FileText from '@luft/symbols/icons/file-text';
 	import { commands } from '#lib/bindings.js';
 	import type { Attachment } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';

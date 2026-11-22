@@ -1,7 +1,7 @@
 <script lang="ts">
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import CircleX from '@lucide/svelte/icons/circle-x';
-	import Info from '@lucide/svelte/icons/info';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
+	import CircleX from '@luft/symbols/icons/circle-x';
+	import Info from '@luft/symbols/icons/info';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, Spinner } from '@luft/ui';
 	import type { Action, Level } from '#lib/bindings.js';

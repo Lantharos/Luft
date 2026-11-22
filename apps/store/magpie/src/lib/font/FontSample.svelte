@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Type from '@lucide/svelte/icons/type';
+	import Type from '@luft/symbols/icons/type';
 	import { loadFont } from './faces';
 
 	let { path }: { path: string } = $props();
@@ -22,7 +22,7 @@
 {#if family}
 	<span class="sample" style:font-family="'{family}'">Aa</span>
 {:else if failed}
-	<Type size={34} strokeWidth={1.5} />
+	<Type size={34} />
 {/if}
 
 <style>

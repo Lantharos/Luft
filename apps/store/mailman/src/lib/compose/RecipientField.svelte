@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import BadgeCheck from '@lucide/svelte/icons/badge-check';
+	import BadgeCheck from '@luft/symbols/icons/badge-check';
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { openUrl } from '#lib/bridge/index.js';

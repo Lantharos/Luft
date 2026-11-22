@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Eject from '@lucide/svelte/icons/eject';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Server from '@lucide/svelte/icons/server';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import Eject from '@luft/symbols/icons/eject';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import Server from '@luft/symbols/icons/server';
+	import Smartphone from '@luft/symbols/icons/smartphone';
 	import { t } from '@luft/i18n';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';

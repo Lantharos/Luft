@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { errorText, Row, SearchField, Section, Segmented } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Order, StorePage } from '#lib/bindings.js';

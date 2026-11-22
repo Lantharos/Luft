@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import ArrowDown from '@lucide/svelte/icons/arrow-down';
-	import ArrowUp from '@lucide/svelte/icons/arrow-up';
-	import Pencil from '@lucide/svelte/icons/pencil';
-	import Plus from '@lucide/svelte/icons/plus';
-	import X from '@lucide/svelte/icons/x';
+	import ArrowDown from '@luft/symbols/icons/arrow-down';
+	import ArrowUp from '@luft/symbols/icons/arrow-up';
+	import Pencil from '@luft/symbols/icons/pencil';
+	import Plus from '@luft/symbols/icons/plus';
+	import X from '@luft/symbols/icons/x';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';

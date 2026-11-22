@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import CircleAlert from '@luft/symbols/icons/circle-alert';
 	import { MenuButton, MenuItem } from '@luft/ui';
 	import type { LayoutEditor } from '../editor.svelte';
 	import { issues, type Target } from '../issues';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Eye from '@luft/symbols/icons/eye';
+	import EyeOff from '@luft/symbols/icons/eye-off';
 	import { t } from '@luft/i18n';
 	import TextField from './TextField.svelte';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Copy from '@lucide/svelte/icons/copy';
-	import Highlighter from '@lucide/svelte/icons/highlighter';
-	import NotebookPen from '@lucide/svelte/icons/notebook-pen';
+	import Copy from '@luft/symbols/icons/copy';
+	import Highlighter from '@luft/symbols/icons/highlighter';
+	import NotebookPen from '@luft/symbols/icons/notebook-pen';
 	import { t } from '@luft/i18n';
 	import type { Viewport } from '#lib/canvas/viewport.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';

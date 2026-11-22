@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fileDragStart, tooltip, VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import Play from '@lucide/svelte/icons/play';
+	import Play from '@luft/symbols/icons/play';
 	import type { Item } from '#lib/bindings.js';
 	import FontSample from '#lib/font/FontSample.svelte';
 	import { library } from '#lib/library/library.svelte.js';

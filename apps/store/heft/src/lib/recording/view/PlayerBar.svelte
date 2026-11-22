@@ -1,10 +1,10 @@
 <script lang="ts">
-	import NotebookText from '@lucide/svelte/icons/notebook-text';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
-	import X from '@lucide/svelte/icons/x';
+	import NotebookText from '@luft/symbols/icons/notebook-text';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { formatClock, IconButton, SeekBar } from '@luft/ui';
 	import { player } from '../player.svelte';

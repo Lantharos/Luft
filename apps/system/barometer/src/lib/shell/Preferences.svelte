@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { duration, Popover, Segmented, Switch } from '@luft/ui';
-	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+	import SlidersHorizontal from '@luft/symbols/icons/sliders-horizontal';
 	import { settings, type TemperatureUnit } from '#lib/state/settings.svelte.js';
 
 	const speeds = $derived([

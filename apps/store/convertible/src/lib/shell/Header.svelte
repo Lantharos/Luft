@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
-	import ListChecks from '@lucide/svelte/icons/list-checks';
-	import Plus from '@lucide/svelte/icons/plus';
-	import X from '@lucide/svelte/icons/x';
+	import ListChecks from '@luft/symbols/icons/list-checks';
+	import Plus from '@luft/symbols/icons/plus';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { IconButton, Segmented, TitleBar } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

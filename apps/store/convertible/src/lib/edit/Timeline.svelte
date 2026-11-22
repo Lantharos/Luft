@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
 	import { t } from '@luft/i18n';
 	import { formatClock, IconButton } from '@luft/ui';
 	import { editor, SCRUB_DELAY } from '#lib/state/editor.svelte.js';

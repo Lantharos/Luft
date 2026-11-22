@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { t } from '@luft/i18n';
 	import { IconButton, PageStage, TitleBar } from '@luft/ui';
 	import { isShown, PANELS, titleOf } from '#lib/panels/registry.js';

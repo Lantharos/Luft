@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="7" cy="9.3" r="5.2"/>
+	</g>
+	<g class="ink">
+		<rect x="9.3" y="3.6" width="3.2" height="2.8" rx="0.8" transform="rotate(45 10.9 5)"/>
+	</g>
+	<g class="cut">
+		<path d="M4.2 9.4a3 3 0 0 1 2.1-2.4" fill="none" stroke-width="1.2"/>
+	</g>
+	<g class="shade">
+		<path d="M12 3.6c.4-1.2 1.4-2 2.6-1.9" fill="none" stroke-width="1.4"/>
+	</g>
+</svg>

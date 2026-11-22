@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { SearchField, tooltip } from '@luft/ui';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
-	import X from '@lucide/svelte/icons/x';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
+	import ChevronUp from '@luft/symbols/icons/chevron-up';
+	import X from '@luft/symbols/icons/x';
 	import { documentState } from './state.svelte';
 
 	let field = $state<{ focus: () => void }>();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Fingerprint from '@lucide/svelte/icons/fingerprint';
+	import Fingerprint from '@luft/symbols/icons/fingerprint';
 	import type { FingerprintEnrollment } from './fingerprint.svelte';
 
 	interface Props {
@@ -17,7 +17,7 @@
 			<circle class="track" cx="60" cy="60" r="54" />
 			<circle class="fill" cx="60" cy="60" r="54" stroke-dasharray={RING} stroke-dashoffset={RING * (1 - enrollment.progress)} />
 		</svg>
-		<Fingerprint size={44} strokeWidth={1.5} />
+		<Fingerprint size={44} />
 	</div>
 	<p class="min-h-[40px] text-center text-[14px] leading-snug" aria-live="polite">{enrollment.message}</p>
 </div>

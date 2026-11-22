@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { MenuItem } from '@luft/ui';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import { styleName, STYLES, visualizer } from './visualizer/settings.svelte';
 </script>

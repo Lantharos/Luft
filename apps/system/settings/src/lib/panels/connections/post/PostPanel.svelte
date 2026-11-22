@@ -1,9 +1,9 @@
 <script lang="ts">
-	import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone';
-	import Plus from '@lucide/svelte/icons/plus';
+	import MonitorSmartphone from '@luft/symbols/icons/monitor-smartphone';
+	import Plus from '@luft/symbols/icons/plus';
 	import { t } from '@luft/i18n';
 	import { basename, errorText, IconButton, Row, Section, Segmented, Switch } from '@luft/ui';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import type { Firewall } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
 	import type { PostState } from '#lib/bindings.js';

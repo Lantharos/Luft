@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { t } from '@luft/i18n';
 	import { Select } from '@luft/ui';
 	import type { Family, FileEntry } from '#lib/bindings.js';

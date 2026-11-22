@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PenLine from '@lucide/svelte/icons/pen-line';
+	import PenLine from '@luft/symbols/icons/pen-line';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { describe, shown } from '#lib/keyboard/describe.js';

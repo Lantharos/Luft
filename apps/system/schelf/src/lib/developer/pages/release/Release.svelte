@@ -1,8 +1,8 @@
 <script lang="ts">
-	import CircleAlert from '@lucide/svelte/icons/circle-alert';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import CircleMinus from '@lucide/svelte/icons/circle-minus';
-	import Clock from '@lucide/svelte/icons/clock';
+	import CircleAlert from '@luft/symbols/icons/circle-alert';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
+	import CircleMinus from '@luft/symbols/icons/circle-minus';
+	import Clock from '@luft/symbols/icons/clock';
 	import type { Component } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';

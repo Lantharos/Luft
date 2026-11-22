@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plus from '@lucide/svelte/icons/plus';
+	import Plus from '@luft/symbols/icons/plus';
 	import { t } from '@luft/i18n';
 	import type { Account, Identity } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';

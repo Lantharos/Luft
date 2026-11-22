@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { onMount } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, PageStage, TitleBar, Toast } from '@luft/ui';
 	import { events } from '#lib/bindings.js';
 	import DriveView from '#lib/components/drive/DriveView.svelte';

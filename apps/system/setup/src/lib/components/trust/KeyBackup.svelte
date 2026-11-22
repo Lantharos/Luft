@@ -1,7 +1,7 @@
 <script lang="ts">
-	import PencilLine from '@lucide/svelte/icons/pencil-line';
-	import Printer from '@lucide/svelte/icons/printer';
-	import Usb from '@lucide/svelte/icons/usb';
+	import PencilLine from '@luft/symbols/icons/pencil-line';
+	import Printer from '@luft/symbols/icons/printer';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, RecoveryWords, WriteDownDialog } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

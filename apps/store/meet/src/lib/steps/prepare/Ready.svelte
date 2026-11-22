@@ -1,9 +1,9 @@
 <script lang="ts">
-	import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
-	import Package from '@lucide/svelte/icons/package';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Sparkles from '@lucide/svelte/icons/sparkles';
-	import Usb from '@lucide/svelte/icons/usb';
+	import HardDriveDownload from '@luft/symbols/icons/hard-drive-download';
+	import Package from '@luft/symbols/icons/package';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import Sparkles from '@luft/symbols/icons/sparkles';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog, Switch } from '@luft/ui';
 	import type { Intent, WindowsChoices } from '#lib/bindings.js';

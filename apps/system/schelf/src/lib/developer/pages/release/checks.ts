@@ -1,6 +1,6 @@
-import CircleCheck from '@lucide/svelte/icons/circle-check';
-import CircleX from '@lucide/svelte/icons/circle-x';
-import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+import CircleCheck from '@luft/symbols/icons/circle-check';
+import CircleX from '@luft/symbols/icons/circle-x';
+import TriangleAlert from '@luft/symbols/icons/triangle-alert';
 import type { Component } from 'svelte';
 import type { CheckResult } from '../../store';
 

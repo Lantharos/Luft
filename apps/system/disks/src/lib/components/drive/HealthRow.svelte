@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
+	import TriangleAlert from '@luft/symbols/icons/triangle-alert';
 	import { Row } from '@luft/ui';
 	import type { Drive, Health } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';

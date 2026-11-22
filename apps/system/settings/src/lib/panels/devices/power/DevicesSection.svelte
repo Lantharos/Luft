@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
-	import BatteryMedium from '@lucide/svelte/icons/battery-medium';
-	import Gamepad from '@lucide/svelte/icons/gamepad-2';
-	import Headphones from '@lucide/svelte/icons/headphones';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
-	import Mouse from '@lucide/svelte/icons/mouse';
-	import Pen from '@lucide/svelte/icons/pen';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
-	import Speaker from '@lucide/svelte/icons/speaker';
-	import SquareMousePointer from '@lucide/svelte/icons/square-mouse-pointer';
-	import Tablet from '@lucide/svelte/icons/tablet';
+	import BatteryMedium from '@luft/symbols/icons/battery-medium';
+	import Gamepad from '@luft/symbols/icons/gamepad-2';
+	import Headphones from '@luft/symbols/icons/headphones';
+	import Keyboard from '@luft/symbols/icons/keyboard';
+	import Mouse from '@luft/symbols/icons/mouse';
+	import Pen from '@luft/symbols/icons/pen';
+	import Smartphone from '@luft/symbols/icons/smartphone';
+	import Speaker from '@luft/symbols/icons/speaker';
+	import SquareMousePointer from '@luft/symbols/icons/square-mouse-pointer';
+	import Tablet from '@luft/symbols/icons/tablet';
 	import { ProgressBar, Row, Section } from '@luft/ui';
 	import type { PowerDevice, PowerDeviceKind } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';

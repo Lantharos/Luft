@@ -1,9 +1,9 @@
 <script lang="ts">
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import X from '@lucide/svelte/icons/x';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { activationToken, duration, fileDragStart, IconButton, ProgressBar } from '@luft/ui';
 	import { commands, type ItemUpdate } from '#lib/bindings.js';

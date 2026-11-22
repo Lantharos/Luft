@@ -1,7 +1,7 @@
 <script lang="ts">
-	import File from '@lucide/svelte/icons/file';
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import Save from '@lucide/svelte/icons/save';
+	import File from '@luft/symbols/icons/file';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
+	import Save from '@luft/symbols/icons/save';
 	import { t } from '@luft/i18n';
 	import { Select } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
-	import Minus from '@lucide/svelte/icons/minus';
-	import Square from '@lucide/svelte/icons/square';
-	import X from '@lucide/svelte/icons/x';
+	import Minus from '@luft/symbols/icons/minus';
+	import Square from '@luft/symbols/icons/square';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 
 	interface Props {

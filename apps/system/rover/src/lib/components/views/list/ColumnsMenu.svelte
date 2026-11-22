@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { t } from '@luft/i18n';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import { columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';

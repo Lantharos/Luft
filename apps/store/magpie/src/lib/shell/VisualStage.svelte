@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { panel, rise, tooltip } from '@luft/ui';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import type { Item } from '#lib/bindings.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import Filmstrip from '#lib/browse/Filmstrip.svelte';

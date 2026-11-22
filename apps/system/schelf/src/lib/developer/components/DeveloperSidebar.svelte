@@ -1,10 +1,10 @@
 <script lang="ts">
-	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
-	import Globe from '@lucide/svelte/icons/globe';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
-	import Store from '@lucide/svelte/icons/store';
-	import UsersRound from '@lucide/svelte/icons/users-round';
+	import ChevronsUpDown from '@luft/symbols/icons/chevrons-up-down';
+	import Globe from '@luft/symbols/icons/globe';
+	import ShieldCheck from '@luft/symbols/icons/shield-check';
+	import SquareTerminal from '@luft/symbols/icons/square-terminal';
+	import Store from '@luft/symbols/icons/store';
+	import UsersRound from '@luft/symbols/icons/users-round';
 	import type { Component } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { selectionPill } from '@luft/ui';

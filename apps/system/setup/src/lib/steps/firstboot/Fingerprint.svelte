@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import FingerprintIcon from '@lucide/svelte/icons/fingerprint';
+	import FingerprintIcon from '@luft/symbols/icons/fingerprint';
 	import { t } from '@luft/i18n';
 	import { FINGERS, fingerLabel, FingerprintDial, FingerprintEnrollment, Select, type Fingerprints } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

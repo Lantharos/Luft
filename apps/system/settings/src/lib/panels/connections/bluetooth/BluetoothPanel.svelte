@@ -1,7 +1,7 @@
 <script lang="ts">
-	import BluetoothIcon from '@lucide/svelte/icons/bluetooth';
-	import Eye from '@lucide/svelte/icons/eye';
-	import Info from '@lucide/svelte/icons/info';
+	import BluetoothIcon from '@luft/symbols/icons/bluetooth';
+	import Eye from '@luft/symbols/icons/eye';
+	import Info from '@luft/symbols/icons/info';
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Dialog, errorText, IconButton, Row, Section, Select, Spinner, Switch } from '@luft/ui';

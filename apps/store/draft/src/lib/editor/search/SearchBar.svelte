@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { closeSearchPanel, findNext, findPrevious, getSearchQuery, replaceAll, replaceNext, SearchQuery, setSearchQuery } from '@codemirror/search';
 	import type { EditorView } from '@codemirror/view';
-	import ArrowDown from '@lucide/svelte/icons/arrow-down';
-	import ArrowUp from '@lucide/svelte/icons/arrow-up';
-	import CaseSensitive from '@lucide/svelte/icons/case-sensitive';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Regex from '@lucide/svelte/icons/regex';
-	import WholeWord from '@lucide/svelte/icons/whole-word';
-	import X from '@lucide/svelte/icons/x';
+	import ArrowDown from '@luft/symbols/icons/arrow-down';
+	import ArrowUp from '@luft/symbols/icons/arrow-up';
+	import CaseSensitive from '@luft/symbols/icons/case-sensitive';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import Regex from '@luft/symbols/icons/regex';
+	import WholeWord from '@luft/symbols/icons/whole-word';
+	import X from '@luft/symbols/icons/x';
 	import { i18n, t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import { untrack } from 'svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import KeyRound from '@lucide/svelte/icons/key-round';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Trash from '@lucide/svelte/icons/trash';
+	import KeyRound from '@luft/symbols/icons/key-round';
+	import Plus from '@luft/symbols/icons/plus';
+	import Trash from '@luft/symbols/icons/trash';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, IconButton, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

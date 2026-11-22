@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { i18n, t } from '@luft/i18n';
 	import { Dialog, MultiChoice, TextField } from '@luft/ui';
 	import { CLASS_LANGUAGES, spokenIn } from '#lib/recording/languages.js';
@@ -34,7 +34,7 @@
 		<div class="flex flex-wrap gap-2" role="radiogroup" aria-label={t('subject-color')}>
 			{#each SUBJECT_COLORS as option (option)}
 				<button type="button" class="swatch" role="radio" aria-checked={color === option} aria-label={option} style:background={option} onclick={() => (color = option)}>
-					{#if color === option}<Check size={16} strokeWidth={2.6} />{/if}
+					{#if color === option}<Check size={16} />{/if}
 				</button>
 			{/each}
 		</div>

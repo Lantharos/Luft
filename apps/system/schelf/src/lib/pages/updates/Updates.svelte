@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import Layers from '@lucide/svelte/icons/layers';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
+	import Layers from '@luft/symbols/icons/layers';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
 	import { ago, bytes, Row, Section, Spinner } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';

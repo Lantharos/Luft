@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Clock from '@lucide/svelte/icons/clock';
-	import Folder from '@lucide/svelte/icons/folder';
-	import House from '@lucide/svelte/icons/house';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Trash from '@lucide/svelte/icons/trash';
-	import X from '@lucide/svelte/icons/x';
+	import Clock from '@luft/symbols/icons/clock';
+	import Folder from '@luft/symbols/icons/folder';
+	import House from '@luft/symbols/icons/house';
+	import Plus from '@luft/symbols/icons/plus';
+	import Trash from '@luft/symbols/icons/trash';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';

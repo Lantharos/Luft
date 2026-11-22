@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Copy from '@lucide/svelte/icons/copy';
-	import CopyPlus from '@lucide/svelte/icons/copy-plus';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
-	import Scissors from '@lucide/svelte/icons/scissors';
-	import Trash from '@lucide/svelte/icons/trash-2';
-	import TypeIcon from '@lucide/svelte/icons/type';
+	import Copy from '@luft/symbols/icons/copy';
+	import CopyPlus from '@luft/symbols/icons/copy-plus';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
+	import Scissors from '@luft/symbols/icons/scissors';
+	import Trash from '@luft/symbols/icons/trash-2';
+	import TypeIcon from '@luft/symbols/icons/type';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Viewport } from '#lib/canvas/viewport.svelte.js';

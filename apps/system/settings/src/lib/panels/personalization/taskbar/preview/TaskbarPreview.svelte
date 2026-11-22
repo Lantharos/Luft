@@ -16,9 +16,9 @@
 		type Edge,
 		type Spot
 	} from '@luft/ui/taskbar';
-	import BatteryFull from '@lucide/svelte/icons/battery-full';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
-	import Wifi from '@lucide/svelte/icons/wifi';
+	import BatteryFull from '@luft/symbols/icons/battery-full';
+	import Volume2 from '@luft/symbols/icons/volume-2';
+	import Wifi from '@luft/symbols/icons/wifi';
 	import type { App } from '#lib/bindings.js';
 	import type { AutoHide, Look, Size, Style } from '../options';
 	import { Arranging, type Grip, type ShownIsland } from './arranging.svelte';

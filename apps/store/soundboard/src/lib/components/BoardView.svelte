@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import Grip from '@lucide/svelte/icons/grip';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Square from '@lucide/svelte/icons/square';
+	import Check from '@luft/symbols/icons/check';
+	import Grip from '@luft/symbols/icons/grip';
+	import Plus from '@luft/symbols/icons/plus';
+	import Stop from '@luft/symbols/icons/stop';
 	import { EmptyState, PageStage, SearchField, TitleBar } from '@luft/ui';
 	import { t } from '@luft/i18n';
 	import { app } from '#lib/state/app.svelte.js';
@@ -37,7 +37,7 @@
 				</button>
 			{/if}
 			<button type="button" class="button" disabled={!app.status.playing.length} onclick={() => void commands.stopAll()}>
-				<Square size={14} />{t('sounds-stop-all')}
+				<Stop size={14} />{t('sounds-stop-all')}
 			</button>
 			<button type="button" class="button primary" onclick={() => void app.addSounds()}><Plus size={16} />{t('sounds-add')}</button>
 		{/snippet}

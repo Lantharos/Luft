@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import Cloud from '@lucide/svelte/icons/cloud';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import CircleCheck from '@luft/symbols/icons/circle-check';
+	import Cloud from '@luft/symbols/icons/cloud';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import type { Component } from 'svelte';
 	import type { FileState } from '#lib/bindings.js';
 

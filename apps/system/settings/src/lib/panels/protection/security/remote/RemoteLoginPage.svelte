@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Globe from '@lucide/svelte/icons/globe';
-	import RectangleEllipsis from '@lucide/svelte/icons/rectangle-ellipsis';
-	import TerminalSquare from '@lucide/svelte/icons/square-terminal';
+	import Globe from '@luft/symbols/icons/globe';
+	import RectangleEllipsis from '@luft/symbols/icons/rectangle-ellipsis';
+	import TerminalSquare from '@luft/symbols/icons/square-terminal';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, Row, Section, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

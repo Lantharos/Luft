@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
-	import Info from '@lucide/svelte/icons/circle-help';
+	import Info from '@luft/symbols/icons/circle-help';
 	import { t } from '@luft/i18n';
 	import { IconButton, bytes, fileDragStart } from '@luft/ui';
 	import type { Family } from '#lib/bindings.js';

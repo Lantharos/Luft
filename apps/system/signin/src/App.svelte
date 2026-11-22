@@ -2,9 +2,9 @@
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { appearance, IconButton, Spinner, WindowControls } from '@luft/ui';
-	import Lock from '@lucide/svelte/icons/lock';
-	import LockOpen from '@lucide/svelte/icons/lock-open';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
+	import Lock from '@luft/symbols/icons/lock';
+	import LockOpen from '@luft/symbols/icons/lock-open';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
 	import { signIn } from '#lib/signin.svelte.js';
 
 	let page: HTMLDivElement;

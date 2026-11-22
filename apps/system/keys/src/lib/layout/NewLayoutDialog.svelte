@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { onMount, tick } from 'svelte';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { Dialog, SearchField, TextField, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';

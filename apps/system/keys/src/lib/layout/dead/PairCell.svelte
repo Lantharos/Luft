@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import ArrowRight from '@lucide/svelte/icons/arrow-right';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import ArrowRight from '@luft/symbols/icons/arrow-right';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator, TextCell, tooltip } from '@luft/ui';
 	import type { DeadKey, Pair } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';

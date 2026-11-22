@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Segmented, Spinner } from '@luft/ui';
-	import Camera from '@lucide/svelte/icons/camera';
-	import ImagePlus from '@lucide/svelte/icons/image-plus';
-	import ScanLine from '@lucide/svelte/icons/scan-line';
+	import Camera from '@luft/symbols/icons/camera';
+	import ImagePlus from '@luft/symbols/icons/image-plus';
+	import ScanLine from '@luft/symbols/icons/scan-line';
 	import type { Feed } from '#lib/bindings.js';
 	import { flatbed } from '#lib/app/flatbed.svelte.js';
 

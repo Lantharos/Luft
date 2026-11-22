@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
-	import Film from '@lucide/svelte/icons/film';
+	import Film from '@luft/symbols/icons/film';
 	import { commands } from '#lib/bindings.js';
 	import type { Focus, Wallpaper } from '#lib/bindings.js';
 	import { CENTER, objectPosition } from '../api';

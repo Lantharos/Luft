@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { t } from '@luft/i18n';
 	import { MenuItem } from '@luft/ui';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';

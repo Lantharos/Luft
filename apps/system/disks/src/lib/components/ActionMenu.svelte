@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Action } from './actions';
 

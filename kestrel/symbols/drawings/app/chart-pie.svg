@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<path d="M7.1 2.9A5.9 5.9 0 1 0 13 8.8H7.1Z"/>
+	</g>
+	<g class="shade">
+		<path d="M8.9 1.1V7h5.9A5.9 5.9 0 0 0 8.9 1.1Z"/>
+	</g>
+</svg>

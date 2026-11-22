@@ -2,8 +2,8 @@
 	import { tick } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import type { Account, Identity } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';

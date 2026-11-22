@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Music from '@lucide/svelte/icons/music';
+	import Music from '@luft/symbols/icons/music';
 	import { fileSource } from '#lib/bridge/index.js';
 
 	let { art, size, radius = 12 }: { art: string | null; size: number; radius?: number } = $props();

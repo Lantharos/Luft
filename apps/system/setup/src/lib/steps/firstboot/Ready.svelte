@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import Settings from '@lucide/svelte/icons/settings';
-	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
+	import Settings from '@luft/symbols/icons/settings';
+	import ShoppingBag from '@luft/symbols/icons/shopping-bag';
 	import { t } from '@luft/i18n';
 	import { Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

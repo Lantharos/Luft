@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Eye from '@lucide/svelte/icons/eye';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import Globe from '@lucide/svelte/icons/globe';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import Minus from '@lucide/svelte/icons/minus';
-	import PanelRight from '@lucide/svelte/icons/panel-right';
-	import Plus from '@lucide/svelte/icons/plus';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import SquarePen from '@lucide/svelte/icons/square-pen';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
+	import Eye from '@luft/symbols/icons/eye';
+	import EyeOff from '@luft/symbols/icons/eye-off';
+	import Globe from '@luft/symbols/icons/globe';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
+	import Minus from '@luft/symbols/icons/minus';
+	import PanelRight from '@luft/symbols/icons/panel-right';
+	import Plus from '@luft/symbols/icons/plus';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import SquarePen from '@luft/symbols/icons/square-pen';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';

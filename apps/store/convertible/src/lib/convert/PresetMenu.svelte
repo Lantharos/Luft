@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Bookmark from '@lucide/svelte/icons/bookmark';
-	import X from '@lucide/svelte/icons/x';
+	import Bookmark from '@luft/symbols/icons/bookmark';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { Dialog, MenuButton, MenuItem, MenuSeparator, TextField } from '@luft/ui';
 	import type { Family } from '#lib/bindings.js';

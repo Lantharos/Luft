@@ -2,14 +2,24 @@
 	"name": "@luft/symbols",
 	"private": true,
 	"type": "module",
+	"exports": {
+		"./icons/*": {
+			"types": "./src/icon.d.ts",
+			"default": "./icons/*.svelte"
+		}
+	},
 	"scripts": {
 		"build": "bun src/build.ts",
 		"check": "tsc --noEmit && bun src/build.ts --check",
 		"preview": "bun src/preview.ts"
 	},
+	"peerDependencies": {
+		"svelte": "^5.57.1"
+	},
 	"devDependencies": {
 		"@types/bun": "^1.4.3",
 		"canvaskit-wasm": "0.42.0",
-		"typescript": "7.0.2"
+		"typescript": "7.0.2",
+		"svelte": "^5.57.1"
 	}
 }

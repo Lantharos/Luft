@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { MenuItem, tooltip } from '@luft/ui';
-	import Info from '@lucide/svelte/icons/info';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import RotateCw from '@lucide/svelte/icons/rotate-cw';
+	import Info from '@luft/symbols/icons/info';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
+	import RotateCw from '@luft/symbols/icons/rotate-cw';
 	import { commands } from '#lib/bindings.js';
 	import { canPrint, printCurrent } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';

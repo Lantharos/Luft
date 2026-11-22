@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ProgressBar } from '@luft/ui';
 	import type { Snippet } from 'svelte';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import ArrowLeft from '@luft/symbols/icons/arrow-left';
 	import { FluentNumber, t } from '@luft/i18n';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';

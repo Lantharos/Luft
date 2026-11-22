@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Play from '@lucide/svelte/icons/play';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import Play from '@luft/symbols/icons/play';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
 	import { basename, errorText, IconButton, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';

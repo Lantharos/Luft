@@ -10,7 +10,9 @@ export const NAME = 'Mochi';
 const ROOT = join(import.meta.dir, '..');
 const DRAWINGS = join(ROOT, 'drawings');
 const ALIASES = join(ROOT, 'aliases');
-const THEME = join(ROOT, 'theme');
+const COMPONENTS = join(ROOT, 'components');
+const OUTPUTS = ['theme', 'icons'];
+const APP_ONLY = 'app';
 const SHADE_OPACITY = 0.4;
 const checking = process.argv.includes('--check');
 
@@ -32,7 +34,7 @@ const svgFiles = (dir: string) => (existsSync(dir) ? readdirSync(dir).filter(fil
 
 export async function drawings() {
 	const found = new Map<string, Drawing>();
-	for (const context of Object.keys(CONTEXTS)) {
+	for (const context of [...Object.keys(CONTEXTS), APP_ONLY]) {
 		for (const file of svgFiles(join(DRAWINGS, context))) {
 			const name = basename(file, '.svg');
 			found.set(name, { context, shapes: parseDrawing(file, await Bun.file(join(DRAWINGS, context, file)).text()) });
@@ -41,10 +43,18 @@ export async function drawings() {
 	return found;
 }
 
-export async function aliases() {
-	const files = readdirSync(ALIASES).filter(file => file.endsWith('.json')).sort();
-	const entries = await Promise.all(files.map(async file => Object.entries(await Bun.file(join(ALIASES, file)).json() as Record<string, string>)));
+async function names(dir: string) {
+	const files = readdirSync(dir).filter(file => file.endsWith('.json')).sort();
+	const entries = await Promise.all(files.map(async file => Object.entries(await Bun.file(join(dir, file)).json() as Record<string, string>)));
 	return new Map(entries.flat());
+}
+
+export const aliases = () => names(ALIASES);
+export const components = () => names(COMPONENTS);
+
+function component(shapes: Shape[]) {
+	const { ink, shade } = layers(shapes, false);
+	return `<script lang="ts">\n\timport Symbol from '../src/Symbol.svelte';\n\timport type { SymbolProps } from '../src/props.ts';\n\n\tlet props: SymbolProps = $props();\n</script>\n\n<Symbol {...props} ink="${ink}" shade="${shade}" />\n`;
 }
 
 export function icon(shapes: Shape[], mirrored: boolean) {
@@ -60,25 +70,29 @@ function indexTheme() {
 	return `[Icon Theme]\nName=${NAME}\nComment=Luft's symbolic icons\nInherits=Adwaita,hicolor\nDirectories=${folders.join(',')}\n\n${sections.join('\n')}`;
 }
 
+function drawingOf(drawn: Map<string, Drawing>, name: string, target: string) {
+	const drawing = drawn.get(target);
+	if (!drawing) throw new Error(`${name} points at ${target}, which isn't drawn`);
+	return drawing;
+}
+
 async function outputs() {
-	const files = new Map([['index.theme', indexTheme()]]);
+	const files = new Map([['theme/index.theme', indexTheme()]]);
 	const drawn = await drawings();
-	const named = [...drawn.entries(), ...[...await aliases()].map(([alias, target]): [string, Drawing] => {
-		const drawing = drawn.get(target);
-		if (!drawing) throw new Error(`The alias ${alias} points at ${target}, which isn't drawn`);
-		return [alias, drawing];
-	})];
+	const themed = [...drawn].filter(([, { context }]) => context !== APP_ONLY);
+	const named = [...themed, ...[...await aliases()].map(([alias, target]): [string, Drawing] => [alias, drawingOf(drawn, alias, target)])];
 	for (const [name, { context, shapes }] of named) {
-		files.set(`symbolic/${context}/${name}-symbolic.svg`, icon(shapes, false));
-		if (MIRRORED.has(name)) files.set(`symbolic/${context}/${name}-symbolic-rtl.svg`, icon(shapes, true));
+		files.set(`theme/symbolic/${context}/${name}-symbolic.svg`, icon(shapes, false));
+		if (MIRRORED.has(name)) files.set(`theme/symbolic/${context}/${name}-symbolic-rtl.svg`, icon(shapes, true));
 	}
+	for (const [name, target] of await components()) files.set(`icons/${name}.svelte`, component(drawingOf(drawn, name, target).shapes));
 	return files;
 }
 
-function written(dir = ''): string[] {
-	if (!existsSync(join(THEME, dir))) return [];
-	return readdirSync(join(THEME, dir), { withFileTypes: true }).flatMap(entry => {
-		const path = dir ? `${dir}/${entry.name}` : entry.name;
+function written(dir: string): string[] {
+	if (!existsSync(join(ROOT, dir))) return [];
+	return readdirSync(join(ROOT, dir), { withFileTypes: true }).flatMap(entry => {
+		const path = `${dir}/${entry.name}`;
 		return entry.isDirectory() ? written(path) : [path];
 	});
 }
@@ -87,14 +101,14 @@ if (import.meta.main) {
 	const files = await outputs();
 	const stale: string[] = [];
 	for (const [path, contents] of files) {
-		const file = Bun.file(join(THEME, path));
+		const file = Bun.file(join(ROOT, path));
 		if (await file.exists() && await file.text() === contents) continue;
 		if (checking) stale.push(path);
 		else await Bun.write(file, contents);
 	}
-	for (const path of written().filter(path => !files.has(path))) {
+	for (const path of OUTPUTS.flatMap(dir => written(dir)).filter(path => !files.has(path))) {
 		if (checking) stale.push(path);
-		else rmSync(join(THEME, path));
+		else rmSync(join(ROOT, path));
 	}
 	if (stale.length) {
 		console.error(`These icons don't match kestrel/symbols; run \`bun run build\` there:\n${stale.join('\n')}`);

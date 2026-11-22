@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
+	import ChevronUp from '@luft/symbols/icons/chevron-up';
 	import type { Sort } from '#lib/state/settings.svelte.js';
 	import type { Column } from './columns';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Settings from '@lucide/svelte/icons/settings';
+	import Settings from '@luft/symbols/icons/settings';
 	import { t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Segmented, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';

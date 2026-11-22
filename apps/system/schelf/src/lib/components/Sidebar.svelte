@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
-	import Compass from '@lucide/svelte/icons/compass';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import Puzzle from '@lucide/svelte/icons/puzzle';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import UserRound from '@lucide/svelte/icons/user-round';
+	import Compass from '@luft/symbols/icons/compass';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import Puzzle from '@luft/symbols/icons/puzzle';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import UserRound from '@luft/symbols/icons/user-round';
 	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES, categoryTitle } from '#lib/catalog/categories.js';
 	import NavItem from '#lib/components/NavItem.svelte';

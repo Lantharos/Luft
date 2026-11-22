@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AudioLines from '@lucide/svelte/icons/audio-lines';
+	import AudioLines from '@luft/symbols/icons/audio-lines';
 	import { t } from '@luft/i18n';
 	import { dateTime, Dialog, formatClock } from '@luft/ui';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';

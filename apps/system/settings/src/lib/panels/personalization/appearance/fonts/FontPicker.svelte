@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Check from '@lucide/svelte/icons/check';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@luft/symbols/icons/check';
+	import ChevronDown from '@luft/symbols/icons/chevron-down';
 	import { tick } from 'svelte';
 	import { errorText, Popover, SearchField, VirtualScroller } from '@luft/ui';
 	import type { Role } from '#lib/bindings.js';

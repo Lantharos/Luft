@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, Segmented, TitleBar } from '@luft/ui';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import type { Mode } from '#lib/bindings.js';
 	import { flatbed } from '#lib/app/flatbed.svelte.js';
 

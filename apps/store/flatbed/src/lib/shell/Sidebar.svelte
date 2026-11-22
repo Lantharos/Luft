@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { selectionPill, Spinner } from '@luft/ui';
-	import Camera from '@lucide/svelte/icons/camera';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Printer from '@lucide/svelte/icons/printer';
-	import Settings from '@lucide/svelte/icons/settings';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Camera from '@luft/symbols/icons/camera';
+	import Plus from '@luft/symbols/icons/plus';
+	import Printer from '@luft/symbols/icons/printer';
+	import Settings from '@luft/symbols/icons/settings';
+	import Usb from '@luft/symbols/icons/usb';
 	import { CAMERA, flatbed } from '#lib/app/flatbed.svelte.js';
 
 	let { onadd, onsettings }: { onadd: () => void; onsettings: () => void } = $props();

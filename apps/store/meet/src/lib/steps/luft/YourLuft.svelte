@@ -1,9 +1,9 @@
 <script lang="ts">
-	import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
-	import Eraser from '@lucide/svelte/icons/eraser';
-	import Hourglass from '@lucide/svelte/icons/hourglass';
-	import PanelLeftOpen from '@lucide/svelte/icons/panel-left-open';
-	import Usb from '@lucide/svelte/icons/usb';
+	import ArrowLeftRight from '@luft/symbols/icons/arrow-left-right';
+	import Eraser from '@luft/symbols/icons/eraser';
+	import Hourglass from '@luft/symbols/icons/hourglass';
+	import PanelLeftOpen from '@luft/symbols/icons/panel-left-open';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog, Spinner } from '@luft/ui';
 	import type { Blocked, Change } from '#lib/bindings.js';

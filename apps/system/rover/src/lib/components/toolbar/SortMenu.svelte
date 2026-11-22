@@ -1,7 +1,7 @@
 <script lang="ts">
-	import ArrowDownWideNarrow from '@lucide/svelte/icons/arrow-down-wide-narrow';
-	import ArrowUpNarrowWide from '@lucide/svelte/icons/arrow-up-narrow-wide';
-	import Check from '@lucide/svelte/icons/check';
+	import ArrowDownWideNarrow from '@luft/symbols/icons/arrow-down-wide-narrow';
+	import ArrowUpNarrowWide from '@luft/symbols/icons/arrow-up-narrow-wide';
+	import Check from '@luft/symbols/icons/check';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import type { GroupBy, SortBy } from '#lib/bindings.js';

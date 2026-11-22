@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Download from '@lucide/svelte/icons/download';
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
+	import Download from '@luft/symbols/icons/download';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
 	import { Dialog, errorText, Row, Section, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { CursorTheme } from '#lib/bindings.js';

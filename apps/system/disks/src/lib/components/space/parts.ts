@@ -1,11 +1,11 @@
 import type { Component } from 'svelte';
 import { t } from '@luft/i18n';
-import AppWindow from '@lucide/svelte/icons/app-window';
-import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
-import Cog from '@lucide/svelte/icons/cog';
-import Download from '@lucide/svelte/icons/download';
-import House from '@lucide/svelte/icons/house';
-import Layers from '@lucide/svelte/icons/layers';
+import AppWindow from '@luft/symbols/icons/app-window';
+import ArchiveRestore from '@luft/symbols/icons/archive-restore';
+import Cog from '@luft/symbols/icons/cog';
+import Download from '@luft/symbols/icons/download';
+import House from '@luft/symbols/icons/house';
+import Layers from '@luft/symbols/icons/layers';
 import type { Part, PartKind } from '#lib/bindings.js';
 import type { Tile } from './tiles';
 

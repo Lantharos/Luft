@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Keyboard from '@lucide/svelte/icons/keyboard';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
+	import Keyboard from '@luft/symbols/icons/keyboard';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import type { DeadKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';

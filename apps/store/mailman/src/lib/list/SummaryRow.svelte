@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { t } from '@luft/i18n';
 	import type { Summary } from '#lib/mail/list.svelte.js';
 	import { BUNDLES, PRIMARY } from '#lib/mail/views.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { VirtualScroller } from '@luft/ui';
 	import type { FileEntry } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';

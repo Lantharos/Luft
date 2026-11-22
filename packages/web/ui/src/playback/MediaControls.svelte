@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
 	import type { Snippet } from 'svelte';
 	import type { ClassValue } from 'svelte/elements';
 	import { t } from '@luft/i18n';

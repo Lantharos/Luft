@@ -2,7 +2,7 @@
 	import type { NativeVideo } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
 	import { canPlayNatively, decodeFailed, NativeVideoSurface } from '@luft/ui';
-	import Play from '@lucide/svelte/icons/play';
+	import Play from '@luft/symbols/icons/play';
 	import { onDestroy } from 'svelte';
 	import { commands } from '#lib/bindings.js';
 	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '#lib/bindings.js';

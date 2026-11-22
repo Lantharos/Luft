@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Fingerprint from '@lucide/svelte/icons/fingerprint';
-	import Trash from '@lucide/svelte/icons/trash';
+	import Fingerprint from '@luft/symbols/icons/fingerprint';
+	import Trash from '@luft/symbols/icons/trash';
 	import { Dialog, errorText, fingerInSentence, fingerLabel, type Fingerprints, FINGERS, IconButton, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import EnrollDialog from './EnrollDialog.svelte';

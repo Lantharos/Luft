@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Wrench from '@lucide/svelte/icons/wrench';
+	import Wrench from '@luft/symbols/icons/wrench';
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, Row, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

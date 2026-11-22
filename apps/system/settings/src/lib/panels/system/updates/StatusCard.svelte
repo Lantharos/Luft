@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Laptop from '@lucide/svelte/icons/laptop';
+	import Laptop from '@luft/symbols/icons/laptop';
 	import HeroCard from '#lib/components/HeroCard.svelte';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, UpdatesOverview } from '#lib/bindings.js';

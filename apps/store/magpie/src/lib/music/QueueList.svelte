@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { formatClock, VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import AudioLines from '@lucide/svelte/icons/audio-lines';
+	import AudioLines from '@luft/symbols/icons/audio-lines';
 	import Artwork from './Artwork.svelte';
 	import { player } from './player.svelte';
 	import { trackArtist, trackTitle } from './queue';

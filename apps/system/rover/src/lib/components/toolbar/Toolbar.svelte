@@ -1,12 +1,12 @@
 <script lang="ts">
-	import ArrowUp from '@lucide/svelte/icons/arrow-up';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Columns3 from '@lucide/svelte/icons/columns-3';
-	import GitBranch from '@lucide/svelte/icons/git-branch';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import List from '@lucide/svelte/icons/list';
-	import PanelRight from '@lucide/svelte/icons/panel-right';
+	import ArrowUp from '@luft/symbols/icons/arrow-up';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
+	import Columns3 from '@luft/symbols/icons/columns-3';
+	import GitBranch from '@luft/symbols/icons/git-branch';
+	import LayoutGrid from '@luft/symbols/icons/layout-grid';
+	import List from '@luft/symbols/icons/list';
+	import PanelRight from '@luft/symbols/icons/panel-right';
 	import { t } from '@luft/i18n';
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
 	import type { Component } from 'svelte';

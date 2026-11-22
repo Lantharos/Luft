@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Clock from '@lucide/svelte/icons/clock';
+	import Clock from '@luft/symbols/icons/clock';
 	import { i18n, t } from '@luft/i18n';
 	import { Popover } from '@luft/ui';
 

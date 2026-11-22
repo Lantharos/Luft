@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { ProgressBar, Spinner, tooltip } from '@luft/ui';
 	import type { Operation } from '#lib/bindings.js';
 	import { activity, percent, percentText } from '#lib/format.js';

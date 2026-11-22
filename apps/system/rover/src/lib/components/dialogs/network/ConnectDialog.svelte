@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Server from '@lucide/svelte/icons/server';
-	import X from '@lucide/svelte/icons/x';
+	import Server from '@luft/symbols/icons/server';
+	import X from '@luft/symbols/icons/x';
 	import { tick } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { Checkbox, Dialog, Spinner, TextField } from '@luft/ui';

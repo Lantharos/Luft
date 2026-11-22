@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
 	import { bytes, Dialog, Row, Switch } from '@luft/ui';
 	import { commands, type InstalledApp, type PluggedDrive } from '#lib/bindings.js';
 

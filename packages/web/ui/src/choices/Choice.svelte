@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 
 	interface Props {
 		icon: Component<{ size?: number }>;

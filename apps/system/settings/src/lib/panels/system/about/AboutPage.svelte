@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Laptop from '@lucide/svelte/icons/laptop';
+	import Laptop from '@luft/symbols/icons/laptop';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, Row, Section, Switch, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

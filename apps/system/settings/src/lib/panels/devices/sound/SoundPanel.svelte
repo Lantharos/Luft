@@ -2,10 +2,10 @@
 	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
-	import Mic from '@lucide/svelte/icons/mic';
-	import MicOff from '@lucide/svelte/icons/mic-off';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
-	import VolumeX from '@lucide/svelte/icons/volume-x';
+	import Mic from '@luft/symbols/icons/mic';
+	import MicOff from '@luft/symbols/icons/mic-off';
+	import Volume2 from '@luft/symbols/icons/volume-2';
+	import VolumeX from '@luft/symbols/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { DeviceView, Direction, Port, SoundSnapshot } from '#lib/bindings.js';

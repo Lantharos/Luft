@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem } from '@luft/ui';
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { allColumns } from './columns';
 
 	interface Props {

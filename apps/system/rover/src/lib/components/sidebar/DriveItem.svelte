@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Eject from '@lucide/svelte/icons/eject';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Eject from '@luft/symbols/icons/eject';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, tooltip } from '@luft/ui';
 	import type { DriveInfo } from '#lib/bindings.js';

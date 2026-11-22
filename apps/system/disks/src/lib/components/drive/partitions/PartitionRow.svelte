@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Lock from '@lucide/svelte/icons/lock';
+	import Lock from '@luft/symbols/icons/lock';
 	import { bytes, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Volume } from '#lib/bindings.js';

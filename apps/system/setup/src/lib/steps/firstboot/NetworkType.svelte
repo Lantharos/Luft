@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Coffee from '@lucide/svelte/icons/coffee';
-	import House from '@lucide/svelte/icons/house';
+	import Coffee from '@luft/symbols/icons/coffee';
+	import House from '@luft/symbols/icons/house';
 	import { i18n, t } from '@luft/i18n';
 	import { Spinner } from '@luft/ui';
 	import type { NetworkType } from '@luft/network';

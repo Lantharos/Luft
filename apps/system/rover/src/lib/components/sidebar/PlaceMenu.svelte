@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Eject from '@lucide/svelte/icons/eject';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
-	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import Globe from '@lucide/svelte/icons/globe';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import Info from '@lucide/svelte/icons/info';
-	import Palette from '@lucide/svelte/icons/palette';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Star from '@lucide/svelte/icons/star';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Eject from '@luft/symbols/icons/eject';
+	import ExternalLink from '@luft/symbols/icons/external-link';
+	import EyeOff from '@luft/symbols/icons/eye-off';
+	import Globe from '@luft/symbols/icons/globe';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import Info from '@luft/symbols/icons/info';
+	import Palette from '@luft/symbols/icons/palette';
+	import Plus from '@luft/symbols/icons/plus';
+	import Star from '@luft/symbols/icons/star';
+	import Trash2 from '@luft/symbols/icons/trash-2';
 	import { t } from '@luft/i18n';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';

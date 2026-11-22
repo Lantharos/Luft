@@ -1,5 +1,5 @@
 <script lang="ts">
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section, Select, Switch, TextField } from '@luft/ui';

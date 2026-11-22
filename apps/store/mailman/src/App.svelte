@@ -3,7 +3,7 @@
 	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
 	import { appearance, basename, CommandPalette, GlassShell, PaletteState, Toast, tooltip } from '@luft/ui';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import ArrowLeft from '@luft/symbols/icons/arrow-left';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Account } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, Dialog, errorText, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import { commands } from '#lib/bindings.js';
 	import type { AccountConfig, NewSecret, Provider, Server } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';

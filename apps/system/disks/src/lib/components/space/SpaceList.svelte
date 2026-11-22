@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import FileIcon from '@lucide/svelte/icons/file';
-	import Files from '@lucide/svelte/icons/files';
-	import Folder from '@lucide/svelte/icons/folder';
+	import FileIcon from '@luft/symbols/icons/file';
+	import Files from '@luft/symbols/icons/files';
+	import Folder from '@luft/symbols/icons/folder';
 	import { PART_ICONS } from './parts';
 	import { bytes } from '@luft/ui';
 	import ActionMenu from '../ActionMenu.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { bytes, Spinner, tooltip } from '@luft/ui';
 	import { showInRover } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';

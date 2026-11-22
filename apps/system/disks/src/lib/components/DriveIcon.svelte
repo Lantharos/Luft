@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Disc3 from '@lucide/svelte/icons/disc-3';
-	import FileBox from '@lucide/svelte/icons/file-box';
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import MemoryStick from '@lucide/svelte/icons/memory-stick';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Disc3 from '@luft/symbols/icons/disc-3';
+	import FileBox from '@luft/symbols/icons/file-box';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import MemoryStick from '@luft/symbols/icons/memory-stick';
+	import Usb from '@luft/symbols/icons/usb';
 	import type { DriveKind } from '#lib/bindings.js';
 
 	interface Props {

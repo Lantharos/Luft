@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ActionRow, Dialog, Row, Section, Segmented, Switch } from '@luft/ui';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Trash from '@lucide/svelte/icons/trash-2';
+	import Plus from '@luft/symbols/icons/plus';
+	import Trash from '@luft/symbols/icons/trash-2';
 	import { commands } from '#lib/bindings.js';
 	import type { Template } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';

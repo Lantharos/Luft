@@ -1,5 +1,5 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
 	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
 	import type { Drives } from '#lib/bindings.js';

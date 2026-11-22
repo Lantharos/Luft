@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Plus from '@lucide/svelte/icons/plus';
-	import X from '@lucide/svelte/icons/x';
+	import Plus from '@luft/symbols/icons/plus';
+	import X from '@luft/symbols/icons/x';
 	import { AppIcon, IconButton, ItemRow, Row, Section, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Entry } from '#lib/bindings.js';

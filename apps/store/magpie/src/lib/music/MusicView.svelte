@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { formatClock, SeekBar, tooltip, VolumeControl } from '@luft/ui';
-	import AudioWaveform from '@lucide/svelte/icons/audio-waveform';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import Repeat from '@lucide/svelte/icons/repeat';
-	import Repeat1 from '@lucide/svelte/icons/repeat-1';
-	import Shuffle from '@lucide/svelte/icons/shuffle';
-	import SkipBack from '@lucide/svelte/icons/skip-back';
-	import SkipForward from '@lucide/svelte/icons/skip-forward';
+	import AudioWaveform from '@luft/symbols/icons/audio-waveform';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
+	import Repeat from '@luft/symbols/icons/repeat';
+	import Repeat1 from '@luft/symbols/icons/repeat-1';
+	import Shuffle from '@luft/symbols/icons/shuffle';
+	import SkipBack from '@luft/symbols/icons/skip-back';
+	import SkipForward from '@luft/symbols/icons/skip-forward';
 	import { untrack } from 'svelte';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import type { Item } from '#lib/bindings.js';

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import AppWindow from '@lucide/svelte/icons/app-window';
-	import Puzzle from '@lucide/svelte/icons/puzzle';
-	import Package from '@lucide/svelte/icons/package';
-	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
+	import AppWindow from '@luft/symbols/icons/app-window';
+	import Puzzle from '@luft/symbols/icons/puzzle';
+	import Package from '@luft/symbols/icons/package';
+	import SquareTerminal from '@luft/symbols/icons/square-terminal';
 	import { AppIcon } from '@luft/ui';
 	import type { Source } from '#lib/bindings.js';
 

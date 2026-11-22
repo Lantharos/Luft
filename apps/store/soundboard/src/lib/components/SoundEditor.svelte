@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Play from '@lucide/svelte/icons/play';
+	import Play from '@luft/symbols/icons/play';
 	import { untrack } from 'svelte';
 	import { Dialog, Row, Segmented, Slider, Switch, TextField } from '@luft/ui';
 	import { t } from '@luft/i18n';

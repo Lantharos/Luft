@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
-	import Info from '@lucide/svelte/icons/info';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Info from '@luft/symbols/icons/info';
+	import Trash2 from '@luft/symbols/icons/trash-2';
 	import { bytes, Dialog, Select, TextField, tooltip } from '@luft/ui';
 	import type { Filesystem } from '#lib/bindings.js';
 	import { editor } from '#lib/editor/editor.svelte.js';

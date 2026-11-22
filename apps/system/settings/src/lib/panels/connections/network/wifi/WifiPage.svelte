@@ -1,6 +1,6 @@
 <script lang="ts">
-	import History from '@lucide/svelte/icons/history';
-	import WifiIcon from '@lucide/svelte/icons/wifi';
+	import History from '@luft/symbols/icons/history';
+	import WifiIcon from '@luft/symbols/icons/wifi';
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';

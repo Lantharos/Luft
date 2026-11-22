@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { TextArea, tooltip } from '@luft/ui';
 
 	interface Props {

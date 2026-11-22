@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
-	import GalleryHorizontalEnd from '@lucide/svelte/icons/gallery-horizontal-end';
-	import ListMusic from '@lucide/svelte/icons/list-music';
-	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import GalleryHorizontalEnd from '@luft/symbols/icons/gallery-horizontal-end';
+	import ListMusic from '@luft/symbols/icons/list-music';
+	import PanelLeft from '@luft/symbols/icons/panel-left';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import type { Group } from '#lib/library/kinds.js';
 

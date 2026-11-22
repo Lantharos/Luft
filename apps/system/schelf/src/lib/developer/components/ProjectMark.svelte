@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AppWindow from '@lucide/svelte/icons/app-window';
-	import Package from '@lucide/svelte/icons/package';
-	import Puzzle from '@lucide/svelte/icons/puzzle';
+	import AppWindow from '@luft/symbols/icons/app-window';
+	import Package from '@luft/symbols/icons/package';
+	import Puzzle from '@luft/symbols/icons/puzzle';
 	import type { DashboardApp } from '../store';
 
 	let { project, size = 18 }: { project: DashboardApp; size?: number } = $props();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import MailPlus from '@lucide/svelte/icons/mail-plus';
+	import MailPlus from '@luft/symbols/icons/mail-plus';
 	import { t } from '@luft/i18n';
 
 	interface Props {

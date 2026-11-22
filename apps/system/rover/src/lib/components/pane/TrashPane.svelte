@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Trash from '@lucide/svelte/icons/trash';
+	import Trash from '@luft/symbols/icons/trash';
 	import { t } from '@luft/i18n';
 	import { bytes, EmptyState, parent, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
 	import type { TrashItem } from '#lib/bindings.js';

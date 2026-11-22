@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Undo2 from '@lucide/svelte/icons/undo-2';
+	import Undo2 from '@luft/symbols/icons/undo-2';
 	import { tooltip } from '@luft/ui';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { editor } from '#lib/editor/editor.svelte.js';

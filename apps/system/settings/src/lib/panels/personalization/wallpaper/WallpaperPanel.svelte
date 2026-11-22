@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import ImagePlus from '@lucide/svelte/icons/image-plus';
+	import FolderOpen from '@luft/symbols/icons/folder-open';
+	import ImagePlus from '@luft/symbols/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { openFolder } from './api';

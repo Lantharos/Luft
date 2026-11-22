@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Avatar, longDateTime, relativeDay, tooltip } from '@luft/ui';
-	import ImageOff from '@lucide/svelte/icons/image-off';
-	import Reply from '@lucide/svelte/icons/reply';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import ImageOff from '@luft/symbols/icons/image-off';
+	import Reply from '@luft/symbols/icons/reply';
+	import Ellipsis from '@luft/symbols/icons/ellipsis';
 	import { commands } from '#lib/bindings.js';
 	import type { Address, ConversationMessage } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';

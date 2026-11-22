@@ -1,9 +1,9 @@
 <script lang="ts">
-	import AudioLines from '@lucide/svelte/icons/audio-lines';
-	import Mic from '@lucide/svelte/icons/mic';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import Square from '@lucide/svelte/icons/square';
+	import AudioLines from '@luft/symbols/icons/audio-lines';
+	import Mic from '@luft/symbols/icons/mic';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
+	import Stop from '@luft/symbols/icons/stop';
 	import { t } from '@luft/i18n';
 	import { formatClock, IconButton, tooltip } from '@luft/ui';
 	import { session } from '#lib/app/session.svelte.js';
@@ -47,7 +47,7 @@
 		{:else}
 			<IconButton icon={Pause} label={t('record-pause')} onclick={() => void recorder.pause()} />
 		{/if}
-		<IconButton icon={Square} label={t('record-stop')} onclick={() => void recorder.stop()} />
+		<IconButton icon={Stop} label={t('record-stop')} onclick={() => void recorder.stop()} />
 	</div>
 {:else if elsewhere}
 	<button type="button" class="recording elsewhere" {@attach tooltip(t('record-elsewhere', { notebook: elsewhere.meta.name }))} onclick={() => session.open(elsewhere.entry)}>

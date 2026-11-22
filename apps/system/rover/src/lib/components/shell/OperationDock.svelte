@@ -1,13 +1,13 @@
 <script lang="ts">
-	import Archive from '@lucide/svelte/icons/archive';
-	import Check from '@lucide/svelte/icons/check';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Pause from '@lucide/svelte/icons/pause';
-	import Play from '@lucide/svelte/icons/play';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Upload from '@lucide/svelte/icons/upload';
-	import Usb from '@lucide/svelte/icons/usb';
-	import X from '@lucide/svelte/icons/x';
+	import Archive from '@luft/symbols/icons/archive';
+	import Check from '@luft/symbols/icons/check';
+	import Copy from '@luft/symbols/icons/copy';
+	import Pause from '@luft/symbols/icons/pause';
+	import Play from '@luft/symbols/icons/play';
+	import Trash2 from '@luft/symbols/icons/trash-2';
+	import Upload from '@luft/symbols/icons/upload';
+	import Usb from '@luft/symbols/icons/usb';
+	import X from '@luft/symbols/icons/x';
 	import { t } from '@luft/i18n';
 	import { basename, bytes, duration } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
+	import Check from '@luft/symbols/icons/check';
 	import { t } from '@luft/i18n';
 	import { Popover, Segmented, Slider, type Side } from '@luft/ui';
 	import { css, readableOn } from '#lib/ink/color.js';
@@ -54,7 +54,7 @@
 					onclick={() => tools.update({ color })}
 				>
 					{#if preset.color === color}
-						<Check size={16} strokeWidth={2.6} />
+						<Check size={16} />
 					{/if}
 				</button>
 			{/each}

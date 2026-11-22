@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Check from '@lucide/svelte/icons/check';
-	import Usb from '@lucide/svelte/icons/usb';
+	import Check from '@luft/symbols/icons/check';
+	import Usb from '@luft/symbols/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, errorText, Row, Spinner } from '@luft/ui';
 	import { commands, events, type KeyDrive } from '#lib/bindings.js';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
-	import WifiIcon from '@lucide/svelte/icons/wifi';
-	import X from '@lucide/svelte/icons/x';
+	import EthernetPort from '@luft/symbols/icons/ethernet-port';
+	import WifiIcon from '@luft/symbols/icons/wifi';
+	import X from '@luft/symbols/icons/x';
 	import { i18n, t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Segmented, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';

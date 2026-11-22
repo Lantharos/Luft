@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Import from '@lucide/svelte/icons/import';
+	import Import from '@luft/symbols/icons/import';
 	import { onMount } from 'svelte';
 	import { i18n, t } from '@luft/i18n';
 	import { ActionRow, errorText, Section, Spinner } from '@luft/ui';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Box from '@lucide/svelte/icons/box';
+	import Box from '@luft/symbols/icons/box';
 	import { t } from '@luft/i18n';
 	import { bytes, Spinner } from '@luft/ui';
 	import { openDisks } from '#lib/bridge/system.js';

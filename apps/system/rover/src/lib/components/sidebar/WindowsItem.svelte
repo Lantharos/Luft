@@ -1,6 +1,6 @@
 <script lang="ts">
-	import HardDrive from '@lucide/svelte/icons/hard-drive';
-	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import HardDrive from '@luft/symbols/icons/hard-drive';
+	import RefreshCw from '@luft/symbols/icons/refresh-cw';
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText } from '@luft/ui';
 	import type { WindowsDrive } from '#lib/bindings.js';

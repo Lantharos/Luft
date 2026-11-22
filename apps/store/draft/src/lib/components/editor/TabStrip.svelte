@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { dragFiles, tooltip } from '@luft/ui';
-	import X from '@lucide/svelte/icons/x';
+	import X from '@luft/symbols/icons/x';
 	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
 	import { documentMenu } from '#lib/files/actions.js';

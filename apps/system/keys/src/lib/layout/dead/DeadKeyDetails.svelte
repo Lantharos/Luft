@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import PenLine from '@lucide/svelte/icons/pen-line';
+	import PenLine from '@luft/symbols/icons/pen-line';
 	import { Popover, TextField, tooltip } from '@luft/ui';
 	import type { DeadKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';

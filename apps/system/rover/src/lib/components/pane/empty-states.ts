@@ -1,10 +1,10 @@
 import { t } from '@luft/i18n';
-import CircleAlert from '@lucide/svelte/icons/circle-alert';
-import Clock from '@lucide/svelte/icons/clock';
-import FolderOpen from '@lucide/svelte/icons/folder-open';
-import FolderX from '@lucide/svelte/icons/folder-x';
-import Lock from '@lucide/svelte/icons/lock';
-import Search from '@lucide/svelte/icons/search';
+import CircleAlert from '@luft/symbols/icons/circle-alert';
+import Clock from '@luft/symbols/icons/clock';
+import FolderOpen from '@luft/symbols/icons/folder-open';
+import FolderX from '@luft/symbols/icons/folder-x';
+import Lock from '@luft/symbols/icons/lock';
+import Search from '@luft/symbols/icons/search';
 import type { EmptyAction, EmptyStateProps } from '@luft/ui';
 import type { EntryContext } from '#lib/file-manager/view/entry-props.js';
 

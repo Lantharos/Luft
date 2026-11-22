@@ -1,15 +1,15 @@
 import type { Component } from 'svelte';
 import { t } from '@luft/i18n';
-import Briefcase from '@lucide/svelte/icons/briefcase';
-import Clapperboard from '@lucide/svelte/icons/clapperboard';
-import Code from '@lucide/svelte/icons/code';
-import FlaskConical from '@lucide/svelte/icons/flask-conical';
-import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
-import Globe from '@lucide/svelte/icons/globe';
-import GraduationCap from '@lucide/svelte/icons/graduation-cap';
-import PenTool from '@lucide/svelte/icons/pen-tool';
-import Settings2 from '@lucide/svelte/icons/settings-2';
-import Wrench from '@lucide/svelte/icons/wrench';
+import Briefcase from '@luft/symbols/icons/briefcase';
+import Clapperboard from '@luft/symbols/icons/clapperboard';
+import Code from '@luft/symbols/icons/code';
+import FlaskConical from '@luft/symbols/icons/flask-conical';
+import Gamepad2 from '@luft/symbols/icons/gamepad-2';
+import Globe from '@luft/symbols/icons/globe';
+import GraduationCap from '@luft/symbols/icons/graduation-cap';
+import PenTool from '@luft/symbols/icons/pen-tool';
+import Settings2 from '@luft/symbols/icons/settings-2';
+import Wrench from '@luft/symbols/icons/wrench';
 
 export type CategoryId = 'office' | 'graphics' | 'audiovideo' | 'game' | 'development' | 'education' | 'science' | 'network' | 'utility' | 'system';
 

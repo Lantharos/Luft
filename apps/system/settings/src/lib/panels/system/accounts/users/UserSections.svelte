@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Camera from '@lucide/svelte/icons/camera';
+	import Camera from '@luft/symbols/icons/camera';
 	import { Avatar, Dialog, ItemRow, Row, Section, TextField, tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Users } from '#lib/bindings.js';

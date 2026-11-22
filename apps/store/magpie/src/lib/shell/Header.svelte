@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { parent, tooltip, WindowControls } from '@luft/ui';
-	import ArrowUp from '@lucide/svelte/icons/arrow-up';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import ArrowUp from '@luft/symbols/icons/arrow-up';
+	import ChevronLeft from '@luft/symbols/icons/chevron-left';
+	import PanelLeft from '@luft/symbols/icons/panel-left';
 	import { library } from '#lib/library/library.svelte.js';
 	import type { Snippet } from 'svelte';
 	import { chrome } from '#lib/app/chrome.svelte.js';

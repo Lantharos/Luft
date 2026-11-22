@@ -1,8 +1,8 @@
 <script lang="ts">
-	import BatteryFull from '@lucide/svelte/icons/battery-full';
-	import Puzzle from '@lucide/svelte/icons/puzzle';
-	import Volume2 from '@lucide/svelte/icons/volume-2';
-	import Wifi from '@lucide/svelte/icons/wifi';
+	import BatteryFull from '@luft/symbols/icons/battery-full';
+	import Puzzle from '@luft/symbols/icons/puzzle';
+	import Volume2 from '@luft/symbols/icons/volume-2';
+	import Wifi from '@luft/symbols/icons/wifi';
 	import { AppIcon, appearance, GUST_SCALE, GustIcon, type GustFills } from '@luft/ui';
 	import type { App } from '#lib/bindings.js';
 	import PreviewClock from './PreviewClock.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import RotateCcw from '@luft/symbols/icons/rotate-ccw';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import type { Category } from '#lib/bindings.js';
 	import { labels } from './keys/accelerator';

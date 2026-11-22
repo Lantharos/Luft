@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import { MediaControls, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Captions from '@lucide/svelte/icons/captions';
-	import Gauge from '@lucide/svelte/icons/gauge';
-	import Maximize from '@lucide/svelte/icons/maximize';
-	import Minimize from '@lucide/svelte/icons/minimize';
-	import PictureInPicture2 from '@lucide/svelte/icons/picture-in-picture-2';
+	import Captions from '@luft/symbols/icons/captions';
+	import Gauge from '@luft/symbols/icons/gauge';
+	import Maximize from '@luft/symbols/icons/maximize';
+	import Minimize from '@luft/symbols/icons/minimize';
+	import PictureInPicture2 from '@luft/symbols/icons/picture-in-picture-2';
 	import type { SubtitleTrack } from '#lib/bindings.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { volume } from '#lib/playback/volume.svelte.js';

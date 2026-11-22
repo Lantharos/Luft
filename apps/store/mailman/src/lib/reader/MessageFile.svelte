@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Avatar, errorText, longDateTime } from '@luft/ui';
-	import Reply from '@lucide/svelte/icons/reply';
+	import Reply from '@luft/symbols/icons/reply';
 	import { commands } from '#lib/bindings.js';
 	import type { OpenedFile } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';

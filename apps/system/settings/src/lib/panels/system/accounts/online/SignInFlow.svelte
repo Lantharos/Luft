@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import Copy from '@lucide/svelte/icons/copy';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import Copy from '@luft/symbols/icons/copy';
+	import ExternalLink from '@luft/symbols/icons/external-link';
+	import Smartphone from '@luft/symbols/icons/smartphone';
 	import { t } from '@luft/i18n';
 	import { Choice, Spinner, TextField } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';

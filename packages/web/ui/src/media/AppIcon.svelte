@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
-	import AppWindow from '@lucide/svelte/icons/app-window';
+	import AppWindow from '@luft/symbols/icons/app-window';
 	import { appearance, type AppIconStyle } from '../appearance.svelte';
 
 	interface Props {

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, relativeDay, tooltip } from '@luft/ui';
-	import Archive from '@lucide/svelte/icons/archive';
-	import Check from '@lucide/svelte/icons/check';
-	import Clock from '@lucide/svelte/icons/clock';
-	import Paperclip from '@lucide/svelte/icons/paperclip';
-	import Star from '@lucide/svelte/icons/star';
-	import Trash from '@lucide/svelte/icons/trash-2';
+	import Archive from '@luft/symbols/icons/archive';
+	import Check from '@luft/symbols/icons/check';
+	import Clock from '@luft/symbols/icons/clock';
+	import Paperclip from '@luft/symbols/icons/paperclip';
+	import Star from '@luft/symbols/icons/star';
+	import Trash from '@luft/symbols/icons/trash-2';
 	import type { ThreadRow } from '#lib/bindings.js';
 
 	interface Props {
@@ -50,7 +50,7 @@
 >
 	<div class="body">
 		{#if chosen}
-			<span class="check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span>
+			<span class="check" aria-hidden="true"><Check size={11} /></span>
 		{:else}
 			<span class="dot" aria-hidden="true"></span>
 		{/if}
@@ -174,7 +174,6 @@
 
 	.row :global(.star) {
 		color: var(--accent);
-		fill: currentColor;
 	}
 
 	.actions {

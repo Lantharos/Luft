@@ -4,11 +4,12 @@ mod install;
 mod made;
 mod plain;
 mod resolve;
+pub mod root;
 pub mod selinux;
 mod stage;
 mod units;
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -21,57 +22,20 @@ use crate::command::run;
 use crate::state::manifest::{Build, Package};
 use crate::state::requested::Requested;
 use crate::state::sources::Sources;
-use crate::state::{self, NAME, deployment};
+use crate::state::{self, NAME};
 use resolve::checks::{self, Place};
 pub use resolve::download::provider;
-use resolve::{Choices, Refused, rpm};
+use resolve::rpm::Rpm;
+use resolve::{Choices, Installed, NotAdding, Refused, rpm};
+use root::kept::{self, Kept};
+use root::workspace::{Folders, Workspace};
 use stage::Layout;
 
 pub const CACHE: &str = "/var/cache/luft/system-packages";
 const DNF_CACHE: &str = "/var/cache/luft/system-packages/dnf";
-const WORK: &str = "/var/cache/luft/system-packages/build";
+const DNF_STATE: &str = "/var/cache/luft/system-packages/dnf-state";
 const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
 const RELEASE: &str = "usr/lib/extension-release.d";
-
-struct Workspace {
-    path: PathBuf,
-    mounts: Vec<PathBuf>,
-}
-
-impl Workspace {
-    fn new() -> Result<Self> {
-        state::remove_folder(Path::new(WORK))?;
-        fs::create_dir(WORK).context("Making a folder to build in")?;
-        Ok(Self {
-            path: PathBuf::from(WORK),
-            mounts: Vec::new(),
-        })
-    }
-
-    fn folder(&self, name: &str) -> Result<PathBuf> {
-        let path = self.path.join(name);
-        fs::create_dir_all(&path)?;
-        Ok(path)
-    }
-
-    fn mounted(&mut self, at: &Path) {
-        self.mounts.push(at.to_path_buf());
-    }
-}
-
-impl Drop for Workspace {
-    fn drop(&mut self) {
-        let unmounted = self.mounts.iter().rev().all(|at| {
-            Command::new("umount")
-                .arg(at)
-                .status()
-                .is_ok_and(|status| status.success())
-        });
-        if unmounted {
-            let _ = fs::remove_dir_all(&self.path);
-        }
-    }
-}
 
 struct OsRelease {
     id: String,
@@ -142,6 +106,54 @@ fn entries(folder: &Path, extension: &str) -> Vec<String> {
     names
 }
 
+/// Downloads what building `requested` for `digest` will, over the kept root when the build
+/// could go on from it, so the build that follows finds every package in dnf's cache.
+pub fn prepare(digest: &str, requested: &Requested, sources: &Sources) -> Result<()> {
+    let kept = kept::usable(digest, requested, sources);
+    let mut work = Workspace::new()?;
+    let folders = work.mount(
+        digest,
+        kept.as_ref().map_or(&[][..], |kept| &kept.layers[..]),
+        sources,
+    )?;
+    let os = os_release(&folders.tree)?;
+    resolve::download::download(
+        &folders.root,
+        &os.version_id,
+        requested,
+        &BTreeSet::new(),
+        sources,
+        &folders.store,
+    )
+    .map(drop)
+}
+
+pub fn refresh_metadata() -> Result<()> {
+    resolve::download::refresh(&os_release(Path::new("/"))?.version_id)
+}
+
+pub fn tidy() -> Result<()> {
+    resolve::download::tidy(&HashSet::new())
+}
+
+/// The packages of the kept root's build, as its package database has them, from where the
+/// build noted each came from.
+fn installed_from(root: &Path, build: &Build) -> Result<Vec<Rpm>> {
+    let labels: Vec<String> = build
+        .packages
+        .iter()
+        .map(|package| format!("{}-{}.{}", package.name, package.version, package.arch))
+        .collect();
+    Ok(rpm::query_installed(root, &labels)?
+        .into_iter()
+        .zip(&build.packages)
+        .map(|(rpm, package)| Rpm {
+            origin: package.origin.clone(),
+            ..rpm
+        })
+        .collect())
+}
+
 fn unchanged(current: &Build, rpms: &[rpm::Rpm]) -> bool {
     current.packages.len() == rpms.len()
         && rpms
@@ -170,7 +182,8 @@ impl Gate {
 /// A build of the system packages in `requested` for the deployment `digest` into `image`.
 /// Nothing is built when the newest packages are the versions `newer_than` already has. The
 /// packages in `needed` fail the build when they can't be in it; anything else that can't
-/// is left out.
+/// is left out. With `keep`, for the running system, the build root is kept, and a change
+/// that only adds packages installs them over the one kept before.
 pub struct Plan<'a> {
     pub digest: &'a str,
     pub requested: &'a Requested,
@@ -179,6 +192,7 @@ pub struct Plan<'a> {
     pub newer_than: Option<&'a Build>,
     pub gate: Option<&'a Gate>,
     pub needed: &'a [String],
+    pub keep: bool,
 }
 
 /// Builds the plan from Fedora's repositories for the deployment's version and the sources,
@@ -186,13 +200,19 @@ pub struct Plan<'a> {
 pub fn build(plan: &Plan, step: &dyn Fn(Step)) -> Result<Option<Build>> {
     let mut choices = Choices::needing(plan.needed);
     let mut escalated = false;
+    let mut kept = (plan.keep && plan.newer_than.is_none())
+        .then(|| kept::usable(plan.digest, plan.requested, plan.sources))
+        .flatten();
     loop {
-        let built = attempt(plan, &mut choices, &mut escalated, step);
-        let refused = match &built {
-            Err(error) => error.downcast_ref::<Refused>().cloned(),
-            Ok(_) => None,
+        let built = attempt(plan, kept.as_ref(), &mut choices, &mut escalated, step);
+        let Err(error) = &built else {
+            return built;
         };
-        match refused {
+        if error.is::<NotAdding>() {
+            kept = None;
+            continue;
+        }
+        match error.downcast_ref::<Refused>().cloned() {
             Some(refused) => choices.refuse(&refused, plan.requested)?,
             None => return built,
         }
@@ -201,53 +221,39 @@ pub fn build(plan: &Plan, step: &dyn Fn(Step)) -> Result<Option<Build>> {
 
 fn attempt(
     plan: &Plan,
+    kept: Option<&Kept>,
     choices: &mut Choices,
     escalated: &mut bool,
     step: &dyn Fn(Step),
 ) -> Result<Option<Build>> {
     let requested = plan.requested;
+    let kept_layers = kept.map_or(&[][..], |kept| &kept.layers[..]);
     let mut work = Workspace::new()?;
-    let (tree, upper, overlay, root) = (
-        work.folder("tree")?,
-        work.folder("upper")?,
-        work.folder("overlay")?,
-        work.folder("root")?,
-    );
-    let stage_folder = work.folder("stage")?;
-    let store = work.path.join("store");
+    let Folders {
+        tree,
+        upper,
+        root,
+        stage: stage_folder,
+        store,
+    } = work.mount(plan.digest, kept_layers, plan.sources)?;
     let rpms_folder = store.join("packages");
-    deployment::mount(plan.digest, &tree)?;
-    work.mounted(&tree);
-    run(Command::new("mount")
-        .args(["-t", "overlay", "overlay", "-o"])
-        .arg(format!(
-            "lowerdir={},upperdir={},workdir={}",
-            tree.display(),
-            upper.display(),
-            overlay.display()
-        ))
-        .arg(&root))?;
-    work.mounted(&root);
-    let cache = root.join("var/cache/libdnf5");
-    fs::create_dir_all(&cache)?;
-    fs::create_dir_all(DNF_CACHE)?;
-    run(Command::new("mount")
-        .arg("--bind")
-        .arg(DNF_CACHE)
-        .arg(&cache))?;
-    work.mounted(&cache);
-
     let os = os_release(&tree)?;
-    resolve::download::offer(&root, plan.sources)?;
     step(Step::Downloading);
-    let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
+    let base: BTreeSet<String> = rpm::installed(&tree)?.into_iter().collect();
+    let installed = match kept {
+        Some(kept) => installed_from(&root, &kept.build)?,
+        None => Vec::new(),
+    };
     let rpms = resolve::resolve(
         &root,
         &os.version_id,
         requested,
         plan.sources,
         &store,
-        &base,
+        &Installed {
+            base: &base,
+            kept: &installed,
+        },
         choices,
     )?;
     if plan
@@ -263,13 +269,24 @@ fn attempt(
     step(Step::Building);
     let made_before = state::footprint()?;
     let seeded = accounts::seed(&root, made_before.users(), made_before.groups())?;
-    let policy_before = selinux::before(&root)?;
-    install::install(&root, &os.version_id, &rpms_folder, &rpms)?;
+    let policy_before = selinux::before(&tree, &root)?;
+    let there: HashSet<(&str, &str)> = installed
+        .iter()
+        .map(|rpm| (rpm.name.as_str(), rpm.arch.as_str()))
+        .collect();
+    let adding: Vec<&Rpm> = rpms
+        .iter()
+        .filter(|rpm| !there.contains(&(rpm.name.as_str(), rpm.arch.as_str())))
+        .collect();
+    install::install(&root, &os.version_id, &rpms_folder, &adding)?;
     let accounts = accounts::collect(&root, &seeded)?;
+    let layers: Vec<PathBuf> = std::iter::once(upper.clone())
+        .chain(kept_layers.iter().rev().cloned())
+        .collect();
     let layout = Layout {
         lower: &tree,
         root: &root,
-        upper: &upper,
+        layers: &layers,
         stage: &stage_folder,
     };
     let enabled = stage::enable(&layout, &rpms, requested)?;
@@ -337,6 +354,10 @@ fn attempt(
     };
     label(&root, &stage_folder)?;
     image(&stage_folder, plan.image)?;
+    if plan.keep {
+        work.unmount()?;
+        kept::keep(plan.digest, &upper, kept, &build, plan.sources)?;
+    }
     Ok(Some(build))
 }
 

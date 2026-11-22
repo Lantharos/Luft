@@ -83,6 +83,7 @@ fn build_into(
     asked: Asked,
     report: &Report,
 ) -> Result<bool> {
+    let keep = deployment::booted().as_deref() == Some(digest);
     let partial = folder(digest, ".new");
     remove_folder(&partial)?;
     fs::create_dir_all(&partial)?;
@@ -102,6 +103,7 @@ fn build_into(
             newer_than: newer_than.as_ref(),
             gate: asked.gate.as_ref(),
             needed: &asked.needed,
+            keep,
         };
         build::build(&plan, &*report)
     });
@@ -116,6 +118,7 @@ fn build_into(
 }
 
 fn prune() -> Result<()> {
+    build::root::kept::prune(deployment::booted().as_deref())?;
     let kept = deployment::all()?;
     let Ok(entries) = fs::read_dir(builds()) else {
         return Ok(());
@@ -205,9 +208,24 @@ fn booted() -> Result<String> {
     deployment::booted().context("System packages need a sealed Luft system.")
 }
 
-/// Adds and removes system packages with the sources in `sources`, then makes the running
-/// system and the other versions on the computer use the new set. With `escalate`, a change
-/// that isn't plain asks for an administrator before anything is merged.
+/// What's left of a change once the running system has it: the builds for the other versions
+/// on the computer, made after the caller has its answer.
+pub struct Afterwards {
+    _lock: Lock,
+    requested: Requested,
+    sources: Sources,
+}
+
+impl Afterwards {
+    pub fn finish(self) -> Result<()> {
+        prepare_others(&self.requested, &self.sources);
+        prune()
+    }
+}
+
+/// Adds and removes system packages with the sources in `sources`, and makes the running
+/// system use the new set. With `escalate`, a change that isn't plain asks for an
+/// administrator before anything is merged.
 fn change_locked(
     current: &Requested,
     add: &[String],
@@ -215,7 +233,7 @@ fn change_locked(
     sources: &Sources,
     escalate: Option<Escalate>,
     report: &Report,
-) -> Result<()> {
+) -> Result<Requested> {
     let asked = Asked {
         gate: escalate.map(|escalate| Gate {
             current: merged(),
@@ -228,37 +246,43 @@ fn change_locked(
         state::save_requested(&next)?;
         Ok(next)
     });
-    let next = match changed {
-        Ok(next) => next,
+    match changed {
+        Ok(next) => {
+            sources::discard(remove)?;
+            Ok(next)
+        }
         Err(error) => {
             if current.is_empty() {
                 forget()?;
             }
-            return Err(error);
+            Err(error)
         }
-    };
-    sources::discard(remove)?;
-    prepare_others(&next, sources);
-    prune()
+    }
 }
 
-/// Adds and removes system packages, then makes the running system and the other versions on
-/// the computer use the new set.
+/// Adds and removes system packages, and makes the running system use the new set. The other
+/// versions on the computer get it from what's left afterwards.
 pub fn change(
     add: &[String],
     remove: &[String],
     escalate: Option<Escalate>,
     report: Report,
-) -> Result<()> {
-    let _lock = Lock::take()?;
-    change_locked(
+) -> Result<Afterwards> {
+    let lock = Lock::take()?;
+    let sources = Sources::current(None);
+    let requested = change_locked(
         &state::requested()?,
         add,
         remove,
-        &Sources::current(None),
+        &sources,
         escalate,
         &report,
-    )
+    )?;
+    Ok(Afterwards {
+        _lock: lock,
+        requested,
+        sources,
+    })
 }
 
 /// Builds the system packages for this version when it started without them, and for the
@@ -317,6 +341,38 @@ pub fn update() -> Result<()> {
     }
     prune()?;
     updated
+}
+
+/// Downloads what installing `names` would, unless the packages are being changed, so the
+/// install that follows finds everything in the cache.
+pub fn prepare(names: &[String]) -> Result<()> {
+    let Some(_lock) = Lock::try_take()? else {
+        return Ok(());
+    };
+    let requested = requested::changed(&state::requested()?, names, &[])?;
+    let (digest, sources) = (booted()?, Sources::current(None));
+    build::isolated(move || build::prepare(&digest, &requested, &sources))
+}
+
+/// Brings the repositories' metadata up to date while system packages are in use, unless
+/// they're being changed, which does it anyway.
+pub fn refresh_metadata() -> Result<()> {
+    if state::requested()?.is_empty() {
+        return Ok(());
+    }
+    match Lock::try_take()? {
+        Some(_lock) => build::refresh_metadata(),
+        None => Ok(()),
+    }
+}
+
+/// Leaves dnf's cache only what the builds on the computer use, once nothing is being changed,
+/// such as packages a prepared install that didn't happen downloaded.
+pub fn tidy() -> Result<()> {
+    match Lock::try_take()? {
+        Some(_lock) => build::tidy(),
+        None => Ok(()),
+    }
 }
 
 /// The system packages, what the running system has merged and the repositories that were

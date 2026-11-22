@@ -30,6 +30,9 @@ async fn serve() -> zbus::Result<()> {
         .await?;
     idle.wait(IDLE_TIMEOUT).await;
     connection.release_name(NAME).await?;
+    if let Err(error) = crate::changes::tidy() {
+        eprintln!("Tidying the downloaded packages: {error:#}");
+    }
     Ok(())
 }
 

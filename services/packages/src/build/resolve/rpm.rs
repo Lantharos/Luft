@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 
 use crate::command::text;
 use crate::state::manifest::Origin;
@@ -9,6 +9,7 @@ use crate::state::manifest::Origin;
 const QUERY: &str = "%{NAME}\\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\\t%{ARCH}\\t[%{PROVIDENAME} ]\\t%{SUMMARY}\\n\
 [%{FILENAMES}\\t%{FILEUSERNAME}\\t%{FILEGROUPNAME}\\t%{FILEMODES}\\t%{FILEFLAGS}\\t%{FILECAPS}\\n]";
 const NO_CAPABILITIES: [&str; 2] = ["", "(none)"];
+const NO_FILES: &str = "(contains no files)";
 
 /// RPMFILE_GHOST: the package claims the path, but its scriptlets or the program make it.
 const GHOST: u32 = 1 << 6;
@@ -92,7 +93,7 @@ pub fn parse(path: &Path, output: &str) -> Option<Rpm> {
                     .is_some_and(|capabilities| !NO_CAPABILITIES.contains(&capabilities)),
             })
         })
-        .filter(|file| file.path != "(contains no files)")
+        .filter(|file| file.path != NO_FILES)
         .collect();
     Some(Rpm {
         path: path.to_path_buf(),
@@ -106,19 +107,72 @@ pub fn parse(path: &Path, output: &str) -> Option<Rpm> {
     })
 }
 
-pub fn query(path: &Path) -> Result<Rpm> {
+/// Whether a line of the query's output starts the next package: file lines name absolute
+/// paths, or that the package has none.
+fn starts_package(line: &str) -> bool {
+    !line.starts_with('/') && !line.starts_with(NO_FILES)
+}
+
+fn split(output: &str) -> Vec<String> {
+    let mut packages: Vec<String> = Vec::new();
+    for line in output.lines() {
+        if starts_package(line) {
+            packages.push(String::new());
+        }
+        if let Some(package) = packages.last_mut() {
+            package.push_str(line);
+            package.push('\n');
+        }
+    }
+    packages
+}
+
+/// Reads the headers of the package files at `paths`, in the same order, with one run of rpm.
+pub fn query(paths: &[PathBuf]) -> Result<Vec<Rpm>> {
+    let mut rpms = Vec::with_capacity(paths.len());
+    for chunk in paths.chunks(512) {
+        let output = text(
+            Command::new("rpm")
+                .args([
+                    "--query",
+                    "--package",
+                    "--nosignature",
+                    "--queryformat",
+                    QUERY,
+                ])
+                .args(chunk),
+        )?;
+        let packages = split(&output);
+        if packages.len() != chunk.len() {
+            bail!("rpm read {} of {} packages", packages.len(), chunk.len());
+        }
+        for (path, package) in chunk.iter().zip(packages) {
+            rpms.push(
+                parse(path, &package).with_context(|| format!("Reading {}", path.display()))?,
+            );
+        }
+    }
+    Ok(rpms)
+}
+
+/// Reads the packages `labels` name, as `name-version.arch`, from the package database in
+/// `root`, in the same order.
+pub fn query_installed(root: &Path, labels: &[String]) -> Result<Vec<Rpm>> {
     let output = text(
         Command::new("rpm")
-            .args([
-                "--query",
-                "--package",
-                "--nosignature",
-                "--queryformat",
-                QUERY,
-            ])
-            .arg(path),
+            .arg("--root")
+            .arg(root)
+            .args(["--query", "--queryformat", QUERY])
+            .args(labels),
     )?;
-    parse(path, &output).with_context(|| format!("Reading {}", path.display()))
+    let packages = split(&output);
+    if packages.len() != labels.len() {
+        bail!("rpm found {} of {} packages", packages.len(), labels.len());
+    }
+    packages
+        .iter()
+        .map(|package| parse(Path::new(""), package).context("Reading the installed packages"))
+        .collect()
 }
 
 pub fn installed(root: &Path) -> Result<Vec<String>> {
@@ -173,6 +227,16 @@ mod tests {
         assert!(!rpm.files[1].ghost && rpm.files[2].ghost);
         assert!(rpm.files[0].capabilities && !rpm.files[1].capabilities);
         assert!(rpm.answers("tailscale(x86-64)") && !rpm.answers("tail"));
+    }
+
+    #[test]
+    fn one_query_splits_into_its_packages() {
+        let output = "htop\t3.5.3-1.fc45\tx86_64\thtop \tViewer\n/usr/bin/htop\troot\troot\t33261\t0\t\n\
+                      nano-meta\t1-1\tnoarch\t\tMeta\n(contains no files)\troot\troot\t0\t0\t(none)\n\
+                      xrdb\t1.2-1\tx86_64\txrdb \tX\n/usr/bin/xrdb\troot\troot\t33261\t0\t\n";
+        let packages = split(output);
+        assert_eq!(packages.len(), 3);
+        assert!(packages[1].starts_with("nano-meta") && packages[2].starts_with("xrdb"));
     }
 
     #[test]

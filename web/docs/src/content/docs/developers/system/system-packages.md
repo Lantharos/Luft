@@ -20,7 +20,7 @@ Everything lives in `/var`, so going back to an earlier version keeps the list a
 
 `packager` builds in a private mount namespace, so nothing it mounts outlives the build.
 
-1. Mount the version's system read-only from the composefs repository, checked file by file against its digest as the startup image does, with a writable overlay on top.
+1. Mount the version's system read-only from the composefs repository, checked file by file against its digest as the startup image does, with a writable overlay on top. A change that only adds packages to the running system goes on from its last build instead ([below](#going-on-from-the-last-build)).
 2. Resolve with `dnf --installroot` against that version's own package database, using only Fedora's repositories and the added sources, with weak dependencies as on any Fedora. Only what the transaction adds brings its recommendations, so Luft's own set stays as small as it was built.
 3. Leave out what can't be a system package ([below](#whats-refused)), so one package doesn't keep the others from being built. A requested package that's refused, or that dnf finds nothing called, is left out by itself; a refused dependency is excluded with `excludepkgs` and resolved again with `--skip-broken`, which leaves out what needs it. What's left out, and why, is in the build's `left_out` and Schelf's list, and packages a change asks for fail it instead. A conflict with Luft's own files, found after installing, builds again without the package that has it.
 4. Check every package against the keys of where it came from and no others: Fedora's against Fedora's keys, each source's against the keys it was added with. One source's key can't vouch for a package from Fedora or from another source. Package files installed by themselves are checked against their digests, as `dnf install ./file.rpm` does.
@@ -30,7 +30,17 @@ Everything lives in `/var`, so going back to an earlier version keeps the list a
 8. Move files under `/etc` and `/var` to `/usr/share/factory` in the extension, with their owner and mode noted. Repository files and keys a package brings are left out: sources are only added with a confirmation.
 9. Declare the users and groups the packages made in a sysusers.d file that comes first, with the IDs they have on the computer.
 10. Turn services on with `systemctl preset`. Fedora's presets decide for the packages they mention; services of requested packages they don't mention are turned on, and those of dependencies they don't mention stay off until something starts them.
-11. Label everything with the build root's SELinux file contexts and make the EROFS image, which keeps the labels.
+11. Label everything with the build root's SELinux file contexts and make the EROFS image, which keeps the labels. It's compressed with LZ4HC on every core: a few seconds for a gigabyte of packages, about half the size of an uncompressed image, and quick to read.
+
+dnf downloads up to 20 packages at once. The packages of every build on the computer stay in dnf's cache, under `/var/cache/luft/system-packages`, so building again, for another version or after a removal, downloads only what's new. `luft-system-packages-metadata.timer` brings the repositories' metadata up to date every four hours while there are system packages and the connection isn't metered, so a change rarely waits for it, and dnf still refreshes it whenever it's older than the repository allows.
+
+When someone opens a package's page in Schelf, or `schelf install` asks to confirm, `Prepare` resolves and downloads what installing it would, without asking anyone for a password, so the install finds everything in the cache. It needs `com.lantharos.packages.tools`, does nothing over a metered connection or while the packages are being changed, and what nobody went on to install leaves the cache when the service stops.
+
+### Going on from the last build
+
+The running system's build root, what installing its packages changed over the system, is kept in `/var/cache/luft/system-packages/kept`. A change for the same version that only adds packages mounts it as a layer under a new writable one and installs only the new packages into it, checked as in step 4: dnf resolves against the packages already there, and staging, the checks for administrators and the image cover the whole set, as they would building from nothing. Each such change adds a layer.
+
+The build starts from the system alone when anything it can't tell for sure might differ: the build in place isn't the one the root made, the version or the sources changed, packages are removed, the transaction would upgrade, replace or remove one that's there, an update runs, the packages made users or groups, whose IDs come from the computer's accounts at the time, or there are eight layers. A removal is always built from nothing because files scriptlets make belong to no package, and only a fresh root shows which ones the remaining packages make.
 
 Extensions are merged without `nosuid`, so setuid and setgid helpers such as Chromium's sandbox or 1Password's work.
 
@@ -83,6 +93,8 @@ Schelf fetches a source as the user, from a `.repo` file's address, `copr:owner/
 A package file opened in Schelf becomes a system package. When it brings a repository, a `.repo` file among its files or one its scriptlets write with `cat > FILE <<EOF`, as 1Password's and Chrome's do, Schelf shows that source like any other, adds it and installs the package by name from it, so later builds take the source's newest version. A package without a source goes in by itself through `InstallFile`, which takes the file as a descriptor and keeps a copy only root can read.
 
 ## Updates
+
+A change returns once the running system has the new set, and only then builds it for the other versions on the computer, in the same service, holding its lock, so the next change waits for that.
 
 When `updater` finishes downloading an update or a switch to the other image, it calls `Rebuild`, and the system packages are built for the staged version before the download reports finished. A restart in the middle stops the build, and the new version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
 

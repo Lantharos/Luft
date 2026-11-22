@@ -147,9 +147,11 @@ pub fn rebuild_policy(root: &Path, packages: &Path) -> Result<()> {
 /// like dnf does with a local file. Scriptlets run there too, so files they make for the
 /// package, such as libvirt's default network, can be taken along; nothing else they change
 /// leaves the build root.
-pub fn install(root: &Path, release: &str, packages: &Path, rpms: &[Rpm]) -> Result<()> {
-    let (files, signed): (Vec<&Rpm>, Vec<&Rpm>) =
-        rpms.iter().partition(|rpm| rpm.origin == Origin::File);
+pub fn install(root: &Path, release: &str, packages: &Path, rpms: &[&Rpm]) -> Result<()> {
+    let (files, signed): (Vec<&Rpm>, Vec<&Rpm>) = rpms
+        .iter()
+        .copied()
+        .partition(|rpm| rpm.origin == Origin::File);
     let from = |origin: &Origin| -> Vec<&Rpm> {
         signed
             .iter()

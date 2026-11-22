@@ -32,19 +32,12 @@ pub fn made(layout: &Layout, rpms: &[Rpm]) -> Result<()> {
         .map(|file| file.path.trim_start_matches('/'))
         .collect();
     let (mut files, mut folders) = (Vec::new(), Vec::new());
-    for top in MERGED.map(|top| layout.upper.join(top)) {
-        if !top.exists() {
-            continue;
-        }
-        for entry in WalkDir::new(top).min_depth(1) {
-            let entry = entry?;
-            let Ok(relative) = entry.path().strip_prefix(layout.upper) else {
-                continue;
-            };
+    for top in MERGED {
+        for relative in layout.changed(top)? {
             let Some(path) = relative.to_str() else {
                 continue;
             };
-            let kind = entry.file_type();
+            let kind = layout.root.join(path).symlink_metadata()?.file_type();
             if owned.contains(path)
                 || left_out(path)
                 || !(kind.is_file() || kind.is_dir() || kind.is_symlink())

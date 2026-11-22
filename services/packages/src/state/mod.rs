@@ -4,7 +4,7 @@ pub mod manifest;
 pub mod requested;
 pub mod sources;
 
-use std::fs::{self, File};
+use std::fs::{self, File, TryLockError};
 use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
 
@@ -61,6 +61,19 @@ impl Lock {
         file.lock()
             .context("Waiting for other work on system packages")?;
         Ok(Self { _held: file })
+    }
+
+    /// The lock, unless other work on system packages holds it.
+    pub fn try_take() -> Result<Option<Self>> {
+        fs::create_dir_all(builds()).context("Making the folder for system packages")?;
+        let file = File::create(lock()).context("Opening the system packages' lock")?;
+        match file.try_lock() {
+            Ok(()) => Ok(Some(Self { _held: file })),
+            Err(TryLockError::WouldBlock) => Ok(None),
+            Err(TryLockError::Error(error)) => {
+                Err(error).context("Taking the system packages' lock")
+            }
+        }
     }
 }
 

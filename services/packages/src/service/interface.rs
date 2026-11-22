@@ -15,7 +15,7 @@ use zbus::{Connection, interface};
 
 use super::error::Error;
 use super::unreviewed::approver;
-use crate::changes::{self, Escalate, NotApproved, Report, Step};
+use crate::changes::{self, Afterwards, Escalate, NotApproved, Report, Step};
 use crate::extensions::unreviewed::Unreviewed;
 use crate::extensions::{self, Signed};
 
@@ -78,13 +78,14 @@ impl Packages {
             .ok_or_else(Error::not_authorized)
     }
 
-    /// Runs `work`, which changes the system packages, reporting its steps. With `approver`,
-    /// the work asks it for com.lantharos.packages.change once it finds the change isn't plain.
+    /// Runs `work`, which changes the system packages, reporting its steps, and once the caller
+    /// has its answer, what's left of it. With `approver`, the work asks it for
+    /// com.lantharos.packages.change once it finds the change isn't plain.
     async fn change(
         &self,
         emitter: &SignalEmitter<'_>,
         approver: Approver<'_>,
-        work: impl FnOnce(Report, Option<Escalate>) -> anyhow::Result<()> + Send + 'static,
+        work: impl FnOnce(Report, Option<Escalate>) -> anyhow::Result<Afterwards> + Send + 'static,
     ) -> Result<(), Error> {
         if self.busy.swap(true, Ordering::SeqCst) {
             return Err(Error::Busy(
@@ -132,7 +133,19 @@ impl Packages {
         }
         let result = work.await;
         self.busy.store(false, Ordering::SeqCst);
-        result.map_err(|_| stopped())?.map_err(Error::from)
+        let afterwards = result.map_err(|_| stopped())?.map_err(Error::from)?;
+        let idle = self.idle.clone();
+        tokio::spawn(async move {
+            let _activity = idle.hold();
+            match tokio::task::spawn_blocking(move || afterwards.finish()).await {
+                Ok(Err(error)) => eprintln!("Finishing the change of system packages: {error:#}"),
+                Err(_) => {
+                    eprintln!("Finishing the change of system packages stopped unexpectedly.")
+                }
+                Ok(Ok(())) => {}
+            }
+        });
+        Ok(())
     }
 
     async fn blocking<T: Send + 'static>(
@@ -177,6 +190,43 @@ impl Packages {
             Self::authorize(connection, &header, TOOLS).await?;
         }
         self.blocking(changes::update).await
+    }
+
+    async fn prepare(
+        &self,
+        names: Vec<String>,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        allowed(|policy| policy.software.system_packages)?;
+        Self::authorize(connection, &header, TOOLS).await?;
+        if self.busy.load(Ordering::SeqCst) || luft_dbus::network::metered(connection).await {
+            return Ok(());
+        }
+        let idle = self.idle.clone();
+        tokio::spawn(async move {
+            let _activity = idle.hold();
+            if let Ok(Err(error)) =
+                tokio::task::spawn_blocking(move || changes::prepare(&names)).await
+            {
+                eprintln!("Preparing system packages: {error:#}");
+            }
+        });
+        Ok(())
+    }
+
+    async fn refresh_metadata(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
+        if luft_dbus::network::metered(connection).await {
+            return Ok(());
+        }
+        self.blocking(changes::refresh_metadata).await
     }
 
     async fn install(

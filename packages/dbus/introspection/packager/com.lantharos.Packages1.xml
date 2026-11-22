@@ -10,6 +10,11 @@
     </method>
     <method name="Update">
     </method>
+    <method name="Prepare">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <method name="RefreshMetadata">
+    </method>
     <method name="Install">
       <arg name="names" type="as" direction="in"/>
     </method>

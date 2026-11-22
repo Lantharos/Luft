@@ -1,4 +1,5 @@
 use std::collections::{BTreeSet, HashMap, HashSet};
+use std::ffi::OsString;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -6,13 +7,13 @@ use std::process::{Command, Stdio};
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
-use super::super::DNF_CACHE;
+use super::super::{DNF_CACHE, DNF_STATE};
 use crate::command::{failure, run};
 use crate::repositories::{self, FOLDER, KEYS};
-use crate::state::manifest::Origin;
-use crate::state::remove_folder;
+use crate::state::manifest::{Origin, Package};
 use crate::state::requested::Requested;
 use crate::state::sources::Sources;
+use crate::state::{builds, load, remove_folder};
 
 const PERSIST: &str = "var/lib/dnf";
 const PACKAGES: &str = "packages";
@@ -48,11 +49,13 @@ struct Stored {
 
 #[derive(Deserialize)]
 struct StoredRpm {
+    action: String,
     repo_id: String,
     package_path: Option<String>,
 }
 
 const STORED: &str = "@stored_transaction(";
+const ADDING: [&str; 2] = ["Install", "Reason Change"];
 const COMMAND_LINE: &str = "@commandline";
 
 /// The folder dnf keeps a repository's metadata and packages in, named after its ID and a
@@ -78,7 +81,37 @@ fn cached() -> impl Iterator<Item = PathBuf> {
         .filter(|path| path.extension().is_some_and(|found| found == "rpm"))
 }
 
-/// Keeps the packages of this build in dnf's cache for the next one, and only those.
+/// The name dnf keeps a package's file under in its cache.
+fn file_name(package: &Package) -> OsString {
+    let version = package
+        .version
+        .split_once(':')
+        .map_or(package.version.as_str(), |(_, version)| version);
+    format!("{}-{version}.{}.rpm", package.name, package.arch).into()
+}
+
+/// Leaves dnf's cache only the packages of the builds on the computer and the files in
+/// `also`, so the next build of any of them doesn't download them again.
+pub fn tidy(also: &HashSet<OsString>) -> Result<()> {
+    let built: HashSet<OsString> = fs::read_dir(builds())
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter_map(|entry| load(&entry.path()))
+        .flat_map(|build| build.packages)
+        .map(|package| file_name(&package))
+        .collect();
+    let stale = cached().filter(|path| {
+        path.file_name()
+            .is_some_and(|name| !also.contains(name) && !built.contains(name))
+    });
+    for stale in stale {
+        fs::remove_file(stale)?;
+    }
+    Ok(())
+}
+
+/// Keeps the packages of this build in dnf's cache for the next one.
 fn keep(downloads: &[(String, PathBuf)]) -> Result<()> {
     let mut kept = HashSet::new();
     for (repository, package) in downloads {
@@ -87,16 +120,14 @@ fn keep(downloads: &[(String, PathBuf)]) -> Result<()> {
         };
         let folder = folder.join(PACKAGES);
         fs::create_dir_all(&folder)?;
-        let target = folder.join(package.file_name().unwrap_or_default());
+        let name = package.file_name().unwrap_or_default();
+        let target = folder.join(name);
         if !target.exists() {
             fs::hard_link(package, &target).context("Keeping the downloaded packages")?;
         }
-        kept.insert(target);
+        kept.insert(name.to_owned());
     }
-    for stale in cached().filter(|path| !kept.contains(path)) {
-        fs::remove_file(stale)?;
-    }
-    Ok(())
+    tidy(&kept)
 }
 
 /// Runs dnf, which leaves out what it can't find or install, and returns the names it
@@ -137,6 +168,8 @@ fn store_file(sources: &Sources, at: &Path) -> Result<()> {
 pub struct Downloaded {
     pub origins: HashMap<PathBuf, Origin>,
     pub unavailable: BTreeSet<String>,
+    /// Whether the transaction only installs packages, changing none that are there.
+    pub adding: bool,
 }
 
 /// Downloads the packages in `wanted` and what they need into `store`, resolved against the
@@ -179,6 +212,7 @@ pub fn download(
             .args([
                 "--setopt=install_weak_deps=True",
                 "--setopt=countme=False",
+                "--setopt=max_parallel_downloads=20",
                 "--assumeyes",
                 "--quiet",
             ])
@@ -195,6 +229,10 @@ pub fn download(
     let owners = repositories::owners(&sources.repositories);
     let mut origins = HashMap::new();
     let mut downloads = Vec::new();
+    let adding = stored
+        .rpms
+        .iter()
+        .all(|rpm| ADDING.contains(&rpm.action.as_str()));
     for rpm in stored.rpms {
         let Some(package_path) = rpm.package_path else {
             continue;
@@ -224,7 +262,21 @@ pub fn download(
     Ok(Downloaded {
         origins,
         unavailable,
+        adding,
     })
+}
+
+/// Brings the metadata of Fedora's repositories and the added sources in dnf's cache up to
+/// date, downloading only what changed.
+pub fn refresh(release: &str) -> Result<()> {
+    run(Command::new("dnf5")
+        .arg(format!("--setopt=cachedir={DNF_CACHE}"))
+        .arg(format!("--setopt=reposdir={FEDORA},{FOLDER}"))
+        .arg(format!("--setopt=persistdir={DNF_STATE}"))
+        .arg(format!("--releasever={release}"))
+        .args(["--setopt=countme=False", "--quiet", "makecache"]))
+    .context("Downloading the repositories' metadata")
+    .map(drop)
 }
 
 /// The package in Fedora or the added sources that provides `capability`, such as a library's

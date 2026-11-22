@@ -55,14 +55,14 @@ pub fn added(before: &BTreeSet<String>, after: &BTreeSet<String>) -> Result<Vec<
     Ok(added)
 }
 
-/// What the store holds before the packages are installed: Luft's own modules, with the
-/// computer's own settings, such as booleans set with `setsebool -P`, so a policy built with
-/// the packages' modules keeps them.
+/// What the store holds before the packages are installed: Luft's own modules, as in `lower`,
+/// with the computer's own settings, such as booleans set with `setsebool -P`, so a policy
+/// built with the packages' modules keeps them.
 pub struct Before {
     modules: BTreeSet<String>,
 }
 
-pub fn before(root: &Path) -> Result<Before> {
+pub fn before(lower: &Path, root: &Path) -> Result<Before> {
     let local = Path::new("/").join(STORE);
     for entry in fs::read_dir(&local).into_iter().flatten().flatten() {
         let is_local = entry.file_name().to_string_lossy().ends_with(".local");
@@ -72,7 +72,7 @@ pub fn before(root: &Path) -> Result<Before> {
         }
     }
     Ok(Before {
-        modules: modules(root),
+        modules: modules(lower),
     })
 }
 

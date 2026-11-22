@@ -13,9 +13,15 @@ part = "services"
     "data/luft-system-packages-link.service",
     "data/luft-system-packages-settle.service",
     "data/luft-system-packages-rebuild.service",
+    "data/luft-system-packages-metadata.service",
+    "data/luft-system-packages-metadata.timer",
 ]
 "/usr/share/polkit-1/actions/" = ["data/com.lantharos.packages.policy"]
 "/usr/share/dnf5/libdnf.conf.d/50-luft-system-packages.conf" = "data/luft-system-packages.conf"
 
 [enable]
-system = ["luft-system-packages-link.service", "luft-system-packages-settle.service"]
+system = [
+    "luft-system-packages-link.service",
+    "luft-system-packages-settle.service",
+    "luft-system-packages-metadata.timer",
+]

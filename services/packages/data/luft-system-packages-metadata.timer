@@ -1,0 +1,10 @@
+[Unit]
+Description=Keep the metadata of the system packages' repositories up to date
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=4h
+RandomizedDelaySec=20min
+
+[Install]
+WantedBy=timers.target

@@ -23,12 +23,33 @@ const ENABLING: [&str; 3] = [".wants", ".requires", ".upholds"];
 const SOURCES: [&str; 2] = ["/etc/yum.repos.d/", "/etc/pki/rpm-gpg/"];
 
 /// The folders of a build: `lower` is Luft's own system, `root` the same with the packages
-/// installed over it and `upper` only what installing them changed.
+/// installed over it and `layers` only what installing them changed.
 pub struct Layout<'a> {
     pub lower: &'a Path,
     pub root: &'a Path,
-    pub upper: &'a Path,
+    pub layers: &'a [PathBuf],
     pub stage: &'a Path,
+}
+
+impl Layout<'_> {
+    /// What installing the packages made or changed under `top`, as paths in the root that are
+    /// still there.
+    pub fn changed(&self, top: &str) -> Result<BTreeSet<PathBuf>> {
+        let mut found = BTreeSet::new();
+        for layer in self.layers {
+            let start = layer.join(top);
+            if start.symlink_metadata().is_err() {
+                continue;
+            }
+            for entry in WalkDir::new(&start).min_depth(1) {
+                let path = entry?.path().strip_prefix(layer)?.to_path_buf();
+                if self.root.join(&path).symlink_metadata().is_ok() {
+                    found.insert(path);
+                }
+            }
+        }
+        Ok(found)
+    }
 }
 
 fn relative(path: &str) -> &str {
@@ -279,22 +300,19 @@ pub fn enable(layout: &Layout, rpms: &[Rpm], requested: &BTreeSet<String>) -> Re
 /// Moves the links `systemctl preset` made in /etc into the extension's /usr, so turning the
 /// services on goes away with it.
 fn harvest_links(layout: &Layout) -> Result<Vec<String>> {
-    let made = layout.upper.join("etc/systemd/system");
+    const MADE: &str = "etc/systemd/system";
     let mut enabled = Vec::new();
-    if !made.exists() {
-        return Ok(enabled);
-    }
-    for entry in WalkDir::new(&made) {
-        let entry = entry?;
-        if !entry.path_is_symlink() {
+    for changed in layout.changed(MADE)? {
+        let link = layout.root.join(&changed);
+        if !link.is_symlink() {
             continue;
         }
-        let path = entry.path().strip_prefix(&made)?;
+        let path = changed.strip_prefix(MADE)?;
         let target = layout.stage.join(relative(units::SYSTEM_UNITS)).join(path);
         let folder =
             Path::new(relative(units::SYSTEM_UNITS)).join(path.parent().unwrap_or(Path::new("")));
         mirror_folder(layout.root, layout.stage, &folder)?;
-        symlink(fs::read_link(entry.path())?, &target)?;
+        symlink(fs::read_link(&link)?, &target)?;
         let enabling = path
             .parent()
             .and_then(|parent| parent.to_str())

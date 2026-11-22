@@ -15,8 +15,9 @@
     system does as root. InstallFile needs com.lantharos.packages.change, AddRepository and
     RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
     the running system uses the new set; Step tells how far they are. List, Provider and
-    DescribeRepository need nothing. Only root can call Rebuild; Update needs root or
-    com.lantharos.packages.tools. InstallExtension and
+    DescribeRepository need nothing. Only root can call Rebuild and RefreshMetadata; Update needs
+    root or com.lantharos.packages.tools, and Prepare com.lantharos.packages.tools without asking
+    anyone. InstallExtension and
     RemoveExtension need com.lantharos.packages.extensions and only change the caller's own folder.
     InstallUnreviewedExtension and AllowExtensionFolder are refused while Developer tools is off and to
     any program but Luft's Settings, and need com.lantharos.packages.unreviewed-extensions every time.
@@ -123,6 +124,16 @@
          fails. com.lantharos.Updater1 calls it when it checks for updates on schedule, and
          Schelf when someone updates them. Returns when it's done. -->
     <method name="Update"/>
+    <!-- Downloads what installing the packages would, so an install of them that follows starts
+         with everything in the cache. Returns at once; does nothing while the packages are being
+         changed, over a metered connection, or when the caller isn't allowed to install them. -->
+    <method name="Prepare">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <!-- Brings the repositories' metadata up to date when system packages are in use and the
+         connection isn't metered, so the next change doesn't wait for it.
+         luft-system-packages-metadata.timer calls it. -->
+    <method name="RefreshMetadata"/>
     <!-- "downloading", "building" or "starting". -->
     <signal name="Step">
       <arg name="step" type="s"/>

@@ -27,6 +27,27 @@ impl fmt::Display for Refused {
 
 impl std::error::Error for Refused {}
 
+/// The change does more than install packages over the kept build root, so it's built over
+/// the system alone.
+#[derive(Debug)]
+pub struct NotAdding;
+
+impl fmt::Display for NotAdding {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("The change replaces or removes packages of the kept build.")
+    }
+}
+
+impl std::error::Error for NotAdding {}
+
+/// What the build root has before anything is installed: Luft's own packages, and those of
+/// the kept build it goes on from.
+#[derive(Clone, Copy)]
+pub struct Installed<'a> {
+    pub base: &'a BTreeSet<String>,
+    pub kept: &'a [Rpm],
+}
+
 /// What a build leaves out so the rest can be built: requested packages that can't be, with
 /// why, and the dependencies dnf has to do without.
 #[derive(Default)]
@@ -81,16 +102,18 @@ impl Choices {
 }
 
 /// Downloads the packages in `requested` and what they need, leaving out what can't be found
-/// or would be refused, so one package doesn't keep the others from being built.
+/// or would be refused, so one package doesn't keep the others from being built. The kept
+/// build's packages are installed in the root already, and are part of what it returns.
 pub fn resolve(
     root: &Path,
     release: &str,
     requested: &Requested,
     sources: &Sources,
     store: &Path,
-    base: &BTreeSet<String>,
+    installed: &Installed,
     choices: &mut Choices,
 ) -> Result<Vec<Rpm>> {
+    let Installed { base, kept } = *installed;
     for name in requested.iter().filter(|name| base.contains(*name)) {
         choices.leave_out(name, format!("{name} is already part of Luft."))?;
     }
@@ -105,11 +128,16 @@ pub fn resolve(
         }
         let downloaded =
             download::download(root, release, &wanted, &choices.excluded, sources, store)?;
-        let mut rpms = downloaded
-            .origins
+        if !kept.is_empty() && !downloaded.adding {
+            return Err(NotAdding.into());
+        }
+        let (paths, origins): (Vec<_>, Vec<_>) = downloaded.origins.into_iter().unzip();
+        let mut rpms: Vec<Rpm> = rpm::query(&paths)?
             .into_iter()
-            .map(|(path, origin)| rpm::query(&path).map(|rpm| Rpm { origin, ..rpm }))
-            .collect::<Result<Vec<_>>>()?;
+            .zip(origins)
+            .map(|(rpm, origin)| Rpm { origin, ..rpm })
+            .chain(kept.iter().cloned())
+            .collect();
         rpms.sort_by(|left, right| left.name.cmp(&right.name));
         for name in &wanted {
             if !rpms.iter().any(|rpm| rpm.answers(name)) {

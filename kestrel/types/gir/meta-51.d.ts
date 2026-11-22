@@ -2063,6 +2063,8 @@ export namespace Meta {
             /** @signal */
             "cursor-prefs-changed": () => void;
             /** @signal */
+            "pointer-shaken": () => void;
+            /** @signal */
             "position-invalidated": () => void;
             /** @signal */
             "visibility-changed": () => void;
@@ -2117,6 +2119,8 @@ export namespace Meta {
         get_sprite(): Cogl.Texture | null;
 
         inhibit_cursor_visibility(): void;
+
+        set_magnification(magnification: number): void;
 
         uninhibit_cursor_visibility(): void;
     }

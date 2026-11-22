@@ -236,6 +236,10 @@
       <default>true</default>
       <summary>Whether pressing Super twice or swiping up with four fingers turns a workspace into a board</summary>
     </key>
+    <key name="shake-to-find-pointer" type="b">
+      <default>true</default>
+      <summary>Whether shaking the mouse or touchpad makes the pointer larger for a moment</summary>
+    </key>
     <key name="reopen-apps" type="b">
       <default>false</default>
       <summary>Whether the apps and windows open when you signed out, restarted or turned off the computer open again when you sign in</summary>

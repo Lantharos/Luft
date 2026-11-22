@@ -7,7 +7,7 @@ use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
 use crate::disk::encrypting::Encrypting;
-use crate::disk::layout::Resize;
+use crate::disk::layout::{Changing, Stage};
 use crate::drives::reencrypt::Progress;
 use crate::system::firmware::tpm::Tpm;
 
@@ -89,17 +89,23 @@ fn encrypting(
     }
 }
 
-fn resize(state: Option<&Resize>) -> &'static str {
-    match state {
-        None => "",
-        Some(Resize::Underway) => "underway",
-        Some(Resize::Waiting(Change::Grow)) => "grow",
-        Some(Resize::Waiting(Change::Shrink { .. })) => "shrink",
-        Some(Resize::Waiting(Change::Trim { .. })) => "trim",
+fn resize(waiting: Option<Change>, changing: Option<&Changing>) -> &'static str {
+    match (changing.map(|changing| changing.stage), waiting) {
+        (Some(Stage::Moving), _) => "moving",
+        (Some(Stage::Finishing), _) => "finishing",
+        (Some(Stage::Paused), _) => "paused",
+        (None, None) => "",
+        (None, Some(Change::Grow)) => "grow",
+        (None, Some(Change::Shrink { .. })) => "shrink",
+        (None, Some(Change::Trim { .. })) => "trim",
     }
 }
 
-pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dict {
+pub fn disk(
+    disk: Option<&DiskStatus>,
+    running: Option<Option<Progress>>,
+    changing: Option<&Changing>,
+) -> Dict {
     let Some(disk) = disk else {
         return dict([("Encrypted", false.into())]);
     };
@@ -119,7 +125,24 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         ("OlderRecoveryKey", disk.older_recovery_key.into()),
         ("TpmRefused", disk.tpm_refused.into()),
         ("SecureBootChanged", disk.secure_boot_changed.into()),
-        ("Resize", resize(disk.resize.as_ref()).into()),
+        ("Resize", resize(disk.resize, changing).into()),
+        (
+            "ResizeProgress",
+            changing.map_or(0.0, |changing| changing.progress).into(),
+        ),
+        (
+            "ResizeDrive",
+            changing
+                .map_or("", |changing| changing.drive.as_str())
+                .into(),
+        ),
+        (
+            "ResizeParts",
+            changing
+                .map(|changing| changing.parts.clone())
+                .unwrap_or_default()
+                .into(),
+        ),
         ("Move", moving.stage.unwrap_or_default().into()),
         ("MoveTo", moving.to.as_str().into()),
         (

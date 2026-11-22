@@ -11,6 +11,7 @@ import {Driver} from './disks/driver.js';
 import {checkEncrypted, checkEncryption, checkHealth, checkRemovable, copied} from './disks/drives.js';
 import {checkEditing} from './disks/editing.js';
 import {trashed, writeSpace} from './disks/space.js';
+import {checkLuftMoving} from './disks/luftMove.js';
 import {checkMoveLuft} from './disks/moving.js';
 import {checkSystemVolume, LUFT_ROOT} from './disks/system.js';
 import {checkOtherSystems} from './disks/systems.js';
@@ -84,5 +85,6 @@ export async function run() {
     await checkWriteImage(await checkDrives());
     await checkSpace();
     await withDriver([], driver => checkOtherSystems(driver, palette));
+    await withDriver([], driver => checkLuftMoving(driver, palette));
   });
 }

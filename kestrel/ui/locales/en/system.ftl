@@ -26,6 +26,10 @@ health-gpu-reset-body = { $day ->
 }
 # Notification button that opens the About page in Settings
 health-gpu-reset-details = Details
+health-luft-moved-title = Luft has moved
+health-luft-moved-body = It now has all the space it was given.
+health-luft-move-paused-title = Luft couldn’t finish moving
+health-luft-move-paused-body = It carries on the next time the computer starts.
 
 # $app is the name of the app that was closed
 oom-app-closed-title = { $app } was closed to free memory

@@ -5,6 +5,7 @@
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { segmentName, usedShare } from '#lib/format.js';
 	import { disks, segmentKey } from '#lib/state/disks.svelte.js';
+	import { movingLuft } from '#lib/luft.js';
 	import { tones } from './tones';
 
 	interface Props {
@@ -13,7 +14,7 @@
 
 	let { drive }: Props = $props();
 
-	let palette = $derived(tones(drive));
+	let palette = $derived(tones(drive, movingLuft(drive, disks.protection)));
 
 	function open(segment: Segment) {
 		if (segment.kind === 'volume') dialogs.open({ kind: 'details', drive, volume: segment });

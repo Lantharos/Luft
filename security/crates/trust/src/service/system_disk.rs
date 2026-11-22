@@ -1,5 +1,6 @@
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use zbus::Connection;
 use zbus::object_server::InterfaceRef;
@@ -8,7 +9,26 @@ use super::PATH;
 use super::drives::{BATTERY_RETRY, follow_battery};
 use super::interface::Trust;
 use crate::disk::encrypting;
+use crate::disk::layout::{self, Changing, Stage};
 use crate::drives::reencrypt::Progress;
+
+const LOOK_AGAIN: Duration = Duration::from_secs(3);
+
+#[derive(Clone, Default)]
+pub struct Resizing(Arc<Mutex<Option<Changing>>>);
+
+impl Resizing {
+    fn report(&self, changing: Option<Changing>) -> bool {
+        let mut latest = self.0.lock().expect("resize lock");
+        let changed = *latest != changing;
+        *latest = changing;
+        changed
+    }
+
+    pub fn latest(&self) -> Option<Changing> {
+        self.0.lock().expect("resize lock").clone()
+    }
+}
 
 #[derive(Clone, Default)]
 pub struct Encryption(Arc<Mutex<Option<Option<Progress>>>>);
@@ -41,7 +61,49 @@ pub async fn continue_work(connection: &Connection) -> zbus::Result<()> {
     {
         start(connection.object_server().interface(PATH).await?);
     }
+    if let Some(changing) = tokio::task::spawn_blocking(layout::changing)
+        .await
+        .unwrap_or_default()
+    {
+        follow_resize(connection.object_server().interface(PATH).await?, changing);
+    }
     Ok(())
+}
+
+fn rounded(changing: Option<Changing>) -> Option<Changing> {
+    changing.map(|changing| Changing {
+        progress: (changing.progress * 100.0).floor() / 100.0,
+        ..changing
+    })
+}
+
+fn follow_resize(trust: InterfaceRef<Trust>, first: Changing) {
+    tokio::spawn(async move {
+        let (idle, resizing) = {
+            let inner = trust.get().await;
+            (inner.idle.clone(), inner.resizing.clone())
+        };
+        let _activity = idle.hold();
+        let mut changing = Some(first);
+        loop {
+            let finished = changing
+                .as_ref()
+                .is_none_or(|changing| changing.stage == Stage::Paused);
+            if resizing.report(rounded(changing)) {
+                if finished {
+                    trust.get().await.forget_status();
+                }
+                announce(&trust).await;
+            }
+            if finished {
+                break;
+            }
+            tokio::time::sleep(LOOK_AGAIN).await;
+            changing = tokio::task::spawn_blocking(layout::changing)
+                .await
+                .unwrap_or_default();
+        }
+    });
 }
 
 async fn announce(trust: &InterfaceRef<Trust>) {

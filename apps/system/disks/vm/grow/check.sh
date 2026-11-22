@@ -22,6 +22,7 @@ partition_of() { lsblk -lnpo PATH,PARTTYPE "$DRIVE" | awk -v type="$1" '$2 == ty
 start_of() { echo $(($(cat "/sys/class/block/${1#/dev/}/start") * 512)); }
 size_of() { lsblk -dbno SIZE "$1"; }
 waiting() { busctl --json=short get-property "${TRUST[@]}" Disk | jq -r .data.Resize.data; }
+shown_move() { busctl --json=short get-property "${TRUST[@]}" Disk | jq -r '.data | "\(.Resize.data) \(.ResizeProgress.data)"'; }
 room() { jq -c "[.[] | select(.reach.kind == \"$1\")][0] // empty" <<< "$2"; }
 remember() { echo "$2" > "$STATE/$1"; }
 recalled() { cat "$STATE/$1"; }
@@ -83,9 +84,19 @@ ask_at_start() {
 
 follow_the_move() {
   journalctl -b -f -t trustd -o cat | while read -r line; do report "trustd $line"; done &
-  settled
+  while systemctl is-active --quiet trustd-system-disk.service; do
+    shown_move >> "$STATE/shown"
+    sleep 2
+  done
   sleep 1
   kill %1 2> /dev/null
+}
+
+check_shown() {
+  local midway
+  midway="$(awk '$1 == "moving" && $2 > 0 && $2 < 1' "$STATE/shown" | tail -1)"
+  [[ -n "$midway" ]] || fail "trustd never showed the move partway: $(sort -u "$STATE/shown" | xargs)"
+  pass "trustd showed the move partway, at $midway"
 }
 
 check_moved() {
@@ -124,6 +135,7 @@ case "$(cat "$STATE/stage")" in
     report MOVING
     follow_the_move
     check_moved
+    check_shown
     echo 3 > "$STATE/stage"
     sync
     systemctl reboot

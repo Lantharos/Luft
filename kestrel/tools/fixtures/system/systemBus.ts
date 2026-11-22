@@ -25,6 +25,9 @@ const CALLS = `<node><interface name="com.lantharos.KestrelChecks.Calls">
 const DRIVES = `<node><interface name="com.lantharos.KestrelChecks.Drives">
   <method name="PlugIn"/>
 </interface></node>`;
+const RESIZE = `<node><interface name="com.lantharos.KestrelChecks.Resize">
+  <method name="Show"><arg type="s" direction="in"/><arg type="d" direction="in"/><arg type="s" direction="in"/><arg type="at" direction="in"/></method>
+</interface></node>`;
 
 const calls: string[] = [];
 const taken: string[] = [];
@@ -49,8 +52,9 @@ publish(CALLS, {
   Seen: () => [...taken, ...calls],
 }, '/com/lantharos/KestrelChecks');
 const udisks = publishUdisks(calls);
-publishSecurity(publish, calls, udisks);
+const security = publishSecurity(publish, calls, udisks);
 publish(DRIVES, {PlugIn: () => udisks.plugIn(pluggedInDrive())}, '/com/lantharos/KestrelChecks/Drives');
+publish(RESIZE, {Show: (stage: string, progress: number, drive: string, parts: number[]) => security.resizing(stage, progress, drive, parts)}, '/com/lantharos/KestrelChecks/Resize');
 publishWindows(publish);
 publishFiles(publish, calls);
 publishPrinters(publish, calls);

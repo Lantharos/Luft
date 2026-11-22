@@ -8,6 +8,7 @@ pub mod unlock;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
+use luft_meet::resize::Change;
 
 use crate::system::firmware::tpm::Tpm;
 use crate::system::host::blocks::{self, Mount};
@@ -77,7 +78,7 @@ pub struct DiskStatus {
     pub older_recovery_key: bool,
     pub tpm_refused: bool,
     pub secure_boot_changed: bool,
-    pub resize: Option<layout::Resize>,
+    pub resize: Option<Change>,
     pub moving: moving::Status,
 }
 
@@ -127,7 +128,7 @@ pub fn status(tpm: &Tpm) -> Option<DiskStatus> {
             && !seal::sealed_this_start()
             && journal::tpm_refused_this_boot(),
         secure_boot_changed: seal::secure_boot_changed(),
-        resize: layout::resize_state(&disk),
+        resize: layout::waiting(&disk),
         moving: moving::status(&disk),
     })
 }

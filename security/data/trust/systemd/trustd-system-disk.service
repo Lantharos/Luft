@@ -3,7 +3,7 @@ Description=Carry on changing Luft's partition, and take back the space Meet Luf
 Documentation=https://docs.luft.computer/developers/system/resizing/
 ConditionKernelCommandLine=!rd.live.image
 After=local-fs.target dbus.service udisks2.service trustd-follow-up.service
-Before=systemd-user-sessions.service
+Before=systemd-user-sessions.service trustd.service
 Wants=udisks2.service
 
 [Service]

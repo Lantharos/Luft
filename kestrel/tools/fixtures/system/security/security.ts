@@ -55,7 +55,7 @@ const FWUPD = `<node><interface name="org.freedesktop.fwupd">
 </interface></node>`;
 
 const WINDOWS_ESP = '10000000-0000-4000-8000-000001048576';
-const DISK = {Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b', Resize: 's',
+const DISK = {Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b', Resize: 's', ResizeProgress: 'd', ResizeDrive: 's', ResizeParts: 'at',
   Move: 's', MoveTo: 's', MoveRefused: 's', MoveNeeds: 't', MoveCopies: 't', MoveFailedTo: 's', MoveFailed: 's',
   EarlierCopy: 'as', EarlierCopyDrive: 's', EarlierCopySize: 't'};
 const GB = 1000 ** 3;
@@ -83,13 +83,13 @@ const overridden = (defaults: object, overrides: object) => Object.definePropert
 export function publishSecurity(publish: Publish, calls: string[], model: Model, trust: object = {}) {
   const startups: Startup[] = [[WINDOWS_ESP, 'EFI/Microsoft', 'windows', [[0, 'Windows Boot Manager']], []]];
   const disk = {Device: '/dev/nvme0n1p3', Encrypted: true, Unlock: ['tpm', 'pin', 'recovery-key'], RecoveryKeyStored: true, TpmRefused: false,
-    SecureBootChanged: false, Resize: '', Move: '', MoveTo: '', MoveRefused: '', MoveNeeds: 48 * GB, MoveCopies: 31 * GB, MoveFailedTo: '',
+    SecureBootChanged: false, Resize: '', ResizeProgress: 0, ResizeDrive: '', ResizeParts: [] as number[], Move: '', MoveTo: '', MoveRefused: '', MoveNeeds: 48 * GB, MoveCopies: 31 * GB, MoveFailedTo: '',
     MoveFailed: '', EarlierCopy: [] as string[], EarlierCopyDrive: '', EarlierCopySize: 0};
   const moving = (drive: string) => {
     disk.Move = 'waiting';
     disk.MoveTo = drive.split('/').at(-1)?.replaceAll('_', ' ') ?? drive;
   };
-  publish(TRUST, overridden({
+  const trustObject = publish(TRUST, overridden({
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
     SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b', OtherKeys: 'as', RemovingOtherKeys: 'b'},
@@ -169,4 +169,14 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
       attribute('EncryptedRam', 'Encrypted RAM', 4, FIRMWARE_SETTING),
     ],
   }, '/');
+
+  return {
+    resizing(stage: string, progress: number, drive: string, parts: number[]) {
+      disk.Resize = stage;
+      disk.ResizeProgress = progress;
+      disk.ResizeDrive = drive;
+      disk.ResizeParts = parts;
+      trustObject.emit_property_changed('Disk', new GLib.Variant('a{sv}', variants(DISK, disk)));
+    },
+  };
 }

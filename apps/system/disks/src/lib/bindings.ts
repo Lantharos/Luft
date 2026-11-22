@@ -521,6 +521,9 @@ export type Protection = {
 	autoUnlock: string,
 	drives: { [key in string]: DriveEncryption },
 	systemResize: string,
+	resizeProgress: number,
+	resizeDrive: string,
+	resizeParts: number[],
 };
 
 export type Reclaim = {

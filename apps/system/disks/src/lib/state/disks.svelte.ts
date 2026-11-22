@@ -22,7 +22,7 @@ class Disks {
 	current = $state<string | null>(null);
 	hovered = $state<string | null>(null);
 	image = $state.raw<ImageProgress | null>(null);
-	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {}, systemResize: '' });
+	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {}, systemResize: '', resizeProgress: 0, resizeDrive: '', resizeParts: [] });
 	loaded = $state(false);
 	sysroot = $state('');
 	readonly busy = new SvelteSet<string>();

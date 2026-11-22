@@ -2,6 +2,7 @@ mod journal;
 pub mod old_system;
 pub(crate) mod parts;
 mod plan;
+mod progress;
 mod requests;
 mod steps;
 mod top_level;
@@ -21,6 +22,7 @@ use parts::{btrfs, halves};
 use plan::Step;
 
 pub use halves::open_in_initrd;
+pub use progress::{Changing, Stage, changing};
 pub(crate) use top_level::TopLevel;
 
 const ATTEMPTS: u32 = 3;
@@ -145,18 +147,6 @@ pub fn grow_at_start() -> Result<()> {
         change: Change::Grow,
         partition: current.partition,
     })
-}
-
-pub enum Resize {
-    Waiting(Change),
-    Underway,
-}
-
-pub fn resize_state(disk: &SystemDisk) -> Option<Resize> {
-    if Journal::load().is_some() {
-        return Some(Resize::Underway);
-    }
-    waiting(disk).map(Resize::Waiting)
 }
 
 pub fn waiting(disk: &SystemDisk) -> Option<Change> {

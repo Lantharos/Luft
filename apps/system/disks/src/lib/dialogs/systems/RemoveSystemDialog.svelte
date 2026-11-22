@@ -6,7 +6,7 @@
 	import { CANCELLED, WAIT, openFolder } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { inner } from '#lib/format.js';
-	import { luftRoom } from '#lib/luft.js';
+	import { luftMoving, luftRoom } from '#lib/luft.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { systems } from '#lib/state/systems.svelte.js';
 	import { growStep, plannedSteps, shortName, stepKey } from '#lib/systems.js';
@@ -37,7 +37,7 @@
 
 	let steps = $derived([...plannedSteps(system), ...(growStarted ? [growStep()] : [])]);
 	let drive = $derived(disks.drives.find((candidate) => candidate.id === (removed?.drive ?? system.drive)) ?? null);
-	let room = $derived(drive && removed?.free && disks.protection.systemResize !== 'underway' ? luftRoom(drive, removed.free.offset) : null);
+	let room = $derived(drive && removed?.free && !luftMoving(disks.protection) ? luftRoom(drive, removed.free.offset) : null);
 	let canOpen = $derived(Boolean(system.folder || system.files));
 	let holdsFiles = $derived(system.parts.length > 0 || system.kept !== null);
 	let title = $derived(

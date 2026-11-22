@@ -21,6 +21,9 @@ pub struct Protection {
     auto_unlock: String,
     drives: HashMap<String, DriveEncryption>,
     system_resize: String,
+    resize_progress: f64,
+    resize_drive: String,
+    resize_parts: Vec<u64>,
 }
 
 #[derive(Serialize, Deserialize, Type)]
@@ -87,6 +90,9 @@ pub async fn state() -> Result<Protection, String> {
     Ok(Protection {
         available: true,
         system_resize: get(&disk, "Resize").unwrap_or_default(),
+        resize_progress: get(&disk, "ResizeProgress").unwrap_or_default(),
+        resize_drive: get(&disk, "ResizeDrive").unwrap_or_default(),
+        resize_parts: get(&disk, "ResizeParts").unwrap_or_default(),
         auto_unlock: if get::<bool>(&disk, "Encrypted").unwrap_or(false) {
             String::new()
         } else {

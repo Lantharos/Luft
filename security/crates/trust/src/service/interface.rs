@@ -13,7 +13,7 @@ use super::error::Error;
 use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
-use super::system_disk::Encryption;
+use super::system_disk::{Encryption, Resizing};
 use crate::boot::{other_systems, started, startup};
 use crate::disk;
 use crate::disk::layout::{self, old_system};
@@ -37,6 +37,7 @@ const FRESH: Duration = Duration::from_secs(2);
 pub struct Trust {
     pub(super) idle: Arc<Idle>,
     pub(super) encryption: Encryption,
+    pub(super) resizing: Resizing,
     busy: Arc<Mutex<()>>,
     snapshot: SyncMutex<Option<(Instant, Arc<Status>)>>,
 }
@@ -46,6 +47,7 @@ impl Trust {
         Self {
             idle,
             encryption: Encryption::default(),
+            resizing: Resizing::default(),
             busy: Arc::default(),
             snapshot: SyncMutex::default(),
         }
@@ -156,12 +158,13 @@ impl Trust {
     #[zbus(property)]
     async fn disk(&self) -> Dict {
         let running = self.encryption.running();
-        let status = if running.is_some() {
+        let resizing = self.resizing.latest();
+        let status = if running.is_some() || resizing.is_some() {
             self.latest_status().await
         } else {
             self.status().await
         };
-        properties::disk(status.disk.as_ref(), running)
+        properties::disk(status.disk.as_ref(), running, resizing.as_ref())
     }
 
     async fn generate_recovery_key(&self) -> Result<Shown, Error> {

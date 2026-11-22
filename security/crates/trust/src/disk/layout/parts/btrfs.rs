@@ -11,6 +11,7 @@ pub struct Member {
     pub devid: u64,
     pub path: String,
     pub size: u64,
+    pub used: u64,
 }
 
 fn parse(listing: &str) -> Vec<Member> {
@@ -25,6 +26,7 @@ fn parse(listing: &str) -> Vec<Member> {
             Some(Member {
                 devid: value("devid")?.parse().ok()?,
                 size: value("size")?.parse().ok()?,
+                used: value("used")?.parse().ok()?,
                 path: value("path")?.to_owned(),
             })
         })
@@ -112,5 +114,6 @@ mod tests {
         assert_eq!(members[1].devid, 2);
         assert_eq!(members[1].path, "/dev/nvme0n1p6");
         assert_eq!(members[0].size, 107374182400);
+        assert_eq!(members[0].used, 7516192768);
     }
 }

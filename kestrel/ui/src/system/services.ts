@@ -20,6 +20,7 @@ import { LoginDisplays } from '../session/loginScreen/displays.js';
 import { LoginNumLock } from '../session/loginScreen/numLock.js';
 import { Health } from './status/health/health.js';
 import { notifyAboutIncidents } from './status/health/incidents.js';
+import { LuftMoveNotices } from './status/health/luftMove.js';
 import { MemoryNotices } from './status/health/memoryNotices.js';
 import { confirmStartupOnceSettled } from './status/health/startup.js';
 import { AppQuestions } from './connectivity/firewall/appQuestions.js';
@@ -45,6 +46,7 @@ export class SystemServices {
   private readonly memoryNotices = new MemoryNotices();
   private readonly updateNotices = new UpdateNotices();
   private readonly crashReports = new CrashReports();
+  private readonly luftMove = new LuftMoveNotices();
   private readonly changes = new ChangesService();
   private readonly driveAccess = new DriveAccessService();
   private readonly health = new Health();
@@ -97,6 +99,7 @@ export class SystemServices {
     this.sharing.destroy();
     this.firewallQuestions.destroy();
     this.crashReports.destroy();
+    this.luftMove.destroy();
     this.changes.destroy();
     this.driveAccess.destroy();
     this.keyring.destroy();

@@ -2,11 +2,13 @@
 	import { t } from '@luft/i18n';
 	import { commands, type PackageSummary } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
+	import Managed from '#lib/components/Managed.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { SLOW } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 
 	let { query, found = $bindable(null) }: { query: string; found?: number | null } = $props();
 
@@ -76,6 +78,8 @@
 							<ProgressButton {operation} />
 						{:else if installed}
 							<span class="px-3 text-[13px] text-[var(--text-muted)]">{t('search-installed')}</span>
+						{:else if !policy.installs('fedora')}
+							<span class="px-3"><Managed /></span>
 						{:else}
 							<button type="button" class="button" onclick={() => install(found)}>{t('search-install')}</button>
 						{/if}

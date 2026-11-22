@@ -339,9 +339,9 @@ settings-managed-accounts = Accounts can’t be added, removed or made administr
 settings-managed-automatic-sign-in = Nobody signs in automatically
 settings-managed-remote-login-off = Remote login stays off
 settings-managed-remote-login-keys = Remote login only takes keys, not passwords
-settings-managed-nearby-no-one = Nobody nearby can find this computer to send to it
-settings-managed-nearby-your-devices = Only your own devices can find this computer to send to it
-settings-managed-nearby-everyone = Everyone nearby can find this computer to send to it
+settings-managed-nearby-no-one = Nobody nearby can send to this computer
+settings-managed-nearby-your-devices = Only your own devices can send to this computer
+settings-managed-nearby-everyone = Everyone nearby can send to this computer
 settings-managed-crash-reports-always = Crash reports are always sent
 settings-managed-crash-reports-never = Crash reports are never sent
 

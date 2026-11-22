@@ -7,6 +7,7 @@ mod failure;
 mod logs;
 mod mcp;
 mod output;
+mod policy;
 mod report;
 mod settings;
 mod status;
@@ -32,6 +33,7 @@ fn run(cli: Cli) -> Outcome {
         Command::Apply { file } => changes::apply_file(&file, output),
         Command::Undo => changes::undo(output),
         Command::History { limit } => changes::history(limit, output),
+        Command::Policy { action } => policy::run(action, output),
         Command::Logs(arguments) => logs::run(arguments, output),
         Command::Report { output: path } => report::run(path, output),
         Command::Extension { action } => extension::run(action, output),

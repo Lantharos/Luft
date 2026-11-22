@@ -15,13 +15,17 @@ pub fn check(text: &str) -> Result<Table, Vec<String>> {
                 .iter()
                 .filter_map(|(key, value)| {
                     let path = format!("{section}.{key}");
-                    problem(&path, section, Table::from_iter([(key.clone(), value.clone())]))
+                    problem(
+                        &path,
+                        section,
+                        Table::from_iter([(key.clone(), value.clone())]),
+                    )
                 })
                 .collect(),
-            value => Vec::from_iter(problem_with(section, Table::from_iter([(
-                section.clone(),
-                value.clone(),
-            )]))),
+            value => Vec::from_iter(problem_with(
+                section,
+                Table::from_iter([(section.clone(), value.clone())]),
+            )),
         })
         .collect();
     if problems.is_empty() {
@@ -32,14 +36,25 @@ pub fn check(text: &str) -> Result<Table, Vec<String>> {
 }
 
 fn problem(path: &str, section: &str, keys: Table) -> Option<String> {
-    problem_with(path, Table::from_iter([(section.to_owned(), Value::Table(keys))]))
+    problem_with(
+        path,
+        Table::from_iter([(section.to_owned(), Value::Table(keys))]),
+    )
 }
 
 fn problem_with(path: &str, policy: Table) -> Option<String> {
     Value::Table(policy)
         .try_into::<Policy>()
         .err()
-        .map(|error| format!("{path}: {}", error.to_string().trim_end()))
+        .map(|error| format!("{path}: {}", plain(&error.to_string())))
+}
+
+fn plain(message: &str) -> String {
+    message
+        .lines()
+        .next()
+        .unwrap_or_default()
+        .replace("expected u32", "expected a whole number")
 }
 
 #[cfg(test)]
@@ -54,7 +69,10 @@ mod tests {
         .unwrap_err();
         assert_eq!(problems.len(), 4, "{problems:#?}");
         assert!(problems[0].starts_with("nearby-sharing.visible-to: unknown variant `friends`"));
-        assert!(problems[1].starts_with("screen-lock.lock-after: invalid type: string \"soon\""));
+        assert_eq!(
+            problems[1],
+            "screen-lock.lock-after: invalid type: string \"soon\", expected a whole number"
+        );
         assert!(problems[2].starts_with("screen-lock.screen-of: unknown field `screen-of`"));
         assert!(problems[3].starts_with("spam: unknown field `spam`"));
     }

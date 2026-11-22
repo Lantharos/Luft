@@ -153,7 +153,11 @@ mod tests {
         let policy = next(&mut follow).await;
         assert_eq!(policy.organization.name.as_deref(), Some("Acme"));
 
-        fs::write(image.join("10-lock.toml"), "[remote-login]\nallowed = false\n").unwrap();
+        fs::write(
+            image.join("10-lock.toml"),
+            "[remote-login]\nallowed = false\n",
+        )
+        .unwrap();
         let policy = next(&mut follow).await;
         assert!(!policy.remote_login.allowed);
         assert_eq!(policy.organization.name.as_deref(), Some("Acme"));

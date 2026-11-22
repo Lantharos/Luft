@@ -20,6 +20,7 @@ glib.workspace = true
 luft-crash-report.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
+luft-policy.workspace = true
 luft-software = { workspace = true, features = ["image"] }
 rmcp = { workspace = true, features = ["server", "transport-io"] }
 serde.workspace = true

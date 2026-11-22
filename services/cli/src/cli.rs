@@ -64,6 +64,11 @@ pub enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
+    /// Show what the organization's policy decides on this computer, and which file decides it
+    Policy {
+        #[command(subcommand)]
+        action: Option<PolicyAction>,
+    },
     /// Show the logs of a part of Luft, such as kestrel, updater or keyring
     Logs(LogsArgs),
     /// Gather what helps with a bug report into one file, with personal details taken out
@@ -113,6 +118,12 @@ pub enum DeveloperAction {
     List,
     /// Change switches only developers need, while Developer tools is on
     Set(SetArgs),
+}
+
+#[derive(Subcommand)]
+pub enum PolicyAction {
+    /// Check a policy file before adding it: every key Luft doesn't know and every value of the wrong kind
+    Check { file: PathBuf },
 }
 
 #[derive(Subcommand)]

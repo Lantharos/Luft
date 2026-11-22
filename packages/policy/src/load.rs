@@ -226,7 +226,13 @@ mod tests {
         let decided: Vec<(&str, String, PathBuf)> = explained
             .decided
             .iter()
-            .map(|decided| (decided.key.as_str(), decided.value.to_string(), decided.file.clone()))
+            .map(|decided| {
+                (
+                    decided.key.as_str(),
+                    decided.value.to_string(),
+                    decided.file.clone(),
+                )
+            })
             .collect();
         let base = local.path().join("10-base.toml");
         assert_eq!(

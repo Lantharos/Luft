@@ -65,10 +65,7 @@ fn write_greetd_config(options: &Options, path: &Path) -> ExitCode {
 }
 
 fn developer_tools_on(options: &Options) -> ExitCode {
-    if Store::new(options.state_dir.clone())
-        .config()
-        .developer_tools
-    {
+    if Store::new(options.state_dir.clone()).developer_tools() {
         ExitCode::SUCCESS
     } else {
         ExitCode::FAILURE

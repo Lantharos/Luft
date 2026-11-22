@@ -13,6 +13,7 @@ libc.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
+luft-policy.workspace = true
 luft-variant.workspace = true
 serde.workspace = true
 serde_json.workspace = true

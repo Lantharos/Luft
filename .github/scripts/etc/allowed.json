@@ -63,6 +63,9 @@
 	"packages/daylight/src/place.rs": {
 		"/etc/localtime": "Reads the time zone"
 	},
+	"packages/policy/src/load.rs": {
+		"/etc/luft/policy.d": "Reads the policy a local administrator chose"
+	},
 	"packages/system/disks/src/mounting.rs": {
 		"/etc": "Refuses to mount a drive over the system's own folders"
 	},
@@ -89,6 +92,9 @@
 	"services/crashes/report/src/names.rs": {
 		"/etc/passwd": "Reads the names of the people with an account, to take them out of crash reports",
 		"/etc/machine-info": "Reads the computer's name, to take it out of crash reports"
+	},
+	"services/locksmith/data/locksmith.path": {
+		"/etc/luft/policy.d": "Locks the settings again when a local administrator changes the policy"
 	},
 	"services/packages/data/luft-system-packages.conf": {
 		"/etc/yum.repos.d": "Keeps dnf's own folders for an administrator's repositories",

@@ -1,0 +1,10 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["locksmith"]
+
+[files]
+"/usr/lib/systemd/system/" = ["data/locksmith.service", "data/locksmith.path"]
+
+[enable]
+system = ["locksmith.service", "locksmith.path"]

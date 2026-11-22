@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
+use luft_policy::{Policy, SoftwarePolicy};
 use tokio::sync::mpsc;
 use zbus::OwnedFd;
 use zbus::message::Header;
@@ -23,6 +24,14 @@ const TOOLS: &str = "com.lantharos.packages.tools";
 const SOURCES: &str = "com.lantharos.packages.sources";
 const LONGEST_CAPABILITY: usize = 256;
 const EXTENSIONS: &str = "com.lantharos.packages.extensions";
+
+fn allowed(by: impl FnOnce(&SoftwarePolicy) -> bool) -> Result<(), Error> {
+    if by(&Policy::load().software) {
+        Ok(())
+    } else {
+        Err(Error::managed())
+    }
+}
 
 fn stopped() -> Error {
     Error::Failed("The system packages service stopped unexpectedly.".to_owned())
@@ -177,6 +186,7 @@ impl Packages {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
+        allowed(|software| software.system_packages)?;
         Self::authorize(connection, &header, TOOLS).await?;
         self.change(
             &emitter,
@@ -193,6 +203,7 @@ impl Packages {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
+        allowed(|software| software.system_packages)?;
         Self::authorize(connection, &header, CHANGE).await?;
         let package = File::from(std::os::fd::OwnedFd::from(package));
         self.change(&emitter, None, move |report, _| {
@@ -249,6 +260,7 @@ impl Packages {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
+        allowed(|software| software.package_sources)?;
         Self::authorize(connection, &header, SOURCES).await?;
         self.blocking(move || changes::add_repository(&file, &text, &keys))
             .await

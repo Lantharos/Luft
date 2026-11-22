@@ -5,12 +5,17 @@ pub enum Error {
     ZBus(zbus::Error),
     NotAuthorized(String),
     Busy(String),
+    Managed(String),
     Failed(String),
 }
 
 impl Error {
     pub fn not_authorized() -> Self {
         Self::NotAuthorized("You aren't allowed to do this.".to_owned())
+    }
+
+    pub fn managed() -> Self {
+        Self::Managed(luft_policy::MANAGED.to_owned())
     }
 }
 

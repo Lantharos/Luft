@@ -1,0 +1,20 @@
+[package]
+name = "luft-policy"
+version = "0.1.0"
+description = "The settings an organization locks on its computers, read from Luft's policy files by every service and app that applies them"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+luft-variant.workspace = true
+serde.workspace = true
+specta.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

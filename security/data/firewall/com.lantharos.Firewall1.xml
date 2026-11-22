@@ -37,6 +37,11 @@
     for Post, Kestrel's way of sending files to devices nearby: it opens LocalSend's port 53317 on
     home networks while someone may find the computer. Both are refused unless the caller runs
     in its own unit of the desktop, kestrel.service and kestrel-post.service.
+
+    Luft's policy files (luft-policy) can turn off home networks, so every network counts as
+    public and none is unclassified; access from public networks, so apps and ports allowed
+    anywhere only open on home networks; and open ports, so OpenPorts is empty. Calls that would
+    go against them fail with com.lantharos.Firewall1.Error.Managed.
   -->
   <interface name="com.lantharos.Firewall1">
     <property name="Unclassified" type="a(os)" access="read"/>

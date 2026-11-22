@@ -52,6 +52,15 @@ impl Service {
         let port = Port::new(port, protocol).ok_or_else(|| {
             Error::InvalidArgs("A port is a number from 1 to 65535 over TCP or UDP".into())
         })?;
+        let policy = luft_policy::Policy::load().firewall;
+        let forbidden = match networks {
+            Some(Networks::Anywhere) => !policy.open_ports || !policy.public_access,
+            Some(Networks::Home) => !policy.open_ports,
+            None => false,
+        };
+        if forbidden {
+            return Err(Error::managed());
+        }
         let (action, question) = match networks {
             Some(Networks::Anywhere) => (
                 OPEN_ANYWHERE,
@@ -171,7 +180,7 @@ impl Service {
         self.firewall
             .lock()
             .await
-            .ports()
+            .open()
             .iter()
             .map(|(port, networks)| {
                 (
@@ -225,6 +234,9 @@ impl Service {
             .ok_or_else(|| {
                 Error::InvalidArgs("Only your Wi-Fi and wired networks are home or public".into())
             })?;
+        if kind == HOME && !luft_policy::Policy::load().firewall.home_networks {
+            return Err(Error::managed());
+        }
         let name = saved.name();
         let (action, question) = match kind {
             HOME => (
@@ -291,6 +303,9 @@ impl Service {
                 "An app is allowed home, anywhere or blocked, not {access}"
             ))
         })?;
+        if access == Access::Anywhere && !luft_policy::Policy::load().firewall.public_access {
+            return Err(Error::managed());
+        }
         let owner = (user(connection, &header).await?, identity);
         let allowed = self.firewall.lock().await.decisions().get(&owner).copied();
         let (action, question) = match (allowed, access) {

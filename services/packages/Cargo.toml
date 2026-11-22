@@ -13,6 +13,7 @@ libc.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
+luft-policy.workspace = true
 luft-store-seal.workspace = true
 luft-unpack.workspace = true
 rustix = { workspace = true, features = ["fs"] }

@@ -63,7 +63,7 @@ peek stop $h
 
 `peek run` gives the program its own hidden display, so nothing reaches your screen. An app you already have open starts a separate copy there, with its own runtime folder, cache and profile; `--shared` lets it use yours. `--here` opens it on your screen instead, and `--size 1920x1200:302x189mm` sets the hidden display's resolution and physical size. Windows you opened yourself need your permission first, which the privacy menu in the taskbar shows and takes back.
 
-peek stays off until Developer tools is on. The switch is `DeveloperTools` on `com.lantharos.Greeter1`, kept in `/var/lib/kestrel-greeter/config.json`, which only root can write. `SetDeveloperTools` always asks for an administrator's password, so no program can turn it on by itself. The same switch opens the text consoles ([Hardening](/security/hardening/#text-consoles)).
+peek stays off until Developer tools is on. The switch is `DeveloperTools` on `com.lantharos.Greeter1`, kept in `/var/lib/kestrel-greeter/config.json`, which only root can write. `SetDeveloperTools` always asks for an administrator's password, so no program can turn it on by itself. The same switch opens the text consoles ([Hardening](/security/hardening/#text-consoles)). An organization's [policy](/developers/system/policy/) can decide it, and `SetDeveloperTools` then refuses to change it.
 
 ## On-screen keyboard layouts
 

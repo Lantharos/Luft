@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Lock from '@lucide/svelte/icons/lock';
+	import { t } from '@luft/i18n';
 
 	interface Props {
 		title: string;
 		description?: string;
 		icon?: Component;
 		disabled?: boolean;
+		locked?: boolean;
 		truncate?: boolean;
 		expanded?: boolean;
 		onclick?: () => void;
@@ -14,7 +17,7 @@
 		below?: Snippet;
 	}
 
-	let { title, description, icon: Icon, disabled = false, truncate = false, expanded, onclick, children, below }: Props = $props();
+	let { title, description, icon: Icon, disabled = false, locked = false, truncate = false, expanded, onclick, children, below }: Props = $props();
 
 	const id = $props.id();
 </script>
@@ -26,12 +29,14 @@
 		{/if}
 		<div class="text">
 			<span class="title">{title}</span>
-			{#if description}
+			{#if locked}
+				<span id="{id}-description" class="description managed"><Lock size={12} />{t('ui-row-managed')}</span>
+			{:else if description}
 				<span id="{id}-description" class="description" class:truncate>{description}</span>
 			{/if}
 		</div>
 		{#if children}
-			<div class="trailing">{@render children()}</div>
+			<div class="trailing" class:locked inert={locked}>{@render children()}</div>
 		{/if}
 		{#if onclick}
 			<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)] transition-transform duration-200 {expanded ? 'rotate-90' : ''}" />
@@ -171,6 +176,16 @@
 		gap: 10px;
 		font-size: 13px;
 		color: var(--text-muted);
+	}
+
+	.managed {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.trailing.locked {
+		opacity: 0.5;
 	}
 
 	.trailing > :global(.icon-button:last-child) {

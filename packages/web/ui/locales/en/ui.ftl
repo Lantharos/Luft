@@ -16,6 +16,11 @@ ui-edit-select-all = Select all
 # Stops marking the misspelled word that was right-clicked
 ui-edit-add-to-dictionary = Add to dictionary
 
+## Settings rows
+
+# Shown under a setting the person's organization decided, which can't be changed here
+ui-row-managed = Managed by your organization
+
 ## Form controls
 
 # Shown in a dropdown before anything is chosen

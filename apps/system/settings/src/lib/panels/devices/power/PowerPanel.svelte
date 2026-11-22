@@ -5,6 +5,7 @@
 	import type { PowerState } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import BatterySection from './BatterySection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
 	import { durationOptions } from './format';
@@ -144,7 +145,11 @@
 {/if}
 
 <Section title={t('settings-power-screen')}>
-	<Row title={t('settings-power-screen-off')} description={t('settings-power-screen-off-description')}>
+	<Row
+		title={t('settings-power-screen-off')}
+		description={t('settings-power-screen-off-description')}
+		locked={policy.current?.['screen-lock']['screen-off'] != null}
+	>
 		<Select
 			label={t('settings-power-screen-off')}
 			options={durationOptions(SCREEN_DELAYS, session.values['idle-delay'] ?? 0)}

@@ -5,6 +5,7 @@
 	import { commands } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { days, including } from './format';
 	import CrashReports from './CrashReports.svelte';
@@ -80,10 +81,15 @@
 	<Row title={t('settings-privacy-screen-off')} description={t('settings-privacy-screen-off-hint', { page: t(hardware.present?.battery ? 'settings-page-power' : 'settings-power-title') })} onclick={() => app.open('power')}>
 		<span>{idle ? t('settings-privacy-screen-off-after', { duration: longDuration(idle) }) : t('settings-privacy-screen-off-never')}</span>
 	</Row>
-	<Row title={t('settings-privacy-lock-when-off')}>
+	<Row title={t('settings-privacy-lock-when-off')} locked={policy.current?.['screen-lock'].enabled != null}>
 		<Switch label={t('settings-privacy-lock-when-off')} checked={locking} onchange={(on) => screensaver.set('lock-enabled', on)} />
 	</Row>
-	<Row title={t('settings-privacy-lock-after')} description={t('settings-privacy-lock-after-hint')} disabled={!locking}>
+	<Row
+		title={t('settings-privacy-lock-after')}
+		description={t('settings-privacy-lock-after-hint')}
+		disabled={!locking}
+		locked={policy.current?.['screen-lock']['lock-after'] != null}
+	>
 		<Select
 			label={t('settings-privacy-lock-after')}
 			options={including(lockDelays, screensaver.values['lock-delay'], longDuration)}

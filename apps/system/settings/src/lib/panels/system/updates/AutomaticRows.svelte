@@ -2,6 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import type { Schedule, UpdatePolicy } from '#lib/bindings.js';
 
 	let { preferences = $bindable() }: { preferences: UpdatePolicy } = $props();
@@ -19,10 +20,10 @@
 	}
 </script>
 
-<Row title={t('settings-updates-look')} description={t('settings-updates-look-description')}>
+<Row title={t('settings-updates-look')} description={t('settings-updates-look-description')} locked={policy.current?.updates.schedule != null}>
 	<Select label={t('settings-updates-look')} options={schedules} value={preferences.schedule} onchange={(schedule) => change({ schedule })} />
 </Row>
-<Row title={t('settings-updates-background')} description={t('settings-updates-background-description')}>
+<Row title={t('settings-updates-background')} description={t('settings-updates-background-description')} locked={policy.current?.updates.download != null}>
 	<Switch label={t('settings-updates-background-label')} checked={preferences.download} disabled={preferences.schedule === 'never'} onchange={(download) => change({ download })} />
 </Row>
 

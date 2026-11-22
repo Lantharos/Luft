@@ -32,6 +32,7 @@ luft-disks.workspace = true
 luft-fingerprint.workspace = true
 luft-i18n.workspace = true
 luft-network.workspace = true
+luft-policy.workspace = true
 luft-software = { workspace = true, features = ["default"] }
 luft-speech = { workspace = true, features = ["default"] }
 luft-trust.workspace = true

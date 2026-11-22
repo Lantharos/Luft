@@ -153,7 +153,7 @@ impl Greeter {
 
     #[zbus(property)]
     fn developer_tools(&self) -> bool {
-        self.store.config().developer_tools
+        self.store.developer_tools()
     }
 
     #[zbus(property)]
@@ -339,6 +339,13 @@ impl Greeter {
         self.access
             .authorize(connection, &header, DEVELOPER_TOOLS)
             .await?;
+        if luft_policy::Policy::load()
+            .developer
+            .tools
+            .is_some_and(|required| required != on)
+        {
+            return Err(Error::managed());
+        }
         self.change_config(|config| config.developer_tools = on)
             .await?;
         self.developer_tools_changed(&emitter).await?;

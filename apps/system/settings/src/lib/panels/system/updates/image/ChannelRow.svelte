@@ -3,6 +3,7 @@
 	import { ConfirmDialog, Row } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, Channel, ChannelChoice, StableRelease } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import Progress from './Progress.svelte';
 
 	interface Props {
@@ -36,6 +37,7 @@
 	const target = $derived(OTHER[choice.chosen]);
 	const confirmation = $derived(choice.waiting ? STAY[target] : CONFIRM[target]);
 	const moving = $derived(activity.running === 'channel');
+	const locked = $derived(policy.current?.updates.channel != null);
 	const unavailable = $derived(target === 'stable' && (stable === null || stable === 'unknown'));
 	const nowhereToSwitch = $derived(target === 'stable' && stable === 'notYet');
 
@@ -53,10 +55,10 @@
 	<Progress {activity} />
 {/snippet}
 
-<Row title={t(TITLES[current])} {description} below={moving ? progress : undefined}>
+<Row title={t(TITLES[current])} {description} {locked} below={moving ? progress : undefined}>
 	{#if moving}
 		<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
-	{:else if !nowhereToSwitch}
+	{:else if !nowhereToSwitch && !locked}
 		<button type="button" class="button" disabled={activity.running !== null || unavailable} onclick={() => (confirming = true)}>{t('settings-updates-switch')}</button>
 	{/if}
 </Row>

@@ -1,0 +1,8 @@
+[Unit]
+Description=Lock the desktop settings again when the local policy changes
+
+[Path]
+PathChanged=/etc/luft/policy.d
+
+[Install]
+WantedBy=multi-user.target

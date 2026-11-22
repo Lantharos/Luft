@@ -16,6 +16,7 @@
 	} from '@luft/network';
 	import { commands } from '#lib/bindings.js';
 	import { extensions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import type { NetworkState } from '../state.svelte';
 	import AppsSection from './AppsSection.svelte';
 	import HowDialog from './HowDialog.svelte';
@@ -91,7 +92,12 @@
 
 	<Section>
 		{#each firewall.networks as network (network.connection)}
-			<Row title={network.name} icon={network.medium === 'wifi' ? WifiIcon : EthernetPort} description={describe(network)}>
+			<Row
+				title={network.name}
+				icon={network.medium === 'wifi' ? WifiIcon : EthernetPort}
+				description={describe(network)}
+				locked={policy.current?.firewall['home-networks'] === false}
+			>
 				<Segmented label={network.name} options={types} value={network.networkType ?? 'public'} onchange={(networkType) => classify(network, networkType)} />
 			</Row>
 		{:else}
@@ -119,7 +125,11 @@
 				{/if}
 			</Row>
 		{/each}
-		<OpenPortRow onopen={(port) => attempt(() => commands.networkOpenPort(port, waitForPerson))} />
+		{#if policy.current?.firewall['open-ports'] === false}
+			<Row title={t('settings-network-firewall-open-port')} locked />
+		{:else}
+			<OpenPortRow onopen={(port) => attempt(() => commands.networkOpenPort(port, waitForPerson))} />
+		{/if}
 	</Section>
 </SubPage>
 

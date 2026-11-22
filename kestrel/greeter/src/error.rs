@@ -9,12 +9,17 @@ pub enum Error {
     InvalidArgs(String),
     UnsupportedImage(String),
     NotSupported(String),
+    Managed(String),
     Failed(String),
 }
 
 impl Error {
     pub fn not_authorized() -> Self {
         Self::NotAuthorized("You aren't allowed to change this".into())
+    }
+
+    pub fn managed() -> Self {
+        Self::Managed(luft_policy::MANAGED.into())
     }
 
     pub fn invalid(message: &str) -> Self {

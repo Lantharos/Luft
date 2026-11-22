@@ -5035,6 +5035,7 @@ dependencies = [
  "luft-daylight",
  "luft-dbus",
  "luft-dbus-macros",
+ "luft-policy",
  "nix",
  "seccompiler",
  "serde",
@@ -5560,6 +5561,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65d91b22da179613dcf4d6ec8349563f52a363f6849e03b00dd0a185ec4a59af"
 dependencies = [
  "scopeguard",
+]
+
+[[package]]
+name = "locksmith"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "luft-policy",
 ]
 
 [[package]]
@@ -6110,6 +6119,17 @@ dependencies = [
  "tokio",
  "zbus 6.0.0",
  "zeroize",
+]
+
+[[package]]
+name = "luft-policy"
+version = "0.1.0"
+dependencies = [
+ "luft-variant",
+ "serde",
+ "specta",
+ "tempfile",
+ "toml",
 ]
 
 [[package]]
@@ -7531,6 +7551,7 @@ dependencies = [
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
+ "luft-policy",
  "luft-store-seal",
  "luft-unpack",
  "rustix",
@@ -9672,6 +9693,7 @@ dependencies = [
  "luft-fingerprint",
  "luft-i18n",
  "luft-network",
+ "luft-policy",
  "luft-software",
  "luft-speech",
  "luft-trust",
@@ -9772,6 +9794,7 @@ dependencies = [
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
+ "luft-policy",
  "nix",
  "tokio",
  "zbus 6.0.0",
@@ -11168,6 +11191,7 @@ dependencies = [
  "luft-dbus",
  "luft-dbus-macros",
  "luft-identity",
+ "luft-policy",
  "luft-variant",
  "serde",
  "serde_json",

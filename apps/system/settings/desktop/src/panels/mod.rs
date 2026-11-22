@@ -1,6 +1,7 @@
 mod connections;
 mod devices;
 mod personalization;
+mod policy;
 mod protection;
 mod system;
 
@@ -10,6 +11,7 @@ use sabine::SabineWindow;
 pub use system::updates::{CHECK_GRAPHICS_ARGUMENT, check_graphics};
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    let window = policy::register(window);
     let window = devices::hardware::register(window, events);
     let window = connections::network::register(window, events);
     let window = connections::bluetooth::register(window, events);

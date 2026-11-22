@@ -21,6 +21,9 @@
     InstallUnreviewedExtension and AllowExtensionFolder are refused while Developer tools is off and to
     any program but Luft's Settings, and need com.lantharos.packages.unreviewed-extensions every time.
     RemoveUnreviewedExtension needs nothing. All three only change the caller's own records.
+    Luft's policy files (luft-policy) can turn off adding system packages, which refuses Install
+    and InstallFile, and adding software sources, which refuses AddRepository, with
+    com.lantharos.Packages1.Error.Managed.
   -->
   <interface name="com.lantharos.Packages1">
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",

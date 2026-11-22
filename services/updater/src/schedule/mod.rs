@@ -47,7 +47,7 @@ impl Every {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Debug)]
 pub struct Schedule {
     pub every: Every,
     pub download: bool,
@@ -55,6 +55,16 @@ pub struct Schedule {
     /// A channel chosen while it had nothing as new as the running version, which the system
     /// moves to once it does. While it waits for stable it keeps taking nightlies.
     pub waiting: Option<Channel>,
+}
+
+impl From<luft_policy::UpdateSchedule> for Every {
+    fn from(schedule: luft_policy::UpdateSchedule) -> Self {
+        match schedule {
+            luft_policy::UpdateSchedule::Daily => Self::Daily,
+            luft_policy::UpdateSchedule::Weekly => Self::Weekly,
+            luft_policy::UpdateSchedule::Never => Self::Never,
+        }
+    }
 }
 
 impl Default for Schedule {
@@ -76,6 +86,15 @@ pub fn now() -> u64 {
 }
 
 impl Schedule {
+    /// This schedule with what the policy decides in place of the person's choices.
+    pub fn under(self, policy: &luft_policy::SystemUpdatesPolicy) -> Self {
+        Self {
+            every: policy.schedule.map_or(self.every, Every::from),
+            download: policy.download.unwrap_or(self.download),
+            ..self
+        }
+    }
+
     pub fn load() -> Self {
         fs::read(FILE)
             .ok()

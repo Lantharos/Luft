@@ -446,6 +446,7 @@ export const commands = {
 	}, options?: CallOptions) => invoke<string>("network_wireguard_public_key", params, options),
 	penDevices: (options?: CallOptions) => invoke<PenDevice[]>("pen_devices", {}, options),
 	penNotesInstalled: (options?: CallOptions) => invoke<boolean>("pen_notes_installed", {}, options),
+	policy: (options?: CallOptions) => invoke<Policy>("policy", {}, options),
 	postChooseFolder: (options?: CallOptions) => invoke<string | null>("post_choose_folder", {}, options),
 	postGetLocalsend: (options?: CallOptions) => invoke<null>("post_get_localsend", {}, options),
 	postStartPairing: (options?: CallOptions) => invoke<string>("post_start_pairing", {}, options),
@@ -996,6 +997,10 @@ export type Details = {
 	mac: string,
 };
 
+export type DeveloperPolicy = {
+	tools: boolean | null,
+};
+
 export type DeviceView = {
 	index: number,
 	name: string,
@@ -1188,6 +1193,12 @@ export type FirewallApp = {
 };
 
 export type FirewallAppKind = "app" | "program";
+
+export type FirewallPolicy = {
+	"home-networks": boolean,
+	"public-access": boolean,
+	"open-ports": boolean,
+};
 
 export type Firmware = {
 	id: string,
@@ -1558,6 +1569,19 @@ export type PluggedDrive = {
 	size: number,
 };
 
+/**
+ *  The settings an organization decided for its computers. A value left out stays the
+ *  person's choice; one given is applied by the service that owns the setting, which refuses
+ *  to change it.
+ */
+export type Policy = {
+	"screen-lock": ScreenLockPolicy,
+	updates: SystemUpdatesPolicy,
+	firewall: FirewallPolicy,
+	software: SoftwarePolicy,
+	developer: DeveloperPolicy,
+};
+
 export type Port = {
 	detected: boolean,
 } & Choice;
@@ -1746,6 +1770,12 @@ export type SchemeColors = {
 	dark: { [key in string]: string },
 };
 
+export type ScreenLockPolicy = {
+	enabled: boolean | null,
+	"screen-off": number | null,
+	"lock-after": number | null,
+};
+
 export type Section = {
 	area: Area,
 	title: string,
@@ -1796,6 +1826,11 @@ export type SigningKey = {
 };
 
 export type SigningKeyState = "none" | "pending" | "enrolled";
+
+export type SoftwarePolicy = {
+	"system-packages": boolean,
+	"package-sources": boolean,
+};
 
 export type SoundSet = {
 	used: number,
@@ -1902,6 +1937,12 @@ export type Switchable = "location" | "camera" | "clipboard";
 
 export type SystemKind = "windows" | "linux" | "old-system" | "earlier-luft";
 
+export type SystemUpdatesPolicy = {
+	schedule: UpdateSchedule | null,
+	download: boolean | null,
+	channel: Channel | null,
+};
+
 export type Target = "output" | "input" | "app";
 
 export type Tpm = {
@@ -1939,6 +1980,8 @@ export type UpdatePolicy = {
 	schedule: Schedule,
 	download: boolean,
 };
+
+export type UpdateSchedule = "daily" | "weekly" | "never";
 
 export type UpdatesOverview = {
 	checked: number | null,

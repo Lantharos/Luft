@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
+use luft_policy::Policy;
 use luft_variant::{Channel, Variant};
 use tokio::sync::mpsc;
 use zbus::message::Header;
@@ -70,6 +71,20 @@ impl Updater {
 
     fn planned(&self) -> Schedule {
         *self.schedule.lock().expect("schedule lock")
+    }
+
+    fn effective(&self) -> Schedule {
+        self.planned().under(&Policy::load().updates)
+    }
+
+    /// The channel the system moves to: the one the policy names while the system follows
+    /// another, or else the one chosen while it had nothing new enough.
+    async fn waiting(&self) -> Result<Option<Channel>, Error> {
+        let Some(required) = Policy::load().updates.channel else {
+            return Ok(self.planned().waiting);
+        };
+        let followed = self.blocking(bootc::followed_channel).await?;
+        Ok((followed != Some(required)).then_some(required))
     }
 
     async fn plan(&self, planned: Schedule) -> Result<(), Error> {
@@ -263,12 +278,12 @@ impl Updater {
 
     #[zbus(property)]
     fn schedule(&self) -> &'static str {
-        self.planned().every.name()
+        self.effective().every.name()
     }
 
     #[zbus(property)]
     fn download_automatically(&self) -> bool {
-        self.planned().download
+        self.effective().download
     }
 
     #[zbus(property)]
@@ -292,6 +307,14 @@ impl Updater {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SCHEDULE).await?;
         let every = Every::named(schedule)?;
+        let requested = Schedule {
+            every,
+            download,
+            ..self.planned()
+        };
+        if requested.under(&Policy::load().updates) != requested {
+            return Err(Error::managed());
+        }
         self.plan(Schedule {
             every,
             download,
@@ -313,7 +336,7 @@ impl Updater {
         if luft_identity::caller::uid(connection, &header).await? != Some(0) {
             return Err(Error::not_authorized());
         }
-        let planned = self.planned();
+        let planned = self.effective();
         if !planned.due(schedule::now()) || self.fetching().is_some() {
             return Ok(());
         }
@@ -321,7 +344,9 @@ impl Updater {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
         }
-        let waiting = planned.waiting;
+        let Ok(waiting) = self.waiting().await else {
+            return Ok(());
+        };
         let Ok(next) = self.blocking(move || bootc::next(waiting)).await else {
             return Ok(());
         };
@@ -347,7 +372,7 @@ impl Updater {
     }
 
     async fn status(&self) -> Result<String, Error> {
-        let waiting = self.planned().waiting;
+        let waiting = self.waiting().await?;
         self.blocking(move || bootc::status(waiting)).await
     }
 
@@ -389,7 +414,7 @@ impl Updater {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        let Some(channel) = self.planned().waiting else {
+        let Some(channel) = self.waiting().await? else {
             return self
                 .begin(Fetch::upgrade, false, Change::Update, server, &emitter)
                 .await;
@@ -419,6 +444,13 @@ impl Updater {
         self.refuse_while_downloading()?;
         let channel = Channel::named(channel)
             .ok_or_else(|| Error::Failed(format!("“{channel}” isn't one of Luft's channels.")))?;
+        if Policy::load()
+            .updates
+            .channel
+            .is_some_and(|required| required != channel)
+        {
+            return Err(Error::managed());
+        }
         if self.blocking(bootc::followed_channel).await? == Some(channel) {
             self.wait_for(None).await?;
             return Ok(false);

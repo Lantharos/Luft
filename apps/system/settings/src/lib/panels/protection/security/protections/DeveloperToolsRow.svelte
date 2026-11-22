@@ -3,6 +3,7 @@
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, Row, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 
 	const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 
@@ -36,7 +37,13 @@
 {/snippet}
 
 {#if on !== null}
-	<Row title={t('settings-developer-tools')} description={t('settings-developer-tools-description')} icon={Wrench} below={error ? failure : undefined}>
+	<Row
+		title={t('settings-developer-tools')}
+		description={t('settings-developer-tools-description')}
+		icon={Wrench}
+		locked={policy.current?.developer.tools != null}
+		below={error ? failure : undefined}
+	>
 		<Switch label={t('settings-developer-tools')} checked={on} disabled={busy} onchange={toggle} />
 	</Row>
 {/if}

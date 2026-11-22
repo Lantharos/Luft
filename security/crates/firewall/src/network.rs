@@ -127,7 +127,7 @@ fn open_to(settings: &Settings, uid: u32) -> bool {
         })
 }
 
-fn role(settings: &Settings) -> Role {
+fn role(settings: &Settings, home_networks: bool) -> Role {
     let shared = ["ipv4", "ipv6"]
         .iter()
         .any(|family| text(settings, family, "method") == "shared");
@@ -138,6 +138,7 @@ fn role(settings: &Settings) -> Role {
         return Role::Guarded;
     }
     match text(settings, "connection", "zone").as_str() {
+        _ if !home_networks => Role::Guarded,
         "" => Role::Unclassified,
         "home" => Role::Home,
         _ => Role::Guarded,
@@ -194,6 +195,7 @@ async fn running(connection: &Connection) -> Result<bool, String> {
 }
 
 pub async fn read(connection: &Connection) -> Result<Layout, String> {
+    let home_networks = luft_policy::Policy::load().firewall.home_networks;
     let mut layout = Layout::default();
     if !running(connection).await? {
         return Ok(layout);
@@ -211,7 +213,7 @@ pub async fn read(connection: &Connection) -> Result<Layout, String> {
             continue;
         };
         let settings = settings(connection, &path).await.map_err(failed)?;
-        match role(&settings) {
+        match role(&settings, home_networks) {
             Role::Home => {
                 let interfaces = interfaces(&objects, &active);
                 for prefix in prefixes(&objects, &active) {

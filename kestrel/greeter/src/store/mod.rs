@@ -35,6 +35,13 @@ impl Store {
         Self { root }
     }
 
+    pub fn developer_tools(&self) -> bool {
+        luft_policy::Policy::load()
+            .developer
+            .tools
+            .unwrap_or_else(|| self.config().developer_tools)
+    }
+
     pub fn config(&self) -> Config {
         let path = self.config_path();
         match fs::read(&path) {

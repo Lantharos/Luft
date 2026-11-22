@@ -1,0 +1,15 @@
+[package]
+name = "locksmith"
+version = "0.1.0"
+description = "Locks the desktop settings Luft's policy files decide, so nobody can change them in their account"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+luft-policy.workspace = true
+
+[lints]
+workspace = true

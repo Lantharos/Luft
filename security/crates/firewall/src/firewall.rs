@@ -6,7 +6,7 @@ use zbus::OwnedObjectPath;
 use crate::apps::{Access, Apps, Decisions, Identity, identity};
 use crate::listening::Change;
 use crate::network::Layout;
-use crate::ports::{self, Opened, Port};
+use crate::ports::{self, Networks, Opened, Port};
 use crate::rules::{self, Sets};
 
 pub struct Firewall {
@@ -44,12 +44,29 @@ impl Firewall {
     fn sets(&mut self) -> Sets {
         self.apps.prune();
         self.post.retain(|unit| identity::alive(unit));
+        let mut reachable = self.apps.reachable();
+        if !luft_policy::Policy::load().firewall.public_access {
+            reachable.anywhere.clear();
+        }
         rules::sets(
             &self.layout,
-            &self.ports,
-            &self.apps.reachable(),
+            &self.open(),
+            &reachable,
             !self.post.is_empty(),
         )
+    }
+
+    /// The open ports the policy leaves open.
+    pub fn open(&self) -> Opened {
+        let policy = luft_policy::Policy::load().firewall;
+        if !policy.open_ports {
+            return Opened::new();
+        }
+        let mut open = self.ports.clone();
+        if !policy.public_access {
+            open.retain(|_, networks| *networks == Networks::Home);
+        }
+        open
     }
 
     async fn load(&mut self, renew: bool) -> Result<(), String> {

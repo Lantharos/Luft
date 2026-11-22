@@ -7,6 +7,7 @@
 	import type { FirewallAccess, FirewallApp } from '@luft/network';
 	import { app as settings } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 
 	interface Props {
 		apps: FirewallApp[];
@@ -18,9 +19,10 @@
 
 	const post = useSettings<{ visibility: string }>('com.lantharos.kestrel.post', ['visibility']);
 
+	let publicAccess = $derived(policy.current?.firewall['public-access'] ?? true);
 	let choices = $derived<{ value: FirewallAccess; label: string }[]>([
 		{ value: 'home', label: t('settings-network-firewall-access-home') },
-		{ value: 'anywhere', label: t('settings-network-firewall-access-anywhere') },
+		...(publicAccess ? [{ value: 'anywhere' as const, label: t('settings-network-firewall-access-anywhere') }] : []),
 		{ value: 'blocked', label: t('settings-network-firewall-access-blocked') }
 	]);
 </script>
@@ -44,7 +46,7 @@
 			<Select
 				label={t('settings-network-firewall-access-label', { app: app.name })}
 				options={choices}
-				value={app.access}
+				value={!publicAccess && app.access === 'anywhere' ? 'home' : app.access}
 				onchange={(access) => onchange(app, access)}
 			/>
 			<IconButton icon={X} label={t('settings-network-firewall-forget', { app: app.name })} onclick={() => onforget(app)} />

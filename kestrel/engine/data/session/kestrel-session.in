@@ -23,7 +23,12 @@ export QT_WAYLAND_RECONNECT=1 QT_QPA_PLATFORMTHEME=gnome
 
 DCONF_PROFILE="${XDG_RUNTIME_DIR:-/tmp}/kestrel/dconf-profile"
 mkdir -p "${DCONF_PROFILE%/*}"
-{ cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } > "$DCONF_PROFILE"
+{ cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } | {
+  read -r own
+  echo "$own"
+  if [ -e /run/luft/policy/dconf ]; then echo file-db:/run/luft/policy/dconf; fi
+  cat
+} > "$DCONF_PROFILE"
 export DCONF_PROFILE
 
 region="$(gsettings get org.gnome.system.locale region 2> /dev/null | tr -d "'")"

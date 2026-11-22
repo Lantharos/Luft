@@ -358,6 +358,8 @@ settings-extensions-unreviewed-copy = Not reviewed, runs inside Luft as a copy
 settings-extensions-unreviewed-copy-sandboxed = Not reviewed, a copy that runs in a sandbox while Developer tools is off
 settings-extensions-unreviewed-folder = Not reviewed, runs inside Luft from its folder
 settings-extensions-unreviewed-folder-sandboxed = Not reviewed, runs in a sandbox while Developer tools is off
+# Shown on an extension nobody reviewed while the person's organization doesn't let such extensions run
+settings-extensions-unreviewed-managed = Your organization doesn't allow extensions nobody reviewed, so this one doesn't run
 # $note says the extension wasn't reviewed and how it runs, $rest is its description or what's wrong with it
 settings-extensions-unreviewed-summary = { $note } · { $rest }
 settings-extensions-inside = Inside Luft

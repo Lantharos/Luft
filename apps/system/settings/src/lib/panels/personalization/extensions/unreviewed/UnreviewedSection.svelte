@@ -2,11 +2,13 @@
 	import { t } from '@luft/i18n';
 	import { errorText, Row, Section } from '@luft/ui';
 	import type { Extension } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import { extensions, type Unreviewed } from '../extensions.svelte';
 	import UnreviewedDialog from './UnreviewedDialog.svelte';
 
 	let { extension }: { extension: Extension } = $props();
 
+	let allowed = $derived(policy.current?.extensions.unreviewed ?? true);
 	let asking = $state<Unreviewed | null>(null);
 	let busy = $state(false);
 	let error = $state('');
@@ -29,8 +31,8 @@
 
 {#if extension.origin === 'own' && extensions.developerTools}
 	<Section title={t('settings-extensions-inside')} description={t('settings-extensions-inside-description')}>
-		<Row title={t('settings-extensions-copy')} description={t('settings-extensions-copy-description')} onclick={() => (asking = 'copy')} />
-		<Row title={t('settings-extensions-folder')} description={t('settings-extensions-folder-description')} onclick={() => (asking = 'folder')} />
+		<Row title={t('settings-extensions-copy')} description={t('settings-extensions-copy-description')} locked={!allowed} onclick={allowed ? () => (asking = 'copy') : undefined} />
+		<Row title={t('settings-extensions-folder')} description={t('settings-extensions-folder-description')} locked={!allowed} onclick={allowed ? () => (asking = 'folder') : undefined} />
 	</Section>
 {:else if extension.origin === 'copy' || extension.origin === 'folder'}
 	<Section title={t('settings-extensions-inside')}>

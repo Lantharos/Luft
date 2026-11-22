@@ -5,6 +5,7 @@
 	import { commands, events } from '#lib/bindings.js';
 	import type { LoginScreen, User } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import { displayName } from '../users/api';
 	import { chooseWallpaper, clearWallpaper, setAutomaticLogin, setDefaultSession, setHiddenUsers, setShowUsers, startsWithoutPassword } from './api';
 	import WallpaperSection from './WallpaperSection.svelte';
@@ -103,7 +104,11 @@
 					<Select label={t('settings-login-session')} options={sessions} value={screen.defaultSession} onchange={(session) => attempt('signing-in', () => setDefaultSession(session))} />
 				</Row>
 			{/if}
-			<Row title={t('settings-login-automatic')} description={t('settings-login-automatic-description')}>
+			<Row
+				title={t('settings-login-automatic')}
+				description={t('settings-login-automatic-description')}
+				locked={policy.current?.accounts['automatic-sign-in'] === false}
+			>
 				<Select label={t('settings-login-automatic')} options={automaticLogins} value={screen.automaticLogin} onchange={chooseAutomaticLogin} />
 			</Row>
 		</Section>

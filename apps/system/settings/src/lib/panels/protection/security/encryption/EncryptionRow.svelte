@@ -3,12 +3,14 @@
 	import { t } from '@luft/i18n';
 	import { errorText, Row } from '@luft/ui';
 	import type { Disk } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import { cancelEncryption, restart } from '../api';
 	import { encryptionSummary } from './describe';
 	import TurnOnDialog from './TurnOnDialog.svelte';
 
 	let { disk, withoutKey }: { disk: Disk; withoutKey: boolean } = $props();
 
+	let required = $derived(policy.current?.encryption.required ?? false);
 	let turningOn = $state(false);
 	let busy = $state(false);
 	let error = $state('');
@@ -25,9 +27,11 @@
 	}
 </script>
 
-<Row title={t('settings-encryption')} description={encryptionSummary(disk, withoutKey)} icon={LockKeyhole}>
+<Row title={t('settings-encryption')} description={encryptionSummary(disk, withoutKey)} icon={LockKeyhole} locked={required && disk.encrypted}>
 	{#if disk.encrypting === 'after-restart'}
-		<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelEncryption)}>{t('settings-encryption-dont-encrypt')}</button>
+		{#if !required}
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelEncryption)}>{t('settings-encryption-dont-encrypt')}</button>
+		{/if}
 		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-protection-restart')}</button>
 	{:else if disk.encrypting === 'no' && !disk.encrypted && disk.canEncrypt}
 		<button type="button" class="button" onclick={() => (turningOn = true)}>{t('settings-encryption-turn-on')}</button>

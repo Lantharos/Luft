@@ -7,6 +7,7 @@
 	import { commands } from '#lib/bindings.js';
 	import type { RemoteLogin } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import AccountsSection from './AccountsSection.svelte';
 	import ConnectSection from './ConnectSection.svelte';
 	import { remoteLoginSummary } from './describe';
@@ -76,7 +77,12 @@
 
 <SubPage title={t('settings-page-remote-login')} {onclose}>
 	<Section description={t('settings-remote-login.description')}>
-		<Row title={t('settings-remote-login')} description={current.enabled ? remoteLoginSummary(current) : undefined} icon={TerminalSquare}>
+		<Row
+			title={t('settings-remote-login')}
+			description={current.enabled ? remoteLoginSummary(current) : undefined}
+			icon={TerminalSquare}
+			locked={policy.current?.['remote-login'].allowed === false}
+		>
 			<Switch label={t('settings-remote-login')} checked={current.enabled} disabled={busy} onchange={turn} />
 		</Row>
 	</Section>
@@ -92,7 +98,12 @@
 		<AccountsSection {remote} {current} {run} />
 
 		<Section title={t('settings-remote-login-safety')}>
-			<Row title={t('settings-remote-login-passwords')} description={t('settings-remote-login-passwords-description')} icon={RectangleEllipsis}>
+			<Row
+				title={t('settings-remote-login-passwords')}
+				description={t('settings-remote-login-passwords-description')}
+				icon={RectangleEllipsis}
+				locked={policy.current?.['remote-login'].passwords === false}
+			>
 				<Switch
 					label={t('settings-remote-login-passwords')}
 					checked={current.passwordLogin}

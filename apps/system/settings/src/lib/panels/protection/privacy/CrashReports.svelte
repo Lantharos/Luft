@@ -2,6 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, Dialog, Row, Section, Select } from '@luft/ui';
 	import { commands, type CrashReportsState } from '#lib/bindings.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 
 	let reports = $state<CrashReportsState | null>(null);
 	let explaining = $state(false);
@@ -26,7 +27,7 @@
 </script>
 
 <Section title={t('settings-crash-reports')} description={t(reports?.available === false ? 'settings-crash-reports-unavailable' : 'settings-crash-reports-description')}>
-	<Row title={t('settings-crash-reports-send')} disabled={!reports?.available}>
+	<Row title={t('settings-crash-reports-send')} disabled={!reports?.available} locked={policy.current?.['crash-reports'].send != null}>
 		<Select
 			label={t('settings-crash-reports-send')}
 			options={choices}

@@ -8,6 +8,7 @@
 	import { commands } from '#lib/bindings.js';
 	import type { PostState } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { policy } from '#lib/state/policy.svelte.js';
 	import NameDialog from './NameDialog.svelte';
 	import PairDialog from './PairDialog.svelte';
 	import { POST_KEYS, POST_SCHEMA, type PostSettings, type Visibility } from './settings';
@@ -75,7 +76,7 @@
 {/if}
 
 <Section>
-	<Row title={t('settings-post-visibility')}>
+	<Row title={t('settings-post-visibility')} locked={policy.current?.['nearby-sharing']['visible-to'] != null}>
 		<Segmented label={t('settings-post-visibility')} options={choices} value={visibility} onchange={(chosen) => post.set('visibility', chosen)} />
 	</Row>
 	{#if publicHere && current}

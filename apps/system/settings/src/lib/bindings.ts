@@ -705,6 +705,7 @@ export const events = {
 	loginChanged: (callback: (payload: LoginScreen) => void) => listen<LoginScreen>("login.changed", callback),
 	networkChanged: (callback: (payload: Network) => void) => listen<Network>("network.changed", callback),
 	networkFailed: (callback: (payload: Failure) => void) => listen<Failure>("network.failed", callback),
+	policyChanged: (callback: (payload: Policy) => void) => listen<Policy>("policy.changed", callback),
 	powerChanged: (callback: (payload: PowerState) => void) => listen<PowerState>("power.changed", callback),
 	printersChanged: (callback: (payload: PrintersState) => void) => listen<PrintersState>("printers.changed", callback),
 	remoteLoginChanged: (callback: (payload: RemoteLogin) => void) => listen<RemoteLogin>("remote-login.changed", callback),
@@ -752,6 +753,12 @@ export type Account = {
 	server: string | null,
 	services: Service[],
 	standing: Standing,
+};
+
+export type AccountsPolicy = {
+	add: boolean,
+	administrators: boolean,
+	"automatic-sign-in": boolean,
 };
 
 export type AccountsSnapshot = {
@@ -826,6 +833,8 @@ export type AppIcons = {
 	clear: IconPaint,
 	monochrome: IconPaint,
 };
+
+export type AppSource = "schelf-store" | "flathub" | "appimage" | "ubuntu";
 
 export type AppState = {
 	page: string | null,
@@ -972,6 +981,12 @@ export type CloudConflict = {
 
 export type Corners = "rounded" | "square";
 
+export type CrashReportSending = "always" | "never";
+
+export type CrashReportsPolicy = {
+	send: CrashReportSending | null,
+};
+
 export type CrashReportsState = {
 	available: boolean,
 	choice: string,
@@ -1081,6 +1096,10 @@ export type EncryptingState = "no" | "after-restart" | "encrypting" | "waiting";
 
 export type EncryptionChange = "encrypt" | "decrypt";
 
+export type EncryptionPolicy = {
+	required: boolean,
+};
+
 export type Engine = "parakeet" | "whisper";
 
 export type EnrollProgress = {
@@ -1165,6 +1184,10 @@ export type ExtensionShortcut = {
 	accelerators: string[],
 	default: string,
 	changed: boolean,
+};
+
+export type ExtensionsPolicy = {
+	unreviewed: boolean,
 };
 
 export type ExternalBrightness = "checking" | "ready" | "missing-tool" | "needs-restart" | "no-access";
@@ -1452,6 +1475,10 @@ export type Monitor = {
 
 export type Motion = "full" | "reduced" | "off";
 
+export type NearbySharingPolicy = {
+	"visible-to": Visibility | null,
+};
+
 export type Network = {
 	wifi: Wifi | null,
 	known: Known[],
@@ -1479,6 +1506,10 @@ export type OpenPort = {
 };
 
 export type Order = "popular" | "rating" | "newest";
+
+export type OrganizationPolicy = {
+	name: string | null,
+};
 
 export type OtherSystem = {
 	id: string,
@@ -1581,11 +1612,18 @@ export type PluggedDrive = {
  *  to change it.
  */
 export type Policy = {
+	organization: OrganizationPolicy,
 	"screen-lock": ScreenLockPolicy,
 	updates: SystemUpdatesPolicy,
 	firewall: FirewallPolicy,
 	software: SoftwarePolicy,
 	developer: DeveloperPolicy,
+	extensions: ExtensionsPolicy,
+	encryption: EncryptionPolicy,
+	accounts: AccountsPolicy,
+	"remote-login": RemoteLoginPolicy,
+	"nearby-sharing": NearbySharingPolicy,
+	"crash-reports": CrashReportsPolicy,
 };
 
 export type Port = {
@@ -1747,6 +1785,11 @@ export type RemoteLogin = {
 	hostname: string,
 };
 
+export type RemoteLoginPolicy = {
+	allowed: boolean,
+	passwords: boolean,
+};
+
 export type Removal = "removed" | "mayLoseFiles";
 
 export type Requirement = {
@@ -1836,6 +1879,8 @@ export type SigningKeyState = "none" | "pending" | "enrolled";
 export type SoftwarePolicy = {
 	"system-packages": boolean,
 	"package-sources": boolean,
+	/**  The only places apps may come from, or all of them when left out. */
+	"app-sources": AppSource[] | null,
 };
 
 export type SoundSet = {
@@ -2035,6 +2080,8 @@ export type Users = {
 export type Value = null | boolean | number | string | Value[] | { [key in string]: Value };
 
 export type Variant = "standard" | "nvidia";
+
+export type Visibility = "no-one" | "your-devices" | "everyone";
 
 export type Vpn = {
 	connection: string,

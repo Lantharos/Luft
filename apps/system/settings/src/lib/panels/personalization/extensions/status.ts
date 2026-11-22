@@ -1,5 +1,6 @@
 import { t } from '@luft/i18n';
 import type { Extension } from '#lib/bindings.js';
+import { policy } from '#lib/state/policy.svelte.js';
 import { extensions } from './extensions.svelte';
 
 const PROBLEMS: Record<string, string> = {
@@ -52,7 +53,10 @@ function detail(extension: Extension, unreviewed: boolean): string {
 	return problem ? t(problem) : extension.description;
 }
 
+const REVIEWED = ['store', 'store-sandboxed', 'development'];
+
 export function unreviewedNote(extension: Extension): string | null {
+	if (policy.current?.extensions.unreviewed === false && !REVIEWED.includes(extension.origin)) return t('settings-extensions-unreviewed-managed');
 	const note = UNREVIEWED[extension.origin];
 	return note ? t(extensions.developerTools ? note.inside : note.sandboxed) : null;
 }

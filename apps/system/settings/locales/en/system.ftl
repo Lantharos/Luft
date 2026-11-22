@@ -301,6 +301,50 @@ settings-about-problem-log = Luft keeps the full log of that session, in case yo
 settings-about-problem-firmware = Restart into firmware settings
 settings-about-done = Done
 
+## Managed by an organization
+
+# Opens the list of the settings the computer's organization decided; $organization is its name
+settings-about-managed = Managed by { $organization }
+settings-about-managed-unnamed = Managed by your organization
+settings-about-managed-title = What { $organization } decides
+settings-about-managed-title-unnamed = What your organization decides
+settings-about-managed-nothing = Your organization doesn’t decide any settings on this computer.
+settings-managed-lock-on = The screen locks when it turns off
+settings-managed-lock-off = The screen doesn’t lock when it turns off
+# $duration is how long, such as "5 minutes"
+settings-managed-screen-off = The screen turns off after { $duration } without use
+settings-managed-screen-stays-on = The screen stays on
+settings-managed-lock-after = The screen locks { $duration } after it turns off
+settings-managed-lock-at-once = The screen locks as soon as it turns off
+settings-managed-updates-daily = Luft looks for updates every day
+settings-managed-updates-weekly = Luft looks for updates every week
+settings-managed-updates-never = Luft doesn’t look for updates by itself
+settings-managed-download-on = Updates download in the background
+settings-managed-download-off = Updates don’t download in the background
+settings-managed-channel-stable = Luft gets stable versions
+settings-managed-channel-nightly = Luft gets nightly versions
+settings-managed-system-packages = System packages can’t be added
+settings-managed-package-sources = Software sources can’t be added
+# $sources lists where apps can come from, such as "Flathub or schelf.store"
+settings-managed-app-sources = Apps can only come from { $sources }
+settings-managed-no-apps = No apps can be installed
+settings-managed-developer-on = Developer tools stays on
+settings-managed-developer-off = Developer tools stays off
+settings-managed-unreviewed-extensions = Extensions nobody reviewed don’t run
+settings-managed-encryption = Luft’s disk has to be encrypted
+settings-managed-home-networks = Every network counts as public
+settings-managed-public-access = Nothing on this computer can be reached from public networks
+settings-managed-open-ports = No ports can be opened for services
+settings-managed-accounts = Accounts can’t be added, removed or made administrators
+settings-managed-automatic-sign-in = Nobody signs in automatically
+settings-managed-remote-login-off = Remote login stays off
+settings-managed-remote-login-keys = Remote login only takes keys, not passwords
+settings-managed-nearby-no-one = Nobody nearby can find this computer to send to it
+settings-managed-nearby-your-devices = Only your own devices can find this computer to send to it
+settings-managed-nearby-everyone = Everyone nearby can find this computer to send to it
+settings-managed-crash-reports-always = Crash reports are always sent
+settings-managed-crash-reports-never = Crash reports are never sent
+
 ## Language & Region
 
 settings-region-language = Language

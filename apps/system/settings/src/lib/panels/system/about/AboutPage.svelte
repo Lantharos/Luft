@@ -10,6 +10,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { builtOn, versionLabel } from '../version';
 	import { openDisks, removeSystem } from './api';
+	import ManagedRow from './ManagedRow.svelte';
 	import RecentProblems from './RecentProblems.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
@@ -59,6 +60,8 @@
 				<button type="button" class="button" onclick={startRename}>{t('settings-about-rename')}</button>
 			{/snippet}
 		</HeroCard>
+
+		<ManagedRow />
 
 		<Section title={t('settings-about-hardware')}>
 			{#if info.processor}

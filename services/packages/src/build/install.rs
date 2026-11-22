@@ -148,6 +148,9 @@ pub fn rebuild_policy(root: &Path, packages: &Path) -> Result<()> {
 /// package, such as libvirt's default network, can be taken along; nothing else they change
 /// leaves the build root.
 pub fn install(root: &Path, release: &str, packages: &Path, rpms: &[&Rpm]) -> Result<()> {
+    if rpms.is_empty() {
+        return Ok(());
+    }
     let (files, signed): (Vec<&Rpm>, Vec<&Rpm>) = rpms
         .iter()
         .copied()

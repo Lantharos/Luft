@@ -40,7 +40,7 @@ the driver, so the two images share every layer below it. The kernel only
 ships inside the startup image, so it moves out of the systems into
 localhost/luft-kernel:$FEDORA, where os/image/seal.sh takes it from.
 
-The image is put together from parts: Kestrel, the boot services, the patched
+The image is put together from parts: Kestrel, the boot services, Luft's cursors, the patched
 bootc and xdg-desktop-portal, the web runtime, Helium, Zypak, the system
 services, each app, the schelf.store releases it preinstalls and NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
 the Fedora image's digest and the CEF build included, in LUFT_PARTS (default localhost/luft-parts),
@@ -143,7 +143,7 @@ part_names() {
   grep -v '^app-' <<<"$components"
   printf '%s\n' bootc portal
   [[ "$1" != luft-nvidia ]] || echo nvidia
-  printf '%s\n' runtime helium cursors zypak
+  printf '%s\n' runtime helium zypak
   [[ -z "$store" ]] || echo store
   grep '^app-' <<<"$components"
 }

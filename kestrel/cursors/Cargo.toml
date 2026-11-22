@@ -1,0 +1,13 @@
+[package]
+name = "luft-cursors"
+description = "Draws Plume, Luft's cursor theme, in light and dark"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+resvg.workspace = true
+
+[lints]
+workspace = true

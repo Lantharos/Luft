@@ -150,10 +150,13 @@ FROM scratch AS store
 COPY --from=store-build /stage /stage
 COPY --from=store-build /out/ /
 
-FROM ${BASE} AS cursors-build
-COPY os/image/parts/cursors /src/os/image/parts/cursors
-COPY os/image/parts/stages/cursors.sh /src/os/image/parts/stages/cursors.sh
-RUN /src/os/image/parts/stages/cursors.sh /stage
+FROM builder AS cursors-build
+COPY --from=sources . /src/
+COPY os/image/parts/stages/cursors.sh os/image/parts/stages/workspace.ts /src/os/image/parts/stages/
+RUN --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
+    --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    bun /src/os/image/parts/stages/workspace.ts /src && \
+    CARGO_TARGET_DIR=/var/tmp/cursors /src/os/image/parts/stages/cursors.sh /stage
 
 FROM scratch AS cursors
 COPY --from=cursors-build /stage /stage

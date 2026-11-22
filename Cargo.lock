@@ -5835,6 +5835,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-cursors"
+version = "0.1.0"
+dependencies = [
+ "resvg",
+]
+
+[[package]]
 name = "luft-daylight"
 version = "0.1.0"
 dependencies = [

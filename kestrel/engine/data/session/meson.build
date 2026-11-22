@@ -115,6 +115,7 @@ foreach slice : ['app', 'background', 'user']
 endforeach
 foreach kind : ['scope', 'service']
   install_data('app-' + kind + '-limits.conf', install_dir: systemduserunitdir / 'app-.' + kind + '.d', rename: '50-kestrel-limits.conf')
+  install_data('app-session.conf', install_dir: systemduserunitdir / 'app-.' + kind + '.d', rename: '50-kestrel-session.conf')
 endforeach
 install_data('root-slice.conf', install_dir: systemduserunitdir / '-.slice.d', rename: '50-kestrel-session.conf')
 install_data('session-slice.conf', install_dir: systemduserunitdir / 'session.slice.d', rename: '50-kestrel-session.conf')

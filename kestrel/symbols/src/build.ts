@@ -13,6 +13,8 @@ const ALIASES = join(ROOT, 'aliases');
 const COMPONENTS = join(ROOT, 'components');
 const OUTPUTS = ['theme', 'icons'];
 const APP_ONLY = 'app';
+const SHELL = ['kestrel/actions', 'kestrel/status'];
+const SHELL_ICONS = '../engine/data/icons/scalable';
 const SHADE_OPACITY = 0.4;
 const checking = process.argv.includes('--check');
 
@@ -34,7 +36,7 @@ const svgFiles = (dir: string) => (existsSync(dir) ? readdirSync(dir).filter(fil
 
 export async function drawings() {
 	const found = new Map<string, Drawing>();
-	for (const context of [...Object.keys(CONTEXTS), APP_ONLY]) {
+	for (const context of [...Object.keys(CONTEXTS), APP_ONLY, ...SHELL]) {
 		for (const file of svgFiles(join(DRAWINGS, context))) {
 			const name = basename(file, '.svg');
 			found.set(name, { context, shapes: parseDrawing(file, await Bun.file(join(DRAWINGS, context, file)).text()) });
@@ -79,7 +81,10 @@ function drawingOf(drawn: Map<string, Drawing>, name: string, target: string) {
 async function outputs() {
 	const files = new Map([['theme/index.theme', indexTheme()]]);
 	const drawn = await drawings();
-	const themed = [...drawn].filter(([, { context }]) => context !== APP_ONLY);
+	const themed = [...drawn].filter(([, { context }]) => context in CONTEXTS);
+	for (const [name, { context, shapes }] of drawn) {
+		if (SHELL.includes(context)) files.set(`${SHELL_ICONS}/${basename(context)}/${name}.svg`, icon(shapes, false));
+	}
 	const named = [...themed, ...[...await aliases()].map(([alias, target]): [string, Drawing] => [alias, drawingOf(drawn, alias, target)])];
 	for (const [name, { context, shapes }] of named) {
 		files.set(`theme/symbolic/${context}/${name}-symbolic.svg`, icon(shapes, false));

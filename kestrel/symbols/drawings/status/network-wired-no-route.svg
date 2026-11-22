@@ -3,7 +3,7 @@
 		<rect x="1" y="1.5" width="8" height="6" rx="1.8"/>
 	</g>
 	<g class="shade">
-		<path d="M4.5 7.5v1.8a2.4 2.4 0 0 0 2.4 2.4H11.6" fill="none" stroke-width="1.8"/>
+		<path d="M4.5 7.5v1.8a2.4 2.4 0 0 0 2.4 2.4H11.6" fill="none" stroke-width="2.2"/>
 	</g>
 	<g class="ink">
 		<circle cx="11.6" cy="11.7" r="3.3"/>

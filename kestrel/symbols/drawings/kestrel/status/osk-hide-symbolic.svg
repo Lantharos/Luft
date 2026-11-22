@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<rect x="1.25" y="1.25" width="13.5" height="8.5" rx="2"/>
+		<path d="M5.6 12.4 8 14.6l2.4-2.2" fill="none" stroke-width="1.8"/>
+	</g>
+	<g class="cut">
+		<circle cx="4" cy="3.6" r="0.6"/>
+		<circle cx="6" cy="3.6" r="0.6"/>
+		<circle cx="8" cy="3.6" r="0.6"/>
+		<circle cx="10" cy="3.6" r="0.6"/>
+		<circle cx="12" cy="3.6" r="0.6"/>
+		<circle cx="4" cy="5.7" r="0.6"/>
+		<circle cx="6" cy="5.7" r="0.6"/>
+		<circle cx="8" cy="5.7" r="0.6"/>
+		<circle cx="10" cy="5.7" r="0.6"/>
+		<circle cx="12" cy="5.7" r="0.6"/>
+		<path d="M5.5 7.8h5" fill="none" stroke-width="1.1"/>
+	</g>
+</svg>

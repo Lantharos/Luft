@@ -4,8 +4,8 @@
  * ShellGlyphRenderer:
  *
  * Draws single glyphs into standalone images, apart from the text renderer's
- * glyph caches: color emoji from the emoji font, or characters in a text font
- * and its fallbacks, kept on their baseline.
+ * glyph caches: color emoji from the emoji fonts in order of preference, or
+ * characters in a text font and its fallbacks, kept on their baseline.
  */
 
 #include "config.h"
@@ -42,48 +42,47 @@ substituted (FcPattern *pattern)
 }
 
 static FcFontSet *
-emoji_fonts (void)
-{
-  FcFontSet *fonts = FcFontSetCreate ();
-  FcPattern *pattern, *match;
-  FcResult result;
-
-  pattern = substituted (FcPatternBuild (NULL,
-                                         FC_FAMILY, FcTypeString, "emoji",
-                                         FC_COLOR, FcTypeBool, FcTrue,
-                                         NULL));
-  match = FcFontMatch (NULL, pattern, &result);
-  FcPatternDestroy (pattern);
-  if (match)
-    FcFontSetAdd (fonts, match);
-  return fonts;
-}
-
-static FcFontSet *
-text_fonts (const char *family)
+sorted_fonts (FcPattern *pattern,
+              FcBool     color)
 {
   FcFontSet *fonts = FcFontSetCreate ();
   FcFontSet *sorted;
-  FcPattern *pattern;
   FcResult result;
-  FcBool color;
+  FcBool font_color;
   int i;
 
-  pattern = substituted (FcPatternBuild (NULL, FC_FAMILY, FcTypeString, family, NULL));
-  sorted = FcFontSort (NULL, pattern, FcTrue, NULL, &result);
+  sorted = FcFontSort (NULL, substituted (pattern), FcTrue, NULL, &result);
   FcPatternDestroy (pattern);
   if (!sorted)
     return fonts;
 
   for (i = 0; i < sorted->nfont; i++)
     {
-      if (FcPatternGetBool (sorted->fonts[i], FC_COLOR, 0, &color) == FcResultMatch && color)
+      if (FcPatternGetBool (sorted->fonts[i], FC_COLOR, 0, &font_color) != FcResultMatch)
+        font_color = FcFalse;
+      if (font_color != color)
         continue;
       FcPatternReference (sorted->fonts[i]);
       FcFontSetAdd (fonts, sorted->fonts[i]);
     }
   FcFontSetDestroy (sorted);
   return fonts;
+}
+
+static FcFontSet *
+emoji_fonts (void)
+{
+  return sorted_fonts (FcPatternBuild (NULL,
+                                       FC_FAMILY, FcTypeString, "emoji",
+                                       FC_COLOR, FcTypeBool, FcTrue,
+                                       NULL),
+                       FcTrue);
+}
+
+static FcFontSet *
+text_fonts (const char *family)
+{
+  return sorted_fonts (FcPatternBuild (NULL, FC_FAMILY, FcTypeString, family, NULL), FcFalse);
 }
 
 static hb_font_t *
@@ -118,18 +117,49 @@ covers (FcPattern *pattern,
 }
 
 static hb_font_t *
-font_for (ShellGlyphRenderer *renderer,
-          gunichar            character)
+loaded_font (ShellGlyphRenderer *renderer,
+             int                 i)
 {
+  if (!renderer->loaded[i])
+    renderer->loaded[i] = load_font (renderer->fonts->fonts[i]);
+  return renderer->loaded[i];
+}
+
+static hb_codepoint_t
+shape_single (ShellGlyphRenderer *renderer,
+              hb_font_t          *font,
+              const char         *text,
+              int                 pixels)
+{
+  hb_glyph_info_t *glyphs;
+  unsigned int n_glyphs;
+
+  hb_font_set_scale (font, pixels, pixels);
+  hb_buffer_clear_contents (renderer->buffer);
+  hb_buffer_add_utf8 (renderer->buffer, text, -1, 0, -1);
+  hb_buffer_guess_segment_properties (renderer->buffer);
+  hb_shape (font, renderer->buffer, NULL, 0);
+
+  glyphs = hb_buffer_get_glyph_infos (renderer->buffer, &n_glyphs);
+  return n_glyphs == 1 ? glyphs[0].codepoint : 0;
+}
+
+static hb_font_t *
+font_for (ShellGlyphRenderer *renderer,
+          const char         *text,
+          int                 pixels,
+          hb_codepoint_t     *glyph)
+{
+  gunichar character = g_utf8_get_char (text);
   int i;
 
   for (i = 0; i < renderer->fonts->nfont; i++)
     {
-      if (renderer->text && !covers (renderer->fonts->fonts[i], character))
+      if (!covers (renderer->fonts->fonts[i], character))
         continue;
-      if (!renderer->loaded[i])
-        renderer->loaded[i] = load_font (renderer->fonts->fonts[i]);
-      return renderer->loaded[i];
+      *glyph = shape_single (renderer, loaded_font (renderer, i), text, pixels);
+      if (*glyph)
+        return renderer->loaded[i];
     }
   return NULL;
 }
@@ -192,6 +222,7 @@ static void
 shell_glyph_renderer_init (ShellGlyphRenderer *self)
 {
   self->buffer = hb_buffer_create ();
+  hb_buffer_set_flags (self->buffer, HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES);
   self->paint = hb_raster_paint_create_or_fail ();
 }
 
@@ -245,36 +276,26 @@ shell_glyph_renderer_render (ShellGlyphRenderer *renderer,
   ClutterActor *stage = CLUTTER_ACTOR (shell_global_get_stage (shell_global_get ()));
   ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (stage));
   hb_font_t *font;
-  hb_glyph_info_t *glyphs;
+  hb_codepoint_t glyph;
   hb_glyph_extents_t glyph_extents;
   hb_raster_image_t *image;
   hb_raster_extents_t extents;
   ClutterContent *content;
   const uint8_t *pixels_up;
   g_autofree uint8_t *pixels_down = NULL;
-  unsigned int n_glyphs, row;
+  unsigned int row;
 
   g_return_val_if_fail (SHELL_IS_GLYPH_RENDERER (renderer), NULL);
 
-  font = font_for (renderer, g_utf8_get_char (text));
+  font = font_for (renderer, text, pixels, &glyph);
   if (!font)
     return NULL;
 
-  hb_font_set_scale (font, pixels, pixels);
-  hb_buffer_clear_contents (renderer->buffer);
-  hb_buffer_add_utf8 (renderer->buffer, text, -1, 0, -1);
-  hb_buffer_guess_segment_properties (renderer->buffer);
-  hb_shape (font, renderer->buffer, NULL, 0);
-
-  glyphs = hb_buffer_get_glyph_infos (renderer->buffer, &n_glyphs);
-  if (n_glyphs != 1 || glyphs[0].codepoint == 0)
-    return NULL;
-
-  hb_font_get_glyph_extents (font, glyphs[0].codepoint, &glyph_extents);
+  hb_font_get_glyph_extents (font, glyph, &glyph_extents);
   if (renderer->text)
-    keep_baseline (font, glyphs[0].codepoint, &glyph_extents);
+    keep_baseline (font, glyph, &glyph_extents);
   hb_raster_paint_set_glyph_extents (renderer->paint, &glyph_extents);
-  hb_raster_paint_glyph (renderer->paint, font, glyphs[0].codepoint);
+  hb_raster_paint_glyph (renderer->paint, font, glyph);
   image = hb_raster_paint_render (renderer->paint);
   if (!image)
     return NULL;

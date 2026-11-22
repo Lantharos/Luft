@@ -136,6 +136,16 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 FROM scratch AS helium
 COPY --from=helium-build /stage /stage
 
+FROM ${BASE} AS twemoji-build
+COPY os/image/parts/twemoji /src/os/image/parts/twemoji
+COPY os/image/parts/stages/twemoji.sh /src/os/image/parts/stages/twemoji.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf install -y --setopt=keepcache=True python3.14 && \
+    /src/os/image/parts/stages/twemoji.sh /stage
+
+FROM scratch AS twemoji
+COPY --from=twemoji-build /stage /stage
+
 FROM builder AS store-build
 ARG STORE
 COPY os/image/parts/store /src/os/image/parts/store

@@ -19,6 +19,7 @@ COPY --from=parts runtime/stage/ /
 COPY --from=parts helium/stage/ /
 COPY --from=parts cursors/stage/ /
 COPY --from=parts zypak/stage/ /
+COPY --from=parts twemoji/stage/ /
 COPY --from=parts apps/ /
 COPY os/image/files/ /
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der

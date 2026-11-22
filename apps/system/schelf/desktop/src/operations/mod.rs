@@ -251,7 +251,11 @@ impl Queue {
         }: Request,
     ) -> Result<u64, String> {
         let id = self.0.next.fetch_add(1, Ordering::Relaxed);
-        self.entries().push(Entry {
+        let mut entries = self.entries();
+        entries.retain(|entry| {
+            entry.operation.key != key || entry.operation.state != OperationState::Failed
+        });
+        entries.push(Entry {
             operation: Operation {
                 id,
                 key,
@@ -265,6 +269,7 @@ impl Queue {
             job,
             cancel: Cancel::default(),
         });
+        drop(entries);
         self.0.wake.notify_one();
         self.publish();
         self.notify(Notice::Changed {

@@ -12,6 +12,7 @@ use crate::task::{CANCELLED, Task};
 const USER_AGENT: &str = "Luft Software (https://github.com/Lantharos)";
 pub const OFFLINE: &str = "You're offline, or the server couldn't be reached.";
 pub const MISSING: &str = "That isn't available any more.";
+const STOPPED: &str = "The download stopped before it finished.";
 
 pub fn failure(error: ureq::Error) -> String {
     match error {
@@ -85,7 +86,8 @@ pub fn save(
     size: Option<u64>,
     task: Task,
 ) -> Result<(), String> {
-    let total = response.body().content_length().or(size);
+    let promised = response.body().content_length();
+    let total = promised.or(size);
     let mut body = response
         .into_body()
         .into_with_config()
@@ -100,9 +102,7 @@ pub fn save(
             let _ = std::fs::remove_file(destination);
             return Err(CANCELLED.into());
         }
-        let read = body
-            .read(&mut buffer)
-            .map_err(|_| "The download stopped before it finished.".to_string())?;
+        let read = body.read(&mut buffer).map_err(|_| STOPPED.to_string())?;
         if read == 0 {
             break;
         }
@@ -110,6 +110,11 @@ pub fn save(
             .map_err(|error| error.to_string())?;
         received += read as u64;
         task.downloaded(received, total);
+    }
+    if promised.is_some_and(|promised| received < promised) {
+        drop(file);
+        let _ = std::fs::remove_file(destination);
+        return Err(STOPPED.into());
     }
     file.flush().map_err(|error| error.to_string())
 }

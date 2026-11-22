@@ -34,7 +34,7 @@
 	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
 
 	let installed = $state<App[]>([]);
-	let style = $derived(kestrel.values['app-icon-style'] ?? 'tinted');
+	let style = $derived(kestrel.values['app-icon-style'] ?? 'default');
 	let tint = $derived(kestrel.values['app-icon-tint'] ?? '');
 	let tints = $derived([
 		{ value: '', label: t('settings-appearance-accent'), color: appearance.accent ?? 'var(--accent)' },

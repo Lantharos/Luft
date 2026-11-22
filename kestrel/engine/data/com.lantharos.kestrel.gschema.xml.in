@@ -304,7 +304,7 @@
       </description>
     </key>
     <key name="app-icon-style" enum="com.lantharos.kestrel.AppIconStyle">
-      <default>'tinted'</default>
+      <default>'default'</default>
       <summary>How app icons are drawn</summary>
       <description>
         Tinted draws each glyph on a plate in the accent color, Original

@@ -99,7 +99,7 @@
 			<RowValue text={wallpaper.name} />
 		</Row>
 		<Row title={t('settings-appearance-icons')} icon={LayoutGrid} onclick={() => open('icons')}>
-			<RowValue text={t(ICON_STYLES[kestrel.values['app-icon-style'] ?? 'tinted'])} />
+			<RowValue text={t(ICON_STYLES[kestrel.values['app-icon-style'] ?? 'default'])} />
 		</Row>
 		<Row title={t('settings-appearance-glass')} icon={Layers} onclick={() => open('glass')}>
 			<RowValue text={t(GLASS_STYLES[glassSummary(glass.values)])} />

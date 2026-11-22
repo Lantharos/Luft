@@ -9,7 +9,7 @@ Install Luft encrypts Luft's partition before anything is on it. Encrypting an i
 
 ## Encrypting while installing
 
-Install Luft formats Luft's partition with `trustctl encryption format`, keyed by the recovery key and, without a TPM, a passphrase of at least eight characters. Before the first start, `trustctl encryption seal` links the TPM. PCR 7 isn't sealed to what the live system measured, since it started through Fedora's shim and GRUB, but to what the computer will measure once Luft's key is in shim: trustd replays the event log without the live system's loader and adds Luft's key, then an organization's own when [its image](/developers/system/organizations/) has one. If the prediction misses, the first start asks once for the recovery key that was just saved, and trustd seals to what that start measured.
+Install Luft formats Luft's partition with `trustctl encryption format`, keyed by the recovery key and, without a TPM, a passphrase of at least eight characters. Before the first start, `trustctl encryption seal` links the TPM. PCR 7 isn't sealed to what the live system measured, since it started through Fedora's shim and GRUB, but to what the computer will measure once Luft's key is in shim: trustd replays the event log without the live system's loader and adds Luft's key, then an organization's own when [its image](/developers/system/organization-images/#unlocking-the-disk-after-joining) has one. If the prediction misses, the first start asks once for the recovery key that was just saved, and trustd seals to what that start measured.
 
 Replacing a Linux system while keeping its files next to Luft can't be encrypted while installing, since those files stay on the same unencrypted partition.
 

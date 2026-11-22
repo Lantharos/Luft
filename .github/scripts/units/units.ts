@@ -7,7 +7,7 @@ export type Unit = { path: string; scope: Scope };
 
 const UNIT_FILE = /\.service(?:\.in)?$/;
 const SERVICE_SECTION = /^\[Service\]$/m;
-const TEST_ONLY = ['**/vm/**', '**/tools/check/**'].map((pattern) => new Glob(pattern));
+const ELSEWHERE = ['**/vm/**', '**/tools/check/**', 'os/org/template/**'].map((pattern) => new Glob(pattern));
 
 const SCOPES: [string, Scope][] = [
 	['apps/system/setup/installer/data/*', 'system'],
@@ -37,7 +37,7 @@ const SCOPES: [string, Scope][] = [
 
 const patterns = SCOPES.map(([pattern, scope]) => ({ glob: new Glob(pattern), scope }));
 
-export const isUnitPath = (path: string) => UNIT_FILE.test(path) && !TEST_ONLY.some((glob) => glob.match(path));
+export const isUnitPath = (path: string) => UNIT_FILE.test(path) && !ELSEWHERE.some((glob) => glob.match(path));
 
 const scopeOf = (path: string) => patterns.find(({ glob }) => glob.match(path))?.scope;
 

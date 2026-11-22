@@ -5,7 +5,7 @@ sidebar:
   order: 6.5
 ---
 
-When one of Luft's own programs crashes, Luft can send a short report, only with the person's agreement. [Logs and reporting problems](/system/logs/#crash-reports) covers what people see and choose. An organization can [decide](/developers/system/policy/) that reports are always or never sent, and nobody is asked then.
+When one of Luft's own programs crashes, Luft can send a short report, only with the person's agreement. [Logs and reporting problems](/system/logs/#crash-reports) covers what people see and choose. An organization can [decide](/organizations/policy/) that reports are always or never sent, and nobody is asked then.
 
 ## Core dumps
 

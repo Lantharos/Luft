@@ -1,0 +1,57 @@
+name: Luft
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      promote:
+        description: Give every computer the pilot build
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luft
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build for the pilot computers
+    if: ${{ !inputs.promote }}
+    runs-on: [self-hosted, luft]
+    environment: signing
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Mirror Luft
+        run: '"$LUFT_TOOLS/org/org.sh" mirror .'
+
+      - name: Build and publish when needed
+        env:
+          SECURE_BOOT_KEY: ${{ secrets.LUFT_SECUREBOOT_KEY }}
+          PCR_KEY: ${{ secrets.LUFT_PCR_KEY_101 }}
+          SIGNING_KEY: ${{ secrets.LUFT_ORG_SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.LUFT_ORG_SIGNING_PASSPHRASE }}
+        run: |
+          keys="$(mktemp -d)"
+          trap 'rm -rf "$keys"' EXIT
+          printf '%s\n' "$SECURE_BOOT_KEY" > "$keys/secure-boot.key"
+          printf '%s\n' "$PCR_KEY" > "$keys/pcr-101.key"
+          printf '%s\n' "$SIGNING_KEY" > "$keys/signing.private"
+          printf '%s' "$SIGNING_PASSPHRASE" > "$keys/signing.passphrase"
+          LUFT_SECUREBOOT_KEY="$keys/secure-boot.key" LUFT_PCR_KEY_101="$keys/pcr-101.key" \
+            LUFT_ORG_SIGNING_KEY="$keys/signing.private" LUFT_ORG_SIGNING_PASSPHRASE="$keys/signing.passphrase" \
+            "$LUFT_TOOLS/org/org.sh" update .
+
+  promote:
+    name: Give every computer the pilot build
+    if: ${{ inputs.promote }}
+    runs-on: [self-hosted, luft]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: '"$LUFT_TOOLS/org/org.sh" promote .'

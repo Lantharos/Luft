@@ -9,6 +9,7 @@ COPY organization.yaml /etc/containers/registries.d/organization.yaml
 RUN bootc container lint
 ARG NAME
 ARG BASE
+ARG SOURCE
 ARG REVISION=""
 LABEL com.lantharos.organization="${NAME}" com.lantharos.organization.base="${BASE}" \
-    com.lantharos.organization.revision="${REVISION}"
+    com.lantharos.organization.source="${SOURCE}" com.lantharos.organization.revision="${REVISION}"

@@ -31,6 +31,10 @@ RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,source=packages/i18n/src/locales.ts,target=/run/luft/locales.ts \
     --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
     /run/luft/stages/finalize.sh luft "${MAJOR}" "${BASE}" "${EARLY}" "${STABLE_RELEASED}"
+RUN --mount=type=bind,source=os,target=/run/luft/os \
+    cd /run/luft/os && mkdir -p /usr/share/luft/organization && \
+    cp -r --parents versions.env org image/seal.sh image/throwaway-keys.sh image/startup \
+      image/files/usr/share/pki/containers/luft.pub image/files/etc/containers/policy.json /usr/share/luft/organization/
 RUN bootc container lint
 ARG VERSION=dev
 ARG RELEASE_NOTES=""

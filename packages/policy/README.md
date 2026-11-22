@@ -1,6 +1,6 @@
 # luft-policy
 
-The settings an organization decides on its computers, read from `/etc/luft/policy.d` and then `/usr/share/luft/policy.d`, so an image's own policy wins. Every service that owns one of these settings reads it and refuses to change what it decides; the files, keys and where each is enforced are in [Locking settings with a policy](https://docs.luft.computer/developers/system/policy/).
+The settings an organization decides on its computers, read from `/etc/luft/policy.d` and then `/usr/share/luft/policy.d`, so an image's own policy wins. Every service that owns one of these settings reads it and refuses to change what it decides; the files and keys are in [Locking settings with a policy](https://docs.luft.computer/organizations/policy/), and where each is enforced in [How policy is enforced](https://docs.luft.computer/developers/system/policy/).
 
 ```toml
 luft-policy.workspace = true

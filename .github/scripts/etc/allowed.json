@@ -53,7 +53,7 @@
 	"os/iso/live/files/usr/libexec/luft-live-logs": {
 		"/etc/os-release": "Reads which system it runs on"
 	},
-	"os/org/org.sh": {
+	"os/org/lib/build.sh": {
 		"/etc/containers/policy.json": "Reads the containers policy of Luft's image to add the organization's signing key to it"
 	},
 	"packages/app/src/ibus.rs": {

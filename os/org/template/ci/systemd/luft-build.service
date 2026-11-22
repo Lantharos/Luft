@@ -1,0 +1,15 @@
+[Unit]
+Description=Build our Luft when Luft or our repository changed
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/luft/repository
+Environment=LUFT_SECUREBOOT_KEY=/srv/luft/keys/secure-boot.key
+Environment=LUFT_PCR_KEY_101=/srv/luft/keys/pcr-101.key
+Environment=LUFT_ORG_SIGNING_KEY=/srv/luft/keys/signing.private
+Environment=LUFT_ORG_SIGNING_PASSPHRASE=/srv/luft/keys/signing.passphrase
+ExecStart=/usr/bin/git pull --ff-only
+ExecStart=/srv/luft/tools/org/org.sh mirror .
+ExecStart=/srv/luft/tools/org/org.sh update .

@@ -39,7 +39,7 @@ It writes `os/iso/state/luft-VERSION.iso` and its `.sha256`, in a few minutes an
 
 ## An organization's own image
 
-`org/org.sh` builds an organization's image on top of Luft's from a copy of `org/template`, signed with the organization's own keys. [Running Luft in your organization](https://docs.luft.computer/developers/system/organizations/) walks through it.
+`org/org.sh` builds an organization's image on top of Luft's from a copy of `org/template`, signed with the organization's own keys. [Building and rolling out your own Luft](https://docs.luft.computer/organizations/your-own-luft/) walks through it, and [How organization images work](https://docs.luft.computer/developers/system/organization-images/) explains it.
 
 ## Try it in a VM
 

@@ -46,7 +46,7 @@ For a release, the identity names `release.yml` instead.
 - **Parts.** Each part pushed to `ghcr.io/lantharos/luft-parts` is signed without a key by the workflow that built it. A build only reuses a part whose signature names that workflow, and pulls it by the digest it checked. Anything else under the same tag counts as missing and is built again.
 - **The Secure Boot key** is only mounted into build steps without network access: one signs SushiBoot, one the startup image and one NVIDIA's modules. The modules are built first, without any key, in a stage that downloads and runs NVIDIA's code. A second, clean stage that holds only Fedora's kernel headers signs what the first produced.
 
-Signing only happens in builds from `main`. Builds anywhere else, including your own, make throwaway keys. An organization that runs its own Luft signs its builds with keys of its own, as [Running Luft in your organization](/developers/system/organizations/) describes.
+Signing only happens in builds from `main`. Builds anywhere else, including your own, make throwaway keys. An organization that runs its own Luft signs its builds with keys of its own, as [Building and rolling out your own Luft](/organizations/your-own-luft/) describes.
 
 ## Downloads
 

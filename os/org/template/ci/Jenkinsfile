@@ -1,0 +1,28 @@
+pipeline {
+  agent { label 'luft' }
+  triggers { cron('H * * * *') }
+  options { disableConcurrentBuilds() }
+  parameters {
+    booleanParam(name: 'PROMOTE', defaultValue: false, description: 'Give every computer the pilot build')
+  }
+  environment { ORG = "${env.LUFT_TOOLS}/org/org.sh" }
+  stages {
+    stage('Build for the pilot computers') {
+      when { not { expression { params.PROMOTE } } }
+      steps {
+        withCredentials([
+          file(credentialsId: 'luft-secure-boot-key', variable: 'LUFT_SECUREBOOT_KEY'),
+          file(credentialsId: 'luft-pcr-key-101', variable: 'LUFT_PCR_KEY_101'),
+          file(credentialsId: 'luft-signing-key', variable: 'LUFT_ORG_SIGNING_KEY'),
+          file(credentialsId: 'luft-signing-passphrase', variable: 'LUFT_ORG_SIGNING_PASSPHRASE'),
+        ]) {
+          sh '"$ORG" mirror . && "$ORG" update .'
+        }
+      }
+    }
+    stage('Give every computer the pilot build') {
+      when { expression { params.PROMOTE } }
+      steps { sh '"$ORG" promote .' }
+    }
+  }
+}

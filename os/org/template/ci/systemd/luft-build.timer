@@ -1,0 +1,10 @@
+[Unit]
+Description=Look for a new Luft or changes to our repository every hour
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

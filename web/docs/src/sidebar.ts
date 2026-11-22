@@ -21,6 +21,7 @@ export const sidebar: Sidebar = [
 	group('Apps', 'apps', true),
 	group('Files and accounts', 'files'),
 	group('System', 'system'),
+	group('Organizations', 'organizations'),
 	{
 		label: 'For developers',
 		collapsed: true,

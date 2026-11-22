@@ -28,4 +28,4 @@ export interface ResolvedAsk {
 export const resolveAsks = (asks: Ask[]): ResolvedAsk[] =>
 	asks.map((entry) => (typeof entry === 'string' ? { ask: entry, shared: false } : { ...entry, shared: entry.shared ?? false }));
 
-export const userSections = ['start', 'desktop', 'windows', 'personalize', 'apps', 'files', 'system'];
+export const userSections = ['start', 'desktop', 'windows', 'personalize', 'apps', 'files', 'system', 'organizations'];

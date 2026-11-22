@@ -85,7 +85,7 @@ See [Writing an extension](/extensions/getting-started/) for what goes into one.
 
 ## Your organization's policy
 
-On a computer an organization looks after, `luft policy` shows every setting its [policy](/developers/system/policy/) decides and the file that decides it, and `luft policy check 10-updates.toml` checks a policy file before you add it, naming every key Luft doesn't know and every value of the wrong kind.
+On a computer an organization looks after, `luft policy` shows every setting its [policy](/organizations/policy/) decides and the file that decides it, and `luft policy check 10-updates.toml` checks a policy file before you add it, naming every key Luft doesn't know and every value of the wrong kind.
 
 ## Scripts
 

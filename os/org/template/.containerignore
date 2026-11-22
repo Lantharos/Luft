@@ -1,6 +1,7 @@
 **/.gitkeep
 .git
-.github
+ci
 keys
 organization.toml
+luft.lock
 README.md

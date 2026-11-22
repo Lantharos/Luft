@@ -1,4 +1,5 @@
 name = "Example"
-image = "ghcr.io/example/luft"
-luft = "ghcr.io/lantharos/luft:1"
+image = "registry.example.com/luft/example"
+luft = "registry.example.com/luft/luft"
+follow = "stable"
 nvidia = true

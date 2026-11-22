@@ -1,7 +1,7 @@
 [package]
 name = "locksmith"
 version = "0.1.0"
-description = "Locks the desktop settings Luft's policy files decide, so nobody can change them in their account"
+description = "Locks the settings Luft's policy files decide in every account, and publishes the policy for the desktop"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true
@@ -10,6 +10,9 @@ rust-version.workspace = true
 [dependencies]
 anyhow.workspace = true
 luft-policy.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+zbus = { workspace = true, features = ["tokio"] }
 
 [lints]
 workspace = true

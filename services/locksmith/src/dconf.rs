@@ -1,10 +1,19 @@
 use std::collections::BTreeMap;
 use std::fmt::Write;
 
-use luft_policy::ScreenLockPolicy;
+use luft_policy::Policy;
 
 const SCREENSAVER: &str = "org/gnome/desktop/screensaver";
 const SESSION: &str = "org/gnome/desktop/session";
+const POST: &str = "com/lantharos/kestrel/post";
+
+/// Every key the policy can lock, so sessions hear about each of them when the policy changes.
+pub const LOCKABLE: [(&str, &str); 4] = [
+    (SCREENSAVER, "lock-enabled"),
+    (SCREENSAVER, "lock-delay"),
+    (SESSION, "idle-delay"),
+    (POST, "visibility"),
+];
 
 /// A desktop setting the policy decides, with its value as GVariant text.
 #[derive(Debug, PartialEq, Eq)]
@@ -14,7 +23,8 @@ pub struct Locked {
     pub value: String,
 }
 
-pub fn locked(screen_lock: &ScreenLockPolicy) -> Vec<Locked> {
+pub fn locked(policy: &Policy) -> Vec<Locked> {
+    let screen_lock = &policy.screen_lock;
     let enabled = screen_lock.enabled.map(|enabled| Locked {
         folder: SCREENSAVER,
         key: "lock-enabled",
@@ -30,7 +40,12 @@ pub fn locked(screen_lock: &ScreenLockPolicy) -> Vec<Locked> {
         key: "idle-delay",
         value: format!("uint32 {seconds}"),
     });
-    [enabled, lock_after, screen_off]
+    let visibility = policy.nearby_sharing.visible_to.map(|visibility| Locked {
+        folder: POST,
+        key: "visibility",
+        value: format!("'{}'", visibility.name()),
+    });
+    [enabled, lock_after, screen_off, visibility]
         .into_iter()
         .flatten()
         .collect()
@@ -63,22 +78,30 @@ pub fn locks(locked: &[Locked]) -> String {
 
 #[cfg(test)]
 mod tests {
+    use luft_policy::{NearbySharingPolicy, ScreenLockPolicy, Visibility};
+
     use super::*;
 
     #[test]
     fn writes_only_what_the_policy_decides() {
-        let locked = locked(&ScreenLockPolicy {
-            enabled: Some(true),
-            screen_off: Some(300),
-            lock_after: None,
+        let locked = locked(&Policy {
+            screen_lock: ScreenLockPolicy {
+                enabled: Some(true),
+                screen_off: Some(300),
+                lock_after: None,
+            },
+            nearby_sharing: NearbySharingPolicy {
+                visible_to: Some(Visibility::NoOne),
+            },
+            ..Policy::default()
         });
         assert_eq!(
             keyfile(&locked),
-            "[org/gnome/desktop/screensaver]\nlock-enabled=true\n\n[org/gnome/desktop/session]\nidle-delay=uint32 300\n\n"
+            "[com/lantharos/kestrel/post]\nvisibility='no-one'\n\n[org/gnome/desktop/screensaver]\nlock-enabled=true\n\n[org/gnome/desktop/session]\nidle-delay=uint32 300\n\n"
         );
         assert_eq!(
             locks(&locked),
-            "/org/gnome/desktop/screensaver/lock-enabled\n/org/gnome/desktop/session/idle-delay\n"
+            "/org/gnome/desktop/screensaver/lock-enabled\n/org/gnome/desktop/session/idle-delay\n/com/lantharos/kestrel/post/visibility\n"
         );
     }
 }

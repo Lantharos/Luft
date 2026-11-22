@@ -1,14 +1,15 @@
 [Unit]
-Description=Lock the desktop settings Luft's policy decides
+Description=Lock the settings Luft's policy decides
 Before=greetd.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/locksmith
-RuntimeDirectory=luft/policy
+RuntimeDirectory=luft/policy polkit-1/rules.d
 RuntimeDirectoryPreserve=yes
 UMask=0022
 ProtectSystem=strict
+ReadWritePaths=/etc/dconf/db
 ProtectHome=yes
 PrivateTmp=yes
 PrivateDevices=yes

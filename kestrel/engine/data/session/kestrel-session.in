@@ -26,7 +26,7 @@ mkdir -p "${DCONF_PROFILE%/*}"
 { cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } | {
   read -r own
   echo "$own"
-  if [ -e /run/luft/policy/dconf ]; then echo file-db:/run/luft/policy/dconf; fi
+  if [ -e /etc/dconf/db/luft-policy ]; then echo system-db:luft-policy; fi
   cat
 } > "$DCONF_PROFILE"
 export DCONF_PROFILE

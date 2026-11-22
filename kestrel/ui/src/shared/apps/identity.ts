@@ -36,7 +36,8 @@ function installedPrograms(appSystem: Shell.AppSystem): Map<string, string> {
   const runs = new Map<string, string>();
   const launchers = new Map<string, string[]>();
   for (const info of appSystem.get_installed()) {
-    const executable = GLib.find_program_in_path(info.get_executable());
+    const name = info.get_executable();
+    const executable = name && GLib.find_program_in_path(name);
     const program = executable && realPath(executable);
     if (!program) continue;
     if (!launchesSomethingElse(info)) {

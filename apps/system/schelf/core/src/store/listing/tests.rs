@@ -1,6 +1,7 @@
 use serde_json::{Value, json};
 
 use super::channel::{self, Following, STABLE};
+use super::luft::Luft;
 use super::{Format, Listing};
 
 const LINUX: &[&str] = &["linux-x86_64"];
@@ -112,7 +113,7 @@ fn channels_of_tide() -> Listing {
 
 fn newest_version<'a>(listing: &'a Listing, channel: &str) -> Option<&'a str> {
     listing
-        .newest(channel, LINUX, EVERYONE, false)
+        .newest(channel, LINUX, EVERYONE, false, None)
         .map(|offer| offer.release.version.as_str())
 }
 
@@ -122,7 +123,7 @@ fn on(id: &str, chosen: Option<&str>, system: Option<&'static str>) -> Following
 
 fn followed_version<'a>(listing: &'a Listing, following: &Following) -> Option<&'a str> {
     listing
-        .followed(following, LINUX, EVERYONE, false)
+        .followed(following, LINUX, EVERYONE, false, Luft::Running)
         .map(|offer| offer.release.version.as_str())
 }
 
@@ -139,6 +140,25 @@ fn each_channel_offers_only_its_own_releases() {
 }
 
 #[test]
+fn an_app_paired_with_the_system_takes_nothing_newer_than_its_pair() {
+    let tide = channels_of_tide();
+    let paired = |ceiling| {
+        tide.newest("nightly", LINUX, EVERYONE, false, Some(ceiling))
+            .map(|offer| offer.release.version.as_str())
+    };
+    assert_eq!(
+        paired("1.4.0-nightly.20261103"),
+        Some("1.4.0-nightly.20261103")
+    );
+    assert_eq!(paired("1.3.9"), None);
+    assert_eq!(
+        tide.newest(STABLE, LINUX, EVERYONE, false, Some("1.1.5"))
+            .map(|offer| offer.release.version.as_str()),
+        Some("1.1.0")
+    );
+}
+
+#[test]
 fn a_rollout_that_has_not_reached_the_device_is_skipped() {
     let tide = listing(
         "sabine",
@@ -149,7 +169,7 @@ fn a_rollout_that_has_not_reached_the_device_is_skipped() {
     );
     assert_eq!(newest_version(&tide, STABLE), Some("1.2.0"));
     let early = tide
-        .newest(STABLE, LINUX, 0.1, false)
+        .newest(STABLE, LINUX, 0.1, false, None)
         .map(|offer| offer.release.version.as_str());
     assert_eq!(early, Some("1.3.0"));
 }
@@ -197,7 +217,7 @@ fn a_sabine_app_installs_from_its_archive_not_its_other_packages() {
             ],
         )],
     );
-    let offer = tide.newest(STABLE, LINUX, EVERYONE, false).unwrap();
+    let offer = tide.newest(STABLE, LINUX, EVERYONE, false, None).unwrap();
     assert_eq!(offer.format, Format::Sabine);
     assert_eq!(offer.artifact.name(), "tide.tar.zst");
 }
@@ -217,7 +237,7 @@ fn an_appimage_among_files_installs_like_a_store_appimage() {
             ],
         )],
     );
-    let offer = tide.newest(STABLE, LINUX, EVERYONE, false).unwrap();
+    let offer = tide.newest(STABLE, LINUX, EVERYONE, false, None).unwrap();
     assert_eq!(offer.format, Format::Appimage);
 }
 
@@ -236,7 +256,7 @@ fn linux_files_luft_cannot_install_are_offered_to_download() {
             ],
         )],
     );
-    assert!(tide.newest(STABLE, LINUX, EVERYONE, false).is_none());
+    assert!(tide.newest(STABLE, LINUX, EVERYONE, false, None).is_none());
     let (_, artifact) = tide
         .download(&on(TIDE, None, None), LINUX, EVERYONE)
         .unwrap();
@@ -265,7 +285,7 @@ fn files_for_other_systems_are_not_offered_at_all() {
             ],
         )],
     );
-    assert!(tide.newest(STABLE, LINUX, EVERYONE, false).is_none());
+    assert!(tide.newest(STABLE, LINUX, EVERYONE, false, None).is_none());
     assert!(
         tide.download(&on(TIDE, None, None), LINUX, EVERYONE)
             .is_none()
@@ -286,7 +306,7 @@ fn a_move_to_a_new_framework_installs_the_new_packaging() {
             release("1.9.0", STABLE, 100, &[archive()]),
         ],
     );
-    let offer = tide.newest(STABLE, LINUX, EVERYONE, false).unwrap();
+    let offer = tide.newest(STABLE, LINUX, EVERYONE, false, None).unwrap();
     assert_eq!(offer.release.version, "2.0.0");
     assert_eq!(offer.format, Format::Appimage);
 }

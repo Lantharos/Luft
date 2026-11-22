@@ -50,6 +50,38 @@ pub struct Published<'a> {
     pub sha256: &'a str,
 }
 
+const SHIPPED: &str = "/usr/share/luft/preinstall";
+
+fn folder(name: &str) -> Result<PathBuf, String> {
+    let folder = cache::folder().join("store").join(name);
+    fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
+    Ok(folder)
+}
+
+/// Where a release of Luft's own apps waits, downloaded ahead, for the
+/// version of Luft it goes with.
+fn ahead_folder() -> PathBuf {
+    cache::folder().join("store/ahead")
+}
+
+fn save(file: &Published, query: &str, into: &Path, task: Task) -> Result<(), String> {
+    if !file.url.starts_with(crate::store::DOWNLOADS) {
+        return Err(t!(L10N, "core-download-changed"));
+    }
+    http::save(
+        ask(&format!("{}?{query}&via={}", file.url, crate::store::via()))?,
+        into,
+        Some(file.size),
+        task,
+    )?;
+    task.progress(Stage::Installing, None);
+    if !matches(into, file)? {
+        let _ = fs::remove_file(into);
+        return Err(t!(L10N, "core-download-changed"));
+    }
+    Ok(())
+}
+
 /// Downloads `file` for `id`, asked for with `query`, keeping it only when
 /// it's exactly the file the store signed for.
 pub fn published_file(
@@ -58,35 +90,62 @@ pub fn published_file(
     query: &str,
     task: Task,
 ) -> Result<PathBuf, String> {
-    if !file.url.starts_with(crate::store::DOWNLOADS) {
-        return Err(t!(L10N, "core-download-changed"));
-    }
-    let folder = cache::folder().join("store/downloads");
-    fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
-    let path = folder.join(format!("{id}.download"));
-    http::save(
-        ask(&format!("{}?{query}&via={}", file.url, crate::store::via()))?,
-        &path,
-        Some(file.size),
-        task,
-    )?;
-    task.progress(Stage::Installing, None);
-    if !matches(&path, file)? {
-        let _ = fs::remove_file(&path);
-        return Err(t!(L10N, "core-download-changed"));
-    }
+    let path = folder("downloads")?.join(format!("{id}.download"));
+    save(file, query, &path, task)?;
     Ok(path)
 }
 
-/// Downloads the artifact, keeping it only when it's exactly the file the
-/// store signed for.
+/// A copy of the artifact on this computer already: downloaded ahead for
+/// this version of Luft, or shipped with it.
+fn at_hand_copy(artifact: &Artifact) -> Option<PathBuf> {
+    let published = artifact.published();
+    [
+        ahead_folder().join(&artifact.sha256),
+        Path::new(SHIPPED).join(artifact.name()),
+    ]
+    .into_iter()
+    .find(|path| matches(path, &published).unwrap_or(false))
+}
+
+pub fn at_hand(artifact: &Artifact) -> bool {
+    at_hand_copy(artifact).is_some()
+}
+
+/// The artifact, from a copy on this computer when there is one, otherwise
+/// downloaded, kept only when it's exactly the file the store signed for.
 pub fn verified(
     id: &str,
     artifact: &Artifact,
     reason: &str,
     task: Task,
 ) -> Result<PathBuf, String> {
-    published_file(id, &artifact.published(), &format!("reason={reason}"), task)
+    let Some(copy) = at_hand_copy(artifact) else {
+        return published_file(id, &artifact.published(), &format!("reason={reason}"), task);
+    };
+    let path = folder("downloads")?.join(format!("{id}.download"));
+    if copy.starts_with(ahead_folder()) {
+        fs::rename(&copy, &path)
+    } else {
+        fs::copy(&copy, &path).map(drop)
+    }
+    .map_err(|error| error.to_string())?;
+    Ok(path)
+}
+
+/// Downloads the artifact ahead of the version of Luft it goes with.
+pub fn ahead(artifact: &Artifact, task: Task) -> Result<(), String> {
+    if at_hand(artifact) {
+        return Ok(());
+    }
+    let folder = folder("ahead")?;
+    let partial = folder.join(format!("{}.download", artifact.sha256));
+    save(&artifact.published(), "reason=update", &partial, task)?;
+    fs::rename(&partial, folder.join(&artifact.sha256)).map_err(|error| error.to_string())
+}
+
+/// Forgets what was downloaded ahead, once no version of Luft waits for it.
+pub fn forget_ahead() {
+    let _ = fs::remove_dir_all(ahead_folder());
 }
 
 /// The artifact's file shipped with the system next to `listing`'s copy,

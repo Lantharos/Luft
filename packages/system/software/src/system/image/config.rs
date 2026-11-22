@@ -1,5 +1,5 @@
 use specta::Type;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use serde::{Deserialize, Serialize};
 
@@ -8,6 +8,7 @@ use super::notes::{self, Section};
 const VERSION: &str = "org.opencontainers.image.version";
 const NOTES: &str = "com.lantharos.release-notes";
 const NVIDIA_DRIVER: &str = "com.lantharos.nvidia-driver";
+const STORE_RELEASES: &str = "com.lantharos.store-releases";
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -67,6 +68,17 @@ impl Config {
     pub fn nvidia_driver(&self) -> Option<String> {
         self.label(NVIDIA_DRIVER)
     }
+
+    /// The schelf.store releases of Luft's own apps and extensions that were out when the image
+    /// was built, by id, from its `id=version id=version` label.
+    pub fn store_releases(&self) -> BTreeMap<String, String> {
+        self.label(STORE_RELEASES)
+            .unwrap_or_default()
+            .split_whitespace()
+            .filter_map(|pair| pair.split_once('='))
+            .map(|(id, version)| (id.to_owned(), version.to_owned()))
+            .collect()
+    }
 }
 
 fn epoch(timestamp: &str) -> Option<u64> {
@@ -84,7 +96,24 @@ fn epoch(timestamp: &str) -> Option<u64> {
 
 #[cfg(test)]
 mod tests {
-    use super::epoch;
+    use super::{Config, epoch};
+
+    #[test]
+    fn reads_store_releases() {
+        let config: Config = serde_json::from_str(
+            r#"{"config": {"Labels": {"com.lantharos.store-releases": "com.lantharos.mailman=1.0.4 com.lantharos.draft=0.3.1"}}}"#,
+        )
+        .expect("config");
+        let releases = config.store_releases();
+        assert_eq!(
+            releases.get("com.lantharos.mailman").map(String::as_str),
+            Some("1.0.4")
+        );
+        assert_eq!(
+            releases.get("com.lantharos.draft").map(String::as_str),
+            Some("0.3.1")
+        );
+    }
 
     #[test]
     fn reads_image_timestamps() {

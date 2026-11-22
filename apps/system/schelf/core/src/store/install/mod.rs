@@ -14,6 +14,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::invited;
+use super::listing::luft::Luft;
 use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
@@ -324,6 +325,20 @@ pub fn fetch(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<
         }),
         replaces: None,
     })
+}
+
+/// Downloads the release `id` moves to with the version of Luft waiting for
+/// the next restart, as you agreed to in `consent`, to install at its start.
+pub fn download_ahead(id: &str, consent: &Consent, task: Task) -> Result<(), String> {
+    task.progress(Stage::Preparing, None);
+    let listing = listing::fetch(id, Age::Current)?;
+    let installed = record::get(id).ok_or_else(|| t!(L10N, "core-not-installed"))?;
+    let offer = listing
+        .update_for(Luft::Staged, &installed.version, installed.inside_luft())
+        .ok_or_else(|| unavailable(&listing))?;
+    agreed(&listing, offer.release, consent)?;
+    refuse_pulled(&listing, offer.release)?;
+    download::ahead(offer.artifact, task)
 }
 
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.

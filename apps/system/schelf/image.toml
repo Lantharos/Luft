@@ -6,6 +6,8 @@ part = "app-schelf"
 "/usr/lib/systemd/user/" = [
     "data/luft-app-updates.service",
     "data/luft-app-updates.timer",
+    "data/luft-app-updates-with-luft.service",
+    "data/luft-app-updates-with-luft.path",
     "data/luft-app-revocations.service",
     "data/luft-app-revocations.timer",
     "data/luft-integrate-apps.service",
@@ -15,4 +17,4 @@ part = "app-schelf"
 ]
 
 [enable]
-user = ["luft-integrate-apps.service", "luft-preinstall.service", "luft-app-drives.service", "luft-app-graphics.service", "luft-app-updates.timer", "luft-app-revocations.timer"]
+user = ["luft-integrate-apps.service", "luft-preinstall.service", "luft-app-drives.service", "luft-app-graphics.service", "luft-app-updates.timer", "luft-app-updates-with-luft.service", "luft-app-updates-with-luft.path", "luft-app-revocations.timer"]

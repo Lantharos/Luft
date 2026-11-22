@@ -20,6 +20,7 @@ asks:
   - { ask: which version do i have, to: releases-and-nightly-builds }
   - { ask: bios update, to: updating-firmware-and-apps }
   - { ask: firmware update, to: updating-firmware-and-apps }
+  - { ask: apps not updated, to: updating-firmware-and-apps }
   - { ask: bootc, to: from-the-command-line }
 ---
 
@@ -73,7 +74,7 @@ Every image is signed with Luft's key, and Luft refuses an update that isn't. It
 ## Updating firmware and apps
 
 - **Firmware** for the computer and its devices also comes through Settings, under System, when the maker publishes it. Most firmware updates finish at the next restart.
-- **Apps** aren't part of the system image. Settings points to [Schelf](/apps/schelf/), which updates them.
+- **Apps** aren't part of the system image, but they update along with it. While a new version of Luft downloads, Luft's own apps download the versions made for it, and they're installed when you first sign in after the restart, together with updates for your other apps from schelf.store, Flathub and AppImages. Over a metered connection, only what's already on the computer is installed and the rest waits. [Schelf](/apps/schelf/) lists the apps ready for the restart under Updates.
 
 ## From the command line
 

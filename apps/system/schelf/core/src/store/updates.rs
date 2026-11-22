@@ -5,7 +5,8 @@ use serde::Serialize;
 use specta::Type;
 
 use super::catalog::Kind;
-use super::install::Consent;
+use super::install::{Consent, download};
+use super::listing::luft::Luft;
 use super::listing::{self, ExtensionAccess, Format, Listing, Offer};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
@@ -37,6 +38,10 @@ pub struct StoreUpdate {
     /// Whether it's an extension inside Luft whose approval schelf.store took
     /// back, which the update moves into a sandbox.
     pub moves_out: bool,
+    /// Whether its file is on this computer already, so installing it
+    /// downloads nothing.
+    #[serde(skip)]
+    pub at_hand: bool,
 }
 
 fn widens_extension(after: Option<&ExtensionAccess>, before: Option<&ExtensionAccess>) -> bool {
@@ -73,16 +78,23 @@ fn source(listing: Listing) -> Result<Option<Listing>, String> {
     }
 }
 
-fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, String> {
+fn update(id: String, installed: Installed, luft: Luft) -> Result<Option<StoreUpdate>, String> {
     let Some(listing) = fetch(&id)?.map(source).transpose()?.flatten() else {
         return Ok(None);
     };
     let replacing = listing.id != id;
+    if luft == Luft::Staged && (replacing || !listing.goes_with(luft)) {
+        return Ok(None);
+    }
     let Some(Offer {
         release,
         artifact,
         format,
-    }) = listing.update(&installed.version, !replacing && installed.inside_luft())
+    }) = listing.update_for(
+        luft,
+        &installed.version,
+        !replacing && installed.inside_luft(),
+    )
     else {
         return Ok(None);
     };
@@ -136,6 +148,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         replacement: replacing.then(|| listing.name().to_owned()),
         moves_inside,
         moves_out,
+        at_hand: download::at_hand(artifact),
         name: installed.name,
         kind: installed.kind,
         format: installed.format,
@@ -145,11 +158,24 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
     }))
 }
 
-/// Every store app with a release this device may have now.
-pub fn find() -> Result<Vec<StoreUpdate>, String> {
+fn find_for(luft: Luft) -> Result<Vec<StoreUpdate>, String> {
     let mut found = Vec::new();
     for (id, installed) in record::all() {
-        found.extend(update(id, installed)?);
+        found.extend(update(id, installed, luft)?);
     }
     Ok(found)
+}
+
+/// Every store app with a release this device may have now.
+pub fn find() -> Result<Vec<StoreUpdate>, String> {
+    find_for(Luft::Running)
+}
+
+/// Luft's own apps that move to a newer release together with the version of
+/// Luft waiting for the next restart.
+pub fn ahead() -> Result<Vec<StoreUpdate>, String> {
+    if Luft::Staged.digest().is_none() {
+        return Ok(Vec::new());
+    }
+    find_for(Luft::Staged)
 }

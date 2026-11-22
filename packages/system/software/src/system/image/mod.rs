@@ -4,7 +4,7 @@ mod notes;
 mod registry;
 mod updater;
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 
 use luft_variant::{Channel, Variant, Version};
 use serde::{Deserialize, Serialize};
@@ -55,6 +55,13 @@ pub struct Running {
     pub digest: Option<String>,
 }
 
+/// The releases of Luft's own apps from schelf.store that a version of Luft on the computer
+/// came out with, and the image it is.
+pub struct Paired {
+    pub digest: Option<String>,
+    pub releases: BTreeMap<String, String>,
+}
+
 #[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelChoice {
@@ -103,6 +110,16 @@ impl Deployments {
             channel: booted.channel(),
             digest: booted.digest().map(str::to_owned),
         }
+    }
+
+    /// What the running version came out with, and what the version waiting for the next
+    /// restart did, when there is one.
+    pub fn paired(&self) -> (Paired, Option<Paired>) {
+        let paired = |deployment: &Deployment| Paired {
+            digest: deployment.digest().map(str::to_owned),
+            releases: deployment.store_releases(),
+        };
+        (paired(&self.0.booted), self.0.staged.as_ref().map(paired))
     }
 
     /// The graphics drivers of the version waiting for the next restart and of the one kept to

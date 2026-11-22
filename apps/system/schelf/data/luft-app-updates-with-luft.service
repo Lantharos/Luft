@@ -1,0 +1,14 @@
+[Unit]
+Description=Update apps with Luft
+After=kestrel-session.target graphical-session.target luft-preinstall.service
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-launch /usr/lib/sabine/com.lantharos.schelf/schelf --update-apps-with-luft
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=kestrel-session.target

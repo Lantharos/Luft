@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use luft_variant::{Channel, Variant};
 use serde::Deserialize;
@@ -177,6 +177,10 @@ impl Deployment {
 
     pub fn digest(&self) -> Option<&str> {
         Some(&self.image.as_ref()?.image_digest)
+    }
+
+    pub fn store_releases(&self) -> BTreeMap<String, String> {
+        self.config.store_releases()
     }
 
     pub fn graphics(&self) -> Graphics {

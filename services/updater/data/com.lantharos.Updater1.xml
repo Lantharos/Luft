@@ -39,7 +39,8 @@
     for it.
 
     A finished download also has com.lantharos.Packages1 build the system packages for the version
-    it staged, before Finished.
+    it staged, and writes the time to /var/lib/updater/staged, which sessions watch to download
+    the apps' updates that go with it, before Finished.
   -->
   <interface name="com.lantharos.Updater1">
     <property name="Downloading" type="b" access="read"/>

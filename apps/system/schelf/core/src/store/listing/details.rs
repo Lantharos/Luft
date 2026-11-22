@@ -2,6 +2,7 @@ use luft_software::apps::flatpak::Permissions;
 use serde::Serialize;
 use specta::Type;
 
+use super::luft::Luft;
 use super::{
     Declared, ExtensionAccess, Format, Listing, Provenance, Release, Replacement, Screenshot,
     channel,
@@ -136,7 +137,7 @@ impl StoreDetails {
         let (platforms, draw) = (listing.platforms(), device::draw());
         let following = listing.following(platforms);
         let inside_luft = installed.is_some_and(Installed::inside_luft);
-        let installable = listing.followed(&following, platforms, draw, inside_luft);
+        let installable = listing.followed(&following, platforms, draw, inside_luft, Luft::Running);
         let download = match installable {
             Some(_) => None,
             None => listing.download(&following, platforms, draw),

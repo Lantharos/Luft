@@ -1,3 +1,5 @@
+mod luft;
+
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -15,7 +17,8 @@ const SEEDS: &str = "/usr/share/luft/preinstall";
 pub fn run(command: &str) -> Option<i32> {
     let result = match command {
         "--preinstall" => preinstall(),
-        "--update-apps" => update_apps(),
+        "--update-apps" => update_apps(false),
+        "--update-apps-with-luft" => update_apps(true),
         "--update-drivers" => update_drivers(),
         "--check-revocations" => store::check_revocations(),
         "--integrate-apps" => {
@@ -95,11 +98,7 @@ fn preinstall() -> Result<(), String> {
         let lines: Vec<&str> = done.iter().map(String::as_str).collect();
         fs::write(&record, lines.join("\n") + "\n").map_err(|error| error.to_string())?;
     }
-    if failures.is_empty() {
-        Ok(())
-    } else {
-        Err(failures.join("\n"))
-    }
+    finish(failures)
 }
 
 fn install_seed(seed: &Path) -> Result<(), String> {
@@ -122,12 +121,17 @@ fn install_seed(seed: &Path) -> Result<(), String> {
     ))
 }
 
-fn update_store_apps(failures: &mut Vec<String>) {
+/// Updates the store apps that have a release this Luft takes. Over a
+/// metered connection only those whose file is on the computer already are.
+fn update_store_apps(failures: &mut Vec<String>, metered: bool) {
     let found = match store::updates::find() {
         Ok(found) => found,
         Err(error) => return failures.push(error),
     };
-    for update in found.into_iter().filter(|update| !update.widens) {
+    for update in found
+        .into_iter()
+        .filter(|update| !update.widens && (update.at_hand || !metered))
+    {
         match quietly(|task| {
             store::install::install(&update.id, &update.consent, Reason::Update, task)
         }) {
@@ -151,17 +155,47 @@ fn update_drivers() -> Result<(), String> {
     quietly(|task| flatpak::drivers::apply(&changes, task))
 }
 
-fn update_apps() -> Result<(), String> {
-    if block_on(metered()) {
+/// Updates apps. When a version of Luft started or was staged since apps
+/// were last updated for one, Flatpak apps update too and Luft's own apps
+/// download the releases that go with the staged version; `with_luft` does
+/// only that, and nothing when apps are up to date with Luft already.
+fn update_apps(with_luft: bool) -> Result<(), String> {
+    let versions = luft::Versions::now();
+    let luft_changed = versions != luft::Versions::last();
+    if with_luft && !luft_changed {
+        return Ok(());
+    }
+    if luft_changed {
+        block_on(flatpak::drivers::online());
+    }
+    let metered = block_on(metered());
+    if metered && !luft_changed {
         eprintln!("Not updating apps over a metered connection.");
         return Ok(());
     }
     let mut failures = Vec::new();
-    update_store_apps(&mut failures);
+    update_store_apps(&mut failures, metered);
+    if metered {
+        eprintln!("Only installing what's downloaded already over a metered connection.");
+        return finish(failures);
+    }
+    if luft_changed {
+        luft::download_ahead(&mut failures);
+        luft::update_flatpaks(&mut failures);
+    }
     if let Err(error) = quietly(|task| flatpak::drivers::apply(&flatpak::drivers::changes(), task))
     {
         failures.push(error);
     }
+    update_appimages(&mut failures);
+    if luft_changed && failures.is_empty() {
+        versions.settle();
+        versions.save()?;
+    }
+    finish(failures)
+}
+
+fn update_appimages(failures: &mut Vec<String>) {
     let managed: BTreeSet<String> = store::record::all()
         .into_values()
         .map(|installed| installed.local)
@@ -179,6 +213,9 @@ fn update_apps() -> Result<(), String> {
             Err(error) => failures.push(format!("{}: {error}", app.name)),
         }
     }
+}
+
+fn finish(failures: Vec<String>) -> Result<(), String> {
     if failures.is_empty() {
         Ok(())
     } else {

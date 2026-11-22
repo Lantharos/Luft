@@ -26,6 +26,7 @@ const PUBLISHED_FOR: Duration = Duration::from_secs(10 * 60);
 const SYSTEM_PACKAGES: &str = "/var/lib/luft/system-packages/packages";
 const PACKAGES: &str = "com.lantharos.Packages1";
 const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
+const STAGED: &str = "/var/lib/updater/staged";
 
 pub struct Updater {
     idle: Arc<Idle>,
@@ -228,6 +229,7 @@ async fn follow(
     let result = work.await;
     if matches!(result, Ok(Ok(()))) && change.stages() {
         build_system_packages(emitter.connection()).await;
+        announce_staged();
     }
     let inner = updater.get().await;
     *inner.downloading.lock().expect("download lock") = None;
@@ -264,6 +266,14 @@ async fn system_packages(connection: &Connection, method: &str) {
 /// it starts.
 async fn build_system_packages(connection: &Connection) {
     system_packages(connection, "Rebuild").await;
+}
+
+/// Lets the people signed in have their apps' updates downloaded for the version just staged,
+/// by changing a file their sessions watch.
+fn announce_staged() {
+    if let Err(error) = std::fs::write(STAGED, schedule::now().to_string()) {
+        eprintln!("Writing {STAGED}: {error}");
+    }
 }
 
 /// Has the system packages brought up to their newest versions, for every version of Luft on

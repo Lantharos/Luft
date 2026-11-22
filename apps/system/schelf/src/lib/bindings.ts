@@ -959,6 +959,7 @@ export type SystemUpdatesPolicy = {
 	schedule: UpdateSchedule | null,
 	download: boolean | null,
 	channel: Channel | null,
+	image: string | null,
 };
 
 /**  How many bytes of a download arrived, out of how many. */
@@ -979,6 +980,11 @@ export type Updates = {
 	apps: AppUpdate[],
 	checked: number,
 	failed: string[],
+	/**
+	 *  Luft's own apps that update when the version of Luft waiting for the
+	 *  next restart starts.
+	 */
+	ahead: string[],
 	sabine: SabineHold | null,
 };
 

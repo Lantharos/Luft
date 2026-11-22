@@ -4,6 +4,7 @@ use luft_app::apps::App;
 use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 use schelf_core::library::Source;
+use schelf_core::store;
 use schelf_core::updates::{self, AppUpdate};
 use serde::Serialize;
 use specta::Type;
@@ -14,6 +15,9 @@ struct Updates {
     apps: Vec<AppUpdate>,
     checked: u64,
     failed: Vec<String>,
+    /// Luft's own apps that update when the version of Luft waiting for the
+    /// next restart starts.
+    ahead: Vec<String>,
     sabine: Option<SabineHold>,
 }
 
@@ -55,12 +59,20 @@ fn named(mut apps: Vec<AppUpdate>) -> Vec<AppUpdate> {
 
 async fn check(Empty {}: Empty) -> Result<Updates, String> {
     let (apps, failed) = updates::find().await;
+    let ahead = tokio::task::spawn_blocking(store::updates::ahead)
+        .await
+        .map_err(|error| error.to_string())?
+        .unwrap_or_default()
+        .into_iter()
+        .map(|update| update.name)
+        .collect();
     Ok(Updates {
         apps: named(apps),
         checked: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_or(0, |time| time.as_secs()),
         failed,
+        ahead,
         sabine: sabine_hold(),
     })
 }

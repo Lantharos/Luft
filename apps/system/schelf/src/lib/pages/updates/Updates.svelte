@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import Layers from '@lucide/svelte/icons/layers';
+	import RotateCw from '@lucide/svelte/icons/rotate-cw';
 	import { ago, bytes, Row, Section, Spinner } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
@@ -15,6 +16,8 @@
 	const waiting = $derived(updates.filter((update) => !operations.forKey(update.key) || operations.forKey(update.key)?.state === 'failed'));
 	const failed = $derived(library.updates?.failed ?? []);
 	const sabine = $derived(library.updates?.sabine ?? null);
+	const ahead = $derived(library.updates?.ahead ?? []);
+	const list = (names: string[]) => new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(names);
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
 
 	const headline = $derived.by(() => {
@@ -90,12 +93,18 @@
 			</Section>
 		{/if}
 
+		{#if ahead.length}
+			<Section>
+				<Row icon={RotateCw} title={t('updates-with-restart')} description={list(ahead)} />
+			</Section>
+		{/if}
+
 		{#if sabine}
 			<Section>
 				<Row
 					icon={Layers}
 					title={t('updates-sabine-waiting', { version: sabine.version })}
-					description={t('updates-sabine-waiting-for', { apps: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(sabine.apps) })}
+					description={t('updates-sabine-waiting-for', { apps: list(sabine.apps) })}
 				/>
 			</Section>
 		{/if}

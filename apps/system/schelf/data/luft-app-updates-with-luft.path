@@ -1,0 +1,11 @@
+[Unit]
+Description=Update apps when a new version of Luft is ready
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Path]
+PathChanged=/var/lib/updater/staged
+Unit=luft-app-updates-with-luft.service
+
+[Install]
+WantedBy=kestrel-session.target

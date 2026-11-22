@@ -86,6 +86,12 @@ impl Following {
         }
     }
 
+    /// Whether this is one of Luft's own apps on the channel of the system it
+    /// runs on, which it updates together with.
+    pub fn goes_with_system(&self) -> bool {
+        self.system.is_some() && !self.chosen
+    }
+
     /// What the page shows as picked.
     pub fn choice(&self) -> &str {
         match self.system {

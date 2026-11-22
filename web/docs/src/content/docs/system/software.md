@@ -35,7 +35,7 @@ Luft's system is a sealed image, so apps live next to it, in your account, where
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
 | Apps and extensions from schelf.store | Your account: AppImages in their sandbox, apps built with Sabine next to Luft's own, extensions on your desktop | By themselves, a few minutes after you sign in and every six hours |
-| Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
+| Flatpak apps from Flathub | Your account | With each new version of Luft, or in Schelf, under Updates, or `schelf update` |
 | AppImages | Your account, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
 | Packages from Fedora and the software sources you add: command-line tools, Fedora's desktop apps, services | The system, for everyone on the computer | By themselves whenever Luft looks for updates, or in Schelf, under Updates |
 

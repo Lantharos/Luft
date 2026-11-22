@@ -1,7 +1,7 @@
 mod access;
 pub mod channel;
 mod details;
-mod luft;
+pub mod luft;
 mod release;
 #[cfg(test)]
 mod tests;
@@ -18,6 +18,7 @@ use super::signed::Age;
 use super::{device, invited};
 use crate::l10n::L10N;
 use channel::Following;
+use luft::Luft;
 
 pub use access::{Declared, ExtensionAccess, ListenPort, permission_title, sandbox_lacks, widens};
 pub use details::StoreDetails;
@@ -167,29 +168,39 @@ impl Listing {
         platforms: &[&str],
         draw: f64,
         inside_luft: bool,
+        ceiling: Option<&str>,
     ) -> Option<Offer<'_>> {
         self.releases
             .iter()
             .filter(|release| release.channel == channel && release.reaches(draw))
             .filter(|release| !inside_luft || self.runs_in_shell(release))
+            .filter(|release| {
+                ceiling.is_none_or(|ceiling| !version::newer(&release.version, ceiling))
+            })
             .filter_map(|release| Offer::of(release, platforms))
             .filter(|offer| offer.release.supported() && self.runnable(offer.release))
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
     }
 
     /// The highest version out of the channels `following` takes releases
-    /// from.
+    /// from. One of Luft's own that goes with the system takes none newer than
+    /// the one `luft` came out with.
     fn followed(
         &self,
         following: &Following,
         platforms: &[&str],
         draw: f64,
         inside_luft: bool,
+        luft: Luft,
     ) -> Option<Offer<'_>> {
+        let ceiling = following
+            .goes_with_system()
+            .then(|| luft.release_of(&self.id))
+            .flatten();
         following
             .sources()
             .into_iter()
-            .filter_map(|channel| self.newest(channel, platforms, draw, inside_luft))
+            .filter_map(|channel| self.newest(channel, platforms, draw, inside_luft, ceiling))
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
     }
 
@@ -239,13 +250,24 @@ impl Listing {
     /// extension that runs inside Luft, `inside_luft`, only moves to another
     /// release approved to run there, never into a sandbox.
     pub fn release(&self, inside_luft: bool) -> Option<Offer<'_>> {
+        self.release_for(Luft::Running, inside_luft)
+    }
+
+    fn release_for(&self, luft: Luft, inside_luft: bool) -> Option<Offer<'_>> {
         let platforms = self.platforms();
         self.followed(
             &self.following(platforms),
             platforms,
             device::draw(),
             inside_luft,
+            luft,
         )
+    }
+
+    /// Whether this is one of Luft's own that `luft` names the release of, so
+    /// it moves to that release together with that version of Luft.
+    pub fn goes_with(&self, luft: Luft) -> bool {
+        self.following(self.platforms()).goes_with_system() && luft.release_of(&self.id).is_some()
     }
 
     /// Whether schelf.store took back its approval for `version` to run
@@ -264,8 +286,13 @@ impl Listing {
     /// when it runs there: the newest it may have, or, once schelf.store took
     /// back the approval of `version`, that same release to run in a sandbox.
     pub fn update(&self, version: &str, inside_luft: bool) -> Option<Offer<'_>> {
+        self.update_for(Luft::Running, version, inside_luft)
+    }
+
+    /// The release `update` moves to once `luft` runs.
+    pub fn update_for(&self, luft: Luft, version: &str, inside_luft: bool) -> Option<Offer<'_>> {
         if !(inside_luft && self.withdrew(version)) {
-            return self.release(inside_luft);
+            return self.release_for(luft, inside_luft);
         }
         let platforms = self.platforms();
         self.releases

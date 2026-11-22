@@ -248,7 +248,7 @@ jobs:
       - run: bun .github/scripts/units/index.ts
 
   compositor-identity:
-    name: Compositor identity rules
+    name: Compositor identity rules and pointer shakes
     needs: changes
     if: needs.changes.outputs.compositor == 'true'
     runs-on: ubuntu-26.04
@@ -261,6 +261,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - run: python3 kestrel/compositor/patches.py identity
+
+      - run: python3 kestrel/compositor/patches.py shake
 
   dbus:
     name: D-Bus interfaces

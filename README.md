@@ -70,6 +70,6 @@ Luft is licensed under the GNU General Public License, version 3 or later ([`LIC
 
 - Luft is built on [Fedora](https://fedoraproject.org) and [bootc](https://bootc-dev.github.io/bootc/), and its apps on [Sabine](https://github.com/Lantharos/Sabine).
 - [Open Runde](https://github.com/lauridskern/open-runde) and [Maple Mono](https://github.com/subframe7536/maple-font) are under the SIL Open Font License, in `packages/web/ui/fonts`.
-- Emoji are [Twemoji](https://github.com/jdecked/twemoji), © Twitter, Inc. and other contributors, under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/), built into a color font in `os/image/parts/stages/twemoji.sh`. [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) (SIL Open Font License) draws the ones Twemoji doesn't have yet.
+- Emoji are [Twemoji](https://github.com/jdecked/twemoji), © Twitter, Inc. and other contributors, under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/), built into a color font in `os/image/parts/stages/twemoji.sh`.
 - [Helium](https://helium.computer), the default browser, is GPL-3.0 and comes unchanged from [its releases](https://github.com/imputnet/helium-linux/releases).
 - The wallpapers are photos from [Unsplash](https://unsplash.com/license), credited in [`CREDITS`](os/image/files/usr/share/backgrounds/luft/CREDITS).

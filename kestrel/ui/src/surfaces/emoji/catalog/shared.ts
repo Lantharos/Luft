@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 
 import { locale } from '../../../shared/i18n/index.js';
 import type { Work } from '../../prewarm/queue.js';
@@ -51,7 +52,8 @@ function* steps(locale: string, { characters, annotations }: Files): Generator<v
   const groups: EmojiGroups = JSON.parse(decoder.decode(Gio.resources_lookup_data(EMOJI, Gio.ResourceLookupFlags.NONE).toArray()));
   const table: CharacterTable = JSON.parse(decoder.decode(characters));
   yield;
-  const catalog = yield* buildCatalog(groups, table);
+  const emojiFont = Shell.GlyphRenderer.new_for_emoji();
+  const catalog = yield* buildCatalog(groups, table, text => emojiFont.draws(text));
   yield* annotate(catalog, annotations);
   return { locale, catalog, index: new SearchIndex(catalog.items) };
 }

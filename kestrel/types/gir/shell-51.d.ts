@@ -959,6 +959,8 @@ export namespace Shell {
         emit<K extends keyof GlyphRenderer.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<GlyphRenderer.SignalSignatures[K]>): void;
 
         // Methods
+        draws(text: string): boolean;
+
         render(text: string, size: number, scale: number): Clutter.Content | null;
     }
 

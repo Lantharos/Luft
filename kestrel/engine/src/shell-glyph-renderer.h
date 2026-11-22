@@ -12,6 +12,9 @@ ShellGlyphRenderer *shell_glyph_renderer_new_for_emoji (void);
 ShellGlyphRenderer *shell_glyph_renderer_new_for_text (const char      *family,
                                                        const CoglColor *color);
 
+gboolean shell_glyph_renderer_draws (ShellGlyphRenderer *renderer,
+                                     const char         *text);
+
 ClutterContent *shell_glyph_renderer_render (ShellGlyphRenderer *renderer,
                                              const char         *text,
                                              int                 size,

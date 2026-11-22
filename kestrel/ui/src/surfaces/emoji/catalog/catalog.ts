@@ -101,12 +101,12 @@ export class Catalog {
   }
 }
 
-export function* buildCatalog(groups: EmojiGroups, characters: CharacterTable): Generator<void, Catalog, unknown> {
+export function* buildCatalog(groups: EmojiGroups, characters: CharacterTable, draws: (text: string) => boolean): Generator<void, Catalog, unknown> {
   const catalog = new Catalog();
   const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
   for (const [id, message] of EMOJI_TABS) {
     const title = t(message);
-    catalog.section(catalog.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
+    catalog.section(catalog.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji).filter(({ text }) => draws(text)));
     yield;
   }
   const decode = characterDecoder(characters);

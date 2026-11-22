@@ -94,16 +94,23 @@ Extend `@luft/ui/tsconfig.base.json` in `tsconfig.json`, and preload `/fonts/Ope
 
 ```svelte
 <GlassShell>
-	<aside class="glass-sidebar drag-region px-3 py-4">…</aside>
+	<aside class="glass-sidebar drag-region px-3 py-4">
+		<nav class="flex flex-col gap-0.5" {@attach selectionPill()}>
+			<button type="button" class="nav-item" class:active aria-current={active ? 'page' : undefined}>…</button>
+		</nav>
+	</aside>
 	<main class="glass-content">
-		<header class="drag-region flex h-[60px] items-center justify-end pr-4">
-			<WindowControls />
-		</header>
+		<TitleBar {title} />
+		<PageStage {page} {order}>…</PageStage>
 	</main>
 </GlassShell>
 ```
 
-Keep 16px of padding to the right of `WindowControls`. Inside `GlassShell`, right-clicking a text field or selected text opens Luft's edit menu, with corrections for a misspelled word and whichever of undo, redo, cut, copy, paste and select all apply there. Sabine only asks for it when the page leaves the `contextmenu` event alone, so an app's own menu, opened from a handler that calls `preventDefault()`, takes its place.
+`TitleBar` is the 60px bar every app window starts with: the title, an optional `detail`, `leading` buttons such as Back, `actions` before `WindowControls`, and `compact` for a document's name over a second line. Sidebar items use `nav-item`, with `tall` for two lines, `nav-detail` for the second line, `nav-count` for a number on the right, and `nav-heading` and `nav-action` for a group's title and its add button. `EmptyState` is the icon, title, message and button an empty page shows.
+
+The shared styles give every app the same behaviour: buttons and other controls keep the arrow cursor and only links show the hand, text in the window can't be selected except in fields and where an app adds `select-text`, every scroller has the same thin scrollbar, and toasts sit centred over the content beside the sidebar.
+
+Inside `GlassShell`, right-clicking a text field or selected text opens Luft's edit menu, with corrections for a misspelled word and whichever of undo, redo, cut, copy, paste and select all apply there. Sabine only asks for it when the page leaves the `contextmenu` event alone, so an app's own menu, opened from a handler that calls `preventDefault()`, takes its place.
 
 ## Dialog windows
 

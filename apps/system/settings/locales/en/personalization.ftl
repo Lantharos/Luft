@@ -323,6 +323,7 @@ settings-accessibility-dwell-time = Rest for
 settings-accessibility-hold = Hold to right-click
 # Followed by a duration slider
 settings-accessibility-hold-time = Hold for
+settings-accessibility-shake-pointer = Shake to find the pointer
 # Ctrl is the key name; use the one printed on keyboards in your language
 settings-accessibility-locate-pointer = Press Ctrl to find the pointer
 settings-accessibility-hearing = Hearing

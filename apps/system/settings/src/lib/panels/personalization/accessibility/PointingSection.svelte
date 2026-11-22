@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import DelayRow from './DelayRow.svelte';
 
 	type Mouse = {
@@ -14,6 +14,7 @@
 	const keyboard = useSettings<{ 'mousekeys-enable': boolean }>('org.gnome.desktop.a11y.keyboard', ['mousekeys-enable']);
 	const mouse = useSettings<Mouse>('org.gnome.desktop.a11y.mouse', ['dwell-click-enabled', 'dwell-time', 'secondary-click-enabled', 'secondary-click-time']);
 	const desktop = useSettings<{ 'locate-pointer': boolean }>('org.gnome.desktop.interface', ['locate-pointer']);
+	const kestrel = useSettings<{ 'shake-to-find-pointer': boolean }>(KESTREL_SCHEMA, ['shake-to-find-pointer']);
 
 	let dwell = $derived(mouse.values['dwell-click-enabled'] ?? false);
 	let secondary = $derived(mouse.values['secondary-click-enabled'] ?? false);
@@ -41,6 +42,13 @@
 			onchange={(value) => mouse.set('secondary-click-time', value)}
 		/>
 	{/if}
+	<Row title={t('settings-accessibility-shake-pointer')}>
+		<Switch
+			label={t('settings-accessibility-shake-pointer')}
+			checked={kestrel.values['shake-to-find-pointer'] ?? true}
+			onchange={(on) => kestrel.set('shake-to-find-pointer', on)}
+		/>
+	</Row>
 	<Row title={t('settings-accessibility-locate-pointer')}>
 		<Switch
 			label={t('settings-accessibility-locate-pointer')}

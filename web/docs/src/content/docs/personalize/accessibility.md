@@ -64,7 +64,8 @@ Apps are told which you chose, so they can follow it too.
 | Mouse keys | Move the pointer with the number pad |
 | Click by resting the pointer | Clicks when the pointer stays still for a moment, while a circle at the pointer fills up. It clicks once; move the pointer on to click again |
 | Hold to right-click | Holding the button down right-clicks |
-| Press Ctrl to find the pointer | Shows where the pointer is |
+| Shake to find the pointer | Makes the pointer larger while you shake the mouse or move quickly back and forth on the touchpad. On by default |
+| Press Ctrl to find the pointer | Makes the pointer larger for a moment |
 
 ## Hearing
 

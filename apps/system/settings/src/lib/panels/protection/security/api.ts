@@ -1,10 +1,13 @@
 import { commands } from '#lib/bindings.js';
+import type { UsbMode } from '#lib/bindings.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 
 export const hostSecurity = () => commands.securityHost({ timeoutMs: 120_000 });
 
-export const setUsbProtection = (enabled: boolean) => commands.securitySetUsb({ enabled }, WAIT_FOR_PERMISSION);
+export const setUsbMode = (mode: UsbMode) => commands.securitySetUsb({ mode }, WAIT_FOR_PERMISSION);
+export const allowUsbDevice = (id: string) => commands.securityAllowUsb({ id }, WAIT_FOR_PERMISSION);
+export const forgetUsbDevice = (id: string) => commands.securityForgetUsb({ id }, WAIT_FOR_PERMISSION);
 
 export const setUpTpmUnlock = (pin: string) => (unlock: string) => commands.securitySetUpTpm({ unlock, pin }, WAIT_FOR_PERMISSION);
 export const removeTpmUnlock = (unlock: string) => commands.securityRemoveTpm({ unlock }, WAIT_FOR_PERMISSION);

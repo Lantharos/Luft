@@ -1,20 +1,39 @@
 mod descriptors;
 mod events;
+mod port;
 mod sysfs;
 
+pub use descriptors::Function;
 pub use events::{Event, Events};
 
-use descriptors::Function;
+use crate::mode::Rules;
+use crate::trust::{Bus as Kind, Identity, Known, Trusted};
 use sysfs::{Bus, Device};
 
-pub fn hold_new_devices() {
-    sysfs::hold_on_new_buses();
-    Bus::all().for_each(|bus| bus.hold_new_devices());
+/// What became of a device that was looked at.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Outcome {
+    Connected,
+    WaitsForUnlock,
+    WaitsForApproval,
 }
 
-pub fn welcome_new_devices() {
-    sysfs::welcome_on_new_buses();
-    Bus::all().for_each(|bus| bus.welcome_new_devices());
+/// Sets what connects by itself on every bus, and on buses that appear later.
+pub fn hold(rules: Rules) {
+    if rules.holds_anything() {
+        sysfs::hold_on_new_buses();
+    } else {
+        sysfs::welcome_on_new_buses();
+    }
+    Bus::all().for_each(|bus| bus.hold(rules.holds_devices(), rules.holds_parts()));
+}
+
+pub fn hold_bus(id: &str, rules: Rules) {
+    Bus::named(id).hold(rules.holds_devices(), rules.holds_parts());
+}
+
+pub fn is_bus(id: &str) -> bool {
+    sysfs::is_root_hub(id)
 }
 
 pub fn exists(id: &str) -> bool {
@@ -25,8 +44,25 @@ pub fn name(id: &str) -> String {
     Device::named(id).name()
 }
 
+pub fn number(id: &str) -> Option<String> {
+    Device::named(id).number()
+}
+
+pub fn announce(id: &str) {
+    Device::named(id).announce();
+}
+
+fn devices() -> impl Iterator<Item = String> {
+    let mut ids: Vec<(usize, String)> = Device::ids()
+        .filter(|id| !is_bus(id))
+        .map(|id| (id.matches('.').count(), id))
+        .collect();
+    ids.sort();
+    ids.into_iter().map(|(_, id)| id)
+}
+
 pub fn waiting() -> impl Iterator<Item = String> {
-    Device::ids().filter(|id| {
+    devices().filter(|id| {
         let device = Device::named(id);
         !device.is_authorized()
             || device
@@ -35,52 +71,101 @@ pub fn waiting() -> impl Iterator<Item = String> {
     })
 }
 
-pub enum Admission {
-    Complete,
-    Waiting,
+pub fn identity(id: &str) -> Option<Identity> {
+    let device = Device::named(id);
+    let (vendor, product) = device.vendor_product()?;
+    let descriptors = device.descriptors()?;
+    Some(Identity::new(
+        Kind::Usb,
+        vendor,
+        product,
+        &device.serial(),
+        descriptors::functions(&descriptors),
+    ))
 }
 
-pub fn admit_usable_part(id: &str) -> Admission {
+pub fn place(id: &str) -> Option<String> {
+    port::of(id)
+}
+
+pub fn knows(id: &str, trusted: &Trusted) -> bool {
+    port::built_in(id)
+        || identity(id)
+            .zip(port::of(id))
+            .is_some_and(|(identity, port)| trusted.knows(&identity, &port))
+}
+
+/// Connects what `rules` let in of the device `id`, and says whether
+/// anything of it still waits.
+pub fn admit(id: &str, rules: Rules, trusted: &Trusted) -> Outcome {
     let device = Device::named(id);
     if !device.is_authorized() {
         let Some(descriptors) = device.descriptors() else {
-            return Admission::Complete;
+            return Outcome::Connected;
         };
-        if !descriptors::functions(&descriptors).any(Function::usable_while_locked) {
-            return Admission::Waiting;
+        let functions: Vec<Function> = descriptors::functions(&descriptors).collect();
+        let known = knows(id, trusted);
+        if rules.needs_approval(known) {
+            return Outcome::WaitsForApproval;
         }
-        Bus::of(id).hold_new_devices();
+        if !rules.admits_device(known, &functions) {
+            return Outcome::WaitsForUnlock;
+        }
         device.authorize();
     }
-    let mut admission = Admission::Complete;
+    let mut outcome = Outcome::Connected;
     for interface in device
         .interfaces()
         .filter(|interface| !interface.is_authorized())
     {
-        if interface
-            .function()
-            .is_some_and(Function::usable_while_locked)
-        {
+        let Some(function) = interface.function() else {
+            continue;
+        };
+        let drive = interface.is_drive(function);
+        if rules.admits_part(function, drive) {
             interface.authorize();
-        } else {
-            admission = Admission::Waiting;
+        } else if rules.waits_for_unlock(function, drive) {
+            outcome = Outcome::WaitsForUnlock;
         }
     }
-    admission
+    outcome
 }
 
-pub fn admit(id: &str) {
-    let device = Device::named(id);
-    if !device.is_authorized() {
-        device.authorize();
+/// The devices connected now that aren't part of the computer, to trust
+/// them where they are.
+pub fn connected() -> impl Iterator<Item = Known> {
+    devices()
+        .filter(|id| Device::named(id).is_authorized() && !port::built_in(id))
+        .filter_map(|id| Some(Known::new(identity(&id)?, &port::of(&id)?, &name(&id))))
+}
+
+/// Disconnects every device that is neither part of the computer nor
+/// trusted where it is. Hubs come before what is plugged into them, so
+/// what an unknown hub carried is gone with it.
+pub fn turn_away_unknown(trusted: &Trusted) {
+    for id in devices() {
+        let device = Device::named(&id);
+        if exists(&id) && device.is_authorized() && !knows(&id, trusted) {
+            eprintln!(
+                "Disconnected {}, which isn't trusted where it is",
+                device.name()
+            );
+            device.deauthorize();
+        }
     }
-    admit_parts(id);
-    device.announce();
 }
 
-pub fn admit_parts(id: &str) {
-    Device::named(id)
-        .interfaces()
-        .filter(|interface| !interface.is_authorized())
-        .for_each(|interface| interface.authorize());
+pub fn turn_away_drives() {
+    for id in devices() {
+        let device = Device::named(&id);
+        for interface in device.interfaces().filter(|interface| {
+            interface.is_authorized()
+                && interface
+                    .function()
+                    .is_some_and(|function| interface.is_drive(function))
+        }) {
+            eprintln!("Disconnected the drive of {}", device.name());
+            interface.deauthorize();
+        }
+    }
 }

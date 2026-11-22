@@ -15,7 +15,7 @@ const NO_SESSION: &str = "/";
     default_service = "org.freedesktop.login1",
     default_path = "/org/freedesktop/login1/seat/seat0"
 )]
-trait Seat {
+pub trait Seat {
     #[zbus(property)]
     fn active_session(&self) -> zbus::Result<(String, OwnedObjectPath)>;
 }
@@ -25,7 +25,7 @@ trait Seat {
     interface = "org.freedesktop.login1.Session",
     default_service = "org.freedesktop.login1"
 )]
-trait Session {
+pub trait Session {
     #[zbus(property)]
     fn class(&self) -> zbus::Result<String>;
 
@@ -34,6 +34,9 @@ trait Session {
 
     #[zbus(property)]
     fn user(&self) -> zbus::Result<(u32, OwnedObjectPath)>;
+
+    #[zbus(property)]
+    fn leader(&self) -> zbus::Result<u32>;
 }
 
 /// Who is signed in at the computer's own screen and keyboard. A text

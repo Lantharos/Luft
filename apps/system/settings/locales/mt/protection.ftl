@@ -149,8 +149,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Żomm lura apparati USB ġodda
-settings-usb-hold-back-description = Dawk imqabbda waqt li l-iskrin huwa msakkar jistennew sakemm tiżblokka
 
 ## Device encryption
 

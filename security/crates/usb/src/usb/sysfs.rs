@@ -7,7 +7,10 @@ const BUS: &str = "/sys/bus/usb";
 const DEVICES: &str = "/sys/bus/usb/devices";
 const PARAMETERS: &str = "/sys/module/usbcore/parameters";
 const DEFAULT_POLICY: &str = "authorized_default";
-const SYSTEM_POLICY: &str = "/run/luft-usb-protection/system-policy";
+const SYSTEM_POLICY: &str = "/run/portguard/system-policy";
+const VENDOR_SPECIFIC: u8 = 0xff;
+const MEDIA_TRANSFER: &str = "MTP";
+const FIXED: &str = "fixed";
 const UNNAMED: &str = "USB device";
 
 pub struct Device {
@@ -43,6 +46,14 @@ fn authorize(path: &Path) {
     write(path, "authorized", "1");
 }
 
+fn deauthorize(path: &Path) {
+    write(path, "authorized", "0");
+}
+
+fn hex(path: &Path, attribute: &str) -> Option<u16> {
+    u16::from_str_radix(&read(path, attribute)?, 16).ok()
+}
+
 fn entries(path: &Path) -> impl Iterator<Item = String> {
     fs::read_dir(path)
         .into_iter()
@@ -51,7 +62,7 @@ fn entries(path: &Path) -> impl Iterator<Item = String> {
         .filter_map(|entry| entry.file_name().into_string().ok())
 }
 
-fn is_root_hub(id: &str) -> bool {
+pub fn is_root_hub(id: &str) -> bool {
     id.starts_with("usb")
 }
 
@@ -72,6 +83,26 @@ impl Device {
 
     pub fn authorize(&self) {
         authorize(&self.path);
+    }
+
+    pub fn deauthorize(&self) {
+        deauthorize(&self.path);
+    }
+
+    pub fn vendor_product(&self) -> Option<(u16, u16)> {
+        Some((hex(&self.path, "idVendor")?, hex(&self.path, "idProduct")?))
+    }
+
+    pub fn serial(&self) -> String {
+        read(&self.path, "serial").unwrap_or_default()
+    }
+
+    pub fn number(&self) -> Option<String> {
+        read(&self.path, "devnum")
+    }
+
+    pub fn is_fixed(&self) -> bool {
+        read(&self.path, "removable").as_deref() == Some(FIXED)
     }
 
     pub fn announce(&self) {
@@ -114,6 +145,16 @@ impl Interface {
         write(Path::new(BUS), "drivers_probe", &self.name);
     }
 
+    pub fn deauthorize(&self) {
+        deauthorize(&self.path);
+    }
+
+    pub fn is_drive(&self, function: Function) -> bool {
+        function.is_drive()
+            || (function.class == VENDOR_SPECIFIC
+                && read(&self.path, "interface").as_deref() == Some(MEDIA_TRANSFER))
+    }
+
     pub fn function(&self) -> Option<Function> {
         let number = |attribute| u8::from_str_radix(&read(&self.path, attribute)?, 16).ok();
         Some(Function {
@@ -131,25 +172,20 @@ impl Bus {
         }
     }
 
-    pub fn of(device: &str) -> Self {
-        let number = device.split_once('-').map_or(device, |(number, _)| number);
-        Self::named(&format!("usb{number}"))
-    }
-
     pub fn all() -> impl Iterator<Item = Self> {
         Device::ids()
             .filter(|id| is_root_hub(id))
             .map(|id| Self::named(&id))
     }
 
-    pub fn hold_new_devices(&self) {
-        write(&self.path, "authorized_default", "0");
-        write(&self.path, "interface_authorized_default", "0");
-    }
-
-    pub fn welcome_new_devices(&self) {
-        write(&self.path, "authorized_default", system_policy());
-        write(&self.path, "interface_authorized_default", "1");
+    pub fn hold(&self, devices: bool, parts: bool) {
+        let devices = if devices { "0" } else { system_policy() };
+        write(&self.path, "authorized_default", devices);
+        write(
+            &self.path,
+            "interface_authorized_default",
+            if parts { "0" } else { "1" },
+        );
     }
 }
 

@@ -9,6 +9,7 @@ use crate::idle::Asking;
 
 const ALLOW_USER_INTERACTION: u32 = 1;
 const MESSAGE: &str = "polkit.message";
+const START_TIME_FIELD: usize = 19;
 
 type Subject<'a> = (&'a str, HashMap<&'a str, Variant<'a>>);
 
@@ -48,6 +49,8 @@ trait Authority {
         flags: u32,
         cancellation_id: &str,
     ) -> zbus::Result<(bool, bool, HashMap<String, String>)>;
+
+    fn cancel_check_authorization(&self, cancellation_id: &str) -> zbus::Result<()>;
 }
 
 pub async fn is_authorized(
@@ -87,6 +90,72 @@ pub async fn is_authorized_to(
         .check_authorization(&subject, action, &details.0, flags, "")
         .await?;
     Ok(authorized)
+}
+
+/// A process polkit asks on behalf of, as `unix-process` subjects name it.
+pub struct Process {
+    pid: u32,
+    start_time: u64,
+    uid: u32,
+}
+
+impl Process {
+    /// The running process `pid` of `uid`, told apart from a later one with
+    /// the same number by when it started.
+    pub fn of(pid: u32, uid: u32) -> std::io::Result<Self> {
+        let stat = std::fs::read_to_string(format!("/proc/{pid}/stat"))?;
+        let start_time = stat
+            .rsplit_once(')')
+            .and_then(|(_, fields)| fields.split_whitespace().nth(START_TIME_FIELD))
+            .and_then(|field| field.parse().ok())
+            .ok_or_else(|| std::io::Error::other(format!("process {pid} has no start time")))?;
+        Ok(Self {
+            pid,
+            start_time,
+            uid,
+        })
+    }
+}
+
+/// Asks whoever is at the session of `process` to allow `action`, for a
+/// change that comes from the computer rather than a caller, such as a
+/// device being plugged in. `cancellation` names the question for
+/// [`cancel`].
+pub async fn process_is_authorized_to(
+    connection: &Connection,
+    process: &Process,
+    action: &str,
+    details: &Details<'_>,
+    cancellation: &str,
+) -> zbus::Result<bool> {
+    let subject = (
+        "unix-process",
+        HashMap::from([
+            ("pid", Variant::from(process.pid)),
+            ("start-time", Variant::from(process.start_time)),
+            ("uid", Variant::from(process.uid as i32)),
+        ]),
+    );
+    let _asking = Asking::start();
+    let (authorized, ..) = AuthorityProxy::new(connection)
+        .await?
+        .check_authorization(
+            &subject,
+            action,
+            &details.0,
+            ALLOW_USER_INTERACTION,
+            cancellation,
+        )
+        .await?;
+    Ok(authorized)
+}
+
+/// Takes back a question asked with a `cancellation` name, closing its prompt.
+pub async fn cancel(connection: &Connection, cancellation: &str) -> zbus::Result<()> {
+    AuthorityProxy::new(connection)
+        .await?
+        .cancel_check_authorization(cancellation)
+        .await
 }
 
 pub enum Denied {

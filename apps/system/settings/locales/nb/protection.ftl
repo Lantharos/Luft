@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Hold igjen nye USB-enheter
-settings-usb-hold-back-description = De som kobles til mens skjermen er låst, venter til du låser opp
 
 ## Device encryption
 

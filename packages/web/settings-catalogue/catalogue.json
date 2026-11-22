@@ -493,12 +493,14 @@
 		{
 			"id": "security.usb-protection",
 			"page": "security",
-			"title": "settings-usb-hold-back",
+			"title": "settings-usb-mode",
 			"system": "usb-protection",
-			"type": "switch",
+			"type": "choice",
 			"options": [
-				{ "value": false, "note": "settings-usb-turn-off-warning" },
-				{ "value": true }
+				{ "value": "off", "label": "settings-usb-mode-off", "note": "settings-usb-turn-off-warning" },
+				{ "value": "while-locked", "label": "settings-usb-mode-while-locked" },
+				{ "value": "no-drives", "label": "settings-usb-mode-no-drives" },
+				{ "value": "known-only", "label": "settings-usb-mode-known-only" }
 			]
 		},
 		{

@@ -11,7 +11,7 @@ export const CHANGES_NAME = 'com.lantharos.Changes1';
 
 const INITIAL: Record<string, boolean | string> = {
   'developer-tools': false,
-  'usb-protection': true,
+  'usb-protection': 'while-locked',
   'update-channel': 'nightly',
   'update-schedule': 'daily',
   'download-updates': true,

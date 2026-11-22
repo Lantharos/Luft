@@ -139,8 +139,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Reține dispozitivele USB noi
-settings-usb-hold-back-description = Cele conectate cât timp ecranul este blocat așteaptă până la deblocare
 
 ## Device encryption
 

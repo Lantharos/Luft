@@ -139,8 +139,6 @@ settings-security-hardware-fix-unknown =
 
 ## Security: USB protection
 
-settings-usb-hold-back = Pea uued USB-seadmed kinni
-settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootavad, kuni lukust avad
 
 ## Device encryption
 

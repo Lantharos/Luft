@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Pidätä uudet USB-laitteet
-settings-usb-hold-back-description = Lukituksen aikana liitetyt odottavat, kunnes avaat lukituksen
 
 ## Device encryption
 

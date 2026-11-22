@@ -6,6 +6,8 @@ use rustix::net::netlink::{self, SocketAddrNetlink};
 use rustix::net::{AddressFamily, RecvFlags, SocketFlags, SocketType, bind, recv, socket_with};
 use tokio::io::unix::AsyncFd;
 
+use crate::thunderbolt;
+
 const KERNEL_EVENTS: u32 = 1;
 const MESSAGE_SIZE: usize = 8192;
 
@@ -42,6 +44,8 @@ fn parse(message: &[u8]) -> Option<Event> {
         ("usb_device", "add") => Some(Event::Added(parts.next()?.to_owned())),
         ("usb_device", "remove") => Some(Event::Removed(parts.next()?.to_owned())),
         ("usb_interface", "add") => Some(Event::Configured(parts.nth(1)?.to_owned())),
+        ("thunderbolt_device", "add") => Some(Event::Added(thunderbolt::id(parts.next()?))),
+        ("thunderbolt_device", "remove") => Some(Event::Removed(thunderbolt::id(parts.next()?))),
         _ => None,
     }
 }
@@ -90,5 +94,7 @@ mod tests {
         assert_eq!(parse(interface), Some(Event::Configured("3-2".to_owned())));
         let gone = b"remove@/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0ACTION=remove\0DEVPATH=/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0\0SUBSYSTEM=usb\0DEVTYPE=usb_interface\0SEQNUM=5014\0";
         assert_eq!(parse(gone), None);
+        let dock = b"add@/devices/pci0000:00/0000:00:0d.2/domain0/0-0/0-1\0ACTION=add\0DEVPATH=/devices/pci0000:00/0000:00:0d.2/domain0/0-0/0-1\0SUBSYSTEM=thunderbolt\0DEVTYPE=thunderbolt_device\0SEQNUM=6001\0";
+        assert_eq!(parse(dock), Some(Event::Added(thunderbolt::id("0-1"))));
     }
 }

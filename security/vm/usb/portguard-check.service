@@ -1,0 +1,12 @@
+[Unit]
+Description=USB protection check
+After=portguard.service polkit.service systemd-user-sessions.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/portguard-check
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

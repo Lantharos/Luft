@@ -1,7 +1,13 @@
 <node>
   <interface name="com.lantharos.UsbProtection1">
-    <method name="SetEnabled">
-      <arg name="enabled" type="b" direction="in"/>
+    <method name="SetMode">
+      <arg name="mode" type="s" direction="in"/>
+    </method>
+    <method name="Allow">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="Forget">
+      <arg name="key" type="s" direction="in"/>
     </method>
     <method name="SetLocked">
       <arg name="locked" type="b" direction="in"/>
@@ -12,8 +18,9 @@
     <signal name="Released">
       <arg name="devices" type="a(ss)"/>
     </signal>
-    <property name="Enabled" type="b" access="read"/>
-    <property name="Guarding" type="b" access="read"/>
     <property name="Held" type="a(ss)" access="read"/>
+    <property name="Mode" type="s" access="read"/>
+    <property name="Trusted" type="a(ss)" access="read"/>
+    <property name="Waiting" type="a(ss)" access="read"/>
   </interface>
 </node>

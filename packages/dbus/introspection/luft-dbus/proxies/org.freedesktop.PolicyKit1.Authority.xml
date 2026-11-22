@@ -10,5 +10,8 @@
       <arg type="b" direction="out"/>
       <arg type="a{ss}" direction="out"/>
     </method>
+    <method name="CancelCheckAuthorization">
+      <arg type="s" direction="in"/>
+    </method>
   </interface>
 </node>

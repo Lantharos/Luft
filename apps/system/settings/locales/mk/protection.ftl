@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Задржи ги новите USB-уреди
-settings-usb-hold-back-description = Оние приклучени додека е заклучено чекаат додека не отклучите
 
 ## Device encryption
 

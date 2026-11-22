@@ -16,6 +16,8 @@ asks:
   - { ask: login without password, to: signing-in-automatically }
   - { ask: usb not working when locked, to: usb-protection }
   - { ask: badusb, to: usb-protection }
+  - { ask: block usb drives, to: usb-protection }
+  - { ask: only allow known usb devices, to: usb-protection }
   - { ask: firewall, to: home-and-public-networks }
   - { ask: allow app through firewall, to: home-and-public-networks }
   - { ask: open port, to: home-and-public-networks }
@@ -72,9 +74,16 @@ Settings, under Accounts → Login screen, can sign one person in at startup wit
 
 ## USB protection
 
-While the screen is locked, and at the login screen, new USB devices wait until you unlock. Plain keyboards, mice and hubs connect right away, so you can always type your password, but a gadget that also poses as a network adapter or a drive only gets its keyboard part. Drives, network adapters, security keys and other special devices wait. When you unlock, everything that waited connects and a notification names it.
+Settings, under Security, **USB devices** chooses how new USB devices are treated:
 
-Devices already connected keep working. Turning this off in Settings needs an administrator.
+- **Hold back while locked**, the default. While the screen is locked, and at the login screen, new devices wait until you unlock. Plain keyboards, mice and hubs connect right away, so you can always type your password, but a gadget that also poses as a network adapter or a drive only gets its keyboard part. When you unlock, everything that waited connects and a notification names it.
+- **No USB drives** also keeps out drives, card readers, cameras and phones sharing their files, even while unlocked. Everything else connects, so a gadget that only pretends to be a keyboard still gets in.
+- **Only known devices** trusts what's plugged in when you choose it, each in the port it's in. A new device, or a known one in another port, stays disconnected until an administrator types their password to allow it, so a gadget can't type that password itself. Parts of the computer itself, such as a laptop's camera, fingerprint reader and Bluetooth, always work. **Known devices** lists what's trusted, with **Forget** for each, and **Allow** for devices that wait. This also covers devices plugged in before the computer starts, and Thunderbolt docks.
+- **Allow all** lets every device connect right away.
+
+Each choice except Allow all still holds devices back while locked. Devices already connected keep working when you change it, and changing it needs an administrator.
+
+If your only keyboard isn't known any more, for example because you moved it to another port, put it back where it was, or start **Rescue** from the boot menu: it asks for the recovery key and holds no device back ([Rescue](/system/recovery/#rescue)).
 
 ## Home and public networks
 

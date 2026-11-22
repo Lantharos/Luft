@@ -6,8 +6,10 @@ const HID: u8 = 0x03;
 const BOOT: u8 = 0x01;
 const KEYBOARD: u8 = 0x01;
 const MOUSE: u8 = 0x02;
+const STILL_IMAGE: u8 = 0x06;
+const MASS_STORAGE: u8 = 0x08;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Function {
     pub class: u8,
     pub subclass: u8,
@@ -21,6 +23,10 @@ impl Function {
             HID => self.subclass == BOOT && matches!(self.protocol, KEYBOARD | MOUSE),
             _ => false,
         }
+    }
+
+    pub fn is_drive(self) -> bool {
+        matches!(self.class, MASS_STORAGE | STILL_IMAGE)
     }
 }
 

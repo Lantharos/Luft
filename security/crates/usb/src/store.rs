@@ -1,18 +1,56 @@
+use std::fs;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-const DISABLED: &str = "/var/lib/luft-usb-protection/disabled";
+use crate::mode::Mode;
+use crate::trust::Trusted;
 
-pub fn enabled() -> bool {
-    !Path::new(DISABLED).exists()
+const STATE: &str = "var/lib/portguard";
+const MODE: &str = "mode";
+const TRUSTED: &str = "trusted";
+
+/// Where the mode and the trusted devices are kept: `/var/lib/portguard`
+/// of the system, or of the one mounted at `root` before it starts.
+pub struct Store {
+    folder: PathBuf,
 }
 
-pub fn save(enabled: bool) -> io::Result<()> {
-    if !enabled {
-        return std::fs::write(DISABLED, "");
+impl Store {
+    pub fn system() -> Self {
+        Self::under(Path::new("/"))
     }
-    match std::fs::remove_file(DISABLED) {
-        Err(error) if error.kind() != io::ErrorKind::NotFound => Err(error),
-        _ => Ok(()),
+
+    pub fn under(root: &Path) -> Self {
+        Self {
+            folder: root.join(STATE),
+        }
+    }
+
+    pub fn mode(&self) -> Mode {
+        fs::read_to_string(self.folder.join(MODE))
+            .ok()
+            .and_then(|name| Mode::named(name.trim()))
+            .unwrap_or_default()
+    }
+
+    pub fn save_mode(&self, mode: Mode) -> io::Result<()> {
+        self.replace(MODE, mode.name())
+    }
+
+    pub fn trusted(&self) -> Trusted {
+        fs::read_to_string(self.folder.join(TRUSTED))
+            .map(|text| Trusted::parse(&text))
+            .unwrap_or_default()
+    }
+
+    pub fn save_trusted(&self, trusted: &Trusted) -> io::Result<()> {
+        self.replace(TRUSTED, &trusted.render())
+    }
+
+    fn replace(&self, name: &str, contents: &str) -> io::Result<()> {
+        let written = self.folder.join(format!(".{name}"));
+        fs::write(&written, contents)?;
+        fs::File::open(&written)?.sync_all()?;
+        fs::rename(written, self.folder.join(name))
     }
 }

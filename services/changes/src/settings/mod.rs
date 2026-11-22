@@ -81,10 +81,7 @@ impl Setting {
     fn is_switch(self) -> bool {
         matches!(
             self,
-            Self::DeveloperTools
-                | Self::UsbProtection
-                | Self::DownloadUpdates
-                | Self::AutomaticTime
+            Self::DeveloperTools | Self::DownloadUpdates | Self::AutomaticTime
         )
     }
 
@@ -99,6 +96,7 @@ impl Setting {
         let allowed = match self {
             Self::UpdateChannel => Channel::named(value.text()).is_some(),
             Self::UpdateSchedule => SCHEDULES.contains(&value.text()),
+            Self::UsbProtection => usb::MODES.contains(&value.text()),
             Self::TimeZone => clock::is_zone(value.text()),
             _ => true,
         };
@@ -118,8 +116,12 @@ impl Setting {
         match self {
             Self::DeveloperTools if on => "turn on developer tools".to_owned(),
             Self::DeveloperTools => "turn off developer tools".to_owned(),
-            Self::UsbProtection if on => "hold back new USB devices while locked".to_owned(),
-            Self::UsbProtection => "stop holding back new USB devices while locked".to_owned(),
+            Self::UsbProtection => match value.text() {
+                "off" => "let every new USB device connect".to_owned(),
+                "no-drives" => "keep USB drives from connecting".to_owned(),
+                "known-only" => "let only trusted USB devices connect".to_owned(),
+                _ => "hold back new USB devices while locked".to_owned(),
+            },
             Self::UpdateChannel => format!("get {} versions of Luft", value.text()),
             Self::UpdateSchedule => match value.text() {
                 "daily" => "look for updates every day".to_owned(),
@@ -137,7 +139,7 @@ impl Setting {
     pub async fn read(self, system: &Connection) -> zbus::Result<Value> {
         Ok(match self {
             Self::DeveloperTools => Value::Switch(greeter::developer_tools(system).await?),
-            Self::UsbProtection => Value::Switch(usb::enabled(system).await?),
+            Self::UsbProtection => Value::Text(usb::mode(system).await?),
             Self::UpdateChannel => Value::Text(updater::channel(system).await?.name().to_owned()),
             Self::UpdateSchedule => Value::Text(updater::schedule(system).await?.0),
             Self::DownloadUpdates => Value::Switch(updater::schedule(system).await?.1),
@@ -149,7 +151,7 @@ impl Setting {
     pub async fn apply(self, system: &Connection, value: &Value) -> Result<(), String> {
         let done = match self {
             Self::DeveloperTools => greeter::set_developer_tools(system, value.switch()).await,
-            Self::UsbProtection => usb::set_enabled(system, value.switch()).await,
+            Self::UsbProtection => usb::set_mode(system, value.text()).await,
             Self::UpdateChannel => return updater::switch_channel(system, value.text()).await,
             Self::UpdateSchedule => updater::set_schedule(system, Some(value.text()), None).await,
             Self::DownloadUpdates => {

@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Bloquer les nouveaux périphériques USB
-settings-usb-hold-back-description = Ceux branchés pendant le verrouillage attendent que vous déverrouilliez
 
 ## Device encryption
 

@@ -1,6 +1,8 @@
 use luft_dbus_macros::introspect;
 use zbus::{Connection, proxy};
 
+pub const MODES: [&str; 4] = ["off", "while-locked", "no-drives", "known-only"];
+
 #[introspect]
 #[proxy(
     interface = "com.lantharos.UsbProtection1",
@@ -8,19 +10,16 @@ use zbus::{Connection, proxy};
     default_path = "/com/lantharos/UsbProtection1"
 )]
 trait UsbProtection {
-    fn set_enabled(&self, enabled: bool) -> zbus::Result<()>;
+    fn set_mode(&self, mode: &str) -> zbus::Result<()>;
 
     #[zbus(property)]
-    fn enabled(&self) -> zbus::Result<bool>;
+    fn mode(&self) -> zbus::Result<String>;
 }
 
-pub async fn enabled(system: &Connection) -> zbus::Result<bool> {
-    UsbProtectionProxy::new(system).await?.enabled().await
+pub async fn mode(system: &Connection) -> zbus::Result<String> {
+    UsbProtectionProxy::new(system).await?.mode().await
 }
 
-pub async fn set_enabled(system: &Connection, enabled: bool) -> zbus::Result<()> {
-    UsbProtectionProxy::new(system)
-        .await?
-        .set_enabled(enabled)
-        .await
+pub async fn set_mode(system: &Connection, mode: &str) -> zbus::Result<()> {
+    UsbProtectionProxy::new(system).await?.set_mode(mode).await
 }

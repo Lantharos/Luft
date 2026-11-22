@@ -139,8 +139,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Aizturēt jaunas USB ierīces
-settings-usb-hold-back-description = Bloķēšanas laikā pievienotās ierīces gaida, līdz atbloķējat
 
 ## Device encryption
 

@@ -1,0 +1,5 @@
+<node>
+  <interface name="org.freedesktop.bolt1.Manager">
+    <property name="AuthMode" type="s" access="readwrite"/>
+  </interface>
+</node>

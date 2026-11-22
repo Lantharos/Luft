@@ -1,6 +1,6 @@
 # Security
 
-Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **portguard** holds back new USB devices while the screen is locked, except plain keyboards and mice. **shield** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **remoted** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
+Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **portguard** decides which new USB and Thunderbolt devices may connect: none but plain keyboards and mice while the screen is locked, and, if chosen, no drives or only devices someone trusted. **shield** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **remoted** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
 
 How the pieces protect the computer is in [Security](https://docs.luft.computer/security/keys/), boot and recovery in [Boot and recovery](https://docs.luft.computer/developers/system/boot/), and what people see on [the Security page](https://docs.luft.computer/system/security/).
 
@@ -8,12 +8,12 @@ How the pieces protect the computer is in [Security](https://docs.luft.computer/
 | --- | --- |
 | `crates/trust` | `trustd` and `trustctl` |
 | `crates/firewall` | `shield` |
-| `crates/usb` | `portguard` |
+| `crates/usb` | `portguard` and `portguard-early`, which applies the mode in the startup image |
 | `crates/remote-login` | `remoted` and `remoted-generator` |
 
 ## Build
 
-`bun os/image/parts/components/install.ts DESTDIR security` builds the services and stages their files the way the [Luft image](../os/README.md) installs them, as `image.toml` lists them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock. `vm/firewall/run.sh` and `vm/remote-login/run.sh` check the firewall and remote login in a VM with SELinux enforcing. The firewall check keeps `/usr` read-only, as on an installed Luft, so the image's own Post opens its port while a stand-in in Kestrel's unit is refused.
+`bun os/image/parts/components/install.ts DESTDIR security` builds the services and stages their files the way the [Luft image](../os/README.md) installs them, as `image.toml` lists them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock. `vm/firewall/run.sh`, `vm/remote-login/run.sh` and `vm/usb/run.sh` check the firewall, remote login and USB protection in a VM with SELinux enforcing. The firewall check keeps `/usr` read-only, as on an installed Luft, so the image's own Post opens its port while a stand-in in Kestrel's unit is refused.
 
 ## trustctl
 
@@ -38,8 +38,8 @@ All commands need root.
 | Name | Interface file | Polkit actions |
 | --- | --- | --- |
 | `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.*` |
-| `com.lantharos.UsbProtection1` | `data/usb/com.lantharos.UsbProtection1.xml` | `com.lantharos.usb-protection.configure` |
+| `com.lantharos.UsbProtection1` | `data/usb/com.lantharos.UsbProtection1.xml` | `com.lantharos.usb-protection.*` |
 | `com.lantharos.Firewall1` | `data/firewall/com.lantharos.Firewall1.xml` | `com.lantharos.firewall.*` |
 | `com.lantharos.RemoteLogin1` | `data/remote-login/com.lantharos.RemoteLogin1.xml` | `com.lantharos.remote-login.*` |
 
-Reading state is open to everyone. The firewall asks the person at the computer to confirm before an app is allowed or a network becomes a home network. Showing the recovery key asks every time, and confirming that a version started is allowed for the active session. Other drives are on `com.lantharos.Trust1.Drives` at the same object.
+Reading state is open to everyone. USB protection asks an administrator at the computer before a device nobody trusted connects, and the firewall asks the person at the computer to confirm before an app is allowed or a network becomes a home network. Showing the recovery key asks every time, and confirming that a version started is allowed for the active session. Other drives are on `com.lantharos.Trust1.Drives` at the same object.

@@ -2,11 +2,25 @@
  "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node name="/com/lantharos/UsbProtection1">
   <!--
-    USB protection while the screen is locked and at the login screen.
+    USB protection: which new USB and Thunderbolt devices may connect.
 
-    Enabled: whether new USB devices wait while nobody is signed in and unlocked at the computer.
-    Guarding: whether new devices are being held back right now.
-    Held: devices held back so far, as (id, name), id being the sysfs device name such as "3-2".
+    Mode: one of
+      "off"           every device connects,
+      "while-locked"  new devices wait while the screen is locked and at the login screen,
+      "no-drives"     as while-locked, and drives, cameras and phones sharing files never connect,
+      "known-only"    as while-locked, and only devices trusted on the port they are in connect.
+    Devices wired inside the computer, on ports its firmware calls fixed, always count as trusted.
+    SetMode changes it, asking for an administrator. Changing to "known-only" trusts every device
+    connected at that moment.
+
+    Held: devices waiting for an unlock, as (id, name), id being the sysfs device name such as
+    "3-2", or "thunderbolt:0-1" for a Thunderbolt device.
+    Waiting: devices nobody trusted in "known-only", as (id, name). While the computer is unlocked,
+    the service asks the person at it for an administrator's approval of each, one at a time, and
+    the device stays disconnected while it asks. Allow does the same for a device the caller names,
+    and trusts it on the port it is in.
+    Trusted: the trusted devices, as (key, name). Forget(key) stops trusting one; it stays connected
+    until it is unplugged.
 
     SetLocked is for Kestrel: the shell of a desktop says when its screen locks and unlocks, and is
     the only caller accepted, told by the unit it runs in. A desktop counts as locked until its
@@ -20,11 +34,18 @@
     when devices start waiting again.
   -->
   <interface name="com.lantharos.UsbProtection1">
-    <property name="Enabled" type="b" access="read"/>
-    <property name="Guarding" type="b" access="read"/>
+    <property name="Mode" type="s" access="read"/>
     <property name="Held" type="a(ss)" access="read"/>
-    <method name="SetEnabled">
-      <arg name="enabled" type="b" direction="in"/>
+    <property name="Waiting" type="a(ss)" access="read"/>
+    <property name="Trusted" type="a(ss)" access="read"/>
+    <method name="SetMode">
+      <arg name="mode" type="s" direction="in"/>
+    </method>
+    <method name="Allow">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="Forget">
+      <arg name="key" type="s" direction="in"/>
     </method>
     <method name="SetLocked">
       <arg name="locked" type="b" direction="in"/>

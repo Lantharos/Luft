@@ -52,14 +52,45 @@ systemd only adds a serial console for one named on the signed kernel command li
 
 ## USB protection
 
-While the screen is locked, and at the login screen, new USB devices wait until someone unlocks. It uses the kernel's `authorized_default` and `interface_authorized_default` switches per bus, so it costs nothing while unlocked. It isn't meant to run alongside USBGuard.
+portguard (`com.lantharos.UsbProtection1`) decides which new USB devices connect, with the kernel's own authorization: `authorized_default` and `interface_authorized_default` per bus, and `authorized` per device and per part of a device. Nothing is switched off at the port, and a mode that lets everything in costs nothing. It isn't meant to run alongside USBGuard. Its one setting, `Mode`, is `off`, `while-locked` (the default), `no-drives` or `known-only`, kept in `/var/lib/portguard/mode`; each but `off` also holds devices back while locked.
+
+### While locked
+
+While the screen is locked, and at the login screen, new USB devices wait until someone unlocks.
 
 - Hubs, and keyboards and mice that say so themselves with USB's boot protocol, connect right away, so the password can always be typed. For a device with several parts, only those parts connect: storage, network, serial, audio, vendor-specific and every other input part, security keys among them, wait. A gadget that poses as a keyboard and a network adapter at once gets only its keyboard, and the many drivers for special input devices stay out of reach of whoever holds the locked computer.
 - A dock plugged in while locked brings buses of its own, so the kernel's policy for new buses is set to hold as well while locked, and put back at unlock. Those buses connect themselves as part of the computer, and only what's plugged into them waits.
 - A device that switches to a different set of parts while locked, as a phone does once it trusts the computer, keeps its connected parts, and the new ones wait like those of a new device.
 - At unlock, everything that waited connects, Kestrel names it in a notification, and each device that waited as a whole is announced again as if just plugged in, so what sets devices up, such as printer setup, sees it. A device whose new parts waited isn't announced again, since that would switch it back. An iPhone that waited isn't handed to `usbmuxd` until it connects, so it pairs at unlock instead of being left half set up.
 - Kestrel says when the screen locks and unlocks with `SetLocked` on `com.lantharos.UsbProtection1`. The service takes that only from Kestrel itself, installed with the system and running in the desktop's own unit of the person whose session is on screen ([Who an app is](/security/identity/)). logind's lock hint, which any program in the session may set, plays no part. A desktop counts as locked until its shell says otherwise, and again the moment that shell leaves the bus, so a shell that crashes while locked lets nothing in. A text console has no lock screen, so whoever signed in there counts as unlocked.
-- Stopped on purpose, the service lets everything that waited connect. When it fails, what waited keeps waiting, and systemd starts it again a second later.
+- Stopped on purpose, the service lets everything that waited connect, except in `known-only`, where new devices wait until it is back. When it fails, what waited keeps waiting, and systemd starts it again a second later.
+
+### No USB drives
+
+`no-drives` keeps `interface_authorized_default` at 0 on every bus, so each part of a new device waits until portguard has looked at it. Parts of the mass storage and still image classes, and vendor-specific parts that call themselves MTP, stay out; everything else connects. It goes by what a device says it is, so a gadget that claims to be only a keyboard gets in.
+
+### Only known devices
+
+`known-only` keeps `authorized_default` at 0, so a new device isn't even configured until portguard lets it in. A device counts as known when:
+
+- it is wired inside the computer: the kernel's `removable` attribute, which comes from the firmware's description of the port, says `fixed` for it and for every hub on the way, so a hub that only claims its own ports are fixed proves nothing; or
+- it is in `/var/lib/portguard/trusted` with the same vendor and product IDs, serial number and set of interface classes, in the same port. A port is named after the controller's PCI path and the port numbers down to the device, with a USB 3 port named after its USB 2 half, so a device is the same whichever speed it connects at. Anyone can make a device that copies another's IDs and serial, so the port is what makes the entry worth anything.
+
+Switching to `known-only` trusts every device connected at that moment. Any other device waits, disconnected, in `Waiting`. While the computer is unlocked, portguard asks about each in turn with polkit's `com.lantharos.usb-protection.allow-device`, which needs an administrator's password every time, for the session on screen, so the prompt comes from Kestrel. The device stays unauthorized while the prompt is open, so a keyboard can't type its own approval. Approving trusts the device in that port, but only if it is still the same enumeration (its device number) saying the same about itself; one swapped in meanwhile is asked about anew. A device that was declined isn't asked about again until the computer restarts; Settings can still allow it with `Allow`. `Forget` takes a device off the list, and it stays connected until it is unplugged. Only devices that waited are ever asked about: switching modes never disconnects anything.
+
+### From the start
+
+The kernel's command line is part of the signed startup image, the same on every computer, so it can't hold `usbcore.authorized_default=0` for only the computers that chose `known-only`. Instead, `portguard-early` runs in the startup image right after the system disk is open and mounted, before the switch to the installed system. In `known-only` it sets every bus, and buses that appear later, to hold new devices, and disconnects every device that is neither built in nor trusted where it is, hubs before what's plugged into them; in `no-drives` it holds new parts and disconnects drives. What is plugged in from then on waits until portguard starts.
+
+Until the disk is open, every device works, because the list of trusted devices is on the encrypted disk and the startup image has no other place to keep it that an attacker couldn't change. A device plugged in that early only reaches the prompt for the disk's passphrase or recovery key, and is disconnected before anything else runs.
+
+### Thunderbolt
+
+Thunderbolt and USB4 devices that tunnel PCIe are approved by boltd, which connects new ones by itself when the computer's IOMMU protects memory. In `known-only`, portguard sets boltd's `AuthMode` to `disabled`, which boltd keeps across restarts, and writes the device's `authorized` itself, by the same rules: its vendor and device IDs and unique ID, in the same place in the Thunderbolt tree, or an administrator's approval. Other modes give it back to boltd. A computer whose firmware sets the security level to `none` or `dponly` connects devices before any program could decide, so only its IOMMU protects it. USB devices behind a Thunderbolt dock are on a USB bus of their own and follow the USB rules.
+
+### Rescue
+
+A desktop whose only keyboard is no longer known could not be used. The Rescue profile of the startup image starts with `systemd.unit=rescue.target` on its signed command line, which no other boot can claim with Secure Boot on, and both `portguard-early` and `portguard` have `ConditionKernelCommandLine=!systemd.unit=rescue.target`, so nothing is held back there. Rescue asks for the recovery key before anything else, so this opens no way in that the recovery key doesn't already.
 
 ## Changing files that aren't yours
 

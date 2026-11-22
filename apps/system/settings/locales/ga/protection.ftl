@@ -149,8 +149,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Coinnigh siar gléasanna USB nua
-settings-usb-hold-back-description = Fanann gléasanna a phlugáiltear isteach agus an ríomhaire faoi ghlas go dtí go ndíghlasálann tú é
 
 ## Device encryption
 

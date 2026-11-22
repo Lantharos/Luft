@@ -15,7 +15,7 @@ use luft_trust::TRUST;
 use properties::Service;
 use specta::Type;
 use trust::Trust;
-use usb::{USB_PROTECTION, UsbProtection};
+use usb::{USB_PROTECTION, UsbMode, UsbProtection};
 
 const TRUST_CHANGED: BridgeEvent<Trust> = BridgeEvent::new("security.trust");
 const USB_CHANGED: BridgeEvent<UsbProtection> = BridgeEvent::new("security.usb");
@@ -53,8 +53,13 @@ struct DiskEncryption {
 }
 
 #[derive(Deserialize, Type)]
-struct UsbEnabled {
-    enabled: bool,
+struct UsbModeChoice {
+    mode: UsbMode,
+}
+
+#[derive(Deserialize, Type)]
+struct UsbDeviceId {
+    id: String,
 }
 
 fn follow<T, F>(service: &'static Service, event: BridgeEvent<T>, events: Events, read: fn() -> F)
@@ -108,9 +113,11 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .with_async("security_trust", events, trust)
         .with_async("security_usb", events, usb_protection)
         .command_async("security_host", |Empty {}| hsi::read())
-        .command_async("security_set_usb", |UsbEnabled { enabled }| {
-            usb::set_enabled(enabled)
+        .command_async("security_set_usb", |UsbModeChoice { mode }| {
+            usb::set_mode(mode)
         })
+        .command_async("security_allow_usb", |UsbDeviceId { id }| usb::allow(id))
+        .command_async("security_forget_usb", |UsbDeviceId { id }| usb::forget(id))
         .command_async(
             "security_set_up_tpm",
             |TpmUnlock { unlock, pin }| async move {

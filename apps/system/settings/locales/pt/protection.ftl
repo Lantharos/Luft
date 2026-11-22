@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Reter novos dispositivos USB
-settings-usb-hold-back-description = Os que forem ligados com a sessão bloqueada esperam até desbloquear
 
 ## Device encryption
 

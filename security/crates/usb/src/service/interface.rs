@@ -1,14 +1,17 @@
 use std::sync::Arc;
 
+use luft_dbus::polkit::{self, Details};
 use luft_dbus_macros::introspect;
-use tokio::sync::Mutex;
+use portguard::mode::Mode;
+use tokio::sync::{Mutex, Notify};
 use zbus::fdo::DBusProxy;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
-use crate::error::Error;
-use crate::protection::{Change, Device, Protection};
+use super::ask;
+use super::error::Error;
+use super::protection::{Change, Device, Protection, Refusal};
 
 pub const NAME: &str = "com.lantharos.UsbProtection1";
 pub const PATH: &str = "/com/lantharos/UsbProtection1";
@@ -18,22 +21,30 @@ const KESTREL: &str = "/usr/bin/kestrel";
 
 pub struct UsbProtection {
     protection: Arc<Mutex<Protection>>,
+    changed: Arc<Notify>,
 }
 
 impl UsbProtection {
-    pub fn new(protection: Arc<Mutex<Protection>>) -> Self {
-        Self { protection }
+    pub fn new(protection: Arc<Mutex<Protection>>, changed: Arc<Notify>) -> Self {
+        Self {
+            protection,
+            changed,
+        }
     }
 
     pub async fn announce(&self, emitter: &SignalEmitter<'_>, change: Change) -> zbus::Result<()> {
-        if change.enabled {
-            self.enabled_changed(emitter).await?;
-        }
-        if change.guarding {
-            self.guarding_changed(emitter).await?;
+        self.changed.notify_one();
+        if change.mode {
+            self.mode_changed(emitter).await?;
         }
         if change.held {
             self.held_changed(emitter).await?;
+        }
+        if change.waiting {
+            self.waiting_changed(emitter).await?;
+        }
+        if change.trusted {
+            self.trusted_changed(emitter).await?;
         }
         if !change.released.is_empty() {
             Self::released(emitter, &change.released).await?;
@@ -42,17 +53,25 @@ impl UsbProtection {
     }
 }
 
+async fn authorize(
+    connection: &Connection,
+    header: &Header<'_>,
+    action: &str,
+    details: &Details<'_>,
+) -> Result<(), Error> {
+    if polkit::is_authorized_to(connection, header, action, details).await? {
+        Ok(())
+    } else {
+        Err(Error::not_authorized())
+    }
+}
+
 #[introspect]
 #[interface(name = "com.lantharos.UsbProtection1")]
 impl UsbProtection {
     #[zbus(property)]
-    async fn enabled(&self) -> bool {
-        self.protection.lock().await.enabled()
-    }
-
-    #[zbus(property)]
-    async fn guarding(&self) -> bool {
-        self.protection.lock().await.guarding()
+    async fn mode(&self) -> String {
+        self.protection.lock().await.mode().name().to_owned()
     }
 
     #[zbus(property)]
@@ -60,18 +79,68 @@ impl UsbProtection {
         self.protection.lock().await.held()
     }
 
-    async fn set_enabled(
+    #[zbus(property)]
+    async fn waiting(&self) -> Vec<Device> {
+        self.protection.lock().await.waiting()
+    }
+
+    #[zbus(property)]
+    async fn trusted(&self) -> Vec<Device> {
+        self.protection.lock().await.trusted()
+    }
+
+    async fn set_mode(
         &self,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
-        enabled: bool,
+        mode: &str,
     ) -> Result<(), Error> {
-        if !luft_dbus::polkit::is_authorized(connection, &header, CONFIGURE).await? {
-            return Err(Error::not_authorized());
-        }
-        let change = self.protection.lock().await.set_enabled(enabled)?;
+        let mode = Mode::named(mode).ok_or_else(|| Error::unknown_mode(mode))?;
+        authorize(connection, &header, CONFIGURE, &Details::default()).await?;
+        let change = self.protection.lock().await.set_mode(mode)?;
         Ok(self.announce(&emitter, change).await?)
+    }
+
+    async fn allow(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        id: &str,
+    ) -> Result<(), Error> {
+        let (name, number) = self
+            .protection
+            .lock()
+            .await
+            .about(id)
+            .ok_or_else(Error::gone)?;
+        let message = ask::message(&name);
+        authorize(connection, &header, ask::ALLOW, &Details::message(&message)).await?;
+        let change = self
+            .protection
+            .lock()
+            .await
+            .allow(id, number.as_deref())
+            .map_err(|refusal| match refusal {
+                Refusal::Gone => Error::gone(),
+                Refusal::NotSaved(error) => error.into(),
+            })?;
+        Ok(self.announce(&emitter, change).await?)
+    }
+
+    async fn forget(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        key: &str,
+    ) -> Result<(), Error> {
+        authorize(connection, &header, CONFIGURE, &Details::default()).await?;
+        if self.protection.lock().await.forget(key)? {
+            self.trusted_changed(&emitter).await?;
+        }
+        Ok(())
     }
 
     async fn set_locked(

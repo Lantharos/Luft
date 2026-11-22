@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Nieuwe usb-apparaten tegenhouden
-settings-usb-hold-back-description = Apparaten die worden aangesloten terwijl de computer vergrendeld is, wachten tot je ontgrendelt
 
 ## Device encryption
 

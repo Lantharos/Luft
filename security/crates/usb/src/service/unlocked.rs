@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use zbus::names::OwnedUniqueName;
 
-use crate::seat::SignedIn;
+use super::seat::SignedIn;
 
 /// Whether the person at the computer has it unlocked. Each desktop's shell
 /// says when it unlocks, and its word holds only while that shell stays on
@@ -52,7 +52,7 @@ mod tests {
     use zbus::names::OwnedUniqueName;
 
     use super::Unlocked;
-    use crate::seat::SignedIn;
+    use crate::service::seat::SignedIn;
 
     const MARA: u32 = 1000;
     const ADA: u32 = 1001;

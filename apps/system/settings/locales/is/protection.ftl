@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Halda nýjum USB-tækjum í bið
-settings-usb-hold-back-description = Tæki sem eru tengd á meðan tölvan er læst bíða þar til þú tekur hana úr lás
 
 ## Device encryption
 

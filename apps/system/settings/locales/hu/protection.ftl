@@ -134,8 +134,6 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Új USB-eszközök visszatartása
-settings-usb-hold-back-description = A zárolt állapotban csatlakoztatott eszközök a feloldásig várnak
 
 ## Device encryption
 

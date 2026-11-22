@@ -233,8 +233,33 @@ settings-security-hardware-fix-unknown = { $count ->
 
 ## Security: USB protection
 
-settings-usb-hold-back = Hold back new USB devices
-settings-usb-hold-back-description = Ones plugged in while locked wait until you unlock
+settings-usb-mode = USB devices
+settings-usb-mode-off = Allow all
+settings-usb-mode-while-locked = Hold back while locked
+settings-usb-mode-no-drives = No USB drives
+settings-usb-mode-known-only = Only known devices
+settings-usb-mode-off-description = New devices work right away, even while locked
+settings-usb-mode-while-locked-description = Ones plugged in while locked wait until you unlock
+settings-usb-mode-no-drives-description = Drives stay out. A device posing as a keyboard still works
+settings-usb-mode-known-only-description = New devices need an administrator’s approval
+settings-usb-known-only-title = Only allow known devices?
+settings-usb-known-only-warning = What’s plugged in now is trusted in the port it’s in. Anything else waits for an administrator’s password, so keep a trusted keyboard where it is.
+settings-usb-known-only-confirm = Only known devices
+settings-usb-trusted = Known devices
+settings-usb-trusted-hint = A device only counts as known in the port it was allowed in.
+settings-usb-trusted-count = { $count ->
+    [one] One device
+   *[other] { $count } devices
+}
+settings-usb-waiting-count = { $count ->
+    [one] One device is waiting
+   *[other] { $count } devices are waiting
+}
+settings-usb-trusted-none = None yet
+settings-usb-allow = Allow
+settings-usb-allow-device = Allow { $device }
+settings-usb-forget = Forget
+settings-usb-forget-device = Forget { $device }
 
 ## Device encryption
 

@@ -7,11 +7,21 @@ pub enum Error {
     ZBus(zbus::Error),
     NotAuthorized(String),
     Failed(String),
+    Gone(String),
+    Unknown(String),
 }
 
 impl Error {
     pub fn not_authorized() -> Self {
         Self::NotAuthorized("You aren't allowed to change this".into())
+    }
+
+    pub fn gone() -> Self {
+        Self::Gone("The device was unplugged or changed".into())
+    }
+
+    pub fn unknown_mode(name: &str) -> Self {
+        Self::Unknown(format!("“{name}” isn't a USB protection mode"))
     }
 }
 

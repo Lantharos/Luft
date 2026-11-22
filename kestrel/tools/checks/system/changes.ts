@@ -27,7 +27,7 @@ const SCROLLBAR_GAP = 4;
 const APP_CACHE_REFRESH = 3000;
 const ISOLATION = /[\u2068\u2069]/g;
 const DEVELOPER_TOOLS = 'Security · Developer tools';
-const USB = 'Security · Hold back new USB devices';
+const USB = 'Security · USB devices';
 const DEVELOPER_WARNING = 'Programs you run can then see your screen';
 const USB_WARNING = 'such as a device that pretends to be a keyboard';
 const MANY = ['appearance.style=dark', 'appearance.pure-black=on', 'taskbar.size=large', 'taskbar.look=solid', 'taskbar.shape=floating', 'keyboard.repeat-delay=400',
@@ -103,7 +103,7 @@ async function checkOneReviewForTheWholeSet() {
   checkGutter(dialog, developer, true);
   const usb = rowOf(USB, dialog);
   require(says('Off → On', developer) && says(DEVELOPER_WARNING, developer) && !says(USB_WARNING, developer), 'Developer tools keeps its own warning in its row');
-  require(says('On → Off', usb) && says(USB_WARNING, usb) && !says(DEVELOPER_WARNING, usb), 'USB protection keeps its own warning in its row');
+  require(says('Hold back while locked → Allow all', usb) && says(USB_WARNING, usb) && !says(DEVELOPER_WARNING, usb), 'USB protection keeps its own warning in its row');
   await answer(DECLINE, 'the review waits for an answer');
   const declined = await asking;
   require(declined.status === DECLINED, `luft says the changes were declined (${declined.status}: ${declined.stderr})`);
@@ -115,7 +115,7 @@ async function checkOneReviewForTheWholeSet() {
   const approved = await approving;
   require(approved.status === 0, `approving applies the set (${approved.stderr})`);
   require(desktop().get_string('color-scheme') === 'prefer-dark' && kestrel().get_string('taskbar-size') === 'large', 'approving makes the personal changes');
-  require(applied().join() === 'Changes1.Apply developer-tools true,Changes1.Apply usb-protection false', 'the system service gets exactly the reviewed system changes');
+  require(applied().join() === 'Changes1.Apply developer-tools true,Changes1.Apply usb-protection off', 'the system service gets exactly the reviewed system changes');
   const result = JSON.parse(approved.stdout) as {reviewed: boolean; changes: {setting: string}[]};
   require(result.reviewed && result.changes.length === 4, 'luft lists every change it made after review');
 }
@@ -123,11 +123,11 @@ async function checkOneReviewForTheWholeSet() {
 async function checkUndoAsksAgain() {
   const undoing = luft(['undo']);
   const dialog = await waitUntil(review, 'putting back a system setting asks again');
-  require(says('On → Off', rowOf(DEVELOPER_TOOLS, dialog)) && says('Off → On', rowOf(USB, dialog)), 'the review shows the settings going back');
+  require(says('On → Off', rowOf(DEVELOPER_TOOLS, dialog)) && says('Allow all → Hold back while locked', rowOf(USB, dialog)), 'the review shows the settings going back');
   await answer(APPROVE, 'the undo review waits');
   require((await undoing).status === 0, 'undo puts the set back once approved');
   require(desktop().get_string('color-scheme') !== 'prefer-dark' && kestrel().get_string('taskbar-size') === 'normal', 'undo puts the personal settings back');
-  require(applied().join() === 'Changes1.Apply developer-tools false,Changes1.Apply usb-protection true', 'undo hands the system service the values from before');
+  require(applied().join() === 'Changes1.Apply developer-tools false,Changes1.Apply usb-protection while-locked', 'undo hands the system service the values from before');
 }
 
 async function checkPersonalChangesApplyDirectly() {

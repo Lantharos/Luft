@@ -16,6 +16,7 @@ luft-dbus.workspace = true
 | `power::on_battery` | Whether the computer runs on its battery, as UPower sees it |
 | `polkit::authorize` | Lets a call go on only when polkit allows its caller the action, asking for a password when the caller allows it |
 | `polkit::is_authorized_to`, `polkit::Details` | The same check with a prompt that names what is about to change, and values for polkit rules |
+| `polkit::process_is_authorized_to`, `polkit::Process`, `polkit::cancel` | Asks the person at a process's session about a change no caller asked for, such as a device being plugged in, and takes the question back |
 | `errors!`, `error::kind` | A service's named errors, and reading their kind in an app; see [Errors from Luft's services](https://docs.luft.computer/developers/desktop/dbus/#errors) |
 | `idle::serve`, `idle::until_idle` | Run a service started on demand until it has had nothing to do for half a minute (feature `service`) |
 | `power::saving_battery` | Whether heavy background work should wait for the charger |

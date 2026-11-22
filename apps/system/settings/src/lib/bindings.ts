@@ -526,6 +526,9 @@ export const commands = {
 		on: boolean,
 	}, options?: CallOptions) => invoke<null>("remote_login_set_public", params, options),
 	securityAcceptSecureBoot: (options?: CallOptions) => invoke<null>("security_accept_secure_boot", {}, options),
+	securityAllowUsb: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("security_allow_usb", params, options),
 	securityCancelEncryption: (options?: CallOptions) => invoke<null>("security_cancel_encryption", {}, options),
 	securityCancelEnrollment: (options?: CallOptions) => invoke<null>("security_cancel_enrollment", {}, options),
 	securityCheckKey: (params: {
@@ -536,6 +539,9 @@ export const commands = {
 		passphrase: string,
 	}, options?: CallOptions) => invoke<null>("security_encrypt_disk", params, options),
 	securityEnrollKey: (options?: CallOptions) => invoke<string>("security_enroll_key", {}, options),
+	securityForgetUsb: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("security_forget_usb", params, options),
 	securityGenerateKey: (options?: CallOptions) => invoke<string>("security_generate_key", {}, options),
 	securityHost: (options?: CallOptions) => invoke<HostSecurity | null>("security_host", {}, options),
 	securityInstallStartup: (options?: CallOptions) => invoke<null>("security_install_startup", {}, options),
@@ -560,7 +566,7 @@ export const commands = {
 		pin: string,
 	}, options?: CallOptions) => invoke<Outcome<string>>("security_set_up_tpm", params, options),
 	securitySetUsb: (params: {
-		enabled: boolean,
+		mode: UsbMode,
 	}, options?: CallOptions) => invoke<null>("security_set_usb", params, options),
 	securityShowKey: (options?: CallOptions) => invoke<string>("security_show_key", {}, options),
 	securityTrust: (options?: CallOptions) => invoke<Trust | null>("security_trust", {}, options),
@@ -2005,10 +2011,12 @@ export type UsbDevice = {
 	name: string,
 };
 
+export type UsbMode = "off" | "while-locked" | "no-drives" | "known-only";
+
 export type UsbProtection = {
-	enabled: boolean,
-	guarding: boolean,
-	held: UsbDevice[],
+	mode: UsbMode,
+	waiting: UsbDevice[],
+	trusted: UsbDevice[],
 };
 
 export type User = {

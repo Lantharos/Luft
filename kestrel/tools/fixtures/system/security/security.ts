@@ -39,10 +39,13 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="RemoveEarlierCopy"/>
 </interface></node>`;
 const USB_PROTECTION = `<node><interface name="com.lantharos.UsbProtection1">
-  <property name="Enabled" type="b" access="read"/>
-  <property name="Guarding" type="b" access="read"/>
+  <property name="Mode" type="s" access="read"/>
   <property name="Held" type="a(ss)" access="read"/>
-  <method name="SetEnabled"><arg name="enabled" type="b" direction="in"/></method>
+  <property name="Waiting" type="a(ss)" access="read"/>
+  <property name="Trusted" type="a(ss)" access="read"/>
+  <method name="SetMode"><arg name="mode" type="s" direction="in"/></method>
+  <method name="Allow"><arg name="id" type="s" direction="in"/></method>
+  <method name="Forget"><arg name="key" type="s" direction="in"/></method>
   <method name="SetLocked"><arg name="locked" type="b" direction="in"/></method>
   <signal name="Released"><arg name="devices" type="a(ss)"/></signal>
 </interface></node>`;
@@ -145,10 +148,13 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));
 
   publish(USB_PROTECTION, {
-    Enabled: true,
-    Guarding: false,
+    Mode: 'while-locked',
     Held: [],
-    SetEnabled: (enabled: boolean) => calls.push(`SetEnabled ${enabled}`),
+    Waiting: [],
+    Trusted: [],
+    SetMode: (mode: string) => calls.push(`SetMode ${mode}`),
+    Allow: (id: string) => calls.push(`Allow ${id}`),
+    Forget: (key: string) => calls.push(`Forget ${key}`),
     SetLocked: (locked: boolean) => calls.push(`SetLocked ${locked}`),
   }, '/com/lantharos/UsbProtection1');
 

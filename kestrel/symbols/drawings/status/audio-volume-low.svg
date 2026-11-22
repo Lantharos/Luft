@@ -3,7 +3,7 @@
 		<path d="M1 5.6C1 4.9 1.5 4.4 2.2 4.4H4L7.3 1.6c.6-.5 1.5-.1 1.5.7v11.4c0 .8-.9 1.2-1.5.7L4 11.6H2.2C1.5 11.6 1 11.1 1 10.4Z"/>
 	</g>
 	<g class="shade">
-		<path d="M10.9 5.3a3.8 3.8 0 0 1 0 5.4" fill="none" stroke-width="1.8"/>
-		<path d="M12.9 3.3a6.6 6.6 0 0 1 0 9.4" fill="none" stroke-width="1.8"/>
+		<path d="M10.9 5.3a3.8 3.8 0 0 1 0 5.4" fill="none" stroke-width="2.2"/>
+		<path d="M12.9 3.3a6.6 6.6 0 0 1 0 9.4" fill="none" stroke-width="2.2"/>
 	</g>
 </svg>

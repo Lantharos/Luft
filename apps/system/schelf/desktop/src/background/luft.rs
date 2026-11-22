@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use luft_software::apps::flatpak::{self, Installation};
 use schelf_core::store;
 use schelf_core::store::install::download;
 use schelf_core::store::listing::luft::Luft;
@@ -70,29 +69,5 @@ pub fn download_ahead(failures: &mut Vec<String>) {
             ),
             Err(error) => failures.push(format!("{}: {error}", update.name)),
         }
-    }
-}
-
-/// Updates the Flatpak apps installed for this account. Updating those
-/// installed for everyone asks an administrator, so they wait for Schelf.
-pub fn update_flatpaks(failures: &mut Vec<String>) {
-    let updates = match flatpak::updates() {
-        Ok(updates) => updates,
-        Err(error) => return failures.push(error),
-    };
-    let references: Vec<&str> = updates
-        .iter()
-        .filter(|update| update.installed.installation == Installation::User)
-        .map(|update| update.installed.reference.as_str())
-        .collect();
-    if references.is_empty() {
-        return;
-    }
-    match quietly(|task| flatpak::update(Installation::User, &references, None, task)) {
-        Ok(()) => {
-            eprintln!("Updated {} Flatpak apps and runtimes", references.len());
-            flatpak::integrate();
-        }
-        Err(error) => failures.push(error),
     }
 }

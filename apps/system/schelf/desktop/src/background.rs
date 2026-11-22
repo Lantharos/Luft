@@ -6,7 +6,8 @@ use std::path::{Path, PathBuf};
 
 use luft_app::block_on;
 use luft_software::apps::appimage::{self, Placement};
-use luft_software::apps::{flatpak, startup, updates};
+use luft_software::apps::flatpak::{self, Installation};
+use luft_software::apps::{startup, updates};
 use luft_software::task::{Cancel, Task};
 
 use schelf_core::store;
@@ -156,9 +157,9 @@ fn update_drivers() -> Result<(), String> {
 }
 
 /// Updates apps. When a version of Luft started or was staged since apps
-/// were last updated for one, Flatpak apps update too and Luft's own apps
-/// download the releases that go with the staged version; `with_luft` does
-/// only that, and nothing when apps are up to date with Luft already.
+/// were last updated for one, Luft's own apps also download the releases that
+/// go with the staged version; `with_luft` does only that, and nothing when
+/// apps are up to date with Luft already.
 fn update_apps(with_luft: bool) -> Result<(), String> {
     let versions = luft::Versions::now();
     let luft_changed = versions != luft::Versions::last();
@@ -181,8 +182,8 @@ fn update_apps(with_luft: bool) -> Result<(), String> {
     }
     if luft_changed {
         luft::download_ahead(&mut failures);
-        luft::update_flatpaks(&mut failures);
     }
+    update_flatpaks(&mut failures);
     if let Err(error) = quietly(|task| flatpak::drivers::apply(&flatpak::drivers::changes(), task))
     {
         failures.push(error);
@@ -193,6 +194,30 @@ fn update_apps(with_luft: bool) -> Result<(), String> {
         versions.save()?;
     }
     finish(failures)
+}
+
+/// Updates the Flatpak apps installed for this account. Updating those
+/// installed for everyone asks an administrator, so they wait for Schelf.
+fn update_flatpaks(failures: &mut Vec<String>) {
+    let updates = match flatpak::updates() {
+        Ok(updates) => updates,
+        Err(error) => return failures.push(error),
+    };
+    let references: Vec<&str> = updates
+        .iter()
+        .filter(|update| update.installed.installation == Installation::User)
+        .map(|update| update.installed.reference.as_str())
+        .collect();
+    if references.is_empty() {
+        return;
+    }
+    match quietly(|task| flatpak::update(Installation::User, &references, None, task)) {
+        Ok(()) => {
+            eprintln!("Updated {} Flatpak apps and runtimes", references.len());
+            flatpak::integrate();
+        }
+        Err(error) => failures.push(error),
+    }
 }
 
 fn update_appimages(failures: &mut Vec<String>) {

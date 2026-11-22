@@ -72,9 +72,8 @@ Luft's own apps from schelf.store, everything in the repository with a `schelf.t
 
 When the updater has staged a version, it writes the time to `/var/lib/updater/staged`. Each signed-in account's `luft-app-updates-with-luft.path` watches that file and starts `schelf --update-apps-with-luft`, which also runs at every sign-in. It compares the image digests of the running and staged versions with the ones it last updated apps for, in `~/.local/state/luft/apps-updated-for`, and when either changed:
 
-- updates the store apps and AppImages as every six hours, with what the running version names;
-- downloads the releases the staged version names into Schelf's cache, `store/ahead`, checked against the store's signed listing, without installing them;
-- updates the account's Flatpak apps, since apps from Flathub otherwise only update in Schelf. Those installed for everyone need an administrator, so they wait for Schelf.
+- updates apps as every six hours: store apps and AppImages with what the running version names, and the account's Flatpak apps. Flatpaks installed for everyone need an administrator, so they wait for Schelf;
+- downloads the releases the staged version names into Schelf's cache, `store/ahead`, checked against the store's signed listing, without installing them.
 
 At the first sign-in on the new version, the releases it names install from that cache, or from the image's own copies in `/usr/share/luft/preinstall`, with nothing to download. Over a metered connection only those copies install, and the rest waits for another network or the six-hour timer. Running apps keep their version until they're opened again, the way [Sabine apps](#sabine-and-installed-apps) update. An account nobody signed in to while the version was staged catches up at its first sign-in the same way, downloading what it needs.
 

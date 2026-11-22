@@ -172,6 +172,10 @@ Any installed app can have a name and an icon of your own. Open the app in Schel
 
 Choose **Change** next to **Icon** to pick a PNG or SVG image. Luft draws the glyph that the Tinted, Clear and Monochrome icon styles use from it, or you can choose **Change** next to **Symbolic icon** to give it an SVG of your own. **Reset** puts back the icons the app came with. App updates don't replace any of this: names are kept in `~/.local/share/luft/app-names`, icons in `~/.local/share/luft/app-icons` and symbolic icons in `~/.local/share/icons/hicolor/symbolic/apps`.
 
+## Starting apps when you sign in
+
+Settings, under Apps, starts the apps you add to its startup list each time you sign in, the way each app asks to be started then, such as without a window. An app in the list starts the same way its icon in Gust does, even after an update, a move or a change to its sandbox, and turning it off stays off. Removing an app, of any kind, takes it out of the list too.
+
 ## Fonts and cursors
 
 - Fonts install from [Magpie](/apps/magpie/) into `~/.local/share/fonts`.

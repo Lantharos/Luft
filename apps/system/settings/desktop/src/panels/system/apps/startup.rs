@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use luft_app::apps::{self, App};
 use luft_i18n::t;
+use luft_software::apps::{debian, flatpak, startup};
 use specta::Type;
 
 use crate::L10N;
@@ -19,9 +20,6 @@ const ENABLED: &str = "X-GNOME-Autostart-enabled";
 const HIDDEN_UNDER_SYSTEMD: &str = "X-GNOME-HiddenUnderSystemd";
 const PHASE: &str = "X-GNOME-Autostart-Phase";
 const FLATPAK: &str = "X-Flatpak";
-const EXEC: &str = "Exec";
-const STARTUP_NOTIFY: &str = "StartupNotify";
-const AUTOSTART_ARGUMENTS: &str = "X-Sabine-Autostart-Arguments";
 
 #[derive(Serialize, Type)]
 pub struct Entry {
@@ -99,10 +97,15 @@ fn runs(info: &gio_unix::DesktopAppInfo) -> bool {
 }
 
 fn installed(info: &gio_unix::DesktopAppInfo) -> bool {
-    match info.string(FLATPAK) {
-        Some(id) => luft_software::apps::flatpak::is_installed(&id),
-        None => program(info).is_some_and(|program| glib::find_program_in_path(program).is_some()),
+    if let Some(id) = info.string(FLATPAK) {
+        return flatpak::is_installed(&id);
     }
+    if let Some(package) = info.string(debian::OWNER) {
+        return debian::installed()
+            .iter()
+            .any(|app| app.package == package.as_str());
+    }
+    program(info).is_some_and(|program| glib::find_program_in_path(program).is_some())
 }
 
 fn program(info: &gio_unix::DesktopAppInfo) -> Option<OsString> {
@@ -191,38 +194,14 @@ pub fn set(Toggle { id, enabled }: Toggle) -> Result<(), String> {
 pub fn add(Addition { app }: Addition) -> Result<(), String> {
     let info =
         gio_unix::DesktopAppInfo::new(&app).ok_or_else(|| t!(L10N, "desktop-apps-uninstalled"))?;
-    let file = load(
-        &info
-            .filename()
-            .ok_or_else(|| t!(L10N, "desktop-apps-cannot-autostart"))?,
-    )?;
-    file.set_boolean(GROUP, HIDDEN, false);
-    file.set_boolean(GROUP, ENABLED, true);
-    start_as_declared(&file);
-    save(&file, &user_directory()?, &app)
+    let launcher = info
+        .filename()
+        .ok_or_else(|| t!(L10N, "desktop-apps-cannot-autostart"))?;
+    startup::add(&app, &launcher).map_err(failed)
 }
 
 pub fn remove(Removal { id }: Removal) -> Result<(), String> {
     fs::remove_file(user_directory()?.join(id)).map_err(failed)
-}
-
-fn start_as_declared(file: &glib::KeyFile) {
-    let (Ok(exec), Ok(arguments)) = (
-        file.string(GROUP, EXEC),
-        file.string(GROUP, AUTOSTART_ARGUMENTS),
-    ) else {
-        return;
-    };
-    let command: Vec<&str> = exec
-        .split(' ')
-        .filter(|word| !word.starts_with('%'))
-        .collect();
-    file.set_string(
-        GROUP,
-        EXEC,
-        &format!("{} {arguments}", command.join(" ").trim_end()),
-    );
-    file.set_boolean(GROUP, STARTUP_NOTIFY, false);
 }
 
 pub fn installed_apps() -> Vec<App> {

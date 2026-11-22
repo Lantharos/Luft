@@ -37,6 +37,7 @@ function autostartEntry(appId: string, commandline: string[], flags: number): st
   entry.set_string(ENTRY, 'Name', Shell.AppSystem.get_default().lookup_app(`${appId}.desktop`)?.get_name() ?? appId);
   entry.set_string(ENTRY, 'Exec', commandline.map(execArgument).join(' '));
   entry.set_string(ENTRY, 'X-Flatpak', appId);
+  entry.set_string(ENTRY, 'X-XDP-Autostart', appId);
   if (flags & ACTIVATABLE) entry.set_boolean(ENTRY, 'DBusActivatable', true);
   return entry.to_data()[0];
 }

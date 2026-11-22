@@ -12,6 +12,7 @@ use crate::apps::operand::operand;
 use crate::progress::Stage;
 use crate::task::Task;
 
+pub use export::OWNER;
 pub use installed::{DebApp, installed};
 pub use package::{Deb, Icon, inspect, runs_here};
 pub use ubuntu::{LAUNCH, ORIGIN, launch};
@@ -71,7 +72,7 @@ pub fn remove(package: &str, task: Task) -> Result<(), String> {
     }
     let mut apps = installed::recorded();
     if let Some(app) = apps.iter().find(|app| app.package == package) {
-        export::unexport(&app.files);
+        export::unexport(&app.files)?;
     }
     apps.retain(|app| app.package != package);
     installed::save(&apps)

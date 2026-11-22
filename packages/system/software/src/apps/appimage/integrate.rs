@@ -8,7 +8,7 @@ use std::sync::OnceLock;
 use super::bundle::{self, Bundle};
 use super::declaration::Declaration;
 use super::library::{self, AppImage, IconSize};
-use crate::apps::chromium;
+use crate::apps::{chromium, startup};
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
@@ -161,6 +161,7 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<Installed, Strin
     for earlier in library::list() {
         if earlier.path == path && earlier.id != id {
             fs::remove_file(&earlier.desktop).map_err(failed)?;
+            startup::forget(&desktop_name(&earlier.id)).map_err(failed)?;
             remove_icons(&earlier.id);
             #[cfg(feature = "system")]
             forget_grants(&earlier.id)?;
@@ -230,9 +231,14 @@ pub fn integrate(id: &str, executable: &Path, bundle: &Bundle) -> Result<(), Str
     fs::create_dir_all(&applications).map_err(failed)?;
     let icon = (!bundle.icons.is_empty()).then_some(id);
     let entry = desktop_entry(id, bundle, executable, icon);
-    fs::write(applications.join(format!("{id}.desktop")), entry).map_err(failed)?;
+    let name = desktop_name(id);
+    fs::write(applications.join(&name), entry).map_err(failed)?;
     refresh_menus(&applications);
-    Ok(())
+    startup::refresh(&name).map_err(failed)
+}
+
+fn desktop_name(id: &str) -> String {
+    format!("{id}.desktop")
 }
 
 fn icon_fits(icon: &Path) -> bool {
@@ -421,6 +427,7 @@ pub fn remove(id: &str) -> Result<(), String> {
     forget_grants(id)?;
     fs::remove_file(&app.path).map_err(failed)?;
     fs::remove_file(&app.desktop).map_err(failed)?;
+    startup::forget(&desktop_name(id)).map_err(failed)?;
     remove_icons(id);
     refresh_icons();
     if let Some(icon) = app.icon.filter(|icon| owned_icon(icon, &app.path)) {

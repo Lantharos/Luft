@@ -2,8 +2,9 @@ use std::io::Read;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-use super::{Installation, command, query};
+use super::{Installation, app_id, command, is_installed, query};
 use crate::apps::operand::operand;
+use crate::apps::startup;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
@@ -107,7 +108,12 @@ pub fn uninstall(installation: Installation, reference: &str, task: Task) -> Res
     run(
         command(installation).args(["uninstall", "-y", "--", operand(reference)?]),
         task,
-    )
+    )?;
+    let id = app_id(reference);
+    if is_installed(id) {
+        return Ok(());
+    }
+    startup::forget(&format!("{id}.desktop")).map_err(|error| error.to_string())
 }
 
 pub fn add_remote(installation: Installation, name: &str, file: &Path) -> Result<(), String> {

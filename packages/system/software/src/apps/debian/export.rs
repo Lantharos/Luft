@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
 use super::ubuntu;
+use crate::apps::startup;
 
 const APPLICATIONS: &str = "/usr/share/applications/";
 const HICOLOR: &str = "/usr/share/icons/hicolor/";
@@ -170,6 +171,7 @@ pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
         let destination = folder.join(&name);
         std::fs::write(&destination, rewrite(&text, package, &copied))
             .map_err(|error| error.to_string())?;
+        startup::refresh(&name).map_err(|error| error.to_string())?;
         exported
             .files
             .push(destination.to_string_lossy().into_owned());
@@ -180,12 +182,12 @@ pub fn export(package: &str, previous: &[String]) -> Result<Exported, String> {
         }
     }
     // Files the last version had that this one doesn't
-    for stale in previous
+    let stale: Vec<String> = previous
         .iter()
         .filter(|file| !exported.files.contains(file))
-    {
-        let _ = std::fs::remove_file(stale);
-    }
+        .cloned()
+        .collect();
+    unexport(&stale)?;
     Ok(exported)
 }
 
@@ -214,10 +216,19 @@ fn main_icon(name: &str, copied: &[(String, PathBuf)]) -> Option<String> {
     .map(|(_, copy)| found(copy))
 }
 
-pub fn unexport(files: &[String]) {
-    for file in files {
+/// Removes what the package put in the home folder, and with its menu entries the startup apps
+/// copied from them.
+pub fn unexport(files: &[String]) -> Result<(), String> {
+    let folder = applications();
+    for file in files.iter().map(Path::new) {
         let _ = std::fs::remove_file(file);
+        if file.parent() == Some(folder.as_path())
+            && let Some(name) = file.file_name()
+        {
+            startup::forget(&name.to_string_lossy()).map_err(|error| error.to_string())?;
+        }
     }
+    Ok(())
 }
 
 #[cfg(test)]

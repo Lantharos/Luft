@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 
 use futures_util::future::{Either, select};
@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use zbus::DynamicType;
 use zbus::Fd;
 
+use crate::apps::startup;
 use crate::progress::Stage;
 use crate::system::repositories::{Described, Draft};
 use crate::task::Task;
@@ -184,7 +185,7 @@ pub async fn update() -> Result<(), String> {
 
 /// Removes system packages and everything they brought, leaving the system as it was before.
 pub async fn remove(names: &[String], task: Task<'_>) -> Result<(), String> {
-    rebuild("Remove", &(names,), task).await
+    forgetting_removed_apps(rebuild("Remove", &(names,), task)).await
 }
 
 /// Checks a repository and its keys, so they can be shown before it's trusted.
@@ -211,5 +212,26 @@ pub async fn add_repository(draft: &Draft) -> Result<(), String> {
 
 /// Removes a repository and the system packages that came from it.
 pub async fn remove_repository(file: &str, task: Task<'_>) -> Result<(), String> {
-    rebuild("RemoveRepository", &(file,), task).await
+    forgetting_removed_apps(rebuild("RemoveRepository", &(file,), task)).await
+}
+
+fn apps(packages: &SystemPackages) -> BTreeSet<String> {
+    packages
+        .packages
+        .iter()
+        .flat_map(|package| package.apps.iter().cloned())
+        .collect()
+}
+
+/// Runs `removal`, then stops starting the apps it took away when you sign in.
+async fn forgetting_removed_apps(
+    removal: impl Future<Output = Result<(), String>>,
+) -> Result<(), String> {
+    let before = apps(&list().await?);
+    removal.await?;
+    let after = apps(&list().await?);
+    for gone in before.difference(&after) {
+        startup::forget(gone).map_err(failed)?;
+    }
+    Ok(())
 }

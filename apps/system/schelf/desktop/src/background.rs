@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use luft_app::block_on;
 use luft_software::apps::appimage::{self, Placement};
-use luft_software::apps::{flatpak, updates};
+use luft_software::apps::{flatpak, startup, updates};
 use luft_software::task::{Cancel, Task};
 
 use schelf_core::store;
@@ -196,4 +196,7 @@ async fn metered() -> bool {
 pub fn integrate_apps() {
     appimage::repair();
     flatpak::integrate();
+    if let Err(error) = startup::refresh_all() {
+        eprintln!("Couldn't update the apps that start when you sign in: {error}");
+    }
 }

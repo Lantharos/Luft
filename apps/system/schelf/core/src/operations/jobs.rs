@@ -4,7 +4,7 @@ use luft_dbus::runtime::block_on;
 use luft_i18n::t;
 use luft_policy::{AppSource, Policy};
 use luft_software::apps::flatpak::{self, FLATHUB, Installation, Step};
-use luft_software::apps::{appimage, debian, places};
+use luft_software::apps::{appimage, debian, places, startup};
 use luft_software::system::repositories::{self, Draft};
 use luft_software::system::system_packages;
 use luft_software::task::Task;
@@ -111,6 +111,9 @@ pub enum Job {
 /// the NVIDIA drivers of its versions on the computer that Flatpak didn't fetch with them.
 fn settle_flatpaks(task: Task) {
     flatpak::integrate();
+    if let Err(error) = startup::refresh_all() {
+        eprintln!("{error}");
+    }
     if host::luft()
         && let Err(error) = flatpak::drivers::apply(&flatpak::drivers::changes(), task)
     {

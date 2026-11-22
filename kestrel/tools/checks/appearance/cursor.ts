@@ -73,11 +73,11 @@ export async function run() {
       return resources['Xcursor.theme'] === THEME && resources['Xcursor.size'] === '48';
     }, 'X resources carry the theme and size for apps without X settings');
 
-    choose({theme: 'Adwaita', size: 32});
-    require(await waitForState(lines, {theme: 'Adwaita', size: 32}), 'running X11 apps follow a new theme and size');
+    choose({theme: 'Plume', size: 32});
+    require(await waitForState(lines, {theme: 'Plume', size: 32}), 'running X11 apps follow a new theme and size');
     await eventually(async () => {
       const resources = await xResources();
-      return resources['Xcursor.theme'] === 'Adwaita' && resources['Xcursor.size'] === '32';
+      return resources['Xcursor.theme'] === 'Plume' && resources['Xcursor.size'] === '32';
     }, 'X resources follow a new theme and size');
   } finally {
     choose(saved);

@@ -28,7 +28,8 @@ leave_out_documentation() {
 
 leave_out_unused_data() {
   rm -f /usr/share/ibus/dicts/emoji-*.dict /usr/share/locale/*/gutenprint_*.po
-  rm -rf /usr/lib/sysimage/rpm-ostree-base-db /usr/share/rpm-ostree /usr/libexec/bootc-base-imagectl
+  rm -rf /usr/lib/sysimage/rpm-ostree-base-db /usr/share/rpm-ostree /usr/libexec/bootc-base-imagectl \
+    /usr/share/icons/Adwaita/cursors
 }
 
 leave_out_arm_firmware() {

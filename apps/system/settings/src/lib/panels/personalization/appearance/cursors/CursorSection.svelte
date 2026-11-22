@@ -30,7 +30,7 @@
 	let removing = $state<CursorTheme | null>(null);
 	let problem = $state('');
 
-	let current = $derived(desktop.values['cursor-theme'] ?? 'Adwaita');
+	let current = $derived(desktop.values['cursor-theme'] ?? 'Plume');
 	let themes = $derived(cursors.themes ?? []);
 	let sizes = $derived(cursorSizes());
 	let shown = $derived.by(() => {

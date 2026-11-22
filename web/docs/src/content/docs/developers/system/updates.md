@@ -46,7 +46,7 @@ Every image carries its version in its configuration, which the image's signatur
 
 ### The schedule
 
-The updater owns when updates are looked for. The schedule (every day, every week or only on request) and whether to download what's found live in `/var/lib/luft-updater/schedule.json`, so they're the same for every account and survive going back to an earlier version.
+The updater owns when updates are looked for. The schedule (every day, every week or only on request) and whether to download what's found live in `/var/lib/updater/schedule.json`, so they're the same for every account and survive going back to an earlier version.
 
 `updater-check.timer` comes by every three hours, up to an hour late so computers don't all ask at once, and after a start or a wake that missed one. It runs only on mains power, and calls `RunSchedule`, which only root may call. The updater checks when the schedule says one is due and NetworkManager doesn't call the connection metered, and downloads when the schedule says so. Either way it sends `UpdateFound`, and Kestrel shows a notification in every open session. When nothing is downloaded, the updater has `packager` bring the system packages up to their newest versions instead.
 

@@ -9,7 +9,7 @@ Installing involves three parts: [Install Luft](/start/usb-stick/#install-luft),
 
 ## What gets installed
 
-`/usr/lib/luft-installer/install.toml` says which images the installer may put on a drive:
+`/usr/lib/installer/install.toml` says which images the installer may put on a drive:
 
 ```toml
 version = "1.2-nightly.21"
@@ -33,14 +33,14 @@ When the drive's EFI system partition is smaller than 1 GB, as Windows' usually 
 The stick's kernel command line has `rd.live.image`, which is how the installer knows where it runs. greetd signs in the passwordless `live` account with `kestrel-session --setup` as its `initial_session`, polkit allows that account everything, and Install Luft appears in Gust only there.
 
 - Setup's first screen starts from the language, formats, time zone and keyboard layouts Meet Luft wrote into `meet.json`, or else from a Windows it can read on the computer, and from the time zone Fedora's GeoIP service gives once it's online. It only says it guessed when one of these told it something.
-- Changing the language on that screen changes the live account's language through AccountsService, so Kestrel follows, and `UseLanguage` makes the service answer in it too. The service keeps the choice in `/run/luft-installer/language` across its idle restarts.
+- Changing the language on that screen changes the live account's language through AccountsService, so Kestrel follows, and `UseLanguage` makes the service answer in it too. The service keeps the choice in `/run/installer/language` across its idle restarts.
 - After copying, `trustctl startup install` puts shim and SushiBoot on the EFI system partition and makes the new system the firmware's next start (`BootNext`), so a stick left in doesn't start setup again. With Secure Boot on and Luft's key not yet trusted, `trustctl secure-boot enroll --state` queues the key in the new system's `/var/lib/trustd`, and the service publishes its code as `SecureBootCode` so the restart screen can show it. [Boot and recovery](/developers/system/boot/) covers what happens to the request at the next start.
 - The recovery key is saved onto a USB drive through UDisks, printed, or written down and checked by typing back three of its 12 words. Encryption stays off until one of them worked, and the key is never saved into the live session's home, which is gone after the restart.
 - Wi-Fi networks joined in the live session come along from `/etc/NetworkManager/system-connections` and `/run/NetworkManager/system-connections`. Before the account exists, passwords the session's keyring held move into NetworkManager's own files, readable by root alone, so the network belongs to everyone on the computer and connects at the first start.
 
 ## The first start
 
-After copying, the installer writes the locale, keyboard, time zone, computer name and account into the new system, and `/var/lib/luft-installer/first-boot` with the account's name. greetd gets an `initial_session` for that account, so every start goes straight back into setup until it's finished.
+After copying, the installer writes the locale, keyboard, time zone, computer name and account into the new system, and `/var/lib/installer/first-boot` with the account's name. greetd gets an `initial_session` for that account, so every start goes straight back into setup until it's finished.
 
 The account's Luft Keyring is created with its password, plus a one-time key in `/var/lib/luft-keyring` that unlocks it in those setup sessions, since an automatic sign-in has no password to unlock it with. While setup is pending, the service also enrolls Luft's Secure Boot key, adds fingerprints and tells the firewall the first network's type (`SetNetworkType`), so the person isn't asked for the password they just chose. It does these only for the account setup is pending for, signed in at the computer, and only for programs outside a sandbox.
 

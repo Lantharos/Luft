@@ -74,7 +74,7 @@ keep_old_system() {
   printf 'NAME="Fedora Linux"\nPRETTY_NAME="Fedora Linux 42 (Workstation Edition)"\n' > "$TARGET/old-system/etc/os-release"
   head -c 300M /dev/urandom > "$TARGET/old-system/home/ada/photos.bin"
   var="$TARGET/state/os/default/var"
-  install -Dm644 /dev/stdin "$var/lib/luft-installer/old-system.json" << EOF
+  install -Dm644 /dev/stdin "$var/lib/installer/old-system.json" << EOF
 {"name": "Fedora Linux 42 (Workstation Edition)", "size": $((300 * 1024 ** 2)), "subvolume": "old-system", "partitions": [], "startups": ["EFI/fedora"]}
 EOF
   install -Dm644 <(echo 1) "$var/lib/luft-remove-check/stage"

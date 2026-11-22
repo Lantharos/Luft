@@ -7,7 +7,7 @@ use anyhow::{Context, Result, bail};
 use luft_variant::Channel;
 use serde::{Deserialize, Serialize};
 
-const FILE: &str = "/var/lib/luft-updater/schedule.json";
+const FILE: &str = "/var/lib/updater/schedule.json";
 const DAY: u64 = 24 * 60 * 60;
 const EARLY: u64 = 4 * 60 * 60;
 

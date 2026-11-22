@@ -8,7 +8,7 @@ use anyhow::Result;
 
 use crate::installations;
 
-pub const RECORD: &str = "/run/luft-windows/hibernated";
+pub const RECORD: &str = "/run/neighbor/hibernated";
 const SETTLE: &str = "--timeout=15";
 
 pub fn run() -> Result<()> {

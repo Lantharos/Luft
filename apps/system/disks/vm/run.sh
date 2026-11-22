@@ -25,7 +25,7 @@ place 644 "$here/luft-remove-check.service" /usr/lib/systemd/system/luft-remove-
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-remove-check.rules
 size="$(podman image inspect --format '{{.Size}}' "$base")"
 printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "ghcr.io/lantharos/luft:1"\nsize = %s\n' "$size" |
-  install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
+  install -Dm644 /dev/stdin "$stage/root/usr/lib/installer/install.toml"
 build_check_image "$base" "$image-system" "systemctl enable luft-remove-prepare.service luft-remove-check.service"
 "$luft/os/image/seal.sh" "$image-system" "$image"
 "$luft/apps/system/setup/installer/vm/source.sh" "$image" "$vm/source.img"

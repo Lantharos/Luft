@@ -1,6 +1,6 @@
 use crate::L10N;
 
-const CHOSEN: &str = "/run/luft-installer/language";
+const CHOSEN: &str = "/run/installer/language";
 
 fn use_locale(requested: &str) {
     L10N.use_locale(requested);

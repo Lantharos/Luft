@@ -4,12 +4,12 @@ part = "services"
 "/usr/libexec/" = ["installer"]
 
 [files]
-"/usr/lib/luft-installer/" = ["data/install.toml"]
+"/usr/lib/installer/" = ["data/install.toml"]
 "/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Installer1.conf"]
 "/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Installer1.service"]
 "/usr/lib/systemd/system/" = ["data/installer.service", "data/installer-expire-setup.service"]
 "/usr/share/polkit-1/actions/" = ["data/com.lantharos.installer.policy"]
-"/usr/share/selinux/packages/" = ["data/luft-installer.cil"]
+"/usr/share/selinux/packages/luft/" = ["data/installer.cil"]
 
 [enable]
 system = ["installer-expire-setup.service"]

@@ -10,7 +10,7 @@ use crate::network::{Layout, Prefix};
 use crate::ports::{Networks, Opened, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
-const BASE: &str = "/usr/share/luft-firewall/base.nft";
+const BASE: &str = "/usr/share/shield/base.nft";
 const APP_SETS: [&str; 2] = ["apps_home", "apps_anywhere"];
 pub const DISCOVERY: [u16; 3] = [1900, 3702, 5353];
 const POST: u16 = 53317;

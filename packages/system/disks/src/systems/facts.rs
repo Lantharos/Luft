@@ -4,7 +4,7 @@ use luft_trust::{TRUST, get, group};
 use serde::Deserialize;
 use zbus::Proxy;
 
-const OLD_SYSTEM: &str = "/var/lib/luft-installer/old-system.json";
+const OLD_SYSTEM: &str = "/var/lib/installer/old-system.json";
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
 const WINDOWS: &str = "com.lantharos.Windows1";
 const WINDOWS_PATH: &str = "/com/lantharos/Windows1";

@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, Write};
 
-const STORE: &str = "/var/lib/luft-remote-login/choices";
-const SSHD_CONFIG: &str = "/run/luft-remote-login/sshd.conf";
+const STORE: &str = "/var/lib/remoted/choices";
+const SSHD_CONFIG: &str = "/run/remoted/sshd.conf";
 const ENABLED: &str = "enabled";
 const PASSWORDS: &str = "password-login";
 const ACCOUNT: &str = "account ";

@@ -8,7 +8,7 @@
       are being built for one that just was.
     Downloaded: bytes of image layers fetched so far by the current download.
     Schedule: how often updater-check.timer has updates checked for, "daily", "weekly" or
-      "never", kept in /var/lib/luft-updater/schedule.json.
+      "never", kept in /var/lib/updater/schedule.json.
     DownloadAutomatically: whether an update found on schedule is downloaded and staged too.
     LastChecked: when an update was last checked for on schedule, in seconds since 1970, or 0.
 

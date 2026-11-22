@@ -59,19 +59,19 @@ keep_usr_local_in_var() {
 
 configure_security() {
   local module modules=()
-  for module in /usr/share/selinux/packages/luft-*.cil; do
+  for module in /usr/share/selinux/packages/luft/*.cil; do
     modules+=(-i "$module")
   done
   semodule "${modules[@]}"
   authselect enable-feature with-fingerprint
-  shield_helpers /
+  shelter_helpers /
 }
 
-shielded=(luft-keyring)
+sheltered=(luft-keyring)
 
-shield_helpers() {
+shelter_helpers() {
   local tree="$1" helper fixed
-  for helper in "${shielded[@]}"; do
+  for helper in "${sheltered[@]}"; do
     [[ -f "$tree/usr/libexec/$helper" ]] || continue
     systemd-sysusers "/usr/lib/sysusers.d/$helper.conf"
     fixed="$(awk '$1 == "g" {print $3}' "/usr/lib/sysusers.d/$helper.conf")"

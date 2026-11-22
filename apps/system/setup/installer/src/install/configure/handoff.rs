@@ -6,7 +6,7 @@ use super::deployment::Deployment;
 use crate::system::files::write;
 use crate::system::greetd;
 
-const MARKER: &str = "lib/luft-installer/first-boot";
+const MARKER: &str = "lib/installer/first-boot";
 
 pub fn prepare(deployment: &Deployment, user: &str) -> Result<()> {
     let initial_session = deployment.var(greetd::INITIAL_SESSION);

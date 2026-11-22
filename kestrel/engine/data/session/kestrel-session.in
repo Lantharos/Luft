@@ -42,7 +42,7 @@ run_until_stopped() {
   wait $!
 }
 
-SETUP_PENDING=/var/lib/luft-installer/first-boot
+SETUP_PENDING=/var/lib/installer/first-boot
 if [ "$1" = --setup ] || [ "$(cat "$SETUP_PENDING" 2> /dev/null)" = "$USER" ]; then
   run_until_stopped kestrel-setup.target
 fi

@@ -41,7 +41,7 @@ Your environment, from `~/.config/environment.d`, `systemctl --user set-environm
 
 A development build started from `KESTREL_BUILDDIR` also passes the variables in `development.list` to the apps it starts, so test sessions can point them at stand-ins. An installed Kestrel ignores that list, and ignores `KESTREL_BUILDDIR`, `KESTREL_DATADIR` and the other variables that point a build at its own files unless the program running is the `kestrel` inside `KESTREL_BUILDDIR`.
 
-This doesn't cover unit files and drop-ins in `~/.config/systemd/user`, which can give a Luft service or Kestrel any environment or command, or Vulkan layers listed in `~/.local/share/vulkan`. Only the [shielded helpers](#shielded-helpers) are out of their reach.
+This doesn't cover unit files and drop-ins in `~/.config/systemd/user`, which can give a Luft service or Kestrel any environment or command, or Vulkan layers listed in `~/.local/share/vulkan`. Only the [sheltered helpers](#sheltered-helpers) are out of their reach.
 
 ### Telling them apart
 
@@ -69,7 +69,7 @@ Code a program makes for itself, as graphics drivers and JIT compilers do from m
 
 This stops a renamed or copied program, one that takes a Luft program's bus name or unit, and a Luft program started with your library slipped in. It doesn't stop a program that takes over one of Luft's programs while it runs: `kernel.yama.ptrace_scope=1` keeps programs from tracing ones they didn't start, but a program can start one of Luft's apps itself and trace it or steer it through the accessibility bus. The session bus runs as you, so a bus started through your own drop-in could hand over any process; the system bus, where USB protection and the firewall listen, runs as its own account.
 
-### Shielded helpers
+### Sheltered helpers
 
 Luft Keyring holds what your other programs mustn't reach, even though it runs as you: your unlocked secrets and the key the TPM releases for it. It is installed setgid to a group of its own, `luft-keyring`, with no account in it.
 
@@ -77,6 +77,6 @@ Luft Keyring holds what your other programs mustn't reach, even though it runs a
 - The kernel only grants the group when nothing traces the start and no-new-privileges isn't set, so the group proves a clean start. Whatever acts for a helper checks for it: the TPM unlock service and Kestrel's keyring prompts. A program that takes the helper's bus name while it isn't running gets nothing.
 - systemd sets no-new-privileges for any user unit that filters system calls or restricts namespaces, so a helper's unit sets none of that and the helper locks itself down. `systemd-analyze security` can't see that and scores it as exposed.
 
-A program of yours can still restart the keyring or start it with an environment of its choosing, but the keyring asks for consent itself, so that gains nothing. Root reaches it as it reaches everything. Cloud drive sign-ins, VPN passwords and GnuPG passphrases end up with rclone, NetworkManager or `gpg-agent`, which hand them to your programs anyway, so the helpers in between aren't shielded. [Luft Keyring](/security/keyring/) covers the keyring itself.
+A program of yours can still restart the keyring or start it with an environment of its choosing, but the keyring asks for consent itself, so that gains nothing. Root reaches it as it reaches everything. Cloud drive sign-ins, VPN passwords and GnuPG passphrases end up with rclone, NetworkManager or `gpg-agent`, which hand them to your programs anyway, so the helpers in between aren't sheltered. [Luft Keyring](/security/keyring/) covers the keyring itself.
 
 Extensions are judged by where they're installed rather than by who calls; [How extensions run](/extensions/how-extensions-run/) covers that.

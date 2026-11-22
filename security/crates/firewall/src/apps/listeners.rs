@@ -4,7 +4,7 @@ use super::identity::{self, Identity};
 use crate::ports::{self, Port};
 use crate::store;
 
-const STORE: &str = "/run/luft-firewall/listeners";
+const STORE: &str = "/run/shield/listeners";
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Listener {

@@ -227,7 +227,7 @@ holds_without_the_service() {
   network="$(systemctl show -p ActiveEnterTimestampMonotonic --value NetworkManager.service)"
   (( base > 0 && base < network )) || fail "the base rules weren't in place before the network started ($base, $network)"
   systemctl stop shield.service
-  nft -f /usr/share/luft-firewall/base.nft || fail "the base rules don't load"
+  nft -f /usr/share/shield/base.nft || fail "the base rules don't load"
   expect closed "an allowed app while only the base rules hold" reaches "$approved"
   expect closed "an opened port while only the base rules hold" reaches "$system"
   ping -c 1 -W 3 10.0.2.2 > /dev/null || fail "the base rules stop the computer's own connections"

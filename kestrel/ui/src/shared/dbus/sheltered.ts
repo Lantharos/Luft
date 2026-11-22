@@ -29,7 +29,7 @@ function startedWithGroup(status: string, group: number): boolean {
     real !== effective && effective === group;
 }
 
-async function callerStartedShielded(invocation: Gio.DBusMethodInvocation, program: string): Promise<boolean> {
+async function callerStartedSheltered(invocation: Gio.DBusMethodInvocation, program: string): Promise<boolean> {
   const group = groupOf(program);
   if (group === null) return false;
   const process = await callerProcess(invocation).catch(() => null);
@@ -43,6 +43,6 @@ async function callerStartedShielded(invocation: Gio.DBusMethodInvocation, progr
   }
 }
 
-export async function callerIsShielded(invocation: Gio.DBusMethodInvocation, name: string, program: string): Promise<boolean> {
-  return await callerOwns(invocation, name) && await callerStartedShielded(invocation, program);
+export async function callerIsSheltered(invocation: Gio.DBusMethodInvocation, name: string, program: string): Promise<boolean> {
+  return await callerOwns(invocation, name) && await callerStartedSheltered(invocation, program);
 }

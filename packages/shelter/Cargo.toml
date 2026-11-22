@@ -1,5 +1,5 @@
 [package]
-name = "luft-shield"
+name = "luft-shelter"
 version = "0.1.0"
 description = "Keeps Luft's small helpers out of reach of your other programs, and tells services a helper started that way"
 authors = ["Kristof"]

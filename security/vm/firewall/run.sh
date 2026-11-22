@@ -22,7 +22,7 @@ setup="systemctl enable usr.mount shield-base.service shield.service shield-chec
 start_stage
 if from_this_tree; then
   bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
-  setup="semodule -i /usr/share/selinux/packages/luft-firewall.cil && $setup"
+  setup="semodule -i /usr/share/selinux/packages/luft/shield.cil && $setup"
 fi
 place 755 "$here/check.sh" /usr/libexec/shield-check
 place 644 "$here/sockets.py" /usr/libexec/shield-check-sockets

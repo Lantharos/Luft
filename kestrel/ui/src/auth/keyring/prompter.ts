@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 
 import { STARTED_FROM_BUILD } from '../../shared/apps/development.js';
 import { callerOwns, stealFd } from '../../shared/dbus/processes.js';
-import { callerIsShielded } from '../../shared/dbus/shielded.js';
+import { callerIsSheltered } from '../../shared/dbus/sheltered.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 
@@ -41,7 +41,7 @@ export function promptKey(invocation: Invocation, handle: string): string {
 
 const fromKeyring = (invocation: Invocation) => STARTED_FROM_BUILD
   ? callerOwns(invocation, SECRET_SERVICE)
-  : callerIsShielded(invocation, SECRET_SERVICE, KEYRING_PROGRAM);
+  : callerIsSheltered(invocation, SECRET_SERVICE, KEYRING_PROGRAM);
 
 function refuse(invocation: Invocation): void {
   invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The secret needs a file descriptor to be written to');

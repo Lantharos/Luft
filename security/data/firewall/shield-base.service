@@ -7,7 +7,7 @@ Wants=network-pre.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/sbin/nft -f /usr/share/luft-firewall/base.nft
+ExecStart=/usr/sbin/nft -f /usr/share/shield/base.nft
 UMask=0077
 ProtectSystem=strict
 ProtectHome=yes

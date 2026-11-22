@@ -48,7 +48,7 @@ impl<'a> Process<'a> {
     /// program is installed setgid to. The kernel only hands out that group
     /// to a start nothing traced and that took no new privileges, and keeps
     /// your programs out of the process from then on.
-    pub fn started_shielded(&self, program: &Path, user: u32) -> Result<(), &'static str> {
+    pub fn started_sheltered(&self, program: &Path, user: u32) -> Result<(), &'static str> {
         let group = group_of(program)?;
         let status = self.read(STATUS).ok_or("its status can't be read")?;
         let status = String::from_utf8_lossy(&status);

@@ -2,7 +2,7 @@
 Description=Wakes Luft's crash collector
 
 [Socket]
-ListenDatagram=/run/luft-crash-collector/poke
+ListenDatagram=/run/crashd/poke
 SocketMode=0666
 DirectoryMode=0755
 RemoveOnStop=yes

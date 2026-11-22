@@ -8,16 +8,16 @@ pub struct Options {
     #[command(subcommand)]
     pub command: Option<Command>,
     /// Where to read the images to install from and how to start them.
-    #[arg(long, default_value = "/usr/lib/luft-installer/install.toml")]
+    #[arg(long, default_value = "/usr/lib/installer/install.toml")]
     pub config: PathBuf,
     /// Where an installed system remembers that its first-run setup is pending.
-    #[arg(long, default_value = "/var/lib/luft-installer")]
+    #[arg(long, default_value = "/var/lib/installer")]
     pub state_dir: PathBuf,
     /// Where the live system started from, with Meet Luft's notes when it came from Windows.
     #[arg(long, default_value = "/run/initramfs/live")]
     pub live_medium: PathBuf,
     /// Where to assemble the new system while installing.
-    #[arg(long, default_value = "/run/luft-installer/target")]
+    #[arg(long, default_value = "/run/installer/target")]
     pub target: PathBuf,
 }
 

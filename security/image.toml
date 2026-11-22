@@ -10,13 +10,13 @@ part = "boot"
 "/usr/share/dbus-1/system-services/" = ["data/remote-login/com.lantharos.RemoteLogin1.service", "data/usb/com.lantharos.UsbProtection1.service", "data/trust/com.lantharos.Trust1.service"]
 "/usr/share/dbus-1/system.d/" = ["data/firewall/com.lantharos.Firewall1.conf", "data/remote-login/com.lantharos.RemoteLogin1.conf", "data/usb/com.lantharos.UsbProtection1.conf", "data/trust/com.lantharos.Trust1.conf"]
 "/usr/share/dbus-1/interfaces/" = ["data/firewall/com.lantharos.Firewall1.xml", "data/remote-login/com.lantharos.RemoteLogin1.xml", "data/usb/com.lantharos.UsbProtection1.xml", "data/trust/com.lantharos.Trust1.xml"]
-"/usr/share/luft-firewall/" = ["data/firewall/base.nft"]
+"/usr/share/shield/" = ["data/firewall/base.nft"]
 "/usr/share/polkit-1/rules.d/" = ["data/firewall/60-shield.rules"]
 "/usr/share/polkit-1/actions/" = ["data/firewall/com.lantharos.firewall.policy", "data/remote-login/com.lantharos.remote-login.policy", "data/usb/com.lantharos.usb-protection.policy", "data/trust/com.lantharos.trust.policy"]
 "/usr/lib/tmpfiles.d/trustd.conf" = "data/trust/trustd.tmpfiles"
 "/usr/lib/systemd/system/sshd.service.d/remoted.conf" = "data/remote-login/sshd.service.conf"
 "/etc/ssh/sshd_config.d/05-luft.conf" = { from = "data/remote-login/05-luft.conf", mode = "600" }
-"/usr/share/selinux/packages/" = ["data/firewall/luft-firewall.cil", "data/remote-login/luft-remote-login.cil", "data/trust/luft-nvpcr.cil", "data/trust/luft-bless-boot.cil"]
+"/usr/share/selinux/packages/luft/" = ["data/firewall/shield.cil", "data/remote-login/remoted.cil", "data/trust/luft-nvpcr.cil", "data/trust/luft-bless-boot.cil"]
 "/usr/lib/udev/rules.d/" = ["data/usb/40-luft-usb-held.rules", "data/trust/61-trustd-drives.rules"]
 "/usr/lib/dracut/dracut.conf.d/" = ["data/trust/90-trustd.conf"]
 "/usr/lib/dracut/modules.d/90trustd/" = [

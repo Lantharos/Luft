@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use std::fmt;
 use std::io;
 
-const STORE: &str = "/var/lib/luft-firewall/ports";
+const STORE: &str = "/var/lib/shield/ports";
 const TCP: u8 = 6;
 const UDP: u8 = 17;
 

@@ -56,8 +56,8 @@ objcopy -O binary --only-section=.initrd "$work/startup.efi" "$work/initramfs.im
 printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "%s"\nsize = %s\n' \
   "$followed" "$(podman image inspect --format '{{.Size}}' "$image")" >"$work/install.toml"
 debugfs -w "$work/helper.img" -f - >/dev/null <<COMMANDS
-rm /usr/lib/luft-installer/install.toml
-write $work/install.toml /usr/lib/luft-installer/install.toml
+rm /usr/lib/installer/install.toml
+write $work/install.toml /usr/lib/installer/install.toml
 write $os/vm/guest/luft-vm-install.service /etc/systemd/system/luft-vm-install.service
 symlink /etc/systemd/system/multi-user.target.wants/luft-vm-install.service /etc/systemd/system/luft-vm-install.service
 COMMANDS

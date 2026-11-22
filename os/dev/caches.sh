@@ -23,7 +23,7 @@ systemd-sysext refresh --mutable=yes --no-reload >/dev/null 2>&1
 # shellcheck source=os/image/stages/finalize.sh
 source "$(dirname "$0")/../image/stages/finalize.sh"
 refresh_caches >/dev/null 2>&1
-shield_helpers "$tree"
+shelter_helpers "$tree"
 
 find "$mutable/usr" \( -type c -o -name .systemd-sysext \) -prune -exec rm -rf {} +
 chmod -R go-w "$mutable/usr"

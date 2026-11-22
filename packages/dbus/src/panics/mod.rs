@@ -14,7 +14,7 @@ pub use frames::build_id;
 
 pub const MESSAGE_ID: &str = "00e5f8b8beb646d9a16444f1f70152be";
 
-const COLLECTOR: &str = "/run/luft-crash-collector/poke";
+const COLLECTOR: &str = "/run/crashd/poke";
 const DEVELOPMENT_COLLECTOR: &str = "LUFT_CRASH_COLLECTOR_POKE";
 const INSTALLED: &str = "/usr/";
 const LONGEST_MESSAGE: usize = 2048;

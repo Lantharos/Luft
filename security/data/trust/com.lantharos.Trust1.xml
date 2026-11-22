@@ -123,7 +123,7 @@
       <arg name="folders" type="a(ss)" direction="in"/>
       <arg name="partitions" type="as" direction="in"/>
     </method>
-    <!-- Deletes the old system that Install Luft kept when it replaced it, as /var/lib/luft-installer/old-system.json
+    <!-- Deletes the old system that Install Luft kept when it replaced it, as /var/lib/installer/old-system.json
          records, then that record. -->
     <method name="RemoveOldSystem"/>
     <!-- Grows the system's partition into the free space right after it, then its encryption and file system.

@@ -2,7 +2,7 @@
 //! programs. Each is installed setgid to a group of its own, so the kernel
 //! keeps your programs out of it from its first instruction, and services
 //! tell it apart by that group. See
-//! [Shielded helpers](https://docs.luft.computer/security/identity/#shielded-helpers).
+//! [Sheltered helpers](https://docs.luft.computer/security/identity/#sheltered-helpers).
 
 mod process;
 mod syscalls;

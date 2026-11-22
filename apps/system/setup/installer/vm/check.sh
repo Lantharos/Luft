@@ -176,10 +176,10 @@ check_whole_drive() {
   check_wifi_carried "$root"
   [[ "$(xargs < "$state/lib/kestrel-greeter/initial-session.toml")" == "user = ada command = /usr/bin/kestrel-session" ]] ||
     fail "starting doesn't sign ada in by itself"
-  [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
+  [[ "$(cat "$state/lib/installer/first-boot")" == ada ]] || fail "the first start won't open setup"
   pass "every start signs ada straight into setup until it's finished"
   local followed
-  followed="$(sed -n 's/^target = "\(.*\)"$/\1/p' /usr/lib/luft-installer/install.toml)"
+  followed="$(sed -n 's/^target = "\(.*\)"$/\1/p' /usr/lib/installer/install.toml)"
   grep -rqsx ".*$followed" "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from the image the stick carries"
   pass "updates come from $followed, the image the stick carries"
   umount "$TARGET"
@@ -402,7 +402,7 @@ check_setup_steps() {
 }
 
 check_setup_expires() {
-  local marker=/var/lib/luft-installer/first-boot boots=/var/lib/luft-installer/first-boot-boots
+  local marker=/var/lib/installer/first-boot boots=/var/lib/installer/first-boot-boots
   touch -d '25 hours ago' "$marker"
   ! setup_step EnrollSigningKey || fail "setup's exceptions last longer than a day"
   touch "$marker"
@@ -428,8 +428,8 @@ check_password_needed_after_setup() {
 }
 
 pending_setup() {
-  mkdir -p /var/lib/luft-installer
-  echo ada > /var/lib/luft-installer/first-boot
+  mkdir -p /var/lib/installer
+  echo ada > /var/lib/installer/first-boot
   printf 'user = "ada"\ncommand = "/usr/bin/kestrel-session"\n' > /var/lib/kestrel-greeter/initial-session.toml
 }
 
@@ -448,7 +448,7 @@ check_first_boot_finish() {
   pending_setup
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
-  [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
+  [[ ! -e /var/lib/installer/first-boot ]] || fail "setup would open again at the next sign-in"
   [[ ! -e /var/lib/kestrel-greeter/initial-session.toml ]] || fail "the next start would still sign ada in by itself"
   pass "only the new account ends setup"
   ! setup_step EnrollSigningKey || fail "setup's exceptions outlast setup"

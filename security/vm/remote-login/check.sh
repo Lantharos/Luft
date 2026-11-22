@@ -18,7 +18,7 @@ fail() {
   sshd -T > /dev/console 2>&1
   ls -laZ "/home/$person" "/home/$person/.ssh" > /dev/console 2>&1
   nft list ruleset > /dev/console
-  ls -laZ /run/luft-remote-login > /dev/console 2>&1
+  ls -laZ /run/remoted > /dev/console 2>&1
   journalctl -b -k --no-pager -o cat -g 'avc: +denied' > /dev/console
   journalctl -b -u sshd -u remoted -u shield -u remoted-check --no-pager -o short-monotonic | tail -n 80 > /dev/console
   systemctl poweroff

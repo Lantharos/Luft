@@ -2,7 +2,7 @@ ARG IMAGE
 FROM ${IMAGE}
 ARG INSTALL_IMAGES
 COPY files/ /
-RUN printf '%s\n' "$INSTALL_IMAGES" >> /usr/lib/luft-installer/install.toml && \
+RUN printf '%s\n' "$INSTALL_IMAGES" >> /usr/lib/installer/install.toml && \
     useradd --no-create-home --groups wheel --comment Luft live && \
     passwd --delete live && \
     systemctl enable luft-live-logs.timer luft-live-logs.path luft-live-logs-shutdown.service && \

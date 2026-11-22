@@ -18,7 +18,7 @@ const SECRETS: &str = "org.freedesktop.secrets";
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
-    if let Err(error) = luft_shield::lock_down() {
+    if let Err(error) = luft_shelter::lock_down() {
         eprintln!("Luft Keyring couldn't lock itself down: {error}");
         return ExitCode::FAILURE;
     }

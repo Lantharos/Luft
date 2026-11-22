@@ -70,7 +70,7 @@ remove_old_system() {
   mkdir -p "$TOP/top" && mount -o subvolid=5 "$(lsblk -lnpo PATH,PARTTYPE "$DRIVE" | awk -v type="$ROOT_TYPE" '$2 == type { print $1 }')" "$TOP/top"
   [[ ! -e "$TOP/top/old-system" ]] && ! btrfs subvolume list "$TOP/top" | grep -q old-system || fail "the old system's subvolumes are still there"
   umount "$TOP/top"
-  [[ ! -e /var/lib/luft-installer/old-system.json ]] || fail "the old system's record is still there"
+  [[ ! -e /var/lib/installer/old-system.json ]] || fail "the old system's record is still there"
   pass "the old system's subvolumes and its record are gone"
   ! entry Fedora && ! esp_has EFI/fedora && ! esp_has EFI/BOOT/fbx64.efi || fail "Fedora's start entry or boot loader is still there"
   pass "Fedora's start entry, its boot loader and shim's fallback are gone"

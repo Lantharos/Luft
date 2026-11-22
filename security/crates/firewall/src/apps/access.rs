@@ -4,7 +4,7 @@ use std::io;
 use super::identity::Identity;
 use crate::store;
 
-const STORE: &str = "/var/lib/luft-firewall/apps";
+const STORE: &str = "/var/lib/shield/apps";
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Access {

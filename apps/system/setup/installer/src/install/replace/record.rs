@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::install::configure::deployment::Deployment;
 use crate::system::files::write;
 
-const RECORD: &str = "lib/luft-installer/old-system.json";
+const RECORD: &str = "lib/installer/old-system.json";
 const NOT_THEIRS: [&str; 7] = [
     "boot",
     "microsoft",

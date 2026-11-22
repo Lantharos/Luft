@@ -31,7 +31,7 @@ place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-move-check.rules
 printf 'kargs = ["systemd.journald.forward_to_console=1"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/91-move-check.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
 printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "ghcr.io/lantharos/luft:1"\nsize = %s\n' "$size" |
-  install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
+  install -Dm644 /dev/stdin "$stage/root/usr/lib/installer/install.toml"
 build_check_image "$base" "$image-system" "systemctl enable luft-move-prepare.service luft-move-check.service"
 "$luft/os/image/seal.sh" "$image-system" "$image"
 "$luft/apps/system/setup/installer/vm/source.sh" "$image" "$vm/source.img"

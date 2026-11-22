@@ -3,7 +3,7 @@ use std::os::fd::{AsFd, FromRawFd, OwnedFd, RawFd};
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
-use luft_shield::Process;
+use luft_shelter::Process;
 
 const UNIT: &str = "luft-keyring.service";
 
@@ -48,7 +48,7 @@ impl Verifier {
     fn is_keyring(&self, socket: RawFd, user: u32) -> Result<(), &'static str> {
         let pidfd = peer_pidfd(socket).ok_or("its process can't be identified")?;
         let process = Process::pinned(pidfd.as_fd())?;
-        process.started_shielded(&self.daemon, user)?;
+        process.started_sheltered(&self.daemon, user)?;
         let binary =
             fs::metadata(&self.daemon).map_err(|_| "the keyring program isn't installed")?;
         let running = process

@@ -2,11 +2,11 @@
 set -uo pipefail
 
 CHIP=(org.freedesktop.secrets /com/lantharos/Keyring1 com.lantharos.Keyring1 Chip)
-SHARE=/usr/share/luft-shield-check
+SHARE=/usr/share/luft-shelter-check
 RUNTIME=/run/user/1000
 NO_GROUP=/home/mara/.config/systemd/user/luft-keyring.service.d/no-new-privileges.conf
 
-report() { echo "luft-shield-check: $*" > /dev/ttyS0; }
+report() { echo "luft-shelter-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
   journalctl -b --no-pager -n 60 _UID=1000 + _SYSTEMD_UNIT=luft-keyring-unlock.service > /dev/ttyS0

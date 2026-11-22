@@ -27,7 +27,7 @@ size="$(podman image inspect --format '{{.Size}}' "$base")"
 followed=ghcr.io/lantharos/luft:1
 [[ "$carried" != nvidia ]] || followed+=-nvidia
 printf '[images.%s]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "%s"\nsize = %s\n' "$carried" "$followed" "$size" |
-  install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
+  install -Dm644 /dev/stdin "$stage/root/usr/lib/installer/install.toml"
 build_check_image "$base" "$image-system" "systemctl enable installer-check.service installer-started.service"
 "$luft/os/image/seal.sh" "$image-system" "$image"
 "$here/source.sh" "$image" "$vm/source.img"

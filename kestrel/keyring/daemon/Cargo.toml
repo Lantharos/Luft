@@ -18,7 +18,7 @@ hkdf.workspace = true
 libc.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
-luft-shield.workspace = true
+luft-shelter.workspace = true
 p256 = { workspace = true, features = ["ecdsa", "std"] }
 rustix = { workspace = true, features = ["fs", "mm", "net", "pipe", "process"] }
 serde.workspace = true

@@ -14,7 +14,7 @@ setup="systemctl enable shield.service remoted-check.service"
 start_stage
 if from_this_tree; then
   bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
-  setup="semodule -i /usr/share/selinux/packages/luft-remote-login.cil && $setup"
+  setup="semodule -i /usr/share/selinux/packages/luft/remoted.cil && $setup"
 fi
 place 755 "$here/check.sh" /usr/libexec/remoted-check
 place 644 "$here/remoted-check.service" /usr/lib/systemd/system/remoted-check.service

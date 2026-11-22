@@ -5,7 +5,7 @@ use super::identity;
 use crate::ports::{self, Port};
 use crate::store;
 
-const STORE: &str = "/var/lib/luft-firewall/extension-ports";
+const STORE: &str = "/var/lib/shield/extension-ports";
 
 #[derive(Default)]
 pub struct Extensions {

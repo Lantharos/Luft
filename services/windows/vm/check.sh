@@ -69,7 +69,7 @@ pass "brings Bluetooth devices from Windows"
 hibernate_windows
 systemctl stop alsa-state.service alsa-restore.service
 startup="$(/usr/libexec/neighbor boot 2>&1)" || fail "the startup check: $startup"
-[[ -f /run/luft-windows/hibernated ]] || fail "the startup check didn't notice the hibernated Windows"
+[[ -f /run/neighbor/hibernated ]] || fail "the startup check didn't notice the hibernated Windows"
 [[ "$(data Drives | jq -r ".[] | select(.device == \"$PART\") | .hibernated")" == "true" ]] || fail "Drives after hibernating"
 call Change sas "$PART" 1 universalClock > /dev/null 2>&1 && fail "changed a hibernated Windows"
 grep -q 'Reset hwC0D0 after Windows' <<<"$startup" || fail "the sound codec wasn't reset: $startup"

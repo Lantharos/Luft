@@ -9,7 +9,7 @@ use crate::errors::Unsupported;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 
-const RECORD: &str = "/var/lib/luft-installer/old-system.json";
+const RECORD: &str = "/var/lib/installer/old-system.json";
 const SUBVOLUME_INODE: u64 = 256;
 
 #[derive(Deserialize)]

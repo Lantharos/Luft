@@ -2,7 +2,7 @@
 Description=End first-run setup that's been open too long
 After=local-fs.target dbus.service
 Before=display-manager.service greetd.service
-ConditionPathExists=/var/lib/luft-installer/first-boot
+ConditionPathExists=/var/lib/installer/first-boot
 
 [Service]
 Type=oneshot

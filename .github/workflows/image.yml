@@ -596,8 +596,8 @@ jobs:
       fail-fast: false
       matrix:
         check:
-          - name: shield
-            folder: packages/shield/vm
+          - name: shelter
+            folder: packages/shelter/vm
           - name: firewall
             folder: security/vm/firewall
           - name: remote login

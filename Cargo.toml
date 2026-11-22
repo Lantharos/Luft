@@ -54,7 +54,7 @@ members = [
     "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
-    "packages/shield",
+    "packages/shelter",
     "packages/unpack",
     "packages/system/accounts",
     "packages/system/cups",
@@ -144,7 +144,7 @@ default-members = [
     "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
-    "packages/shield",
+    "packages/shelter",
     "packages/unpack",
     "packages/system/accounts",
     "packages/system/cups",
@@ -212,7 +212,7 @@ luft-meet = { path = "packages/system/meet" }
 luft-network = { path = "packages/system/network" }
 luft-recovery-key = { path = "packages/system/recovery-key" }
 luft-sandbox = { path = "apps/system/schelf/sandbox" }
-luft-shield = { path = "packages/shield" }
+luft-shelter = { path = "packages/shelter" }
 luft-software = { path = "packages/system/software", default-features = false }
 luft-handwriting = { path = "packages/system/handwriting" }
 luft-language = { path = "packages/system/language" }

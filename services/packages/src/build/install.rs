@@ -13,8 +13,8 @@ use crate::repositories;
 use crate::state::manifest::Origin;
 
 const KEYS: &str = "usr/share/pki/rpm-gpg";
-const PACKAGES: &str = "/run/luft-packages";
-const SOURCE_KEYS: &str = "var/lib/luft-packages-source-keys";
+const PACKAGES: &str = "/run/packager";
+const SOURCE_KEYS: &str = "var/lib/packager-source-keys";
 const HIDDEN: [&str; 3] = ["/tmp", "/run", "/var/cache/libdnf5"];
 const CAPABILITIES: [&str; 7] = [
     "chown",

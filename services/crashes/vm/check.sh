@@ -2,7 +2,7 @@
 set -uo pipefail
 
 BUS=(com.lantharos.CrashCollector1 /com/lantharos/CrashCollector1 com.lantharos.CrashCollector1)
-SPOOL=/var/lib/luft-crash-collector/reports
+SPOOL=/var/lib/crashd/reports
 COREDUMP=fc2e22bc6ee647b6b90729ab34a250b1
 
 report() { echo "luft-crashes-check: $*" > /dev/ttyS0; }

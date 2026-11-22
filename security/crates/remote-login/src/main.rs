@@ -23,7 +23,9 @@ fn main() -> anyhow::Result<()> {
     luft_dbus::panics::report();
     match std::env::args().nth(1).as_deref() {
         None => serve(),
-        Some(WRITE_SSHD_CONFIG) => Ok(Choices::load()?.effective().write_sshd_config()?),
+        Some(WRITE_SSHD_CONFIG) => {
+            Ok(Choices::load()?.effective().write_sshd_config().map(drop)?)
+        }
         Some(argument) => bail!("Unknown argument {argument}"),
     }
 }

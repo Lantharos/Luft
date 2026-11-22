@@ -88,7 +88,12 @@ impl Choices {
         text
     }
 
-    pub fn write_sshd_config(&self) -> io::Result<()> {
-        replace(SSHD_CONFIG, &self.sshd_config())
+    /// Writes the SSH server's configuration, and says whether it changed.
+    pub fn write_sshd_config(&self) -> io::Result<bool> {
+        let config = self.sshd_config();
+        if std::fs::read_to_string(SSHD_CONFIG).is_ok_and(|written| written == config) {
+            return Ok(false);
+        }
+        replace(SSHD_CONFIG, &config).map(|()| true)
     }
 }

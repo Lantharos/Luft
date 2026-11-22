@@ -64,7 +64,10 @@ export class ExtensionManager {
       this.store.watchShortcuts(() => this.changed()),
       onLocaleChanged(() => this.restartAll()),
       this.developerTools.watch(() => this.rescan()),
-      this.policy.watch(() => this.sync()),
+      this.policy.watch(() => {
+        this.developerTools.refresh();
+        this.sync();
+      }),
     ];
     this.rescan();
     for (const id of this.crashes.turnedOffLately)

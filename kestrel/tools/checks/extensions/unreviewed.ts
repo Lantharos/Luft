@@ -54,6 +54,17 @@ async function checkOff(origin: string) {
   await eventually(async () => (await listed(ID))?.state === 'running', 'turning Developer tools on again runs it inside the desktop again');
 }
 
+function decide(policy: object) {
+  GLib.file_set_contents(GLib.getenv('KESTREL_POLICY')!, JSON.stringify(policy));
+}
+
+async function checkPolicy() {
+  decide({extensions: {unreviewed: false}});
+  await eventually(async () => (await listed(ID))?.state !== 'running', 'when the policy stops extensions nobody reviewed, the approved copy stops at once');
+  decide({extensions: {unreviewed: true}});
+  await eventually(async () => (await listed(ID))?.state === 'running', 'and runs again once the policy allows them');
+}
+
 async function checkRemovingCopy() {
   await removeUnreviewed(ID);
   await reaches('own', 'store-only', 'removing the copy goes back to the sandbox');
@@ -79,6 +90,7 @@ export async function run() {
     await checkSandboxedFirst();
     await checkCopy();
     await checkOff('copy');
+    await checkPolicy();
     await checkRemovingCopy();
     await checkFolder();
     await checkOff('folder');
@@ -88,6 +100,7 @@ export async function run() {
       `Packages AllowExtensionFolder ${ID} ${ownFolder(ID)}`, `Packages RemoveUnreviewedExtension ${ID}`,
     ].join(), 'every approval and removal went through the packages service');
   } finally {
+    decide({});
     await setDeveloperTools(true);
     await removeUnreviewed(ID);
     await request('Remove', ID);

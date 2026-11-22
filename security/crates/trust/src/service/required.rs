@@ -27,6 +27,9 @@ fn encrypt(on_battery: bool) -> Result<()> {
 }
 
 pub async fn follow(trust: &InterfaceRef<Trust>) {
+    if !Policy::load().encryption.required {
+        return;
+    }
     let on_battery = luft_dbus::power::on_battery(trust.signal_emitter().connection()).await;
     let emitter = trust.signal_emitter();
     if let Err(error) = trust

@@ -111,7 +111,9 @@ impl RemoteLogin {
             if !Policy::load().remote_login.allowed {
                 return shut(connection, &mut choices).await;
             }
-            choices.effective().write_sshd_config()?;
+            if !choices.effective().write_sshd_config()? {
+                return Ok(());
+            }
             sshd::reload().await.map_err(Error::Failed)
         };
         if let Err(error) = followed.await {

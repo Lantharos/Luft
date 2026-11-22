@@ -33,6 +33,11 @@ export class DeveloperTools {
     return this.on ?? false;
   }
 
+  /** Asks again, for when the greeter service may have changed it without running to say so. */
+  refresh(): void {
+    void this.read();
+  }
+
   watch(changed: () => void): () => void {
     this.listeners.add(changed);
     return () => this.listeners.delete(changed);

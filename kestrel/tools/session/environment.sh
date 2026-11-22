@@ -162,6 +162,7 @@ place_extensions() {
     echo "$id" >> "$record"
   done
   export KESTREL_DEVELOPMENT_EXTENSIONS="$development" KESTREL_STORE_EXTENSIONS="$store" KESTREL_SANDBOXED_STORE_EXTENSIONS="$sandboxed" KESTREL_UNREVIEWED_EXTENSIONS="$unreviewed"
+  export KESTREL_POLICY="$session/policy.json"
 }
 
 prepare_session() {

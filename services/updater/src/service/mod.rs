@@ -37,11 +37,18 @@ async fn serve() -> zbus::Result<()> {
 
 async fn follow_policy(connection: &zbus::Connection) -> zbus::Result<()> {
     let mut policy = luft_policy::Follow::start()?;
-    let updater = connection.object_server().interface::<_, Updater>(PATH).await?;
+    let updater = connection
+        .object_server()
+        .interface::<_, Updater>(PATH)
+        .await?;
     loop {
         policy.changed().await?;
         let emitter = updater.signal_emitter();
         updater.get().await.schedule_changed(emitter).await?;
-        updater.get().await.download_automatically_changed(emitter).await?;
+        updater
+            .get()
+            .await
+            .download_automatically_changed(emitter)
+            .await?;
     }
 }

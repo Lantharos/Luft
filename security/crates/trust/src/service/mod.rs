@@ -38,7 +38,10 @@ async fn serve() -> zbus::Result<()> {
         .await?;
     drives::continue_work(&connection).await?;
     system_disk::continue_work(&connection).await?;
-    let trust = connection.object_server().interface::<_, Trust>(PATH).await?;
+    let trust = connection
+        .object_server()
+        .interface::<_, Trust>(PATH)
+        .await?;
     required::follow(&trust).await;
     tokio::select! {
         () = idle.wait(IDLE_TIMEOUT) => {}

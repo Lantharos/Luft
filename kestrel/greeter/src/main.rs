@@ -89,7 +89,10 @@ async fn serve(options: Options) -> zbus::Result<()> {
 
 async fn follow_policy(connection: &zbus::Connection) -> zbus::Result<()> {
     let mut policy = luft_policy::Follow::start()?;
-    let greeter = connection.object_server().interface::<_, Greeter>(PATH).await?;
+    let greeter = connection
+        .object_server()
+        .interface::<_, Greeter>(PATH)
+        .await?;
     loop {
         policy.changed().await?;
         let emitter = greeter.signal_emitter();

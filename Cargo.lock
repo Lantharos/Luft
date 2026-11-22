@@ -5775,6 +5775,7 @@ dependencies = [
  "luft-crash-report",
  "luft-dbus",
  "luft-dbus-macros",
+ "luft-policy",
  "luft-software",
  "rmcp",
  "serde",

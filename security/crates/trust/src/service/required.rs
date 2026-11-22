@@ -12,15 +12,18 @@ use crate::system::secrets::secret::Secret;
 /// unlocks it without anyone typing. The recovery key is made here and kept sealed to the TPM,
 /// where an administrator can show it in Settings.
 fn encrypt(on_battery: bool) -> Result<()> {
-    if !Policy::load().encryption.required || !encrypting::tpm_unlocks() || encrypting::underway()
-    {
+    if !Policy::load().encryption.required || !encrypting::tpm_unlocks() || encrypting::underway() {
         return Ok(());
     }
     let disk = SystemDisk::find()?;
     if !encrypting::possible(&disk) || disk.header()?.is_some() {
         return Ok(());
     }
-    encrypting::request(&keys::generate_recovery_key()?, &Secret::default(), on_battery)
+    encrypting::request(
+        &keys::generate_recovery_key()?,
+        &Secret::default(),
+        on_battery,
+    )
 }
 
 pub async fn follow(trust: &InterfaceRef<Trust>) {

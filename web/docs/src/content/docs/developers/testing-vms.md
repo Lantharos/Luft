@@ -64,9 +64,11 @@ Checks of single parts live in a `vm` folder next to their code and share `os/vm
 | `apps/system/setup/installer/vm/run.sh` | Installing onto a whole drive, beside a kept partition and beside Windows, encryption and the recovery key, and setup on the installed drives | up to 30 min |
 | `kestrel/keyring/tools/vm/build.sh`, then `run.sh tpm`, `gone`, `none` | Signing in with a password or a fingerprint, the lock screen, `sudo`, PINs and resealing, with a TPM, after it's gone and without one | 3 min each |
 | `packages/shelter/vm/run.sh` | Other programs of the same account can't read the keyring, and the unlock service refuses them | 1 min |
+| `security/vm/encryption/run.sh` | On an installed drive with Secure Boot and a TPM, a policy that requires encryption has Luft encrypt itself from the next restart, unlocked by the TPM | 20 min |
 | `security/vm/firewall/run.sh` | Network types, per-app and per-program decisions, extension ports, other tables kept, across a restart | 3 min |
-| `security/vm/remote-login/run.sh` | Off by default, who may turn it on and sign in, penalties, going back to an older system | 2 min |
+| `security/vm/remote-login/run.sh` | Off by default, who may turn it on and sign in, penalties, going back to an older system, a policy that keeps it off or allows only keys | 2.5 min |
 | `security/vm/usb/run.sh` | Only known devices with sticks plugged into other ports, approval, No USB drives, and a stick plugged in before start | 6 min |
+| `services/locksmith/vm/run.sh` | A changed policy reaching a running session's locked settings, keeping accounts from being added, automatic sign-in and required encryption | 2 min |
 | `services/crashes/vm/run.sh` | Core dumps and panics become reports for the first person who asks | 1.5 min |
 | `services/packages/vm/run.sh` | An unreviewed extension is copied only with an administrator's approval, out of the account's reach | 1 min |
 | `services/packages/vm/plain/run.sh` | On an installed drive with the network, command-line tools come and go without a password, packages with a service or a setuid program, or whose scriptlets make one, need an administrator either way, and a package that can't be built doesn't hold back the others | 4 min |

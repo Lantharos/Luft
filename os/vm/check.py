@@ -177,6 +177,28 @@ def session(check: Check, _: argparse.Namespace):
     check.collect()
 
 
+TRUST = "com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1"
+TRUST_DISK = f"busctl get-property {TRUST} Disk"
+
+
+def encryption(check: Check, _: argparse.Namespace):
+    check.start("installed")
+    check.enroll_key()
+    check.wait_for_greeter()
+    check.secure_boot()
+    if check.succeeds("lsblk -nro FSTYPE | grep -qx crypto_LUKS"):
+        raise MachineError("Luft was installed encrypted, so there's nothing for the policy to turn on")
+    check.wait("trustd asks for encryption by itself, as the policy requires",
+               lambda: '"after-restart"' in check.output(TRUST_DISK), 300)
+    if not check.succeeds(f"busctl call {TRUST} CancelSystemDiskEncryption 2>&1 | grep -q 'organization manages'"):
+        raise MachineError("calling off encryption the policy requires wasn't refused as managed")
+    check.log("calling encryption off is refused, since the policy requires it")
+    check.restart(lambda: check.output("systemd-run --on-active=1 systemctl reboot"))
+    check.wait_for_greeter()
+    check.wait("Luft's partition is encrypted, unlocked by the TPM without anyone typing",
+               lambda: check.succeeds("lsblk -nro FSTYPE | grep -qx crypto_LUKS"), 600)
+
+
 def booted_image(check: Check) -> str:
     return check.output("bootc status --format=json | jq -r .status.booted.image.image.image")
 
@@ -231,6 +253,9 @@ def main():
     scenarios = parser.add_subparsers(dest="scenario", required=True)
     scenarios.add_parser(
         "session", help="add Luft's key, wait for the login screen, sign in, check the desktop and open Settings")
+    scenarios.add_parser(
+        "encryption", help="add Luft's key, and check that a policy requiring encryption has trustd encrypt Luft's "
+                           "partition from the next restart")
     going_back = scenarios.add_parser(
         "rollback", help="update, then update to a version that never reaches the login screen, and check that the "
                          "computer goes back after three tries")
@@ -242,7 +267,7 @@ def main():
     shutil.rmtree(out, ignore_errors=True)
     check = Check(vm, out, arguments.minutes)
     try:
-        {"session": session, "rollback": rollback}[arguments.scenario](check, arguments)
+        {"session": session, "encryption": encryption, "rollback": rollback}[arguments.scenario](check, arguments)
     except (MachineError, OSError) as error:
         check.failed(error)
         check.stop()

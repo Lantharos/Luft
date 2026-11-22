@@ -86,7 +86,7 @@
 			{/if}
 		</div>
 		{#if children}
-			<div class="body soft-scroll">{@render children()}</div>
+			<div class="body">{@render children()}</div>
 		{/if}
 		<div bind:this={actionBar} class="flex justify-end gap-2">{@render actions()}</div>
 	</div>

@@ -24,6 +24,11 @@
 		pointer-events: none;
 	}
 
+	:root:has(.glass-sidebar) .toast-region {
+		left: calc(var(--sidebar-width) + (100vw - var(--sidebar-width)) / 2);
+		--toast-room: calc(100vw - var(--sidebar-width) - 48px);
+	}
+
 	.toast {
 		grid-area: 1 / 1;
 		justify-self: center;

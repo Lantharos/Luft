@@ -68,7 +68,7 @@
 	{@attach topLayer}
 	{@attach place}
 	{@attach revealContents}
-	class="menu soft-scroll"
+	class="menu"
 	class:placed={placement}
 	style:left="{placement?.left ?? at.x}px"
 	style:top="{placement?.top ?? at.y}px"

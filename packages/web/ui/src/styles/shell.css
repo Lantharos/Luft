@@ -132,12 +132,150 @@
 			calc(100% - var(--scroll-fade-size)) 100%;
 	}
 
-	.soft-scroll {
-		scrollbar-width: thin;
-		scrollbar-color: color-mix(in oklab, var(--ink) 14%, transparent) transparent;
+	.glass-shell {
+		user-select: none;
 	}
 
-	[data-scheme='light'] .soft-scroll {
-		scrollbar-color: color-mix(in oklab, var(--ink) 18%, transparent) transparent;
+	.title-bar {
+		display: flex;
+		height: 60px;
+		flex: none;
+		align-items: center;
+		gap: 8px;
+		padding-inline: 32px 16px;
+	}
+
+	.title-bar.leading {
+		padding-left: 16px;
+	}
+
+	.title-bar-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-right: 8px;
+	}
+
+	.nav-heading {
+		display: flex;
+		height: 32px;
+		align-items: center;
+		justify-content: space-between;
+		padding-inline: 12px 4px;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--sidebar-text-muted);
+	}
+
+	.nav-item {
+		position: relative;
+		display: flex;
+		height: 38px;
+		width: 100%;
+		flex: none;
+		align-items: center;
+		gap: 12px;
+		border-radius: var(--radius-pill);
+		padding-inline: 12px;
+		text-align: left;
+		font-size: 14px;
+		color: var(--sidebar-text);
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.nav-item.tall {
+		height: auto;
+		min-height: 52px;
+		border-radius: 16px;
+		padding-block: 8px;
+	}
+
+	.nav-item:hover:not(:disabled) {
+		background: var(--sidebar-control);
+		color: var(--text);
+	}
+
+	.nav-item.active {
+		background: transparent;
+		color: var(--text);
+	}
+
+	.nav-item:disabled:not(.active) {
+		opacity: 0.5;
+	}
+
+	.nav-item.quiet {
+		color: var(--sidebar-text-muted);
+	}
+
+	.nav-detail {
+		font-size: 12px;
+		color: var(--sidebar-text-muted);
+	}
+
+	.nav-count {
+		margin-left: auto;
+		font-size: 12.5px;
+		font-variant-numeric: tabular-nums;
+		color: var(--sidebar-text-muted);
+	}
+
+	.nav-action {
+		display: grid;
+		height: 28px;
+		width: 28px;
+		flex: none;
+		place-items: center;
+		border-radius: var(--radius-pill);
+		color: var(--sidebar-text-muted);
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.nav-action:hover {
+		background: var(--sidebar-control);
+		color: var(--text);
+	}
+
+	.page-stage {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.page-stage-ghosts {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.page-stage-scroller {
+		position: relative;
+		display: flex;
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+		overflow-x: hidden;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+	}
+
+	.page-stage-page {
+		display: flex;
+		min-width: 0;
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.page-stage-scroller > .page-stage-page {
+		flex: 1 0 auto;
 	}
 }

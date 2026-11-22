@@ -26,11 +26,25 @@
 		color: inherit;
 	}
 
-	button {
+	:where(button, label, summary, select, [role='button'], [role='tab'], [role='option'], [role='radio'], [role='checkbox'], [role='switch'], [role='menuitem'], [role='menuitemradio'], [role='menuitemcheckbox'], [role='treeitem'], [role='slider']) {
 		cursor: default;
 	}
 
-	input {
+	* {
+		scrollbar-width: thin;
+	}
+
+	:root {
+		scrollbar-color: color-mix(in oklab, var(--ink) 14%, transparent) transparent;
+	}
+
+	:root[data-scheme='light'] {
+		scrollbar-color: color-mix(in oklab, var(--ink) 18%, transparent) transparent;
+	}
+
+	input,
+	textarea,
+	[contenteditable] {
 		user-select: text;
 	}
 

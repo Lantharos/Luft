@@ -107,12 +107,10 @@
 		width: 100%;
 		min-width: 80px;
 		touch-action: none;
-		cursor: pointer;
 		user-select: none;
 	}
 
 	.seek.disabled {
-		cursor: default;
 		opacity: 0.4;
 	}
 

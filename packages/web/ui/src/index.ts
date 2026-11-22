@@ -63,15 +63,19 @@ export { default as WriteDownDialog } from './security/recovery/WriteDownDialog.
 
 export { springTiming } from './motion/easing';
 export { listMotion, reorder } from './motion/lists';
-export { PageMotion } from './motion/pages';
 export { selectionPill } from './motion/pill';
 export { revealContents } from './motion/reveal';
-export { dialog, fade, menu, page, toast } from './motion/transitions';
+export { dialog, fade, menu, panel, rise, toast } from './motion/transitions';
+
+export { pageMotion, type PageMotion } from './navigation/motion';
+export { default as PageStack } from './navigation/PageStack.svelte';
+export { default as PageStage } from './navigation/PageStage.svelte';
 
 export { GUST_BOX, GUST_ON_DARK, GUST_ON_LIGHT, GUST_PARTS, GUST_PATHS, GUST_SCALE, type GustFill, type GustFills, type GustPart } from './taskbar/gust';
 export { default as GustIcon } from './taskbar/GustIcon.svelte';
 export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint, TaskbarLooks } from './taskbar/looks';
 
+export { default as EmptyState, type EmptyAction, type EmptyStateProps } from './notices/EmptyState.svelte';
 export { default as Spinner } from './notices/Spinner.svelte';
 export { default as Toast } from './notices/Toast.svelte';
 export { Toasts, type ToastAction, type ToastMessage } from './notices/toasts.svelte';
@@ -86,6 +90,7 @@ export { activationToken } from './shell/activation';
 export { dragFiles, fileDragStart } from './shell/fileDrag';
 export { droppedPaths, fileDrop } from './shell/fileDrop';
 export { default as GlassShell } from './shell/GlassShell.svelte';
+export { default as TitleBar } from './shell/TitleBar.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
 export { keepWindowState } from './shell/windowState.svelte';
 

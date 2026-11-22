@@ -43,7 +43,7 @@
 	{@attach topLayer}
 	{@attach place}
 	{@attach revealContents}
-	class="popover soft-scroll"
+	class="popover"
 	class:placed={placement}
 	class:above={placement?.above}
 	class:sideways={side}

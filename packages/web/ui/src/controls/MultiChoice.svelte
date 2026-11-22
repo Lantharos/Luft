@@ -58,8 +58,4 @@
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 		color: var(--text);
 	}
-
-	button[aria-disabled='true'] {
-		cursor: default;
-	}
 </style>

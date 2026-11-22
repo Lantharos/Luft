@@ -71,7 +71,7 @@
 			onkeydown={keydown}
 		/>
 		{#if items.length}
-			<div bind:this={list} {id} class="palette-list soft-scroll" role="listbox" aria-label={palette.source.placeholder}>
+			<div bind:this={list} {id} class="palette-list" role="listbox" aria-label={palette.source.placeholder}>
 				{#each items as item, index (item.key)}
 					<button
 						id={optionId(index)}

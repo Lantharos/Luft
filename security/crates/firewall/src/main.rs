@@ -27,6 +27,16 @@ async fn settled(deadline: Option<Instant>) {
     }
 }
 
+async fn relayout(connection: &Connection, firewall: &Mutex<Firewall>) -> Option<Followed> {
+    match network::read(connection).await {
+        Ok(layout) => Some(firewall.lock().await.follow(layout).await),
+        Err(error) => {
+            eprintln!("Couldn't read the networks: {error}");
+            None
+        }
+    }
+}
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
     luft_dbus::panics::report();
@@ -48,6 +58,7 @@ async fn main() -> anyhow::Result<()> {
     let interface = server.interface::<_, Service>(PATH).await?;
     let mut terminate = signal(SignalKind::terminate())?;
     let mut interrupt = signal(SignalKind::interrupt())?;
+    let mut policy = luft_policy::Follow::start()?;
     loop {
         let deadline = firewall.lock().await.deadline();
         let followed = tokio::select! {
@@ -55,13 +66,17 @@ async fn main() -> anyhow::Result<()> {
                 if !changed {
                     break;
                 }
-                match network::read(&connection).await {
-                    Ok(layout) => firewall.lock().await.follow(layout).await,
-                    Err(error) => {
-                        eprintln!("Couldn't read the networks: {error}");
-                        continue;
-                    }
-                }
+                let Some(followed) = relayout(&connection, &firewall).await else {
+                    continue;
+                };
+                followed
+            }
+            changed = policy.changed() => {
+                changed?;
+                let Some(followed) = relayout(&connection, &firewall).await else {
+                    continue;
+                };
+                followed
             }
             bound = watcher.next() => Followed {
                 waiting: firewall.lock().await.observe(bound?).await,

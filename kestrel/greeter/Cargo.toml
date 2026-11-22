@@ -15,7 +15,7 @@ libloading.workspace = true
 luft-daylight.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
-luft-policy.workspace = true
+luft-policy = { workspace = true, features = ["follow"] }
 nix = { workspace = true, features = ["user"] }
 seccompiler.workspace = true
 serde.workspace = true

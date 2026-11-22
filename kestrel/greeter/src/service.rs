@@ -433,6 +433,8 @@ impl Greeter {
             let _writing = self.writing.lock().await;
             if user.is_empty() {
                 self.greetd.set_initial_session(None)?;
+            } else if !luft_policy::Policy::load().accounts.automatic_sign_in {
+                return Err(Error::managed());
             } else {
                 require_regular_user(&user)?;
                 let default_session = self.store.config().default_session;

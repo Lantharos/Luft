@@ -54,6 +54,9 @@ impl Greetd {
     }
 
     fn initial_session(&self) -> Option<Table> {
+        if !luft_policy::Policy::load().accounts.automatic_sign_in {
+            return None;
+        }
         let text = match fs::read_to_string(&self.initial_session) {
             Ok(text) => text,
             Err(error) if error.kind() == io::ErrorKind::NotFound => return None,

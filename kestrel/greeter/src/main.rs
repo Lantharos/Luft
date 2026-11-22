@@ -79,7 +79,21 @@ async fn serve(options: Options) -> zbus::Result<()> {
         .name(NAME)
         .build()
         .await?;
-    idle.wait(IDLE_TIMEOUT).await;
+    tokio::select! {
+        () = idle.wait(IDLE_TIMEOUT) => {}
+        followed = follow_policy(&connection) => followed?,
+    }
     connection.release_name(NAME).await?;
     Ok(())
+}
+
+async fn follow_policy(connection: &zbus::Connection) -> zbus::Result<()> {
+    let mut policy = luft_policy::Follow::start()?;
+    let greeter = connection.object_server().interface::<_, Greeter>(PATH).await?;
+    loop {
+        policy.changed().await?;
+        let emitter = greeter.signal_emitter();
+        greeter.get().await.developer_tools_changed(emitter).await?;
+        greeter.get().await.automatic_login_changed(emitter).await?;
+    }
 }

@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 use std::time::Instant;
 
+use luft_policy::Visibility;
 use zbus::OwnedObjectPath;
 
 use crate::apps::{Access, Apps, Decisions, Identity, identity};
@@ -44,15 +45,17 @@ impl Firewall {
     fn sets(&mut self) -> Sets {
         self.apps.prune();
         self.post.retain(|unit| identity::alive(unit));
+        let policy = luft_policy::Policy::load();
         let mut reachable = self.apps.reachable();
-        if !luft_policy::Policy::load().firewall.public_access {
+        if !policy.firewall.public_access {
             reachable.anywhere.clear();
         }
+        let sharing = policy.nearby_sharing.visible_to != Some(Visibility::NoOne);
         rules::sets(
             &self.layout,
             &self.open(),
             &reachable,
-            !self.post.is_empty(),
+            sharing && !self.post.is_empty(),
         )
     }
 

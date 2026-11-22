@@ -5569,6 +5569,9 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "luft-policy",
+ "serde_json",
+ "tokio",
+ "zbus 6.0.0",
 ]
 
 [[package]]
@@ -6125,10 +6128,13 @@ dependencies = [
 name = "luft-policy"
 version = "0.1.0"
 dependencies = [
+ "futures-util",
+ "inotify",
  "luft-variant",
  "serde",
  "specta",
  "tempfile",
+ "tokio",
  "toml",
 ]
 

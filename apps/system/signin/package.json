@@ -12,7 +12,7 @@
 		"desktop:bundle": "sabine bundle ."
 	},
 	"dependencies": {
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.105"
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.107"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.51.0",

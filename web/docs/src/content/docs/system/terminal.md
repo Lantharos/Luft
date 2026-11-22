@@ -83,6 +83,10 @@ Some things stay in Settings, where it can explain them properly: online account
 
 See [Writing an extension](/extensions/getting-started/) for what goes into one.
 
+## Your organization's policy
+
+On a computer an organization looks after, `luft policy` shows every setting its [policy](/developers/system/policy/) decides and the file that decides it, and `luft policy check 10-updates.toml` checks a policy file before you add it, naming every key Luft doesn't know and every value of the wrong kind.
+
 ## Scripts
 
 Every command takes `--json` and prints its answer as JSON. The exit code says how it went:

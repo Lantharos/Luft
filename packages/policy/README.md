@@ -14,4 +14,6 @@ if !Policy::load().software.system_packages {
 }
 ```
 
-`cargo test` here covers merging files in name order and which folder wins.
+With the `follow` feature, `Follow` watches both folders and gives the policy each time it changes.
+
+`cargo test` here covers merging files in name order, which folder wins, which file decides each value, the problems a file is checked for and following the folders as files and folders come and go.

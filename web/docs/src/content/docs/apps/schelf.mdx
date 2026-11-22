@@ -53,6 +53,8 @@ When the same app is on schelf.store or Flathub, the window says so, with the ve
 
 An `.rpm` file, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. A `.deb` file's app goes into Ubuntu, kept in your account. [Installing software](/system/software/) explains where each kind goes.
 
+On a computer an organization looks after, it can decide where apps may come from and whether system packages and software sources can be added. What it keeps out shows **Managed by your organization** in place of **Install**, in Schelf and in Parcel alike.
+
 ## Apps from schelf.store
 
 Everything Schelf downloads from schelf.store is signed, and Schelf checks the signature and every file before it installs anything; [App permissions](/security/app-permissions/#trusting-the-catalog) describes the checks. AppImages run in their [sandbox](/system/software/#full-access) with the access they declared, apps built with Sabine install like Luft's own apps, and extensions are added to your desktop, inside it when the store approved them and in a sandbox otherwise ([how extensions run](/personalize/extensions/)).

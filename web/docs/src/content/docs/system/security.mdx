@@ -60,6 +60,8 @@ With a TPM, the disk unlocks by itself when the computer started the way it shou
 
 The TPM keeps unlocking through Luft's updates and ordinary firmware updates. If Secure Boot is turned off or its keys change, the computer asks for the recovery key and says why. When the keys changed, Settings then says the computer starts differently now: if you made the change, confirm it with your password and the disk unlocks by itself again, and until then every start asks for the recovery key. With Secure Boot off, the TPM doesn't unlock the disk, because nothing then checks what starts the computer: Settings says so, and every start asks for your passphrase or recovery key until Secure Boot is on again. Settings can show the recovery key again, after your password, and replace it.
 
+An organization can require encryption. With a TPM, Luft then turns it on by itself and is encrypted from the next restart, keeping the recovery key for an administrator to show in Settings; without one, someone has to turn it on with a passphrase. Either way, a requested encryption can't be called off.
+
 ### Encrypting other drives
 
 [Disks](/apps/disks/) can encrypt other drives in place, with a recovery key and an optional passphrase. **Unlock automatically on this computer** opens them without asking when Luft itself is encrypted, like BitLocker's automatic unlock.
@@ -70,7 +72,7 @@ Your passwords, sign-in tokens and keys live in Luft Keyring, encrypted in one f
 
 ## Signing in automatically
 
-Settings, under Accounts → Login screen, can sign one person in at startup without a password. It's off unless you turn it on. When nothing asks for a password while the computer starts, because the disk isn't encrypted or the TPM unlocks it without a PIN, Settings asks you to confirm first: anyone who can switch the computer on then reaches that person's desktop and files without typing anything. Luft Keyring stays locked until the password is typed, and the lock screen still asks for it after the computer sleeps or locks, as long as **Lock the screen when it turns off** is on under Privacy. Restarting the computer gets past the lock screen, though.
+Settings, under Accounts → Login screen, can sign one person in at startup without a password. It's off unless you turn it on. When nothing asks for a password while the computer starts, because the disk isn't encrypted or the TPM unlocks it without a PIN, Settings asks you to confirm first: anyone who can switch the computer on then reaches that person's desktop and files without typing anything. Luft Keyring stays locked until the password is typed, and the lock screen still asks for it after the computer sleeps or locks, as long as **Lock the screen when it turns off** is on under Privacy. Restarting the computer gets past the lock screen, though. An organization can keep automatic sign-in off on its computers.
 
 ## USB protection
 
@@ -97,7 +99,7 @@ Programs you start in Terminal, such as a web server you're working on, are aske
 
 ## Remote login
 
-Remote login lets you sign in to this computer from another device with SSH, to use its terminal and files from your laptop or phone. It's off until you turn it on in Settings, under Security → Remote login, and while it's off, nothing on the computer listens for SSH at all.
+Remote login lets you sign in to this computer from another device with SSH, to use its terminal and files from your laptop or phone. It's off until you turn it on in Settings, under Security → Remote login, and while it's off, nothing on the computer listens for SSH at all. An organization can keep it off, or allow only keys, and a change to that stops the SSH server or takes passwords away at once.
 
 Turning it on needs an administrator, because anyone with a key you add can then control the computer as you: open your files, run programs and change what you can change. At first only your account can sign in, only from devices on home networks, and only with a key, never a password or as root.
 

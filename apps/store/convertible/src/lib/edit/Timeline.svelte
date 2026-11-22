@@ -170,7 +170,6 @@
 		background: var(--surface);
 		overflow: hidden;
 		touch-action: none;
-		cursor: pointer;
 	}
 
 	.shade {
@@ -198,10 +197,5 @@
 		border-radius: 4px;
 		background: var(--accent);
 		cursor: ew-resize;
-	}
-
-	.handle:focus-visible {
-		outline: 2px solid var(--control-focus);
-		outline-offset: 1px;
 	}
 </style>

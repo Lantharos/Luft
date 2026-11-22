@@ -93,7 +93,7 @@
 		<Segmented label={t('rover-rename-case')} options={casings} value={options.casing} onchange={(casing) => (options.casing = casing)} />
 	{/if}
 
-	<ol class="soft-scroll flex max-h-[260px] flex-col overflow-y-auto rounded-[16px] bg-[var(--surface)] p-1.5 text-[13px]">
+	<ol class="flex max-h-[260px] flex-col overflow-y-auto rounded-[16px] bg-[var(--surface)] p-1.5 text-[13px]">
 		{#each preview as item (item.entry.path)}
 			<li class="grid grid-cols-[minmax(0,1fr)_16px_minmax(0,1fr)] items-center gap-2 rounded-[10px] px-2.5 py-1.5">
 				<span class="truncate text-[var(--text-muted)]" {@attach tooltip(item.entry.name)}>{item.entry.name}</span>

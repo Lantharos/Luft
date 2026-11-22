@@ -33,7 +33,7 @@
 	}
 </script>
 
-<div class="reader soft-scroll">
+<div class="reader">
 	<div class="mx-auto flex max-w-[880px] flex-col gap-2 px-6 pt-2 pb-12">
 		<div class="flex flex-col gap-1 px-1 pb-3">
 			<h1 class="text-[22px] leading-tight font-semibold">{reader.subject || '(no subject)'}</h1>

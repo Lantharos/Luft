@@ -75,7 +75,7 @@
 	});
 </script>
 
-<div class="soft-scroll h-full overflow-y-auto">
+<div class="h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<p class="px-2 text-[14px] text-[var(--text-soft)]">
 			{t('sources-intro')}

@@ -29,7 +29,7 @@
 			<p class="max-w-[540px] text-[15px] leading-relaxed text-[var(--text-soft)]">{description}</p>
 		{/if}
 	</header>
-	<div class="soft-scroll scroll-fade -mx-3 mt-7 min-h-0 flex-1 overflow-y-auto px-3 pb-2">
+	<div class="scroll-fade -mx-3 mt-7 min-h-0 flex-1 overflow-y-auto px-3 pb-2" data-step-body>
 		{@render children?.()}
 	</div>
 	<footer class="mt-5 grid min-h-10 grid-cols-[1fr_auto_1fr] items-center gap-3">

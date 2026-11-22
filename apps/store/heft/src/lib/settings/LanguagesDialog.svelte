@@ -12,7 +12,7 @@
 </script>
 
 <Dialog title={t('settings-languages')} description={t('settings-languages-body')} wide {onclose}>
-	<div class="max-h-[50vh] overflow-y-auto soft-scroll">
+	<div class="max-h-[50vh] overflow-y-auto">
 		<MultiChoice label={t('settings-languages')} {options} value={chosen} least={1} onchange={(value) => (chosen = value)} />
 	</div>
 	{#snippet actions()}

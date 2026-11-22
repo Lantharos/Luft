@@ -1,9 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { t } from '@luft/i18n';
-	import { bytes, tooltip } from '@luft/ui';
-	import { cubicOut } from 'svelte/easing';
-	import { fade } from 'svelte/transition';
+	import { bytes, dialog, fade, tooltip } from '@luft/ui';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import { entryArt } from '#lib/file-manager/listing/art.js';
@@ -16,10 +14,6 @@
 	let position = $derived(entry ? (view.indexByPath.get(entry.path) ?? 0) + 1 : 0);
 	let count = $derived(manager.displayEntries.length);
 
-	function pop(_node: Element) {
-		return { duration: 180, easing: cubicOut, css: (t: number) => `opacity: ${t}; scale: ${0.97 + t * 0.03}` };
-	}
-
 	function close() {
 		view.quickLook = false;
 	}
@@ -29,10 +23,10 @@
 	<div
 		class="quicklook-backdrop"
 		role="presentation"
-		transition:fade={{ duration: 160 }}
+		transition:fade
 		onpointerdown={(event) => event.target === event.currentTarget && close()}
 	>
-		<div class="quicklook" role="dialog" aria-label={t('rover-quicklook-label', { name: entry.name })} in:pop out:fade={{ duration: 120 }}>
+		<div class="quicklook" role="dialog" aria-label={t('rover-quicklook-label', { name: entry.name })} transition:dialog>
 			<header class="quicklook-header">
 				<EntryIcon kind={fileKind(entry)} size={28} {...entryArt(entry)} />
 				<div class="min-w-0 flex-1">
@@ -51,7 +45,7 @@
 			</header>
 			<div class="quicklook-body">
 				{#key entry.path}
-					<div class="quicklook-content" in:fade={{ duration: 140 }}>
+					<div class="quicklook-content" in:fade>
 						<FilePreview {entry} full />
 					</div>
 				{/key}

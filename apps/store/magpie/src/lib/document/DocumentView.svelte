@@ -60,7 +60,7 @@
 		<CantShow {item} message={t('magpie-document-cant-open')} detail={t('magpie-document-damaged')} />
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-		<div bind:this={container} class="pages soft-scroll" onclick={followLink} {@attach wheelZoom}>
+		<div bind:this={container} class="pages" onclick={followLink} {@attach wheelZoom}>
 			<div bind:this={pages} class="pdfViewer"></div>
 		</div>
 	{/if}

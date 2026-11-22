@@ -139,7 +139,7 @@
 	</div>
 	<div class="flex min-h-0 flex-1">
 		{#if tools === 'side'}
-			<div class="soft-scroll flex flex-none flex-col items-center overflow-y-auto px-2 pb-3">
+			<div class="flex flex-none flex-col items-center overflow-y-auto px-2 pb-3">
 				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side opens="right" />
 			</div>
 		{/if}

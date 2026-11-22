@@ -126,7 +126,7 @@
 	<div
 		bind:this={editor}
 		{@attach start}
-		class="editor soft-scroll"
+		class="editor"
 		class:empty
 		contenteditable="true"
 		role="textbox"

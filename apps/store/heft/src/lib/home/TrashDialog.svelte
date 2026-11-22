@@ -29,7 +29,7 @@
 </script>
 
 <Dialog title={t('trash-title')} description={t('trash-body')} {onclose}>
-	<ul class="flex max-h-[360px] flex-col overflow-y-auto soft-scroll">
+	<ul class="flex max-h-[360px] flex-col overflow-y-auto">
 		{#each items as item (item.id)}
 			<li class="flex items-center gap-3 py-2">
 				<div class="min-w-0 flex-1">

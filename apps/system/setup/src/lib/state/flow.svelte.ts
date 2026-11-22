@@ -10,7 +10,6 @@ const FINAL: Step[] = ['finishing', 'ready'];
 class Flow {
 	phase = $state<Phase | null>(null);
 	index = $state(0);
-	direction = $state(1);
 	private skipped = $state<Step[]>([]);
 
 	steps = $derived((this.phase === 'first-boot' ? FIRST_BOOT : LIVE).filter((step) => !this.skipped.includes(step)));
@@ -32,19 +31,16 @@ class Flow {
 	}
 
 	next() {
-		this.direction = 1;
 		this.index = Math.min(this.index + 1, this.steps.length - 1);
 	}
 
 	back() {
 		if (!this.canGoBack) return;
-		this.direction = -1;
 		this.index -= 1;
 	}
 
 	goTo(step: Step) {
 		const index = this.steps.indexOf(step);
-		this.direction = index >= this.index ? 1 : -1;
 		this.index = index;
 	}
 }

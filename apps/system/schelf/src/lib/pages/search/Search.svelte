@@ -40,7 +40,7 @@
 	const nothing = $derived(!installed.length && remote?.length === 0 && packages === 0);
 </script>
 
-<div class="soft-scroll h-full overflow-y-auto">
+<div class="h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[1040px] flex-col gap-8 px-8 pt-2 pb-10">
 		{#if installed.length}
 			<section class="flex flex-col gap-2">

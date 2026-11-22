@@ -10,7 +10,7 @@
 </script>
 
 <Dialog title={t('deleted-pages-title')} description={t('deleted-pages-body')} wide {onclose}>
-	<div class="grid max-h-[420px] grid-cols-4 gap-3 overflow-y-auto soft-scroll">
+	<div class="grid max-h-[420px] grid-cols-4 gap-3 overflow-y-auto">
 		{#each items as item (item.page.id)}
 			<div class="flex flex-col items-center gap-2">
 				<Thumbnail {notebook} entry={item.page} width={120} />

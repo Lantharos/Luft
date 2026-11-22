@@ -44,7 +44,7 @@ const CHANNEL_NOTES: Record<Channel, string> = {
 class MeetState {
 	platform = $state<Platform>('windows');
 	step = $state<Step>('hello');
-	direction = $state(1);
+	depth = $state(0);
 	report = $state<Report | null>(null);
 	prepared = $state<Prepared | null>(null);
 	boxCode = $state<string | null>(null);
@@ -66,7 +66,7 @@ class MeetState {
 	private inspection = 0;
 
 	go(step: Step, direction = ORDER.indexOf(step) >= ORDER.indexOf(this.step) ? 1 : -1) {
-		this.direction = direction;
+		this.depth += direction;
 		this.failure = null;
 		this.step = step;
 	}

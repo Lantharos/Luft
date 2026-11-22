@@ -54,7 +54,7 @@
 	}
 </script>
 
-<aside class="details soft-scroll" aria-label={t('magpie-photo-details')}>
+<aside class="details" aria-label={t('magpie-photo-details')}>
 	<h2 class="mb-4 truncate text-[15px] font-semibold" {@attach tooltip(item.name)}>{item.name}</h2>
 	<dl class="flex flex-col gap-3.5">
 		{#each rows as [label, value] (label)}

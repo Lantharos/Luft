@@ -42,7 +42,7 @@
 		{/if}
 		<button type="button" class="button" onclick={() => (session.view = 'convert')}>{session.files.length ? t('queue-back') : t('queue-more')}</button>
 	</div>
-	<ul class="soft-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 pb-3">
+	<ul class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 pb-3">
 		{#each queue.items as item (item.id)}
 			<li class="row" draggable={Boolean(item.output)} ondragstart={item.output ? fileDragStart(item.output) : undefined}>
 				<span class="min-w-0 flex-1">

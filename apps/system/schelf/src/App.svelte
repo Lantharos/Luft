@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, IconButton, PageStack, TitleBar, Toast } from '@luft/ui';
 	import AccessNotice from '#lib/account/AccessNotice.svelte';
 	import AccountDialog from '#lib/account/AccountDialog.svelte';
 	import OpenFailedDialog from '#lib/components/OpenFailedDialog.svelte';
@@ -46,6 +46,10 @@
 	}
 </script>
 
+{#snippet backButton()}
+	<IconButton icon={ChevronLeft} label={t('title-back')} large onclick={() => navigation.back()} />
+{/snippet}
+
 <svelte:window onkeydown={keys} />
 
 <GlassShell>
@@ -55,45 +59,36 @@
 		<Sidebar />
 	{/if}
 	<main class="glass-content">
-		<header class="drag-region flex h-[60px] flex-none items-center gap-3 pr-4 pl-6">
-			{#if depth > 1}
-				<IconButton icon={ChevronLeft} label={t('title-back')} large onclick={() => navigation.back()} />
-			{/if}
-			<h1 class="min-w-0 flex-1 truncate pl-2 text-[20px] font-semibold">{heading}</h1>
-			<WindowControls />
-		</header>
-		<div class="min-h-0 flex-1">
-			{#if ready}
-				{#each navigation.stack as entry, index (`${index}:${JSON.stringify(entry)}`)}
-					<div class="h-full" hidden={index !== depth - 1}>
-						{#if entry.page === 'discover'}
-							<Discover />
-						{:else if entry.page === 'installed'}
-							<Installed />
-						{:else if entry.page === 'updates'}
-							<Updates />
-						{:else if entry.page === 'category' || entry.page === 'collection' || entry.page === 'extensions'}
-							<Browse route={entry} />
-						{:else if entry.page === 'search'}
-							<Search query={entry.query} />
-						{:else if entry.page === 'app'}
-							<AppPage target={entry.target} name={entry.name} askFullAccess={entry.askFullAccess} reviewAccess={entry.reviewAccess} />
-						{:else if entry.page === 'sources'}
-							<Sources />
-						{:else if entry.page === 'project'}
-							<Project id={entry.id} tab={entry.tab} />
-						{:else if entry.page === 'release'}
-							<Release id={entry.id} release={entry.release} />
-						{:else if entry.page === 'publisher'}
-							<Publisher section={entry.section} />
-						{/if}
-					</div>
-				{/each}
-			{/if}
-		</div>
+		<TitleBar title={heading} leading={depth > 1 ? backButton : undefined} />
+		{#if ready}
+			<PageStack entries={navigation.stack} key={(entry, index) => `${index}:${JSON.stringify(entry)}`} order={navigation.order}>
+				{#snippet children(entry)}
+					{#if entry.page === 'discover'}
+						<Discover />
+					{:else if entry.page === 'installed'}
+						<Installed />
+					{:else if entry.page === 'updates'}
+						<Updates />
+					{:else if entry.page === 'category' || entry.page === 'collection' || entry.page === 'extensions'}
+						<Browse route={entry} />
+					{:else if entry.page === 'search'}
+						<Search query={entry.query} />
+					{:else if entry.page === 'app'}
+						<AppPage target={entry.target} name={entry.name} askFullAccess={entry.askFullAccess} reviewAccess={entry.reviewAccess} />
+					{:else if entry.page === 'sources'}
+						<Sources />
+					{:else if entry.page === 'project'}
+						<Project id={entry.id} tab={entry.tab} />
+					{:else if entry.page === 'release'}
+						<Release id={entry.id} release={entry.release} />
+					{:else if entry.page === 'publisher'}
+						<Publisher section={entry.section} />
+					{/if}
+				{/snippet}
+			</PageStack>
+		{/if}
 	</main>
 	<Toast
-		class="left-[calc(var(--sidebar-width)_+_(100vw_-_var(--sidebar-width))_/_2)]"
 		toast={developer.notices.current}
 		dismissible
 		ondismiss={developer.notices.dismiss}

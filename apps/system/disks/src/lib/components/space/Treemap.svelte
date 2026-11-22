@@ -118,7 +118,6 @@
 <div bind:this={host} bind:clientWidth={width} class="map">
 	<canvas
 		bind:this={canvas}
-		class:pointer={hovered?.startsWith('dir:')}
 		style:width="{width}px"
 		style:height="{HEIGHT}px"
 		aria-label={t('disks-space-map')}
@@ -140,9 +139,5 @@
 
 	canvas {
 		display: block;
-	}
-
-	.pointer {
-		cursor: pointer;
 	}
 </style>

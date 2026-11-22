@@ -47,7 +47,7 @@
 	});
 </script>
 
-<VirtualScroller class="soft-scroll h-full" items={apps} key={catalogKey} layout={route.page === 'extensions' ? EXTENSION_LAYOUT : LAYOUT}>
+<VirtualScroller class="h-full" items={apps} key={catalogKey} layout={route.page === 'extensions' ? EXTENSION_LAYOUT : LAYOUT}>
 	{#snippet header()}
 		<div class="flex min-h-2 items-center justify-between gap-4 bg-[var(--content)] px-8 pb-3">
 			{#if error}

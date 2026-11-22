@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, IconButton, PageStage, TitleBar, Toast } from '@luft/ui';
 	import { events } from '#lib/bindings.js';
 	import DriveView from '#lib/components/drive/DriveView.svelte';
 	import EditorActions from '#lib/components/editor/EditorActions.svelte';
@@ -28,6 +28,9 @@
 	let editing = $derived(!space.root && editor.active ? editor.layout : null);
 	let title = $derived(space.root ? space.title : editing ? t('disks-editor-title', { drive: disks.drive?.name ?? '' }) : (disks.drive?.name ?? 'Disks'));
 
+	let page = $derived(space.root ? 'space' : editing ? 'editor' : disks.drive?.id);
+	let order = $derived(disks.drives.findIndex((drive) => drive.id === disks.drive?.id));
+
 	let working = $derived(editor.running || disks.busy.size > 0 || (disks.image !== null && !disks.image.finished));
 
 	function close() {
@@ -42,35 +45,29 @@
 	}
 </script>
 
+{#snippet backButton()}
+	<IconButton icon={ChevronLeft} label={t('disks-back')} large disabled={editor.running} onclick={back} />
+{/snippet}
+
+{#snippet editorActions()}
+	<EditorActions />
+{/snippet}
+
 <GlassShell class="[--sidebar-width:260px]">
 	<Sidebar />
 	<main class="glass-content">
-		<header class="drag-region flex h-[60px] flex-none items-center gap-2 pr-4 {space.root || editing ? 'pl-6' : 'pl-8'}">
-			{#if space.root || editing}
-				<IconButton icon={ChevronLeft} label={t('disks-back')} large disabled={editor.running} onclick={back} />
+		<TitleBar {title} onclose={close} leading={space.root || editing ? backButton : undefined} actions={editing ? editorActions : undefined} />
+		<PageStage {page} {order} depth={space.root || editing ? 1 : 0} class="mx-auto w-full max-w-[820px] gap-7 px-8 pt-2 pb-10">
+			{#if space.root}
+				<SpaceView />
+			{:else if editing && disks.drive}
+				<EditorView drive={disks.drive} layout={editing} />
+			{:else if disks.drive}
+				<DriveView drive={disks.drive} />
 			{/if}
-			<h1 class="min-w-0 flex-1 truncate text-[20px] font-semibold">{title}</h1>
-			{#if editing}
-				<EditorActions />
-			{/if}
-			<WindowControls onclose={close} />
-		</header>
-		<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
-			<div class="mx-auto flex w-full max-w-[820px] flex-col gap-7 px-8 pt-2 pb-10">
-				{#if space.root}
-					<SpaceView />
-				{:else if editing && disks.drive}
-					<EditorView drive={disks.drive} layout={editing} />
-				{:else if disks.drive}
-					{#key disks.drive.id}
-						<DriveView drive={disks.drive} />
-					{/key}
-				{/if}
-			</div>
-		</div>
+		</PageStage>
 	</main>
 	<Toast
-		class="left-[calc(var(--sidebar-width)_+_(100vw_-_var(--sidebar-width))_/_2)]"
 		toast={disks.notices.current}
 		dismissible
 		ondismiss={disks.notices.dismiss}

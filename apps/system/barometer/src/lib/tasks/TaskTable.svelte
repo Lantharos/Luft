@@ -88,7 +88,7 @@
 
 <VirtualScroller
 	bind:this={scroller}
-	class="task-table soft-scroll min-h-0 flex-1"
+	class="task-table min-h-0 flex-1"
 	style="--table-columns: {template(columns)}"
 	{items}
 	key={(node) => node.key}

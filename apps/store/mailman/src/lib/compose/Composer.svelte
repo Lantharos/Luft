@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { appearance, bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
+	import { appearance, bytes, MenuButton, MenuItem, MenuSeparator, rise, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -13,7 +13,6 @@
 	import Quote from '@lucide/svelte/icons/text-quote';
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import X from '@lucide/svelte/icons/x';
-	import { fly } from 'svelte/transition';
 	import { commands } from '#lib/bindings.js';
 	import type { Template } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
@@ -102,7 +101,7 @@
 	}
 </script>
 
-<div bind:this={panel} class="composer" class:expanded={composer.expanded} role="dialog" aria-label={title} tabindex="-1" onkeydown={keydown} transition:fly={{ y: 24, duration: 220 }}>
+<div bind:this={panel} class="composer" class:expanded={composer.expanded} role="dialog" aria-label={title} tabindex="-1" onkeydown={keydown} transition:rise>
 	<div bind:this={surface} class="surface"></div>
 	<div bind:this={sheet} class="sheet">
 		<header class="flex h-12 flex-none items-center gap-1 pr-2 pl-5">
@@ -140,7 +139,7 @@
 					<Quote size={15} />{showQuote ? t('mailman-compose-hide-quoted') : t('mailman-compose-show-quoted')}
 				</button>
 				{#if showQuote}
-					<div class="quote soft-scroll"><QuotedMail html={composition.quote} /></div>
+					<div class="quote"><QuotedMail html={composition.quote} /></div>
 				{/if}
 			</div>
 		{/if}

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
-	import PanelStage from '#lib/components/stage/PanelStage.svelte';
+	import PanelStage from '#lib/components/PanelStage.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 

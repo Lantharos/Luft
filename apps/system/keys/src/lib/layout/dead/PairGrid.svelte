@@ -61,7 +61,6 @@
 		{#if items.length}
 			<VirtualScroller
 				bind:this={scroller}
-				class="soft-scroll"
 				style="height: {height}px"
 				{items}
 				key={(item) => String(item.index)}

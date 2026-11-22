@@ -4,7 +4,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
 	import { t } from '@luft/i18n';
-	import { IconButton, Segmented, WindowControls } from '@luft/ui';
+	import { IconButton, Segmented, TitleBar } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { queue } from '#lib/state/queue.svelte.js';
 	import { session, type View } from '#lib/state/session.svelte.js';
@@ -32,9 +32,8 @@
 	}
 </script>
 
-<header class="drag-region flex h-[52px] shrink-0 items-center gap-2 pl-4 pr-3">
-	<h1 class="min-w-0 flex-1 truncate text-[14px] font-semibold">{title}</h1>
-	<div class="flex items-center gap-1" data-no-drag>
+<TitleBar compact {title} onclose={close}>
+	{#snippet actions()}
 		{#if session.files.length && editable && session.view !== 'queue'}
 			<div class="w-[176px]">
 				<Segmented label={t('mode-label')} options={modes} value={session.view} onchange={(value) => (session.view = value)} />
@@ -59,9 +58,8 @@
 				<ListChecks size={18} />
 			</button>
 		{/if}
-	</div>
-	<div class="ml-2"><WindowControls onclose={close} /></div>
-</header>
+	{/snippet}
+</TitleBar>
 
 <style>
 	.queue {

@@ -54,7 +54,7 @@
 
 </script>
 
-<VirtualScroller class="soft-scroll h-full" items={shown} key={(app) => app.key} layout={LAYOUT}>
+<VirtualScroller class="h-full" items={shown} key={(app) => app.key} layout={LAYOUT}>
 	{#snippet header()}
 		<div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 bg-[var(--content)] px-8 pb-3">
 			<Segmented

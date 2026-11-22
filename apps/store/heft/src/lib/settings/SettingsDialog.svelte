@@ -23,7 +23,7 @@
 {/snippet}
 
 <Dialog title={t('settings-title')} wide {onclose}>
-	<div class="flex max-h-[60vh] flex-col gap-6 overflow-x-hidden overflow-y-auto pr-1 soft-scroll *:flex-none">
+	<div class="flex max-h-[60vh] flex-col gap-6 overflow-x-hidden overflow-y-auto pr-1 *:flex-none">
 		<section class="flex gap-5">
 			<PressureCurve firmness={settings.values.firmness} onchange={(value) => settings.set('firmness', value)} />
 			<div class="flex min-w-0 flex-1 flex-col gap-2">

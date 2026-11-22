@@ -36,7 +36,7 @@
 
 <main class="glass-content" ondragover={(event) => event.preventDefault()} ondrop={drop}>
 	<Header />
-	<div class="min-h-0 flex-1 overflow-y-auto soft-scroll">
+	<div class="min-h-0 flex-1 overflow-y-auto">
 		<div class="mx-auto flex max-w-[1180px] flex-col gap-6 px-6 pt-4 pb-10">
 			{#if recentPages.length}
 				<section class="flex flex-col gap-3 px-4">

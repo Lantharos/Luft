@@ -18,7 +18,7 @@
 	<Row title={t('app-places-read-only-switch')}>
 		<Switch label={t('app-places-read-only-switch')} checked={readOnly} onchange={(on) => (readOnly = on)} />
 	</Row>
-	<div class="list soft-scroll">
+	<div class="list">
 		{#each drives ?? [] as drive (`${drive.uuid} ${drive.drive}`)}
 			<button type="button" class="drive" onclick={() => ongive(drive, readOnly)}>
 				<HardDrive size={20} class="flex-none text-[var(--text-muted)]" />

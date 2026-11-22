@@ -49,14 +49,14 @@
 <svelte:window ondragover={drop.ondragover} ondrop={drop.ondrop} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full select-none">
+	<GlassShell class="h-full">
 		<Sidebar onadd={() => (open = { kind: 'add' })} onsettings={() => (open = { kind: 'settings' })} />
 		<main class="glass-content relative flex flex-col">
 			<Header onsave={() => (open = { kind: 'save' })} onclear={() => (open = { kind: 'clear' })} />
 			{#if failure}
 				<p class="m-auto max-w-[420px] text-center text-[14px] text-[var(--text-soft)]">{t('start-failed', { reason: failure })}</p>
 			{:else if ready}
-				<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
+				<div class="flex min-h-0 flex-1 flex-col overflow-y-auto">
 					{#if flatbed.pages.length || flatbed.scanning}
 						<PageGrid onopen={(page) => (open = { kind: 'corners', page })} />
 					{:else}
@@ -68,7 +68,6 @@
 				</div>
 			{/if}
 			<Toast
-				class="absolute z-40"
 				toast={flatbed.toasts.current}
 				ondismiss={flatbed.toasts.dismiss}
 				onhold={flatbed.toasts.hold}

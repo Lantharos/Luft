@@ -12,91 +12,55 @@
 </script>
 
 <aside class="glass-sidebar drag-region flex flex-col px-3 pt-4 pb-3">
-	<p class="px-3 pt-2 pb-2 text-[13px] font-semibold text-[var(--sidebar-text-muted)]">{t('sources-title')}</p>
+	<h2 class="nav-heading">{t('sources-title')}</h2>
 	<nav class="flex flex-col gap-0.5" data-no-drag {@attach selectionPill()}>
 		{#each flatbed.scanners as scanner (scanner.id)}
 			{@const Icon = scanner.connection === 'usb' ? Usb : Printer}
 			<button
 				type="button"
-				class="source"
+				class="nav-item tall"
 				class:active={flatbed.source === scanner.id}
 				aria-current={flatbed.source === scanner.id ? 'page' : undefined}
 				disabled={flatbed.scanning}
 				onclick={() => flatbed.choose(scanner.id)}
 			>
-				<Icon size={17} />
+				<Icon size={18} />
 				<span class="min-w-0 flex-1">
 					<span class="block truncate">{scanner.name}</span>
-					<span class="block truncate text-[12px] text-[var(--sidebar-text-muted)]">
+					<span class="nav-detail block truncate">
 						{scanner.connection === 'usb' ? t('source-usb') : t('source-network')}
 					</span>
 				</span>
 			</button>
 		{/each}
 		{#if flatbed.searching}
-			<div class="source quiet pointer-events-none" role="status">
-				<Spinner size={17} />
+			<div class="nav-item quiet pointer-events-none" role="status">
+				<Spinner size={18} />
 				<span class="truncate">{t('sources-searching')}</span>
 			</div>
 		{/if}
 		<button
 			type="button"
-			class="source"
+			class="nav-item tall"
 			class:active={flatbed.source === CAMERA}
 			aria-current={flatbed.source === CAMERA ? 'page' : undefined}
 			disabled={flatbed.scanning}
 			onclick={() => flatbed.choose(CAMERA)}
 		>
-			<Camera size={17} />
+			<Camera size={18} />
 			<span class="min-w-0 flex-1">
 				<span class="block truncate">{t('source-camera')}</span>
-				<span class="block truncate text-[12px] text-[var(--sidebar-text-muted)]">{t('source-camera-detail')}</span>
+				<span class="nav-detail block truncate">{t('source-camera-detail')}</span>
 			</span>
 		</button>
-		<button type="button" class="source quiet" onclick={onadd}>
-			<Plus size={17} />
+		<button type="button" class="nav-item quiet" onclick={onadd}>
+			<Plus size={18} />
 			<span class="truncate">{t('source-add')}</span>
 		</button>
 	</nav>
 	<div class="flex-1"></div>
-	<button type="button" class="source quiet" data-no-drag onclick={onsettings}>
-		<Settings size={17} />
+	<button type="button" class="nav-item quiet" data-no-drag onclick={onsettings}>
+		<Settings size={18} />
 		<span class="truncate">{t('settings-open')}</span>
 	</button>
 </aside>
-
-<style>
-	.source {
-		display: flex;
-		min-height: 36px;
-		width: 100%;
-		align-items: center;
-		gap: 12px;
-		border-radius: 14px;
-		padding: 7px 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.source:hover:not(:disabled) {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.source.active {
-		background: transparent;
-		color: var(--text);
-	}
-
-	.source:disabled:not(.active) {
-		opacity: 0.5;
-	}
-
-	.source.quiet {
-		color: var(--sidebar-text-muted);
-	}
-</style>

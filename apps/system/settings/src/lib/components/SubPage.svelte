@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack, type Snippet } from 'svelte';
 	import { app } from '#lib/state/app.svelte.js';
-	import { pageMotion } from './stage/motion';
+	import { pageMotion } from '@luft/ui';
 
 	interface Props {
 		title: string;

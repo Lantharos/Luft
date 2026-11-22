@@ -25,7 +25,7 @@
 </script>
 
 {#if entries.length}
-	<VirtualScroller class="soft-scroll min-h-0 flex-1" items={entries} {key} layout={LAYOUT}>
+	<VirtualScroller class="min-h-0 flex-1" items={entries} {key} layout={LAYOUT}>
 		{#snippet children(entry)}
 			{#if entry.type === 'folder'}
 				<button type="button" class="entry" draggable="true" ondragstart={fileDragStart(entry.folder.path)} onclick={() => library.browse(entry.folder.path)}>

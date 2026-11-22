@@ -58,7 +58,7 @@
 
 	function show() {
 		const own = trigger!.getBoundingClientRect();
-		const { top } = (trigger!.closest('.soft-scroll') ?? trigger!).getBoundingClientRect();
+		const { top } = (trigger!.closest('[data-step-body]') ?? trigger!).getBoundingClientRect();
 		sheet = { left: own.left, top, width: own.width, height: innerHeight - top - WINDOW_MARGIN };
 		query = '';
 		queueMicrotask(() => search?.focus());
@@ -118,7 +118,7 @@
 		<div class="p-1 pb-2">
 			<SearchField bind:this={search} bind:value={query} label={t('setup-picker-search')} onkeydown={keydown} />
 		</div>
-		<div bind:this={list} class="soft-scroll flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" role="listbox" aria-label={label}>
+		<div bind:this={list} class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" role="listbox" aria-label={label}>
 			{#each matches as item, index (key(item))}
 				{@const second = secondLine(item)}
 				<button

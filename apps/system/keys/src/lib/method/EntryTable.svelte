@@ -64,7 +64,6 @@
 		</div>
 		<VirtualScroller
 			bind:this={scroller}
-			class="soft-scroll"
 			style="height: {Math.min(TALLEST, shown.length * (ROW + GAP))}px"
 			items={shown}
 			key={(row) => String(row.uid)}

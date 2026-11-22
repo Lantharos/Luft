@@ -25,7 +25,7 @@
 
 <Dialog {title} {description} {onclose}>
 	<SearchField label={t('settings-apps-search')} bind:value={query} />
-	<div class="list soft-scroll">
+	<div class="list">
 		{#each shown as app (app.id)}
 			<button type="button" class="app" onclick={() => onchoose(app.id)}>
 				<AppIcon icon={app.icon} id={app.id} size={28} />

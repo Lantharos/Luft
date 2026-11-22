@@ -57,7 +57,7 @@
 		bind:value={query}
 		onkeydown={(event) => event.key === 'Enter' && shown[0] && choose(shown[0].id)}
 	/>
-	<div bind:this={list} class="zones soft-scroll" role="listbox" aria-label={t('settings-datetime-zones')}>
+	<div bind:this={list} class="zones" role="listbox" aria-label={t('settings-datetime-zones')}>
 		{#each shown as zone (zone.id)}
 			<button type="button" role="option" aria-selected={zone.id === current} class="zone" onclick={() => choose(zone.id)}>
 				<span class="flex min-w-0 flex-1 flex-col">

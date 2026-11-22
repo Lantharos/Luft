@@ -15,7 +15,7 @@
 	});
 </script>
 
-<div bind:this={strip} class="columns-strip soft-scroll" role="group" aria-label={t('rover-view-folder-columns')}>
+<div bind:this={strip} class="columns-strip" role="group" aria-label={t('rover-view-folder-columns')}>
 
 	{#each data.columns as column (column.path)}
 		<FolderColumn {column} entries={column.current ? manager.displayEntries : data.entries(column.path)} />

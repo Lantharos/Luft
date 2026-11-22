@@ -96,7 +96,7 @@
 		{#if choices.length}
 			<VirtualScroller
 				bind:this={list}
-				class="soft-scroll mt-1"
+				class="mt-1"
 				style="height: {Math.min(choices.length, VISIBLE_ROWS) * ROW_HEIGHT}px"
 				role="listbox"
 				aria-label={label}

@@ -132,7 +132,7 @@
 			onblur={() => (view.editingPath = false)}
 		/>
 		{#if completion.candidates.length > 0}
-			<div class="path-candidates soft-scroll" role="listbox" aria-label={t('rover-path-matching')} tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
+			<div class="path-candidates" role="listbox" aria-label={t('rover-path-matching')} tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
 				{#each completion.candidates as name, index (name)}
 					<button
 						class={['path-candidate', index === completion.index && 'is-active']}

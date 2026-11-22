@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { basename, bytes, parent } from '@luft/ui';
-	import { cubicOut } from 'svelte/easing';
+	import { basename, bytes, panel, parent } from '@luft/ui';
 	import type { FileEntry } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import FilePreview from '#lib/components/preview/FilePreview.svelte';
@@ -46,11 +45,6 @@
 		if (!folders) return t('rover-details-files', { files });
 		return t('rover-details-folders-and-files', { folders, files });
 	}
-
-	function appear(
-_node: Element) {
-		return { duration: 200, easing: cubicOut, css: (t: number) => `opacity: ${t}; scale: ${0.985 + t * 0.015}` };
-	}
 </script>
 
 {#snippet metadata(items: DetailRow[])}
@@ -68,7 +62,7 @@ _node: Element) {
 	</dl>
 {/snippet}
 
-<aside class="details-pane soft-scroll" aria-label={t('rover-details')} transition:appear>
+<aside class="details-pane" aria-label={t('rover-details')} transition:panel>
 	{#if entry}
 		<div class="details-preview">
 			{#key entry.path}

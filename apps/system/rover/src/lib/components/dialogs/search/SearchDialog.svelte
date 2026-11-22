@@ -69,7 +69,7 @@
 <Dialog title={t('rover-search-title', { folder: basename(search.root) || search.root })} wide onclose={search.close}>
 	<SearchField bind:this={field} label={t('rover-search-field')} large bind:value={search.text} onkeydown={keydown} />
 	<SearchFilters online={Boolean(manager.cloud.holding(search.root))} />
-	<div class="soft-scroll -mx-2 h-[min(420px,50vh)] overflow-y-auto px-2">
+	<div class="-mx-2 h-[min(420px,50vh)] overflow-y-auto px-2">
 		<SearchResults
 			results={shown}
 			root={search.root}

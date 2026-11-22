@@ -54,7 +54,7 @@
 
 <VirtualScroller
 	bind:this={surface.scroller}
-	class="soft-scroll min-h-0 w-64 flex-none shadow-[inset_-1px_0_0_var(--hairline)]"
+	class="min-h-0 w-64 flex-none shadow-[inset_-1px_0_0_var(--hairline)]"
 	items={column.current ? surface.items : entries}
 	key={(entry) => entry.path}
 	layout={LAYOUT}

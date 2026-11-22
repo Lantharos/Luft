@@ -13,9 +13,9 @@
 </script>
 
 <aside class="glass-sidebar drag-region gap-3 px-3 py-4">
-	<div class="flex h-8 items-center justify-between pr-1 pl-3">
-		<h2 class="text-[13px] font-medium text-[var(--sidebar-text-muted)]">{t('boards-title')}</h2>
-		<button type="button" class="add" aria-label={t('board-new')} {@attach tooltip(t('board-new'))} onclick={() => void app.addBoard()}>
+	<div class="nav-heading">
+		<h2>{t('boards-title')}</h2>
+		<button type="button" class="nav-action" aria-label={t('board-new')} {@attach tooltip(t('board-new'))} onclick={() => void app.addBoard()}>
 			<Plus size={16} />
 		</button>
 	</div>
@@ -34,62 +34,10 @@
 				oncontextmenu={(event) => open(event, board)}
 			>
 				<span class="truncate">{board.name}</span>
-				<span class="count">{board.sounds.length}</span>
+				<span class="nav-count">{board.sounds.length}</span>
 			</button>
 		{/each}
 	</nav>
 	<MixPanel />
 </aside>
 
-<style>
-	.add {
-		display: grid;
-		height: 28px;
-		width: 28px;
-		place-items: center;
-		border-radius: var(--radius-pill);
-		color: var(--sidebar-text-muted);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.add:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item {
-		display: flex;
-		height: 38px;
-		width: 100%;
-		flex: none;
-		align-items: center;
-		justify-content: space-between;
-		gap: 10px;
-		border-radius: var(--radius-pill);
-		padding-inline: 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.nav-item:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item.active {
-		background: transparent;
-		color: var(--text);
-	}
-
-	.count {
-		font-size: 12.5px;
-		color: var(--sidebar-text-muted);
-		font-variant-numeric: tabular-nums;
-	}
-</style>

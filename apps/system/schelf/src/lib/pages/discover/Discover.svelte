@@ -65,7 +65,7 @@
 	});
 </script>
 
-<div class="soft-scroll h-full overflow-y-auto">
+<div class="h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[1040px] flex-col gap-8 px-8 pt-2 pb-10">
 		{#if offline}
 			<div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">

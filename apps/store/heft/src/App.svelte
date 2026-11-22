@@ -85,7 +85,7 @@
 <svelte:window onkeydown={keys} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full select-none">
+	<GlassShell class="h-full">
 		{#if failure}
 			<main class="glass-content drag-region grid place-items-center p-8 text-center">
 				<div class="max-w-[420px]">

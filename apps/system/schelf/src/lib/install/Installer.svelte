@@ -70,7 +70,7 @@
 		</div>
 	</div>
 
-	<div class="soft-scroll mt-5 -mx-2 min-h-0 flex-1 overflow-y-auto px-2">
+	<div class="mt-5 -mx-2 min-h-0 flex-1 overflow-y-auto px-2">
 		{#key phase}
 			<div in:fade>
 				{#if phase === 'unreadable'}

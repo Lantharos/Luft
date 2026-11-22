@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
+	import { EmptyState } from '@luft/ui';
 	import { list } from '#lib/mail/list.svelte.js';
 
 	function quiet(view: string): [string, string] {
@@ -30,7 +31,4 @@
 	let copy = $derived(list.searching ? [t('mailman-empty-search-title'), t('mailman-empty-search', { query: list.query })] : quiet(list.view));
 </script>
 
-<div class="flex flex-1 flex-col items-center justify-center gap-1.5 px-8 pb-16 text-center">
-	<p class="text-[15px] font-semibold">{copy[0]}</p>
-	<p class="max-w-[260px] text-[13px] leading-relaxed text-[var(--text-muted)]">{copy[1]}</p>
-</div>
+<EmptyState title={copy[0]} message={copy[1]} />

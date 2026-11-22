@@ -24,45 +24,17 @@
 		{@const Icon = ICONS[location.place]}
 		<button
 			type="button"
-			class="place"
+			class="nav-item"
 			class:active={library.folder === location.path}
 			aria-current={library.folder === location.path ? 'page' : undefined}
 			onclick={() => library.browse(location.path)}
 		>
-			<Icon size={17} />
+			<Icon size={18} />
 			<span class="truncate">{placeName(location.place)}</span>
 		</button>
 	{/each}
-	<button type="button" class="place" onclick={openFolder}>
-		<FolderOpen size={17} />
+	<button type="button" class="nav-item" onclick={openFolder}>
+		<FolderOpen size={18} />
 		<span class="truncate">{t('magpie-open-folder')}</span>
 	</button>
 </nav>
-
-<style>
-	.place {
-		display: flex;
-		height: 36px;
-		width: 100%;
-		align-items: center;
-		gap: 12px;
-		border-radius: var(--radius-pill);
-		padding-inline: 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.place:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.place.active {
-		background: transparent;
-		color: var(--text);
-	}
-</style>

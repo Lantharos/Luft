@@ -47,7 +47,7 @@
 	const lessonDate = (page: PageEntry) => date(Math.floor(page.created / 1000));
 </script>
 
-<aside class="glass-sidebar rail soft-scroll" aria-label={t('rail-label')}>
+<aside class="glass-sidebar rail" aria-label={t('rail-label')}>
 	{#if headings.length}
 		<div class="px-3 pt-3">
 			<Segmented

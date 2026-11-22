@@ -1,5 +1,5 @@
 import type { CatalogApp, Collection } from '#lib/bindings.js';
-import type { CategoryId } from '#lib/catalog/categories.js';
+import { CATEGORIES, type CategoryId } from '#lib/catalog/categories.js';
 import type { ProjectTab, PublisherPage } from '#lib/developer/pages.js';
 
 export type AppTarget = { listing: CatalogApp } | { installed: string };
@@ -18,6 +18,8 @@ export type Route =
 	| { page: 'release'; id: string; release: string; version: string }
 	| { page: 'publisher'; section: PublisherPage };
 
+const SIDEBAR: Route['page'][] = ['search', 'discover', 'installed', 'updates', 'extensions', 'category', 'collection', 'sources', 'publisher', 'project', 'release', 'app'];
+
 const DEVELOPER_PAGES = new Set<Route['page']>(['project', 'release', 'publisher']);
 
 class Navigation {
@@ -31,6 +33,12 @@ class Navigation {
 
 	get root() {
 		return this.stack[0];
+	}
+
+	get order() {
+		const root = this.root;
+		const place = SIDEBAR.indexOf(root.page) * CATEGORIES.length;
+		return root.page === 'category' ? place + CATEGORIES.findIndex((category) => category.id === root.category) : place;
 	}
 
 	get developing() {

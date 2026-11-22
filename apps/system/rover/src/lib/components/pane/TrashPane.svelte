@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
-	import { bytes, parent, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
+	import { bytes, EmptyState, parent, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
 	import type { TrashItem } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
-	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import LoadingRows from '#lib/components/pane/LoadingRows.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 
@@ -55,7 +54,7 @@
 			<button class="button danger" type="button" onclick={() => dialogs.emptyTrash(activeLocation)}>{t('rover-empty-trash')}</button>
 		</div>
 	</div>
-	<VirtualScroller class="entry-scroller soft-scroll" {items} key={(item) => item.id} layout={LAYOUT} role="listbox" aria-label={t('rover-place-trash')}>
+	<VirtualScroller class="entry-scroller" {items} key={(item) => item.id} layout={LAYOUT} role="listbox" aria-label={t('rover-place-trash')}>
 
 		{#snippet children(item)}
 			<div

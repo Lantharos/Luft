@@ -35,7 +35,7 @@
 
 <section class="flex min-h-0 flex-1 flex-col" aria-label={t('mailman-list-label')}>
 	{#if list.items.length}
-		<VirtualScroller bind:this={scroller} class="soft-scroll min-h-0 flex-1" items={list.items} {key} layout={LAYOUT} stableOrder role="listbox" style="overflow-x: hidden" onscroll={scrolled}>
+		<VirtualScroller bind:this={scroller} class="min-h-0 flex-1" items={list.items} {key} layout={LAYOUT} stableOrder role="listbox" style="overflow-x: hidden" onscroll={scrolled}>
 			{#snippet children(item)}
 				{#if item.kind === 'summary'}
 					<SummaryRow summary={item.summary} onopen={() => navigate(item.summary.view)} />

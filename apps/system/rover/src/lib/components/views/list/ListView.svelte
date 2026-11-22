@@ -73,7 +73,7 @@
 
 <VirtualScroller
 	bind:this={surface.scroller}
-	class="entry-scroller list-scroller soft-scroll"
+	class="entry-scroller list-scroller"
 	style="--list-columns: {columns.template}"
 	items={surface.rows}
 	key={(row) => (isGroupRow(row) ? `\u0000group:${row.group}` : row.path)}

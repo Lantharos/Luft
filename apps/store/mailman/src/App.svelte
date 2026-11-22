@@ -156,7 +156,7 @@
 />
 
 <div class="h-[100dvh] w-screen overflow-hidden" style:--sidebar-width="{layout.sidebarWidth}px">
-	<GlassShell class="h-full select-none">
+	<GlassShell class="h-full">
 		{#if layout.sidebar !== 'none'}
 			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={showPalette} onsignin={(account) => (signingIn = account)} />
 		{/if}

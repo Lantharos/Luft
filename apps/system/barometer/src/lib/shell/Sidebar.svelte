@@ -13,7 +13,7 @@
 
 <aside class="glass-sidebar drag-region px-3 pt-4 pb-3">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" aria-label={t('barometer-views')} {@attach selectionPill()}>
-		<button type="button" class="view" class:active={app.page === TASKS} aria-current={app.page === TASKS ? 'page' : undefined} onclick={() => app.open(TASKS)}>
+		<button type="button" class="nav-item" class:active={app.page === TASKS} aria-current={app.page === TASKS ? 'page' : undefined} onclick={() => app.open(TASKS)}>
 			<LayoutGrid size={18} />
 			<span class="truncate">{t('barometer-processes-title')}</span>
 		</button>
@@ -24,32 +24,3 @@
 		</div>
 	</nav>
 </aside>
-
-<style>
-	.view {
-		display: flex;
-		height: 38px;
-		width: 100%;
-		flex: none;
-		align-items: center;
-		gap: 12px;
-		border-radius: var(--radius-pill);
-		padding-inline: 14px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.view:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.view.active {
-		background: transparent;
-		color: var(--text);
-	}
-</style>

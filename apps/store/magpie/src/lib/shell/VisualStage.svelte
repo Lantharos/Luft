@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { tooltip } from '@luft/ui';
+	import { panel, rise, tooltip } from '@luft/ui';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { fly } from 'svelte/transition';
 	import type { Item } from '#lib/bindings.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
-	import { appear, disappear } from '#lib/app/transitions.js';
 	import Filmstrip from '#lib/browse/Filmstrip.svelte';
 	import { library } from '#lib/library/library.svelte.js';
 	import { activePhoto } from '#lib/photo/active.svelte.js';
@@ -40,7 +38,7 @@
 		onpointermove={chrome.wake}
 	>
 		{#key item.path}
-			<div class="absolute inset-0" in:appear out:disappear>
+			<div class="absolute inset-0" transition:panel>
 				{#if item.kind === 'image'}
 					<PhotoView {item} />
 				{:else}
@@ -59,7 +57,7 @@
 			</button>
 		{/if}
 		{#if showStrip}
-			<div class="strip fade-idle" transition:fly={{ y: 16, duration: 200 }}>
+			<div class="strip fade-idle" transition:rise>
 				<Filmstrip />
 			</div>
 		{/if}

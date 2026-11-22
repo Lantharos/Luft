@@ -8,7 +8,7 @@
 </script>
 
 <Dialog title={named(release, 'settings-updates-notes-title', 'settings-updates-notes-title-new')} {onclose}>
-	<div class="soft-scroll flex max-h-[360px] flex-col gap-4 overflow-y-auto">
+	<div class="flex max-h-[360px] flex-col gap-4 overflow-y-auto">
 		{#each release.notes ?? [] as section (section.title)}
 			<section class="flex flex-col gap-1.5">
 				<h3 class="text-[13px] font-semibold text-[var(--text)]">{section.title}</h3>

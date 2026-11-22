@@ -15,7 +15,7 @@
 </script>
 
 <Dialog title={t('beside-title')} description={t('beside-body')} {onclose}>
-	<div class="flex max-h-[420px] flex-col gap-4 overflow-y-auto soft-scroll">
+	<div class="flex max-h-[420px] flex-col gap-4 overflow-y-auto">
 		{#each subjects as subject (subject.meta.id)}
 			<section class="flex flex-col gap-1">
 				<h3 class="flex items-center gap-2 px-2 text-[12.5px] font-semibold text-(--text-soft)">

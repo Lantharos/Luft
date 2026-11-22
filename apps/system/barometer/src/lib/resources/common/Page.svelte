@@ -12,7 +12,7 @@
 </script>
 
 <Header {title} {detail} />
-<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
+<div class="min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[980px] flex-col gap-8 px-8 pt-2 pb-10">
 		{@render children()}
 	</div>

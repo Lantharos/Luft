@@ -3,7 +3,7 @@
 	import Grip from '@lucide/svelte/icons/grip';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Square from '@lucide/svelte/icons/square';
-	import { SearchField, WindowControls } from '@luft/ui';
+	import { EmptyState, PageStage, SearchField, TitleBar } from '@luft/ui';
 	import { t } from '@luft/i18n';
 	import { app } from '#lib/state/app.svelte.js';
 	import { arrangement } from '#lib/state/arrange.svelte.js';
@@ -11,6 +11,7 @@
 	import Tile from './Tile.svelte';
 
 	let dragging = $state(false);
+	let order = $derived(app.search ? -1 : app.library.boards.findIndex((board) => board.id === app.boardId));
 
 	function dragged(event: DragEvent) {
 		if (!event.dataTransfer?.types.includes('Files')) return;
@@ -27,21 +28,21 @@
 </script>
 
 <main class="glass-content" class:dragging ondragover={dragged} ondragleave={() => (dragging = false)} ondrop={dropped}>
-	<header class="drag-region flex h-[60px] flex-none items-center gap-2 pr-4 pl-6">
-		<div class="w-[240px]"><SearchField bind:value={app.search} label={t('sounds-search')} /></div>
-		<div class="flex-1"></div>
-		{#if arrangement.on || (app.sounds.length > 1 && !app.search)}
-			<button type="button" class="button" class:primary={arrangement.on} aria-pressed={arrangement.on} onclick={arrangement.toggle}>
-				{#if arrangement.on}<Check size={16} />{t('sounds-arrange-done')}{:else}<Grip size={16} />{t('sounds-arrange')}{/if}
+	<TitleBar>
+		<div class="flex-1"><div class="w-[240px]"><SearchField bind:value={app.search} label={t('sounds-search')} /></div></div>
+		{#snippet actions()}
+			{#if arrangement.on || (app.sounds.length > 1 && !app.search)}
+				<button type="button" class="button" class:primary={arrangement.on} aria-pressed={arrangement.on} onclick={arrangement.toggle}>
+					{#if arrangement.on}<Check size={16} />{t('sounds-arrange-done')}{:else}<Grip size={16} />{t('sounds-arrange')}{/if}
+				</button>
+			{/if}
+			<button type="button" class="button" disabled={!app.status.playing.length} onclick={() => void commands.stopAll()}>
+				<Square size={14} />{t('sounds-stop-all')}
 			</button>
-		{/if}
-		<button type="button" class="button" disabled={!app.status.playing.length} onclick={() => void commands.stopAll()}>
-			<Square size={14} />{t('sounds-stop-all')}
-		</button>
-		<button type="button" class="button primary" onclick={() => void app.addSounds()}><Plus size={16} />{t('sounds-add')}</button>
-		<div class="ml-2"><WindowControls /></div>
-	</header>
-	<div class="soft-scroll min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-8">
+			<button type="button" class="button primary" onclick={() => void app.addSounds()}><Plus size={16} />{t('sounds-add')}</button>
+		{/snippet}
+	</TitleBar>
+	<PageStage page={app.search ? null : app.boardId} {order} class="px-6 pt-2 pb-8">
 		{#if app.sounds.length}
 			<div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
 				{#each app.sounds as sound, index (sound.id)}
@@ -59,14 +60,11 @@
 			</div>
 			<p class="sr-only" aria-live="polite">{arrangement.moved ? t('sounds-arrange-moved', arrangement.moved) : ''}</p>
 		{:else if app.search}
-			<p class="pt-[14vh] text-center text-[15px] text-[var(--text-muted)]">{t('empty-search', { search: app.search })}</p>
+			<EmptyState title={t('empty-search', { search: app.search })} />
 		{:else}
-			<div class="flex flex-col items-center gap-2 pt-[16vh] text-center">
-				<h2 class="text-[22px] font-semibold">{t('empty-title')}</h2>
-				<p class="max-w-[42ch] text-[14px] text-[var(--text-muted)]">{t('empty-detail')}</p>
-			</div>
+			<EmptyState title={t('empty-title')} message={t('empty-detail')} />
 		{/if}
-	</div>
+	</PageStage>
 </main>
 
 <style>

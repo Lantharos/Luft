@@ -74,7 +74,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="soft-scroll flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 pb-24">
+	<div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 pb-24">
 		{#if transcript}
 			{#key revision}
 				{#if showing === 'notes'}

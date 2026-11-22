@@ -41,7 +41,7 @@
 		<FileList />
 	{/if}
 	<aside class="panel" aria-label={t('panel-label')}>
-		<div class="settings soft-scroll">
+		<div class="settings">
 			{#if editing && editor.visual}
 				<section class="flex flex-col gap-3">
 					<h2 class="text-[13px] font-semibold text-[var(--text-soft)]">{t('adjust-title')}</h2>

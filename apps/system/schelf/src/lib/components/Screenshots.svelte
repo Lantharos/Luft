@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fade } from '@luft/ui';
 	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -31,7 +32,7 @@
 <svelte:window onkeydown={keys} />
 
 {#if shown.length}
-	<div class="strip soft-scroll">
+	<div class="strip">
 		{#each shown as shot, index (shot.url)}
 			<button type="button" class="shot" aria-label={shot.caption ?? t('screenshots-numbered', { number: index + 1 })} onclick={() => (open = index)}>
 				<img src={shot.url} alt={shot.caption ?? ''} loading="lazy" decoding="async" onerror={() => fail(shot.url)} />
@@ -42,7 +43,7 @@
 
 {#if open !== null && shown[open]}
 	{@const shot = shown[open]}
-	<div class="lightbox" role="dialog" aria-modal="true" aria-label={shot.caption ?? t('screenshots-one')}>
+	<div class="lightbox" role="dialog" transition:fade aria-modal="true" aria-label={shot.caption ?? t('screenshots-one')}>
 		<button type="button" class="backdrop" aria-label={t('screenshots-close')} onclick={() => (open = null)}></button>
 		<figure>
 			<img src={shot.url} alt={shot.caption ?? ''} />
@@ -90,7 +91,6 @@
 		display: grid;
 		place-items: center;
 		padding: 56px 72px;
-		animation: fade var(--motion-standard) var(--ease-decelerate);
 	}
 
 	.backdrop {
@@ -142,11 +142,5 @@
 
 	.next {
 		right: 16px;
-	}
-
-	@keyframes fade {
-		from {
-			opacity: 0;
-		}
 	}
 </style>

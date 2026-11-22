@@ -29,7 +29,7 @@
 			<li>{risk}</li>
 		{/each}
 	</ul>
-	<pre class="paste-preview soft-scroll">{review.text}</pre>
+	<pre class="paste-preview">{review.text}</pre>
 	{#snippet actions()}
 		<button type="button" class="button" onclick={cancel}>{t('terminal-paste-cancel')}</button>
 		<button type="button" class="button primary" onclick={paste}>{t('terminal-paste-confirm')}</button>

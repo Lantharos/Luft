@@ -28,7 +28,7 @@
 	});
 </script>
 
-<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
+<div class="min-h-0 flex-1 overflow-y-auto">
 	<dl class="mx-auto grid max-w-[760px] grid-cols-[minmax(110px,160px)_1fr] gap-x-8 gap-y-4 px-8 pt-4 pb-12">
 		{#each rows as [label, value] (label)}
 			<dt class="text-[13px] text-[var(--text-muted)]">{label}</dt>

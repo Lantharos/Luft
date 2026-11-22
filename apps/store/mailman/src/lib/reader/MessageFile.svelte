@@ -36,7 +36,7 @@
 	}
 </script>
 
-<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
+<div class="min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto flex max-w-[880px] flex-col gap-4 px-6 pt-2 pb-12">
 		{#if opened}
 			<h1 class="px-1 text-[22px] leading-tight font-semibold">{opened.subject || t('mailman-list-no-subject')}</h1>

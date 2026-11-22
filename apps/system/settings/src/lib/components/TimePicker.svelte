@@ -75,14 +75,14 @@
 {#if open && trigger}
 	<Popover anchor={trigger} {label} role="dialog" maxHeight={POPOVER_HEIGHT} onclose={() => (open = false)}>
 		<div class="columns">
-			<div class="column soft-scroll" role="listbox" aria-label={t('settings-time-picker-hour')} {@attach centerSelected}>
+			<div class="column" role="listbox" aria-label={t('settings-time-picker-hour')} {@attach centerSelected}>
 				{#each HOURS as option (option)}
 					<button type="button" role="option" aria-selected={option === hour} onclick={() => set(option * 60 + minute)}>
 						{hourLabel(option)}
 					</button>
 				{/each}
 			</div>
-			<div class="column soft-scroll" role="listbox" aria-label={t('settings-time-picker-minute')} {@attach centerSelected}>
+			<div class="column" role="listbox" aria-label={t('settings-time-picker-minute')} {@attach centerSelected}>
 				{#each MINUTES as option (option)}
 					<button type="button" role="option" aria-selected={option === minute} onclick={() => set(hour * 60 + option)}>
 						{pad(option)}

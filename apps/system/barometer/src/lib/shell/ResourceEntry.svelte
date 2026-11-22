@@ -15,39 +15,17 @@
 	let summary = $derived(monitor.latest ? resource.summary(monitor.latest) : '');
 </script>
 
-<button type="button" class="entry" class:active aria-current={active ? 'page' : undefined} onclick={() => app.open(resource.id)}>
+<button type="button" class="nav-item tall entry" class:active aria-current={active ? 'page' : undefined} onclick={() => app.open(resource.id)}>
 	<span class="text">
 		<span class="title">{resource.title}</span>
-		<span class="summary">{summary}</span>
+		<span class="nav-detail summary">{summary}</span>
 	</span>
 	<Graph class="spark" {lines} max={resource.max} floor={resource.floor} binary={resource.binary} compact />
 </button>
 
 <style>
 	.entry {
-		display: flex;
-		min-height: 52px;
-		width: 100%;
-		flex: none;
-		align-items: center;
-		gap: 12px;
-		border-radius: 16px;
-		padding: 7px 8px 7px 14px;
-		text-align: left;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.entry:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.entry.active {
-		background: transparent;
-		color: var(--text);
+		padding-right: 8px;
 	}
 
 	.text {
@@ -67,8 +45,6 @@
 
 	.summary {
 		overflow: hidden;
-		font-size: 12px;
-		color: var(--sidebar-text-muted);
 		font-variant-numeric: tabular-nums;
 		text-overflow: ellipsis;
 		white-space: nowrap;

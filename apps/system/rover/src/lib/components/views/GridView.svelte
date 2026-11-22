@@ -54,7 +54,7 @@
 
 <VirtualScroller
 	bind:this={surface.scroller}
-	class="entry-scroller soft-scroll"
+	class="entry-scroller"
 	items={surface.items}
 	key={(entry) => entry.path}
 	{layout}

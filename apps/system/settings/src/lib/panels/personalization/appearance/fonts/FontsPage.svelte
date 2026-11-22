@@ -55,7 +55,7 @@
 		<div class="row-group">
 			{#if shown.length}
 				<VirtualScroller
-					class="soft-scroll scroll-fade h-[min(calc(100dvh-250px),calc(var(--rows)*60px))]"
+					class="scroll-fade h-[min(calc(100dvh-250px),calc(var(--rows)*60px))]"
 					style="--rows: {shown.length}"
 					items={shown}
 					key={(family) => family.name}

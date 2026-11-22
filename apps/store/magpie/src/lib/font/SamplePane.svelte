@@ -19,7 +19,7 @@
 	}
 </script>
 
-<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
+<div class="min-h-0 flex-1 overflow-y-auto">
 	<div class="mx-auto flex max-w-[860px] flex-col gap-7 px-8 pt-6 pb-12" class:invisible={!fontState.family}>
 		<div class="flex flex-col gap-2">
 			<p class="hero" {style}>{headline(face.characters, face.family)}</p>

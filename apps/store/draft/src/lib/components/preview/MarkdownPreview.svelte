@@ -83,7 +83,7 @@
 	}
 </script>
 
-<article bind:this={container} class="markdown soft-scroll" {@attach links}>
+<article bind:this={container} class="markdown" {@attach links}>
 	{#if heldBack && workspace.active}
 		{@const id = workspace.active.id}
 		<RemoteImagesNotice class="remote" onshow={() => showingRemote.add(id)} />

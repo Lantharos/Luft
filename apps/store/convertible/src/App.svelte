@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
-	import { appearance, ConfirmDialog, droppedPaths, GlassShell, keepWindowState } from '@luft/ui';
+	import { appearance, ConfirmDialog, droppedPaths, GlassShell, keepWindowState, PageStage } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import ConflictDialog from '#lib/shell/ConflictDialog.svelte';
 	import Header from '#lib/shell/Header.svelte';
@@ -14,7 +14,10 @@
 	import { queue } from '#lib/state/queue.svelte.js';
 	import { session, type Opened } from '#lib/state/session.svelte.js';
 
+	const PLACES = ['home', 'work', 'queue'] as const;
+
 	let dragging = $state(false);
+	let place = $derived<(typeof PLACES)[number]>(session.view === 'queue' ? 'queue' : session.files.length ? 'work' : 'home');
 
 	onMount(() => {
 		const stops = [queue.listen(), sabineEvents.singleInstance((activation) => void activate(activation))];
@@ -56,16 +59,18 @@
 <svelte:window onkeydown={handleKeydown} {ondragover} {ondrop} ondragleave={(event) => (dragging = event.relatedTarget !== null)} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full select-none">
+	<GlassShell class="h-full">
 		<main class="glass-content flex min-w-0 flex-col">
 			<Header />
-			{#if session.view === 'queue'}
-				<QueueView />
-			{:else if session.files.length}
-				<Workspace />
-			{:else}
-				<Home over={dragging} />
-			{/if}
+			<PageStage page={place} order={PLACES.indexOf(place)} scrolls={false}>
+				{#if place === 'queue'}
+					<QueueView />
+				{:else if place === 'work'}
+					<Workspace />
+				{:else}
+					<Home over={dragging} />
+				{/if}
+			</PageStage>
 		</main>
 	</GlassShell>
 </div>

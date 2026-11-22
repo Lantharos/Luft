@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { fade } from '@luft/ui';
+	import { EmptyState, fade } from '@luft/ui';
 	import type { FileEntry } from '#lib/bindings.js';
-	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import LoadingRows from '#lib/components/pane/LoadingRows.svelte';
 	import TrashPane from '#lib/components/pane/TrashPane.svelte';
 	import ColumnsView from '#lib/components/views/ColumnsView.svelte';

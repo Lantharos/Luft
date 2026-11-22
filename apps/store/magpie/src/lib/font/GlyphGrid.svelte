@@ -16,7 +16,7 @@
 	}
 </script>
 
-<VirtualScroller class="soft-scroll min-h-0 flex-1" items={list} key={(codepoint) => String(codepoint)} layout={LAYOUT}>
+<VirtualScroller class="min-h-0 flex-1" items={list} key={(codepoint) => String(codepoint)} layout={LAYOUT}>
 	{#snippet children(codepoint)}
 		<button type="button" class="glyph" {@attach tooltip(t('magpie-font-copy', { code: hex(codepoint) }))} onclick={() => copy(codepoint)}>
 			<span class="character" style:font-family="'{fontState.family}'" style:font-variation-settings={fontState.variation}>{String.fromCodePoint(codepoint)}</span>

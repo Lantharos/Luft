@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import { appWindow } from '@lantharos/sabine';
-	import { appearance, GlassShell } from '@luft/ui';
+	import { appearance, GlassShell, PageStage } from '@luft/ui';
 	import Fingerprint from '#lib/steps/firstboot/Fingerprint.svelte';
 	import NetworkType from '#lib/steps/firstboot/NetworkType.svelte';
 	import SecureBoot from '#lib/steps/firstboot/SecureBoot.svelte';
@@ -21,7 +19,6 @@
 	import { setup } from '#lib/state/setup.svelte.js';
 
 	const STEPS = { region: Region, early: Early, destination: Destination, network: Network, account: Account, finishing: Finishing, 'network-type': NetworkType, 'secure-boot': SecureBoot, protect: Protect, fingerprint: Fingerprint, ready: Ready };
-	const SLIDE = 28;
 
 	onMount(() => {
 		const stopping = setup.start();
@@ -45,11 +42,9 @@
 	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 		<div class="drag-region absolute inset-x-0 top-0 z-10 h-10"></div>
 		{#if setup.ready && Step}
-			{#key flow.step}
-				<div class="absolute inset-0" in:fly={{ x: SLIDE * flow.direction, duration: 260, easing: cubicOut }} out:fly={{ x: -SLIDE * flow.direction, duration: 160 }}>
-					<Step />
-				</div>
-			{/key}
+			<PageStage page={flow.step} depth={flow.index} scrolls={false} class="absolute inset-0">
+				<Step />
+			</PageStage>
 		{/if}
 	</main>
 </GlassShell>

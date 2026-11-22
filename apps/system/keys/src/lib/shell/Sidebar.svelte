@@ -22,9 +22,9 @@
 
 {#snippet group(title: string, kind: Kind, items: Item[], add: string)}
 	<section class="flex flex-col gap-0.5">
-		<div class="flex h-8 items-center justify-between pr-1 pl-3">
-			<h2 class="text-[13px] font-medium text-[var(--sidebar-text-muted)]">{title}</h2>
-			<button type="button" class="add" aria-label={add} {@attach tooltip(add)} onclick={() => (app.creating = kind === 'layout' ? { kind, from: null } : { kind })}>
+		<div class="nav-heading">
+			<h2>{title}</h2>
+			<button type="button" class="nav-action" aria-label={add} {@attach tooltip(add)} onclick={() => (app.creating = kind === 'layout' ? { kind, from: null } : { kind })}>
 				<Plus size={16} />
 			</button>
 		</div>
@@ -51,49 +51,6 @@
 </aside>
 
 <style>
-	.add {
-		display: grid;
-		height: 28px;
-		width: 28px;
-		place-items: center;
-		border-radius: var(--radius-pill);
-		color: var(--sidebar-text-muted);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.add:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item {
-		display: flex;
-		height: 38px;
-		width: 100%;
-		align-items: center;
-		gap: 10px;
-		border-radius: var(--radius-pill);
-		padding-inline: 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.nav-item:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item.active {
-		background: transparent;
-		color: var(--text);
-	}
-
 	.mark {
 		width: 26px;
 		flex: none;

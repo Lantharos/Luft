@@ -20,7 +20,7 @@
 </script>
 
 <div class="flex min-h-0 flex-1 flex-col px-3 pb-3">
-	<VirtualScroller class="soft-scroll min-h-0 flex-1" items={session.files} key={(file) => file.path} layout={LAYOUT} role="list" aria-label={t('list-files')}>
+	<VirtualScroller class="min-h-0 flex-1" items={session.files} key={(file) => file.path} layout={LAYOUT} role="list" aria-label={t('list-files')}>
 		{#snippet children(file)}
 			<div
 				class="row"
@@ -62,7 +62,6 @@
 		height: 44px;
 		padding: 0 8px 0 12px;
 		border-radius: 10px;
-		cursor: default;
 	}
 
 	.row:hover {
@@ -74,7 +73,6 @@
 	}
 
 	.row:focus-visible {
-		outline: 2px solid var(--control-focus);
 		outline-offset: -2px;
 	}
 </style>

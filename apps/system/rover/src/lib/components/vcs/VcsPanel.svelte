@@ -105,7 +105,7 @@
 		</div>
 
 		<div class="grid min-h-0 flex-1 grid-rows-[minmax(128px,38%)_minmax(0,1fr)]">
-			<section class="soft-scroll min-h-0 overflow-auto px-3 py-3" aria-label={t('rover-vcs-changed-files-label')}>
+			<section class="min-h-0 overflow-auto px-3 py-3" aria-label={t('rover-vcs-changed-files-label')}>
 				{#if vcs.changedFiles.length === 0}
 					<div class="grid h-full place-items-center text-[13px] text-[var(--text-muted)]">{t('rover-vcs-no-changes')}</div>
 				{:else}
@@ -136,7 +136,7 @@
 				{/if}
 			</section>
 
-			<section class="soft-scroll min-h-0 overflow-auto bg-[var(--content)] px-4 py-3 shadow-[inset_0_1px_0_var(--hairline)]" aria-label={t('rover-vcs-diff')}>
+			<section class="min-h-0 overflow-auto bg-[var(--content)] px-4 py-3 shadow-[inset_0_1px_0_var(--hairline)]" aria-label={t('rover-vcs-diff')}>
 				{#if vcs.isDiffLoading}
 					<div class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />{t('rover-vcs-diff-loading')}</div>
 				{:else if vcs.diff}

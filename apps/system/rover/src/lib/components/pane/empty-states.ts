@@ -5,21 +5,8 @@ import FolderOpen from '@lucide/svelte/icons/folder-open';
 import FolderX from '@lucide/svelte/icons/folder-x';
 import Lock from '@lucide/svelte/icons/lock';
 import Search from '@lucide/svelte/icons/search';
-import type { Component } from 'svelte';
+import type { EmptyAction, EmptyStateProps } from '@luft/ui';
 import type { EntryContext } from '#lib/file-manager/view/entry-props.js';
-
-export type EmptyAction = {
-	label: string;
-	run: () => unknown;
-};
-
-export type EmptyStateProps = {
-	icon: Component;
-	title: string;
-	message?: string;
-	action?: EmptyAction;
-	tone?: 'neutral' | 'danger';
-};
 
 const PERMISSION = /permission denied|os error 13|not permitted/i;
 const MISSING = /does not exist|no such file|os error 2\b/i;

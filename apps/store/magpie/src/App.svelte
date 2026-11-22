@@ -99,7 +99,7 @@
 <svelte:window onkeydown={handleKeydown} ondragover={drop.ondragover} ondrop={drop.ondrop} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full select-none">
+	<GlassShell class="h-full">
 		{#if !viewer}
 			<Sidebar />
 		{/if}
@@ -160,7 +160,6 @@
 				{/if}
 			</div>
 			<Toast
-				class="absolute z-40"
 				toast={chrome.toasts.current}
 				ondismiss={chrome.toasts.dismiss}
 				onhold={chrome.toasts.hold}

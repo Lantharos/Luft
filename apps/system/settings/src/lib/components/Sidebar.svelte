@@ -55,7 +55,7 @@
 		{#if setting}
 			<span class="flex min-w-0 flex-col">
 				<span class="truncate text-[13.5px] leading-tight">{setting}</span>
-				<span class="truncate text-[12px] leading-tight text-[var(--sidebar-text-muted)]">{titleOf(panel, present)}</span>
+				<span class="nav-detail truncate leading-tight">{titleOf(panel, present)}</span>
 			</span>
 		{:else}
 			<span class="truncate">{titleOf(panel, present)}</span>
@@ -72,7 +72,7 @@
 		<Icon size={18} class="flex-none" />
 		<span class="flex min-w-0 flex-col">
 			<span class="truncate text-[13.5px] leading-tight">{title}</span>
-			<span class="truncate text-[12px] leading-tight text-[var(--sidebar-text-muted)]">{where}</span>
+			<span class="nav-detail truncate leading-tight">{where}</span>
 		</span>
 	</button>
 {/snippet}
@@ -83,7 +83,7 @@
 		{#if present}
 			{#each groups as group, index (index)}
 				<section class="flex flex-col gap-0.5">
-					<h2 class="flex h-8 items-center px-3 text-[13px] font-medium text-[var(--sidebar-text-muted)]">{group.title}</h2>
+					<h2 class="nav-heading">{group.title}</h2>
 					{#each group.panels as panel (panel.id)}
 						{@render item({ panel, setting: null }, present)}
 					{/each}
@@ -106,29 +106,3 @@
 	</nav>
 </aside>
 
-<style>
-	.nav-item {
-		position: relative;
-		display: flex;
-		height: 38px;
-		width: 100%;
-		align-items: center;
-		gap: 12px;
-		border-radius: var(--radius-pill);
-		padding-inline: 12px;
-		text-align: left;
-		font-size: 14px;
-		color: var(--sidebar-text);
-		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.nav-item:hover {
-		background: var(--sidebar-control);
-		color: var(--text);
-	}
-
-	.nav-item.active {
-		background: transparent;
-		color: var(--text);
-	}
-</style>

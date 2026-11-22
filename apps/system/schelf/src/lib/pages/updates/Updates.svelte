@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="soft-scroll h-full overflow-y-auto">
+<div class="h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<div class="flex items-center gap-4 px-2">
 			<div class="flex min-w-0 flex-1 flex-col gap-1">

@@ -76,7 +76,7 @@
 						<span>{t('rover-vcs-files')}</span>
 						<span>{t('rover-chooser-selected', { count: selected.length })}</span>
 					</div>
-					<div class="soft-scroll max-h-[280px] overflow-auto rounded-[14px] bg-[var(--content)] p-1 shadow-[inset_0_0_0_1px_var(--hairline)]">
+					<div class="max-h-[280px] overflow-auto rounded-[14px] bg-[var(--content)] p-1 shadow-[inset_0_0_0_1px_var(--hairline)]">
 						{#each files as file (file.path)}
 							<button
 								class="flex min-h-10 w-full items-center gap-2 rounded-[12px] px-2 text-left text-[13px] text-[var(--text-soft)] transition-[background-color,color,opacity] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"

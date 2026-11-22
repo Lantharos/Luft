@@ -18,7 +18,7 @@
 </script>
 
 <Dialog title={t('recordings-title')} {onclose}>
-	<div class="soft-scroll flex max-h-[420px] flex-col gap-1 overflow-y-auto">
+	<div class="flex max-h-[420px] flex-col gap-1 overflow-y-auto">
 		{#each recordings as recording (recording.id)}
 			<button type="button" class="choice" onclick={() => (void player.open(notebook, recording), onclose())}>
 				<AudioLines size={17} />

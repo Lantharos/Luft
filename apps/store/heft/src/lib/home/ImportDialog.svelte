@@ -26,7 +26,7 @@
 </script>
 
 <Dialog title={t('import-title', { count: paths.length, name: pictureName(paths[0]), kind })} description={t('import-body', { kind })} {onclose}>
-	<div class="flex max-h-[360px] flex-col overflow-y-auto soft-scroll">
+	<div class="flex max-h-[360px] flex-col overflow-y-auto">
 		{#each library.active as subject (subject.meta.id)}
 			<button type="button" class="choice" disabled={busy} onclick={() => void pick(subject)}>
 				<span class="size-3 rounded-full" style:background={subject.meta.color}></span>

@@ -123,7 +123,7 @@
 />
 
 <div class="h-[100dvh] w-screen min-w-[800px] overflow-hidden bg-transparent text-[var(--text)]">
-	<GlassShell class="h-full select-none [--sidebar-width:260px]">
+	<GlassShell class="h-full [--sidebar-width:260px]">
 		<Sidebar bind:this={sidebar} {manager} {drag} {chooser} {trash} />
 
 		<main class="glass-content relative isolate">

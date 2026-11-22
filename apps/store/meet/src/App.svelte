@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import { t } from '@luft/i18n';
-	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, PageStage, Toast, WindowControls } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import * as meet from '#lib/bridge/meet.js';
 	import { luft } from '#lib/state/luft.svelte.js';
@@ -38,7 +36,6 @@
 		stick: Stick,
 		stickDone: StickDone
 	};
-	const SLIDE = 28;
 
 	const SHORTCUTS: Record<string, () => unknown> = {
 		KeyN: () => session.switchChannel(),
@@ -81,13 +78,10 @@
 			<span class="text-[12.5px] text-[var(--text-muted)]">{session.nightly ? t('meet-nightly') : ''}</span>
 			<WindowControls maximizable={false} closable={session.step !== 'working'} />
 		</div>
-		{#key session.step}
-			<div class="absolute inset-0" in:fly={{ x: SLIDE * session.direction, duration: 260, easing: cubicOut }} out:fly={{ x: -SLIDE * session.direction, duration: 160 }}>
-				<Step />
-			</div>
-		{/key}
+		<PageStage page={Step} depth={session.depth} scrolls={false} class="absolute inset-0">
+			<Step />
+		</PageStage>
 		<Toast
-			class="absolute z-20"
 			toast={session.notes.current}
 			ondismiss={session.notes.dismiss}
 			onhold={session.notes.hold}

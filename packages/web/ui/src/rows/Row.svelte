@@ -32,7 +32,7 @@
 			{#if locked}
 				<span id="{id}-description" class="description managed"><Lock size={12} />{t('ui-row-managed')}</span>
 			{:else if description}
-				<span id="{id}-description" class="description" class:truncate>{description}</span>
+				<span id="{id}-description" class="description" class:truncate class:selectable={!onclick}>{description}</span>
 			{/if}
 		</div>
 		{#if children}
@@ -159,6 +159,10 @@
 		font-size: 14px;
 		font-weight: 500;
 		color: var(--text);
+	}
+
+	.description.selectable {
+		user-select: text;
 	}
 
 	.description {

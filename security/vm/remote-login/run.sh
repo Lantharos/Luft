@@ -9,7 +9,7 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 serial="$vm/serial.log"
 forwarded=$((20000 + RANDOM % 20000))
 
-setup="systemctl enable shield.service remoted-check.service"
+setup="systemctl enable shield.service remoted-policy.path remoted-check.service"
 
 start_stage
 if from_this_tree; then
@@ -31,3 +31,4 @@ boot_check() {
 boot_check first 12 "PASS first"
 boot_check went-back 6 "PASS went-back"
 boot_check on-at-start 6 "PASS on-at-start"
+boot_check policy 6 "PASS policy"

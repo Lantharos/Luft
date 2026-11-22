@@ -10,6 +10,7 @@ key=/root/check-key
 rules=/etc/polkit-1/rules.d/90-remote-login-check.rules
 ldconfig_rewrites=/etc/ld.so.cache
 phase_file=/var/lib/remoted-check/phase
+policy=/etc/luft/policy.d/10-remoted-check.toml
 read -r forwarded < <(sed -n 's/.*luft\.remote-login-check=\([0-9]*\).*/\1/p' /proc/cmdline)
 
 say() { echo "remoted-check: $*" > /dev/console; }
@@ -267,6 +268,47 @@ on_at_start() {
   remote_login SetEnabled b false || fail "SetEnabled false"
 }
 
+managed() {
+  local answer
+  answer="$(remote_login "$@" 2>&1)"
+  grep -q 'organization manages' <<< "$answer" || { say "answered: $answer"; return 1; }
+}
+
+refuses_passwords() { ! with_password "$person"; }
+
+decide() {
+  install -D -m 644 /dev/stdin "$policy" <<< "$1"
+}
+
+policy_passwords() {
+  remote_login SetEnabled b true || fail "SetEnabled true before the policy"
+  remote_login SetPasswordLogin b true || fail "SetPasswordLogin true before the policy"
+  expect works "signing in with a password before the policy" with_password "$person"
+  decide $'[remote-login]\npasswords = false'
+  eventually "PasswordLogin turns off as soon as the policy allows only keys" sh -c "busctl get-property $name $path $name PasswordLogin | grep -q false"
+  eventually "sshd stops taking passwords at once" refuses_passwords
+  sshd -T | grep -qix "passwordauthentication no" || fail "sshd -T still takes passwords under a keys-only policy"
+  expect works "signing in with a key under a keys-only policy" with_key "$person"
+  managed SetPasswordLogin b true || fail "turning passwords on under a keys-only policy isn't refused as managed"
+  say "ok: a keys-only policy takes passwords away from a running SSH server"
+}
+
+policy_off() {
+  systemctl stop remoted.service
+  decide $'[remote-login]\nallowed = false'
+  eventually "the policy folder starts remoted" systemctl is-active --quiet remoted.service
+  eventually "remoted stops sshd as soon as the policy keeps remote login off" sh -c "! systemctl is-active --quiet sshd.service"
+  [[ "$(property Enabled)" == "b false" ]] || fail "Enabled is $(property Enabled) under a policy that keeps it off"
+  ! ss -Hltn | grep -q ':22 ' || fail "something listens on port 22 under a policy that keeps it off"
+  managed SetEnabled b true || fail "turning remote login on under the policy isn't refused as managed"
+  expect refused "signing in under a policy that keeps remote login off" with_key "$person"
+  rm "$policy"
+  remote_login SetEnabled b true || fail "SetEnabled true once the policy is gone"
+  expect works "signing in with a key once the policy is gone" with_key "$person"
+  remote_login SetEnabled b false || fail "SetEnabled false"
+  say "ok: the policy starts remoted when it changes, which stops sshd at once and refuses turning it on"
+}
+
 [[ "$(getenforce)" == Enforcing ]] || fail "SELinux isn't enforcing"
 [[ -n "$forwarded" ]] || fail "no forwarded port on the command line"
 phase="$(cat "$phase_file" 2> /dev/null || echo first)"
@@ -297,6 +339,13 @@ case "$phase" in
     home_network
     on_at_start
     turned_off
+    no_denials
+    next=policy
+    ;;
+  policy)
+    home_network
+    policy_passwords
+    policy_off
     no_denials
     next=done
     ;;

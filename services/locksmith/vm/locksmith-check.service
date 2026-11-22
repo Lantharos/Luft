@@ -1,0 +1,12 @@
+[Unit]
+Description=Policy check
+After=locksmith.service polkit.service dbus.service trustd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/locksmith-check
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

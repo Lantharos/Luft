@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 
-use super::CERTIFICATE;
 use super::request::Request;
 use crate::boot::startup;
 use crate::errors::Unsupported;
@@ -33,18 +32,30 @@ impl Enrollment {
     }
 }
 
-fn listed_in(certificates: Vec<Vec<u8>>) -> bool {
-    std::fs::read(CERTIFICATE).is_ok_and(|ours| certificates.contains(&ours))
+fn all_in(ours: &[Vec<u8>], certificates: &[Vec<u8>]) -> bool {
+    !ours.is_empty() && ours.iter().all(|ours| certificates.contains(ours))
 }
 
 pub fn enrollment() -> Enrollment {
-    if listed_in(efi::enrolled_certificates()) {
-        Enrollment::Enrolled
-    } else if listed_in(efi::requested_certificates()) {
+    let ours = super::certificates();
+    let mut known = efi::enrolled_certificates();
+    if all_in(&ours, &known) {
+        return Enrollment::Enrolled;
+    }
+    known.extend(efi::requested_certificates());
+    if all_in(&ours, &known) {
         Enrollment::Pending
     } else {
         Enrollment::None
     }
+}
+
+fn not_enrolled() -> Vec<PathBuf> {
+    let enrolled = efi::enrolled_certificates();
+    super::certificate_files()
+        .into_iter()
+        .filter(|path| std::fs::read(path).is_ok_and(|ours| !enrolled.contains(&ours)))
+        .collect()
 }
 
 pub(super) fn one_time_code() -> Result<String> {
@@ -111,11 +122,11 @@ pub(super) fn wait_longer_on_blue_screen() -> Result<()> {
         .status()
 }
 
-fn import(code: &str) -> Result<()> {
+fn import(certificates: &[PathBuf], code: &str) -> Result<()> {
     let scratch = Scratch::empty()?;
     Tool::new("mokutil")
         .arg("--import")
-        .arg(Path::new(CERTIFICATE))
+        .args(certificates)
         .arg("--hash-file")
         .arg(hash_file(&scratch, code)?)
         .status()?;
@@ -127,7 +138,7 @@ fn ask_shim(mut request: Request, state: &Path) -> Result<String> {
         Some(code) => code,
         None => one_time_code()?,
     };
-    import(&code)?;
+    import(&not_enrolled(), &code)?;
     request.code = Some(code.clone());
     request.save_in(state)?;
     show_on_restart(&request);
@@ -161,6 +172,21 @@ pub fn follow_up() -> Result<()> {
         (Enrollment::None, None) => missed(Request::default())?,
     }
     Ok(())
+}
+
+/// Asks shim to also trust `certificate`, the key that signs the startup images of an image
+/// this computer is about to switch to, and returns the code to confirm it with.
+pub fn request_for_next_image(certificate: &Path) -> Result<String> {
+    if enrollment() == Enrollment::Pending {
+        revoke()?;
+    }
+    let code = one_time_code()?;
+    import(&[certificate.to_owned()], &code)?;
+    let mut request = Request::default();
+    request.code = Some(code.clone());
+    request.save()?;
+    show_on_restart(&request);
+    Ok(code)
 }
 
 pub fn cancel() -> Result<()> {

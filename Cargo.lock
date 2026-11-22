@@ -10919,11 +10919,13 @@ dependencies = [
  "luft-meet",
  "luft-policy",
  "luft-recovery-key",
+ "luft-variant",
  "rustix",
  "serde",
  "serde_json",
  "sha2",
  "tokio",
+ "toml",
  "zbus 6.0.0",
 ]
 

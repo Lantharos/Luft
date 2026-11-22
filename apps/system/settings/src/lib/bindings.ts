@@ -1992,6 +1992,7 @@ export type SystemUpdatesPolicy = {
 	schedule: UpdateSchedule | null,
 	download: boolean | null,
 	channel: Channel | null,
+	image: string | null,
 };
 
 export type Target = "output" | "input" | "app";

@@ -1,0 +1,97 @@
+name: Luft
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      promote:
+        description: Give every computer the pilot build
+        type: boolean
+        default: false
+
+concurrency:
+  group: luft
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build for the pilot computers
+    if: ${{ !inputs.promote }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 120
+    environment: signing
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Make room
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+
+      - name: Sign in to the registry
+        env:
+          TOKEN: ${{ github.token }}
+        run: podman login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<<"$TOKEN"
+
+      - name: Luft's build tools
+        run: |
+          luft="$(sed -n 's/^luft *= *"\(.*\)"$/\1/p' organization.toml)"
+          revision="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$luft")"
+          git clone --quiet --filter=blob:none --no-checkout https://github.com/Lantharos/Luft "$RUNNER_TEMP/luft"
+          git -C "$RUNNER_TEMP/luft" sparse-checkout set os
+          git -C "$RUNNER_TEMP/luft" checkout --quiet "$revision"
+          echo "ORG=$RUNNER_TEMP/luft/os/org/org.sh" >> "$GITHUB_ENV"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if "$ORG" needed .; then echo "build=1" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Build
+        if: steps.changes.outputs.build == '1'
+        env:
+          SECURE_BOOT_KEY: ${{ secrets.LUFT_ORG_SECURE_BOOT_KEY }}
+          PCR_KEY: ${{ secrets.LUFT_ORG_PCR_KEY_101 }}
+        run: |
+          keys="$(mktemp -d)"
+          trap 'rm -rf "$keys"' EXIT
+          printf '%s\n' "$SECURE_BOOT_KEY" > "$keys/secure-boot.key"
+          printf '%s\n' "$PCR_KEY" > "$keys/pcr-101.key"
+          LUFT_SECUREBOOT_KEY="$keys/secure-boot.key" LUFT_PCR_KEY_101="$keys/pcr-101.key" TMPDIR="$RUNNER_TEMP" \
+            "$ORG" build .
+
+      - name: Publish
+        if: steps.changes.outputs.build == '1'
+        env:
+          SIGNING_KEY: ${{ secrets.LUFT_ORG_SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.LUFT_ORG_SIGNING_PASSPHRASE }}
+        run: |
+          keys="$(mktemp -d)"
+          trap 'rm -rf "$keys"' EXIT
+          printf '%s\n' "$SIGNING_KEY" > "$keys/signing.private"
+          printf '%s' "$SIGNING_PASSPHRASE" > "$keys/signing.passphrase"
+          LUFT_ORG_SIGNING_KEY="$keys/signing.private" LUFT_ORG_SIGNING_PASSPHRASE="$keys/signing.passphrase" \
+            "$ORG" publish .
+
+  promote:
+    name: Give every computer the pilot build
+    if: ${{ inputs.promote }}
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Sign in to the registry
+        env:
+          TOKEN: ${{ github.token }}
+        run: podman login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<<"$TOKEN"
+
+      - name: Promote
+        run: |
+          git clone --quiet --depth 1 --filter=blob:none --sparse https://github.com/Lantharos/Luft "$RUNNER_TEMP/luft"
+          git -C "$RUNNER_TEMP/luft" sparse-checkout set os
+          "$RUNNER_TEMP/luft/os/org/org.sh" promote .

@@ -3,6 +3,7 @@ mod command;
 mod progress;
 mod schedule;
 mod service;
+mod signatures;
 mod space;
 
 use std::process::ExitCode;

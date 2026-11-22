@@ -53,6 +53,7 @@ lock-after = 0         # seconds after the screen turns off before it locks
 schedule = "daily"     # "daily", "weekly" or "never"
 download = true        # download and stage updates found on schedule
 channel = "stable"     # "stable" or "nightly"
+image = "ghcr.io/acme/luft:1-pilot"  # the image to follow, in place of the channel
 
 [firewall]
 home-networks = false  # every network counts as public
@@ -99,7 +100,7 @@ Keys that only take something away, such as everything under `firewall`, `accoun
 | --- | --- |
 | `organization` | Nothing to enforce; Settings shows the name |
 | `screen-lock`, `nearby-sharing` | `locksmith`, below, which locks the desktop settings |
-| `updates` | `updater`: `Schedule` and `DownloadAutomatically` report the policy's values and the scheduled check follows them. A system on another channel than the policy's moves to it the way [a channel switch](/developers/system/updates/#the-updater) does, waiting until that channel has caught up. |
+| `updates` | `updater`: `Schedule` and `DownloadAutomatically` report the policy's values and the scheduled check follows them. A system on another channel than the policy's moves to it the way [a channel switch](/developers/system/updates/#the-updater) does, waiting until that channel has caught up. A system following another image than `image` moves to it the same way, keeping its standard or NVIDIA image, but only to an image `/etc/containers/policy.json` requires a signature for, such as [an organization's own](/developers/system/organizations/). |
 | `firewall` | `shield`: with `home-networks` off, no network is home and none waits to be chosen; with `public-access` off, apps and ports allowed anywhere only open on home networks; with `open-ports` off, the ports opened for services stay closed. |
 | `software.system-packages`, `software.package-sources` | `packager` refuses `Install` and `InstallFile`, or `AddRepository`. Schelf and the `schelf` command show and refuse them before asking. Packages and sources added earlier stay. |
 | `software.app-sources` | Schelf, its install window for files and the `schelf` command refuse to install from other sources and show those apps as managed. Apps installed earlier keep updating and can be removed. |

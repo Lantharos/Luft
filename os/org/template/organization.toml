@@ -1,0 +1,4 @@
+name = "Example"
+image = "ghcr.io/example/luft"
+luft = "ghcr.io/lantharos/luft:1"
+nvidia = true

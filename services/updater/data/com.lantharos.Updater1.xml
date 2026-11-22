@@ -30,10 +30,13 @@
     image's configuration, which its signature covers. Only Rollback starts an older version, the
     one kept on the computer.
 
-    Luft's policy files (luft-policy) can decide the schedule, DownloadAutomatically and the
-    channel. Schedule and DownloadAutomatically then report the policy's values, SetSchedule and
-    SwitchChannel fail with com.lantharos.Updater1.Error.Managed when they would change them, and
-    a system following another channel than the policy's waits for that channel.
+    Luft's policy files (luft-policy) can decide the schedule, DownloadAutomatically, the
+    channel and the image. Schedule and DownloadAutomatically then report the policy's values,
+    SetSchedule and SwitchChannel fail with com.lantharos.Updater1.Error.Managed when they would
+    change them, and a system following another channel than the policy's waits for that channel.
+    A system following another image than the policy's moves to it, in its own variant, once it
+    is as new as the running version, but only when the containers policy requires a signature
+    for it.
 
     A finished download also has com.lantharos.Packages1 build the system packages for the version
     it staged, before Finished.

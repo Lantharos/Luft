@@ -107,16 +107,34 @@ pub fn enroll(device: &Path, unlock: &Secret, pin: &Secret) -> Result<()> {
 
 pub fn enroll_when_installed(device: &Path, unlock: &Secret, state: &Path) -> Result<()> {
     let now = tpm::secure_boot_pcr().context("The TPM didn't say how this computer started.")?;
-    let certificate = std::fs::read(crate::keys::CERTIFICATE)?;
-    let installed = eventlog::secure_boot_pcr_with_luft_key(
+    let installed = eventlog::secure_boot_pcr_with_keys(
         &now,
-        &certificate,
+        &crate::keys::certificates(),
         efi::secure_boot() == SecureBoot::On,
     )
     .unwrap_or(now);
     generations::link(device, unlock, &Secret::default(), &installed, state)?;
     remember_seal(state, &installed)?;
     write_in(state, INSTALLED, "")
+}
+
+/// Lets the TPM also unlock the disk for the next image's startup, signed with `certificate`
+/// and the TPM policy keys `policy_keys`, before that image first starts. The disk keeps its
+/// keys for this image, so going back still unlocks. Returns whether it could.
+pub fn link_for_next_image(certificate: &[u8], policy_keys: &[(u32, PathBuf)]) -> Result<bool> {
+    let Some((device, unlock)) = sealed_disk() else {
+        return Ok(false);
+    };
+    let now = tpm::secure_boot_pcr().context("The TPM didn't say how this computer started.")?;
+    let mut certificates = crate::keys::certificates();
+    certificates.push(certificate.to_vec());
+    let next = eventlog::secure_boot_pcr_with_keys(&now, &certificates, true)
+        .context("The TPM's event log doesn't match how this computer started.")?;
+    let state = Path::new(paths::STATE);
+    generations::link_also(&device, &unlock, &next, policy_keys, state)?;
+    remember_seal(state, &next)?;
+    write_in(state, INSTALLED, "")?;
+    Ok(true)
 }
 
 fn tpm_sealed_disk() -> Option<(PathBuf, Secret)> {
@@ -200,6 +218,9 @@ pub fn accept_secure_boot_change() -> Result<()> {
 }
 
 pub fn before_restart() -> Result<()> {
+    if paths::state(INSTALLED).exists() {
+        return Ok(());
+    }
     let Some(next) = tpm::secure_boot_pcr().and_then(|now| eventlog::next_secure_boot_pcr(&now))
     else {
         return Ok(());

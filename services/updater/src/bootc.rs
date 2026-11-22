@@ -13,13 +13,14 @@ use serde_json::{Map, Value, json};
 
 use crate::command::{self, run};
 use crate::progress::Pull;
+use crate::signatures;
 
 const BOOTC: &str = "bootc";
 const REGISTRY: &str = "registry";
 const PROGRESS_FD: i32 = 3;
 const CHECK_TIMEOUT: &str = "2m";
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
-const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
+const UNSIGNED: &str = "This update isn't signed with the key this computer trusts for its system, so it wasn't downloaded.";
 const OLDER: &str =
     "This update is older than the version of Luft on this computer, so it wasn't installed.";
 const VERSION: &str = "/config/Labels/org.opencontainers.image.version";
@@ -211,20 +212,48 @@ pub fn next(waiting: Option<Channel>) -> Result<Next> {
         return update(&host);
     };
     let target = on_channel(&host, channel)?;
+    toward(&host, target, channel == Channel::Stable)
+}
+
+/// The move to `target` once it has a version at least as new as the running one, or else,
+/// when `keep_updating`, an update of what the system follows now.
+fn toward(host: &Value, target: Reference, keep_updating: bool) -> Result<Next> {
     let config = match offered(&target.image) {
         Ok(config) => Some(config),
         Err(error) if not_published(&error) => None,
         Err(error) => return Err(error),
     };
     let reachable = config.filter(|config| {
-        !older_than_running(&host, Some(config)) && !has_root(&host, "staged", config)
+        !older_than_running(host, Some(config)) && !has_root(host, "staged", config)
     });
     Ok(match reachable {
-        Some(config) if has_root(&host, "booted", &config) => Next::Retarget(target),
+        Some(config) if has_root(host, "booted", &config) => Next::Retarget(target),
         Some(_) => Next::Move(target),
-        None if channel == Channel::Stable => update(&host)?,
+        None if keep_updating => update(host)?,
         None => Next::Nothing,
     })
+}
+
+/// What to do next on a system whose policy names the image it follows: its updates once it
+/// follows that image, in its own variant, or the move there. A system only moves to an image
+/// its containers policy requires a signature for.
+pub fn next_image(image: &str) -> Result<Next> {
+    let host = host()?;
+    let followed = followed(&host)?;
+    let target = Variant::of(&followed.image)
+        .reference(image)
+        .ok_or_else(|| anyhow!("The policy names {image}, which has no tag to follow."))?;
+    if target == followed.image {
+        return update(&host);
+    }
+    if !signatures::required_for(&target)? {
+        bail!("The policy names {image}, which this computer doesn't require a signature for.");
+    }
+    let target = Reference {
+        image: target,
+        transport: REGISTRY.to_owned(),
+    };
+    toward(&host, target, true)
 }
 
 /// Whether the channel has a version out, or `None` when the registry couldn't be asked.

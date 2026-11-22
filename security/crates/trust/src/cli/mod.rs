@@ -9,6 +9,7 @@ use clap::{Parser, Subcommand};
 use crate::boot::{started, startup};
 use crate::disk;
 use crate::keys::{mok, others};
+use crate::organization;
 use crate::service::{actions, status};
 use crate::system::secrets::secret::Secret;
 
@@ -57,6 +58,11 @@ enum Command {
         #[command(subcommand)]
         action: SystemDiskAction,
     },
+    /// Running an organization's own image of Luft
+    Organization {
+        #[command(subcommand)]
+        action: OrganizationAction,
+    },
     /// Check what games with anti-cheat look for in how the computer started
     AntiCheat,
     /// Catch up once per start on Luft's key, the startup files and the TPM's disk key
@@ -77,6 +83,12 @@ enum SecureBootAction {
     RemoveOthers,
     /// Withdraw the request to remove them
     KeepOthers,
+}
+
+#[derive(Subcommand)]
+enum OrganizationAction {
+    /// Switch to the image a description from the organization names, checked with its keys, and trust the key its startup is signed with
+    Join { description: PathBuf },
 }
 
 #[derive(Subcommand)]
@@ -159,6 +171,7 @@ impl Cli {
             Command::RecoveryKey { action } => recovery_key(action),
             Command::Encryption { action } => encryption(action),
             Command::SystemDisk { action } => system_disk(action),
+            Command::Organization { action } => organization(action),
             Command::AntiCheat => {
                 let status = status::gather();
                 report::anti_cheat(&status.anti_cheat, &status.signing_key.other_keys);
@@ -173,6 +186,23 @@ impl Cli {
             }
         }
     }
+}
+
+fn organization(action: OrganizationAction) -> Result<()> {
+    let OrganizationAction::Join { description } = action;
+    let joined = organization::join(&description)?;
+    println!("This computer now gets Luft from {}.", joined.image);
+    let Some(code) = joined.code else {
+        println!("Restart to start it.");
+        return Ok(());
+    };
+    println!(
+        "Restart, and on the blue screen choose Enroll MOK, Continue and Yes, type {code}, then Reboot."
+    );
+    if !joined.tpm_linked {
+        println!("The disk asks for its recovery key or passphrase once on the first start.");
+    }
+    Ok(())
 }
 
 fn follow_up() {

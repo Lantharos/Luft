@@ -158,9 +158,11 @@ fn events_matching(now: &str) -> Option<Vec<Event>> {
     (replay(events.iter().map(|event| event.digest)) == now).then_some(events)
 }
 
-pub fn secure_boot_pcr_with_luft_key(
+/// PCR 7 for a start whose shim checks what it starts against `certificates`, each once, in
+/// that order.
+pub fn secure_boot_pcr_with_keys(
     now: &str,
-    certificate: &[u8],
+    certificates: &[Vec<u8>],
     secure_boot: bool,
 ) -> Option<String> {
     let mut digests: Vec<Sha256Digest> = events_matching(now)?
@@ -169,8 +171,10 @@ pub fn secure_boot_pcr_with_luft_key(
         .map(|event| event.digest)
         .collect();
     if secure_boot {
-        let signature = [SHIM_LOCK.as_slice(), certificate].concat();
-        digests.push(sha256(&authority(MOK_LIST, &signature)));
+        digests.extend(certificates.iter().map(|certificate| {
+            let signature = [SHIM_LOCK.as_slice(), certificate].concat();
+            sha256(&authority(MOK_LIST, &signature))
+        }));
     }
     Some(replay(digests))
 }

@@ -21,10 +21,12 @@ luft-identity.workspace = true
 luft-disks.workspace = true
 luft-meet.workspace = true
 luft-recovery-key.workspace = true
+luft-variant.workspace = true
 rustix = { workspace = true, features = ["fs", "process", "stdio", "termios"] }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
+toml.workspace = true
 tokio = { workspace = true, features = ["rt", "sync", "time"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 

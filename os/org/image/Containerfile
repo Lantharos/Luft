@@ -1,0 +1,14 @@
+ARG SYSTEM
+FROM ${SYSTEM}
+RUN rm -rf /usr/lib/luft/pcr-keys
+COPY organization.der /usr/share/luft/secure-boot/organization.der
+COPY pcr-keys/ /usr/lib/luft/pcr-keys/
+COPY organization.pub /usr/share/pki/containers/organization.pub
+COPY policy.json /etc/containers/policy.json
+COPY organization.yaml /etc/containers/registries.d/organization.yaml
+RUN bootc container lint
+ARG NAME
+ARG BASE
+ARG REVISION=""
+LABEL com.lantharos.organization="${NAME}" com.lantharos.organization.base="${BASE}" \
+    com.lantharos.organization.revision="${REVISION}"

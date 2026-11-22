@@ -37,6 +37,10 @@ os/iso/build.sh ghcr.io/lantharos/luft:1-nightly       # from the published imag
 
 It writes `os/iso/state/luft-VERSION.iso` and its `.sha256`, in a few minutes and without root.
 
+## An organization's own image
+
+`org/org.sh` builds an organization's image on top of Luft's from a copy of `org/template`, signed with the organization's own keys. [Running Luft in your organization](https://docs.luft.computer/developers/system/organizations/) walks through it.
+
 ## Try it in a VM
 
 ```sh

@@ -1,0 +1,6 @@
+ARG LUFT
+FROM ${LUFT}
+COPY certificates/ /usr/share/pki/ca-trust-source/anchors/
+COPY policy/ /usr/share/luft/policy.d/
+COPY files/ /
+RUN update-ca-trust

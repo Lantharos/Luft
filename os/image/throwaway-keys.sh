@@ -18,11 +18,13 @@ throwaway_keys() {
 }
 
 pcr_keys() {
-  local generation name
-  for generation in ${PCR_GENERATIONS//,/ }; do
-    name="LUFT_PCR_KEY_$generation"
-    [[ -z "${!name:-}" ]] || echo "$generation ${!name}"
-  done
+  local name generation
+  for name in ${!LUFT_PCR_KEY_@}; do
+    generation="${name#LUFT_PCR_KEY_}"
+    if [[ "$generation" =~ ^[0-9]+$ && -n "${!name}" ]]; then
+      echo "$generation ${!name}"
+    fi
+  done | sort -n
 }
 
 use_signing_keys() {

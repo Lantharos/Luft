@@ -87,6 +87,16 @@ impl Updater {
         Ok((followed != Some(required)).then_some(required))
     }
 
+    /// What to do next: follow the image the policy names, or else the channel the system
+    /// waits for or follows.
+    async fn next(&self) -> Result<Next, Error> {
+        if let Some(image) = Policy::load().updates.image {
+            return self.blocking(move || bootc::next_image(&image)).await;
+        }
+        let waiting = self.waiting().await?;
+        self.blocking(move || bootc::next(waiting)).await
+    }
+
     async fn plan(&self, planned: Schedule) -> Result<(), Error> {
         self.blocking(move || planned.save()).await?;
         *self.schedule.lock().expect("schedule lock") = planned;
@@ -344,10 +354,7 @@ impl Updater {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
         }
-        let Ok(waiting) = self.waiting().await else {
-            return Ok(());
-        };
-        let Ok(next) = self.blocking(move || bootc::next(waiting)).await else {
+        let Ok(next) = self.next().await else {
             return Ok(());
         };
         self.plan(Schedule {
@@ -414,12 +421,12 @@ impl Updater {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        let Some(channel) = self.waiting().await? else {
+        if Policy::load().updates.image.is_none() && self.waiting().await?.is_none() {
             return self
                 .begin(Fetch::upgrade, false, Change::Update, server, &emitter)
                 .await;
-        };
-        let next = self.blocking(move || bootc::next(Some(channel))).await?;
+        }
+        let next = self.next().await?;
         if !self.fetch_next(next, false, server, &emitter).await? {
             return Err(Error::Failed(
                 "There's no update to download yet.".to_owned(),
@@ -444,11 +451,8 @@ impl Updater {
         self.refuse_while_downloading()?;
         let channel = Channel::named(channel)
             .ok_or_else(|| Error::Failed(format!("“{channel}” isn't one of Luft's channels.")))?;
-        if Policy::load()
-            .updates
-            .channel
-            .is_some_and(|required| required != channel)
-        {
+        let policy = Policy::load().updates;
+        if policy.image.is_some() || policy.channel.is_some_and(|required| required != channel) {
             return Err(Error::managed());
         }
         if self.blocking(bootc::followed_channel).await? == Some(channel) {

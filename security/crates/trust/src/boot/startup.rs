@@ -13,6 +13,7 @@ const FOLDER: &str = "EFI/luft";
 const REMOVABLE: &str = "EFI/BOOT";
 const REMOVABLE_SHIM: &str = "BOOTX64.EFI";
 const CERTIFICATE: &str = "luft.cer";
+const ORGANIZATION_CERTIFICATE: &str = "organization.cer";
 const SYSTEMD_BOOT: &str = "EFI/systemd";
 const BOOTCTL_FOLDERS: [&str; 3] = ["loader/keys", "loader/entries", "EFI/Linux"];
 const LOADER: &str = "\\EFI\\luft\\shimx64.efi";
@@ -53,6 +54,13 @@ pub fn place(esp: &Esp) -> Result<bool> {
         Path::new(keys::CERTIFICATE),
         &esp.file(&format!("{FOLDER}/{CERTIFICATE}")),
     )?;
+    let organization = esp.file(&format!("{FOLDER}/{ORGANIZATION_CERTIFICATE}"));
+    if Path::new(keys::ORGANIZATION_CERTIFICATE).exists() {
+        changed |=
+            files::copy_if_changed(Path::new(keys::ORGANIZATION_CERTIFICATE), &organization)?;
+    } else {
+        let _ = std::fs::remove_file(organization);
+    }
     changed |= files::place_shim_after(boot_menu, &esp.file(FOLDER), SHIM)?;
     changed |= files::place_shim_after(boot_menu, &esp.file(REMOVABLE), REMOVABLE_SHIM)?;
     remove_systemd_boot(esp);

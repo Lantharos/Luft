@@ -21,7 +21,7 @@ A second key signs the TPM policy of each startup image, which is what lets the 
 
 Every image pushed to `ghcr.io/lantharos/luft` is signed twice, by digest:
 
-- With Luft's image key, a cosign key pair. The public half ships as `/usr/share/pki/containers/luft.pub`, and `/etc/containers/policy.json` requires a signature by it for every tag of `ghcr.io/lantharos/luft`. bootc reads the policy whenever it fetches the system, so updates, `bootc upgrade` and `bootc switch` refuse an image that isn't signed by it, and Settings says the update isn't signed by Luft.
+- With Luft's image key, a cosign key pair. The public half ships as `/usr/share/pki/containers/luft.pub`, and `/etc/containers/policy.json` requires a signature by it for every tag of `ghcr.io/lantharos/luft`. bootc reads the policy whenever it fetches the system, so updates, `bootc upgrade` and `bootc switch` refuse an image that isn't signed by it, and Settings says the update isn't signed with the key the computer trusts.
 - Without a key, through sigstore: cosign gets a short-lived certificate naming the workflow that built the image, `image.yml` for a nightly or `release.yml` for a release, on `main`, and the signature is recorded in sigstore's public transparency log. Computers don't check this one. It makes every image the workflows ever signed visible to anyone, and an image signed with a stolen image key outside those workflows has no entry.
 
 The policy arrives with the image, so a computer accepts its first signed image from a version that had none, and refuses unsigned ones from then on. Install Luft installs from the image on the USB stick, which is checked against the same key before the stick is built.
@@ -46,7 +46,7 @@ For a release, the identity names `release.yml` instead.
 - **Parts.** Each part pushed to `ghcr.io/lantharos/luft-parts` is signed without a key by the workflow that built it. A build only reuses a part whose signature names that workflow, and pulls it by the digest it checked. Anything else under the same tag counts as missing and is built again.
 - **The Secure Boot key** is only mounted into build steps without network access: one signs SushiBoot, one the startup image and one NVIDIA's modules. The modules are built first, without any key, in a stage that downloads and runs NVIDIA's code. A second, clean stage that holds only Fedora's kernel headers signs what the first produced.
 
-Signing only happens in builds from `main`. Builds anywhere else, including your own, make throwaway keys.
+Signing only happens in builds from `main`. Builds anywhere else, including your own, make throwaway keys. An organization that runs its own Luft signs its builds with keys of its own, as [Running Luft in your organization](/developers/system/organizations/) describes.
 
 ## Downloads
 

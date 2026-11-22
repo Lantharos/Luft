@@ -16,6 +16,7 @@ pub struct SystemUpdatesPolicy {
     pub schedule: Option<UpdateSchedule>,
     pub download: Option<bool>,
     pub channel: Option<Channel>,
+    pub image: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]

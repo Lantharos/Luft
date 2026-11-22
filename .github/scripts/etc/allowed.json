@@ -53,6 +53,9 @@
 	"os/iso/live/files/usr/libexec/luft-live-logs": {
 		"/etc/os-release": "Reads which system it runs on"
 	},
+	"os/org/org.sh": {
+		"/etc/containers/policy.json": "Reads the containers policy of Luft's image to add the organization's signing key to it"
+	},
 	"packages/app/src/ibus.rs": {
 		"/etc/machine-id": "Reads the machine ID"
 	},
@@ -89,6 +92,10 @@
 	},
 	"security/crates/trust/src/drives/target.rs": {
 		"/etc/fstab": "Reads the drives an administrator mounts"
+	},
+	"security/crates/trust/src/organization/switch.rs": {
+		"/etc/containers/policy.json": "Reads the containers policy, and shows bootc a copy with the organization's key in a namespace of its own",
+		"/etc/containers/registries.d": "Shows bootc where the organization's signatures are, in a namespace of its own"
 	},
 	"services/crashes/report/src/names.rs": {
 		"/etc/passwd": "Reads the names of the people with an account, to take them out of crash reports",
@@ -137,6 +144,9 @@
 	"services/packages/src/build/stage.rs": {
 		"/etc/yum.repos.d/": "Leaves the repository files packages bring out of the extension",
 		"/etc/pki/rpm-gpg/": "Leaves the keys packages bring out of the extension"
+	},
+	"services/updater/src/signatures.rs": {
+		"/etc/containers/policy.json": "Reads whether bootc requires a signature for the image a policy names"
 	},
 	"sushi/crates/sushi/src/config.rs": {
 		"/etc/sushi/sushi.conf": "Reads the boot splash settings an administrator chose"

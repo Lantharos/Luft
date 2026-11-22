@@ -37,7 +37,7 @@
 	const target = $derived(OTHER[choice.chosen]);
 	const confirmation = $derived(choice.waiting ? STAY[target] : CONFIRM[target]);
 	const moving = $derived(activity.running === 'channel');
-	const locked = $derived(policy.current?.updates.channel != null);
+	const locked = $derived(policy.current?.updates.channel != null || policy.current?.updates.image != null);
 	const unavailable = $derived(target === 'stable' && (stable === null || stable === 'unknown'));
 	const nowhereToSwitch = $derived(target === 'stable' && stable === 'notYet');
 

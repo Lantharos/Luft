@@ -127,18 +127,11 @@ fn enroll(
     unlock: &Secret,
     pin: &Secret,
     secure_boot_pcr: &str,
-    generation: u32,
+    public_key: &Path,
     replace: bool,
 ) -> Result<u32> {
     let before = signed_slots(&read(device)?);
-    keys::enroll_tpm(
-        device,
-        unlock,
-        pin,
-        secure_boot_pcr,
-        &public_key(generation),
-        replace,
-    )?;
+    keys::enroll_tpm(device, unlock, pin, secure_boot_pcr, public_key, replace)?;
     signed_slots(&read(device)?)
         .into_iter()
         .find(|slot| replace || !before.contains(slot))
@@ -161,10 +154,45 @@ pub fn link(
     let mut record = Record::load(state);
     record.slots.clear();
     for (index, generation) in record.linkable(&shipped()).into_iter().enumerate() {
-        let slot = enroll(device, unlock, pin, secure_boot_pcr, generation, index == 0)?;
+        let slot = enroll(
+            device,
+            unlock,
+            pin,
+            secure_boot_pcr,
+            &public_key(generation),
+            index == 0,
+        )?;
         record.slots.insert(generation, slot);
     }
     record.save(state)
+}
+
+/// Adds keys for the TPM policy keys of another image, keeping those of this one.
+pub fn link_also(
+    device: &Path,
+    unlock: &Secret,
+    secure_boot_pcr: &str,
+    policy_keys: &[(u32, PathBuf)],
+    state: &Path,
+) -> Result<()> {
+    let mut record = Record::load(state);
+    for (generation, public_key) in policy_keys {
+        if let Some(slot) = record.slots.remove(generation) {
+            remove(device, slot)?;
+        }
+        let slot = enroll(
+            device,
+            unlock,
+            &Secret::default(),
+            secure_boot_pcr,
+            public_key,
+            false,
+        )?;
+        record.slots.insert(*generation, slot);
+        record.retired.remove(generation);
+        record.save(state)?;
+    }
+    Ok(())
 }
 
 fn remove(device: &Path, slot: u32) -> Result<()> {
@@ -223,7 +251,7 @@ pub fn follow_up() -> Result<()> {
             &unlock,
             &Secret::default(),
             &secure_boot_pcr,
-            generation,
+            &public_key(generation),
             false,
         )?;
         record.slots.insert(generation, slot);

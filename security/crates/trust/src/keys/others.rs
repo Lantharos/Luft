@@ -3,7 +3,6 @@ use std::sync::Mutex;
 
 use anyhow::{Result, bail};
 
-use super::CERTIFICATE;
 use super::mok;
 use crate::boot::files;
 use crate::errors::Unsupported;
@@ -17,7 +16,7 @@ const NAME_FIELDS: [&str; 3] = ["commonName", "organizationName", "organizationa
 
 fn shipped() -> Vec<Vec<u8>> {
     let mut shipped = files::shim_certificates();
-    shipped.extend(std::fs::read(CERTIFICATE));
+    shipped.extend(super::certificates());
     shipped
 }
 

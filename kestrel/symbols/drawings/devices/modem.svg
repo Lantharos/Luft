@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<rect x="1.25" y="8.25" width="13.5" height="5.5" rx="1.8"/>
+	</g>
+	<g class="shade">
+		<path d="M4 7V2.6M12 7V2.6" fill="none" stroke-width="1.6"/>
+	</g>
+	<g class="cut">
+		<circle cx="4.5" cy="11" r="0.7"/>
+		<circle cx="7" cy="11" r="0.7"/>
+		<circle cx="9.5" cy="11" r="0.7"/>
+	</g>
+</svg>

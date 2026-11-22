@@ -1,0 +1,14 @@
+{
+	"applications-system": "preferences-system",
+	"battery-caution-charging": "battery-level-10-charging",
+	"battery-empty": "battery-level-0",
+	"battery-empty-charging": "battery-level-0-charging",
+	"battery-full": "battery-level-100",
+	"battery-full-charged": "battery-level-100-charged",
+	"battery-full-charging": "battery-level-90-charging",
+	"battery-good": "battery-level-70",
+	"battery-good-charging": "battery-level-70-charging",
+	"battery-low-charging": "battery-level-20-charging",
+	"emblem-system": "preferences-system",
+	"gnome-power-manager": "battery-level-80-charging"
+}

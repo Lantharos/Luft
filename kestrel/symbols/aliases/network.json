@@ -1,0 +1,9 @@
+{
+	"bluetooth-hardware-disabled": "bluetooth-disabled",
+	"network-cellular": "network-cellular-signal-excellent",
+	"network-cellular-connected": "network-cellular-signal-excellent",
+	"network-cellular-hardware-disabled": "network-cellular-disabled",
+	"network-wireless": "network-wireless-signal-excellent",
+	"network-wireless-connected": "network-wireless-signal-excellent",
+	"network-wireless-hardware-disabled": "network-wireless-disabled"
+}

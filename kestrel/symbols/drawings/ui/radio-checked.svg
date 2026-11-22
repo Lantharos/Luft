@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="8" cy="8" r="6.5"/>
+	</g>
+	<g class="cut">
+		<circle cx="8" cy="8" r="3.7"/>
+	</g>
+	<g class="ink">
+		<circle cx="8" cy="8" r="2.3"/>
+	</g>
+</svg>

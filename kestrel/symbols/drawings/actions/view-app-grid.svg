@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="3.4" cy="3.4" r="1.55"/>
+		<circle cx="8" cy="3.4" r="1.55"/>
+		<circle cx="12.6" cy="3.4" r="1.55"/>
+		<circle cx="3.4" cy="8" r="1.55"/>
+		<circle cx="8" cy="8" r="1.55"/>
+		<circle cx="12.6" cy="8" r="1.55"/>
+		<circle cx="3.4" cy="12.6" r="1.55"/>
+		<circle cx="8" cy="12.6" r="1.55"/>
+		<circle cx="12.6" cy="12.6" r="1.55"/>
+	</g>
+</svg>

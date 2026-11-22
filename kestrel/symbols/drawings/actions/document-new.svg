@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<path d="M3 2.6c0-.9.7-1.6 1.6-1.6h4.6c.4 0 .8.2 1.1.5l2.7 2.7c.3.3.5.7.5 1.1v8.1c0 .9-.7 1.6-1.6 1.6H4.6c-.9 0-1.6-.7-1.6-1.6Z"/>
+	</g>
+	<g class="cut">
+		<path d="M9.2 1v2.6c0 .7.5 1.2 1.2 1.2H13" fill="none" stroke-width="1.2"/>
+	</g>
+	<g class="cut">
+		<circle cx="12.2" cy="12.2" r="4.4"/>
+	</g>
+	<g class="ink">
+		<circle cx="12.2" cy="12.2" r="3.1"/>
+	</g>
+	<g class="cut">
+		<path d="M12.2 10.6v3.2M10.6 12.2h3.2" fill="none" stroke-width="1.4"/>
+	</g>
+</svg>

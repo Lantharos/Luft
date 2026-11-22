@@ -105,6 +105,7 @@ refresh_caches() {
   glib-compile-schemas /usr/share/glib-2.0/schemas
   fc-cache -f
   gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+  gtk-update-icon-cache -f -t /usr/share/icons/Mochi
   update-desktop-database /usr/share/applications
   update-mime-database /usr/share/mime
 }

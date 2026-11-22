@@ -1,0 +1,13 @@
+part = "kestrel"
+
+[files]
+"/usr/share/icons/Mochi/" = "theme/index.theme"
+"/usr/share/icons/Mochi/symbolic/actions/" = "theme/symbolic/actions/*.svg"
+"/usr/share/icons/Mochi/symbolic/categories/" = "theme/symbolic/categories/*.svg"
+"/usr/share/icons/Mochi/symbolic/devices/" = "theme/symbolic/devices/*.svg"
+"/usr/share/icons/Mochi/symbolic/emotes/" = "theme/symbolic/emotes/*.svg"
+"/usr/share/icons/Mochi/symbolic/legacy/" = "theme/symbolic/legacy/*.svg"
+"/usr/share/icons/Mochi/symbolic/mimetypes/" = "theme/symbolic/mimetypes/*.svg"
+"/usr/share/icons/Mochi/symbolic/places/" = "theme/symbolic/places/*.svg"
+"/usr/share/icons/Mochi/symbolic/status/" = "theme/symbolic/status/*.svg"
+"/usr/share/icons/Mochi/symbolic/ui/" = "theme/symbolic/ui/*.svg"

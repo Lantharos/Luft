@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<rect x="1.9" y="2.9" width="12.2" height="10.2" rx="2.2" fill="none" stroke-width="1.8"/>
+	</g>
+	<g class="cut">
+		<circle cx="12.2" cy="12.2" r="4.4"/>
+	</g>
+	<g class="ink">
+		<circle cx="12.2" cy="12.2" r="3.1"/>
+	</g>
+	<g class="cut">
+		<path d="M12.2 10.6v3.2M10.6 12.2h3.2" fill="none" stroke-width="1.4"/>
+	</g>
+</svg>

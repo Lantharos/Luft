@@ -380,6 +380,14 @@
         "typescript": "7.0.2",
       },
     },
+    "kestrel/symbols": {
+      "name": "@luft/symbols",
+      "devDependencies": {
+        "@types/bun": "^1.4.3",
+        "canvaskit-wasm": "0.42.0",
+        "typescript": "7.0.2",
+      },
+    },
     "kestrel/tools": {
       "name": "@luft/kestrel-tools",
       "devDependencies": {
@@ -962,6 +970,8 @@
     "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/web/settings-pages"],
 
     "@luft/site": ["@luft/site@workspace:web/site"],
+
+    "@luft/symbols": ["@luft/symbols@workspace:kestrel/symbols"],
 
     "@luft/ui": ["@luft/ui@workspace:packages/web/ui"],
 

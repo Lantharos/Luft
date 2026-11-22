@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<rect x="1.25" y="2.25" width="13.5" height="9.5" rx="2"/>
+	</g>
+	<g class="shade">
+		<path d="M4.2 12.8 3.4 14.4M11.8 12.8l.8 1.6" fill="none" stroke-width="1.6"/>
+	</g>
+</svg>

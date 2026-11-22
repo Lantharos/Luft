@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="8" cy="6.5" r="5"/>
+	</g>
+	<g class="shade">
+		<rect x="4.25" y="13.25" width="7.5" height="1.75" rx="0.875"/>
+	</g>
+	<g class="cut">
+		<circle cx="8" cy="6.5" r="1.9" fill="none" stroke-width="1.2"/>
+	</g>
+</svg>

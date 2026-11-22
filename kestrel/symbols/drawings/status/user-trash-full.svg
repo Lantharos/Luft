@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<path d="M3.4 6h9.2l-.8 7.5a1.6 1.6 0 0 1-1.6 1.4H5.8a1.6 1.6 0 0 1-1.6-1.4Z"/>
+	</g>
+	<g class="shade">
+		<rect x="1.9" y="2.2" width="6.4" height="2" rx="1" transform="rotate(-14 2 4)"/>
+		<circle cx="10.6" cy="3.4" r="2"/>
+	</g>
+</svg>

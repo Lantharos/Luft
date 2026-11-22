@@ -25,6 +25,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | `wrapper` | `kestrel-wrapper`, which holds the Wayland socket and starts Kestrel again after a crash |
 | `peek` | `peek`, lets other programs see and use windows |
 | [`cursors`](cursors/README.md) | Plume, the cursor theme |
+| [`symbols`](symbols/README.md) | Mochi, the symbolic icon theme |
 | `tools` | Development sessions and checks |
 
 ## Build and run

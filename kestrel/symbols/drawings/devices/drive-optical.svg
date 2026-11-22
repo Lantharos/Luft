@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<rect x="1.25" y="7.25" width="13.5" height="6.5" rx="2"/>
+	</g>
+	<g class="shade">
+		<path d="M2.6 6a5.4 5.4 0 0 1 10.8 0Z"/>
+	</g>
+	<g class="cut">
+		<path d="M3.8 10.5h5" fill="none" stroke-width="1.2"/>
+		<circle cx="11.8" cy="10.5" r="0.8"/>
+	</g>
+</svg>

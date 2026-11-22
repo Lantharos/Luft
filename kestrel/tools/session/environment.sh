@@ -186,6 +186,8 @@ prepare_session() {
   export XCURSOR_PATH="$XDG_DATA_HOME/icons:$cursors"
   mkdir -p "$session/data/fonts"
   ln -sfn "$build/data/fonts" "$session/data/fonts/luft"
+  mkdir -p "$session/data/icons"
+  ln -sfn "$root/kestrel/symbols/theme" "$session/data/icons/Mochi"
   mkdir -p "$session/data/sounds"
   ln -sfn "$root/kestrel/engine/data/sounds/luft" "$session/data/sounds/luft"
   write_dbus_services

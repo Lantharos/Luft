@@ -425,7 +425,7 @@ A player has `id`, `app`, `appName`, `title`, `artist`, `album`, `artwork` (a fi
 
 ## Icons
 
-Wherever an icon goes, give a symbolic icon name such as `weather-showers-symbolic`, or the path of an SVG in the extension's folder.
+Wherever an icon goes, give a symbolic icon name such as `weather-showers-symbolic`, or the path of an SVG in the extension's folder. Symbolic names are drawn from Mochi, Luft's own icon theme, and fall back to Adwaita for the few it doesn't have.
 
 ## Versions
 

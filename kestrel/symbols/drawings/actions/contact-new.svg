@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="ink">
+		<circle cx="6.5" cy="4.8" r="2.9"/>
+		<path d="M1.5 13.6c0-2.8 2.2-4.6 5-4.6s5 1.8 5 4.6c0 .5-.4.9-.9.9H2.4c-.5 0-.9-.4-.9-.9Z"/>
+	</g>
+	<g class="cut">
+		<circle cx="12.2" cy="12.2" r="4.4"/>
+	</g>
+	<g class="ink">
+		<circle cx="12.2" cy="12.2" r="3.1"/>
+	</g>
+	<g class="cut">
+		<path d="M12.2 10.6v3.2M10.6 12.2h3.2" fill="none" stroke-width="1.4"/>
+	</g>
+</svg>

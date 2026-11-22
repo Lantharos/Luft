@@ -1,0 +1,22 @@
+{
+	"camera-hardware-disabled": "camera-disabled",
+	"computer-apple-ipad": "tablet",
+	"drive-harddisk-ieee1394": "drive-harddisk",
+	"drive-harddisk-solidstate": "drive-harddisk",
+	"drive-harddisk-system": "drive-harddisk",
+	"drive-harddisk-usb": "drive-harddisk",
+	"drive-multidisk": "drive-harddisk",
+	"drive-removable-media": "media-removable",
+	"media-optical-bd": "media-optical",
+	"media-optical-cd": "media-optical",
+	"media-optical-cd-audio": "media-optical",
+	"media-optical-dvd": "media-optical",
+	"media-zip": "media-floppy",
+	"microphone-hardware-disabled": "microphone-disabled",
+	"multimedia-player-apple-ipod-touch": "multimedia-player",
+	"pda": "phone",
+	"phone-apple-iphone": "phone",
+	"phone-old": "phone",
+	"printer-network": "printer",
+	"video-single-display": "video-display"
+}

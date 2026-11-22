@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g class="shade">
+		<path d="M1.9 10.2v1.8a2.1 2.1 0 0 0 2.1 2.1h3.2" fill="none" stroke-width="1.8"/>
+	</g>
+	<g class="ink">
+		<path d="M6.4 1.8V8.6" fill="none" stroke-width="1.9"/>
+		<path d="M3.5 5.8 6.4 8.7 9.3 5.8" fill="none" stroke-width="1.9"/>
+	</g>
+	<g class="cut">
+		<circle cx="12.2" cy="12.2" r="4.4"/>
+	</g>
+	<g class="ink">
+		<circle cx="12.2" cy="12.2" r="3.1"/>
+	</g>
+	<g class="cut">
+		<path d="M12.2 10.6v1.3" fill="none" stroke-width="1.4"/>
+		<circle cx="12.2" cy="13.9" r="0.75"/>
+	</g>
+</svg>

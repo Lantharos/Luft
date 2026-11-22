@@ -330,3 +330,6 @@ account-lost = You no longer have access to the { $channel } version of { $name 
 account-lost-description = What you installed stays and gets the public versions from now on.
 account-ok = OK
 account-not-now = Not now
+
+# Shown instead of installing when the person's organization doesn't allow it
+schelf-managed = Managed by your organization

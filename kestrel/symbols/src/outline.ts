@@ -6,7 +6,7 @@ const ck = await CanvasKitInit();
 const TRANSFORM = /(translate|scale|rotate)\(([^)]*)\)/g;
 const MIRROR = [-1, 0, 16, 0, 1, 0, 0, 0, 1];
 const CENTRE = 8;
-const MARGIN = 0.5;
+const MARGIN = 0.25;
 const MOST_GROWTH = 1.15;
 
 const round = (value: number) => String(Math.round(value * 100) / 100);

@@ -8,7 +8,7 @@ import threading
 from pathlib import Path
 
 GADGET = Path("/sys/kernel/config/usb_gadget/printer")
-MOUNT = Path("/run/luft-printers-check/ffs")
+MOUNT = Path("/run/printers-check/ffs")
 DEVICE_ID = b"MFG:Canon;CMD:BJL,BJRaster3,BSCCe,NCCe,IVEC,IVECPLI;MDL:MX490 series;CLS:PRINTER;DES:Canon MX490 series;VER:1.000;"
 
 DESCRIPTORS_MAGIC_V2 = 3

@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=com.lantharos.UsbProtection1
-Exec=@libexecdir@/luft-usb-protection
+Exec=@libexecdir@/portguard
 User=root
-SystemdService=luft-usb-protection.service
+SystemdService=portguard.service

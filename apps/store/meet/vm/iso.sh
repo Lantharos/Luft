@@ -39,7 +39,7 @@ stage_changes() {
 ARG BASE
 FROM ${BASE}
 COPY root/ /
-RUN systemctl enable luft-installer-expire-setup.service trustd-system-disk.service && \
+RUN systemctl enable installer-expire-setup.service trustd-system-disk.service && \
     dnf install -y qemu-guest-agent && dnf clean all && \
     echo '(typepermissive virt_qemu_ga_t)' >/tmp/guest-agent.cil && semodule -i /tmp/guest-agent.cil && rm /tmp/guest-agent.cil
 CONTAINERFILE

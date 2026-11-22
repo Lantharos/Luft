@@ -210,7 +210,7 @@ mod tests {
     fn panics_are_told_apart_by_where_they_happened() {
         let panic = |location| {
             of(&Failure {
-                program: "luft-firewall",
+                program: "shield",
                 kind: Kind::Panic,
                 signal: None,
                 message: Some("index out of bounds: the len is 3 but the index is 7"),

@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=com.lantharos.Packages1
-Exec=/usr/libexec/luft-packages
+Exec=/usr/libexec/packager
 User=root
-SystemdService=luft-packages.service
+SystemdService=packager.service

@@ -9,15 +9,15 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 serial="$vm/serial.log"
 forwarded=$((20000 + RANDOM % 20000))
 
-setup="systemctl enable luft-firewall.service luft-remote-login-check.service"
+setup="systemctl enable shield.service remoted-check.service"
 
 start_stage
 if from_this_tree; then
   bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
   setup="semodule -i /usr/share/selinux/packages/luft-remote-login.cil && $setup"
 fi
-place 755 "$here/check.sh" /usr/libexec/luft-remote-login-check
-place 644 "$here/luft-remote-login-check.service" /usr/lib/systemd/system/luft-remote-login-check.service
+place 755 "$here/check.sh" /usr/libexec/remoted-check
+place 644 "$here/remoted-check.service" /usr/lib/systemd/system/remoted-check.service
 build_check_image "$(base_image)" "$image_name-remote-login-check" "$setup"
 make_root_drive "$image_name-remote-login-check"
 relabel_root_drive "$serial.relabel"
@@ -25,7 +25,7 @@ relabel_root_drive "$serial.relabel"
 boot_check() {
   CPUS=2 MEMORY=3072 SELINUX="selinux=1 enforcing=1" APPEND="luft.remote-login-check=$forwarded" \
     boot_root_drive "$serial.$1" "$2" -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$forwarded-:22"
-  expect_in_log "$serial.$1" luft-remote-login-check "$3"
+  expect_in_log "$serial.$1" remoted-check "$3"
 }
 
 boot_check first 12 "PASS first"

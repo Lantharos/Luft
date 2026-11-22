@@ -3,7 +3,7 @@ use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use luft_remote_login::choices::Choices;
+use remoted::choices::Choices;
 
 const SSHD: &str = "sshd.service";
 const SSHD_UNIT: &str = "/usr/lib/systemd/system/sshd.service";
@@ -32,7 +32,7 @@ fn generate(normal: &Path, early: &Path) -> io::Result<()> {
 fn main() -> ExitCode {
     let folders: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
     let [normal, early, _late] = folders.as_slice() else {
-        eprintln!("Usage: luft-remote-login-generator NORMAL-DIR EARLY-DIR LATE-DIR");
+        eprintln!("Usage: remoted-generator NORMAL-DIR EARLY-DIR LATE-DIR");
         return ExitCode::FAILURE;
     };
     match generate(normal, early) {

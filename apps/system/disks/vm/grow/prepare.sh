@@ -14,7 +14,7 @@ GIB=$((1024 ** 3))
 report() { echo "luft-grow-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-installer --no-pager -n 40 > /dev/ttyS0
+  journalctl -b -u installer --no-pager -n 40 > /dev/ttyS0
   exit 1
 }
 call() { busctl --json=short call "${BUS[@]}" "$@"; }

@@ -8,8 +8,8 @@ ConditionPathExists=/var/lib/luft/system-packages/packages
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-packages link
-SyslogIdentifier=luft-packages
+ExecStart=/usr/libexec/packager link
+SyslogIdentifier=packager
 ReadWritePaths=/run
 ProtectSystem=strict
 ProtectHome=yes

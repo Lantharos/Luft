@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=com.lantharos.Printers1
-Exec=/usr/libexec/luft-printers
+Exec=/usr/libexec/printers
 User=root
-SystemdService=luft-printers.service
+SystemdService=printers.service

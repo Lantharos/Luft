@@ -1,6 +1,6 @@
 # luft-windows
 
-Reads a Windows installation on the same computer straight from its NTFS partition, and carefully changes the few settings that make sharing a computer with Luft smooth. The installer uses it while installing next to Windows; [`services/windows`](../../../services/windows) is `luft-windows`, the system service that looks after Windows afterwards.
+Reads a Windows installation on the same computer straight from its NTFS partition, and carefully changes the few settings that make sharing a computer with Luft smooth. The installer uses it while installing next to Windows; [`services/windows`](../../../services/windows) is `neighbor`, the system service that looks after Windows afterwards.
 
 ```toml
 luft-windows.workspace = true

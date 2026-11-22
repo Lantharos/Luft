@@ -1,15 +1,11 @@
 [package]
-name = "luft-windows-service"
+name = "neighbor"
 version = "0.1.0"
 description = "Looks after Windows on the same computer: Fast Startup, its clock and its Bluetooth devices"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-
-[[bin]]
-name = "luft-windows"
-path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true

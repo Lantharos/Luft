@@ -1,34 +1,32 @@
 [Unit]
-Description=USB protection while locked
-Before=display-manager.service systemd-user-sessions.service
-StartLimitIntervalSec=0
+Description=Recover devices Windows left asleep
+DefaultDependencies=no
+After=local-fs.target systemd-udev-trigger.service
+Before=greetd.service bluetooth.service alsa-state.service alsa-restore.service
+ConditionKernelCommandLine=!rd.live.image
 
 [Service]
-Type=dbus
-BusName=com.lantharos.UsbProtection1
-ExecStart=@libexecdir@/luft-usb-protection
-Restart=on-failure
-RestartSec=1
-UMask=0077
-StateDirectory=luft-usb-protection
-StateDirectoryMode=0700
-RuntimeDirectory=luft-usb-protection
-RuntimeDirectoryMode=0700
+Type=oneshot
+ExecStart=/usr/libexec/neighbor boot
+SyslogIdentifier=neighbor
+RuntimeDirectory=luft-windows
 RuntimeDirectoryPreserve=yes
-ReadWritePaths=/sys/devices /sys/bus/usb /sys/module/usbcore/parameters
+ReadWritePaths=/sys/devices
 ProtectSystem=strict
 ProtectHome=yes
-PrivateTmp=yes
-PrivateDevices=yes
+PrivateTmp=disconnected
 PrivateNetwork=yes
 NoNewPrivileges=yes
+DevicePolicy=closed
+DeviceAllow=block-* r
+DeviceAllow=char-alsa rw
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
-ProcSubset=pid
+ProtectProc=invisible
 RestrictAddressFamilies=AF_UNIX AF_NETLINK
 RestrictNamespaces=yes
 RestrictRealtime=yes
@@ -38,7 +36,7 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=CAP_SYS_PTRACE
+CapabilityBoundingSet=CAP_SYS_RAWIO
 
 [Install]
 WantedBy=multi-user.target

@@ -1,15 +1,15 @@
 # Security
 
-Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except plain keyboards and mice. **luft-firewall** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **luft-remote-login** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
+Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **portguard** holds back new USB devices while the screen is locked, except plain keyboards and mice. **shield** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **remoted** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
 
 How the pieces protect the computer is in [Security](https://docs.luft.computer/security/keys/), boot and recovery in [Boot and recovery](https://docs.luft.computer/developers/system/boot/), and what people see on [the Security page](https://docs.luft.computer/system/security/).
 
 | Crate | Builds |
 | --- | --- |
 | `crates/trust` | `trustd` and `trustctl` |
-| `crates/firewall` | `luft-firewall` |
-| `crates/usb` | `luft-usb-protection` |
-| `crates/remote-login` | `luft-remote-login` and `luft-remote-login-generator` |
+| `crates/firewall` | `shield` |
+| `crates/usb` | `portguard` |
+| `crates/remote-login` | `remoted` and `remoted-generator` |
 
 ## Build
 

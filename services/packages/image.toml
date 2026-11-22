@@ -1,13 +1,13 @@
 part = "services"
 
 [programs]
-"/usr/libexec/" = ["luft-packages"]
+"/usr/libexec/" = ["packager"]
 
 [files]
 "/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Packages1.conf"]
 "/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Packages1.service"]
 "/usr/lib/systemd/system/" = [
-    "data/luft-packages.service",
+    "data/packager.service",
     "data/luft-system-packages-activate.socket",
     "data/luft-system-packages-activate@.service",
     "data/luft-system-packages-link.service",

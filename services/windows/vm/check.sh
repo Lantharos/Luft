@@ -4,15 +4,15 @@ set -uo pipefail
 BUS=(com.lantharos.Windows1 /com/lantharos/Windows1 com.lantharos.Windows1)
 DISK=/dev/vdb
 PART=/dev/vdb1
-WINDOWS=/usr/lib/luft-windows-check/fake-windows
-MOUNT=/run/luft-windows-check
+WINDOWS=/usr/lib/neighbor-check/fake-windows
+MOUNT=/run/neighbor-check
 ADAPTER=/var/lib/bluetooth/C8:E2:65:A1:B2:C3
 BASIC_DATA=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
 
-report() { echo "luft-windows-check: $*" > /dev/ttyS0; }
+report() { echo "neighbor-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -t luft-windows --no-pager -n 30 > /dev/ttyS0
+  journalctl -b -t neighbor --no-pager -n 30 > /dev/ttyS0
   exit 1
 }
 pass() { report "PASS $*"; }
@@ -68,7 +68,7 @@ pass "brings Bluetooth devices from Windows"
 
 hibernate_windows
 systemctl stop alsa-state.service alsa-restore.service
-startup="$(/usr/libexec/luft-windows boot 2>&1)" || fail "the startup check: $startup"
+startup="$(/usr/libexec/neighbor boot 2>&1)" || fail "the startup check: $startup"
 [[ -f /run/luft-windows/hibernated ]] || fail "the startup check didn't notice the hibernated Windows"
 [[ "$(data Drives | jq -r ".[] | select(.device == \"$PART\") | .hibernated")" == "true" ]] || fail "Drives after hibernating"
 call Change sas "$PART" 1 universalClock > /dev/null 2>&1 && fail "changed a hibernated Windows"

@@ -1,17 +1,15 @@
 [Unit]
-Description=Remote login over SSH
+Description=Printer settings
+After=cups.socket
+Wants=cups.socket
 
 [Service]
 Type=dbus
-BusName=com.lantharos.RemoteLogin1
-ExecStart=@libexecdir@/luft-remote-login
-UMask=0077
-StateDirectory=luft-remote-login
-StateDirectoryMode=0700
-RuntimeDirectory=luft-remote-login
-RuntimeDirectoryPreserve=yes
+BusName=com.lantharos.Printers1
+ExecStart=/usr/libexec/printers
+SyslogIdentifier=printers
 ProtectSystem=strict
-ReadWritePaths=/var/home
+ProtectHome=yes
 PrivateTmp=yes
 PrivateDevices=yes
 PrivateNetwork=yes
@@ -22,6 +20,7 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
+ProtectProc=invisible
 ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX
 RestrictNamespaces=yes
@@ -32,5 +31,4 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-SystemCallFilter=@setuid
-CapabilityBoundingSet=CAP_SETUID CAP_SETGID
+CapabilityBoundingSet=

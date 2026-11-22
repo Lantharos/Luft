@@ -9,10 +9,10 @@ password=remote-login-check
 key=/root/check-key
 rules=/etc/polkit-1/rules.d/90-remote-login-check.rules
 ldconfig_rewrites=/etc/ld.so.cache
-phase_file=/var/lib/luft-remote-login-check/phase
+phase_file=/var/lib/remoted-check/phase
 read -r forwarded < <(sed -n 's/.*luft\.remote-login-check=\([0-9]*\).*/\1/p' /proc/cmdline)
 
-say() { echo "luft-remote-login-check: $*" > /dev/console; }
+say() { echo "remoted-check: $*" > /dev/console; }
 fail() {
   say "FAIL $*"
   sshd -T > /dev/console 2>&1
@@ -20,7 +20,7 @@ fail() {
   nft list ruleset > /dev/console
   ls -laZ /run/luft-remote-login > /dev/console 2>&1
   journalctl -b -k --no-pager -o cat -g 'avc: +denied' > /dev/console
-  journalctl -b -u sshd -u luft-remote-login -u luft-firewall -u luft-remote-login-check --no-pager -o short-monotonic | tail -n 80 > /dev/console
+  journalctl -b -u sshd -u remoted -u shield -u remoted-check --no-pager -o short-monotonic | tail -n 80 > /dev/console
   systemctl poweroff
   exit 1
 }
@@ -236,7 +236,7 @@ older_etc() {
   install -d /etc/systemd/system/multi-user.target.wants /etc/systemd/system/sockets.target.wants
   ln -sf /usr/lib/systemd/system/sshd.service /etc/systemd/system/multi-user.target.wants/sshd.service
   ln -sf /usr/lib/systemd/system/sshd.socket /etc/systemd/system/sockets.target.wants/sshd.socket
-  printf '%s\n' "AllowUsers $person" "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/10-luft-remote-login.conf
+  printf '%s\n' "AllowUsers $person" "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/10-remoted.conf
   say "ok: /etc is now one from a version that had remote login and passwords on"
 }
 

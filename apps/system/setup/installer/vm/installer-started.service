@@ -3,7 +3,7 @@ Description=Tell the installer check that the installed system started into setu
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-installer-started
+ExecStart=/usr/libexec/installer-started
 
 [Install]
 WantedBy=graphical.target

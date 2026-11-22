@@ -7,12 +7,12 @@ CONFIG=/var/lib/kestrel-greeter/config.json
 ID=com.example.Clock
 FOLDER=/home/mara/.local/share/luft/extensions/$ID
 UNREVIEWED=/var/lib/luft/unreviewed-extensions/1000
-RULE=/etc/polkit-1/rules.d/50-luft-packages-check.rules
+RULE=/etc/polkit-1/rules.d/50-packager-check.rules
 
-report() { echo "luft-packages-check: $*" > /dev/ttyS0; }
+report() { echo "packager-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-packages.service -u kestrel-greeter.service -u polkit.service --no-pager -n 40 > /dev/ttyS0
+  journalctl -b -u packager.service -u kestrel-greeter.service -u polkit.service --no-pager -n 40 > /dev/ttyS0
   systemctl poweroff --no-block
   exit 1
 }

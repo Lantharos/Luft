@@ -6,8 +6,8 @@ After=luft-system-packages-activate.socket
 [Service]
 Type=dbus
 BusName=com.lantharos.Packages1
-ExecStart=/usr/libexec/luft-packages
-SyslogIdentifier=luft-packages
+ExecStart=/usr/libexec/packager
+SyslogIdentifier=packager
 KillMode=mixed
 TimeoutStopSec=5min
 UMask=0022

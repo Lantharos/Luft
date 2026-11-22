@@ -10,7 +10,14 @@ use crate::tasks::process::read_cgroup;
 
 const UNIT_KEY: &str = "cgroup:";
 const SYSTEMD: &str = "systemd";
-const OWN: [&str; 5] = ["luft-", "kestrel", "sabine", "peek-", "com.lantharos."];
+const OWN: [&str; 6] = [
+    "luft-",
+    "kestrel",
+    "sabine",
+    "peek-",
+    "neighbor-",
+    "com.lantharos.",
+];
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]

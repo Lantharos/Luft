@@ -13,7 +13,7 @@ Crashes go to `systemd-coredump` as on Fedora. It writes the crashed thread's st
 
 ## How reports are made
 
-Crash reports never read a core dump. `luft-crash-collector`, a system service started after each core dump and whenever one of Luft's programs panics, reads from the journal only the fields a report is made from. It runs as its own account in the `systemd-journal` group, without network or capabilities. A user service in each session, `luft-crash-reports`, takes the person's own reports and the system's, asks through Kestrel or follows the person's choice, and sends. The inbox's address and client key ship in `/usr/share/luft/crash-reports.toml`; both are public by design, and a build whose file leaves either empty sends nothing and asks nothing.
+Crash reports never read a core dump. `crashd`, a system service started after each core dump and whenever one of Luft's programs panics, reads from the journal only the fields a report is made from. It runs as its own account in the `systemd-journal` group, without network or capabilities. A user service in each session, `luft-crash-reports`, takes the person's own reports and the system's, asks through Kestrel or follows the person's choice, and sends. The inbox's address and client key ship in `/usr/share/luft/crash-reports.toml`; both are public by design, and a build whose file leaves either empty sends nothing and asks nothing.
 
 Only Luft's own programs are reported: a file of the read-only image under `/usr`, owned by root, where the image installs Luft's programs, told apart as [Who an app is](/security/identity/) describes. Apps you installed, Flatpaks, AppImages, games, anything in a home folder and anything in a container never are.
 

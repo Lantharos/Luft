@@ -31,7 +31,7 @@ What's new comes from the image's `com.lantharos.release-notes` label, or, when 
 
 ## The updater
 
-Changing the image needs root, so Settings and Schelf go through `luft-updater` (`com.lantharos.Updater1`, in `services/updater`), a small service started on demand that runs `bootc`. Its sandbox only keeps it away from home folders, kernel modules and logs, since bootc mounts the boot partitions and writes the system's deployments.
+Changing the image needs root, so Settings and Schelf go through `updater` (`com.lantharos.Updater1`, in `services/updater`), a small service started on demand that runs `bootc`. Its sandbox only keeps it away from home folders, kernel modules and logs, since bootc mounts the boot partitions and writes the system's deployments.
 
 - **Finding.** The updater asks the registry for the image's layers with `skopeo` and compares them with every version on the computer, so checking needs no rights and Settings can show how much a download takes.
 - **Staging.** `Download` runs `bootc upgrade --download-only`. A staged update stays locked until Kestrel's restart and power off dialog calls `Apply`, so leaving the box there unticked simply doesn't install it.
@@ -48,7 +48,7 @@ Every image carries its version in its configuration, which the image's signatur
 
 The updater owns when updates are looked for. The schedule (every day, every week or only on request) and whether to download what's found live in `/var/lib/luft-updater/schedule.json`, so they're the same for every account and survive going back to an earlier version.
 
-`luft-updater-check.timer` comes by every three hours, up to an hour late so computers don't all ask at once, and after a start or a wake that missed one. It runs only on mains power, and calls `RunSchedule`, which only root may call. The updater checks when the schedule says one is due and NetworkManager doesn't call the connection metered, and downloads when the schedule says so. Either way it sends `UpdateFound`, and Kestrel shows a notification in every open session. When nothing is downloaded, the updater has `luft-packages` bring the system packages up to their newest versions instead.
+`updater-check.timer` comes by every three hours, up to an hour late so computers don't all ask at once, and after a start or a wake that missed one. It runs only on mains power, and calls `RunSchedule`, which only root may call. The updater checks when the schedule says one is due and NetworkManager doesn't call the connection metered, and downloads when the schedule says so. Either way it sends `UpdateFound`, and Kestrel shows a notification in every open session. When nothing is downloaded, the updater has `packager` bring the system packages up to their newest versions instead.
 
 ### Channels
 

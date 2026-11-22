@@ -1,16 +1,17 @@
 [Unit]
-Description=Applies system settings reviewed in Kestrel
+Description=Tell Luft's crash collector about a core dump
 
 [Service]
-Type=dbus
-BusName=com.lantharos.Changes1
-ExecStart=/usr/libexec/luft-changes
-SyslogIdentifier=luft-changes
+Type=oneshot
+ExecStart=/usr/libexec/crashd --poke
+DynamicUser=yes
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
 PrivateDevices=yes
 PrivateNetwork=yes
+PrivateIPC=yes
+PrivateUsers=yes
 IPAddressDeny=any
 NoNewPrivileges=yes
 ProtectKernelTunables=yes
@@ -19,6 +20,8 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX
 RestrictNamespaces=yes
 RestrictRealtime=yes
@@ -28,5 +31,4 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=CAP_SYS_PTRACE
-UMask=0077
+CapabilityBoundingSet=

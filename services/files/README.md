@@ -1,4 +1,4 @@
-# luft-files
+# files
 
 Changes files and processes that the person at the screen can't change themselves, for Rover and Barometer. It replaces running `cp`, `mv`, `rm`, `kill` and `renice` as root: each thing it can do is one narrow method on `com.lantharos.Files1` (see `data/com.lantharos.Files1.xml`), and every call is checked with polkit, which has Kestrel ask for an administrator's password. The password covers that one call, whose prompt says what it changes, so the methods for files take all the items of a change at once. Only someone signed in at the computer can be asked; remote and background sessions are refused. Started over D-Bus, it stops after half a minute with nothing to do.
 
@@ -10,7 +10,7 @@ The crate is also a library: `luft_files::client` calls the service, and `luft_f
 | --- | --- |
 | `com.lantharos.Files1.conf` | `/usr/share/dbus-1/system.d/` |
 | `com.lantharos.Files1.service` | `/usr/share/dbus-1/system-services/` |
-| `luft-files.service` | `/usr/lib/systemd/system/` |
+| `files.service` | `/usr/lib/systemd/system/` |
 | `com.lantharos.files.policy` | `/usr/share/polkit-1/actions/` |
 
 `cargo test -p luft-files` covers copying sparse files, stopping a copy, that links are never followed on the way to an item or inside it, and that a copy that fails leaves what was already there alone.

@@ -1,5 +1,5 @@
 [package]
-name = "luft-changes"
+name = "changes"
 version = "0.1.0"
 description = "Applies the system settings someone reviewed in Kestrel, for luft"
 authors = ["Kristof"]

@@ -1,5 +1,5 @@
 [package]
-name = "luft-updater"
+name = "updater"
 version = "0.1.0"
 description = "Checks, downloads and rolls back Luft's system image with bootc for Settings and the shell"
 authors = ["Kristof"]

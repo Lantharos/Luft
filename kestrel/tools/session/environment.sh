@@ -68,7 +68,7 @@ build_helpers() {
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio \
-    -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture -p luft-cli -p luft-thumbnailer)
+    -p crashd -p luft-crash-reports -p luft-crash-fixture -p luft-cli -p luft-thumbnailer)
 }
 
 dbus_service() {
@@ -90,7 +90,7 @@ write_dbus_services() {
   dbus_service com.lantharos.Kestrel.Post "$tools/session/postNetwork.sh" run "$session/post-network" this "$root/target/release/kestrel-post"
   dbus_service org.freedesktop.impl.portal.desktop.rover "$(command -v gjs)" -m "$built_tools/fixtures/session/fileChooser.js"
   export LUFT_CRASH_COLLECTOR_POKE="$KESTREL_APP_RUNTIME_DIR/crash-collector.poke"
-  dbus_service com.lantharos.CrashCollector1 /bin/sh -c "'DBUS_SYSTEM_BUS_ADDRESS=\$DBUS_SESSION_BUS_ADDRESS STATE_DIRECTORY=$session/crash-collector exec $root/target/release/luft-crash-collector'"
+  dbus_service com.lantharos.CrashCollector1 /bin/sh -c "'DBUS_SYSTEM_BUS_ADDRESS=\$DBUS_SESSION_BUS_ADDRESS STATE_DIRECTORY=$session/crash-collector exec $root/target/release/crashd'"
   dbus_service com.lantharos.CrashReports1 /usr/bin/env "LUFT_CRASH_REPORTS_CONFIG=$session/crash-reports.toml" "$root/target/release/luft-crash-reports"
   for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \
     org.gtk.vfs.AfcVolumeMonitor org.gtk.vfs.GPhoto2VolumeMonitor org.gtk.vfs.MTPVolumeMonitor; do

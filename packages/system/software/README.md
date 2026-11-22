@@ -15,7 +15,7 @@ How image updates work is in [Updates and releases](https://docs.luft.computer/d
 ## Checks
 
 ```sh
-cargo clippy -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer --all-targets
-cargo fmt --check -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer
-cargo test -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer
+cargo clippy -p luft-software -p updater -p packager -p luft-thumbnailer --all-targets
+cargo fmt --check -p luft-software -p updater -p packager -p luft-thumbnailer
+cargo test -p luft-software -p updater -p packager -p luft-thumbnailer
 ```

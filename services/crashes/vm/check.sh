@@ -8,7 +8,7 @@ COREDUMP=fc2e22bc6ee647b6b90729ab34a250b1
 report() { echo "luft-crashes-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-crash-collector.service -u luft-crash-collector-poke.service -u 'systemd-coredump@*' --no-pager -n 40 > /dev/ttyS0
+  journalctl -b -u crashd.service -u crashd-poke.service -u 'systemd-coredump@*' --no-pager -n 40 > /dev/ttyS0
   systemctl poweroff --no-block
   exit 1
 }
@@ -39,7 +39,7 @@ core_dump_of_a_system_service() {
   crash_as_a_service /usr/libexec/luft-crash-fixture segv
   dumped /usr/libexec/luft-crash-fixture
   spooled system || fail "a crashed system service left no report"
-  journalctl -b -u luft-crash-collector-poke.service -o cat | grep -q 'Finished' || fail "systemd-coredump didn't wake the collector"
+  journalctl -b -u crashd-poke.service -o cat | grep -q 'Finished' || fail "systemd-coredump didn't wake the collector"
   grep -q '"kind":"signal"' "$SPOOL"/system/*.json || fail "the report isn't of a signal: $(cat "$SPOOL"/system/*.json)"
   grep -q '"frames":\[{' "$SPOOL"/system/*.json || fail "the report has no stack: $(cat "$SPOOL"/system/*.json)"
   pass "a system service's core dump wakes the collector and leaves a report with its stack"
@@ -55,7 +55,7 @@ taken_by_the_person_who_asks() {
 }
 
 panic_wakes_the_collector() {
-  systemctl stop luft-crash-collector.service
+  systemctl stop crashd.service
   crash_as_a_service /usr/libexec/luft-crash-fixture panic
   spooled system || fail "a panic left no report"
   grep -q '"kind":"panic"' "$SPOOL"/system/*.json || fail "the report isn't of a panic: $(cat "$SPOOL"/system/*.json)"
@@ -70,7 +70,7 @@ other_programs_are_left_out() {
   pass "a program that isn't Luft's crashing leaves no report"
 }
 
-systemctl is-active -q luft-crash-collector.socket || fail "the collector's socket isn't listening"
+systemctl is-active -q crashd.socket || fail "the collector's socket isn't listening"
 core_dump_of_a_system_service
 taken_by_the_person_who_asks
 panic_wakes_the_collector

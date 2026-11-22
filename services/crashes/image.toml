@@ -1,13 +1,13 @@
 part = "services"
 
 [programs]
-"/usr/libexec/" = ["luft-crash-collector", "luft-crash-reports"]
+"/usr/libexec/" = ["crashd", "luft-crash-reports"]
 
 [files]
 "/usr/lib/systemd/system/" = [
-    "data/luft-crash-collector.service",
-    "data/luft-crash-collector.socket",
-    "data/luft-crash-collector-poke.service",
+    "data/crashd.service",
+    "data/crashd.socket",
+    "data/crashd-poke.service",
 ]
 "/usr/lib/systemd/system/systemd-coredump@.service.d/luft-crash-reports.conf" = "data/systemd-coredump.conf"
 "/usr/lib/systemd/user/" = ["data/luft-crash-reports.service"]
@@ -18,5 +18,5 @@ part = "services"
 "/usr/share/luft/" = ["data/crash-reports.toml"]
 
 [enable]
-system = ["luft-crash-collector.socket"]
+system = ["crashd.socket"]
 user = ["luft-crash-reports.service"]

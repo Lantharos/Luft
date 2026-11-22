@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=com.lantharos.Windows1
-Exec=/usr/libexec/luft-windows
+Exec=/usr/libexec/neighbor
 User=root
-SystemdService=luft-windows.service
+SystemdService=neighbor.service

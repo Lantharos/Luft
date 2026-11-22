@@ -53,9 +53,9 @@ Two services act without asking because nothing could be gained from a prompt. t
 1. luft checks every value against what the setting takes, drops ones already set, and sends the whole set to Kestrel's review.
 2. Kestrel answers only `/usr/bin/luft` from the image, judged through its pidfd like any prompt. It refuses while the screen is locked, while another review is open, and after five in a minute.
 3. Kestrel reads the current values itself, system ones through `com.lantharos.Changes1.Read`, and lists every change from what it is to what it becomes, with the warning Settings shows and the program that ran luft. **Don't change** is what Enter picks. If luft goes away, the window closes.
-4. On **Change**, Kestrel makes exactly what it showed. System settings go to `luft-changes`, which answers only Kestrel in `kestrel.service`, asks polkit for an administrator's password once for the set, every time, and makes each change through the service that owns it.
+4. On **Change**, Kestrel makes exactly what it showed. System settings go to the `changes` service, which answers only Kestrel in `kestrel.service`, asks polkit for an administrator's password once for the set, every time, and makes each change through the service that owns it.
 
-A program that traces luft or feeds it arguments can only change what the window lists, and a person still has to approve it. `luft-changes` runs as root with only `CAP_SYS_PTRACE`, which it needs to read its caller's program through the pidfd, and stops after half a minute without calls.
+A program that traces luft or feeds it arguments can only change what the window lists, and a person still has to approve it. `changes` runs as root with only `CAP_SYS_PTRACE`, which it needs to read its caller's program through the pidfd, and stops after half a minute without calls.
 
 What needs the warnings and steps of Settings stays there: online accounts, remote login, automatic login, encryption, Luft Keyring, the firewall and running an unreviewed extension inside the desktop. luft names the Settings page instead.
 

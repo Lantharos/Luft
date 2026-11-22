@@ -5,7 +5,7 @@ ConditionPathExists=/dev/disk/by-label/luft-source
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-installer-check
+ExecStart=/usr/libexec/installer-check
 ExecStopPost=/usr/bin/systemctl poweroff --no-block
 
 [Install]

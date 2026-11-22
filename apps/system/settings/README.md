@@ -18,7 +18,7 @@ Installing registers the `kestrel-settings:` link scheme, which [opens a page](h
 
 ## Automatic updates
 
-`luft-updater` keeps the schedule and checks on it by itself, also when nobody is signed in ([image updates](https://docs.luft.computer/developers/system/updates/#the-updater)). System shows the schedule and changes it through the updater.
+`updater` keeps the schedule and checks on it by itself, also when nobody is signed in ([image updates](https://docs.luft.computer/developers/system/updates/#the-updater)). System shows the schedule and changes it through the updater.
 
 ## NVIDIA graphics
 

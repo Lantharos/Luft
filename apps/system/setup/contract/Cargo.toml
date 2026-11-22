@@ -1,7 +1,7 @@
 [package]
 name = "luft-installer-contract"
 version = "0.1.0"
-description = "The survey, install plan and regional settings Install Luft and luft-installer exchange over D-Bus"
+description = "The survey, install plan and regional settings Install Luft and installer exchange over D-Bus"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true

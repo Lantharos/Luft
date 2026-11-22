@@ -1,5 +1,5 @@
 [package]
-name = "luft-printers"
+name = "printers"
 version = "0.1.0"
 description = "Sets up printers plugged in by USB and lets Settings add, change and remove printers"
 authors = ["Kristof"]

@@ -4,7 +4,7 @@ After=dbus.service cups.socket avahi-daemon.service local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-printers-check
+ExecStart=/usr/libexec/printers-check
 
 [Install]
 WantedBy=multi-user.target

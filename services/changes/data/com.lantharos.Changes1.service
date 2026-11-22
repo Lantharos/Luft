@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=com.lantharos.Changes1
-Exec=/usr/libexec/luft-changes
+Exec=/usr/libexec/changes
 User=root
-SystemdService=luft-changes.service
+SystemdService=changes.service

@@ -10,13 +10,13 @@ serial="$vm/serial.log"
 data="$luft/services/crashes/data"
 built="$luft/target/release"
 
-(cd "$luft" && cargo build --release --quiet -p luft-crash-collector -p luft-crash-reports -p luft-crash-fixture)
+(cd "$luft" && cargo build --release --quiet -p crashd -p luft-crash-reports -p luft-crash-fixture)
 start_stage
-place 755 "$built/luft-crash-collector" /usr/libexec/luft-crash-collector
+place 755 "$built/crashd" /usr/libexec/crashd
 place 755 "$built/luft-crash-reports" /usr/libexec/luft-crash-reports
 place 755 "$built/luft-crash-fixture" /usr/libexec/luft-crash-fixture
 place 755 "$built/luft-crash-fixture" /usr/bin/crash-fixture
-for unit in luft-crash-collector.service luft-crash-collector.socket luft-crash-collector-poke.service; do
+for unit in crashd.service crashd.socket crashd-poke.service; do
   place 644 "$data/$unit" "/usr/lib/systemd/system/$unit"
 done
 place 644 "$data/systemd-coredump.conf" /usr/lib/systemd/system/systemd-coredump@.service.d/luft-crash-reports.conf
@@ -26,7 +26,7 @@ place 644 "$data/com.lantharos.CrashCollector1.service" /usr/share/dbus-1/system
 place 755 "$here/check.sh" /usr/libexec/luft-crashes-check
 place 644 "$here/luft-crashes-check.service" /usr/lib/systemd/system/luft-crashes-check.service
 build_check_image "$image_name:45" "$image_name-crashes-check" \
-  "systemctl enable luft-crash-collector.socket luft-crashes-check.service && useradd --create-home --uid 1000 mara"
+  "systemctl enable crashd.socket luft-crashes-check.service && useradd --create-home --uid 1000 mara"
 make_root_drive "$image_name-crashes-check"
 
 CPUS=2 MEMORY=3072 boot_root_drive "$serial" 10

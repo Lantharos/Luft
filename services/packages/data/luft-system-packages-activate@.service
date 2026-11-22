@@ -3,11 +3,11 @@ Description=Bring system packages into the running system
 CollectMode=inactive-or-failed
 
 [Service]
-ExecStart=/usr/libexec/luft-packages activate
+ExecStart=/usr/libexec/packager activate
 StandardInput=socket
 StandardOutput=socket
 StandardError=journal
-SyslogIdentifier=luft-packages
+SyslogIdentifier=packager
 UMask=0022
 IPAddressDeny=any
 CapabilityBoundingSet=CAP_AUDIT_WRITE CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER CAP_FSETID CAP_KILL CAP_LINUX_IMMUTABLE CAP_MAC_ADMIN CAP_MKNOD CAP_SETFCAP CAP_SETGID CAP_SETUID CAP_SYS_ADMIN

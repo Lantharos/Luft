@@ -1,13 +1,12 @@
 [Unit]
-Description=Printer settings
-After=cups.socket
+Description=Set up printers plugged in by USB
+After=cups.socket avahi-daemon.socket
 Wants=cups.socket
 
 [Service]
-Type=dbus
-BusName=com.lantharos.Printers1
-ExecStart=/usr/libexec/luft-printers
-SyslogIdentifier=luft-printers
+Type=oneshot
+ExecStart=/usr/libexec/printers usb
+SyslogIdentifier=printers
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes

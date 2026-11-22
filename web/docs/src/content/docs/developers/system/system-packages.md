@@ -5,20 +5,20 @@ sidebar:
   order: 10
 ---
 
-The packages someone asks for, command-line tools from Fedora among them, become one [systemd system extension](https://www.freedesktop.org/software/systemd/man/latest/systemd-sysext.html), an EROFS image that systemd lays over `/usr` and `/opt` after the system has started. Each version of Luft on the computer gets its own build, made against exactly that version, so an update or going back never meets packages built for something else. Using them is covered in [System packages](/system/system-packages/); the service is `luft-packages` in `services/packages`.
+The packages someone asks for, command-line tools from Fedora among them, become one [systemd system extension](https://www.freedesktop.org/software/systemd/man/latest/systemd-sysext.html), an EROFS image that systemd lays over `/usr` and `/opt` after the system has started. Each version of Luft on the computer gets its own build, made against exactly that version, so an update or going back never meets packages built for something else. Using them is covered in [System packages](/system/system-packages/); the service is `packager` in `services/packages`.
 
 ## Who does what
 
 Building runs packages' scriptlets and talks to the network, so it's kept apart from what changes the running system.
 
-- `luft-packages.service` (`com.lantharos.Packages1`, started on demand) builds, and keeps the list, package files and software sources under `/var/lib/luft/system-packages`. It sees the system read-only, can write only its state and cache folders, has no devices, and holds only the capabilities building needs.
+- `packager.service` (`com.lantharos.Packages1`, started on demand) builds, and keeps the list, package files and software sources under `/var/lib/luft/system-packages`. It sees the system read-only, can write only its state and cache folders, has no devices, and holds only the capabilities building needs.
 - `luft-system-packages-activate@.service`, one instance per request on a socket only root can open, brings a finished build into the running system or takes the packages away. It reads nothing from the build service but the word asking for one of the two.
 
 Everything lives in `/var`, so going back to an earlier version keeps the list and the sources. A drop-in for dnf adds the sources folder to its `reposdir`, so `dnf repolist` on the computer sees them too.
 
 ## Building
 
-`luft-packages` builds in a private mount namespace, so nothing it mounts outlives the build.
+`packager` builds in a private mount namespace, so nothing it mounts outlives the build.
 
 1. Mount the version's system read-only from the composefs repository, checked file by file against its digest as the startup image does, with a writable overlay on top.
 2. Resolve with `dnf --installroot` against that version's own package database, using only Fedora's repositories and the added sources, with weak dependencies as on any Fedora. Only what the transaction adds brings its recommendations, so Luft's own set stays as small as it was built.
@@ -84,7 +84,7 @@ A package file opened in Schelf becomes a system package. When it brings a repos
 
 ## Updates
 
-When `luft-updater` finishes downloading an update or a switch to the other image, it calls `Rebuild`, and the system packages are built for the staged version before the download reports finished. A restart in the middle stops the build, and the new version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
+When `updater` finishes downloading an update or a switch to the other image, it calls `Rebuild`, and the system packages are built for the staged version before the download reports finished. A restart in the middle stops the build, and the new version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
 
 When the updater checks on its schedule, at most once a day, and downloads nothing, it calls `Update`: for every version on the computer, the list is resolved again and rebuilt only when a version changed. Schelf calls it too when someone updates their system packages, which needs `com.lantharos.packages.tools`; it finds newer versions by asking the computer's own `dnf`, which sees Fedora's repositories and the added sources, for the newest version of each requested package. The running version's new build goes in the way an install does, restarting services whose package changed, with the build before put back on failure. So fixes from Fedora and added sources arrive as often as Luft looks for updates.
 

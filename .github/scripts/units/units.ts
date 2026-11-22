@@ -31,7 +31,7 @@ const SCOPES: [string, Scope][] = [
 	['services/language/data/*', 'user'],
 	['services/speech/data/*', 'user'],
 	['services/crashes/data/luft-crash-reports.service', 'user'],
-	['services/windows/data/luft-windows-notice.service', 'user'],
+	['services/windows/data/neighbor-notice.service', 'user'],
 	['services/*/data/*', 'system'],
 ];
 

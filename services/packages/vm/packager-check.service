@@ -4,7 +4,7 @@ After=dbus.service polkit.service local-fs.target usr.mount
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/luft-packages-check
+ExecStart=/usr/libexec/packager-check
 
 [Install]
 WantedBy=multi-user.target

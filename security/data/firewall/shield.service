@@ -1,13 +1,13 @@
 [Unit]
 Description=Firewall
-Wants=luft-firewall-base.service
-After=luft-firewall-base.service
-PartOf=luft-firewall-base.service
+Wants=shield-base.service
+After=shield-base.service
+PartOf=shield-base.service
 
 [Service]
 Type=dbus
 BusName=com.lantharos.Firewall1
-ExecStart=@libexecdir@/luft-firewall
+ExecStart=@libexecdir@/shield
 Restart=on-failure
 UMask=0077
 StateDirectory=luft-firewall

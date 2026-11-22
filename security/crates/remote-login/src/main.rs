@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use anyhow::bail;
 use luft_dbus::idle::Idle;
-use luft_remote_login::choices::Choices;
+use remoted::choices::Choices;
 
 use service::{NAME, PATH, RemoteLogin};
 

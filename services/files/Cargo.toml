@@ -7,6 +7,10 @@ license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[[bin]]
+name = "files"
+path = "src/main.rs"
+
 [dependencies]
 chrono.workspace = true
 luft-dbus.workspace = true

@@ -63,7 +63,7 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 
 ## Changing files that aren't yours
 
-Rover and Barometer run as you, so they can't change the system's files or another person's, or stop their programs. When you ask for that, they call `luft-files` (`com.lantharos.Files1`), a service that runs as root only while it has work. It can copy, move, rename, delete and trash items, make a file or folder, and signal or reprioritise processes, and nothing else: there is no way to hand it a command to run.
+Rover and Barometer run as you, so they can't change the system's files or another person's, or stop their programs. When you ask for that, they call `files` (`com.lantharos.Files1`), a service that runs as root only while it has work. It can copy, move, rename, delete and trash items, make a file or folder, and signal or reprioritise processes, and nothing else: there is no way to hand it a command to run.
 
 Every call is checked with polkit. The prompt says what is about to happen, such as Delete “/etc/fstab” for good, with the path or process name as the service sees it, and polkit rules can decide on the same details (`operation`, `path`, `target`, `count`, `processes`). The password covers exactly the call the prompt described: the next change asks again, so a program can't get one harmless change approved and make others on its back. One action is one call, so moving a hundred files into a system folder asks once, with a prompt that counts them. Only someone at the computer itself can be asked; network sessions, background sessions and a locked screen get nothing.
 

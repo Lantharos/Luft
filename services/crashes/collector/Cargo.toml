@@ -1,5 +1,5 @@
 [package]
-name = "luft-crash-collector"
+name = "crashd"
 version = "0.1.0"
 description = "Finds crashes of Luft's own programs in the journal and keeps finished, scrubbed reports for the people at the computer"
 authors = ["Kristof"]

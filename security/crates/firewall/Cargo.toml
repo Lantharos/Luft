@@ -1,5 +1,5 @@
 [package]
-name = "luft-firewall"
+name = "shield"
 description = "Keeps devices on the network from reaching the computer, except the apps people let them reach"
 version = "0.1.0"
 edition.workspace = true

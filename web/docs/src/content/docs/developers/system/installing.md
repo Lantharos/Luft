@@ -5,7 +5,7 @@ sidebar:
   order: 11
 ---
 
-Installing involves three parts: [Install Luft](/start/usb-stick/#install-luft), the app in `apps/system/setup`; `luft-installer`, the service behind it on `com.lantharos.Installer1`; and Kestrel's setup mode, which runs both before anyone has an account. The same app runs from the USB stick and from [Meet Luft](/developers/system/meet-luft/)'s partitions.
+Installing involves three parts: [Install Luft](/start/usb-stick/#install-luft), the app in `apps/system/setup`; `installer`, the service behind it on `com.lantharos.Installer1`; and Kestrel's setup mode, which runs both before anyone has an account. The same app runs from the USB stick and from [Meet Luft](/developers/system/meet-luft/)'s partitions.
 
 ## What gets installed
 
@@ -44,7 +44,7 @@ After copying, the installer writes the locale, keyboard, time zone, computer na
 
 The account's Luft Keyring is created with its password, plus a one-time key in `/var/lib/luft-keyring` that unlocks it in those setup sessions, since an automatic sign-in has no password to unlock it with. While setup is pending, the service also enrolls Luft's Secure Boot key, adds fingerprints and tells the firewall the first network's type (`SetNetworkType`), so the person isn't asked for the password they just chose. It does these only for the account setup is pending for, signed in at the computer, and only for programs outside a sandbox.
 
-`FinishFirstBoot`, which only that account may call, removes the `initial_session`, the marker and the keyring's one-time key, and the next start shows the login screen. Setup doesn't stay open forever: `luft-installer-expire-setup.service` counts the starts, and after five, or a day after installing, it finishes setup the same way before the login screen appears. The service stops doing setup's work at the same limits.
+`FinishFirstBoot`, which only that account may call, removes the `initial_session`, the marker and the keyring's one-time key, and the next start shows the login screen. Setup doesn't stay open forever: `installer-expire-setup.service` counts the starts, and after five, or a day after installing, it finishes setup the same way before the login screen appears. The service stops doing setup's work at the same limits.
 
 ## Setup mode
 

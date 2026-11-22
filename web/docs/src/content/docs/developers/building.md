@@ -113,18 +113,18 @@ sources = ["kestrel/engine/data/emoji.json"]
 profile = "release-abort"
 
 [programs]
-"/usr/libexec/" = ["luft-updater"]
+"/usr/libexec/" = ["updater"]
 
 [files]
-"/usr/lib/systemd/system/" = ["data/luft-updater.service", "data/systemd/*.service"]
+"/usr/lib/systemd/system/" = ["data/updater.service", "data/systemd/*.service"]
 "/usr/lib/dracut/modules.d/90trustd/" = [{ from = "data/dracut/module-setup.sh", mode = "755" }]
 
 [links]
 "/usr/bin/sch" = "schelf"
 
 [enable]
-system = ["luft-updater-check.timer"]
-user = ["luft-windows-notice.service"]
+system = ["updater-check.timer"]
+user = ["neighbor-notice.service"]
 ```
 
 - `part` is `kestrel`, `boot`, `services`, or `app-NAME` for an app, which gets a part of its own. A new part also needs a stage of its own in `os/image/parts/Containerfile`.

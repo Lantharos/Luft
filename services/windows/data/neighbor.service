@@ -4,8 +4,8 @@ Description=Windows next to Luft
 [Service]
 Type=dbus
 BusName=com.lantharos.Windows1
-ExecStart=/usr/libexec/luft-windows
-SyslogIdentifier=luft-windows
+ExecStart=/usr/libexec/neighbor
+SyslogIdentifier=neighbor
 RuntimeDirectory=luft-windows-drive
 ReadWritePaths=-/var/lib/bluetooth
 ProtectSystem=strict

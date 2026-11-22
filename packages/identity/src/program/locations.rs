@@ -6,7 +6,25 @@ use std::path::Path;
 const APPS: &str = "/usr/lib/sabine/com.lantharos.";
 const PROGRAM_FOLDERS: [&str; 2] = ["/usr/bin", "/usr/libexec"];
 const PREFIXES: [&str; 3] = ["kestrel", "luft-", "mutter-"];
-const NAMED: [&str; 6] = ["luft", "peek", "sushictl", "sushid", "trustctl", "trustd"];
+const NAMED: [&str; 17] = [
+    "changes",
+    "crashd",
+    "files",
+    "installer",
+    "luft",
+    "neighbor",
+    "packager",
+    "peek",
+    "portguard",
+    "printers",
+    "remoted",
+    "shield",
+    "sushictl",
+    "sushid",
+    "trustctl",
+    "trustd",
+    "updater",
+];
 
 pub fn is_luft_location(path: &Path) -> bool {
     if path.to_string_lossy().starts_with(APPS) {
@@ -33,7 +51,7 @@ mod tests {
         for luft in [
             "/usr/bin/kestrel",
             "/usr/libexec/kestrel-settings",
-            "/usr/libexec/luft-firewall",
+            "/usr/libexec/shield",
             "/usr/libexec/trustd",
             "/usr/bin/luft",
             "/usr/lib/sabine/com.lantharos.settings/settings",
@@ -45,7 +63,7 @@ mod tests {
             "/usr/bin/flatpak",
             "/usr/lib/sabine/org.example.App/app",
             "/usr/libexec/kestrel/extra/helper",
-            "/var/home/mara/.local/bin/luft-firewall",
+            "/var/home/mara/.local/bin/shield",
         ] {
             assert!(!is_luft_location(Path::new(other)), "{other}");
         }

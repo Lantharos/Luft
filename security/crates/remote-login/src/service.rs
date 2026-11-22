@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
-use luft_remote_login::choices::Choices;
+use remoted::choices::Choices;
 use tokio::sync::Mutex;
 use zbus::fdo::{self, DBusProxy};
 use zbus::message::Header;

@@ -2,7 +2,7 @@
 
 Rover is Luft's file manager, and the file dialog every app uses: tabs, list, grid and column views, Quick Look, search by name or contents, network locations, cloud drives and Git status. Using it is described in [the docs](https://docs.luft.computer/apps/rover/).
 
-Network locations need GVfs with `gvfs-fuse` and the backend for each protocol, such as `gvfs-smb`. Changing files that belong to the system or someone else goes through [`luft-files`](../../../services/files).
+Network locations need GVfs with `gvfs-fuse` and the backend for each protocol, such as `gvfs-smb`. Changing files that belong to the system or someone else goes through [`files`](../../../services/files).
 
 ## Build and run
 

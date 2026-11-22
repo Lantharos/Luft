@@ -1,5 +1,5 @@
 [package]
-name = "luft-packages"
+name = "packager"
 version = "0.1.0"
 description = "Builds the system packages Luft merges over its image as a system extension, and installs approved extensions, for Schelf"
 authors = ["Kristof"]

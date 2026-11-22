@@ -1,0 +1,12 @@
+[Unit]
+Description=Check neighbor against a Windows drive made in this VM
+After=dbus.service local-fs.target
+ConditionPathExists=/usr/lib/neighbor-check/fake-windows
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/neighbor-check
+ExecStopPost=/usr/bin/systemctl poweroff --no-block
+
+[Install]
+WantedBy=multi-user.target

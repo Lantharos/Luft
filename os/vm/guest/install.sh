@@ -10,7 +10,7 @@ ESP_ID=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
 report() { echo "luft-vm-install: $*"; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-installer --no-pager -n 60
+  journalctl -b -u installer --no-pager -n 60
   exit 1
 }
 call() { busctl --json=short call "${BUS[@]}" "$@"; }

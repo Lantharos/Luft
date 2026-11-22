@@ -17,19 +17,19 @@ for guest in 8000 8001 8002 8003 80; do
 done
 forwarded="$(IFS=,; echo "${forwards[*]}")"
 
-setup="systemctl enable usr.mount luft-firewall-base.service luft-firewall.service luft-firewall-check.service"
+setup="systemctl enable usr.mount shield-base.service shield.service shield-check.service"
 
 start_stage
 if from_this_tree; then
   bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
   setup="semodule -i /usr/share/selinux/packages/luft-firewall.cil && $setup"
 fi
-place 755 "$here/check.sh" /usr/libexec/luft-firewall-check
-place 644 "$here/sockets.py" /usr/libexec/luft-firewall-check-sockets
-place 644 "$here/luft-firewall-check.service" /usr/lib/systemd/system/luft-firewall-check.service
+place 755 "$here/check.sh" /usr/libexec/shield-check
+place 644 "$here/sockets.py" /usr/libexec/shield-check-sockets
+place 644 "$here/shield-check.service" /usr/lib/systemd/system/shield-check.service
 place 644 "$here/kestrel.service" /etc/systemd/user/kestrel.service
 place 644 "$here/usr.mount" /usr/lib/systemd/system/usr.mount
-place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-firewall-check.rules
+place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-shield-check.rules
 build_check_image "$(base_image)" "$image_name-firewall-check" "$setup"
 make_root_drive "$image_name-firewall-check"
 relabel_root_drive "$serial.relabel"
@@ -37,5 +37,5 @@ relabel_root_drive "$serial.relabel"
 for boot in first second; do
   CPUS=2 MEMORY=3072 SELINUX="selinux=1 enforcing=1" APPEND="luft.firewall-check=$(IFS=,; echo "${hosts[*]}")" \
     boot_root_drive "$serial.$boot" 10 -nic "user,model=virtio-net-pci,$forwarded"
-  expect_in_log "$serial.$boot" luft-firewall-check "PASS $boot"
+  expect_in_log "$serial.$boot" shield-check "PASS $boot"
 done

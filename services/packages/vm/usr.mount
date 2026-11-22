@@ -1,6 +1,6 @@
 [Unit]
 Description=The system's programs, read-only as on an installed Luft
-Before=luft-packages-check.service
+Before=packager-check.service
 
 [Mount]
 What=/usr
@@ -8,4 +8,4 @@ Where=/usr
 Options=bind,ro
 
 [Install]
-RequiredBy=luft-packages-check.service
+RequiredBy=packager-check.service

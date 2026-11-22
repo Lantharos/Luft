@@ -123,9 +123,6 @@ mod tests {
             program_name(Path::new("/usr/lib/sabine/com.lantharos.settings/settings")),
             "com.lantharos.settings"
         );
-        assert_eq!(
-            program_name(Path::new("/usr/libexec/luft-firewall")),
-            "luft-firewall"
-        );
+        assert_eq!(program_name(Path::new("/usr/libexec/shield")), "shield");
     }
 }

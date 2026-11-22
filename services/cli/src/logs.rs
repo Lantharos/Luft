@@ -52,19 +52,13 @@ impl Part {
             Self::Kestrel => (&[], &["kestrel.service"]),
             Self::DesktopSettings => (&[], &["kestrel-settings.service"]),
             Self::LoginScreen => (&["greetd.service", "kestrel-greeter.service"], &[]),
-            Self::Updater => (&["luft-updater.service", "luft-updater-check.service"], &[]),
+            Self::Updater => (&["updater.service", "updater-check.service"], &[]),
             Self::Packages => (
-                &[
-                    "luft-packages.service",
-                    "luft-system-packages-rebuild.service",
-                ],
+                &["packager.service", "luft-system-packages-rebuild.service"],
                 &[],
             ),
             Self::Keyring => (&["luft-keyring-unlock.service"], &["luft-keyring.service"]),
-            Self::Firewall => (
-                &["luft-firewall.service", "luft-firewall-base.service"],
-                &[],
-            ),
+            Self::Firewall => (&["shield.service", "shield-base.service"], &[]),
             Self::Trust => (
                 &[
                     "trustd.service",
@@ -73,13 +67,10 @@ impl Part {
                 ],
                 &[],
             ),
-            Self::Usb => (&["luft-usb-protection.service"], &[]),
+            Self::Usb => (&["portguard.service"], &[]),
             Self::Accounts => (&[], &["luft-accounts.service"]),
-            Self::Crashes => (
-                &["luft-crash-collector.service"],
-                &["luft-crash-reports.service"],
-            ),
-            Self::Changes => (&["luft-changes.service"], &[]),
+            Self::Crashes => (&["crashd.service"], &["luft-crash-reports.service"]),
+            Self::Changes => (&["changes.service"], &[]),
         };
         Units {
             system: system.iter().map(|unit| (*unit).to_owned()).collect(),

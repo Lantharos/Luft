@@ -18,17 +18,17 @@ require_signed_by_keys "$base"
 
 start_stage
 stage_part services
-place 755 "$here/check.sh" /usr/libexec/luft-installer-check
-place 644 "$here/luft-installer-check.service" /usr/lib/systemd/system/luft-installer-check.service
-place 755 "$here/started.sh" /usr/libexec/luft-installer-started
-place 644 "$here/luft-installer-started.service" /usr/lib/systemd/system/luft-installer-started.service
-place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-installer-check.rules
+place 755 "$here/check.sh" /usr/libexec/installer-check
+place 644 "$here/installer-check.service" /usr/lib/systemd/system/installer-check.service
+place 755 "$here/started.sh" /usr/libexec/installer-started
+place 644 "$here/installer-started.service" /usr/lib/systemd/system/installer-started.service
+place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-installer-check.rules
 size="$(podman image inspect --format '{{.Size}}' "$base")"
 followed=ghcr.io/lantharos/luft:1
 [[ "$carried" != nvidia ]] || followed+=-nvidia
 printf '[images.%s]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "%s"\nsize = %s\n' "$carried" "$followed" "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
-build_check_image "$base" "$image-system" "systemctl enable luft-installer-check.service luft-installer-started.service"
+build_check_image "$base" "$image-system" "systemctl enable installer-check.service installer-started.service"
 "$luft/os/image/seal.sh" "$image-system" "$image"
 "$here/source.sh" "$image" "$vm/source.img"
 make_root_drive "$image"
@@ -42,7 +42,7 @@ mkdir -p "$vm/kept" && echo "still here" > "$vm/kept/kept"
 mkfs.ext4 -q -F -E offset=1048576 -d "$vm/kept" "$vm/free.img" 8G
 
 DRIVES="$vm/whole.img $vm/free.img $vm/source.img:ro $vm/windows.img" boot_root_drive "$vm/serial.log" 60
-expect_in_log "$vm/serial.log" luft-installer-check DONE
+expect_in_log "$vm/serial.log" installer-check DONE
 
 starts() {
   local drive="$1" what="$2" log="$vm/installed-$1.log"
@@ -50,15 +50,15 @@ starts() {
   DISK="$vm/$drive.img" TPM=0 NETWORK=0 HEADLESS=1 CPUS=2 MEMORY=4096 SERIAL="$log" LUFT_VM="$vm" "$luft/os/vm/qemu.sh" &
   local qemu=$!
   for _ in $(seq 300); do
-    grep -qaE 'luft-installer-check: (STARTED|FAIL)' "$log" 2> /dev/null && break
+    grep -qaE 'installer-check: (STARTED|FAIL)' "$log" 2> /dev/null && break
     sleep 1
   done
   kill "$(cat "$vm/qemu.pid")"
   wait "$qemu" 2> /dev/null || true
-  if grep -qa 'luft-installer-check: STARTED' "$log"; then
-    echo "luft-installer-check: PASS $what starts on its own, $(sed -n 's/.*luft-installer-check: STARTED //p' "$log" | tr -d '\r')"
+  if grep -qa 'installer-check: STARTED' "$log"; then
+    echo "installer-check: PASS $what starts on its own, $(sed -n 's/.*installer-check: STARTED //p' "$log" | tr -d '\r')"
   else
-    echo "luft-installer-check: FAIL $what didn't start, see $log"
+    echo "installer-check: FAIL $what didn't start, see $log"
     exit 1
   fi
 }

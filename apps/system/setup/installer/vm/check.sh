@@ -6,10 +6,10 @@ TARGET=/run/luft-check/target
 SOURCE=/run/luft-source
 INSTALL_TIMEOUT=1800
 
-report() { echo "luft-installer-check: $*" > /dev/ttyS0; }
+report() { echo "installer-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-installer --no-pager -n 40 > /dev/ttyS0
+  journalctl -b -u installer --no-pager -n 40 > /dev/ttyS0
   exit 1
 }
 pass() { report "PASS $*"; }
@@ -81,7 +81,7 @@ check_meet_hints() {
   [[ "$hints" == "$(jq -cS . <<< "$HINTS")" ]] || fail "the survey doesn't hand setup the language, time zone and keyboards Meet Luft noted: $hints"
   pass "the survey hands setup the language, formats, time zone and keyboards Meet Luft noted"
   rm -r /run/initramfs/live
-  systemctl stop luft-installer
+  systemctl stop installer
 }
 
 write_trust_stand_in() {
@@ -192,7 +192,7 @@ check_whole_drive() {
 }
 
 check_free_space() {
-  systemctl stop luft-installer
+  systemctl stop installer
   local survey drive offset
   survey="$(call Survey | jq -r '.data[0]')" || fail "the second survey failed"
   drive="$(jq -r '.drives[] | select(.device == "/dev/vdc") | .block' <<< "$survey")"
@@ -245,7 +245,7 @@ prepare_windows() {
 }
 
 check_alongside_windows() {
-  systemctl stop luft-installer
+  systemctl stop installer
   prepare_windows
   local survey drive size unexpected
   survey="$(call Survey | jq -r '.data[0]')" || fail "the third survey failed"
@@ -407,12 +407,12 @@ check_setup_expires() {
   ! setup_step EnrollSigningKey || fail "setup's exceptions last longer than a day"
   touch "$marker"
   rm -f "$boots"
-  /usr/libexec/luft-installer expire-setup && /usr/libexec/luft-installer expire-setup || fail "counting starts failed"
+  /usr/libexec/installer expire-setup && /usr/libexec/installer expire-setup || fail "counting starts failed"
   [[ "$(wc -l < "$boots")" == 1 && -e "$marker" ]] || fail "one start counts as $(wc -l < "$boots") or ended setup"
   setup_step EnrollSigningKey || fail "setup's exceptions ended after one start"
   seq 5 >> "$boots"
   ! setup_step EnrollSigningKey || fail "setup's exceptions last more than five starts"
-  /usr/libexec/luft-installer expire-setup || fail "ending setup failed"
+  /usr/libexec/installer expire-setup || fail "ending setup failed"
   [[ ! -e "$marker" && ! -e "$boots" ]] || fail "setup is still pending after too many starts"
   [[ ! -e /var/lib/kestrel-greeter/initial-session.toml ]] || fail "too many starts later, ada is still signed in by herself"
   pass "setup's exceptions and signing in by itself end a day after installing or after five starts"
@@ -434,7 +434,7 @@ pending_setup() {
 }
 
 check_first_boot_finish() {
-  systemctl stop luft-installer
+  systemctl stop installer
   useradd --groups wheel ada
   pending_setup
   [[ "$(busctl --json=short get-property "${BUS[@]}" Phase | jq -r .data)" == first-boot ]] || fail "the installed system doesn't know setup is pending"

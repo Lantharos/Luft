@@ -1,17 +1,14 @@
 [Unit]
-Description=Tell Luft's crash collector about a core dump
+Description=Changes to files that need an administrator
 
 [Service]
-Type=oneshot
-ExecStart=/usr/libexec/luft-crash-collector --poke
-DynamicUser=yes
-ProtectSystem=strict
-ProtectHome=yes
-PrivateTmp=yes
+Type=dbus
+BusName=com.lantharos.Files1
+ExecStart=/usr/libexec/files
+SyslogIdentifier=files
+ProtectSystem=yes
 PrivateDevices=yes
 PrivateNetwork=yes
-PrivateIPC=yes
-PrivateUsers=yes
 IPAddressDeny=any
 NoNewPrivileges=yes
 ProtectKernelTunables=yes
@@ -20,8 +17,6 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
-ProtectProc=invisible
-ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX
 RestrictNamespaces=yes
 RestrictRealtime=yes
@@ -30,5 +25,6 @@ LockPersonality=yes
 MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
-SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=
+SystemCallFilter=~@privileged
+SystemCallFilter=@chown
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER CAP_KILL CAP_SYS_NICE

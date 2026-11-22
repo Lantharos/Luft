@@ -1227,6 +1227,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "changes"
+version = "0.1.0"
+dependencies = [
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "luft-variant",
+ "serde_json",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "chardetng"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1625,6 +1638,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "crashd"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "luft-crash-report",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "zbus 6.0.0",
 ]
 
 [[package]]
@@ -4510,6 +4540,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "installer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "futures-util",
+ "getrandom 0.4.3",
+ "libc",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-disks",
+ "luft-i18n",
+ "luft-identity",
+ "luft-installer-contract",
+ "luft-keyring-vault",
+ "luft-meet",
+ "luft-trust",
+ "luft-variant",
+ "luft-windows",
+ "serde",
+ "serde_json",
+ "tokio",
+ "toml",
+ "toml_edit",
+ "zbus 6.0.0",
+ "zeroize",
+]
+
+[[package]]
 name = "interpolate_name"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5692,19 +5751,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "luft-changes"
-version = "0.1.0"
-dependencies = [
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "luft-variant",
- "serde_json",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
 name = "luft-cli"
 version = "0.1.0"
 dependencies = [
@@ -5726,23 +5772,6 @@ dependencies = [
  "toml",
  "zbus 6.0.0",
  "zstd 0.14.4",
-]
-
-[[package]]
-name = "luft-crash-collector"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "luft-crash-report",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "zbus 6.0.0",
 ]
 
 [[package]]
@@ -5866,21 +5895,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "luft-firewall"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aya",
- "futures-util",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "nix",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
 name = "luft-handwriting"
 version = "0.1.0"
 dependencies = [
@@ -5929,35 +5943,6 @@ dependencies = [
  "luft-dbus-macros",
  "tempfile",
  "zbus 6.0.0",
-]
-
-[[package]]
-name = "luft-installer"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "futures-util",
- "getrandom 0.4.3",
- "libc",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-disks",
- "luft-i18n",
- "luft-identity",
- "luft-installer-contract",
- "luft-keyring-vault",
- "luft-meet",
- "luft-trust",
- "luft-variant",
- "luft-windows",
- "serde",
- "serde_json",
- "tokio",
- "toml",
- "toml_edit",
- "zbus 6.0.0",
- "zeroize",
 ]
 
 [[package]]
@@ -6116,30 +6101,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "luft-packages"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "luft-store-seal",
- "luft-unpack",
- "rustix",
- "serde",
- "serde_json",
- "sha2",
- "tar",
- "tempfile",
- "tokio",
- "toml",
- "walkdir",
- "zbus 6.0.0",
- "zstd 0.14.4",
-]
-
-[[package]]
 name = "luft-pinentry"
 version = "0.1.0"
 dependencies = [
@@ -6152,38 +6113,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "luft-printers"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "luft-cups",
- "luft-dbus",
- "luft-dbus-macros",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
 name = "luft-recovery-key"
 version = "0.1.0"
 dependencies = [
  "getrandom 0.4.3",
  "sha2",
-]
-
-[[package]]
-name = "luft-remote-login"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64 0.23.1",
- "luft-dbus",
- "luft-dbus-macros",
- "nix",
- "rustix",
- "sha2",
- "tokio",
- "zbus 6.0.0",
 ]
 
 [[package]]
@@ -6343,36 +6277,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "luft-updater"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "libc",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "luft-variant",
- "serde",
- "serde_json",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
-name = "luft-usb-protection"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "futures-util",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-identity",
- "rustix",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
 name = "luft-variant"
 version = "0.1.0"
 dependencies = [
@@ -6404,22 +6308,6 @@ dependencies = [
  "ntfs",
  "regf-rs",
  "serde",
-]
-
-[[package]]
-name = "luft-windows-service"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "futures-util",
- "libc",
- "luft-dbus",
- "luft-dbus-macros",
- "luft-windows",
- "serde",
- "serde_json",
- "tokio",
- "zbus 6.0.0",
 ]
 
 [[package]]
@@ -6892,6 +6780,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee6cda3051665f1fb8d9e08fc35c96d5a244fb1be711a03b71118828afc9a873"
 dependencies = [
  "jni-sys 0.3.1",
+]
+
+[[package]]
+name = "neighbor"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures-util",
+ "libc",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-windows",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zbus 6.0.0",
 ]
 
 [[package]]
@@ -7619,6 +7523,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "packager"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "luft-store-seal",
+ "luft-unpack",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tar",
+ "tempfile",
+ "tokio",
+ "toml",
+ "walkdir",
+ "zbus 6.0.0",
+ "zstd 0.14.4",
+]
+
+[[package]]
 name = "pam_luft_keyring"
 version = "0.1.0"
 dependencies = [
@@ -8069,6 +7997,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "portguard"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures-util",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "rustix",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "postcard"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8176,6 +8118,18 @@ dependencies = [
  "primefield",
  "serdect",
  "wnaf",
+]
+
+[[package]]
+name = "printers"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "luft-cups",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "tokio",
+ "zbus 6.0.0",
 ]
 
 [[package]]
@@ -8724,6 +8678,21 @@ name = "regf-rs"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "349e79c5a22cd52d15fe4d364428b1c1040a6b2025a763c59f645a955ceae1ef"
+
+[[package]]
+name = "remoted"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.23.1",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "nix",
+ "rustix",
+ "sha2",
+ "tokio",
+ "zbus 6.0.0",
+]
 
 [[package]]
 name = "renderdoc-sys"
@@ -9792,6 +9761,21 @@ name = "shell-words"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc6fe69c597f9c37bfeeeeeb33da3530379845f10be461a66d16d03eca2ded77"
+
+[[package]]
+name = "shield"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aya",
+ "futures-util",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "nix",
+ "tokio",
+ "zbus 6.0.0",
+]
 
 [[package]]
 name = "shlex"
@@ -11174,6 +11158,22 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
+
+[[package]]
+name = "updater"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "luft-identity",
+ "luft-variant",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zbus 6.0.0",
+]
 
 [[package]]
 name = "ureq"

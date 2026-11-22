@@ -1,10 +1,10 @@
 part = "services"
 
 [programs]
-"/usr/libexec/" = ["luft-changes"]
+"/usr/libexec/" = ["changes"]
 
 [files]
 "/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Changes1.conf"]
 "/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Changes1.service"]
-"/usr/lib/systemd/system/" = ["data/luft-changes.service"]
+"/usr/lib/systemd/system/" = ["data/changes.service"]
 "/usr/share/polkit-1/actions/" = ["data/com.lantharos.changes.policy"]

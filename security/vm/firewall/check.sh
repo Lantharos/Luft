@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-state=/var/lib/luft-firewall-check
+state=/var/lib/shield-check
 name=com.lantharos.Firewall1
 path=/com/lantharos/Firewall1
 person=checker
 RECEIVER=$'import socket, sys\nreceiver = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)\nreceiver.bind(("::", int(sys.argv[1])))\nwhile True:\n    datagram = receiver.recv(64)\n    with open(sys.argv[2], "ab") as received:\n        received.write(datagram)'
 read -r approved other program extension system < <(sed -n 's/.*luft\.firewall-check=\([0-9,]*\).*/\1/p' /proc/cmdline | tr , ' ')
 
-say() { echo "luft-firewall-check: $*" > /dev/console; }
+say() { echo "shield-check: $*" > /dev/console; }
 fail() {
   say "FAIL $*"
   nft list ruleset > /dev/console
   ss -ltnp > /dev/console
   ls -la "/home/$person" > /dev/console 2>&1
-  journalctl -b -u luft-firewall --no-pager -o cat > /dev/console
+  journalctl -b -u shield --no-pager -o cat > /dev/console
   journalctl -b "_UID=${uid:-0}" --no-pager -o cat | grep -v "\"GET " | tail -n 60 > /dev/console
   systemctl poweroff
   exit 1
@@ -71,7 +71,7 @@ no_denials() {
   local denied
   denied="$(journalctl -b -k --no-pager -o cat -g 'avc: +denied')"
   [[ -z "$denied" ]] || echo "$denied" > /dev/console
-  ! grep -qE 'comm="(luft-firewall|nft)"|luft_firewall' <<< "$denied" || fail "SELinux denied the firewall something"
+  ! grep -qE 'comm="(shield|nft)"' <<< "$denied" || fail "SELinux denied the firewall something"
   say "ok: SELinux enforcing, nothing of the firewall's denied"
 }
 
@@ -91,7 +91,7 @@ serve_as() {
 }
 
 sockets_as() {
-  as_person systemd-run --user --quiet --collect --unit="$1" -- python3 /usr/libexec/luft-firewall-check-sockets "$2"
+  as_person systemd-run --user --quiet --collect --unit="$1" -- python3 /usr/libexec/shield-check-sockets "$2"
 }
 
 samples() {
@@ -214,7 +214,7 @@ untouched_tables() {
   nft add table ip luft-check-nat
   nft add chain ip luft-check-nat postrouting '{ type nat hook postrouting priority srcnat; }'
   nft add rule ip luft-check-nat postrouting oifname "$device" masquerade
-  systemctl restart luft-firewall.service
+  systemctl restart shield.service
   eventually "the firewall comes back after a restart" is_home
   nft list chain ip luft-check-nat postrouting | grep -q masquerade || fail "restarting the firewall touched another table"
   expect open "an allowed app right after a restart" reaches "$approved"
@@ -223,15 +223,15 @@ untouched_tables() {
 
 holds_without_the_service() {
   local base network
-  base="$(systemctl show -p ActiveEnterTimestampMonotonic --value luft-firewall-base.service)"
+  base="$(systemctl show -p ActiveEnterTimestampMonotonic --value shield-base.service)"
   network="$(systemctl show -p ActiveEnterTimestampMonotonic --value NetworkManager.service)"
   (( base > 0 && base < network )) || fail "the base rules weren't in place before the network started ($base, $network)"
-  systemctl stop luft-firewall.service
+  systemctl stop shield.service
   nft -f /usr/share/luft-firewall/base.nft || fail "the base rules don't load"
   expect closed "an allowed app while only the base rules hold" reaches "$approved"
   expect closed "an opened port while only the base rules hold" reaches "$system"
   ping -c 1 -W 3 10.0.2.2 > /dev/null || fail "the base rules stop the computer's own connections"
-  systemctl start luft-firewall.service
+  systemctl start shield.service
   eventually "the firewall fills the base rules again" is_home
   expect open "an allowed app once the firewall runs again" reaches "$approved"
   say "ok: without the service nothing gets in, and the computer still gets out"

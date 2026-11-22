@@ -10,7 +10,7 @@ MISSING=luft-check-no-such-package
 report() { echo "luft-system-packages-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-packages.service -u 'luft-system-packages-*' --no-pager -n 60 > /dev/ttyS0
+  journalctl -b -u packager.service -u 'luft-system-packages-*' --no-pager -n 60 > /dev/ttyS0
   systemctl poweroff --no-block
   exit 1
 }

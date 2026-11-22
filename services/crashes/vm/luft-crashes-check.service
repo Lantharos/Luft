@@ -1,6 +1,6 @@
 [Unit]
 Description=Check Luft's crash collector by crashing programs in this VM
-After=dbus.service systemd-journald.service luft-crash-collector.socket local-fs.target
+After=dbus.service systemd-journald.service crashd.socket local-fs.target
 
 [Service]
 Type=oneshot

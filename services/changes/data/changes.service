@@ -1,17 +1,17 @@
 [Unit]
-Description=Set up printers plugged in by USB
-After=cups.socket avahi-daemon.socket
-Wants=cups.socket
+Description=Applies system settings reviewed in Kestrel
 
 [Service]
-Type=oneshot
-ExecStart=/usr/libexec/luft-printers usb
-SyslogIdentifier=luft-printers
+Type=dbus
+BusName=com.lantharos.Changes1
+ExecStart=/usr/libexec/changes
+SyslogIdentifier=changes
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
 PrivateDevices=yes
 PrivateNetwork=yes
+IPAddressDeny=any
 NoNewPrivileges=yes
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
@@ -19,8 +19,6 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
-ProtectProc=invisible
-ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX
 RestrictNamespaces=yes
 RestrictRealtime=yes
@@ -30,4 +28,5 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=
+CapabilityBoundingSet=CAP_SYS_PTRACE
+UMask=0077

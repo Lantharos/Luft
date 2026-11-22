@@ -2,17 +2,17 @@
 set -uo pipefail
 
 BUS=(com.lantharos.Printers1 /com/lantharos/Printers1 com.lantharos.Printers1)
-WORK=/run/luft-printers-check
+WORK=/run/printers-check
 NETWORK_PRINTER=Luft_Test_Printer
 USB_OUTPUT="$WORK/usb-received"
 
-report() { echo "luft-printers-check: $*" > /dev/ttyS0; }
+report() { echo "printers-check: $*" > /dev/ttyS0; }
 failed=0
 fail() {
   report "FAIL $*"
   failed=1
   {
-    journalctl -b -u luft-printer-setup.service -u luft-printers.service -u avahi-daemon.service --no-pager -n 40
+    journalctl -b -u printers-setup.service -u printers.service -u avahi-daemon.service --no-pager -n 40
     journalctl -b -u cups.service --no-pager -n 15
     lpstat -t
     ip -br addr
@@ -26,7 +26,7 @@ fail() {
     timeout 10 /usr/lib/cups/backend/usb
     timeout 10 avahi-browse -art
     cat "$WORK"/*.log
-  } 2>&1 | sed 's/^/luft-printers-check: | /' > /dev/ttyS0
+  } 2>&1 | sed 's/^/printers-check: | /' > /dev/ttyS0
   return 1
 }
 pass() { report "PASS $*"; }
@@ -54,7 +54,7 @@ network_printer() {
 
 session() {
   useradd -m checker
-  runuser -u checker -- dbus-run-session -- /usr/libexec/luft-printers-check-session "$NETWORK_PRINTER" 2>&1 | sed -u 's/^/luft-printers-check: session: /' > /dev/ttyS0
+  runuser -u checker -- dbus-run-session -- /usr/libexec/printers-check-session "$NETWORK_PRINTER" 2>&1 | sed -u 's/^/printers-check: session: /' > /dev/ttyS0
   ((PIPESTATUS[0] == 0)) || fail "the session check" || return
   eventually "the test page didn't reach the network printer" sh -c "find '$WORK/spool' -type f -size +0 | grep -q ." || return
   pass "the test page reached the network printer"
@@ -70,7 +70,7 @@ gadget_device() {
 
 usb_printer() {
   local device
-  /usr/libexec/luft-printers-check-gadget "$USB_OUTPUT" > "$WORK/gadget.log" 2>&1 &
+  /usr/libexec/printers-check-gadget "$USB_OUTPUT" > "$WORK/gadget.log" 2>&1 &
   eventually "no USB printer appeared" gadget_device || return
   device="$(gadget_device)"
   [[ "$(cat "$device/authorized")" == 0 ]] || fail "the printer was allowed with nobody signed in" || return
@@ -78,7 +78,7 @@ usb_printer() {
   echo add > "$device/uevent"
   eventually "the allowed USB printer has no printer port" test -e /dev/usb/lp0 || return
   pass "the USB printer is plugged in and let in, as USB protection does at an unlock"
-  eventually "luft-printer-setup didn't set it up" sh -c "lpstat -v | grep -q 'usb://Canon/MX490%20series'" || return
+  eventually "printers-setup didn't set it up" sh -c "lpstat -v | grep -q 'usb://Canon/MX490%20series'" || return
   queue="$(lpstat -v | sed -n 's/^device for \([^:]*\): usb:\/\/Canon\/MX490%20series.*/\1/p')"
   [[ "$(lpoptions -p "$queue" | grep -o "printer-make-and-model='[^']*'")" == *Gutenprint* ]] || fail "$queue has no Gutenprint driver: $(lpoptions -p "$queue")" || return
   pass "plugging it in set up $queue with Gutenprint"

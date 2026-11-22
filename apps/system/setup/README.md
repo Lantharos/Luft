@@ -10,8 +10,8 @@ Install Luft puts Luft on a computer from the USB stick or from Meet Luft, next 
 | --- | --- |
 | `src` | The setup window |
 | `desktop` | Its native side: regional settings, NetworkManager, the installer and trustd |
-| `installer` | `luft-installer`, the system service that partitions, copies and configures (`com.lantharos.Installer1`) |
-| `contract` | The survey, install plan and regional settings the setup window and `luft-installer` exchange, shared by both |
+| `installer` | `installer`, the system service that partitions, copies and configures (`com.lantharos.Installer1`) |
+| `contract` | The survey, install plan and regional settings the setup window and `installer` exchange, shared by both |
 
 ## Build and run
 
@@ -24,7 +24,7 @@ bun run desktop:build    # production web build and release binary
 cargo build --release --manifest-path installer/Cargo.toml
 ```
 
-The setup app and `luft-installer` ship in Luft's image; the installer's D-Bus, systemd, polkit and SELinux files are in `installer/data`.
+The setup app and `installer` ship in Luft's image; the installer's D-Bus, systemd, polkit and SELinux files are in `installer/data`.
 
 ## Testing
 

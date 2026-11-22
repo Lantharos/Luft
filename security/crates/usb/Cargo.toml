@@ -1,5 +1,5 @@
 [package]
-name = "luft-usb-protection"
+name = "portguard"
 description = "Holds back USB devices connected while nobody is signed in and unlocked"
 version = "0.1.0"
 edition.workspace = true

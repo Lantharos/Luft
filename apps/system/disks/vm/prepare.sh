@@ -11,7 +11,7 @@ ROOT_TYPE=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
 report() { echo "luft-remove-check: $*" > /dev/ttyS0; }
 fail() {
   report "FAIL $*"
-  journalctl -b -u luft-installer --no-pager -n 40 > /dev/ttyS0
+  journalctl -b -u installer --no-pager -n 40 > /dev/ttyS0
   exit 1
 }
 call() { busctl --json=short call "${BUS[@]}" "$@"; }

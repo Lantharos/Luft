@@ -13,15 +13,15 @@ settings="${KESTREL_SETTINGS:-$luft/target/release/kestrel-settings}"
 start_stage
 stage_part services
 place 755 "$settings" /usr/libexec/kestrel-settings
-place 755 "$here/check.sh" /usr/libexec/luft-printers-check
-place 755 "$here/session.sh" /usr/libexec/luft-printers-check-session
-place 755 "$here/gadget.py" /usr/libexec/luft-printers-check-gadget
-place 644 "$here/luft-printers-check.service" /usr/lib/systemd/system/luft-printers-check.service
-place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-printers-check.rules
+place 755 "$here/check.sh" /usr/libexec/printers-check
+place 755 "$here/session.sh" /usr/libexec/printers-check-session
+place 755 "$here/gadget.py" /usr/libexec/printers-check-gadget
+place 644 "$here/printers-check.service" /usr/lib/systemd/system/printers-check.service
+place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-printers-check.rules
 build_check_image "$base" "$image_name-printers-check" \
-  "dnf install -y --setopt=install_weak_deps=False cups-printerapp gutenprint-cups avahi-tools && dnf clean all && systemctl enable luft-printers-check.service"
+  "dnf install -y --setopt=install_weak_deps=False cups-printerapp gutenprint-cups avahi-tools && dnf clean all && systemctl enable printers-check.service"
 make_root_drive "$image_name-printers-check"
 
 relabel_root_drive "$vm/relabel.log"
 SELINUX="selinux=1 enforcing=1" CPUS=4 MEMORY=4096 boot_root_drive "$serial" 15
-expect_in_log "$serial" luft-printers-check "PASS everything"
+expect_in_log "$serial" printers-check "PASS everything"

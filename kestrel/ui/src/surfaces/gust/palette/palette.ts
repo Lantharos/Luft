@@ -8,6 +8,7 @@ import { pixelScale } from '../../../shared/display/graphics.js';
 import { isControlEnter } from '../../../shared/input/keyboardNavigation.js';
 import { appKey } from '../../../shared/apps/launchHistory.js';
 import { SearchEngine, type SearchHost } from '../../search/engine.js';
+import { query, startsName } from '../../search/ranking.js';
 import { searchField } from '../../search/field.js';
 import { watchInstalledApps } from '../../search/installedApps.js';
 import type { SearchView } from '../../search/item.js';
@@ -141,12 +142,16 @@ export class GustPalette implements GustSurface {
 
   private show(view: SearchView | null): void {
     const windows = !view && this.chips.selected === 'open';
-    this.setMode(windows ? 'windows' : !view || view.best?.key.startsWith(APP) ? 'grid' : 'results');
+    this.setMode(windows ? 'windows' : !view || this.namesApp(view) ? 'grid' : 'results');
     const shown = windows ? this.engine.openWindows() : view;
     if (!shown || this.mode === 'grid') return;
     this.body.visible = !!shown.best || shown.groups.some(group => group.items.length);
     this.results.show(this.list, shown);
     if (shown.fresh) this.scroller.vadjustment.value = 0;
+  }
+
+  private namesApp({ best }: SearchView): boolean {
+    return !!best?.key.startsWith(APP) && startsName(best.title, query(this.query));
   }
 
   private setMode(mode: Mode): void {

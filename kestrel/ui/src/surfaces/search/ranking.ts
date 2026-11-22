@@ -42,6 +42,10 @@ function startsWord(text: string, part: string): boolean {
   return index === 0 || (index > 0 && WORD_BREAK.test(text[index - 1]));
 }
 
+export function startsName(name: string, search: Query): boolean {
+  return startsWord(fold(name), search.text);
+}
+
 function tier(entry: Searchable, { text, words }: Query): number | null {
   if (entry.name === text) return Tier.Exact;
   const index = entry.name.indexOf(text);

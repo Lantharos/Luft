@@ -10,7 +10,7 @@
 	import { paletteSource, shellCommands, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
-	import { followSidebarRegions, layout } from '#lib/app/layout.svelte.js';
+	import { layout } from '#lib/app/layout.svelte.js';
 	import { keepReading, navigate, openThread, reopen, type Reading } from '#lib/app/navigation.js';
 	import Composer from '#lib/compose/Composer.svelte';
 	import { composer } from '#lib/compose/composer.svelte.js';
@@ -71,7 +71,6 @@
 		document.documentElement.dataset.scheme = appearance.scheme;
 	});
 
-	followSidebarRegions();
 
 	onMount(() => {
 		const stops = [
@@ -156,7 +155,7 @@
 />
 
 <div class="h-[100dvh] w-screen overflow-hidden" style:--sidebar-width="{layout.sidebarWidth}px">
-	<GlassShell class="h-full">
+	<GlassShell class="h-full" followSidebar>
 		{#if layout.sidebar !== 'none'}
 			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={showPalette} onsignin={(account) => (signingIn = account)} />
 		{/if}

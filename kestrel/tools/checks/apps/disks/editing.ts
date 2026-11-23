@@ -13,7 +13,7 @@ const {require, eventually} = checks('Luft app');
 const DONE_X = 744;
 const SPACE_BUTTON = [565, 720];
 const ACCENT_TOLERANCE = 24;
-const CONTROL_TOLERANCE = 4;
+const SURFACE_TOLERANCE = 4;
 const BUTTON_PIXELS = 12;
 const PLAN_TIMEOUT = 15000;
 const PLAN = [
@@ -35,9 +35,9 @@ function actionsRow(frame: Frame, accent: string) {
 
 function spaceButtonAt(frame: Frame, colors: Colors) {
   const y = require(actionsRow(frame, colors.primary), 'the details dialog has a Done button');
-  let control = 0;
-  for (let x = SPACE_BUTTON[0]; x < SPACE_BUTTON[1]; x += 2) if (frame.near(x, y, colors.surfaceContainerHigh, CONTROL_TOLERANCE)) control++;
-  return control >= BUTTON_PIXELS ? y : null;
+  let button = 0;
+  for (let x = SPACE_BUTTON[0]; x < SPACE_BUTTON[1]; x += 2) if (!frame.near(x, y, colors.surfaceContainerHigh, SURFACE_TOLERANCE)) button++;
+  return button >= BUTTON_PIXELS ? y : null;
 }
 
 export async function details(driver: Driver, name: Control, palette: Palette) {

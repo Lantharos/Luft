@@ -37,7 +37,7 @@
 <MenuButton label={t('notebook-menu')} class="plain-button min-w-0">
 	{#snippet trigger()}
 		<span class="truncate font-semibold text-(--text)">{notebook.meta.name}</span>
-		<ChevronDown size={15} />
+		<ChevronDown size={13} />
 	{/snippet}
 	{#snippet children(close)}
 		<MenuItem onclick={() => ((dialog = 'rename'), close())}>{t('notebook-rename')}</MenuItem>

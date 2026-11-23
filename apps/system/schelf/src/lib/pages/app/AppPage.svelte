@@ -102,7 +102,7 @@
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
 				{#if details?.developer || from || withdrawn}
 					{@const rest = [from, withdrawn && t('app-withdrawn')].filter(Boolean).join(' · ')}
-					<span class="flex min-w-0 items-center gap-1 text-[13px] text-[var(--text-muted)]">
+					<span class="flex min-w-0 items-center gap-1 text-[13px] font-medium text-[var(--text-muted)]">
 						{#if details?.developer}
 							<span class="truncate">{details.developer}</span>
 							{#if details.verified}

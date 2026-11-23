@@ -34,19 +34,21 @@
 
 <style>
 	.switch {
+		--knob: 24px;
+		--travel: 22px;
 		position: relative;
 		flex: none;
-		height: 26px;
-		width: 44px;
+		height: 30px;
+		width: 52px;
 		border-radius: var(--radius-pill);
-		background: var(--control);
+		background: color-mix(in oklab, var(--ink) 16%, transparent);
 		transition:
-			background-color var(--motion-quick) var(--ease-decelerate),
+			background-color var(--motion-standard) var(--ease-glide),
 			opacity var(--motion-tap) var(--ease-decelerate);
 	}
 
 	.switch:hover:not(:disabled) {
-		background: var(--control-hover);
+		background: color-mix(in oklab, var(--ink) 21%, transparent);
 	}
 
 	.switch.on,
@@ -62,20 +64,22 @@
 		position: absolute;
 		top: 3px;
 		left: 3px;
-		height: 20px;
-		width: 20px;
+		height: var(--knob);
+		width: var(--knob);
 		border-radius: var(--radius-pill);
-		background: var(--text);
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+		background: #fff;
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.18),
+			0 2px 6px rgba(0, 0, 0, 0.16);
 		transition:
-			translate var(--spring-snappy-duration) var(--spring-snappy),
+			translate var(--spring-smooth-duration) var(--spring-smooth),
 			scale var(--spring-snappy-duration) var(--spring-snappy),
-			background-color var(--motion-quick) var(--ease-decelerate);
+			background-color var(--motion-standard) var(--ease-glide);
 	}
 
 	.on .knob {
-		translate: 18px 0;
-		background: var(--accent-text);
+		translate: var(--travel) 0;
+		background: oklch(from var(--accent) clamp(0.3, calc((0.9 - l) * 14 + 0.3), 1) 0 h);
 	}
 
 	.switch:active:not(:disabled) .knob {

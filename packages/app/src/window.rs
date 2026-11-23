@@ -1,6 +1,6 @@
 use sabine::{
-    BackdropPreference, BackdropRole, SabineLifecyclePolicy, SabineWindow,
-    SabineWindowControlAction, SingleInstancePolicy, WindowRegion, WindowRegionRect,
+    BackdropPreference, BackdropRole, SabineLifecyclePolicy, SabineWindow, SingleInstancePolicy,
+    WindowInsets, WindowRegion,
 };
 use serde::Serialize;
 use specta::Type;
@@ -13,13 +13,7 @@ use crate::desktop::{
 
 // Kestrel rounds windows to 15px, so the blur and input regions follow it
 const WINDOW_RADIUS: i32 = 15;
-const CONTROL_SIZE: i32 = 28;
-const CONTROL_TOP: i32 = 12;
-const CONTROL_OFFSETS: [(SabineWindowControlAction, i32); 3] = [
-    (SabineWindowControlAction::Minimize, -108),
-    (SabineWindowControlAction::Maximize, -76),
-    (SabineWindowControlAction::Close, -44),
-];
+const SHEET_INSET: i32 = 8;
 
 #[derive(Clone, Copy)]
 pub struct Backdrop {
@@ -45,43 +39,17 @@ pub struct GlassWindow<'a> {
 
 impl GlassWindow<'_> {
     pub fn apply(&self, window: SabineWindow) -> SabineWindow {
-        self.build(window, &CONTROL_OFFSETS)
-    }
-
-    pub fn apply_with_page_close(&self, window: SabineWindow) -> SabineWindow {
-        self.build(window, &CONTROL_OFFSETS[..2])
-    }
-
-    fn build(
-        &self,
-        window: SabineWindow,
-        controls: &[(SabineWindowControlAction, i32)],
-    ) -> SabineWindow {
-        let mut window = window
-            .title(self.title)
-            .size(self.size.0, self.size.1)
-            .min_size(self.min_size.0, self.min_size.1)
-            .frameless()
-            .glass()
-            .backdrop(self.backdrop.role, self.backdrop.preference)
-            .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
-            .blur_region(WindowRegion::rounded_left(
-                self.sidebar_width,
-                WINDOW_RADIUS,
-            ))
-            .opaque_region(WindowRegion::content_after_sidebar_rounded_right(
-                self.sidebar_width,
-                0,
-                WINDOW_RADIUS,
-            ))
-            .input_region(WindowRegion::rounded_rect(WINDOW_RADIUS));
-
-        for &(action, offset) in controls {
-            window = window.control_region(
-                action,
-                WindowRegionRect::new(offset, CONTROL_TOP, CONTROL_SIZE, CONTROL_SIZE),
-            );
-        }
+        let window = self.glass_regions(
+            window
+                .title(self.title)
+                .size(self.size.0, self.size.1)
+                .min_size(self.min_size.0, self.min_size.1)
+                .frameless()
+                .glass()
+                .backdrop(self.backdrop.role, self.backdrop.preference)
+                .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
+                .input_region(WindowRegion::rounded_rect(WINDOW_RADIUS)),
+        );
 
         match self.single_instance {
             Some(id) => window
@@ -89,6 +57,23 @@ impl GlassWindow<'_> {
                 .single_instance(SingleInstancePolicy::FocusExisting),
             None => window,
         }
+    }
+
+    fn glass_regions(&self, window: SabineWindow) -> SabineWindow {
+        if self.sidebar_width == 0 {
+            return window
+                .blur_region(WindowRegion::empty())
+                .opaque_region(WindowRegion::rounded_rect(WINDOW_RADIUS));
+        }
+        let sheet = WindowInsets::new(self.sidebar_width, SHEET_INSET, SHEET_INSET, SHEET_INSET);
+        let sheet_radius = WINDOW_RADIUS - SHEET_INSET;
+        window
+            .blur_region(WindowRegion::around_inset(
+                WINDOW_RADIUS,
+                sheet,
+                sheet_radius,
+            ))
+            .opaque_region(WindowRegion::inset(sheet, sheet_radius))
     }
 }
 

@@ -61,7 +61,7 @@
 			<MenuButton label={t('settings-cursors-choose-download', { name: item.name })} class="button" align="end" minWidth={260}>
 				{#snippet trigger()}
 					{t('settings-cursors-get')}
-					<ChevronDown size={15} />
+					<ChevronDown size={13} />
 				{/snippet}
 				{#snippet children(close)}
 					{#each item.files as file (file.index)}

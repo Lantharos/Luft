@@ -27,7 +27,7 @@ async function showState(app: LuftApp, name: string, values: BatteryValues) {
   (await app.settle(() => true)).save(`settings-battery-${name}`);
 }
 
-const LIMIT_SWITCH: Point = [959, 354];
+const LIMIT_SWITCH: Point = [958, 400];
 
 async function checkLimit(app: LuftApp) {
   await showState(app, 'limit-by-firmware', {ChargeThresholdSupported: true, ChargeThresholdEnabled: false, ChargeStartThreshold: 0, ChargeEndThreshold: 0});

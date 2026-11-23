@@ -22,7 +22,7 @@
 		{/if}
 	</span>
 	{#if onclick}
-		<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)]" />
+		<ChevronRight size={15} class="shrink-0 text-[var(--text-muted)]" />
 	{/if}
 {/snippet}
 
@@ -42,7 +42,7 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		padding-right: 16px;
+		padding-right: 14px;
 		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
@@ -57,7 +57,7 @@
 		flex: 1;
 		align-items: center;
 		gap: 14px;
-		padding: 10px 12px 10px 16px;
+		padding: 11px 12px 11px 14px;
 		text-align: left;
 	}
 
@@ -81,7 +81,7 @@
 	.description {
 		font-size: 12.5px;
 		line-height: 1.4;
-		color: var(--text-muted);
+		color: var(--text-quiet);
 	}
 
 	.trailing {

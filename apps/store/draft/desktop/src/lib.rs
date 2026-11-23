@@ -23,7 +23,7 @@ pub fn run_app() -> ! {
     let state = DraftState::new();
     luft_app::run(
         &state.events,
-        |window| bridge::register(GLASS_WINDOW.apply_with_page_close(window), &state),
+        |window| bridge::register(GLASS_WINDOW.apply(window), &state),
         |_| {},
     )
 }

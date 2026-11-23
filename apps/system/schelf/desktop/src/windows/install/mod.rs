@@ -1,9 +1,7 @@
 mod dialog;
 
 use luft_app::{Appearance, Backdrop, Commands};
-use sabine::{
-    SabineLifecyclePolicy, SabineWindow, SabineWindowControlAction, WindowRegion, WindowRegionRect,
-};
+use sabine::{SabineLifecyclePolicy, SabineWindow, WindowRegion};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -43,10 +41,6 @@ pub fn window(window: SabineWindow, title: &str, request: u32) -> SabineWindow {
         .glass()
         .backdrop(Backdrop::WINDOW.role, Backdrop::WINDOW.preference)
         .blur_region(WindowRegion::rounded_rect(RADIUS))
-        .control_region(
-            SabineWindowControlAction::Close,
-            WindowRegionRect::new(-44, 12, 28, 28),
-        )
         .content_suffix(format!("#install/{request}"))
 }
 

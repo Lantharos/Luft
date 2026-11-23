@@ -27,7 +27,7 @@ pub fn run() -> ! {
                 single_instance: Some("com.lantharos.disks"),
                 backdrop: Backdrop::WINDOW,
             }
-            .apply_with_page_close(window)
+            .apply(window)
             .on_close_requested(move |_| {
                 asking.emit(events::CLOSE_ASKED, ());
                 false

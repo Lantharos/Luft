@@ -159,7 +159,7 @@
 			{#each crumbs as crumb, index (crumb.path || crumb.label)}
 				{@const accepts = acceptsDrops && Boolean(crumb.path) && drag.canDropOn(crumb.path)}
 				{#if index > 0}
-					<ChevronRight size={14} class="flex-none text-[var(--text-muted)] opacity-55" />
+					<ChevronRight size={12} class="flex-none text-[var(--text-muted)] opacity-55" />
 				{/if}
 				<button
 					class={['path-crumb', index === crumbs.length - 1 && 'is-current', drag.target?.key === segmentKey(crumb.path) && 'is-drop-target']}
@@ -232,10 +232,20 @@
 		padding-inline: 9px;
 		color: var(--text-muted);
 		font-size: 13px;
+		font-weight: 500;
 		transition:
 			background-color var(--motion-tap) var(--ease-decelerate),
 			color var(--motion-tap) var(--ease-decelerate),
 			box-shadow var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.path-crumb:not(.is-current) {
+		min-width: 34px;
+		flex-shrink: 1;
+	}
+
+	.path-crumb :global(svg) {
+		flex: none;
 	}
 
 	.path-crumb:hover {
@@ -245,7 +255,7 @@
 
 	.path-crumb.is-current {
 		color: var(--text);
-		font-weight: 500;
+		font-weight: 600;
 	}
 
 	.path-crumb.is-drop-target {
@@ -253,7 +263,6 @@
 		color: var(--text);
 		box-shadow: inset 0 0 0 1.5px var(--accent-line);
 	}
-
 
 	.path-edit-area {
 		min-width: 24px;

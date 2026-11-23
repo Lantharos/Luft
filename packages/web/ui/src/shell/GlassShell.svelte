@@ -4,13 +4,15 @@
 	import type { ClassValue } from 'svelte/elements';
 	import { appearance } from '../appearance.svelte';
 	import TextMenu from '../menus/TextMenu.svelte';
+	import { sheetRegions } from './sheetRegions';
 
 	interface Props {
 		class?: ClassValue;
+		followSidebar?: boolean;
 		children: Snippet;
 	}
 
-	let { class: className, children }: Props = $props();
+	let { class: className, followSidebar = false, children }: Props = $props();
 
 	let floating = $state(true);
 
@@ -25,6 +27,7 @@
 	class={['glass-shell', className]}
 	data-effect={appearance.translucent ? 'translucent' : 'solid'}
 	data-window={floating ? 'floating' : 'docked'}
+	{@attach followSidebar && sheetRegions}
 >
 	{@render children()}
 </div>

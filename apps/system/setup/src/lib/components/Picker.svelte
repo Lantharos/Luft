@@ -100,7 +100,7 @@
 		<span class="text-[12.5px] text-[var(--text-muted)]">{label}</span>
 		<span class="truncate text-[15px] font-medium">{value}</span>
 	</span>
-	<ChevronDown size={17} class="flex-none text-[var(--text-muted)]" />
+	<ChevronDown size={13} class="flex-none text-[var(--text-muted)]" />
 </button>
 
 {#if sheet}

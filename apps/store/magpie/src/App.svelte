@@ -99,7 +99,7 @@
 <svelte:window onkeydown={handleKeydown} ondragover={drop.ondragover} ondrop={drop.ondrop} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full">
+	<GlassShell class="h-full" followSidebar>
 		{#if !viewer}
 			<Sidebar />
 		{/if}

@@ -80,7 +80,7 @@
 	onkeydown={keydown}
 >
 	<span class="truncate">{selected?.label ?? placeholder ?? t('ui-select-placeholder')}</span>
-	<ChevronDown size={16} class="chevron" />
+	<ChevronDown size={13} class="chevron" />
 </button>
 
 {#if open && trigger}
@@ -109,12 +109,12 @@
 <style>
 	.trigger {
 		display: inline-flex;
-		height: 36px;
+		height: 38px;
 		max-width: 280px;
 		min-width: 140px;
 		align-items: center;
 		justify-content: space-between;
-		gap: 10px;
+		gap: 7px;
 		border-radius: var(--radius-pill);
 		background: var(--control);
 		padding-inline: 14px 12px;
@@ -134,7 +134,7 @@
 
 	.trigger :global(.chevron) {
 		flex: none;
-		color: var(--text-muted);
+		color: var(--text-soft);
 		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 

@@ -11,8 +11,8 @@ import {changes, withApp} from '../../lib/apps.js';
 
 const {require, eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
-const SWITCH: Point = [1151, 470];
-const CHANNEL = {x: 507, y: 400, width: 600, height: 110};
+const SWITCH: Point = [1138, 538];
+const CHANNEL = {x: 507, y: 455, width: 600, height: 130};
 const CONFIRM_STABLE: Point = [844, 493];
 const CONFIRM_NIGHTLY: Point = [844, 493];
 const CANCEL_NIGHTLY: Point = [732, 493];

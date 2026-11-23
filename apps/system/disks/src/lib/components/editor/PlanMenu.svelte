@@ -19,7 +19,7 @@
 	onclick={() => (open = !open)}
 >
 	{t('disks-editor-changes', { count })}
-	<ChevronDown size={15} />
+	<ChevronDown size={13} />
 </button>
 
 {#if open && button}

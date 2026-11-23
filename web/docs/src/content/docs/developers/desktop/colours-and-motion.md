@@ -36,7 +36,7 @@ Terminal colours are the usual sixteen, nudged up to 15° toward the accent and 
 
 ## Reading the palette
 
-Luft's apps get the palette through [their startup state](/developers/desktop/writing-apps/#startup-state), and `@luft/ui` turns it into CSS variables: every role as `--kestrel-light-…` and `--kestrel-dark-…`, with tokens such as `--accent`, `--text` and `--control` built on them. Other programs read it from D-Bus or from files.
+Luft's apps get the palette through [their startup state](/developers/desktop/writing-apps/#startup-state), and `@luft/ui` turns it into CSS variables: every role as `--kestrel-light-…` and `--kestrel-dark-…`, with tokens such as `--accent`, `--text` and `--control` built on them. `--content`, the sheet an app's pages sit on, is `surface` in light and `surfaceContainer` in dark, a step above the glass around it. Other programs read it from D-Bus or from files.
 
 `com.lantharos.Kestrel.Appearance` at `/com/lantharos/Kestrel/Appearance` on `com.lantharos.Kestrel` has read-only properties that emit `PropertiesChanged`, with colours as `#rrggbb`. It's the one object of Kestrel's that sandboxed apps may read.
 

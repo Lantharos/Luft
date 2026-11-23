@@ -76,7 +76,7 @@ async function checkSample({name, source, tabs, install}: Sample, home: Frame, p
   const covers = (surface: string) => (frame: Frame) => frame.share([surface], 2) >= SURFACE_SHARE;
   useScheme('dark');
   await withApp('magpie', [copySample(source)], async app => {
-    const shown = (frame: Frame) => !frame.looksLike(home) && covers(palette.dark.surface)(frame);
+    const shown = (frame: Frame) => !frame.looksLike(home) && covers(palette.dark.surfaceContainer)(frame);
     const dark = await app.settle(shown);
     dark.save(`magpie-font-${name}-dark`);
     require(shown(dark), `magpie opens a ${name} font file as a font view`);

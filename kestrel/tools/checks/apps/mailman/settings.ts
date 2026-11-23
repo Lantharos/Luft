@@ -10,9 +10,9 @@ const {eventually} = checks('Luft app');
 const STORE = GLib.build_filenamev([GLib.get_user_data_dir(), 'com.lantharos.mailman', 'mail.sqlite']);
 const ACCOUNT_ROW: Point = [714, 155];
 const ADD_ADDRESS: Point = [548, 351];
-const NAME_FIELD: Point = [600, 394];
-const ADDRESS_FIELD: Point = [830, 394];
-const SAVE: Point = [520, 630];
+const NAME_FIELD: Point = [600, 408];
+const ADDRESS_FIELD: Point = [830, 408];
+const SAVE: Point = [527, 649];
 
 function query(sql: string) {
   const [, stdout] = GLib.spawn_sync(null, ['sqlite3', STORE, sql], null, GLib.SpawnFlags.SEARCH_PATH, null);

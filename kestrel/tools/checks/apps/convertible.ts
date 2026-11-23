@@ -14,11 +14,11 @@ import {checkPalette, saveBothStyles, withPalette, type Palette} from './lib/pal
 const {require, eventually} = checks('Luft app');
 const CONVERT_TIMEOUT = 30000;
 const SETTLE = 1500;
-const FIRST_SUGGESTION: Point = [800, 95];
-const QUEUE_BUTTON: Point = [943, 26];
-const EDIT_MODE: Point = [878, 26];
-const EDIT_MODE_BESIDE_QUEUE: Point = [842, 26];
-const REDACT_TOOL: Point = [334, 68];
+const FIRST_SUGGESTION: Point = [800, 103];
+const QUEUE_BUTTON: Point = [943, 33];
+const EDIT_MODE: Point = [878, 33];
+const EDIT_MODE_BESIDE_QUEUE: Point = [842, 33];
+const REDACT_TOOL: Point = [334, 76];
 const KEEP_BOTH: Point = [682, 425];
 const REDACTED_AREA = {x: 260, y: 260, width: 160, height: 80};
 const BLACK_TOLERANCE = 4;

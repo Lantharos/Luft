@@ -7,7 +7,7 @@ import {withApp} from '../../lib/apps.js';
 import {installBrowser} from '../../lib/browser.js';
 
 const {require, eventually} = checks('Luft app');
-const REPORT: Point = [660, 345];
+const REPORT: Point = [660, 393];
 const NEW_ISSUE = 'https://github.com/Lantharos/Luft/issues/new';
 const RUNNING = '1.2-nightly.21, nightly, build 4c5f0f8a1b6e';
 

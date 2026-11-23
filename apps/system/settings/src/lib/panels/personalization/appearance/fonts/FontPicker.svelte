@@ -87,7 +87,7 @@
 
 <button bind:this={trigger} type="button" class="trigger" class:open aria-haspopup="listbox" aria-expanded={open} aria-label={label} onclick={() => (open ? close() : show())}>
 	<span class="truncate" style:font-family={face(family)}>{family}</span>
-	<ChevronDown size={16} class="chevron" />
+	<ChevronDown size={13} class="chevron" />
 </button>
 
 {#if open && trigger}
@@ -133,16 +133,17 @@
 <style>
 	.trigger {
 		display: inline-flex;
-		height: 36px;
+		height: 38px;
 		max-width: 260px;
 		min-width: 160px;
 		align-items: center;
 		justify-content: space-between;
-		gap: 10px;
+		gap: 7px;
 		border-radius: var(--radius-pill);
 		background: var(--control);
 		padding-inline: 14px 12px;
 		font-size: 13.5px;
+		font-weight: 500;
 		transition: background-color var(--motion-tap) var(--ease-decelerate);
 	}
 
@@ -153,7 +154,7 @@
 
 	.trigger :global(.chevron) {
 		flex: none;
-		color: var(--text-muted);
+		color: var(--text-soft);
 		transition: transform var(--motion-quick) var(--ease-decelerate);
 	}
 

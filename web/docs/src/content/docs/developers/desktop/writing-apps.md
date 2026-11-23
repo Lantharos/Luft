@@ -33,10 +33,9 @@ pub fn run_app() -> ! {
 }
 ```
 
-- `sidebar_width` must match the page's `--sidebar-width`.
+- `sidebar_width` must match the page's `--sidebar-width`, and is `0` for a window without a sidebar.
 - `backdrop` says what the glass is for and which material it would like, see [Glass](#glass).
 - With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event, which bridge commands take as an `Activation`, the same type `Activation::current_process()` gives for the app's own launch.
-- `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` watches Kestrel's palette and the desktop's fonts for the page. The last closure runs at the same point, for the app's own watchers.
 
 Bridge commands go through the `Commands` trait, for handlers that return `Result<T, String>`:
@@ -55,7 +54,7 @@ Sandboxed apps only see the files they're given. `Activation::paths_within_reach
 
 ### Glass
 
-The sidebar is glass, and Kestrel draws it as the material people chose for app windows: Luca, a blur of what is behind, or Maris, the surface colour with a hint of the wallpaper. `Backdrop::WINDOW` follows that choice. An app whose layout needs one material asks for it with `BackdropPreference::Maris` or `BackdropPreference::Luca`, and a window that is a popover or a palette rather than an app's main window sets `BackdropRole::Transient`, so it follows the choice for panels and menus:
+A window with a sidebar is glass all around: the sidebar and an 8px frame on the other three sides, around the content as an opaque sheet with corners 8px tighter than the window's. Only the frame and sidebar are blurred, and nothing is drawn under the sheet. A window without a sidebar is opaque. Kestrel draws the glass as the material people chose for app windows: Luca, a blur of what is behind, or Maris, the surface colour with a hint of the wallpaper. `Backdrop::WINDOW` follows that choice. An app whose layout needs one material asks for it with `BackdropPreference::Maris` or `BackdropPreference::Luca`, and a window that is a popover or a palette rather than an app's main window sets `BackdropRole::Transient`, so it follows the choice for panels and menus:
 
 ```rust
 use luft_app::Backdrop;
@@ -67,7 +66,7 @@ const PALETTE: Backdrop = Backdrop {
 };
 ```
 
-`GlassShell` leaves out the sidebar's own tint over Maris, whose surface colour is already the whole surface, and keeps it over Luca, where it keeps text readable. How the materials are drawn is in [The compositor](/developers/desktop/compositor/#glass).
+`GlassShell` leaves out the glass's own tint over Maris, whose surface colour is already the whole surface, and keeps it over Luca, where it keeps text readable. A window whose sidebar comes and goes, such as one that hides it for a single opened file, sets `followSidebar` on `GlassShell`, which gives the window the regions of whichever layout it shows. How the materials are drawn is in [The compositor](/developers/desktop/compositor/#glass).
 
 ## The page
 
@@ -106,7 +105,7 @@ Extend `@luft/ui/tsconfig.base.json` in `tsconfig.json`, and preload `/fonts/Ope
 </GlassShell>
 ```
 
-`TitleBar` is the 60px bar every app window starts with: the title, an optional `detail`, `leading` buttons such as Back, `actions` before `WindowControls`, and `compact` for a document's name over a second line. Sidebar items use `nav-item`, with `tall` for two lines, `nav-detail` for the second line, `nav-count` for a number on the right, and `nav-heading` and `nav-action` for a group's title and its add button. `EmptyState` is the icon, title, message and button an empty page shows.
+`TitleBar` is the 68px bar every app window starts with: the title, an optional `detail`, `leading` buttons such as Back, `actions` before `WindowControls`, and `compact` for a document's name over a second line. `WindowControls` tells Sabine where its buttons are, so they work even while the page is busy; with an `onclose` of its own, the close button stays with the page, which decides when to close. Sidebar items use `nav-item`, with `tall` for two lines, `nav-detail` for the second line, `nav-count` for a number on the right, and `nav-heading` and `nav-action` for a group's title and its add button. The selected item sits on a light pill with its icon in the accent colour. `EmptyState` is the icon, title, message and button an empty page shows.
 
 The shared styles give every app the same behaviour: buttons and other controls keep the arrow cursor and only links show the hand, text in the window can't be selected except in fields and where an app adds `select-text`, every scroller has the same thin scrollbar, and toasts sit centred over the content beside the sidebar.
 

@@ -32,7 +32,7 @@
 		</div>
 	{:else}
 		<div class="flex min-w-0 flex-1 items-baseline gap-3">
-			<h1 class="truncate text-[20px] font-semibold">{title}</h1>
+			<h1 class="truncate text-[25px] font-semibold tracking-[-0.01em]">{title}</h1>
 			{#if detail}
 				<span class="truncate text-[13px] text-[var(--text-muted)]">{detail}</span>
 			{/if}

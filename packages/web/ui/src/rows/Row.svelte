@@ -39,7 +39,7 @@
 			<div class="trailing" class:locked inert={locked}>{@render children()}</div>
 		{/if}
 		{#if onclick}
-			<ChevronRight size={18} class="shrink-0 text-[var(--text-muted)] transition-transform duration-200 {expanded ? 'rotate-90' : ''}" />
+			<ChevronRight size={15} class="shrink-0 text-[var(--text-muted)] transition-transform duration-200 {expanded ? 'rotate-90' : ''}" />
 		{/if}
 	</div>
 {/snippet}
@@ -77,7 +77,7 @@
 		width: 100%;
 		flex-direction: column;
 		gap: 12px;
-		padding: 14px 16px;
+		padding: 16px;
 		text-align: left;
 	}
 
@@ -168,7 +168,7 @@
 	.description {
 		font-size: 12.5px;
 		line-height: 1.4;
-		color: var(--text-muted);
+		color: var(--text-quiet);
 	}
 
 	.trailing {
@@ -203,6 +203,6 @@
 	}
 
 	.detached {
-		padding: 0 16px 14px;
+		padding: 0 14px 14px;
 	}
 </style>

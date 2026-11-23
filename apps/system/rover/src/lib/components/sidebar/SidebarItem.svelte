@@ -36,7 +36,7 @@
 <style>
 	.sidebar-item {
 		display: flex;
-		min-height: 36px;
+		min-height: 40px;
 		flex: none;
 		align-items: center;
 		border-radius: var(--radius-pill);
@@ -52,9 +52,14 @@
 		color: var(--text);
 	}
 
-	.sidebar-item.is-active {
+	.sidebar-item.is-active,
+	.sidebar-item.is-active:hover {
 		background: transparent;
-		color: var(--text);
+		color: var(--sidebar-active-text);
+	}
+
+	.sidebar-item.is-active .sidebar-item__main > :global(svg) {
+		color: var(--accent);
 	}
 
 	.sidebar-item.is-drop-target,
@@ -65,7 +70,7 @@
 	}
 
 	.sidebar-item--drive {
-		min-height: 44px;
+		min-height: 48px;
 	}
 
 	.sidebar-item__main {
@@ -74,10 +79,11 @@
 		min-width: 0;
 		flex: 1;
 		align-items: center;
-		gap: 11px;
-		padding-inline: 12px;
+		gap: 12px;
+		padding-inline: 14px;
 		text-align: left;
 		font-size: 14px;
+		font-weight: 500;
 	}
 
 	.sidebar-item__main:disabled {

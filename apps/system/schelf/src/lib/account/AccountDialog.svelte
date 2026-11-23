@@ -73,7 +73,7 @@
 						<button type="button" class="invitation" onclick={() => open(invitation)}>
 							<span class="min-w-0 flex-1 truncate">{invitation.name}</span>
 							<span class="text-[13px] text-[var(--text-muted)]">{channelName(invitation.channel)}</span>
-							<ChevronRight size={16} class="text-[var(--text-muted)]" />
+							<ChevronRight size={15} class="text-[var(--text-muted)]" />
 						</button>
 					</li>
 				{/each}

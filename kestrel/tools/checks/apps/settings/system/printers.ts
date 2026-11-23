@@ -13,8 +13,8 @@ const ADD: Point = [660, 239];
 const LABELS: Point = [660, 171];
 const USB_PRINTER: Point = [440, 305];
 const DRIVER: Point = [440, 258];
-const CANCEL_JOB: Point = [979, 271];
-const TEST_PAGE: Point = [660, 546];
+const CANCEL_JOB: Point = [974, 321];
+const TEST_PAGE: Point = [660, 650];
 
 async function restyle(app: LuftApp, label: string, change: () => void) {
   const before = await app.frame();

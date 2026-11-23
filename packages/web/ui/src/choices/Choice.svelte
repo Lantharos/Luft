@@ -24,7 +24,7 @@
 			<span class="mt-1 text-[12.5px] leading-snug text-[var(--text-muted)]">{note}</span>
 		{/if}
 	</span>
-	<ChevronRight size={18} class="flex-none text-[var(--text-muted)]" />
+	<ChevronRight size={15} class="flex-none text-[var(--text-muted)]" />
 </button>
 
 <style>

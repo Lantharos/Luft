@@ -159,7 +159,7 @@
 			<div class="send">
 				<button type="button" class="button primary main" disabled={composer.sending} onclick={() => send()} {@attach tooltip(t('mailman-compose-send-tooltip'))}>{t('mailman-compose-send')}</button>
 				<MenuButton label={t('mailman-compose-send-later')} class="button primary chevron" align="start">
-					{#snippet trigger()}<ChevronDown size={16} />{/snippet}
+					{#snippet trigger()}<ChevronDown size={13} />{/snippet}
 					{#snippet children(closeMenu)}
 						{#each SEND_LATER as moment (moment.id)}
 							{@const at = moment.at()}

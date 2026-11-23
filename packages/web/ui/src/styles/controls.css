@@ -19,14 +19,14 @@
 	.button,
 	.plain-button {
 		display: inline-flex;
-		min-height: 36px;
+		min-height: 38px;
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
 		border-radius: var(--radius-pill);
-		padding-inline: 14px;
-		font-size: 13px;
-		font-weight: 500;
+		padding-inline: 16px;
+		font-size: 13.5px;
+		font-weight: 600;
 		white-space: nowrap;
 		transition-property: background-color, color, opacity;
 		transition-duration: var(--motion-tap);
@@ -42,6 +42,10 @@
 	.button {
 		background: var(--control);
 		color: var(--text);
+	}
+
+	.button:not(.primary, .danger) {
+		box-shadow: inset 0 1px 0 var(--raised-edge);
 	}
 
 	.button:hover:not(:disabled) {
@@ -108,7 +112,7 @@
 	}
 
 	.text-field {
-		height: 36px;
+		height: 38px;
 		width: 100%;
 		border-radius: var(--radius-pill);
 		background: var(--control);
@@ -134,45 +138,15 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
+		gap: 2px;
 		border-radius: var(--radius-group);
-		overflow: hidden;
+		padding: var(--group-inset);
+		background: var(--group);
 	}
 
 	.row-group > * {
-		--surface-hover: color-mix(in srgb, var(--ink) 6.5%, var(--group));
-		background-color: var(--group);
-	}
-
-	.row-group > :first-child {
-		border-top-left-radius: var(--radius-group);
-		border-top-right-radius: var(--radius-group);
-	}
-
-	.row-group > :last-child {
-		border-bottom-left-radius: var(--radius-group);
-		border-bottom-right-radius: var(--radius-group);
-	}
-
-	.row-group > * + * {
-		box-shadow: inset 0 1px 0 var(--hairline);
-	}
-
-	.row-group > [data-pressed] {
-		box-shadow:
-			inset 0 1px 0 var(--hairline),
-			inset 0 -1px 0 var(--hairline);
-	}
-
-	.row-group > [data-pressed]:first-child {
-		box-shadow: inset 0 -1px 0 var(--hairline);
-	}
-
-	.row-group > [data-pressed]:last-child {
-		box-shadow: inset 0 1px 0 var(--hairline);
-	}
-
-	.row-group > [data-pressed] + * {
-		box-shadow: none;
+		--surface-hover: color-mix(in oklab, var(--ink) 5.5%, transparent);
+		border-radius: calc(var(--radius-group) - var(--group-inset));
 	}
 
 	.selection-track {
@@ -186,6 +160,7 @@
 		z-index: -1;
 		border-radius: var(--radius-pill);
 		background: var(--sidebar-active);
+		box-shadow: var(--sidebar-active-shadow);
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity var(--motion-quick) var(--ease-decelerate);

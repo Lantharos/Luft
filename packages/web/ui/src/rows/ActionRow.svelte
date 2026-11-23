@@ -51,7 +51,7 @@
 		flex: 1;
 		align-items: center;
 		gap: 14px;
-		padding: 14px 16px;
+		padding: 16px;
 		text-align: left;
 	}
 
@@ -86,7 +86,7 @@
 	.description {
 		font-size: 12.5px;
 		line-height: 1.4;
-		color: var(--text-muted);
+		color: var(--text-quiet);
 	}
 
 	.description.alert {

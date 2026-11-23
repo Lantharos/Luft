@@ -78,7 +78,7 @@
 		<MenuButton label={t('mailman-compose-send-from')} class={['sender', typing && 'compact']} align="start" minWidth={280}>
 			{#snippet trigger()}
 				{#if !typing}{@render current()}{/if}
-				<ChevronDown size={14} class="flex-none text-[var(--text-muted)]" />
+				<ChevronDown size={13} class="flex-none text-[var(--text-muted)]" />
 			{/snippet}
 			{#snippet children(close)}
 				{#each groups as group, index (group.account.id)}

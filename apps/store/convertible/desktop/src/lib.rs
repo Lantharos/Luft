@@ -11,7 +11,7 @@ const WINDOW: GlassWindow = GlassWindow {
     title: "Convertible",
     size: (1080, 740),
     min_size: (640, 480),
-    sidebar_width: 280,
+    sidebar_width: 0,
     single_instance: Some("com.lantharos.convertible"),
     backdrop: Backdrop::WINDOW,
 };
@@ -21,7 +21,7 @@ pub fn run_app() -> ! {
     let context = AppContext::new(&events);
     luft_app::run(
         &events,
-        |window| bridge::register(WINDOW.apply_with_page_close(window), &context),
+        |window| bridge::register(WINDOW.apply(window), &context),
         |_| {},
     )
 }

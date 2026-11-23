@@ -24,18 +24,18 @@
 <style>
 	.title {
 		overflow: hidden;
-		padding: 0 6px 8px;
+		padding: 0 8px 10px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: 14px;
+		font-size: 15px;
 		font-weight: 600;
-		color: var(--text-soft);
+		color: var(--text);
 	}
 
 	.description {
 		padding: 0 6px 10px;
 		margin-top: -4px;
 		font-size: 13px;
-		color: var(--text-muted);
+		color: var(--text-quiet);
 	}
 </style>

@@ -27,7 +27,7 @@
 		<p class="truncate text-[14px] font-semibold text-[var(--text)]">{label}<span class="ml-2 font-normal text-[var(--text-muted)]">{description}</span></p>
 		<p class="truncate text-[12.5px] text-[var(--text-muted)]">{summary.names.join(', ')}</p>
 	</div>
-	<ChevronRight size={17} class="flex-none text-[var(--text-muted)]" />
+	<ChevronRight size={15} class="flex-none text-[var(--text-muted)]" />
 </button>
 
 <style>

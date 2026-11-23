@@ -34,7 +34,7 @@
 />
 
 <div class="h-[100dvh] w-screen overflow-hidden bg-transparent text-[var(--text)]" style:--editor-font-size="{settings.fontSize}px">
-	<GlassShell class="h-full [--sidebar-width:260px]">
+	<GlassShell class="h-full [--sidebar-width:260px]" followSidebar>
 		{#if sidebar}
 			<Sidebar />
 		{/if}

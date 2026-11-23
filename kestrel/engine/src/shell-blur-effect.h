@@ -43,6 +43,10 @@ typedef enum
  * @SHELL_BLUR_STYLE_WALLPAPER: show the compositor's blurred wallpaper beneath it
  * @SHELL_BLUR_STYLE_MARIS: show the glass surface colour over the
  *   compositor's wide blur of the wallpaper
+ * @SHELL_BLUR_STYLE_NIKO: blur what is beneath the actor as it changes in
+ *   the lightness of the Niko tint, see meta_compositor_set_niko_tint()
+ * @SHELL_BLUR_STYLE_NIKO_WALLPAPER: show the compositor's blurred wallpaper
+ *   in the lightness of the Niko tint
  *
  * How a background blur looks.
  */
@@ -51,6 +55,8 @@ typedef enum
   SHELL_BLUR_STYLE_LUCA,
   SHELL_BLUR_STYLE_WALLPAPER,
   SHELL_BLUR_STYLE_MARIS,
+  SHELL_BLUR_STYLE_NIKO,
+  SHELL_BLUR_STYLE_NIKO_WALLPAPER,
 } ShellBlurStyle;
 
 #define SHELL_TYPE_BLUR_EFFECT (shell_blur_effect_get_type())

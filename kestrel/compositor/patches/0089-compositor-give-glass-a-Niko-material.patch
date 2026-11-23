@@ -1,0 +1,569 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Mon, 23 Nov 2026 07:12:19 +0100
+Subject: [PATCH] compositor: give glass a Niko material
+
+Niko glass follows Acrylic: it blurs what is behind it like Luca, twice
+as wide, then takes the luminosity of the Niko tint as far as the shell
+says, the hue and saturation of the tint as far as its alpha says, and a
+faint speckle of noise. It blurs only the wallpaper whenever Luca does.
+Apps hear it as its own material, draw no tint of their own over it and
+can ask for it.
+
+Upstream-Status: luft-only Kestrel's Niko material
+---
+ clutter/clutter/clutter-paint-node-private.h  |  5 +
+ clutter/clutter/clutter-paint-nodes.c         | 94 +++++++++++++------
+ src/compositor/compositor.c                   | 68 +++++++++++++-
+ src/compositor/meta-background-blur-private.h |  5 +
+ src/compositor/meta-background-effect.c       |  9 +-
+ src/compositor/meta-background-wallpaper.c    | 34 +++++--
+ src/compositor/meta-glass.h                   |  3 +
+ src/meta/compositor.h                         | 13 +++
+ src/wayland/meta-wayland-kestrel-glass.c      | 18 +++-
+ src/wayland/protocol/kestrel-glass-v1.xml     | 20 ++--
+ 10 files changed, 215 insertions(+), 54 deletions(-)
+
+diff --git a/clutter/clutter/clutter-paint-node-private.h b/clutter/clutter/clutter-paint-node-private.h
+index 9efd8f54b0575bc9f4cdafd2b6595edbbb6558eb..438e2f9c809c8372073e14f997417535be147282 100644
+--- a/clutter/clutter/clutter-paint-node-private.h
++++ b/clutter/clutter/clutter-paint-node-private.h
+@@ -137,6 +137,11 @@ void clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                           const CoglColor *tint,
+                                           float            luminosity);
+ 
++CLUTTER_EXPORT
++void clutter_blur_add_niko_effect (CoglPipeline    *pipeline,
++                                   const CoglColor *tint,
++                                   float            luminosity);
++
+ #define CLUTTER_TYPE_EFFECT_NODE                (clutter_effect_node_get_type ())
+ #define CLUTTER_EFFECT_NODE(obj)                (G_TYPE_CHECK_INSTANCE_CAST ((obj), CLUTTER_TYPE_EFFECT_NODE, ClutterEffectNode))
+ #define CLUTTER_IS_EFFECT_NODE(obj)             (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CLUTTER_TYPE_EFFECT_NODE))
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index ccf8992188249099a3d26de02402b136b29d816e..84303b15bb460b6e41c38f75db5a401b9a6fac91 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1674,11 +1674,15 @@ clutter_blur_node_get_grain (CoglContext *context)
+   return grain;
+ }
+ 
++#define NIKO_SPECKLE 0.02f
++
+ static const char *blur_framebuffer_effect_declarations =
+   "uniform float blur_framebuffer_saturation;                               \n"
+   "uniform float blur_framebuffer_noise;                                    \n"
+   "uniform vec4 blur_framebuffer_tint;                                      \n"
+   "uniform float blur_framebuffer_luminosity;                               \n"
++  "uniform float blur_framebuffer_hue;                                      \n"
++  "uniform float blur_framebuffer_speckle;                                  \n"
+   "                                                                          \n"
+   "float blur_framebuffer_lum (vec3 color)                                  \n"
+   "{                                                                        \n"
+@@ -1710,7 +1714,11 @@ static const char *blur_framebuffer_effect_source =
+   "                   blur_framebuffer_luminosity);                          \n"
+   "      color = mix (color, blur_framebuffer_tint.rgb,                      \n"
+   "                   blur_framebuffer_tint.a);                              \n"
+-  "      if (blur_framebuffer_noise > 0.0)                                   \n"
++  "      color = mix (color,                                                 \n"
++  "                   blur_framebuffer_set_lum (blur_framebuffer_tint.rgb,   \n"
++  "                     blur_framebuffer_lum (color)),                       \n"
++  "                   blur_framebuffer_hue);                                 \n"
++  "      if (blur_framebuffer_noise > 0.0 || blur_framebuffer_speckle > 0.0) \n"
+   "        {                                                                 \n"
+   "          vec2 grain_cell = mod (floor (gl_FragCoord.xy), 64.0);          \n"
+   "          float grain = texture2D (cogl_sampler1,                         \n"
+@@ -1719,26 +1727,31 @@ static const char *blur_framebuffer_effect_source =
+   "            (mod (grain_cell + vec2 (32.0, 21.0), 64.0) + 0.5) / 64.0).r; \n"
+   "          color += vec3 ((grain - 1.0) * blur_framebuffer_noise *         \n"
+   "            mix (0.5, 1.0, dot (color, vec3 (0.2126, 0.7152, 0.0722)))); \n"
++  "          color = mix (color, vec3 (grain * 0.5), blur_framebuffer_speckle); \n"
+   "        }                                                                 \n"
+   "      color = clamp (color, vec3 (0.0), vec3 (1.0));                      \n"
+   "                                                                          \n"
+   "      cogl_color_out.rgb = color * cogl_color_out.a;                      \n"
+   "    }                                                                     \n";
+ 
+-void
+-clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+-                                     float            saturation,
+-                                     float            noise,
+-                                     const CoglColor *tint,
+-                                     float            luminosity)
++static void
++set_uniform (CoglPipeline *pipeline,
++             const char   *name,
++             float         value)
+ {
+-  static CoglSnippet *snippet;
+-  int saturation_uniform;
+-  int noise_uniform;
+-  float tint_color[4] = { 0.f, 0.f, 0.f, 0.f };
++  cogl_pipeline_set_uniform_1f (pipeline, cogl_pipeline_get_uniform_location (pipeline, name), value);
++}
+ 
+-  if (saturation == 1.0f && noise == 0.0f && !tint)
+-    return;
++static void
++add_effect (CoglPipeline    *pipeline,
++            float            saturation,
++            float            noise,
++            const float     *tint,
++            float            luminosity,
++            float            hue,
++            float            speckle)
++{
++  static CoglSnippet *snippet;
+ 
+   if (!snippet)
+     snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+@@ -1752,16 +1765,28 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+   cogl_pipeline_set_layer_combine (pipeline, 1, "RGBA = REPLACE(PREVIOUS)", NULL);
+   cogl_pipeline_add_snippet (pipeline, snippet);
+ 
+-  saturation_uniform =
+-    cogl_pipeline_get_uniform_location (pipeline,
+-                                        "blur_framebuffer_saturation");
+-  if (saturation_uniform > -1)
+-    cogl_pipeline_set_uniform_1f (pipeline, saturation_uniform, saturation);
++  set_uniform (pipeline, "blur_framebuffer_saturation", saturation);
++  set_uniform (pipeline, "blur_framebuffer_noise", noise);
++  set_uniform (pipeline, "blur_framebuffer_luminosity", luminosity);
++  set_uniform (pipeline, "blur_framebuffer_hue", hue);
++  set_uniform (pipeline, "blur_framebuffer_speckle", speckle);
++  cogl_pipeline_set_uniform_float (pipeline,
++                                   cogl_pipeline_get_uniform_location (pipeline,
++                                                                       "blur_framebuffer_tint"),
++                                   4, 1, tint);
++}
++
++void
++clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
++                                     float            saturation,
++                                     float            noise,
++                                     const CoglColor *tint,
++                                     float            luminosity)
++{
++  float tint_color[4] = { 0.f, 0.f, 0.f, 0.f };
+ 
+-  noise_uniform =
+-    cogl_pipeline_get_uniform_location (pipeline, "blur_framebuffer_noise");
+-  if (noise_uniform > -1)
+-    cogl_pipeline_set_uniform_1f (pipeline, noise_uniform, noise);
++  if (saturation == 1.0f && noise == 0.0f && !tint)
++    return;
+ 
+   if (tint)
+     {
+@@ -1770,14 +1795,23 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+       tint_color[2] = cogl_color_get_blue (tint);
+       tint_color[3] = cogl_color_get_alpha (tint);
+     }
+-  cogl_pipeline_set_uniform_float (pipeline,
+-                                   cogl_pipeline_get_uniform_location (pipeline,
+-                                                                       "blur_framebuffer_tint"),
+-                                   4, 1, tint_color);
+-  cogl_pipeline_set_uniform_1f (pipeline,
+-                                cogl_pipeline_get_uniform_location (pipeline,
+-                                                                    "blur_framebuffer_luminosity"),
+-                                luminosity);
++  add_effect (pipeline, saturation, noise, tint_color, luminosity, 0.f, 0.f);
++}
++
++void
++clutter_blur_add_niko_effect (CoglPipeline    *pipeline,
++                              const CoglColor *tint,
++                              float            luminosity)
++{
++  float tint_color[4] = {
++    cogl_color_get_red (tint),
++    cogl_color_get_green (tint),
++    cogl_color_get_blue (tint),
++    0.f,
++  };
++
++  add_effect (pipeline, 1.f, 0.f, tint_color, luminosity,
++              cogl_color_get_alpha (tint), NIKO_SPECKLE);
+ }
+ 
+ static gboolean
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 144571f6be5cdac5be88e854d5a4fcd1d189da00..04f81917f65277021c4c771440691ec9ad531402 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -157,6 +157,8 @@ typedef struct _MetaCompositorPrivate
+   gboolean luca_from_wallpaper;
+   CoglColor glass_surface;
+   float glass_luminosity;
++  CoglColor niko_tint;
++  float niko_luminosity;
+   unsigned int maris_requests;
+ 
+   GSettings *kestrel_settings;
+@@ -1687,6 +1689,49 @@ meta_compositor_get_glass_surface (MetaCompositor *compositor,
+   return &priv->glass_surface;
+ }
+ 
++/**
++ * meta_compositor_set_niko_tint:
++ * @compositor: a #MetaCompositor
++ * @tint: the colour Niko glass takes its lightness from, its alpha how much
++ *   of its hue and saturation the glass takes
++ * @luminosity: how far the blur under Niko glass takes the luminosity of
++ *   @tint
++ */
++void
++meta_compositor_set_niko_tint (MetaCompositor  *compositor,
++                               const CoglColor *tint,
++                               float            luminosity)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  if (cogl_color_equal (&priv->niko_tint, tint) &&
++      priv->niko_luminosity == luminosity)
++    return;
++
++  priv->niko_tint = *tint;
++  priv->niko_luminosity = luminosity;
++  invalidate_background_blurs (compositor);
++}
++
++/**
++ * meta_compositor_get_niko_tint:
++ * @compositor: a #MetaCompositor
++ * @luminosity: (out): how far the blur takes the luminosity of the tint
++ *
++ * Returns: (transfer none): the tint of Niko glass
++ */
++const CoglColor *
++meta_compositor_get_niko_tint (MetaCompositor *compositor,
++                               float          *luminosity)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  *luminosity = priv->niko_luminosity;
++  return &priv->niko_tint;
++}
++
+ static MetaGlassMaterial
+ luca_material (MetaCompositor *compositor)
+ {
+@@ -1696,6 +1741,15 @@ luca_material (MetaCompositor *compositor)
+   return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_WALLPAPER : META_GLASS_MATERIAL_LIVE;
+ }
+ 
++static MetaGlassMaterial
++niko_material (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_NIKO_WALLPAPER : META_GLASS_MATERIAL_NIKO;
++}
++
+ MetaGlassMaterial
+ meta_compositor_get_glass_material (MetaCompositor       *compositor,
+                                     MetaGlassRole         role,
+@@ -1711,12 +1765,24 @@ meta_compositor_get_glass_material (MetaCompositor       *compositor,
+       return META_GLASS_MATERIAL_SURFACE;
+     case META_GLASS_PREFERENCE_LUCA:
+       return luca_material (compositor);
++    case META_GLASS_PREFERENCE_NIKO:
++      return niko_material (compositor);
+     case META_GLASS_PREFERENCE_USER:
+       break;
+     }
+ 
+   style = role == META_GLASS_ROLE_TRANSIENT ? priv->glass_transients : priv->glass_windows;
+-  return style == META_GLASS_STYLE_MARIS ? META_GLASS_MATERIAL_SURFACE : luca_material (compositor);
++  switch (style)
++    {
++    case META_GLASS_STYLE_MARIS:
++      return META_GLASS_MATERIAL_SURFACE;
++    case META_GLASS_STYLE_NIKO:
++      return niko_material (compositor);
++    case META_GLASS_STYLE_LUCA:
++      break;
++    }
++
++  return luca_material (compositor);
+ }
+ 
+ void
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+index c40d02ef7c7aacf50164c561b8aaaa8bfa6b74f6..c76b682c40b769846d299c2fca8cf637def918ac 100644
+--- a/src/compositor/meta-background-blur-private.h
++++ b/src/compositor/meta-background-blur-private.h
+@@ -144,6 +144,11 @@ void meta_background_apply_corners (const MetaBackgroundPaint *paint,
+                                     CoglPipeline              *pipeline,
+                                     const graphene_rect_t     *space);
+ 
++gboolean meta_background_is_niko (MetaGlassMaterial material);
++
++void meta_background_add_glass_effect (const MetaBackgroundPaint *paint,
++                                       CoglPipeline              *pipeline);
++
+ gboolean meta_background_shows_wallpaper (MetaCompositor    *compositor,
+                                           MetaGlassMaterial  material);
+ 
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 67a9b0d30b4b58158d882381c4b6feeae3e4f23f..0ab5f3ddb72bf977f5269b58d5ce5f8be09cc64e 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -26,6 +26,7 @@
+ #include "clutter/clutter-paint-node-private.h"
+ 
+ #define RESULT_SIZE_STEP 64
++#define NIKO_BLUR_SCALE 2.f
+ 
+ static int
+ result_size_class (int size)
+@@ -138,14 +139,14 @@ paint_live (MetaBackgroundPaint *paint)
+                                                       paint->source_rect.width,
+                                                       paint->source_rect.height,
+                                                       paint->radius,
+-                                                      paint->saturation,
+-                                                      paint->noise,
++                                                      1.f, 0.f,
+                                                       paint->opacity);
+   if (!blur_node)
+     return;
+ 
+   if (paint->area)
+     clutter_blur_node_set_area (blur_node, paint->area);
++  meta_background_add_glass_effect (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
+   apply_source_corners (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
+ 
+   for (i = 0; i < mtk_region_num_rectangles (paint->paint_region); i++)
+@@ -223,7 +224,7 @@ create_result_pipeline (const MetaBackgroundPaint *paint,
+                               (float) height / result->capacity_height,
+                               1.f);
+   cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
+-  clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise, NULL, 0.f);
++  meta_background_add_glass_effect (paint, pipeline);
+   apply_source_corners (paint, pipeline);
+   return pipeline;
+ }
+@@ -510,6 +511,8 @@ meta_background_blur_paint (MetaBackgroundBlur    *blur,
+   meta_compositor_get_background_blur_params (blur->compositor, &paint.radius,
+                                               &paint.saturation, &paint.noise);
+   paint.material = meta_compositor_get_glass_material (blur->compositor, blur->role, blur->preference);
++  if (paint.material == META_GLASS_MATERIAL_NIKO)
++    paint.radius *= NIKO_BLUR_SCALE;
+   if (prepare_paint (blur, &paint, paint_context, clip_region))
+     paint_blur (blur, &paint, clutter_paint_context_get_stage_view (paint_context));
+ 
+diff --git a/src/compositor/meta-background-wallpaper.c b/src/compositor/meta-background-wallpaper.c
+index 76d68c7d9299a85085e452b028472be6b6ce7d86..f5de599f915959a28bffa23193e4f0f6f81b8bda 100644
+--- a/src/compositor/meta-background-wallpaper.c
++++ b/src/compositor/meta-background-wallpaper.c
+@@ -52,21 +52,34 @@ stage_to_framebuffer (MetaBackgroundPaint *paint,
+   return TRUE;
+ }
+ 
+-static void
+-add_glass_effect (const MetaBackgroundPaint *paint,
+-                  CoglPipeline              *pipeline)
++gboolean
++meta_background_is_niko (MetaGlassMaterial material)
++{
++  return material == META_GLASS_MATERIAL_NIKO ||
++    material == META_GLASS_MATERIAL_NIKO_WALLPAPER;
++}
++
++void
++meta_background_add_glass_effect (const MetaBackgroundPaint *paint,
++                                  CoglPipeline              *pipeline)
+ {
+-  const CoglColor *surface;
++  const CoglColor *tint;
+   float luminosity;
+ 
+-  if (paint->material != META_GLASS_MATERIAL_SURFACE)
++  if (meta_background_is_niko (paint->material))
++    {
++      tint = meta_compositor_get_niko_tint (paint->compositor, &luminosity);
++      clutter_blur_add_niko_effect (pipeline, tint, luminosity);
++    }
++  else if (paint->material == META_GLASS_MATERIAL_SURFACE)
++    {
++      tint = meta_compositor_get_glass_surface (paint->compositor, &luminosity);
++      clutter_blur_add_framebuffer_effect (pipeline, 1.f, paint->noise, tint, luminosity);
++    }
++  else
+     {
+       clutter_blur_add_framebuffer_effect (pipeline, paint->saturation, paint->noise, NULL, 0.f);
+-      return;
+     }
+-
+-  surface = meta_compositor_get_glass_surface (paint->compositor, &luminosity);
+-  clutter_blur_add_framebuffer_effect (pipeline, 1.f, paint->noise, surface, luminosity);
+ }
+ 
+ static CoglPipeline *
+@@ -84,7 +97,7 @@ create_piece_pipeline (MetaBackgroundPaint   *paint,
+                                    COGL_PIPELINE_FILTER_LINEAR);
+   cogl_pipeline_set_layer_wrap_mode (pipeline, 0,
+                                      COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+-  add_glass_effect (paint, pipeline);
++  meta_background_add_glass_effect (paint, pipeline);
+   meta_background_apply_corners (paint, pipeline, piece);
+   cogl_color_init_from_4f (&color, alpha, alpha, alpha, alpha);
+   cogl_pipeline_set_color (pipeline, &color);
+@@ -133,6 +146,7 @@ meta_background_shows_wallpaper (MetaCompositor    *compositor,
+   MtkRectangle area;
+ 
+   return material != META_GLASS_MATERIAL_LIVE &&
++    material != META_GLASS_MATERIAL_NIKO &&
+     meta_compositor_get_frosted_wallpaper (compositor, frost_of (material), 0, &area);
+ }
+ 
+diff --git a/src/compositor/meta-glass.h b/src/compositor/meta-glass.h
+index fe46325f0f3acdbe5b7b0351a06de769aced97e4..7b1d9b33c33c2dc9b07b1e7945588ff1f69905bf 100644
+--- a/src/compositor/meta-glass.h
++++ b/src/compositor/meta-glass.h
+@@ -22,6 +22,8 @@ typedef enum
+   META_GLASS_MATERIAL_LIVE,
+   META_GLASS_MATERIAL_WALLPAPER,
+   META_GLASS_MATERIAL_SURFACE,
++  META_GLASS_MATERIAL_NIKO,
++  META_GLASS_MATERIAL_NIKO_WALLPAPER,
+ } MetaGlassMaterial;
+ 
+ typedef enum
+@@ -35,4 +37,5 @@ typedef enum
+   META_GLASS_PREFERENCE_USER,
+   META_GLASS_PREFERENCE_LUCA,
+   META_GLASS_PREFERENCE_MARIS,
++  META_GLASS_PREFERENCE_NIKO,
+ } MetaGlassPreference;
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index 3272e6c761a7d39abbe08f59463a19a49fa2c1f1..1e29fb506a3153e0133e11da211818011bdbacca 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -123,11 +123,15 @@ void meta_compositor_get_background_blur_params (MetaCompositor *compositor,
+  * @META_GLASS_STYLE_MARIS: glass is the surface colour over a wide blur of
+  *   the wallpaper that takes the luminosity of the surface colour, like
+  *   Mica
++ * @META_GLASS_STYLE_NIKO: glass blurs what is behind it, or only the
++ *   wallpaper whenever Luca does, and takes the luminosity and some of the
++ *   hue of the Niko tint, like Acrylic, see meta_compositor_set_niko_tint()
+  */
+ typedef enum
+ {
+   META_GLASS_STYLE_LUCA,
+   META_GLASS_STYLE_MARIS,
++  META_GLASS_STYLE_NIKO,
+ } MetaGlassStyle;
+ 
+ /**
+@@ -157,6 +161,15 @@ META_EXPORT
+ const CoglColor * meta_compositor_get_glass_surface (MetaCompositor *compositor,
+                                                      float          *luminosity);
+ 
++META_EXPORT
++void meta_compositor_set_niko_tint (MetaCompositor  *compositor,
++                                    const CoglColor *tint,
++                                    float            luminosity);
++
++META_EXPORT
++const CoglColor * meta_compositor_get_niko_tint (MetaCompositor *compositor,
++                                                 float          *luminosity);
++
+ META_EXPORT
+ gboolean meta_compositor_get_maris_requested (MetaCompositor *compositor);
+ 
+diff --git a/src/wayland/meta-wayland-kestrel-glass.c b/src/wayland/meta-wayland-kestrel-glass.c
+index 5fb3a40c7f69da53ee2eb6b8e90f4fa55b9ae3ba..39bba81bc5e17df9082a16f97f616f30318784e2 100644
+--- a/src/wayland/meta-wayland-kestrel-glass.c
++++ b/src/wayland/meta-wayland-kestrel-glass.c
+@@ -41,8 +41,19 @@ typedef struct
+ static enum kestrel_glass_v1_material
+ material_of (MetaGlassMaterial material)
+ {
+-  return material == META_GLASS_MATERIAL_SURFACE ?
+-    KESTREL_GLASS_V1_MATERIAL_MARIS : KESTREL_GLASS_V1_MATERIAL_LUCA;
++  switch (material)
++    {
++    case META_GLASS_MATERIAL_SURFACE:
++      return KESTREL_GLASS_V1_MATERIAL_MARIS;
++    case META_GLASS_MATERIAL_NIKO:
++    case META_GLASS_MATERIAL_NIKO_WALLPAPER:
++      return KESTREL_GLASS_V1_MATERIAL_NIKO;
++    case META_GLASS_MATERIAL_LIVE:
++    case META_GLASS_MATERIAL_WALLPAPER:
++      break;
++    }
++
++  return KESTREL_GLASS_V1_MATERIAL_LUCA;
+ }
+ 
+ static void
+@@ -146,6 +157,9 @@ glass_set_preference (struct wl_client   *client,
+     case KESTREL_GLASS_V1_PREFERENCE_MARIS:
+       set_preference (glass, META_GLASS_PREFERENCE_MARIS);
+       break;
++    case KESTREL_GLASS_V1_PREFERENCE_NIKO:
++      set_preference (glass, META_GLASS_PREFERENCE_NIKO);
++      break;
+     default:
+       set_preference (glass, META_GLASS_PREFERENCE_USER);
+       break;
+diff --git a/src/wayland/protocol/kestrel-glass-v1.xml b/src/wayland/protocol/kestrel-glass-v1.xml
+index 9e5c0b4a19c3ef957e50ef76f728bedc2d5f44f7..8f51209a4be7bf4437890e493b680d9aa1e07c38 100644
+--- a/src/wayland/protocol/kestrel-glass-v1.xml
++++ b/src/wayland/protocol/kestrel-glass-v1.xml
+@@ -26,15 +26,16 @@
+   <interface name="kestrel_glass_manager_v1" version="1">
+     <description summary="the material of a surface's glass">
+       Glass is the part of a surface a client asks to blur through
+-      ext_background_effect_v1. Kestrel draws it as one of two materials:
+-      Luca, a blur of what is behind the surface or only of the wallpaper,
+-      and Maris, the desktop's surface colour over a wide blur of the
+-      wallpaper that covers most of it.
++      ext_background_effect_v1. Kestrel draws it as one of three materials:
++      Luca, a blur of what is behind the surface or only of the wallpaper;
++      Maris, the desktop's surface colour over a wide blur of the wallpaper
++      that covers most of it; and Niko, a blur of what is behind the surface
++      that takes the lightness of the surface colour.
+ 
+       Through a glass object, a client says what kind of surface the glass
+       belongs to and which material it would like, and hears which material
+       the glass has. A client draws its own tint over Luca glass, and none
+-      over Maris glass, whose surface colour is already the whole surface.
++      over Maris or Niko glass, which already are the whole surface.
+     </description>
+ 
+     <enum name="error">
+@@ -78,6 +79,7 @@
+              summary="the material the person chose for this kind of surface"/>
+       <entry name="luca" value="1" summary="Luca"/>
+       <entry name="maris" value="2" summary="Maris"/>
++      <entry name="niko" value="3" summary="Niko"/>
+     </enum>
+ 
+     <enum name="material">
+@@ -85,6 +87,8 @@
+              summary="a blur of what is behind, or of the wallpaper only"/>
+       <entry name="maris" value="1"
+              summary="the surface colour over a wide blur of the wallpaper"/>
++      <entry name="niko" value="2"
++             summary="a blur of what is behind, or of the wallpaper only, in the lightness of the surface colour"/>
+     </enum>
+ 
+     <request name="destroy" type="destructor">
+@@ -101,9 +105,9 @@
+ 
+     <request name="set_preference">
+       <description summary="ask for a material">
+-        Maris is always granted. Luca is granted too, and then blurs only the
+-        wallpaper whenever the person's Luca glass does, such as while the
+-        power saver is on. The default is user.
++        Maris is always granted. Luca and Niko are granted too, and then blur
++        only the wallpaper whenever the person's Luca glass does, such as
++        while the power saver is on. The default is user.
+       </description>
+       <arg name="preference" type="uint" enum="preference"/>
+     </request>

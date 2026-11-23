@@ -16,6 +16,7 @@ const KINDS = ['taskbar', 'surfaces', 'windows'] as const;
 const KEYS = [...KINDS, 'luca-blurs', 'wallpaper-on-power-saver'];
 const BACKDROP_COLOR = 'd02020';
 const REDDISH = 60;
+const NIKO_REDDISH = 30;
 const SURFACE_DISTANCE = 24;
 const CLIENT_TINT = [0x18, 0x24, 0x30];
 const CLIENT_ALPHA = 0x60 / 255;
@@ -23,6 +24,7 @@ const CLIENT_ALPHA = 0x60 / 255;
 type Kind = (typeof KINDS)[number];
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
+const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
 const backdrops = () => descendants(global.stage).flatMap(actor => actor.mapped ? actor.get_effects() : [])
   .filter((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect && effect.mode === Shell.BlurMode.BACKGROUND);
 const taskbarGlass = () => named('kestrel-panel')!.get_effects().find((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect)!;
@@ -38,7 +40,8 @@ async function centerOf(window: Meta.Window) {
   return [red, green, blue];
 }
 
-const reddish = ([red, green, blue]: number[]) => red - Math.max(green, blue) > REDDISH;
+const redness = ([red, green, blue]: number[]) => red - Math.max(green, blue);
+const reddish = (color: number[]) => redness(color) > REDDISH;
 
 function nearSurface(color: number[]) {
   const [{red, green, blue}] = global.compositor.get_glass_surface();
@@ -46,7 +49,7 @@ function nearSurface(color: number[]) {
   return Math.max(...expected.map((channel, index) => Math.abs(channel - color[index]))) < SURFACE_DISTANCE;
 }
 
-function choose(styles: Partial<Record<Kind, 'luca' | 'maris'>>, lucaBlurs: 'everything' | 'wallpaper' = 'everything') {
+function choose(styles: Partial<Record<Kind, 'luca' | 'maris' | 'niko'>>, lucaBlurs: 'everything' | 'wallpaper' = 'everything') {
   for (const kind of KINDS) settings.set_string(kind, styles[kind] ?? 'luca');
   settings.set_string('luca-blurs', lucaBlurs);
 }
@@ -106,7 +109,25 @@ export async function run() {
     await settled();
     require(nearSurface(await centerOf(glass.window)), 'app windows stay Maris while Luca blurs only the wallpaper');
 
+    interfaceSettings.set_string('color-scheme', 'prefer-dark');
+    choose({taskbar: 'niko', surfaces: 'niko', windows: 'niko'});
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.NIKO), 'every kind of glass turns to Niko');
+    await settled();
+    require(redness(await centerOf(glass.window)) > NIKO_REDDISH, 'Niko glass on an app window blurs the window behind it');
+    await captureSurfaces('niko');
+
+    choose({taskbar: 'niko', surfaces: 'niko', windows: 'niko'}, 'wallpaper');
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.NIKO_WALLPAPER),
+      'Niko glass blurs only the wallpaper while Luca does');
+    await settled();
+    require(redness(await centerOf(glass.window)) < NIKO_REDDISH, 'Niko glass on an app window shows the wallpaper instead of the window behind it while Luca blurs only the wallpaper');
+    interfaceSettings.reset('color-scheme');
+
     choose({});
+    const niko = await glassClient('Asks for Niko', ['window', 'niko']);
+    await eventually(() => niko.materials.at(-1) === 'niko', 'an app asking for Niko hears it has Niko');
+    await stop(niko.process);
+
     const asking = await glassClient('Asks for Maris', ['window', 'maris']);
     await eventually(() => asking.materials.at(-1) === 'maris', 'an app asking for Maris hears it has Maris');
     await settled();
@@ -120,6 +141,8 @@ export async function run() {
     settings.set_string('windows', 'maris');
     settings.set_string('surfaces', 'luca');
     await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface stays with panels and menus, not app windows');
+    settings.set_string('surfaces', 'niko');
+    await eventually(() => transient.materials.at(-1) === 'niko', 'a transient surface follows panels and menus to Niko');
     await stop(transient.process);
 
     choose({taskbar: 'maris'});
@@ -138,5 +161,6 @@ export async function run() {
   } finally {
     await setPowerProfile('balanced');
     for (const key of KEYS) settings.reset(key);
+    interfaceSettings.reset('color-scheme');
   }
 }

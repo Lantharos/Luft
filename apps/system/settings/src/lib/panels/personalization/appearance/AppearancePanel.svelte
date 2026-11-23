@@ -34,6 +34,7 @@
 	const GLASS_STYLES = {
 		luca: 'settings-appearance-glass-luca',
 		maris: 'settings-appearance-glass-maris',
+		niko: 'settings-appearance-glass-niko',
 		mixed: 'settings-appearance-glass-mixed'
 	};
 

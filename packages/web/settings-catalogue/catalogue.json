@@ -80,7 +80,8 @@
 			"key": "com.lantharos.kestrel.glass taskbar",
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
-				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+				{ "value": "maris", "label": "settings-appearance-glass-maris" },
+				{ "value": "niko", "label": "settings-appearance-glass-niko" }
 			]
 		},
 		{
@@ -90,7 +91,8 @@
 			"key": "com.lantharos.kestrel.glass surfaces",
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
-				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+				{ "value": "maris", "label": "settings-appearance-glass-maris" },
+				{ "value": "niko", "label": "settings-appearance-glass-niko" }
 			]
 		},
 		{
@@ -100,7 +102,8 @@
 			"key": "com.lantharos.kestrel.glass windows",
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
-				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+				{ "value": "maris", "label": "settings-appearance-glass-maris" },
+				{ "value": "niko", "label": "settings-appearance-glass-niko" }
 			]
 		},
 		{
@@ -246,7 +249,8 @@
 			"key": "com.lantharos.kestrel.glass see-through",
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
-				{ "value": "maris", "label": "settings-appearance-glass-maris" }
+				{ "value": "maris", "label": "settings-appearance-glass-maris" },
+				{ "value": "niko", "label": "settings-appearance-glass-niko" }
 			]
 		},
 		{

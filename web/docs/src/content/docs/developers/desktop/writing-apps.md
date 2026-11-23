@@ -54,7 +54,7 @@ Sandboxed apps only see the files they're given. `Activation::paths_within_reach
 
 ### Glass
 
-A window with a sidebar is glass all around: the sidebar and an 8px frame on the other three sides, around the content as an opaque sheet with corners 8px tighter than the window's. Only the frame and sidebar are blurred, and nothing is drawn under the sheet. A window without a sidebar is opaque. Kestrel draws the glass as the material people chose for app windows: Luca, a blur of what is behind, or Maris, the surface colour with a hint of the wallpaper. `Backdrop::WINDOW` follows that choice. An app whose layout needs one material asks for it with `BackdropPreference::Maris` or `BackdropPreference::Luca`, and a window that is a popover or a palette rather than an app's main window sets `BackdropRole::Transient`, so it follows the choice for panels and menus:
+A window with a sidebar is glass all around: the sidebar and an 8px frame on the other three sides, around the content as an opaque sheet with corners 8px tighter than the window's. Only the frame and sidebar are blurred, and nothing is drawn under the sheet. A window without a sidebar is opaque. Kestrel draws the glass as the material people chose for app windows: Luca, a blur of what is behind, Maris, the surface colour with a hint of the wallpaper, or Niko, a blur of what is behind in the lightness of the surface. `Backdrop::WINDOW` follows that choice. An app whose layout needs one material asks for it with `BackdropPreference::Luca`, `BackdropPreference::Maris` or `BackdropPreference::Niko`, and a window that is a popover or a palette rather than an app's main window sets `BackdropRole::Transient`, so it follows the choice for panels and menus:
 
 ```rust
 use luft_app::Backdrop;
@@ -66,7 +66,7 @@ const PALETTE: Backdrop = Backdrop {
 };
 ```
 
-`GlassShell` leaves out the glass's own tint over Maris, whose surface colour is already the whole surface, and keeps it over Luca, where it keeps text readable. A window whose sidebar comes and goes, such as one that hides it for a single opened file, sets `followSidebar` on `GlassShell`, which gives the window the regions of whichever layout it shows. How the materials are drawn is in [The compositor](/developers/desktop/compositor/#glass).
+`GlassShell` leaves out the glass's own tint over Maris and Niko, which already are the whole surface, and keeps it over Luca, where it keeps text readable. A window whose sidebar comes and goes, such as one that hides it for a single opened file, sets `followSidebar` on `GlassShell`, which gives the window the regions of whichever layout it shows. How the materials are drawn is in [The compositor](/developers/desktop/compositor/#glass).
 
 ## The page
 

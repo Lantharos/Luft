@@ -4,13 +4,32 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import Shell from 'gi://Shell';
 
-import { fromHex } from '../color.js';
+import { fromHex, type Rgb } from '../color.js';
+import { setLuminosity, type Channels } from './blend.js';
 import { WallpaperFrost, type FrostKind } from '../../core/stage/background/wallpaperFrost.js';
 import { PlaybackConditions } from '../../desktop/wallpaper/conditions.js';
 import { repaintWallpaperGlass, setGlassStyle, type GlassKind } from './kestrelGlass.js';
 
 const KINDS: GlassKind[] = ['taskbar', 'surfaces', 'windows', 'see-through'];
 const MARIS = { luminosity: 1, cover: { dark: 0.8, light: 0.5 } };
+const NIKO = {
+  dark: { tint: 0.15, luminosity: 0.96, lightness: 0x2c / 255 },
+  light: { tint: 0, luminosity: 0.85 },
+};
+const STYLES: Record<string, Meta.GlassStyle> = {
+  luca: Meta.GlassStyle.LUCA,
+  maris: Meta.GlassStyle.MARIS,
+  niko: Meta.GlassStyle.NIKO,
+};
+
+type Scheme = keyof typeof NIKO;
+
+const glassColor = ([red, green, blue]: Rgb, share: number) => new Cogl.Color({ red, green, blue, alpha: Math.round(share * 255) });
+
+function nikoTint(surface: Rgb, niko: (typeof NIKO)[Scheme]): Rgb {
+  if (!('lightness' in niko)) return surface;
+  return setLuminosity(surface.map(channel => channel / 255) as Channels, niko.lightness).map(channel => Math.round(channel * 255)) as Rgb;
+}
 
 class FrostPieces {
   private frost: WallpaperFrost | null = null;
@@ -54,7 +73,7 @@ export class GlassStyles {
   }
 
   private chosen(kind: GlassKind): Meta.GlassStyle {
-    return this.settings.get_string(kind) === 'maris' ? Meta.GlassStyle.MARIS : Meta.GlassStyle.LUCA;
+    return STYLES[this.settings.get_string(kind)];
   }
 
   private wallpaperOnly(): boolean {
@@ -63,9 +82,15 @@ export class GlassStyles {
   }
 
   private shellStyle(kind: GlassKind, wallpaperOnly: boolean): Shell.BlurStyle {
-    if (this.chosen(kind) === Meta.GlassStyle.MARIS)
-      return this.wide.ready ? Shell.BlurStyle.MARIS : Shell.BlurStyle.LUCA;
-    return wallpaperOnly && this.blurred.ready ? Shell.BlurStyle.WALLPAPER : Shell.BlurStyle.LUCA;
+    const frosted = wallpaperOnly && this.blurred.ready;
+    switch (this.chosen(kind)) {
+      case Meta.GlassStyle.MARIS:
+        return this.wide.ready ? Shell.BlurStyle.MARIS : Shell.BlurStyle.LUCA;
+      case Meta.GlassStyle.NIKO:
+        return frosted ? Shell.BlurStyle.NIKO_WALLPAPER : Shell.BlurStyle.NIKO;
+      default:
+        return frosted ? Shell.BlurStyle.WALLPAPER : Shell.BlurStyle.LUCA;
+    }
   }
 
   private sync(): void {
@@ -81,9 +106,11 @@ export class GlassStyles {
     repaintWallpaperGlass();
   }
 
-  setSurface(color: string, scheme: 'dark' | 'light'): void {
-    const [red, green, blue] = fromHex(color);
-    global.compositor.set_glass_surface(new Cogl.Color({ red, green, blue, alpha: Math.round(MARIS.cover[scheme] * 255) }), MARIS.luminosity);
+  setSurface(color: string, scheme: Scheme): void {
+    const surface = fromHex(color);
+    const niko = NIKO[scheme];
+    global.compositor.set_glass_surface(glassColor(surface, MARIS.cover[scheme]), MARIS.luminosity);
+    global.compositor.set_niko_tint(glassColor(nikoTint(surface, niko), niko.tint), niko.luminosity);
     repaintWallpaperGlass();
   }
 

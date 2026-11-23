@@ -8,6 +8,8 @@
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import ChooseAppDialog from '#lib/panels/system/apps/ChooseAppDialog.svelte';
 	import { GLASS_SCHEMA, type Glass, type GlassStyle } from '../appearance/glass.js';
+	import GlassPreview from '../appearance/GlassPreview.svelte';
+	import { currentWallpaper } from '../wallpaper/current.svelte';
 
 	type SeeThrough = {
 		'see-through-apps': string[];
@@ -17,6 +19,7 @@
 
 	const look = useSettings<SeeThrough>(KESTREL_SCHEMA, ['see-through-apps', 'see-through-opacity', 'see-through-keep-text']);
 	const glass = useSettings<Pick<Glass, 'see-through'>>(GLASS_SCHEMA, ['see-through']);
+	const wallpaper = currentWallpaper();
 
 	let installed = $state<App[]>([]);
 	let adding = $state(false);
@@ -25,7 +28,8 @@
 	let amount = $derived(1 - (look.values['see-through-opacity'] ?? 0.7));
 	let materials = $derived<{ value: GlassStyle; label: string }[]>([
 		{ value: 'luca', label: t('settings-appearance-glass-luca') },
-		{ value: 'maris', label: t('settings-appearance-glass-maris') }
+		{ value: 'maris', label: t('settings-appearance-glass-maris') },
+		{ value: 'niko', label: t('settings-appearance-glass-niko') }
 	]);
 	let apps = $derived(ids.map((id) => installed.find((app) => app.id === id) ?? { id, name: id, icon: null }));
 
@@ -58,7 +62,14 @@
 {#if apps.length}
 	<Section>
 		<Row title={t('settings-see-through-material')}>
-			<Segmented label={t('settings-see-through-material')} options={materials} value={glass.values['see-through'] ?? 'luca'} onchange={(material) => glass.set('see-through', material)} />
+			<Segmented label={t('settings-see-through-material')} options={materials} value={glass.values['see-through'] ?? 'luca'} onchange={(material) => glass.set('see-through', material)}>
+				{#snippet item(option)}
+					<span class="flex items-center gap-2 pe-1 text-[13px] font-medium">
+						<GlassPreview style={option.value} wallpaper={wallpaper.url} />
+						{option.label}
+					</span>
+				{/snippet}
+			</Segmented>
 		</Row>
 		<Row title={t('settings-see-through-amount')}>
 			<span class="w-11 text-right tabular-nums">{percent(amount)}</span>

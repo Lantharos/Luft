@@ -158,6 +158,7 @@ export namespace Meta {
     enum GlassStyle {
         LUCA = 0,
         MARIS = 1,
+        NIKO = 2,
     }
 
 
@@ -1853,6 +1854,8 @@ export namespace Meta {
 
         get_maris_requested(): boolean;
 
+        get_niko_tint(): [Cogl.Color, number];
+
         get_stage(): Clutter.Stage;
 
         get_top_window_group(): Clutter.Actor;
@@ -1870,6 +1873,8 @@ export namespace Meta {
         set_glass_surface(surface: Cogl.Color, luminosity: number): void;
 
         set_monitor_gap(monitor: number, gap: boolean): void;
+
+        set_niko_tint(tint: Cogl.Color, luminosity: number): void;
     }
 
 

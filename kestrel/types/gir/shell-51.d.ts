@@ -108,6 +108,8 @@ export namespace Shell {
         LUCA = 0,
         WALLPAPER = 1,
         MARIS = 2,
+        NIKO = 3,
+        NIKO_WALLPAPER = 4,
     }
 
 

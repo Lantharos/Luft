@@ -66,6 +66,7 @@ settings-appearance-wallpaper-battery-description = Otherwise video wallpapers p
 settings-appearance-glass = Glass
 settings-appearance-glass-luca = Luca
 settings-appearance-glass-maris = Maris
+settings-appearance-glass-niko = Niko
 settings-appearance-glass-mixed = Mixed
 settings-appearance-glass-taskbar = Taskbar
 settings-appearance-glass-surfaces = Gust, panels and menus

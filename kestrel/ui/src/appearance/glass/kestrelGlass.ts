@@ -20,6 +20,9 @@ interface Backdrop {
 
 export type GlassKind = 'taskbar' | 'surfaces' | 'windows' | 'see-through';
 
+const LUCA_RADIUS = 30;
+const NIKO_RADIUS = 60;
+
 const surfaces = new Set<Backdrop>();
 const cornered = new Set<Backdrop>();
 const backdrops = new Map<Shell.BlurEffect, GlassKind>();
@@ -76,10 +79,20 @@ function followTheme(actor: St.Widget, effect: Shell.BlurEffect): void {
   });
 }
 
+function blurRadius(kind: GlassKind): number {
+  const niko = styles[kind] === Shell.BlurStyle.NIKO || styles[kind] === Shell.BlurStyle.NIKO_WALLPAPER;
+  return (niko ? NIKO_RADIUS : LUCA_RADIUS) * St.ThemeContext.get_for_stage(global.stage).scale_factor;
+}
+
+function applyStyle(effect: Shell.BlurEffect, kind: GlassKind): void {
+  effect.style = styles[kind];
+  effect.radius = blurRadius(kind);
+}
+
 export function setGlassStyle(kind: GlassKind, style: Shell.BlurStyle): void {
   styles[kind] = style;
   for (const [effect, effectKind] of backdrops)
-    if (effectKind === kind) effect.style = style;
+    if (effectKind === kind) applyStyle(effect, kind);
 }
 
 export function repaintWallpaperGlass(): void {
@@ -89,18 +102,14 @@ export function repaintWallpaperGlass(): void {
 
 export function blurBackdrop(actor: St.Widget, corners: number, kind: GlassKind = 'surfaces'): Shell.BlurEffect {
   const theme = St.ThemeContext.get_for_stage(global.stage);
-  const effect = new Shell.BlurEffect({
-    mode: Shell.BlurMode.BACKGROUND,
-    style: styles[kind],
-    radius: 30 * theme.scale_factor,
-    brightness: 1,
-  });
+  const effect = new Shell.BlurEffect({ mode: Shell.BlurMode.BACKGROUND, brightness: 1 });
+  applyStyle(effect, kind);
   backdrops.set(effect, kind);
   effect.set_property('corner-radius', corners);
   followTheme(actor, effect);
   actor.add_effect_with_name('backdrop', effect);
   const changed = theme.connect('notify::scale-factor', () => {
-    effect.radius = 30 * theme.scale_factor;
+    effect.radius = blurRadius(kind);
   });
   actor.connect('destroy', () => {
     theme.disconnect(changed);

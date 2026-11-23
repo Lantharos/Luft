@@ -15,7 +15,7 @@ Any app can have see-through windows: the window's background turns to glass, wh
 
 To turn it on for an app, right-click its title bar (or press <kbd>Alt</kbd>+<kbd>Space</kbd>) and choose **See-through**. Choose it again to turn it off. Settings, under Windows, lists the apps you've chosen, adds more and sets the look for all of them:
 
-- **Material** picks the glass, the same two as on the [Glass page](/personalize/appearance/#glass). **Luca** blurs whatever is behind the window, the windows underneath included, or only the wallpaper while **Luca blurs only the wallpaper** is on, which keeps a window calm to read over and costs almost nothing to draw. **Maris** is the desktop's surface colour with a hint of the wallpaper's colours.
+- **Material** picks the glass, the same three as on the [Glass page](/personalize/appearance/#glass). **Luca** blurs whatever is behind the window, the windows underneath included, or only the wallpaper while **Luca blurs only the wallpaper** is on, which keeps a window calm to read over and costs almost nothing to draw. **Maris** is the desktop's surface colour with a hint of the wallpaper's colours. **Niko** blurs like Luca, evened out to one lightness.
 - **How see-through** sets how much of the glass shows through the window's background.
 - **Keep text solid** keeps everything that stands out from the window's background solid. Turn it off to make the whole window see-through, text included.
 

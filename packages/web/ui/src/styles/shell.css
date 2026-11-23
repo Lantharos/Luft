@@ -65,7 +65,8 @@
 		background: transparent;
 	}
 
-	[data-backdrop='maris'] .glass-shell[data-effect='translucent']:has(> .glass-sidebar:not([inert])) {
+	[data-backdrop='maris'] .glass-shell[data-effect='translucent']:has(> .glass-sidebar:not([inert])),
+	[data-backdrop='niko'] .glass-shell[data-effect='translucent']:has(> .glass-sidebar:not([inert])) {
 		--frame-glass: transparent;
 	}
 
@@ -99,7 +100,8 @@
 		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 	}
 
-	[data-backdrop='maris'] [data-effect='translucent'] .glass-sidebar {
+	[data-backdrop='maris'] [data-effect='translucent'] .glass-sidebar,
+	[data-backdrop='niko'] [data-effect='translucent'] .glass-sidebar {
 		background: transparent;
 	}
 

@@ -4,9 +4,8 @@ import type St from 'gi://St';
 import type { GlassShading } from '../../../../../packages/web/ui/src/taskbar/looks';
 import type { Rgb } from '../../appearance/color.js';
 import type { Backdrop } from '../wallpaper/floor.js';
+import { blendLuma, setLuminosity, type Channels } from '../../appearance/glass/blend.js';
 import { clampUnit } from '../../shared/math.js';
-
-type Channels = [number, number, number];
 
 export interface PanelSurface {
   tint: Rgb;
@@ -15,12 +14,9 @@ export interface PanelSurface {
 }
 
 const LUMA: Channels = [0.2126, 0.7152, 0.0722];
-const BLEND_LUMA: Channels = [0.3, 0.59, 0.11];
 const glassSettings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.glass' });
 
-const weigh = (weights: Channels) => (color: Channels) => color.reduce((sum, channel, index) => sum + channel * weights[index], 0);
-const luma = weigh(LUMA);
-const blendLuma = weigh(BLEND_LUMA);
+const luma = (color: Channels) => color.reduce((sum, channel, index) => sum + channel * LUMA[index], 0);
 const mix = (from: Channels, to: Channels, amount: number) => from.map((value, index) => value + (to[index] - value) * amount) as Channels;
 
 function smoothstep(low: number, high: number, value: number): number {
@@ -48,19 +44,20 @@ function shadeLikeGlass(color: Channels, { dim, lift, saturation }: GlassShading
   return mix([gray, gray, gray], lifted, saturation).map(clampUnit) as Channels;
 }
 
-function setLuminosity(color: Channels, target: number): Channels {
-  const shifted = color.map(channel => channel + target - blendLuma(color)) as Channels;
-  const low = Math.min(...shifted);
-  const high = Math.max(...shifted);
-  const floored = low < 0 ? shifted.map(channel => target + (channel - target) * target / (target - low)) as Channels : shifted;
-  return high > 1 ? floored.map(channel => target + (channel - target) * (1 - target) / (high - target)) as Channels : floored;
-}
+const channels = ({ red, green, blue }: { red: number; green: number; blue: number }): Channels => [red / 255, green / 255, blue / 255];
 
 function coverLikeMaris(color: Channels, covered: number): Channels {
-  const [{ red, green, blue, alpha }, luminosity] = global.compositor.get_glass_surface();
-  const surface: Channels = [red / 255, green / 255, blue / 255];
-  const amount = Math.max(0, 1 - (1 - alpha / 255) / (1 - covered));
-  return mix(mix(color, setLuminosity(color, blendLuma(surface)), luminosity), surface, amount);
+  const [surface, luminosity] = global.compositor.get_glass_surface();
+  const tint = channels(surface);
+  const amount = Math.max(0, 1 - (1 - surface.alpha / 255) / (1 - covered));
+  return mix(mix(color, setLuminosity(color, blendLuma(tint)), luminosity), tint, amount);
+}
+
+function tintLikeNiko(color: Channels): Channels {
+  const [niko, luminosity] = global.compositor.get_niko_tint();
+  const tint = channels(niko);
+  const lit = mix(color, setLuminosity(color, blendLuma(tint)), luminosity);
+  return mix(lit, setLuminosity(tint, blendLuma(lit)), niko.alpha / 255);
 }
 
 export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface {
@@ -73,9 +70,10 @@ export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: B
   const over = tint.map(channel => channel / 255) as Channels;
   return [floor.color, ...floor.extremes].map(color => {
     const behind = color.map(channel => channel / 255) as Channels;
-    const maris = glass && glassSettings.get_string('taskbar') === 'maris';
-    const covered = maris ? coverLikeMaris(behind, opacity) : glass ? shadeLikeGlass(behind, glass) : behind;
-    return mix(covered, over, opacity).map(channel => Math.round(channel * 255)) as Rgb;
+    const style = glass && glassSettings.get_string('taskbar');
+    const shown = style === 'niko' ? tintLikeNiko(behind) :
+      mix(style === 'maris' ? coverLikeMaris(behind, opacity) : glass ? shadeLikeGlass(behind, glass) : behind, over, opacity);
+    return shown.map(channel => Math.round(channel * 255)) as Rgb;
   });
 }
 

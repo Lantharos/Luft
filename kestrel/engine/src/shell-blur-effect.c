@@ -51,6 +51,8 @@
  * doesn't. @SHELL_BLUR_STYLE_WALLPAPER shows the compositor's blurred wallpaper
  * instead, and @SHELL_BLUR_STYLE_MARIS its wide one under the glass surface
  * colour, see meta_compositor_add_frosted_wallpaper().
+ * @SHELL_BLUR_STYLE_NIKO and @SHELL_BLUR_STYLE_NIKO_WALLPAPER blur the same
+ * way as Luca and its wallpaper, and take the lightness of the Niko tint.
  */
 
 static const gchar *position_glsl_declarations =
@@ -70,6 +72,9 @@ static const gchar *brightness_glsl_declarations =
 "uniform float saturation;                                                 \n"
 "uniform vec4 surface_tint;                                                \n"
 "uniform float surface_luminosity;                                         \n"
+"uniform float surface_hue;                                                \n"
+"uniform vec4 surface_cancel;                                              \n"
+"uniform float speckle;                                                    \n"
 "uniform float grain;                                                      \n"
 "float lum(vec3 color) {                                                   \n"
 "  return dot(color, vec3(0.3, 0.59, 0.11));                               \n"
@@ -108,6 +113,11 @@ static const gchar *brightness_glsl =
 "  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
 "                           surface_tint.rgb * cogl_color_out.a,           \n"
 "                           surface_tint.a);                               \n"
+"  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
+"    set_lum(surface_tint.rgb,                                             \n"
+"            lum(cogl_color_out.rgb / max(cogl_color_out.a, 0.001))) *     \n"
+"      cogl_color_out.a,                                                   \n"
+"    surface_hue);                                                         \n"
 "  vec2 grain_cell = mod(floor(gl_FragCoord.xy), 64.0);                    \n"
 "  float noise = texture2D(cogl_sampler1, (grain_cell + 0.5) / 64.0).r +   \n"
 "    texture2D(cogl_sampler1,                                              \n"
@@ -116,6 +126,12 @@ static const gchar *brightness_glsl =
 "                     / max(cogl_color_out.a, 0.001);                      \n"
 "  cogl_color_out.rgb = clamp(cogl_color_out.rgb + (noise - 1.0) * grain * \n"
 "                             mix(0.5, 1.0, grain_luma) * cogl_color_out.a,\n"
+"                             0.0, cogl_color_out.a);                      \n"
+"  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
+"                           vec3(noise * 0.5) * cogl_color_out.a, speckle); \n"
+"  cogl_color_out.rgb = clamp((cogl_color_out.rgb -                        \n"
+"                              surface_cancel.rgb * cogl_color_out.a) /    \n"
+"                             (1.0 - surface_cancel.a),                    \n"
 "                             0.0, cogl_color_out.a);                      \n"
 "  vec2 half_size = surface_size * 0.5;                                    \n"
 "  float r = min(corner_radius, min(half_size.x, half_size.y));              \n"
@@ -127,6 +143,7 @@ static const gchar *brightness_glsl =
 
 #define RESULT_SIZE_STEP 64
 #define GRAIN 0.005f
+#define NIKO_SPECKLE 0.02f
 
 typedef enum
 {
@@ -175,6 +192,9 @@ struct _ShellBlurEffect
   float saturation;
   int surface_tint_uniform;
   int surface_luminosity_uniform;
+  int surface_hue_uniform;
+  int surface_cancel_uniform;
+  int speckle_uniform;
   int result_area_end_uniform;
   int grain_uniform;
 
@@ -318,6 +338,12 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_tint");
   self->surface_luminosity_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_luminosity");
+  self->surface_hue_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_hue");
+  self->surface_cancel_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_cancel");
+  self->speckle_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "speckle");
   cogl_pipeline_add_layer_snippet (self->brightness_fb.pipeline, 0, result_area_snippet ());
   self->result_area_end_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "result_area_end");
@@ -375,30 +401,75 @@ get_compositor (void)
   return meta_display_get_compositor (shell_global_get_display (shell_global_get ()));
 }
 
-static float
-surface_tint (ShellBlurEffect *self,
-              float           *tint)
+static gboolean
+is_niko (ShellBlurStyle style)
 {
+  return style == SHELL_BLUR_STYLE_NIKO || style == SHELL_BLUR_STYLE_NIKO_WALLPAPER;
+}
+
+static gboolean
+is_live (ShellBlurStyle style)
+{
+  return style == SHELL_BLUR_STYLE_LUCA || style == SHELL_BLUR_STYLE_NIKO;
+}
+
+static void
+own_background (ShellBlurEffect *self,
+                CoglColor       *background)
+{
+  cogl_color_init_from_4f (background, 0.f, 0.f, 0.f, 0.f);
+  if (ST_IS_WIDGET (self->actor))
+    st_theme_node_get_background_color (st_widget_get_theme_node (ST_WIDGET (self->actor)),
+                                        background);
+}
+
+typedef struct
+{
+  float tint[4];
   float luminosity;
-  const CoglColor *surface = meta_compositor_get_glass_surface (get_compositor (), &luminosity);
+  float hue;
+  float cancel[4];
+} SurfaceShade;
+
+static void
+copy_color (const CoglColor *color,
+            float           *out)
+{
+  out[0] = cogl_color_get_red (color);
+  out[1] = cogl_color_get_green (color);
+  out[2] = cogl_color_get_blue (color);
+}
+
+static SurfaceShade
+surface_shade (ShellBlurEffect *self)
+{
+  MetaCompositor *compositor = get_compositor ();
+  SurfaceShade shade = { 0 };
+  const CoglColor *tint;
   CoglColor background;
 
-  tint[0] = cogl_color_get_red (surface);
-  tint[1] = cogl_color_get_green (surface);
-  tint[2] = cogl_color_get_blue (surface);
-  tint[3] = 0.f;
-  if (self->style != SHELL_BLUR_STYLE_MARIS)
-    return 0.f;
-
-  if (ST_IS_WIDGET (self->actor))
+  if (self->style == SHELL_BLUR_STYLE_MARIS)
     {
-      st_theme_node_get_background_color (st_widget_get_theme_node (ST_WIDGET (self->actor)),
-                                          &background);
-      tint[3] = MAX (0.f, 1.f - (1.f - cogl_color_get_alpha (surface)) /
-                              (1.f - cogl_color_get_alpha (&background)));
+      tint = meta_compositor_get_glass_surface (compositor, &shade.luminosity);
+      own_background (self, &background);
+      copy_color (tint, shade.tint);
+      shade.tint[3] = MAX (0.f, 1.f - (1.f - cogl_color_get_alpha (tint)) /
+                                  (1.f - cogl_color_get_alpha (&background)));
+    }
+  else if (is_niko (self->style))
+    {
+      tint = meta_compositor_get_niko_tint (compositor, &shade.luminosity);
+      own_background (self, &background);
+      copy_color (tint, shade.tint);
+      shade.hue = cogl_color_get_alpha (tint);
+      copy_color (&background, shade.cancel);
+      shade.cancel[3] = cogl_color_get_alpha (&background);
+      shade.cancel[0] *= shade.cancel[3];
+      shade.cancel[1] *= shade.cancel[3];
+      shade.cancel[2] *= shade.cancel[3];
     }
 
-  return luminosity;
+  return shade;
 }
 
 static void
@@ -407,10 +478,11 @@ update_brightness (ShellBlurEffect *self,
                    const float     *map,
                    uint8_t          paint_opacity)
 {
-  gboolean shaded = self->style != SHELL_BLUR_STYLE_MARIS;
+  gboolean shaded = self->style == SHELL_BLUR_STYLE_LUCA || self->style == SHELL_BLUR_STYLE_WALLPAPER;
+  gboolean background = self->mode == SHELL_BLUR_MODE_BACKGROUND;
+  SurfaceShade shade = surface_shade (self);
   CoglColor color;
   float size[2];
-  float tint[4];
 
   clutter_actor_get_size (self->actor, &size[0], &size[1]);
   cogl_pipeline_set_uniform_float (pipeline, self->surface_size_uniform, 2, 1, size);
@@ -420,10 +492,14 @@ update_brightness (ShellBlurEffect *self,
   cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, shaded ? self->dark_lift : 0.f);
   cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform, shaded ? self->saturation : 1.f);
   cogl_pipeline_set_uniform_1f (pipeline, self->brightness_uniform, self->brightness);
-  cogl_pipeline_set_uniform_1f (pipeline, self->surface_luminosity_uniform, surface_tint (self, tint));
-  cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, tint);
+  cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, shade.tint);
+  cogl_pipeline_set_uniform_1f (pipeline, self->surface_luminosity_uniform, shade.luminosity);
+  cogl_pipeline_set_uniform_1f (pipeline, self->surface_hue_uniform, shade.hue);
+  cogl_pipeline_set_uniform_float (pipeline, self->surface_cancel_uniform, 4, 1, shade.cancel);
   cogl_pipeline_set_uniform_1f (pipeline, self->grain_uniform,
-                                self->mode == SHELL_BLUR_MODE_BACKGROUND ? GRAIN : 0.f);
+                                background && !is_niko (self->style) ? GRAIN : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->speckle_uniform,
+                                background && is_niko (self->style) ? NIKO_SPECKLE : 0.f);
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -516,7 +592,7 @@ sync_spread (ShellBlurEffect *self)
 {
   gboolean spreads = self->actor &&
     self->mode == SHELL_BLUR_MODE_BACKGROUND &&
-    self->style == SHELL_BLUR_STYLE_LUCA;
+    is_live (self->style);
 
   if (spreads && !self->spread)
     self->spread = shell_backdrop_spread_new (CLUTTER_ACTOR_META (self), self->backdrops);
@@ -1018,7 +1094,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
       return;
     }
 
-  if (self->style != SHELL_BLUR_STYLE_LUCA)
+  if (!is_live (self->style))
     paint_wallpaper (self, node, paint_opacity);
   else if (!paint_live (self, node, paint_context, flags, paint_opacity))
     {

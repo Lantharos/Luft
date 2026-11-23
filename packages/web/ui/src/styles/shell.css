@@ -48,7 +48,7 @@
 
 	.glass-shell:has(> .glass-sidebar:not([inert])) > .glass-content {
 		margin: var(--sheet-inset) var(--sheet-inset) var(--sheet-inset) 0;
-		border-radius: max(0px, var(--window-radius) - var(--sheet-inset));
+		border-radius: var(--sheet-radius);
 		box-shadow:
 			0 1px 2px var(--sheet-shadow),
 			0 8px 28px var(--sheet-shadow),

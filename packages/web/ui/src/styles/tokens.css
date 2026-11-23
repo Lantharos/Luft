@@ -51,11 +51,13 @@
 	--group-inset: 6px;
 	--sheet-inset: 8px;
 	--window-radius: 15px;
+	--sheet-radius: 7px;
 	--sidebar-width: 280px;
 }
 
 :root[data-corners='square'] {
 	--window-radius: 0px;
+	--sheet-radius: 0px;
 }
 
 :root[data-black]:not([data-scheme='light']) {

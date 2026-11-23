@@ -18,7 +18,7 @@ Upstream-Status: luft-only Kestrel's rounded window corners
  1 file changed, 47 insertions(+)
 
 diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
-index 241e31e160d393f6550d2380e4ff673a054a7281..b76959c418a3e1990503e742ca733cb6b03c648d 100644
+index dce8642d90e39b309eaa1ecf20a90090991c11c1..bce0b461e6e6124c8513b6ac01ee024cb0a8f1f5 100644
 --- a/src/compositor/meta-background-effect.c
 +++ b/src/compositor/meta-background-effect.c
 @@ -344,6 +344,52 @@ paint_blur (MetaBackgroundBlur  *blur,

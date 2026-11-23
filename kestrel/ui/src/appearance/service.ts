@@ -172,7 +172,7 @@ export class AppearanceService {
       palette: buildPalette(seed, this.PureBlack),
     };
     const style = isDark() ? 'dark' : 'light';
-    this.glass.setSurface(this.appearance.palette[style].colors.surface);
+    this.glass.setSurface(this.appearance.palette[style].colors.surface, style);
     appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     this.stylesheet.apply(seed, this.appearance.palette);
     this.paintTaskbar();

@@ -10,7 +10,7 @@ import { PlaybackConditions } from '../../desktop/wallpaper/conditions.js';
 import { repaintWallpaperGlass, setGlassStyle, type GlassKind } from './kestrelGlass.js';
 
 const KINDS: GlassKind[] = ['taskbar', 'surfaces', 'windows', 'see-through'];
-const MARIS_COVERAGE = 0.8;
+const MARIS = { luminosity: 1, cover: { dark: 0.8, light: 0.5 } };
 
 class FrostPieces {
   private frost: WallpaperFrost | null = null;
@@ -81,9 +81,9 @@ export class GlassStyles {
     repaintWallpaperGlass();
   }
 
-  setSurface(color: string): void {
+  setSurface(color: string, scheme: 'dark' | 'light'): void {
     const [red, green, blue] = fromHex(color);
-    global.compositor.set_glass_surface(new Cogl.Color({ red, green, blue, alpha: Math.round(MARIS_COVERAGE * 255) }));
+    global.compositor.set_glass_surface(new Cogl.Color({ red, green, blue, alpha: Math.round(MARIS.cover[scheme] * 255) }), MARIS.luminosity);
     repaintWallpaperGlass();
   }
 

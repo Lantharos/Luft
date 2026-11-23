@@ -41,7 +41,7 @@ async function centerOf(window: Meta.Window) {
 const reddish = ([red, green, blue]: number[]) => red - Math.max(green, blue) > REDDISH;
 
 function nearSurface(color: number[]) {
-  const {red, green, blue} = global.compositor.get_glass_surface();
+  const [{red, green, blue}] = global.compositor.get_glass_surface();
   const expected = [red, green, blue].map((channel, index) => channel * (1 - CLIENT_ALPHA) + CLIENT_TINT[index]);
   return Math.max(...expected.map((channel, index) => Math.abs(channel - color[index]))) < SURFACE_DISTANCE;
 }

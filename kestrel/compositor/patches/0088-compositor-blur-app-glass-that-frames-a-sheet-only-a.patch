@@ -210,7 +210,7 @@ index 527f4c363cc692e76202330e7409f02418cd1a29..50bb5158378e6546f948f59dfe0a0644
  }
  
 diff --git a/clutter/clutter/clutter-paint-node-private.h b/clutter/clutter/clutter-paint-node-private.h
-index 0957146f9bcf0738fe0120f6084e8a462ffcfea8..fa9337870b4da4517e042bcdbf3867d153824ff1 100644
+index 0f97132ba22e8243cdbcd85b3f5d40e189b30cc8..9efd8f54b0575bc9f4cdafd2b6595edbbb6558eb 100644
 --- a/clutter/clutter/clutter-paint-node-private.h
 +++ b/clutter/clutter/clutter-paint-node-private.h
 @@ -118,6 +118,13 @@ ClutterPaintNode * clutter_blur_node_new_from_framebuffer          (CoglFramebuf
@@ -228,7 +228,7 @@ index 0957146f9bcf0738fe0120f6084e8a462ffcfea8..fa9337870b4da4517e042bcdbf3867d1
  void clutter_blur_node_get_result_size (ClutterPaintNode *node,
                                          int              *width,
 diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
-index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cbe360ee60 100644
+index 3ce36f206f83438db960a822c38a899daff073a4..ccf8992188249099a3d26de02402b136b29d816e 100644
 --- a/clutter/clutter/clutter-paint-nodes.c
 +++ b/clutter/clutter/clutter-paint-nodes.c
 @@ -1510,6 +1510,8 @@ struct _ClutterBlurNode
@@ -240,8 +240,8 @@ index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cb
  };
  
  G_DEFINE_TYPE (ClutterBlurNode, clutter_blur_node, CLUTTER_TYPE_LAYER_NODE)
-@@ -1751,6 +1753,36 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
-                                    4, 1, tint_color);
+@@ -1778,6 +1780,36 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                 luminosity);
  }
  
 +static gboolean
@@ -277,7 +277,7 @@ index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cb
  static void
  clutter_blur_node_post_draw (ClutterPaintNode    *node,
                               ClutterPaintContext *paint_context)
-@@ -1758,32 +1790,13 @@ clutter_blur_node_post_draw (ClutterPaintNode    *node,
+@@ -1785,32 +1817,13 @@ clutter_blur_node_post_draw (ClutterPaintNode    *node,
    ClutterPaintNodeClass *parent_class =
      CLUTTER_PAINT_NODE_CLASS (clutter_blur_node_parent_class);
    ClutterBlurNode *blur_node = CLUTTER_BLUR_NODE (node);
@@ -313,7 +313,7 @@ index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cb
  
    parent_class->post_draw (node, paint_context);
  }
-@@ -1795,6 +1808,7 @@ clutter_blur_node_finalize (ClutterPaintNode *node)
+@@ -1822,6 +1835,7 @@ clutter_blur_node_finalize (ClutterPaintNode *node)
  
    g_clear_pointer (&blur_node->target, release_blur_target);
    g_clear_object (&blur_node->source_framebuffer);
@@ -321,7 +321,7 @@ index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cb
  
    CLUTTER_PAINT_NODE_CLASS (clutter_blur_node_parent_class)->finalize (node);
  }
-@@ -1865,6 +1879,7 @@ clutter_blur_node_new (unsigned int width,
+@@ -1892,6 +1906,7 @@ clutter_blur_node_new (unsigned int width,
    blur_node->width = MAX (width, 1u);
    blur_node->height = MAX (height, 1u);
    n_levels = clutter_blur_get_levels (radius, &blur_node->offset);
@@ -329,7 +329,7 @@ index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cb
    blur_node->target = take_blur_target (cogl_context,
                                          blur_node->width,
                                          blur_node->height,
-@@ -1905,6 +1920,65 @@ clutter_blur_node_get_result_size (ClutterPaintNode *node,
+@@ -1932,6 +1947,65 @@ clutter_blur_node_get_result_size (ClutterPaintNode *node,
                                  width, height);
  }
  
@@ -520,7 +520,7 @@ index e2fb6e2ebe7fddbf0e21f294732392c8d3fc9d81..724ab4c7fafadf112f992bd6f1ea538c
    g_array_unref (blur->previous_placements);
    g_free (blur);
 diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
-index 13ab94e8ad33562b2b1566c2a579ea6ca70979e6..8e6f1a51d301d746f760cc04136f9cf76b57ba9e 100644
+index 29aa91dc60cd74ce7727482a33ba77265350cb0f..67a9b0d30b4b58158d882381c4b6feeae3e4f23f 100644
 --- a/src/compositor/meta-background-effect.c
 +++ b/src/compositor/meta-background-effect.c
 @@ -144,6 +144,8 @@ paint_live (MetaBackgroundPaint *paint)

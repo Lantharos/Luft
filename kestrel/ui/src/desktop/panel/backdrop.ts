@@ -15,9 +15,12 @@ export interface PanelSurface {
 }
 
 const LUMA: Channels = [0.2126, 0.7152, 0.0722];
+const BLEND_LUMA: Channels = [0.3, 0.59, 0.11];
 const glassSettings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.glass' });
 
-const luma = (color: Channels) => color.reduce((sum, channel, index) => sum + channel * LUMA[index], 0);
+const weigh = (weights: Channels) => (color: Channels) => color.reduce((sum, channel, index) => sum + channel * weights[index], 0);
+const luma = weigh(LUMA);
+const blendLuma = weigh(BLEND_LUMA);
 const mix = (from: Channels, to: Channels, amount: number) => from.map((value, index) => value + (to[index] - value) * amount) as Channels;
 
 function smoothstep(low: number, high: number, value: number): number {
@@ -45,10 +48,19 @@ function shadeLikeGlass(color: Channels, { dim, lift, saturation }: GlassShading
   return mix([gray, gray, gray], lifted, saturation).map(clampUnit) as Channels;
 }
 
+function setLuminosity(color: Channels, target: number): Channels {
+  const shifted = color.map(channel => channel + target - blendLuma(color)) as Channels;
+  const low = Math.min(...shifted);
+  const high = Math.max(...shifted);
+  const floored = low < 0 ? shifted.map(channel => target + (channel - target) * target / (target - low)) as Channels : shifted;
+  return high > 1 ? floored.map(channel => target + (channel - target) * (1 - target) / (high - target)) as Channels : floored;
+}
+
 function coverLikeMaris(color: Channels, covered: number): Channels {
-  const { red, green, blue, alpha } = global.compositor.get_glass_surface();
+  const [{ red, green, blue, alpha }, luminosity] = global.compositor.get_glass_surface();
+  const surface: Channels = [red / 255, green / 255, blue / 255];
   const amount = Math.max(0, 1 - (1 - alpha / 255) / (1 - covered));
-  return mix(color, [red / 255, green / 255, blue / 255], amount);
+  return mix(mix(color, setLuminosity(color, blendLuma(surface)), luminosity), surface, amount);
 }
 
 export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface {
@@ -61,8 +73,8 @@ export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: B
   const over = tint.map(channel => channel / 255) as Channels;
   return [floor.color, ...floor.extremes].map(color => {
     const behind = color.map(channel => channel / 255) as Channels;
-    const shaded = glass ? shadeLikeGlass(behind, glass) : behind;
-    const covered = glass && glassSettings.get_string('taskbar') === 'maris' ? coverLikeMaris(shaded, opacity) : shaded;
+    const maris = glass && glassSettings.get_string('taskbar') === 'maris';
+    const covered = maris ? coverLikeMaris(behind, opacity) : glass ? shadeLikeGlass(behind, glass) : behind;
     return mix(covered, over, opacity).map(channel => Math.round(channel * 255)) as Rgb;
   });
 }

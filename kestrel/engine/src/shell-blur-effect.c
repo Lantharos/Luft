@@ -69,7 +69,21 @@ static const gchar *brightness_glsl_declarations =
 "uniform float dark_lift;                                                  \n"
 "uniform float saturation;                                                 \n"
 "uniform vec4 surface_tint;                                                \n"
-"uniform float grain;                                                      \n";
+"uniform float surface_luminosity;                                         \n"
+"uniform float grain;                                                      \n"
+"float lum(vec3 color) {                                                   \n"
+"  return dot(color, vec3(0.3, 0.59, 0.11));                               \n"
+"}                                                                         \n"
+"vec3 set_lum(vec3 color, float target) {                                  \n"
+"  color += target - lum(color);                                           \n"
+"  float low = min(min(color.r, color.g), color.b);                        \n"
+"  float high = max(max(color.r, color.g), color.b);                       \n"
+"  if (low < 0.0)                                                          \n"
+"    color = target + (color - target) * target / (target - low);          \n"
+"  if (high > 1.0)                                                         \n"
+"    color = target + (color - target) * (1.0 - target) / (high - target); \n"
+"  return color;                                                           \n"
+"}                                                                         \n";
 
 static const gchar *result_area_declarations =
 "uniform vec2 result_area_end;                                             \n";
@@ -87,6 +101,10 @@ static const gchar *brightness_glsl =
 "  float lifted = dot(cogl_color_out.rgb, vec3(0.2126, 0.7152, 0.0722));    \n"
 "  cogl_color_out.rgb = clamp(mix(vec3(lifted), cogl_color_out.rgb,         \n"
 "                                 saturation), 0.0, cogl_color_out.a);      \n"
+"  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
+"    set_lum(cogl_color_out.rgb / max(cogl_color_out.a, 0.001),            \n"
+"            lum(surface_tint.rgb)) * cogl_color_out.a,                    \n"
+"    surface_luminosity);                                                  \n"
 "  cogl_color_out.rgb = mix(cogl_color_out.rgb,                            \n"
 "                           surface_tint.rgb * cogl_color_out.a,           \n"
 "                           surface_tint.a);                               \n"
@@ -156,6 +174,7 @@ struct _ShellBlurEffect
   int saturation_uniform;
   float saturation;
   int surface_tint_uniform;
+  int surface_luminosity_uniform;
   int result_area_end_uniform;
   int grain_uniform;
 
@@ -297,6 +316,8 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "saturation");
   self->surface_tint_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_tint");
+  self->surface_luminosity_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_luminosity");
   cogl_pipeline_add_layer_snippet (self->brightness_fb.pipeline, 0, result_area_snippet ());
   self->result_area_end_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "result_area_end");
@@ -354,24 +375,30 @@ get_compositor (void)
   return meta_display_get_compositor (shell_global_get_display (shell_global_get ()));
 }
 
-static void
+static float
 surface_tint (ShellBlurEffect *self,
               float           *tint)
 {
-  const CoglColor *surface = meta_compositor_get_glass_surface (get_compositor ());
+  float luminosity;
+  const CoglColor *surface = meta_compositor_get_glass_surface (get_compositor (), &luminosity);
   CoglColor background;
 
   tint[0] = cogl_color_get_red (surface);
   tint[1] = cogl_color_get_green (surface);
   tint[2] = cogl_color_get_blue (surface);
   tint[3] = 0.f;
-  if (self->style != SHELL_BLUR_STYLE_MARIS || !ST_IS_WIDGET (self->actor))
-    return;
+  if (self->style != SHELL_BLUR_STYLE_MARIS)
+    return 0.f;
 
-  st_theme_node_get_background_color (st_widget_get_theme_node (ST_WIDGET (self->actor)),
-                                      &background);
-  tint[3] = MAX (0.f, 1.f - (1.f - cogl_color_get_alpha (surface)) /
-                          (1.f - cogl_color_get_alpha (&background)));
+  if (ST_IS_WIDGET (self->actor))
+    {
+      st_theme_node_get_background_color (st_widget_get_theme_node (ST_WIDGET (self->actor)),
+                                          &background);
+      tint[3] = MAX (0.f, 1.f - (1.f - cogl_color_get_alpha (surface)) /
+                              (1.f - cogl_color_get_alpha (&background)));
+    }
+
+  return luminosity;
 }
 
 static void
@@ -380,6 +407,7 @@ update_brightness (ShellBlurEffect *self,
                    const float     *map,
                    uint8_t          paint_opacity)
 {
+  gboolean shaded = self->style != SHELL_BLUR_STYLE_MARIS;
   CoglColor color;
   float size[2];
   float tint[4];
@@ -388,11 +416,11 @@ update_brightness (ShellBlurEffect *self,
   cogl_pipeline_set_uniform_float (pipeline, self->surface_size_uniform, 2, 1, size);
   cogl_pipeline_set_uniform_float (pipeline, self->surface_map_uniform, 4, 1, map);
   cogl_pipeline_set_uniform_1f (pipeline, self->corner_radius_uniform, self->corner_radius);
-  cogl_pipeline_set_uniform_1f (pipeline, self->bright_dim_uniform, self->bright_dim);
-  cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, self->dark_lift);
-  cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform, self->saturation);
+  cogl_pipeline_set_uniform_1f (pipeline, self->bright_dim_uniform, shaded ? self->bright_dim : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, shaded ? self->dark_lift : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform, shaded ? self->saturation : 1.f);
   cogl_pipeline_set_uniform_1f (pipeline, self->brightness_uniform, self->brightness);
-  surface_tint (self, tint);
+  cogl_pipeline_set_uniform_1f (pipeline, self->surface_luminosity_uniform, surface_tint (self, tint));
   cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, tint);
   cogl_pipeline_set_uniform_1f (pipeline, self->grain_uniform,
                                 self->mode == SHELL_BLUR_MODE_BACKGROUND ? GRAIN : 0.f);

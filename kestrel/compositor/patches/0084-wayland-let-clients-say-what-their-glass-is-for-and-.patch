@@ -75,7 +75,7 @@ index 237b5a1f28ae52406827ce6aaa6dd894305e8bc0..21314351463ef393b523caca13cb618b
 +void meta_compositor_count_maris_request (MetaCompositor *compositor,
 +                                          int             change);
 diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
-index 92e6023a5fe0cd376fe01f581b49785d5534559b..5303b2ae2e7df66b3c717448a88b0142773f1550 100644
+index d165a5d4f1b00818c0bf758e18e0014662d36a67..bf137a23dea8fe32593429e2afef54d3c56cab91 100644
 --- a/src/compositor/compositor.c
 +++ b/src/compositor/compositor.c
 @@ -97,6 +97,15 @@ enum
@@ -94,15 +94,15 @@ index 92e6023a5fe0cd376fe01f581b49785d5534559b..5303b2ae2e7df66b3c717448a88b0142
  typedef struct _MetaCompositorPrivate
  {
    GObject parent;
-@@ -147,6 +156,7 @@ typedef struct _MetaCompositorPrivate
-   MetaGlassStyle glass_transients;
+@@ -148,6 +157,7 @@ typedef struct _MetaCompositorPrivate
    gboolean luca_from_wallpaper;
    CoglColor glass_surface;
+   float glass_luminosity;
 +  unsigned int maris_requests;
  
    GSettings *kestrel_settings;
  } MetaCompositorPrivate;
-@@ -1480,6 +1490,19 @@ meta_compositor_class_init (MetaCompositorClass *klass)
+@@ -1481,6 +1491,19 @@ meta_compositor_class_init (MetaCompositorClass *klass)
                           G_PARAM_STATIC_STRINGS);
    g_object_class_install_properties (object_class, N_PROPS, obj_props);
  
@@ -122,7 +122,7 @@ index 92e6023a5fe0cd376fe01f581b49785d5534559b..5303b2ae2e7df66b3c717448a88b0142
    quark_compositor_view =
      g_quark_from_static_string ("-meta-compositor-view");
  }
-@@ -1616,6 +1639,7 @@ meta_compositor_set_glass (MetaCompositor *compositor,
+@@ -1617,6 +1640,7 @@ meta_compositor_set_glass (MetaCompositor *compositor,
    priv->glass_transients = transients;
    priv->luca_from_wallpaper = luca_from_wallpaper;
    invalidate_background_blurs (compositor);
@@ -130,7 +130,7 @@ index 92e6023a5fe0cd376fe01f581b49785d5534559b..5303b2ae2e7df66b3c717448a88b0142
  }
  
  /**
-@@ -1653,16 +1677,64 @@ meta_compositor_get_glass_surface (MetaCompositor *compositor)
+@@ -1663,16 +1687,64 @@ meta_compositor_get_glass_surface (MetaCompositor *compositor,
    return &priv->glass_surface;
  }
  
@@ -252,7 +252,7 @@ index 4642e6dc3e7a07678261160db719007668815b14..e2fb6e2ebe7fddbf0e21f294732392c8
    blur->placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
    blur->previous_placements = g_array_new (FALSE, FALSE, sizeof (MetaBackgroundPlacement));
 diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
-index 676ac38ef8e84d91af00c4b818e0ac3ab462a973..241e31e160d393f6550d2380e4ff673a054a7281 100644
+index f09dbcbb2f554c2708501341a4a3acb0c14aa55a..dce8642d90e39b309eaa1ecf20a90090991c11c1 100644
 --- a/src/compositor/meta-background-effect.c
 +++ b/src/compositor/meta-background-effect.c
 @@ -426,7 +426,7 @@ meta_background_blur_paint (MetaBackgroundBlur    *blur,
@@ -433,12 +433,12 @@ index 81b3b8823e8732d73d0984ef2eb85af7daa1b54c..83ef4df3b88750a9156822ddbe4caf08
    ['idle-inhibit', 'unstable', 1, ],
    ['keyboard-shortcuts-inhibit', 'unstable', 1, ],
 diff --git a/src/meta/compositor.h b/src/meta/compositor.h
-index 4b786517d26bac269cc54e3a30d114dc58939674..0d634c73d648a300de44b3a578d1bd692a5c8048 100644
+index c317298d0471e17c9911b8c9e6237af2f16da447..3272e6c761a7d39abbe08f59463a19a49fa2c1f1 100644
 --- a/src/meta/compositor.h
 +++ b/src/meta/compositor.h
-@@ -154,6 +154,9 @@ void meta_compositor_set_glass_surface (MetaCompositor  *compositor,
- META_EXPORT
- const CoglColor * meta_compositor_get_glass_surface (MetaCompositor *compositor);
+@@ -157,6 +157,9 @@ META_EXPORT
+ const CoglColor * meta_compositor_get_glass_surface (MetaCompositor *compositor,
+                                                      float          *luminosity);
  
 +META_EXPORT
 +gboolean meta_compositor_get_maris_requested (MetaCompositor *compositor);

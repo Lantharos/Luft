@@ -1845,7 +1845,7 @@ export namespace Meta {
 
         get_feedback_group(): Clutter.Actor;
 
-        get_glass_surface(): Cogl.Color;
+        get_glass_surface(): [Cogl.Color, number];
 
         get_input_panel_group(): Clutter.Actor;
 
@@ -1867,7 +1867,7 @@ export namespace Meta {
 
         set_glass(windows: GlassStyle, transients: GlassStyle, luca_from_wallpaper: boolean): void;
 
-        set_glass_surface(surface: Cogl.Color): void;
+        set_glass_surface(surface: Cogl.Color, luminosity: number): void;
 
         set_monitor_gap(monitor: number, gap: boolean): void;
     }

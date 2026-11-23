@@ -71,6 +71,12 @@ static const gchar *brightness_glsl_declarations =
 "uniform vec4 surface_tint;                                                \n"
 "uniform float grain;                                                      \n";
 
+static const gchar *result_area_declarations =
+"uniform vec2 result_area_end;                                             \n";
+
+static const gchar *result_area_lookup =
+"  cogl_tex_coord.st = min(cogl_tex_coord.st, result_area_end);            \n";
+
 static const gchar *brightness_glsl =
 "  cogl_color_out.rgb *= brightness;                                       \n"
 "  float luma = dot(cogl_color_out.rgb, vec3(0.2126, 0.7152, 0.0722)) /    \n"
@@ -150,6 +156,7 @@ struct _ShellBlurEffect
   int saturation_uniform;
   float saturation;
   int surface_tint_uniform;
+  int result_area_end_uniform;
   int grain_uniform;
 
   ShellBlurOutline outline;
@@ -253,6 +260,21 @@ create_brightness_pipeline (CoglContext *ctx)
   return cogl_pipeline_copy (brightness_pipeline);
 }
 
+static CoglSnippet *
+result_area_snippet (void)
+{
+  static CoglSnippet *snippet;
+
+  if (!snippet)
+    {
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_TEXTURE_LOOKUP,
+                                  result_area_declarations, NULL);
+      cogl_snippet_set_pre (snippet, result_area_lookup);
+    }
+
+  return snippet;
+}
+
 static void
 create_pipelines (ShellBlurEffect *self,
                   CoglContext     *ctx)
@@ -275,6 +297,9 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "saturation");
   self->surface_tint_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_tint");
+  cogl_pipeline_add_layer_snippet (self->brightness_fb.pipeline, 0, result_area_snippet ());
+  self->result_area_end_uniform =
+    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "result_area_end");
   self->grain_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "grain");
 }
@@ -439,13 +464,17 @@ result_fits (CoglTexture  *texture,
 static void
 show_result_area (ShellBlurEffect *self)
 {
+  float width = cogl_texture_get_width (self->brightness_fb.texture);
+  float height = cogl_texture_get_height (self->brightness_fb.texture);
+  float end[2] = {
+    (self->result_width - 0.5f) / width,
+    (self->result_height - 0.5f) / height,
+  };
   graphene_matrix_t matrix;
 
-  graphene_matrix_init_scale (&matrix,
-                              (float) self->result_width / cogl_texture_get_width (self->brightness_fb.texture),
-                              (float) self->result_height / cogl_texture_get_height (self->brightness_fb.texture),
-                              1.f);
+  graphene_matrix_init_scale (&matrix, self->result_width / width, self->result_height / height, 1.f);
   cogl_pipeline_set_layer_matrix (self->brightness_fb.pipeline, 0, &matrix);
+  cogl_pipeline_set_uniform_float (self->brightness_fb.pipeline, self->result_area_end_uniform, 2, 1, end);
 }
 
 static float

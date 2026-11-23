@@ -85,3 +85,4 @@
 0085-compositor-fill-app-glass-out-to-the-window-s-rounde.patch
 0086-clutter-soften-the-grain-of-blurs-and-take-it-per-sc.patch
 0087-backends-tell-the-shell-when-the-pointer-is-shaken-a.patch
+0088-compositor-blur-app-glass-that-frames-a-sheet-only-a.patch

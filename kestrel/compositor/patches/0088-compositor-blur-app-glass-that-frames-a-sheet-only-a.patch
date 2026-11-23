@@ -1,0 +1,628 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Mon, 23 Nov 2026 04:02:01 +0100
+Subject: [PATCH] compositor: blur app glass that frames a sheet only around
+ the glass
+
+A glass region around an opaque sheet has the whole window as its
+extents, so the blur read and blurred all of it, and what is under the
+sheet had to be drawn for the blur to read. The blur now draws each of
+its steps only within its reach of the glass, and the window culls
+everything under its opaque region except that reach around the glass,
+which the redraw clip covers whenever the glass blurs again.
+
+Upstream-Status: luft-only builds on Kestrel's kept app glass
+---
+ clutter/clutter/clutter-blur-private.h        |  13 +-
+ clutter/clutter/clutter-blur.c                |  90 +++++++++++--
+ clutter/clutter/clutter-paint-node-private.h  |   7 ++
+ clutter/clutter/clutter-paint-nodes.c         | 118 ++++++++++++++----
+ src/compositor/meta-background-blur-private.h |   3 +
+ src/compositor/meta-background-blur.c         |  64 +++++++++-
+ src/compositor/meta-background-effect.c       |  39 ++++++
+ src/compositor/meta-background-effect.h       |   2 +
+ src/compositor/meta-surface-actor.c           |   4 +-
+ 9 files changed, 297 insertions(+), 43 deletions(-)
+
+diff --git a/clutter/clutter/clutter-blur-private.h b/clutter/clutter/clutter-blur-private.h
+index 7098b5332ce2191e3fabbc16a23a84040a06f5a4..36375854fb6f271703c0c8ab10a429d21518913b 100644
+--- a/clutter/clutter/clutter-blur-private.h
++++ b/clutter/clutter/clutter-blur-private.h
+@@ -20,6 +20,7 @@
+ #include <glib-object.h>
+ 
+ #include "cogl/cogl.h"
++#include "mtk/mtk.h"
+ 
+ G_BEGIN_DECLS
+ 
+@@ -39,10 +40,14 @@ void clutter_blur_get_result_size (int  n_levels,
+ ClutterBlur * clutter_blur_new (CoglTexture *texture,
+                                 int          n_levels);
+ 
+-void clutter_blur_apply (ClutterBlur *blur,
+-                         int          width,
+-                         int          height,
+-                         float        offset);
++int clutter_blur_get_reach (int   n_levels,
++                            float offset);
++
++void clutter_blur_apply (ClutterBlur  *blur,
++                         int           width,
++                         int           height,
++                         float         offset,
++                         const GArray *area);
+ 
+ CoglTexture * clutter_blur_get_texture (ClutterBlur *blur);
+ 
+diff --git a/clutter/clutter/clutter-blur.c b/clutter/clutter/clutter-blur.c
+index 527f4c363cc692e76202330e7409f02418cd1a29..50bb5158378e6546f948f59dfe0a0644f5a58290 100644
+--- a/clutter/clutter/clutter-blur.c
++++ b/clutter/clutter/clutter-blur.c
+@@ -17,6 +17,8 @@
+ 
+ #include "config.h"
+ 
++#include <math.h>
++
+ #include "clutter/clutter-blur-private.h"
+ 
+ #include "clutter/clutter-backend.h"
+@@ -35,7 +37,9 @@
+  * The texture may be larger than what is blurred. Only the area from its
+  * top left corner that [method@Clutter.Blur.apply] is given is read, and
+  * the result covers the same area of [method@Clutter.Blur.get_texture]
+- * at half the size.
++ * at half the size. Given the parts of that area that are wanted, each
++ * step draws only those parts grown by clutter_blur_get_reach(), so only
++ * they hold the blur and only they need to be filled in the texture.
+  *
+  * https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf
+  */
+@@ -321,6 +325,8 @@ run_pass (CoglPipeline      *pipeline,
+           const LevelTarget *source,
+           const BlurLevel   *source_level,
+           const BlurLevel   *target_level,
++          int                scale,
++          const GArray      *area,
+           float              offset)
+ {
+   float texture_width = cogl_texture_get_width (source->texture);
+@@ -332,6 +338,10 @@ run_pass (CoglPipeline      *pipeline,
+     (source_level->width - 0.5f) / texture_width,
+     (source_level->height - 0.5f) / texture_height,
+   };
++  float s_scale = source_level->width / texture_width / target_level->width;
++  float t_scale = source_level->height / texture_height / target_level->height;
++  g_autofree float *coordinates = NULL;
++  unsigned int i;
+ 
+   cogl_pipeline_set_uniform_float (pipeline,
+                                    cogl_pipeline_get_uniform_location (pipeline, "kawase_step"),
+@@ -339,11 +349,61 @@ run_pass (CoglPipeline      *pipeline,
+   cogl_pipeline_set_uniform_float (pipeline,
+                                    cogl_pipeline_get_uniform_location (pipeline, "kawase_bounds"),
+                                    4, 1, bounds);
+-  cogl_framebuffer_draw_textured_rectangle (target->framebuffer, pipeline,
+-                                            0, 0, target_level->width, target_level->height,
+-                                            0, 0,
+-                                            source_level->width / texture_width,
+-                                            source_level->height / texture_height);
++  if (!area)
++    {
++      cogl_framebuffer_draw_textured_rectangle (target->framebuffer, pipeline,
++                                                0, 0, target_level->width, target_level->height,
++                                                0, 0,
++                                                source_level->width / texture_width,
++                                                source_level->height / texture_height);
++      return;
++    }
++
++  coordinates = g_new (float, area->len * 8);
++  for (i = 0; i < area->len; i++)
++    {
++      const MtkRectangle *rect = &g_array_index (area, MtkRectangle, i);
++      float x1 = MIN (rect->x / scale, target_level->width);
++      float y1 = MIN (rect->y / scale, target_level->height);
++      float x2 = MIN ((rect->x + rect->width + scale - 1) / scale, target_level->width);
++      float y2 = MIN ((rect->y + rect->height + scale - 1) / scale, target_level->height);
++      float *rectangle = &coordinates[i * 8];
++
++      rectangle[0] = x1;
++      rectangle[1] = y1;
++      rectangle[2] = x2;
++      rectangle[3] = y2;
++      rectangle[4] = x1 * s_scale;
++      rectangle[5] = y1 * t_scale;
++      rectangle[6] = x2 * s_scale;
++      rectangle[7] = y2 * t_scale;
++    }
++  cogl_framebuffer_draw_textured_rectangles (target->framebuffer, pipeline,
++                                             coordinates, area->len);
++}
++
++/**
++ * clutter_blur_get_reach: (skip)
++ * @n_levels: how many times the texture is halved
++ * @offset: sampling offset from clutter_blur_get_levels()
++ *
++ * Returns: how far, in pixels of the blurred area, the pixels a blurred
++ *   pixel is made of can lie from it: each step's taps and filtering, and
++ *   a pixel of the level it draws for rounding the area to that level
++ */
++int
++clutter_blur_get_reach (int   n_levels,
++                        float offset)
++{
++  float reach = 2.0f;
++  int i;
++
++  for (i = 1; i <= n_levels; i++)
++    reach += (0.5f * offset + 1.0f) * (1 << (i - 1)) + (1 << i);
++  for (i = 1; i < n_levels; i++)
++    reach += (offset + 1.0f) * (1 << (i + 1)) + (1 << i);
++
++  return n_levels > 0 ? (int) ceilf (reach) : 0;
+ }
+ 
+ /**
+@@ -352,15 +412,19 @@ run_pass (CoglPipeline      *pipeline,
+  * @width: width of the area to blur, from the texture's top left corner
+  * @height: height of that area
+  * @offset: sampling offset from clutter_blur_get_levels()
++ * @area: (nullable) (element-type MtkRectangle): the parts of that area to
++ *   blur, already grown by clutter_blur_get_reach(), or %NULL for all of it
+  *
+  * Applies the blur. The result is in [method@Clutter.Blur.get_texture],
+- * in the area clutter_blur_get_result_size() gives.
++ * in the area clutter_blur_get_result_size() gives, or in the parts of it
++ * @area asks for.
+  */
+ void
+-clutter_blur_apply (ClutterBlur *blur,
+-                    int          width,
+-                    int          height,
+-                    float        offset)
++clutter_blur_apply (ClutterBlur  *blur,
++                    int           width,
++                    int           height,
++                    float         offset,
++                    const GArray *area)
+ {
+   int i;
+ 
+@@ -375,7 +439,7 @@ clutter_blur_apply (ClutterBlur *blur,
+       level->height = (blur->level[i - 1].height + 1) / 2;
+       run_pass (level->down_pipeline, &level->down,
+                 &blur->level[i - 1].down, &blur->level[i - 1], level,
+-                offset);
++                1 << i, area, offset);
+     }
+ 
+   for (i = blur->n_levels - 1; i >= 1; i--)
+@@ -384,7 +448,7 @@ clutter_blur_apply (ClutterBlur *blur,
+ 
+       run_pass (level->up_pipeline, &level->up,
+                 brought_up (blur, i + 1), &blur->level[i + 1], level,
+-                offset);
++                1 << i, area, offset);
+     }
+ }
+ 
+diff --git a/clutter/clutter/clutter-paint-node-private.h b/clutter/clutter/clutter-paint-node-private.h
+index 0957146f9bcf0738fe0120f6084e8a462ffcfea8..fa9337870b4da4517e042bcdbf3867d153824ff1 100644
+--- a/clutter/clutter/clutter-paint-node-private.h
++++ b/clutter/clutter/clutter-paint-node-private.h
+@@ -118,6 +118,13 @@ ClutterPaintNode * clutter_blur_node_new_from_framebuffer          (CoglFramebuf
+                                                                     float                  noise,
+                                                                     uint8_t                opacity);
+ 
++CLUTTER_EXPORT
++void clutter_blur_node_set_area (ClutterPaintNode *node,
++                                 const MtkRegion  *area);
++
++CLUTTER_EXPORT
++int clutter_blur_node_get_reach (float radius);
++
+ CLUTTER_EXPORT
+ void clutter_blur_node_get_result_size (ClutterPaintNode *node,
+                                         int              *width,
+diff --git a/clutter/clutter/clutter-paint-nodes.c b/clutter/clutter/clutter-paint-nodes.c
+index 8fac21806276d1576e14372c1a6b0592d36fd031..d3fd1c267fd178cab88c246eed6067cbe360ee60 100644
+--- a/clutter/clutter/clutter-paint-nodes.c
++++ b/clutter/clutter/clutter-paint-nodes.c
+@@ -1510,6 +1510,8 @@ struct _ClutterBlurNode
+   int width;
+   int height;
+   float offset;
++  int reach;
++  GArray *area;
+ };
+ 
+ G_DEFINE_TYPE (ClutterBlurNode, clutter_blur_node, CLUTTER_TYPE_LAYER_NODE)
+@@ -1751,6 +1753,36 @@ clutter_blur_add_framebuffer_effect (CoglPipeline    *pipeline,
+                                    4, 1, tint_color);
+ }
+ 
++static gboolean
++capture_source (ClutterBlurNode *blur_node)
++{
++  g_autoptr (GError) error = NULL;
++  MtkRectangle whole = { 0, 0, blur_node->width, blur_node->height };
++  const MtkRectangle *rects = blur_node->area ? (MtkRectangle *) blur_node->area->data : &whole;
++  unsigned int n_rects = blur_node->area ? blur_node->area->len : 1;
++  unsigned int i;
++
++  for (i = 0; i < n_rects; i++)
++    {
++      if (!cogl_framebuffer_blit (blur_node->source_framebuffer,
++                                  blur_node->target->offscreen,
++                                  blur_node->source_x + rects[i].x,
++                                  blur_node->source_y + rects[i].y,
++                                  rects[i].x,
++                                  rects[i].y,
++                                  rects[i].width,
++                                  rects[i].height,
++                                  &error))
++        {
++          g_warning ("Failed to capture blur node framebuffer: %s",
++                     error->message);
++          return FALSE;
++        }
++    }
++
++  return TRUE;
++}
++
+ static void
+ clutter_blur_node_post_draw (ClutterPaintNode    *node,
+                              ClutterPaintContext *paint_context)
+@@ -1758,32 +1790,13 @@ clutter_blur_node_post_draw (ClutterPaintNode    *node,
+   ClutterPaintNodeClass *parent_class =
+     CLUTTER_PAINT_NODE_CLASS (clutter_blur_node_parent_class);
+   ClutterBlurNode *blur_node = CLUTTER_BLUR_NODE (node);
+-  gboolean should_blur = TRUE;
+-
+-  if (blur_node->source_framebuffer)
+-    {
+-      g_autoptr (GError) error = NULL;
+-
+-      should_blur =
+-        cogl_framebuffer_blit (blur_node->source_framebuffer,
+-                               blur_node->target->offscreen,
+-                               blur_node->source_x,
+-                               blur_node->source_y,
+-                               0,
+-                               0,
+-                               blur_node->width,
+-                               blur_node->height,
+-                               &error);
+-      if (!should_blur)
+-        g_warning ("Failed to capture blur node framebuffer: %s",
+-                   error->message);
+-    }
+ 
+-  if (should_blur)
++  if (!blur_node->source_framebuffer || capture_source (blur_node))
+     clutter_blur_apply (blur_node->target->blur,
+                         blur_node->width,
+                         blur_node->height,
+-                        blur_node->offset);
++                        blur_node->offset,
++                        blur_node->area);
+ 
+   parent_class->post_draw (node, paint_context);
+ }
+@@ -1795,6 +1808,7 @@ clutter_blur_node_finalize (ClutterPaintNode *node)
+ 
+   g_clear_pointer (&blur_node->target, release_blur_target);
+   g_clear_object (&blur_node->source_framebuffer);
++  g_clear_pointer (&blur_node->area, g_array_unref);
+ 
+   CLUTTER_PAINT_NODE_CLASS (clutter_blur_node_parent_class)->finalize (node);
+ }
+@@ -1865,6 +1879,7 @@ clutter_blur_node_new (unsigned int width,
+   blur_node->width = MAX (width, 1u);
+   blur_node->height = MAX (height, 1u);
+   n_levels = clutter_blur_get_levels (radius, &blur_node->offset);
++  blur_node->reach = clutter_blur_get_reach (n_levels, blur_node->offset);
+   blur_node->target = take_blur_target (cogl_context,
+                                         blur_node->width,
+                                         blur_node->height,
+@@ -1905,6 +1920,65 @@ clutter_blur_node_get_result_size (ClutterPaintNode *node,
+                                 width, height);
+ }
+ 
++/**
++ * clutter_blur_node_set_area: (skip)
++ * @node: a #ClutterBlurNode
++ * @area: the parts of the blurred area that are wanted, from its top left
++ *
++ * Blurs only what @area needs, so only the pixels within
++ * clutter_blur_node_get_reach() of it are read.
++ */
++void
++clutter_blur_node_set_area (ClutterPaintNode *node,
++                            const MtkRegion  *area)
++{
++  ClutterBlurNode *blur_node = CLUTTER_BLUR_NODE (node);
++  MtkRectangle whole = { 0, 0, blur_node->width, blur_node->height };
++  g_autoptr (MtkRegion) grown = mtk_region_create ();
++  int reach = blur_node->reach;
++  int i;
++
++  for (i = 0; i < mtk_region_num_rectangles (area); i++)
++    {
++      MtkRectangle rect = mtk_region_get_rectangle (area, i);
++
++      mtk_region_union_rectangle (grown, &MTK_RECTANGLE_INIT (rect.x - reach,
++                                                              rect.y - reach,
++                                                              rect.width + 2 * reach,
++                                                              rect.height + 2 * reach));
++    }
++  mtk_region_intersect_rectangle (grown, &whole);
++
++  g_clear_pointer (&blur_node->area, g_array_unref);
++  if (mtk_region_contains_rectangle (grown, &whole) == MTK_REGION_OVERLAP_IN)
++    return;
++
++  blur_node->area = g_array_sized_new (FALSE, FALSE, sizeof (MtkRectangle),
++                                       mtk_region_num_rectangles (grown));
++  for (i = 0; i < mtk_region_num_rectangles (grown); i++)
++    {
++      MtkRectangle rect = mtk_region_get_rectangle (grown, i);
++
++      g_array_append_val (blur_node->area, rect);
++    }
++}
++
++/**
++ * clutter_blur_node_get_reach: (skip)
++ * @radius: radius (in pixels) of the blur
++ *
++ * Returns: how far from a blurred pixel, in pixels, the pixels it is made
++ *   of can lie
++ */
++int
++clutter_blur_node_get_reach (float radius)
++{
++  float offset;
++  int n_levels = clutter_blur_get_levels (radius, &offset);
++
++  return clutter_blur_get_reach (n_levels, offset);
++}
++
+ /**
+  * clutter_blur_node_new_from_framebuffer:
+  * @framebuffer: the source framebuffer
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+index 5a631cf5c83d275a939a5f9ed1231b2bb95b2407..c40d02ef7c7aacf50164c561b8aaaa8bfa6b74f6 100644
+--- a/src/compositor/meta-background-blur-private.h
++++ b/src/compositor/meta-background-blur-private.h
+@@ -52,6 +52,7 @@ typedef struct
+   ClutterActorBox source_box;
+   ClutterActorBox region_box;
+   MtkRegion *paint_region;
++  MtkRegion *area;
+   const ClutterActorBox *content_box;
+   int content_width;
+   int content_height;
+@@ -86,6 +87,8 @@ struct _MetaBackgroundBlur
+   MetaCompositor *compositor;
+   ClutterActor *actor;
+   MtkRegion *blur_region;
++  MtkRegion *sample_region;
++  int sample_reach;
+   MetaGlassRole role;
+   MetaGlassPreference preference;
+   MetaStage *stage;
+diff --git a/src/compositor/meta-background-blur.c b/src/compositor/meta-background-blur.c
+index e2fb6e2ebe7fddbf0e21f294732392c8d3fc9d81..724ab4c7fafadf112f992bd6f1ea538c7adb2fc4 100644
+--- a/src/compositor/meta-background-blur.c
++++ b/src/compositor/meta-background-blur.c
+@@ -22,6 +22,7 @@
+ #include "compositor/meta-background-blur-private.h"
+ 
+ #include "clutter/clutter-mutter.h"
++#include "clutter/clutter-paint-node-private.h"
+ 
+ static void view_destroyed (gpointer  data,
+                             GObject  *view);
+@@ -109,6 +110,62 @@ region_on_stage (const MtkRegion    *region,
+   return on_stage;
+ }
+ 
++static int
++sample_reach (MetaBackgroundBlur *blur)
++{
++  float radius, saturation, noise;
++  int reach = 0;
++  GList *l;
++
++  if (mtk_region_num_rectangles (blur->blur_region) <= 1 ||
++      meta_background_shows_wallpaper (blur->compositor,
++                                       meta_compositor_get_glass_material (blur->compositor,
++                                                                           blur->role,
++                                                                           blur->preference)))
++    return 0;
++
++  meta_compositor_get_background_blur_params (blur->compositor, &radius, &saturation, &noise);
++  for (l = clutter_actor_peek_stage_views (blur->actor); l; l = l->next)
++    {
++      float scale = clutter_stage_view_get_scale (l->data);
++
++      reach = MAX (reach, (int) ceilf (clutter_blur_node_get_reach (radius * scale) / scale) + 1);
++    }
++
++  return reach;
++}
++
++const MtkRegion *
++meta_background_blur_get_sample_region (MetaBackgroundBlur *blur)
++{
++  int reach = sample_reach (blur);
++  MtkRectangle extents;
++  int i;
++
++  if (blur->sample_region && blur->sample_reach == reach)
++    return blur->sample_region;
++
++  g_clear_pointer (&blur->sample_region, mtk_region_unref);
++  blur->sample_reach = reach;
++  blur->sample_region = mtk_region_copy (blur->blur_region);
++  if (reach == 0)
++    return blur->sample_region;
++
++  for (i = 0; i < mtk_region_num_rectangles (blur->blur_region); i++)
++    {
++      MtkRectangle rect = mtk_region_get_rectangle (blur->blur_region, i);
++
++      mtk_region_union_rectangle (blur->sample_region,
++                                  &MTK_RECTANGLE_INIT (rect.x - reach,
++                                                       rect.y - reach,
++                                                       rect.width + 2 * reach,
++                                                       rect.height + 2 * reach));
++    }
++  extents = mtk_region_get_extents (blur->blur_region);
++  mtk_region_intersect_rectangle (blur->sample_region, &extents);
++  return blur->sample_region;
++}
++
+ static MtkRegion *
+ original_on_stage (MetaBackgroundBlur *blur,
+                    const MtkRectangle *layout)
+@@ -118,7 +175,8 @@ original_on_stage (MetaBackgroundBlur *blur,
+   clutter_actor_get_relative_transformation_matrix (blur->actor,
+                                                     CLUTTER_ACTOR (blur->stage),
+                                                     &actor_to_stage);
+-  return region_on_stage (blur->blur_region, &actor_to_stage, layout);
++  return region_on_stage (meta_background_blur_get_sample_region (blur),
++                          &actor_to_stage, layout);
+ }
+ 
+ static gboolean
+@@ -224,7 +282,8 @@ look_behind_clone (ClutterActor *source,
+   graphene_matrix_multiply (&actor_to_source, &source_to_clone, &actor_to_stage);
+   graphene_matrix_multiply (&actor_to_stage, &clone_to_stage, &actor_to_stage);
+ 
+-  area = region_on_stage (data->blur->blur_region, &actor_to_stage, &data->layout);
++  area = region_on_stage (meta_background_blur_get_sample_region (data->blur),
++                          &actor_to_stage, &data->layout);
+   if (!area || !touches (data->redraw_clip, area))
+     return;
+ 
+@@ -346,6 +405,7 @@ meta_background_blur_destroy (MetaBackgroundBlur *blur)
+   g_clear_signal_handler (&blur->before_paint_id, blur->stage);
+   g_list_free_full (blur->views, (GDestroyNotify) free_view);
+   g_clear_pointer (&blur->blur_region, mtk_region_unref);
++  g_clear_pointer (&blur->sample_region, mtk_region_unref);
+   g_array_unref (blur->placements);
+   g_array_unref (blur->previous_placements);
+   g_free (blur);
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 13ab94e8ad33562b2b1566c2a579ea6ca70979e6..8e6f1a51d301d746f760cc04136f9cf76b57ba9e 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -144,6 +144,8 @@ paint_live (MetaBackgroundPaint *paint)
+   if (!blur_node)
+     return;
+ 
++  if (paint->area)
++    clutter_blur_node_set_area (blur_node, paint->area);
+   apply_source_corners (paint, clutter_layer_node_get_pipeline (CLUTTER_LAYER_NODE (blur_node)));
+ 
+   for (i = 0; i < mtk_region_num_rectangles (paint->paint_region); i++)
+@@ -245,6 +247,9 @@ refresh_result (MetaBackgroundPaint    *paint,
+   if (!blur_node)
+     return FALSE;
+ 
++  if (paint->area)
++    clutter_blur_node_set_area (blur_node, paint->area);
++
+   clutter_blur_node_get_result_size (blur_node, &width, &height);
+   if (!ensure_result (result, cogl_framebuffer_get_context (paint->framebuffer), width, height))
+     return FALSE;
+@@ -388,6 +393,37 @@ fill_rounded_corners (const MetaBackgroundPaint *paint,
+     }
+ }
+ 
++static MtkRegion *
++area_in_source (const MetaBackgroundPaint *paint,
++                const MtkRegion           *effect_region)
++{
++  MtkRegion *area = mtk_region_create ();
++  int i;
++
++  for (i = 0; i < mtk_region_num_rectangles (effect_region); i++)
++    {
++      MtkRectangle region_rect = mtk_region_get_rectangle (effect_region, i);
++      ClutterActorBox actor_box;
++      graphene_rect_t framebuffer_rect;
++      MtkRectangle rect;
++
++      if (!meta_background_region_rect_to_actor_box (&region_rect, paint->content_box,
++                                                     paint->content_width,
++                                                     paint->content_height,
++                                                     &actor_box) ||
++          !meta_background_actor_box_to_framebuffer (&actor_box, &paint->transform,
++                                                     &framebuffer_rect))
++        continue;
++
++      mtk_rectangle_from_graphene_rect (&framebuffer_rect, MTK_ROUNDING_STRATEGY_GROW, &rect);
++      rect.x -= paint->source_rect.x;
++      rect.y -= paint->source_rect.y;
++      mtk_region_union_rectangle (area, &rect);
++    }
++
++  return area;
++}
++
+ static gboolean
+ prepare_paint (MetaBackgroundBlur  *blur,
+                MetaBackgroundPaint *paint,
+@@ -442,6 +478,8 @@ prepare_paint (MetaBackgroundBlur  *blur,
+ 
+   source = mtk_rectangle_to_graphene_rect (&paint->source_rect);
+   paint->radius *= paint->transform.scale;
++  if (mtk_region_num_rectangles (effect_region) > 1)
++    paint->area = area_in_source (paint, effect_region);
+   return meta_background_framebuffer_to_actor_box (&source, &paint->transform,
+                                                    &paint->source_box);
+ }
+@@ -476,4 +514,5 @@ meta_background_blur_paint (MetaBackgroundBlur    *blur,
+     paint_blur (blur, &paint, clutter_paint_context_get_stage_view (paint_context));
+ 
+   g_clear_pointer (&paint.paint_region, mtk_region_unref);
++  g_clear_pointer (&paint.area, mtk_region_unref);
+ }
+diff --git a/src/compositor/meta-background-effect.h b/src/compositor/meta-background-effect.h
+index 9be6ddc76fc94fb535975629697501f863b2c4e9..28e123fa30dbbf5bc9a45f758dfd648cae9f665f 100644
+--- a/src/compositor/meta-background-effect.h
++++ b/src/compositor/meta-background-effect.h
+@@ -31,6 +31,8 @@ MetaBackgroundBlur * meta_background_blur_new (MetaCompositor      *compositor,
+                                                MetaGlassPreference  preference);
+ void meta_background_blur_destroy (MetaBackgroundBlur *blur);
+ 
++const MtkRegion * meta_background_blur_get_sample_region (MetaBackgroundBlur *blur);
++
+ void meta_background_blur_paint (MetaBackgroundBlur    *blur,
+                                  ClutterPaintNode      *root_node,
+                                  ClutterPaintContext   *paint_context,
+diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
+index a13e36db98fd51add115b9f17ca9032974d2de58..df096bb99f62086e25a0c10223eb34b32b088b37 100644
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -468,11 +468,11 @@ subtract_opaque_region (MetaSurfaceActor *surface_actor,
+       if (!opaque_region)
+         return;
+ 
+-      if (priv->background_blur_region)
++      if (priv->background_blur)
+         {
+           effective_opaque_region = mtk_region_copy (opaque_region);
+           mtk_region_subtract (effective_opaque_region,
+-                               priv->background_blur_region);
++                               meta_background_blur_get_sample_region (priv->background_blur));
+           opaque_region = effective_opaque_region;
+         }
+ 

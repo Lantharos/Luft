@@ -3,7 +3,7 @@ import WifiHigh from '@luft/symbols/icons/wifi-high';
 import WifiLow from '@luft/symbols/icons/wifi-low';
 import WifiZero from '@luft/symbols/icons/wifi-zero';
 import { i18n, t } from '@luft/i18n';
-import type { Details, Link, Security } from '@luft/network';
+import { signalLevel, type Details, type Link, type Security, type SignalLevel } from '@luft/network';
 
 export type DetailRow = [label: string, value: string];
 
@@ -27,19 +27,18 @@ export const securityLabel = (security: Security) => t(SECURITY_LABELS[security]
 export const linkLabel = (link: Link) => t(LINK_LABELS[link]);
 export const isSecured = (security: Security) => security !== 'open' && security !== 'owe';
 
-export function signalIcon(strength: number) {
-	if (strength >= 70) return Wifi;
-	if (strength >= 45) return WifiHigh;
-	if (strength >= 20) return WifiLow;
-	return WifiZero;
-}
+const SIGNAL_ICONS: Record<SignalLevel, typeof Wifi> = { excellent: Wifi, good: WifiHigh, ok: WifiLow, weak: WifiZero, none: WifiZero };
 
-export function signalLabel(strength: number) {
-	if (strength >= 70) return t('settings-network-signal-excellent');
-	if (strength >= 45) return t('settings-network-signal-good');
-	if (strength >= 20) return t('settings-network-signal-fair');
-	return t('settings-network-signal-weak');
-}
+const SIGNAL_LABELS: Record<SignalLevel, string> = {
+	excellent: 'settings-network-signal-excellent',
+	good: 'settings-network-signal-good',
+	ok: 'settings-network-signal-fair',
+	weak: 'settings-network-signal-weak',
+	none: 'settings-network-signal-weak'
+};
+
+export const signalIcon = (strength: number) => SIGNAL_ICONS[signalLevel(strength)];
+export const signalLabel = (strength: number) => t(SIGNAL_LABELS[signalLevel(strength)]);
 
 export function speedLabel(megabits: number) {
 	const gigabits = megabits >= 1000;

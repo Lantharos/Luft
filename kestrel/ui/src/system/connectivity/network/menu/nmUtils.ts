@@ -32,14 +32,6 @@ function phoneName(device: NM.Device): string {
   return usbProduct(device) ?? (device.get_driver() === APPLE_PHONE_DRIVER ? 'iPhone' : KestrelUi.t('network-device-phone'));
 }
 
-export function signalToIcon(value: number): string {
-  if (value < 20) return 'none';
-  if (value < 40) return 'weak';
-  if (value < 50) return 'ok';
-  if (value < 80) return 'good';
-  return 'excellent';
-}
-
 export function forgetUnlessJoined(activeConnection: NM.ActiveConnection): void {
   const { connection } = activeConnection;
   const settle = (): void => {

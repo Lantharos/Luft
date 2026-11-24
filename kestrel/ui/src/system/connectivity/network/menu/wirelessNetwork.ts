@@ -11,7 +11,8 @@ import * as PopupMenu from '../../../../shared/popups/popupMenu.js';
 import * as Util from '../../../../core/runtime/util.js';
 import { ownPermission } from '../../../../shared/dbus/polkit.js';
 import { registerDestroyableType } from '../../../../core/runtime/signalTracker.js';
-import { forgetUnlessJoined, NM80211Mode, signalToIcon } from './nmUtils.js';
+import { forgetUnlessJoined, NM80211Mode } from './nmUtils.js';
+import { signalLevel } from '../../../../../../../packages/web/network/bridge/signal';
 
 Gio._promisify(NM.Client.prototype, 'add_and_activate_connection_async');
 
@@ -74,7 +75,7 @@ export class WirelessNetwork extends GObject.Object {
   get icon_name(): string {
     if (this.mode === NM80211Mode.ADHOC) return 'network-workgroup-symbolic';
     if (!this.bestAp) return '';
-    return `network-wireless-signal-${signalToIcon(this.bestAp.strength)}-symbolic`;
+    return `network-wireless-signal-${signalLevel(this.bestAp.strength)}-symbolic`;
   }
 
   get secure(): boolean {

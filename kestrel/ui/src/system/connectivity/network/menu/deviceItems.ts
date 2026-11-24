@@ -10,7 +10,8 @@ import * as Util from '../../../../core/runtime/util.js';
 import { BroadbandModem } from '../modemManager.js';
 import { ItemSorter } from './itemSorter.js';
 import { NMDeviceConnectionItem, NMSectionItem, type ConnectionSection } from './menuItems.js';
-import { canReachInternet, signalToIcon } from './nmUtils.js';
+import { canReachInternet } from './nmUtils.js';
+import { signalLevel } from '../../../../../../../packages/web/network/bridge/signal';
 
 class NMDeviceItem extends NMSectionItem implements ConnectionSection {
   static {
@@ -221,7 +222,7 @@ export class NMModemDeviceItem extends NMDeviceItem {
       case NM.ActiveConnectionState.ACTIVATING:
         return 'network-cellular-acquiring-symbolic';
       case NM.ActiveConnectionState.ACTIVATED:
-        return `network-cellular-signal-${signalToIcon(this.mobileDevice?.signalQuality ?? 0)}-symbolic`;
+        return `network-cellular-signal-${signalLevel(this.mobileDevice?.signalQuality ?? 0)}-symbolic`;
       default:
         return this.activeConnection ? 'network-cellular-signal-none-symbolic' : 'network-cellular-disabled-symbolic';
     }

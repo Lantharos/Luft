@@ -7,7 +7,8 @@ import { arrange } from '../../../../shared/motion/arrange.js';
 import { vanish } from '../../../../shared/motion/collapse.js';
 import { ItemSorter } from './itemSorter.js';
 import { NMSectionItem } from './menuItems.js';
-import { canReachInternet, connectionName, MAX_VISIBLE_NETWORKS, NM80211Mode, signalToIcon, ssidToLabel } from './nmUtils.js';
+import { canReachInternet, connectionName, MAX_VISIBLE_NETWORKS, NM80211Mode, ssidToLabel } from './nmUtils.js';
+import { signalLevel } from '../../../../../../../packages/web/network/bridge/signal';
 import { NMWirelessNetworkItem, WirelessNetwork } from './wirelessNetwork.js';
 
 export class NMWirelessDeviceItem extends NMSectionItem {
@@ -83,7 +84,7 @@ export class NMWirelessDeviceItem extends NMSectionItem {
           return 'network-wireless-offline-symbolic';
         }
 
-        return `network-wireless-signal-${signalToIcon(this.activeAccessPoint.strength)}-symbolic`;
+        return `network-wireless-signal-${signalLevel(this.activeAccessPoint.strength)}-symbolic`;
       }
       default:
         return 'network-wireless-signal-none-symbolic';

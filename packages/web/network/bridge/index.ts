@@ -3,6 +3,7 @@ import type { InvokeOptions } from '@lantharos/sabine';
 import type { Security } from './bindings';
 
 export * from './bindings';
+export * from './signal';
 
 export type Family = 'ipv4' | 'ipv6';
 export type MacChoice = 'builtin' | 'random' | 'stable' | 'custom';

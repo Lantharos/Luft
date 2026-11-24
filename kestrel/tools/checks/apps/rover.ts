@@ -11,6 +11,7 @@ import {exists, removeTree, write} from './lib/files.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkLooks} from './rover/looks.js';
 import {checkNetwork} from './rover/network.js';
+import {checkPicker} from './rover/picker.js';
 import {checkPlaces, withUserFolders} from './rover/places.js';
 import {checkPrivileged} from './rover/privileged.js';
 import {checkRename} from './rover/rename.js';
@@ -86,6 +87,7 @@ export async function run() {
         await checkLooks(app, GLib.build_filenamev([FOLDER, 'Looks']), open);
         await checkThumbnails(app, GLib.build_filenamev([FOLDER, 'Thumbnails']), open);
       })));
+      await checkPicker(GLib.build_filenamev([FOLDER, 'Picker']));
       const rclone = GLib.find_program_in_path('rclone');
       if (rclone) await checkNetwork(rclone);
       else console.log('Kestrel Luft app check: rover network locations skipped without rclone');

@@ -127,7 +127,7 @@
 		<Sidebar bind:this={sidebar} {manager} {drag} {chooser} {trash} />
 
 		<main class="glass-content relative isolate">
-			<Toolbar {manager} {drag} {view} {vcs} chooser={Boolean(chooser)} />
+			<Toolbar {manager} {drag} {view} {vcs} {chooser} />
 			<TabStrip {manager} {drag} />
 			{#if !chooser}
 				<CloudNotes {manager} />

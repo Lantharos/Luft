@@ -395,6 +395,7 @@ export type DirectoryChanged = {
 export type DirectoryContents = {
 	path: string,
 	entries: FileEntry[],
+	writable: boolean,
 };
 
 export type Drive = {

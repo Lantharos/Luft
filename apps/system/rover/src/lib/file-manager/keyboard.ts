@@ -26,6 +26,11 @@ export function handleKeydown(event: KeyboardEvent, context: KeyboardContext) {
 		event.preventDefault();
 		return void manager.refresh();
 	}
+	if (primary && event.shiftKey && key === 'n') {
+		event.preventDefault();
+		if (!manager.draft && (chooser ? chooser.canMakeFolder : manager.view === 'home')) manager.startCreate('folder');
+		return;
+	}
 	if (event.key === 'F2') {
 		if (chooser) return;
 		if (manager.selection.size > 1) tools.rename(manager, tools.selection(manager));

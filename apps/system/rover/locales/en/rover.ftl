@@ -145,6 +145,8 @@ rover-chooser-name = Name
 # The name a new file gets until one is typed.
 rover-chooser-untitled = Untitled
 rover-chooser-file-name = File name
+# Shown on the New folder button in a folder the person can’t change.
+rover-chooser-no-new-folder = You can’t make folders here
 
 ## Right-click menu
 

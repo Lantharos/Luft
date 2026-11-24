@@ -36,7 +36,6 @@ function viewKeyAction(event: KeyboardEvent, { manager, view, chooser }: ViewKey
 	const { key } = event;
 
 	if (view.quickLook && (key === 'Escape' || key === ' ')) return () => (view.quickLook = false);
-	if (primary && event.shiftKey && !chooser && key.toLowerCase() === 'n') return () => manager.startCreate('folder');
 	if (primary && !event.altKey && !event.shiftKey) return primaryAction(key, manager, view);
 	if (event.altKey && !primary) return altAction(key, manager, view);
 	if (primary || event.altKey || manager.view === 'trash') return null;

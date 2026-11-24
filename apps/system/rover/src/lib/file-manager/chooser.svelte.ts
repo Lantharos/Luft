@@ -22,6 +22,7 @@ export class ChooserState {
 
 	acceptPaths = $derived.by(() => this.#acceptPaths());
 	canAccept = $derived(this.acceptPaths.length > 0);
+	canMakeFolder = $derived.by(() => this.#manager.view === 'home' && this.#manager.writable);
 
 	constructor(request: number, config: ChooserConfig, manager: FileManager) {
 		this.#request = request;
@@ -31,6 +32,7 @@ export class ChooserState {
 		this.filter = config.filter ?? (config.filters.length > 0 ? 0 : null);
 		const matchers = config.filters.map(filterMatcher);
 		manager.entryFilter = (entry) => this.filter === null || matchers[this.filter](entry);
+		manager.revealCreated = (entry) => (config.mode === 'save' ? manager.navigate(entry.path) : manager.selectOnly(entry.path));
 	}
 
 	accepts = (entry: Pick<FileEntry, 'isDir'>) => {

@@ -31,7 +31,7 @@ export function emptyStateFor({ manager, chooser }: EntryContext): EmptyStatePro
 		};
 	}
 	if (manager.view === 'recent') return { icon: Clock, title: t('rover-empty-recent-title'), message: t('rover-empty-recent-message') };
-	if (chooser) return { icon: FolderOpen, title: t('rover-empty-folder-title') };
+	if (chooser && !chooser.canMakeFolder) return { icon: FolderOpen, title: t('rover-empty-folder-title') };
 	return { icon: FolderOpen, title: t('rover-empty-folder-title'), action: { label: t('rover-new-folder'), run: () => manager.startCreate('folder') } };
 
 }

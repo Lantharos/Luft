@@ -1,6 +1,8 @@
 use std::collections::HashSet;
+use std::ffi::CString;
 use std::fs;
 use std::io::Read;
+use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::SystemTime;
@@ -36,6 +38,7 @@ pub struct FileEntry {
 pub struct DirectoryContents {
     pub path: String,
     pub entries: Vec<FileEntry>,
+    pub writable: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Type)]
@@ -69,7 +72,16 @@ pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryConten
         .filter_map(|entry_path| file_entry(&entry_path).ok())
         .collect();
 
-    Ok(DirectoryContents { path, entries })
+    Ok(DirectoryContents {
+        writable: writable(&directory),
+        path,
+        entries,
+    })
+}
+
+fn writable(directory: &Path) -> bool {
+    CString::new(directory.as_os_str().as_bytes())
+        .is_ok_and(|path| unsafe { libc::access(path.as_ptr(), libc::W_OK) } == 0)
 }
 
 pub(crate) fn mount_points() -> HashSet<PathBuf> {

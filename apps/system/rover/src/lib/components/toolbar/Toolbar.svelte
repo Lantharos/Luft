@@ -3,6 +3,7 @@
 	import ChevronLeft from '@luft/symbols/icons/chevron-left';
 	import ChevronRight from '@luft/symbols/icons/chevron-right';
 	import Columns3 from '@luft/symbols/icons/columns-3';
+	import FolderPlus from '@luft/symbols/icons/folder-plus';
 	import GitBranch from '@luft/symbols/icons/git-branch';
 	import LayoutGrid from '@luft/symbols/icons/layout-grid';
 	import List from '@luft/symbols/icons/list';
@@ -11,6 +12,7 @@
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
 	import type { Component } from 'svelte';
 	import type { ViewMode } from '#lib/bindings.js';
+	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
@@ -25,7 +27,7 @@
 		drag: DragController;
 		view: ViewState;
 		vcs: VcsState;
-		chooser: boolean;
+		chooser: ChooserState | null;
 	}
 
 	let { manager, drag, view, vcs, chooser }: Props = $props();
@@ -93,7 +95,18 @@
 				{/snippet}
 			</Segmented>
 			<SortMenu {manager} />
-			{#if !chooser}
+			{#if chooser}
+				<button
+					class="icon-button"
+					type="button"
+					aria-label={t('rover-new-folder')}
+					disabled={!chooser.canMakeFolder}
+					onclick={() => manager.startCreate('folder')}
+					{@attach tooltip(chooser.canMakeFolder ? t('rover-new-folder') : t('rover-chooser-no-new-folder'))}
+				>
+					<FolderPlus size={17} />
+				</button>
+			{:else}
 				<NewMenu {manager} />
 			{/if}
 		{/if}
@@ -108,7 +121,7 @@
 		>
 			<PanelRight size={17} />
 		</button>
-		<MoreMenu {manager} {view} {chooser} />
+		<MoreMenu {manager} {view} chooser={chooser !== null} />
 	</div>
 
 	<WindowControls minimizable={!chooser} maximizable={!chooser} onclose={manager.actions.closeWindow} />

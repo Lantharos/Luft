@@ -67,6 +67,7 @@ export class FileManager {
 	userDirs = $state.raw<UserDirs | null>(null);
 	currentPath = $state('');
 	entries = $state.raw<FileEntry[]>([]);
+	writable = $state(true);
 	trash = $state.raw<TrashContents>(EMPTY_TRASH);
 	error = $state<string | null>(null);
 	searchQuery = $state('');
@@ -78,6 +79,7 @@ export class FileManager {
 	clipboard = $state.raw<ClipboardState>({ items: [], operation: null });
 	canPaste = $state(false);
 	entryFilter = $state.raw<((entry: FileEntry) => boolean) | null>(null);
+	revealCreated = (entry: FileEntry): unknown => this.selectOnly(entry.path);
 	notice = $state<string | null>(null);
 	operations = $state.raw<Operation[]>([]);
 	arrival = $state.raw<Arrival | null>(null);
@@ -216,11 +218,11 @@ export class FileManager {
 		try {
 			const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden });
 			if (!this.loading.isCurrent(token)) return;
-			this.#showListing(listing.path, listing.entries);
+			this.#showListing(listing.path, listing.entries, listing.writable);
 			void commands.watchDirectory({ viewer: this.#viewer, path: listing.path });
 		} catch (caught) {
 			if (!this.loading.isCurrent(token)) return;
-			this.#showListing(path, []);
+			this.#showListing(path, [], false);
 			this.error = errorText(caught);
 		} finally {
 			this.loading.finish(token);
@@ -232,6 +234,7 @@ export class FileManager {
 		const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden }).catch(() => null);
 		if (!listing || this.view !== 'home' || this.currentPath !== path || this.loading.active) return;
 		this.entries = listing.entries;
+		this.writable = listing.writable;
 		this.cloud.follow(path);
 		const present = new Set(listing.entries.map((entry) => entry.path));
 		for (const selected of this.selection) if (!present.has(selected)) this.selection.delete(selected);
@@ -480,7 +483,8 @@ export class FileManager {
 						: await commands.createFile({ path: this.currentPath, name });
 			this.draft = null;
 			await this.refreshListing(this.currentPath);
-			this.selectOnly(entry.path);
+			if (draft.mode === 'create') await this.revealCreated(entry);
+			else this.selectOnly(entry.path);
 		} catch (caught) {
 			this.notify(caught);
 		}
@@ -501,10 +505,11 @@ export class FileManager {
 		this.#recalling = null;
 	}
 
-	#showListing(path: string, entries: FileEntry[]) {
+	#showListing(path: string, entries: FileEntry[], writable: boolean) {
 		const from = this.currentPath;
 		this.currentPath = path;
 		this.entries = entries;
+		this.writable = writable;
 		this.cloud.follow(path);
 		this.viewMode = this.viewMode === 'columns' ? 'columns' : viewModeForPath(path, settings.value, this.userDirs);
 		this.view = 'home';

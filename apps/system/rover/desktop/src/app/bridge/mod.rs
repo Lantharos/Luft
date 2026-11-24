@@ -60,6 +60,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("existing_paths", |Paths { paths }| {
             Ok(entries::existing(paths))
         })
+        .command("is_folder", |Path { path }| {
+            Ok(std::path::Path::new(&path).is_dir())
+        })
         .command("is_pdf", |Path { path }| Ok(entries::is_pdf(&path)))
         .with("create_file", state, |state, NewEntry { path, name }| {
             entries::create_file(path, name, &state.history)

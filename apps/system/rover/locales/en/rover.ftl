@@ -160,6 +160,8 @@ rover-chooser-replace-description = { $count ->
    *[other] { $names } are already here.
 }
 rover-chooser-replace = Replace
+# Shown when a name typed with slashes points into a folder that isn't there.
+rover-chooser-missing-folder = There’s no folder at { $path }
 
 ## Right-click menu
 

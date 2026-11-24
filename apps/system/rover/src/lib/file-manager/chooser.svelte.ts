@@ -1,8 +1,10 @@
 import { appWindow } from '@lantharos/sabine';
-import { join } from '@luft/ui';
+import { t } from '@luft/i18n';
+import { basename, join, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/bindings.js';
 import { filterMatcher } from './chooser-filter';
+import { expandHome } from './location/expand';
 import type { FileManager } from './manager.svelte';
 
 const CHOOSER_ADDRESS = /^#chooser\/(\d+)$/;
@@ -72,6 +74,10 @@ export class ChooserState {
 
 	selectAll = () => this.selectRange(this.#manager.displayEntries.map((entry) => entry.path));
 
+	accept = async () => {
+		if (this.config.mode !== 'save' || !(await this.#followTypedFolder())) await this.submit();
+	};
+
 	submit = async (paths = this.acceptPaths) => {
 		if (this.#finished || paths.length === 0 || this.cannotSave) return;
 		const clashes = this.config.mode === 'open' ? [] : await commands.existingPaths({ paths });
@@ -104,6 +110,29 @@ export class ChooserState {
 		await appWindow.close();
 	};
 
+	async #followTypedFolder() {
+		const manager = this.#manager;
+		const typed = expandHome(this.saveName.trim(), manager.homePath);
+		const path = typed.startsWith('/') ? typed : join(this.#folder(), typed);
+		if (await commands.isFolder({ path })) {
+			this.saveName = this.config.currentName ?? '';
+			await manager.navigate(path);
+			return true;
+		}
+		if (!typed.includes('/')) return false;
+		if (!(await commands.isFolder({ path: parent(path) }))) {
+			manager.notify(t('rover-chooser-missing-folder', { path: parent(path) }));
+			return true;
+		}
+		await manager.navigate(parent(path));
+		this.saveName = basename(path);
+		return false;
+	}
+
+	#folder() {
+		return this.#manager.currentPath || this.config.currentFolder || this.#manager.homePath;
+	}
+
 	#targetWritable() {
 		const manager = this.#manager;
 		const folder = this.config.mode === 'save_files' && manager.entries.find((entry) => entry.isDir && manager.selection.has(entry.path));
@@ -112,7 +141,7 @@ export class ChooserState {
 
 	#acceptPaths() {
 		const manager = this.#manager;
-		const folder = manager.currentPath || this.config.currentFolder || manager.homePath;
+		const folder = this.#folder();
 		if (this.config.mode === 'save') {
 			const name = this.saveName.trim();
 			return name ? [join(folder, name)] : [];

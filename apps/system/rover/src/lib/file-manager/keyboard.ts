@@ -64,7 +64,7 @@ function handleChooserKey(event: KeyboardEvent, chooser: ChooserState, selectAll
 		chooser.selectAll();
 	} else if (event.key === 'Enter' && chooser.canAccept) {
 		event.preventDefault();
-		void chooser.submit();
+		void chooser.accept();
 	} else if (event.key === 'Escape') {
 		event.preventDefault();
 		void chooser.cancel();

@@ -125,6 +125,9 @@ export const commands = {
 		path: string,
 	}, options?: CallOptions) => invoke<FileEntry>("get_file_info", params, options),
 	historyState: (options?: CallOptions) => invoke<HistoryState>("history_state", {}, options),
+	isFolder: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<boolean>("is_folder", params, options),
 	isPdf: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<boolean>("is_pdf", params, options),

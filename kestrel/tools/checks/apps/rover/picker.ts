@@ -111,6 +111,21 @@ async function checkReplace(rover: LuftApp, saved: string) {
   require(savedTo(await request.answer('Replace answers the app')) === saved, 'Replace saves over the file');
 }
 
+async function checkTypedFolders(rover: LuftApp, folder: string) {
+  const inbox = GLib.build_filenamev([folder, NEW_FOLDER, 'Inbox']);
+  GLib.mkdir_with_parents(inbox, WRITABLE);
+  const request = new SaveRequest(folder);
+  await rover.open();
+  type(NEW_FOLDER);
+  await changes(rover, 'typing a folder’s name in the save dialog goes into it', () => press(Clutter.KEY_Return));
+  await pause(SILENCE);
+  require(request.answered === null, 'the save dialog never offers to replace a folder');
+  press(Clutter.KEY_Control_L, Clutter.KEY_a);
+  type('Inbox/Plan.txt');
+  press(Clutter.KEY_Return);
+  require(savedTo(await request.answer('a typed path answers the app')) === GLib.build_filenamev([inbox, 'Plan.txt']), 'a name with a folder in it saves into that folder');
+}
+
 async function checkReadOnly(rover: LuftApp, folder: string) {
   GLib.mkdir_with_parents(folder, WRITABLE);
   GLib.chmod(folder, NOT_WRITABLE);
@@ -134,6 +149,7 @@ export async function checkPicker(folder: string) {
   const rover = await serveChooser();
   try {
     await checkReplace(rover, await checkNewFolder(rover, folder));
+    await checkTypedFolders(rover, folder);
     await checkReadOnly(rover, GLib.build_filenamev([folder, 'Locked']));
   } finally {
     await rover.close();

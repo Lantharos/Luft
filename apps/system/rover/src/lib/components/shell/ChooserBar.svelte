@@ -11,9 +11,10 @@
 	interface Props {
 		chooser: ChooserState;
 		selectedCount: number;
+		notice: string | null;
 	}
 
-	let { chooser, selectedCount }: Props = $props();
+	let { chooser, selectedCount, notice }: Props = $props();
 
 	const BUTTON =
 		'inline-flex h-10 min-w-[96px] select-none items-center justify-center rounded-full px-5 text-[13px] font-medium leading-none transition-[background-color,color,opacity,box-shadow,filter] disabled:opacity-40';
@@ -51,7 +52,7 @@
 		if (event.key === 'Enter' && chooser.canAccept) {
 			event.preventDefault();
 			event.stopPropagation();
-			void chooser.submit();
+			void chooser.accept();
 		}
 		if (event.key === 'Escape') {
 			event.preventDefault();
@@ -68,7 +69,11 @@
 		</div>
 		<div class="min-w-0">
 			<div class="truncate text-[14px] font-medium text-[var(--text)]">{config.title.trim() || selectionText}</div>
-			<div class="truncate text-[12px] text-[var(--text-muted)]">{selectionText}</div>
+			{#if notice}
+				<div class="truncate text-[12px] text-[var(--danger)]" role="status">{notice}</div>
+			{:else}
+				<div class="truncate text-[12px] text-[var(--text-muted)]">{selectionText}</div>
+			{/if}
 		</div>
 	</div>
 
@@ -107,7 +112,7 @@
 			class={[BUTTON, PRIMARY]}
 			type="button"
 			disabled={!chooser.canAccept}
-			onclick={() => chooser.submit()}
+			onclick={chooser.accept}
 			{@attach tooltip(chooser.cannotSave ? t('rover-chooser-no-save') : '')}
 		>
 			{acceptLabel}

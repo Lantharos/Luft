@@ -143,7 +143,7 @@
 			</div>
 
 			{#if chooser}
-				<ChooserBar {chooser} selectedCount={manager.selection.size} />
+				<ChooserBar {chooser} selectedCount={manager.selection.size} notice={manager.notice} />
 			{:else}
 				<StatusBar {manager} {vcs} />
 			{/if}

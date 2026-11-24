@@ -37,14 +37,15 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  .../meta-wayland-foreign-toplevel-list.h      |  13 +
  src/wayland/meta-wayland-image-copy-capture.c | 843 ++++++++++++++++++
  src/wayland/meta-wayland-image-copy-capture.h |  13 +
- src/wayland/meta-wayland-layer-shell.c        | 486 ++++++++++
- src/wayland/meta-wayland-layer-shell.h        |   6 +
+ src/wayland/meta-wayland-layer-shell.c        | 553 ++++++++++++
+ src/wayland/meta-wayland-layer-shell.h        |  10 +
  src/wayland/meta-wayland-sandbox.c            |  33 +
  src/wayland/meta-wayland-sandbox.h            |   8 +
+ src/wayland/meta-wayland-subsurface.c         |  13 +-
  src/wayland/meta-wayland-versions.h           |   4 +
  src/wayland/meta-wayland.c                    |   6 +
  .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 +++++++++
- 18 files changed, 2228 insertions(+)
+ 19 files changed, 2309 insertions(+), 3 deletions(-)
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
  create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
@@ -1467,10 +1468,10 @@ index 0000000000000000000000000000000000000000..9f08b035326cd784166bb511949316b0
 +                                           unsigned int                 id);
 diff --git a/src/wayland/meta-wayland-layer-shell.c b/src/wayland/meta-wayland-layer-shell.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6a3e18b22
+index 0000000000000000000000000000000000000000..09da9b9fc09ce8a9338560b71b4c3079e94e7a10
 --- /dev/null
 +++ b/src/wayland/meta-wayland-layer-shell.c
-@@ -0,0 +1,486 @@
+@@ -0,0 +1,553 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -1631,34 +1632,87 @@ index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6
 +                                     state->margin_top, state->margin_bottom));
 +}
 +
++static gboolean
++collect_surface_actor (GNode    *node,
++                       gpointer  data)
++{
++  MetaSurfaceActor *surface_actor = meta_wayland_surface_get_actor (node->data);
++  GList **surface_actors = data;
++
++  if (surface_actor)
++    *surface_actors = g_list_append (*surface_actors, surface_actor);
++  return FALSE;
++}
++
++static void
++rebuild_surface_tree (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaWaylandSurface *surface = surface_of (layer_surface);
++  g_autoptr (GList) surface_actors = NULL;
++  g_autoptr (GList) children = NULL;
++  int index = 0;
++
++  if (!layer_surface->group)
++    return;
++
++  g_node_traverse (surface->applied_state.subsurface_branch_node, G_IN_ORDER, G_TRAVERSE_LEAVES, -1,
++                   collect_surface_actor, &surface_actors);
++
++  children = clutter_actor_get_children (layer_surface->group);
++  for (GList *l = children; l; l = l->next)
++    if (!g_list_find (surface_actors, l->data))
++      clutter_actor_remove_child (layer_surface->group, l->data);
++
++  for (GList *l = surface_actors; l; l = l->next, index++)
++    {
++      ClutterActor *actor = l->data;
++      ClutterActor *parent = clutter_actor_get_parent (actor);
++
++      if (parent == layer_surface->group)
++        {
++          clutter_actor_set_child_at_index (layer_surface->group, actor, index);
++          continue;
++        }
++      if (parent)
++        clutter_actor_remove_child (parent, actor);
++      clutter_actor_insert_child_at_index (layer_surface->group, actor, index);
++    }
++}
++
 +static void
 +show (MetaWaylandLayerSurface *layer_surface)
 +{
 +  MetaDisplay *display = meta_context_get_display (context_of (layer_surface));
 +  ClutterActor *top_window_group = meta_compositor_get_top_window_group (display->compositor);
-+  MetaSurfaceActor *surface_actor =
-+    meta_wayland_actor_surface_get_actor (META_WAYLAND_ACTOR_SURFACE (layer_surface));
 +
-+  if (layer_surface->group || !surface_actor)
++  if (layer_surface->group)
 +    return;
 +
 +  layer_surface->group = g_object_new (META_TYPE_WAYLAND_OVERLAY_GROUP, NULL);
-+  clutter_actor_add_child (layer_surface->group, CLUTTER_ACTOR (surface_actor));
 +  clutter_actor_add_child (top_window_group, layer_surface->group);
++  rebuild_surface_tree (layer_surface);
 +}
 +
 +static void
 +hide (MetaWaylandLayerSurface *layer_surface)
 +{
-+  MetaSurfaceActor *surface_actor =
-+    meta_wayland_actor_surface_get_actor (META_WAYLAND_ACTOR_SURFACE (layer_surface));
-+
 +  if (!layer_surface->group)
 +    return;
 +
-+  if (surface_actor && clutter_actor_get_parent (CLUTTER_ACTOR (surface_actor)) == layer_surface->group)
-+    clutter_actor_remove_child (layer_surface->group, CLUTTER_ACTOR (surface_actor));
++  clutter_actor_remove_all_children (layer_surface->group);
 +  g_clear_pointer (&layer_surface->group, clutter_actor_destroy);
++}
++
++static MetaWaylandSurface *
++layer_surface_get_toplevel (MetaWaylandSurfaceRole *surface_role)
++{
++  return meta_wayland_surface_role_get_surface (surface_role);
++}
++
++static void
++layer_surface_notify_subsurface_state_changed (MetaWaylandSurfaceRole *surface_role)
++{
++  rebuild_surface_tree (META_WAYLAND_LAYER_SURFACE (surface_role));
 +}
 +
 +static void
@@ -1745,6 +1799,8 @@ index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6
 +  surface_role_class->assigned = layer_surface_assigned;
 +  surface_role_class->apply_state = layer_surface_apply_state;
 +  surface_role_class->get_preferred_scale_monitor = layer_surface_get_preferred_scale_monitor;
++  surface_role_class->notify_subsurface_state_changed = layer_surface_notify_subsurface_state_changed;
++  surface_role_class->get_toplevel = layer_surface_get_toplevel;
 +  actor_surface_class->get_geometry_scale = layer_surface_get_geometry_scale;
 +}
 +
@@ -1942,6 +1998,18 @@ index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6
 +  wl_resource_set_implementation (resource, &layer_shell_interface, data, NULL);
 +}
 +
++/**
++ * meta_wayland_surface_is_overlay:
++ * @surface: a #MetaWaylandSurface
++ *
++ * Returns: whether @surface is shown on the overlay layer
++ */
++gboolean
++meta_wayland_surface_is_overlay (MetaWaylandSurface *surface)
++{
++  return surface && surface->role && META_IS_WAYLAND_LAYER_SURFACE (surface->role);
++}
++
 +void
 +meta_wayland_init_layer_shell (MetaWaylandCompositor *compositor)
 +{
@@ -1959,16 +2027,20 @@ index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6
 +}
 diff --git a/src/wayland/meta-wayland-layer-shell.h b/src/wayland/meta-wayland-layer-shell.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..7528005555a81a18031c815503d4766af6ac035d
+index 0000000000000000000000000000000000000000..a065cba25512eedc39a64b25e2bb2080752392da
 --- /dev/null
 +++ b/src/wayland/meta-wayland-layer-shell.h
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,10 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#pragma once
++
++#include <glib.h>
 +
 +#include "wayland/meta-wayland-types.h"
 +
 +void meta_wayland_init_layer_shell (MetaWaylandCompositor *compositor);
++
++gboolean meta_wayland_surface_is_overlay (MetaWaylandSurface *surface);
 diff --git a/src/wayland/meta-wayland-sandbox.c b/src/wayland/meta-wayland-sandbox.c
 index 60d0f71214df6857a2caee4da26951fcb1bfd70c..c450f8efcecfa88f3139303de60b2de243b45ce0 100644
 --- a/src/wayland/meta-wayland-sandbox.c
@@ -2036,6 +2108,56 @@ index 667454f92ace05017d4ba3fdab7f314227097e72..e7be8f9a90f9cb5b22d895398572d4aa
 +MetaWaylandAccess meta_wayland_filter_window_capture (const struct wl_client *client,
 +                                                      const struct wl_global *global,
 +                                                      gpointer                user_data);
+diff --git a/src/wayland/meta-wayland-subsurface.c b/src/wayland/meta-wayland-subsurface.c
+index 837a0a1ee23c0ea639b0399dffcc84f1d9033067..a4acdc01626fa2794710f0c7bf603c8566d6748d 100644
+--- a/src/wayland/meta-wayland-subsurface.c
++++ b/src/wayland/meta-wayland-subsurface.c
+@@ -26,6 +26,7 @@
+ #include "wayland/meta-wayland-actor-surface.h"
+ #include "wayland/meta-wayland-buffer.h"
+ #include "wayland/meta-wayland-surface-private.h"
++#include "wayland/meta-wayland-layer-shell.h"
+ #include "wayland/meta-wayland-transaction.h"
+ #include "wayland/meta-window-wayland.h"
+ 
+@@ -64,6 +65,12 @@ should_show (MetaWaylandSurface *surface)
+     return TRUE;
+ }
+ 
++static gboolean
++in_overlay (MetaWaylandSurface *surface)
++{
++  return meta_wayland_surface_is_overlay (meta_wayland_surface_get_toplevel (surface));
++}
++
+ static void
+ sync_actor_subsurface_state (MetaWaylandSurface *surface)
+ {
+@@ -72,13 +79,13 @@ sync_actor_subsurface_state (MetaWaylandSurface *surface)
+   int x, y;
+ 
+   toplevel_window = meta_wayland_surface_get_toplevel_window (surface);
+-  if (!toplevel_window || !should_show (surface))
++  if ((!toplevel_window && !in_overlay (surface)) || !should_show (surface))
+     {
+       clutter_actor_hide (actor);
+       return;
+     }
+ 
+-  if (toplevel_window->client_type == META_WINDOW_CLIENT_TYPE_X11)
++  if (toplevel_window && toplevel_window->client_type == META_WINDOW_CLIENT_TYPE_X11)
+     return;
+ 
+   x = y = 0;
+@@ -258,7 +265,7 @@ meta_wayland_subsurface_sync_actor_state (MetaWaylandActorSurface *actor_surface
+   MetaWaylandActorSurfaceClass *actor_surface_class =
+     META_WAYLAND_ACTOR_SURFACE_CLASS (meta_wayland_subsurface_parent_class);
+ 
+-  if (meta_wayland_surface_get_window (surface))
++  if (meta_wayland_surface_get_window (surface) || in_overlay (surface))
+     actor_surface_class->sync_actor_state (actor_surface);
+ 
+   sync_actor_subsurface_state (surface);
 diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
 index c27c8bb9b11d13790db66363090ccfd85f489c34..495e6951f898cffe2f44d50def1de5c1fb717abd 100644
 --- a/src/wayland/meta-wayland-versions.h

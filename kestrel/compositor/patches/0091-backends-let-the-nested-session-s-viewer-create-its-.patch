@@ -1,0 +1,130 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 24 Nov 2026 10:20:50 +0100
+Subject: [PATCH] backends: let the nested session's viewer create its sessions
+ again
+
+A nested session shows itself through mutter-devkit, which records the
+virtual monitor and sends input through the ScreenCast and RemoteDesktop
+services. Since only the desktop portal backend and Kestrel's screencast
+service may create sessions there, the viewer was refused and the
+nested session ended as soon as it started.
+
+The viewer the compositor started itself may create sessions too: a
+caller that is a direct child of the compositor and runs Mutter's own
+mutter-devkit, judged from the process behind the calling connection
+and pinned by a pidfd while it is read.
+
+Upstream-Status: luft-only follows the session service restriction Kestrel adds
+---
+ src/backends/meta-dbus-session-manager.c |  5 ++-
+ src/core/meta-sandbox.c                  | 53 ++++++++++++++++++++++++
+ src/core/meta-sandbox.h                  |  4 ++
+ 3 files changed, 61 insertions(+), 1 deletion(-)
+
+diff --git a/src/backends/meta-dbus-session-manager.c b/src/backends/meta-dbus-session-manager.c
+index 85170782e1d721ea3d6a793032d3175b788080bd..2f8f2fb88735375e5e130efff2379f5abbd375dd 100644
+--- a/src/backends/meta-dbus-session-manager.c
++++ b/src/backends/meta-dbus-session-manager.c
+@@ -26,6 +26,7 @@
+ #include "backends/meta-dbus-access-checker.h"
+ #include "backends/meta-dbus-session-watcher.h"
+ #include "core/meta-dbus-guard.h"
++#include "core/meta-sandbox.h"
+ 
+ #define PORTAL_BACKEND_NAME "org.freedesktop.impl.portal.desktop.kestrel"
+ #define SCREENCAST_SERVICE_NAME "com.lantharos.Kestrel.Screencast"
+@@ -132,7 +133,9 @@ authorize_method (GDBusInterfaceSkeleton *interface_skeleton,
+   if (!g_str_equal (g_dbus_method_invocation_get_method_name (invocation),
+                     "CreateSession") ||
+       meta_dbus_access_checker_is_sender_allowed (priv->portal_checker, sender) ||
+-      meta_dbus_access_checker_is_sender_allowed (priv->screencast_checker, sender))
++      meta_dbus_access_checker_is_sender_allowed (priv->screencast_checker, sender) ||
++      meta_dbus_sender_is_own_child (g_dbus_method_invocation_get_connection (invocation),
++                                     sender, MUTTER_LIBEXECDIR "/mutter-devkit"))
+     return TRUE;
+ 
+   g_dbus_method_invocation_return_error (invocation,
+diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
+index e0fac4f4dfb44d1c0f9a23749162c5cfba777871..4f8b707c2c0dbe2e523814da9d477c6583906e24 100644
+--- a/src/core/meta-sandbox.c
++++ b/src/core/meta-sandbox.c
+@@ -9,6 +9,9 @@
+ #include <gio/gunixfdlist.h>
+ #include <glib/gstdio.h>
+ #include <sys/pidfd.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
+ 
+ #include "core/meta-process-identity.h"
+ #include "meta/meta-context.h"
+@@ -223,6 +226,56 @@ meta_dbus_sender_is_unsandboxed (MetaContext     *context,
+   return identify_credentials (context, reply, fd_list, &app_id) && !app_id;
+ }
+ 
++/**
++ * meta_dbus_sender_is_own_child:
++ * @connection: the bus @sender_name is on
++ * @sender_name: a D-Bus sender
++ * @program: the program the child runs
++ *
++ * Returns: whether @sender_name is a process the compositor itself started
++ *   running @program, such as the devkit viewer of a nested session
++ */
++gboolean
++meta_dbus_sender_is_own_child (GDBusConnection *connection,
++                               const char      *sender_name,
++                               const char      *program)
++{
++  g_autoptr (GUnixFDList) fd_list = NULL;
++  g_autoptr (GVariant) reply = NULL;
++  g_autofree char *stat_path = NULL;
++  g_autofree char *exe_path = NULL;
++  g_autofree char *stat = NULL;
++  g_autofree char *exe = NULL;
++  g_autofd int pidfd = -1;
++  const char *fields;
++  pid_t pid;
++  int parent;
++
++  reply = g_dbus_connection_call_with_unix_fd_list_sync (connection,
++                                                         "org.freedesktop.DBus",
++                                                         "/org/freedesktop/DBus",
++                                                         "org.freedesktop.DBus",
++                                                         "GetConnectionCredentials",
++                                                         g_variant_new ("(s)", sender_name),
++                                                         G_VARIANT_TYPE ("(a{sv})"),
++                                                         G_DBUS_CALL_FLAGS_NONE,
++                                                         -1, NULL, &fd_list,
++                                                         NULL, NULL);
++  if (!pidfd_of_credentials (reply, fd_list, &pidfd, &pid))
++    return FALSE;
++
++  stat_path = g_strdup_printf ("/proc/%d/stat", pid);
++  exe_path = g_strdup_printf ("/proc/%d/exe", pid);
++  if (!g_file_get_contents (stat_path, &stat, NULL, NULL))
++    return FALSE;
++
++  fields = strrchr (stat, ')');
++  exe = g_file_read_link (exe_path, NULL);
++  return fields && sscanf (fields, ") %*c %d", &parent) == 1 && parent == getpid () &&
++         exe && g_str_equal (exe, program) &&
++         pidfd_send_signal (pidfd, 0, NULL, 0) == 0;
++}
++
+ static void
+ on_sender_credentials (GObject      *source,
+                        GAsyncResult *result,
+diff --git a/src/core/meta-sandbox.h b/src/core/meta-sandbox.h
+index 1905cfd4945c83cd1843303c5734a57edebaab76..31df47b44fb8837dae5f1a678f963da913f5feb4 100644
+--- a/src/core/meta-sandbox.h
++++ b/src/core/meta-sandbox.h
+@@ -16,3 +16,7 @@ gboolean meta_process_identify (int     pidfd,
+ gboolean meta_dbus_sender_is_unsandboxed (MetaContext     *context,
+                                           GDBusConnection *connection,
+                                           const char      *sender_name);
++
++gboolean meta_dbus_sender_is_own_child (GDBusConnection *connection,
++                                        const char      *sender_name,
++                                        const char      *program);

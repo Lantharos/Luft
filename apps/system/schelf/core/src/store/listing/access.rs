@@ -26,6 +26,8 @@ pub struct Declared {
     pub microphone: bool,
     #[serde(default)]
     pub camera: bool,
+    #[serde(default)]
+    pub record_windows: bool,
     pub unsandboxed: Option<String>,
 }
 
@@ -42,6 +44,7 @@ impl Declared {
             x11: false,
             microphone: false,
             camera: false,
+            record_windows: false,
             unsandboxed: None,
         }
     }
@@ -57,6 +60,7 @@ impl Declared {
             x11: self.x11,
             microphone: self.microphone,
             camera: self.camera,
+            record_windows: self.record_windows,
             unsandboxed: self.unsandboxed.clone(),
         }
     }
@@ -84,6 +88,7 @@ impl Declared {
             || (self.pipewire && !before.pipewire)
             || (self.microphone && !before.microphone)
             || (self.camera && !before.camera)
+            || (self.record_windows && !before.record_windows)
         {
             return true;
         }
@@ -269,6 +274,7 @@ mod tests {
             x11: false,
             microphone: false,
             camera: false,
+            record_windows: false,
             unsandboxed: None,
         }
     }

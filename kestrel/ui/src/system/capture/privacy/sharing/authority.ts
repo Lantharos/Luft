@@ -1,6 +1,7 @@
 import GLib from 'gi://GLib';
 
 import { RememberedGrants, type Kind } from './remembered.js';
+import { StoredGrants } from './stored.js';
 
 export type { Kind } from './remembered.js';
 
@@ -23,6 +24,7 @@ interface Use {
 
 class SharingAuthority {
   private readonly rememberedGrants = new RememberedGrants();
+  private readonly storedGrants = new StoredGrants(() => this.changed());
   private readonly uses = new Map<string, Use>();
   private readonly listeners = new Set<() => void>();
   private serial = 0;
@@ -52,11 +54,12 @@ class SharingAuthority {
   }
 
   async forget(id: string): Promise<void> {
+    if (await this.storedGrants.remove(id)) return;
     if (await this.rememberedGrants.remove(id)) this.changed();
   }
 
   async list(): Promise<Grant[]> {
-    const remembered = await this.rememberedGrants.all();
+    const remembered = [...await this.rememberedGrants.all(), ...await this.storedGrants.all()];
     const uses = [...this.uses];
     return [
       ...remembered.map(grant => ({ ...grant, remembered: true, active: uses.some(([, use]) => use.remembered === grant.id) })),

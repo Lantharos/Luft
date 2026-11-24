@@ -1,0 +1,2490 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 24 Nov 2026 09:37:11 +0100
+Subject: [PATCH] wayland: let apps that may record windows list, capture and
+ overlay them
+
+A game clipper finds the game's window, records only that window and
+shows a short hint above it while it is full screen. Mutter offered
+neither without the screen cast portal, which asks every time.
+
+ext-foreign-toplevel-list-v1 lists the windows on the taskbar with
+their title and app id, which for X11 windows is their WM_CLASS, such
+as steam_app_<id> for Steam games. ext-image-copy-capture-v1 with
+ext-foreign-toplevel-image-capture-source-v1 copies a window into a
+buffer the client provides, shared memory or a DMA-BUF in ARGB8888 or
+XRGB8888, drawing the pointer in when asked, and stops when the window
+closes. MetaDisplay::window-capture-started and ::window-capture-ended
+tell the shell what is recorded, and meta_display_stop_window_capture()
+ends a recording. zwlr_layer_shell_v1 offers only the overlay layer:
+such a surface sits above every window, fullscreen ones included, and
+is never picked, so it takes neither focus nor the pointer.
+
+Sandboxed clients see these globals only while the shell permits their
+app window-capture, and starting a recording or an overlay checks it
+again.
+
+Upstream-Status: luft-only GNOME offers recording through the screen cast portal instead
+---
+ src/core/display-private.h                    |   8 +
+ src/core/display.c                            |  68 ++
+ src/core/meta-sandbox.h                       |   1 +
+ src/meson.build                               |  10 +
+ src/meta/display.h                            |   4 +
+ src/wayland/meta-wayland-dma-buf.c            |  34 +
+ src/wayland/meta-wayland-dma-buf.h            |   9 +
+ .../meta-wayland-foreign-toplevel-list.c      | 275 ++++++
+ .../meta-wayland-foreign-toplevel-list.h      |  13 +
+ src/wayland/meta-wayland-image-copy-capture.c | 843 ++++++++++++++++++
+ src/wayland/meta-wayland-image-copy-capture.h |  13 +
+ src/wayland/meta-wayland-layer-shell.c        | 486 ++++++++++
+ src/wayland/meta-wayland-layer-shell.h        |   6 +
+ src/wayland/meta-wayland-sandbox.c            |  33 +
+ src/wayland/meta-wayland-sandbox.h            |   8 +
+ src/wayland/meta-wayland-versions.h           |   4 +
+ src/wayland/meta-wayland.c                    |   6 +
+ .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 +++++++++
+ 18 files changed, 2228 insertions(+)
+ create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
+ create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
+ create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
+ create mode 100644 src/wayland/meta-wayland-image-copy-capture.h
+ create mode 100644 src/wayland/meta-wayland-layer-shell.c
+ create mode 100644 src/wayland/meta-wayland-layer-shell.h
+ create mode 100644 src/wayland/protocol/wlr-layer-shell-unstable-v1.xml
+
+diff --git a/src/core/display-private.h b/src/core/display-private.h
+index a166cc6952f77a9396c434eb49a7072b6c3a463a..e8041ad8ff06ad8dd2c8647bac65e66d56717330 100644
+--- a/src/core/display-private.h
++++ b/src/core/display-private.h
+@@ -286,6 +286,14 @@ gboolean meta_display_apply_startup_properties (MetaDisplay *display,
+ void meta_display_queue_workarea_recalc  (MetaDisplay *display);
+ void meta_display_queue_check_fullscreen (MetaDisplay *display);
+ 
++void meta_display_window_capture_started (MetaDisplay  *display,
++                                          unsigned int  id,
++                                          MetaWindow   *window,
++                                          const char   *app_id);
++
++void meta_display_window_capture_ended (MetaDisplay  *display,
++                                        unsigned int  id);
++
+ MetaWindow *meta_display_get_window_from_id (MetaDisplay *display,
+                                              uint64_t     window_id);
+ uint64_t    meta_display_generate_window_id (MetaDisplay *display);
+diff --git a/src/core/display.c b/src/core/display.c
+index d0c2d950cb6f0c772abfca5ec164fe62e24043bd..ac4c60c5cec83da2ef9bf9817ac3b81de57d2798 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -65,6 +65,7 @@
+ #include "wayland/meta-wayland.h"
+ #include "wayland/meta-wayland-input-device.h"
+ #include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-image-copy-capture.h"
+ #include "wayland/meta-wayland-tablet-seat.h"
+ #include "wayland/meta-wayland-tablet-pad.h"
+ #include "wayland/meta-wayland-tablet-manager.h"
+@@ -182,6 +183,8 @@ enum
+   WINDOW_VISIBILITY_UPDATED,
+   BELL,
+   PEN_ACTION,
++  WINDOW_CAPTURE_STARTED,
++  WINDOW_CAPTURE_ENDED,
+   LAST_SIGNAL
+ };
+ 
+@@ -496,6 +499,38 @@ meta_display_class_init (MetaDisplayClass *klass)
+                   G_TYPE_INT,
+                   META_TYPE_WINDOW);
+ 
++  /**
++   * MetaDisplay::window-capture-started:
++   * @display: the #MetaDisplay
++   * @id: the capture, to stop it with meta_display_stop_window_capture()
++   * @window: the window being recorded
++   * @app_id: (nullable): the sandboxed app recording it, or %NULL for a
++   *   program outside a sandbox
++   *
++   * A Wayland client started recording a window through
++   * ext-image-copy-capture-v1.
++   */
++  display_signals[WINDOW_CAPTURE_STARTED] =
++    g_signal_new ("window-capture-started",
++                  G_TYPE_FROM_CLASS (klass),
++                  G_SIGNAL_RUN_LAST,
++                  0, NULL, NULL, NULL,
++                  G_TYPE_NONE, 3,
++                  G_TYPE_UINT, META_TYPE_WINDOW, G_TYPE_STRING);
++
++  /**
++   * MetaDisplay::window-capture-ended:
++   * @display: the #MetaDisplay
++   * @id: the capture that ended
++   */
++  display_signals[WINDOW_CAPTURE_ENDED] =
++    g_signal_new ("window-capture-ended",
++                  G_TYPE_FROM_CLASS (klass),
++                  G_SIGNAL_RUN_LAST,
++                  0, NULL, NULL, NULL,
++                  G_TYPE_NONE, 1,
++                  G_TYPE_UINT);
++
+   display_signals[IN_FULLSCREEN_CHANGED] =
+     g_signal_new ("in-fullscreen-changed",
+                   G_TYPE_FROM_CLASS (klass),
+@@ -2341,6 +2376,39 @@ meta_display_get_context (MetaDisplay *display)
+   return priv->context;
+ }
+ 
++void
++meta_display_window_capture_started (MetaDisplay  *display,
++                                     unsigned int  id,
++                                     MetaWindow   *window,
++                                     const char   *app_id)
++{
++  g_signal_emit (display, display_signals[WINDOW_CAPTURE_STARTED], 0, id, window, app_id);
++}
++
++void
++meta_display_window_capture_ended (MetaDisplay  *display,
++                                   unsigned int  id)
++{
++  g_signal_emit (display, display_signals[WINDOW_CAPTURE_ENDED], 0, id);
++}
++
++/**
++ * meta_display_stop_window_capture:
++ * @display: a #MetaDisplay
++ * @id: a capture from #MetaDisplay::window-capture-started
++ *
++ * Stops recording the window; the app hears the capture stopped.
++ */
++void
++meta_display_stop_window_capture (MetaDisplay  *display,
++                                  unsigned int  id)
++{
++  MetaWaylandCompositor *compositor =
++    meta_context_get_wayland_compositor (meta_display_get_context (display));
++
++  meta_wayland_image_copy_capture_stop (meta_wayland_compositor_get_image_copy_capture (compositor), id);
++}
++
+ /**
+  * meta_display_get_compositor:
+  * @display: a #MetaDisplay
+diff --git a/src/core/meta-sandbox.h b/src/core/meta-sandbox.h
+index 27bd6a103f49b2d0390f45ae0faef76225849e7c..1905cfd4945c83cd1843303c5734a57edebaab76 100644
+--- a/src/core/meta-sandbox.h
++++ b/src/core/meta-sandbox.h
+@@ -7,6 +7,7 @@
+ #include "meta/types.h"
+ 
+ #define META_PERMISSION_FULL_ACCESS "full-access"
++#define META_PERMISSION_WINDOW_CAPTURE "window-capture"
+ 
+ gboolean meta_process_identify (int     pidfd,
+                                 pid_t   pid,
+diff --git a/src/meson.build b/src/meson.build
+index 2db3fa4ec2afdbc64a6bbf51136f16c315a07709..eee5ab8531b16694e68ea1d26da346e0de81ec9e 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -663,6 +663,12 @@ mutter_sources += [
+   'wayland/meta-wayland-kestrel-glass.h',
+   'wayland/meta-wayland-kestrel-window.c',
+   'wayland/meta-wayland-kestrel-window.h',
++  'wayland/meta-wayland-foreign-toplevel-list.c',
++  'wayland/meta-wayland-foreign-toplevel-list.h',
++  'wayland/meta-wayland-image-copy-capture.c',
++  'wayland/meta-wayland-image-copy-capture.h',
++  'wayland/meta-wayland-layer-shell.c',
++  'wayland/meta-wayland-layer-shell.h',
+   'wayland/meta-wayland-xdg-decoration.c',
+   'wayland/meta-wayland-xdg-decoration.h',
+   'wayland/meta-wayland-icon-pixels.c',
+@@ -1046,12 +1052,16 @@ wayland_protocols = [
+   ['drm-lease', 'staging', 1, ],
+   ['ext-background-effect', 'staging', 1, ],
+   ['ext-data-control', 'staging', 1, ],
++  ['ext-foreign-toplevel-list', 'staging', 1, ],
++  ['ext-image-capture-source', 'staging', 1, ],
++  ['ext-image-copy-capture', 'staging', 1, ],
+   ['ext-idle-notify', 'staging', 1, ],
+   ['fractional-scale', 'staging', 1, ],
+   ['fifo', 'staging', 1, ],
+   ['gtk-shell', 'private', ],
+   ['kestrel-glass-v1', 'private', ],
+   ['kestrel-window-v1', 'private', ],
++  ['wlr-layer-shell-unstable-v1', 'private', ],
+   ['idle-inhibit', 'unstable', 1, ],
+   ['keyboard-shortcuts-inhibit', 'unstable', 1, ],
+   ['linux-dmabuf', 'stable', 1, ],
+diff --git a/src/meta/display.h b/src/meta/display.h
+index cc4d658d0380ac7e17afb9973189ebe524c7d0d2..f1973c068100ac91eb21bcaceaa3df1822aba783 100644
+--- a/src/meta/display.h
++++ b/src/meta/display.h
+@@ -90,6 +90,10 @@ void meta_display_close (MetaDisplay *display,
+ META_EXPORT
+ MetaContext * meta_display_get_context (MetaDisplay *display);
+ 
++META_EXPORT
++void meta_display_stop_window_capture (MetaDisplay  *display,
++                                       unsigned int  id);
++
+ META_EXPORT
+ MetaCompositor *meta_display_get_compositor  (MetaDisplay *display);
+ 
+diff --git a/src/wayland/meta-wayland-dma-buf.c b/src/wayland/meta-wayland-dma-buf.c
+index ae3a84b4ffb1e55529282ab1b813e4966d1c124e..44f6750589737719ce6a063fc529654b53fe3687 100644
+--- a/src/wayland/meta-wayland-dma-buf.c
++++ b/src/wayland/meta-wayland-dma-buf.c
+@@ -751,6 +751,40 @@ meta_wayland_dma_buf_try_acquire_scanout (MetaWaylandBuffer     *buffer,
+   return g_steal_pointer (&scanout);
+ }
+ 
++CoglFramebuffer *
++meta_wayland_dma_buf_buffer_create_framebuffer (MetaWaylandDmaBufBuffer  *dma_buf,
++                                                CoglContext              *context,
++                                                CoglPixelFormat           format,
++                                                GError                  **error)
++{
++  CoglRenderer *renderer = cogl_context_get_renderer (context);
++  uint64_t modifiers[META_WAYLAND_DMA_BUF_MAX_FDS];
++  int n_planes = 0;
++
++  while (n_planes < META_WAYLAND_DMA_BUF_MAX_FDS && dma_buf->fds[n_planes] != -1)
++    modifiers[n_planes++] = dma_buf->drm_modifier;
++
++  return cogl_renderer_create_dma_buf_framebuffer (renderer, context,
++                                                   dma_buf->width, dma_buf->height,
++                                                   dma_buf->drm_format, format,
++                                                   n_planes, dma_buf->fds,
++                                                   dma_buf->strides, dma_buf->offsets,
++                                                   dma_buf->drm_modifier == DRM_FORMAT_MOD_INVALID ? NULL : modifiers,
++                                                   error);
++}
++
++uint32_t
++meta_wayland_dma_buf_buffer_get_drm_format (MetaWaylandDmaBufBuffer *dma_buf)
++{
++  return dma_buf->drm_format;
++}
++
++dev_t
++meta_wayland_dma_buf_manager_get_main_device (MetaWaylandDmaBufManager *dma_buf_manager)
++{
++  return dma_buf_manager->main_device_id;
++}
++
+ int
+ meta_wayland_dma_buf_buffer_get_width (MetaWaylandBuffer *buffer)
+ {
+diff --git a/src/wayland/meta-wayland-dma-buf.h b/src/wayland/meta-wayland-dma-buf.h
+index cf13821210fceca9f1f56bc6dfaaad10e50ee7de..862b890d47310ee7d45ece9ca4004d9f09d12ee8 100644
+--- a/src/wayland/meta-wayland-dma-buf.h
++++ b/src/wayland/meta-wayland-dma-buf.h
+@@ -77,5 +77,14 @@ meta_wayland_dma_buf_try_acquire_scanout (MetaWaylandBuffer     *buffer,
+                                           const graphene_rect_t *src_rect,
+                                           const MtkRectangle    *dst_rect);
+ 
++CoglFramebuffer * meta_wayland_dma_buf_buffer_create_framebuffer (MetaWaylandDmaBufBuffer  *dma_buf,
++                                                                 CoglContext              *context,
++                                                                 CoglPixelFormat           format,
++                                                                 GError                  **error);
++
++uint32_t meta_wayland_dma_buf_buffer_get_drm_format (MetaWaylandDmaBufBuffer *dma_buf);
++
++dev_t meta_wayland_dma_buf_manager_get_main_device (MetaWaylandDmaBufManager *dma_buf_manager);
++
+ int meta_wayland_dma_buf_buffer_get_width (MetaWaylandBuffer *buffer);
+ int meta_wayland_dma_buf_buffer_get_height (MetaWaylandBuffer *buffer);
+diff --git a/src/wayland/meta-wayland-foreign-toplevel-list.c b/src/wayland/meta-wayland-foreign-toplevel-list.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4b8d0a40e
+--- /dev/null
++++ b/src/wayland/meta-wayland-foreign-toplevel-list.c
+@@ -0,0 +1,275 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "wayland/meta-wayland-foreign-toplevel-list.h"
++
++#include "core/window-private.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-sandbox.h"
++#include "wayland/meta-wayland-versions.h"
++
++#include "ext-foreign-toplevel-list-v1-server-protocol.h"
++
++typedef struct _ForeignToplevel
++{
++  MetaWaylandForeignToplevelList *list;
++  MetaWindow *window;
++  char *identifier;
++  GList *handles;
++  gulong title_handler_id;
++  gulong wm_class_handler_id;
++  gulong unmanaged_handler_id;
++} ForeignToplevel;
++
++struct _MetaWaylandForeignToplevelList
++{
++  MetaWaylandCompositor *compositor;
++  GList *lists;
++  GHashTable *toplevels;
++  char *run_id;
++  gulong window_created_handler_id;
++};
++
++static const struct ext_foreign_toplevel_handle_v1_interface handle_interface;
++
++static gboolean
++is_listed (MetaWindow *window)
++{
++  return !window->override_redirect && !meta_window_is_skip_taskbar (window);
++}
++
++static void
++send_details (struct wl_resource *handle,
++              MetaWindow         *window)
++{
++  ext_foreign_toplevel_handle_v1_send_title (handle, meta_window_get_title (window) ?: "");
++  ext_foreign_toplevel_handle_v1_send_app_id (handle, meta_window_get_wm_class (window) ?: "");
++  ext_foreign_toplevel_handle_v1_send_done (handle);
++}
++
++static void
++handle_destructor (struct wl_resource *resource)
++{
++  ForeignToplevel *toplevel = wl_resource_get_user_data (resource);
++
++  if (toplevel)
++    toplevel->handles = g_list_remove (toplevel->handles, resource);
++}
++
++static void
++handle_destroy (struct wl_client   *client,
++                struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct ext_foreign_toplevel_handle_v1_interface handle_interface = {
++  handle_destroy,
++};
++
++static void
++announce (ForeignToplevel    *toplevel,
++          struct wl_resource *list)
++{
++  struct wl_resource *handle;
++
++  handle = wl_resource_create (wl_resource_get_client (list),
++                               &ext_foreign_toplevel_handle_v1_interface,
++                               wl_resource_get_version (list), 0);
++  wl_resource_set_implementation (handle, &handle_interface, toplevel, handle_destructor);
++  toplevel->handles = g_list_prepend (toplevel->handles, handle);
++
++  ext_foreign_toplevel_list_v1_send_toplevel (list, handle);
++  ext_foreign_toplevel_handle_v1_send_identifier (handle, toplevel->identifier);
++  send_details (handle, toplevel->window);
++}
++
++static void
++on_details_changed (MetaWindow      *window,
++                    GParamSpec      *pspec,
++                    ForeignToplevel *toplevel)
++{
++  for (GList *l = toplevel->handles; l; l = l->next)
++    send_details (l->data, window);
++}
++
++static void
++toplevel_free (ForeignToplevel *toplevel)
++{
++  for (GList *l = toplevel->handles; l; l = l->next)
++    {
++      ext_foreign_toplevel_handle_v1_send_closed (l->data);
++      wl_resource_set_user_data (l->data, NULL);
++    }
++  g_list_free (toplevel->handles);
++  g_clear_signal_handler (&toplevel->title_handler_id, toplevel->window);
++  g_clear_signal_handler (&toplevel->wm_class_handler_id, toplevel->window);
++  g_clear_signal_handler (&toplevel->unmanaged_handler_id, toplevel->window);
++  g_free (toplevel->identifier);
++  g_free (toplevel);
++}
++
++static void
++on_unmanaged (MetaWindow      *window,
++              ForeignToplevel *toplevel)
++{
++  g_hash_table_remove (toplevel->list->toplevels, window);
++}
++
++static void
++track (MetaWaylandForeignToplevelList *self,
++       MetaWindow                     *window)
++{
++  ForeignToplevel *toplevel;
++
++  if (!is_listed (window) || g_hash_table_contains (self->toplevels, window))
++    return;
++
++  toplevel = g_new0 (ForeignToplevel, 1);
++  toplevel->list = self;
++  toplevel->window = window;
++  toplevel->identifier = g_strdup_printf ("%s-%" G_GUINT64_FORMAT, self->run_id, meta_window_get_id (window));
++  toplevel->title_handler_id =
++    g_signal_connect (window, "notify::title", G_CALLBACK (on_details_changed), toplevel);
++  toplevel->wm_class_handler_id =
++    g_signal_connect (window, "notify::wm-class", G_CALLBACK (on_details_changed), toplevel);
++  toplevel->unmanaged_handler_id =
++    g_signal_connect (window, "unmanaged", G_CALLBACK (on_unmanaged), toplevel);
++  g_hash_table_insert (self->toplevels, window, toplevel);
++
++  for (GList *l = self->lists; l; l = l->next)
++    announce (toplevel, l->data);
++}
++
++static void
++on_window_created (MetaDisplay                    *display,
++                   MetaWindow                     *window,
++                   MetaWaylandForeignToplevelList *self)
++{
++  track (self, window);
++}
++
++static void
++follow_windows (MetaWaylandForeignToplevelList *self)
++{
++  MetaDisplay *display = meta_context_get_display (self->compositor->context);
++  g_autoptr (GList) windows = NULL;
++
++  if (self->window_created_handler_id)
++    return;
++
++  self->window_created_handler_id =
++    g_signal_connect (display, "window-created", G_CALLBACK (on_window_created), self);
++  windows = meta_display_list_all_windows (display);
++  for (GList *l = windows; l; l = l->next)
++    track (self, l->data);
++}
++
++static void
++list_destructor (struct wl_resource *resource)
++{
++  MetaWaylandForeignToplevelList *self = wl_resource_get_user_data (resource);
++
++  self->lists = g_list_remove (self->lists, resource);
++}
++
++static void
++list_stop (struct wl_client   *client,
++           struct wl_resource *resource)
++{
++  MetaWaylandForeignToplevelList *self = wl_resource_get_user_data (resource);
++
++  if (!g_list_find (self->lists, resource))
++    return;
++
++  self->lists = g_list_remove (self->lists, resource);
++  ext_foreign_toplevel_list_v1_send_finished (resource);
++}
++
++static void
++list_destroy (struct wl_client   *client,
++              struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct ext_foreign_toplevel_list_v1_interface list_interface = {
++  list_stop,
++  list_destroy,
++};
++
++static void
++bind_list (struct wl_client *client,
++           void             *data,
++           uint32_t          version,
++           uint32_t          id)
++{
++  MetaWaylandForeignToplevelList *self = data;
++  struct wl_resource *resource;
++  GHashTableIter iter;
++  ForeignToplevel *toplevel;
++
++  follow_windows (self);
++  resource = wl_resource_create (client, &ext_foreign_toplevel_list_v1_interface, version, id);
++  wl_resource_set_implementation (resource, &list_interface, self, list_destructor);
++  self->lists = g_list_prepend (self->lists, resource);
++
++  g_hash_table_iter_init (&iter, self->toplevels);
++  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &toplevel))
++    announce (toplevel, resource);
++}
++
++/**
++ * meta_wayland_foreign_toplevel_handle_get_window:
++ * @handle: an ext_foreign_toplevel_handle_v1 resource
++ *
++ * Returns: (nullable): the window behind @handle, or %NULL once it closed
++ */
++MetaWindow *
++meta_wayland_foreign_toplevel_handle_get_window (struct wl_resource *handle)
++{
++  ForeignToplevel *toplevel;
++
++  g_return_val_if_fail (wl_resource_instance_of (handle, &ext_foreign_toplevel_handle_v1_interface,
++                                                 &handle_interface), NULL);
++
++  toplevel = wl_resource_get_user_data (handle);
++  return toplevel ? toplevel->window : NULL;
++}
++
++static void
++foreign_toplevel_list_free (MetaWaylandForeignToplevelList *self)
++{
++  if (self->window_created_handler_id)
++    g_clear_signal_handler (&self->window_created_handler_id,
++                            meta_context_get_display (self->compositor->context));
++  g_clear_pointer (&self->toplevels, g_hash_table_destroy);
++  g_list_free (self->lists);
++  g_free (self->run_id);
++  g_free (self);
++}
++
++void
++meta_wayland_init_foreign_toplevel_list (MetaWaylandCompositor *compositor)
++{
++  MetaWaylandForeignToplevelList *self = g_new0 (MetaWaylandForeignToplevelList, 1);
++  struct wl_global *global;
++
++  self->compositor = compositor;
++  self->run_id = g_strdup_printf ("%08x", g_random_int ());
++  self->toplevels = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) toplevel_free);
++
++  global = wl_global_create (compositor->wayland_display,
++                             &ext_foreign_toplevel_list_v1_interface,
++                             META_EXT_FOREIGN_TOPLEVEL_LIST_V1_VERSION,
++                             self, bind_list);
++  if (!global)
++    g_error ("Failed to register a global ext-foreign-toplevel-list object");
++
++  meta_wayland_filter_manager_add_global (meta_wayland_compositor_get_filter_manager (compositor),
++                                          global, meta_wayland_filter_window_capture,
++                                          compositor->context);
++
++  g_object_set_data_full (G_OBJECT (compositor), "-meta-wayland-foreign-toplevel-list",
++                          self, (GDestroyNotify) foreign_toplevel_list_free);
++}
+diff --git a/src/wayland/meta-wayland-foreign-toplevel-list.h b/src/wayland/meta-wayland-foreign-toplevel-list.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9e0f86e00ac503c061ed4757de2286a2501ef93
+--- /dev/null
++++ b/src/wayland/meta-wayland-foreign-toplevel-list.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <wayland-server.h>
++
++#include "meta/window.h"
++#include "wayland/meta-wayland-types.h"
++
++typedef struct _MetaWaylandForeignToplevelList MetaWaylandForeignToplevelList;
++
++void meta_wayland_init_foreign_toplevel_list (MetaWaylandCompositor *compositor);
++
++MetaWindow * meta_wayland_foreign_toplevel_handle_get_window (struct wl_resource *handle);
+diff --git a/src/wayland/meta-wayland-image-copy-capture.c b/src/wayland/meta-wayland-image-copy-capture.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c045bff3789
+--- /dev/null
++++ b/src/wayland/meta-wayland-image-copy-capture.c
+@@ -0,0 +1,843 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "wayland/meta-wayland-image-copy-capture.h"
++
++#include <drm_fourcc.h>
++
++#include "backends/meta-backend-private.h"
++#include "backends/meta-cursor-tracker-private.h"
++#include "backends/meta-screen-cast-window.h"
++#include "compositor/meta-window-actor-private.h"
++#include "core/display-private.h"
++#include "core/window-private.h"
++#include "wayland/meta-wayland-buffer.h"
++#include "wayland/meta-wayland-dma-buf.h"
++#include "wayland/meta-wayland-foreign-toplevel-list.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-sandbox.h"
++#include "wayland/meta-wayland-versions.h"
++
++#include "ext-image-capture-source-v1-server-protocol.h"
++#include "ext-image-copy-capture-v1-server-protocol.h"
++
++typedef struct
++{
++  uint32_t shm_format;
++  uint32_t drm_format;
++  CoglPixelFormat cogl_format;
++} CaptureFormat;
++
++static const CaptureFormat formats[] = {
++  { WL_SHM_FORMAT_ARGB8888, DRM_FORMAT_ARGB8888, COGL_PIXEL_FORMAT_BGRA_8888_PRE },
++  { WL_SHM_FORMAT_XRGB8888, DRM_FORMAT_XRGB8888, COGL_PIXEL_FORMAT_BGRX_8888 },
++};
++
++static GQuark quark_framebuffer = 0;
++
++typedef struct _Session Session;
++
++typedef struct
++{
++  struct wl_resource *resource;
++  MetaWindow *window;
++  gulong unmanaged_handler_id;
++} CaptureSource;
++
++typedef struct
++{
++  Session *session;
++  struct wl_resource *resource;
++  struct wl_resource *buffer;
++  gboolean captured;
++} Frame;
++
++struct _Session
++{
++  MetaWaylandImageCopyCapture *manager;
++  struct wl_resource *resource;
++  unsigned int id;
++  MetaWindow *window;
++  MetaWindowActor *actor;
++  gboolean paint_cursors;
++  int width;
++  int height;
++  gboolean copied_once;
++  gboolean damaged;
++  Frame *frame;
++  guint copy_source_id;
++  CoglFramebuffer *readback;
++  gulong damaged_handler_id;
++  gulong size_handler_id;
++  gulong unmanaged_handler_id;
++  gulong cursor_handler_id;
++};
++
++struct _MetaWaylandImageCopyCapture
++{
++  MetaWaylandCompositor *compositor;
++  GHashTable *sessions;
++  unsigned int last_id;
++};
++
++static const struct ext_image_capture_source_v1_interface source_interface;
++static const struct ext_image_copy_capture_session_v1_interface session_interface;
++static const struct ext_image_copy_capture_frame_v1_interface frame_interface;
++
++static MetaBackend *
++backend_of (Session *session)
++{
++  return meta_context_get_backend (session->manager->compositor->context);
++}
++
++static CoglContext *
++cogl_context_of (Session *session)
++{
++  return clutter_backend_get_cogl_context (meta_backend_get_clutter_backend (backend_of (session)));
++}
++
++static MetaDisplay *
++display_of (Session *session)
++{
++  return meta_context_get_display (session->manager->compositor->context);
++}
++
++static const CaptureFormat *
++format_for_shm (uint32_t shm_format)
++{
++  for (size_t i = 0; i < G_N_ELEMENTS (formats); i++)
++    if (formats[i].shm_format == shm_format)
++      return &formats[i];
++  return NULL;
++}
++
++static const CaptureFormat *
++format_for_drm (uint32_t drm_format)
++{
++  for (size_t i = 0; i < G_N_ELEMENTS (formats); i++)
++    if (formats[i].drm_format == drm_format)
++      return &formats[i];
++  return NULL;
++}
++
++static void
++source_free (CaptureSource *source)
++{
++  if (source->window)
++    g_clear_signal_handler (&source->unmanaged_handler_id, source->window);
++  g_free (source);
++}
++
++static void
++on_source_window_unmanaged (MetaWindow    *window,
++                            CaptureSource *source)
++{
++  g_clear_signal_handler (&source->unmanaged_handler_id, window);
++  source->window = NULL;
++}
++
++static void
++source_destructor (struct wl_resource *resource)
++{
++  source_free (wl_resource_get_user_data (resource));
++}
++
++static void
++source_destroy (struct wl_client   *client,
++                struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct ext_image_capture_source_v1_interface source_interface = {
++  source_destroy,
++};
++
++static void
++toplevel_source_manager_create_source (struct wl_client   *client,
++                                       struct wl_resource *resource,
++                                       uint32_t            id,
++                                       struct wl_resource *toplevel_handle)
++{
++  CaptureSource *source = g_new0 (CaptureSource, 1);
++
++  source->window = meta_wayland_foreign_toplevel_handle_get_window (toplevel_handle);
++  if (source->window)
++    source->unmanaged_handler_id =
++      g_signal_connect (source->window, "unmanaged", G_CALLBACK (on_source_window_unmanaged), source);
++
++  source->resource = wl_resource_create (client, &ext_image_capture_source_v1_interface,
++                                         wl_resource_get_version (resource), id);
++  wl_resource_set_implementation (source->resource, &source_interface, source, source_destructor);
++}
++
++static void
++manager_destroy (struct wl_client   *client,
++                 struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct ext_foreign_toplevel_image_capture_source_manager_v1_interface toplevel_source_manager_interface = {
++  toplevel_source_manager_create_source,
++  manager_destroy,
++};
++
++static void
++blit_cursor (Session         *session,
++             CoglFramebuffer *framebuffer)
++{
++  MetaBackend *backend = backend_of (session);
++  MetaCursorRenderer *cursor_renderer = meta_backend_get_cursor_renderer (backend);
++  MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend);
++  graphene_point_t relative_position;
++  graphene_point_t position;
++  graphene_matrix_t matrix;
++  g_autoptr (CoglPipeline) pipeline = NULL;
++  ClutterCursor *cursor;
++  CoglTexture *texture;
++  float view_scale, cursor_scale, scale, x, y;
++  int width, height, hotspot_x, hotspot_y;
++
++  cursor = cursor_renderer ? meta_cursor_renderer_get_cursor (cursor_renderer) : NULL;
++  texture = cursor ? clutter_cursor_get_texture (cursor) : NULL;
++  if (!texture)
++    return;
++
++  meta_cursor_tracker_get_pointer (cursor_tracker, &position, NULL);
++  if (!meta_screen_cast_window_transform_cursor_position (META_SCREEN_CAST_WINDOW (session->actor),
++                                                          cursor, &position,
++                                                          &relative_position, &view_scale))
++    return;
++
++  cursor_scale = clutter_cursor_get_scale (cursor);
++  scale = cursor_scale * view_scale;
++  clutter_cursor_get_geometry (cursor, &width, &height, &hotspot_x, &hotspot_y);
++  x = (relative_position.x - hotspot_x) * scale;
++  y = (relative_position.y - hotspot_y) * scale;
++
++  pipeline = cogl_pipeline_new (cogl_context_of (session));
++  cogl_pipeline_set_layer_texture (pipeline, 0, texture);
++  cogl_pipeline_set_layer_filters (pipeline, 0, COGL_PIPELINE_FILTER_LINEAR, COGL_PIPELINE_FILTER_LINEAR);
++  graphene_matrix_init_identity (&matrix);
++  mtk_compute_viewport_matrix (&matrix, width, height, cursor_scale,
++                               clutter_cursor_get_transform (cursor),
++                               clutter_cursor_get_viewport_src_rect (cursor));
++  cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
++  cogl_framebuffer_draw_rectangle (framebuffer, pipeline, x, y, x + width, y + height);
++}
++
++static gboolean
++render (Session         *session,
++        CoglFramebuffer *framebuffer)
++{
++  MtkRectangle bounds = { 0, 0, session->width, session->height };
++
++  cogl_framebuffer_clear4f (framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
++  if (!meta_screen_cast_window_blit_to_framebuffer (META_SCREEN_CAST_WINDOW (session->actor),
++                                                    &bounds, framebuffer))
++    return FALSE;
++  if (session->paint_cursors)
++    blit_cursor (session, framebuffer);
++  cogl_framebuffer_flush (framebuffer);
++  return TRUE;
++}
++
++static CoglFramebuffer *
++readback_framebuffer (Session *session)
++{
++  g_autoptr (CoglTexture) texture = NULL;
++  CoglOffscreen *offscreen;
++
++  if (session->readback &&
++      cogl_framebuffer_get_width (session->readback) == session->width &&
++      cogl_framebuffer_get_height (session->readback) == session->height)
++    return session->readback;
++
++  g_clear_object (&session->readback);
++  texture = cogl_texture_2d_new_with_size (cogl_context_of (session), session->width, session->height);
++  offscreen = cogl_offscreen_new_with_texture (texture);
++  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), NULL))
++    {
++      g_object_unref (offscreen);
++      return NULL;
++    }
++  session->readback = COGL_FRAMEBUFFER (offscreen);
++  return session->readback;
++}
++
++static gboolean
++copy_to_shm (Session              *session,
++             struct wl_shm_buffer *shm_buffer)
++{
++  const CaptureFormat *format = format_for_shm (wl_shm_buffer_get_format (shm_buffer));
++  CoglFramebuffer *framebuffer;
++  gboolean copied;
++
++  if (!format ||
++      wl_shm_buffer_get_width (shm_buffer) != session->width ||
++      wl_shm_buffer_get_height (shm_buffer) != session->height ||
++      wl_shm_buffer_get_stride (shm_buffer) != session->width * 4)
++    return FALSE;
++
++  framebuffer = readback_framebuffer (session);
++  if (!framebuffer || !render (session, framebuffer))
++    return FALSE;
++
++  wl_shm_buffer_begin_access (shm_buffer);
++  copied = cogl_framebuffer_read_pixels (framebuffer, 0, 0, session->width, session->height,
++                                         format->cogl_format, wl_shm_buffer_get_data (shm_buffer));
++  wl_shm_buffer_end_access (shm_buffer);
++  return copied;
++}
++
++static CoglFramebuffer *
++dma_buf_framebuffer (Session           *session,
++                     MetaWaylandBuffer *buffer)
++{
++  MetaWaylandDmaBufBuffer *dma_buf = meta_wayland_dma_buf_from_buffer (buffer);
++  CoglFramebuffer *framebuffer = g_object_get_qdata (G_OBJECT (buffer), quark_framebuffer);
++  const CaptureFormat *format;
++  g_autoptr (GError) error = NULL;
++
++  if (framebuffer)
++    return framebuffer;
++
++  format = dma_buf ? format_for_drm (meta_wayland_dma_buf_buffer_get_drm_format (dma_buf)) : NULL;
++  if (!format)
++    return NULL;
++
++  framebuffer = meta_wayland_dma_buf_buffer_create_framebuffer (dma_buf, cogl_context_of (session),
++                                                                format->cogl_format, &error);
++  if (!framebuffer)
++    {
++      g_warning ("Couldn't record into a client's buffer: %s", error->message);
++      return NULL;
++    }
++
++  g_object_set_qdata_full (G_OBJECT (buffer), quark_framebuffer, framebuffer, g_object_unref);
++  return framebuffer;
++}
++
++static gboolean
++copy_to_dma_buf (Session           *session,
++                 MetaWaylandBuffer *buffer)
++{
++  CoglFramebuffer *framebuffer;
++
++  if (meta_wayland_dma_buf_buffer_get_width (buffer) != session->width ||
++      meta_wayland_dma_buf_buffer_get_height (buffer) != session->height)
++    return FALSE;
++
++  framebuffer = dma_buf_framebuffer (session, buffer);
++  return framebuffer && render (session, framebuffer);
++}
++
++static void
++send_ready (Frame   *frame,
++            Session *session)
++{
++  int64_t now = g_get_monotonic_time ();
++  uint64_t seconds = now / G_USEC_PER_SEC;
++
++  ext_image_copy_capture_frame_v1_send_transform (frame->resource, WL_OUTPUT_TRANSFORM_NORMAL);
++  ext_image_copy_capture_frame_v1_send_damage (frame->resource, 0, 0, session->width, session->height);
++  ext_image_copy_capture_frame_v1_send_presentation_time (frame->resource, seconds >> 32, seconds & 0xffffffff,
++                                                          (now % G_USEC_PER_SEC) * 1000);
++  ext_image_copy_capture_frame_v1_send_ready (frame->resource);
++}
++
++static void
++copy_frame (Session *session)
++{
++  Frame *frame = session->frame;
++  MetaWaylandBuffer *buffer;
++  struct wl_shm_buffer *shm_buffer;
++  gboolean copied = FALSE;
++
++  buffer = meta_wayland_buffer_from_resource (session->manager->compositor, frame->buffer);
++  shm_buffer = wl_shm_buffer_get (frame->buffer);
++  if (shm_buffer)
++    copied = copy_to_shm (session, shm_buffer);
++  else if (meta_wayland_buffer_realize (buffer) && buffer->type == META_WAYLAND_BUFFER_TYPE_DMA_BUF)
++    copied = copy_to_dma_buf (session, buffer);
++
++  session->frame = NULL;
++  wl_resource_set_user_data (frame->resource, NULL);
++  if (!copied)
++    {
++      ext_image_copy_capture_frame_v1_send_failed (frame->resource,
++                                                   EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_BUFFER_CONSTRAINTS);
++      g_free (frame);
++      return;
++    }
++
++  session->copied_once = TRUE;
++  session->damaged = FALSE;
++  send_ready (frame, session);
++  g_free (frame);
++}
++
++static gboolean
++copy_when_idle (gpointer data)
++{
++  Session *session = data;
++
++  session->copy_source_id = 0;
++  if (session->frame && session->frame->captured && session->actor)
++    copy_frame (session);
++  return G_SOURCE_REMOVE;
++}
++
++static void
++maybe_copy (Session *session)
++{
++  if (!session->frame || !session->frame->captured || session->copy_source_id)
++    return;
++  if (session->copied_once && !session->damaged)
++    return;
++
++  session->copy_source_id = g_idle_add_full (G_PRIORITY_HIGH, copy_when_idle, session, NULL);
++}
++
++static void
++send_constraints (Session *session)
++{
++  CoglContext *cogl_context = cogl_context_of (session);
++  CoglRenderer *renderer = cogl_context_get_renderer (cogl_context);
++  MetaWaylandDmaBufManager *dma_buf_manager = session->manager->compositor->dma_buf_manager;
++  struct wl_resource *resource = session->resource;
++
++  ext_image_copy_capture_session_v1_send_buffer_size (resource, session->width, session->height);
++  for (size_t i = 0; i < G_N_ELEMENTS (formats); i++)
++    ext_image_copy_capture_session_v1_send_shm_format (resource, formats[i].shm_format);
++
++  if (dma_buf_manager && cogl_renderer_is_dma_buf_supported (renderer))
++    {
++      dev_t device = meta_wayland_dma_buf_manager_get_main_device (dma_buf_manager);
++      struct wl_array device_array;
++
++      wl_array_init (&device_array);
++      *(dev_t *) wl_array_add (&device_array, sizeof (dev_t)) = device;
++      ext_image_copy_capture_session_v1_send_dmabuf_device (resource, &device_array);
++      wl_array_release (&device_array);
++
++      for (size_t i = 0; i < G_N_ELEMENTS (formats); i++)
++        {
++          g_autoptr (GArray) modifiers = NULL;
++          uint64_t implicit = cogl_renderer_get_implicit_drm_modifier (renderer);
++          struct wl_array modifier_array;
++
++          modifiers = cogl_renderer_query_drm_modifiers (renderer, formats[i].cogl_format,
++                                                         COGL_DRM_MODIFIER_FILTER_SINGLE_PLANE |
++                                                         COGL_DRM_MODIFIER_FILTER_NOT_EXTERNAL_ONLY,
++                                                         NULL);
++          wl_array_init (&modifier_array);
++          for (guint m = 0; modifiers && m < modifiers->len; m++)
++            *(uint64_t *) wl_array_add (&modifier_array, sizeof (uint64_t)) = g_array_index (modifiers, uint64_t, m);
++          *(uint64_t *) wl_array_add (&modifier_array, sizeof (uint64_t)) = implicit;
++          ext_image_copy_capture_session_v1_send_dmabuf_format (resource, formats[i].drm_format, &modifier_array);
++          wl_array_release (&modifier_array);
++        }
++    }
++
++  ext_image_copy_capture_session_v1_send_done (resource);
++}
++
++static gboolean
++update_size (Session *session)
++{
++  MtkRectangle bounds;
++
++  meta_screen_cast_window_get_buffer_bounds (META_SCREEN_CAST_WINDOW (session->actor), &bounds);
++  if (bounds.width == session->width && bounds.height == session->height)
++    return FALSE;
++
++  session->width = bounds.width;
++  session->height = bounds.height;
++  return TRUE;
++}
++
++static void
++on_damaged (MetaWindowActor *actor,
++            Session         *session)
++{
++  session->damaged = TRUE;
++  maybe_copy (session);
++}
++
++static void
++on_size_changed (MetaWindow *window,
++                 Session    *session)
++{
++  if (!update_size (session))
++    return;
++
++  send_constraints (session);
++  session->damaged = TRUE;
++}
++
++static void
++on_cursor_moved (MetaCursorTracker *cursor_tracker,
++                 Session           *session)
++{
++  session->damaged = TRUE;
++  maybe_copy (session);
++}
++
++static void
++session_stop (Session *session)
++{
++  MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend_of (session));
++
++  if (!session->window)
++    return;
++
++  g_clear_handle_id (&session->copy_source_id, g_source_remove);
++  g_clear_signal_handler (&session->cursor_handler_id, cursor_tracker);
++  if (session->actor)
++    {
++      g_clear_signal_handler (&session->damaged_handler_id, session->actor);
++      meta_screen_cast_window_dec_usage (META_SCREEN_CAST_WINDOW (session->actor));
++      g_clear_object (&session->actor);
++    }
++  g_clear_signal_handler (&session->size_handler_id, session->window);
++  g_clear_signal_handler (&session->unmanaged_handler_id, session->window);
++  session->window = NULL;
++
++  if (session->frame && session->frame->captured)
++    {
++      wl_resource_set_user_data (session->frame->resource, NULL);
++      ext_image_copy_capture_frame_v1_send_failed (session->frame->resource,
++                                                   EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_STOPPED);
++      g_clear_pointer (&session->frame, g_free);
++    }
++
++  g_hash_table_remove (session->manager->sessions, GUINT_TO_POINTER (session->id));
++  meta_display_window_capture_ended (display_of (session), session->id);
++}
++
++static void
++on_unmanaged (MetaWindow *window,
++              Session    *session)
++{
++  session_stop (session);
++  ext_image_copy_capture_session_v1_send_stopped (session->resource);
++}
++
++static void
++frame_destructor (struct wl_resource *resource)
++{
++  Frame *frame = wl_resource_get_user_data (resource);
++
++  if (!frame)
++    return;
++
++  frame->session->frame = NULL;
++  g_free (frame);
++}
++
++static void
++frame_destroy (struct wl_client   *client,
++               struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++frame_attach_buffer (struct wl_client   *client,
++                     struct wl_resource *resource,
++                     struct wl_resource *buffer)
++{
++  Frame *frame = wl_resource_get_user_data (resource);
++
++  if (!frame)
++    return;
++  if (frame->captured)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_ERROR_ALREADY_CAPTURED,
++                              "attach_buffer sent after capture");
++      return;
++    }
++  frame->buffer = buffer;
++}
++
++static void
++frame_damage_buffer (struct wl_client   *client,
++                     struct wl_resource *resource,
++                     int32_t             x,
++                     int32_t             y,
++                     int32_t             width,
++                     int32_t             height)
++{
++  Frame *frame = wl_resource_get_user_data (resource);
++
++  if (x < 0 || y < 0 || width <= 0 || height <= 0)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_ERROR_INVALID_BUFFER_DAMAGE,
++                              "damage_buffer with an invalid region");
++      return;
++    }
++  if (frame && frame->captured)
++    wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_ERROR_ALREADY_CAPTURED,
++                            "damage_buffer sent after capture");
++}
++
++static void
++frame_capture (struct wl_client   *client,
++               struct wl_resource *resource)
++{
++  Frame *frame = wl_resource_get_user_data (resource);
++
++  if (!frame)
++    {
++      ext_image_copy_capture_frame_v1_send_failed (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_STOPPED);
++      return;
++    }
++  if (frame->captured)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_ERROR_ALREADY_CAPTURED,
++                              "capture sent twice");
++      return;
++    }
++  if (!frame->buffer)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_ERROR_NO_BUFFER,
++                              "capture sent without a buffer");
++      return;
++    }
++
++  frame->captured = TRUE;
++  maybe_copy (frame->session);
++}
++
++static const struct ext_image_copy_capture_frame_v1_interface frame_interface = {
++  frame_destroy,
++  frame_attach_buffer,
++  frame_damage_buffer,
++  frame_capture,
++};
++
++static void
++session_create_frame (struct wl_client   *client,
++                      struct wl_resource *resource,
++                      uint32_t            id)
++{
++  Session *session = wl_resource_get_user_data (resource);
++  struct wl_resource *frame_resource;
++  Frame *frame = NULL;
++
++  if (session->frame)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_SESSION_V1_ERROR_DUPLICATE_FRAME,
++                              "create_frame sent before the previous frame was destroyed");
++      return;
++    }
++
++  frame_resource = wl_resource_create (client, &ext_image_copy_capture_frame_v1_interface,
++                                       wl_resource_get_version (resource), id);
++  if (session->window)
++    {
++      frame = g_new0 (Frame, 1);
++      frame->session = session;
++      frame->resource = frame_resource;
++      session->frame = frame;
++    }
++  wl_resource_set_implementation (frame_resource, &frame_interface, frame, frame_destructor);
++}
++
++static void
++session_destructor (struct wl_resource *resource)
++{
++  Session *session = wl_resource_get_user_data (resource);
++
++  session_stop (session);
++  if (session->frame)
++    {
++      wl_resource_set_user_data (session->frame->resource, NULL);
++      g_free (session->frame);
++    }
++  g_clear_object (&session->readback);
++  g_free (session);
++}
++
++static void
++session_destroy (struct wl_client   *client,
++                 struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct ext_image_copy_capture_session_v1_interface session_interface = {
++  session_create_frame,
++  session_destroy,
++};
++
++static gboolean
++session_start (Session    *session,
++               MetaWindow *window)
++{
++  MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend_of (session));
++  MetaWindowActor *actor = window ? meta_window_actor_from_window (window) : NULL;
++  struct wl_client *client = wl_resource_get_client (session->resource);
++
++  if (!actor)
++    return FALSE;
++
++  session->window = window;
++  session->actor = g_object_ref (actor);
++  session->id = ++session->manager->last_id;
++  meta_screen_cast_window_inc_usage (META_SCREEN_CAST_WINDOW (actor));
++  session->damaged_handler_id = g_signal_connect (actor, "damaged", G_CALLBACK (on_damaged), session);
++  session->size_handler_id = g_signal_connect (window, "size-changed", G_CALLBACK (on_size_changed), session);
++  session->unmanaged_handler_id = g_signal_connect (window, "unmanaged", G_CALLBACK (on_unmanaged), session);
++  if (session->paint_cursors)
++    session->cursor_handler_id =
++      g_signal_connect (cursor_tracker, "position-invalidated", G_CALLBACK (on_cursor_moved), session);
++  g_hash_table_insert (session->manager->sessions, GUINT_TO_POINTER (session->id), session);
++
++  update_size (session);
++  send_constraints (session);
++  meta_display_window_capture_started (display_of (session), session->id, window,
++                                       meta_wayland_client_get_sandboxed_app_id (client));
++  return TRUE;
++}
++
++static void
++copy_capture_manager_create_session (struct wl_client   *client,
++                                     struct wl_resource *resource,
++                                     uint32_t            id,
++                                     struct wl_resource *source_resource,
++                                     uint32_t            options)
++{
++  MetaWaylandImageCopyCapture *manager = wl_resource_get_user_data (resource);
++  CaptureSource *source = wl_resource_get_user_data (source_resource);
++  Session *session;
++
++  if (options & ~EXT_IMAGE_COPY_CAPTURE_MANAGER_V1_OPTIONS_PAINT_CURSORS)
++    {
++      wl_resource_post_error (resource, EXT_IMAGE_COPY_CAPTURE_MANAGER_V1_ERROR_INVALID_OPTION,
++                              "unknown capture options");
++      return;
++    }
++
++  session = g_new0 (Session, 1);
++  session->manager = manager;
++  session->paint_cursors = !!(options & EXT_IMAGE_COPY_CAPTURE_MANAGER_V1_OPTIONS_PAINT_CURSORS);
++  session->resource = wl_resource_create (client, &ext_image_copy_capture_session_v1_interface,
++                                          wl_resource_get_version (resource), id);
++  wl_resource_set_implementation (session->resource, &session_interface, session, session_destructor);
++
++  if (!meta_wayland_client_may_capture_windows (manager->compositor->context, client) ||
++      !session_start (session, source->window))
++    ext_image_copy_capture_session_v1_send_stopped (session->resource);
++}
++
++static void
++copy_capture_manager_create_pointer_cursor_session (struct wl_client   *client,
++                                                    struct wl_resource *resource,
++                                                    uint32_t            id,
++                                                    struct wl_resource *source,
++                                                    struct wl_resource *pointer)
++{
++  wl_resource_post_error (resource, WL_DISPLAY_ERROR_IMPLEMENTATION,
++                          "cursor sessions are not supported; ask for paint_cursors instead");
++}
++
++static const struct ext_image_copy_capture_manager_v1_interface copy_capture_manager_interface = {
++  copy_capture_manager_create_session,
++  copy_capture_manager_create_pointer_cursor_session,
++  manager_destroy,
++};
++
++static void
++bind_toplevel_source_manager (struct wl_client *client,
++                              void             *data,
++                              uint32_t          version,
++                              uint32_t          id)
++{
++  struct wl_resource *resource =
++    wl_resource_create (client, &ext_foreign_toplevel_image_capture_source_manager_v1_interface, version, id);
++
++  wl_resource_set_implementation (resource, &toplevel_source_manager_interface, data, NULL);
++}
++
++static void
++bind_copy_capture_manager (struct wl_client *client,
++                           void             *data,
++                           uint32_t          version,
++                           uint32_t          id)
++{
++  struct wl_resource *resource =
++    wl_resource_create (client, &ext_image_copy_capture_manager_v1_interface, version, id);
++
++  wl_resource_set_implementation (resource, &copy_capture_manager_interface, data, NULL);
++}
++
++/**
++ * meta_wayland_image_copy_capture_stop:
++ * @manager: the window capture of the compositor
++ * @id: a capture session, as meta_display's window-capture-started named it
++ *
++ * Ends the session; the client hears it stopped.
++ */
++void
++meta_wayland_image_copy_capture_stop (MetaWaylandImageCopyCapture *manager,
++                                      unsigned int                 id)
++{
++  Session *session = g_hash_table_lookup (manager->sessions, GUINT_TO_POINTER (id));
++
++  if (!session)
++    return;
++
++  session_stop (session);
++  ext_image_copy_capture_session_v1_send_stopped (session->resource);
++}
++
++static void
++add_global (MetaWaylandCompositor    *compositor,
++            const struct wl_interface *interface,
++            int                       version,
++            gpointer                  data,
++            wl_global_bind_func_t     bind)
++{
++  struct wl_global *global = wl_global_create (compositor->wayland_display, interface, version, data, bind);
++
++  if (!global)
++    g_error ("Failed to register a global %s object", interface->name);
++
++  meta_wayland_filter_manager_add_global (meta_wayland_compositor_get_filter_manager (compositor),
++                                          global, meta_wayland_filter_window_capture,
++                                          compositor->context);
++}
++
++static void
++image_copy_capture_free (MetaWaylandImageCopyCapture *manager)
++{
++  g_hash_table_destroy (manager->sessions);
++  g_free (manager);
++}
++
++MetaWaylandImageCopyCapture *
++meta_wayland_compositor_get_image_copy_capture (MetaWaylandCompositor *compositor)
++{
++  return g_object_get_data (G_OBJECT (compositor), "-meta-wayland-image-copy-capture");
++}
++
++void
++meta_wayland_init_image_copy_capture (MetaWaylandCompositor *compositor)
++{
++  MetaWaylandImageCopyCapture *manager = g_new0 (MetaWaylandImageCopyCapture, 1);
++
++  quark_framebuffer = g_quark_from_static_string ("-meta-wayland-image-copy-capture-framebuffer");
++  manager->compositor = compositor;
++  manager->sessions = g_hash_table_new (NULL, NULL);
++
++  add_global (compositor, &ext_foreign_toplevel_image_capture_source_manager_v1_interface,
++              META_EXT_IMAGE_CAPTURE_SOURCE_V1_VERSION, manager, bind_toplevel_source_manager);
++  add_global (compositor, &ext_image_copy_capture_manager_v1_interface,
++              META_EXT_IMAGE_COPY_CAPTURE_V1_VERSION, manager, bind_copy_capture_manager);
++
++  g_object_set_data_full (G_OBJECT (compositor), "-meta-wayland-image-copy-capture",
++                          manager, (GDestroyNotify) image_copy_capture_free);
++}
+diff --git a/src/wayland/meta-wayland-image-copy-capture.h b/src/wayland/meta-wayland-image-copy-capture.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f08b035326cd784166bb511949316b0532ba5c2
+--- /dev/null
++++ b/src/wayland/meta-wayland-image-copy-capture.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "wayland/meta-wayland-types.h"
++
++typedef struct _MetaWaylandImageCopyCapture MetaWaylandImageCopyCapture;
++
++void meta_wayland_init_image_copy_capture (MetaWaylandCompositor *compositor);
++
++MetaWaylandImageCopyCapture * meta_wayland_compositor_get_image_copy_capture (MetaWaylandCompositor *compositor);
++
++void meta_wayland_image_copy_capture_stop (MetaWaylandImageCopyCapture *manager,
++                                           unsigned int                 id);
+diff --git a/src/wayland/meta-wayland-layer-shell.c b/src/wayland/meta-wayland-layer-shell.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc09c1d60f7d7a64a5592760e501dfe6a3e18b22
+--- /dev/null
++++ b/src/wayland/meta-wayland-layer-shell.c
+@@ -0,0 +1,486 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "wayland/meta-wayland-layer-shell.h"
++
++#include "backends/meta-logical-monitor-private.h"
++#include "backends/meta-monitor-manager-private.h"
++#include "backends/meta-monitor-private.h"
++#include "compositor/compositor-private.h"
++#include "wayland/meta-wayland-actor-surface.h"
++#include "wayland/meta-wayland-outputs.h"
++#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-sandbox.h"
++#include "wayland/meta-wayland-surface-private.h"
++#include "wayland/meta-wayland-versions.h"
++
++#include "wlr-layer-shell-unstable-v1-server-protocol.h"
++
++#define ANCHOR_ALL (ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP | ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM | \
++                    ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT | ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT)
++
++typedef struct
++{
++  uint32_t width;
++  uint32_t height;
++  uint32_t anchor;
++  int32_t margin_top;
++  int32_t margin_right;
++  int32_t margin_bottom;
++  int32_t margin_left;
++} LayerState;
++
++#define META_TYPE_WAYLAND_OVERLAY_GROUP (meta_wayland_overlay_group_get_type ())
++G_DECLARE_FINAL_TYPE (MetaWaylandOverlayGroup, meta_wayland_overlay_group,
++                      META, WAYLAND_OVERLAY_GROUP, ClutterActor)
++
++struct _MetaWaylandOverlayGroup
++{
++  ClutterActor parent;
++};
++
++G_DEFINE_TYPE (MetaWaylandOverlayGroup, meta_wayland_overlay_group, CLUTTER_TYPE_ACTOR)
++
++static void
++meta_wayland_overlay_group_pick (ClutterActor       *actor,
++                                 ClutterPickContext *pick_context)
++{
++}
++
++static void
++meta_wayland_overlay_group_init (MetaWaylandOverlayGroup *group)
++{
++}
++
++static void
++meta_wayland_overlay_group_class_init (MetaWaylandOverlayGroupClass *klass)
++{
++  CLUTTER_ACTOR_CLASS (klass)->pick = meta_wayland_overlay_group_pick;
++}
++
++#define META_TYPE_WAYLAND_LAYER_SURFACE (meta_wayland_layer_surface_get_type ())
++G_DECLARE_FINAL_TYPE (MetaWaylandLayerSurface, meta_wayland_layer_surface,
++                      META, WAYLAND_LAYER_SURFACE, MetaWaylandActorSurface)
++
++struct _MetaWaylandLayerSurface
++{
++  MetaWaylandActorSurface parent;
++
++  struct wl_resource *resource;
++  MetaWaylandOutput *output;
++  LayerState pending;
++  LayerState current;
++  uint32_t configured_serial;
++  gboolean configured;
++  ClutterActor *group;
++};
++
++G_DEFINE_TYPE (MetaWaylandLayerSurface, meta_wayland_layer_surface, META_TYPE_WAYLAND_ACTOR_SURFACE)
++
++static MetaWaylandSurface *
++surface_of (MetaWaylandLayerSurface *layer_surface)
++{
++  return meta_wayland_surface_role_get_surface (META_WAYLAND_SURFACE_ROLE (layer_surface));
++}
++
++static MetaContext *
++context_of (MetaWaylandLayerSurface *layer_surface)
++{
++  return meta_wayland_compositor_get_context (surface_of (layer_surface)->compositor);
++}
++
++static MetaLogicalMonitor *
++logical_monitor_of (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaBackend *backend = meta_context_get_backend (context_of (layer_surface));
++  MetaMonitor *monitor = layer_surface->output ? meta_wayland_output_get_monitor (layer_surface->output) : NULL;
++  MetaLogicalMonitor *logical_monitor = monitor ? meta_monitor_get_logical_monitor (monitor) : NULL;
++
++  return logical_monitor ?: meta_monitor_manager_get_primary_logical_monitor (meta_backend_get_monitor_manager (backend));
++}
++
++static void
++send_configure (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaLogicalMonitor *logical_monitor = logical_monitor_of (layer_surface);
++  MtkRectangle area = logical_monitor ? meta_logical_monitor_get_layout (logical_monitor) : (MtkRectangle) { 0 };
++  LayerState *state = &layer_surface->current;
++  uint32_t width = state->width;
++  uint32_t height = state->height;
++
++  if (!width)
++    width = MAX (0, area.width - state->margin_left - state->margin_right);
++  if (!height)
++    height = MAX (0, area.height - state->margin_top - state->margin_bottom);
++
++  layer_surface->configured_serial =
++    wl_display_next_serial (surface_of (layer_surface)->compositor->wayland_display);
++  zwlr_layer_surface_v1_send_configure (layer_surface->resource, layer_surface->configured_serial, width, height);
++  layer_surface->configured = TRUE;
++}
++
++static float
++place (int      start,
++       int      length,
++       int      size,
++       gboolean at_start,
++       gboolean at_end,
++       int      margin_start,
++       int      margin_end)
++{
++  if (at_start && !at_end)
++    return start + margin_start;
++  if (at_end && !at_start)
++    return start + length - size - margin_end;
++  return start + (length - size) / 2.0f;
++}
++
++static void
++update_position (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaWaylandSurface *surface = surface_of (layer_surface);
++  MetaLogicalMonitor *logical_monitor = logical_monitor_of (layer_surface);
++  LayerState *state = &layer_surface->current;
++  MtkRectangle area;
++
++  if (!logical_monitor)
++    return;
++
++  area = meta_logical_monitor_get_layout (logical_monitor);
++  clutter_actor_set_position (layer_surface->group,
++                              place (area.x, area.width, meta_wayland_surface_get_width (surface),
++                                     state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT,
++                                     state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT,
++                                     state->margin_left, state->margin_right),
++                              place (area.y, area.height, meta_wayland_surface_get_height (surface),
++                                     state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP,
++                                     state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM,
++                                     state->margin_top, state->margin_bottom));
++}
++
++static void
++show (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaDisplay *display = meta_context_get_display (context_of (layer_surface));
++  ClutterActor *top_window_group = meta_compositor_get_top_window_group (display->compositor);
++  MetaSurfaceActor *surface_actor =
++    meta_wayland_actor_surface_get_actor (META_WAYLAND_ACTOR_SURFACE (layer_surface));
++
++  if (layer_surface->group || !surface_actor)
++    return;
++
++  layer_surface->group = g_object_new (META_TYPE_WAYLAND_OVERLAY_GROUP, NULL);
++  clutter_actor_add_child (layer_surface->group, CLUTTER_ACTOR (surface_actor));
++  clutter_actor_add_child (top_window_group, layer_surface->group);
++}
++
++static void
++hide (MetaWaylandLayerSurface *layer_surface)
++{
++  MetaSurfaceActor *surface_actor =
++    meta_wayland_actor_surface_get_actor (META_WAYLAND_ACTOR_SURFACE (layer_surface));
++
++  if (!layer_surface->group)
++    return;
++
++  if (surface_actor && clutter_actor_get_parent (CLUTTER_ACTOR (surface_actor)) == layer_surface->group)
++    clutter_actor_remove_child (layer_surface->group, CLUTTER_ACTOR (surface_actor));
++  g_clear_pointer (&layer_surface->group, clutter_actor_destroy);
++}
++
++static void
++layer_surface_assigned (MetaWaylandSurfaceRole *surface_role)
++{
++  MetaWaylandSurface *surface = meta_wayland_surface_role_get_surface (surface_role);
++
++  if (!wl_list_empty (&surface->unassigned.pending_frame_callback_list))
++    meta_wayland_compositor_add_frame_callback_surface (surface->compositor, surface);
++
++  META_WAYLAND_SURFACE_ROLE_CLASS (meta_wayland_layer_surface_parent_class)->assigned (surface_role);
++}
++
++static void
++layer_surface_apply_state (MetaWaylandSurfaceRole  *surface_role,
++                           MetaWaylandSurfaceState *pending)
++{
++  MetaWaylandLayerSurface *layer_surface = META_WAYLAND_LAYER_SURFACE (surface_role);
++  MetaWaylandSurface *surface = meta_wayland_surface_role_get_surface (surface_role);
++
++  meta_wayland_compositor_add_frame_callback_surface (surface->compositor, surface);
++  META_WAYLAND_SURFACE_ROLE_CLASS (meta_wayland_layer_surface_parent_class)->apply_state (surface_role, pending);
++
++  if (!layer_surface->resource)
++    return;
++
++  layer_surface->current = layer_surface->pending;
++  if (!meta_wayland_surface_get_buffer (surface))
++    {
++      hide (layer_surface);
++      send_configure (layer_surface);
++      return;
++    }
++
++  if (!layer_surface->configured)
++    {
++      wl_resource_post_error (layer_surface->resource, ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE,
++                              "a buffer was attached before the first configure");
++      return;
++    }
++
++  show (layer_surface);
++  update_position (layer_surface);
++}
++
++static int
++layer_surface_get_geometry_scale (MetaWaylandActorSurface *actor_surface)
++{
++  MetaWaylandLayerSurface *layer_surface = META_WAYLAND_LAYER_SURFACE (actor_surface);
++  MetaBackend *backend = meta_context_get_backend (context_of (layer_surface));
++  MetaLogicalMonitor *logical_monitor = logical_monitor_of (layer_surface);
++
++  if (meta_backend_is_stage_views_scaled (backend) || !logical_monitor)
++    return 1;
++  return (int) roundf (meta_logical_monitor_get_scale (logical_monitor));
++}
++
++static MetaLogicalMonitor *
++layer_surface_get_preferred_scale_monitor (MetaWaylandSurfaceRole *surface_role)
++{
++  return logical_monitor_of (META_WAYLAND_LAYER_SURFACE (surface_role));
++}
++
++static void
++layer_surface_dispose (GObject *object)
++{
++  hide (META_WAYLAND_LAYER_SURFACE (object));
++  G_OBJECT_CLASS (meta_wayland_layer_surface_parent_class)->dispose (object);
++}
++
++static void
++meta_wayland_layer_surface_init (MetaWaylandLayerSurface *layer_surface)
++{
++}
++
++static void
++meta_wayland_layer_surface_class_init (MetaWaylandLayerSurfaceClass *klass)
++{
++  GObjectClass *object_class = G_OBJECT_CLASS (klass);
++  MetaWaylandSurfaceRoleClass *surface_role_class = META_WAYLAND_SURFACE_ROLE_CLASS (klass);
++  MetaWaylandActorSurfaceClass *actor_surface_class = META_WAYLAND_ACTOR_SURFACE_CLASS (klass);
++
++  object_class->dispose = layer_surface_dispose;
++  surface_role_class->assigned = layer_surface_assigned;
++  surface_role_class->apply_state = layer_surface_apply_state;
++  surface_role_class->get_preferred_scale_monitor = layer_surface_get_preferred_scale_monitor;
++  actor_surface_class->get_geometry_scale = layer_surface_get_geometry_scale;
++}
++
++static void
++layer_surface_destructor (struct wl_resource *resource)
++{
++  MetaWaylandLayerSurface *layer_surface = wl_resource_get_user_data (resource);
++
++  if (!layer_surface)
++    return;
++
++  hide (layer_surface);
++  layer_surface->resource = NULL;
++}
++
++static void
++layer_surface_set_size (struct wl_client   *client,
++                        struct wl_resource *resource,
++                        uint32_t            width,
++                        uint32_t            height)
++{
++  MetaWaylandLayerSurface *layer_surface = wl_resource_get_user_data (resource);
++
++  layer_surface->pending.width = width;
++  layer_surface->pending.height = height;
++}
++
++static void
++layer_surface_set_anchor (struct wl_client   *client,
++                          struct wl_resource *resource,
++                          uint32_t            anchor)
++{
++  MetaWaylandLayerSurface *layer_surface = wl_resource_get_user_data (resource);
++
++  if (anchor & ~ANCHOR_ALL)
++    {
++      wl_resource_post_error (resource, ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_ANCHOR, "unknown anchor edges");
++      return;
++    }
++  layer_surface->pending.anchor = anchor;
++}
++
++static void
++layer_surface_set_exclusive_zone (struct wl_client   *client,
++                                  struct wl_resource *resource,
++                                  int32_t             zone)
++{
++}
++
++static void
++layer_surface_set_margin (struct wl_client   *client,
++                          struct wl_resource *resource,
++                          int32_t             top,
++                          int32_t             right,
++                          int32_t             bottom,
++                          int32_t             left)
++{
++  MetaWaylandLayerSurface *layer_surface = wl_resource_get_user_data (resource);
++
++  layer_surface->pending.margin_top = top;
++  layer_surface->pending.margin_right = right;
++  layer_surface->pending.margin_bottom = bottom;
++  layer_surface->pending.margin_left = left;
++}
++
++static void
++layer_surface_set_keyboard_interactivity (struct wl_client   *client,
++                                          struct wl_resource *resource,
++                                          uint32_t            keyboard_interactivity)
++{
++  if (keyboard_interactivity > ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_ON_DEMAND)
++    wl_resource_post_error (resource, ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_KEYBOARD_INTERACTIVITY,
++                            "unknown keyboard interactivity");
++}
++
++static void
++layer_surface_get_popup (struct wl_client   *client,
++                         struct wl_resource *resource,
++                         struct wl_resource *popup)
++{
++  wl_resource_post_error (resource, ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE,
++                          "overlays take no input, so they have no popups");
++}
++
++static void
++layer_surface_ack_configure (struct wl_client   *client,
++                             struct wl_resource *resource,
++                             uint32_t            serial)
++{
++}
++
++static void
++layer_surface_destroy (struct wl_client   *client,
++                       struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static void
++layer_surface_set_layer (struct wl_client   *client,
++                         struct wl_resource *resource,
++                         uint32_t            layer)
++{
++  if (layer != ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY)
++    wl_resource_post_error (resource, ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER,
++                            "Kestrel offers only the overlay layer");
++}
++
++static void
++layer_surface_set_exclusive_edge (struct wl_client   *client,
++                                  struct wl_resource *resource,
++                                  uint32_t            edge)
++{
++}
++
++static const struct zwlr_layer_surface_v1_interface layer_surface_interface = {
++  layer_surface_set_size,
++  layer_surface_set_anchor,
++  layer_surface_set_exclusive_zone,
++  layer_surface_set_margin,
++  layer_surface_set_keyboard_interactivity,
++  layer_surface_get_popup,
++  layer_surface_ack_configure,
++  layer_surface_destroy,
++  layer_surface_set_layer,
++  layer_surface_set_exclusive_edge,
++};
++
++static void
++layer_shell_get_layer_surface (struct wl_client   *client,
++                               struct wl_resource *resource,
++                               uint32_t            id,
++                               struct wl_resource *surface_resource,
++                               struct wl_resource *output_resource,
++                               uint32_t            layer,
++                               const char         *namespace)
++{
++  MetaWaylandSurface *surface = wl_resource_get_user_data (surface_resource);
++  MetaContext *context = meta_wayland_compositor_get_context (surface->compositor);
++  MetaWaylandLayerSurface *layer_surface;
++
++  if (!meta_wayland_client_may_capture_windows (context, client))
++    {
++      wl_resource_post_error (resource, ZWLR_LAYER_SHELL_V1_ERROR_ROLE,
++                              "this app may not show overlays");
++      return;
++    }
++  if (layer != ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY)
++    {
++      wl_resource_post_error (resource, ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER,
++                              "Kestrel offers only the overlay layer");
++      return;
++    }
++  if (meta_wayland_surface_get_buffer (surface))
++    {
++      wl_resource_post_error (resource, ZWLR_LAYER_SHELL_V1_ERROR_ALREADY_CONSTRUCTED,
++                              "wl_surface@%d already has a buffer", wl_resource_get_id (surface_resource));
++      return;
++    }
++  if (!meta_wayland_surface_assign_role (surface, META_TYPE_WAYLAND_LAYER_SURFACE, NULL))
++    {
++      wl_resource_post_error (resource, ZWLR_LAYER_SHELL_V1_ERROR_ROLE,
++                              "wl_surface@%d already has a role", wl_resource_get_id (surface_resource));
++      return;
++    }
++
++  layer_surface = META_WAYLAND_LAYER_SURFACE (surface->role);
++  layer_surface->output = output_resource ? wl_resource_get_user_data (output_resource) : NULL;
++  layer_surface->resource = wl_resource_create (client, &zwlr_layer_surface_v1_interface,
++                                                wl_resource_get_version (resource), id);
++  wl_resource_set_implementation (layer_surface->resource, &layer_surface_interface,
++                                  layer_surface, layer_surface_destructor);
++}
++
++static void
++layer_shell_destroy (struct wl_client   *client,
++                     struct wl_resource *resource)
++{
++  wl_resource_destroy (resource);
++}
++
++static const struct zwlr_layer_shell_v1_interface layer_shell_interface = {
++  layer_shell_get_layer_surface,
++  layer_shell_destroy,
++};
++
++static void
++bind_layer_shell (struct wl_client *client,
++                  void             *data,
++                  uint32_t          version,
++                  uint32_t          id)
++{
++  struct wl_resource *resource = wl_resource_create (client, &zwlr_layer_shell_v1_interface, version, id);
++
++  wl_resource_set_implementation (resource, &layer_shell_interface, data, NULL);
++}
++
++void
++meta_wayland_init_layer_shell (MetaWaylandCompositor *compositor)
++{
++  struct wl_global *global = wl_global_create (compositor->wayland_display,
++                                               &zwlr_layer_shell_v1_interface,
++                                               META_ZWLR_LAYER_SHELL_V1_VERSION,
++                                               compositor, bind_layer_shell);
++
++  if (!global)
++    g_error ("Failed to register a global wlr-layer-shell object");
++
++  meta_wayland_filter_manager_add_global (meta_wayland_compositor_get_filter_manager (compositor),
++                                          global, meta_wayland_filter_window_capture,
++                                          compositor->context);
++}
+diff --git a/src/wayland/meta-wayland-layer-shell.h b/src/wayland/meta-wayland-layer-shell.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7528005555a81a18031c815503d4766af6ac035d
+--- /dev/null
++++ b/src/wayland/meta-wayland-layer-shell.h
+@@ -0,0 +1,6 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "wayland/meta-wayland-types.h"
++
++void meta_wayland_init_layer_shell (MetaWaylandCompositor *compositor);
+diff --git a/src/wayland/meta-wayland-sandbox.c b/src/wayland/meta-wayland-sandbox.c
+index 60d0f71214df6857a2caee4da26951fcb1bfd70c..c450f8efcecfa88f3139303de60b2de243b45ce0 100644
+--- a/src/wayland/meta-wayland-sandbox.c
++++ b/src/wayland/meta-wayland-sandbox.c
+@@ -116,6 +116,39 @@ meta_wayland_filter_unsandboxed (const struct wl_client *client,
+   return META_WAYLAND_ACCESS_ALLOWED;
+ }
+ 
++/**
++ * meta_wayland_client_may_capture_windows:
++ * @context: the #MetaContext
++ * @client: a Wayland client
++ *
++ * Returns: whether @client may see and record windows and show overlays:
++ *   it runs outside a sandbox, or its app was given window-capture
++ */
++gboolean
++meta_wayland_client_may_capture_windows (MetaContext            *context,
++                                         const struct wl_client *client)
++{
++  const char *app_id;
++
++  if (!meta_wayland_client_is_sandboxed (client))
++    return TRUE;
++
++  app_id = meta_wayland_client_get_sandboxed_app_id (client);
++  return app_id &&
++         meta_context_is_app_permitted (context, META_PERMISSION_WINDOW_CAPTURE, app_id);
++}
++
++MetaWaylandAccess
++meta_wayland_filter_window_capture (const struct wl_client *client,
++                                    const struct wl_global *global,
++                                    gpointer                user_data)
++{
++  MetaContext *context = user_data;
++
++  return meta_wayland_client_may_capture_windows (context, client) ? META_WAYLAND_ACCESS_ALLOWED
++                                                                    : META_WAYLAND_ACCESS_DENIED;
++}
++
+ static void
+ identify_connecting_process (ClientSandbox    *sandbox,
+                              struct wl_client *client)
+diff --git a/src/wayland/meta-wayland-sandbox.h b/src/wayland/meta-wayland-sandbox.h
+index 667454f92ace05017d4ba3fdab7f314227097e72..e7be8f9a90f9cb5b22d895398572d4aa69106bdb 100644
+--- a/src/wayland/meta-wayland-sandbox.h
++++ b/src/wayland/meta-wayland-sandbox.h
+@@ -5,6 +5,7 @@
+ #include <wayland-server-core.h>
+ 
+ #include "wayland/meta-wayland-filter-manager.h"
++#include "meta/meta-context.h"
+ #include "wayland/meta-wayland-types.h"
+ 
+ void meta_wayland_init_sandbox (MetaWaylandCompositor *compositor);
+@@ -16,3 +17,10 @@ const char * meta_wayland_client_get_sandboxed_app_id (const struct wl_client *c
+ MetaWaylandAccess meta_wayland_filter_unsandboxed (const struct wl_client *client,
+                                                    const struct wl_global *global,
+                                                    gpointer                user_data);
++
++gboolean meta_wayland_client_may_capture_windows (MetaContext            *context,
++                                                  const struct wl_client *client);
++
++MetaWaylandAccess meta_wayland_filter_window_capture (const struct wl_client *client,
++                                                      const struct wl_global *global,
++                                                      gpointer                user_data);
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index c27c8bb9b11d13790db66363090ccfd85f489c34..495e6951f898cffe2f44d50def1de5c1fb717abd 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -73,6 +73,10 @@
+ #define META_WP_POINTER_WARP_VERSION 1
+ #define META_EXT_BACKGROUND_EFFECT_V1_VERSION 1
+ #define META_KESTREL_WINDOW_V1_VERSION 2
++#define META_EXT_FOREIGN_TOPLEVEL_LIST_V1_VERSION 1
++#define META_EXT_IMAGE_CAPTURE_SOURCE_V1_VERSION 1
++#define META_EXT_IMAGE_COPY_CAPTURE_V1_VERSION 1
++#define META_ZWLR_LAYER_SHELL_V1_VERSION 5
+ #define META_KESTREL_GLASS_V1_VERSION 1
+ #define META_ZXDG_DECORATION_MANAGER_V1_VERSION 2
+ #define META_EXT_IDLE_NOTIFIER_V1_VERSION 2
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index 3bbcca7c23cb5575fa8354b3967fac9f6418b9dc..8b84a6252d73350803b6eb00c6567923e339d962 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -74,6 +74,9 @@
+ #include "wayland/meta-wayland-toplevel-icon.h"
+ #include "wayland/meta-wayland-kestrel-glass.h"
+ #include "wayland/meta-wayland-kestrel-window.h"
++#include "wayland/meta-wayland-foreign-toplevel-list.h"
++#include "wayland/meta-wayland-image-copy-capture.h"
++#include "wayland/meta-wayland-layer-shell.h"
+ #include "wayland/meta-wayland-xdg-decoration.h"
+ #include "wayland/meta-wayland-xdg-foreign.h"
+ #include "wayland/meta-wayland-xdg-session-manager.h"
+@@ -1043,6 +1046,9 @@ meta_wayland_compositor_new (MetaContext *context)
+   meta_wayland_init_background_effect (compositor);
+   meta_wayland_init_toplevel_icon (compositor);
+   meta_wayland_init_kestrel_window (compositor);
++  meta_wayland_init_foreign_toplevel_list (compositor);
++  meta_wayland_init_image_copy_capture (compositor);
++  meta_wayland_init_layer_shell (compositor);
+   meta_wayland_init_kestrel_glass (compositor);
+   meta_wayland_init_xdg_decoration (compositor);
+   meta_wayland_init_fixes (compositor);
+diff --git a/src/wayland/protocol/wlr-layer-shell-unstable-v1.xml b/src/wayland/protocol/wlr-layer-shell-unstable-v1.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..e9f27e4fdbe605f0a7014ec6194cf5dbc50d2b65
+--- /dev/null
++++ b/src/wayland/protocol/wlr-layer-shell-unstable-v1.xml
+@@ -0,0 +1,407 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="wlr_layer_shell_unstable_v1">
++  <copyright>
++    Copyright © 2017 Drew DeVault
++
++    Permission to use, copy, modify, distribute, and sell this
++    software and its documentation for any purpose is hereby granted
++    without fee, provided that the above copyright notice appear in
++    all copies and that both that copyright notice and this permission
++    notice appear in supporting documentation, and that the name of
++    the copyright holders not be used in advertising or publicity
++    pertaining to distribution of the software without specific,
++    written prior permission.  The copyright holders make no
++    representations about the suitability of this software for any
++    purpose.  It is provided "as is" without express or implied
++    warranty.
++
++    THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
++    SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
++    FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
++    SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
++    AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
++    ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
++    THIS SOFTWARE.
++  </copyright>
++
++  <interface name="zwlr_layer_shell_v1" version="5">
++    <description summary="create surfaces that are layers of the desktop">
++      Clients can use this interface to assign the surface_layer role to
++      wl_surfaces. Such surfaces are assigned to a "layer" of the output and
++      rendered with a defined z-depth respective to each other. They may also be
++      anchored to the edges and corners of a screen and specify input handling
++      semantics. This interface should be suitable for the implementation of
++      many desktop shell components, and a broad number of other applications
++      that interact with the desktop.
++    </description>
++
++    <request name="get_layer_surface">
++      <description summary="create a layer_surface from a surface">
++        Create a layer surface for an existing surface. This assigns the role of
++        layer_surface, or raises a protocol error if another role is already
++        assigned.
++
++        Creating a layer surface from a wl_surface which has a buffer attached
++        or committed is a client error, and any attempts by a client to attach
++        or manipulate a buffer prior to the first layer_surface.configure call
++        must also be treated as errors.
++
++        After creating a layer_surface object and setting it up, the client
++        must perform an initial commit without any buffer attached.
++        The compositor will reply with a layer_surface.configure event.
++        The client must acknowledge it and is then allowed to attach a buffer
++        to map the surface.
++
++        You may pass NULL for output to allow the compositor to decide which
++        output to use. Generally this will be the one that the user most
++        recently interacted with.
++
++        Clients can specify a namespace that defines the purpose of the layer
++        surface.
++      </description>
++      <arg name="id" type="new_id" interface="zwlr_layer_surface_v1"/>
++      <arg name="surface" type="object" interface="wl_surface"/>
++      <arg name="output" type="object" interface="wl_output" allow-null="true"/>
++      <arg name="layer" type="uint" enum="layer" summary="layer to add this surface to"/>
++      <arg name="namespace" type="string" summary="namespace for the layer surface"/>
++    </request>
++
++    <enum name="error">
++      <entry name="role" value="0" summary="wl_surface has another role"/>
++      <entry name="invalid_layer" value="1" summary="layer value is invalid"/>
++      <entry name="already_constructed" value="2" summary="wl_surface has a buffer attached or committed"/>
++    </enum>
++
++    <enum name="layer">
++      <description summary="available layers for surfaces">
++        These values indicate which layers a surface can be rendered in. They
++        are ordered by z depth, bottom-most first. Traditional shell surfaces
++        will typically be rendered between the bottom and top layers.
++        Fullscreen shell surfaces are typically rendered at the top layer.
++        Multiple surfaces can share a single layer, and ordering within a
++        single layer is undefined.
++      </description>
++
++      <entry name="background" value="0"/>
++      <entry name="bottom" value="1"/>
++      <entry name="top" value="2"/>
++      <entry name="overlay" value="3"/>
++    </enum>
++
++    <!-- Version 3 additions -->
++
++    <request name="destroy" type="destructor" since="3">
++      <description summary="destroy the layer_shell object">
++        This request indicates that the client will not use the layer_shell
++        object any more. Objects that have been created through this instance
++        are not affected.
++      </description>
++    </request>
++  </interface>
++
++  <interface name="zwlr_layer_surface_v1" version="5">
++    <description summary="layer metadata interface">
++      An interface that may be implemented by a wl_surface, for surfaces that
++      are designed to be rendered as a layer of a stacked desktop-like
++      environment.
++
++      Layer surface state (layer, size, anchor, exclusive zone,
++      margin, interactivity) is double-buffered, and will be applied at the
++      time wl_surface.commit of the corresponding wl_surface is called.
++
++      Attaching a null buffer to a layer surface unmaps it.
++
++      Unmapping a layer_surface means that the surface cannot be shown by the
++      compositor until it is explicitly mapped again. The layer_surface
++      returns to the state it had right after layer_shell.get_layer_surface.
++      The client can re-map the surface by performing a commit without any
++      buffer attached, waiting for a configure event and handling it as usual.
++    </description>
++
++    <request name="set_size">
++      <description summary="sets the size of the surface">
++        Sets the size of the surface in surface-local coordinates. The
++        compositor will display the surface centered with respect to its
++        anchors.
++
++        If you pass 0 for either value, the compositor will assign it and
++        inform you of the assignment in the configure event. You must set your
++        anchor to opposite edges in the dimensions you omit; not doing so is a
++        protocol error. Both values are 0 by default.
++
++        Size is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="width" type="uint"/>
++      <arg name="height" type="uint"/>
++    </request>
++
++    <request name="set_anchor">
++      <description summary="configures the anchor point of the surface">
++        Requests that the compositor anchor the surface to the specified edges
++        and corners. If two orthogonal edges are specified (e.g. 'top' and
++        'left'), then the anchor point will be the intersection of the edges
++        (e.g. the top left corner of the output); otherwise the anchor point
++        will be centered on that edge, or in the center if none is specified.
++
++        Anchor is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="anchor" type="uint" enum="anchor"/>
++    </request>
++
++    <request name="set_exclusive_zone">
++      <description summary="configures the exclusive geometry of this surface">
++        Requests that the compositor avoids occluding an area with other
++        surfaces. The compositor's use of this information is
++        implementation-dependent - do not assume that this region will not
++        actually be occluded.
++
++        A positive value is only meaningful if the surface is anchored to one
++        edge or an edge and both perpendicular edges. If the surface is not
++        anchored, anchored to only two perpendicular edges (a corner), anchored
++        to only two parallel edges or anchored to all edges, a positive value
++        will be treated the same as zero.
++
++        A positive zone is the distance from the edge in surface-local
++        coordinates to consider exclusive.
++
++        Surfaces that do not wish to have an exclusive zone may instead specify
++        how they should interact with surfaces that do. If set to zero, the
++        surface indicates that it would like to be moved to avoid occluding
++        surfaces with a positive exclusive zone. If set to -1, the surface
++        indicates that it would not like to be moved to accommodate for other
++        surfaces, and the compositor should extend it all the way to the edges
++        it is anchored to.
++
++        For example, a panel might set its exclusive zone to 10, so that
++        maximized shell surfaces are not shown on top of it. A notification
++        might set its exclusive zone to 0, so that it is moved to avoid
++        occluding the panel, but shell surfaces are shown underneath it. A
++        wallpaper or lock screen might set their exclusive zone to -1, so that
++        they stretch below or over the panel.
++
++        The default value is 0.
++
++        Exclusive zone is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="zone" type="int"/>
++    </request>
++
++    <request name="set_margin">
++      <description summary="sets a margin from the anchor point">
++        Requests that the surface be placed some distance away from the anchor
++        point on the output, in surface-local coordinates. Setting this value
++        for edges you are not anchored to has no effect.
++
++        The exclusive zone includes the margin.
++
++        Margin is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="top" type="int"/>
++      <arg name="right" type="int"/>
++      <arg name="bottom" type="int"/>
++      <arg name="left" type="int"/>
++    </request>
++
++    <enum name="keyboard_interactivity">
++      <description summary="types of keyboard interaction possible for a layer shell surface">
++        Types of keyboard interaction possible for layer shell surfaces. The
++        rationale for this is twofold: (1) some applications are not interested
++        in keyboard events and not allowing them to be focused can improve the
++        desktop experience; (2) some applications will want to take exclusive
++        keyboard focus.
++      </description>
++
++      <entry name="none" value="0">
++        <description summary="no keyboard focus is possible">
++          This value indicates that this surface is not interested in keyboard
++          events and the compositor should never assign it the keyboard focus.
++
++          This is the default value, set for newly created layer shell surfaces.
++
++          This is useful for e.g. desktop widgets that display information or
++          only have interaction with non-keyboard input devices.
++        </description>
++      </entry>
++      <entry name="exclusive" value="1">
++        <description summary="request exclusive keyboard focus">
++          Request exclusive keyboard focus if this surface is above the shell surface layer.
++
++          For the top and overlay layers, the seat will always give
++          exclusive keyboard focus to the top-most layer which has keyboard
++          interactivity set to exclusive. If this layer contains multiple
++          surfaces with keyboard interactivity set to exclusive, the compositor
++          determines the one receiving keyboard events in an implementation-
++          defined manner. In this case, no guarantee is made when this surface
++          will receive keyboard focus (if ever).
++
++          For the bottom and background layers, the compositor is allowed to use
++          normal focus semantics.
++
++          This setting is mainly intended for applications that need to ensure
++          they receive all keyboard events, such as a lock screen or a password
++          prompt.
++        </description>
++      </entry>
++      <entry name="on_demand" value="2" since="4">
++        <description summary="request regular keyboard focus semantics">
++          This requests the compositor to allow this surface to be focused and
++          unfocused by the user in an implementation-defined manner. The user
++          should be able to unfocus this surface even regardless of the layer
++          it is on.
++
++          Typically, the compositor will want to use its normal mechanism to
++          manage keyboard focus between layer shell surfaces with this setting
++          and regular toplevels on the desktop layer (e.g. click to focus).
++          Nevertheless, it is possible for a compositor to require a special
++          interaction to focus or unfocus layer shell surfaces (e.g. requiring
++          a click even if focus follows the mouse normally, or providing a
++          keybinding to switch focus between layers).
++
++          This setting is mainly intended for desktop shell components (e.g.
++          panels) that allow keyboard interaction. Using this option can allow
++          implementing a desktop shell that can be fully usable without the
++          mouse.
++        </description>
++      </entry>
++    </enum>
++
++    <request name="set_keyboard_interactivity">
++      <description summary="requests keyboard events">
++        Set how keyboard events are delivered to this surface. By default,
++        layer shell surfaces do not receive keyboard events; this request can
++        be used to change this.
++
++        This setting is inherited by child surfaces set by the get_popup
++        request.
++
++        Layer surfaces receive pointer, touch, and tablet events normally. If
++        you do not want to receive them, set the input region on your surface
++        to an empty region.
++
++        Keyboard interactivity is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="keyboard_interactivity" type="uint" enum="keyboard_interactivity"/>
++    </request>
++
++    <request name="get_popup">
++      <description summary="assign this layer_surface as an xdg_popup parent">
++        This assigns an xdg_popup's parent to this layer_surface.  This popup
++        should have been created via xdg_surface::get_popup with the parent set
++        to NULL, and this request must be invoked before committing the popup's
++        initial state.
++
++        See the documentation of xdg_popup for more details about what an
++        xdg_popup is and how it is used.
++      </description>
++      <arg name="popup" type="object" interface="xdg_popup"/>
++    </request>
++
++    <request name="ack_configure">
++      <description summary="ack a configure event">
++        When a configure event is received, if a client commits the
++        surface in response to the configure event, then the client
++        must make an ack_configure request sometime before the commit
++        request, passing along the serial of the configure event.
++
++        If the client receives multiple configure events before it
++        can respond to one, it only has to ack the last configure event.
++
++        A client is not required to commit immediately after sending
++        an ack_configure request - it may even ack_configure several times
++        before its next surface commit.
++
++        A client may send multiple ack_configure requests before committing, but
++        only the last request sent before a commit indicates which configure
++        event the client really is responding to.
++      </description>
++      <arg name="serial" type="uint" summary="the serial from the configure event"/>
++    </request>
++
++    <request name="destroy" type="destructor">
++      <description summary="destroy the layer_surface">
++        This request destroys the layer surface.
++      </description>
++    </request>
++
++    <event name="configure">
++      <description summary="suggest a surface change">
++        The configure event asks the client to resize its surface.
++
++        Clients should arrange their surface for the new states, and then send
++        an ack_configure request with the serial sent in this configure event at
++        some point before committing the new surface.
++
++        The client is free to dismiss all but the last configure event it
++        received.
++
++        The width and height arguments specify the size of the window in
++        surface-local coordinates.
++
++        The size is a hint, in the sense that the client is free to ignore it if
++        it doesn't resize, pick a smaller size (to satisfy aspect ratio or
++        resize in steps of NxM pixels). If the client picks a smaller size and
++        is anchored to two opposite anchors (e.g. 'top' and 'bottom'), the
++        surface will be centered on this axis.
++
++        If the width or height arguments are zero, it means the client should
++        decide its own window dimension.
++      </description>
++      <arg name="serial" type="uint"/>
++      <arg name="width" type="uint"/>
++      <arg name="height" type="uint"/>
++    </event>
++
++    <event name="closed">
++      <description summary="surface should be closed">
++        The closed event is sent by the compositor when the surface will no
++        longer be shown. The output may have been destroyed or the user may
++        have asked for it to be removed. Further changes to the surface will be
++        ignored. The client should destroy the resource after receiving this
++        event, and create a new surface if they so choose.
++      </description>
++    </event>
++
++    <enum name="error">
++      <entry name="invalid_surface_state" value="0" summary="provided surface state is invalid"/>
++      <entry name="invalid_size" value="1" summary="size is invalid"/>
++      <entry name="invalid_anchor" value="2" summary="anchor bitfield is invalid"/>
++      <entry name="invalid_keyboard_interactivity" value="3" summary="keyboard interactivity is invalid"/>
++      <entry name="invalid_exclusive_edge" value="4" summary="exclusive edge is invalid given the surface anchors"/>
++    </enum>
++
++    <enum name="anchor" bitfield="true">
++      <entry name="top" value="1" summary="the top edge of the anchor rectangle"/>
++      <entry name="bottom" value="2" summary="the bottom edge of the anchor rectangle"/>
++      <entry name="left" value="4" summary="the left edge of the anchor rectangle"/>
++      <entry name="right" value="8" summary="the right edge of the anchor rectangle"/>
++    </enum>
++
++    <!-- Version 2 additions -->
++
++    <request name="set_layer" since="2">
++      <description summary="change the layer of the surface">
++        Change the layer that the surface is rendered on.
++
++        Layer is double-buffered, see wl_surface.commit.
++      </description>
++      <arg name="layer" type="uint" enum="zwlr_layer_shell_v1.layer" summary="layer to move this surface to"/>
++    </request>
++
++    <!-- Version 5 additions -->
++
++    <request name="set_exclusive_edge" since="5">
++      <description summary="set the edge the exclusive zone will be applied to">
++        Requests an edge for the exclusive zone to apply. The exclusive
++        edge will be automatically deduced from anchor points when possible,
++        but when the surface is anchored to a corner, it will be necessary
++        to set it explicitly to disambiguate, as it is not possible to deduce
++        which one of the two corner edges should be used.
++
++        The edge must be one the surface is anchored to, otherwise the
++        invalid_exclusive_edge protocol error will be raised.
++      </description>
++      <arg name="edge" type="uint" enum="anchor"/>
++    </request>
++  </interface>
++</protocol>

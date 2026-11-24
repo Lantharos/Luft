@@ -21,15 +21,20 @@ const DEVICES: [&str; 3] = ["usb", "serial", "all"];
 const PLAYBACK: &str = "playback";
 const MICROPHONE: &str = "microphone";
 const CAMERA: &str = "camera";
+/// What `windows` takes, and the device word Schelf shows for it.
+const CAPTURE: &str = "capture";
+const WINDOWS: &str = "windows";
 const DOWNLOADS: &str = "xdg-download";
 const HOME: &str = "home";
 const KESTREL: &str = "com.lantharos.Kestrel";
 /// The objects of Kestrel every sandbox reaches already: its palette, its
-/// Send sheet and its sound theme.
-const KESTREL_FOR_EVERY_APP: [&str; 3] = [
+/// Send sheet, its sound theme and the request to record windows, which the
+/// person answers.
+const KESTREL_FOR_EVERY_APP: [&str; 4] = [
     "/com/lantharos/Kestrel/Appearance",
     "/com/lantharos/Kestrel/Share",
     "/com/lantharos/Kestrel/Sounds",
+    "/com/lantharos/Kestrel/WindowCapture",
 ];
 /// Name spaces of the desktop's own services, which an app that owned a name
 /// in them could stand in for.
@@ -70,6 +75,9 @@ pub struct Declaration {
     pub microphone: bool,
     /// Whether it uses cameras.
     pub camera: bool,
+    /// Whether it records the windows it picks, such as a game, and shows
+    /// overlays over them, as `windows = "capture"` asks.
+    pub record_windows: bool,
     /// Why it asks to run outside a sandbox, when it does.
     pub unsandboxed: Option<String>,
 }
@@ -86,6 +94,7 @@ impl Default for Declaration {
             x11: false,
             microphone: false,
             camera: false,
+            record_windows: false,
             unsandboxed: None,
         }
     }
@@ -116,6 +125,7 @@ struct Table {
     microphone: bool,
     #[serde(default)]
     camera: bool,
+    windows: Option<String>,
     #[serde(default)]
     unsandboxed: bool,
     reason: Option<String>,
@@ -245,6 +255,15 @@ impl Declaration {
         if let Some(name) = table.own.iter().find(|name| !ownable(name)) {
             return Err(format!("{name} isn't a name an app can own."));
         }
+        if let Some(windows) = table
+            .windows
+            .as_deref()
+            .filter(|windows| *windows != CAPTURE)
+        {
+            return Err(format!(
+                "{windows} isn't something an app can do with windows."
+            ));
+        }
         Ok(Self {
             network: table.network.unwrap_or(true),
             filesystems: table.filesystems,
@@ -255,6 +274,7 @@ impl Declaration {
             x11: table.x11,
             microphone: table.microphone,
             camera: table.camera,
+            record_windows: table.windows.is_some(),
             unsandboxed: None,
         })
     }
@@ -291,7 +311,11 @@ impl Declaration {
         if downloads && !self.reaches_downloads() {
             filesystems.push(DOWNLOADS.to_owned());
         }
-        let recording = [(self.microphone, MICROPHONE), (self.camera, CAMERA)];
+        let recording = [
+            (self.microphone, MICROPHONE),
+            (self.camera, CAMERA),
+            (self.record_windows, WINDOWS),
+        ];
         Permissions {
             shared,
             sockets,
@@ -360,6 +384,19 @@ mod tests {
         );
         assert_eq!(declaration.devices, ["usb"]);
         assert_eq!(declaration.talk, ["org.mpris.MediaPlayer2.notes"]);
+    }
+
+    #[test]
+    fn an_app_asks_to_record_windows() {
+        let declaration = Declaration::read("[sandbox]\nwindows = \"capture\"\n").unwrap();
+        assert!(declaration.record_windows);
+        assert!(
+            declaration
+                .permissions()
+                .devices
+                .contains(&WINDOWS.to_owned())
+        );
+        assert!(Declaration::read("[sandbox]\nwindows = \"control\"\n").is_err());
     }
 
     #[test]

@@ -1854,7 +1854,7 @@ export type Shared = {
 	active: boolean,
 };
 
-export type SharedKind = "screen" | "control" | "input" | "windows-see" | "windows-use";
+export type SharedKind = "screen" | "control" | "input" | "windows-see" | "windows-use" | "windows-record";
 
 export type Shortcut = {
 	schema: string,

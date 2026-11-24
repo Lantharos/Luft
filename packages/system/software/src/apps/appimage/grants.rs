@@ -4,7 +4,7 @@ use std::path::Path;
 use luft_dbus as dbus;
 use luft_identity::permissions::{
     self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO, OWN,
-    Permission, READ_ONLY_FOLDERS, X11, YES,
+    Permission, READ_ONLY_FOLDERS, WINDOW_CAPTURE, X11, YES,
 };
 use zbus::Connection;
 
@@ -41,7 +41,7 @@ async fn given(connection: &Connection, permission: &Permission, id: &str) -> Re
         == Some(YES))
 }
 
-const EVERYTHING: [&Permission; 11] = [
+const EVERYTHING: [&Permission; 12] = [
     &FULL_ACCESS,
     &FOLDERS,
     &READ_ONLY_FOLDERS,
@@ -53,6 +53,7 @@ const EVERYTHING: [&Permission; 11] = [
     &X11,
     &MICROPHONE,
     &CAMERA,
+    &WINDOW_CAPTURE,
 ];
 const ALL_DEVICES: &str = "all";
 
@@ -125,7 +126,17 @@ pub async fn grant(id: &str, declaration: &Declaration, full_access: bool) -> Re
             store(connection, permission, id, &answer(true)).await?;
         }
     }
+    if declaration.record_windows {
+        store(connection, &WINDOW_CAPTURE, id, &given_now()).await?;
+    }
     Ok(())
+}
+
+fn given_now() -> Vec<String> {
+    let since = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_secs());
+    vec![YES.to_owned(), since.to_string()]
 }
 
 fn answer(given: bool) -> Vec<String> {
@@ -266,6 +277,9 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
     if before.camera && !after.camera {
         store(connection, &CAMERA, id, &[]).await?;
     }
+    if before.record_windows && !after.record_windows {
+        store(connection, &WINDOW_CAPTURE, id, &[]).await?;
+    }
     if after.network {
         Ok(())
     } else {
@@ -276,7 +290,19 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
 /// What the app's sandbox opens to it, in Flatpak's words.
 pub async fn granted(id: &str) -> Result<Permissions, String> {
     let connection = dbus::session().await?;
-    let (folders, read_only, devices, network, talk, own, downloads, x11, microphone, camera) = futures_util::try_join!(
+    let (
+        folders,
+        read_only,
+        devices,
+        network,
+        talk,
+        own,
+        downloads,
+        x11,
+        microphone,
+        camera,
+        record_windows,
+    ) = futures_util::try_join!(
         held(connection, &FOLDERS, id),
         held(connection, &READ_ONLY_FOLDERS, id),
         held(connection, &DEVICES, id),
@@ -287,6 +313,7 @@ pub async fn granted(id: &str) -> Result<Permissions, String> {
         given(connection, &X11, id),
         given(connection, &MICROPHONE, id),
         given(connection, &CAMERA, id),
+        given(connection, &WINDOW_CAPTURE, id),
     )?;
     let closed = |answer: &[String]| answer.first().map(String::as_str) == Some(NO);
     Ok(Declaration {
@@ -302,6 +329,7 @@ pub async fn granted(id: &str) -> Result<Permissions, String> {
         x11,
         microphone,
         camera,
+        record_windows,
         unsandboxed: None,
     }
     .opened(!closed(&downloads)))

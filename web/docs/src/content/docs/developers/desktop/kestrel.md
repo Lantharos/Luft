@@ -67,6 +67,23 @@ peek stop $h
 
 peek stays off until Developer tools is on. The switch is `DeveloperTools` on `com.lantharos.Greeter1`, kept in `/var/lib/kestrel-greeter/config.json`, which only root can write. `SetDeveloperTools` always asks for an administrator's password, so no program can turn it on by itself. The same switch opens the text consoles ([Hardening](/security/hardening/#text-consoles)). An organization's [policy](/organizations/policy/) can decide it, and `SetDeveloperTools` then refuses to change it.
 
+## Recording windows
+
+A game clipper records the game's window, not the whole screen, and shows a short note over the game while it is full screen. Kestrel offers that through standard Wayland protocols, so the same app works on other desktops that have them:
+
+| Protocol | Version | Gives |
+| --- | --- | --- |
+| `ext_foreign_toplevel_list_v1` | 1 | The windows on the taskbar, each with its title, app ID and an identifier that is never reused. The app ID of an X11 window is its `WM_CLASS`, so Steam games show as `steam_app_<id>` |
+| `ext_foreign_toplevel_image_capture_source_manager_v1` | 1 | A capture source for one of those windows |
+| `ext_image_copy_capture_manager_v1` | 1 | Frames of the window copied into the app's own buffers: DMA-BUFs on the main graphics device or shared memory, in `ARGB8888` or `XRGB8888`, with the pointer drawn in when the app asks for `paint_cursors`. After the first frame, a frame waits until the window changes. The session stops when the window closes. Cursor sessions aren't offered |
+| `zwlr_layer_shell_v1` | 5 | The overlay layer only. An overlay sits above every window, full-screen ones included, on the output it names or the primary one, placed by its anchors and margins. It never takes keyboard focus and the pointer goes through it to the window below, whatever its keyboard interactivity or input region say. Asking for another layer, or for a popup, is a protocol error |
+
+Sandboxed apps see none of these globals unless they may record windows: either they declared `windows = "capture"` in `[sandbox]` and the person agreed when installing, or the person allowed it when the app called `RequestAccess()` on `com.lantharos.Kestrel.WindowCapture`. That shows "Allow *app* to see your windows?" once. Allowing writes `yes` to the `window-capture` table of the permission store, under the app ID the sandbox gives the app, never one the app names. Declining refuses the app until it restarts. Programs outside a sandbox see the globals without asking, as they can already read the screen.
+
+Kestrel hands the compositor the apps allowed, and the compositor checks them when a client binds a global, when it starts a recording and when it asks for an overlay. A client sees new globals only in a registry it creates after the permission arrives, so an app that just got it creates a new `wl_registry`. Taking the permission away in Settings, under Privacy → Screen and input sharing, stops the app's recordings and keeps it from starting new ones.
+
+While an app records a window, the taskbar shows that the screen is shared, its menu stops every recording, and Settings lists the app as recording right now. The compositor announces each recording with `MetaDisplay::window-capture-started` and `::window-capture-ended`, and `meta_display_stop_window_capture()` ends one.
+
 ## On-screen keyboard layouts
 
 The on-screen keyboard reads its layouts from `kestrel/engine/data/osk-layouts`, one JSON file per XKB layout, named `layout.json` or `layout+variant.json`. A layout the folder lacks falls back to its base layout and then to `us`. Terminals use the `-extended` files, and fields that ask for digits, numbers, phone numbers, email addresses or URLs use `digits`, `number`, `phone`, `email` and `url`. The files started from the Android keyboards in Unicode CLDR 43, the last release that published them, and are edited by hand.

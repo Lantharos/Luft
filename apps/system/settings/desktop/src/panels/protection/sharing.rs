@@ -27,6 +27,7 @@ enum SharedKind {
     Input,
     WindowsSee,
     WindowsUse,
+    WindowsRecord,
 }
 
 #[derive(Serialize, Type)]

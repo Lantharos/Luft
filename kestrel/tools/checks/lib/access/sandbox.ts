@@ -56,13 +56,18 @@ export async function openSecurityContext(appId: string, {prefix = [], socket = 
   return {process, socket: path, listening: lines[0] === 'listening'};
 }
 
-export async function sandboxedApp(talk: string, {own = null}: {own?: string | null} = {}) {
+export interface SandboxedAppOptions {
+  own?: string | null;
+  rules?: string[];
+}
+
+export async function sandboxedApp(talk: string, {own = null, rules = [`--talk=${talk}`]}: SandboxedAppOptions = {}) {
   const socket = scratch(`sandbox-bus-${++contexts}`);
   GLib.unlink(socket);
   const cache = linkTarget(GLib.get_user_cache_dir());
   const proxy = spawn([
     ...bubblewrapped(SANDBOXED_APP, ['--unshare-pid', '--ro-bind', '/etc', '/etc', '--bind', '/tmp', '/tmp', '--bind', cache, cache]),
-    'xdg-dbus-proxy', GLib.getenv('DBUS_SESSION_BUS_ADDRESS')!, socket, '--filter', `--talk=${talk}`,
+    'xdg-dbus-proxy', GLib.getenv('DBUS_SESSION_BUS_ADDRESS')!, socket, '--filter', ...rules,
     ...own ? [`--own=${own}`] : [],
   ]);
   await waitUntil(() => GLib.file_test(socket, GLib.FileTest.EXISTS), `a sandboxed app that may talk to ${talk} starts`, 10000);

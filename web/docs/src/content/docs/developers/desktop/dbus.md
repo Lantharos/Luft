@@ -30,7 +30,7 @@ In an app, `luft_dbus::error::kind(&error)` gives the kind of a failed call and 
 
 ## Kestrel
 
-These are on `com.lantharos.Kestrel` on the session bus. Sandboxed apps may only read `Appearance`, which [Colours and motion](/developers/desktop/colours-and-motion/#reading-the-palette) describes, and make the two calls marked below.
+These are on `com.lantharos.Kestrel` on the session bus. Sandboxed apps may only read `Appearance`, which [Colours and motion](/developers/desktop/colours-and-motion/#reading-the-palette) describes, and make the three calls marked below.
 
 | Interface and path | Does |
 | --- | --- |
@@ -38,6 +38,7 @@ These are on `com.lantharos.Kestrel` on the session bus. Sandboxed apps may only
 | `com.lantharos.Kestrel.Share`, `/com/lantharos/Kestrel/Share` | `Send(a(sh) files)` opens the Send sheet for files handed over as names and open file descriptors, where people pick a device nearby or an app. Only the app whose window is in front may call it, sandboxed or not, and at most five sheets a minute |
 | `com.lantharos.Kestrel.Sounds`, `/com/lantharos/Kestrel/Sounds` | `Play(s name)` plays a sound of the theme, following the sound switches, at most four a second per caller; sandboxed apps may call it. `Preview` plays regardless of the switches and `Check` says whether a file can be a custom sound, both for Settings |
 | `com.lantharos.Kestrel.DriveAccess`, `/com/lantharos/Kestrel/DriveAccess` | `Ask(h app, s drive) → b` asks whether a sandboxed app may use a drive. Only Schelf may call it; [Kestrel's prompts](/developers/desktop/prompts/#drives) has the rules |
+| `com.lantharos.Kestrel.WindowCapture`, `/com/lantharos/Kestrel/WindowCapture` | `RequestAccess()` asks the person once whether the calling app may record windows and show notes over games, and returns once it may, or fails with `com.lantharos.Kestrel.WindowCapture.Error.Denied`. Sandboxed apps may call it; [Recording windows](/developers/desktop/kestrel/#recording-windows) has the rest |
 | `com.lantharos.Kestrel.Sharing`, `/com/lantharos/Kestrel/Sharing` | `List` returns who sees the screen or sends input now and who may again, `Revoke(s id)` ends one, and `Changed` follows. Settings uses it under Privacy; sandboxed apps can't call it |
 | `com.lantharos.Kestrel.Pens`, `/com/lantharos/Kestrel/Pens` | The `Devices` property lists the seat's pens and drawing tablets, each with the `VVVV:PPPP` ID GNOME's tablet settings use, its name, and whether it's a pen on a screen or a separate tablet |
 

@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 
 import { readText, userFile, writeText } from '../../../../appearance/files.js';
 
-export type Kind = 'screen' | 'control' | 'input' | 'windows-see' | 'windows-use';
+export type Kind = 'screen' | 'control' | 'input' | 'windows-see' | 'windows-use' | 'windows-record';
 
 export interface Remembered {
   readonly id: string;

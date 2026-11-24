@@ -87,3 +87,4 @@
 0087-backends-tell-the-shell-when-the-pointer-is-shaken-a.patch
 0088-compositor-blur-app-glass-that-frames-a-sheet-only-a.patch
 0089-compositor-give-glass-a-Niko-material.patch
+0090-wayland-let-apps-that-may-record-windows-list-captur.patch

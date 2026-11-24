@@ -31,6 +31,13 @@ pub const BACKGROUND_CLIPBOARD: Permission = Permission {
     id: "background-clipboard",
 };
 
+/// Apps that may record the windows they pick and show overlays over games,
+/// with `yes` and the time it was given in seconds since the epoch.
+pub const WINDOW_CAPTURE: Permission = Permission {
+    table: "window-capture",
+    id: "window-capture",
+};
+
 /// Folders an AppImage's sandbox opens, one path per folder.
 pub const FOLDERS: Permission = Permission {
     table: "sandbox",

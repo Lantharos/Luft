@@ -6,6 +6,7 @@ import { appIcons } from '../../../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { formatsLocale, localized, t } from '../../../shared/i18n/index.js';
 import { windowAccess, type Level } from '../peek/access/grants.js';
+import { windowCaptures } from '../windows/captures.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
 import { typingActivity } from './typing.js';
@@ -78,7 +79,10 @@ export class PrivacyIndicator {
     if (state.camera && !users.some(user => user.kind === 'camera'))
       entries.push({ label: t('privacy-camera-unknown-app'), icon: icon(ICONS.camera), enabled: false, run: () => {} });
     if (state.sharing)
-      entries.push({ label: t('privacy-stop-sharing'), icon: icon(ICONS.sharing), run: () => { for (const handle of this.monitor.handles) if (!handle.is_recording) handle.stop(); } });
+      entries.push({ label: t('privacy-stop-sharing'), icon: icon(ICONS.sharing), run: () => {
+        for (const handle of this.monitor.handles) if (!handle.is_recording) handle.stop();
+        windowCaptures.stopAll();
+      } });
     if (state.recording)
       entries.push({ label: t('privacy-stop-recording'), icon: icon(ICONS.recording), run: this.stopScreencast });
     if (state.location)

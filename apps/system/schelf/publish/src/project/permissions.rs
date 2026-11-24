@@ -55,6 +55,9 @@ pub fn describe_permissions(permissions: Option<&Permissions>) -> Vec<String> {
     if permissions.x11 {
         lines.push("Shows its windows through X11".into());
     }
+    if permissions.record_windows {
+        lines.push("Records the windows it picks and shows notes over games".into());
+    }
     for entry in &permissions.talk {
         lines.push(match entry.split_once('@') {
             Some((name, object)) => format!("Talks to {object} of {name}"),

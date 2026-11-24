@@ -16,6 +16,7 @@ export interface Permission {
 
 export const FULL_ACCESS: Permission = { table: 'full-access', id: 'full-access' };
 export const BACKGROUND_CLIPBOARD: Permission = { table: 'background-clipboard', id: 'background-clipboard' };
+export const WINDOW_CAPTURE: Permission = { table: 'window-capture', id: 'window-capture' };
 
 export const answerOf = (apps: Apps, app: string): Answer | null => {
   const answer = apps[app]?.[0];
@@ -55,10 +56,16 @@ export async function setPermission({ table, id }: Permission, app: string, valu
 
 export const setAnswer = (permission: Permission, app: string, answer: Answer): Promise<void> => setPermission(permission, app, [answer]);
 
-export function watchStore(permissions: Permission[], changed: (permission: Permission, apps: Apps) => void): void {
-  Gio.DBus.session.signal_subscribe(STORE, STORE, 'Changed', STORE_PATH, null, Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
-    const [table, id, deleted, , apps] = parameters.deepUnpack<[string, string, boolean, GLib.Variant, Apps]>();
-    const permission = permissions.find(candidate => candidate.table === table && candidate.id === id);
+export async function forgetAnswer({ table, id }: Permission, app: string): Promise<void> {
+  await Gio.DBus.session.call(STORE, STORE_PATH, STORE, 'DeletePermission', new GLib.Variant('(sss)', [table, id, app]),
+    null, Gio.DBusCallFlags.NONE, -1, null);
+}
+
+export function watchStore(permissions: Permission[], changed: (permission: Permission, apps: Apps) => void): () => void {
+  const id = Gio.DBus.session.signal_subscribe(STORE, STORE, 'Changed', STORE_PATH, null, Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
+    const [table, entry, deleted, , apps] = parameters.deepUnpack<[string, string, boolean, GLib.Variant, Apps]>();
+    const permission = permissions.find(candidate => candidate.table === table && candidate.id === entry);
     if (permission) changed(permission, deleted ? {} : apps);
   });
+  return () => Gio.DBus.session.signal_unsubscribe(id);
 }

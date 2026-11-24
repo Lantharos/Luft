@@ -8,6 +8,7 @@ const STORE_PATH = '/org/freedesktop/impl/portal/PermissionStore';
 
 export const FULL_ACCESS = 'full-access';
 export const BACKGROUND_CLIPBOARD = 'background-clipboard';
+export const WINDOW_CAPTURE = 'window-capture';
 
 const store = (method: string, parameters: GLib.Variant) => call(STORE, STORE_PATH, STORE, method, parameters);
 const permitted = (permission: string, appId: string) => global.context.is_app_permitted(permission, appId);

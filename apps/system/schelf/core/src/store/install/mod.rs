@@ -75,6 +75,7 @@ fn full_access_declared() -> Declared {
         x11: false,
         microphone: false,
         camera: false,
+        record_windows: false,
         network: true,
         filesystems: Vec::new(),
         devices: Vec::new(),

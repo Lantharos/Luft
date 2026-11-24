@@ -29,7 +29,7 @@ const DESKTOP_NAMESPACES: [&str; 6] = [
     "org.a11y",
 ];
 const PLAYERS: &str = "org.mpris.MediaPlayer2";
-const SANDBOX_KEYS: [&str; 11] = [
+const SANDBOX_KEYS: [&str; 12] = [
     "network",
     "filesystems",
     "devices",
@@ -39,9 +39,11 @@ const SANDBOX_KEYS: [&str; 11] = [
     "x11",
     "microphone",
     "camera",
+    "windows",
     "unsandboxed",
     "reason",
 ];
+const WINDOWS: [&str; 1] = ["capture"];
 
 /// What an app asks its sandbox for.
 #[derive(Clone, Debug, PartialEq)]
@@ -55,6 +57,7 @@ pub struct Permissions {
     pub x11: bool,
     pub microphone: bool,
     pub camera: bool,
+    pub record_windows: bool,
     pub unsandboxed: Option<String>,
 }
 
@@ -70,6 +73,7 @@ impl Default for Permissions {
             x11: false,
             microphone: false,
             camera: false,
+            record_windows: false,
             unsandboxed: None,
         }
     }
@@ -235,6 +239,20 @@ fn sandbox(checker: &mut Checker, value: &Value) -> Option<Permissions> {
     let x11 = flag(checker, table, &path, "x11");
     let microphone = flag(checker, table, &path, "microphone");
     let camera = flag(checker, table, &path, "camera");
+    let windows = match table.get("windows") {
+        None => Some(false),
+        value => {
+            let refusal = |value: Option<&Value>| {
+                format!(
+                    "{} isn't something an app can do with windows.",
+                    shown(value)
+                )
+            };
+            checker
+                .choice(&at(&path, "windows"), value, &WINDOWS, Some(&refusal))
+                .map(|_| true)
+        }
+    };
     let unsandboxed = flag(checker, table, &path, "unsandboxed");
     let reason = match table.get("reason") {
         None => Some(None),
@@ -268,6 +286,7 @@ fn sandbox(checker: &mut Checker, value: &Value) -> Option<Permissions> {
         x11: x11?,
         microphone: microphone?,
         camera: camera?,
+        record_windows: windows?,
         unsandboxed: None,
     })
 }
@@ -318,6 +337,7 @@ mod tests {
                 x11: false,
                 microphone: true,
                 camera: false,
+                record_windows: false,
                 unsandboxed: None,
             }
         );

@@ -1,8 +1,8 @@
-import { appsAnswering, answerOf, BACKGROUND_CLIPBOARD, FULL_ACCESS, lookupSync, setAnswer, watchStore, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
+import { appsAnswering, answerOf, BACKGROUND_CLIPBOARD, FULL_ACCESS, lookupSync, setAnswer, watchStore, WINDOW_CAPTURE, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
 
 const PASSWORD_MANAGERS = ['com.onepassword.OnePassword', 'org.keepassxc.KeePassXC', 'com.bitwarden.desktop'];
 const ANSWERED_BY_DEFAULT = new Map<Permission, string[]>([[BACKGROUND_CLIPBOARD, PASSWORD_MANAGERS]]);
-const PERMISSIONS = [FULL_ACCESS, BACKGROUND_CLIPBOARD];
+const PERMISSIONS = [FULL_ACCESS, BACKGROUND_CLIPBOARD, WINDOW_CAPTURE];
 
 function answerDefaults(permission: Permission, apps: Apps): void {
   for (const app of ANSWERED_BY_DEFAULT.get(permission) ?? [])

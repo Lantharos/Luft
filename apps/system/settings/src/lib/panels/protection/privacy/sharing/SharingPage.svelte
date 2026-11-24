@@ -14,7 +14,8 @@
 		control: 'settings-sharing-can-control',
 		input: 'settings-sharing-can-input',
 		'windows-see': 'settings-sharing-can-windows-see',
-		'windows-use': 'settings-sharing-can-windows-use'
+		'windows-use': 'settings-sharing-can-windows-use',
+		'windows-record': 'settings-sharing-can-windows-record'
 	};
 
 	let shared = $state.raw<Shared[] | null>(null);
@@ -28,8 +29,9 @@
 	}
 
 	function details(entry: Shared) {
-		const when = entry.active ? t('settings-sharing-active') : t('settings-sharing-allowed-since', { when: ago(entry.since) });
-		return `${t(CAN[entry.kind])} · ${when}`;
+		const can = t(CAN[entry.kind]);
+		if (entry.active) return `${can} · ${t('settings-sharing-active')}`;
+		return entry.since ? `${can} · ${t('settings-sharing-allowed-since', { when: ago(entry.since) })}` : can;
 	}
 
 	void commands.sharingList().then((next) => (shared = next));

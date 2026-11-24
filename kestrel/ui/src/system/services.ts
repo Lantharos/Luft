@@ -27,6 +27,7 @@ import { AppQuestions } from './connectivity/firewall/appQuestions.js';
 import { SharingService } from './capture/privacy/sharing/service.js';
 import { DesktopPolicy } from './capture/peek/access/desktop.js';
 import { PeekService } from './capture/peek/service.js';
+import { WindowCaptureService } from './capture/windows/service.js';
 import { MonitorWake } from './hardware/display/relight/monitorWake.js';
 import { MediaKeys } from './input/mediaKeys/mediaKeys.js';
 import { BatteryWarnings } from './hardware/power/batteryWarnings.js';
@@ -76,6 +77,7 @@ export class SystemServices {
   private readonly peek: PeekService;
   private readonly firewallQuestions: AppQuestions;
   private readonly sharing = new SharingService();
+  private readonly windowCapture = new WindowCaptureService();
 
   constructor(context: Context, openGust: () => void) {
     this.titleBars = new TitleBars((window, x, y) =>
@@ -97,6 +99,7 @@ export class SystemServices {
   destroy(): void {
     this.peek.destroy();
     this.sharing.destroy();
+    this.windowCapture.destroy();
     this.firewallQuestions.destroy();
     this.crashReports.destroy();
     this.luftMove.destroy();

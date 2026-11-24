@@ -565,6 +565,7 @@ settings-sharing-can-control = Can see your screen and use your mouse and keyboa
 settings-sharing-can-input = Can use your mouse and keyboard
 settings-sharing-can-windows-see = Can see your open windows
 settings-sharing-can-windows-use = Can see and move your open windows
+settings-sharing-can-windows-record = Can record your windows and show notes over games
 settings-sharing-active = Sharing right now
 # $when is a relative time, like "2 days ago"
 settings-sharing-allowed-since = Allowed { $when }

@@ -29,6 +29,7 @@ camera = false
 | `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing |
 | `microphone` | `false` | It records sound, from a microphone or from what the computer plays |
 | `camera` | `false` | It uses cameras. An app that only uses the camera portal can leave this out and is asked the first time |
+| `windows` | none | `capture`: it records the windows it picks, such as a game, and shows notes over full-screen games. An app that leaves this out asks the first time, as [Recording windows](/developers/desktop/kestrel/#recording-windows) describes |
 | `x11` | `false` | It draws through X11, which is shown before it installs |
 | `own` | none | Session bus names it answers to, such as its media player. Names of the desktop's own services, and every media player at once, are refused |
 | `pipewire` | `false` | It speaks to PipeWire itself. Every app in Schelf's sandbox reaches PipeWire, where Luft notices when it records; a Sabine app outside it needs this to |
@@ -69,9 +70,10 @@ Every permission lives in the desktop portal's permission store, one table per k
 | `sandbox` | The `folders` and `read-only-folders` of any sandboxed app, an AppImage's `devices`, extra `bus` names and the names it may `own`, and `network`, `downloads` and `x11` switches, and `flatpak-places`, what Luft last wrote into a Flatpak's overrides |
 | `drives` | One entry per drive an app was given or refused, named after its filesystem's UUID and the drive it's on, with `read-write`, `read-only` or `no` for each app |
 | `devices` | `microphone` and `camera`, which the camera portal shares |
+| `window-capture` | Apps that may record windows and show notes over games, with `yes` and the time it was given |
 | `location`, `background`, `notifications` and others | What apps asked for through the desktop portal |
 
-Kestrel reads `full-access` and `background-clipboard` before it starts, follows every change, and hands the compositor the apps each covers with `meta_context_set_permitted_apps()`. An app with full access counts as unsandboxed in the Wayland protocols kept from sandboxes, in screen recording and display services, and in the shell's D-Bus services. Connections already made keep how they were sorted, so a change applies the next time the app starts.
+Kestrel reads `full-access`, `background-clipboard` and `window-capture` before it starts, follows every change, and hands the compositor the apps each covers with `meta_context_set_permitted_apps()`. An app with full access counts as unsandboxed in the Wayland protocols kept from sandboxes, in screen recording and display services, and in the shell's D-Bus services. Connections already made keep how they were sorted, so a change applies the next time the app starts.
 
 Settings, under Apps, shows every table, lists every Flatpak and AppImage, and takes any permission away. An app the portal allowed to start at sign-in gets an entry in `~/.config/autostart` named after its app ID, listed with the other startup apps.
 

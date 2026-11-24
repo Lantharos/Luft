@@ -5,6 +5,7 @@ import { getGeoclueAgent } from './location.js';
 import { LEVEL_METERS } from '../../../shared/apps/levelMeters.js';
 import { ownDictation } from '../../input/dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
+import { windowCaptures } from '../windows/captures.js';
 import { cameraMonitor } from './camera.js';
 import { typingActivity } from './typing.js';
 
@@ -46,6 +47,7 @@ export class PrivacyMonitor {
     });
     this.disconnectors.push(
       windowAccess.watch(changed),
+      windowCaptures.watch(changed),
       typingActivity.watch(changed),
       ownDictation.watch(dictationChanged),
       () => this.camera.disconnect(camera),
@@ -65,7 +67,7 @@ export class PrivacyMonitor {
     return {
       camera: this.camera.cameras_in_use,
       microphone: this.mixer.recording,
-      sharing: [...this.handles].some(handle => !handle.is_recording),
+      sharing: [...this.handles].some(handle => !handle.is_recording) || windowCaptures.active.length > 0,
       recording: [...this.handles].some(handle => handle.is_recording),
       location: this.geoclue.inUse,
       windows: windowAccess.active.length > 0,

@@ -9,6 +9,7 @@ import HardDrive from '@luft/symbols/icons/hard-drive';
 import KeyRound from '@luft/symbols/icons/key-round';
 import MessagesSquare from '@luft/symbols/icons/messages-square';
 import Mic from '@luft/symbols/icons/mic';
+import MonitorUp from '@luft/symbols/icons/monitor-up';
 import Printer from '@luft/symbols/icons/printer';
 import ShieldCheck from '@luft/symbols/icons/shield-check';
 import SquareTerminal from '@luft/symbols/icons/square-terminal';
@@ -92,6 +93,7 @@ export function describe(permissions: Permissions): Access[] {
 	}
 	if (has(permissions.devices, 'microphone')) access.push({ icon: Mic, title: t('permission-microphone'), description: t('permission-microphone-description'), notable: true });
 	if (has(permissions.devices, 'camera')) access.push({ icon: Camera, title: t('permission-camera'), description: t('permission-camera-description'), notable: true });
+	if (has(permissions.devices, 'windows')) access.push({ icon: MonitorUp, title: t('permission-windows'), description: t('permission-windows-description'), notable: true });
 	if (has(permissions.sockets, 'pulseaudio')) access.push({ icon: Volume2, title: t('permission-sound'), description: t('permission-pulseaudio-description'), notable: false });
 	if (has(permissions.sockets, 'playback')) access.push({ icon: Volume2, title: t('permission-sound'), description: t('permission-playback-description'), notable: false });
 	if (bus.includes('org.freedesktop.secrets')) access.push({ icon: KeyRound, title: t('permission-secrets'), description: t('permission-secrets-description'), notable: true });

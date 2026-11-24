@@ -285,6 +285,19 @@ peek-deny = Don’t allow
 peek-allow-once = Allow once
 peek-allow-until-quit = Allow until it quits
 
+## Window recording prompt
+# An app, such as a game clipper, asks once to record windows it picks and to show short notes over full-screen games. The answer is kept until it's revoked in Settings.
+
+window-capture-request = Allow { $app } to see your windows?
+window-capture-description = It can record any window and show notes over full-screen games without asking again.
+
+## Window recording errors
+# Returned to an app that asked to record windows. Developers see them in their logs.
+
+window-capture-error-unknown-app = Kestrel can’t tell which app is asking
+window-capture-error-declined = The person using this computer declined this. The app can ask again after it restarts.
+window-capture-error-not-allowed = The person using this computer didn’t allow it
+
 ## Window access errors
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 

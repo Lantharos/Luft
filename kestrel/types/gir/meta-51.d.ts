@@ -2242,6 +2242,10 @@ export namespace Meta {
             /** @signal */
             "showing-desktop-changed": () => void;
             /** @signal */
+            "window-capture-ended": (id: number) => void;
+            /** @signal */
+            "window-capture-started": (id: number, window: Window, app_id: string | null) => void;
+            /** @signal */
             "window-created": (object: Window) => void;
             /** @signal */
             "window-demands-attention": (object: Window) => void;
@@ -2384,6 +2388,8 @@ export namespace Meta {
         set_x11_origin(x: number, y: number): void;
 
         sort_windows_by_stacking(windows: Window[]): Window[];
+
+        stop_window_capture(id: number): void;
 
         ungrab_accelerator(action_id: number): boolean;
 

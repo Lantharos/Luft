@@ -81,7 +81,7 @@ def capture(connection, app_id):
         elif sender == IDS["frame"] and opcode == FRAME_READY:
             width, height = size
             middle = ((height // 2) * width + width // 2) * 4
-            say("ready", f"{width}x{height}", pixels[middle : middle + 4].hex())
+            say("ready", f"{width}x{height}", pixels[middle : middle + 4].hex(), pixels[0:4].hex())
         elif sender == IDS["frame"] and opcode == FRAME_FAILED:
             say("failed", struct.unpack_from("=I", payload)[0])
 

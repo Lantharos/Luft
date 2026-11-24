@@ -14,8 +14,13 @@ as steam_app_<id> for Steam games. ext-image-copy-capture-v1 with
 ext-foreign-toplevel-image-capture-source-v1 copies a window into a
 buffer the client provides, shared memory or a DMA-BUF in ARGB8888 or
 XRGB8888, drawing the pointer in when asked, and stops when the window
-closes. MetaDisplay::window-capture-started and ::window-capture-ended
-tell the shell what is recorded, and meta_display_stop_window_capture()
+closes. A DMA-BUF frame is ready once the GPU has finished drawing it,
+so clients need no implicit sync, and a frame fails with
+buffer_constraints only when its buffer doesn't fit. Window recordings,
+the screen cast portal's included, show the window's own picture
+without the shell's rounded corners, outline and shadow.
+MetaDisplay::window-capture-started and ::window-capture-ended tell
+the shell what is recorded, and meta_display_stop_window_capture()
 ends a recording. zwlr_layer_shell_v1 offers only the overlay layer:
 such a surface sits above every window, fullscreen ones included, and
 is never picked, so it takes neither focus nor the pointer.
@@ -26,6 +31,13 @@ again.
 
 Upstream-Status: luft-only GNOME offers recording through the screen cast portal instead
 ---
+ clutter/clutter/clutter-paint-context.h       |   1 +
+ src/compositor/meta-shaped-texture.c          |   9 +-
+ src/compositor/meta-window-actor-wayland.c    |   1 +
+ src/compositor/meta-window-actor-x11.c        |   3 +-
+ src/compositor/meta-window-actor.c            |   2 +-
+ src/compositor/meta-window-corners.c          |   6 +
+ src/compositor/meta-window-corners.h          |   1 +
  src/core/display-private.h                    |   8 +
  src/core/display.c                            |  68 ++
  src/core/meta-sandbox.h                       |   1 +
@@ -33,19 +45,19 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/meta/display.h                            |   4 +
  src/wayland/meta-wayland-dma-buf.c            |  34 +
  src/wayland/meta-wayland-dma-buf.h            |   9 +
- .../meta-wayland-foreign-toplevel-list.c      | 275 ++++++
+ .../meta-wayland-foreign-toplevel-list.c      | 284 ++++++
  .../meta-wayland-foreign-toplevel-list.h      |  13 +
- src/wayland/meta-wayland-image-copy-capture.c | 843 ++++++++++++++++++
+ src/wayland/meta-wayland-image-copy-capture.c | 901 ++++++++++++++++++
  src/wayland/meta-wayland-image-copy-capture.h |  13 +
- src/wayland/meta-wayland-layer-shell.c        | 553 ++++++++++++
+ src/wayland/meta-wayland-layer-shell.c        | 553 +++++++++++
  src/wayland/meta-wayland-layer-shell.h        |  10 +
  src/wayland/meta-wayland-sandbox.c            |  33 +
  src/wayland/meta-wayland-sandbox.h            |   8 +
  src/wayland/meta-wayland-subsurface.c         |  13 +-
  src/wayland/meta-wayland-versions.h           |   4 +
  src/wayland/meta-wayland.c                    |   6 +
- .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 +++++++++
- 19 files changed, 2309 insertions(+), 3 deletions(-)
+ .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 ++++++++
+ 26 files changed, 2393 insertions(+), 9 deletions(-)
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
  create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
@@ -54,6 +66,106 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  create mode 100644 src/wayland/meta-wayland-layer-shell.h
  create mode 100644 src/wayland/protocol/wlr-layer-shell-unstable-v1.xml
 
+diff --git a/clutter/clutter/clutter-paint-context.h b/clutter/clutter/clutter-paint-context.h
+index 321c86ee472f7c2cecade97b66b2c6a38da8afb8..fe27d274e43f4f56e874d5e021b1bea5b6458fe9 100644
+--- a/clutter/clutter/clutter-paint-context.h
++++ b/clutter/clutter/clutter-paint-context.h
+@@ -34,6 +34,7 @@ typedef enum _ClutterPaintFlag
+   CLUTTER_PAINT_FLAG_NO_CURSORS = 1 << 0,
+   CLUTTER_PAINT_FLAG_FORCE_CURSORS = 1 << 1,
+   CLUTTER_PAINT_FLAG_CLEAR = 1 << 2,
++  CLUTTER_PAINT_FLAG_BARE_WINDOWS = 1 << 3,
+ } ClutterPaintFlag;
+ 
+ #define CLUTTER_TYPE_PAINT_CONTEXT (clutter_paint_context_get_type ())
+diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
+index 76cf5d772979f8384b92b33003378e6ac0f5a5d6..41c6e59252b169ac8bdfa698a4f719f341595289 100644
+--- a/src/compositor/meta-shaped-texture.c
++++ b/src/compositor/meta-shaped-texture.c
+@@ -927,10 +927,11 @@ do_paint_content (MetaShapedTexture   *stex,
+           cogl_pipeline_set_layer_filters (blended_pipeline, i, min_filter, mag_filter);
+         }
+ 
+-      meta_window_corners_apply (&stex->corners,
+-                                 n_planes == 1 ? META_WINDOW_CORNER_FILL_SHADOW :
+-                                                 META_WINDOW_CORNER_FILL_CLEAR,
+-                                 blended_pipeline, dst_width, dst_height);
++      if (!meta_window_corners_bare (paint_context))
++        meta_window_corners_apply (&stex->corners,
++                                   n_planes == 1 ? META_WINDOW_CORNER_FILL_SHADOW :
++                                                   META_WINDOW_CORNER_FILL_CLEAR,
++                                   blended_pipeline, dst_width, dst_height);
+ 
+       cogl_color_init_from_4f (&color, opacity / 255.0f, opacity / 255.0f,
+                                opacity / 255.0f, opacity / 255.0f);
+diff --git a/src/compositor/meta-window-actor-wayland.c b/src/compositor/meta-window-actor-wayland.c
+index 7b12ef66a0f4b5e79486e2848a813a1daec64124..b902db57a5a2ad8142bac409119bd1bacb5cafd6 100644
+--- a/src/compositor/meta-window-actor-wayland.c
++++ b/src/compositor/meta-window-actor-wayland.c
+@@ -568,6 +568,7 @@ meta_window_actor_wayland_paint (ClutterActor        *actor,
+   guint8 opacity = clutter_actor_get_paint_opacity (actor);
+   graphene_rect_t outline;
+   gboolean outlined =
++    !meta_window_corners_bare (paint_context) &&
+     meta_window_corners_get_outline (META_WINDOW_ACTOR (self), &outline);
+ #ifdef HAVE_XWAYLAND
+   MtkRectangle frame;
+diff --git a/src/compositor/meta-window-actor-x11.c b/src/compositor/meta-window-actor-x11.c
+index 168c61ca2154b5c137d0df2ee26a8b75c7407e2c..9b4e4d835e67d3c13c490d4bc294d950c51faff8 100644
+--- a/src/compositor/meta-window-actor-x11.c
++++ b/src/compositor/meta-window-actor-x11.c
+@@ -1221,7 +1221,8 @@ meta_window_actor_x11_paint (ClutterActor        *actor,
+         mtk_region_unref (clip);
+     }
+ 
+-  outlined = get_outline (actor_x11, &outline);
++  outlined = !meta_window_corners_bare (paint_context) &&
++             get_outline (actor_x11, &outline);
+   if (outlined && meta_window_corners_casts_shadow (window))
+     {
+       MtkRectangle frame;
+diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
+index dbce6b00985d6cf717889980f9c28231b03ce105..a4828ac2bcaf72420053680ac5bf9b0bb42ea8ee 100644
+--- a/src/compositor/meta-window-actor.c
++++ b/src/compositor/meta-window-actor.c
+@@ -1617,7 +1617,7 @@ meta_window_actor_blit_to_framebuffer (MetaScreenCastWindow *screen_cast_window,
+ 
+   paint_context =
+     clutter_paint_context_new_for_framebuffer (framebuffer, NULL,
+-                                               CLUTTER_PAINT_FLAG_NONE,
++                                               CLUTTER_PAINT_FLAG_BARE_WINDOWS,
+                                                clutter_actor_get_color_state (actor));
+   clutter_actor_paint (actor, paint_context);
+   clutter_paint_context_destroy (paint_context);
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index 8f707f86860d0ff4841fafb04548a0304b278c4c..913c5bd8668ec5399f21dc0134989aa587954274 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -48,6 +48,12 @@ meta_window_corners_get_radius (void)
+   return corners_rounded ? META_WINDOW_CORNER_RADIUS : 0.0f;
+ }
+ 
++gboolean
++meta_window_corners_bare (ClutterPaintContext *paint_context)
++{
++  return clutter_paint_context_get_paint_flags (paint_context) & CLUTTER_PAINT_FLAG_BARE_WINDOWS;
++}
++
+ /* Whether @window floats free of the screen edges, where it would get
+  * rounded corners and the compositor's shadow */
+ static gboolean
+diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
+index fe871eedb0280cd05cb83e4bf246db0526fd39d2..e3ebbcd6cfea265f8b94ad3bacabfaca965bdb26 100644
+--- a/src/compositor/meta-window-corners.h
++++ b/src/compositor/meta-window-corners.h
+@@ -36,6 +36,7 @@ gboolean meta_window_corners_set_monitor_gap (int      monitor,
+ gboolean meta_window_corners_equal (const MetaWindowCorners *a,
+                                     const MetaWindowCorners *b);
+ float meta_window_corners_get_radius (void);
++gboolean meta_window_corners_bare (ClutterPaintContext *paint_context);
+ MetaWindowCorners meta_window_corners_for_actor (ClutterActor *actor);
+ gboolean meta_window_corners_get_outline (MetaWindowActor *window_actor,
+                                           graphene_rect_t *bounds);
 diff --git a/src/core/display-private.h b/src/core/display-private.h
 index a166cc6952f77a9396c434eb49a7072b6c3a463a..e8041ad8ff06ad8dd2c8647bac65e66d56717330 100644
 --- a/src/core/display-private.h
@@ -300,10 +412,10 @@ index cf13821210fceca9f1f56bc6dfaaad10e50ee7de..862b890d47310ee7d45ece9ca4004d9f
  int meta_wayland_dma_buf_buffer_get_height (MetaWaylandBuffer *buffer);
 diff --git a/src/wayland/meta-wayland-foreign-toplevel-list.c b/src/wayland/meta-wayland-foreign-toplevel-list.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4b8d0a40e
+index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb68a01759
 --- /dev/null
 +++ b/src/wayland/meta-wayland-foreign-toplevel-list.c
-@@ -0,0 +1,275 @@
+@@ -0,0 +1,284 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -334,6 +446,7 @@ index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4
 +  GHashTable *toplevels;
 +  char *run_id;
 +  gulong window_created_handler_id;
++  gulong display_closing_handler_id;
 +};
 +
 +static const struct ext_foreign_toplevel_handle_v1_interface handle_interface;
@@ -456,6 +569,15 @@ index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4
 +}
 +
 +static void
++on_display_closing (MetaDisplay                    *display,
++                    MetaWaylandForeignToplevelList *self)
++{
++  g_clear_signal_handler (&self->window_created_handler_id, display);
++  g_clear_signal_handler (&self->display_closing_handler_id, display);
++  g_hash_table_remove_all (self->toplevels);
++}
++
++static void
 +follow_windows (MetaWaylandForeignToplevelList *self)
 +{
 +  MetaDisplay *display = meta_context_get_display (self->compositor->context);
@@ -466,6 +588,8 @@ index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4
 +
 +  self->window_created_handler_id =
 +    g_signal_connect (display, "window-created", G_CALLBACK (on_window_created), self);
++  self->display_closing_handler_id =
++    g_signal_connect (display, "closing", G_CALLBACK (on_display_closing), self);
 +  windows = meta_display_list_all_windows (display);
 +  for (GList *l = windows; l; l = l->next)
 +    track (self, l->data);
@@ -546,9 +670,6 @@ index 0000000000000000000000000000000000000000..3e4b44cf4cb721c990dfcd09cb92e4b4
 +static void
 +foreign_toplevel_list_free (MetaWaylandForeignToplevelList *self)
 +{
-+  if (self->window_created_handler_id)
-+    g_clear_signal_handler (&self->window_created_handler_id,
-+                            meta_context_get_display (self->compositor->context));
 +  g_clear_pointer (&self->toplevels, g_hash_table_destroy);
 +  g_list_free (self->lists);
 +  g_free (self->run_id);
@@ -600,16 +721,17 @@ index 0000000000000000000000000000000000000000..f9e0f86e00ac503c061ed4757de2286a
 +MetaWindow * meta_wayland_foreign_toplevel_handle_get_window (struct wl_resource *handle);
 diff --git a/src/wayland/meta-wayland-image-copy-capture.c b/src/wayland/meta-wayland-image-copy-capture.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c045bff3789
+index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005d892bbb4
 --- /dev/null
 +++ b/src/wayland/meta-wayland-image-copy-capture.c
-@@ -0,0 +1,843 @@
+@@ -0,0 +1,901 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
 +#include "wayland/meta-wayland-image-copy-capture.h"
 +
 +#include <drm_fourcc.h>
++#include <glib-unix.h>
 +
 +#include "backends/meta-backend-private.h"
 +#include "backends/meta-cursor-tracker-private.h"
@@ -643,6 +765,13 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +
 +typedef struct _Session Session;
 +
++typedef enum
++{
++  COPY_DONE,
++  COPY_UNFIT,
++  COPY_FAILED,
++} CopyResult;
++
 +typedef struct
 +{
 +  struct wl_resource *resource;
@@ -656,6 +785,9 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  struct wl_resource *resource;
 +  struct wl_resource *buffer;
 +  gboolean captured;
++  int64_t copied_at;
++  int fence;
++  guint fence_source_id;
 +} Frame;
 +
 +struct _Session
@@ -845,7 +977,6 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +    return FALSE;
 +  if (session->paint_cursors)
 +    blit_cursor (session, framebuffer);
-+  cogl_framebuffer_flush (framebuffer);
 +  return TRUE;
 +}
 +
@@ -872,7 +1003,7 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  return session->readback;
 +}
 +
-+static gboolean
++static CopyResult
 +copy_to_shm (Session              *session,
 +             struct wl_shm_buffer *shm_buffer)
 +{
@@ -884,34 +1015,30 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +      wl_shm_buffer_get_width (shm_buffer) != session->width ||
 +      wl_shm_buffer_get_height (shm_buffer) != session->height ||
 +      wl_shm_buffer_get_stride (shm_buffer) != session->width * 4)
-+    return FALSE;
++    return COPY_UNFIT;
 +
 +  framebuffer = readback_framebuffer (session);
 +  if (!framebuffer || !render (session, framebuffer))
-+    return FALSE;
++    return COPY_FAILED;
 +
 +  wl_shm_buffer_begin_access (shm_buffer);
 +  copied = cogl_framebuffer_read_pixels (framebuffer, 0, 0, session->width, session->height,
 +                                         format->cogl_format, wl_shm_buffer_get_data (shm_buffer));
 +  wl_shm_buffer_end_access (shm_buffer);
-+  return copied;
++  return copied ? COPY_DONE : COPY_FAILED;
 +}
 +
 +static CoglFramebuffer *
-+dma_buf_framebuffer (Session           *session,
-+                     MetaWaylandBuffer *buffer)
++dma_buf_framebuffer (Session                 *session,
++                     MetaWaylandBuffer       *buffer,
++                     MetaWaylandDmaBufBuffer *dma_buf,
++                     const CaptureFormat     *format)
 +{
-+  MetaWaylandDmaBufBuffer *dma_buf = meta_wayland_dma_buf_from_buffer (buffer);
 +  CoglFramebuffer *framebuffer = g_object_get_qdata (G_OBJECT (buffer), quark_framebuffer);
-+  const CaptureFormat *format;
 +  g_autoptr (GError) error = NULL;
 +
 +  if (framebuffer)
 +    return framebuffer;
-+
-+  format = dma_buf ? format_for_drm (meta_wayland_dma_buf_buffer_get_drm_format (dma_buf)) : NULL;
-+  if (!format)
-+    return NULL;
 +
 +  framebuffer = meta_wayland_dma_buf_buffer_create_framebuffer (dma_buf, cogl_context_of (session),
 +                                                                format->cogl_format, &error);
@@ -925,32 +1052,81 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  return framebuffer;
 +}
 +
-+static gboolean
++static CopyResult
 +copy_to_dma_buf (Session           *session,
-+                 MetaWaylandBuffer *buffer)
++                 MetaWaylandBuffer *buffer,
++                 int               *fence)
 +{
++  MetaWaylandDmaBufBuffer *dma_buf = meta_wayland_dma_buf_from_buffer (buffer);
++  const CaptureFormat *format =
++    format_for_drm (meta_wayland_dma_buf_buffer_get_drm_format (dma_buf));
 +  CoglFramebuffer *framebuffer;
 +
-+  if (meta_wayland_dma_buf_buffer_get_width (buffer) != session->width ||
++  if (!format ||
++      meta_wayland_dma_buf_buffer_get_width (buffer) != session->width ||
 +      meta_wayland_dma_buf_buffer_get_height (buffer) != session->height)
-+    return FALSE;
++    return COPY_UNFIT;
 +
-+  framebuffer = dma_buf_framebuffer (session, buffer);
-+  return framebuffer && render (session, framebuffer);
++  framebuffer = dma_buf_framebuffer (session, buffer, dma_buf, format);
++  if (!framebuffer || !render (session, framebuffer))
++    return COPY_FAILED;
++
++  cogl_framebuffer_flush (framebuffer);
++  *fence = cogl_renderer_get_latest_sync_fd (cogl_context_get_renderer (cogl_context_of (session)));
++  if (*fence < 0)
++    cogl_framebuffer_finish (framebuffer);
++  return COPY_DONE;
 +}
 +
 +static void
-+send_ready (Frame   *frame,
-+            Session *session)
++frame_free (Frame *frame)
 +{
-+  int64_t now = g_get_monotonic_time ();
-+  uint64_t seconds = now / G_USEC_PER_SEC;
++  g_clear_handle_id (&frame->fence_source_id, g_source_remove);
++  g_clear_fd (&frame->fence, NULL);
++  g_free (frame);
++}
 +
++static void
++frame_detach (Frame *frame)
++{
++  frame->session->frame = NULL;
++  wl_resource_set_user_data (frame->resource, NULL);
++}
++
++static void
++frame_fail (Frame                                              *frame,
++            enum ext_image_copy_capture_frame_v1_failure_reason reason)
++{
++  frame_detach (frame);
++  ext_image_copy_capture_frame_v1_send_failed (frame->resource, reason);
++  frame_free (frame);
++}
++
++static void
++frame_ready (Frame *frame)
++{
++  Session *session = frame->session;
++  uint64_t seconds = frame->copied_at / G_USEC_PER_SEC;
++
++  frame_detach (frame);
 +  ext_image_copy_capture_frame_v1_send_transform (frame->resource, WL_OUTPUT_TRANSFORM_NORMAL);
 +  ext_image_copy_capture_frame_v1_send_damage (frame->resource, 0, 0, session->width, session->height);
 +  ext_image_copy_capture_frame_v1_send_presentation_time (frame->resource, seconds >> 32, seconds & 0xffffffff,
-+                                                          (now % G_USEC_PER_SEC) * 1000);
++                                                          (frame->copied_at % G_USEC_PER_SEC) * 1000);
 +  ext_image_copy_capture_frame_v1_send_ready (frame->resource);
++  frame_free (frame);
++}
++
++static gboolean
++on_frame_rendered (int          fence,
++                   GIOCondition condition,
++                   gpointer     data)
++{
++  Frame *frame = data;
++
++  frame->fence_source_id = 0;
++  frame_ready (frame);
++  return G_SOURCE_REMOVE;
 +}
 +
 +static void
@@ -959,29 +1135,34 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  Frame *frame = session->frame;
 +  MetaWaylandBuffer *buffer;
 +  struct wl_shm_buffer *shm_buffer;
-+  gboolean copied = FALSE;
++  CopyResult result = COPY_UNFIT;
 +
++  frame->copied_at = g_get_monotonic_time ();
 +  buffer = meta_wayland_buffer_from_resource (session->manager->compositor, frame->buffer);
 +  shm_buffer = wl_shm_buffer_get (frame->buffer);
 +  if (shm_buffer)
-+    copied = copy_to_shm (session, shm_buffer);
++    result = copy_to_shm (session, shm_buffer);
 +  else if (meta_wayland_buffer_realize (buffer) && buffer->type == META_WAYLAND_BUFFER_TYPE_DMA_BUF)
-+    copied = copy_to_dma_buf (session, buffer);
++    result = copy_to_dma_buf (session, buffer, &frame->fence);
 +
-+  session->frame = NULL;
-+  wl_resource_set_user_data (frame->resource, NULL);
-+  if (!copied)
++  switch (result)
 +    {
-+      ext_image_copy_capture_frame_v1_send_failed (frame->resource,
-+                                                   EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_BUFFER_CONSTRAINTS);
-+      g_free (frame);
++    case COPY_UNFIT:
++      frame_fail (frame, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_BUFFER_CONSTRAINTS);
 +      return;
++    case COPY_FAILED:
++      frame_fail (frame, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_UNKNOWN);
++      return;
++    case COPY_DONE:
++      break;
 +    }
 +
 +  session->copied_once = TRUE;
 +  session->damaged = FALSE;
-+  send_ready (frame, session);
-+  g_free (frame);
++  if (frame->fence < 0)
++    frame_ready (frame);
++  else
++    frame->fence_source_id = g_unix_fd_add (frame->fence, G_IO_IN, on_frame_rendered, frame);
 +}
 +
 +static gboolean
@@ -990,7 +1171,8 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  Session *session = data;
 +
 +  session->copy_source_id = 0;
-+  if (session->frame && session->frame->captured && session->actor)
++  if (session->frame && session->frame->captured && !session->frame->fence_source_id &&
++      session->actor)
 +    copy_frame (session);
 +  return G_SOURCE_REMOVE;
 +}
@@ -998,7 +1180,8 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +static void
 +maybe_copy (Session *session)
 +{
-+  if (!session->frame || !session->frame->captured || session->copy_source_id)
++  if (!session->frame || !session->frame->captured || session->frame->fence_source_id ||
++      session->copy_source_id)
 +    return;
 +  if (session->copied_once && !session->damaged)
 +    return;
@@ -1112,12 +1295,7 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  session->window = NULL;
 +
 +  if (session->frame && session->frame->captured)
-+    {
-+      wl_resource_set_user_data (session->frame->resource, NULL);
-+      ext_image_copy_capture_frame_v1_send_failed (session->frame->resource,
-+                                                   EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_STOPPED);
-+      g_clear_pointer (&session->frame, g_free);
-+    }
++    frame_fail (session->frame, EXT_IMAGE_COPY_CAPTURE_FRAME_V1_FAILURE_REASON_STOPPED);
 +
 +  g_hash_table_remove (session->manager->sessions, GUINT_TO_POINTER (session->id));
 +  meta_display_window_capture_ended (display_of (session), session->id);
@@ -1140,7 +1318,7 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +    return;
 +
 +  frame->session->frame = NULL;
-+  g_free (frame);
++  frame_free (frame);
 +}
 +
 +static void
@@ -1247,6 +1425,7 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +      frame = g_new0 (Frame, 1);
 +      frame->session = session;
 +      frame->resource = frame_resource;
++      frame->fence = -1;
 +      session->frame = frame;
 +    }
 +  wl_resource_set_implementation (frame_resource, &frame_interface, frame, frame_destructor);
@@ -1261,7 +1440,7 @@ index 0000000000000000000000000000000000000000..1c7260bf447d4e4238cb3f37946a1c04
 +  if (session->frame)
 +    {
 +      wl_resource_set_user_data (session->frame->resource, NULL);
-+      g_free (session->frame);
++      frame_free (session->frame);
 +    }
 +  g_clear_object (&session->readback);
 +  g_free (session);

@@ -135,9 +135,10 @@ async function checkCapture(socket: string, game: Meta.Window) {
     throw new Error(`${error.message}: ${lines.join(' | ')}`);
   });
   require(lines.some(line => line.startsWith('listed ')), 'the app finds the window by its app id');
-  const [, size, pixel] = lines.find(line => line.startsWith('ready'))!.split(' ');
+  const [, size, middle, corner] = lines.find(line => line.startsWith('ready'))!.split(' ');
   const {width, height} = game.get_buffer_rect();
-  require(size === `${width}x${height}` && pixel === GAME_PIXEL, `the frame holds the window's picture (${size} ${pixel})`);
+  require(size === `${width}x${height}` && middle === GAME_PIXEL, `the frame holds the window's picture (${size} ${middle})`);
+  require(corner === GAME_PIXEL, `the frame leaves out the desktop's rounded corners (${corner})`);
   require((await grants()).some(entry => entry.active === true), 'Settings shows that the app is recording');
   return capture;
 }

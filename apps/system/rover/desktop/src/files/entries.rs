@@ -32,6 +32,7 @@ pub struct FileEntry {
     pub modified: Option<i64>,
     pub mime_type: Option<String>,
     pub extension: Option<String>,
+    pub writable: bool,
 }
 
 #[derive(Debug, Serialize, Type)]
@@ -88,6 +89,13 @@ pub(crate) fn mount_points() -> HashSet<PathBuf> {
     drives::visible_mount_points()
         .into_iter()
         .map(PathBuf::from)
+        .collect()
+}
+
+pub fn existing(paths: Vec<String>) -> Vec<String> {
+    paths
+        .into_iter()
+        .filter(|path| fs::symlink_metadata(path).is_ok())
         .collect()
 }
 
@@ -233,6 +241,7 @@ pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
         .and_then(|target| mime_type(path, &name, target));
 
     Ok(FileEntry {
+        writable: is_dir && writable(path),
         is_hidden: name.starts_with('.'),
         name,
         path: path.to_string_lossy().into_owned(),

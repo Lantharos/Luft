@@ -97,6 +97,9 @@ export const commands = {
 	emptyTrash: (params: {
 		trashPath?: string | null,
 	}, options?: CallOptions) => invoke<null>("empty_trash", params, options),
+	existingPaths: (params: {
+		paths: string[],
+	}, options?: CallOptions) => invoke<string[]>("existing_paths", params, options),
 	exploreSpace: (params: {
 		path: string,
 		token?: string | null,
@@ -462,6 +465,7 @@ export type FileEntry = {
 	modified: number | null,
 	mimeType: string | null,
 	extension: string | null,
+	writable: boolean,
 };
 
 export type FileState = "online" | "local" | "syncing";

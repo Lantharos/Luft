@@ -15,7 +15,8 @@ export function withDraft(entries: FileEntry[], draft: InlineDraft | null): File
 		size: 0,
 		modified: null,
 		mimeType: null,
-		extension: null
+		extension: null,
+		writable: false
 	};
 	return [placeholder, ...entries];
 }

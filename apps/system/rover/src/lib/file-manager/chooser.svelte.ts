@@ -19,9 +19,11 @@ export class ChooserState {
 	#finished = false;
 	saveName = $state('');
 	filter = $state<number | null>(null);
+	replacing = $state.raw<{ paths: string[]; clashes: string[] } | null>(null);
 
 	acceptPaths = $derived.by(() => this.#acceptPaths());
-	canAccept = $derived(this.acceptPaths.length > 0);
+	cannotSave = $derived.by(() => this.config.mode !== 'open' && !this.#targetWritable());
+	canAccept = $derived(this.acceptPaths.length > 0 && !this.cannotSave);
 	canMakeFolder = $derived.by(() => this.#manager.view === 'home' && this.#manager.writable);
 
 	constructor(request: number, config: ChooserConfig, manager: FileManager) {
@@ -71,7 +73,23 @@ export class ChooserState {
 	selectAll = () => this.selectRange(this.#manager.displayEntries.map((entry) => entry.path));
 
 	submit = async (paths = this.acceptPaths) => {
-		if (this.#finished || paths.length === 0) return;
+		if (this.#finished || paths.length === 0 || this.cannotSave) return;
+		const clashes = this.config.mode === 'open' ? [] : await commands.existingPaths({ paths });
+		if (clashes.length > 0) this.replacing = { paths, clashes };
+		else await this.#finish(paths);
+	};
+
+	replace = (paths: string[]) => {
+		this.replacing = null;
+		void this.#finish(paths);
+	};
+
+	keep = () => {
+		this.replacing = null;
+	};
+
+	#finish = async (paths: string[]) => {
+		if (this.#finished) return;
 		this.#finished = true;
 		await commands
 			.acceptChooser({ request: this.#request, paths, filter: this.filter })
@@ -85,6 +103,12 @@ export class ChooserState {
 		await commands.cancelChooser({ request: this.#request }).catch((error) => console.error('Could not cancel the file chooser', error));
 		await appWindow.close();
 	};
+
+	#targetWritable() {
+		const manager = this.#manager;
+		const folder = this.config.mode === 'save_files' && manager.entries.find((entry) => entry.isDir && manager.selection.has(entry.path));
+		return folder ? folder.writable : manager.writable;
+	}
 
 	#acceptPaths() {
 		const manager = this.#manager;

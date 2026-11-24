@@ -147,6 +147,19 @@ rover-chooser-untitled = Untitled
 rover-chooser-file-name = File name
 # Shown on the New folder button in a folder the person can’t change.
 rover-chooser-no-new-folder = You can’t make folders here
+# Shown on the Save button in a folder the person can’t change.
+rover-chooser-no-save = You can’t save here
+# Asked before saving over files that are already there. $name is the file's name when there's one.
+rover-chooser-replace-title = { $count ->
+    [one] Replace “{ $name }”?
+   *[other] Replace { $count } files?
+}
+# $names lists the files' names.
+rover-chooser-replace-description = { $count ->
+    [one] A file with this name is already here.
+   *[other] { $names } are already here.
+}
+rover-chooser-replace = Replace
 
 ## Right-click menu
 

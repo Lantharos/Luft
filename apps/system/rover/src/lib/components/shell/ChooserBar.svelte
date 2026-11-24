@@ -2,8 +2,10 @@
 	import File from '@luft/symbols/icons/file';
 	import FolderOpen from '@luft/symbols/icons/folder-open';
 	import Save from '@luft/symbols/icons/save';
+	import { tick } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Select } from '@luft/ui';
+	import { Select, tooltip } from '@luft/ui';
+	import ReplaceDialog from '#lib/components/dialogs/replace/ReplaceDialog.svelte';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 
 	interface Props {
@@ -32,9 +34,17 @@
 	);
 	let Icon = $derived(config.mode === 'save' ? Save : config.directory || config.mode === 'save_files' ? FolderOpen : File);
 
+	let nameField = $state<HTMLInputElement>();
+
 	function focusName(input: HTMLInputElement) {
 		input.focus();
 		input.select();
+	}
+
+	async function keepEditing() {
+		chooser.keep();
+		await tick();
+		if (nameField) focusName(nameField);
 	}
 
 	function handleNameKeydown(event: KeyboardEvent) {
@@ -75,6 +85,7 @@
 		<div class="flex w-[320px] min-w-0 items-center gap-2">
 			<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{t('rover-chooser-name')}</span>
 			<input
+				bind:this={nameField}
 				{@attach focusName}
 				class="h-10 min-w-0 flex-1 rounded-full bg-[var(--control)] px-4 text-[13px] font-medium text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] placeholder:font-normal placeholder:text-[var(--text-muted)] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_20%,transparent)]"
 				value={chooser.saveName}
@@ -92,11 +103,22 @@
 	<div class="flex shrink-0 items-center gap-2">
 		<button class={[BUTTON, SECONDARY]} type="button" onclick={chooser.cancel}>{t('rover-cancel')}</button>
 
-		<button class={[BUTTON, PRIMARY]} type="button" disabled={!chooser.canAccept} onclick={() => chooser.submit()}>
+		<button
+			class={[BUTTON, PRIMARY]}
+			type="button"
+			disabled={!chooser.canAccept}
+			onclick={() => chooser.submit()}
+			{@attach tooltip(chooser.cannotSave ? t('rover-chooser-no-save') : '')}
+		>
 			{acceptLabel}
 		</button>
 	</div>
 </div>
+
+{#if chooser.replacing}
+	{@const { paths, clashes } = chooser.replacing}
+	<ReplaceDialog {clashes} onreplace={() => chooser.replace(paths)} onclose={keepEditing} />
+{/if}
 
 <style>
 	.chooser-bar {

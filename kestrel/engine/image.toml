@@ -5,6 +5,7 @@ sources = [
     "kestrel/ui",
     "packages/extension-api",
     "packages/identity/unsafe.list",
+    "packages/web/network/bridge/signal.ts",
     "packages/i18n/tools",
     "packages/web/motion",
     "packages/web/settings-catalogue",

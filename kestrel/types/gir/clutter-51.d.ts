@@ -6071,6 +6071,7 @@ export namespace Clutter {
         NO_CURSORS = 1,
         FORCE_CURSORS = 2,
         CLEAR = 4,
+        BARE_WINDOWS = 8,
     }
 
 

@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import type Mtk from 'gi://Mtk';
 
 import {answerable, labelled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -10,7 +11,7 @@ import {call} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
 import {answer, forget, WINDOW_CAPTURE} from '../lib/access/permissions.js';
 import {SANDBOXED_APP, launch, openSecurityContext, sandboxedApp, through, type Launched} from '../lib/access/sandbox.js';
-import {fixture, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
+import {fixture, gjs, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
 import {settled, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('window capture');
@@ -24,6 +25,9 @@ const GAME = fixture('clients', 'wayland', 'windowStateClient.py');
 const GAME_TITLE = 'Kestrel window state: ';
 const GAME_APP = 'com.lantharos.Kestrel.WindowState';
 const GAME_PIXEL = '403020ff';
+const FRAMED_TITLE = 'Framed game';
+const FRAMED_APP = 'steam_app_367520';
+const FRAMED_BACKGROUND = '#203040';
 const DENIED = `${IFACE}.Error.Denied`;
 const OVERLAY_WIDTH = 200;
 const OVERLAY_HEIGHT = 100;
@@ -126,21 +130,37 @@ async function checkOverlay(socket: string, game: Meta.Window) {
   await eventually(() => global.top_window_group.get_n_children() === overlays, 'the overlay goes away with the app');
 }
 
-async function checkCapture(socket: string, game: Meta.Window) {
+async function recorded(socket: string, app: string, game: Meta.Window, {width, height}: Mtk.Rectangle) {
   await eventually(() => (game.get_compositor_private() as Meta.WindowActor).opacity === 255, 'the game has finished opening');
   await settled();
-  const capture = await client(socket, 'capture', GAME_APP);
+  const capture = await client(socket, 'capture', app);
   const {lines} = capture;
   await eventually(() => lines.some(line => line.startsWith('ready')), 'the app records a frame of the window').catch(error => {
     throw new Error(`${error.message}: ${lines.join(' | ')}`);
   });
   require(lines.some(line => line.startsWith('listed ')), 'the app finds the window by its app id');
   const [, size, middle, corner] = lines.find(line => line.startsWith('ready'))!.split(' ');
-  const {width, height} = game.get_buffer_rect();
   require(size === `${width}x${height}` && middle === GAME_PIXEL, `the frame holds the window's picture (${size} ${middle})`);
-  require(corner === GAME_PIXEL, `the frame leaves out the desktop's rounded corners (${corner})`);
+  require(corner === GAME_PIXEL, `the frame leaves out the desktop's corners, title bar and shadow (${corner})`);
+  return capture;
+}
+
+async function checkCapture(socket: string, game: Meta.Window) {
+  const capture = await recorded(socket, GAME_APP, game, game.get_buffer_rect());
   require((await grants()).some(entry => entry.active === true), 'Settings shows that the app is recording');
   return capture;
+}
+
+async function checkFramed(socket: string) {
+  const game = gjs('clients/x11/x11Window.js', [FRAMED_TITLE, FRAMED_BACKGROUND, '', FRAMED_APP]);
+  try {
+    const window = await waitForWindow(FRAMED_TITLE, 'a game with an X11 title bar opens');
+    const content = window.frame_rect_to_client_rect(window.get_frame_rect());
+    require(window.get_buffer_rect().height > content.height, 'Kestrel frames the X11 game');
+    await stop((await recorded(socket, FRAMED_APP, window, content)).process);
+  } finally {
+    await stop(game);
+  }
 }
 
 async function checkStopped({process, lines}: Launched, gameProcess: Process) {
@@ -162,6 +182,7 @@ async function checkWayland() {
     game = spawn(['python3', GAME]);
     const window = await waitForWindow(GAME_TITLE);
     const capture = await checkCapture(sandbox.socket, window);
+    await checkFramed(sandbox.socket);
     await checkOverlay(sandbox.socket, window);
     await checkStopped(capture, game);
   } finally {

@@ -18,7 +18,8 @@ closes. A DMA-BUF frame is ready once the GPU has finished drawing it,
 so clients need no implicit sync, and a frame fails with
 buffer_constraints only when its buffer doesn't fit. Window recordings,
 the screen cast portal's included, show the window's own picture
-without the shell's rounded corners, outline and shadow.
+without the shell's rounded corners, outline and shadow, and an X11
+window's recording is its client area alone, without the frame.
 MetaDisplay::window-capture-started and ::window-capture-ended tell
 the shell what is recorded, and meta_display_stop_window_capture()
 ends a recording. zwlr_layer_shell_v1 offers only the overlay layer:
@@ -35,7 +36,7 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/compositor/meta-shaped-texture.c          |   9 +-
  src/compositor/meta-window-actor-wayland.c    |   1 +
  src/compositor/meta-window-actor-x11.c        |   3 +-
- src/compositor/meta-window-actor.c            |   2 +-
+ src/compositor/meta-window-actor.c            |  29 +-
  src/compositor/meta-window-corners.c          |   6 +
  src/compositor/meta-window-corners.h          |   1 +
  src/core/display-private.h                    |   8 +
@@ -47,7 +48,7 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/wayland/meta-wayland-dma-buf.h            |   9 +
  .../meta-wayland-foreign-toplevel-list.c      | 284 ++++++
  .../meta-wayland-foreign-toplevel-list.h      |  13 +
- src/wayland/meta-wayland-image-copy-capture.c | 901 ++++++++++++++++++
+ src/wayland/meta-wayland-image-copy-capture.c | 916 ++++++++++++++++++
  src/wayland/meta-wayland-image-copy-capture.h |  13 +
  src/wayland/meta-wayland-layer-shell.c        | 553 +++++++++++
  src/wayland/meta-wayland-layer-shell.h        |  10 +
@@ -57,7 +58,7 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/wayland/meta-wayland-versions.h           |   4 +
  src/wayland/meta-wayland.c                    |   6 +
  .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 ++++++++
- 26 files changed, 2393 insertions(+), 9 deletions(-)
+ 26 files changed, 2420 insertions(+), 24 deletions(-)
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
  create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
@@ -125,10 +126,58 @@ index 168c61ca2154b5c137d0df2ee26a8b75c7407e2c..9b4e4d835e67d3c13c490d4bc294d950
      {
        MtkRectangle frame;
 diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
-index dbce6b00985d6cf717889980f9c28231b03ce105..a4828ac2bcaf72420053680ac5bf9b0bb42ea8ee 100644
+index dbce6b00985d6cf717889980f9c28231b03ce105..69ab4190e53c103f6b2af24687330adf30ab2003 100644
 --- a/src/compositor/meta-window-actor.c
 +++ b/src/compositor/meta-window-actor.c
-@@ -1617,7 +1617,7 @@ meta_window_actor_blit_to_framebuffer (MetaScreenCastWindow *screen_cast_window,
+@@ -1551,7 +1551,7 @@ meta_window_actor_blit_to_framebuffer (MetaScreenCastWindow *screen_cast_window,
+     meta_window_actor_get_instance_private (window_actor);
+   ClutterActor *actor = CLUTTER_ACTOR (window_actor);
+   ClutterPaintContext *paint_context;
+-  graphene_rect_t scaled_clip;
++  graphene_rect_t clip;
+   CoglColor clear_color;
+   MetaShapedTexture *stex;
+   graphene_matrix_t transform, inverted_transform;
+@@ -1586,27 +1586,24 @@ meta_window_actor_blit_to_framebuffer (MetaScreenCastWindow *screen_cast_window,
+ 
+   cogl_color_init_from_4f (&clear_color, 0.0, 0.0, 0.0, 0.0);
+   cogl_framebuffer_clear (framebuffer, COGL_BUFFER_BIT_COLOR, &clear_color);
++  clip = mtk_rectangle_to_graphene_rect (bounds);
++  graphene_rect_intersection (&clip,
++                              &GRAPHENE_RECT_INIT (0, 0, unscaled_width, unscaled_height),
++                              &clip);
++
+   cogl_framebuffer_orthographic (framebuffer,
+-                                 0, 0,
+-                                 unscaled_width, unscaled_height,
++                                 clip.origin.x, clip.origin.y,
++                                 clip.origin.x + unscaled_width,
++                                 clip.origin.y + unscaled_height,
+                                  0, 1.0);
+   cogl_framebuffer_set_viewport (framebuffer,
+                                  0, 0,
+                                  unscaled_width, unscaled_height);
+ 
+-  scaled_clip = mtk_rectangle_to_graphene_rect (bounds);
+-  graphene_rect_scale (&scaled_clip,
+-                       unscaled_width / width,
+-                       unscaled_height / height,
+-                       &scaled_clip);
+-  graphene_rect_intersection (&scaled_clip,
+-                              &GRAPHENE_RECT_INIT (0, 0, unscaled_width, unscaled_height),
+-                              &scaled_clip);
+-
+   cogl_framebuffer_push_rectangle_clip (framebuffer,
+-                                        scaled_clip.origin.x, scaled_clip.origin.y,
+-                                        scaled_clip.origin.x + scaled_clip.size.width,
+-                                        scaled_clip.origin.y + scaled_clip.size.height);
++                                        clip.origin.x, clip.origin.y,
++                                        clip.origin.x + clip.size.width,
++                                        clip.origin.y + clip.size.height);
+ 
+   cogl_framebuffer_push_matrix (framebuffer);
+   cogl_framebuffer_scale (framebuffer,
+@@ -1617,7 +1614,7 @@ meta_window_actor_blit_to_framebuffer (MetaScreenCastWindow *screen_cast_window,
  
    paint_context =
      clutter_paint_context_new_for_framebuffer (framebuffer, NULL,
@@ -721,10 +770,10 @@ index 0000000000000000000000000000000000000000..f9e0f86e00ac503c061ed4757de2286a
 +MetaWindow * meta_wayland_foreign_toplevel_handle_get_window (struct wl_resource *handle);
 diff --git a/src/wayland/meta-wayland-image-copy-capture.c b/src/wayland/meta-wayland-image-copy-capture.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005d892bbb4
+index 0000000000000000000000000000000000000000..240d4061ba6c864b6d4bd270ed017dcb39111650
 --- /dev/null
 +++ b/src/wayland/meta-wayland-image-copy-capture.c
-@@ -0,0 +1,901 @@
+@@ -0,0 +1,916 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -798,8 +847,7 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  MetaWindow *window;
 +  MetaWindowActor *actor;
 +  gboolean paint_cursors;
-+  int width;
-+  int height;
++  MtkRectangle area;
 +  gboolean copied_once;
 +  gboolean damaged;
 +  Frame *frame;
@@ -951,8 +999,8 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  cursor_scale = clutter_cursor_get_scale (cursor);
 +  scale = cursor_scale * view_scale;
 +  clutter_cursor_get_geometry (cursor, &width, &height, &hotspot_x, &hotspot_y);
-+  x = (relative_position.x - hotspot_x) * scale;
-+  y = (relative_position.y - hotspot_y) * scale;
++  x = (relative_position.x - hotspot_x) * scale - session->area.x;
++  y = (relative_position.y - hotspot_y) * scale - session->area.y;
 +
 +  pipeline = cogl_pipeline_new (cogl_context_of (session));
 +  cogl_pipeline_set_layer_texture (pipeline, 0, texture);
@@ -969,11 +1017,9 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +render (Session         *session,
 +        CoglFramebuffer *framebuffer)
 +{
-+  MtkRectangle bounds = { 0, 0, session->width, session->height };
-+
 +  cogl_framebuffer_clear4f (framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
 +  if (!meta_screen_cast_window_blit_to_framebuffer (META_SCREEN_CAST_WINDOW (session->actor),
-+                                                    &bounds, framebuffer))
++                                                    &session->area, framebuffer))
 +    return FALSE;
 +  if (session->paint_cursors)
 +    blit_cursor (session, framebuffer);
@@ -987,12 +1033,12 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  CoglOffscreen *offscreen;
 +
 +  if (session->readback &&
-+      cogl_framebuffer_get_width (session->readback) == session->width &&
-+      cogl_framebuffer_get_height (session->readback) == session->height)
++      cogl_framebuffer_get_width (session->readback) == session->area.width &&
++      cogl_framebuffer_get_height (session->readback) == session->area.height)
 +    return session->readback;
 +
 +  g_clear_object (&session->readback);
-+  texture = cogl_texture_2d_new_with_size (cogl_context_of (session), session->width, session->height);
++  texture = cogl_texture_2d_new_with_size (cogl_context_of (session), session->area.width, session->area.height);
 +  offscreen = cogl_offscreen_new_with_texture (texture);
 +  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (offscreen), NULL))
 +    {
@@ -1012,9 +1058,9 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  gboolean copied;
 +
 +  if (!format ||
-+      wl_shm_buffer_get_width (shm_buffer) != session->width ||
-+      wl_shm_buffer_get_height (shm_buffer) != session->height ||
-+      wl_shm_buffer_get_stride (shm_buffer) != session->width * 4)
++      wl_shm_buffer_get_width (shm_buffer) != session->area.width ||
++      wl_shm_buffer_get_height (shm_buffer) != session->area.height ||
++      wl_shm_buffer_get_stride (shm_buffer) != session->area.width * 4)
 +    return COPY_UNFIT;
 +
 +  framebuffer = readback_framebuffer (session);
@@ -1022,7 +1068,7 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +    return COPY_FAILED;
 +
 +  wl_shm_buffer_begin_access (shm_buffer);
-+  copied = cogl_framebuffer_read_pixels (framebuffer, 0, 0, session->width, session->height,
++  copied = cogl_framebuffer_read_pixels (framebuffer, 0, 0, session->area.width, session->area.height,
 +                                         format->cogl_format, wl_shm_buffer_get_data (shm_buffer));
 +  wl_shm_buffer_end_access (shm_buffer);
 +  return copied ? COPY_DONE : COPY_FAILED;
@@ -1063,8 +1109,8 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  CoglFramebuffer *framebuffer;
 +
 +  if (!format ||
-+      meta_wayland_dma_buf_buffer_get_width (buffer) != session->width ||
-+      meta_wayland_dma_buf_buffer_get_height (buffer) != session->height)
++      meta_wayland_dma_buf_buffer_get_width (buffer) != session->area.width ||
++      meta_wayland_dma_buf_buffer_get_height (buffer) != session->area.height)
 +    return COPY_UNFIT;
 +
 +  framebuffer = dma_buf_framebuffer (session, buffer, dma_buf, format);
@@ -1110,7 +1156,7 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +
 +  frame_detach (frame);
 +  ext_image_copy_capture_frame_v1_send_transform (frame->resource, WL_OUTPUT_TRANSFORM_NORMAL);
-+  ext_image_copy_capture_frame_v1_send_damage (frame->resource, 0, 0, session->width, session->height);
++  ext_image_copy_capture_frame_v1_send_damage (frame->resource, 0, 0, session->area.width, session->area.height);
 +  ext_image_copy_capture_frame_v1_send_presentation_time (frame->resource, seconds >> 32, seconds & 0xffffffff,
 +                                                          (frame->copied_at % G_USEC_PER_SEC) * 1000);
 +  ext_image_copy_capture_frame_v1_send_ready (frame->resource);
@@ -1197,7 +1243,7 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  MetaWaylandDmaBufManager *dma_buf_manager = session->manager->compositor->dma_buf_manager;
 +  struct wl_resource *resource = session->resource;
 +
-+  ext_image_copy_capture_session_v1_send_buffer_size (resource, session->width, session->height);
++  ext_image_copy_capture_session_v1_send_buffer_size (resource, session->area.width, session->area.height);
 +  for (size_t i = 0; i < G_N_ELEMENTS (formats); i++)
 +    ext_image_copy_capture_session_v1_send_shm_format (resource, formats[i].shm_format);
 +
@@ -1233,18 +1279,36 @@ index 0000000000000000000000000000000000000000..480d9c9373c4a3aafb8bd669f497f005
 +  ext_image_copy_capture_session_v1_send_done (resource);
 +}
 +
++static MtkRectangle
++client_area (Session *session)
++{
++  MtkRectangle bounds, buffer, client;
++  float scale_x, scale_y;
++
++  meta_screen_cast_window_get_buffer_bounds (META_SCREEN_CAST_WINDOW (session->actor), &bounds);
++  if (meta_window_get_client_type (session->window) != META_WINDOW_CLIENT_TYPE_X11)
++    return bounds;
++
++  meta_window_get_buffer_rect (session->window, &buffer);
++  meta_window_get_client_area_rect (session->window, &client);
++  scale_x = (float) bounds.width / buffer.width;
++  scale_y = (float) bounds.height / buffer.height;
++  return (MtkRectangle) {
++    .x = (int) roundf (client.x * scale_x),
++    .y = (int) roundf (client.y * scale_y),
++    .width = (int) roundf (client.width * scale_x),
++    .height = (int) roundf (client.height * scale_y),
++  };
++}
++
 +static gboolean
 +update_size (Session *session)
 +{
-+  MtkRectangle bounds;
++  MtkRectangle area = client_area (session);
++  gboolean resized = area.width != session->area.width || area.height != session->area.height;
 +
-+  meta_screen_cast_window_get_buffer_bounds (META_SCREEN_CAST_WINDOW (session->actor), &bounds);
-+  if (bounds.width == session->width && bounds.height == session->height)
-+    return FALSE;
-+
-+  session->width = bounds.width;
-+  session->height = bounds.height;
-+  return TRUE;
++  session->area = area;
++  return resized;
 +}
 +
 +static void

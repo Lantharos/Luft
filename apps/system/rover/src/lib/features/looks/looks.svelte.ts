@@ -25,12 +25,17 @@ class FolderLooks {
 	of(entry: FileEntry) {
 		if (!entry.isDir) return {};
 		this.#screen.watch(entry);
-		return this.art(entry.path);
+		return this.folder(entry.path);
+	}
+
+	folder(path: string) {
+		const look = this.#known.get(path);
+		return { glyph: look?.icon ?? this.defaultIcon(path), tint: tint(look?.color) };
 	}
 
 	art(path: string) {
-		const look = this.#known.get(path);
-		return { icon: iconNamed(look?.icon ?? this.#defaults.get(path)), tint: tint(look?.color) };
+		const { glyph, tint } = this.folder(path);
+		return { icon: iconNamed(glyph), tint };
 	}
 
 	look(path: string) {

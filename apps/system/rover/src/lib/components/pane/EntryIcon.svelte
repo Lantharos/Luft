@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
 	import type { FileKind } from '#lib/utils/kinds.js';
+	import FolderIcon from './FolderIcon.svelte';
 	import { KIND_ICONS } from './kind-icons';
 
 	interface Props {
 		kind: FileKind;
 		size: number;
-		icon?: Component;
+		glyph?: string;
 		tint?: string | null;
 		thumbnail?: string | null;
 		backdrop?: boolean;
@@ -14,7 +14,9 @@
 		fit?: 'cover' | 'contain';
 	}
 
-	let { kind, size, icon, tint = null, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
+	const FOLDER_SHARE = 0.84;
+
+	let { kind, size, glyph = 'folder', tint = null, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
 	const TONES: Partial<Record<FileKind, string>> = {
@@ -27,7 +29,7 @@
 		code: 'code'
 	};
 
-	let Icon = $derived(icon ?? KIND_ICONS[kind]);
+	let Icon = $derived(KIND_ICONS[kind]);
 	let showThumbnail = $derived(Boolean(thumbnail) && failedThumbnail !== thumbnail);
 	let artwork = $derived(app ? 'entry-icon--app' : `entry-icon--thumbnail entry-icon--${fit}`);
 </script>
@@ -48,6 +50,8 @@
 			draggable="false"
 			onerror={() => (failedThumbnail = thumbnail)}
 		/>
+	{:else if kind === 'folder'}
+		<FolderIcon {glyph} size={Math.round(size * FOLDER_SHARE)} />
 	{:else}
 		<Icon size={Math.round(Math.max(14, size * 0.46))} />
 	{/if}
@@ -66,7 +70,7 @@
 	}
 
 	.entry-icon--folder {
-		background: color-mix(in srgb, var(--tint, var(--folder)) 11%, transparent);
+		background: transparent;
 		color: var(--tint, var(--folder));
 	}
 

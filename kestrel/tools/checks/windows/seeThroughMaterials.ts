@@ -26,7 +26,7 @@ const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
 const KESTREL_KEYS = ['see-through-apps', 'see-through-opacity'];
-const GLASS_KEYS = ['see-through', 'luca-blurs'];
+const GLASS_KEYS = ['see-through', 'blurs'];
 const BACKGROUND_KEYS = ['picture-uri', 'picture-uri-dark'];
 const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const BEHIND = 'See-through behind';
@@ -168,6 +168,8 @@ export async function run() {
       terminal.move_resize_frame(true, x, primary.y + 40, width, 460);
       behind.move_frame(true, x - 100, primary.y);
       kestrel.set_double('see-through-opacity', 0.4);
+      glass.set_string('see-through', 'luca');
+      glass.set_string('blurs', 'everything');
       kestrel.set_strv('see-through-apps', [app.get_id()]);
       await eventually(() => terminal.get_compositor_private<Meta.WindowActor>()!.get_children().some(child => child.get_effect('see-through')), 'Terminal turns see-through');
 
@@ -175,7 +177,7 @@ export async function run() {
       require(everything.apart > DIFFERENT, `Luca lets the window underneath show through (${Math.round(everything.apart * 100)}% apart)`);
       await captureOverAndAlone(terminal, behind, 'see-through-luca-dark');
 
-      glass.set_string('luca-blurs', 'wallpaper');
+      glass.set_string('blurs', 'wallpaper');
       await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.WALLPAPER, 'Luca that blurs only the wallpaper shows the frosted wallpaper');
       const wallpaper = await lookWithAndWithout(terminal, behind);
       require(wallpaper.apart < SAME, `Luca that blurs only the wallpaper hides the window underneath (${Math.round(wallpaper.apart * 1000) / 10}% apart)`);
@@ -204,7 +206,7 @@ export async function run() {
       await captureOverAndAlone(terminal, behind, 'see-through-maris-light');
 
       glass.set_string('see-through', 'luca');
-      glass.set_string('luca-blurs', 'everything');
+      glass.set_string('blurs', 'everything');
       await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.LUCA, 'Luca blurs everything behind again');
       await captureOverAndAlone(terminal, behind, 'see-through-luca-light');
     }));

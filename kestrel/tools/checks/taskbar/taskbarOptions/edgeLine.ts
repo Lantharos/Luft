@@ -3,7 +3,7 @@ import type Meta from 'gi://Meta';
 import {gjs, stop, waitForWindow} from '../../lib/processes.js';
 import {captureFrame} from '../../lib/screenshots.js';
 import {taskbarEdge, vertical} from '../../lib/edge.js';
-import {plainWallpaper, withWallpaper} from './looks.js';
+import {plainWallpaper, withLucaTaskbar, withWallpaper} from './looks.js';
 import {eventually, panelBox, set} from './taskbar.js';
 
 const DEPTH = 6;
@@ -37,7 +37,7 @@ function fillFirstHalf(window: Meta.Window) {
 export async function checkEdgeLine() {
   set('taskbar-style', 'bar');
   set('taskbar-look', 'glass');
-  await withWallpaper(plainWallpaper('black', 0), async () => {
+  await withLucaTaskbar(() => withWallpaper(plainWallpaper('black', 0), async () => {
     await eventually(async () => await unlined(0.25) && await unlined(0.75), 'over a black wallpaper the edge-to-edge taskbar draws no line along its edge');
     const app = gjs('clients/windows/window.js');
     try {
@@ -50,5 +50,5 @@ export async function checkEdgeLine() {
       await stop(app);
     }
     await eventually(async () => await unlined(0.25) && await unlined(0.75), 'the line goes once the window closes');
-  });
+  }));
 }

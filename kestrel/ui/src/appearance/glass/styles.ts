@@ -88,7 +88,7 @@ export class GlassStyles {
   }
 
   private wallpaperOnly(): boolean {
-    return this.settings.get_string('luca-blurs') === 'wallpaper' ||
+    return this.settings.get_string('blurs') === 'wallpaper' ||
       (this.conditions.powerSaving && this.settings.get_boolean('wallpaper-on-power-saver'));
   }
 

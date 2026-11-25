@@ -11,16 +11,16 @@ import {settled} from '../checks/lib/wait.js';
 import {slideWindow} from './glass.js';
 import type {FrameRecorder, Interaction} from './recorder.js';
 
-type Look = {material: 'luca' | 'maris'; lucaBlurs: 'everything' | 'wallpaper'};
+type Look = {material: 'luca' | 'maris'; blurs: 'everything' | 'wallpaper'};
 
-const GLASS_KEYS = ['see-through', 'luca-blurs'];
+const GLASS_KEYS = ['see-through', 'blurs'];
 const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const glass = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
 
 let terminal: LuftApp | null = null;
 
-async function seeThroughTerminal({material, lucaBlurs}: Look) {
+async function seeThroughTerminal({material, blurs}: Look) {
   if (!terminal) {
     GLib.mkdir_with_parents(GLib.path_get_dirname(TERMINAL_SETTINGS), 0o755);
     GLib.file_set_contents(TERMINAL_SETTINGS, '{"translucent": false}');
@@ -29,7 +29,7 @@ async function seeThroughTerminal({material, lucaBlurs}: Look) {
   const app = Shell.WindowTracker.get_default().get_window_app(terminal.window)!;
   settings.set_strv('see-through-apps', [app.get_id()]);
   glass.set_string('see-through', material);
-  glass.set_string('luca-blurs', lucaBlurs);
+  glass.set_string('blurs', blurs);
   const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
   terminal.window.move_resize_frame(true, area.x + 120, area.y + 60, 900, 600);
   terminal.window.raise();
@@ -52,7 +52,7 @@ const interactions = (look: Look, label: string): Interaction[] => [
 ];
 
 export const seeThroughInteractions: Interaction[] = [
-  ...interactions({material: 'luca', lucaBlurs: 'everything'}, 'Luca'),
-  ...interactions({material: 'luca', lucaBlurs: 'wallpaper'}, 'Luca over the wallpaper'),
-  ...interactions({material: 'maris', lucaBlurs: 'everything'}, 'Maris'),
+  ...interactions({material: 'luca', blurs: 'everything'}, 'Luca'),
+  ...interactions({material: 'luca', blurs: 'wallpaper'}, 'Luca over the wallpaper'),
+  ...interactions({material: 'maris', blurs: 'everything'}, 'Maris'),
 ];

@@ -62,7 +62,7 @@
 {#if apps.length}
 	<Section>
 		<Row title={t('settings-see-through-material')}>
-			<Segmented label={t('settings-see-through-material')} options={materials} value={glass.values['see-through'] ?? 'luca'} onchange={(material) => glass.set('see-through', material)}>
+			<Segmented label={t('settings-see-through-material')} options={materials} value={glass.values['see-through'] ?? 'niko'} onchange={(material) => glass.set('see-through', material)}>
 				{#snippet item(option)}
 					<span class="flex items-center gap-2 pe-1 text-[13px] font-medium">
 						<GlassPreview style={option.value} wallpaper={wallpaper.url} />

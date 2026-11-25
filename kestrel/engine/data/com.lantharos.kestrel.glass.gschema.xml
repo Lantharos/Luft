@@ -5,40 +5,40 @@
     <value nick="niko" value="2"/>
   </enum>
 
-  <enum id="com.lantharos.kestrel.LucaBlurs">
+  <enum id="com.lantharos.kestrel.GlassBlurs">
     <value nick="everything" value="0"/>
     <value nick="wallpaper" value="1"/>
   </enum>
 
   <schema id="com.lantharos.kestrel.glass" path="/com/lantharos/kestrel/glass/">
     <key name="taskbar" enum="com.lantharos.kestrel.GlassStyle">
-      <default>'luca'</default>
+      <default>'niko'</default>
       <summary>How the taskbar's glass looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
     </key>
     <key name="surfaces" enum="com.lantharos.kestrel.GlassStyle">
-      <default>'luca'</default>
+      <default>'niko'</default>
       <summary>How the glass of Gust, panels and menus looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour. Apps’ popovers and palettes follow it too.</description>
     </key>
     <key name="windows" enum="com.lantharos.kestrel.GlassStyle">
-      <default>'luca'</default>
+      <default>'niko'</default>
       <summary>How the glass of app windows looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
     </key>
     <key name="see-through" enum="com.lantharos.kestrel.GlassStyle">
-      <default>'luca'</default>
+      <default>'niko'</default>
       <summary>How the glass behind see-through windows looks</summary>
       <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
     </key>
-    <key name="luca-blurs" enum="com.lantharos.kestrel.LucaBlurs">
-      <default>'everything'</default>
-      <summary>What Luca glass blurs</summary>
+    <key name="blurs" enum="com.lantharos.kestrel.GlassBlurs">
+      <default>'wallpaper'</default>
+      <summary>What glass blurs</summary>
       <description>“everything” blurs whatever is behind the glass as it changes, “wallpaper” only the wallpaper, which uses less power.</description>
     </key>
     <key name="wallpaper-on-power-saver" type="b">
       <default>true</default>
-      <summary>Whether Luca glass blurs only the wallpaper while the power saver is on</summary>
+      <summary>Whether glass blurs only the wallpaper while the power saver is on</summary>
     </key>
   </schema>
 </schemalist>

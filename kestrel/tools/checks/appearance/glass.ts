@@ -13,7 +13,7 @@ import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('glass');
 const KINDS = ['taskbar', 'surfaces', 'windows'] as const;
-const KEYS = [...KINDS, 'luca-blurs', 'wallpaper-on-power-saver'];
+const KEYS = [...KINDS, 'blurs', 'wallpaper-on-power-saver'];
 const BACKDROP_COLOR = 'd02020';
 const REDDISH = 60;
 const NIKO_REDDISH = 30;
@@ -49,9 +49,9 @@ function nearSurface(color: number[]) {
   return Math.max(...expected.map((channel, index) => Math.abs(channel - color[index]))) < SURFACE_DISTANCE;
 }
 
-function choose(styles: Partial<Record<Kind, 'luca' | 'maris' | 'niko'>>, lucaBlurs: 'everything' | 'wallpaper' = 'everything') {
+function choose(styles: Partial<Record<Kind, 'luca' | 'maris' | 'niko'>>, blurs: 'everything' | 'wallpaper' = 'everything') {
   for (const kind of KINDS) settings.set_string(kind, styles[kind] ?? 'luca');
-  settings.set_string('luca-blurs', lucaBlurs);
+  settings.set_string('blurs', blurs);
 }
 
 async function glassClient(title: string, glass: string[] = []) {
@@ -87,7 +87,12 @@ export async function run() {
     const glass = await glassClient('Glass');
     await settled();
 
-    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.LUCA), 'glass starts as Luca everywhere');
+    await eventually(() => backdrops().length > 0 && backdrops().every(effect => effect.style === Shell.BlurStyle.NIKO_WALLPAPER),
+      'glass starts as Niko over the wallpaper everywhere');
+    require(redness(await centerOf(glass.window)) < NIKO_REDDISH, 'Niko glass on an app window starts out showing the wallpaper instead of the window behind it');
+
+    choose({});
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.LUCA), 'every kind of glass turns to Luca');
     require(reddish(await centerOf(glass.window)), 'Luca glass on an app window blurs the window behind it');
     await captureSurfaces('luca');
 
@@ -107,7 +112,7 @@ export async function run() {
     choose({windows: 'maris'}, 'wallpaper');
     await eventually(() => taskbarGlass().style === Shell.BlurStyle.WALLPAPER, 'the taskbar blurs only the wallpaper while app windows are Maris');
     await settled();
-    require(nearSurface(await centerOf(glass.window)), 'app windows stay Maris while Luca blurs only the wallpaper');
+    require(nearSurface(await centerOf(glass.window)), 'app windows stay Maris while glass blurs only the wallpaper');
 
     interfaceSettings.set_string('color-scheme', 'prefer-dark');
     choose({taskbar: 'niko', surfaces: 'niko', windows: 'niko'});
@@ -118,9 +123,9 @@ export async function run() {
 
     choose({taskbar: 'niko', surfaces: 'niko', windows: 'niko'}, 'wallpaper');
     await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.NIKO_WALLPAPER),
-      'Niko glass blurs only the wallpaper while Luca does');
+      'Niko glass blurs only the wallpaper when asked to');
     await settled();
-    require(redness(await centerOf(glass.window)) < NIKO_REDDISH, 'Niko glass on an app window shows the wallpaper instead of the window behind it while Luca blurs only the wallpaper');
+    require(redness(await centerOf(glass.window)) < NIKO_REDDISH, 'Niko glass on an app window shows the wallpaper instead of the window behind it while glass blurs only the wallpaper');
     interfaceSettings.reset('color-scheme');
 
     choose({});

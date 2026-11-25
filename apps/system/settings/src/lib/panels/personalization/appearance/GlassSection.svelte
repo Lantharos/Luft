@@ -6,7 +6,7 @@
 	import { GLASS_SCHEMA, type Glass, type GlassKind, type GlassStyle } from './glass.js';
 	import GlassPreview from './GlassPreview.svelte';
 
-	const glass = useSettings<Glass>(GLASS_SCHEMA, ['taskbar', 'surfaces', 'windows', 'luca-blurs', 'wallpaper-on-power-saver']);
+	const glass = useSettings<Glass>(GLASS_SCHEMA, ['taskbar', 'surfaces', 'windows', 'blurs', 'wallpaper-on-power-saver']);
 	const wallpaper = currentWallpaper();
 
 	let styles = $derived<{ value: GlassStyle; label: string }[]>([
@@ -24,7 +24,7 @@
 <Section>
 	{#each kinds as kind (kind.key)}
 		<Row title={kind.title}>
-			<Segmented label={kind.title} options={styles} value={glass.values[kind.key] ?? 'luca'} onchange={(style) => glass.set(kind.key, style)}>
+			<Segmented label={kind.title} options={styles} value={glass.values[kind.key] ?? 'niko'} onchange={(style) => glass.set(kind.key, style)}>
 				{#snippet item(option)}
 					<span class="flex items-center gap-2 pe-1 text-[13px] font-medium">
 						<GlassPreview style={option.value} wallpaper={wallpaper.url} />
@@ -40,8 +40,8 @@
 	<Row title={t('settings-appearance-glass-blurs')}>
 		<Switch
 			label={t('settings-appearance-glass-blurs')}
-			checked={glass.values['luca-blurs'] === 'wallpaper'}
-			onchange={(on) => glass.set('luca-blurs', on ? 'wallpaper' : 'everything')} />
+			checked={(glass.values.blurs ?? 'wallpaper') === 'wallpaper'}
+			onchange={(on) => glass.set('blurs', on ? 'wallpaper' : 'everything')} />
 	</Row>
 	<Row title={t('settings-appearance-glass-power-saver')}>
 		<Switch

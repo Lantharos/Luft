@@ -110,15 +110,27 @@ async function checkStyles() {
   set('taskbar-look', 'glass');
 }
 
+export async function withLucaTaskbar(action: () => Promise<void>) {
+  const materials = new Gio.Settings({schema_id: 'com.lantharos.kestrel.glass'});
+  materials.set_string('taskbar', 'luca');
+  try {
+    await action();
+  } finally {
+    materials.reset('taskbar');
+  }
+}
+
 export async function checkWallpaperGlass() {
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-  for (const [scheme, name, glass, gray] of [['prefer-dark', 'dark', 'light', 1], ['default', 'light', 'dark', 0]] as const) {
-    styles.set_string('color-scheme', scheme);
-    await withWallpaper(plainWallpaper(glass, gray), async () => {
-      await checkShading(glass, `over a ${gray ? 'white' : 'black'} wallpaper the ${name} style's taskbar takes ${glass} glass`);
-      await captureEdge(`taskbar-${glass}-wallpaper-${name}`);
-    });
-  }
+  await withLucaTaskbar(async () => {
+    for (const [scheme, name, glass, gray] of [['prefer-dark', 'dark', 'light', 1], ['default', 'light', 'dark', 0]] as const) {
+      styles.set_string('color-scheme', scheme);
+      await withWallpaper(plainWallpaper(glass, gray), async () => {
+        await checkShading(glass, `over a ${gray ? 'white' : 'black'} wallpaper the ${name} style's Luca taskbar takes ${glass} glass`);
+        await captureEdge(`taskbar-${glass}-wallpaper-${name}`);
+      });
+    }
+  });
 }
 
 export async function checkFloating() {

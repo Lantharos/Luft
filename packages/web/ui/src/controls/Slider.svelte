@@ -133,12 +133,24 @@
 <style>
 	.slider {
 		position: relative;
-		height: 28px;
+		height: var(--rail);
 		width: 100%;
 		min-width: 120px;
+		border-radius: var(--radius-pill);
 		touch-action: none;
 		user-select: none;
+		--rail: 6px;
 		--travel: calc(var(--thumb) / 2 + var(--fraction) * (100% - var(--thumb)));
+	}
+
+	.slider::before {
+		position: absolute;
+		inset: -11px 0;
+		content: '';
+	}
+
+	.slider:focus-visible {
+		outline-offset: calc((var(--thumb) - var(--rail)) / 2 + 2px);
 	}
 
 	.slider.disabled {
@@ -147,7 +159,7 @@
 
 	.rail {
 		position: absolute;
-		inset: 11px 0;
+		inset: 0;
 		border-radius: var(--radius-pill);
 		background: var(--control);
 		overflow: hidden;
@@ -178,7 +190,7 @@
 
 	.thumb {
 		position: absolute;
-		top: 4px;
+		top: calc((var(--rail) - var(--thumb)) / 2);
 		left: 0;
 		height: var(--thumb);
 		width: var(--thumb);
@@ -196,7 +208,7 @@
 
 	.value {
 		position: absolute;
-		bottom: 32px;
+		bottom: calc((var(--rail) + var(--thumb)) / 2 + 8px);
 		left: 0;
 		transform: translateX(-50%);
 		padding: 3px 9px;

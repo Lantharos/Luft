@@ -90,6 +90,10 @@
 		padding-bottom: 12px;
 	}
 
+	.row:has(> .below > :global(.slider:only-child)) {
+		gap: 8px;
+	}
+
 	.row.disabled {
 		opacity: 0.45;
 	}

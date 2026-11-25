@@ -60,7 +60,7 @@
 		bottom: calc(100% + 8px);
 		z-index: 10;
 		width: 148px;
-		padding: 4px 12px;
+		padding: 11px 12px;
 		border-radius: var(--radius-pill);
 		background: var(--popover);
 		box-shadow: 0 8px 24px var(--shadow-soft);

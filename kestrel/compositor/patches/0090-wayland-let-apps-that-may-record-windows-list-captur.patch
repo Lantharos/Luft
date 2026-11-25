@@ -26,7 +26,9 @@ MetaDisplay::window-capture-started and ::window-capture-ended tell
 the shell what is recorded, and meta_display_stop_window_capture()
 ends a recording. zwlr_layer_shell_v1 offers only the overlay layer:
 such a surface sits above every window, fullscreen ones included, and
-is never picked, so it takes neither focus nor the pointer.
+is never picked, so it takes neither focus nor the pointer. While one
+covers a monitor, the full-screen window under it isn't scanned out
+directly, so the overlay is composited above it.
 
 Sandboxed clients see these globals only while the shell permits their
 app window-capture, and starting a recording or an overlay checks it
@@ -35,6 +37,7 @@ again.
 Upstream-Status: luft-only GNOME offers recording through the screen cast portal instead
 ---
  clutter/clutter/clutter-paint-context.h       |   1 +
+ src/compositor/meta-compositor-view-native.c  |  35 +
  src/compositor/meta-shaped-texture.c          |   9 +-
  src/compositor/meta-window-actor-wayland.c    |   1 +
  src/compositor/meta-window-actor-x11.c        |   3 +-
@@ -63,7 +66,7 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/wayland/meta-wayland-versions.h           |   4 +
  src/wayland/meta-wayland.c                    |   6 +
  .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 ++++++++
- 29 files changed, 2473 insertions(+), 24 deletions(-)
+ 30 files changed, 2508 insertions(+), 24 deletions(-)
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
  create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
@@ -84,6 +87,66 @@ index 321c86ee472f7c2cecade97b66b2c6a38da8afb8..fe27d274e43f4f56e874d5e021b1bea5
  } ClutterPaintFlag;
  
  #define CLUTTER_TYPE_PAINT_CONTEXT (clutter_paint_context_get_type ())
+diff --git a/src/compositor/meta-compositor-view-native.c b/src/compositor/meta-compositor-view-native.c
+index d9414115c9e13905320845e59d60106ffe8f4345..8d0faeabc1c545f7e477fa4f99ad61a9d560452c 100644
+--- a/src/compositor/meta-compositor-view-native.c
++++ b/src/compositor/meta-compositor-view-native.c
+@@ -132,6 +132,32 @@ update_scanout_candidate (MetaCompositorViewNative *view_native,
+     }
+ }
+ 
++static gboolean
++is_covered_above_windows (MetaCompositor     *compositor,
++                          const MtkRectangle *view_rect)
++{
++  ClutterActor *group = meta_compositor_get_top_window_group (compositor);
++  ClutterActor *child;
++
++  for (child = clutter_actor_get_first_child (group);
++       child;
++       child = clutter_actor_get_next_sibling (child))
++    {
++      ClutterActorBox box;
++
++      if (!clutter_actor_is_mapped (child) ||
++          clutter_actor_get_paint_opacity (child) == 0 ||
++          !clutter_actor_get_paint_box (child, &box))
++        continue;
++
++      if (box.x1 < view_rect->x + view_rect->width && box.x2 > view_rect->x &&
++          box.y1 < view_rect->y + view_rect->height && box.y2 > view_rect->y)
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
+ static MetaSurfaceActor *
+ find_candidate (MetaCompositorView *compositor_view,
+                 MetaCompositor     *compositor,
+@@ -305,6 +331,7 @@ find_scanout_candidate (MetaCompositorView  *compositor_view,
+   MetaSurfaceActorWayland *surface_actor_wayland;
+   MetaWaylandSurface *surface;
+   CoglOnscreen *onscreen;
++  MtkRectangle view_rect;
+ 
+   if (meta_get_debug_paint_flags () & META_DEBUG_PAINT_DISABLE_DIRECT_SCANOUT)
+     return FALSE;
+@@ -316,6 +343,14 @@ find_scanout_candidate (MetaCompositorView  *compositor_view,
+   if (!surface_actor)
+     return FALSE;
+ 
++  clutter_stage_view_get_layout (stage_view, &view_rect);
++  if (is_covered_above_windows (compositor, &view_rect))
++    {
++      meta_topic (META_DEBUG_RENDER,
++                  "No direct scanout candidate: an overlay covers the view");
++      return FALSE;
++    }
++
+   if (!meta_stage_view_is_cursor_overlay_inhibited (view) &&
+       surface_actor_has_overlapping_cursor_overlays (compositor,
+                                                      compositor_view,
 diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
 index 76cf5d772979f8384b92b33003378e6ac0f5a5d6..41c6e59252b169ac8bdfa698a4f719f341595289 100644
 --- a/src/compositor/meta-shaped-texture.c

@@ -76,20 +76,21 @@ export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface
   return { tint: [red, green, blue], opacity: alpha / 255, glass: blurred ? glassShading(node) : null };
 }
 
-export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: Backdrop, niko: NikoGlass): Rgb[] {
+export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: Backdrop, niko: NikoGlass,
+  material = glassSettings.get_string('taskbar')): Rgb[] {
   if (!floor.color) return [];
   const over = tint.map(channel => channel / 255) as Channels;
   return [floor.color, ...floor.extremes].map(color => {
     const behind = color.map(channel => channel / 255) as Channels;
-    const style = glass && glassSettings.get_string('taskbar');
+    const style = glass && material;
     const shown = style === 'niko' ? cancelledUnder(tintLikeNiko(behind, niko), over, opacity) :
       mix(style === 'maris' ? coverLikeMaris(behind, opacity) : glass ? shadeLikeGlass(behind, glass) : behind, over, opacity);
     return shown.map(channel => Math.round(channel * 255)) as Rgb;
   });
 }
 
-export function taskbarBackdrops(panel: St.Widget, floor: Backdrop): Rgb[] {
+export function taskbarBackdrops(panel: St.Widget, floor: Backdrop, material?: string): Rgb[] {
   const node = panel.peek_theme_node();
-  return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor, shownNiko()) : [];
+  return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor, shownNiko(), material) : [];
 }
 

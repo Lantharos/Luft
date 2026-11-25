@@ -2,7 +2,7 @@ import Mtk from 'gi://Mtk';
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
 
-import { toneOf } from '../../../appearance/color.js';
+import { toneOf, type Rgb } from '../../../appearance/color.js';
 import { isVertical } from '../../../shared/layout/edge.js';
 import { SURFACE_GAP } from '../../../shared/layout/surface.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
@@ -15,6 +15,7 @@ type Span = [number, number];
 const BRIGHT_TONE = 62;
 const LIFT = 0.32;
 const DIM = 0.25;
+const DARKEST = 1;
 const MAX_SPANS = 4;
 const RESTING_REACH = 2 * SURFACE_GAP + 1;
 
@@ -30,6 +31,13 @@ function watchWindows(changed: () => void): () => void {
     overlap?.destroy();
     overlap = null;
   };
+}
+
+const luma = ([red, green, blue]: Rgb) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+
+function shadeOver(behind: Rgb, luca: Rgb): [lift: number, dim: number] {
+  const change = (toneOf(luca) > BRIGHT_TONE ? -DIM : LIFT) * luma(luca) / Math.max(luma(behind), DARKEST);
+  return change > 0 ? [change, 0] : [0, -change];
 }
 
 function merged(spans: Span[]): Span[] {
@@ -53,6 +61,7 @@ export class TaskbarEdge {
   constructor(private readonly actor: St.Widget, private readonly effect: Shell.BlurEffect, private readonly screen: () => TaskbarLayout) {
     const unwatchFloor = wallpaperFloor.watch(() => this.sync());
     actor.connect('notify::allocation', () => this.follow());
+    actor.connect('style-changed', () => this.sync());
     actor.connect('destroy', () => {
       unwatchFloor();
       this.unwatchWindows?.();
@@ -67,7 +76,8 @@ export class TaskbarEdge {
       return;
     }
     const [behind] = taskbarBackdrops(this.actor, wallpaperFloor);
-    this.shade = behind && toneOf(behind) > BRIGHT_TONE ? [0, DIM] : [LIFT, 0];
+    const [luca] = taskbarBackdrops(this.actor, wallpaperFloor, 'luca');
+    this.shade = behind ? shadeOver(behind, luca) : [LIFT, 0];
     this.unwatchWindows ??= watchWindows(() => this.follow());
     this.follow();
   }

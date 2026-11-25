@@ -29,6 +29,7 @@ Every role sits at a fixed tone, the perceived lightness from 0 for black to 100
 | `inverseSurface`, `inverseOnSurface`, `inversePrimary` | 20, 95, 80 | 90, 20, 40 | Tooltips and snackbars |
 
 - The tones are chosen so text and `on…` roles reach 4.5:1 against what they sit on and `outline` 3:1 against `surface`, which the appearance checks hold them to.
+- The surfaces and their text, the `neutral` roles, carry a little of the accent's colour: 0.12 of its chroma, and the `…Variant` roles 0.2. A vivid wallpaper would turn every surface its colour, so above a chroma of 0.07 the chroma they take from goes through a soft knee that eases it toward 0.085. Muted wallpapers stay below the knee and keep their colours exactly; the accent itself keeps its full chroma.
 - A white accent makes the palette black and white: `primary`, `onPrimary`, `primaryContainer`, `onPrimaryContainer` and `inversePrimary` become 10, 100, 25, 100, 100 in light and 100, 10, 85, 0, 10 in dark.
 - With Pure black, dark `surface`, `surfaceDim` and `surfaceContainerLowest` are `#000000`, the other containers 4, 8, 12 and 17, and `surfaceBright` 18.
 

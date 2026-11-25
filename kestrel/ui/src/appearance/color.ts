@@ -69,6 +69,8 @@ const toOklch = (color: Rgb): Oklch => {
   return [lightness, Math.hypot(a, b), hueOf(a, b)];
 };
 
+export const chromaOf = (color: Rgb) => toOklch(color)[1];
+
 const oklabFromOklch = ([lightness, chroma, hue]: Oklch): Oklab => {
   const radians = hue * Math.PI / 180;
   return [lightness, chroma * Math.cos(radians), chroma * Math.sin(radians)];

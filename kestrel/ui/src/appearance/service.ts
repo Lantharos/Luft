@@ -2,7 +2,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { followCorners } from './corners.js';
 import { setSolidSurfaces } from './glass/kestrelGlass.js';
-import { GlassStyles } from './glass/styles.js';
+import { castScale } from './glass/cast.js';
+import { GlassStyles, nikoGlass } from './glass/styles.js';
 
 import { accentColor, fromHex, namedAccent, NEUTRAL, seedFromColor, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
@@ -44,7 +45,8 @@ const PLATE_PARTS = ['plate', 'ink', 'shade', 'rim'] as const;
 
 export class AppearanceService {
   private readonly stylesheet = new AccentStylesheet('accent', (seed, palette, variant) =>
-    taskbarStylesheet(seed, palette, variant, this.PureBlack) + titleBarStylesheet(palette, variant));
+    taskbarStylesheet(seed, palette, variant, this.PureBlack, nikoGlass(palette[variant].colors.surface, variant, this.wallpaperCast)) +
+    titleBarStylesheet(palette, variant));
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -62,6 +64,7 @@ export class AppearanceService {
   private readonly glass = new GlassStyles();
   private readonly glassSettings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.glass' });
   private wallpaperSeed: Seed | null = null;
+  private wallpaperCast = 1;
   private appearance: Appearance | null = null;
   private taskbar = '{}';
   private published = '';
@@ -108,6 +111,7 @@ export class AppearanceService {
   get Taskbar(): string { return this.taskbar; }
 
   apply(samples: Rgb[]): void {
+    this.wallpaperCast = castScale(samples);
     this.wallpaperSeed = seedFromSamples(samples);
     this.update();
   }
@@ -172,7 +176,7 @@ export class AppearanceService {
       palette: buildPalette(seed, this.PureBlack),
     };
     const style = isDark() ? 'dark' : 'light';
-    this.glass.setSurface(this.appearance.palette[style].colors.surface, style);
+    this.glass.setSurface(this.appearance.palette[style].colors.surface, style, this.wallpaperCast);
     appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     this.stylesheet.apply(seed, this.appearance.palette);
     this.paintTaskbar();

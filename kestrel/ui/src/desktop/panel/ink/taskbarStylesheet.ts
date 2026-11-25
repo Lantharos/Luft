@@ -2,6 +2,7 @@ import { contrast, fromHex, isNeutral, type Rgb, type Seed } from '../../../appe
 import type { Colors, Palette } from '../../../appearance/palette.js';
 import { rgba } from '../../../appearance/stylesheet.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
+import type { NikoGlass } from '../../../appearance/glass/styles.js';
 import { backdropsBehind, type PanelSurface } from '../backdrop.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { schemeThemes, type Halo, type Scheme, type SchemeTheme } from './schemeThemes.js';
@@ -72,8 +73,8 @@ function inkFor(scheme: Scheme, backdrops: Rgb[], themes: Record<Scheme, SchemeT
   return worst(themes[OTHER[scheme]].ink, backdrops) > own ? OTHER[scheme] : scheme;
 }
 
-function inkOver(surface: Surface, scheme: Scheme, themes: Record<Scheme, SchemeTheme>) {
-  const backdrops = backdropsBehind(surface.surface, wallpaperFloor);
+function inkOver(surface: Surface, scheme: Scheme, themes: Record<Scheme, SchemeTheme>, niko: NikoGlass) {
+  const backdrops = backdropsBehind(surface.surface, wallpaperFloor, niko);
   const ink = inkFor(scheme, backdrops, themes);
   return { ...surface, backdrops, ink, contrast: worst(themes[ink].ink, backdrops) };
 }
@@ -90,22 +91,22 @@ function haloFor(look: TaskbarLook, readable: boolean): Halo {
   return wallpaperFloor.busy ? 'strong-halo' : 'no-halo';
 }
 
-export function lookInks(scheme: Scheme, tints: Tints): LookInk[] {
+export function lookInks(scheme: Scheme, tints: Tints, niko: NikoGlass): LookInk[] {
   const themes = schemeThemes();
   return surfaces(themes[scheme], tints).map(surface => {
-    const plain = inkOver(surface, scheme, themes);
+    const plain = inkOver(surface, scheme, themes, niko);
     const backed = needsBacking(surface, plain.contrast);
-    const { contrast, ...choice } = backed ? inkOver({ ...surface, surface: backing(themes[scheme]) }, scheme, themes) : plain;
+    const { contrast, ...choice } = backed ? inkOver({ ...surface, surface: backing(themes[scheme]) }, scheme, themes, niko) : plain;
     return { ...choice, backed, halo: haloFor(surface.look, contrast >= TEXT_CONTRAST) };
   });
 }
 
-function inkRules(style: Scheme, scheme: Scheme, palette: Palette, tints: Tints): string {
+function inkRules(style: Scheme, scheme: Scheme, palette: Palette, tints: Tints, niko: NikoGlass): string {
   if (!wallpaperFloor.color) return '';
   const themes = schemeThemes();
   const chosen = new Map<TaskbarLook, LookInk>();
   let css = '';
-  for (const choice of lookInks(scheme, tints)) {
+  for (const choice of lookInks(scheme, tints, niko)) {
     const { look, opaque, ink, halo, backed, surface } = choice;
     const inherited = opaque ? chosen.get(look)! : { ink: style, halo: 'no-halo', backed: false };
     chosen.set(look, choice);
@@ -121,11 +122,11 @@ function inkRules(style: Scheme, scheme: Scheme, palette: Palette, tints: Tints)
   return css;
 }
 
-export function taskbarStylesheet(seed: Seed, palette: Palette, style: Scheme, pureBlack: boolean): string {
+export function taskbarStylesheet(seed: Seed, palette: Palette, style: Scheme, pureBlack: boolean, niko: NikoGlass): string {
   const scheme = taskbarScheme(style, pureBlack && style === 'dark', wallpaperFloor);
   const tints = tintsOf(seed, palette[scheme].colors);
   return `${surfaceRules(style, scheme)}${selector('solid')} { background-color: ${tints.solid}; }
 ${selector('accent')} { background-color: ${rgba(tints.accent, ACCENT_OPACITY)}; }
 ${selector('accent', true)} { background-color: ${tints.accent}; }
-${inkRules(style, scheme, palette, tints)}`;
+${inkRules(style, scheme, palette, tints, niko)}`;
 }

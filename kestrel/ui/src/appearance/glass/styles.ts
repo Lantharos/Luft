@@ -24,11 +24,22 @@ const STYLES: Record<string, Meta.GlassStyle> = {
 
 type Scheme = keyof typeof NIKO;
 
+export interface NikoGlass {
+  tint: Rgb;
+  share: number;
+  luminosity: number;
+}
+
 const glassColor = ([red, green, blue]: Rgb, share: number) => new Cogl.Color({ red, green, blue, alpha: Math.round(share * 255) });
 
 function nikoTint(surface: Rgb, niko: (typeof NIKO)[Scheme]): Rgb {
   if (!('lightness' in niko)) return surface;
   return setLuminosity(surface.map(channel => channel / 255) as Channels, niko.lightness).map(channel => Math.round(channel * 255)) as Rgb;
+}
+
+export function nikoGlass(color: string, scheme: Scheme, castScale: number): NikoGlass {
+  const niko = NIKO[scheme];
+  return { tint: nikoTint(fromHex(color), niko), share: 1 - (1 - niko.tint) * castScale, luminosity: niko.luminosity };
 }
 
 class FrostPieces {
@@ -106,11 +117,10 @@ export class GlassStyles {
     repaintWallpaperGlass();
   }
 
-  setSurface(color: string, scheme: Scheme): void {
-    const surface = fromHex(color);
-    const niko = NIKO[scheme];
-    global.compositor.set_glass_surface(glassColor(surface, MARIS.cover[scheme]), MARIS.luminosity);
-    global.compositor.set_niko_tint(glassColor(nikoTint(surface, niko), niko.tint), niko.luminosity);
+  setSurface(color: string, scheme: Scheme, castScale: number): void {
+    const niko = nikoGlass(color, scheme, castScale);
+    global.compositor.set_glass_surface(glassColor(fromHex(color), MARIS.cover[scheme]), MARIS.luminosity);
+    global.compositor.set_niko_tint(glassColor(niko.tint, niko.share), niko.luminosity);
     repaintWallpaperGlass();
   }
 

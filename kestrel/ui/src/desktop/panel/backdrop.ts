@@ -5,6 +5,7 @@ import type { GlassShading } from '../../../../../packages/web/ui/src/taskbar/lo
 import type { Rgb } from '../../appearance/color.js';
 import type { Backdrop } from '../wallpaper/floor.js';
 import { blendLuma, setLuminosity, type Channels } from '../../appearance/glass/blend.js';
+import type { NikoGlass } from '../../appearance/glass/styles.js';
 import { clampUnit } from '../../shared/math.js';
 
 export interface PanelSurface {
@@ -53,11 +54,21 @@ function coverLikeMaris(color: Channels, covered: number): Channels {
   return mix(mix(color, setLuminosity(color, blendLuma(tint)), luminosity), tint, amount);
 }
 
-function tintLikeNiko(color: Channels): Channels {
-  const [niko, luminosity] = global.compositor.get_niko_tint();
-  const tint = channels(niko);
-  const lit = mix(color, setLuminosity(color, blendLuma(tint)), luminosity);
-  return mix(lit, setLuminosity(tint, blendLuma(lit)), niko.alpha / 255);
+export function shownNiko(): NikoGlass {
+  const [{ red, green, blue, alpha }, luminosity] = global.compositor.get_niko_tint();
+  return { tint: [red, green, blue], share: alpha / 255, luminosity };
+}
+
+function tintLikeNiko(color: Channels, { tint, share, luminosity }: NikoGlass): Channels {
+  const tinted = tint.map(channel => channel / 255) as Channels;
+  const lit = mix(color, setLuminosity(color, blendLuma(tinted)), luminosity);
+  return mix(lit, setLuminosity(tinted, blendLuma(lit)), share);
+}
+
+function cancelledUnder(target: Channels, over: Channels, opacity: number): Channels {
+  if (opacity >= 1) return over;
+  return target.map((value, index) =>
+    clampUnit((value - over[index] * opacity) / (1 - opacity)) * (1 - opacity) + over[index] * opacity) as Channels;
 }
 
 export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface {
@@ -65,13 +76,13 @@ export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface
   return { tint: [red, green, blue], opacity: alpha / 255, glass: blurred ? glassShading(node) : null };
 }
 
-export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: Backdrop): Rgb[] {
+export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: Backdrop, niko: NikoGlass): Rgb[] {
   if (!floor.color) return [];
   const over = tint.map(channel => channel / 255) as Channels;
   return [floor.color, ...floor.extremes].map(color => {
     const behind = color.map(channel => channel / 255) as Channels;
     const style = glass && glassSettings.get_string('taskbar');
-    const shown = style === 'niko' ? tintLikeNiko(behind) :
+    const shown = style === 'niko' ? cancelledUnder(tintLikeNiko(behind, niko), over, opacity) :
       mix(style === 'maris' ? coverLikeMaris(behind, opacity) : glass ? shadeLikeGlass(behind, glass) : behind, over, opacity);
     return shown.map(channel => Math.round(channel * 255)) as Rgb;
   });
@@ -79,6 +90,6 @@ export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: B
 
 export function taskbarBackdrops(panel: St.Widget, floor: Backdrop): Rgb[] {
   const node = panel.peek_theme_node();
-  return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor) : [];
+  return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor, shownNiko()) : [];
 }
 

@@ -1,3 +1,4 @@
+import { softKnee } from '../shared/math.js';
 import { atTone, isNeutral, toHex, type Rgb, type Seed, type TonalPalette } from './color.js';
 import { terminalColors } from './terminal.js';
 
@@ -7,6 +8,8 @@ type Tones = [palette: PaletteName, light: number, dark: number];
 const ERROR_HUE = 27;
 const ERROR_CHROMA = 0.18;
 const TERTIARY_ROTATION = 60;
+const SURFACE_KNEE = 0.07;
+const SURFACE_CEILING = 0.085;
 
 const ROLES = {
   primary: ['primary', 40, 80],
@@ -76,13 +79,14 @@ export interface Palette {
 }
 
 function tonalPalettes({ hue, chroma }: Seed): Record<PaletteName, TonalPalette> {
+  const surfaceChroma = softKnee(chroma, SURFACE_KNEE, SURFACE_CEILING);
   return {
     primary: { hue, chroma },
     secondary: { hue, chroma: chroma * 0.35 },
     tertiary: { hue: (hue + TERTIARY_ROTATION) % 360, chroma: chroma * 0.7 },
     error: { hue: ERROR_HUE, chroma: ERROR_CHROMA },
-    neutral: { hue, chroma: Math.min(0.02, chroma * 0.12) },
-    neutralVariant: { hue, chroma: Math.min(0.032, chroma * 0.2) },
+    neutral: { hue, chroma: surfaceChroma * 0.12 },
+    neutralVariant: { hue, chroma: surfaceChroma * 0.2 },
   };
 }
 

@@ -3,13 +3,13 @@ import type { Attachment } from 'svelte/attachments';
 
 const WINDOW_RADIUS = 15;
 const SHEET_INSET = 8;
+const SHEET_RADIUS = 9;
 
 function regions(sidebar: number) {
 	const input = region.roundedRect(WINDOW_RADIUS);
 	if (!sidebar) return { blur: region.empty(), opaque: region.roundedRect(WINDOW_RADIUS), input };
 	const sheet = { left: sidebar, top: SHEET_INSET, right: SHEET_INSET, bottom: SHEET_INSET };
-	const radius = WINDOW_RADIUS - SHEET_INSET;
-	return { blur: region.aroundInset(WINDOW_RADIUS, sheet, radius), opaque: region.inset(sheet, radius), input };
+	return { blur: region.aroundInset(WINDOW_RADIUS, sheet, SHEET_RADIUS), opaque: region.inset(sheet, SHEET_RADIUS), input };
 }
 
 export const sheetRegions: Attachment<HTMLElement> = (shell) => {

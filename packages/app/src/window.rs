@@ -14,6 +14,7 @@ use crate::desktop::{
 // Kestrel rounds windows to 15px, so the blur and input regions follow it
 const WINDOW_RADIUS: i32 = 15;
 const SHEET_INSET: i32 = 8;
+const SHEET_RADIUS: i32 = 9;
 
 #[derive(Clone, Copy)]
 pub struct Backdrop {
@@ -66,14 +67,13 @@ impl GlassWindow<'_> {
                 .opaque_region(WindowRegion::rounded_rect(WINDOW_RADIUS));
         }
         let sheet = WindowInsets::new(self.sidebar_width, SHEET_INSET, SHEET_INSET, SHEET_INSET);
-        let sheet_radius = WINDOW_RADIUS - SHEET_INSET;
         window
             .blur_region(WindowRegion::around_inset(
                 WINDOW_RADIUS,
                 sheet,
-                sheet_radius,
+                SHEET_RADIUS,
             ))
-            .opaque_region(WindowRegion::inset(sheet, sheet_radius))
+            .opaque_region(WindowRegion::inset(sheet, SHEET_RADIUS))
     }
 }
 

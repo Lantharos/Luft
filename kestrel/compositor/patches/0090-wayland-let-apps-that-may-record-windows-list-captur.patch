@@ -9,8 +9,10 @@ shows a short hint above it while it is full screen. Mutter offered
 neither without the screen cast portal, which asks every time.
 
 ext-foreign-toplevel-list-v1 lists the windows on the taskbar with
-their title and app id, which for X11 windows is their WM_CLASS, such
-as steam_app_<id> for Steam games. ext-image-copy-capture-v1 with
+their title and the app id the shell attributes them to with
+meta_window_set_shell_app_id(), such as steam_app_<id> for a Steam
+game whose window calls itself something else, or else their WM_CLASS
+or Wayland app id. ext-image-copy-capture-v1 with
 ext-foreign-toplevel-image-capture-source-v1 copies a window into a
 buffer the client provides, shared memory or a DMA-BUF in ARGB8888 or
 XRGB8888, drawing the pointer in when asked, and stops when the window
@@ -42,11 +44,14 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/core/display-private.h                    |   8 +
  src/core/display.c                            |  68 ++
  src/core/meta-sandbox.h                       |   1 +
+ src/core/window-private.h                     |   1 +
+ src/core/window.c                             |  39 +
  src/meson.build                               |  10 +
  src/meta/display.h                            |   4 +
+ src/meta/window.h                             |   7 +
  src/wayland/meta-wayland-dma-buf.c            |  34 +
  src/wayland/meta-wayland-dma-buf.h            |   9 +
- .../meta-wayland-foreign-toplevel-list.c      | 284 ++++++
+ .../meta-wayland-foreign-toplevel-list.c      | 290 ++++++
  .../meta-wayland-foreign-toplevel-list.h      |  13 +
  src/wayland/meta-wayland-image-copy-capture.c | 916 ++++++++++++++++++
  src/wayland/meta-wayland-image-copy-capture.h |  13 +
@@ -58,7 +63,7 @@ Upstream-Status: luft-only GNOME offers recording through the screen cast portal
  src/wayland/meta-wayland-versions.h           |   4 +
  src/wayland/meta-wayland.c                    |   6 +
  .../protocol/wlr-layer-shell-unstable-v1.xml  | 407 ++++++++
- 26 files changed, 2420 insertions(+), 24 deletions(-)
+ 29 files changed, 2473 insertions(+), 24 deletions(-)
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.c
  create mode 100644 src/wayland/meta-wayland-foreign-toplevel-list.h
  create mode 100644 src/wayland/meta-wayland-image-copy-capture.c
@@ -346,6 +351,96 @@ index 27bd6a103f49b2d0390f45ae0faef76225849e7c..1905cfd4945c83cd1843303c5734a57e
  
  gboolean meta_process_identify (int     pidfd,
                                  pid_t   pid,
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index 9d2b94a0e50c62bd8bc41ead9ec3843e35660f90..4cef9b3db1ed87f1090232b8c25e71990e772e66 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -265,6 +265,7 @@ struct _MetaWindow
+   char *mutter_hints;
+   char *sandboxed_app_id;
+   char *gtk_application_id;
++  char *shell_app_id;
+   char *gtk_unique_bus_name;
+   char *gtk_application_object_path;
+   char *gtk_window_object_path;
+diff --git a/src/core/window.c b/src/core/window.c
+index 50342c797309a28010a18eaa16fd8a2caa7bc517..0376c90c86d83f63fae0a2b87c84abdffeeee7f0 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -228,6 +228,7 @@ enum
+   PROP_ABOVE,
+   PROP_WM_CLASS,
+   PROP_GTK_APPLICATION_ID,
++  PROP_SHELL_APP_ID,
+   PROP_GTK_UNIQUE_BUS_NAME,
+   PROP_GTK_APPLICATION_OBJECT_PATH,
+   PROP_GTK_WINDOW_OBJECT_PATH,
+@@ -418,6 +419,7 @@ meta_window_finalize (GObject *object)
+   g_free (window->desc);
+   g_free (window->sandboxed_app_id);
+   g_free (window->gtk_application_id);
++  g_free (window->shell_app_id);
+   g_free (window->gtk_unique_bus_name);
+   g_free (window->gtk_application_object_path);
+   g_free (window->gtk_window_object_path);
+@@ -516,6 +518,9 @@ meta_window_get_property (GObject         *object,
+     case PROP_GTK_APPLICATION_ID:
+       g_value_set_string (value, window->gtk_application_id);
+       break;
++    case PROP_SHELL_APP_ID:
++      g_value_set_string (value, window->shell_app_id);
++      break;
+     case PROP_GTK_UNIQUE_BUS_NAME:
+       g_value_set_string (value, window->gtk_unique_bus_name);
+       break;
+@@ -771,6 +776,10 @@ meta_window_class_init (MetaWindowClass *klass)
+     g_param_spec_string ("gtk-application-id", NULL, NULL,
+                          NULL,
+                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
++  obj_props[PROP_SHELL_APP_ID] =
++    g_param_spec_string ("shell-app-id", NULL, NULL,
++                         NULL,
++                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+   obj_props[PROP_GTK_UNIQUE_BUS_NAME] =
+     g_param_spec_string ("gtk-unique-bus-name", NULL, NULL,
+                          NULL,
+@@ -7265,6 +7274,36 @@ meta_window_get_gtk_application_id (MetaWindow *window)
+   return window->gtk_application_id;
+ }
+ 
++/**
++ * meta_window_get_shell_app_id:
++ * @window: a #MetaWindow
++ *
++ * Returns: (transfer none) (nullable): the ID of the app the shell
++ *   attributes @window to, such as steam_app_<id> for a Steam game
++ **/
++const char *
++meta_window_get_shell_app_id (MetaWindow *window)
++{
++  return window->shell_app_id;
++}
++
++/**
++ * meta_window_set_shell_app_id:
++ * @window: a #MetaWindow
++ * @app_id: (nullable): the ID of the app the shell attributes @window to,
++ *   or %NULL when it can't tell
++ *
++ * Window lists given to clients name @window by this ID instead of its
++ * WM_CLASS or Wayland app ID.
++ **/
++void
++meta_window_set_shell_app_id (MetaWindow *window,
++                              const char *app_id)
++{
++  if (g_set_str (&window->shell_app_id, app_id))
++    g_object_notify_by_pspec (G_OBJECT (window), obj_props[PROP_SHELL_APP_ID]);
++}
++
+ /**
+  * meta_window_get_gtk_unique_bus_name:
+  * @window: a #MetaWindow
 diff --git a/src/meson.build b/src/meson.build
 index 2db3fa4ec2afdbc64a6bbf51136f16c315a07709..eee5ab8531b16694e68ea1d26da346e0de81ec9e 100644
 --- a/src/meson.build
@@ -394,6 +489,24 @@ index cc4d658d0380ac7e17afb9973189ebe524c7d0d2..f1973c068100ac91eb21bcaceaa3df18
 +
  META_EXPORT
  MetaCompositor *meta_display_get_compositor  (MetaDisplay *display);
+ 
+diff --git a/src/meta/window.h b/src/meta/window.h
+index b8b011e003ea51b00fa74b6446544d4a3f4dcc1c..3b157146f229cec6e3911c96ee2d7c119771a18b 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -236,6 +236,13 @@ gboolean meta_window_is_unsandboxed (MetaWindow *window);
+ META_EXPORT
+ const char * meta_window_get_gtk_application_id (MetaWindow *window);
+ 
++META_EXPORT
++const char * meta_window_get_shell_app_id (MetaWindow *window);
++
++META_EXPORT
++void meta_window_set_shell_app_id (MetaWindow *window,
++                                   const char *app_id);
++
+ META_EXPORT
+ const char * meta_window_get_gtk_unique_bus_name (MetaWindow *window);
  
 diff --git a/src/wayland/meta-wayland-dma-buf.c b/src/wayland/meta-wayland-dma-buf.c
 index ae3a84b4ffb1e55529282ab1b813e4966d1c124e..44f6750589737719ce6a063fc529654b53fe3687 100644
@@ -461,10 +574,10 @@ index cf13821210fceca9f1f56bc6dfaaad10e50ee7de..862b890d47310ee7d45ece9ca4004d9f
  int meta_wayland_dma_buf_buffer_get_height (MetaWaylandBuffer *buffer);
 diff --git a/src/wayland/meta-wayland-foreign-toplevel-list.c b/src/wayland/meta-wayland-foreign-toplevel-list.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb68a01759
+index 0000000000000000000000000000000000000000..d05405e98bd1bc72e42c648851165da7d4370137
 --- /dev/null
 +++ b/src/wayland/meta-wayland-foreign-toplevel-list.c
-@@ -0,0 +1,284 @@
+@@ -0,0 +1,290 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -485,6 +598,7 @@ index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb
 +  GList *handles;
 +  gulong title_handler_id;
 +  gulong wm_class_handler_id;
++  gulong shell_app_id_handler_id;
 +  gulong unmanaged_handler_id;
 +} ForeignToplevel;
 +
@@ -511,7 +625,9 @@ index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb
 +              MetaWindow         *window)
 +{
 +  ext_foreign_toplevel_handle_v1_send_title (handle, meta_window_get_title (window) ?: "");
-+  ext_foreign_toplevel_handle_v1_send_app_id (handle, meta_window_get_wm_class (window) ?: "");
++  ext_foreign_toplevel_handle_v1_send_app_id (handle,
++                                              meta_window_get_shell_app_id (window) ?:
++                                              meta_window_get_wm_class (window) ?: "");
 +  ext_foreign_toplevel_handle_v1_send_done (handle);
 +}
 +
@@ -572,6 +688,7 @@ index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb
 +  g_list_free (toplevel->handles);
 +  g_clear_signal_handler (&toplevel->title_handler_id, toplevel->window);
 +  g_clear_signal_handler (&toplevel->wm_class_handler_id, toplevel->window);
++  g_clear_signal_handler (&toplevel->shell_app_id_handler_id, toplevel->window);
 +  g_clear_signal_handler (&toplevel->unmanaged_handler_id, toplevel->window);
 +  g_free (toplevel->identifier);
 +  g_free (toplevel);
@@ -601,6 +718,8 @@ index 0000000000000000000000000000000000000000..e34cada7c6c01a6bbd73f1303b1c2bfb
 +    g_signal_connect (window, "notify::title", G_CALLBACK (on_details_changed), toplevel);
 +  toplevel->wm_class_handler_id =
 +    g_signal_connect (window, "notify::wm-class", G_CALLBACK (on_details_changed), toplevel);
++  toplevel->shell_app_id_handler_id =
++    g_signal_connect (window, "notify::shell-app-id", G_CALLBACK (on_details_changed), toplevel);
 +  toplevel->unmanaged_handler_id =
 +    g_signal_connect (window, "unmanaged", G_CALLBACK (on_unmanaged), toplevel);
 +  g_hash_table_insert (self->toplevels, window, toplevel);

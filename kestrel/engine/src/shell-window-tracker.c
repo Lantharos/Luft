@@ -587,7 +587,8 @@ get_app_from_steam_game (ShellWindowTracker *tracker,
  */
 static ShellApp *
 get_app_for_window (ShellWindowTracker    *tracker,
-                    MetaWindow            *window)
+                    MetaWindow            *window,
+                    char                 **steam_game)
 {
   ShellApp *result = NULL;
   MetaWindow *transient_for;
@@ -597,7 +598,7 @@ get_app_for_window (ShellWindowTracker    *tracker,
 
   transient_for = meta_window_get_transient_for (window);
   if (transient_for != NULL)
-    return get_app_for_window (tracker, transient_for);
+    return get_app_for_window (tracker, transient_for, NULL);
 
   /* First, we check whether we already know about this window,
    * if so, just return that.
@@ -618,7 +619,11 @@ get_app_for_window (ShellWindowTracker    *tracker,
 
   steam_class_game = steam_game_from_class (window);
   if (steam_class_game != NULL)
-    return get_app_from_steam_game (tracker, window, steam_class_game);
+    {
+      if (steam_game)
+        *steam_game = g_strdup (steam_class_game);
+      return get_app_from_steam_game (tracker, window, steam_class_game);
+    }
 
   /* Check if the app's WM_CLASS specifies an app; this is
    * canonical if it does.
@@ -629,7 +634,13 @@ get_app_for_window (ShellWindowTracker    *tracker,
 
   steam_launched_game = steam_game_from_environment (window);
   if (steam_launched_game != NULL)
-    return get_app_from_steam_game (tracker, window, steam_launched_game);
+    {
+      ShellApp *app = get_app_from_steam_game (tracker, window, steam_launched_game);
+
+      if (steam_game)
+        *steam_game = g_steal_pointer (&steam_launched_game);
+      return app;
+    }
 
   /* Check if the window was opened from within a sandbox; if this
    * is the case, a corresponding .desktop file is guaranteed to match;
@@ -762,18 +773,43 @@ on_window_unmanaged (MetaWindow *window,
   disassociate_window (SHELL_WINDOW_TRACKER (user_data), window);
 }
 
+static char *
+attributed_app_id (MetaWindow *window,
+                   ShellApp   *app,
+                   const char *steam_game)
+{
+  MetaWindow *transient_for = meta_window_get_transient_for (window);
+  const char *id;
+
+  if (transient_for != NULL)
+    return g_strdup (meta_window_get_shell_app_id (transient_for));
+
+  if (steam_game != NULL)
+    return g_strconcat (STEAM_WINDOW_CLASS, steam_game, NULL);
+
+  if (shell_app_is_window_backed (app))
+    return NULL;
+
+  id = shell_app_get_id (app);
+  return g_strndup (id, strlen (id) - (g_str_has_suffix (id, ".desktop") ? strlen (".desktop") : 0));
+}
+
 static void
 track_window (ShellWindowTracker *self,
               MetaWindow      *window)
 {
   ShellApp *app;
+  g_autofree char *steam_game = NULL;
+  g_autofree char *app_id = NULL;
 
-  app = get_app_for_window (self, window);
+  app = get_app_for_window (self, window, &steam_game);
   if (!app)
     return;
 
   /* At this point we've stored the association from window -> application */
   g_hash_table_insert (self->window_to_app, window, app);
+  app_id = attributed_app_id (window, app, steam_game);
+  meta_window_set_shell_app_id (window, app_id);
 
   g_signal_connect (window, "notify::wm-class", G_CALLBACK (on_wm_class_changed), self);
   g_signal_connect (window, "notify::title", G_CALLBACK (on_title_changed), self);

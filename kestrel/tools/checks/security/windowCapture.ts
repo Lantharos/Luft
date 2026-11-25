@@ -26,7 +26,8 @@ const GAME_TITLE = 'Kestrel window state: ';
 const GAME_APP = 'com.lantharos.Kestrel.WindowState';
 const GAME_PIXEL = '403020ff';
 const FRAMED_TITLE = 'Framed game';
-const FRAMED_APP = 'steam_app_367520';
+const FRAMED_GAME = '367520';
+const FRAMED_CLASS = 'JSB.x86_64';
 const FRAMED_BACKGROUND = '#203040';
 const DENIED = `${IFACE}.Error.Denied`;
 const OVERLAY_WIDTH = 200;
@@ -152,12 +153,13 @@ async function checkCapture(socket: string, game: Meta.Window) {
 }
 
 async function checkFramed(socket: string) {
-  const game = gjs('clients/x11/x11Window.js', [FRAMED_TITLE, FRAMED_BACKGROUND, '', FRAMED_APP]);
+  const game = gjs('clients/x11/x11Window.js', [FRAMED_TITLE, FRAMED_BACKGROUND, '', FRAMED_CLASS], {env: {SteamGameId: FRAMED_GAME}});
   try {
-    const window = await waitForWindow(FRAMED_TITLE, 'a game with an X11 title bar opens');
+    const window = await waitForWindow(FRAMED_TITLE, 'a Steam game with an X11 title bar opens');
+    require(window.get_wm_class() === FRAMED_CLASS, `the game names itself ${window.get_wm_class()}`);
     const content = window.frame_rect_to_client_rect(window.get_frame_rect());
     require(window.get_buffer_rect().height > content.height, 'Kestrel frames the X11 game');
-    await stop((await recorded(socket, FRAMED_APP, window, content)).process);
+    await stop((await recorded(socket, `steam_app_${FRAMED_GAME}`, window, content)).process);
   } finally {
     await stop(game);
   }

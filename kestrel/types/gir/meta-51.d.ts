@@ -3885,6 +3885,7 @@ export namespace Meta {
             "notify::mutter-hints": (pspec: GObject.ParamSpec) => void;
             "notify::on-all-workspaces": (pspec: GObject.ParamSpec) => void;
             "notify::resizeable": (pspec: GObject.ParamSpec) => void;
+            "notify::shell-app-id": (pspec: GObject.ParamSpec) => void;
             "notify::skip-taskbar": (pspec: GObject.ParamSpec) => void;
             "notify::tag": (pspec: GObject.ParamSpec) => void;
             "notify::title": (pspec: GObject.ParamSpec) => void;
@@ -3943,6 +3944,8 @@ export namespace Meta {
             on_all_workspaces: boolean;
             onAllWorkspaces: boolean;
             resizeable: boolean;
+            shell_app_id: string | null;
+            shellAppId: string | null;
             skip_taskbar: boolean;
             skipTaskbar: boolean;
             tag: string | null;
@@ -4054,6 +4057,10 @@ export namespace Meta {
         get onAllWorkspaces(): boolean;
 
         get resizeable(): boolean;
+
+        get shell_app_id(): string | null;
+
+        get shellAppId(): string | null;
 
         get skip_taskbar(): boolean;
 
@@ -4215,6 +4222,8 @@ export namespace Meta {
 
         get_sandboxed_app_id(): string | null;
 
+        get_shell_app_id(): string | null;
+
         get_stable_sequence(): number;
 
         get_startup_id(): string | null;
@@ -4338,6 +4347,8 @@ export namespace Meta {
         set_magnification(magnification: number): void;
 
         set_maximize_flags(directions: MaximizeFlags): void;
+
+        set_shell_app_id(app_id: string | null): void;
 
         set_tiled_edges(edges: Direction): void;
 

@@ -25,8 +25,7 @@ export function windowById(id: number): Meta.Window {
 }
 
 function appId(window: Meta.Window): string {
-  const app = Shell.WindowTracker.get_default().get_window_app(window);
-  return app?.get_id()?.replace(/\.desktop$/, '') ?? window.get_sandboxed_app_id() ?? window.get_wm_class() ?? '';
+  return window.get_shell_app_id() ?? window.get_sandboxed_app_id() ?? window.get_wm_class() ?? '';
 }
 
 export function describe(window: Meta.Window, level: Level | null, handle: string): Record<string, GLib.Variant> {

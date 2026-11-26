@@ -4,17 +4,14 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
-import {drag, moveTo, type Point} from '../../../lib/input/input.js';
+import {middle} from '../../../lib/apps/probe.js';
+import {drag, moveTo} from '../../../lib/input/input.js';
 import {repository} from '../../../lib/processes.js';
 import {capture} from '../../../lib/screenshots.js';
 import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
-const PREVIEW: Point = [655, 278];
 const DRAG = 60;
-const GRID = {left: 328, top: 378, width: 654, gap: 12};
-const GROUP_ROW = {left: 40, below: 80};
-const GROUP_PAGE_TOP = 120;
 const GROUP = 'Coast';
 const FOG_FOCUS = [0.5, 0.768];
 const FOG_SHAPE = 5899 / 3933;
@@ -24,21 +21,6 @@ const USER_DIRS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.d
 
 type Focus = [number, number];
 type Saved = [Gio.Settings, string, GLib.Variant];
-
-function tileWidth(shape: number) {
-  const smallest = Math.round(120 * Math.sqrt(shape));
-  const columns = Math.floor((GRID.width + GRID.gap) / (smallest + GRID.gap));
-  return (GRID.width - GRID.gap * (columns - 1)) / columns;
-}
-
-function tile(index: number, shape: number, top = GRID.top): Point {
-  const width = tileWidth(shape);
-  return [Math.round(GRID.left + (width + GRID.gap) * index + width / 2), Math.round(top + width / shape / 2)];
-}
-
-function firstGroupRow(shape: number): Point {
-  return [GRID.left + GROUP_ROW.left, Math.round(GRID.top + tileWidth(shape) / shape + GROUP_ROW.below)];
-}
 
 function copyWallpaper(name: string, folder: Gio.File) {
   for (const file of [`${name}.jpg`, `${name}.json`])
@@ -80,20 +62,21 @@ export async function checkWallpaper(app: LuftApp) {
     for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.set_value(key, new GLib.Variant('(dd)', [0.5, 0.5]));
     await show(app, 'system/about');
     await show(app, 'appearance/wallpaper');
-    moveTo(app.at(PREVIEW));
+    const preview = middle(await app.find({role: 'application'}));
+    moveTo(app.at(preview));
     (await app.settle(() => true)).save('settings-wallpaper');
 
     const {width, height} = Main.layoutManager.primaryMonitor!;
     const shape = width / height;
     const axis = shape > FOG_SHAPE ? 1 : 0;
-    const [x, y] = PREVIEW;
-    await drag(app.at(PREVIEW), app.at(axis === 1 ? [x, y - DRAG] : [x - DRAG, y]));
+    const [x, y] = preview;
+    await drag(app.at(preview), app.at(axis === 1 ? [x, y - DRAG] : [x - DRAG, y]));
     await eventually(() => focus()[axis] > 0.6 && focus()[1 - axis] === 0.5, 'dragging the preview shows another part of the wallpaper');
     const chosen = () => kestrel.get_value('wallpaper-focus-chosen').recursiveUnpack<Record<string, Focus>>()[uri];
     await eventually(() => chosen()?.[axis] === focus()[axis], 'the chosen position is remembered for that wallpaper');
     await capture('settings-wallpaper-moved');
 
-    app.click(tile(1, shape));
+    app.click(await app.find({role: 'button', name: 'Fog'}));
     await eventually(() => background.get_string('picture-uri-dark') === shared.fog && focus().every((value, axis) => value === FOG_FOCUS[axis]),
       'picking a wallpaper uses the focus stored next to it');
 
@@ -102,10 +85,10 @@ export async function checkWallpaper(app: LuftApp) {
     await app.changes(panel, 'a folder added to the wallpapers folder shows up as a group');
     const grouped = await app.settle(() => true);
     grouped.save('settings-wallpaper-groups');
-    app.click(firstGroupRow(shape));
+    app.click(await app.find({role: 'button', name: GROUP}));
     await app.changes(grouped, 'the group opens');
     (await app.settle(() => true)).save('settings-wallpaper-group');
-    app.click(tile(0, shape, GROUP_PAGE_TOP));
+    app.click(await app.find({role: 'button', name: 'Dunes'}));
     await eventually(() => background.get_string('picture-uri-dark') === dunes, 'picking a wallpaper from a group sets it');
   } finally {
     for (const [settings, key, value] of saved) settings.set_value(key, value);

@@ -6,7 +6,6 @@ import {StandInScanner} from '../../fixtures/services/scanner.js';
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {freePorts} from '../lib/apps/ports.js';
 import {checks} from '../lib/check.js';
-import type {Point} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {changes, withApp} from './lib/apps.js';
@@ -18,8 +17,6 @@ import {CONTRACT} from './flatbed/contract.js';
 const {eventually} = checks('Luft app');
 const MODEL = 'Canon PIXMA MX490 Series';
 const DPI = 150;
-const FEEDER: Point = [607, 733];
-const SCAN: Point = [799, 733];
 const SCANNING_MS = 30000;
 const SETTLE = 1500;
 const SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'com.lantharos.flatbed', 'settings.json']);
@@ -44,8 +41,8 @@ function scannedPage(blocks: Block[], name: string): Uint8Array {
 
 async function scanContract(app: LuftApp) {
   await pause(SETTLE);
-  await changes(app, 'the feeder is chosen', () => app.click(FEEDER));
-  app.click(SCAN);
+  await changes(app, 'the feeder is chosen', async () => app.click(await app.find({role: 'radio', name: 'Feeder'})));
+  app.click(await app.find({role: 'button', name: 'Scan'}));
   await eventually(() => exists(GLib.build_filenamev([DOCUMENT, 'document'])), 'Flatbed keeps the pages it scans', SCANNING_MS);
   await pause(SCANNING_MS / 10);
 }

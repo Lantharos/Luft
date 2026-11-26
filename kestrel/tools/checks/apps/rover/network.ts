@@ -5,7 +5,7 @@ import GLib from 'gi://GLib';
 import {ScratchKeyring} from '../../../fixtures/services/secretService.js';
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
-import {press, type, type Point} from '../../lib/input/input.js';
+import {press, type} from '../../lib/input/input.js';
 import {freePorts, listening} from '../../lib/apps/ports.js';
 import {scratch, spawn} from '../../lib/processes.js';
 import {waitUntil} from '../../lib/wait.js';
@@ -17,9 +17,6 @@ const {require, eventually} = checks('Luft app');
 const USER = 'luft';
 const PASSWORD = 'hunter2';
 const MOUNT_TIMEOUT = 20000;
-const PATH_BAR: Point = [760, 30];
-const MORE: Point = [1066, 26];
-const CONNECT: Point = [948, 243];
 const DIALOG = {x: 380, y: 200, width: 440, height: 400};
 const SHARE = {'docs/Plan.md': '# Plan\n', 'docs/Budget.csv': 'a,b\n1,2\n', 'photos/README.txt': 'Holiday photos\n', 'Notes.txt': 'Shared notes\n'};
 const QUIET = Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE;
@@ -92,15 +89,15 @@ async function checkConnections(app: LuftApp, keyring: ScratchKeyring, ports: Po
 
   await unmount('davs');
   keyring.forget();
-  await typeAddress(app, `davs://127.0.0.1:${ports.dav}/docs`, () => app.click(PATH_BAR));
+  await typeAddress(app, `davs://127.0.0.1:${ports.dav}/docs`, async () => app.click(await app.find({role: 'button', name: 'Edit location'})));
   await changes(app, 'Rover asks whether to trust the certificate', enter, DIALOG);
   await acceptCertificate(app, 'certificate-again');
   signIn({remember: false});
   await eventually(() => mounted('davs'), 'typing an address after clicking the path bar replaces the path and connects', MOUNT_TIMEOUT);
   (await app.settle(() => true)).save('rover-network-docs-dark');
 
-  await changes(app, 'the more menu opens', () => app.click(MORE));
-  await changes(app, 'Connect to server opens', () => app.click(CONNECT));
+  await changes(app, 'the more menu opens', async () => app.click(await app.find({role: 'button', name: 'More'})));
+  await changes(app, 'Connect to server opens', async () => app.click(await app.find({role: 'menuitem', name: 'Connect to server…'})));
   (await app.frame()).save('rover-connect-dark');
   await changes(app, 'the connect dialog follows the light style', () => useScheme('light'));
   (await app.frame()).save('rover-connect-light');

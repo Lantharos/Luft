@@ -1,32 +1,22 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, type Point} from '../lib/input/input.js';
+import {press} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {settled} from '../lib/wait.js';
 import {changes, withApp} from '../apps/lib/apps.js';
 import {saveEveryLook} from '../apps/lib/corners.js';
 import {write} from '../apps/lib/files.js';
-import {menuItem} from '../apps/rover/places.js';
 import {install, request} from './lib/extensions.js';
 
 const {require, eventually} = checks('file actions');
 const FILES = 'com.example.Files';
-const FOLDER: Point = [330, 104];
-const NOTE: Point = [330, 140];
-const CONVERTIBLE = 'com.lantharos.convertible.desktop';
-const SEPARATOR = null;
-const EDITING = [SEPARATOR, 'Cut', 'Copy', 'Duplicate', 'Copy path', SEPARATOR, 'Rename', 'Compress…', 'Convert…'];
-const TEXT_MENU = ['Open', 'Quick Look', 'Add to Favorites', ...EDITING, 'Print…', 'Send to device'];
-const BELOW_FOLDER_ACTION = ['Share with', 'Open in terminal', 'See what’s using space', 'Properties', SEPARATOR, 'Move to trash'];
-const MENU_ITEM = 38;
-const MENU_SEPARATOR = 9;
-const MENU_END = 34;
+const FOLDER = {text: 'Trips'};
+const NOTE = {text: 'Notes.txt'};
 
 interface Chosen {
   key: string;
@@ -41,18 +31,7 @@ interface Fixture {
 }
 
 const fixture = () => (globalThis as {fileActionsFixture?: Fixture}).fileActionsFixture!;
-function added(point: Point, menu: (string | null)[], index: number) {
-  const converts = GioUnix.DesktopAppInfo.new(CONVERTIBLE) !== null;
-  const shown = menu.filter(label => label !== 'Convert…' || converts);
-  const before = shown.slice(0, shown.indexOf('Send to device') + 1);
-  const separators = before.filter(label => label === SEPARATOR).length;
-  return menuItem(point, before.length - separators + index, separators);
-}
-function addedToFolder(app: LuftApp): Point {
-  const separators = BELOW_FOLDER_ACTION.filter(label => label === SEPARATOR).length;
-  const lower = (BELOW_FOLDER_ACTION.length - separators) * MENU_ITEM + separators * MENU_SEPARATOR;
-  return [FOLDER[0] + 70, app.window.get_frame_rect().height - MENU_END - lower];
-}
+const choose = async (app: LuftApp, name: string) => app.click(await app.find({role: 'menuitem', name}));
 const last = () => fixture().chosen.at(-1);
 const fileId = (path: string) => Gio.File.new_for_path(path).query_info('id::file', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('id::file');
 const chosenOn = (path: string) => last()!.paths.length === 1 && fileId(last()!.paths[0]!) === fileId(path);
@@ -64,39 +43,39 @@ async function checkOnlyRover() {
 }
 
 async function checkPlainActions(app: LuftApp, folder: string, note: string) {
-  await changes(app, 'right-clicking a text file opens its menu', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
+  await changes(app, 'right-clicking a text file opens its menu', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-text-menu');
-  await changes(app, 'choosing an added action closes the menu', () => app.click(added(NOTE, TEXT_MENU, 0)));
+  await changes(app, 'choosing an added action closes the menu', () => choose(app, 'Count words'));
   await eventually(() => last()?.key === 'words' && chosenOn(note), 'Count words gets the text file it was chosen on');
 
-  await changes(app, 'right-clicking a folder opens its menu', () => app.click(FOLDER, Clutter.BUTTON_SECONDARY));
+  await changes(app, 'right-clicking a folder opens its menu', async () => app.click(await app.find(FOLDER), Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-folder-menu');
-  await changes(app, 'choosing the folder action closes the menu', () => app.click(addedToFolder(app)));
+  await changes(app, 'choosing the folder action closes the menu', () => choose(app, 'Tidy up'));
   await eventually(() => last()?.key === 'tidy' && chosenOn(folder), 'an action for folders shows on folders, without the one for text');
 }
 
 async function checkChoices(app: LuftApp, note: string) {
-  await changes(app, 'right-clicking the text file again opens its menu', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
+  await changes(app, 'right-clicking the text file again opens its menu', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
   const opened = fixture().opened;
-  await changes(app, 'an action with choices opens them in the menu', () => app.click(added(NOTE, TEXT_MENU, 1)));
+  await changes(app, 'an action with choices opens them in the menu', () => choose(app, 'Share with'));
   await eventually(() => fixture().opened === opened + 1, 'and tells the extension it opened');
   await saveEveryLook(app, 'file-actions-choices-empty');
-  await changes(app, 'Look again keeps the menu open and shows what turned up', () => app.click(menuItem(NOTE, 2, 2)));
+  await changes(app, 'Look again keeps the menu open and shows what turned up', () => choose(app, 'Look again'));
   require(last()?.choice === 'again', 'Look again reaches the extension');
   await saveEveryLook(app, 'file-actions-choices-found');
-  await changes(app, 'choosing a found entry closes the menu', () => app.click(menuItem(NOTE, 1, 1)));
+  await changes(app, 'choosing a found entry closes the menu', () => choose(app, 'Pixel 8'));
   await eventually(() => last()?.choice === 'Pixel 8' && chosenOn(note), 'the extension gets the choice and the file');
 }
 
 async function checkHidden(app: LuftApp) {
   fixture().hide();
   await settled();
-  await changes(app, 'right-clicking the text file once more opens its menu', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
+  await changes(app, 'right-clicking the text file once more opens its menu', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-hidden');
   press(Clutter.KEY_Escape);
   await request('Disable', FILES);
   await settled();
-  await changes(app, 'right-clicking with the extension off opens a menu without its actions', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
+  await changes(app, 'right-clicking with the extension off opens a menu without its actions', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-off');
   press(Clutter.KEY_Escape);
 }

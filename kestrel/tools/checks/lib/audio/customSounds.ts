@@ -9,7 +9,7 @@ import {show, showEnd} from '../../apps/settings/navigation.js';
 import type {LuftApp} from '../apps/luftApp.js';
 import {checks} from '../check.js';
 import {call} from '../dbus.js';
-import type {Point} from '../input/input.js';
+import type {Query} from '../apps/probe.js';
 import {scratch} from '../processes.js';
 import {output} from '../screenshots.js';
 import {settled} from '../wait.js';
@@ -26,11 +26,11 @@ const PITCH = 660;
 const LOUDNESS = 8000;
 const TIMEOUT = 8000;
 const NOTIFICATION_ROW = {x: 320, y: 240, width: 700, height: 100};
-const CHOOSE_NOTIFICATION: Point = [956, 274];
-const PLAY_NOTIFICATION: Point = [893, 274];
-const RESET_NOTIFICATION: Point = [851, 274];
-const CHOOSE_FOLDER: Point = [935, 139];
-const RESET_ALL: Point = [828, 139];
+const CHOOSE_NOTIFICATION = {role: 'button', name: 'Choose a file for Notification'};
+const PLAY_NOTIFICATION = {role: 'button', name: 'Play Notification'};
+const RESET_NOTIFICATION = {role: 'button', name: 'Go back to Luft\'s sound for Notification'};
+const CHOOSE_FOLDER = {role: 'button', name: 'Choose folder'};
+const RESET_ALL = {role: 'button', name: 'Reset all'};
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.sounds'});
 const custom = () => settings.get_value('custom').deepUnpack<Record<string, string>>();
@@ -64,9 +64,9 @@ async function verdict(path: string) {
   return reply.deepUnpack<[string]>()[0];
 }
 
-async function choose(app: LuftApp, path: string, button: Point) {
+async function choose(app: LuftApp, path: string, button: Query) {
   await answerChooser(path);
-  app.click(button);
+  app.click(await app.find(button));
 }
 
 interface Played {
@@ -108,7 +108,7 @@ async function checkChoosing(app: LuftApp, folder: string, notify: () => Promise
   const copy = custom()[NOTIFICATION];
   GLib.unlink(chime);
   await playedFrom('the next notification plays the copy, with no restart', ({name, path}) => name === NOTIFICATION && path === copy, notify);
-  await playedFrom('and the play button previews it', ({path}) => path === copy, () => app.click(PLAY_NOTIFICATION));
+  await playedFrom('and the play button previews it', ({path}) => path === copy, async () => app.click(await app.find(PLAY_NOTIFICATION)));
   await settled();
   await shoot(app, 'custom-chosen');
 
@@ -116,7 +116,7 @@ async function checkChoosing(app: LuftApp, folder: string, notify: () => Promise
   require(custom()[NOTIFICATION] === copy, 'and keeps the sound that was chosen');
   await shoot(app, 'custom-too-long');
 
-  app.click(RESET_NOTIFICATION);
+  app.click(await app.find(RESET_NOTIFICATION));
   await eventually(() => !custom()[NOTIFICATION] && !GLib.file_test(copy, GLib.FileTest.EXISTS), 'resetting forgets the sound and removes its copy', TIMEOUT);
   await playedFrom('and brings back Luft’s sound', ({name, path}) => name === NOTIFICATION && !path?.startsWith(STORE), notify);
 }
@@ -135,7 +135,7 @@ async function checkSets(app: LuftApp, folder: string, notify: () => Promise<unk
   await eventually(() => heard.some(({path}) => path === custom()[NOTIFICATION]), 'a notification plays the set’s sound', TIMEOUT);
   await shoot(app, 'custom-set');
 
-  app.click(RESET_ALL);
+  app.click(await app.find(RESET_ALL));
   await eventually(() => Object.keys(custom()).length === 0 && !GLib.file_test(STORE, GLib.FileTest.EXISTS), 'resetting every sound empties the store', TIMEOUT);
 }
 

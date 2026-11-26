@@ -42,6 +42,8 @@ The nested session is different: it copies the host's wallpaper, settings, keybo
 
 Headless sessions run the Luft apps built in this tree, which have to be built first with `bun run desktop:build` in each app's folder; a check stops with the command to run when an app's build is older than its sources. They run Kestrel through `kestrel-wrapper`, as the real session does, so a crash restarts it and the checks see it reconnect.
 
+Checks find what to click in an app the way a person would, by its role and name or by the text it shows, and click it with real pointer events through Kestrel: `app.click(await app.find({role: 'radio', name: 'Heavy'}))`. A search can be narrowed to the inside of another element with `within`, and `nth` picks one of several matches. `find` waits until exactly one match shows, stands still and isn't covered, and while a dialog is open it only looks inside it. Each app a check opens gets `LUFT_APP_PROBE`, the name of a socket on which `luft-app` passes these questions to the page, so spacing and layout can change without breaking a check.
+
 Point `KESTREL_SESSION_DIR` and `KESTREL_CAPTURE_DIR` at empty scratch folders, start each run with a fresh session folder, since state left from an earlier run can fail checks, and never type a real password into a prompt that appears during a test.
 
 ## Variables

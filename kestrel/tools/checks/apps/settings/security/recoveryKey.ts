@@ -2,18 +2,19 @@ import Clutter from 'gi://Clutter';
 
 import {RECOVERY_WORD} from '../../../../fixtures/system/security/recoveryKeys.js';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
-import {press, type, type Point} from '../../../lib/input/input.js';
+import type {Query} from '../../../lib/apps/probe.js';
+import {press, type} from '../../../lib/input/input.js';
 import {changes} from '../../lib/apps.js';
 import {show} from '../navigation.js';
 
 const AT = {
-  show: [876, 433],
-  replace: [955, 433],
-  writeDown: [558, 468],
-  done: [755, 536],
-} satisfies Record<string, Point>;
+  show: {role: 'button', name: 'Show'},
+  replace: {role: 'button', name: 'Replace'},
+  writeDown: {role: 'button', name: 'Write it down'},
+  done: {role: 'button', name: 'Done'},
+} satisfies Record<string, Query>;
 
-const click = (app: LuftApp, point: Point, label: string) => changes(app, label, () => app.click(point));
+const click = (app: LuftApp, control: Query, label: string) => changes(app, label, async () => app.click(await app.find(control)));
 const enter = (app: LuftApp, label: string) => changes(app, label, () => press(Clutter.KEY_Return));
 
 export async function checkRecoveryKey(app: LuftApp) {

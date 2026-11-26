@@ -1,20 +1,20 @@
 import Gio from 'gi://Gio';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
-import type {Point} from '../../../lib/input/input.js';
+import type {Query} from '../../../lib/apps/probe.js';
 import {checks} from '../../../lib/check.js';
 import {callLog} from '../../../system/lib/systemCalls.js';
 import {useScheme} from '../../lib/palette.js';
 import {scrollToEnd, show} from '../navigation.js';
 
-const OFFICE: Point = [660, 102];
-const BACK: Point = [316, 30];
-const ADD: Point = [660, 239];
-const LABELS: Point = [660, 171];
-const USB_PRINTER: Point = [440, 305];
-const DRIVER: Point = [440, 258];
-const CANCEL_JOB: Point = [974, 321];
-const TEST_PAGE: Point = [660, 650];
+const OFFICE = {text: 'Office Printer'};
+const BACK = {role: 'button', name: 'Back'};
+const ADD = {role: 'button', name: 'Add a printer'};
+const LABELS = {text: 'Label Printer'};
+const USB_PRINTER = {text: 'Canon MX490 series'};
+const DRIVER = {text: 'Canon MX490 series - CUPS+Gutenprint v5.3.5'};
+const CANCEL_JOB = {role: 'button', name: 'Cancel printing'};
+const TEST_PAGE = {role: 'button', name: 'Print a test page'};
 
 async function restyle(app: LuftApp, label: string, change: () => void) {
   const before = await app.frame();
@@ -22,9 +22,10 @@ async function restyle(app: LuftApp, label: string, change: () => void) {
   return app.changes(before, label);
 }
 
-async function click(app: LuftApp, point: Point, label: string) {
+async function click(app: LuftApp, control: Query, label: string) {
+  const target = await app.find(control);
   const before = await app.frame();
-  app.click(point);
+  app.click(target);
   return app.changes(before, label);
 }
 

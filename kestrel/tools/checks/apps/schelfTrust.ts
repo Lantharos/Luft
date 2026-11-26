@@ -2,7 +2,6 @@ import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
-import type {Point} from '../lib/input/input.js';
 import {fixture, outcome, scratch} from '../lib/processes.js';
 import {withApp} from './lib/apps.js';
 import {install} from './lib/appImages.js';
@@ -12,7 +11,6 @@ const BUILDER = fixture('sandbox', 'trust.sh');
 const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
 const SAFE_STORAGE = fixture('sandbox', 'safeStorage');
 const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
-const INSTALL_BUTTON: Point = [1030, 110];
 
 async function saved(app: LuftApp, name: string) {
   (await app.settle(() => true)).save(name);
@@ -20,7 +18,7 @@ async function saved(app: LuftApp, name: string) {
 
 async function installClicked(app: LuftApp, name: string) {
   await app.settle(() => true);
-  app.click(INSTALL_BUTTON);
+  app.click(await app.find({role: 'button', name: 'Install'}));
   await saved(app, name);
 }
 

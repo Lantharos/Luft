@@ -3,16 +3,11 @@ import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
-import {press, type, type Point} from '../../lib/input/input.js';
+import {press, type} from '../../lib/input/input.js';
 import {changes, withApp} from '../lib/apps.js';
 
 const {eventually} = checks('Luft app');
 const STORE = GLib.build_filenamev([GLib.get_user_data_dir(), 'com.lantharos.mailman', 'mail.sqlite']);
-const ACCOUNT_ROW: Point = [714, 155];
-const ADD_ADDRESS: Point = [548, 351];
-const NAME_FIELD: Point = [600, 408];
-const ADDRESS_FIELD: Point = [830, 408];
-const SAVE: Point = [527, 649];
 
 function query(sql: string) {
   const [, stdout] = GLib.spawn_sync(null, ['sqlite3', STORE, sql], null, GLib.SpawnFlags.SEARCH_PATH, null);
@@ -27,17 +22,18 @@ function seedAccount() {
 
 async function addAddress(app: LuftApp) {
   (await changes(app, 'Ctrl+, opens the settings', () => press(Clutter.KEY_Control_L, Clutter.KEY_comma))).save('mailman-settings');
-  await changes(app, 'clicking an account opens its settings', () => app.click(ACCOUNT_ROW));
-  await changes(app, 'Add an address opens the address editor', () => app.click(ADD_ADDRESS));
+  await changes(app, 'clicking an account opens its settings', async () => app.click(await app.find({role: 'button', name: 'Mara'})));
+  await changes(app, 'Add an address opens the address editor', async () => app.click(await app.find({role: 'button', name: 'Add an address'})));
+  const name = await app.find({role: 'textbox', name: 'Name'});
   await changes(app, 'typing a name with a space keeps the editor open', () => {
-    app.click(NAME_FIELD);
+    app.click(name);
     press(Clutter.KEY_Control_L, Clutter.KEY_a);
     type('Mara Lindqvist');
   });
   (await app.settle(() => true)).save('mailman-address-editor');
-  app.click(ADDRESS_FIELD);
+  app.click(await app.find({role: 'textbox', name: 'Address'}));
   type('mara.work@example.test');
-  await changes(app, 'Save keeps the new address', () => app.click(SAVE));
+  await changes(app, 'Save keeps the new address', async () => app.click(await app.find({role: 'button', name: 'Save'})));
 }
 
 export async function checkSettings() {

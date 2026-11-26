@@ -10,6 +10,7 @@ use crate::desktop::palette::{self, Palette};
 use crate::desktop::{
     self, corners::Corners, lines::Lines, motion::Motion, posture::Posture, typography::Typography,
 };
+use crate::probe::Probe;
 
 // Kestrel rounds windows to 15px, so the blur and input regions follow it
 const WINDOW_RADIUS: i32 = 15;
@@ -122,10 +123,21 @@ pub fn run(
 ) -> ! {
     luft_dbus::panics::report();
     let events = events.clone();
+    let probe = Probe::from_environment();
+    let declared = probe.clone();
     SabineWindow::main_with_process(
-        move |window| Ok(desktop::declare_appearance(build(window))),
+        move |window| {
+            let window = desktop::declare_appearance(build(window));
+            Ok(match &declared {
+                Some(probe) => probe.declare(window),
+                None => window,
+            })
+        },
         move |process| {
             events.attach(process.bridge_event_emitter());
+            if let Some(probe) = probe {
+                probe.serve(process.bridge_event_emitter());
+            }
             crate::spawn(palette::watch_palette(events.clone()));
             crate::spawn(desktop::watch(events.clone()));
             started(events);

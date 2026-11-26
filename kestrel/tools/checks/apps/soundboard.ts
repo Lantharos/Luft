@@ -9,7 +9,7 @@ import {RATE, wav} from '../lib/audio/music.js';
 import {givePorts, intoSpeakers, link} from '../lib/audio/routing.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {hold, press, release} from '../lib/input/input.js';
+import {hold, press, release, type Point} from '../lib/input/input.js';
 import {outcome, repository, scratch, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
 import {capture, type Area, type Frame} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
@@ -32,17 +32,15 @@ const VOICE_SECONDS = 60;
 const LEVEL = 0.4;
 const HEARD = 0.1;
 const SILENT = 0.01;
-const ADD_SOUNDS: [number, number] = [880, 42];
-const FIRST_TILE: [number, number] = [370, 130];
-const EDIT_ITEM: [number, number] = [392, 146];
-const TILE_BESIDE_MENU: [number, number] = [335, 170];
-const FIRST_BOARD: [number, number] = [140, 80];
-const RENAME_ITEM: [number, number] = [162, 96];
-const EMPTY_SPOT: [number, number] = [700, 600];
-const MICROPHONE_SELECT: [number, number] = [140, 470];
+const TILE = {role: 'button', name: 'Airhorn'};
+const BOARD = {role: 'button', name: 'Sounds 1'};
+const TILE_EDGE = 12;
+const EMPTY_SPOT: Point = [700, 600];
 const BESIDE_TILE = {x: 490, y: 134, width: 60, height: 60};
 const BESIDE_BOARD = {x: 284, y: 96, width: 16, height: 80};
 const BELOW_SELECT = {x: 40, y: 506, width: 200, height: 100};
+const LIST_GAP = 8;
+const LIST_HEIGHT = 80;
 const MENU_TOLERANCE = 6;
 const MENU_PIXELS = 100;
 const LISTEN_MS = 700;
@@ -90,7 +88,7 @@ const listening = (act: () => void | Promise<void>) => recorded(eventually, from
 
 async function addSound(app: LuftApp, path: string) {
   await call('org.freedesktop.impl.portal.desktop.rover', '/org/freedesktop/portal/desktop', 'com.lantharos.KestrelChecks.FileChooser', 'Answer', new GLib.Variant('(s)', [Gio.File.new_for_path(path).get_uri()]));
-  app.click(ADD_SOUNDS);
+  app.click(await app.find({role: 'button', name: 'Add sounds'}));
   await eventually(() => exists(GLib.build_filenamev([dataFolder(), 'library.json'])) && soundId() !== null, 'a chosen file joins the board', 15000);
 }
 
@@ -129,8 +127,9 @@ async function checkMenus(app: LuftApp) {
   const boardMenu = app.area(BESIDE_BOARD);
   const popover = app.area(BELOW_SELECT);
   const [noTileMenu, noBoardMenu, noPopover] = [await app.frame(tileMenu), await app.frame(boardMenu), await app.frame(popover)];
-  const openTile = () => app.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
-  const openBoard = () => app.click(FIRST_BOARD, Clutter.BUTTON_SECONDARY);
+  const [tile, board] = [await app.find(TILE), await app.find(BOARD)];
+  const openTile = () => app.click(tile, Clutter.BUTTON_SECONDARY);
+  const openBoard = () => app.click(board, Clutter.BUTTON_SECONDARY);
 
   await opens(app, tileMenu, noTileMenu, 'right-clicking a tile opens its menu', openTile);
   await capture('soundboard-tile-menu');
@@ -152,32 +151,38 @@ async function checkMenus(app: LuftApp) {
 
   await opens(app, tileMenu, noTileMenu, 'the tile\'s menu opens once more', openTile);
   await pause(AFTER_PRESS_MS);
-  await opens(app, popover, noPopover, 'choosing Edit opens the editor', () => app.click(EDIT_ITEM));
+  const edit = await app.find({role: 'menuitem', name: 'Edit…'});
+  await opens(app, popover, noPopover, 'choosing Edit opens the editor', () => app.click(edit));
   await pause(AFTER_PRESS_MS);
   await capture('soundboard-editor');
   await closes(app, tileMenu, noTileMenu, 'Escape closes the editor, and no menu is left behind', pressEscape);
 
   await opens(app, boardMenu, noBoardMenu, 'a board\'s menu opens for renaming', openBoard);
   await pause(AFTER_PRESS_MS);
-  await opens(app, popover, noPopover, 'choosing Rename opens its dialog', () => app.click(RENAME_ITEM));
+  const rename = await app.find({role: 'menuitem', name: 'Rename'});
+  await opens(app, popover, noPopover, 'choosing Rename opens its dialog', () => app.click(rename));
   await pause(AFTER_PRESS_MS);
   await capture('soundboard-rename');
   await closes(app, boardMenu, noBoardMenu, 'Escape closes the rename dialog', pressEscape);
 
   await pause(AFTER_PRESS_MS);
-  const openSelect = () => app.click(MICROPHONE_SELECT);
-  await opens(app, popover, noPopover, 'the microphone list opens', openSelect);
-  await closes(app, popover, noPopover, 'clicking elsewhere closes the microphone list', empty);
+  const microphone = await app.find({role: 'combobox', name: 'Your microphone'});
+  const list = app.area({x: microphone.x, y: microphone.y + microphone.height + LIST_GAP, width: microphone.width, height: LIST_HEIGHT});
+  const noList = await app.frame(list);
+  const openSelect = () => app.click(microphone);
+  await opens(app, list, noList, 'the microphone list opens', openSelect);
+  await closes(app, list, noList, 'clicking elsewhere closes the microphone list', empty);
   await pause(AFTER_PRESS_MS);
-  await opens(app, popover, noPopover, 'the microphone list opens again', openSelect);
-  await closes(app, popover, noPopover, 'Escape closes the microphone list', pressEscape);
+  await opens(app, list, noList, 'the microphone list opens again', openSelect);
+  await closes(app, list, noList, 'Escape closes the microphone list', pressEscape);
 }
 
 async function checkDismissingIsSilent(app: LuftApp) {
+  const tile = await app.find(TILE);
   const heard = await listening(async () => {
-    app.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
+    app.click(tile, Clutter.BUTTON_SECONDARY);
     await pause(AFTER_PRESS_MS);
-    app.click(TILE_BESIDE_MENU);
+    app.click([tile.x + TILE_EDGE, tile.y + tile.height - TILE_EDGE]);
     await pause(AFTER_PRESS_MS);
   });
   require(toneStrength(heard, SOUND_PITCH) < SILENT, `clicking a tile to close a menu plays nothing (${toneStrength(heard, SOUND_PITCH).toFixed(3)})`);
@@ -190,7 +195,7 @@ async function checkSoundAndVoice(app: LuftApp) {
       await link(`${VOICE_NODE}:capture_FL`, 'soundboard-capture:input_FL') && await link(`${VOICE_NODE}:capture_FR`, 'soundboard-capture:input_FR'), 'the voice reaches the app');
     await pause(AFTER_PRESS_MS);
     require(Shell.Mixer.get_default().recording, 'the real microphone in use shows as in use');
-    app.click(FIRST_TILE);
+    app.click(await app.find(TILE));
     await pause(AFTER_PRESS_MS);
   });
   const during = recording.subarray(-RATE / 2);
@@ -204,7 +209,7 @@ async function checkPrivacy(app: LuftApp) {
   await eventually(() => intoSpeakers(MONITOR, 'soundboard-monitor:output', 2), 'the sounds reach the speakers');
   let seen = false;
   const watch = mixer.connect('notify::recording', () => (seen ||= mixer.recording));
-  app.click(FIRST_TILE);
+  app.click(await app.find(TILE));
   await pause(AFTER_PRESS_MS * 2);
   mixer.disconnect(watch);
   require(!seen && !mixer.recording, 'playing a sound with nobody listening doesn\'t look like a call');

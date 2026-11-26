@@ -5,7 +5,7 @@ import GLib from 'gi://GLib';
 import {printsThroughDialog, writeDocument, writePicture} from '../lib/access/printing.js';
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
-import {press, type Point} from '../lib/input/input.js';
+import {press} from '../lib/input/input.js';
 import {fixture, scratch} from '../lib/processes.js';
 import type {Frame} from '../lib/screenshots.js';
 import {changes, withApp} from './lib/apps.js';
@@ -24,11 +24,6 @@ const SAMPLES: Sample[] = [
   {name: 'system', source: '/usr/share/fonts/adwaita-sans-fonts/AdwaitaSans-Regular.ttf', tabs: true},
   {name: 'woff2', source: fixture('fonts', 'MagpieSample-Regular.woff2'), install: true},
 ];
-const TAB_Y = 77;
-const TAB_WIDTH = 113;
-const TABS = {preview: -1, characters: 0, details: 1};
-const HEADER_Y = 29;
-const HEADER_BUTTON_FROM_RIGHT = 198;
 const INSTALLED_LABEL = {right: 340, y: 15, width: 90, height: 28};
 const LABEL_TOLERANCE = 8;
 const SURFACE_SHARE = 0.5;
@@ -41,16 +36,14 @@ function copySample(source: string) {
   return target;
 }
 
-const tab = (app: LuftApp, name: keyof typeof TABS): Point => [app.window.get_frame_rect().width / 2 + TABS[name] * TAB_WIDTH, TAB_Y];
-const headerButton = (app: LuftApp): Point => [app.window.get_frame_rect().width - HEADER_BUTTON_FROM_RIGHT, HEADER_Y];
 
 function installedLabel(app: LuftApp) {
   const {width} = app.window.get_frame_rect();
   return app.area({x: width - INSTALLED_LABEL.right, y: INSTALLED_LABEL.y, width: INSTALLED_LABEL.width, height: INSTALLED_LABEL.height});
 }
 
-async function pressHeaderButton(app: LuftApp, label: string, done: () => boolean, shown: (frame: Frame) => boolean) {
-  app.click(headerButton(app));
+async function pressHeaderButton(app: LuftApp, name: string, label: string, done: () => boolean, shown: (frame: Frame) => boolean) {
+  app.click(await app.find({role: 'button', name}));
   await eventually(done, label);
   await eventually(async () => shown(await app.frame(installedLabel(app))), `${label}, and its header says so`);
 }
@@ -58,18 +51,18 @@ async function pressHeaderButton(app: LuftApp, label: string, done: () => boolea
 async function checkInstall(app: LuftApp) {
   const missing = await app.frame(installedLabel(app));
   const installed = (frame: Frame) => !frame.looksLike(missing, LABEL_TOLERANCE);
-  await pressHeaderButton(app, 'magpie installs a font into the fonts folder', () => GLib.file_test(INSTALLED, GLib.FileTest.IS_REGULAR), installed);
+  await pressHeaderButton(app, 'Install', 'magpie installs a font into the fonts folder', () => GLib.file_test(INSTALLED, GLib.FileTest.IS_REGULAR), installed);
   (await app.settle(() => true)).save('magpie-font-installed-dark');
-  await pressHeaderButton(app, 'magpie removes a font it installed', () => !GLib.file_test(INSTALLED, GLib.FileTest.EXISTS),
+  await pressHeaderButton(app, 'Remove', 'magpie removes a font it installed', () => !GLib.file_test(INSTALLED, GLib.FileTest.EXISTS),
     frame => !installed(frame));
 }
 
 async function checkTabs(app: LuftApp) {
-  for (const name of ['characters', 'details'] as const) {
-    await changes(app, `magpie shows a font's ${name}`, () => app.click(tab(app, name)));
-    (await app.frame()).save(`magpie-font-${name}-dark`);
+  for (const name of ['Characters', 'Details']) {
+    await changes(app, `magpie shows a font's ${name.toLowerCase()}`, async () => app.click(await app.find({role: 'radio', name})));
+    (await app.frame()).save(`magpie-font-${name.toLowerCase()}-dark`);
   }
-  await changes(app, 'magpie goes back to the font preview', () => app.click(tab(app, 'preview')));
+  await changes(app, 'magpie goes back to the font preview', async () => app.click(await app.find({role: 'radio', name: 'Preview'})));
 }
 
 async function checkSample({name, source, tabs, install}: Sample, home: Frame, palette: Palette) {

@@ -19,6 +19,7 @@ pub mod fonts;
 pub mod ibus;
 pub mod launch;
 pub mod portal;
+mod probe;
 #[cfg(feature = "recovery")]
 pub mod recovery;
 mod sample;

@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import {descendants, named, shownStyled} from '../lib/actors.js';
+import {middle} from '../lib/apps/probe.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {centerOf, click, moveTo, pressButton, press as pressKey, releaseButton, type Point} from '../lib/input/input.js';
@@ -18,7 +19,6 @@ import {checkOffers, checkPairing, checkPin, checkText, clearNotifications, clos
 
 const {require, eventually} = checks('Post');
 const DBUS = 'org.freedesktop.DBus';
-const FIRST_ENTRY: Point = [330, 104];
 const DRAG_STEPS = 24;
 const DRAG_STEP_MS = 30;
 const HOVER_MS = 400;
@@ -89,7 +89,8 @@ async function checkDrops() {
   GLib.file_set_contents(GLib.build_filenamev([folder, 'Ticket.pdf']), '%PDF-1.4\n');
   await withApp('rover', [folder], async app => {
     await settled();
-    await dragOver(app.at(FIRST_ENTRY), centerOf(indicator()!), async () => {
+    const ticket = app.at(middle(await app.find({text: 'Ticket.pdf'})));
+    await dragOver(ticket, centerOf(indicator()!), async () => {
       require((indicator() as St.Widget).has_style_pseudo_class('dropping'), 'Post lights up under files dragged over it');
       await captureTray('post-drop-icon');
     });
@@ -97,7 +98,7 @@ async function checkDrops() {
     pressKey(Clutter.KEY_Escape);
     await eventually(() => !sheet(), 'Escape closes it');
     const bare = bareSpot();
-    await dragOver(app.at(FIRST_ENTRY), bare, async () => {
+    await dragOver(ticket, bare, async () => {
       require((panel() as St.Widget).has_style_pseudo_class('dropping'), 'the taskbar lights up under files dragged over a bare part of it');
       const [x, y] = panel().get_transformed_position();
       await captureArea('post-drop-taskbar', {x: Math.round(x), y: Math.round(y), width: Math.round(panel().width), height: Math.round(panel().height)});
@@ -106,7 +107,7 @@ async function checkDrops() {
     pressKey(Clutter.KEY_Escape);
     await eventually(() => !sheet(), 'Escape closes it');
     const rover = await eventually(() => appButton('Rover'), 'Rover has a button in the taskbar');
-    await dragOver(app.at(FIRST_ENTRY), centerOf(rover), async () => {
+    await dragOver(ticket, centerOf(rover), async () => {
       require(!(panel() as St.Widget).has_style_pseudo_class('dropping'), 'an app’s button doesn’t light the taskbar up');
     });
     await settled();

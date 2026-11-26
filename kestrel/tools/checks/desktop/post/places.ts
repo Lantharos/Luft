@@ -3,19 +3,16 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
-import {press, type Point} from '../../lib/input/input.js';
+import {press} from '../../lib/input/input.js';
 import {scratch} from '../../lib/processes.js';
 import {changes, withApp} from '../../apps/lib/apps.js';
 import {saveEveryLook} from '../../apps/lib/corners.js';
 import {write} from '../../apps/lib/files.js';
-import {menuItem} from '../../apps/rover/places.js';
 import {show} from '../../apps/settings/navigation.js';
 import type {Nearby} from './nearby.js';
 import {NEARBY, nearbyId} from './transfers.js';
 
 const {eventually} = checks('Post');
-const FILE: Point = [330, 104];
-const SEND_TO_DEVICE = menuItem(FILE, 10, 2);
 const FIREWALL = 'com.lantharos.Firewall1';
 const WIRED = '/org/freedesktop/NetworkManager/Settings/1';
 
@@ -24,9 +21,9 @@ export async function checkRover(nearby: Nearby) {
   const file = GLib.build_filenamev([scratch('post', 'Rover'), 'Boarding pass.txt']);
   write(file, 'Gate 14, seat 22A\n');
   await withApp('rover', [GLib.path_get_dirname(file)], async app => {
-    await changes(app, 'right-clicking a file in Rover opens its menu', () => app.click(FILE, Clutter.BUTTON_SECONDARY));
+    await changes(app, 'right-clicking a file in Rover opens its menu', async () => app.click(await app.find({text: 'Boarding pass.txt'}), Clutter.BUTTON_SECONDARY));
     await saveEveryLook(app, 'post-rover-menu');
-    await changes(app, `Send to device opens the devices nearby, ${NEARBY} among them`, () => app.click(SEND_TO_DEVICE));
+    await changes(app, `Send to device opens the devices nearby, ${NEARBY} among them`, async () => app.click(await app.find({role: 'menuitem', name: 'Send to device'})));
     await saveEveryLook(app, 'post-rover-devices');
     press(Clutter.KEY_Escape);
   });

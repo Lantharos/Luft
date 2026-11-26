@@ -14,7 +14,6 @@ import {code, focus, openEntry, tryFieldHolds, typeInto, useSources} from './typ
 const {eventually} = checks('Keys');
 const KEY_LEFT = 105;
 const IBUS_RESTART = 30000;
-const TRY_FIELD = [-200, 120];
 export const ENGINE = 'keys:pinyin-lite';
 const METHOD = `name = "Pinyin lite"
 label = "拼"
@@ -36,8 +35,7 @@ words = [
 
 async function checkTryField(app: LuftApp, palette: Palette) {
   await focus(app.window);
-  const {width} = app.window.get_frame_rect();
-  app.click([width + TRY_FIELD[0], TRY_FIELD[1]]);
+  app.click(await app.find({role: 'textbox', name: 'Try the input method'}));
   await changes(app, 'the Try it field shows the reading', () => type('ni'));
   await saveBothStyles(app, palette, 'keys-method-try');
   await changes(app, 'a number picks a word in the Try it field', () => type('2'));

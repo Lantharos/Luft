@@ -8,7 +8,7 @@ import St from 'gi://St';
 import {styled} from '../../../lib/actors.js';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
-import {press, type, type Point} from '../../../lib/input/input.js';
+import {press, type} from '../../../lib/input/input.js';
 import {gjs, stop, waitForWindow, type Process} from '../../../lib/processes.js';
 import {captureFrame, output, type Area, type Frame} from '../../../lib/screenshots.js';
 import {settled, waitUntil} from '../../../lib/wait.js';
@@ -19,7 +19,7 @@ const {require, eventually} = checks('Luft app');
 const DEFAULTS: Record<string, string> = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN: Record<string, string> = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
-const PICKERS: Record<string, Point> = {'font-name': [900, 148], 'monospace-font-name': [900, 214]};
+const PICKERS: Record<string, string> = {'font-name': 'Interface font', 'monospace-font-name': 'Monospace font'};
 const LARGER_TEXT = 1.25;
 const TERMINAL_TEXT = 'fn main() -> Result<(), Error> { 0x1F != 0o17 }  The quick brown fox 0123456789';
 const ZOOM = 4;
@@ -100,7 +100,7 @@ class Surfaces {
 
 async function pick(app: LuftApp, key: string, family: string, shot: string | null = null) {
   await raise(app.window);
-  await changes(app, 'the font picker opens', () => app.click(PICKERS[key]));
+  await changes(app, 'the font picker opens', async () => app.click(await app.find({role: 'button', name: PICKERS[key]})));
   if (shot) (await app.frame()).save(shot);
   await changes(app, `the font picker finds ${family}`, () => type(family.toLowerCase()));
   press(Clutter.KEY_Return);

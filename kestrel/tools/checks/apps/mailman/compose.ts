@@ -2,7 +2,8 @@ import Clutter from 'gi://Clutter';
 
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
-import {press, type, type Point} from '../../lib/input/input.js';
+import type {Box} from '../../lib/apps/probe.js';
+import {press, type} from '../../lib/input/input.js';
 import {settled} from '../../lib/wait.js';
 import {changes, type Region} from '../lib/apps.js';
 import {withScheme} from '../lib/palette.js';
@@ -10,31 +11,12 @@ import {address, ALIASES, type MailServer} from './stalwart.js';
 
 const {require, eventually} = checks('Luft app');
 const ARRIVAL = 30000;
-const COMPOSER = {margin: 20, width: 620, height: 600, header: 48, row: 42, sidebar: 264};
-const FROM_TRIGGER_X = 100;
-const MENU = {gap: 6, padding: 6, heading: 26, item: 40, separator: 13};
-
-type Composer = ReturnType<typeof composer>;
+const SENDER = {role: 'button', name: 'Send from'};
 
 interface Sending {
-  account: number;
   from: string;
   to: string;
   subject: string;
-}
-
-function composer(app: LuftApp) {
-  const {width, height} = app.window.get_frame_rect();
-  const size = {width: Math.min(COMPOSER.width, width - COMPOSER.sidebar - 2 * COMPOSER.margin), height: Math.min(COMPOSER.height, height - 100)};
-  const x = width - COMPOSER.margin - size.width;
-  const y = height - COMPOSER.margin - size.height;
-  return {x, y, ...size, fromRow: y + COMPOSER.header + COMPOSER.row / 2};
-}
-
-function menuItem(area: Composer, accounts: number[], account: number, item: number): Point {
-  const before = accounts.slice(0, account).reduce((total, items) => total + MENU.heading + items * MENU.item + MENU.separator, 0);
-  const top = area.fromRow + 15 + MENU.gap + MENU.padding + before + MENU.heading;
-  return [area.x + FROM_TRIGGER_X, top + MENU.item * (item + 0.5)];
 }
 
 async function saveBoth(app: LuftApp, area: Region, name: string) {
@@ -46,18 +28,18 @@ async function saveBoth(app: LuftApp, area: Region, name: string) {
   }
 }
 
-async function openComposer(app: LuftApp) {
+async function openComposer(app: LuftApp): Promise<Box> {
   await changes(app, 'C opens the composer', () => press(Clutter.KEY_c));
-  return composer(app);
+  return app.find({role: 'dialog'});
 }
 
-async function chooseSender(app: LuftApp, area: Composer, accounts: number[], account: number, item: number, label: string) {
-  await changes(app, 'clicking From opens the sender menu', () => app.click([area.x + FROM_TRIGGER_X, area.fromRow]));
-  await changes(app, label, () => app.click(menuItem(area, accounts, account, item)));
+async function chooseSender(app: LuftApp, sender: string, label: string) {
+  await changes(app, 'clicking From opens the sender menu', async () => app.click(await app.find(SENDER)));
+  await changes(app, label, async () => app.click(await app.find({text: sender})));
 }
 
-async function write(app: LuftApp, area: Composer, to: string, subject: string) {
-  app.click([area.x + FROM_TRIGGER_X, area.fromRow + COMPOSER.row]);
+async function write(app: LuftApp, to: string, subject: string) {
+  app.click(await app.find({role: 'textbox', name: 'To'}));
   type(address(to));
   press(Clutter.KEY_Return);
   press(Clutter.KEY_Tab);
@@ -65,10 +47,10 @@ async function write(app: LuftApp, area: Composer, to: string, subject: string) 
   await settled();
 }
 
-async function sendFromAlias(app: LuftApp, server: MailServer, accounts: number[], {account, from, to, subject}: Sending) {
-  const area = await openComposer(app);
-  await chooseSender(app, area, accounts, account, 1, `choosing ${address(ALIASES[from])} shows it as the sender`);
-  await write(app, area, to, subject);
+async function sendFromAlias(app: LuftApp, server: MailServer, {from, to, subject}: Sending) {
+  await openComposer(app);
+  await chooseSender(app, address(ALIASES[from]), `choosing ${address(ALIASES[from])} shows it as the sender`);
+  await write(app, to, subject);
   press(Clutter.KEY_Control_L, Clutter.KEY_Return);
   const alias = address(ALIASES[from]);
   const sentFromAlias = new RegExp(`^from:.*<${alias.replaceAll('.', '\\.')}>`, 'im');
@@ -77,20 +59,19 @@ async function sendFromAlias(app: LuftApp, server: MailServer, accounts: number[
   require(!/^sender:/im.test(server.received(to, subject)), `mail sent from ${alias} carries no Sender header`);
 }
 
-async function checkCustomAddress(app: LuftApp, accounts: number[]) {
+async function checkCustomAddress(app: LuftApp) {
   const area = await openComposer(app);
   await saveBoth(app, area, 'mailman-composer');
-  await changes(app, 'clicking From opens the sender menu', () => app.click([area.x + FROM_TRIGGER_X, area.fromRow]));
+  await changes(app, 'clicking From opens the sender menu', async () => app.click(await app.find(SENDER)));
   await saveBoth(app, {...area, y: area.y - 20, height: area.height + 20}, 'mailman-composer-from');
-  await changes(app, 'Another address lets you type the sender', () => app.click(menuItem(area, accounts, 0, accounts[0] - 1)));
+  await changes(app, 'Another address lets you type the sender', async () => app.click(await app.find({text: 'Another address…', nth: 0})));
   type('someone@example.org');
   await saveBoth(app, area, 'mailman-composer-custom');
   await changes(app, 'Escape closes the composer', () => press(Clutter.KEY_Escape));
 }
 
 export async function checkSending(app: LuftApp, server: MailServer) {
-  const accounts = [3, 3];
-  await checkCustomAddress(app, accounts);
-  await sendFromAlias(app, server, accounts, {account: 0, from: 'alice', to: 'bob', subject: 'alias-over-smtp'});
-  await sendFromAlias(app, server, accounts, {account: 1, from: 'bob', to: 'alice', subject: 'alias-over-jmap'});
+  await checkCustomAddress(app);
+  await sendFromAlias(app, server, {from: 'alice', to: 'bob', subject: 'alias-over-smtp'});
+  await sendFromAlias(app, server, {from: 'bob', to: 'alice', subject: 'alias-over-jmap'});
 }

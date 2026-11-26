@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
-import {chord, drag, rest, type Point} from '../lib/input/input.js';
+import {chord, drag, rest} from '../lib/input/input.js';
 import {repository, scratch} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
@@ -14,12 +14,7 @@ import {checkPalette, saveBothStyles, withPalette, type Palette} from './lib/pal
 const {require, eventually} = checks('Luft app');
 const CONVERT_TIMEOUT = 30000;
 const SETTLE = 1500;
-const FIRST_SUGGESTION: Point = [800, 103];
-const QUEUE_BUTTON: Point = [943, 33];
-const EDIT_MODE: Point = [878, 33];
-const EDIT_MODE_BESIDE_QUEUE: Point = [842, 33];
-const REDACT_TOOL: Point = [334, 76];
-const KEEP_BOTH: Point = [682, 425];
+const EDIT_MODE = {role: 'radio', name: 'Edit'};
 const REDACTED_AREA = {x: 260, y: 260, width: 160, height: 80};
 const BLACK_TOLERANCE = 4;
 const REDACTED_SHARE = 0.9;
@@ -39,7 +34,7 @@ async function convert(app: LuftApp) {
 async function checkDropPickDone(app: LuftApp, folder: string, picture: string, palette: Palette) {
   await pause(SETTLE);
   (await app.settle(() => true)).save('convertible-file');
-  app.click(FIRST_SUGGESTION);
+  app.click(await app.find({role: 'radio', name: 'WebP'}));
   rest();
   await saveBothStyles(app, palette, 'convertible-format');
   await convert(app);
@@ -51,11 +46,11 @@ async function checkDropPickDone(app: LuftApp, folder: string, picture: string, 
 }
 
 async function checkRedaction(app: LuftApp, folder: string) {
-  app.click(QUEUE_BUTTON);
+  app.click(await app.find({role: 'button', name: 'Show the finished list'}));
   await pause(SETTLE);
-  app.click(EDIT_MODE_BESIDE_QUEUE);
+  app.click(await app.find(EDIT_MODE));
   await pause(SETTLE);
-  app.click(REDACT_TOOL);
+  app.click(await app.find({role: 'button', name: 'Redact'}));
   rest();
   (await app.settle(() => true)).save('convertible-edit');
   const [left, top] = [240, 240];
@@ -67,7 +62,7 @@ async function checkRedaction(app: LuftApp, folder: string) {
   await chord(Clutter.KEY_Control_L, Clutter.KEY_Return);
   await pause(SETTLE);
   (await app.frame()).save('convertible-conflict');
-  app.click(KEEP_BOTH);
+  app.click(await app.find({role: 'button', name: 'Keep both'}));
   await pause(SETTLE);
   const output = GLib.build_filenamev([folder, 'harbor (1).webp']);
   await eventually(() => exists(output), 'the edited picture is saved beside the first, without replacing it', CONVERT_TIMEOUT);
@@ -78,14 +73,14 @@ async function checkEditors(folder: string) {
   const song = repository('apps', 'store', 'convertible', 'desktop', 'tests', 'fixtures', 'tone.flac');
   await withApp('convertible', [clip], async app => {
     await pause(SETTLE);
-    app.click(EDIT_MODE);
+    app.click(await app.find(EDIT_MODE));
     await pause(SETTLE);
     (await app.settle(() => true)).save('convertible-video');
   });
   await withApp('convertible', [song], async app => {
     await pause(SETTLE);
     (await app.settle(() => true)).save('convertible-song');
-    app.click(EDIT_MODE);
+    app.click(await app.find(EDIT_MODE));
     await pause(SETTLE);
     (await app.settle(() => true)).save('convertible-trim');
   });

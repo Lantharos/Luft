@@ -11,6 +11,7 @@ import {inputMethodSettled} from '../lib/input/inputMethod.js';
 import {centerOf, click, hold, press, release, type Point} from '../lib/input/input.js';
 import {penTap} from '../lib/input/penStroke.js';
 import {LuftApp} from '../lib/apps/luftApp.js';
+import {middle} from '../lib/apps/probe.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled, waitUntil} from '../lib/wait.js';
@@ -19,7 +20,6 @@ import {palmWatchOver} from './lib/pen.js';
 import {fold, tap, touchDown, touchUp} from './lib/touch.js';
 
 const {require, eventually} = checks('on-screen keyboard');
-const ROVER_SEARCH: Point = [142, 32];
 const BROWSER_OPEN_TIMEOUT = 60000;
 const KEYBOARD_DELAY = 600;
 const WORD = 'luft';
@@ -240,7 +240,7 @@ async function checkSabine() {
   try {
     await rover.open();
     await settled();
-    await tapsOpen('the search field of a Sabine app', rover.at(ROVER_SEARCH));
+    await tapsOpen('the search field of a Sabine app', rover.at(middle(await rover.find({role: 'textbox', name: 'Search current folder'}))));
     await capture('tablet-keyboard-sabine');
     await hide('the Sabine app closes', () => rover.close());
   } finally {

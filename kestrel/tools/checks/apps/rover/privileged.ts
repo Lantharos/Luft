@@ -3,13 +3,12 @@ import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
-import {press, type Point} from '../../lib/input/input.js';
+import {press} from '../../lib/input/input.js';
 import {callLog} from '../../system/lib/systemCalls.js';
 import {changes} from '../lib/apps.js';
 import {children, write} from '../lib/files.js';
 
 const {eventually} = checks('Luft app');
-const FIRST_ROW: Point = [330, 104];
 const NAMES = ['Alder.txt', 'Birch.txt', 'Cedar.txt', 'Dogwood.txt'];
 const NOT_WRITABLE = 0o555;
 const WRITABLE = 0o755;
@@ -24,7 +23,7 @@ export async function checkPrivileged(app: LuftApp, folder: string, open: Open) 
   const left = () => children(folder).map(info => info.get_name()).sort().join(', ');
   try {
     await open(app, folder);
-    await changes(app, 'Rover selects a file in a folder the account can’t change', () => app.click(FIRST_ROW));
+    await changes(app, 'Rover selects a file in a folder the account can’t change', async () => app.click(await app.find({text: 'Alder.txt'})));
     await changes(app, 'Ctrl+A selects them all', () => press(Clutter.KEY_Control_L, Clutter.KEY_a));
     press(Clutter.KEY_Delete);
     await eventually(() => left() === '' && asked() === 'Files1.Trash 4', 'Rover asks an administrator once to trash four files it can’t move itself');

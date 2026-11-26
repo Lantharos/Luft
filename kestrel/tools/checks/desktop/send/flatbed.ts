@@ -5,7 +5,7 @@ import {showsText} from '../../lib/actors.js';
 import {appBinary, LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
-import {click, type Point} from '../../lib/input/input.js';
+import {click} from '../../lib/input/input.js';
 import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
 import {changes} from '../../apps/lib/apps.js';
@@ -13,10 +13,7 @@ import {withScheme} from '../../apps/lib/palette.js';
 
 const {require, eventually} = checks('Send sheet');
 const FLATBED = 'com.lantharos.flatbed';
-const OPEN_PICTURES: Point = [800, 733];
-const SAVE: Point = [980, 29];
-const SAVE_IN_DIALOG: Point = [813, 553];
-const SEND: Point = [367, 436];
+const SAVE = {role: 'button', name: 'Save…'};
 const SAVING_MS = 60000;
 
 const answer = (path: string) => call('org.freedesktop.impl.portal.desktop.rover', '/org/freedesktop/portal/desktop',
@@ -34,13 +31,13 @@ export async function checkFlatbed(sheet: () => Clutter.Actor | null, choice: (n
     await app.open();
     await settled(1500);
     await answer(picture);
-    await changes(app, 'Flatbed takes a page from a picture', () => app.click(OPEN_PICTURES));
-    await changes(app, 'Save asks for a name and a format', () => app.click(SAVE));
+    await changes(app, 'Flatbed takes a page from a picture', async () => app.click(await app.find({role: 'button', name: 'Open pictures…'})));
+    await changes(app, 'Save asks for a name and a format', async () => app.click(await app.find(SAVE)));
     await answer(saved);
-    app.click(SAVE_IN_DIALOG);
+    app.click(await app.find(SAVE));
     await eventually(() => GLib.file_test(saved, GLib.FileTest.EXISTS), 'Flatbed saves the PDF where it was asked to', SAVING_MS);
     await settled(1500);
-    app.click(SEND);
+    app.click(await app.find({role: 'button', name: 'Send…'}));
     const open = await eventually(sheet, 'Send… in Flatbed opens the Send sheet');
     require(showsText('Send “Receipt.pdf”', open), 'for the PDF it saved');
     require(!choice('Flatbed'), 'without offering Flatbed itself');

@@ -1,7 +1,6 @@
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {resetBattery, setBattery, UPOWER_STATE, type BatteryValues} from '../lib/battery.js';
 import {checks} from '../lib/check.js';
-import type {Point} from '../lib/input/input.js';
 import {callLog} from '../system/lib/systemCalls.js';
 import {withApp} from './lib/apps.js';
 import {withScheme} from './lib/palette.js';
@@ -27,14 +26,12 @@ async function showState(app: LuftApp, name: string, values: BatteryValues) {
   (await app.settle(() => true)).save(`settings-battery-${name}`);
 }
 
-const LIMIT_SWITCH: Point = [958, 400];
-
 async function checkLimit(app: LuftApp) {
   await showState(app, 'limit-by-firmware', {ChargeThresholdSupported: true, ChargeThresholdEnabled: false, ChargeStartThreshold: 0, ChargeEndThreshold: 0});
   await showState(app, 'limit', {ChargeStartThreshold: 75, ChargeEndThreshold: 80});
   const calls = callLog();
   calls();
-  app.click(LIMIT_SWITCH);
+  app.click(await app.find({role: 'switch', name: 'Limit charging'}));
   await eventually(() => calls().includes('EnableChargeThreshold true'), 'the charge limit switch asks UPower to limit charging');
   (await app.settle(() => true)).save('settings-battery-limit-on');
 }

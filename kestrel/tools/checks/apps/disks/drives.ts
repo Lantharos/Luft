@@ -7,7 +7,7 @@ import {checks} from '../../lib/check.js';
 import {type} from '../../lib/input/input.js';
 import {scratch} from '../../lib/processes.js';
 import {exists} from '../lib/files.js';
-import type {Driver} from './driver.js';
+import {more, type Driver} from './driver.js';
 
 const {require, eventually} = checks('Luft app');
 const ARCHIVE = 'archive-luks';
@@ -19,7 +19,7 @@ const same = (a: Uint8Array, b: Uint8Array) => a.length === b.length && a.every(
 export const copied = (from: string, to: string) => exists(to) && same(bytes(from), bytes(to));
 
 export async function checkRemovable(driver: Driver) {
-  await driver.click('more');
+  await driver.click(more('TRAVEL'));
   await driver.click('unmount');
   await driver.called(['udisks Unmount /dev/sdb1'], 'disks opens on the drive holding a mounted folder and unmounts it');
   await driver.click('mount');
@@ -27,7 +27,7 @@ export async function checkRemovable(driver: Driver) {
 
   const candidates = ['Documents/TRAVEL.img', 'TRAVEL.img'].map(name => GLib.build_filenamev([GLib.get_home_dir(), name]));
   candidates.forEach(candidate => GLib.unlink(candidate));
-  await driver.click('more');
+  await driver.click(more('TRAVEL'));
   (await driver.click('saveImage')).save('disks-save-image-dark');
   await driver.tab();
   await driver.key(Clutter.KEY_Return);
@@ -36,7 +36,7 @@ export async function checkRemovable(driver: Driver) {
   const image = await eventually(() => candidates.find(candidate => copied(source, candidate)), 'disks saves a partition as a disk image byte for byte', COPY_TIMEOUT);
   await driver.click('done');
 
-  await driver.click('more');
+  await driver.click(more('TRAVEL'));
   (await driver.click('format')).save('disks-format-dark');
   await driver.tab(1, true);
   await driver.key(Clutter.KEY_Return);
@@ -59,7 +59,7 @@ export async function checkEncrypted(driver: Driver, keyring: ScratchKeyring) {
   require(keyring.items.some(item => item.attributes['gvfs-luks-uuid'] === ARCHIVE && item.secret === PASSPHRASE),
     'disks remembers the passphrase where the desktop looks when the drive is plugged in');
 
-  await driver.click('more');
+  await driver.click(more('Archive'));
   await driver.click('lock');
   await driver.called(['udisks Lock /dev/sda1'], 'disks locks an encrypted partition');
   keyring.forget();
@@ -78,11 +78,11 @@ export async function checkHealth(driver: Driver) {
   await driver.tab(2, true);
   await driver.key(Clutter.KEY_Return);
   await driver.called(['udisks SelftestStart short Seagate_Barracuda'], 'disks starts a quick self-test on a failing drive');
+  await driver.click('done');
 }
 
 export async function checkEncryption(driver: Driver) {
-  await driver.click('seagate');
-  await driver.click('more');
+  await driver.click(more('Old Windows'));
   (await driver.click('turnOn')).save('disks-encrypt-dark');
   (await driver.click('checked')).save('disks-encrypt-key-dark');
   (await driver.click('writeDown')).save('disks-encrypt-write-down-dark');
@@ -96,7 +96,7 @@ export async function checkEncryption(driver: Driver) {
   (await driver.app.settle(() => true)).save('disks-encrypting-dark');
 
   await driver.click('wdc');
-  await driver.click('more');
+  await driver.click(more('Archive'));
   (await driver.click('encryption')).save('disks-encryption-dark');
   await driver.tab();
   await driver.key(Clutter.KEY_space);

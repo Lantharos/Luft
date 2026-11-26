@@ -5,7 +5,8 @@ import type Meta from 'gi://Meta';
 
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
-import {centerOf, click, drag, press, type, type Point} from '../../lib/input/input.js';
+import {middle} from '../../lib/apps/probe.js';
+import {centerOf, click, drag, press, type} from '../../lib/input/input.js';
 import {builtFixture, fixture, outcome, scratch} from '../../lib/processes.js';
 import {pause, waitUntil} from '../../lib/wait.js';
 import {changes, openApp} from '../lib/apps.js';
@@ -24,7 +25,6 @@ const LEFT = 10;
 const TOP = 20;
 const RECEIVER_LEFT = 640;
 const MOVED_MS = 400;
-const FIRST_ROW: Point = [338, 104];
 const DRAG = {steps: 24, interval: 30, hover: 500};
 
 const installedExtension = (argument: string) =>
@@ -57,14 +57,15 @@ async function handOver(rover: LuftApp, receiver: Receiver, what: string) {
   receiver.window.make_above();
   await pause(MOVED_MS);
   rover.window.activate(global.get_current_time());
-  await drag(rover.at(FIRST_ROW), centerOf(receiver.window.get_compositor_private<Meta.WindowActor>()), DRAG);
+  const handed = rover.at(middle(await rover.find({text: HANDED})));
+  await drag(handed, centerOf(receiver.window.get_compositor_private<Meta.WindowActor>()), DRAG);
   const dropped = await receiver.next(`a file dragged from Rover reaches ${what}`);
   reportHanded(`${what}, dropped on,`, dropped);
   require(dropped.how === 'drop' && readable(dropped), `a file dragged from Rover onto ${what} is readable in its sandbox`);
   const clipboard = St.Clipboard.get_default();
   clipboard.set_text(St.ClipboardType.CLIPBOARD, '');
   rover.window.activate(global.get_current_time());
-  click(rover.at(FIRST_ROW));
+  click(rover.at(middle(await rover.find({text: HANDED}))));
   press(Clutter.KEY_Control_L, Clutter.KEY_c);
   await waitUntil(() => clipboard.get_mimetypes(St.ClipboardType.CLIPBOARD).includes(URI_LIST), 'Rover copies the file');
   const pasted = await receiver.paste(`a file copied in Rover is pasted into ${what}`);

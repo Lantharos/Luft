@@ -7,6 +7,7 @@ import type Meta from 'gi://Meta';
 import {atSessionEnd} from '../../../automation/runner.js';
 import {appFolder, requireFresh} from './freshness.js';
 import {prepareHome} from './home.js';
+import {describe, middle, Probe, type Box, type Query} from './probe.js';
 import {call} from '../dbus.js';
 import {click, type Point} from '../input/input.js';
 import {outcome, repository, spawn, type Process} from '../processes.js';
@@ -21,6 +22,7 @@ const LOG_LINES = 40;
 const SETTLE_TIMEOUT = 5000;
 const SETTLE_INTERVAL = 50;
 const CHANGE_TIMEOUT = 5000;
+const FIND_TIMEOUT = 5000;
 const SABINE = GLib.build_filenamev([GLib.get_user_data_dir(), 'sabine']);
 
 interface Service {
@@ -103,6 +105,8 @@ const readJson = (path: string) => JSON.parse(new TextDecoder().decode(GLib.file
 const resting = (actor: Meta.WindowActor) =>
   actor.mapped && actor.opacity === 255 && actor.scale_x === 1 && actor.scale_y === 1 && actor.translation_x === 0 && actor.translation_y === 0;
 
+const scaled = ({x, y, width, height}: Box, ratio: number): Box => ({x: x * ratio, y: y * ratio, width: width * ratio, height: height * ratio});
+
 const alive = (pid: number) => GLib.file_test(`/proc/${pid}`, GLib.FileTest.EXISTS);
 
 function sessionDaemon(): number | null {
@@ -144,6 +148,7 @@ export class LuftApp {
   window!: Meta.Window;
   private _log: string[] = [];
   private readonly _process: Process;
+  private readonly _probe = new Probe();
   private _painted = false;
   private _exited = false;
 
@@ -155,7 +160,7 @@ export class LuftApp {
       throw new Error(`${name} is not built at ${path}`);
     const argv = slice ? inScope(slice, this.id, [path, ...args]) : [path, ...args];
     const scoped: Record<string, string> = slice ? {XDG_RUNTIME_DIR: GLib.get_user_runtime_dir()} : {};
-    this._process = spawn(argv, {env: {...environment(manifest), ...env, ...scoped}, flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
+    this._process = spawn(argv, {env: {...environment(manifest), ...env, ...scoped, LUFT_APP_PROBE: this._probe.socket}, flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
     this._process.exited.then(() => (this._exited = true));
     readLines(this._process.get_stderr_pipe()!, line => {
       this._log = [...this._log.slice(1 - LOG_LINES), line];
@@ -209,8 +214,39 @@ export class LuftApp {
     return {x: frame.x + x, y: frame.y + y, width, height: height ?? frame.height - y};
   }
 
-  click(point: Point, button: number = Clutter.BUTTON_PRIMARY) {
-    click(this.at(point), button);
+  click(target: Point | Box, button: number = Clutter.BUTTON_PRIMARY) {
+    click(this.at(Array.isArray(target) ? target : middle(target)), button);
+  }
+
+  private ratio(scale: number) {
+    return scale / global.display.get_monitor_scale(this.window.get_monitor());
+  }
+
+  async all(query: Query): Promise<Box[]> {
+    const {scale, matches} = await this._probe.ask(query);
+    return matches.filter(match => match.hit).map(match => scaled(match, this.ratio(scale)));
+  }
+
+  async find(query: Query, timeout = FIND_TIMEOUT): Promise<Box> {
+    let found = 0;
+    let alike: string[] = [];
+    let last: string | null = null;
+    const stillBox = async () => {
+      const answer = await this._probe.ask(query);
+      const {scale, matches} = answer;
+      found = matches.length;
+      alike = answer.alike;
+      const match = query.nth === undefined ? (found === 1 ? matches[0] : undefined) : matches[query.nth];
+      const seen = last;
+      last = JSON.stringify(match ?? null);
+      return match?.hit && seen === last && scaled(match, this.ratio(scale));
+    };
+    try {
+      return await waitUntil(stillBox, `${this.name} shows ${describe(query)}`, timeout);
+    } catch (error) {
+      if (error instanceof Timeout) error.message += ` (it found ${found}${alike.length ? `, among ${alike.map(name => `“${name}”`).join(', ')}` : ''})\n${this.log}`;
+      throw error;
+    }
   }
 
   frame(area: Area = this.window.get_frame_rect()) {
@@ -245,6 +281,7 @@ export class LuftApp {
   }
 
   async close() {
+    this._probe.close();
     if (this._exited) return;
     this._process.send_signal(15);
     await this._process.exited;

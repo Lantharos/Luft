@@ -9,11 +9,11 @@
 
 	let { item }: { item: Item } = $props();
 
-	const TABS: { value: Tab; label: string }[] = [
+	const tabs: { value: Tab; label: string }[] = $derived([
 		{ value: 'preview', label: t('magpie-font-preview') },
 		{ value: 'characters', label: t('magpie-font-characters') },
 		{ value: 'details', label: t('magpie-font-details') }
-	];
+	]);
 
 	$effect(() => {
 		void fontState.open(item.path);
@@ -31,7 +31,7 @@
 	{:else if fontState.face}
 		<div class="flex flex-none justify-center pb-2">
 			<div class="w-[340px]">
-				<Segmented label={t('magpie-font-view')} options={TABS} value={fontState.tab} onchange={(tab) => (fontState.tab = tab)} />
+				<Segmented label={t('magpie-font-view')} options={tabs} value={fontState.tab} onchange={(tab) => (fontState.tab = tab)} />
 			</div>
 		</div>
 		{#if fontState.tab === 'preview'}

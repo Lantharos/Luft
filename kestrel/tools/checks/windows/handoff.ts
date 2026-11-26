@@ -21,7 +21,6 @@ const BROWSER_FOCUS_TIMEOUT = 15000;
 const NO_LAUNCH_TOKEN = {XDG_ACTIVATION_TOKEN: null, DESKTOP_STARTUP_ID: null};
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Handoff check']);
 const BACKGROUND: Point = [500, 200];
-const TERMINAL_HERE = [98, 192];
 const LINK = 'http://127.0.0.1:9/harbour';
 const UNPROMPTED_LINK = 'http://127.0.0.1:9/unprompted';
 const BODY: Point = [620, 420];
@@ -48,8 +47,7 @@ async function openTerminalHere(rover: LuftApp) {
   rover.window.activate(global.get_current_time());
   await eventually(() => rover.window.has_focus(), 'Rover is in front');
   await changes(rover, 'right-clicking the folder opens its menu', () => rover.click(BACKGROUND, Clutter.BUTTON_SECONDARY));
-  const [x, y] = BACKGROUND;
-  rover.click([x + TERMINAL_HERE[0], y + TERMINAL_HERE[1]]);
+  rover.click(await rover.find({role: 'menuitem', name: 'Open terminal here'}));
 }
 
 async function checkTerminal() {

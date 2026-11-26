@@ -14,8 +14,6 @@ const {require, eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
 const DOWNLOAD_TIMEOUT = 45000;
 const ACCENT_TOLERANCE = 6;
-const DOWNLOAD: Point = [1128, 244];
-const ROW_PROGRESS = {x: 510, y: 274, width: 690, height: 50};
 const SIDEBAR = {x: 52, y: 60, width: 216};
 const SIDEBAR_POINT: Point = [140, 500];
 const SIDEBAR_STEPS = 10;
@@ -54,6 +52,11 @@ class Updates {
   async progress(area: Region) {
     return (await this.app.frame(this.app.area(area))).count([this.accent], ACCENT_TOLERANCE);
   }
+
+  async pageProgress() {
+    const [bar] = await this.app.all({role: 'progressbar', within: {role: 'main'}});
+    return bar ? this.progress(bar) : 0;
+  }
 }
 
 async function checkDownload(updates: Updates) {
@@ -61,9 +64,9 @@ async function checkDownload(updates: Updates) {
   require(await updates.progress(SIDEBAR) === 0, 'the Updates entry shows no progress while nothing runs');
   (await updates.app.frame()).save('settings-updates-available');
 
-  updates.app.click(DOWNLOAD);
+  updates.app.click(await updates.app.find({role: 'button', name: 'Download'}));
   let started = 0;
-  await eventually(async () => (started = await updates.progress(ROW_PROGRESS)) > 0, 'Updates shows the download progress');
+  await eventually(async () => (started = await updates.pageProgress()) > 0, 'Updates shows the download progress');
   (await updates.app.frame()).save('settings-updates-downloading');
 
   await followLink('settings', 'kestrel-settings:accounts');
@@ -77,9 +80,9 @@ async function checkDownload(updates: Updates) {
   await followLink('settings', 'kestrel-settings:system');
   await eventually(async () => await updates.progress(SIDEBAR) === 0, 'the sidebar leaves the progress to the Updates page while it is open');
   let back = 0;
-  await eventually(async () => (back = await updates.progress(ROW_PROGRESS)) > started, 'coming back to Updates shows the download where it is');
+  await eventually(async () => (back = await updates.pageProgress()) > started, 'coming back to Updates shows the download where it is');
   (await updates.app.frame()).save('settings-updates-back');
-  await eventually(async () => await updates.progress(ROW_PROGRESS) > back, 'the download keeps advancing after coming back to Updates');
+  await eventually(async () => await updates.pageProgress() > back, 'the download keeps advancing after coming back to Updates');
   require(await updates.downloads() === 1, 'navigating during the download starts no second download');
   return back;
 }
@@ -87,10 +90,10 @@ async function checkDownload(updates: Updates) {
 async function checkReopening(updates: Updates, back: number) {
   await updates.app.close();
   await updates.open({ready: false});
-  await eventually(async () => await updates.progress(ROW_PROGRESS) > back, 'reopening Settings picks up the running download');
+  await eventually(async () => await updates.pageProgress() > back, 'reopening Settings picks up the running download');
   (await updates.app.frame()).save('settings-updates-reopened');
   require(await updates.downloads() === 0, 'reopening Settings during the download starts no second download');
-  await eventually(async () => await updates.progress(ROW_PROGRESS) === 0, 'the download finishes', DOWNLOAD_TIMEOUT);
+  await eventually(async () => await updates.pageProgress() === 0, 'the download finishes', DOWNLOAD_TIMEOUT);
   (await updates.app.settle(() => true)).save('settings-updates-ready');
 }
 

@@ -1,7 +1,7 @@
 import {type} from '../../lib/input/input.js';
 import {squareCorners} from '../lib/corners.js';
 import {saveBothStyles, type Palette} from '../lib/palette.js';
-import type {Driver} from './driver.js';
+import {more, type Driver} from './driver.js';
 
 async function saveLooks(driver: Driver, palette: Palette, name: string) {
   await saveBothStyles(driver.app, palette, name);
@@ -11,7 +11,7 @@ async function saveLooks(driver: Driver, palette: Palette, name: string) {
 export async function checkMoveLuft(driver: Driver, palette: Palette) {
   await driver.click('seagate');
   await driver.click('samsung');
-  await driver.click('moreDrive');
+  await driver.click(more('Samsung SSD 990 PRO 1TB'));
   await driver.click('moveLuft');
   await saveLooks(driver, palette, 'disks-move-drive');
   await driver.click('moveToSeagate');

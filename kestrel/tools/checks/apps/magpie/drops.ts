@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {writeDocument, writePicture} from '../../lib/access/printing.js';
 import type {LuftApp} from '../../lib/apps/luftApp.js';
+import {middle} from '../../lib/apps/probe.js';
 import {checks} from '../../lib/check.js';
 import {drag, press, type, type Point} from '../../lib/input/input.js';
 import {outcome} from '../../lib/processes.js';
@@ -16,8 +17,6 @@ const LEFT = 10;
 const TOP = 20;
 const MAGPIE_LEFT = 640;
 const MOVED_MS = 400;
-const FIRST_ROW: Point = [338, 104];
-const ROW_HEIGHT = 36;
 const ON_THE_PAGE: Point = [420, 400];
 const ON_THE_SIDEBAR: Point = [90, 400];
 const COLOR_TOLERANCE = 16;
@@ -28,7 +27,7 @@ const DRAG = {steps: 24, interval: 30, hover: 500};
 
 interface Sample {
   kind: string;
-  row: number;
+  file: string;
   shown: (frame: Frame) => boolean;
 }
 
@@ -37,10 +36,10 @@ const videoOn = (frame: Frame) => frame.share(['#00ff00', '#ff00ff'], BAR_TOLERA
 const pageOn = (frame: Frame) => frame.share(['#ffffff'], COLOR_TOLERANCE) > PICTURE_SHARE;
 
 const SAMPLES: Sample[] = [
-  {kind: 'video', row: 0, shown: videoOn},
-  {kind: 'PDF', row: 1, shown: pageOn},
-  {kind: 'picture', row: 2, shown: pictureOn},
-  {kind: 'song', row: 3, shown: frame => !pictureOn(frame) && !videoOn(frame) && !pageOn(frame)},
+  {kind: 'video', file: 'Clip.webm', shown: videoOn},
+  {kind: 'PDF', file: 'Paper.pdf', shown: pageOn},
+  {kind: 'picture', file: 'Picture.png', shown: pictureOn},
+  {kind: 'song', file: 'Song.flac', shown: frame => !pictureOn(frame) && !videoOn(frame) && !pageOn(frame)},
 ];
 
 const inFolder = (name: string) => GLib.build_filenamev([FOLDER, name]);
@@ -71,9 +70,8 @@ async function overlap(rover: LuftApp, magpie: LuftApp) {
   await pause(MOVED_MS);
 }
 
-async function dropOn(rover: LuftApp, magpie: LuftApp, {kind, row, shown}: Sample, at: Point, where: string) {
-  const [x, y] = FIRST_ROW;
-  await drag(rover.at([x, y + row * ROW_HEIGHT]), magpie.at(at), DRAG);
+async function dropOn(rover: LuftApp, magpie: LuftApp, {kind, file, shown}: Sample, at: Point, where: string) {
+  await drag(rover.at(middle(await rover.find({text: file}))), magpie.at(at), DRAG);
   const opened = await magpie.settle(shown);
   await capture(`magpie-drop-${where.replaceAll(' ', '-')}-${kind.toLowerCase()}`);
   require(shown(opened), `a ${kind} dropped from Rover on ${where} opens in Magpie`);

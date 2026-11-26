@@ -7,7 +7,7 @@ import {scratch} from '../lib/processes.js';
 import {withApp} from './lib/apps.js';
 import {exists, removeTree} from './lib/files.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
-import {Driver} from './disks/driver.js';
+import {Driver, more} from './disks/driver.js';
 import {checkEncrypted, checkEncryption, checkHealth, checkRemovable, copied} from './disks/drives.js';
 import {checkEditing} from './disks/editing.js';
 import {trashed, writeSpace} from './disks/space.js';
@@ -60,7 +60,7 @@ async function checkSpace() {
   try {
     await withDriver([`disks-space://${root}`], async driver => {
       (await driver.app.settle(() => true)).save('disks-space-dark');
-      await driver.click('largest');
+      await driver.click(more('Videos'));
       await driver.click('trash');
       await driver.tab(1, true);
       await driver.key(Clutter.KEY_Return);
@@ -80,7 +80,7 @@ export async function run() {
       await checkPalette(driver.app, palette);
       await showDark(driver.app, palette);
       await checkEditing(driver, palette);
-      await checkSystemVolume(driver, palette);
+      await checkSystemVolume(driver);
     }, LUFT_ROOT);
     await checkWriteImage(await checkDrives());
     await checkSpace();

@@ -7,7 +7,6 @@ import {capture} from '../../lib/screenshots.js';
 import {pause, settled} from '../../lib/wait.js';
 import {withApp} from '../lib/apps.js';
 import {IN_SESSION, install, launchLine, SABINE_BUILDER} from '../lib/appImages.js';
-import type {Point} from '../../lib/input/input.js';
 import {scrollToEnd, showEnd} from '../settings/navigation.js';
 import {answer, answers, checkOnlySchelfAsks, notificationTitled, DRIVE_LABEL, DRIVE_SIZE, driveFolder, eventually, Looker, mount, require, setAnswer,
   shownDialog, unmount} from './drive.js';
@@ -58,13 +57,11 @@ async function checkAsked(id: string, folder: string) {
   await looker.close();
 }
 
-const HARVEST_ROW: Point = [660, 589];
-
 async function captureGiven(id: string) {
   await withApp('schelf', [`schelf:app?${id}`], async app => (await scrollToEnd(app, await app.settle(() => true))).save('schelf-drives'));
   await withApp('settings', [], async app => {
     const shown = await showEnd(app, 'apps');
-    app.click(HARVEST_ROW);
+    app.click(await app.find({role: 'button', has: {text: 'Harvest'}}));
     (await app.settle(frame => !frame.looksLike(shown))).save('settings-apps-drives');
   });
 }

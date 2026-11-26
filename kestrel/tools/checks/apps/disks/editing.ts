@@ -2,19 +2,14 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
-import type {Frame} from '../../lib/screenshots.js';
 import {exists, removeTree} from '../lib/files.js';
-import {showDark, useScheme, type Colors, type Palette} from '../lib/palette.js';
+import {showDark, useScheme, type Palette} from '../lib/palette.js';
 import {followLink} from '../lib/apps.js';
-import type {Control, Driver} from './driver.js';
+import {more, type Control, type Driver} from './driver.js';
 import {trashed, writeSpace} from './space.js';
 
 const {require, eventually} = checks('Luft app');
-const DONE_X = 744;
-const SPACE_BUTTON = [565, 720];
-const ACCENT_TOLERANCE = 24;
-const SURFACE_TOLERANCE = 4;
-const BUTTON_PIXELS = 12;
+const SEE_SPACE = {role: 'button', name: 'See what’s using space'};
 const PLAN_TIMEOUT = 15000;
 const PLAN = [
   'udisks Delete /dev/sdd5',
@@ -27,45 +22,33 @@ const PLAN = [
   'udisks CreatePartitionAndFormat /dev/sdd ext4 size=1073741824 name=lab-data',
 ];
 
-function actionsRow(frame: Frame, accent: string) {
-  const rows: number[] = [];
-  for (let y = 120; y < 700; y++) if (frame.near(DONE_X, y, accent, ACCENT_TOLERANCE)) rows.push(y);
-  return rows.length ? rows[Math.floor(rows.length / 2)] : null;
-}
-
-function spaceButtonAt(frame: Frame, colors: Colors) {
-  const y = require(actionsRow(frame, colors.primary), 'the details dialog has a Done button');
-  let button = 0;
-  for (let x = SPACE_BUTTON[0]; x < SPACE_BUTTON[1]; x += 2) if (!frame.near(x, y, colors.surfaceContainerHigh, SURFACE_TOLERANCE)) button++;
-  return button >= BUTTON_PIXELS ? y : null;
-}
-
-export async function details(driver: Driver, name: Control, palette: Palette) {
-  return spaceButtonAt(await driver.click(name), palette.dark);
+export async function details(driver: Driver, name: Control) {
+  await driver.click(name);
+  return (await driver.app.all(SEE_SPACE))[0] ?? null;
 }
 
 export async function trashLargest(driver: Driver, folder: string, name: string, label: string) {
   const before = trashed(name);
-  await driver.click('largest');
+  await driver.click(more(name));
   await driver.click('trash');
   await driver.tab(1, true);
   await driver.key(Clutter.KEY_Return);
   await eventually(() => !exists(GLib.build_filenamev([folder, name])) && trashed(name) === before + 1, label);
 }
 
-async function checkSpaceFromDisks(driver: Driver, palette: Palette) {
+async function checkSpaceFromDisks(driver: Driver) {
   for (const [name, label] of [['efi', 'EFI system partition'], ['boot', 'small /boot partition']] as const) {
-    require(await details(driver, name, palette) === null, `disks doesn't offer to measure the ${label}`);
+    require(await details(driver, name) === null, `disks doesn't offer to measure the ${label}`);
     await driver.key(Clutter.KEY_Escape);
   }
-  require(await details(driver, 'fedora', palette) !== null, 'disks offers to measure the partition the system runs from');
+  require(await details(driver, 'fedora') !== null, 'disks offers to measure the partition the system runs from');
   await driver.key(Clutter.KEY_Escape);
 
   const root = writeSpace();
   try {
     await driver.click('lab');
-    const button = require(await details(driver, 'projects', palette), 'disks offers to measure a mounted data partition');
-    (await driver.act('disks measures the partition', () => driver.app.click([SPACE_BUTTON[0] + 40, button]))).save('disks-space-from-details-dark');
+    const button = require(await details(driver, 'projects'), 'disks offers to measure a mounted data partition');
+    (await driver.act('disks measures the partition', () => driver.app.click(button))).save('disks-space-from-details-dark');
     await trashLargest(driver, root, 'Videos', 'see what’s using space from a partition’s details measures it and trashes its largest folder');
 
     const music = GLib.build_filenamev([root, 'Music']);
@@ -82,7 +65,7 @@ function inOrder(seen: string[], expected: string[]) {
 }
 
 async function checkPlan(driver: Driver, palette: Palette) {
-  for (const step of ['lab', 'moreDrive', 'editPartitions', 'barProjects', 'deleteProjects', 'undo', 'barScratch', 'deleteScratch', 'barRaw', 'exact'] as const)
+  for (const step of ['lab', more('Kingston A400'), 'editPartitions', 'barProjects', 'delete', 'undo', 'barScratch', 'delete', 'barRaw', 'exact'] as const)
     await driver.click(step);
   await driver.tab(3, true);
   await driver.enter('0');
@@ -112,6 +95,6 @@ async function checkPlan(driver: Driver, palette: Palette) {
 }
 
 export async function checkEditing(driver: Driver, palette: Palette) {
-  await checkSpaceFromDisks(driver, palette);
+  await checkSpaceFromDisks(driver);
   await checkPlan(driver, palette);
 }

@@ -15,9 +15,6 @@ import {checkPalette, withPalette} from './lib/palette.js';
 const {require, eventually} = checks('Luft app');
 const MENU_AT: Point = [220, 220];
 const MENU = {x: 220, y: 220, width: 200, height: 330};
-const MENU_ITEM = {copy: 0, paste: 1, selectAll: 2};
-const MENU_PADDING = 4;
-const MENU_ITEM_HEIGHT = 38;
 const FIRST_LINE = {x: 0, y: 50, width: 300, height: 22};
 const PROMPT_LINE = {x: 0, y: 86, width: 300, height: 22};
 const DIALOG = {x: 200, y: 190, width: 560, height: 240};
@@ -46,17 +43,16 @@ const copy = (text: string) => clipboard.set_text(St.ClipboardType.CLIPBOARD, te
 
 const openMenu = (app: LuftApp) => changes(app, 'right-clicking terminal opens its menu', () => app.click(MENU_AT, Clutter.BUTTON_SECONDARY), MENU);
 
-function pick(app: LuftApp, item: keyof typeof MENU_ITEM) {
-  const [x, y] = MENU_AT;
-  return changes(app, `choosing ${item} closes the menu`, () => app.click([x + 40, y + MENU_PADDING + MENU_ITEM_HEIGHT * (MENU_ITEM[item] + 0.5)]), MENU);
+function pick(app: LuftApp, item: string) {
+  return changes(app, `choosing ${item} closes the menu`, async () => app.click(await app.find({role: 'menuitem', name: item})), MENU);
 }
 
 async function checkMenu(app: LuftApp) {
   await openMenu(app);
-  await changes(app, 'Select all highlights the printed text', () => pick(app, 'selectAll'), FIRST_LINE);
+  await changes(app, 'Select all highlights the printed text', () => pick(app, 'Select all'), FIRST_LINE);
   (await app.frame()).save('terminal-select-all');
   await openMenu(app);
-  await pick(app, 'copy');
+  await pick(app, 'Copy');
   await eventually(async () => (await readClipboard())?.includes(PRINTED), 'terminal selects everything and copies it from the context menu');
   await changes(app, 'clicking clears the selection', () => app.click(MENU_AT), FIRST_LINE);
 }
@@ -65,7 +61,7 @@ async function checkPasting(app: LuftApp, result: string) {
   copy(MENU_PASTE);
   await openMenu(app);
   (await app.frame()).save('terminal-menu');
-  await pick(app, 'paste');
+  await pick(app, 'Paste');
   await changes(app, 'the script asks for a password', () => press(Clutter.KEY_Return), PROMPT_LINE);
 
   copy(CANCELLED);
@@ -75,7 +71,7 @@ async function checkPasting(app: LuftApp, result: string) {
 
   copy(CONFIRMED);
   await openMenu(app);
-  await changes(app, 'pasting several lines from the menu asks too', () => pick(app, 'paste'), DIALOG);
+  await changes(app, 'pasting several lines from the menu asks too', () => pick(app, 'Paste'), DIALOG);
   press(Clutter.KEY_Return);
 
   const received = await eventually(() => readResult(result), 'the password prompt receives the paste');

@@ -4,7 +4,6 @@ import GLib from 'gi://GLib';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import {pause, waitUntil} from '../../../lib/wait.js';
-import type {Point} from '../../../lib/input/input.js';
 import {installBuilt, listed, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
 import {installOwn} from '../../../extensions/lib/sandbox.js';
 import {page, placeApps, placeSpotify, removeSpotify, TAILOR} from '../../../extensions/lib/tailor.js';
@@ -13,10 +12,6 @@ import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 import {checkUnreviewed} from './unreviewed.js';
 
 const {eventually, require} = checks('Luft app');
-const HEAVY: Point = [952, 330];
-const SEASONS_SWITCH: Point = [928, 126];
-const LEFT_EDGE: Point = [899, 270];
-const RIGHT_EDGE: Point = [958, 270];
 const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -41,11 +36,11 @@ async function checkOwnPages(app: LuftApp) {
     await setSetting(VISUALIZER, 'edges', new GLib.Variant('as', ['top', 'bottom', 'right']));
     await app.changes(oneEdge, 'the edges picked elsewhere show as picked in Settings');
     (await app.settle(() => true)).save('settings-extension-visualizer-edges');
-    app.click(LEFT_EDGE);
+    app.click(await app.find({role: 'button', name: 'Left'}));
     await eventually(async () => String(await setting(VISUALIZER, 'edges')) === 'top,bottom,left,right', 'clicking an edge adds it to the others');
     await setSetting(VISUALIZER, 'edges', new GLib.Variant('as', ['right']));
     await app.settle(() => true);
-    app.click(RIGHT_EDGE);
+    app.click(await app.find({role: 'button', name: 'Right'}));
     await pause(300);
     require(String(await setting(VISUALIZER, 'edges')) === 'right', 'the last edge can’t be turned off');
     await request('Disable', VISUALIZER);
@@ -132,7 +127,7 @@ async function checkSandboxedPage(app: LuftApp) {
 async function checkListSwitch(app: LuftApp) {
   const titles = app.area({x: 300, y: 50, width: 580});
   const list = await app.frame(titles);
-  app.click(SEASONS_SWITCH);
+  app.click(await app.find({role: 'switch', name: 'Turn on Seasons'}));
   await eventually(async () => (await listed(SEASONS))?.enabled === false, 'the switch in the list turns Seasons off');
   (await app.settle(() => true)).save('settings-extensions-switched');
   require((await app.frame(titles)).looksLike(list), 'pressing the switch leaves the list where it was');
@@ -151,7 +146,7 @@ export async function checkExtensions(app: LuftApp) {
     await setSetting(SEASONS, 'on', new GLib.Variant('b', true));
     await app.changes(off, 'turning Seasons on elsewhere shows its other settings in Settings');
     (await app.settle(() => true)).save('settings-extension-seasons-on');
-    app.click(HEAVY);
+    app.click(await app.find({role: 'radio', name: 'Heavy'}));
     await eventually(async () => await setting(SEASONS, 'intensity') === 'heavy', 'choosing heavy in Settings makes Seasons heavier in Kestrel');
     const rain = await app.settle(() => true);
     await setSetting(SEASONS, 'effect', new GLib.Variant('s', 'snow'));

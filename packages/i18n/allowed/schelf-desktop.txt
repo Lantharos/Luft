@@ -3,3 +3,4 @@ apps/system/schelf/desktop/src/lib.rs	Schelf
 apps/system/schelf/desktop/src/library/opening/diagnosis.rs	No module named '
 apps/system/schelf/desktop/src/library/opening/diagnosis.rs	Typelib file for namespace '
 apps/system/schelf/desktop/src/library/opening/diagnosis.rs	Can't exec \"
+apps/system/schelf/desktop/src/background/luft.rs	Downloaded {} {} for the next restart

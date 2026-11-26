@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 const KEPT = /^(com\.lantharos\.|org\.gnome\.desktop\.|org\.gnome\.mutter)/;
-const KEPT_BY_THE_DESKTOP = new Set(['org.gnome.desktop.notifications application-children']);
+const KEPT_BY_THE_DESKTOP = new Set(['org.gnome.desktop.notifications application-children', 'com.lantharos.kestrel gust-known-apps']);
 const STATE = GLib.get_user_state_dir();
 const SETTINGS_AT_START = GLib.build_filenamev([STATE, 'capture-settings.json']);
 const DISPLAYS_AT_START = GLib.build_filenamev([STATE, `capture-displays-${GLib.path_get_basename(GLib.getenv('KESTREL_CAPTURE_QUEUE')!)}.json`]);

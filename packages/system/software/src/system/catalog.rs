@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::repositories;
+use super::{repositories, rpm_version};
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename = "PackageSummary", rename_all = "camelCase")]
@@ -127,12 +127,16 @@ pub fn newest(packages: &[&str]) -> Result<HashMap<String, (String, u64)>, Strin
             else {
                 continue;
             };
+            let version = without_epoch(version);
+            if newest
+                .get(name)
+                .is_some_and(|(known, _): &(String, u64)| !rpm_version::newer(version, known))
+            {
+                continue;
+            }
             newest.insert(
                 name.to_owned(),
-                (
-                    without_epoch(version).to_owned(),
-                    size.trim().parse().unwrap_or(0),
-                ),
+                (version.to_owned(), size.trim().parse().unwrap_or(0)),
             );
         }
     }

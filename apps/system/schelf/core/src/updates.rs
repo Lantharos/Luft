@@ -5,6 +5,7 @@ use luft_i18n::t;
 use luft_software::apps::flatpak::{self, Installation};
 use luft_software::apps::{debian, updates};
 use luft_software::system::catalog::{self, without_epoch};
+use luft_software::system::rpm_version;
 use luft_software::system::system_packages::{self, Origin};
 use serde::Serialize;
 use specta::Type;
@@ -105,7 +106,7 @@ fn system() -> Result<Vec<AppUpdate>, String> {
         .filter_map(|package| {
             let (to, size) = newest.get(&package.name)?;
             let from = without_epoch(&package.version);
-            (to != from).then(|| AppUpdate {
+            rpm_version::newer(to, from).then(|| AppUpdate {
                 key: format!("system/{}", package.name),
                 source: Source::System,
                 id: package.name.clone(),

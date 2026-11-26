@@ -2,6 +2,7 @@ pub mod catalog;
 #[cfg(feature = "image")]
 pub mod image;
 pub mod repositories;
+pub mod rpm_version;
 #[cfg(feature = "system")]
 pub mod store_extensions;
 #[cfg(feature = "system")]

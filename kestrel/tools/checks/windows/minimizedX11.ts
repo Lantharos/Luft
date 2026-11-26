@@ -32,9 +32,8 @@ export async function run() {
     require(shot.near(200, 150, '#00ff00', 30), 'a preview of the minimized window shows the app as it was, not the cleared window');
     window.unminimize();
     await eventually(() => window.get_title() === 'Clears when hidden: shown', 'the app is shown again');
+    await eventually(() => actor.get_n_children() === 1, 'the picture is gone once the window is back');
     await settled();
-    await pause(400);
-    require(actor.get_n_children() === 1, 'the picture is gone once the window is back');
     const back = await captureFrame({x: 200, y: 200, width: 400, height: 300});
     require(back.near(200, 150, '#00ff00', 30), 'the restored window shows the app live again');
   } finally {

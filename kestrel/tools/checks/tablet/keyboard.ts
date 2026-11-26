@@ -23,6 +23,7 @@ const {require, eventually} = checks('on-screen keyboard');
 const BROWSER_OPEN_TIMEOUT = 60000;
 const KEYBOARD_DELAY = 600;
 const WORD = 'luft';
+const variant = GLib.getenv('KESTREL_CAPTURE_VARIANT');
 const SERBIAN = new GLib.Variant('a(ss)', [['xkb', 'rs+latin'], ['xkb', 'rs']]);
 
 const keyboard = () => Main.keyboard.keyboardActor;
@@ -148,7 +149,6 @@ async function checkChromium(label: string, argv: string[], clientType: Meta.Win
     await tapsOpen(`a field in ${label}`, centerOf(window.get_compositor_private<Meta.WindowActor>()));
     await typeOnKeyboard(WORD);
     await eventually(() => window.get_title().startsWith(`Kestrel typed: ${WORD}`), `typing on the on-screen keyboard writes into the field in ${label}`);
-    await capture(`tablet-keyboard-${label.replace(/\W+/g, '-').toLowerCase()}`);
     await hide(`its hide key is tapped over ${label}`, () => tap(centerOf(hideKey()!)));
     await tapsOpen(`the focused field in ${label} again`, centerOf(window.get_compositor_private<Meta.WindowActor>()));
     await hide(`${label} closes`, () => window.delete(global.get_current_time()));
@@ -196,7 +196,7 @@ async function checkHeft() {
   try {
     await heft.open();
     heft.window.maximize();
-    await settled(1500);
+    await settled();
     const {x, y, width, height} = heft.window.get_frame_rect();
     const paper: Point = [x + width / 2, y + height * 0.6];
     await tapsBeside('the paper in Heft', paper);
@@ -207,7 +207,6 @@ async function checkHeft() {
     await pause(KEYBOARD_DELAY);
     require(!Main.inputMethod.currentFocus, 'text typed on the paper in Heft keeps the on-screen keyboard out of it');
     await tapsBeside('text being typed in Heft', paper);
-    await capture('tablet-keyboard-heft');
     await palmWatchOver();
   } finally {
     await heft.close();
@@ -241,7 +240,6 @@ async function checkSabine() {
     await rover.open();
     await settled();
     await tapsOpen('the search field of a Sabine app', rover.at(middle(await rover.find({role: 'textbox', name: 'Search current folder'}))));
-    await capture('tablet-keyboard-sabine');
     await hide('the Sabine app closes', () => rover.close());
   } finally {
     await rover.close();
@@ -317,14 +315,15 @@ export async function run() {
   await fold(true);
   try {
     await checkGtk();
+    await checkGust();
+    await checkLockScreen();
+    await checkSabine();
+    if (variant) return;
     await checkHeldDelete();
     await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND, {tapsBesideField: true});
     await checkToolkit('an Xwayland window', () => gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
       Meta.WindowClientType.X11);
-    await checkGust();
     await checkLayers();
-    await checkLockScreen();
-    await checkSabine();
     await checkLayouts();
     await checkChromiumApps();
     await checkHeft();

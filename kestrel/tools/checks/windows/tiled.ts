@@ -85,7 +85,7 @@ async function drag(window: Meta.Window, [toX, toY]: Point) {
 async function checkLayouts(window: Meta.Window, backend: string) {
   await snapWithLayout(window, QUARTERS, 0);
   await expectTiled(window, ['top', 'left'], `A ${backend} quarter from snap layouts`);
-  await capture(`tiled-${backend}-quarter`);
+  if (backend === 'wayland') await capture('tiled-quarter');
 
   window.change_workspace_by_index(1, false);
   await eventually(() => window.get_workspace().index() === 1, 'the window moves to the next workspace');
@@ -99,7 +99,7 @@ async function checkLayouts(window: Meta.Window, backend: string) {
 
   await snapWithLayout(window, THIRDS, 1);
   await expectTiled(window, ['top', 'bottom'], `A ${backend} middle third from snap layouts`);
-  await capture(`tiled-${backend}-third`);
+  if (backend === 'wayland') await capture('tiled-third');
 }
 
 async function checkCorner(window: Meta.Window, backend: string, area: Area) {
@@ -112,7 +112,7 @@ async function checkCorner(window: Meta.Window, backend: string, area: Area) {
 
   await drag(window, [area.x + area.width / 3, area.y + area.height / 2]);
   await expectFloating(window, `Dragging a snapped ${backend} window away`);
-  await capture(`tiled-${backend}-floating`);
+  if (backend === 'wayland') await capture('tiled-floating');
 }
 
 async function checkKeyboardMove(window: Meta.Window, backend: string) {

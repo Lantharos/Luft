@@ -9,7 +9,7 @@ import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 
 const {require, eventually} = checks('fullscreen');
-const STAY = 2500;
+const STAY = 1000;
 
 async function staysShown(actor: Clutter.Actor, label: string) {
   let hidden = 0;
@@ -28,7 +28,7 @@ async function checkGust(game: Meta.Window, panel: Clutter.Actor) {
   await staysShown(gust, 'Gust stays open over a fullscreen game');
   require(game.is_fullscreen() && global.display.focus_window === game && !panel.visible,
     'the game stays fullscreen and focused, and the taskbar stays hidden, while Gust is open');
-  await capture(`fullscreen-gust-${game.title.split(' ').pop()}`);
+  if (game.title.endsWith('wayland')) await capture('fullscreen-gust');
   press(Clutter.KEY_Escape);
   await eventually(() => !gust.visible, 'Escape closes Gust over a fullscreen game');
 }
@@ -40,7 +40,7 @@ async function checkTaskView(game: Meta.Window) {
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Tab);
   await eventually(() => shown(view) && cards().length === 1, 'Super+Tab opens the task view over a fullscreen game');
   await staysShown(view, 'the task view stays open over a fullscreen game');
-  await capture(`fullscreen-task-view-${game.title.split(' ').pop()}`);
+  if (game.title.endsWith('wayland')) await capture('fullscreen-task-view');
   await drag(cards()[0], desktops()[1], {steps: 16});
   await eventually(() => game.get_workspace().index() === 1 && shown(view) && cards().length === 0,
     'dragging a fullscreen game onto another desktop moves it there');

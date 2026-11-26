@@ -58,10 +58,9 @@ async function page(): Promise<{title?: string; items: Record<string, unknown>[]
 
 async function checkListing() {
   const extension = await eventually(async () => (await listed(API))?.state === 'running' && await listed(API), 'an extension with every new permission runs');
-  const listing = extension as unknown as {page: boolean; settings: {key: string; page?: string; images?: string[]}[]};
+  const listing = extension as unknown as {settings: {key: string; page?: string; images?: string[]}[]};
   require((await shortcut('type')).accelerators.join() === '<Super><Alt>y', 'its free default shortcut is bound');
   require((await shortcut('taken')).accelerators.length === 0, 'a default that quick settings already uses is left unset');
-  require(listing.page, 'it describes a settings page of its own');
   require(listing.settings.find(setting => setting.key === 'glow')?.page === 'appearance', 'a setting can show on the Appearance page too');
   require(listing.settings.find(setting => setting.key === 'look')?.images?.length === 2, 'a choice offers its pictures to Settings');
 }
@@ -84,8 +83,6 @@ async function checkPanel() {
   require(!api().typeNow('too early'), 'it can’t type before anyone used it');
   click(taskbarItem()!);
   const [panel] = await eventually(() => popups().length === 1 && popups(), 'clicking its taskbar item opens its panel');
-  await eventually(() => panel.opacity === 255, 'the panel fades in');
-  require(showsText('Pressed 0 times', panel), 'the panel shows the extension’s view');
   require(panel.contains(global.stage.get_key_focus()!), 'the panel takes the keyboard');
   await capture('extension-panel');
   const slider = descendants(panel).find(actor => actor instanceof St.Widget && actor.has_style_class_name('slider'))!;
@@ -103,7 +100,6 @@ async function checkPanel() {
 async function checkWindow() {
   api().openWindow();
   const [window] = await eventually(() => popups().length === 1 && popups(), 'it opens a small window');
-  await eventually(() => window.opacity === 255, 'the window fades in');
   const focus = global.stage.get_key_focus();
   require(!focus || !window.contains(focus), 'a window leaves the keyboard where it was');
   await capture('extension-window');

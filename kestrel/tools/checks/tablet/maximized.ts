@@ -3,16 +3,16 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import {Main, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
+import {existing, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {moveTo, type Point} from '../lib/input/input.js';
 import {gjs, stop, waitForWindows} from '../lib/processes.js';
-import {pause, settled, waitUntil} from '../lib/wait.js';
+import {settled, waitUntil} from '../lib/wait.js';
 import {inside, monitor, pressesStayWith} from './lib/presses.js';
 import {fold, plugInTouchscreen} from './lib/touch.js';
 
 const {require, eventually} = checks('maximized');
-const SURFACE_SETTLES = 600;
-const SURFACES = ['gust', 'quick', 'notifications', 'tasks'] as const;
+const SURFACES = [['gust', 'kestrel-gust-panel'], ['quick', 'kestrel-quick-settings'], ['notifications', 'kestrel-notifications'], ['tasks', 'kestrel-task-view']] as const;
 
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const workArea = () => Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryMonitor!.index);
@@ -53,11 +53,13 @@ function requireNothingAbove(front: Meta.Window, label: string) {
 }
 
 async function surfacesLeaveNothingBehind(front: Meta.Window, behind: Meta.Window) {
-  for (const surface of SURFACES) {
+  for (const [surface, name] of SURFACES) {
+    const actor = existing(name);
     toggleSurface(surface);
-    await pause(SURFACE_SETTLES);
+    await eventually(() => shown(actor), `${surface} opens over the maximized window`);
+    await settled();
     toggleSurface(surface);
-    await pause(SURFACE_SETTLES);
+    await eventually(() => !actor.visible, `${surface} closes`);
     front.activate(global.get_current_time());
     await settled();
     requireNothingAbove(front, `after ${surface} opens and closes`);
@@ -65,10 +67,10 @@ async function surfacesLeaveNothingBehind(front: Meta.Window, behind: Meta.Windo
   }
 }
 
-async function pressesUnder(front: Meta.Window, behind: Meta.Window, condition: string) {
+async function pressesUnder(front: Meta.Window, behind: Meta.Window, condition: string, everywhere = false) {
   await maximizedInFront(front, condition);
   requireNothingAbove(front, condition);
-  await pressesStayWith(front, behind, spots(front), `maximized (${condition})`, {require, eventually});
+  await pressesStayWith(front, behind, everywhere ? spots(front) : spots(front).slice(-1), `maximized (${condition})`, {require, eventually});
 }
 
 export async function run() {
@@ -82,7 +84,7 @@ export async function run() {
     behind.activate(global.get_current_time());
     await waitUntil(() => global.display.focus_window === behind, 'the window behind had focus last');
 
-    await pressesUnder(front, behind, 'with the taskbar always shown');
+    await pressesUnder(front, behind, 'with the taskbar always shown', true);
     front.unmaximize();
     await eventually(() => !front.maximized_horizontally, 'the window unmaximizes');
     await settled();
@@ -94,7 +96,7 @@ export async function run() {
     settings.reset('taskbar-auto-hide');
 
     await fold(true);
-    await pressesUnder(front, behind, 'folded into a tablet');
+    await pressesUnder(front, behind, 'folded into a tablet', true);
     await fold(false);
     await pressesUnder(front, behind, 'back from tablet posture');
   } finally {

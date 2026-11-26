@@ -12,7 +12,6 @@ import {withApp} from '../apps/lib/apps.js';
 
 const {require, eventually} = checks('see-through windows');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const KEYS = ['see-through-apps', 'see-through-keep-text'];
 const TERMINAL_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
 const TEXT = 'Text stays solid while the background lets the desktop through';
 const LAUNCHES = 6;
@@ -38,16 +37,13 @@ export async function run() {
       await eventually(seeThrough, 'choosing an app makes its windows see-through');
       await settled();
       await capture('see-through');
-      settings.set_boolean('see-through-keep-text', false);
-      await settled();
-      await capture('see-through-whole-window');
       settings.reset('see-through-apps');
       await eventually(() => !seeThrough(), 'taking the app off makes its windows solid again');
       return app.get_id();
     });
     await launchesSeeThrough(appId);
   } finally {
-    for (const key of KEYS) settings.reset(key);
+    settings.reset('see-through-apps');
     GLib.unlink(TERMINAL_SETTINGS);
   }
 }

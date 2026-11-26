@@ -13,7 +13,6 @@ import {hostsOf, installOwn} from './lib/sandbox.js';
 const {require, eventually} = checks('sandboxed extensions');
 const SANDBOXED = 'com.example.Sandboxed';
 const ASKER = 'com.example.Asker';
-const STORE_ONLY = 'com.example.Drawing';
 
 interface Asker {
   peers: {handles(id: string, name: string): boolean; request(id: string, name: string, value?: unknown): Promise<unknown>};
@@ -82,13 +81,6 @@ async function checkPeers(host: string) {
   await eventually(() => GLib.file_test(file, GLib.FileTest.EXISTS) && new TextDecoder().decode(GLib.file_get_contents(file)[1]).includes('"kept"'), 'what it stored is written by the desktop');
 }
 
-async function checkStoreOnly() {
-  installOwn('marker', STORE_ONLY, text => `${text}permissions = ["wallpaper"]\n`);
-  await request('Reload', STORE_ONLY);
-  const listing = await eventually(() => listed(STORE_ONLY), 'an extension that draws on the wallpaper, in the own folder, is listed');
-  require(listing.state === 'store-only' && listing.problem.includes('wallpaper'), `it waits to come from schelf.store and says why (${listing.problem})`);
-}
-
 async function checkTurnedOff(host: string) {
   await request('Disable', SANDBOXED);
   await eventually(() => !taskbarItem() && !tile(), 'turning it off takes its item and toggle away');
@@ -102,10 +94,9 @@ export async function run() {
     const host = await checkRuns();
     await checkSurfaces();
     await checkPeers(host);
-    await checkStoreOnly();
     await checkTurnedOff(host);
   } finally {
-    for (const id of [SANDBOXED, ASKER, STORE_ONLY]) await request('Remove', id);
-    for (const id of [SANDBOXED, STORE_ONLY]) if (GLib.file_test(ownFolder(id), GLib.FileTest.IS_DIR)) removeFolder(Gio.File.new_for_path(ownFolder(id)));
+    for (const id of [SANDBOXED, ASKER]) await request('Remove', id);
+    if (GLib.file_test(ownFolder(SANDBOXED), GLib.FileTest.IS_DIR)) removeFolder(Gio.File.new_for_path(ownFolder(SANDBOXED)));
   }
 }

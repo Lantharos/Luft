@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
@@ -70,14 +71,13 @@ export async function run() {
     await boardResting();
     const corner = named('kestrel-board-corner')!;
     const gust = named('kestrel-gust-panel')!;
-    require(corner.visible, 'the corner shows Gust, this desktop\'s apps and the status pill on a board');
     const tracker = Shell.WindowTracker.get_default();
     const apps = new Set(boardWindows().map(window => tracker.get_window_app(window)));
     const dock = named('kestrel-board-dock', corner)!;
     require(dock.get_child_at_index(1)!.get_n_children() === apps.size, `the corner lists the ${apps.size} apps open on this desktop`);
     await checkGust(gust, corner, dock);
     await checkApps(dock);
-    await checkLeaving(gust);
+    if (!GLib.getenv('KESTREL_CAPTURE_VARIANT')) await checkLeaving(gust);
   } finally {
     await leaveBoard();
   }

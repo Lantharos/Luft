@@ -4,15 +4,21 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
+import {pause} from '../lib/wait.js';
+import {kestrelUptime} from '../restore/lib/signIn.js';
 import {install, listed, request, SEASONS} from './lib/extensions.js';
 
 const {require, eventually} = checks('extension crashes');
 const STATE = scratch('extension-crashes.json');
 const requeued = (crashes: number) => `000${crashes}~${GLib.getenv('KESTREL_CAPTURE_WORKER')}-extensions:crashes`;
 const PROBE = 'com.example.Probe';
+const CRASHES_IN_A_ROW_WITHIN_S = 121;
+const CRASH_RECORD = GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'extensions-running.json']);
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 const read = () => JSON.parse(new TextDecoder().decode(GLib.file_get_contents(STATE)[1])) as {crashes: number};
+const crashedLately = () => GLib.file_test(CRASH_RECORD, GLib.FileTest.EXISTS) &&
+  Object.keys((JSON.parse(new TextDecoder().decode(GLib.file_get_contents(CRASH_RECORD)[1])) as {crashes: object}).crashes).length > 0;
 const notified = (title: string) => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === title));
 
 function crashAgain(crashes: number): Promise<never> {
@@ -29,6 +35,7 @@ async function running(id: string) {
 
 export async function run() {
   if (!GLib.file_test(STATE, GLib.FileTest.EXISTS)) {
+    if (crashedLately()) await pause(Math.max(0, CRASHES_IN_A_ROW_WITHIN_S - kestrelUptime()) * 1000);
     install('probe', PROBE);
     await request('Reload', PROBE);
     await eventually(() => running(PROBE), 'the probe runs before Kestrel crashes');

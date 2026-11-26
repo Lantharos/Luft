@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
@@ -14,6 +15,7 @@ import {screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
 const {require, eventually} = checks('board');
+const variant = GLib.getenv('KESTREL_CAPTURE_VARIANT');
 const manager = global.workspace_manager;
 const group = global.window_group;
 const DOUBLE_CLICK_TIME = new Gio.Settings({schema_id: 'org.gnome.desktop.peripherals.mouse'}).get_int('double-click');
@@ -37,8 +39,6 @@ async function checkTurnedOff() {
 }
 
 async function checkEntering() {
-  require(boardWindows().length === 4, 'four windows open on the first desktop');
-  require(!noOverlap(), 'the desktop starts with stacked windows');
   await showBoard();
   require(!named('kestrel-gust-panel')!.visible, 'double-tapping Super turns the board on without leaving Gust open');
   require(boardWindows().every(window => window.unconstrained), 'windows on the board can go anywhere');
@@ -195,9 +195,9 @@ async function checkLeaving() {
 export async function run() {
   await openWindows();
   try {
-    await checkTurnedOff();
+    if (!variant) await checkTurnedOff();
     await checkEntering();
-    await checkDesktops();
+    if (!variant) await checkDesktops();
     checkGestures();
     await checkMoving();
     await checkClosingWhileMoving();

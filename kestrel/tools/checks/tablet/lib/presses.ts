@@ -5,7 +5,7 @@ import {click, type Point} from '../../lib/input/input.js';
 import {pause} from '../../lib/wait.js';
 import {tap} from './touch.js';
 
-const LONGER_THAN_A_DOUBLE_CLICK = 700;
+const LONGER_THAN_A_DOUBLE_CLICK = global.stage.context.get_settings().double_click_time + 100;
 
 export const monitor = () => global.display.get_monitor_geometry(global.display.get_primary_monitor());
 export const middle = (): Point => [monitor().x + monitor().width / 2, monitor().y + monitor().height / 3];

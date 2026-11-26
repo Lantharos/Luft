@@ -182,7 +182,6 @@ export async function run() {
       const wallpaper = await lookWithAndWithout(terminal, behind);
       require(wallpaper.apart < SAME, `Luca that blurs only the wallpaper hides the window underneath (${Math.round(wallpaper.apart * 1000) / 10}% apart)`);
       require(shareApart(wallpaper.over, everything.over) > DIFFERENT, 'blurring only the wallpaper looks different from blurring everything behind');
-      await captureOverAndAlone(terminal, behind, 'see-through-luca-wallpaper-dark');
 
       const darkLook = await captureFrame(inside(terminal));
       await changesTo(terminal, darkLook, () => background.set_string('picture-uri-dark', writePicture('changed', PICTURES.changed)), 'the window follows a new wallpaper');
@@ -204,11 +203,6 @@ export async function run() {
 
       await changesTo(terminal, maris.alone, () => interfaceSettings.set_string('color-scheme', 'default'), 'Maris follows the light style');
       await captureOverAndAlone(terminal, behind, 'see-through-maris-light');
-
-      glass.set_string('see-through', 'luca');
-      glass.set_string('blurs', 'everything');
-      await eventually(() => backdropStyle(terminal) === Shell.BlurStyle.LUCA, 'Luca blurs everything behind again');
-      await captureOverAndAlone(terminal, behind, 'see-through-luca-light');
     }));
   } finally {
     await scaled?.restore();

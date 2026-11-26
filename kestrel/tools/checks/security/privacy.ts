@@ -15,7 +15,7 @@ import {capture} from '../lib/screenshots.js';
 const {require, eventually} = checks('panel status');
 const SCREEN_CAST = 'org.gnome.Mutter.ScreenCast';
 const LEVEL_METER_NAMES = ['com.lantharos.settings', 'org.PulseAudio.pavucontrol'];
-const SETTLE_MS = 1000;
+const SETTLE_MS = 500;
 
 interface DumpObject {
   type: string;

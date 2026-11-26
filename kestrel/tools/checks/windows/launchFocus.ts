@@ -14,7 +14,7 @@ import {builtFixture, firstLine, gjs, spawn, waitForWindow, type SpawnOptions} f
 import {pause, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('launch focus');
-const DELAY = 2000;
+const DELAY = 1000;
 const BEFORE_INTERACTION = 300;
 const SETTLE = 500;
 const NOTICE_TIMEOUT = 15000;

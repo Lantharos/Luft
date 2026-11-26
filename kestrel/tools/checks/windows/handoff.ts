@@ -16,7 +16,7 @@ import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('handoff focus');
 const OPEN_TIMEOUT = 60000;
-const UNPROMPTED_WAIT = 3000;
+const UNPROMPTED_WAIT = 1500;
 const BROWSER_FOCUS_TIMEOUT = 15000;
 const NO_LAUNCH_TOKEN = {XDG_ACTIVATION_TOKEN: null, DESKTOP_STARTUP_ID: null};
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Handoff check']);

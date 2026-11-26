@@ -10,7 +10,7 @@ const {require} = checks('palm rejection');
 const RECORDINGS = ['touch-only', 'taps-after', 'writing', 'palm-taskbar'];
 const VIRTUAL_PX_PER_MM = 4;
 const PEN_FORGOTTEN = 5000;
-const HOLDS_SETTLE = 1000;
+const HOLDS_SETTLE = 600;
 const TOOLS = {pen: Clutter.InputDeviceToolType.PEN, eraser: Clutter.InputDeviceToolType.ERASER} as const;
 
 type Event =
@@ -50,6 +50,7 @@ const touchscreen = seat.create_virtual_device(Clutter.InputDeviceType.TOUCHSCRE
 const pen = seat.create_virtual_device(Clutter.InputDeviceType.TABLET_DEVICE);
 const penSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.pen'});
 let sent: Sent[] = [];
+let ahead = 0;
 
 const load = (name: string): Recording =>
   JSON.parse(new TextDecoder().decode(GLib.file_get_contents(fixture('pen', `${name}.json`))[1]));
@@ -78,8 +79,8 @@ async function replay(recording: Recording, mirrored: boolean) {
   const labels = [...recording.touches];
   const start = GLib.get_monotonic_time() + 100_000;
   for (const event of recording.events) {
-    const time = start + event[0] * 1000;
-    const wait = (time - GLib.get_monotonic_time()) / 1000;
+    const time = start + ahead + event[0] * 1000;
+    const wait = (time - ahead - GLib.get_monotonic_time()) / 1000;
     if (wait >= 1) await pause(Math.floor(wait));
     switch (event[1]) {
     case 'near':
@@ -141,7 +142,7 @@ export async function run() {
         sent = [];
         await replay(recording, hand === 'left');
         report(hand === 'left' ? `${name}, mirrored for the left hand` : name);
-        await pause(PEN_FORGOTTEN);
+        ahead += PEN_FORGOTTEN * 1000;
       }
     }
   } finally {

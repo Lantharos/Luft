@@ -17,7 +17,7 @@ const {require, eventually} = checks('long press');
 const FILE_MANAGER = 'com.lantharos.rover.desktop';
 const HELD = global.stage.context.get_settings().long_press_duration + 150;
 const SHORT = 120;
-const QUIET = 600;
+const QUIET = 300;
 
 const menu = () => named('kestrel-context-menu')!;
 const panel = () => named('kestrel-panel')!;

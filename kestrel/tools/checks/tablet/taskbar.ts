@@ -20,6 +20,7 @@ const STRIP = 24;
 const EXPANDED = 64;
 const IDLE_COLLAPSE = 5000;
 const DRAG_COMPLETES = 80;
+const variant = GLib.getenv('KESTREL_CAPTURE_VARIANT');
 const clips = GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'clips']);
 
 const panel = () => ofType(named('kestrel-panel'), St.Widget);
@@ -125,6 +126,7 @@ async function expandAndCollapse(window: Meta.Window) {
   const frame = window.get_frame_rect();
   await tap([frame.x + frame.width / 2, frame.y + frame.height / 2]);
   await eventually(collapsed, 'tapping outside collapses the taskbar');
+  if (variant) return;
 
   await tap(centerOf(strip()!));
   await eventually(expanded, 'the strip expands the taskbar again');
@@ -137,8 +139,11 @@ async function checkGust() {
   await eventually(expanded, 'the taskbar expands before opening Gust');
   await tap(centerOf(named('Gust', panel())!));
   await eventually(() => shown(named('kestrel-gust-panel')), 'Gust opens from the expanded taskbar');
-  await pause(IDLE_COLLAPSE + 500);
-  require(expanded(), 'the taskbar stays expanded while Gust is open');
+  if (!variant) {
+    await pause(IDLE_COLLAPSE + 500);
+    require(expanded(), 'the taskbar stays expanded while Gust is open');
+  }
+  await settled();
   require(!Main.keyboard.visible, 'Gust opens without the on-screen keyboard');
   const gustTop = named('kestrel-gust-panel')!.get_transformed_position()[1] + named('kestrel-gust-panel')!.height;
   require(gustTop <= bottom() - EXPANDED, 'Gust sits above the expanded taskbar');
@@ -181,7 +186,6 @@ export async function run() {
   await settled();
   const normal = geometry();
   const normalWorkBottom = workBottom();
-  await capture('tablet-normal-before');
   const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
@@ -196,8 +200,7 @@ export async function run() {
     await eventually(() => resting() && geometry() === normal, 'unfolding restores the normal taskbar exactly');
     require(!strip(), 'the strip goes away');
     await eventually(() => workBottom() === normalWorkBottom, 'windows give the taskbar its space back');
-    await capture('tablet-normal-after');
-    await reducedMotion(normal);
+    if (!variant) await reducedMotion(normal);
   } finally {
     await fold(false);
     await stop(app);

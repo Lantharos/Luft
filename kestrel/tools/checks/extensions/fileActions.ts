@@ -49,7 +49,6 @@ async function checkPlainActions(app: LuftApp, folder: string, note: string) {
   await eventually(() => last()?.key === 'words' && chosenOn(note), 'Count words gets the text file it was chosen on');
 
   await changes(app, 'right-clicking a folder opens its menu', async () => app.click(await app.find(FOLDER), Clutter.BUTTON_SECONDARY));
-  await saveEveryLook(app, 'file-actions-folder-menu');
   await changes(app, 'choosing the folder action closes the menu', () => choose(app, 'Tidy up'));
   await eventually(() => last()?.key === 'tidy' && chosenOn(folder), 'an action for folders shows on folders, without the one for text');
 }
@@ -59,7 +58,6 @@ async function checkChoices(app: LuftApp, note: string) {
   const opened = fixture().opened;
   await changes(app, 'an action with choices opens them in the menu', () => choose(app, 'Share with'));
   await eventually(() => fixture().opened === opened + 1, 'and tells the extension it opened');
-  await saveEveryLook(app, 'file-actions-choices-empty');
   await changes(app, 'Look again keeps the menu open and shows what turned up', () => choose(app, 'Look again'));
   require(last()?.choice === 'again', 'Look again reaches the extension');
   await saveEveryLook(app, 'file-actions-choices-found');
@@ -67,16 +65,20 @@ async function checkChoices(app: LuftApp, note: string) {
   await eventually(() => last()?.choice === 'Pixel 8' && chosenOn(note), 'the extension gets the choice and the file');
 }
 
+const offers = async (app: LuftApp, name: string) => (await app.all({role: 'menuitem', name})).length > 0;
+
 async function checkHidden(app: LuftApp) {
   fixture().hide();
   await settled();
   await changes(app, 'right-clicking the text file once more opens its menu', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
-  await saveEveryLook(app, 'file-actions-hidden');
+  await app.find({role: 'menuitem', name: 'Count words'});
+  require(!await offers(app, 'Share with'), 'a hidden action leaves the menu');
   press(Clutter.KEY_Escape);
   await request('Disable', FILES);
   await settled();
-  await changes(app, 'right-clicking with the extension off opens a menu without its actions', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
-  await saveEveryLook(app, 'file-actions-off');
+  await changes(app, 'right-clicking with the extension off opens its menu', async () => app.click(await app.find(NOTE), Clutter.BUTTON_SECONDARY));
+  await app.find({role: 'menuitem', name: 'Rename'});
+  require(!await offers(app, 'Count words'), 'turning the extension off takes its actions out of the menu');
   press(Clutter.KEY_Escape);
 }
 

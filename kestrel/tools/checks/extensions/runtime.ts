@@ -30,7 +30,7 @@ const notified = (title: string) => Main.messageTray.getSources().some(source =>
 async function checkSeasons() {
   const seasons = await eventually(() => listed(SEASONS), 'Seasons is listed');
   require(seasons.state === 'running' && seasons.origin === 'development' && seasons.version === '1.0.0', 'Seasons runs from the development folder');
-  require(layerSheets(SEASONS).length === 0, 'Seasons draws nothing while it is off: its layers have no actors');
+  await eventually(() => layerSheets(SEASONS).length === 0, 'Seasons draws nothing while it is off: its layers have no actors', 15000);
 }
 
 async function checkDisabledCostsNothing() {

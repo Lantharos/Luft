@@ -4,7 +4,6 @@ import St from 'gi://St';
 
 import {POLKIT_PASSWORD} from '../../fixtures/auth/polkitSession.js';
 import {answerable, descendants, labelled, named, shown, shownStyled, showsText, textOf} from '../lib/actors.js';
-import {withScheme} from '../apps/lib/palette.js';
 import {checks} from '../lib/check.js';
 import {click, press, type} from '../lib/input/input.js';
 import {capture, output, screenshot} from '../lib/screenshots.js';
@@ -64,18 +63,18 @@ async function finished(outcome: Promise<Outcome>, expected: Outcome, label: str
   await eventually(() => !dialog(), 'the prompt goes away');
 }
 
-async function fingerprintFirst(scheme: string) {
+async function fingerprintFirst() {
   const {outcome} = await opened();
   await eventually(glyphFirst, 'with a finger enrolled the prompt leads with the fingerprint and hides the password');
   require(button('Use password instead')!.has_key_focus(), 'the quiet password link takes the keyboard');
-  await settledCapture(`polkit-fingerprint-${scheme}`);
+  await settledCapture('polkit-fingerprint-dark');
   await touch('verify-no-match', () => hint() === NOT_RECOGNIZED, 'an unknown finger says so');
   await pause(TINTED);
-  await captureNow(`polkit-fingerprint-failed-${scheme}`);
+  await captureNow('polkit-fingerprint-failed-dark');
   require(!entry(), 'an unknown finger keeps the prompt on the fingerprint');
   type('c');
   await eventually(() => entry()?.text === 'c' && focused(), 'typing switches to the password and keeps the first key');
-  await settledCapture(`polkit-password-switched-${scheme}`);
+  await settledCapture('polkit-password-switched-dark');
   click(button('Use fingerprint')!);
   await eventually(fingerprintShown, 'the fingerprint is a click away from the password');
   click(button('Use password instead')!);
@@ -83,7 +82,7 @@ async function fingerprintFirst(scheme: string) {
   type('wrong horse');
   press(Clutter.KEY_Return);
   await eventually(() => showsText(WRONG) && entry()?.text === '' && entry()?.reactive, 'a wrong password says so and asks again');
-  await settledCapture(`polkit-wrong-password-${scheme}`);
+  await settledCapture('polkit-wrong-password-dark');
   await touch('verify-match', () => true, 'the fingerprint still works while the password is asked');
   await finished(outcome, 'authorized', 'a finger allows the change while the password field shows');
 }
@@ -114,13 +113,13 @@ async function attemptsRunOut() {
   await finished(outcome, 'authorized', 'the password allows the change');
 }
 
-async function passwordOnly(scheme: string) {
+async function passwordOnly() {
   const {outcome} = await opened();
   await eventually(() => focused() && !button('Use fingerprint') && hint() === null, 'without a finger the prompt asks for the password only');
   require(!button('Allow')?.reactive, 'Allow waits for a password');
   type('correct');
   await eventually(() => button('Allow')?.reactive, 'Allow takes a typed password');
-  await settledCapture(`polkit-password-${scheme}`);
+  await settledCapture('polkit-password-dark');
   type(POLKIT_PASSWORD.slice('correct'.length));
   await eventually(() => entry()?.text === POLKIT_PASSWORD, 'the whole password is typed');
   click(button('Allow')!);
@@ -151,16 +150,14 @@ export async function run() {
   await withStandInHelper(async () => {
     await enroll(GLib.get_user_name(), ['right-index-finger']);
     try {
-      await fingerprintFirst('dark');
+      await fingerprintFirst();
       await recognized();
       await attemptsRunOut();
       await cancelled();
-      await withScheme('light', () => fingerprintFirst('light'));
     } finally {
       await enroll(GLib.get_user_name(), []);
     }
-    await passwordOnly('dark');
-    await withScheme('light', () => passwordOnly('light'));
+    await passwordOnly();
     await administrators();
   });
   require(!named('kestrel-auth-use-password'), 'no prompt is left behind');

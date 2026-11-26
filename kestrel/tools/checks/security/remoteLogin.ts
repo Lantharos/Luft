@@ -17,17 +17,6 @@ const signIn = (account: string, address: string) =>
 
 const told = () => Main.messageTray.getSources().flatMap(source => source.notifications).find(notification => notification.title === TITLE);
 
-async function captureCorners() {
-  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-  kestrel.set_boolean('rounded-window-corners', false);
-  try {
-    await settled();
-    await capture('remote-login-signed-in-square');
-  } finally {
-    kestrel.reset('rounded-window-corners');
-  }
-}
-
 export async function run() {
   await signIn('mara', '192.168.1.20');
   const notification = await eventually(told, 'signing in over SSH shows a notification with the address');
@@ -39,5 +28,4 @@ export async function run() {
     await settled();
     await capture('remote-login-signed-in-light');
   });
-  await captureCorners();
 }

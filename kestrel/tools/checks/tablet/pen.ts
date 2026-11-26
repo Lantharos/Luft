@@ -9,13 +9,12 @@ import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {penTap} from '../lib/input/penStroke.js';
-import {pause, settled, waitUntil} from '../lib/wait.js';
+import {pause, waitUntil} from '../lib/wait.js';
 import {BTN_STYLUS2, hover, leave, pen, pressButton} from './lib/pen.js';
 
 const {require, eventually} = checks('pen');
 const SCHEMES: Scheme[] = ['light', 'dark'];
 
-const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const penSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.pen'});
 const gust = () => named('kestrel-gust-panel');
 const listed = () => property<[string, string, string][]>('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Pens', 'com.lantharos.Kestrel.Pens', 'Devices');
@@ -68,16 +67,6 @@ async function writeAtOnce() {
   }
 }
 
-async function withSquareCorners(action: () => Promise<void>) {
-  kestrel.set_boolean('rounded-window-corners', false);
-  try {
-    await settled();
-    await action();
-  } finally {
-    kestrel.reset('rounded-window-corners');
-  }
-}
-
 export async function run() {
   await writeAtOnce();
   await waitUntil(async () => (await listed()).some(([, , kind]) => kind === 'screen'), 'Kestrel lists the virtual pen as a pen on the screen');
@@ -86,5 +75,4 @@ export async function run() {
   await withApp('settings', [], async app => {
     for (const scheme of SCHEMES) await withScheme(scheme, async () => (await show(app, 'pen')).save(`settings-pen-${scheme}`));
   });
-  await withSquareCorners(() => withApp('settings', [], async app => (await show(app, 'pen')).save('settings-pen-square')));
 }

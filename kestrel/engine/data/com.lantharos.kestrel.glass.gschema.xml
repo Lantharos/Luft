@@ -34,7 +34,7 @@
     <key name="blurs" enum="com.lantharos.kestrel.GlassBlurs">
       <default>'wallpaper'</default>
       <summary>What glass blurs</summary>
-      <description>“everything” blurs whatever is behind the glass as it changes, “wallpaper” only the wallpaper, which uses less power.</description>
+      <description>“everything” blurs whatever is behind the glass as it changes, “wallpaper” only the wallpaper, which uses less power. See-through windows always blur what is behind them.</description>
     </key>
     <key name="wallpaper-on-power-saver" type="b">
       <default>true</default>

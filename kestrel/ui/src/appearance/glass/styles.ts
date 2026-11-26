@@ -87,9 +87,16 @@ export class GlassStyles {
     return STYLES[this.settings.get_string(kind)];
   }
 
+  private savingPower(): boolean {
+    return this.conditions.powerSaving && this.settings.get_boolean('wallpaper-on-power-saver');
+  }
+
   private wallpaperOnly(): boolean {
-    return this.settings.get_string('blurs') === 'wallpaper' ||
-      (this.conditions.powerSaving && this.settings.get_boolean('wallpaper-on-power-saver'));
+    return this.settings.get_string('blurs') === 'wallpaper' || this.savingPower();
+  }
+
+  private blursWallpaperOnly(kind: GlassKind, wallpaperOnly: boolean): boolean {
+    return kind === 'see-through' ? this.savingPower() : wallpaperOnly;
   }
 
   private shellStyle(kind: GlassKind, wallpaperOnly: boolean): Shell.BlurStyle {
@@ -108,7 +115,7 @@ export class GlassStyles {
     const wallpaperOnly = this.wallpaperOnly();
     this.blurred.want(wallpaperOnly);
     this.wide.want(KINDS.some(kind => this.chosen(kind) === Meta.GlassStyle.MARIS) || global.compositor.get_maris_requested());
-    for (const kind of KINDS) setGlassStyle(kind, this.shellStyle(kind, wallpaperOnly));
+    for (const kind of KINDS) setGlassStyle(kind, this.shellStyle(kind, this.blursWallpaperOnly(kind, wallpaperOnly)));
     global.compositor.set_glass(this.chosen('windows'), this.chosen('surfaces'), wallpaperOnly);
   }
 

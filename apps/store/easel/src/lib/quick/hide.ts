@@ -4,12 +4,16 @@ import type { Rect } from '#lib/gpu/tiles.js';
 import { clip } from '#lib/raster/mask.js';
 import { readRegion } from '#lib/raster/readback.js';
 import { stamp } from '#lib/raster/stamp.js';
+import { removeArea } from '#lib/ai/actions.js';
 
 const BLOCKS = 14;
 
-export async function hideArea(doc: ImageDocument, layer: Layer, area: Rect, kind: 'redact' | 'blur', label: string) {
+export type HideKind = 'blur' | 'redact' | 'remove';
+
+export async function hideArea(doc: ImageDocument, layer: Layer, area: Rect, kind: HideKind, label: string) {
 	const rect = clip(area, doc.width, doc.height);
 	if (!rect) return;
+	if (kind === 'remove') return removeArea(doc, layer, rect);
 	if (kind === 'redact') {
 		stamp(doc, layer, label, rect, (context) => {
 			context.fillStyle = '#000';

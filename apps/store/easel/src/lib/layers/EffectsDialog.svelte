@@ -45,7 +45,7 @@
 {/snippet}
 
 <Dialog title={t('easel-effects')} onclose={() => finish(false)}>
-	<div class="flex flex-col gap-5 px-2.5 py-2.5">
+	<div class="flex flex-col gap-5 px-2.5 py-3">
 		<div class="flex items-center justify-between text-[14px] font-semibold">
 			<span>{t('easel-effect-shadow')}</span>
 			<Switch label={t('easel-effect-shadow')} checked={effects.shadow.enabled} onchange={(checked) => ((effects.shadow.enabled = checked), changed())} />

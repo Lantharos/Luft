@@ -54,7 +54,7 @@ export class DrawTool implements BoardHandler {
 		this.#shape =
 			found.kind === 'shape'
 				? { id: stroke.id, kind: 'shape', shape: found.shape, x: found.x, y: found.y, w: found.w, h: found.h, color, fill: null, text: '' }
-				: { id: stroke.id, kind: 'arrow', from: { x: found.from[0], y: found.from[1] }, to: { x: found.to[0], y: found.to[1] }, color, width: 2.5, head: found.head };
+				: { id: stroke.id, kind: 'arrow', from: { x: found.from[0], y: found.from[1] }, to: { x: found.to[0], y: found.to[1] }, route: 'straight', color, width: 2.5, head: found.head };
 		this.host.live = this.#shape;
 		this.host.redraw();
 	}

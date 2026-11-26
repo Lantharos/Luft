@@ -1,6 +1,6 @@
 import { commands } from '#lib/bindings.js';
 import { BoardDocument, type Asset } from '#lib/board/board.svelte.js';
-import { objectId, type BoardObject } from '#lib/board/model.js';
+import { objectId, type BoardObject, type Box } from '#lib/board/model.js';
 import { BoardRenderer } from '#lib/board/render/renderer.js';
 import { PRINT } from '#lib/board/render/look.js';
 import { boardBounds, boardSvg } from '#lib/board/svg.js';
@@ -43,8 +43,12 @@ export async function addPicture(board: BoardDocument, bytes: Uint8Array<ArrayBu
 	board.select([picture.id]);
 }
 
-function rasterize(board: BoardDocument, scale: number) {
-	const area = boardBounds(board.objects, board.lookup, PADDING);
+export function boardArea(board: BoardDocument, frame = ''): Box {
+	const chosen = board.lookup(frame);
+	return chosen?.kind === 'frame' ? { x: chosen.x, y: chosen.y, w: chosen.w, h: chosen.h } : boardBounds(board.objects, board.lookup, PADDING);
+}
+
+function rasterize(board: BoardDocument, scale: number, area: Box) {
 	const width = Math.max(1, Math.round(area.w * scale));
 	const height = Math.max(1, Math.round(area.h * scale));
 	const grid = new TileGrid(width, height);
@@ -63,8 +67,8 @@ function rasterize(board: BoardDocument, scale: number) {
 	return grid;
 }
 
-export async function exportBoard(board: BoardDocument, request: Omit<ExportRequest, 'width' | 'height'>, scale: number) {
-	const grid = rasterize(board, scale);
+export async function exportBoard(board: BoardDocument, request: Omit<ExportRequest, 'width' | 'height'>, scale: number, area: Box) {
+	const grid = rasterize(board, scale, area);
 	try {
 		await exportGrid(grid, { ...request, width: grid.width, height: grid.height });
 	} finally {
@@ -72,13 +76,8 @@ export async function exportBoard(board: BoardDocument, request: Omit<ExportRequ
 	}
 }
 
-export function boardSize(board: BoardDocument) {
-	const area = boardBounds(board.objects, board.lookup, PADDING);
-	return { width: Math.round(area.w), height: Math.round(area.h) };
-}
-
-export async function exportVector(board: BoardDocument, path: string, pdf: boolean) {
-	const svg = boardSvg(board.objects, board.lookup, board.assets, PRINT, boardBounds(board.objects, board.lookup, PADDING));
+export async function exportVector(board: BoardDocument, path: string, pdf: boolean, area: Box) {
+	const svg = boardSvg(board.objects, board.lookup, board.assets, PRINT, area);
 	const body = new TextEncoder().encode(svg);
 	await (pdf ? commands.exportPdf({ path }, { body }) : commands.exportFile({ path }, { body }));
 }
@@ -90,8 +89,8 @@ export async function saveBoard(board: BoardDocument, path: string) {
 	const record: BoardRecord = { format: FORMAT, kind: 'board', objects: board.objects, assets: types };
 	const id = await commands.saveBegin({ path, document: record as never });
 	await Promise.all([...used].map((asset) => commands.saveAsset({ id, name: asset }, { body: board.assets.get(asset)!.bytes })));
-	const area = boardBounds(board.objects, board.lookup, PADDING);
-	const grid = rasterize(board, Math.min(1, PREVIEW_SIDE / Math.max(area.w, area.h)));
+	const area = boardArea(board);
+	const grid = rasterize(board, Math.min(1, PREVIEW_SIDE / Math.max(area.w, area.h)), area);
 	const compositor = new Compositor(grid.width, grid.height);
 	compositor.render(grid.tiles.keys(), [{ kind: 'pixels', pixels: grid, mask: null, opacity: 1, blend: 'normal', visible: true, stroke: null, adjust: null }], null);
 	await sendPreview(id, { width: grid.width, height: grid.height, compositor });

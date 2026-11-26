@@ -63,6 +63,15 @@ easel-export-title = Export
 easel-export-format = Format
 easel-export-size = Size
 easel-export-quality = Quality
+easel-export-area = Area
+easel-develop-title = Develop
+easel-develop-exposure = Exposure
+easel-develop-temperature = Temperature
+easel-develop-tint = Tint
+easel-develop-highlights = Highlights
+easel-develop-shadows = Shadows
+easel-develop-reset = Reset
+easel-export-board = Whole board
 easel-export-save = Export
 
 ## Tools
@@ -202,6 +211,7 @@ easel-history-blend = Blending
 easel-history-opacity = Opacity
 easel-history-draw = Draw
 easel-history-arrow = Arrow
+easel-history-frame = Frame
 easel-history-note = Sticky note
 easel-history-picture = Picture
 easel-history-group = Group
@@ -219,6 +229,21 @@ easel-board-arrow = Arrow
 easel-board-text = Text
 easel-board-note = Sticky note
 easel-board-picture = Picture
+easel-board-frame = Frame
+easel-arrow-straight = Straight
+easel-arrow-elbow = Elbow
+easel-frame-name = Frame { $number }
+easel-template-blank = Blank
+easel-template-grid = Grid
+easel-template-kanban = Kanban
+easel-template-flowchart = Flowchart
+easel-template-to-do = To do
+easel-template-doing = Doing
+easel-template-done = Done
+easel-template-start = Start
+easel-template-step = Step
+easel-template-decision = Decision
+easel-template-end = End
 easel-board-color = Pen colour
 easel-board-note-color = Note colour
 easel-board-ink = Ink
@@ -247,6 +272,7 @@ easel-markup-pen = Pen
 easel-markup-color = Colour
 easel-hide-kind = Hide with
 easel-hide-blur = Blur
+easel-hide-remove = Remove
 easel-hide-redact = Black out
 easel-hide-hint = Drag over what to hide
 easel-layer-markup = Markup
@@ -362,3 +388,21 @@ easel-rulers = Rulers
 easel-snapping = Snap to guides
 # A length in pixels
 easel-pixels = { $value } px
+
+## On-device models
+
+easel-select-subject = Select subject
+easel-remove-fill = Remove and fill in
+easel-remove-background = Remove background
+easel-upscale-2 = Upscale ×2
+easel-upscale-4 = Upscale ×4
+# $name is the name of a machine learning model
+easel-model-title = Download { $name }?
+# $size is a size such as 210 MB, $licence the model's licence
+easel-model-body = Easel needs this model once, { $size }, and keeps it on this computer. It's under the { $licence } licence.
+easel-model-downloading = Downloading
+easel-model-download = Download
+easel-history-remove-background = Remove background
+easel-history-select-subject = Select subject
+easel-history-remove-fill = Remove and fill in
+easel-history-upscale = Upscale

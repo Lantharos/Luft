@@ -3,6 +3,7 @@ use luft_app::{Activation, Appearance, Events};
 use serde::Serialize;
 use specta::Type;
 
+use crate::ai::{self, Models};
 use crate::bridge::events::THUMBNAILS_READY;
 use crate::files::jobs::Jobs;
 use crate::format::save::Save;
@@ -14,6 +15,8 @@ pub struct EaselState {
     pub thumbnails: Thumbnails,
     pub saves: Jobs<Save>,
     pub exports: Jobs<Export>,
+    pub models: Models,
+    pub ai: Jobs<ai::Job>,
 }
 
 #[derive(Serialize, Type)]
@@ -32,6 +35,8 @@ impl EaselState {
             thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
             saves: Jobs::default(),
             exports: Jobs::default(),
+            models: Models::new(events.clone()),
+            ai: Jobs::default(),
             events,
         }
     }

@@ -1,10 +1,11 @@
 import type { ToolEvent } from '#lib/tools/tool.js';
 import { hits } from '../geometry';
-import { isBoxed, NOTE_SIZE, objectId, TEXT_SIZE, type Arrow, type BoardObject, type End, type Shape } from '../model';
+import { isBoxed, NOTE_SIZE, objectId, TEXT_SIZE, type Arrow, type BoardObject, type Box, type End, type Frame, type Shape } from '../model';
 import type { BoardHandler, BoardHost } from './tool';
 
 const MIN_DRAG = 4;
 const DEFAULT_SHAPE = { w: 180, h: 100 };
+const DEFAULT_FRAME = { w: 640, h: 400 };
 const ARROW_WIDTH = 2.5;
 
 export function attachAt(host: BoardHost, x: number, y: number, except: string | null = null): End {
@@ -70,7 +71,7 @@ export class ArrowTool implements BoardHandler {
 	}
 
 	#arrow(from: End, to: End): Arrow {
-		return { id: objectId(), kind: 'arrow', from, to, color: this.host.ink(), width: ARROW_WIDTH, head: true };
+		return { id: objectId(), kind: 'arrow', from, to, route: this.host.route(), color: this.host.ink(), width: ARROW_WIDTH, head: true };
 	}
 
 	up(event: ToolEvent) {
@@ -81,6 +82,43 @@ export class ArrowTool implements BoardHandler {
 		const arrow = this.#arrow(from, attachAt(this.host, event.x, event.y, from.attach ?? null));
 		const { board } = this.host;
 		board.commit(this.host.label('easel-history-arrow'), [...board.objects, arrow]);
+	}
+}
+
+function dragged(start: [number, number], event: ToolEvent): Box {
+	return { x: Math.min(start[0], event.x), y: Math.min(start[1], event.y), w: Math.abs(event.x - start[0]), h: Math.abs(event.y - start[1]) };
+}
+
+export class FrameTool implements BoardHandler {
+	#start: [number, number] | null = null;
+
+	constructor(private readonly host: BoardHost) {}
+
+	#frame(box: Box): Frame {
+		const number = this.host.board.objects.filter((object) => object.kind === 'frame').length + 1;
+		return { id: objectId(), kind: 'frame', ...box, text: this.host.label('easel-frame-name', { number }) };
+	}
+
+	down(event: ToolEvent) {
+		this.#start = [event.x, event.y];
+	}
+
+	move(event: ToolEvent) {
+		if (!this.#start) return;
+		this.host.live = this.#frame(dragged(this.#start, event));
+		this.host.redraw();
+	}
+
+	up(event: ToolEvent) {
+		const start = this.#start;
+		this.#start = null;
+		this.host.live = null;
+		if (!start) return;
+		const box = Math.hypot(event.x - start[0], event.y - start[1]) * this.host.scale() > MIN_DRAG ? dragged(start, event) : { x: start[0] - DEFAULT_FRAME.w / 2, y: start[1] - DEFAULT_FRAME.h / 2, ...DEFAULT_FRAME };
+		const frame = this.#frame(box);
+		const { board } = this.host;
+		board.commit(this.host.label('easel-history-frame'), [frame, ...board.objects]);
+		board.select([frame.id]);
 	}
 }
 

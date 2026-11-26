@@ -10,7 +10,8 @@ import { Editor } from '#lib/editor/editor.svelte.js';
 import { ToolSettings } from '#lib/editor/settings.svelte.js';
 import { openBoard, saveBoard, type BoardRecord } from '#lib/files/board-file.js';
 import { openImage, saveImage, type ImageRecord } from '#lib/files/image-file.svelte.js';
-import { baseName, extension, pictureDocument } from '#lib/files/picture.js';
+import { baseName, extension, layeredDocument, pictureDocument, RAW, rawDocument } from '#lib/files/picture.js';
+import type { RawDevelopment } from '#lib/adjust/develop.js';
 import { startGpu } from '#lib/gpu/device.js';
 import { kit } from '#lib/gpu/kit.js';
 import { scaling } from '#lib/gpu/matrix.js';
@@ -19,6 +20,7 @@ import { Whiteboard } from '#lib/whiteboard/whiteboard.svelte.js';
 import { QuickEdit } from '#lib/quick/quick.svelte.js';
 import { exportGrid, formatOf } from '#lib/files/export.js';
 import { recent } from './recent.svelte';
+import { templateObjects, type Template } from '#lib/board/templates.js';
 
 export type Screen =
 	| { kind: 'home' }
@@ -26,7 +28,7 @@ export type Screen =
 	| { kind: 'board'; whiteboard: Whiteboard; path: string | null; name: string }
 	| { kind: 'quick'; quick: QuickEdit; path: string; name: string };
 
-export type DialogKind = 'new-image' | 'export' | 'history' | 'resize' | 'unsaved' | 'save-back' | null;
+export type DialogKind = 'new-image' | 'new-board' | 'develop' | 'export' | 'history' | 'resize' | 'unsaved' | 'save-back' | null;
 
 const TOAST_MS = 2600;
 const CHOOSER = { timeoutMs: 24 * 60 * 60 * 1000 };
@@ -40,6 +42,7 @@ export class App {
 	failure = $state<string | null>(null);
 	pictures = $state<string | null>(null);
 	busy = $state(false);
+	developing = $state.raw<RawDevelopment | null>(null);
 	readonly tools = new ToolSettings();
 	readonly toasts = new Toasts(TOAST_MS);
 	#leaving: ((choice: 'save' | 'discard' | 'cancel') => void) | null = null;
@@ -82,6 +85,17 @@ export class App {
 		return this.screen.kind === 'home' ? '' : this.screen.name;
 	}
 
+	async working(task: () => Promise<unknown>) {
+		this.busy = true;
+		try {
+			await task();
+		} catch (error) {
+			this.toasts.show(errorText(error));
+		} finally {
+			this.busy = false;
+		}
+	}
+
 	async chooseAndOpen() {
 		const paths = await commands.chooseOpen({ folder: this.pictures }, CHOOSER);
 		if (paths.length) await this.openPaths(paths, false);
@@ -99,6 +113,13 @@ export class App {
 				const record = opened.document as unknown as ImageRecord | BoardRecord;
 				if (record.kind === 'board') this.showBoard(await openBoard(record, opened.assets), path, baseName(path));
 				else this.showImage(await openImage(record, opened.layers), path, baseName(path));
+			} else if (extension(path) === 'psd') {
+				this.showImage(await layeredDocument(path), null, baseName(path));
+			} else if (RAW.has(extension(path))) {
+				const development = await rawDocument(path);
+				this.showImage(development.doc, null, baseName(path));
+				this.developing = development;
+				this.dialog = 'develop';
 			} else if (quick) {
 				this.showQuick(await pictureDocument(path), path);
 			} else {
@@ -111,6 +132,12 @@ export class App {
 		} finally {
 			this.busy = false;
 		}
+	}
+
+	finishDeveloping() {
+		this.developing?.finish();
+		this.developing = null;
+		this.dialog = null;
 	}
 
 	async newImage(width: number, height: number, background: string | null) {
@@ -131,9 +158,10 @@ export class App {
 		this.showImage(doc, null, t('easel-untitled'));
 	}
 
-	async newBoard() {
+	async newBoard(template: Template) {
+		this.dialog = null;
 		if (!(await this.leave())) return;
-		this.showBoard(new BoardDocument(), null, t('easel-untitled-board'));
+		this.showBoard(new BoardDocument(templateObjects(template)), null, t('easel-untitled-board'));
 	}
 
 	showImage(doc: ImageDocument, path: string | null, name: string) {

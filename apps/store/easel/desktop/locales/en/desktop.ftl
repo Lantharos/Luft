@@ -18,3 +18,5 @@ easel-error-not-document = This isn't an Easel document
 easel-error-empty-board = The board is empty
 # $name is the file name inside the document
 easel-error-bad-name = Easel can't keep { $name } in a document
+easel-error-no-model = Easel has no model for this
+easel-error-model-missing = The model hasn't been downloaded yet

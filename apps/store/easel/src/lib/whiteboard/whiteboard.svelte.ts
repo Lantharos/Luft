@@ -1,8 +1,8 @@
 import { t } from '@luft/i18n';
 import { BoardDocument } from '#lib/board/board.svelte.js';
-import { NOTE_COLORS, type BoardObject, type Box, type ShapeKind } from '#lib/board/model.js';
+import { NOTE_COLORS, type BoardObject, type Box, type Route, type ShapeKind } from '#lib/board/model.js';
 import { INK } from '#lib/board/render/look.js';
-import { ArrowTool, PlaceTool, ShapeTool } from '#lib/board/tools/create.js';
+import { ArrowTool, FrameTool, PlaceTool, ShapeTool } from '#lib/board/tools/create.js';
 import { DrawTool } from '#lib/board/tools/draw.js';
 import { EraseTool } from '#lib/board/tools/erase.js';
 import { SelectTool } from '#lib/board/tools/select.js';
@@ -15,6 +15,7 @@ export class Whiteboard implements BoardHost {
 	tool = $state<BoardTool>('pen');
 	color = $state(INK);
 	shapeKind = $state<ShapeKind>('rectangle');
+	routing = $state<Route>('straight');
 	note = $state(NOTE_COLORS[0]);
 	marquee = $state<Box | null>(null);
 	editing = $state<string | null>(null);
@@ -36,15 +37,17 @@ export class Whiteboard implements BoardHost {
 			shape: new ShapeTool(this),
 			arrow: new ArrowTool(this),
 			text: new PlaceTool(this, 'text'),
-			note: new PlaceTool(this, 'note')
+			note: new PlaceTool(this, 'note'),
+			frame: new FrameTool(this)
 		};
 	}
 
 	scale = () => this.viewport.scale;
 	shape = () => this.shapeKind;
+	route = () => this.routing;
 	noteColor = () => this.note;
 	ink = () => this.color;
-	label = (key: string) => t(key);
+	label = (key: string, args?: Record<string, string | number>) => t(key, args);
 
 	edit(id: string) {
 		this.editing = id;

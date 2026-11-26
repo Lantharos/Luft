@@ -1,3 +1,4 @@
+mod ai;
 mod bridge;
 mod files;
 mod format;

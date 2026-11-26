@@ -32,4 +32,5 @@ export interface ExportChoice {
 	format: Format | 'svg' | 'pdf';
 	quality: number;
 	scale: number;
+	area: string;
 }

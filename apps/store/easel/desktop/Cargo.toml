@@ -15,13 +15,18 @@ dirs.workspace = true
 fast_image_resize.workspace = true
 gio.workspace = true
 glycin = { workspace = true, features = ["tokio"] }
+half.workspace = true
 jpeg-encoder.workspace = true
 krilla = { workspace = true, features = ["raster-images"] }
 krilla-svg.workspace = true
 luft-app = { workspace = true, features = ["settings", "thumbnails"] }
 luft-i18n.workspace = true
+luft-models.workspace = true
+ort = { workspace = true, features = ["api-24", "std", "load-dynamic"] }
 parking_lot.workspace = true
 png.workspace = true
+psd.workspace = true
+rawler.workspace = true
 rayon.workspace = true
 sabine.workspace = true
 serde.workspace = true

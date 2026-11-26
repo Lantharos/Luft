@@ -14,12 +14,13 @@ bun run desktop:bundle   # release bundle
 sabine install --bundle .
 ```
 
-Opening files needs a build or bundle, since Sabine's local file access only works from the packaged app. TIFF and HEIC need the `glycin-loaders` package and `bwrap`.
+Opening files needs a build or bundle, since Sabine's local file access only works from the packaged app. TIFF and HEIC need the `glycin-loaders` package and `bwrap`, and the AI tools need ONNX Runtime (`onnxruntime`).
 
 | Path | Contents |
 |------|----------|
 | `~/.config/easel/settings.json` | Settings |
 | `~/.config/easel/recent.json` | Recent files |
+| `~/.local/share/easel/models` | Downloaded models for the AI tools |
 
 ## License
 

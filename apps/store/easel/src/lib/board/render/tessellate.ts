@@ -65,10 +65,10 @@ export class Mesh {
 		this.disc(color, to[0], to[1], width / 2, CAP_STEPS);
 	}
 
-	arrow(color: Rgba, from: [number, number], to: [number, number], width: number, head: boolean) {
-		this.line(color, from, to, width);
+	arrow(color: Rgba, path: [number, number][], width: number, head: boolean) {
+		for (let at = 1; at < path.length; at++) this.line(color, path[at - 1], path[at], width);
 		if (!head) return;
-		const [left, tip, right] = arrowHead(from, to, width);
+		const [left, tip, right] = arrowHead(path[path.length - 2], path[path.length - 1], width);
 		this.line(color, left, tip, width);
 		this.line(color, right, tip, width);
 	}

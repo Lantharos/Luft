@@ -5,11 +5,14 @@
 	import type { Editor } from '../editor.svelte';
 	import OptionSlider from './OptionSlider.svelte';
 	import RefineDialog from '#lib/dialogs/RefineDialog.svelte';
+	import { removeAndFill, selectSubject } from '#lib/ai/actions.js';
+	import { useApp } from '#lib/app/context.js';
 
 	let { editor }: { editor: Editor } = $props();
 	let settings = $derived(editor.settings);
 	let doc = $derived(editor.doc);
 	let dialog = $state<'refine' | 'range' | null>(null);
+	const app = useApp();
 </script>
 
 {#if settings.tool === 'select'}
@@ -49,6 +52,8 @@
 	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => doc.clearSelection(t('easel-history-deselect'))}>{t('easel-selection-clear')}</button>
 	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => (dialog = 'refine')}>{t('easel-refine')}</button>
 	<button type="button" class="chip" onclick={() => (dialog = 'range')}>{t('easel-color-range')}</button>
+	<button type="button" class="chip" onclick={() => void app.working(() => selectSubject(doc))}>{t('easel-select-subject')}</button>
+	<button type="button" class="chip" disabled={!doc.selectionActive || !doc.active.paintable} onclick={() => void app.working(() => removeAndFill(doc, doc.active))}>{t('easel-remove-fill')}</button>
 	<button type="button" class={['chip', doc.quickMask && 'is-on']} aria-pressed={doc.quickMask} onclick={() => editor.toggleQuickMask()}>{t('easel-quick-mask')}</button>
 </div>
 

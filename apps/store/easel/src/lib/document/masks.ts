@@ -18,7 +18,7 @@ function uniform(mode: number, color = [1, 1, 1, 1]) {
 	return kit.uniform(data);
 }
 
-function setMask(doc: ImageDocument, layer: Layer, label: string, mask: TileGrid | null): Entry {
+export function setMask(doc: ImageDocument, layer: Layer, label: string, mask: TileGrid | null): Entry {
 	const before = layer.mask;
 	const apply = (forward: boolean) => {
 		layer.mask = forward ? mask : before;

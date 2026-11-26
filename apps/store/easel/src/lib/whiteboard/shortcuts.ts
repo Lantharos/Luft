@@ -9,7 +9,7 @@ import type { Whiteboard } from './whiteboard.svelte';
 
 const OBJECTS = 'application/x-easel-objects';
 const OFFSET = 24;
-const KEYS: Record<string, BoardTool> = { v: 'select', p: 'pen', h: 'highlighter', e: 'eraser', s: 'shape', a: 'arrow', t: 'text', n: 'note' };
+const KEYS: Record<string, BoardTool> = { v: 'select', p: 'pen', h: 'highlighter', e: 'eraser', s: 'shape', a: 'arrow', t: 'text', n: 'note', f: 'frame' };
 
 function copies(objects: BoardObject[], offset: number) {
 	const ids = new Map(objects.map((object) => [object.id, objectId()]));
@@ -31,7 +31,8 @@ export async function paste(whiteboard: Whiteboard) {
 	const objects = data[OBJECTS];
 	if (typeof objects === 'string') {
 		const pasted = copies(JSON.parse(objects) as BoardObject[], OFFSET);
-		board.commit(t('easel-history-paste'), [...board.objects, ...pasted]);
+		const frames = pasted.filter((object) => object.kind === 'frame');
+		board.commit(t('easel-history-paste'), [...frames, ...board.objects, ...pasted.filter((object) => object.kind !== 'frame')]);
 		board.select(pasted.map((object) => object.id));
 		return;
 	}

@@ -1,11 +1,14 @@
-import { arrowEnds, bounds, LINE_HEIGHT } from './geometry';
-import { LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE, type BoardObject, type Box } from './model';
+import { arrowPath, bounds, FRAME_BAND, LINE_HEIGHT } from './geometry';
+import { FRAME_TITLE_SIZE, LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE, type BoardObject, type Box } from './model';
 import type { Asset } from './board.svelte';
 import { measureLabel } from './render/labels';
 import { resolve, type Look } from './render/look';
+import type { Rgba } from '#lib/raster/color.js';
 import { arrowHead } from '#lib/raster/shapes.js';
 
 const escape = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const paint = ([r, g, b, a]: Rgba) => `rgb(${Math.round(r * 255)} ${Math.round(g * 255)} ${Math.round(b * 255)} / ${a})`;
 
 function base64(bytes: Uint8Array) {
 	let binary = '';
@@ -32,10 +35,13 @@ function element(object: BoardObject, look: Look, lookup: (id: string) => BoardO
 			return `<polyline points="${points.join(' ')}" fill="none" stroke="${resolve(object.color, look)}" stroke-width="${object.width}" stroke-linecap="round" stroke-linejoin="round"${opacity}/>`;
 		}
 		case 'arrow': {
-			const [from, to] = arrowEnds(object, lookup);
-			const head = object.head ? `<polyline points="${arrowHead(from, to, object.width).map((point) => point.join(',')).join(' ')}" fill="none" stroke="${resolve(object.color, look)}" stroke-width="${object.width}" stroke-linecap="round" stroke-linejoin="round"/>` : '';
-			return `<line x1="${from[0]}" y1="${from[1]}" x2="${to[0]}" y2="${to[1]}" stroke="${resolve(object.color, look)}" stroke-width="${object.width}" stroke-linecap="round"/>${head}`;
+			const path = arrowPath(object, lookup);
+			const stroke = `fill="none" stroke="${resolve(object.color, look)}" stroke-width="${object.width}" stroke-linecap="round" stroke-linejoin="round"`;
+			const head = object.head ? `<polyline points="${arrowHead(path[path.length - 2], path[path.length - 1], object.width).map((point) => point.join(',')).join(' ')}" ${stroke}/>` : '';
+			return `<polyline points="${path.map((point) => point.join(',')).join(' ')}" ${stroke}/>${head}`;
 		}
+		case 'frame':
+			return `<rect x="${object.x}" y="${object.y}" width="${object.w}" height="${object.h}" rx="12" fill="${paint(look.frame)}" stroke="${paint(look.frameLine)}"/>${textBlock(object.text, object.x + 2, object.y - FRAME_BAND, FRAME_TITLE_SIZE, 600, look.frameTitle, null)}`;
 		case 'shape': {
 			const { x, y, w, h } = object;
 			const paint = `fill="${object.fill ? resolve(object.fill, look) : 'none'}" stroke="${resolve(object.color, look)}" stroke-width="2"`;

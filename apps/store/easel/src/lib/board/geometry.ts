@@ -1,5 +1,8 @@
-import type { Arrow, BoardObject, Box, Boxed, End } from './model';
-import { isBoxed } from './model';
+import type { Arrow, BoardObject, Box, Boxed, End, Frame } from './model';
+import { FRAME_TITLE_GAP, FRAME_TITLE_SIZE, isBoxed } from './model';
+
+type Point = [number, number];
+type Lookup = (id: string) => BoardObject | undefined;
 
 const LINE_HEIGHT = 1.3;
 const measure = new OffscreenCanvas(1, 1).getContext('2d')!;
@@ -17,11 +20,11 @@ export function union(boxes: Box[]): Box | null {
 	return { x, y, w: Math.max(...boxes.map((box) => box.x + box.w)) - x, h: Math.max(...boxes.map((box) => box.y + box.h)) - y };
 }
 
-export function centerOf(box: Box): [number, number] {
+export function centerOf(box: Box): Point {
 	return [box.x + box.w / 2, box.y + box.h / 2];
 }
 
-export function boundaryPoint(target: Boxed, toward: [number, number]): [number, number] {
+export function boundaryPoint(target: Boxed, toward: Point): Point {
 	const [cx, cy] = centerOf(target);
 	const dx = toward[0] - cx;
 	const dy = toward[1] - cy;
@@ -35,19 +38,57 @@ export function boundaryPoint(target: Boxed, toward: [number, number]): [number,
 	return [cx + dx * t, cy + dy * t];
 }
 
-export function arrowEnds(arrow: Arrow, lookup: (id: string) => BoardObject | undefined): [[number, number], [number, number]] {
-	const target = (end: End) => {
-		const object = end.attach ? lookup(end.attach) : undefined;
-		return object && isBoxed(object) ? object : null;
-	};
-	const fromBox = target(arrow.from);
-	const toBox = target(arrow.to);
-	const fromAim: [number, number] = fromBox ? centerOf(fromBox) : [arrow.from.x, arrow.from.y];
-	const toAim: [number, number] = toBox ? centerOf(toBox) : [arrow.to.x, arrow.to.y];
+function attached(end: End, lookup: Lookup) {
+	const object = end.attach ? lookup(end.attach) : undefined;
+	return object && isBoxed(object) ? object : null;
+}
+
+function side(box: Boxed, horizontal: boolean, sign: number): Point {
+	const [cx, cy] = centerOf(box);
+	return horizontal ? [cx + (sign * box.w) / 2, cy] : [cx, cy + (sign * box.h) / 2];
+}
+
+function elbow(start: Point, end: Point, fromBox: Boxed | null, toBox: Boxed | null): Point[] {
+	const horizontal = Math.abs(end[0] - start[0]) >= Math.abs(end[1] - start[1]);
+	const sign = Math.sign(horizontal ? end[0] - start[0] : end[1] - start[1]) || 1;
+	const a = fromBox ? side(fromBox, horizontal, sign) : start;
+	const b = toBox ? side(toBox, horizontal, -sign) : end;
+	if (horizontal) {
+		const middle = (a[0] + b[0]) / 2;
+		return a[1] === b[1] ? [a, b] : [a, [middle, a[1]], [middle, b[1]], b];
+	}
+	const middle = (a[1] + b[1]) / 2;
+	return a[0] === b[0] ? [a, b] : [a, [a[0], middle], [b[0], middle], b];
+}
+
+export function arrowPath(arrow: Arrow, lookup: Lookup): Point[] {
+	const fromBox = attached(arrow.from, lookup);
+	const toBox = attached(arrow.to, lookup);
+	const fromAim: Point = fromBox ? centerOf(fromBox) : [arrow.from.x, arrow.from.y];
+	const toAim: Point = toBox ? centerOf(toBox) : [arrow.to.x, arrow.to.y];
+	if (arrow.route === 'elbow') return elbow(fromAim, toAim, fromBox, toBox);
 	return [fromBox ? boundaryPoint(fromBox, toAim) : fromAim, toBox ? boundaryPoint(toBox, fromAim) : toAim];
 }
 
-export function bounds(object: BoardObject, lookup: (id: string) => BoardObject | undefined): Box {
+export const FRAME_BAND = FRAME_TITLE_SIZE * LINE_HEIGHT + FRAME_TITLE_GAP;
+
+function pointsBox(points: Point[], pad: number): Box {
+	const xs = points.map((point) => point[0]);
+	const ys = points.map((point) => point[1]);
+	const x = Math.min(...xs) - pad;
+	const y = Math.min(...ys) - pad;
+	return { x, y, w: Math.max(...xs) + pad - x, h: Math.max(...ys) + pad - y };
+}
+
+function hitsFrame(frame: Frame, x: number, y: number, slop: number) {
+	const across = x >= frame.x - slop && x <= frame.x + frame.w + slop;
+	if (across && y >= frame.y - FRAME_BAND && y <= frame.y) return true;
+	const near = across && y >= frame.y - slop && y <= frame.y + frame.h + slop;
+	const deep = x > frame.x + slop && x < frame.x + frame.w - slop && y > frame.y + slop && y < frame.y + frame.h - slop;
+	return near && !deep;
+}
+
+export function bounds(object: BoardObject, lookup: Lookup): Box {
 	switch (object.kind) {
 		case 'stroke': {
 			let left = Infinity;
@@ -63,11 +104,10 @@ export function bounds(object: BoardObject, lookup: (id: string) => BoardObject 
 			const pad = object.width;
 			return { x: left - pad, y: top - pad, w: right - left + pad * 2, h: bottom - top + pad * 2 };
 		}
-		case 'arrow': {
-			const [[x1, y1], [x2, y2]] = arrowEnds(object, lookup);
-			const pad = object.width * 4;
-			return { x: Math.min(x1, x2) - pad, y: Math.min(y1, y2) - pad, w: Math.abs(x2 - x1) + pad * 2, h: Math.abs(y2 - y1) + pad * 2 };
-		}
+		case 'arrow':
+			return pointsBox(arrowPath(object, lookup), object.width * 4);
+		case 'frame':
+			return { x: object.x, y: object.y - FRAME_BAND, w: object.w, h: object.h + FRAME_BAND };
 		case 'text': {
 			const size = textBox(object.text || ' ', object.size);
 			return { x: object.x, y: object.y, ...size };
@@ -93,7 +133,7 @@ export function segmentDistance(px: number, py: number, ax: number, ay: number, 
 	return Math.hypot(px - ax - dx * t, py - ay - dy * t);
 }
 
-export function hits(object: BoardObject, x: number, y: number, slop: number, lookup: (id: string) => BoardObject | undefined) {
+export function hits(object: BoardObject, x: number, y: number, slop: number, lookup: Lookup) {
 	if (object.kind === 'stroke') {
 		const reach = object.width / 2 + slop;
 		for (let at = 3; at < object.points.length; at += 3) {
@@ -102,9 +142,10 @@ export function hits(object: BoardObject, x: number, y: number, slop: number, lo
 		return object.points.length === 3 && Math.hypot(x - object.points[0], y - object.points[1]) <= reach;
 	}
 	if (object.kind === 'arrow') {
-		const [[x1, y1], [x2, y2]] = arrowEnds(object, lookup);
-		return segmentDistance(x, y, x1, y1, x2, y2) <= object.width / 2 + slop;
+		const path = arrowPath(object, lookup);
+		return path.slice(1).some((point, index) => segmentDistance(x, y, ...path[index], ...point) <= object.width / 2 + slop);
 	}
+	if (object.kind === 'frame') return hitsFrame(object, x, y, slop);
 	const box = bounds(object, lookup);
 	return x >= box.x - slop && y >= box.y - slop && x <= box.x + box.w + slop && y <= box.y + box.h + slop;
 }

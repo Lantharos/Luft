@@ -2,7 +2,9 @@
 	import { boardToolLabel } from '#lib/app/labels.js';
 	import ArrowUpRight from '@luft/symbols/icons/arrow-up-right';
 	import Circle from '@luft/symbols/icons/circle';
+	import Elbow from '@luft/symbols/icons/elbow';
 	import Eraser from '@luft/symbols/icons/eraser';
+	import FrameIcon from '@luft/symbols/icons/frame';
 	import Highlighter from '@luft/symbols/icons/highlighter';
 	import ImageIcon from '@luft/symbols/icons/image';
 	import MousePointer from '@luft/symbols/icons/mouse-pointer-2';
@@ -33,9 +35,9 @@
 		{ id: 'eraser', icon: Eraser }
 	];
 	const PLACING: { id: BoardTool; icon: typeof Pen }[] = [
-		{ id: 'arrow', icon: ArrowUpRight },
 		{ id: 'text', icon: Type },
-		{ id: 'note', icon: StickyNote }
+		{ id: 'note', icon: StickyNote },
+		{ id: 'frame', icon: FrameIcon }
 	];
 
 	let notes = $derived(whiteboard.tool === 'note');
@@ -58,6 +60,13 @@
 			<MenuItem checked={whiteboard.shapeKind === 'rectangle'} onclick={() => (close(), (whiteboard.shapeKind = 'rectangle'), whiteboard.choose('shape'))}><Square size={16} />{t('easel-shape-box')}</MenuItem>
 			<MenuItem checked={whiteboard.shapeKind === 'ellipse'} onclick={() => (close(), (whiteboard.shapeKind = 'ellipse'), whiteboard.choose('shape'))}><Circle size={16} />{t('easel-shape-ellipse')}</MenuItem>
 			<MenuItem checked={whiteboard.shapeKind === 'diamond'} onclick={() => (close(), (whiteboard.shapeKind = 'diamond'), whiteboard.choose('shape'))}><Square size={16} class="rotate-45 scale-90" />{t('easel-shape-diamond')}</MenuItem>
+		{/snippet}
+	</MenuButton>
+	<MenuButton label={t('easel-board-arrow')} class={['board-tool', whiteboard.tool === 'arrow' && 'is-active']}>
+		{#snippet trigger()}{#if whiteboard.routing === 'elbow'}<Elbow size={20} />{:else}<ArrowUpRight size={20} />{/if}{/snippet}
+		{#snippet children(close)}
+			<MenuItem checked={whiteboard.routing === 'straight'} onclick={() => (close(), (whiteboard.routing = 'straight'), whiteboard.choose('arrow'))}><ArrowUpRight size={16} />{t('easel-arrow-straight')}</MenuItem>
+			<MenuItem checked={whiteboard.routing === 'elbow'} onclick={() => (close(), (whiteboard.routing = 'elbow'), whiteboard.choose('arrow'))}><Elbow size={16} />{t('easel-arrow-elbow')}</MenuItem>
 		{/snippet}
 	</MenuButton>
 	{#each PLACING as entry (entry.id)}{@render button(entry.id, entry.icon)}{/each}

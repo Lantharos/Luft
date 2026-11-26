@@ -20,7 +20,7 @@
 </script>
 
 <Dialog title={kind === 'refine' ? t('easel-refine') : t('easel-color-range')} {onclose}>
-	<div class="flex flex-col gap-4 px-2.5 py-2.5">
+	<div class="flex flex-col gap-4 px-2.5 py-3">
 		{#if kind === 'refine'}
 			<Segmented
 				label={t('easel-refine')}

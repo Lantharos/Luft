@@ -30,7 +30,7 @@
 </script>
 
 <Dialog title={adjustmentName[adjustment.type]()} onclose={() => finish(false)}>
-	<div class="flex flex-col gap-4 px-2.5 py-2.5">
+	<div class="flex flex-col gap-4 px-2.5 py-3">
 		{#if adjustment.type === 'curves'}
 			<CurveEditor
 				points={adjustment.curve}

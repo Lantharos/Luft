@@ -6,7 +6,7 @@ import {checks} from '../lib/check.js';
 import {press, type} from '../lib/input/input.js';
 import {withApp} from './lib/apps.js';
 import {exists, removeTree} from './lib/files.js';
-import {answerChooser, colorsOf, documentOf, folder, inFolder, near, pixelAt, remove, writePicture, type Rgb} from './easel/files.js';
+import {answerChooser, colorsOf, documentOf, folder, inFolder, near, pixelAt, remove, sizeOf, writePicture, type Rgb} from './easel/files.js';
 
 export const timeout = 360000;
 
@@ -15,6 +15,8 @@ const BASE: Rgb = [40, 120, 200];
 const FILL: Rgb = [47, 111, 222];
 const MULTIPLIED = BASE.map((channel, index) => Math.round((channel * FILL[index]) / 255)) as Rgb;
 const NOTE: Rgb = [243, 216, 138];
+const NEXT_NOTE: Rgb = [241, 185, 165];
+const LANE = {width: 360, height: 640};
 const SAVE_TIMEOUT = 15000;
 const CENTER = [300, 200] as const;
 
@@ -110,6 +112,13 @@ async function checkMasksAndAdjustments(source: string, saved: string) {
 async function checkBoard(saved: string) {
   await withApp('easel', [], async app => {
     app.click(await app.find({text: 'New board'}));
+    app.click(await app.find(button('Kanban')));
+    press(Clutter.KEY_Control_L, Clutter.KEY_a);
+    const lane = await exported(app, 'lane.png');
+    const size = sizeOf(lane);
+    require(size.width === LANE.width && size.height === LANE.height, `exporting a frame exports just its area (${size.width} × ${size.height})`);
+    const colors = colorsOf(lane);
+    require(colors.some(color => near(color, NOTE, 4)) && !colors.some(color => near(color, NEXT_NOTE, 4)), 'the exported frame holds its own note and nothing from the next lane');
     app.click(await app.find(button('Sticky note')));
     app.click(await app.find({role: 'application'}));
     type('Plan the launch');
@@ -120,7 +129,9 @@ async function checkBoard(saved: string) {
     await eventually(() => exists(saved), 'Easel saves a board', SAVE_TIMEOUT);
   });
   const record = await documentOf(saved);
-  require(record.kind === 'board' && record.objects.some((object: {kind: string; text?: string}) => object.kind === 'note' && object.text === 'Plan the launch'), 'the saved board keeps the sticky note and its text');
+  const objects: {kind: string; text?: string}[] = record.objects;
+  require(record.kind === 'board' && objects.some(object => object.kind === 'note' && object.text === 'Plan the launch'), 'the saved board keeps the sticky note and its text');
+  require(objects.filter(object => object.kind === 'frame').map(object => object.text).join() === 'To do,Doing,Done', 'the saved board keeps the template\'s frames');
   await withApp('easel', [saved], async app => {
     const colors = colorsOf(await exported(app, 'board.png'));
     require(colors.some(color => near(color, NOTE, 4)), 'the reopened board draws the sticky note');

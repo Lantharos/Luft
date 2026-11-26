@@ -44,7 +44,8 @@ Layers are listed from the bottom up. `kind` is `raster`, `text`, `adjustment` o
   "format": 1, "kind": "board",
   "objects": [
     { "id": "…", "kind": "shape", "shape": "rectangle", "x": 0, "y": 0, "w": 180, "h": 80, "color": "ink", "fill": null, "text": "Sign in" },
-    { "id": "…", "kind": "arrow", "from": { "x": 180, "y": 40, "attach": "<shape id>" }, "to": { "x": 400, "y": 40 }, "color": "ink", "width": 2.5, "head": true },
+    { "id": "…", "kind": "arrow", "from": { "x": 180, "y": 40, "attach": "<shape id>" }, "to": { "x": 400, "y": 40 }, "route": "elbow", "color": "ink", "width": 2.5, "head": true },
+    { "id": "…", "kind": "frame", "x": -40, "y": -120, "w": 1200, "h": 640, "text": "Sign-in flow" },
     { "id": "…", "kind": "stroke", "tool": "pen", "color": "#e8a25a", "width": 3, "points": [12, 40, 0.5, 14, 41, 0.62] },
     { "id": "…", "kind": "note", "x": 300, "y": 200, "w": 180, "h": 180, "color": "#f3d88a", "text": "Fewer than 5 screens" },
     { "id": "…", "kind": "text", "x": 0, "y": -60, "text": "First start", "size": 22, "color": "ink" },
@@ -54,7 +55,7 @@ Layers are listed from the bottom up. `kind` is `raster`, `text`, `adjustment` o
 }
 ```
 
-Board coordinates are unbounded and grow down and to the right. Objects are listed from the back to the front. A stroke's `points` are its x, y and pen pressure, three numbers each. `ink` is the colour that contrasts with the board: light on a dark board, dark on a light one and in exports. An arrow end with `attach` follows that object: its end is where the line between the two ends crosses the object's outline. Objects sharing a `group` are selected and moved together. `assets` maps each picture to its type.
+Board coordinates are unbounded and grow down and to the right. Objects are listed from the back to the front. A stroke's `points` are its x, y and pen pressure, three numbers each. `ink` is the colour that contrasts with the board: light on a dark board, dark on a light one and in exports. An arrow end with `attach` follows that object. A `straight` arrow ends where the line between the two ends crosses the object's outline; an `elbow` arrow leaves and enters through the middle of the sides facing each other along the longer axis and bends twice halfway between them. A frame's `text` is its name, drawn above it, and frames come before the objects they hold, so they're drawn behind them. Objects sharing a `group` are selected and moved together. `assets` maps each picture to its type.
 
 ### Tiles
 
@@ -89,6 +90,16 @@ A selection is another single-channel tile grid. Rectangles, ellipses and lassos
 
 ### Boards
 
-Board objects are immutable; changing one replaces it, and each undo step is the list of objects before and after. Each object is turned into triangles once, in board coordinates, and kept in a GPU buffer until it changes. Text and note labels are drawn with the canvas 2D API into textures at the nearest power of two of the zoom, and pictures are kept at most 2048 pixels on a side for drawing. A frame draws the dot grid in one pass, then only the objects whose bounds meet the view, with four-sample antialiasing, and only when something changed.
+Board objects are immutable; changing one replaces it, and each undo step is the list of objects before and after. Because steps share every object they didn't change, a board keeps its whole history. Moving a frame moves everything whose bounds lie inside it, and exporting a frame renders the board clipped to the frame's rectangle. Each object is turned into triangles once, in board coordinates, and kept in a GPU buffer until it changes. Text and note labels are drawn with the canvas 2D API into textures at the nearest power of two of the zoom, and pictures are kept at most 2048 pixels on a side for drawing. A frame draws the dot grid in one pass, then only the objects whose bounds meet the view, with four-sample antialiasing, and only when something changed.
 
 Drawing recognises shapes when the pen pauses at the end of a stroke: the stroke is simplified to its corners, and a closed path with four right angles becomes a box or a diamond, other closed paths an ellipse, two corners a line, and a line with a head an arrow.
+
+## Raw photos and Photoshop files
+
+Raw photos are decoded in Rust with [rawler](https://github.com/dnglab/dnglab): demosaicing, the camera's as-shot white balance and its colour matrix give linear light in sRGB primaries, turned to the camera's orientation and handed to the page as 16-bit floats. The page keeps those as a tile grid of `rgba16float` textures while **Develop** is open, and one shader pass per tile writes the layer: white balance and exposure in linear light, then sRGB encoding, highlights and shadows as a luminance shift weighted towards each end, and a soft shoulder that rolls highlights off instead of clipping them. Closing **Develop** frees the linear tiles. Photoshop files are read with the [psd](https://github.com/chinedufn/psd) crate, one full-size RGBA buffer per layer, with blend modes Easel has kept and the rest drawn as normal.
+
+## On-device AI
+
+The models run in the desktop process with [ONNX Runtime](https://onnxruntime.ai), loaded from the system's library, on worker threads so the page never waits. `data/models.json` lists each model's pinned source, size and SHA-256; the models workflow mirrors them to `get.luft.computer/models`, and Easel downloads them from there into `~/.local/share/easel/models` the first time they're needed, checking both.
+
+The page reads a layer or the composite back, sends it in chunks, and gets a file back. **Remove background** and **Select subject** run BiRefNet lite at 1024 × 1024 on a copy at most 1536 pixels on a side, and the mask is scaled back up on the GPU into a layer mask or the selection. **Remove and fill in** crops the selection with a margin of 30% on each side, runs LaMa at 512 × 512, and bakes the result through the selection, so pixels outside it never change. **Upscale** runs Real-ESRGAN's compact general model, which enlarges four times, on 256-pixel tiles with 16 pixels of overlap across up to four sessions at once; ×2 scales each enlarged tile down by half before it's placed. Transparent pixels keep the alpha of the pixel they came from.

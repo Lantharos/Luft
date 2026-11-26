@@ -68,3 +68,17 @@ export function writeRegion(grid: TileGrid, data: Uint8Array, area: { x: number;
 		);
 	}
 }
+
+export async function readTexture(texture: GPUTexture) {
+	const pixel = BYTES[texture.format];
+	const row = Math.ceil((texture.width * pixel) / ROW_ALIGN) * ROW_ALIGN;
+	const buffer = device.createBuffer({ size: row * texture.height, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+	kit.begin().copyTextureToBuffer({ texture }, { buffer, bytesPerRow: row }, [texture.width, texture.height]);
+	kit.flush();
+	await buffer.mapAsync(GPUMapMode.READ);
+	const mapped = new Uint8Array(buffer.getMappedRange());
+	const out = new Uint8Array(texture.width * texture.height * pixel);
+	for (let y = 0; y < texture.height; y++) out.set(mapped.subarray(y * row, y * row + texture.width * pixel), y * texture.width * pixel);
+	buffer.destroy();
+	return out;
+}

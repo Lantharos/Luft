@@ -31,7 +31,7 @@ export class Transformer {
 		this.#levels = [source];
 	}
 
-	render(matrix: Projective, target: GPUTexture, origin: [number, number]) {
+	render(matrix: Projective, target: GPUTexture, origin: [number, number], size: [number, number] = [TILE, TILE]) {
 		const scale = Math.sqrt(Math.abs(matrix[0] * matrix[4] - matrix[1] * matrix[3])) / Math.abs(matrix[8]);
 		let level = 0;
 		while (scale * 2 ** (level + 1) <= 1 && this.#levels[level].width > 1) {
@@ -42,7 +42,7 @@ export class Transformer {
 		const placed = multiplyProjective(matrix, projective(scaling(this.#levels[0].width / source.width, this.#levels[0].height / source.height)));
 		const data = new Float32Array(20);
 		packedProjective(placed, data);
-		data.set([origin[0], origin[1], 0, 0, source.width, source.height, TILE, TILE], 12);
+		data.set([origin[0], origin[1], 0, 0, source.width, source.height, size[0], size[1]], 12);
 		const use = target.format === 'r8unorm' ? kit.transformMask : kit.transform;
 		const pass = kit.pass(target.createView(), [0, 0, 0, 0]);
 		pass.setPipeline(use);

@@ -4,6 +4,7 @@ import type { ToolId } from '#lib/editor/settings.svelte.js';
 import type { Adjust } from '#lib/gpu/shaders/adjust.js';
 import type { BlendMode } from '#lib/gpu/shaders/blend.js';
 import type { QuickMode } from '#lib/quick/quick.svelte.js';
+import type { Template } from '#lib/board/templates.js';
 
 export const toolLabel: Record<ToolId, () => string> = {
 	move: () => t('easel-tool-move'),
@@ -38,6 +39,13 @@ export const blendLabel: Record<BlendMode, () => string> = {
 	add: () => t('easel-blend-add')
 };
 
+export const templateLabel: Record<Template, () => string> = {
+	blank: () => t('easel-template-blank'),
+	grid: () => t('easel-template-grid'),
+	kanban: () => t('easel-template-kanban'),
+	flowchart: () => t('easel-template-flowchart')
+};
+
 export const boardToolLabel: Record<BoardTool, () => string> = {
 	select: () => t('easel-board-select'),
 	pen: () => t('easel-board-pen'),
@@ -47,6 +55,7 @@ export const boardToolLabel: Record<BoardTool, () => string> = {
 	arrow: () => t('easel-board-arrow'),
 	text: () => t('easel-board-text'),
 	note: () => t('easel-board-note'),
+	frame: () => t('easel-board-frame'),
 	picture: () => t('easel-board-picture')
 };
 

@@ -13,7 +13,7 @@ import { ShapeTool } from '#lib/tools/shapes.js';
 import { TextTool } from '#lib/tools/text.svelte.js';
 import type { ToolEvent, ToolHandler } from '#lib/tools/tool.js';
 import { Viewport } from '#lib/viewport/viewport.svelte.js';
-import { hideArea } from './hide';
+import { hideArea, type HideKind } from './hide';
 
 export type QuickMode = 'crop' | 'adjust' | 'markup' | 'hide' | 'size';
 export type MarkupTool = 'pen' | 'arrow' | 'box' | 'text';
@@ -28,7 +28,7 @@ export class QuickEdit {
 	angle = $state(0);
 	adjust = $state<Adjust>({ ...NEUTRAL });
 	markupTool = $state<MarkupTool>('pen');
-	hideKind = $state<'redact' | 'blur'>('blur');
+	hideKind = $state<HideKind>('blur');
 	overlay = $state<Overlay | null>(null);
 	shapePreview = $state<ShapeSpec | null>(null);
 	readonly colors = MARKUP_COLORS;

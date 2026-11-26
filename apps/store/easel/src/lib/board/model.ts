@@ -31,10 +31,13 @@ export interface End {
 	attach?: string;
 }
 
+export type Route = 'straight' | 'elbow';
+
 export interface Arrow extends Base {
 	kind: 'arrow';
 	from: End;
 	to: End;
+	route: Route;
 	color: string;
 	width: number;
 	head: boolean;
@@ -68,7 +71,16 @@ export interface Picture extends Base {
 	asset: string;
 }
 
-export type BoardObject = Stroke | Shape | Arrow | Text | Note | Picture;
+export interface Frame extends Base {
+	kind: 'frame';
+	x: number;
+	y: number;
+	w: number;
+	h: number;
+	text: string;
+}
+
+export type BoardObject = Stroke | Shape | Arrow | Text | Note | Picture | Frame;
 export type Boxed = Shape | Note | Picture;
 
 export interface Box {
@@ -85,6 +97,8 @@ export const LABEL_SIZE = 16;
 export const NOTE_TEXT_SIZE = 15;
 export const NOTE_PADDING = 14;
 export const NOTE_SIZE = 180;
+export const FRAME_TITLE_SIZE = 14;
+export const FRAME_TITLE_GAP = 8;
 
 let counter = 0;
 export const objectId = () => `${Date.now().toString(36)}${(counter++).toString(36)}`;

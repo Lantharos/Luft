@@ -1,7 +1,9 @@
 pub mod decode;
 pub mod encode;
 pub mod export;
+pub mod layered;
 pub mod pdf;
+pub mod raw;
 
 use std::sync::LazyLock;
 use std::sync::mpsc;
@@ -33,4 +35,13 @@ pub fn on_glycin<T: Send + 'static>(
 
 pub fn context() -> glib::MainContext {
     CONTEXT.clone()
+}
+
+pub fn premultiply(pixels: &mut [u8]) {
+    for pixel in pixels.as_chunks_mut::<4>().0 {
+        let alpha = u16::from(pixel[3]);
+        for channel in &mut pixel[..3] {
+            *channel = ((u16::from(*channel) * alpha + 127) / 255) as u8;
+        }
+    }
 }

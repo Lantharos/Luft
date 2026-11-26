@@ -10,6 +10,7 @@
 	import Editor from '#lib/editor/Editor.svelte';
 	import Home from '#lib/home/Home.svelte';
 	import { previews } from '#lib/home/previews.svelte.js';
+	import { models } from '#lib/ai/models.svelte.js';
 	import Whiteboard from '#lib/whiteboard/Whiteboard.svelte';
 	import QuickEdit from '#lib/quick/QuickEdit.svelte';
 
@@ -17,7 +18,7 @@
 	provideApp(app);
 
 	onMount(() => {
-		const stops = [events.easelThumbnails(previews.receive), sabineEvents.openUrlsAvailable(() => void app.openPending())];
+		const stops = [events.easelThumbnails(previews.receive), sabineEvents.openUrlsAvailable(() => void app.openPending()), models.start()];
 		void app.start().then(() => app.openPending());
 		return () => stops.forEach((stop) => stop());
 	});
@@ -29,7 +30,7 @@
 	function globalKeys(event: KeyboardEvent) {
 		if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'n' || app.dialog) return;
 		event.preventDefault();
-		if (event.shiftKey) void app.newBoard();
+		if (event.shiftKey) app.dialog = 'new-board';
 		else app.dialog = 'new-image';
 	}
 </script>

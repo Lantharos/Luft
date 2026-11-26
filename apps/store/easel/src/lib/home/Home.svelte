@@ -16,7 +16,7 @@
 
 	const actions = $derived([
 		{ icon: ImagePlus, label: t('easel-new-image'), keys: 'Ctrl+N', run: () => (app.dialog = 'new-image') },
-		{ icon: StickyNote, label: t('easel-new-board'), keys: 'Ctrl+Shift+N', run: () => app.newBoard() },
+		{ icon: StickyNote, label: t('easel-new-board'), keys: 'Ctrl+Shift+N', run: () => (app.dialog = 'new-board') },
 		{ icon: FolderOpen, label: t('easel-open'), keys: 'Ctrl+O', run: () => app.chooseAndOpen() }
 	]);
 </script>

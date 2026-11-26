@@ -5,7 +5,7 @@ use glycin::{Loader, MainContextSelector, MemoryFormat, MemoryFormatSelection};
 use serde::Serialize;
 use specta::Type;
 
-use super::{context, on_glycin};
+use super::{context, on_glycin, premultiply};
 use crate::files::{cache_file, failed};
 
 #[derive(Serialize, Type)]
@@ -13,6 +13,16 @@ pub struct Decoded {
     file: String,
     width: u32,
     height: u32,
+}
+
+impl Decoded {
+    pub fn new(file: std::path::PathBuf, width: u32, height: u32) -> Self {
+        Self {
+            file: file.to_string_lossy().into_owned(),
+            width,
+            height,
+        }
+    }
 }
 
 pub fn decode(path: &Path) -> Result<Decoded, String> {
@@ -34,17 +44,8 @@ pub fn decode(path: &Path) -> Result<Decoded, String> {
         }
         Ok((width, height, pixels))
     })?;
-    for pixel in pixels.as_chunks_mut::<4>().0 {
-        let alpha = u16::from(pixel[3]);
-        for channel in &mut pixel[..3] {
-            *channel = ((u16::from(*channel) * alpha + 127) / 255) as u8;
-        }
-    }
+    premultiply(&mut pixels);
     let target = cache_file("pixels")?;
     fs::write(&target, pixels).map_err(failed)?;
-    Ok(Decoded {
-        file: target.to_string_lossy().into_owned(),
-        width,
-        height,
-    })
+    Ok(Decoded::new(target, width, height))
 }

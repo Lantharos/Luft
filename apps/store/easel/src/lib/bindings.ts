@@ -3,6 +3,25 @@
 import { invoke, listen, type CallOptions, type InvokeOptions } from "@lantharos/sabine";
 
 export const commands = {
+	aiBegin: (params: {
+		task: Task,
+		width: number,
+		height: number,
+	}, options?: CallOptions) => invoke<number>("ai_begin", params, options),
+	aiCancel: (params: {
+		engine: Engine,
+	}, options?: CallOptions) => invoke<null>("ai_cancel", params, options),
+	aiChunk: (params: {
+		id: number,
+		mask: boolean,
+	}, options?: InvokeOptions) => invoke<null>("ai_chunk", params, options),
+	aiCommit: (params: {
+		id: number,
+	}, options?: InvokeOptions) => invoke<Output>("ai_commit", params, options),
+	aiInstall: (params: {
+		engine: Engine,
+	}, options?: CallOptions) => invoke<null>("ai_install", params, options),
+	aiModels: (options?: CallOptions) => invoke<Model[]>("ai_models", {}, options),
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
 	chooseOpen: (params: {
 		folder?: string | null,
@@ -14,6 +33,9 @@ export const commands = {
 	decodePicture: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Decoded>("decode_picture", params, options),
+	decodeRaw: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<Decoded>("decode_raw", params, options),
 	documentPreview: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<string>("document_preview", params, options),
@@ -46,6 +68,9 @@ export const commands = {
 	openDocument: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Opened>("open_document", params, options),
+	openLayered: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<Layered>("open_layered", params, options),
 	releaseFiles: (params: {
 		paths: string[],
 	}, options?: CallOptions) => invoke<null>("release_files", params, options),
@@ -95,6 +120,8 @@ export const events = {
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
+	easelAi: (callback: (payload: number) => void) => listen<number>("easel.ai", callback),
+	easelModels: (callback: (payload: null) => void) => listen<null>("easel.models", callback),
 	easelThumbnails: (callback: (payload: ThumbnailBatch) => void) => listen<ThumbnailBatch>("easel.thumbnails", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 };
@@ -138,6 +165,8 @@ export type Decoded = {
 	height: number,
 };
 
+export type Engine = "matte" | "inpaint" | "upscale";
+
 export type Format = "png" | "jpeg" | "webp" | "avif";
 
 export type IconPaint = {
@@ -147,11 +176,25 @@ export type IconPaint = {
 	rim: number,
 };
 
+export type ImportedLayer = {
+	file: string,
+	name: string,
+	opacity: number,
+	visible: boolean,
+	blend: string,
+};
+
 export type LayerPixels = {
 	layer: string,
 	file: string,
 	indices: number[],
 	mask: boolean,
+};
+
+export type Layered = {
+	width: number,
+	height: number,
+	layers: ImportedLayer[],
 };
 
 export type Lines = "none" | "lines" | "scanlines";
@@ -162,12 +205,31 @@ export type Locale = {
 	fixed: boolean,
 };
 
+export type Model = {
+	id: string,
+	engine: Engine,
+	name: string,
+	licence: string,
+	credit: string,
+	size: number,
+	installed: boolean,
+	received: number | null,
+	problem: string | null,
+};
+
 export type Motion = "full" | "reduced" | "off";
 
 export type Opened = {
 	document: Value,
 	layers: LayerPixels[],
 	assets: AssetFile[],
+};
+
+export type Output = {
+	file: string,
+	width: number,
+	height: number,
+	channels: number,
 };
 
 export type Palette = {
@@ -195,6 +257,8 @@ export type SchemeColors = {
 };
 
 export type StoreName = "settings" | "recent";
+
+export type Task = "matte" | "inpaint" | "upscale2" | "upscale4";
 
 export type ThumbnailBatch = {
 	items: Ready[],

@@ -7,6 +7,7 @@
 	import { useApp } from '#lib/app/context.js';
 	import type { Editor } from './editor.svelte';
 	import ZoomMenu from './ZoomMenu.svelte';
+	import { upscale } from '#lib/ai/actions.js';
 	import { FILTERS, filterName } from '#lib/filters/filters.js';
 
 	interface Props {
@@ -34,6 +35,8 @@
 			<MenuSeparator />
 			<MenuItem onclick={() => (close(), (app.dialog = 'history'))}>{t('easel-history')}</MenuItem>
 			<MenuItem onclick={() => (close(), (app.dialog = 'resize'))}>{t('easel-resize')}</MenuItem>
+			<MenuItem onclick={() => (close(), editor.finishTool(), void app.working(() => upscale(doc, 2).then(() => editor.viewport.fit(doc.width, doc.height))))}>{t('easel-upscale-2')}</MenuItem>
+			<MenuItem onclick={() => (close(), editor.finishTool(), void app.working(() => upscale(doc, 4).then(() => editor.viewport.fit(doc.width, doc.height))))}>{t('easel-upscale-4')}</MenuItem>
 			<MenuItem checked={editor.settings.rulers} onclick={() => (close(), (editor.settings.rulers = !editor.settings.rulers))}>{t('easel-rulers')}</MenuItem>
 			<MenuItem checked={editor.settings.snapping} onclick={() => (close(), (editor.settings.snapping = !editor.settings.snapping))}>{t('easel-snapping')}</MenuItem>
 			<MenuSeparator />
@@ -42,7 +45,7 @@
 			{/each}
 			<MenuSeparator />
 			<MenuItem onclick={() => (close(), (app.dialog = 'new-image'))}>{t('easel-new-image')}</MenuItem>
-			<MenuItem onclick={() => (close(), app.newBoard())}>{t('easel-new-board')}</MenuItem>
+			<MenuItem onclick={() => (close(), (app.dialog = 'new-board'))}>{t('easel-new-board')}</MenuItem>
 			<MenuItem onclick={() => (close(), app.chooseAndOpen())}>{t('easel-open')}</MenuItem>
 		{/snippet}
 	</MenuButton>

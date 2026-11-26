@@ -7,10 +7,11 @@ use std::path::Path as FilePath;
 use luft_app::{Activation, Commands, Empty};
 use sabine::{BridgeError, SabineWindow, WithBody};
 
+use crate::ai;
 use crate::files::{self, blocking, dialogs, failed, store};
 use crate::format::{open, save};
 use crate::l10n::L10N;
-use crate::picture::{decode, export, pdf};
+use crate::picture::{decode, export, layered, pdf, raw};
 use crate::state::{self, EaselState};
 use params::*;
 
@@ -46,8 +47,55 @@ pub fn register(window: SabineWindow, state: &EaselState) -> SabineWindow {
         })
         .command_async("decode_picture", |Path { path }| {
             blocking(move || decode::decode(FilePath::new(&path)))
+        })
+        .command_async("decode_raw", |Path { path }| {
+            blocking(move || raw::decode_raw(FilePath::new(&path)))
+        })
+        .command_async("open_layered", |Path { path }| {
+            blocking(move || layered::open_psd(FilePath::new(&path)))
         });
-    register_saving(window, state)
+    let window = register_saving(window, state);
+    register_ai(window, state)
+}
+
+fn register_ai(window: SabineWindow, state: &EaselState) -> SabineWindow {
+    let chunks = state.ai.clone();
+    let finishing = (state.ai.clone(), state.models.clone(), state.events.clone());
+    window
+        .with("ai_models", &state.models, |models, Empty {}| models.list())
+        .with(
+            "ai_install",
+            &state.models,
+            |models, ai::Install { engine }| models.install(engine),
+        )
+        .with(
+            "ai_cancel",
+            &state.models,
+            |models, ai::Install { engine }| models.cancel(engine),
+        )
+        .with("ai_begin", &state.ai, |jobs, begin: ai::Begin| {
+            Ok(jobs.start(ai::Job::new(begin)))
+        })
+        .bridge_typed("ai_chunk", move |request: WithBody<ai::Chunk>| {
+            let data = body(request.body)?;
+            let job = chunks.get(request.params.id).map_err(BridgeError::new)?;
+            let mut job = job.lock();
+            if request.params.mask {
+                job.mask.extend_from_slice(&data)
+            } else {
+                job.pixels.extend_from_slice(&data)
+            }
+            Ok(())
+        })
+        .bridge_typed_async("ai_commit", move |request: WithBody<Job>| {
+            let (jobs, models, events) = finishing.clone();
+            async move {
+                let job = jobs.finish(request.params.id).map_err(BridgeError::new)?;
+                blocking(move || job.finish(&models, &events))
+                    .await
+                    .map_err(BridgeError::new)
+            }
+        })
 }
 
 fn register_saving(window: SabineWindow, state: &EaselState) -> SabineWindow {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { arrowEnds, LINE_HEIGHT } from '#lib/board/geometry.js';
-	import { LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE } from '#lib/board/model.js';
+	import { arrowPath, FRAME_BAND, LINE_HEIGHT } from '#lib/board/geometry.js';
+	import { FRAME_TITLE_SIZE, LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE } from '#lib/board/model.js';
 	import { resolve, type Look } from '#lib/board/render/look.js';
 	import type { Whiteboard } from './whiteboard.svelte';
 
@@ -12,6 +12,11 @@
 	let selection = $derived(board.selection);
 	let box = $derived(board.boundsOf(selection));
 	let arrow = $derived(selection.length === 1 && selection[0].kind === 'arrow' ? selection[0] : null);
+	let ends = $derived.by(() => {
+		if (!arrow) return [];
+		const path = arrowPath(arrow, board.lookup);
+		return [path[0], path[path.length - 1]];
+	});
 	let editing = $derived(whiteboard.editing ? board.lookup(whiteboard.editing) : undefined);
 
 	function screen(x: number, y: number, w = 0, h = 0) {
@@ -23,6 +28,7 @@
 		if (!editing || !('text' in editing)) return null;
 		const s = viewport.scale;
 		if (editing.kind === 'text') return { ...screen(editing.x, editing.y), size: editing.size * s, color: resolve(editing.color, look), width: null as number | null, align: 'left', weight: 500 };
+		if (editing.kind === 'frame') return { ...screen(editing.x + 2, editing.y - FRAME_BAND), size: FRAME_TITLE_SIZE * s, color: look.frameTitle, width: null, align: 'left', weight: 600 };
 		if (editing.kind === 'note') return { ...screen(editing.x + NOTE_PADDING, editing.y + NOTE_PADDING), size: NOTE_TEXT_SIZE * s, color: look.noteText, width: (editing.w - NOTE_PADDING * 2) * s, align: 'left', weight: 500 };
 		return { ...screen(editing.x + 10, editing.y + editing.h / 2 - (LABEL_SIZE * LINE_HEIGHT) / 2), size: LABEL_SIZE * s, color: resolve(editing.color, look), width: (editing.w - 20) * s, align: 'center', weight: 600 };
 	});
@@ -33,7 +39,7 @@
 		{@const rect = screen(box.x, box.y, box.w, box.h)}
 		<rect class="frame" x={rect.x - 4} y={rect.y - 4} width={rect.width + 8} height={rect.height + 8} rx="6" />
 		{#if arrow}
-			{#each arrowEnds(arrow, board.lookup) as [x, y], index (index)}
+			{#each ends as [x, y], index (index)}
 				{@const point = screen(x, y)}
 				<circle class="handle" cx={point.x} cy={point.y} r="6" />
 			{/each}

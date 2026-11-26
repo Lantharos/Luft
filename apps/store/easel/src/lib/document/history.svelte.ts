@@ -44,6 +44,8 @@ export class History {
 	saved = $state(0);
 	#bytes = 0;
 
+	constructor(private readonly most = MOST) {}
+
 	get canUndo() {
 		return this.position > 0;
 	}
@@ -98,7 +100,7 @@ export class History {
 
 	#trim() {
 		let drop = 0;
-		while (this.entries.length - drop > 1 && (this.#bytes > BUDGET || this.entries.length - drop > MOST)) {
+		while (this.entries.length - drop > 1 && (this.#bytes > BUDGET || this.entries.length - drop > this.most)) {
 			const oldest = this.entries[drop++];
 			oldest.forget?.('past');
 			this.#bytes -= oldest.bytes;

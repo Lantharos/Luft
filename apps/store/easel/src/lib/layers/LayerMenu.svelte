@@ -6,6 +6,8 @@
 	import { canMerge, deleteLayer, duplicateLayer, groupLayer, mergeDown, ungroup } from '#lib/document/layer-actions.js';
 	import type { Layer } from '#lib/document/layers.svelte.js';
 	import { addMask, applyMask, deleteMask, invertMask } from '#lib/document/masks.js';
+	import { removeBackground } from '#lib/ai/actions.js';
+	import { useApp } from '#lib/app/context.js';
 
 	interface Props {
 		doc: ImageDocument;
@@ -16,6 +18,7 @@
 	}
 
 	let { doc, layer, onrename, onadjust, oneffects }: Props = $props();
+	const app = useApp();
 </script>
 
 <MenuButton label={t('easel-layer-more')} class="icon-button" align="end">
@@ -30,6 +33,9 @@
 		<MenuItem onclick={() => (close(), doc.changeState(t(layer.locked ? 'easel-layer-unlock' : 'easel-layer-lock'), layer, { locked: !layer.locked }))}>{layer.locked ? t('easel-layer-unlock') : t('easel-layer-lock')}</MenuItem>
 		{#if layer.kind === 'raster' || layer.kind === 'text'}
 			<MenuItem onclick={() => (close(), oneffects(layer.id))}>{t('easel-effects')}</MenuItem>
+		{/if}
+		{#if layer.kind === 'raster'}
+			<MenuItem onclick={() => (close(), void app.working(() => removeBackground(doc, layer)))}>{t('easel-remove-background')}</MenuItem>
 		{/if}
 		<MenuSeparator />
 		{#if layer.kind === 'group'}

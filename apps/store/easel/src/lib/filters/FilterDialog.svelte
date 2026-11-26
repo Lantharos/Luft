@@ -31,7 +31,7 @@
 </script>
 
 <Dialog title={filterName[kind]()} onclose={() => finish(false)}>
-	<div class="flex flex-col gap-4 px-2.5 py-2.5">
+	<div class="flex flex-col gap-4 px-2.5 py-3">
 		{#each fields as field (field.key)}
 			<div class="flex flex-col gap-2">
 				<div class="flex justify-between text-[13px]"><span>{field.label()}</span><span class="text-(--text-muted) tabular-nums">{values[field.key]}</span></div>

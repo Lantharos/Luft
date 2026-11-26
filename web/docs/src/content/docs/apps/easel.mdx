@@ -23,8 +23,14 @@ asks:
   - { ask: curves, to: masks-and-adjustment-layers }
   - { ask: blur a photo, to: filters }
   - { ask: clone stamp, to: retouching }
+  - { ask: remove background, to: on-device-ai }
+  - { ask: upscale, to: on-device-ai }
+  - { ask: raw photo, to: camera-raw-and-photoshop-files }
+  - { ask: psd, to: camera-raw-and-photoshop-files }
   - { ask: diagram, to: the-whiteboard }
   - { ask: sticky notes, to: the-whiteboard }
+  - { ask: kanban, to: the-whiteboard }
+  - { ask: flowchart, to: the-whiteboard }
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -40,7 +46,7 @@ A picture you open from Rover shows on its own, with the kinds of edit along the
 - **Crop** to a free shape, the original's, a square, 16:9, 4:3 or 9:16. **Straighten** levels a tilted horizon, and the buttons beside it rotate and flip.
 - **Adjust** light, contrast, colour, warmth and sharpness, or press **Auto**.
 - **Mark up** with a pen, arrows, boxes and text.
-- **Hide** blurs or blacks out what you drag over, such as a face or a number.
+- **Hide** blurs or blacks out what you drag over, such as a face or a number, or removes it and fills the gap.
 - **Size** makes the picture smaller.
 
 **Done** asks whether to replace the original or save a copy. **Open in editor** takes the picture, with your edits, into the editor.
@@ -65,6 +71,24 @@ The **More** menu has blur, motion blur, sharpen, reduce noise, vignette and pix
 
 The clone stamp and the healing brush copy from another part of the picture: <kbd>Alt</kbd>-click where to copy from, then paint. The healing brush blends what it copies into the colours and light around it. Smudge pushes colour along the stroke, like a finger through wet paint.
 
+## On-device AI
+
+Easel can remove a background, select the subject of a photo, remove something and fill the gap, and upscale a picture two or four times. **Remove background** is in the layer menu, **Select subject** and **Remove and fill in** are with the selection tools, and **Upscale** is in the **More** menu. Everything runs on your computer, and nothing you edit leaves it.
+
+The first time you use one, Easel shows how large its model is and downloads it once. The models are open, and their licences let Easel use them:
+
+| Tool | Model | Licence |
+| --- | --- | --- |
+| Remove background, select subject | BiRefNet lite | MIT |
+| Remove and fill in | LaMa | Apache 2.0 |
+| Upscale | Real-ESRGAN general | BSD 3-Clause |
+
+## Camera raw and Photoshop files
+
+Easel opens raw photos from most cameras, such as `.cr2`, `.cr3`, `.nef`, `.arw`, `.raf`, `.orf`, `.rw2` and `.dng`. **Develop** shows first, to set exposure, white balance, highlights and shadows while you watch, then the photo opens in the editor.
+
+Photoshop files open with their layers, each with its name, opacity, blend mode and visibility. Layered TIFF files open flattened.
+
 ## Selecting
 
 The select tool draws rectangles and ellipses, the lasso draws freely, and the magic wand picks similar colours. Hold <kbd>Shift</kbd> to add to a selection and <kbd>Alt</kbd> to take away from it, or choose **Add** or **Subtract**. **Feather** softens its edge. A selection limits painting, filling, filters and moving to what's inside it. **Refine** grows, shrinks, borders or smooths it, **Colour range** selects everything close to the main colour, and **Quick mask**, or <kbd>Q</kbd>, shows the selection as a red overlay you paint with the brush and the eraser.
@@ -85,9 +109,13 @@ A board has no edges. Draw with the pen or the highlighter, and erase whole stro
 - Arrows started or ended on a shape stay attached to it when it moves.
 - Double-click a shape or a note to write in it.
 - Drop or paste pictures onto the board.
+- Arrows can go straight or bend at right angles; pick which from the arrow button.
 - Drag over empty space to select several things, and group them with <kbd>Ctrl</kbd>+<kbd>G</kbd>.
+- **Frame** marks out an area. Moving a frame moves everything in it, and double-clicking its name renames it.
 
-Boards export to PNG, JPEG, WebP, AVIF, SVG and PDF.
+**New board** starts blank or from a grid of frames, a kanban board or a flowchart. Undo goes back as far as the board's beginning.
+
+Boards export to PNG, JPEG, WebP, AVIF, SVG and PDF. Select a frame before exporting to export just that frame.
 
 ## Keyboard shortcuts
 
@@ -103,5 +131,5 @@ Boards export to PNG, JPEG, WebP, AVIF, SVG and PDF.
 | <kbd>Q</kbd> | Quick mask |
 | <kbd>[</kbd> / <kbd>]</kbd> | Smaller and larger brush |
 | <kbd>X</kbd> | Swap the two colours |
-| <kbd>V</kbd> <kbd>P</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>T</kbd> <kbd>N</kbd> | On a board: select, pen, highlighter, eraser, shapes, arrow, text, sticky note |
+| <kbd>V</kbd> <kbd>P</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>T</kbd> <kbd>N</kbd> <kbd>F</kbd> | On a board: select, pen, highlighter, eraser, shapes, arrow, text, sticky note, frame |
 | <kbd>Ctrl</kbd>+<kbd>G</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> | On a board: group, ungroup |

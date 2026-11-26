@@ -1,0 +1,35 @@
+{
+  "mirror": "https://get.luft.computer/models",
+  "models": [
+    {
+      "id": "birefnet-lite",
+      "engine": "matte",
+      "name": "BiRefNet lite",
+      "licence": "MIT",
+      "credit": "BiRefNet by Peng Zheng and others, converted to ONNX by the ONNX Community",
+      "homepage": "https://github.com/ZhengPeng7/BiRefNet",
+      "source": "https://huggingface.co/onnx-community/BiRefNet_lite-ONNX/resolve/de15b22ba131738a16dff04aab8bdf8dc32e3ac1/onnx",
+      "files": [{ "name": "model.onnx", "size": 224005088, "sha256": "5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333" }]
+    },
+    {
+      "id": "lama",
+      "engine": "inpaint",
+      "name": "LaMa",
+      "licence": "Apache 2.0",
+      "credit": "LaMa by Roman Suvorov and others at Samsung AI, converted to ONNX by Carve",
+      "homepage": "https://github.com/advimman/lama",
+      "source": "https://huggingface.co/Carve/LaMa-ONNX/resolve/c3c0c9e468934d62e79c329e35d82dd09ff8c444",
+      "files": [{ "name": "lama_fp32.onnx", "size": 208044816, "sha256": "1faef5301d78db7dda502fe59966957ec4b79dd64e16f03ed96913c7a4eb68d6" }]
+    },
+    {
+      "id": "realesr-general-x4v3",
+      "engine": "upscale",
+      "name": "Real-ESRGAN",
+      "licence": "BSD 3-Clause",
+      "credit": "Real-ESRGAN by Xintao Wang and others, converted to ONNX by Codeep",
+      "homepage": "https://github.com/xinntao/Real-ESRGAN",
+      "source": "https://huggingface.co/vlad-grig/realesr-general-x4v3-onnx/resolve/0e95d93e454cf6b5de9bdf5a1c9e7ec340d38231/onnx",
+      "files": [{ "name": "model.onnx", "size": 4866420, "sha256": "7b10e80021ec3e0ff35017ae5022791879d93a799b2e201e1010a37510202266" }]
+    }
+  ]
+}

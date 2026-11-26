@@ -2,8 +2,8 @@ import { canvasFormat, device } from '#lib/gpu/device.js';
 import { kit, PREMULTIPLIED } from '#lib/gpu/kit.js';
 import { packed, type Matrix } from '#lib/gpu/matrix.js';
 import type { Asset } from '../board.svelte';
-import { arrowEnds, bounds, intersects } from '../geometry';
-import { LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE, type BoardObject, type Box } from '../model';
+import { arrowPath, bounds, FRAME_BAND, intersects } from '../geometry';
+import { FRAME_TITLE_SIZE, LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE, type BoardObject, type Box } from '../model';
 import { Labels, type LabelSpec } from './labels';
 import { resolve, rgba, type Look } from './look';
 import { GRID, IMAGE, SOLID } from './shaders';
@@ -13,6 +13,7 @@ const SAMPLES = 4;
 const HIGHLIGHTER_ALPHA = 0.38;
 const NOTE_RADIUS = 10;
 const SHAPE_RADIUS = 14;
+const FRAME_RADIUS = 12;
 const GRID_SPACING = 24;
 const SHADOW: [number, number, number, number] = [0, 0, 0, 0.22];
 
@@ -64,9 +65,13 @@ export class BoardRenderer {
 			case 'stroke':
 				mesh.stroke(rgba(object.color, look, object.tool === 'highlighter' ? HIGHLIGHTER_ALPHA : 1), object.points, object.width);
 				break;
-			case 'arrow': {
-				const [from, to] = arrowEnds(object, scene.lookup);
-				mesh.arrow(rgba(object.color, look), from, to, object.width, object.head);
+			case 'arrow':
+				mesh.arrow(rgba(object.color, look), arrowPath(object, scene.lookup), object.width, object.head);
+				break;
+			case 'frame': {
+				const ring = rectangleRing(object.x, object.y, object.w, object.h, FRAME_RADIUS);
+				mesh.fan(look.frame, [object.x + object.w / 2, object.y + object.h / 2], ring);
+				mesh.outline(look.frameLine, ring, 1);
 				break;
 			}
 			case 'shape': {
@@ -98,6 +103,8 @@ export class BoardRenderer {
 			return { text: object.text, size: NOTE_TEXT_SIZE, color: look.noteText, weight: 500, width: object.w - NOTE_PADDING * 2, align: 'left', box: { x: object.x + NOTE_PADDING, y: object.y + NOTE_PADDING, w: 0, h: 0 } };
 		if (object.kind === 'shape' && object.text)
 			return { text: object.text, size: LABEL_SIZE, color: resolve(object.color, look), weight: 600, width: Math.max(LABEL_SIZE, object.w - 20), align: 'center', box: { x: object.x + 10, y: object.y + object.h / 2, w: 0, h: -1 } };
+		if (object.kind === 'frame' && object.text)
+			return { text: object.text, size: FRAME_TITLE_SIZE, color: look.frameTitle, weight: 600, width: null, align: 'left', box: { x: object.x + 2, y: object.y - FRAME_BAND, w: 0, h: 0 } };
 		return null;
 	}
 

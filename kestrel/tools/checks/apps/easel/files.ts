@@ -26,6 +26,11 @@ export function pixelAt(path: string, x: number, y: number): Rgb {
   return [pixels[at], pixels[at + 1], pixels[at + 2]];
 }
 
+export function sizeOf(path: string) {
+  const picture = GdkPixbuf.Pixbuf.new_from_file(path);
+  return {width: picture.get_width(), height: picture.get_height()};
+}
+
 export function colorsOf(path: string): Rgb[] {
   const picture = GdkPixbuf.Pixbuf.new_from_file(path);
   const pixels = picture.get_pixels();

@@ -13,7 +13,7 @@ export class BoardDocument {
 	objects = $state.raw<BoardObject[]>([]);
 	selected = $state.raw<Set<string>>(new Set());
 	readonly assets = new Map<string, Asset>();
-	readonly history = new History();
+	readonly history = new History(Infinity);
 	onchange: () => void = () => {};
 	#index = new Map<string, BoardObject>();
 

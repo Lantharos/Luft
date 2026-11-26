@@ -1,5 +1,5 @@
 import type { ToolEvent } from '#lib/tools/tool.js';
-import { arrowEnds, contains, hits } from '../geometry';
+import { arrowPath, contains, hits } from '../geometry';
 import type { Arrow, BoardObject, Box } from '../model';
 import { moved, scaled } from '../transform';
 import { attachAt } from './create';
@@ -10,7 +10,7 @@ const SLOP_PX = 5;
 const MIN_SIZE = 4;
 
 type Drag =
-	| { kind: 'move'; start: [number, number]; before: BoardObject[] }
+	| { kind: 'move'; start: [number, number]; before: BoardObject[]; moving: Set<string> }
 	| { kind: 'resize'; start: [number, number]; before: BoardObject[]; box: Box; proportional: boolean }
 	| { kind: 'end'; arrow: Arrow; which: 'from' | 'to'; before: BoardObject[] }
 	| { kind: 'marquee'; start: [number, number]; add: boolean };
@@ -40,7 +40,8 @@ export class SelectTool implements BoardHandler {
 		const box = selectionBox(this.host);
 		const single = selection.length === 1 && selection[0].kind === 'arrow' ? (selection[0] as Arrow) : null;
 		if (single) {
-			const ends = arrowEnds(single, board.lookup);
+			const path = arrowPath(single, board.lookup);
+			const ends = [path[0], path[path.length - 1]];
 			for (const [index, which] of (['from', 'to'] as const).entries()) {
 				if (this.#near(event.x, event.y, ...ends[index])) {
 					this.#drag = { kind: 'end', arrow: single, which, before: board.objects };
@@ -49,7 +50,7 @@ export class SelectTool implements BoardHandler {
 			}
 		}
 		if (box && !single && this.#near(event.x, event.y, box.x + box.w, box.y + box.h)) {
-			const proportional = event.shift || selection.some((object) => object.kind !== 'shape' && object.kind !== 'note');
+			const proportional = event.shift || selection.some((object) => object.kind !== 'shape' && object.kind !== 'note' && object.kind !== 'frame');
 			this.#drag = { kind: 'resize', start: [event.x, event.y], before: board.objects, box, proportional };
 			return;
 		}
@@ -65,7 +66,17 @@ export class SelectTool implements BoardHandler {
 			else next.add(hit.id);
 			board.select(next);
 		} else if (!board.selected.has(hit.id)) board.select([hit.id]);
-		this.#drag = { kind: 'move', start: [event.x, event.y], before: board.objects };
+		this.#drag = { kind: 'move', start: [event.x, event.y], before: board.objects, moving: this.#withContents() };
+	}
+
+	#withContents() {
+		const { board } = this.host;
+		const moving = new Set(board.selected);
+		for (const frame of board.selection) {
+			if (frame.kind !== 'frame') continue;
+			for (const object of board.objects) if (contains(frame, board.boundsOf([object])!)) moving.add(object.id);
+		}
+		return moving;
 	}
 
 	move(event: ToolEvent) {
@@ -83,13 +94,13 @@ export class SelectTool implements BoardHandler {
 			board.preview(drag.before.map((object) => (object.id === drag.arrow.id ? { ...drag.arrow, [drag.which]: end } : object)));
 			return;
 		}
-		const moving = board.selected;
 		if (drag.kind === 'move') {
 			const dx = event.x - drag.start[0];
 			const dy = event.y - drag.start[1];
-			board.preview(drag.before.map((object) => (moving.has(object.id) ? moved(object, dx, dy) : object)));
+			board.preview(drag.before.map((object) => (drag.moving.has(object.id) ? moved(object, dx, dy) : object)));
 			return;
 		}
+		const moving = board.selected;
 		const { box } = drag;
 		let sx = Math.max(MIN_SIZE, box.w + event.x - drag.start[0]) / Math.max(1, box.w);
 		let sy = Math.max(MIN_SIZE, box.h + event.y - drag.start[1]) / Math.max(1, box.h);

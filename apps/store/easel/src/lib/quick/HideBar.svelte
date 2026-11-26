@@ -11,7 +11,8 @@
 	value={quick.hideKind}
 	options={[
 		{ value: 'blur', label: t('easel-hide-blur') },
-		{ value: 'redact', label: t('easel-hide-redact') }
+		{ value: 'redact', label: t('easel-hide-redact') },
+		{ value: 'remove', label: t('easel-hide-remove') }
 	]}
 	onchange={(value) => (quick.hideKind = value)}
 />

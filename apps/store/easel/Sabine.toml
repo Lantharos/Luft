@@ -18,7 +18,21 @@ mime_types = [
 	"image/bmp",
 	"image/tiff",
 	"image/heic",
-	"image/heif"
+	"image/heif",
+	"image/vnd.adobe.photoshop",
+	"image/x-adobe-dng",
+	"image/x-canon-cr2",
+	"image/x-canon-cr3",
+	"image/x-canon-crw",
+	"image/x-epson-erf",
+	"image/x-fuji-raf",
+	"image/x-hasselblad-3fr",
+	"image/x-nikon-nef",
+	"image/x-olympus-orf",
+	"image/x-panasonic-rw2",
+	"image/x-pentax-pef",
+	"image/x-phaseone-iiq",
+	"image/x-sony-arw"
 ]
 
 [app.extensions]

@@ -10,7 +10,7 @@ const DEFAULTS: Settings = {
 	cursorStyle: 'block',
 	cursorBlink: true,
 	translucent: true,
-	opacity: 0.86,
+	opacity: 0.6,
 	scheme: 'system',
 	shell: null,
 	copyOnSelect: false,

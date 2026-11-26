@@ -9,6 +9,7 @@ import {scratch} from '../lib/processes.js';
 import {changes, withApp} from './lib/apps.js';
 import {installBrowser} from './lib/browser.js';
 import {pause} from '../lib/wait.js';
+import {write} from './lib/files.js';
 import {checkPalette, withPalette} from './lib/palette.js';
 
 const {require, eventually} = checks('Luft app');
@@ -103,10 +104,13 @@ async function checkLinks() {
   }
 }
 
+const SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'terminal', 'settings.json']);
+
 export async function run() {
   await checkLinks();
   const result = scratch('terminal-paste-check.txt');
   GLib.unlink(result);
+  write(SETTINGS, JSON.stringify({translucent: false}));
   try {
     await withPalette(palette => withApp('terminal', ['-e', 'sh', '-c', promptScript(result)], async app => {
       await checkPalette(app, palette, {tolerance: 40});
@@ -115,5 +119,6 @@ export async function run() {
     }));
   } finally {
     GLib.unlink(result);
+    GLib.unlink(SETTINGS);
   }
 }

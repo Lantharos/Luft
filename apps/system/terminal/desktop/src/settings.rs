@@ -41,7 +41,7 @@ impl Default for Settings {
             cursor_style: CursorStyle::Block,
             cursor_blink: true,
             translucent: true,
-            opacity: 0.86,
+            opacity: 0.6,
             scheme: SchemePreference::System,
             shell: None,
             copy_on_select: false,

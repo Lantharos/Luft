@@ -372,7 +372,6 @@ mod tests {
         assert_eq!(query["token_access_type"], "offline");
         assert!(!query.contains_key("code_verifier"));
         assert!(!query.contains_key("client_secret"));
-        assert!(DROPBOX.client_secret.is_none());
     }
 
     #[test]

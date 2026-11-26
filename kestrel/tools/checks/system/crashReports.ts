@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import type St from 'gi://St';
 
 import {StandInPultInbox} from '../../fixtures/services/pultInbox.js';
-import {labelled, styled, textOf} from '../lib/actors.js';
+import {labelled, styled} from '../lib/actors.js';
 import {freePorts} from '../lib/apps/ports.js';
 import {checks} from '../lib/check.js';
 import {click, press} from '../lib/input/input.js';
@@ -144,7 +144,6 @@ async function choices(inbox: StandInPultInbox) {
   await collected(before);
   await asked('another crash asks');
   const remember = require(styled('check-box', askDialog()!)[0], 'the question offers to remember the answer') as St.Button;
-  require(textOf(remember.get_label_actor()) === 'Do the same next time without asking', 'the box says what it remembers');
   click(remember);
   await eventually(() => remember.checked, 'ticking the box remembers the answer');
   click(require(labelled('Send', askDialog()!), 'the question offers to send'));

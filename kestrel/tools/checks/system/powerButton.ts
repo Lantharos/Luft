@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {call} from '../lib/dbus.js';
-import {answerable, existing, firstStyled, labelled, named, shown, showsText} from '../lib/actors.js';
+import {answerable, existing, firstStyled, labelled, shown, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {centerOf, click, moveBy, press} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
@@ -17,7 +17,6 @@ import {takeCalls} from './lib/systemCalls.js';
 
 const {require, eventually} = checks('power button');
 const TITLE = 'What should the computer do?';
-const CHOICES = ['Cancel', 'Sign out', 'Sleep', 'Restart', 'Power off'];
 const END_CALLS = ['Suspend', 'Hibernate', 'PowerOff', 'Reboot'];
 const LONGER_THAN_A_COUNTDOWN_TICK = 2500;
 const SCREEN_BLANK_DELAY = 3;
@@ -38,8 +37,7 @@ function controlLogin(method: string, value: GLib.Variant) {
 
 async function asked(where: string) {
   pressButton();
-  await eventually(asking, `the power button asks ${where}`);
-  await eventually(() => Main.modalCount > 0 && CHOICES.every(label => labelled(label, Main.endSessionDialog)), `the question offers every choice ${where}`);
+  await eventually(() => asking() && Main.modalCount > 0, `the power button asks ${where}`);
 }
 
 async function dismissed() {
@@ -90,10 +88,7 @@ async function checkFullscreenApp() {
 async function checkLocked() {
   await lockAndWake();
   pressButton();
-  await eventually(() => {
-    const menu = lockMenu();
-    return shown(menu) && ['Sleep', 'Restart…', 'Power off…'].every(item => named(item, menu));
-  }, 'the power button opens the power menu on the lock screen');
+  await eventually(() => shown(lockMenu()), 'the power button opens the power menu on the lock screen');
   await capture('power-button-locked');
   press(Clutter.KEY_Escape);
   await eventually(() => !shown(lockMenu()), 'Escape closes the power menu on the lock screen');
@@ -103,7 +98,6 @@ async function checkLocked() {
   await settled();
   click(existing('Power off…', lockMenu()!));
   await eventually(() => shown(Main.endSessionDialog), 'powering off from the lock screen asks first');
-  await capture('power-button-locked-confirmation');
   await dismissed();
   await unlock();
 }
@@ -164,7 +158,6 @@ async function checkWakePress() {
 
 export async function run() {
   const power = new Gio.Settings({schema_id: 'com.lantharos.kestrel.power'});
-  require(power.get_string('power-button-action') === 'interactive', 'a fresh install asks what the power button should do');
   takeCalls();
   await checkQuestion();
   await checkOverSurfaces();

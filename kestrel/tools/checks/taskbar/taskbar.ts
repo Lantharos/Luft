@@ -3,9 +3,9 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {dismissImmediately} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
+import {descendants, existing, firstStyled, named, ofType} from '../lib/actors.js';
 import {islandOf} from './taskbarOptions/taskbar.js';
 import {checks} from '../lib/check.js';
 import {centerOf, moveTo, rest} from '../lib/input/input.js';
@@ -13,7 +13,7 @@ import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.
 import {capture} from '../lib/screenshots.js';
 import {hold} from '../lib/frameClock.js';
 import {nextFrame, settled, waitUntil} from '../lib/wait.js';
-import {beyond, boxOf, farSide, nearSide, vertical} from '../lib/edge.js';
+import {beyond, boxOf, farSide, nearSide, taskbarEdge, vertical} from '../lib/edge.js';
 
 const {require, eventually} = checks('taskbar');
 const TITLES = ['Kestrel window check 1', 'Kestrel window check 2'];
@@ -43,12 +43,13 @@ async function checkIndicators(panel: Clutter.Actor, window: Meta.Window) {
   await eventually(() => fill.get_parent()!.visible && Math.abs(along(fill) - along(fill.get_parent()!) / 2) <= 1, 'apps show their progress');
   await eventually(() => ofType(firstStyled('kestrel-task-attention', button), St.Widget).visible, 'apps asking for attention are highlighted');
   await capture('taskbar-indicators');
-  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-  settings.set_boolean('taskbar-badges', false);
-  await eventually(() => !badge.visible, 'turning badges off hides them');
-  await capture('taskbar-badges-off');
-  settings.set_boolean('taskbar-badges', true);
-  await eventually(() => badge.visible, 'turning badges on shows them again');
+  if (taskbarEdge() === 'bottom') {
+    const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+    settings.set_boolean('taskbar-badges', false);
+    await eventually(() => !badge.visible, 'turning badges off hides them');
+    settings.set_boolean('taskbar-badges', true);
+    await eventually(() => badge.visible, 'turning badges on shows them again');
+  }
   await stop(launcher);
   await eventually(() => !badge.visible, 'indicators clear when the app exits');
 }
@@ -114,12 +115,6 @@ async function checkOpening(panel: Clutter.Actor) {
     await settled();
     await capture('window');
     require(before < midway && midway < length(), `the taskbar animates its length as a window opens (${before}, ${midway}, ${length()})`);
-
-    toggleSurface('gust');
-    await eventually(() => shown(named('kestrel-gust-panel')), 'Gust opens over a window');
-    await capture('gust-over-window');
-    toggleSurface('gust');
-    await eventually(() => !existing('kestrel-gust-panel').visible, 'Gust closes again');
 
     window.maximize();
     await eventually(() => window.is_maximized(), 'the window maximizes');

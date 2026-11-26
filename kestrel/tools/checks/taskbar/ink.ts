@@ -33,7 +33,7 @@ function trayIcon() {
 async function measure(label: string) {
   await settled();
   const status = islandOf('clock');
-  (await renderedFrame(areaOf(status))).saveZoomed(`ink-${label}`, CROP_ZOOM);
+  const frame = await renderedFrame(areaOf(status));
   const failures: string[] = [];
   const readings = [];
   for (const [part, target, name, glyph] of PARTS) {
@@ -44,6 +44,7 @@ async function measure(label: string) {
     if (ratio < target) failures.push(`${label}: the ${part} has ${ratio.toFixed(2)}:1 against the taskbar`);
   }
   console.log(`Taskbar ink ${label}: ${readings.join(', ')}`);
+  if (failures.length) frame.saveZoomed(`ink-${label}`, CROP_ZOOM);
   return failures;
 }
 

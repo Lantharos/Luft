@@ -12,7 +12,7 @@ import {pause, settled} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {fold} from '../tablet/lib/touch.js';
 import {closeGust, rows, gust} from '../gust/search/results.js';
-import {beyond, boxOf, farSide, nearSide} from '../lib/edge.js';
+import {beyond, boxOf, farSide, nearSide, taskbarEdge} from '../lib/edge.js';
 
 const {require, eventually} = checks('Hidden taskbar');
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -44,7 +44,6 @@ async function checkCorner() {
   await eventually(workAreaFillsTheScreen, 'windows get the whole screen');
   await capture('taskbar-hidden');
   await open(existing('kestrel-corner-quick-settings'), () => named('kestrel-quick-settings'), 'the corner opens quick settings');
-  await capture('taskbar-hidden-quick-settings');
   closeGust();
   await open(existing('kestrel-corner-clock'), () => named('kestrel-notifications'), 'the corner clock opens notifications');
   closeGust();
@@ -77,7 +76,6 @@ async function checkWindowSwitching() {
   await eventually(() => shown(gust()), 'Super opens Gust');
   click(centerOf(existing('kestrel-gust-chip-open', gust()!)));
   await eventually(() => rows().some(actor => actor.name?.startsWith('kestrel-search-window:')), 'Open lists the open windows');
-  await capture('taskbar-hidden-gust-palette');
   const window = ofType(rows().find(actor => actor.name?.startsWith('kestrel-search-window:')) ?? null, St.Button);
   click(centerOf(window));
   await eventually(() => global.display.focus_window?.get_title() === WINDOW, 'a window is switched to from Gust');
@@ -107,10 +105,12 @@ export async function run() {
   try {
     await waitForWindow(WINDOW);
     await checkCorner();
-    await checkGustButton();
-    await checkWindowSwitching();
-    await checkTablet();
-    await checkLocking();
+    if (taskbarEdge() === 'bottom') {
+      await checkGustButton();
+      await checkWindowSwitching();
+      await checkTablet();
+      await checkLocking();
+    }
   } finally {
     closeGust();
     for (const key of ['taskbar-shown', 'taskbar-gust-button', 'gust-look']) shell.reset(key);

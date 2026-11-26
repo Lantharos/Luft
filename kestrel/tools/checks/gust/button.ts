@@ -21,7 +21,7 @@ async function measure(label: string) {
   await settled();
   const button = ofType(named('Gust', named('kestrel-panel')!), St.Button);
   const area = areaOf(button);
-  (await renderedFrame(area)).saveZoomed(`gust-button-${label}`, CROP_ZOOM);
+  const frame = await renderedFrame(area);
   const mark = await measureMark(button.child!.get_children().filter((layer): layer is St.Widget => layer instanceof St.Widget), area);
   const failures = [
     mark.secondary < MIN_BACKDROP_CONTRAST && `its back layer has ${mark.secondary.toFixed(2)}:1 against the taskbar`,
@@ -29,6 +29,7 @@ async function measure(label: string) {
     mark.darker !== mark.lightFront && 'its back layer is not the quieter one',
   ].filter(Boolean);
   console.log(`Gust button ${label}: back ${mark.secondary.toFixed(2)}, front ${mark.primary.toFixed(2)}, between ${mark.partners.toFixed(2)}`);
+  if (failures.length) frame.saveZoomed(`gust-button-${label}`, CROP_ZOOM);
   return failures.map(failure => `${label}: ${failure}`);
 }
 

@@ -23,7 +23,6 @@ const PEN_SETTLE = 200;
 const SELECTION = {left: 160, top: 120, right: 1180, bottom: 640};
 
 const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const penSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.pen'});
 
 const ui = () => Main.screenshotUI;
@@ -96,7 +95,7 @@ async function penOpensDrawing() {
   }
 }
 
-async function draw(scheme: string, corners: string) {
+async function draw(scheme: string) {
   await openEditor();
   const [left, top] = [SELECTION.left, SELECTION.top];
   await penWave(left + 80, top + 120);
@@ -111,7 +110,7 @@ async function draw(scheme: string, corners: string) {
 
   await choose('pen');
   await dragFrom([left + 600, top + 80], [left + 800, top + 300], 24);
-  await capture(`screenshot-markup-${scheme}${corners}`);
+  await capture(`screenshot-markup-${scheme}`);
 
   await choose('eraser');
   await dragFrom([left + 640, top + 60], [left + 760, top + 320], 24);
@@ -124,7 +123,7 @@ async function draw(scheme: string, corners: string) {
   await dragFrom([left, top], [left + 40, top + 30], 8);
   const [, , width, height] = editor().cropFrame.crop;
   require(width < SELECTION.right - SELECTION.left && height < SELECTION.bottom - SELECTION.top, 'dragging a corner crops the screenshot');
-  await capture(`screenshot-markup-crop-${scheme}${corners}`);
+  await capture(`screenshot-markup-crop-${scheme}`);
   return {width, height};
 }
 
@@ -151,18 +150,13 @@ export async function run() {
   rest();
   await penOpensDrawing();
   try {
-    for (const rounded of [true, false]) {
-      kestrel.set_boolean('rounded-window-corners', rounded);
-      for (const [name, colorScheme] of SCHEMES) {
-        interfaceSettings.set_string('color-scheme', colorScheme);
-        await settled();
-        const crop = await draw(name, rounded ? '' : '-square');
-        await saved(crop);
-      }
+    for (const [name, colorScheme] of SCHEMES) {
+      interfaceSettings.set_string('color-scheme', colorScheme);
+      await settled();
+      await saved(await draw(name));
     }
   } finally {
     interfaceSettings.set_string('color-scheme', scheme);
-    kestrel.reset('rounded-window-corners');
     if (ui().visible) ui().close(true);
   }
 }

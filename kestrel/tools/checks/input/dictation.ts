@@ -171,8 +171,6 @@ async function checkPill() {
   releaseCopilot();
   await eventually(() => shown(spinner()), 'letting go turns the pill into a spinner while the rest is recognized');
   require(!privacy().visible, 'the privacy indicator stays hidden as dictation closes the microphone');
-  await pause(900);
-  await capture('dictation-processing');
   await eventually(() => !preedit(window) && entryText(window) !== typed, 'the words are typed once recognized', 10000);
   await eventually(() => !shown(indicator()), 'the pill fades out after typing');
 

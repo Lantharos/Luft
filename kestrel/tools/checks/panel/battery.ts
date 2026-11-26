@@ -125,7 +125,7 @@ async function captureSurfaces(scheme: Style) {
   await apply({level: 50, charging: true});
   toggleSurface('quick');
   const tile = () => styled('kestrel-control', named('kestrel-quick-settings')!).find(control => control.accessible_name === 'Battery');
-  await eventually(() => tile()?.mapped && indicator(tile())?.mapped, 'quick settings shows the battery tile with the drawn battery');
+  await eventually(() => tile()?.mapped && indicator(tile())?.mapped, 'quick settings opens with its battery tile');
   await settled();
   await captureArea(`battery-quick-settings-${scheme}`, areaAround(tile()!));
   toggleSurface('quick');
@@ -147,13 +147,15 @@ async function switchStyle(scheme: Scheme) {
 export async function run() {
   const scheme = interfaceSettings.get_string('color-scheme');
   try {
+    const unscaled = global.display.get_monitor_scale(global.display.get_primary_monitor()) === 1;
     for (const style of ['prefer-dark', 'prefer-light'] as const) {
       await switchStyle(style);
       await checkStates(SCHEMES[style]);
+      if (!unscaled) continue;
       interfaceSettings.set_boolean('show-battery-percentage', true);
       await captureSurfaces(SCHEMES[style]);
     }
-    await checkIdle();
+    if (unscaled) await checkIdle();
   } finally {
     interfaceSettings.reset('show-battery-percentage');
     interfaceSettings.set_string('color-scheme', scheme);

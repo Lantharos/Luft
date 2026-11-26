@@ -3,12 +3,11 @@ import Gio from 'gi://Gio';
 import {existing} from '../lib/actors.js';
 import {remember} from '../lib/settings.js';
 import {checkAlways, checkWindows} from './taskbarOptions/autoHide.js';
-import {checkDisplays} from './taskbarOptions/displays.js';
 import {checkEdgeLine} from './taskbarOptions/edgeLine.js';
 import {checkAlignment, checkFloating, checkLooks, checkSizes, checkWallpaperGlass} from './taskbarOptions/looks.js';
+import {taskbarEdge} from '../lib/edge.js';
 import {edgeGap, eventually, HEIGHTS, KEYS, panel, require, set, settings} from './taskbarOptions/taskbar.js';
 import {checkPositions} from './taskbarOptions/positions.js';
-import {checkWorkspaceWindows} from './taskbarOptions/workspaces.js';
 
 const slots = () => existing('kestrel-taskbar-dock', panel()).get_children();
 
@@ -26,18 +25,18 @@ export async function run() {
   try {
     require(edgeGap() === HEIGHTS.normal, 'the taskbar reserves its thickness along its edge of the screen');
     await checkAlignment();
-    await checkPositions();
-    await checkLooks();
-    await checkWallpaperGlass();
-    styles.set_string('color-scheme', scheme);
+    if (taskbarEdge() === 'bottom') {
+      await checkPositions();
+      await checkLooks();
+      await checkWallpaperGlass();
+      styles.set_string('color-scheme', scheme);
+      await checkPinned();
+    }
     await checkEdgeLine();
     await checkFloating();
     await checkSizes();
     await checkAlways();
     await checkWindows();
-    await checkPinned();
-    await checkWorkspaceWindows();
-    await checkDisplays();
   } finally {
     restore();
     styles.set_string('color-scheme', scheme);

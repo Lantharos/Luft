@@ -102,7 +102,7 @@ async function checkStyles() {
         set('taskbar-look', look);
         await eventually(() => panel().has_style_class_name(`kestrel-taskbar-${look}`) && backdrop().enabled === ['glass', 'accent'].includes(look),
           `the ${style} taskbar takes the ${look} look and blurs only when it needs to`);
-        await captureEdge(`taskbar-${style}-${look}-${name}`);
+        if (style === 'bar') await captureEdge(`taskbar-${look}-${name}`);
       }
     }
     await checkPureBlack(name);

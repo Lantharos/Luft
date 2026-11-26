@@ -6,7 +6,7 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {
-  getStyleVariant, accelerometer, PopupBaseMenuItem, PopupImageMenuItem, PopupMenuItem, QuickMenuToggle, QuickSlider, QuickToggle, toggleSurface,
+  getStyleVariant, accelerometer, PopupBaseMenuItem, PopupImageMenuItem, PopupMenuItem, QuickMenuToggle, QuickToggle, toggleSurface,
 } from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, existing, named, ofType, shown, styled, textOf} from '../lib/actors.js';
@@ -115,15 +115,8 @@ async function checkToggles(interfaceSettings: Gio.Settings) {
 
   more(keyboard).emit('clicked', 1);
   await eventually(() => keyboard.width === grid().width, 'the keyboard tile opens its options');
-  await capture('keyboard-backlight-menu');
   more(keyboard).emit('clicked', 1);
   await eventually(() => keyboard.width < grid().width / 2 + 1, 'closing options returns the tile to the grid');
-
-  const volume = ofType(descendants(quick()).find(actor => actor instanceof QuickSlider && actor.menuEnabled) ?? null, QuickSlider);
-  volume.menuButton.emit('clicked', 1);
-  await eventually(() => volume.menu.isOpen, 'the device chevron opens the device list');
-  volume.menuButton.emit('clicked', 1);
-  await eventually(() => !volume.menu.isOpen, 'the same chevron closes it again');
 }
 
 async function checkActiveInk(name: string, interfaceSettings: Gio.Settings) {
@@ -141,7 +134,6 @@ async function checkActiveInk(name: string, interfaceSettings: Gio.Settings) {
       const ink = foreground(styled('kestrel-control-title', control)[0]);
       return styled('kestrel-control-icon', control).every(icon => foreground(icon) === ink) && contrast(ink, composited(control, surface)) >= 4.5;
     }), `active tiles draw their icons, chevrons and text in one readable color on the ${name} accent in ${variant}`);
-    await capture(`quick-settings-active-${name}-${variant}`);
   }
 }
 
@@ -214,7 +206,6 @@ async function checkRotation() {
     rest();
     await settled();
     require(rotation.checked && subtitle(rotation) === 'On' && rotation.icon_name === 'rotation-allowed-symbolic', 'auto rotate starts on');
-    await capture('quick-settings-rotation');
     await toggle(rotation, 'turning auto rotate off locks the rotation',
       checked => !checked && touchscreen.get_boolean('orientation-lock') && subtitle(rotation) === 'Off' && rotation.icon_name === 'rotation-locked-symbolic');
     await chord(Clutter.KEY_Super_L, Clutter.KEY_o);

@@ -64,7 +64,6 @@ async function checkEmoji(window: Meta.Window, settings: Gio.Settings) {
   await capture('emoji-picker');
 
   await search('party', 'party popper', 'searching for party finds 🎉 first');
-  await capture('emoji-picker-search');
   await pick(window, '🎉', 'Enter inserts the emoji into the field');
   require(shown(panel()), 'the panel stays open after picking');
 
@@ -75,7 +74,6 @@ async function checkEmoji(window: Meta.Window, settings: Gio.Settings) {
   press(Clutter.KEY_Tab);
   press(Clutter.KEY_Return);
   await eventually(() => shown(firstStyled('kestrel-emoji-tones', panel())), 'the skin tones open from the keyboard');
-  await capture('emoji-picker-skin-tone');
   press(Clutter.KEY_Right);
   press(Clutter.KEY_Right);
   press(Clutter.KEY_Return);
@@ -99,7 +97,6 @@ async function checkSymbols(window: Meta.Window, settings: Gio.Settings) {
   erase('copyright');
   await search('degree', 'degree sign', 'searching for degree finds ° first');
   await eventually(() => footer() === 'Degree sign · U+00B0', 'the footer shows the name and code point');
-  await capture('emoji-picker-symbol-search');
   await pick(window, '🎉🎉👋🏼🎉°', 'Enter inserts a symbol into the field');
 
   press(Clutter.KEY_Tab);

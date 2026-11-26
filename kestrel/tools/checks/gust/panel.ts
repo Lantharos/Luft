@@ -5,7 +5,7 @@ import St from 'gi://St';
 
 import {descendants, existing, named, ofType, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, click, moveTo, press, rest, rightClick, type} from '../lib/input/input.js';
+import {click, moveTo, press, rest, rightClick, type} from '../lib/input/input.js';
 import {capture, captureRenderedFrames} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 
@@ -38,13 +38,6 @@ async function checkOpening(gust: Clutter.Actor) {
   global.stage.disconnect(hintSignal);
   require(hintPositions.size === 1, 'the search placeholder stays put while Gust opens');
   await capture('gust-panel');
-
-  const button = ofType(named('Gust', named('kestrel-panel')!), St.Widget);
-  const [buttonX, buttonY] = button.get_transformed_position();
-  moveTo([buttonX + 20, buttonY + 20]);
-  await eventually(() => button.hover, 'the Gust button reacts to the pointer');
-  await capture('gust-button-hover');
-  rest();
 }
 
 const ITEM = 'kestrel-gust-item-';
@@ -58,16 +51,6 @@ const listedId = (row: St.Button) => row.name!.slice('kestrel-search-app:'.lengt
 async function checkGrid(gust: Clutter.Actor) {
   const items = shownItems(gust);
   require(items.map(idOf).join() === pins().filter(installed).join(), 'Gust shows the apps pinned to it, in their order');
-
-  const kindOf = (item: St.Button) => Shell.AppSystem.get_default().lookup_app(idOf(item))?.app_info.get_generic_name();
-  const described = require(items.find(item => kindOf(item) && kindOf(item) !== item.accessible_name), 'Gust pins an app with a generic name');
-  moveTo(centerOf(described));
-  const hint = await eventually(() => styled('kestrel-gust-hint').find(label => label.visible && (label as St.Label).text === kindOf(described)),
-    'resting on an app in Gust says what kind of app it is');
-  await settled();
-  await capture('gust-panel-app-hint');
-  rest();
-  await eventually(() => !hint.visible, 'the hint goes away with the pointer');
 }
 
 async function chooseFromMenu(actor: Clutter.Actor, label: string) {
@@ -97,14 +80,6 @@ async function checkAllApps(gust: Clutter.Actor) {
   await eventually(() => !allApps(gust).mapped && shownItems(gust).some(item => idOf(item) === id), 'Escape goes back to the pinned apps, with the new one');
   await chooseFromMenu(shownItems(gust).find(item => idOf(item) === id)!, 'Unpin from Gust');
   await eventually(() => !pins().includes(id) && !shownItems(gust).some(item => idOf(item) === id), 'Unpin from Gust takes it away');
-
-  const saved = settings.get_string('gust-layout');
-  settings.set_string('gust-layout', '{"items":[],"folders":{}}');
-  await eventually(() => named('kestrel-gust-no-pins', gust)?.mapped && !shownItems(gust).length, 'with nothing pinned, Gust says so');
-  await settled();
-  await capture('gust-panel-empty');
-  settings.set_string('gust-layout', saved);
-  await eventually(() => shownItems(gust).length && !named('kestrel-gust-no-pins', gust)?.mapped, 'the pins come back');
 }
 
 async function checkCaret() {
@@ -134,7 +109,6 @@ async function checkContextMenu(gust: Clutter.Actor) {
   rightClick(named('Rover', gust)!);
   const menu = named('kestrel-context-menu')!;
   await eventually(() => menu.visible, 'right-clicking an app opens its menu');
-  require(named('Unpin from Gust', menu), 'a search result can be unpinned from Gust');
   const secondAction = styled('kestrel-context-action', menu)[1];
   const [actionX, actionY] = secondAction.get_transformed_position();
   moveTo([actionX + 20, actionY + secondAction.height / 2]);

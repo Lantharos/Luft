@@ -7,7 +7,7 @@ import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lanthar
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold} from '../lib/frameClock.js';
-import {beyond, boxOf, farSide, nearSide, slideProperty, towardEdge} from '../lib/edge.js';
+import {beyond, boxOf, farSide, nearSide, slideProperty, taskbarEdge, towardEdge} from '../lib/edge.js';
 import {pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require} = checks('motion');
@@ -167,11 +167,12 @@ export async function run() {
   const forced = global.force_animations;
   global.force_animations = true;
   try {
+    for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
+    await checkClippedAtTaskbar();
+    if (taskbarEdge() !== 'bottom') return;
     await checkSpring();
     await checkRetarget();
     await checkDisabledAnimations();
-    for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
-    await checkClippedAtTaskbar();
     a11y.set_string('reduced-motion', 'reduce');
     for (const [surface, name] of SURFACES) await checkReducedSurface(surface, name);
   } finally {

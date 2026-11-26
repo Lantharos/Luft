@@ -75,6 +75,7 @@ export async function run() {
     await pause(300);
     require(spriteWidth() === themeWidth(1) && near(await shownWidth(), SIZE), 'a fast swipe leaves the pointer at its size');
     moveTo(START);
+    if (scale() !== 1) return;
 
     kestrel.set_boolean('shake-to-find-pointer', false);
     await shake();

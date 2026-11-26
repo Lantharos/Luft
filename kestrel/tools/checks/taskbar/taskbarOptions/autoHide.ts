@@ -63,7 +63,7 @@ async function checkSeparateHover() {
   const appsEnd = apps.get_transformed_position()[0] + apps.width;
   for (const [label, point] of [['its apps', [appsX, appsY]], ['its clock and status', [statusX, appsY]], ['the space between its parts', [(appsEnd + status.get_transformed_position()[0]) / 2, appsY]]] as const) {
     moveTo([point[0], point[1]]);
-    await pause(800);
+    await pause(HIDE_DELAY + 200);
     if (!revealed()) throw new Error(`the separate taskbar stays while the pointer rests on ${label}`);
   }
   pointAway();

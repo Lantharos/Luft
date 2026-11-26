@@ -31,11 +31,8 @@ async function checkNotices() {
   await toggle(Clutter.KEY_Caps_Lock, 'Caps Lock on', caps, true);
   await capture('caps-lock-on-osd');
   await toggle(Clutter.KEY_Caps_Lock, 'Caps Lock off', caps, false);
-  await capture('caps-lock-off-osd');
   await toggle(Clutter.KEY_Num_Lock, `Num Lock ${numWas ? 'off' : 'on'}`, num, !numWas);
-  await capture(`num-lock-${numWas ? 'off' : 'on'}-osd`);
   await toggle(Clutter.KEY_Num_Lock, `Num Lock ${numWas ? 'on' : 'off'}`, num, numWas);
-  await capture(`num-lock-${numWas ? 'on' : 'off'}-osd`);
   await hidden();
 }
 

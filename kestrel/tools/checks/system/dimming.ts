@@ -82,8 +82,6 @@ async function checkOverlay(dimmedLuminance: number) {
   const painted = paintedOpacities();
   wake();
   await eventually(() => Main.brightnessManager.dimming, 'the screen dims after half the screen blank delay', (SCREEN_BLANK_DELAY / 2 + 2) * 1000);
-  await pause(500);
-  await saveScreenshot('dimming-fading');
   await eventually(() => overlay().opacity === depth && !overlay().get_transition('opacity'), 'the overlay settles at the dimmed level', 3000);
   painted.stop();
 

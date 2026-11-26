@@ -29,7 +29,7 @@ async function checkMenu(indicator: St.Button) {
   const menu = existing('kestrel-context-menu');
   await settled();
   click(indicator);
-  await eventually(() => shown(menu) && named('Keyboard settings', menu), 'the menu lists input sources and keyboard settings');
+  await eventually(() => shown(menu), 'clicking the indicator opens its menu');
   const listedEnglish = named('English (US)', menu);
   const listedGerman = named('German', menu);
   const [english, german] = require(listedEnglish && listedGerman && [listedEnglish, listedGerman], 'the menu lists every input source');

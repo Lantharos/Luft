@@ -43,7 +43,6 @@ async function checkCalculator() {
     search(conversion);
     await eventually(() => bestTitle() === title, `search converts ${conversion}`);
   }
-  await capture('search-units');
   search('10 km to');
   require(bestTitle() === '= 6.21371 mi', 'a conversion stays while the target unit is typed');
 }
@@ -77,7 +76,6 @@ async function checkToggles() {
     style.set_string('color-scheme', 'default');
     search('dark mode');
     await eventually(() => titleOf(rows()[0]) === 'Switch to dark style', 'natural words find the dark style action first');
-    await capture('search-actions');
     await activate('action:dark-style');
     await eventually(() => style.get_string('color-scheme') === 'prefer-dark', 'the dark style action switches to dark');
     search('light mode');

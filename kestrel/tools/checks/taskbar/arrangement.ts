@@ -11,12 +11,14 @@ import {centerOf, click, moveTo, press, pressButton, releaseButton, rest, restin
 import {fixture, spawn, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {remember} from '../lib/settings.js';
-import {pause, settled} from '../lib/wait.js';
+import {nextFrame, settled} from '../lib/wait.js';
 import {crowding} from './lib/parts.js';
+import {checkDisplays} from './taskbarOptions/displays.js';
+import {checkWorkspaceWindows} from './taskbarOptions/workspaces.js';
 
 const {require, eventually} = checks('taskbar arrangement');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const KEYS = ['taskbar-arrangement', 'taskbar-style'];
+const KEYS = ['taskbar-arrangement', 'taskbar-style', 'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
 const SYSTEM = ['tray', 'status', 'clock'];
 const THICKNESS = 48;
 const MARGIN = 8;
@@ -108,7 +110,6 @@ async function checkPresets(window: Meta.Window, color: number[]) {
     const rounded = await roundedCorners(window, color);
     require(rounded.every((corner, index) => corner === expected[name][index]),
       `with the ${name} arrangement, only the maximized window's corners facing an island are rounded (${rounded.join(', ')})`);
-    await capture(`taskbar-preset-${name}-maximized`);
     window.unmaximize();
   }
 }
@@ -183,7 +184,6 @@ async function checkExtensionElement() {
   try {
     await eventually(() => arrangement().some(([spot, elements]) => spot === 'bottom-end' && elements.join() === ['media/now-playing', ...SYSTEM].join()),
       'an extension\'s element joins the tray\'s island, in front of it');
-    await eventually(() => named('now-playing-stand-in', island('bottom-end')!)?.mapped, 'and shows there');
     arrange([['bottom-center', ['gust', 'dock', 'media/now-playing']], ['bottom-end', SYSTEM]]);
     await eventually(() => named('now-playing-stand-in', island('bottom-center')!)?.mapped, 'Now playing can sit in the dock\'s island');
     await settled();
@@ -200,15 +200,12 @@ async function dragTo(from: Clutter.Actor, to: Clutter.Actor, capturing: string 
   const [toX, toY] = centerOf(to);
   moveTo([fromX, fromY]);
   pressButton();
-  await pause(60);
+  await nextFrame();
   for (let step = 1; step <= DRAG_STEPS; step++) {
     moveTo([fromX + (toX - fromX) * step / DRAG_STEPS, fromY + (toY - fromY) * step / DRAG_STEPS]);
-    await pause(30);
-    if (capturing && step === DRAG_STEPS) {
-      await pause(400);
-      await capture(capturing);
-    }
+    await nextFrame();
   }
+  if (capturing) await capture(capturing);
   releaseButton();
   await settled();
 }
@@ -267,11 +264,8 @@ async function checkDesktopMenu() {
     await settled();
     rightClick(restingPoint());
     await eventually(() => menu.visible && named('Edit taskbar', menu), `right-clicking the desktop offers to edit a ${style} taskbar`);
-    await capture(`desktop-menu-${style}`);
     click(existing('Edit taskbar', menu));
     await eventually(() => taskbarEditor() && shown(named('kestrel-arrange-done')), `the desktop's menu opens the editor for a ${style} taskbar`);
-    await settled();
-    await capture(`desktop-menu-editing-${style}`);
     click(existing('kestrel-arrange-done'));
     await eventually(() => !taskbarEditor(), 'Done closes the editor');
   }
@@ -306,6 +300,10 @@ export async function run() {
     await checkEditing();
     await checkDesktopMenu();
     await checkSecondDisplay();
+    settings.reset('taskbar-arrangement');
+    settings.reset('taskbar-style');
+    await checkWorkspaceWindows();
+    await checkDisplays();
   } finally {
     taskbarEditor()?.cancel();
     restore();

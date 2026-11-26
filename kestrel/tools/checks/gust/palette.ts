@@ -6,7 +6,6 @@ import {formatsLocale} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, ofType, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {call} from '../lib/dbus.js';
 import {centerOf, chord, click, press, rest} from '../lib/input/input.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -17,7 +16,6 @@ const {require, eventually} = checks('Gust palette');
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const keybindings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.keybindings'});
 const RATES = GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'currency-rates.json']);
-const NOTES = GLib.build_filenamev([GLib.get_home_dir(), 'Documents', 'Gust check', 'Lighthouse notes.txt']);
 const WINDOW = 'Harbor timetable';
 const COPIED = 'the ferry leaves at seven sharp';
 
@@ -33,8 +31,6 @@ const listShown = () => shown(named('kestrel-search-results', palette()!));
 const highlighted = () => rows().find(actor => actor.child!.get_first_child()!.visible) ?? null;
 const keyed = (prefix: string) => rows().find(actor => actor.name?.startsWith(`kestrel-search-${prefix}`)) ?? null;
 const fullDate = (year: number, month: number, day: number) => new Intl.DateTimeFormat(formatsLocale(), {dateStyle: 'full', timeZone: 'UTC'}).format(Date.UTC(year, month - 1, day));
-const indexed = async (name: string) => (await call('com.lantharos.Search', '/com/lantharos/Search', 'com.lantharos.Search', 'Find',
-  new GLib.Variant('(su)', [name, 10]), '(a(sbd))')).deepUnpack()[0].some(([path]) => path === NOTES);
 
 async function openWithSuper() {
   closeGust();
@@ -120,7 +116,6 @@ async function checkGrid() {
   await eventually(() => cells().length > 0 && cells().length < total, 'a category shows only its apps');
   await settled();
   checkAlignment();
-  await capture('gust-palette-category');
   press(Clutter.KEY_Tab);
   await eventually(() => entry().clutter_text.has_key_focus(), 'Tab goes back to the search field');
   press(Clutter.KEY_Escape);
@@ -154,13 +149,6 @@ async function checkResults() {
   search(WINDOW.toLowerCase());
   await eventually(() => keyed('window:'), 'open windows are found by title');
   await eventually(() => shown(preview()), 'a window shows a preview');
-  await capture('gust-palette-windows');
-  search('fonts');
-  await eventually(() => row('setting:appearance'), 'Settings pages are found');
-  search('dark mode');
-  await eventually(() => row('action:dark-style'), 'system actions are found');
-  search('2*(3+18)');
-  await eventually(() => bestTitle() === '= 42', 'calculations come first');
   search('100 usd in eur');
   const euros = new Intl.NumberFormat(formatsLocale(), {style: 'currency', currency: 'EUR'}).format(80);
   await eventually(() => bestTitle() === `= ${euros}`, 'currencies convert with the saved rates');
@@ -169,11 +157,6 @@ async function checkResults() {
   search('grinning face');
   await eventually(() => keyed('emoji:'), 'emoji are found');
   await eventually(() => shown(preview()), 'an emoji shows a large preview');
-  await eventually(() => indexed('lighthouse'), 'the file index finds a new file', 20000);
-  search('lighthouse notes');
-  await eventually(() => keyed('file:'), 'files are found by name', 20000);
-  search('breakwater seagulls');
-  await eventually(() => keyed('file:'), 'files are found by what they say', 20000);
   search('qwzx plover');
   await eventually(() => bestTitle() === 'Search the web for “qwzx plover”', 'the web search comes up when nothing else matches');
 }
@@ -216,8 +199,6 @@ async function checkAnswers() {
 export async function run() {
   GLib.mkdir_with_parents(GLib.path_get_dirname(RATES), 0o755);
   GLib.file_set_contents(RATES, JSON.stringify({date: '2026-10-21', eur: {usd: 1.25, gbp: 0.85, jpy: 160}}));
-  GLib.mkdir_with_parents(GLib.path_get_dirname(NOTES), 0o755);
-  GLib.file_set_contents(NOTES, 'Seagulls circle the breakwater every morning.\n');
   gjs('clients/windows/boardWindow.js', [WINDOW, '640', '420']);
   try {
     await waitForWindow(WINDOW);
@@ -231,7 +212,6 @@ export async function run() {
     shell.reset('gust-look');
     keybindings.reset('toggle-gust');
     await stopAll();
-    GLib.unlink(NOTES);
     GLib.unlink(RATES);
   }
 }

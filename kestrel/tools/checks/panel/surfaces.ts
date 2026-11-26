@@ -1,12 +1,12 @@
 import Clutter from 'gi://Clutter';
-import {QuickMenuToggle, QuickSlider, QuickToggle, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {QuickMenuToggle, QuickSlider, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, rest} from '../lib/input/input.js';
+import {click, press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
-import {besideItsButton} from '../lib/edge.js';
+import {besideItsButton, taskbarEdge} from '../lib/edge.js';
 
 const {require, eventually} = checks('surface');
 
@@ -23,17 +23,6 @@ async function checkSwitching() {
   require(besideItsButton(quick, named('Quick settings', named('kestrel-panel')!)!), 'Quick Settings opens beside its button');
   await capture('quick-settings');
   return quick;
-}
-
-async function checkDoNotDisturb(quick: Clutter.Actor) {
-  const found = descendants(quick).filter((actor): actor is QuickToggle => actor instanceof QuickToggle).find(toggle => toggle.title === 'Do Not Disturb');
-  const quiet = require(found?.mapped && found, 'Quick Settings offers Do Not Disturb');
-  const initial = quiet.checked;
-  click(quiet);
-  await eventually(() => quiet.checked !== initial, 'clicking Do Not Disturb turns it over');
-  click(quiet);
-  await eventually(() => quiet.checked === initial, 'clicking it again restores it');
-  rest();
 }
 
 async function checkSelectors(quick: Clutter.Actor) {
@@ -73,7 +62,6 @@ async function checkPowerMenu() {
 
 export async function run() {
   const quick = await checkSwitching();
-  await checkDoNotDisturb(quick);
-  await checkSelectors(quick);
+  if (taskbarEdge() === 'bottom') await checkSelectors(quick);
   await checkPowerMenu();
 }

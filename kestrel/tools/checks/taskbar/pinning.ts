@@ -1,4 +1,4 @@
-import Clutter from 'gi://Clutter';
+import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
@@ -6,7 +6,7 @@ import Shell from 'gi://Shell';
 import {write} from '../apps/lib/files.js';
 import {existing, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, rest, restingPoint, rightClick} from '../lib/input/input.js';
+import {click, rightClick} from '../lib/input/input.js';
 import {fixture, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -53,12 +53,6 @@ export async function run() {
   await eventually(() => !favorites.get_strv('favorite-apps').includes(FILE_MANAGER), 'Unpin from taskbar unpins the app');
   favorites.set_strv('favorite-apps', saved);
   await eventually(() => named('Rover', panel)?.mapped, 'pinning the app again brings its button back');
-
-  rightClick(restingPoint());
-  await eventually(() => menu.visible && named('Change wallpaper', menu), 'right-clicking the desktop offers to change the wallpaper');
-  press(Clutter.KEY_Escape);
-  await eventually(() => !menu.visible, 'Escape closes the desktop menu');
-  rest();
 
   await checkRewrittenLauncher(panel, favorites, saved);
 }

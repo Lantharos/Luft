@@ -110,11 +110,13 @@ async function checkPopup(name: string) {
   const box = boxOf(popup());
   require(panels().every(panel => !crowding(panel)), 'the taskbar stays in place while the list is open');
   require(box.width > 0 && box.height > 0, 'the list of more apps opens on screen');
-  await capture(`taskbar-overflow-${name}-popup`);
-  rightClick(rows()[0]);
-  await eventually(() => menu().visible && named('Unpin from taskbar', menu()), 'right-clicking an app in the list opens its menu');
-  press(Clutter.KEY_Escape);
-  await eventually(() => !menu().visible, 'Escape closes the app menu');
+  if (name === LAYOUTS[0].name) {
+    await capture('taskbar-overflow-popup');
+    rightClick(rows()[0]);
+    await eventually(() => menu().visible && named('Unpin from taskbar', menu()), 'right-clicking an app in the list opens its menu');
+    press(Clutter.KEY_Escape);
+    await eventually(() => !menu().visible, 'Escape closes the app menu');
+  }
   press(Clutter.KEY_Escape);
   await eventually(() => !popup().visible, 'Escape closes the list');
 }
@@ -187,7 +189,6 @@ async function checkTablet() {
     await eventually(() => popup().visible && rows().length === MOST - shownApps(), 'tapping the overflow button lists the other apps');
     await settled();
     require(rows().every(row => row.height >= TOUCH_ROW), 'the list is sized for fingers');
-    await capture('taskbar-overflow-tablet-popup');
     touchDown(centerOf(rows()[0]));
     await eventually(() => menu().visible, 'touching and holding an app in the list opens its menu', 2000);
     touchUp();

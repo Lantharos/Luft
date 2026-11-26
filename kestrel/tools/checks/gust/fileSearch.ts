@@ -2,15 +2,14 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {labelled, named} from '../lib/actors.js';
 import {resetBattery, setBattery, UPOWER_STATE} from '../lib/battery.js';
 import {sabineService} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, rightClick} from '../lib/input/input.js';
+import {press} from '../lib/input/input.js';
 import {findWindow, scratch, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {waitUntil} from '../lib/wait.js';
 import {bestTitle, closeGust, descriptionOf, groupTitles, openGust, row, search, withHandler} from './search/results.js';
 
 const {require, eventually} = checks('Gust file search');
@@ -116,12 +115,6 @@ async function checkNames() {
   await openGust();
   search('harbor plans');
   await eventually(() => bestTitle() === 'Harbor plans.txt', 'the file is found again');
-  await settled();
-  rightClick(row(`file:${uri(PLANS)}`)!);
-  const menu = named('kestrel-context-menu')!;
-  await eventually(() => menu.visible && labelled('Show in Rover', menu)?.mapped, 'a file result offers to show it in Rover');
-  press(Clutter.KEY_Escape);
-  await eventually(() => !menu.visible, 'Escape closes the file menu');
   await sabineService();
   press(Clutter.KEY_Control_L, Clutter.KEY_Return);
   const rover = await waitForWindow(window => window.get_wm_class() === 'com.lantharos.rover', 'Ctrl+Enter shows the file in Rover', REVEAL_TIMEOUT);

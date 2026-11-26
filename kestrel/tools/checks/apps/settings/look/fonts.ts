@@ -19,7 +19,7 @@ const {require, eventually} = checks('Luft app');
 const DEFAULTS: Record<string, string> = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN: Record<string, string> = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
-const PICKERS: Record<string, Point> = {'font-name': [900, 162], 'monospace-font-name': [900, 238]};
+const PICKERS: Record<string, Point> = {'font-name': [900, 148], 'monospace-font-name': [900, 214]};
 const LARGER_TEXT = 1.25;
 const TERMINAL_TEXT = 'fn main() -> Result<(), Error> { 0x1F != 0o17 }  The quick brown fox 0123456789';
 const ZOOM = 4;

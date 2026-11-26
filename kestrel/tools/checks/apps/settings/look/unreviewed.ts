@@ -15,10 +15,10 @@ const ID = 'com.example.Unreviewed';
 const PAGE = `extensions/${ID.toLowerCase()}`;
 const INSTALL_COPY: Point = [660, 466];
 const CONFIRM_COPY: Point = [660, 461];
-const STOP: Point = [956, 374];
+const STOP: Point = [960, 354];
 const RUN_FROM_FOLDER: Point = [660, 532];
 const CONFIRM_FOLDER: Point = [645, 512];
-const TAKE_BACK: Point = [938, 458];
+const TAKE_BACK: Point = [942, 436];
 const PAGE_CONTENT = {x: 300, y: 76, width: 720, height: 360};
 
 const alike = (frame: Frame, other: Frame) => frame.pixelsApart(other, 24) < 200;

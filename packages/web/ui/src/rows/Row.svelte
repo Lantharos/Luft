@@ -210,6 +210,10 @@
 		gap: 10px;
 	}
 
+	.below:empty {
+		display: none;
+	}
+
 	.detached {
 		padding: 0 14px 14px;
 	}

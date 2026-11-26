@@ -84,7 +84,6 @@ async function checkFringes(before: Frame, width: number, height: number) {
   await choose('desktop-crt', true);
   await choose('crt-curvature', 0.5);
   await eventually(async () => (await frame()).pixelsApart(fringed, SAME) > 0, 'it goes with CRT and curvature');
-  await capture('phosphor-aberration-crt');
   require(attachedEffects().views > 0, 'and stays on');
   await choose('desktop-crt', false);
   await choose('crt-curvature', 0);
@@ -102,7 +101,6 @@ async function checkWindows(before: Frame, stripedWindow: ReturnType<typeof glob
   await act(toggle.action, new GLib.Variant('b', true));
   await eventually(() => attachedEffects().effects === 1, 'a rule puts it on that app only');
   const fringed = await frame();
-  await capture('phosphor-aberration-window');
   const {x, y, width, height} = stripedWindow!.get_frame_rect();
   const {box} = fringed.differences(before);
   require(fringed.pixelsApart(before, SAME) > 0, 'it changes that window');

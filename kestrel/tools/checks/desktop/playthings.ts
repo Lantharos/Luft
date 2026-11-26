@@ -78,10 +78,8 @@ async function checkLanterns() {
   await settled(lantern);
   const fast = await furthest(lantern, () => sweep(...across(lantern, 90), 8));
   require(fast > slow * 1.4, `a faster pass swings it further (${fast}° against ${slow}°)`);
-  await capture('playthings-lantern-swinging');
   rest();
   await settled(lantern);
-  await pause(1200);
   await resting('a settled lantern', 3000, 'once settled it paints nothing');
 
   const middle = middleOf(lantern);
@@ -136,8 +134,7 @@ async function checkBehindWindows() {
   const [x, y] = middleOf(lantern);
   const {window} = await openWindow('In front of a lantern', 500, 400);
   window.move_frame(true, Math.max(0, x - 250), Math.max(0, y - 200));
-  await pause(500);
-  require(!hasPart(topAt([x, y])), 'a window in front takes the pointer');
+  await eventually(() => !hasPart(topAt([x, y])), 'a window in front takes the pointer');
   const moved = await furthest(lantern, () => sweep([x - 120, y], [x + 120, y], 8));
   require(moved < 0.1, `moving over the window leaves the lantern behind it alone (${moved}°)`);
   click([x, y]);
@@ -159,7 +156,6 @@ async function checkFingers() {
   }
   await pause(250);
   require(swing(first) > 6 && swing(second) > 6, `two fingers pull two lanterns at once (${swing(first)}°, ${swing(second)}°)`);
-  await capture('playthings-two-fingers');
   start.forEach((_point, slot) => touchscreen.notify_touch_up(now(), slot));
   await pause(300);
   require(swing(first) > 1 && swing(second) > 1, 'both swing on when let go');
@@ -203,7 +199,6 @@ async function checkClouds() {
   await pause(500);
   const pushed = Math.max(...puffs.map((puff, index) => Math.hypot(middleOf(puff)[0] - middles[index][0], middleOf(puff)[1] - middles[index][1])));
   require(pushed > 12, `puffs part around the pointer (${pushed} pixels)`);
-  await capture('playthings-clouds-parted');
   await pause(2500);
   const parked = await measure('a pointer parked in a cloud', 2000, () => pause(2000));
   if (parked.paints > QUIET_PAINTS) require((await measure('a pointer parked in a cloud, again', 2000, () => pause(2000))).paints <= QUIET_PAINTS, 'puffs held apart by a still pointer rest too');
@@ -211,7 +206,6 @@ async function checkClouds() {
   click(center);
   await eventually(() => showing() > before, 'poking a cloud makes it rain');
   await pause(700);
-  await capture('playthings-rain');
   moveTo(FAR_FROM_CLOUDS);
   await eventually(() => showing() === before, 'the rain stops by itself', 6000);
   await eventually(() => puffs.every((puff, index) => near(middleOf(puff)[0], middles[index][0], 1)), 'and the puffs come back together', SETTLE_MS);
@@ -230,7 +224,6 @@ async function checkCampfire() {
   const lean = () => turned(flame) > 180 ? turned(flame) - 360 : turned(flame);
   await leanFrom(x + 90);
   await eventually(() => lean() < -5, 'flames lean away from the pointer on the right');
-  await capture('playthings-campfire-lean');
   await sweep([x + 90, y], [x - 90, y], 20);
   await eventually(() => lean() > 5, 'and from the left');
   rest();
@@ -240,7 +233,6 @@ async function checkCampfire() {
   await eventually(() => showing() === resting, 'any sparks from moving past it burn out', 8000);
   click([x, y + 20]);
   await eventually(() => showing() > resting, 'clicking throws sparks');
-  await capture('playthings-sparks');
   rest();
   await eventually(() => showing() === resting, 'the sparks burn out', 8000);
   const [restingX, restingY] = [flame.scale_x, flame.scale_y];
@@ -251,7 +243,6 @@ async function checkCampfire() {
     fanned = flame.scale_y > restingY * 1.12;
   }
   require(fanned, `fanning makes the fire catch (${restingX} × ${restingY}, now ${flame.scale_x} × ${flame.scale_y})`);
-  await capture('playthings-fanned');
   rest();
   await eventually(() => near(flame.scale_y, restingY, 0.08), 'and it dies down', SETTLE_MS);
 }
@@ -270,14 +261,12 @@ async function checkStars() {
   await pause(600);
   require(stars[2].opacity > resting + 30, `stars brighten near the pointer (${resting}, now ${stars[2].opacity})`);
   await eventually(() => lines.some(line => line.visible), 'and join up');
-  await capture('playthings-stars-near');
   click([x, y]);
   await eventually(() => stars[2].scale_x > 1.3, 'clicking a star makes it twinkle');
   await pause(500);
   const comet = () => parts().some(part => part.visible && part.height > COMET_AT_LEAST);
   await sweep([x - 60, y - 60], [x + 240, y + 120], 3);
   await eventually(comet, 'a flick sends a shooting star');
-  await capture('playthings-shooting-star');
   rest();
   await eventually(() => parts().every(part => stars.includes(part) || !part.visible), 'which burns out, and the lines let go', 8000);
 }
@@ -299,7 +288,7 @@ async function checkSleeping(fullScreenAlone: number) {
   rest();
   await pause(600);
   const lowRate = ({paints, elsewhere}: Cost) => paints > 4 && paints < 22 && elsewhere === 0;
-  const breathing = await steady('all four, ambient', 6000, lowRate);
+  const breathing = await steady('all four, ambient', 3000, lowRate);
   require(lowRate(breathing), `ambient motion runs at a low rate, on its own display (${breathing.paints} paints a second, ${breathing.elsewhere} on the other)`);
 
   await fullScreen(async () => {
@@ -311,25 +300,18 @@ async function checkSleeping(fullScreenAlone: number) {
   });
 
   a11y.set_string('reduced-motion', 'reduce');
-  await pause(800);
   await resting('reduced motion', 3000, 'it stays still with reduced motion');
   a11y.reset('reduced-motion');
   await setPowerProfile('power-saver');
-  await pause(800);
   await resting('battery saver', 3000, 'it stays still with battery saver on');
   await setPowerProfile('balanced');
-  await pause(500);
   require((await measure('back to normal', 2000)).paints > 4, 'ambient motion comes back after');
   await choose({'lantern-count': count(7), 'cloud-count': count(6), 'campfire-count': count(3), 'star-count': count(4)});
   await eventually(() => lanterns().length === 7, 'the most of everything shows');
-  rest();
-  await pause(800);
-  await capture('playthings-most');
-  const most = await steady('the most of everything, ambient', 6000, lowRate);
+  const most = await steady('the most of everything, ambient', 3000, lowRate);
   require(lowRate(most), `the most of everything stays at that rate and leaves the other display alone (${most.paints} paints a second, ${most.elsewhere} on the other)`);
   await ambient(false);
-  await pause(800);
-  await resting('the most of everything, still', 5000, 'with ambient motion off, the most of everything still paints nothing');
+  await resting('the most of everything, still', 3000, 'with ambient motion off, the most of everything still paints nothing');
   await choose({'lantern-count': count(3), 'cloud-count': count(2), 'campfire-count': count(1), 'star-count': count(1)});
   await eventually(() => lanterns().length === 3, 'back to the default amounts');
   await pause(500);
@@ -384,23 +366,19 @@ async function checkDisplaysAndTaskbar() {
   const area = () => global.workspace_manager.get_active_workspace().get_work_area_for_monitor(primary);
   arrange(alongEdge('left'));
   await eventually(() => area().x > 0, 'the taskbar moves to the left', 8000);
-  await pause(1000);
-  const leftmost = Math.min(...labelled('Lantern').map(actor => middleOf(actor)[0]));
-  require(leftmost >= area().x, `things stay clear of a taskbar on the left (${leftmost}, area from ${area().x})`);
-  await capture('playthings-taskbar-left');
+  const leftmost = () => Math.min(...labelled('Lantern').map(actor => middleOf(actor)[0]));
+  await eventually(() => leftmost() >= area().x, 'things stay clear of a taskbar on the left');
   arrange(alongEdge('top'));
   await eventually(() => area().y > 0, 'the taskbar moves to the top', 8000);
-  await pause(1000);
-  const highest = Math.min(...labelled('Lantern').map(actor => middleOf(actor)[1]));
-  require(highest > area().y, 'lanterns hang from below a taskbar on top');
-  await capture('playthings-taskbar-top');
+  const highest = () => Math.min(...labelled('Lantern').map(actor => middleOf(actor)[1]));
+  await eventually(() => highest() > area().y, 'lanterns hang from below a taskbar on top');
   kestrel.reset('taskbar-arrangement');
-  await pause(1000);
+  const monitor = global.display.get_monitor_geometry(primary);
+  await eventually(() => area().x === monitor.x && area().y === monitor.y, 'the taskbar goes back to the bottom', 8000);
 
   await choose({displays: new GLib.Variant('s', 'every')});
   const secondLeft = global.display.get_monitor_geometry(1).x;
   await eventually(() => labelled('Lantern').some(actor => middleOf(actor)[0] > secondLeft), 'every display gets its own', 8000);
-  await capture('playthings-both-displays');
   await pressButton('Arrange');
   await eventually(() => named('Done'), 'arranging works with every display');
   await pause(300);

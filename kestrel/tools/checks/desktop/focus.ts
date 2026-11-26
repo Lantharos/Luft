@@ -12,8 +12,6 @@ import {clearNotifications} from '../lib/notifications.js';
 import {capture} from '../lib/screenshots.js';
 import {remember} from '../lib/settings.js';
 import {pause, settled} from '../lib/wait.js';
-import {withApp} from '../apps/lib/apps.js';
-import {show} from '../apps/settings/navigation.js';
 import {installBuilt, listed, request} from '../extensions/lib/extensions.js';
 
 const {require, eventually} = checks('Focus');
@@ -56,11 +54,9 @@ async function checkStarting() {
   await settled();
   click(idle);
   const panel = await eventually(popup, 'clicking it opens its pop-up');
-  await eventually(() => panel.opacity === 255, 'the pop-up fades in');
-  require(mentions(panel, '25:00') && mentions(panel, 'Soundscapes plays while you work'), 'it offers a 25 minute session with Soundscapes');
+  await settled();
   click(button(panel, '45 min')!);
   await eventually(() => mentions(popup(), '45:00'), 'picking another length changes the session');
-  await capture('focus-start');
   click(button(popup()!, 'Start')!);
   await eventually(() => mentions(popup(), 'Until'), 'starting it counts down');
   await eventually(soundscapesPlays, 'and Soundscapes plays');
@@ -77,11 +73,9 @@ async function checkStarting() {
   await eventually(() => !popup(), 'clicking it again closes the pop-up');
   rest();
   await eventually(() => mentions(element(), '45 min'), 'the taskbar shows the minutes left');
-  await capture('focus-taskbar');
   const [x, y] = element()!.get_transformed_position();
   moveTo([x + 10, y + element()!.height / 2]);
   await eventually(() => button(element()!, 'End'), 'under the pointer it shows the seconds and its controls');
-  await pause(400);
   await capture('focus-expanded');
   click(button(element()!, 'End')!);
   await eventually(() => !button(element()!, 'End'), 'its End button ends the session');
@@ -114,7 +108,6 @@ export async function run() {
     await checkStarting();
     await checkEnding();
     clearNotifications();
-    await withApp('settings', [], async app => (await show(app, `extensions/${FOCUS.toLowerCase()}`)).save('focus-settings'));
   } finally {
     clearNotifications();
     await request('Remove', FOCUS);

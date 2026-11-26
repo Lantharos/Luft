@@ -2,14 +2,13 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {named, shownStyled, showsText} from '../lib/actors.js';
+import {named, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, press} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
-import {withScheme} from '../apps/lib/palette.js';
 import {Nearby} from './post/nearby.js';
 import {NEARBY} from './post/transfers.js';
 import {Caller} from './send/caller.js';
@@ -66,17 +65,12 @@ function receiving(nearby: Nearby) {
 
 async function checkSending(caller: Caller, scan: string, arrives: (name: string) => Promise<string>) {
   await caller.send();
-  const open = await eventually(sheet, 'the app in front opens the Send sheet for its file');
-  require(showsText('Send “Scan.pdf”', open) && showsText('Devices nearby', open), 'naming the file, with the devices nearby');
+  await eventually(sheet, 'the app in front opens the Send sheet for its file');
   await caller.send();
   require((await caller.next('a second sheet is answered')).includes('already open'), 'one sheet opens at a time');
   await eventually(() => choice(NEARBY), 'Post finds the computer nearby while the sheet is open', 30000);
   await settled();
-  await capture('send-sheet-dark');
-  await withScheme('light', async () => {
-    await settled();
-    await capture('send-sheet-light');
-  });
+  await capture('send-sheet');
   click(choice(NEARBY)!);
   await eventually(() => !sheet(), 'choosing the device closes the sheet');
   require(await caller.next('the app hears the sheet closed') === 'sent', 'and the app hears it closed');

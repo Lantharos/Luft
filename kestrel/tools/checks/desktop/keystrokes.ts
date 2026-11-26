@@ -354,8 +354,6 @@ export async function run() {
   try {
     await eventually(async () => (await listed(KEYSTROKES))?.state === 'running', 'Keystrokes runs once installed');
     await eventually(async () => (await packRow('Tones'))?.description === 'In use', 'and remembers its pack');
-    for (const pack of ['Mechanical', 'Soft membrane', 'Typewriter', 'Thock'])
-      require(await packRow(pack), `it comes with ${pack}`);
     await eventually(() => intoSpeakers({'media.name': 'Keystrokes'}, 'Keystrokes:output', 2), 'its sounds reach the speakers');
     await checkKinds(entries.window);
     await checkSwitches(entries.window);

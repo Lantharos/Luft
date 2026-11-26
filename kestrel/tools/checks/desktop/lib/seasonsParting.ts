@@ -7,7 +7,7 @@ import Meta from 'gi://Meta';
 import {descendants} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';
 import {moveTo, type Point, press, rest} from '../../lib/input/input.js';
-import {type Area, captureFrame, capture, type Frame} from '../../lib/screenshots.js';
+import {type Area, captureFrame, type Frame} from '../../lib/screenshots.js';
 import {pause} from '../../lib/wait.js';
 import {openWindow} from '../../tiling/lib/tiling.js';
 import {SEASONS, setSetting} from '../../extensions/lib/extensions.js';
@@ -59,13 +59,12 @@ async function showing() {
   return seen;
 }
 
-async function partedBy(move: () => void, release: () => void, name: string, shot: string | null) {
+async function partedBy(move: () => void, release: () => void, name: string) {
   rest();
   await pause(SETTLE_MS);
   const away = await showing();
   move();
   await pause(SETTLE_MS);
-  if (shot) await capture(shot);
   const near = await activity(around(POINT));
   require(near < away * STILL_PARTED, `${name} parts around it (${near} changing pixels against ${away})`);
   release();
@@ -73,13 +72,13 @@ async function partedBy(move: () => void, release: () => void, name: string, sho
   await showing();
 }
 
-export const partsForPointer = (name: string, shot: string) => partedBy(() => moveTo(POINT), rest, name, shot);
+export const partsForPointer = (name: string) => partedBy(() => moveTo(POINT), rest, name);
 
 async function checkFinger() {
   const settings = global.stage.context.get_settings();
   const longPress = settings.long_press_duration;
   settings.long_press_duration = FOREVER_MS;
-  await partedBy(() => touchscreen.notify_touch_down(now(), 0, ...POINT), () => touchscreen.notify_touch_up(now(), 0), 'rain under a finger', null);
+  await partedBy(() => touchscreen.notify_touch_down(now(), 0, ...POINT), () => touchscreen.notify_touch_up(now(), 0), 'rain under a finger');
   settings.long_press_duration = longPress;
 }
 
@@ -138,7 +137,7 @@ async function checkStopsListening() {
 }
 
 export async function checkParting() {
-  await partsForPointer('rain', 'seasons-rain-parted');
+  await partsForPointer('rain');
   await checkFinger();
   await checkLongPress();
   await checkWindowInFront();

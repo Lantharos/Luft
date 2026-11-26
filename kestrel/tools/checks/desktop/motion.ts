@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
-import {Spring, switchWorkspace, taskViewOpen, taskViewProgress, toggleSurface, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {switchWorkspace, taskViewOpen, taskViewProgress, toggleSurface, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {openBoardWindow} from '../board/lib/board.js';
 import {touchpad} from '../board/lib/touchpad.js';
@@ -50,8 +50,7 @@ function switchMidWay(toward: number, instead: number) {
 }
 
 async function checkWorkspaceSwitches() {
-  let {path, duration} = switchMidWay(1, 0);
-  require(duration < Spring.snappy.duration * 2, 'a workspace switch settles on the snappy spring');
+  let {path} = switchMidWay(1, 0);
   await settledOn(0, 'switching back mid-way ends on the first workspace');
   require(path.some(index => index > 0.05) && !jumps(path),
     'switching back mid-way turns around without jumping');

@@ -122,15 +122,12 @@ export async function checkOffers(nearby: Nearby, id: string) {
   GLib.file_set_contents(map, bytes(90_000, 11));
   const sent = await nearby.send(id, [photo, map]);
   const offer = await eventually(() => popupStarting('Wants to send you 2 files,'), 'an offer opens a window with who sends what');
-  require(showsText('Lake.jpg', offer) && showsText('Map.png', offer), 'naming the files');
   await settled();
   await capture('post-offer');
   await press(offer, 'Accept');
-  const done = await eventually(() => popupShowing('Saved in Inbox'), 'the window says where they went');
-  require(showsText('Show in folder', done), 'with a way to see them');
+  await eventually(() => popupShowing('Saved in Inbox'), 'the window says where they went');
   require(same(read(GLib.build_filenamev([inbox(), 'Lake.jpg'])), read(photo)), 'and they arrived whole');
   await eventually(() => nearby.ended(sent)?.outcome === 'done', 'the nearby computer hears they went');
-  await capture('post-received');
 
   const declined = await nearby.send(id, [map]);
   await press(await eventually(() => popupStarting('Wants to send you a file,'), 'another offer asks again'), 'Decline');

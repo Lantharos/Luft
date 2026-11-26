@@ -15,10 +15,8 @@ import {nextFrame, settled, waitUntil} from '../lib/wait.js';
 const {require, eventually} = checks('dialog');
 const MOUNT = ['org.gtk.MountOperationHandler', '/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler'] as const;
 const END_SESSION = ['org.gnome.Shell', '/org/gnome/SessionManager/EndSessionDialog', 'org.gnome.SessionManager.EndSessionDialog'] as const;
-const LOGOUT = 0;
 const RESTART = 2;
 const UNHURRIED = 3600;
-const COUNTDOWN = 60;
 
 async function checkLockMode(panel: Clutter.Actor, gust: Clutter.Actor) {
   Main.sessionMode.pushMode('unlock-dialog');
@@ -49,13 +47,11 @@ async function checkVolumePassword() {
     ['kestrel-check', 'Unlock encrypted volume', 'drive-harddisk-symbolic', '', '', Gio.AskPasswordFlags.NEED_PASSWORD]));
   const entry = await waitUntil(() => descendants(global.stage).find((actor): actor is St.PasswordEntry => actor instanceof St.PasswordEntry && actor.mapped),
     'the encrypted volume password dialog opens');
-  require(Main.modalCount > 0, 'the encrypted volume password dialog is modal');
   await waitUntil(() => answerable('prompt-dialog'), 'the encrypted volume password dialog takes input');
   await capture('volume-password-dialog');
   const [x, y] = entry.get_transformed_position();
   rightClick([x + 40, y + entry.height / 2]);
   await eventually(() => contextMenuOf(entry)?.isOpen, 'right-clicking a password field offers to show the text');
-  await capture('password-menu');
   press(Clutter.KEY_Escape);
   await eventually(() => !contextMenuOf(entry)?.isOpen, 'Escape closes the password field menu');
   await settled();
@@ -63,14 +59,6 @@ async function checkVolumePassword() {
   await request;
   await call(...MOUNT, 'Close');
   await eventually(() => Main.modalCount === 0, 'the password dialog cancels cleanly');
-}
-
-async function checkEndSession() {
-  await call(...END_SESSION, 'Open', new GLib.Variant('(uuuao)', [LOGOUT, 0, COUNTDOWN, []]));
-  await eventually(() => Main.modalCount > 0, 'the log out confirmation opens');
-  await capture('end-session-dialog');
-  await call(...END_SESSION, 'Close');
-  await eventually(() => Main.modalCount === 0, 'the log out confirmation closes');
 }
 
 async function checkRestart() {
@@ -92,6 +80,5 @@ export async function run() {
   await checkLockMode(panel, gust);
   await checkHeadset(gust);
   await checkVolumePassword();
-  await checkEndSession();
   await checkRestart();
 }

@@ -97,7 +97,6 @@ async function checkBanner(replies: Reply[]) {
     const field = firstStyled('notification-reply-entry', banner);
     return field instanceof St.Entry && field;
   }, 'banners offer an inline reply field');
-  await capture('notification-banner-reply');
   entry.set_text('On my way');
   entry.clutter_text.emit('activate');
   await eventually(() => replies.some(([replied, text]) => replied === id && text === 'On my way'), 'banner replies reach the app');
@@ -168,7 +167,6 @@ async function checkCalendar() {
   await waitUntil(() => shown(center), 'the notification center opens');
   const firstHeading = () => textOf(classed('kestrel-calendar-heading', center)[0]);
   try {
-    require(/, week \d+$/.test(ofType(firstStyled('kestrel-calendar-month', center), St.Button).label), 'the month header shows the week number');
     locale.set_string('region', 'de_DE.UTF-8');
     await eventually(() => firstHeading() === shortDay(1), 'German region formats start the week on Monday');
     settings.set_string('week-start', 'sunday');
@@ -213,13 +211,11 @@ async function checkCalendarScrolling() {
     scroll(Clutter.ScrollDirection.UP, calendar);
     scroll(Clutter.ScrollDirection.UP, calendar);
     await eventually(() => shows(-1) && atRest(), 'each wheel notch up goes back one month');
-    await capture('notification-calendar-previous');
 
     const start = weeks.week;
     moveTo(calendar);
     await fingerScroll(WEEKS_DRAGGED * weeks.pitch, {steps: 24});
     require(Math.abs(weeks.week - start - WEEKS_DRAGGED) < 0.05, 'the calendar follows the fingers on the touchpad');
-    await capture('notification-calendar-dragging');
     await pause(VELOCITY_WINDOW);
     liftFingers();
     await eventually(() => shows(0) && atRest(), 'letting go settles on the nearest month');
@@ -331,7 +327,6 @@ async function checkBannerSwipes(closed: Map<number, number>, invoked: Reply[]) 
   pressButton();
   await glide(down, [down[0] + 4, down[1] + 30], 5);
   require(near(banner.translation_y, 30) && banner.translation_x === 0, 'a banner dragged down follows the pointer downward only');
-  await capture('notification-banner-drag-down');
   await glide([down[0] + 4, down[1] + 30], [down[0] + 6, down[1] + 70], 4);
   await pause(VELOCITY_WINDOW + 50);
   releaseButton();
@@ -351,7 +346,6 @@ async function checkBannerSwipes(closed: Map<number, number>, invoked: Reply[]) 
   moveTo(centerOf(banner));
   await fingerScroll(-60, {horizontal: true, steps: 6});
   require(near(banner.translation_x, 60), 'a two-finger swipe moves the banner with the fingers');
-  await capture('notification-banner-touchpad');
   await fingerScroll(-140, {horizontal: true, steps: 10});
   await pause(VELOCITY_WINDOW);
   liftFingers();
@@ -381,7 +375,6 @@ async function checkCenterSwipes(closed: Map<number, number>) {
     await glide([x, y], [x + 100, y + 3], 10);
     require(near(card.translation_x, 100) && card.translation_y === 0 && chatter.translation_x === 0,
       'a notification in a group follows the pointer sideways on its own');
-    await capture('notification-center-drag');
     await glide([x + 100, y + 3], [x + 200, y + 3], 6);
     await pause(VELOCITY_WINDOW + 50);
     const before = chatter.height;

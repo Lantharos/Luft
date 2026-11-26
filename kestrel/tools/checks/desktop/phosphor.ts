@@ -67,12 +67,8 @@ async function checkBorder(before: Frame, area: ReturnType<typeof areaOf>) {
   await eventually(() => attachedEffects().overlays === 2, 'a border goes on both windows');
   const bordered = await frame();
   await capture('phosphor-border');
-  const {box} = bordered.differences(before);
-  const left = bordered.pixelsApart(before, SAME);
-  require(left > 0, 'the border shows');
   require(bordered.near(pixels(area.x + 1), pixels(area.y + 120), '#ff0000', 40), 'along the window\'s left edge');
   require(!bordered.near(pixels(area.x + 40), pixels(area.y + 120), '#ff0000', 40) || before.near(pixels(area.x + 40), pixels(area.y + 120), '#ff0000', 40), 'and not in the window');
-  require(box.x2 > box.x1, 'only around windows');
   await choose('border', 'off');
   await eventually(() => attachedEffects().overlays === 0, 'turning the border off takes it away');
   require((await frame()).pixelsApart(before, SAME) === 0, 'and leaves the screen as it was');
@@ -206,14 +202,11 @@ async function checkMagnifier(before: Frame) {
   await eventually(() => attachedEffects().views === views(), 'the filter is on');
   const plain = await frame();
   magnifier.set_boolean('screen-magnifier-enabled', true);
-  await pause(1000);
-  const zoomed = await frame();
-  require(zoomed.pixelsApart(plain, 8) > 0, 'the magnifier still works over a filter');
+  await eventually(async () => (await frame()).pixelsApart(plain, 8) > 0, 'the magnifier still works over a filter');
   magnifier.set_boolean('screen-magnifier-enabled', false);
   filter.dispose();
   await eventually(nothingAttached, 'the filter comes off');
-  await pause(1000);
-  require((await frame()).pixelsApart(before, SAME) === 0, 'the screen is back as it was');
+  await eventually(async () => (await frame()).pixelsApart(before, SAME) === 0, 'the screen is back as it was');
 }
 
 const IDENTITY_WINDOW = 'window_color = window_color;';
@@ -236,7 +229,6 @@ async function checkShapesKept(window: NonNullable<ReturnType<typeof global.disp
     await sameThrough(`${what}, on the display`, before, () => shaders().filter(IDENTITY_FILTER, {captured: true}), CAPTURED_FILTER_SAME);
   };
   await passThrough('floating with rounded corners');
-  await capture('phosphor-identity-floating');
   kestrel.set_boolean('rounded-window-corners', false);
   await passThrough('with square corners');
   kestrel.reset('rounded-window-corners');

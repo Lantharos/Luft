@@ -5,8 +5,6 @@ import GLib from 'gi://GLib';
 import {checks} from '../../lib/check.js';
 import {press} from '../../lib/input/input.js';
 import {builtFixture, outcome, scratch} from '../../lib/processes.js';
-import {capture} from '../../lib/screenshots.js';
-import {settled} from '../../lib/wait.js';
 import {IN_SESSION, install, launchLine, SABINE_BUILDER} from '../../apps/lib/appImages.js';
 import {Caller, callerArguments} from './caller.js';
 
@@ -37,8 +35,6 @@ export async function checkSandboxed(sheet: () => unknown, pdf: Uint8Array) {
       'and reaches nothing else of Kestrel\'s, neither the file actions nor the extensions, nor even the Send sheet\'s description');
     await caller.send();
     await eventually(sheet, 'a sandboxed app opens the Send sheet for a file it hands over');
-    await settled();
-    await capture('send-sheet-sandboxed');
     press(Clutter.KEY_Escape);
     require(await caller.next('the sheet closes') === 'sent', 'and hears once it closed');
   } finally {

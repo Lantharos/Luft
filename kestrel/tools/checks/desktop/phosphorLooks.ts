@@ -40,7 +40,6 @@ async function checkEveryLook() {
   for (const look of ['scanlines', 'tint', 'grain', 'vignette', 'bezel']) {
     await choose('overlay', look);
     await eventually(() => attachedEffects().overlays === 2, `the ${look} overlay goes on`);
-    await capture(`phosphor-overlay-${look}`);
   }
   await choose('overlay', 'off');
   await choose('chromatic-aberration', 0.5);
@@ -60,7 +59,6 @@ async function checkEveryLook() {
   for (const lines of ['lines', 'scanlines', 'shimmer']) {
     await choose('surface-lines', lines);
     await eventually(() => attachedEffects().effects > 0, `${lines} go on the taskbar`);
-    await capture(`phosphor-surface-${lines}`);
   }
   await choose('surface-lines', 'off');
   await eventually(nothingAttached, 'and they come off');

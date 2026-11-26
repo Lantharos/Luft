@@ -5,10 +5,8 @@ import {descendants, named} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';
 import {captureArea, captureFrame, type Frame} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
-import {withScheme} from '../../apps/lib/palette.js';
 
 const {require} = checks('Post');
-const ZOOM = 8;
 const PEEK = 24;
 
 export const indicator = () => named('kestrel-taskbar-post');
@@ -36,14 +34,12 @@ function ink(frame: Frame) {
   return lit / (width * height);
 }
 
-async function inkOf(icon: St.Icon, name: string) {
+async function inkOf(icon: St.Icon) {
   const [x, y] = icon.get_transformed_position();
-  const frame = await captureFrame({x: Math.round(x), y: Math.round(y), width: Math.round(icon.width), height: Math.round(icon.height)});
-  frame.saveZoomed(name, ZOOM);
-  return ink(frame);
+  return ink(await captureFrame({x: Math.round(x), y: Math.round(y), width: Math.round(icon.width), height: Math.round(icon.height)}));
 }
 
-export async function captureTray(name: string) {
+async function captureTray(name: string) {
   const post = indicator()!;
   const [x, y] = post.get_transformed_position();
   const width = right(status()) - Math.round(x);
@@ -65,13 +61,9 @@ export async function checkTray() {
   require(centred(post, own!, own!) && centred(status(), shown[0]!, shown.at(-1)!), 'each button has as much room on one side of its icons as on the other');
   require(shown.every(icon => icon.width === own!.width && icon.height === own!.height), 'Post’s icon is the size of the status icons');
   require(row.every(icon => Math.abs(middle(icon) - middle(own!)) < 1), 'and lines up with them');
-  const weights = await Promise.all(shown.map((icon, index) => inkOf(icon, `post-weight-status-${index}`)));
-  const weight = await inkOf(own!, 'post-weight-own');
+  const weights = await Promise.all(shown.map(icon => inkOf(icon)));
+  const weight = await inkOf(own!);
   console.log(`Ink: Post ${weight.toFixed(3)}, the status icons ${weights.map(value => value.toFixed(3)).join(', ')}`);
   require(weights.some(other => Math.abs(other - weight) / other < 0.35), 'Post’s icon is about as heavy as the icons beside it');
-  await captureTray('post-tray-dark');
-  await withScheme('light', async () => {
-    await settled();
-    await captureTray('post-tray-light');
-  });
+  await captureTray('post-tray');
 }

@@ -129,9 +129,7 @@ export async function checkCorners(checksApi: Checks) {
     for (const sampled of all) await checkRounded(checksApi, sampled, 'with rounded corners');
 
     kestrel.set_boolean('rounded-window-corners', false);
-    await pause(800);
     for (const sampled of all) await checkSquare(checksApi, sampled, 'after turning rounded corners off');
-    await capture('phosphor-corners-square');
     const squareX11 = await shotOf(x11);
     const tip = point(x11.window, 0, IN_THE_TIP);
     await choose('border', 'off');
@@ -141,28 +139,23 @@ export async function checkCorners(checksApi: Checks) {
     await choose('border', 'color');
 
     kestrel.reset('rounded-window-corners');
-    await pause(800);
     for (const sampled of all) await checkRounded(checksApi, sampled, 'after turning rounded corners on');
 
     gtk.window.maximize();
-    await pause(800);
     const maximized = await shotOf(gtk);
     const corner = point(gtk.window, 3, IN_THE_TIP);
     require(maximized.near(corner[0], corner[1], GOLD, 60), `the border follows a maximized window's square corner (${color(maximized, corner)})`);
     gtk.window.unmaximize();
-    await pause(800);
     await checkRounded(checksApi, gtk, 'unmaximized');
     gtk.window.activate(global.get_current_time());
     hold(Clutter.KEY_Super_L);
     press(Clutter.KEY_Left);
     release(Clutter.KEY_Super_L);
     await eventually(() => gtk.window.get_frame_rect().x === Main.layoutManager.primaryMonitor!.x, 'Super and Left tile the window');
-    await pause(800);
     const tiled = await shotOf(gtk);
     const onTheEdge = point(gtk.window, 3, IN_THE_TIP);
     require(tiled.near(onTheEdge[0], onTheEdge[1], GOLD, 60), `the border follows a tiled window's square corner (${color(tiled, onTheEdge)})`);
     gtk.window.unmaximize();
-    await pause(800);
     await checkRounded(checksApi, gtk, 'untiled');
     gtk.window.make_fullscreen();
     await eventually(() => attachedEffects().overlays === all.length, 'the border comes off a fullscreen window');

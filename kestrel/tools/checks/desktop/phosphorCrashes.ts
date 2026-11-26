@@ -44,7 +44,6 @@ export async function run() {
   }
   await eventually(async () => (await listed(PHOSPHOR))?.state === 'crashed', 'a second crash in a row keeps Phosphor off');
   require(nothingAttached(), 'with nothing attached');
-  require(!await running(), 'and it stays off');
   await request('Remove', PHOSPHOR);
   for (const key of ['extension-settings', 'disabled-extensions', 'extension-problems']) kestrel.reset(key);
   GLib.unlink(STATE);

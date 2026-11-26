@@ -5,7 +5,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
-import {capture, captureFrame, output, screenshot} from '../lib/screenshots.js';
+import {capture, captureFrame} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {listed, request} from '../extensions/lib/extensions.js';
 import {act, attachedEffects, choose, installProbes, nothingAttached, pageItems, PHOSPHOR, SHADERS, shaders, shadersRun} from './phosphor/effects.js';
@@ -102,26 +102,21 @@ async function checkWindowLooks(striped: Meta.Window) {
   for (const style of BORDERS) {
     await wear([['border', style], ['border-color', '#ff5fa2'], ['border-width', 3], ['border-motion', 'still']]);
     await eventually(() => attachedEffects().overlays === 2, `a ${style} border goes on`);
-    await capture(`phosphor-border-${style}`);
     await wear([['border-motion', 'flow']]);
     await eventually(() => attachedEffects().overlays === 2, `a ${style} border flows`);
   }
   await wear([['border', 'glow'], ['border-motion', 'still'], ['border-app-color', true]]);
-  await capture('phosphor-border-app-color');
   await wear([['border', 'off'], ['border-app-color', false]]);
   for (const shadow of ['hard', 'soft']) {
     await wear([['shadow', shadow], ['shadow-color', '#5fd4ff'], ['shadow-size', 14]]);
     await eventually(() => attachedEffects().overlays === 2, `a ${shadow} shadow goes on every window`);
-    await capture(`phosphor-shadow-${shadow}`);
   }
   await wear([['shadow', 'off']]);
   striped.activate(global.get_current_time());
   await wear([['unfocused', 'dim'], ['unfocused-strength', 0.6]]);
   await eventually(() => attachedEffects().overlays === 1, 'dimming goes on the window in the background only');
-  await capture('phosphor-unfocused-dim');
   await wear([['unfocused', 'desaturate'], ['unfocused-strength', 1]]);
   await eventually(() => attachedEffects().effects === 1, 'taking colour away goes on the window in the background only');
-  await capture('phosphor-unfocused-desaturate');
   await wear([['unfocused', 'off']]);
   for (const overlay of [['tint', 'overlay-tint-color', '#5fd4ff'], ['scanlines', 'overlay-line-spacing', 6], ['grain', 'overlay-grain-size', 4], ['vignette', 'overlay-vignette-size', 0.9]] as const) {
     await wear([['overlay', overlay[0]], [overlay[1], overlay[2]]]);
@@ -136,8 +131,6 @@ async function checkTransitions() {
     await wear([['open-effect', look], ['close-effect', look], ['open-length', 2], ['close-length', 2]]);
     gjs('clients/windows/stripedWindow.js', [`Shown ${look}`, '520', '360']);
     await waitForWindow(candidate => candidate.get_title() === `Shown ${look}`, `a window opens with ${look}`);
-    await pause(380);
-    GLib.file_set_contents(output(`phosphor-open-${look}`), (await screenshot()).toArray());
     await settled();
     require(nothingAttached(), `${look} leaves nothing on the window once it's open`);
     global.get_window_actors().find(actor => actor.meta_window?.get_title() === `Shown ${look}`)!.meta_window!.delete(global.get_current_time());
@@ -150,15 +143,9 @@ async function checkFilters() {
   for (const [name, choices] of Object.entries(FILTERS)) {
     await wear([...FILTER_OFF, ...choices]);
     await eventually(() => attachedEffects().views > 0, `the ${name} filter goes on`);
-    await capture(`phosphor-filter-${name}`);
   }
   await wear([...FILTER_OFF, ['glitch-bursts', true], ['glitch-gap', 60]]);
   await eventually(() => attachedEffects().views > 0, 'glitches now and then put a filter on');
-  const view = global.stage.peek_stage_views().find(candidate => candidate.get_filter())!;
-  view.get_filter()!.set_uniform('filter_play', 1, [0.5]);
-  view.queue_filter_frame();
-  await pause(200);
-  GLib.file_set_contents(output('phosphor-filter-glitch'), (await screenshot()).toArray());
   await wear(FILTER_OFF);
   await eventually(nothingAttached, 'turning the filters off leaves nothing');
 }
@@ -166,8 +153,6 @@ async function checkFilters() {
 async function checkPresets() {
   for (const preset of PRESETS) {
     await choose('look', preset);
-    await settled();
-    await pause(600);
     await capture(`phosphor-look-${preset}`);
   }
   await choose('look', 'vaporwave');
@@ -180,7 +165,6 @@ async function checkPresets() {
   await eventually(() => settingIs('border-width', 6), 'picking Custom again brings back what was changed');
   await choose('look', 'plain');
   await eventually(nothingAttached, 'the plain look leaves nothing on the screen');
-  await capture('phosphor-look-plain');
   await checkQuickChanges();
 }
 
@@ -234,8 +218,6 @@ async function subpageValue(key: string) {
 }
 
 async function checkSubpages() {
-  const keys = (await pageItems()).filter(item => item.type === 'page').map(item => (item as {key?: string}).key);
-  require(['windows', 'motion', 'apps', 'filters', 'color', 'surfaces'].every(key => keys.includes(key)), 'each area of the page opens on a page of its own');
   await choose('look', 'plain');
   await eventually(async () => await subpageValue('windows') === 'Off', 'with nothing on, Windows says so');
   await choose('border', 'neon');

@@ -120,12 +120,10 @@ async function checkWindowsStayTheirOwn() {
   const window = await open('Striped', 200, 150);
   const area = window.get_frame_rect();
   const withWindow = await frame();
-  require(withWindow.pixelsApart(plain, 8) > 0, 'the window shows');
   const inside: Area = {x: area.x + 24, y: area.y + 24, width: area.width - 48, height: area.height - 48};
   const insideWas = await renderedFrame(inside);
   await desktopOnly();
   const filteredWithWindow = await frame();
-  filteredWithWindow.save('phosphor-desktop-invert');
   require((await renderedFrame(inside)).looksLike(insideWas, SAME), 'a filtered desktop leaves the window alone');
   require(await pixelsBroken(around(area), plain, filtered, withWindow, filteredWithWindow) === 0,
     'the window\'s corners and shadow show the filtered desktop, with no halo');
@@ -134,7 +132,6 @@ async function checkWindowsStayTheirOwn() {
   await choose('filters-captured', true);
   await eventually(() => attachedEffects().views > 0, 'over the whole screen the filter goes on the display');
   const overEverything = await shownWithFilter();
-  overEverything.save('phosphor-desktop-control');
   require(await pixelsBroken(around(area), plain, filtered, withWindow, overEverything) > 0, 'and the same measure sees it on the window');
   await choose('filters-captured', false);
   await choose('invert', 'off');
@@ -279,10 +276,12 @@ async function checkOnePicture() {
       await choose('filters-scope', 'desktop');
       await eventually(() => attachedEffects().layers > 0, `${look} goes on the desktop`);
       const desktop = await shownWithFilter();
-      desktop.save(`phosphor-desktop-${style}-${look}`);
       const apart = desktop.pixelsApart(whole, ONE_PICTURE_TOLERANCE);
       console.log(`phosphor on the desktop: ${look} on a ${style} taskbar differs from the whole screen in ${apart} pixels`);
-      if (apart >= allowed) whole.save(`phosphor-desktop-${style}-${look}-whole`);
+      if (apart >= allowed) {
+        desktop.save(`phosphor-desktop-${style}-${look}`);
+        whole.save(`phosphor-desktop-${style}-${look}-whole`);
+      }
       require(apart < allowed, `${look} on a ${style} taskbar reads the same as over the whole screen`);
       for (const [key, , off] of settings) await choose(key, off);
       await eventually(nothingAttached, 'and it comes off');

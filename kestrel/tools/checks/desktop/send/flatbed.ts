@@ -6,10 +6,8 @@ import {appBinary, LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
 import {click} from '../../lib/input/input.js';
-import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
 import {changes} from '../../apps/lib/apps.js';
-import {withScheme} from '../../apps/lib/palette.js';
 
 const {require, eventually} = checks('Send sheet');
 const FLATBED = 'com.lantharos.flatbed';
@@ -43,11 +41,6 @@ export async function checkFlatbed(sheet: () => Clutter.Actor | null, choice: (n
     require(!choice('Flatbed'), 'without offering Flatbed itself');
     await eventually(() => choice(device), 'with the computer nearby');
     await settled();
-    await capture('send-sheet-flatbed-dark');
-    await withScheme('light', async () => {
-      await settled();
-      await capture('send-sheet-flatbed-light');
-    });
     click(choice(device)!);
     await eventually(() => !sheet(), 'choosing it closes the sheet');
     const copy = await arrives('Receipt.pdf');

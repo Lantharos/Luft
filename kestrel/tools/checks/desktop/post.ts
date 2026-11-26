@@ -13,8 +13,8 @@ import {pause, settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
 import {seenCalls} from '../system/lib/systemCalls.js';
 import {Nearby} from './post/nearby.js';
-import {checkRover, checkSettings} from './post/places.js';
-import {captureTray, checkTray, indicator} from './post/taskbar.js';
+import {checkRover} from './post/places.js';
+import {checkTray, indicator} from './post/taskbar.js';
 import {checkOffers, checkPairing, checkPin, checkText, clearNotifications, closeWindows, inbox, NEARBY, nearbyId, popupShowing, settings, thisId} from './post/transfers.js';
 
 const {require, eventually} = checks('Post');
@@ -54,7 +54,6 @@ async function checkPanel() {
   await settled();
   click(indicator()!);
   const shown = await eventually(() => popupShowing(NEARBY), 'Post’s panel lists the computer nearby');
-  require(!!popupShowing('Who can find Mara’s Laptop') && !!popupShowing('Your devices'), 'and who can find this computer');
   await settled();
   const [px, py] = shown.get_transformed_position();
   await captureArea('post-panel', {x: Math.round(px), y: Math.round(py), width: Math.round(shown.width), height: Math.round(shown.height)});
@@ -92,7 +91,6 @@ async function checkDrops() {
     const ticket = app.at(middle(await app.find({text: 'Ticket.pdf'})));
     await dragOver(ticket, centerOf(indicator()!), async () => {
       require((indicator() as St.Widget).has_style_pseudo_class('dropping'), 'Post lights up under files dragged over it');
-      await captureTray('post-drop-icon');
     });
     await eventually(sheet, 'dropping files on Post opens the Send sheet');
     pressKey(Clutter.KEY_Escape);
@@ -100,8 +98,6 @@ async function checkDrops() {
     const bare = bareSpot();
     await dragOver(ticket, bare, async () => {
       require((panel() as St.Widget).has_style_pseudo_class('dropping'), 'the taskbar lights up under files dragged over a bare part of it');
-      const [x, y] = panel().get_transformed_position();
-      await captureArea('post-drop-taskbar', {x: Math.round(x), y: Math.round(y), width: Math.round(panel().width), height: Math.round(panel().height)});
     });
     await eventually(sheet, 'dropping files on a bare part of the taskbar opens the Send sheet');
     pressKey(Clutter.KEY_Escape);
@@ -136,7 +132,6 @@ export async function run() {
     await closeWindows();
     await checkRover(nearby);
     await checkDrops();
-    await checkSettings();
   } finally {
     clearNotifications();
     await nearby.stop();

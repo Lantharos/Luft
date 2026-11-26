@@ -7,7 +7,6 @@ import {appBinary} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {click} from '../../lib/input/input.js';
 import {outcome, scratch, waitForWindow} from '../../lib/processes.js';
-import {captureArea} from '../../lib/screenshots.js';
 import {pause, settled} from '../../lib/wait.js';
 import {Caller, type Files} from './caller.js';
 import {savePicture} from './files.js';
@@ -29,11 +28,6 @@ function kept(name: string, folder: string): string[] {
   return notebook ? children(notebook.get_child(folder)).map(file => file.get_basename()!) : [];
 }
 
-const windowArea = (window: Meta.Window) => {
-  const {x, y, width, height} = window.get_frame_rect();
-  return {x, y, width, height};
-};
-
 async function sendTo(files: Files, choice: (name: string) => Clutter.Actor | null, label: string): Promise<Meta.Window> {
   const caller = await Caller.start(files, `an app with ${label} opens`);
   try {
@@ -48,8 +42,6 @@ async function sendTo(files: Files, choice: (name: string) => Clutter.Actor | nu
   const heft = await waitForWindow(window => window.get_wm_class() === HEFT, 'Heft opens with it', 60000);
   heft.activate(global.get_current_time());
   await pause(LOADING);
-  await settled();
-  await captureArea(`send-heft-${label.replace(/\W+/g, '-')}`, windowArea(heft));
   const {x, y, width, height} = heft.get_frame_rect();
   click([x + width / 2 + FIRST_SUBJECT[0], y + height / 2 + FIRST_SUBJECT[1]]);
   return heft;
@@ -70,8 +62,6 @@ export async function checkHeft(choice: (name: string) => Clutter.Actor | null, 
     await eventually(() => kept('Scan', 'sources').some(name => name.endsWith('.pdf')), 'the PDF becomes a book in Heft', 15000);
     await sendTo({'Whiteboard.png': picture}, choice, 'a picture');
     await eventually(() => kept('Whiteboard', 'assets').some(name => name.endsWith('.png')), 'the picture goes into a new notebook in Heft', 15000);
-    await pause(LOADING);
-    await captureArea('send-heft-notebook', windowArea(heft));
   } finally {
     GLib.unlink(USER_FOLDERS);
     if (heft) await outcome(['kill', String(heft.get_pid())]);

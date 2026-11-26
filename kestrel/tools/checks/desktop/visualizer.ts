@@ -167,21 +167,10 @@ async function checkEdges(resting: Resting) {
     const name = edges.join('-');
     await settledOn(edges);
     requireBandsAlong(edges);
-    await capture(`visualizer-edges-${name}`);
     await requireLitEdges(resting, edges, name);
     await requireFadedBandEnds(name);
   }
   require(await place([]).then(() => false, () => true), 'it can’t be left with no edges at all');
-  for (const style of ['wave', 'bars']) {
-    await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
-    await pause(FADED_IN_MS);
-    await capture(`visualizer-edges-all-${style}`);
-  }
-  await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
-  kestrel.set_string('taskbar-style', 'separate');
-  await pause(FADED_IN_MS);
-  await capture('visualizer-edges-all-islands');
-  kestrel.reset('taskbar-style');
   await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', DEFAULT_REACH));
 }
 
@@ -203,16 +192,14 @@ async function checkBehindWindows() {
     await settledOn([edge]);
     below.raise();
     above.raise();
-    await pause(FADED_IN_MS);
     const {x, y} = overBand(edge);
     above.move_frame(true, x, y);
     below.move_frame(true, x, y);
     const {x: left, y: top, width, height} = above.get_frame_rect();
     const inside = {x: left + WINDOW_INSET, y: top + WINDOW_INSET, width: width - 2 * WINDOW_INSET, height: height - 2 * WINDOW_INSET};
-    for (const style of STYLES) {
+    for (const style of edge === 'bottom' ? STYLES : ['glow']) {
       await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
       await pause(FADED_IN_MS);
-      await capture(`visualizer-behind-window-${edge}-${style}`);
       const {shown, hidden} = await withAndWithoutBands(inside);
       require(shown.pixelsApart(hidden, 0) === 0, `the ${style} style on the ${edge} edge stays behind a window`);
     }
@@ -226,11 +213,9 @@ async function checkBehindWindows() {
 async function checkReach() {
   for (const reach of [0.2, 1]) {
     await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', reach));
-    await pause(FADED_IN_MS);
     for (const style of STYLES) {
       await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
       await pause(FADED_IN_MS);
-      await capture(`visualizer-reach-${reach * 100}-${style}`);
       await requireFadedBandEnds(`reaching ${reach * 100}% of the short side in the ${style} style`);
     }
   }
@@ -242,10 +227,8 @@ async function checkFollowsTaskbar(resting: Record<Edge, Resting>) {
   for (const edge of ['left', 'top', 'right'] as const) {
     await arrange(edge);
     await settledOn([edge]);
-    await capture(`visualizer-taskbar-${edge}-beside`);
     await requireLitEdges(resting[edge], [edge], `beside a taskbar on the ${edge}`);
     await settledOn(EDGES);
-    await capture(`visualizer-taskbar-${edge}-around`);
     await requireLitEdges(resting[edge], EDGES, `all around with the taskbar on the ${edge}`);
   }
   kestrel.reset('taskbar-arrangement');

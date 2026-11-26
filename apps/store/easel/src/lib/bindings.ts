@@ -73,6 +73,7 @@ export const commands = {
 		id: number,
 		layer: string,
 		indices: number[],
+		mask: boolean,
 	}, options?: InvokeOptions) => invoke<null>("save_tiles", params, options),
 	showInFolder: (params: {
 		path: string,
@@ -150,6 +151,7 @@ export type LayerPixels = {
 	layer: string,
 	file: string,
 	indices: number[],
+	mask: boolean,
 };
 
 export type Lines = "none" | "lines" | "scanlines";

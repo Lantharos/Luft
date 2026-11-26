@@ -4,10 +4,12 @@
 	import { eraseSelection, fillSelection, invertSelection } from '#lib/document/actions.js';
 	import type { Editor } from '../editor.svelte';
 	import OptionSlider from './OptionSlider.svelte';
+	import RefineDialog from '#lib/dialogs/RefineDialog.svelte';
 
 	let { editor }: { editor: Editor } = $props();
 	let settings = $derived(editor.settings);
 	let doc = $derived(editor.doc);
+	let dialog = $state<'refine' | 'range' | null>(null);
 </script>
 
 {#if settings.tool === 'select'}
@@ -38,11 +40,18 @@
 		<Switch label={t('easel-option-contiguous')} checked={settings.contiguous} onchange={(checked) => (settings.contiguous = checked)} />
 	</div>
 {:else}
-	<OptionSlider label={t('easel-option-feather')} value={settings.feather} min={0} max={200} format={(value) => `${value} px`} onchange={(value) => (settings.feather = value)} />
+	<OptionSlider label={t('easel-option-feather')} value={settings.feather} min={0} max={200} format={(value) => t('easel-pixels', { value })} onchange={(value) => (settings.feather = value)} />
 {/if}
 <div class="flex flex-wrap gap-1.5">
 	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => fillSelection(doc, settings.primary)}>{t('easel-selection-fill')}</button>
 	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => eraseSelection(doc)}>{t('easel-selection-erase')}</button>
 	<button type="button" class="chip" onclick={() => invertSelection(doc)}>{t('easel-selection-invert')}</button>
 	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => doc.clearSelection(t('easel-history-deselect'))}>{t('easel-selection-clear')}</button>
+	<button type="button" class="chip" disabled={!doc.selectionActive} onclick={() => (dialog = 'refine')}>{t('easel-refine')}</button>
+	<button type="button" class="chip" onclick={() => (dialog = 'range')}>{t('easel-color-range')}</button>
+	<button type="button" class={['chip', doc.quickMask && 'is-on']} aria-pressed={doc.quickMask} onclick={() => editor.toggleQuickMask()}>{t('easel-quick-mask')}</button>
 </div>
+
+{#if dialog}
+	<RefineDialog {doc} kind={dialog} color={settings.primary} mode={settings.selectMode} onclose={() => (dialog = null)} />
+{/if}

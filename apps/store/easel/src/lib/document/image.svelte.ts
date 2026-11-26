@@ -6,7 +6,13 @@ import type { Adjust } from '#lib/gpu/shaders/adjust.js';
 import { newTile, TileGrid, type Rect } from '#lib/gpu/tiles.js';
 import { Batch, LayersChange, StateChange, Toggle } from './entries';
 import { History, TileChange, type Entry } from './history.svelte';
-import { Layer, layerState, type LayerKind, type LayerState } from './layers.svelte';
+import { applyState, Layer, layerState, type LayerKind, type LayerState } from './layers.svelte';
+import { NodeBuilder } from './nodes';
+
+export interface Guide {
+	axis: 'x' | 'y';
+	at: number;
+}
 
 export type Draw = (index: number, target: GPUTexture, before: GPUTexture | undefined) => void;
 
@@ -29,6 +35,12 @@ export class ImageDocument {
 	live: { layer: Layer; stroke: LiveStroke } | null = null;
 	floating: Floating | null = null;
 	adjust: { layer: string; value: Adjust } | null = null;
+	preview: { layer: string; grid: TileGrid } | null = null;
+	maskEditing = $state(false);
+	quickMask = $state(false);
+	guides = $state<Guide[]>([]);
+	quickStroke: { grid: TileGrid; erase: boolean; opacity: number } | null = null;
+	readonly nodes = new NodeBuilder();
 	onchange: () => void = () => {};
 	#dirty = new Set<number>();
 
@@ -58,9 +70,10 @@ export class ImageDocument {
 	}
 
 	scene(view: Matrix): Scene {
+		if (this.nodes.effectsChanged(this.layers)) for (const index of this.compositor.levels[0].all()) this.#dirty.add(index);
 		if (this.#dirty.size) {
-			const layers = this.layers.map((layer) => ({ ...layerState(layer), pixels: layer.pixels, mask: null, adjust: this.adjust?.layer === layer.id ? this.adjust.value : null, stroke: this.live?.layer === layer ? this.live.stroke : null }));
-			this.compositor.render(this.#dirty, layers, this.selectionActive ? this.selection : null);
+			const nodes = this.nodes.build(this.layers, { live: this.live, adjust: this.adjust, preview: this.preview });
+			this.compositor.render(this.#dirty, nodes, this.selectionActive ? this.selection : null);
 			this.#dirty.clear();
 		}
 		return {
@@ -69,8 +82,9 @@ export class ImageDocument {
 			height: this.height,
 			levels: this.compositor.levels,
 			floating: this.floating,
-			selection: this.selectionActive ? this.selection : null,
-			checker: CHECKER
+			selection: this.selectionActive && !this.quickMask ? this.selection : null,
+			checker: CHECKER,
+			quickMask: this.quickMask ? { selection: this.selection, stroke: this.quickStroke?.grid ?? null, mode: this.quickStroke ? (this.quickStroke.erase ? 2 : 1) : 0, opacity: this.quickStroke?.opacity ?? 0 } : null
 		};
 	}
 
@@ -124,7 +138,7 @@ export class ImageDocument {
 	changeState(label: string, layer: Layer, change: Partial<LayerState>, merge = false) {
 		const last = this.history.entries[this.history.position - 1];
 		const before = layerState(layer);
-		Object.assign(layer, change);
+		applyState(layer, { ...before, ...change });
 		this.invalidate();
 		if (merge && last instanceof StateChange && last.layer === layer && last.label === label && this.history.position === this.history.entries.length) {
 			last.after = layerState(layer);
@@ -157,7 +171,11 @@ export class ImageDocument {
 
 	destroy() {
 		this.history.clear();
-		for (const layer of this.layers) layer.pixels.destroy();
+		for (const layer of this.layers) {
+			layer.pixels.destroy();
+			layer.mask?.destroy();
+		}
+		this.nodes.destroy();
 		this.selection.destroy();
 		this.compositor.destroy();
 	}

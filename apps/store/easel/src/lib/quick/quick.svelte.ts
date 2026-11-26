@@ -1,7 +1,7 @@
 import { t } from '@luft/i18n';
 import type { ImageDocument } from '#lib/document/image.svelte.js';
 import { reshape } from '#lib/document/reshape.js';
-import type { Overlay } from '#lib/editor/overlay.js';
+import type { Overlay } from '#lib/editor/stage/overlay.js';
 import { ToolSettings } from '#lib/editor/settings.svelte.js';
 import { kit } from '#lib/gpu/kit.js';
 import { multiply, rotation, scaling, translation, type Matrix } from '#lib/gpu/matrix.js';

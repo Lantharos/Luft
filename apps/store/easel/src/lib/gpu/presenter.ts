@@ -1,15 +1,16 @@
 import { canvasFormat, device } from './device';
 import { kit, PREMULTIPLIED } from './kit';
-import { IDENTITY, packed, type Matrix } from './matrix';
-import { ANTS, CHECKER, PRESENT } from './shaders/view';
+import { packed, packedProjective, projective, IDENTITY, type Matrix, type Projective } from './matrix';
+import { ANTS, CHECKER, PRESENT, PRESENT_MASK, QUICK_MASK } from './shaders/view';
 import { TILE, type Rect, type TileGrid } from './tiles';
 
 const PIXELATED_FROM = 2;
+const FLAT = projective(IDENTITY);
 const ANTS_FRAME = 80;
 
 export interface Floating {
 	grid: TileGrid;
-	matrix: Matrix;
+	matrix: Projective;
 }
 
 export interface Scene {
@@ -20,6 +21,8 @@ export interface Scene {
 	floating: Floating | null;
 	selection: TileGrid | null;
 	checker: [number[], number[]];
+	mono?: boolean;
+	quickMask?: { selection: TileGrid; stroke: TileGrid | null; mode: number; opacity: number } | null;
 }
 
 function pipeline(code: string) {
@@ -36,6 +39,8 @@ interface Pipelines {
 	present: GPURenderPipeline;
 	checker: GPURenderPipeline;
 	ants: GPURenderPipeline;
+	mask: GPURenderPipeline;
+	quick: GPURenderPipeline;
 }
 
 let shared: Pipelines | null = null;
@@ -53,7 +58,7 @@ export class Presenter {
 	) {
 		this.context = canvas.getContext('webgpu')!;
 		this.context.configure({ device, format: canvasFormat, alphaMode: 'premultiplied' });
-		shared ??= { present: pipeline(PRESENT), checker: pipeline(CHECKER), ants: pipeline(ANTS) };
+		shared ??= { present: pipeline(PRESENT), checker: pipeline(CHECKER), ants: pipeline(ANTS), mask: pipeline(PRESENT_MASK), quick: pipeline(QUICK_MASK) };
 		this.#pipelines = shared;
 		this.#scene = scene;
 	}
@@ -79,7 +84,8 @@ export class Presenter {
 	}
 
 	#drawScene(pass: GPURenderPassEncoder, scene: Scene, width: number, height: number) {
-		const { present, checker, ants } = this.#pipelines;
+		const { checker, ants } = this.#pipelines;
+		const present = scene.mono ? this.#pipelines.mask : this.#pipelines.present;
 		const scale = Math.hypot(scene.view[0], scene.view[1]);
 		const viewData = new Float32Array(16);
 		packed(scene.view, viewData);
@@ -100,25 +106,41 @@ export class Presenter {
 		const grid = scene.levels[level];
 		for (const index of grid.indicesIn(visible)) {
 			const texture = grid.get(index);
-			if (texture) this.#quad(pass, present, IDENTITY, grid.rectOf(index), texture, sampler);
+			if (texture) this.#quad(pass, present, FLAT, grid.rectOf(index), texture, sampler);
 		}
 		if (scene.floating) {
 			const floating = scene.floating.grid;
 			for (const [index, texture] of floating.tiles) this.#quad(pass, present, scene.floating.matrix, floating.rectOf(index), texture, scale >= PIXELATED_FROM ? kit.nearest : kit.linear);
 		}
-		if (scene.selection) {
+		if (scene.quickMask) {
+			const { quick } = this.#pipelines;
+			const { selection, stroke, mode, opacity } = scene.quickMask;
+			pass.setPipeline(quick);
+			pass.setBindGroup(0, kit.group(quick, [viewBinding]));
+			for (const index of selection.indicesIn(visible)) {
+				const data = new Float32Array(20);
+				packedProjective(FLAT, data);
+				const rect = selection.rectOf(index);
+				data.set([rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width / TILE, rect.height / TILE], 12);
+				const strokeValues = new Float32Array(4);
+				new Uint32Array(strokeValues.buffer)[0] = mode;
+				strokeValues[1] = opacity;
+				pass.setBindGroup(1, kit.group(quick, [kit.uniform(data), selection.get(index)?.createView() ?? kit.clear, kit.linear, stroke?.get(index)?.createView() ?? kit.clear, kit.uniform(strokeValues)], 1));
+				pass.draw(4);
+			}
+		} else if (scene.selection) {
 			pass.setPipeline(ants);
 			pass.setBindGroup(0, kit.group(ants, [viewBinding]));
 			for (const index of scene.selection.indicesIn(visible)) {
 				const texture = scene.selection.get(index);
-				if (texture) this.#quad(pass, ants, scene.floating?.matrix ?? IDENTITY, scene.selection.rectOf(index), texture, kit.linear);
+				if (texture) this.#quad(pass, ants, scene.floating?.matrix ?? FLAT, scene.selection.rectOf(index), texture, kit.linear);
 			}
 		}
 	}
 
-	#quad(pass: GPURenderPassEncoder, use: GPURenderPipeline, model: Matrix, rect: Rect, texture: GPUTexture, sampler: GPUSampler) {
+	#quad(pass: GPURenderPassEncoder, use: GPURenderPipeline, model: Projective, rect: Rect, texture: GPUTexture, sampler: GPUSampler) {
 		const data = new Float32Array(20);
-		packed(model, data);
+		packedProjective(model, data);
 		data.set([rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width / TILE, rect.height / TILE], 12);
 		pass.setBindGroup(1, kit.group(use, [kit.uniform(data), texture.createView(), sampler], 1));
 		pass.draw(4);

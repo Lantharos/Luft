@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { apply } from '#lib/gpu/matrix.js';
+	import { applyProjective } from '#lib/gpu/matrix.js';
 	import { arrowHead, type ShapeSpec } from '#lib/raster/shapes.js';
 	import type { Viewport } from '#lib/viewport/viewport.svelte.js';
 	import type { Overlay } from './overlay';
@@ -19,7 +19,7 @@
 
 	function corners(entry: Extract<Overlay, { kind: 'transform' }>) {
 		const { x, y, width: w, height: h, matrix } = entry;
-		return [apply(matrix, x, y), apply(matrix, x + w, y), apply(matrix, x + w, y + h), apply(matrix, x, y + h)].map(([px, py]) => viewport.toScreen(px, py));
+		return [applyProjective(matrix, x, y), applyProjective(matrix, x + w, y), applyProjective(matrix, x + w, y + h), applyProjective(matrix, x, y + h)].map(([px, py]) => viewport.toScreen(px, py));
 	}
 
 	function screenRect(rect: { x: number; y: number; width: number; height: number }) {
@@ -52,6 +52,10 @@
 		{#each points as [x, y], index (index)}
 			<rect class="handle" x={x - 5} y={y - 5} width="10" height="10" rx="3" />
 		{/each}
+	{:else if overlay?.kind === 'point'}
+		{@const [x, y] = viewport.toScreen(overlay.x, overlay.y)}
+		<path class="guide" d="M{x - 9} {y}H{x + 9}M{x} {y - 9}V{y + 9}" />
+		<circle class="guide" cx={x} cy={y} r="5" />
 	{:else if overlay?.kind === 'crop'}
 		{@const doc = screenRect({ x: 0, y: 0, width, height })}
 		{@const rect = screenRect(overlay.rect)}

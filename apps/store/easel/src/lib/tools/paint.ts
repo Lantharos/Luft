@@ -19,13 +19,15 @@ export class PaintTool implements ToolHandler {
 	) {}
 
 	down(event: ToolEvent) {
+		if (this.doc.quickMask) return this.#startQuick(event);
 		const layer = this.doc.active;
-		if (layer.locked || !layer.visible || layer.kind !== 'raster') return;
+		const onMask = this.doc.maskEditing && layer.mask !== null;
+		if (layer.locked || !layer.visible || (layer.kind !== 'raster' && !onMask)) return;
 		const settings = this.settings();
 		this.#erasing = settings.erase || event.eraser;
 		const brush = this.#erasing ? settings.eraser : settings.brush;
 		this.#stroke = new StrokeMask(this.doc.width, this.doc.height, brush);
-		this.doc.live = { layer, stroke: { grid: this.#stroke.grid, color: premultiplied(settings.color), opacity: brush.opacity, erase: this.#erasing } };
+		this.doc.live = { layer, stroke: { grid: this.#stroke.grid, color: premultiplied(settings.color), opacity: brush.opacity, erase: this.#erasing, mask: onMask, clone: null } };
 		this.#add(event);
 	}
 
@@ -33,7 +35,34 @@ export class PaintTool implements ToolHandler {
 		if (this.#stroke) this.#add(event);
 	}
 
+	#startQuick(event: ToolEvent) {
+		const settings = this.settings();
+		this.#erasing = settings.erase || event.eraser;
+		const brush = this.#erasing ? settings.eraser : settings.brush;
+		this.#stroke = new StrokeMask(this.doc.width, this.doc.height, brush);
+		this.doc.quickStroke = { grid: this.#stroke.grid, erase: this.#erasing, opacity: brush.opacity };
+		this.#add(event);
+	}
+
+	#finishQuick(stroke: StrokeMask) {
+		const quick = this.doc.quickStroke!;
+		this.doc.quickStroke = null;
+		const params = new Float32Array([1, 1, 1, 1, quick.opacity, 0, 0, 0]);
+		new Uint32Array(params.buffer)[5] = quick.erase ? ERASE : PAINT;
+		const uniform = kit.uniform(params);
+		this.doc.replaceSelection(this.label(quick.erase), [...stroke.grid.tiles.keys()], (index, target, before) =>
+			kit.fill(target, kit.bakeMask, [before?.createView() ?? kit.clear, stroke.grid.get(index)!.createView(), kit.full, kit.clear, uniform])
+		, this.doc.bounds);
+		kit.flush();
+		stroke.destroy();
+	}
+
 	up() {
+		if (this.doc.quickStroke && this.#stroke) {
+			const stroke = this.#stroke;
+			this.#stroke = null;
+			return this.#finishQuick(stroke);
+		}
 		const stroke = this.#stroke;
 		const live = this.doc.live;
 		if (!stroke || !live) return;
@@ -42,18 +71,23 @@ export class PaintTool implements ToolHandler {
 		params.set(live.stroke.color);
 		params[4] = live.stroke.opacity;
 		new Uint32Array(params.buffer)[5] = this.#erasing ? ERASE : PAINT;
-		const uniform = kit.uniform(params);
 		const selection = this.doc.selectionActive ? this.doc.selection : null;
 		this.doc.live = null;
-		this.doc.paint(this.label(this.#erasing), live.layer, [...stroke.grid.tiles.keys()], (index, target, before) => {
-			kit.fill(target, kit.bake, [
-				before?.createView() ?? kit.clear,
+		const onMask = live.stroke.mask;
+		if (onMask) params.set([1, 1, 1, 1]);
+		const uniform = kit.uniform(params);
+		const grid = onMask ? live.layer.mask! : live.layer.pixels;
+		const change = this.doc.tileChange(this.label(this.#erasing), grid, [...stroke.grid.tiles.keys()], (index, target, before) => {
+			kit.fill(target, onMask ? kit.bakeMask : kit.bake, [
+				before?.createView() ?? (onMask ? kit.full : kit.clear),
 				stroke.grid.get(index)!.createView(),
 				selection ? (selection.get(index)?.createView() ?? kit.clear) : kit.full,
 				kit.clear,
 				uniform
 			]);
 		});
+		live.layer.touch();
+		this.doc.record(change);
 		kit.flush();
 		stroke.destroy();
 	}

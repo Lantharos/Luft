@@ -71,3 +71,13 @@ export function union(a: Rect | null, b: Rect): Rect {
 	const y = Math.min(a.y, b.y);
 	return { x, y, width: Math.max(a.x + a.width, b.x + b.width) - x, height: Math.max(a.y + a.height, b.y + b.height) - y };
 }
+
+export function copyGrid(grid: TileGrid, copy: (source: GPUTexture, target: GPUTexture) => void) {
+	const result = new TileGrid(grid.width, grid.height, grid.format);
+	for (const [index, texture] of grid.tiles) {
+		const tile = newTile(grid.format);
+		copy(texture, tile);
+		result.set(index, tile);
+	}
+	return result;
+}

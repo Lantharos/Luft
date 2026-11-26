@@ -1,8 +1,8 @@
 import type { BrushSettings } from '#lib/gpu/brush.js';
-import type { SelectMode } from '#lib/raster/selection.js';
+import type { SelectMode } from '#lib/raster/selection/selection.js';
 import { readStore, writeStore } from '#lib/app/store.js';
 
-export type ToolId = 'move' | 'select' | 'lasso' | 'wand' | 'brush' | 'eraser' | 'fill' | 'gradient' | 'text' | 'shapes' | 'picker' | 'crop';
+export type ToolId = 'move' | 'select' | 'lasso' | 'wand' | 'brush' | 'eraser' | 'clone' | 'heal' | 'smudge' | 'fill' | 'gradient' | 'text' | 'shapes' | 'picker' | 'crop';
 const SAVE_DELAY = 500;
 
 export type ShapeKind = 'rectangle' | 'ellipse' | 'line' | 'arrow';
@@ -25,6 +25,8 @@ export class ToolSettings {
 	font = $state('Open Runde');
 	fontSize = $state(64);
 	fontWeight = $state(600);
+	rulers = $state(false);
+	snapping = $state(true);
 
 	#saving = 0;
 
@@ -56,7 +58,9 @@ export class ToolSettings {
 			shapeWidth: this.shapeWidth,
 			font: this.font,
 			fontSize: this.fontSize,
-			fontWeight: this.fontWeight
+			fontWeight: this.fontWeight,
+			rulers: this.rulers,
+			snapping: this.snapping
 		});
 	}
 

@@ -2,10 +2,10 @@ import type { ImageDocument } from '#lib/document/image.svelte.js';
 import { kit } from '#lib/gpu/kit.js';
 import { newTile } from '#lib/gpu/tiles.js';
 import { premultiplied } from '#lib/raster/color.js';
-import { floodFill } from '#lib/raster/flood.js';
+import { floodFill } from '#lib/raster/selection/flood.js';
 import { release } from '#lib/raster/mask.js';
 import { readTiles, writeRegion } from '#lib/raster/readback.js';
-import { combineSelection, type SelectMode } from '#lib/raster/selection.js';
+import { combineSelection, type SelectMode } from '#lib/raster/selection/selection.js';
 import type { ToolEvent, ToolHandler } from './tool';
 
 export interface FloodHost {

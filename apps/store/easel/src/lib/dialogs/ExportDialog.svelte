@@ -39,7 +39,7 @@
 </script>
 
 <Dialog title={t('easel-export-title')} wide {onclose}>
-	<div class="flex flex-col gap-5 px-2.5 py-1">
+	<div class="flex flex-col gap-5 px-2.5 py-2.5">
 		<Segmented label={t('easel-export-format')} value={format} options={formats} onchange={(value) => (format = value)} />
 		{#if raster}
 			<div class="flex flex-col gap-2">

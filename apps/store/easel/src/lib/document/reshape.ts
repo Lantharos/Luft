@@ -1,10 +1,10 @@
 import { Compositor } from '#lib/gpu/compositor.js';
 import { kit } from '#lib/gpu/kit.js';
-import type { Matrix } from '#lib/gpu/matrix.js';
+import { projective, type Matrix } from '#lib/gpu/matrix.js';
 import { newTile, TILE_BYTES, TileGrid } from '#lib/gpu/tiles.js';
 import { assemble, Transformer } from '#lib/raster/transform.js';
 import type { ImageDocument } from './image.svelte';
-import { Layer, layerState } from './layers.svelte';
+import { applyState, Layer, layerState } from './layers.svelte';
 
 interface Shape {
 	width: number;
@@ -21,7 +21,7 @@ function transformGrid(source: TileGrid, matrix: Matrix, target: TileGrid) {
 	for (const index of target.all()) {
 		const tile = newTile(target.format);
 		const rect = target.rectOf(index);
-		transformer.render(matrix, tile, [rect.x, rect.y]);
+		transformer.render(projective(matrix), tile, [rect.x, rect.y]);
 		target.set(index, tile);
 	}
 	transformer.destroy();
@@ -31,10 +31,14 @@ export function reshape(doc: ImageDocument, label: string, width: number, height
 	const translationOnly = matrix[0] === 1 && matrix[1] === 0 && matrix[2] === 0 && matrix[3] === 1;
 	const layers = doc.layers.map((layer) => {
 		const text = translationOnly && layer.text ? { ...layer.text, x: layer.text.x + matrix[4], y: layer.text.y + matrix[5] } : null;
-		const next = new Layer(text ? 'text' : 'raster', layer.name, width, height, layer.id);
-		Object.assign(next, layerState(layer));
+		const next = new Layer(layer.kind === 'text' && !text ? 'raster' : layer.kind, layer.name, width, height, layer.id);
+		applyState(next, layerState(layer));
 		next.text = text;
 		transformGrid(layer.pixels, matrix, next.pixels);
+		if (layer.mask) {
+			next.mask = new TileGrid(width, height, 'r8unorm');
+			transformGrid(layer.mask, matrix, next.mask);
+		}
 		return next;
 	});
 	const selection = new TileGrid(width, height, 'r8unorm');
@@ -61,7 +65,10 @@ export function reshape(doc: ImageDocument, label: string, width: number, height
 		redo: () => apply(after),
 		forget: (side) => {
 			const dropped = side === 'past' ? before : after;
-			for (const layer of dropped.layers) layer.pixels.destroy();
+			for (const layer of dropped.layers) {
+				layer.pixels.destroy();
+				layer.mask?.destroy();
+			}
 			dropped.selection.destroy();
 			dropped.compositor.destroy();
 		}

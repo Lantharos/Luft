@@ -86,8 +86,12 @@ fn register_saving(window: SabineWindow, state: &EaselState) -> SabineWindow {
                 let raw = body(request.body)?;
                 let job = saves.get(request.params.id).map_err(BridgeError::new)?;
                 blocking(move || {
-                    job.lock()
-                        .add_tiles(&request.params.layer, &request.params.indices, &raw)
+                    job.lock().add_tiles(
+                        &request.params.layer,
+                        &request.params.indices,
+                        &raw,
+                        request.params.mask,
+                    )
                 })
                 .await
                 .map_err(BridgeError::new)

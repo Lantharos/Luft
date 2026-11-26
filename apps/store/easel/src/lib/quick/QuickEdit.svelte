@@ -9,8 +9,8 @@
 	import { t } from '@luft/i18n';
 	import { tooltip, WindowControls } from '@luft/ui';
 	import { useApp } from '#lib/app/context.js';
-	import OverlayView from '#lib/editor/OverlayView.svelte';
-	import TextEditing from '#lib/editor/TextEditing.svelte';
+	import OverlayView from '#lib/editor/stage/OverlayView.svelte';
+	import TextEditing from '#lib/editor/stage/TextEditing.svelte';
 	import { Presenter } from '#lib/gpu/presenter.js';
 	import type { ToolEvent } from '#lib/tools/tool.js';
 	import Stage from '#lib/viewport/Stage.svelte';

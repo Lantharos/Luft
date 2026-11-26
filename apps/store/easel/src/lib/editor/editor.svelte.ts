@@ -11,8 +11,11 @@ import { LassoTool, MarqueeTool, modeFor } from '#lib/tools/select.js';
 import { ShapeTool } from '#lib/tools/shapes.js';
 import type { ToolEvent, ToolHandler } from '#lib/tools/tool.js';
 import { CropTool } from '#lib/tools/crop.svelte.js';
+import { CloneTool } from '#lib/tools/retouch/clone.js';
+import { SmudgeTool } from '#lib/tools/retouch/smudge.js';
 import { TextTool } from '#lib/tools/text.svelte.js';
-import type { Overlay } from './overlay';
+import type { FilterKind } from '#lib/filters/filters.js';
+import type { Overlay } from './stage/overlay';
 import type { ToolId, ToolSettings } from './settings.svelte';
 
 const HANDLE_PX = 9;
@@ -22,6 +25,7 @@ export class Editor {
 	overlay = $state<Overlay | null>(null);
 	shapePreview = $state<ShapeSpec | null>(null);
 	busy = $state(false);
+	panel = $state<{ kind: 'adjustment' | 'effects'; layer: string } | { kind: 'filter'; filter: FilterKind } | null>(null);
 	readonly handlers: Record<ToolId, ToolHandler>;
 	readonly move: MoveTool;
 	readonly crop: CropTool;
@@ -58,6 +62,9 @@ export class Editor {
 			wand: new WandTool(floodHost(t('easel-history-select'), () => settings.primary)),
 			brush: paint,
 			eraser: paint,
+			clone: new CloneTool({ doc, show, heal: false, label: t('easel-tool-clone'), brush: () => settings.brush }),
+			heal: new CloneTool({ doc, show, heal: true, label: t('easel-tool-heal'), brush: () => settings.brush }),
+			smudge: new SmudgeTool(doc, () => settings.brush, t('easel-tool-smudge')),
 			fill: new FillTool(floodHost(t('easel-history-fill'), () => settings.primary)),
 			gradient: new GradientTool({ doc, show, label: t('easel-history-gradient'), colors: () => [settings.primary, settings.secondary], radial: () => settings.gradient === 'radial' }),
 			text: this.text,
@@ -77,6 +84,14 @@ export class Editor {
 
 	get handler() {
 		return this.handlers[this.settings.tool];
+	}
+
+	toggleQuickMask() {
+		const { doc } = this;
+		this.finishTool();
+		doc.quickMask = !doc.quickMask;
+		if (doc.quickMask && !['brush', 'eraser'].includes(this.settings.tool)) this.settings.tool = 'brush';
+		doc.invalidate();
 	}
 
 	choose(tool: ToolId) {

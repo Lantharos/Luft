@@ -8,7 +8,7 @@ use serde_json::Value;
 use specta::Type;
 use zip::ZipArchive;
 
-use super::{DOCUMENT, MIME, PREVIEW, TILE_BYTES, tiles};
+use super::{DOCUMENT, MASK_TILE_BYTES, MIME, PREVIEW, TILE_BYTES, tiles};
 use crate::files::{cache_file, failed};
 use crate::l10n::L10N;
 
@@ -17,6 +17,7 @@ pub struct LayerPixels {
     layer: String,
     file: String,
     indices: Vec<u32>,
+    mask: bool,
 }
 
 #[derive(Serialize, Type)]
@@ -48,6 +49,16 @@ fn archive(path: &Path) -> Result<ZipArchive<File>, String> {
     Ok(archive)
 }
 
+fn grid_name(name: &str) -> Option<(&str, bool)> {
+    let (folder, rest) = name.split_once('/')?;
+    let layer = rest.strip_suffix(".tiles")?;
+    match folder {
+        "layers" => Some((layer, false)),
+        "masks" => Some((layer, true)),
+        _ => None,
+    }
+}
+
 pub fn open(path: &Path) -> Result<Opened, String> {
     let mut archive = archive(path)?;
     let mut document = Value::Null;
@@ -57,17 +68,16 @@ pub fn open(path: &Path) -> Result<Opened, String> {
         let (name, data) = read_entry(&mut archive, index)?;
         if name == DOCUMENT {
             document = serde_json::from_slice(&data).map_err(failed)?;
-        } else if let Some(layer) = name
-            .strip_prefix("layers/")
-            .and_then(|rest| rest.strip_suffix(".tiles"))
-        {
-            let (indices, pixels) = tiles::decode(&data, TILE_BYTES)?;
+        } else if let Some((layer, mask)) = grid_name(&name) {
+            let (indices, pixels) =
+                tiles::decode(&data, if mask { MASK_TILE_BYTES } else { TILE_BYTES })?;
             let file = cache_file("tiles")?;
             fs::write(&file, pixels).map_err(failed)?;
             layers.push(LayerPixels {
                 layer: layer.to_string(),
                 file: file.to_string_lossy().into_owned(),
                 indices,
+                mask,
             });
         } else if let Some(asset) = name.strip_prefix("assets/") {
             let file = cache_file(asset)?;

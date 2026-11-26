@@ -1,5 +1,5 @@
 import type { ImageDocument } from '#lib/document/image.svelte.js';
-import type { Overlay } from '#lib/editor/overlay.js';
+import type { Overlay } from '#lib/editor/stage/overlay.js';
 import { kit } from '#lib/gpu/kit.js';
 import { premultiplied } from '#lib/raster/color.js';
 import type { ToolEvent, ToolHandler } from './tool';

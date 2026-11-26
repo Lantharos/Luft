@@ -3,9 +3,9 @@ import { Batch, Toggle } from '#lib/document/entries.js';
 import { renderText } from '#lib/raster/text.js';
 import { TileChange, type Entry } from '#lib/document/history.svelte.js';
 import type { Layer } from '#lib/document/layers.svelte.js';
-import type { Overlay } from '#lib/editor/overlay.js';
+import type { Overlay } from '#lib/editor/stage/overlay.js';
 import { kit } from '#lib/gpu/kit.js';
-import { apply, invert, multiply, rotation, scaling, translation, type Matrix } from '#lib/gpu/matrix.js';
+import { apply, applyProjective, invertProjective, multiply, projective, quadMapping, rotation, scaling, translation, type Projective } from '#lib/gpu/matrix.js';
 import { newTile, TileGrid, type Rect } from '#lib/gpu/tiles.js';
 import { assemble, Transformer } from '#lib/raster/transform.js';
 import type { ToolEvent, ToolHandler } from './tool';
@@ -17,7 +17,7 @@ export interface MoveHost {
 	label: string;
 }
 
-type Grab = { kind: 'move' } | { kind: 'rotate'; start: number; angle: number } | { kind: 'scale' };
+type Grab = { kind: 'move'; corners: [number, number][] | null } | { kind: 'rotate'; start: number; angle: number } | { kind: 'scale' } | { kind: 'distort'; corner: number };
 
 const LIFT = 3;
 const CUT = 1;
@@ -35,6 +35,7 @@ interface Session {
 	sx: number;
 	sy: number;
 	angle: number;
+	corners: [number, number][] | null;
 }
 
 function bake(mode: number) {
@@ -57,10 +58,12 @@ export class MoveTool implements ToolHandler {
 		return this.#session !== null;
 	}
 
-	#matrix(session: Session): Matrix {
-		const cx = session.bounds.x + session.bounds.width / 2;
-		const cy = session.bounds.y + session.bounds.height / 2;
-		return [translation(cx + session.tx, cy + session.ty), rotation(session.angle), scaling(session.sx, session.sy), translation(-cx, -cy)].reduce(multiply);
+	#matrix(session: Session): Projective {
+		const { x, y, width, height } = session.bounds;
+		if (session.corners) return quadMapping(x, y, width, height, session.corners);
+		const cx = x + width / 2;
+		const cy = y + height / 2;
+		return projective([translation(cx + session.tx, cy + session.ty), rotation(session.angle), scaling(session.sx, session.sy), translation(-cx, -cy)].reduce(multiply));
 	}
 
 	#begin(): Session | null {
@@ -91,7 +94,7 @@ export class MoveTool implements ToolHandler {
 			floating.set(index, lifted);
 		}
 		const bounds = selected && doc.selectionBounds ? doc.selectionBounds : this.#contentBounds(floating);
-		const session = { layer, originals, floating, bounds, selected, tx: 0, ty: 0, sx: 1, sy: 1, angle: 0 };
+		const session: Session = { layer, originals, floating, bounds, selected, tx: 0, ty: 0, sx: 1, sy: 1, angle: 0, corners: null };
 		doc.floating = { grid: floating, matrix: this.#matrix(session) };
 		doc.invalidate(indices);
 		return session;
@@ -109,17 +112,22 @@ export class MoveTool implements ToolHandler {
 	#corners(session: Session) {
 		const matrix = this.#matrix(session);
 		const { x, y, width, height } = session.bounds;
-		return ([[x, y], [x + width, y], [x + width, y + height], [x, y + height]] as const).map(([px, py]) => apply(matrix, px, py));
+		return ([[x, y], [x + width, y], [x + width, y + height], [x, y + height]] as const).map(([px, py]) => applyProjective(matrix, px, py));
 	}
 
 	#hit(session: Session, event: ToolEvent): Grab {
 		const radius = this.host.handleRadius();
 		const corners = this.#corners(session);
-		if (corners.some(([cx, cy]) => Math.hypot(cx - event.x, cy - event.y) <= radius)) return { kind: 'scale' };
-		const [lx, ly] = apply(invert(this.#matrix(session)), event.x, event.y);
+		const corner = corners.findIndex(([cx, cy]) => Math.hypot(cx - event.x, cy - event.y) <= radius);
+		if (corner >= 0 && (event.ctrl || session.corners)) {
+			session.corners ??= corners;
+			return { kind: 'distort', corner };
+		}
+		if (corner >= 0) return { kind: 'scale' };
+		const [lx, ly] = applyProjective(invertProjective(this.#matrix(session)), event.x, event.y);
 		const { x, y, width, height } = session.bounds;
 		const inside = lx >= x && ly >= y && lx <= x + width && ly <= y + height;
-		if (inside) return { kind: 'move' };
+		if (inside) return { kind: 'move', corners: session.corners && session.corners.map(([px, py]) => [px, py] as [number, number]) };
 		const cx = x + width / 2 + session.tx;
 		const cy = y + height / 2 + session.ty;
 		return { kind: 'rotate', start: Math.atan2(event.y - cy, event.x - cx), angle: session.angle };
@@ -142,7 +150,11 @@ export class MoveTool implements ToolHandler {
 		const start = this.#startState;
 		const dx = event.x - this.#start[0];
 		const dy = event.y - this.#start[1];
-		if (grab.kind === 'move' || session.layer.text) {
+		if (grab.kind === 'distort' && !session.layer.text) {
+			session.corners![grab.corner] = [event.x, event.y];
+		} else if (grab.kind === 'move' && grab.corners) {
+			session.corners = grab.corners.map(([px, py]) => [px + dx, py + dy]);
+		} else if (grab.kind === 'move' || session.layer.text) {
 			session.tx = start.tx + dx;
 			session.ty = start.ty + dy;
 		} else if (grab.kind === 'rotate') {
@@ -222,7 +234,7 @@ export class MoveTool implements ToolHandler {
 		this.#session = null;
 		const { doc } = this.host;
 		const matrix = this.#matrix(session);
-		const unchanged = session.tx === 0 && session.ty === 0 && session.sx === 1 && session.sy === 1 && session.angle === 0;
+		const unchanged = !session.corners && session.tx === 0 && session.ty === 0 && session.sx === 1 && session.sy === 1 && session.angle === 0;
 		if (unchanged) return this.cancel();
 		if (session.layer.text) return this.#moveText(session);
 		const corners = this.#corners(session);
@@ -269,12 +281,12 @@ export class MoveTool implements ToolHandler {
 		this.host.doc.record(new Batch(this.host.label, [pixels, new Toggle(this.host.label, (forward) => (layer.text = forward ? after : before))]));
 	}
 
-	#moveSelection(matrix: Matrix) {
+	#moveSelection(matrix: Projective) {
 		const { doc } = this.host;
 		const source = assemble(doc.selection);
 		const transformer = new Transformer(source);
 		const corners = doc.selectionBounds!;
-		const moved = [apply(matrix, corners.x, corners.y), apply(matrix, corners.x + corners.width, corners.y), apply(matrix, corners.x, corners.y + corners.height), apply(matrix, corners.x + corners.width, corners.y + corners.height)];
+		const moved = [applyProjective(matrix, corners.x, corners.y), applyProjective(matrix, corners.x + corners.width, corners.y), applyProjective(matrix, corners.x, corners.y + corners.height), applyProjective(matrix, corners.x + corners.width, corners.y + corners.height)];
 		const xs = moved.map(([x]) => x);
 		const ys = moved.map(([, y]) => y);
 		const bounds = { x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };

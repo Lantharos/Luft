@@ -1,6 +1,6 @@
 import type { ImageDocument } from '#lib/document/image.svelte.js';
 import { reshape } from '#lib/document/reshape.js';
-import type { Overlay } from '#lib/editor/overlay.js';
+import type { Overlay } from '#lib/editor/stage/overlay.js';
 import { translation } from '#lib/gpu/matrix.js';
 import type { Rect } from '#lib/gpu/tiles.js';
 import type { ToolEvent, ToolHandler } from './tool';

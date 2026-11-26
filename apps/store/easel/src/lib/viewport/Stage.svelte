@@ -13,10 +13,11 @@
 		fingerPans?: boolean;
 		connect: (invalidate: () => void) => void;
 		onhover?: (event: ToolEvent | null) => void;
+		adjust?: (event: ToolEvent) => ToolEvent;
 		children?: Snippet;
 	}
 
-	let { viewport, surface, handler, cursor = 'default', fingerPans = false, connect, onhover, children }: Props = $props();
+	let { viewport, surface, handler, cursor = 'default', fingerPans = false, connect, onhover, adjust = (event) => event, children }: Props = $props();
 
 	const ERASER_BUTTON = 32;
 
@@ -61,7 +62,7 @@
 			return { x: px, y: py, pressure: point.pointerType === 'pen' ? point.pressure : 1 };
 		};
 		const coalesced = event.type === 'pointermove' ? event.getCoalescedEvents() : [];
-		return {
+		return adjust({
 			x,
 			y,
 			localX,
@@ -73,7 +74,7 @@
 			ctrl: event.ctrlKey || event.metaKey,
 			eraser: event.pointerType === 'pen' && (event.buttons & ERASER_BUTTON) !== 0,
 			samples: (coalesced.length ? coalesced : [event]).map(sample)
-		};
+		});
 	}
 
 	function down(event: PointerEvent) {

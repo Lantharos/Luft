@@ -1,8 +1,8 @@
 import type { ImageDocument } from '#lib/document/image.svelte.js';
 import type { Rect } from '#lib/gpu/tiles.js';
 import { clip, grow, rasterize } from '#lib/raster/mask.js';
-import { combineSelection, type SelectMode } from '#lib/raster/selection.js';
-import type { Overlay } from '#lib/editor/overlay.js';
+import { combineSelection, type SelectMode } from '#lib/raster/selection/selection.js';
+import type { Overlay } from '#lib/editor/stage/overlay.js';
 import type { ToolEvent, ToolHandler } from './tool';
 
 export interface SelectHost {

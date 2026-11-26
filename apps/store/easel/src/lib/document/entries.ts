@@ -21,7 +21,11 @@ export class LayersChange implements Entry {
 
 	forget(side: 'past' | 'future') {
 		const [dropped, kept] = side === 'past' ? [this.before, this.after] : [this.after, this.before];
-		for (const layer of dropped) if (!kept.includes(layer)) layer.pixels.destroy();
+		for (const layer of dropped) {
+			if (kept.includes(layer)) continue;
+			layer.pixels.destroy();
+			layer.mask?.destroy();
+		}
 	}
 }
 

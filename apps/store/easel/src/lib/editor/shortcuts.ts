@@ -13,7 +13,7 @@ function typing(event: KeyboardEvent) {
 }
 
 export function editorShortcut(app: App, editor: Editor, event: KeyboardEvent) {
-	if (typing(event) || app.dialog) return;
+	if (typing(event) || app.dialog || editor.panel) return;
 	const { doc, settings, viewport } = editor;
 	const mod = event.ctrlKey || event.metaKey;
 	const key = event.key.toLowerCase();
@@ -44,6 +44,7 @@ export function editorShortcut(app: App, editor: Editor, event: KeyboardEvent) {
 	if (event.altKey) return;
 	if (key === 'delete' || key === 'backspace') return run(() => eraseSelection(doc));
 	if (key === 'x') return run(() => settings.swap());
+	if (key === 'q') return run(() => editor.toggleQuickMask());
 	if (key === '[' || key === ']') {
 		const brush = settings.tool === 'eraser' ? settings.eraser : settings.brush;
 		return run(() => (brush.size = Math.max(1, Math.min(500, Math.round(key === ']' ? brush.size * BRUSH_STEP + 1 : brush.size / BRUSH_STEP)))));

@@ -7,6 +7,7 @@
 	import { useApp } from '#lib/app/context.js';
 	import type { Editor } from './editor.svelte';
 	import ZoomMenu from './ZoomMenu.svelte';
+	import { FILTERS, filterName } from '#lib/filters/filters.js';
 
 	interface Props {
 		editor: Editor;
@@ -33,6 +34,12 @@
 			<MenuSeparator />
 			<MenuItem onclick={() => (close(), (app.dialog = 'history'))}>{t('easel-history')}</MenuItem>
 			<MenuItem onclick={() => (close(), (app.dialog = 'resize'))}>{t('easel-resize')}</MenuItem>
+			<MenuItem checked={editor.settings.rulers} onclick={() => (close(), (editor.settings.rulers = !editor.settings.rulers))}>{t('easel-rulers')}</MenuItem>
+			<MenuItem checked={editor.settings.snapping} onclick={() => (close(), (editor.settings.snapping = !editor.settings.snapping))}>{t('easel-snapping')}</MenuItem>
+			<MenuSeparator />
+			{#each FILTERS as filter (filter)}
+				<MenuItem disabled={!doc.active.paintable} onclick={() => (close(), editor.finishTool(), (editor.panel = { kind: 'filter', filter }))}>{filterName[filter]()}</MenuItem>
+			{/each}
 			<MenuSeparator />
 			<MenuItem onclick={() => (close(), (app.dialog = 'new-image'))}>{t('easel-new-image')}</MenuItem>
 			<MenuItem onclick={() => (close(), app.newBoard())}>{t('easel-new-board')}</MenuItem>

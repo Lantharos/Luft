@@ -19,7 +19,7 @@
 	]}
 	onchange={(value) => (settings.shape = value)}
 />
-<OptionSlider label={t('easel-option-width')} value={settings.shapeWidth} min={1} max={80} format={(value) => `${value} px`} onchange={(value) => (settings.shapeWidth = value)} />
+<OptionSlider label={t('easel-option-width')} value={settings.shapeWidth} min={1} max={80} format={(value) => t('easel-pixels', { value })} onchange={(value) => (settings.shapeWidth = value)} />
 {#if closed}
 	<div class="flex items-center justify-between px-1 text-[13px]">
 		<span>{t('easel-option-filled')}</span>

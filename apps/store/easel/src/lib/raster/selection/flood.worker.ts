@@ -10,6 +10,7 @@ export interface FloodRequest {
 	y: number;
 	tolerance: number;
 	contiguous: boolean;
+	color?: [number, number, number, number];
 }
 
 export interface FloodResult {
@@ -17,24 +18,24 @@ export interface FloodResult {
 	bounds: { x: number; y: number; width: number; height: number };
 }
 
-function flood({ tiles, cols, width, height, x, y, tolerance, contiguous }: FloodRequest): FloodResult {
+function flood({ tiles, cols, width, height, x, y, tolerance, contiguous, color }: FloodRequest): FloodResult {
 	const empty = new Uint8Array(4);
 	const pixel = (px: number, py: number) => {
 		const tile = tiles.get((py >> SHIFT) * cols + (px >> SHIFT));
 		const at = (((py & (TILE - 1)) << SHIFT) + (px & (TILE - 1))) * 4;
 		return tile ? tile.subarray(at, at + 4) : empty;
 	};
-	const seed = Array.from(pixel(x, y));
+	const seed = color ?? Array.from(pixel(x, y));
 	const limit = tolerance * 255;
 	const matches = (px: number, py: number) => {
 		const color = pixel(px, py);
 		return Math.abs(color[0] - seed[0]) <= limit && Math.abs(color[1] - seed[1]) <= limit && Math.abs(color[2] - seed[2]) <= limit && Math.abs(color[3] - seed[3]) <= limit;
 	};
 	const filled = new Uint8Array(width * height);
-	let left = x;
-	let right = x;
-	let top = y;
-	let bottom = y;
+	let left = contiguous ? x : width;
+	let right = contiguous ? x : -1;
+	let top = contiguous ? y : height;
+	let bottom = contiguous ? y : -1;
 	const mark = (px: number, py: number) => {
 		filled[py * width + px] = 255;
 		if (px < left) left = px;
@@ -67,6 +68,7 @@ function flood({ tiles, cols, width, height, x, y, tolerance, contiguous }: Floo
 			}
 		}
 	}
+	if (right < left) return { mask: new Uint8Array(1), bounds: { x: 0, y: 0, width: 1, height: 1 } };
 	const bounds = { x: left, y: top, width: right - left + 1, height: bottom - top + 1 };
 	const mask = new Uint8Array(bounds.width * bounds.height);
 	for (let py = 0; py < bounds.height; py++) mask.set(filled.subarray((py + top) * width + left, (py + top) * width + left + bounds.width), py * bounds.width);

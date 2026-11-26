@@ -6,9 +6,10 @@
 		layer: Layer;
 		width: number;
 		height: number;
+		mask?: boolean;
 	}
 
-	let { layer, width, height }: Props = $props();
+	let { layer, width, height, mask = false }: Props = $props();
 
 	const SIZE = 32;
 	const CHECKER: [number[], number[]] = [
@@ -27,7 +28,7 @@
 			const scale = (SIZE * ratio) / Math.max(width, height);
 			const x = (SIZE * ratio - width * scale) / 2;
 			const y = (SIZE * ratio - height * scale) / 2;
-			return { view: [scale, 0, 0, scale, x, y], width, height, levels: [layer.pixels], floating: null, selection: null, checker: CHECKER };
+			return { view: [scale, 0, 0, scale, x, y], width, height, levels: [mask && layer.mask ? layer.mask : layer.pixels], floating: null, selection: null, checker: CHECKER, mono: mask };
 		});
 		return () => presenter?.destroy();
 	});

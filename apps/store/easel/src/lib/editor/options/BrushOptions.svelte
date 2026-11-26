@@ -8,7 +8,7 @@
 	const percent = (value: number) => `${Math.round(value * 100)}%`;
 </script>
 
-<OptionSlider label={t('easel-option-size')} value={brush.size} min={1} max={500} format={(value) => `${value} px`} onchange={(value) => (brush.size = value)} />
+<OptionSlider label={t('easel-option-size')} value={brush.size} min={1} max={500} format={(value) => t('easel-pixels', { value })} onchange={(value) => (brush.size = value)} />
 <OptionSlider label={t('easel-option-hardness')} value={brush.hardness} min={0} max={1} step={0.01} format={percent} onchange={(value) => (brush.hardness = value)} />
 <OptionSlider label={t('easel-option-opacity')} value={brush.opacity} min={0.01} max={1} step={0.01} format={percent} onchange={(value) => (brush.opacity = value)} />
 <OptionSlider label={t('easel-option-smoothing')} value={brush.smoothing} min={0} max={1} step={0.01} format={percent} onchange={(value) => (brush.smoothing = value)} />

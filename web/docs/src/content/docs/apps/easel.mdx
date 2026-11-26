@@ -19,6 +19,10 @@ asks:
   - { ask: resize a picture, to: quick-edits }
   - { ask: layers, to: working-with-layers }
   - { ask: magic wand, to: selecting }
+  - { ask: layer mask, to: masks-and-adjustment-layers }
+  - { ask: curves, to: masks-and-adjustment-layers }
+  - { ask: blur a photo, to: filters }
+  - { ask: clone stamp, to: retouching }
   - { ask: diagram, to: the-whiteboard }
   - { ask: sticky notes, to: the-whiteboard }
 ---
@@ -47,9 +51,25 @@ The editor's tools are on the left and the current tool's settings are on the ri
 
 Easel saves layered work as an `.easel` file, which keeps every layer. **Export** writes PNG, JPEG, WebP or AVIF, at the size and quality you choose.
 
+## Masks and adjustment layers
+
+**Add a mask** in the layer menu hides parts of a layer without erasing them: paint black on the mask to hide and white to show, with the mask's thumbnail picked in the layer list. **Mask from selection** starts from what's selected, and the same menu inverts, turns off, applies and deletes a mask.
+
+The **+** button above the layers adds adjustment layers: curves, levels, hue and saturation, colour balance, black and white, brightness and contrast, exposure and vibrance. They change everything under them without touching any pixels, so double-click one to change it again, mask it to limit where it applies, or hide it. Put layers in a group, from the layer menu, to move, hide and blend them together. **Effects** adds a drop shadow and an outline that follow the layer's shape.
+
+## Filters
+
+The **More** menu has blur, motion blur, sharpen, reduce noise, vignette and pixelate. Each previews on the picture while you move its sliders, and only applies inside the selection when there is one.
+
+## Retouching
+
+The clone stamp and the healing brush copy from another part of the picture: <kbd>Alt</kbd>-click where to copy from, then paint. The healing brush blends what it copies into the colours and light around it. Smudge pushes colour along the stroke, like a finger through wet paint.
+
 ## Selecting
 
-The select tool draws rectangles and ellipses, the lasso draws freely, and the magic wand picks similar colours. Hold <kbd>Shift</kbd> to add to a selection and <kbd>Alt</kbd> to take away from it, or choose **Add** or **Subtract**. **Feather** softens its edge. A selection limits painting, filling and moving to what's inside it.
+The select tool draws rectangles and ellipses, the lasso draws freely, and the magic wand picks similar colours. Hold <kbd>Shift</kbd> to add to a selection and <kbd>Alt</kbd> to take away from it, or choose **Add** or **Subtract**. **Feather** softens its edge. A selection limits painting, filling, filters and moving to what's inside it. **Refine** grows, shrinks, borders or smooths it, **Colour range** selects everything close to the main colour, and **Quick mask**, or <kbd>Q</kbd>, shows the selection as a red overlay you paint with the brush and the eraser.
+
+Hold <kbd>Ctrl</kbd> while dragging a corner with the move tool to distort the picture freely, for perspective and skew. **Rulers** in the **More** menu shows rulers; drag from one to place a guide, and drag a guide back to remove it. Selections, crops and shapes snap to guides and to the picture's edges and middle.
 
 ## Painting and drawing
 
@@ -79,7 +99,8 @@ Boards export to PNG, JPEG, WebP, AVIF, SVG and PDF.
 | <kbd>Ctrl</kbd>+<kbd>A</kbd> / <kbd>Ctrl</kbd>+<kbd>D</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> | Select all, deselect, invert the selection |
 | <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> | Copy, cut, paste |
 | <kbd>Ctrl</kbd>+<kbd>0</kbd> / <kbd>Ctrl</kbd>+<kbd>1</kbd> | Fit, actual size |
-| <kbd>V</kbd> <kbd>M</kbd> <kbd>L</kbd> <kbd>W</kbd> <kbd>B</kbd> <kbd>E</kbd> <kbd>G</kbd> <kbd>D</kbd> <kbd>T</kbd> <kbd>U</kbd> <kbd>I</kbd> <kbd>C</kbd> | Move, select, lasso, magic wand, brush, eraser, fill, gradient, text, shapes, colour picker, crop |
+| <kbd>V</kbd> <kbd>M</kbd> <kbd>L</kbd> <kbd>W</kbd> <kbd>B</kbd> <kbd>E</kbd> <kbd>S</kbd> <kbd>J</kbd> <kbd>R</kbd> <kbd>G</kbd> <kbd>D</kbd> <kbd>T</kbd> <kbd>U</kbd> <kbd>I</kbd> <kbd>C</kbd> | Move, select, lasso, magic wand, brush, eraser, clone stamp, healing brush, smudge, paint bucket, gradient, text, shapes, colour picker, crop |
+| <kbd>Q</kbd> | Quick mask |
 | <kbd>[</kbd> / <kbd>]</kbd> | Smaller and larger brush |
 | <kbd>X</kbd> | Swap the two colours |
 | <kbd>V</kbd> <kbd>P</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>T</kbd> <kbd>N</kbd> | On a board: select, pen, highlighter, eraser, shapes, arrow, text, sticky note |

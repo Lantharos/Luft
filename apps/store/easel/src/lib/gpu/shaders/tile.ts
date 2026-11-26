@@ -20,6 +20,11 @@ struct Params {
 	stroke_mode: u32,
 	stroke_opacity: f32,
 	adjust: Adjust,
+	stroke_target: u32,
+	clone_mode: u32,
+	pad1: f32,
+	pad2: f32,
+	clone: vec4f,
 }
 @group(0) @binding(0) var backdrop: texture_2d<f32>;
 @group(0) @binding(1) var layer: texture_2d<f32>;
@@ -27,20 +32,44 @@ struct Params {
 @group(0) @binding(3) var selection: texture_2d<f32>;
 @group(0) @binding(4) var layer_mask: texture_2d<f32>;
 @group(0) @binding(5) var<uniform> params: Params;
+@group(0) @binding(6) var clone_source: texture_2d<f32>;
+@group(0) @binding(7) var low_source: texture_2d<f32>;
+@group(0) @binding(8) var low_sampler: sampler;
+
+fn cloned(at: vec2i) -> vec4f {
+	let point = vec2f(at) + params.clone.zw;
+	let origin_point = point - params.clone.xy;
+	let size = vec2f(textureDimensions(clone_source));
+	let inside = all(origin_point >= vec2f(0.0)) && all(origin_point < size);
+	var color = select(vec4f(0.0), textureLoad(clone_source, vec2i(origin_point), 0), inside);
+	if (params.clone_mode == 2u) {
+		let low = vec2f(textureDimensions(low_source));
+		let here = textureSampleLevel(low_source, low_sampler, (point + 0.5) / size, 0.0);
+		let there = textureSampleLevel(low_source, low_sampler, (origin_point + 0.5) / size, 0.0);
+		color = vec4f(clamp(color.rgb + (here.rgb - there.rgb), vec3f(0.0), vec3f(color.a)), color.a);
+		_ = low;
+	}
+	return color;
+}
 
 @fragment
 fn fragmentMain(@builtin(position) position: vec4f) -> @location(0) vec4f {
 	let at = vec2i(position.xy);
 	var source = adjustPixel(layer, at, params.adjust);
+	var cover = textureLoad(layer_mask, at, 0).r;
 	if (params.stroke_mode != 0u) {
 		let amount = textureLoad(stroke, at, 0).r * params.stroke_opacity * textureLoad(selection, at, 0).r;
-		if (params.stroke_mode == 1u) {
+		if (params.stroke_target == 1u) {
+			cover = select(cover * (1.0 - amount), cover + (1.0 - cover) * amount, params.stroke_mode == 1u);
+		} else if (params.clone_mode != 0u) {
+			source = cloned(at) * amount + source * (1.0 - amount);
+		} else if (params.stroke_mode == 1u) {
 			source = params.stroke_color * amount + source * (1.0 - amount);
 		} else {
 			source = source * (1.0 - amount);
 		}
 	}
-	source = source * (params.opacity * textureLoad(layer_mask, at, 0).r);
+	source = source * (params.opacity * cover);
 	return blendOver(params.blend, source, textureLoad(backdrop, at, 0));
 }
 `;
@@ -140,9 +169,9 @@ struct Out {
 fn vertexMain(@builtin(vertex_index) index: u32) -> Out {
 	let corner = vec2f(f32(index & 1u), f32((index >> 1u) & 1u));
 	let documentPoint = params.matrix * vec3f(params.source_origin + corner * params.source_size, 1.0);
-	let local = (documentPoint.xy - params.target_origin) / params.target_size;
+	let local = (documentPoint.xy - params.target_origin * documentPoint.z) / params.target_size;
 	var out: Out;
-	out.position = vec4f(local.x * 2.0 - 1.0, 1.0 - local.y * 2.0, 0.0, 1.0);
+	out.position = vec4f(local.x * 2.0 - documentPoint.z, documentPoint.z - local.y * 2.0, 0.0, documentPoint.z);
 	out.uv = corner * params.source_size / vec2f(textureDimensions(source));
 	return out;
 }

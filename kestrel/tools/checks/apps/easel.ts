@@ -40,6 +40,7 @@ async function checkLayers(source: string, saved: string) {
     (await app.settle(() => true)).save('easel-quick-edit');
     app.click(await app.find(button('Open in editor')));
     app.click(await app.find(button('Add a layer')));
+    app.click(await app.find({role: 'menuitem', name: 'Layer'}));
     app.click(await app.find(button('Select')));
     press(Clutter.KEY_Control_L, Clutter.KEY_a);
     app.click(await app.find({...button('Fill'), within: {role: 'region', name: 'Tool options'}}));
@@ -72,6 +73,40 @@ async function checkLayers(source: string, saved: string) {
   });
 }
 
+async function layerAction(app: LuftApp, name: string) {
+  app.click(await app.find(button('Layer actions')));
+  app.click(await app.find({role: 'menuitem', name}));
+}
+
+async function checkMasksAndAdjustments(source: string, saved: string) {
+  const gray = Math.round(BASE[0] * 0.4 + BASE[1] * 0.4 + BASE[2] * 0.2);
+  await withApp('easel', [source], async app => {
+    app.click(await app.find(button('Open in editor')));
+    app.click(await app.find(button('Add a layer')));
+    app.click(await app.find({role: 'menuitem', name: 'Layer'}));
+    app.click(await app.find(button('Select')));
+    press(Clutter.KEY_Control_L, Clutter.KEY_a);
+    app.click(await app.find({...button('Fill'), within: {role: 'region', name: 'Tool options'}}));
+    press(Clutter.KEY_Control_L, Clutter.KEY_d);
+    await layerAction(app, 'Add a mask');
+    require(near(await centerOf(app, 'masked.png'), FILL), 'a white mask keeps the layer visible');
+    await layerAction(app, 'Invert mask');
+    require(near(await centerOf(app, 'hidden.png'), BASE), 'an inverted mask hides the layer');
+    app.click(await app.find(button('Add a layer')));
+    app.click(await app.find({role: 'menuitem', name: 'Black and white'}));
+    app.click(await app.find(button('Done')));
+    const mono = await centerOf(app, 'mono.png');
+    require(near(mono, [gray, gray, gray]), `a black and white adjustment layer turns what's under it gray (${mono})`);
+    await answerChooser(saved);
+    press(Clutter.KEY_Control_L, Clutter.KEY_s);
+    await eventually(() => exists(saved), 'Easel saves masks and adjustment layers', SAVE_TIMEOUT);
+  });
+  await withApp('easel', [saved], async app => {
+    const reopened = await centerOf(app, 'mono-reopened.png');
+    require(near(reopened, [gray, gray, gray]), `the reopened document keeps the mask and the adjustment (${reopened})`);
+  });
+}
+
 async function checkBoard(saved: string) {
   await withApp('easel', [], async app => {
     app.click(await app.find({text: 'New board'}));
@@ -97,6 +132,7 @@ export async function run() {
   writePicture(source, BASE);
   try {
     await checkLayers(source, inFolder('layers.easel'));
+    await checkMasksAndAdjustments(source, inFolder('masks.easel'));
     await checkBoard(inFolder('board.easel'));
   } finally {
     if (GLib.file_test(folder, GLib.FileTest.IS_DIR)) removeTree(folder);

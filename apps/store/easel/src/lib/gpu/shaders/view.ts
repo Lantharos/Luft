@@ -7,6 +7,11 @@ struct View {
 }
 @group(0) @binding(0) var<uniform> view: View;
 
+fn toClipH(point: vec3f) -> vec4f {
+	let screen = view.matrix * point;
+	return vec4f(screen.x / view.viewport.x * 2.0 - screen.z, screen.z - screen.y / view.viewport.y * 2.0, 0.0, screen.z);
+}
+
 fn toClip(point: vec2f) -> vec4f {
 	let screen = view.matrix * vec3f(point, 1.0);
 	return vec4f(screen.x / view.viewport.x * 2.0 - 1.0, 1.0 - screen.y / view.viewport.y * 2.0, 0.0, 1.0);
@@ -33,7 +38,7 @@ struct Out {
 fn vertexMain(@builtin(vertex_index) index: u32) -> Out {
 	let corner = vec2f(f32(index & 1u), f32((index >> 1u) & 1u));
 	var out: Out;
-	out.position = toClip((quad.model * vec3f(quad.rect.xy + corner * quad.rect.zw, 1.0)).xy);
+	out.position = toClipH(quad.model * vec3f(quad.rect.xy + corner * quad.rect.zw, 1.0));
 	out.uv = quad.uv.xy + corner * quad.uv.zw;
 	return out;
 }
@@ -43,6 +48,8 @@ fn fragmentMain(input: Out) -> @location(0) vec4f {
 	return textureSample(image, image_sampler, input.uv);
 }
 `;
+
+export const PRESENT_MASK = PRESENT.replace('return textureSample(image, image_sampler, input.uv);', 'let value = textureSample(image, image_sampler, input.uv).r;\n\treturn vec4f(value, value, value, 1.0);');
 
 export const CHECKER = /* wgsl */ `
 ${VIEW}
@@ -86,7 +93,7 @@ struct Out {
 fn vertexMain(@builtin(vertex_index) index: u32) -> Out {
 	let corner = vec2f(f32(index & 1u), f32((index >> 1u) & 1u));
 	var out: Out;
-	out.position = toClip((quad.model * vec3f(quad.rect.xy + corner * quad.rect.zw, 1.0)).xy);
+	out.position = toClipH(quad.model * vec3f(quad.rect.xy + corner * quad.rect.zw, 1.0));
 	out.uv = quad.uv.xy + corner * quad.uv.zw;
 	return out;
 }
@@ -107,5 +114,52 @@ fn fragmentMain(input: Out) -> @location(0) vec4f {
 	}
 	let dash = fract((input.position.x + input.position.y - view.time * 24.0) / 12.0) < 0.5;
 	return select(vec4f(0.0, 0.0, 0.0, 1.0), vec4f(1.0), dash);
+}
+`;
+
+export const QUICK_MASK = /* wgsl */ `
+${VIEW}
+struct Quad {
+	model: mat3x3f,
+	rect: vec4f,
+	uv: vec4f,
+}
+struct Stroke {
+	mode: u32,
+	opacity: f32,
+	pad0: f32,
+	pad1: f32,
+}
+@group(1) @binding(0) var<uniform> quad: Quad;
+@group(1) @binding(1) var mask: texture_2d<f32>;
+@group(1) @binding(2) var mask_sampler: sampler;
+@group(1) @binding(3) var stroke: texture_2d<f32>;
+@group(1) @binding(4) var<uniform> live: Stroke;
+
+struct Out {
+	@builtin(position) position: vec4f,
+	@location(0) uv: vec2f,
+}
+
+@vertex
+fn vertexMain(@builtin(vertex_index) index: u32) -> Out {
+	let corner = vec2f(f32(index & 1u), f32((index >> 1u) & 1u));
+	var out: Out;
+	out.position = toClipH(quad.model * vec3f(quad.rect.xy + corner * quad.rect.zw, 1.0));
+	out.uv = quad.uv.xy + corner * quad.uv.zw;
+	return out;
+}
+
+@fragment
+fn fragmentMain(input: Out) -> @location(0) vec4f {
+	var value = textureSample(mask, mask_sampler, input.uv).r;
+	let amount = textureSample(stroke, mask_sampler, input.uv).r * live.opacity;
+	if (live.mode == 1u) {
+		value = value + (1.0 - value) * amount;
+	} else if (live.mode == 2u) {
+		value = value * (1.0 - amount);
+	}
+	let alpha = (1.0 - value) * 0.5;
+	return vec4f(0.86, 0.18, 0.2, 1.0) * alpha;
 }
 `;

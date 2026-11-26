@@ -1,7 +1,7 @@
 import type { ImageDocument } from '#lib/document/image.svelte.js';
 import { kit } from '#lib/gpu/kit.js';
 import { union, type Rect } from '#lib/gpu/tiles.js';
-import { release } from './mask';
+import { release } from '../mask';
 
 export type SelectMode = 'new' | 'add' | 'subtract';
 

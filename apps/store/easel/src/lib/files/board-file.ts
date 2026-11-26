@@ -8,7 +8,7 @@ import { kit } from '#lib/gpu/kit.js';
 import { Compositor } from '#lib/gpu/compositor.js';
 import { newTile, TILE, TileGrid } from '#lib/gpu/tiles.js';
 import { exportGrid, type ExportRequest } from './export';
-import { FORMAT, sendPreview } from './image-file';
+import { FORMAT, sendPreview } from './image-file.svelte';
 import { fetchBytes } from './pixels';
 
 const DISPLAY_SIDE = 2048;
@@ -93,7 +93,7 @@ export async function saveBoard(board: BoardDocument, path: string) {
 	const area = boardBounds(board.objects, board.lookup, PADDING);
 	const grid = rasterize(board, Math.min(1, PREVIEW_SIDE / Math.max(area.w, area.h)));
 	const compositor = new Compositor(grid.width, grid.height);
-	compositor.render(grid.tiles.keys(), [{ pixels: grid, mask: null, opacity: 1, blend: 'normal', visible: true, stroke: null, adjust: null }], null);
+	compositor.render(grid.tiles.keys(), [{ kind: 'pixels', pixels: grid, mask: null, opacity: 1, blend: 'normal', visible: true, stroke: null, adjust: null }], null);
 	await sendPreview(id, { width: grid.width, height: grid.height, compositor });
 	compositor.destroy();
 	grid.destroy();

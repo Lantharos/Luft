@@ -14,9 +14,10 @@ export async function fetchBytes(path: string) {
 
 export function uploadTiles(grid: TileGrid, indices: number[], data: Uint8Array) {
 	kit.flush();
+	const pixel = grid.format === 'r8unorm' ? 1 : 4;
 	indices.forEach((index, slot) => {
 		const texture = newTile(grid.format);
-		device.queue.writeTexture({ texture }, data, { offset: slot * TILE_BYTES, bytesPerRow: TILE * 4 }, [TILE, TILE]);
+		device.queue.writeTexture({ texture }, data, { offset: slot * TILE * TILE * pixel, bytesPerRow: TILE * pixel }, [TILE, TILE]);
 		grid.set(index, texture);
 	});
 }
@@ -50,8 +51,9 @@ export async function* tileBatches(grid: TileGrid) {
 	for (let at = 0; at < indices.length; at += BODY_TILES) {
 		const batch = indices.slice(at, at + BODY_TILES);
 		const tiles = await readTiles(grid, batch);
-		const body = new Uint8Array(batch.length * TILE_BYTES);
-		batch.forEach((index, slot) => body.set(tiles.get(index)!, slot * TILE_BYTES));
+		const size = grid.format === 'r8unorm' ? TILE * TILE : TILE_BYTES;
+		const body = new Uint8Array(batch.length * size);
+		batch.forEach((index, slot) => body.set(tiles.get(index)!, slot * size));
 		yield { indices: batch, body };
 	}
 }

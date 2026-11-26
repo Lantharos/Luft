@@ -9,7 +9,7 @@ import { reshape } from '#lib/document/reshape.js';
 import { Editor } from '#lib/editor/editor.svelte.js';
 import { ToolSettings } from '#lib/editor/settings.svelte.js';
 import { openBoard, saveBoard, type BoardRecord } from '#lib/files/board-file.js';
-import { openImage, saveImage, type ImageRecord } from '#lib/files/image-file.js';
+import { openImage, saveImage, type ImageRecord } from '#lib/files/image-file.svelte.js';
 import { baseName, extension, pictureDocument } from '#lib/files/picture.js';
 import { startGpu } from '#lib/gpu/device.js';
 import { kit } from '#lib/gpu/kit.js';

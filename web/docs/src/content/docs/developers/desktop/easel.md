@@ -15,6 +15,7 @@ An `.easel` file is a ZIP archive, so ordinary tools can look inside one:
 mimetype                  application/vnd.lantharos.easel, stored, always first
 document.json             what the document is
 layers/<id>.tiles         an image layer's pixels
+masks/<id>.tiles          a layer's mask
 assets/<id>               a picture placed on a board, exactly as it was imported
 preview.png               the whole document, at most 512 pixels on its longest side
 ```
@@ -36,7 +37,7 @@ Images and boards share the format and differ in `kind`. Both have `format`, 1 f
 }
 ```
 
-Layers are listed from the bottom up. `blend` is one of `normal`, `multiply`, `screen`, `overlay`, `darken`, `lighten`, `color-dodge`, `color-burn`, `hard-light`, `soft-light`, `difference` and `add`, with the separable formulas of the W3C compositing specification. A text layer keeps its `text` and also its pixels, so other programs and older Easels can show it; Easel draws it again from `text` when it's edited. Layer kinds Easel doesn't know are kept as raster layers.
+Layers are listed from the bottom up. `kind` is `raster`, `text`, `adjustment` or `group`; a layer with a `parent` belongs to that group, which composites its layers on their own before blending the result with the group's opacity and blend mode. An adjustment layer has `adjustment`, with its `type` (`curves`, `levels`, `hue`, `balance`, `mono`, `brightness`, `exposure` or `vibrance`) and the settings for every type, and no pixels. `effects` holds a `shadow` (`enabled`, `x`, `y`, `blur`, `color`, `opacity`) and a `stroke` (`enabled`, `size`, `color`, `opacity`). `mask` says that the layer has a mask in `masks/<id>.tiles` and whether it's `enabled`. `guides` lists guides as `{ "axis": "x", "at": 640 }`. `blend` is one of `normal`, `multiply`, `screen`, `overlay`, `darken`, `lighten`, `color-dodge`, `color-burn`, `hard-light`, `soft-light`, `difference` and `add`, with the separable formulas of the W3C compositing specification. A text layer keeps its `text` and also its pixels, so other programs and older Easels can show it; Easel draws it again from `text` when it's edited. Layer kinds Easel doesn't know are kept as raster layers.
 
 ```json
 {
@@ -68,7 +69,7 @@ An image layer's pixels are in 512 × 512 tiles, numbered row by row from the to
 | 8 for each tile | Its number and the length of its data, both 32-bit |
 | … | Each tile's data, in the same order |
 
-A tile's data is one zstd frame holding 512 × 512 pixels of 8-bit RGBA with premultiplied alpha, the form Easel composites in. `preview.png` and exports have straight alpha, as PNG expects.
+A tile's data is one zstd frame holding 512 × 512 pixels of 8-bit RGBA with premultiplied alpha, the form Easel composites in. A mask's tiles hold one byte for each pixel; a mask tile that isn't stored is white. `preview.png` and exports have straight alpha, as PNG expects.
 
 ## Rendering
 
@@ -79,6 +80,10 @@ Easel draws with WebGPU in its page. On Linux, Sabine offers WebGPU through Dawn
 Every layer is a grid of 512 × 512 textures, created only where something is painted. A change marks the tiles it touched; before the next frame, each dirty tile is composited from the layers that have that tile, bottom up, each pass blending one layer onto the result with its opacity, blend mode, and mask, then copied into the composite and halved four times into smaller versions. The view draws the composite tiles on screen at the version closest to the zoom, so a 6000 × 4000 picture zoomed out samples a fraction of its pixels, and an unchanged picture costs one draw per visible tile.
 
 Painting never changes a layer in place. A brush stroke stamps soft round dabs into a single-channel stroke mask, with maximum blending so overlapping dabs don't build up; while the stroke lasts, the compositor blends the mask over the layer in the brush colour, clipped by the selection. When the stroke ends, the touched tiles are drawn into new textures, and the old ones become the undo step. Undo swaps textures back without copying, and the history keeps at most 300 steps and 1.5 GB of replaced tiles, dropping the oldest first.
+
+Masks are single-channel tile grids the blend pass multiplies the layer by, and painting on a mask goes through the same stroke mask. An adjustment layer is a pass over what's under it: curves, levels, colour balance, brightness and exposure become a 256-entry lookup per channel, generated when the settings change, and hue, black and white and vibrance are computed in the shader. Groups composite into a scratch tile of their own. Effects are drawn from the layer's alpha once per change, blurred and coloured on the whole layer, and composited under it as extra layers.
+
+Filters and effects work on the whole layer at once: its tiles are copied into one texture, so a blur reaches across tile edges. Large blur radii halve the texture first and blur the smaller copy, which keeps a 100-pixel blur of a 24-megapixel picture to a few milliseconds. A filter's preview replaces the layer's tiles in the compositor until it's applied. The clone stamp and the healing brush sample a copy of the layer taken when the stroke starts; healing adds the difference between heavily blurred copies of the target and the source, so the copied texture takes on the surrounding light. Smudge works on a copy of the layer, picking up the area under the previous dab and laying it down under the next. Quick mask draws the selection as an overlay and paints into it with the brush's stroke mask. Distorting with the move tool maps the selection's rectangle onto four corners with a perspective matrix, drawn with perspective-correct sampling.
 
 A selection is another single-channel tile grid. Rectangles, ellipses and lassos are filled with the canvas 2D API tile by tile, with a blur for feathering; the magic wand and the fill bucket read the layer back and flood it in a worker. Moving and scaling draw the source into the target tiles through a matrix, halving it first when it shrinks a lot so it doesn't alias. Decoding and encoding run in Rust: glycin decodes TIFF and HEIC, and PNG, JPEG, WebP and AVIF are written from the composite with Lanczos resizing.
 

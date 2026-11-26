@@ -24,6 +24,22 @@ pub struct Refused {
     pub message: String,
 }
 
+impl Refused {
+    fn unnamed(message: impl ToString) -> Self {
+        Self {
+            kind: None,
+            message: message.to_string(),
+        }
+    }
+
+    fn by(error: &zbus::Error) -> Self {
+        Self {
+            kind: luft_dbus::error::kind(error),
+            message: explain(error),
+        }
+    }
+}
+
 pub enum Signal {
     Accounts,
     Drives,
@@ -66,8 +82,17 @@ fn json(value: &impl Serialize) -> String {
     serde_json::to_string(value).expect("requests always serialize")
 }
 
-pub async fn accounts() -> Result<Vec<Account>, String> {
-    call_json(ACCOUNTS, "Accounts", &()).await
+/// The accounts on this computer. Refused as `ServiceUnknown` when the
+/// accounts service isn't installed, and as `NotAuthorized` when the caller
+/// isn't one of the programs it answers.
+pub async fn accounts() -> Result<Vec<Account>, Refused> {
+    let text: String = proxy(ACCOUNTS)
+        .await
+        .map_err(Refused::unnamed)?
+        .call("Accounts", &())
+        .await
+        .map_err(|error| Refused::by(&error))?;
+    serde_json::from_str(&text).map_err(Refused::unnamed)
 }
 
 /// Starts a sign-in. The password goes to the service through a pipe, so it
@@ -127,17 +152,12 @@ pub async fn rename(account: &str, name: &str) -> Result<(), String> {
 /// `discard_unsynced`, it is refused as `Unsynced` while files kept here may
 /// not have reached the cloud.
 pub async fn remove_account(account: &str, discard_unsynced: bool) -> Result<(), Refused> {
-    let accounts = proxy(ACCOUNTS).await.map_err(|message| Refused {
-        kind: None,
-        message,
-    })?;
-    accounts
+    proxy(ACCOUNTS)
+        .await
+        .map_err(Refused::unnamed)?
         .call("Remove", &(account, discard_unsynced))
         .await
-        .map_err(|error| Refused {
-            kind: luft_dbus::error::kind(&error),
-            message: explain(&error),
-        })
+        .map_err(|error| Refused::by(&error))
 }
 
 pub async fn drives() -> Result<Vec<Drive>, String> {

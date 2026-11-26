@@ -16,6 +16,7 @@ GREETER = "pgrep -u greetd -x kestrel"
 SESSION_UNITS = "kestrel-session.target kestrel.service kestrel-settings.service"
 INCIDENTS = "/var/lib/kestrel-watchdog/incidents"
 SETTINGS = "luft-vm-settings"
+SETTINGS_PROGRAM = "/usr/lib/sabine/com.lantharos.settings/settings"
 LOADER_INFO = "/sys/firmware/efi/efivars/LoaderInfo-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f"
 SETTLE = 15
 
@@ -66,8 +67,8 @@ class Check:
         except MachineError:
             return False
 
-    def output(self, command: str) -> str:
-        status, text = self.shell(command)
+    def output(self, command: str, seconds: float = 60) -> str:
+        status, text = self.shell(command, seconds)
         if status != 0:
             raise MachineError(f"{command} failed with {status}: {text}")
         return text.strip()
@@ -177,6 +178,57 @@ def session(check: Check, _: argparse.Namespace):
     check.collect()
 
 
+PACKAGES = "com.lantharos.Packages1 /com/lantharos/Packages1 com.lantharos.Packages1"
+REFUSALS = "Refused a caller|Refused to count|Couldn't tell USB protection"
+
+
+def as_user(command: str) -> str:
+    return f"systemd-run --user --machine={USER}@ --wait --pipe --quiet {command}"
+
+
+def refusals(check: Check, since: str) -> str:
+    return check.shell(f"journalctl --no-pager -o cat --since='{since}' | grep -E \"{REFUSALS}\"")[1].strip()
+
+
+def install(check: Check, package: str):
+    check.output(as_user(f"busctl --system --timeout=1800 call {PACKAGES} Install as 1 {package}"), 1800)
+
+
+def runs_from_before(check: Check, pid: str, path: str) -> bool:
+    return check.output(f"stat -L -c %d:%i /proc/{pid}/exe") != check.output(f"stat -c %d:%i {path}")
+
+
+def packages(check: Check, _: argparse.Namespace):
+    check.start("first")
+    check.enroll_key()
+    check.wait_for_greeter()
+    check.sign_in()
+    started = check.output("date '+%Y-%m-%d %H:%M:%S'")
+    check.wait("the network is up", lambda: check.succeeds("nm-online --quiet --timeout=5"), 300)
+    install(check, "htop")
+    check.open_settings()
+    install(check, "figlet")
+    kestrel = check.output(f"pgrep -u {USER} -x kestrel")
+    settings = check.output(f"pgrep -u {USER} -o -f {SETTINGS_PROGRAM}")
+    if not (runs_from_before(check, kestrel, "/usr/bin/kestrel") and runs_from_before(check, settings, SETTINGS_PROGRAM)):
+        raise MachineError("Kestrel or Settings runs from the /usr now mounted, so the merges changed nothing to check")
+    check.log(f"Kestrel and Settings run from earlier /usr mounts: {check.output(f'readlink /proc/{settings}/exe')}")
+    check.output(as_user("settings kestrel-settings:accounts"))
+    time.sleep(SETTLE)
+    check.wake()
+    check.screenshot("online-accounts")
+    check.output("loginctl lock-sessions")
+    time.sleep(SETTLE)
+    check.wake()
+    check.machine.type(PASSWORD + "\n")
+    time.sleep(SETTLE)
+    check.screenshot("unlocked")
+    if found := refusals(check, started):
+        raise MachineError(f"a service turned away a program that started before a merge: {found}")
+    check.log("Accounts answered Settings and USB protection took Kestrel's unlock after the merges")
+    check.collect()
+
+
 TRUST = "com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1"
 TRUST_DISK = f"busctl get-property {TRUST} Disk"
 
@@ -254,6 +306,9 @@ def main():
     scenarios.add_parser(
         "session", help="add Luft's key, wait for the login screen, sign in, check the desktop and open Settings")
     scenarios.add_parser(
+        "packages", help="sign in, open Settings, install a system package, and check that Settings and Kestrel are "
+                         "still recognised as Luft's own programs")
+    scenarios.add_parser(
         "encryption", help="add Luft's key, and check that a policy requiring encryption has trustd encrypt Luft's "
                            "partition from the next restart")
     going_back = scenarios.add_parser(
@@ -267,7 +322,7 @@ def main():
     shutil.rmtree(out, ignore_errors=True)
     check = Check(vm, out, arguments.minutes)
     try:
-        {"session": session, "encryption": encryption, "rollback": rollback}[arguments.scenario](check, arguments)
+        {"session": session, "packages": packages, "encryption": encryption, "rollback": rollback}[arguments.scenario](check, arguments)
     except (MachineError, OSError) as error:
         check.failed(error)
         check.stop()

@@ -21,7 +21,7 @@ export const commands = {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("about_report_problem", params, options),
 	accessibilityScreenReader: (options?: CallOptions) => invoke<boolean>("accessibility_screen_reader", {}, options),
-	accounts: (options?: CallOptions) => invoke<AccountsSnapshot>("accounts", {}, options),
+	accounts: (options?: CallOptions) => invoke<OnlineAccounts>("accounts", {}, options),
 	accountsAnswer: (params: {
 		session: string,
 		answer: Answer,
@@ -1498,6 +1498,8 @@ export type Offer = {
 	to: Variant,
 	size: number | null,
 };
+
+export type OnlineAccounts = { state: "ready"; snapshot: AccountsSnapshot } | { state: "notInstalled" } | { state: "refused" } | { state: "failed"; error: string };
 
 export type OpenPort = {
 	port: number,

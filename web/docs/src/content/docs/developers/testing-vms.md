@@ -53,6 +53,7 @@ Disks, startup, installing and system services are tested in QEMU VMs from `os/v
 | `os/vm/qemu.sh` | Starts a VM; `--help` lists options such as `SECURE_BOOT=1`, `TPM=0`, `ISO=`, extra drives and `HEADLESS=1` |
 | `os/vm/control.py` | Screenshots, keys, clicks and root commands over the serial console of a running VM, and `enroll` on shim's blue screen |
 | `os/vm/check.py session` | Starts the installed VM with Secure Boot, adds Luft's key, signs in, checks that Kestrel and its services stay up, and opens Settings |
+| `os/vm/check.py packages` | The same, then installs a system package and checks that Accounts still answers Settings and USB protection still takes Kestrel's unlock, both started on the `/usr` from before |
 | `os/vm/check.py rollback` | Updates the VM to a new version and checks it's marked good, then to one whose login screen never starts, and checks that after three tries it goes back |
 
 `LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` keeps its screenshots, the serial console, the journal and `bootc status` in `check` inside it when a step fails or times out.

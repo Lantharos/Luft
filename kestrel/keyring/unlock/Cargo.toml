@@ -9,6 +9,7 @@ license.workspace = true
 [dependencies]
 getrandom.workspace = true
 libc.workspace = true
+luft-identity.workspace = true
 luft-keyring-wire = { workspace = true, features = ["tokio"] }
 luft-shelter.workspace = true
 postcard.workspace = true

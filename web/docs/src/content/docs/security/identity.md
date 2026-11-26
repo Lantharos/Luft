@@ -47,9 +47,11 @@ This doesn't cover unit files and drop-ins in `~/.config/systemd/user`, which ca
 
 A few calls are for one of Luft's programs alone. Before answering one, the service gets a pidfd for the caller and, while it pins the process, checks that:
 
-- the program file is in the image under `/usr`, owned by root, writable by nobody else, and still the file at that path;
+- the program file is in the image under `/usr`, owned by root, writable by nobody else, on a read-only mount, and the file the image has at that path;
 - it is the one program the call is for;
 - no file from outside the image that still exists is mapped in as code, its starting environment holds none of the unsafe variables, and a Sabine app wasn't started with switches that open its browser to others, such as `--remote-debugging-port`.
+
+Installing a [system package](/developers/system/system-packages/) merges a new `/usr` over the old one. Programs already running keep their file on the old `/usr`, which isn't mounted anywhere any more, so the kernel names it from that `/usr`'s own root, such as `/bin/kestrel`, and it is a different file from the one now at `/usr/bin/kestrel`. Such a program counts when its file holds the same program, byte for byte, as the image's file at that path. Only root can make a file that passes the other checks, so a copy that matches is the image's program, and an older version of it doesn't match. The service compares the two once, then remembers the result while it keeps the old file open, which keeps its device and inode from being given to any other file. Kestrel's graphics watchdog and the keyring's unlock service check their callers' programs the same way.
 
 Code a program makes for itself, as graphics drivers and JIT compilers do from memory or from a file they delete at once, isn't held against it: the check tells those apart from a library by whether the mapped file is still at its path, by inode.
 

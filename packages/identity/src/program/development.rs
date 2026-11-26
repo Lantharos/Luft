@@ -15,7 +15,7 @@ pub fn is_development_build() -> bool {
     *DEVELOPMENT.get_or_init(|| {
         open_folder(std::process::id())
             .and_then(|folder| image::running(&folder))
-            .is_none_or(|running| !running.is_installed())
+            .is_none_or(|running| running.installed().is_none())
     })
 }
 

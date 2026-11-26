@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::Path;
 
+use luft_identity::program;
+
 const GPU_CODE: [&str; 9] = [
     "[nvidia",
     "[amdgpu]",
@@ -59,7 +61,8 @@ pub fn is_debugged(pid: u32) -> bool {
 }
 
 pub fn is_kestrel(pid: u32) -> bool {
-    fs::read_link(format!("/proc/{pid}/exe")).is_ok_and(|program| program == Path::new(KESTREL))
+    fs::File::open(format!("/proc/{pid}/exe"))
+        .is_ok_and(|program| program::is_installed_file(&program.into(), Path::new(KESTREL)))
 }
 
 pub fn owner(pid: u32) -> Option<u32> {

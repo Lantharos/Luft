@@ -1,8 +1,7 @@
-use std::fs::{self, File};
 use std::os::fd::{AsFd, FromRawFd, OwnedFd, RawFd};
-use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
+use luft_identity::program;
 use luft_shelter::Process;
 
 const UNIT: &str = "luft-keyring.service";
@@ -16,19 +15,11 @@ pub enum Peer {
 
 pub struct Verifier {
     daemon: PathBuf,
-    at_start: Option<(u64, u64)>,
-}
-
-fn identity(metadata: &fs::Metadata) -> (u64, u64) {
-    (metadata.dev(), metadata.ino())
 }
 
 impl Verifier {
     pub fn new(daemon: PathBuf) -> Self {
-        let at_start = fs::metadata(&daemon)
-            .ok()
-            .map(|metadata| identity(&metadata));
-        Self { daemon, at_start }
+        Self { daemon }
     }
 
     pub fn identify(&self, socket: RawFd) -> Peer {
@@ -49,15 +40,11 @@ impl Verifier {
         let pidfd = peer_pidfd(socket).ok_or("its process can't be identified")?;
         let process = Process::pinned(pidfd.as_fd())?;
         process.started_sheltered(&self.daemon, user)?;
-        let binary =
-            fs::metadata(&self.daemon).map_err(|_| "the keyring program isn't installed")?;
         let running = process
             .open("exe", libc::O_PATH)
-            .and_then(|exe| File::from(exe).metadata().ok())
             .ok_or("its program can't be read")?;
-        let running = identity(&running);
         check(
-            running == identity(&binary) || Some(running) == self.at_start,
+            program::is_installed_file(&running, &self.daemon),
             "it isn't the keyring program",
         )?;
 

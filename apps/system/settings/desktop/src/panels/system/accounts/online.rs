@@ -2,7 +2,7 @@ use std::pin::pin;
 use std::sync::Once;
 
 use futures_util::StreamExt;
-use luft_accounts::client::{self, Signal};
+use luft_accounts::client::{self, Refused, Signal};
 use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider, Step};
 use luft_app::{Commands, Empty, Events, launch};
 use luft_i18n::t;
@@ -21,6 +21,27 @@ static WATCH: Once = Once::new();
 struct AccountsSnapshot {
     accounts: Vec<Account>,
     drives: Vec<Drive>,
+}
+
+#[derive(Serialize, Type)]
+#[serde(tag = "state", rename_all = "camelCase")]
+enum OnlineAccounts {
+    Ready { snapshot: AccountsSnapshot },
+    NotInstalled,
+    Refused,
+    Failed { error: String },
+}
+
+impl From<Refused> for OnlineAccounts {
+    fn from(refused: Refused) -> Self {
+        match refused.kind.as_deref() {
+            Some("ServiceUnknown") => Self::NotInstalled,
+            Some("NotAuthorized") => Self::Refused,
+            _ => Self::Failed {
+                error: refused.message,
+            },
+        }
+    }
 }
 
 #[derive(Serialize, Type)]
@@ -93,10 +114,12 @@ struct Address {
     token: Option<String>,
 }
 
-async fn snapshot() -> Result<AccountsSnapshot, String> {
+async fn snapshot() -> Result<AccountsSnapshot, OnlineAccounts> {
     Ok(AccountsSnapshot {
         accounts: client::accounts().await?,
-        drives: client::drives().await?,
+        drives: client::drives()
+            .await
+            .map_err(|error| OnlineAccounts::Failed { error })?,
     })
 }
 
@@ -119,12 +142,15 @@ async fn watch(events: Events) {
     }
 }
 
-async fn accounts(events: Events, Empty {}: Empty) -> Result<AccountsSnapshot, String> {
-    let snapshot = snapshot().await?;
+async fn accounts(events: Events, Empty {}: Empty) -> Result<OnlineAccounts, String> {
+    let snapshot = match snapshot().await {
+        Ok(snapshot) => snapshot,
+        Err(unavailable) => return Ok(unavailable),
+    };
     WATCH.call_once(|| {
         luft_app::spawn(watch(events));
     });
-    Ok(snapshot)
+    Ok(OnlineAccounts::Ready { snapshot })
 }
 
 fn open(Address { url, token }: Address) -> Result<(), String> {

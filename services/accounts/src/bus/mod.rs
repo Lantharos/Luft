@@ -39,6 +39,7 @@ pub async fn admit(
         .await
         .map(drop)
         .ok_or_else(|| {
+            eprintln!("Refused a caller that isn't one of {programs:?} from the system image");
             Error::NotAuthorized(
                 "Only Settings and Rover can reach your online accounts.".to_owned(),
             )

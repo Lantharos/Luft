@@ -16,11 +16,9 @@
 	import * as api from '#lib/bridge/index.js';
 	import { showPathProperties } from '#lib/features/actions.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
-	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
-	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { FileManager, PlaceMenuState, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
-	import { mainPlaces, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
-	import { hidePlace, settings, showPlace } from '#lib/state/settings.svelte.js';
+	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
+	import * as sidebar from '#lib/file-manager/places/sidebar.js';
 
 	interface Props {
 		menu: PlaceMenuState;
@@ -32,16 +30,12 @@
 
 	let place = $derived(menu.place);
 	let path = $derived(folderOf(place));
-	let opensFolder = $derived(place.kind !== 'favorite' || place.bookmark.isDir);
-	let inMainGroup = $derived(place.kind === 'folder' || place.kind === 'recent' || place.kind === 'trash');
-	let hiddenPlaces = $derived.by(() => {
-		const hidden = new Set(settings.value.hiddenPlaces);
-		return mainPlaces(manager.userDirs).filter((main) => hidden.has(main.path));
-	});
+	let shownView = $derived(place.kind === 'entry' && place.row.entry.kind === 'place' && sidebar.isView(place.row.entry.place) ? place.row.entry.place : null);
+	let opensFolder = $derived(place.kind !== 'entry' || sidebar.opensFolder(place.row.entry));
+	let missing = $derived(place.kind === 'entry' ? sidebar.missing(manager.userDirs) : []);
 
 	function folderOf(place: SidebarPlace) {
-		if (place.kind === 'folder') return place.path;
-		if (place.kind === 'favorite') return place.bookmark.path;
+		if (place.kind === 'entry') return place.row.path;
 		if (place.kind === 'drive') return place.drive.mountPoint;
 		if (place.kind === 'network') return place.entry.location?.path ?? null;
 		return null;
@@ -53,14 +47,14 @@
 	}
 
 	function open() {
-		if (place.kind === 'recent' || place.kind === 'trash') return manager.showView(place.kind);
-		if (place.kind === 'favorite') return manager.openEntry(place.bookmark);
+		if (shownView) return manager.showView(shownView);
+		if (place.kind === 'entry') return manager.openEntry({ path: path!, isDir: opensFolder });
 		if (place.kind === 'network' && !path) return manager.openAddress(place.entry.place.uri);
 		return manager.navigate(path!);
 	}
 
 	function openInTab() {
-		if (place.kind === 'recent' || place.kind === 'trash') return manager.openViewInTab(place.kind);
+		if (shownView) return manager.openViewInTab(shownView);
 		if (place.kind === 'network' && !path) return manager.openAddress(place.entry.place.uri, manager.openTab);
 		return manager.openTab(path!);
 	}
@@ -108,25 +102,21 @@
 		<MenuSeparator />
 		{@render item(Globe, t('rover-connect-to-server'), () => dialogs.connect())}
 	{/if}
-	{#if place.kind === 'folder'}
-		{@const folder = place.path}
-		{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => hidePlace(folder))}
+	{#if place.kind === 'entry'}
+		{@const key = place.row.key}
+		{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => sidebar.remove(key))}
 	{/if}
-	{#if place.kind === 'favorite'}
-		{@const bookmark = place.bookmark}
-		{@render item(Star, t('rover-menu-remove-favorite'), () => bookmarks.unpin(bookmark.path))}
-	{/if}
-	{#if (place.kind === 'folder' || place.kind === 'favorite') && opensFolder && path}
+	{#if place.kind === 'entry' && opensFolder && path}
 		{@const folder = path}
 		{@render item(Palette, t('rover-menu-change-icon'), () => changeIcon(folder).catch(manager.notify))}
 	{/if}
-	{#if inMainGroup && hiddenPlaces.length > 0}
+	{#if missing.length > 0}
 		<MenuSeparator />
-		{#each hiddenPlaces as hidden (hidden.path)}
-			{@render item(folderLooks.art(hidden.path).icon, t('rover-place-show', { name: hidden.label }), () => showPlace(hidden.path))}
+		{#each missing as absent (absent)}
+			{@render item(sidebar.placeArt(absent, manager.userDirs).icon, t('rover-place-show', { name: sidebar.placeLabel(absent, manager.userDirs) }), () => sidebar.restore(absent))}
 		{/each}
 	{/if}
-	{#if place.kind === 'trash'}
+	{#if shownView === 'trash'}
 		<MenuSeparator />
 		{@render item(Trash2, t('rover-empty-trash'), emptyTrash, true, trash.count === 0)}
 	{/if}

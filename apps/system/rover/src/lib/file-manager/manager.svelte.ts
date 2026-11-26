@@ -2,7 +2,7 @@ import { SvelteSet } from 'svelte/reactivity';
 import { t } from '@luft/i18n';
 import { appearance, basename, errorText, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
-import type { AppState, Changes, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
+import type { AppState, Changes, DriveInfo, FileEntry, GroupBy, Operation, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
 import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 import { FileActionsState } from '#lib/features/fileActions.svelte.js';
@@ -18,29 +18,23 @@ import { sortedEntries, visibleEntries } from './listing/entries';
 import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';
 import { viewModeForPath } from './listing/view-modes';
+import type { SidebarRow } from './places/sidebar';
 
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 export type SidebarPlace =
-	| { kind: 'folder'; path: string }
-	| { kind: 'favorite'; bookmark: PinnedFolder }
+	| { kind: 'entry'; row: SidebarRow }
 	| { kind: 'drive'; drive: DriveInfo }
-	| { kind: 'network'; entry: NetworkEntry }
-	| { kind: 'recent' }
-	| { kind: 'trash' };
+	| { kind: 'network'; entry: NetworkEntry };
 export type PlaceMenuState = { x: number; y: number; place: SidebarPlace };
 
 function placeKey(place: SidebarPlace): string {
 	switch (place.kind) {
-		case 'folder':
-			return `folder:${place.path}`;
-		case 'favorite':
-			return `favorite:${place.bookmark.path}`;
+		case 'entry':
+			return `entry:${place.row.key}`;
 		case 'drive':
 			return `drive:${place.drive.mountPoint}`;
 		case 'network':
 			return `network:${place.entry.place.uri}`;
-		default:
-			return place.kind;
 	}
 }
 

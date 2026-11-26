@@ -12,12 +12,11 @@ const DEFAULT_SETTINGS: Settings = {
 	sortBy: 'name',
 	sortAsc: true,
 	showHidden: false,
-	pinnedFolders: [],
+	sidebar: [],
 	gridSize: 88,
 	detailsOpen: false,
 	listColumns: DEFAULT_LIST_COLUMNS,
 	groupBy: 'none',
-	hiddenPlaces: [],
 	networkPlaces: [],
 	recentServers: [],
 	trustedFolders: []
@@ -49,14 +48,3 @@ class SettingsState {
 
 export const settings = new SettingsState();
 
-export function hidePlace(path: string) {
-	settings.update((current) => ({ ...current, hiddenPlaces: [...current.hiddenPlaces, path] }));
-}
-
-export function showPlace(path: string) {
-	settings.update((current) => ({
-		...current,
-		hiddenPlaces: current.hiddenPlaces.filter((place) => place !== path),
-		pinnedFolders: current.pinnedFolders.filter((bookmark) => bookmark.path !== path)
-	}));
-}

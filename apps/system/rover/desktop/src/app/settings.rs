@@ -46,11 +46,46 @@ pub struct ListColumn {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct PinnedFolder {
+pub struct PinnedItem {
     pub name: String,
     pub path: String,
     pub is_dir: bool,
     pub icon: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum Place {
+    Home,
+    Recent,
+    Documents,
+    Downloads,
+    Music,
+    Pictures,
+    Videos,
+    Trash,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(tag = "kind", rename_all = "lowercase")]
+pub enum SidebarEntry {
+    Place { place: Place },
+    Pinned(PinnedItem),
+}
+
+fn default_sidebar() -> Vec<SidebarEntry> {
+    [
+        Place::Home,
+        Place::Recent,
+        Place::Documents,
+        Place::Downloads,
+        Place::Music,
+        Place::Pictures,
+        Place::Videos,
+        Place::Trash,
+    ]
+    .map(|place| SidebarEntry::Place { place })
+    .into()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -66,12 +101,11 @@ pub struct Settings {
     pub sort_by: SortBy,
     pub sort_asc: bool,
     pub show_hidden: bool,
-    pub pinned_folders: Vec<PinnedFolder>,
+    pub sidebar: Vec<SidebarEntry>,
     pub grid_size: u32,
     pub details_open: bool,
     pub list_columns: Vec<ListColumn>,
     pub group_by: GroupBy,
-    pub hidden_places: Vec<String>,
     pub network_places: Vec<NetworkPlace>,
     pub recent_servers: Vec<String>,
     pub trusted_folders: Vec<String>,
@@ -84,7 +118,7 @@ impl Default for Settings {
             sort_by: SortBy::Name,
             sort_asc: true,
             show_hidden: false,
-            pinned_folders: Vec::new(),
+            sidebar: default_sidebar(),
             grid_size: 88,
             details_open: false,
             list_columns: vec![
@@ -105,7 +139,6 @@ impl Default for Settings {
                 },
             ],
             group_by: GroupBy::None,
-            hidden_places: Vec::new(),
             network_places: Vec::new(),
             recent_servers: Vec::new(),
             trusted_folders: Vec::new(),

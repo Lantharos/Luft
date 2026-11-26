@@ -12,11 +12,10 @@
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
-	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { GRID_SIZES, type ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import { mainPlaces } from '#lib/file-manager/places/places.svelte.js';
-	import { settings, showPlace } from '#lib/state/settings.svelte.js';
+	import * as sidebar from '#lib/file-manager/places/sidebar.js';
+	import { settings } from '#lib/state/settings.svelte.js';
 	import { shortcutLabel } from '#lib/utils/shortcuts.js';
 
 	interface Props {
@@ -31,10 +30,7 @@
 	let HiddenIcon = $derived(settings.value.showHidden ? Eye : EyeOff);
 	let smallest = $derived(view.gridSize <= GRID_SIZES[0]);
 	let largest = $derived(view.gridSize >= GRID_SIZES[GRID_SIZES.length - 1]);
-	let hiddenPlaces = $derived.by(() => {
-		const hidden = new Set(settings.value.hiddenPlaces);
-		return mainPlaces(manager.userDirs).filter((place) => hidden.has(place.path));
-	});
+	let missing = $derived(sidebar.missing(manager.userDirs));
 
 	function run(action: () => unknown, close: () => void) {
 		close();
@@ -75,13 +71,13 @@
 			<span class="flex-1">{t('rover-details')}</span>
 			{@render shortcut(shortcutLabel(['alt'], 'P'))}
 		</MenuItem>
-		{#if hiddenPlaces.length > 0}
+		{#if missing.length > 0}
 			<MenuSeparator />
-			{#each hiddenPlaces as place (place.path)}
-				{@const Icon = folderLooks.art(place.path).icon}
-				<MenuItem onclick={() => run(() => showPlace(place.path), close)}>
+			{#each missing as place (place)}
+				{@const Icon = sidebar.placeArt(place, manager.userDirs).icon}
+				<MenuItem onclick={() => run(() => sidebar.restore(place), close)}>
 					<Icon size={16} />
-					<span class="flex-1">{t('rover-more-show-place', { name: place.label })}</span>
+					<span class="flex-1">{t('rover-more-show-place', { name: sidebar.placeLabel(place, manager.userDirs) })}</span>
 				</MenuItem>
 			{/each}
 		{/if}

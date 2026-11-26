@@ -2,7 +2,7 @@ import { appWindow } from '@lantharos/sabine';
 import { t } from '@luft/i18n';
 import { basename, join, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
-import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/bindings.js';
+import type { ChooserConfig, FileEntry, PinnedItem } from '#lib/bindings.js';
 import { filterMatcher } from './chooser-filter';
 import { expandHome } from './location/expand';
 import type { FileManager } from './manager.svelte';
@@ -59,9 +59,9 @@ export class ChooserState {
 		if (this.accepts(entry)) void this.submit([entry.path]);
 	};
 
-	openFavorite = (favorite: PinnedFolder) => {
-		if (favorite.isDir) return void this.#manager.navigate(favorite.path);
-		if (this.accepts(favorite)) void this.submit([favorite.path]);
+	openPinned = (item: PinnedItem) => {
+		if (item.isDir) return void this.#manager.navigate(item.path);
+		if (this.accepts(item)) void this.submit([item.path]);
 	};
 
 	selectRange = (paths: string[]) => {

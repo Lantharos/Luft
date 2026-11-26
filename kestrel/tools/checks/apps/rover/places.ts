@@ -15,7 +15,6 @@ const MENU_ITEM = 38;
 const MENU_TOP = 25;
 const SEPARATOR = 9;
 const SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'rover', 'settings.json']);
-const DOCUMENTS_PATH = GLib.build_filenamev([GLib.get_home_dir(), 'Documents']);
 
 export const menuItem = ([x, y]: Point, index: number, separators = 0): Point => [x + 70, y + MENU_TOP + index * MENU_ITEM + separators * SEPARATOR];
 
@@ -34,16 +33,16 @@ export async function withUserFolders(run: () => Promise<void>) {
   }
 }
 
-const hiddenPlaces = (): string[] => exists(SETTINGS) ? JSON.parse(read(SETTINGS)).hiddenPlaces ?? [] : [];
+const documentsShown = (): boolean => !exists(SETTINGS) || JSON.parse(read(SETTINGS)).sidebar.some((entry: {place?: string}) => entry.place === 'documents');
 
 export async function checkPlaces(app: LuftApp) {
   await changes(app, "right-clicking Documents in Rover's sidebar opens its menu", () => app.click(DOCUMENTS, Clutter.BUTTON_SECONDARY));
   await changes(app, 'Rover takes Documents out of the sidebar', () => app.click(menuItem(DOCUMENTS, 2)));
-  await eventually(() => hiddenPlaces().includes(DOCUMENTS_PATH), 'Rover remembers that Documents left the sidebar');
+  await eventually(() => !documentsShown(), 'Rover remembers that Documents left the sidebar');
 
   await changes(app, "right-clicking Home in Rover's sidebar opens its menu", () => app.click(HOME, Clutter.BUTTON_SECONDARY));
   (await app.settle(() => true)).save('rover-sidebar-restore-dark');
   await changes(app, 'Rover puts Documents back in its place', () => app.click(menuItem(HOME, 4, 1)));
-  await eventually(() => !hiddenPlaces().includes(DOCUMENTS_PATH), 'Rover remembers that Documents is back in the sidebar');
+  await eventually(documentsShown, 'Rover remembers that Documents is back in the sidebar');
   (await app.settle(() => true)).save('rover-sidebar-restored-dark');
 }

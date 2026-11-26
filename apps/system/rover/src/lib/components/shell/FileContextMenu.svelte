@@ -28,7 +28,6 @@
 	import Scissors from '@luft/symbols/icons/scissors';
 	import Search from '@luft/symbols/icons/search';
 	import SquarePen from '@luft/symbols/icons/square-pen';
-	import Star from '@luft/symbols/icons/star';
 	import Terminal from '@luft/symbols/icons/terminal';
 	import Trash2 from '@luft/symbols/icons/trash-2';
 	import { t } from '@luft/i18n';
@@ -39,11 +38,9 @@
 	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
-	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
-	import { mainPlaces } from '#lib/file-manager/places/places.svelte.js';
+	import * as sidebar from '#lib/file-manager/places/sidebar.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import { hidePlace, settings, showPlace } from '#lib/state/settings.svelte.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 	import SymbolicIcon from './SymbolicIcon.svelte';
 
@@ -57,9 +54,7 @@
 	let { menu, manager, view, vcs }: Props = $props();
 
 	let target = $derived(menu.target);
-	let isPinned = $derived(Boolean(target && bookmarks.isPinned(target.path)));
-	let isMainPlace = $derived(Boolean(target && mainPlaces(manager.userDirs).some((place) => place.path === target.path)));
-	let inSidebar = $derived(Boolean(target && !settings.value.hiddenPlaces.includes(target.path)));
+	let inSidebar = $derived(Boolean(target && sidebar.contains(target.path, manager.userDirs)));
 	let offersVcs = $derived(Boolean(vcs.project && (!target || target.isDir || vcs.statusFor(target.path, false))));
 	let targets = $derived(target ? tools.targetsOf(manager, target) : []);
 	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
@@ -150,15 +145,10 @@
 		{#if target.isDir}
 			{@render item(Plus, t('rover-menu-open-in-tab'), () => manager.openTab(target.path))}
 		{/if}
-		{#if isMainPlace}
-			{#if inSidebar}
-				{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => hidePlace(target.path))}
-			{:else}
-				{@render item(PanelLeft, t('rover-menu-show-in-sidebar'), () => showPlace(target.path))}
-			{/if}
-		{/if}
-		{#if !isMainPlace || isPinned}
-			{@render item(Star, isPinned ? t('rover-menu-remove-favorite') : t('rover-menu-add-favorite'), () => bookmarks.togglePinned(target))}
+		{#if inSidebar}
+			{@render item(EyeOff, t('rover-menu-remove-from-sidebar'), () => sidebar.removePath(target.path, manager.userDirs))}
+		{:else}
+			{@render item(PanelLeft, t('rover-menu-add-to-sidebar'), () => sidebar.add([target.path], manager.entries, manager.userDirs))}
 		{/if}
 		{#if targets.every((entry) => entry.isDir)}
 			{@render item(Palette, t('rover-menu-change-icon'), () => dialogs.look(targets))}

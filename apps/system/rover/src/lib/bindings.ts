@@ -596,12 +596,14 @@ export type Palette = {
 
 export type Pause = "metered" | "battery";
 
-export type PinnedFolder = {
+export type PinnedItem = {
 	name: string,
 	path: string,
 	isDir: boolean,
 	icon: string | null,
 };
+
+export type Place = "home" | "recent" | "documents" | "downloads" | "music" | "pictures" | "videos" | "trash";
 
 export type PluggedDevice = {
 	name: string,
@@ -661,18 +663,21 @@ export type Settings = {
 	sortBy: SortBy,
 	sortAsc: boolean,
 	showHidden: boolean,
-	pinnedFolders: PinnedFolder[],
+	sidebar: SidebarEntry[],
 	gridSize: number,
 	detailsOpen: boolean,
 	listColumns: ListColumn[],
 	groupBy: GroupBy,
-	hiddenPlaces: string[],
 	networkPlaces: NetworkPlace[],
 	recentServers: string[],
 	trustedFolders: string[],
 };
 
 export type Side = "thisDevice" | "cloud";
+
+export type SidebarEntry = { kind: "place"; place: Place } | {
+	kind: "pinned",
+} & PinnedItem;
 
 export type SortBy = "name" | "size" | "date" | "type";
 

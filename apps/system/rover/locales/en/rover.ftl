@@ -174,9 +174,7 @@ rover-menu-commit-changes = Commit changes
 rover-menu-commit-file = Commit this file
 rover-menu-open-in-tab = Open in tab
 rover-menu-remove-from-sidebar = Remove from sidebar
-rover-menu-show-in-sidebar = Show in sidebar
-rover-menu-remove-favorite = Remove from Favorites
-rover-menu-add-favorite = Add to Favorites
+rover-menu-add-to-sidebar = Add to sidebar
 rover-menu-change-icon = Change icon…
 rover-menu-keep-on-device = Keep on this device
 rover-menu-copy-share-link = Copy share link
@@ -292,10 +290,9 @@ rover-place-trash = Trash
 rover-place-open-in-new-tab = Open in new tab
 # The variable is the name of a folder hidden from the sidebar, such as "Music".
 rover-place-show = Show { $name }
-rover-favorites = Favorites
 # The variable is the name of a file or folder.
-rover-favorites-remove-named = Remove { $name } from Favorites
-rover-favorites-drop = Drop to add to Favorites
+rover-sidebar-remove-named = Remove { $name } from the sidebar
+rover-sidebar-drop = Drop to add to the sidebar
 rover-cloud-heading = Cloud
 rover-cloud-add-account = Add a cloud account
 rover-cloud-add-account-short = Add an account

@@ -5761,6 +5761,7 @@ dependencies = [
  "specta-typescript",
  "tokio",
  "zbus 6.0.0",
+ "zip",
 ]
 
 [[package]]
@@ -9121,8 +9122,8 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "sabine"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "accesskit",
  "accesskit_macos",
@@ -9192,8 +9193,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "serde",
  "serde_json",
@@ -9204,8 +9205,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-dialog"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "bytemuck",
  "glyphon",
@@ -9220,8 +9221,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -9232,8 +9233,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "block2 0.6.2",
  "dispatch2",
@@ -9263,8 +9264,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "bzip2",
  "flate2",
@@ -9284,8 +9285,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.113.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.113#b1c22ad805fdbfe05731d421df6743921d267789"
+version = "0.114.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.114#e952bab9072d624344b0357ba3833a0c7e19cf7a"
 dependencies = [
  "base64 0.23.1",
  "clap",
@@ -10396,7 +10397,7 @@ version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c2499c2d826531388872b2268718aed907a39bd785ab0dcfe57fab26283f92e"
 dependencies = [
- "skrifa 0.42.1",
+ "skrifa 0.44.0",
  "yazi",
  "zeno",
 ]

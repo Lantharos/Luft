@@ -168,7 +168,7 @@ jobs:
       contents: write
       id-token: write
       attestations: write
-    uses: Lantharos/Sabine/.github/workflows/release-app.yml@b1c22ad805fdbfe05731d421df6743921d267789
+    uses: Lantharos/Sabine/.github/workflows/release-app.yml@e952bab9072d624344b0357ba3833a0c7e19cf7a
     with:
       sabine_version: ${{ needs.plan.outputs.sabine }}
       app: ${{ matrix.app.folder }}

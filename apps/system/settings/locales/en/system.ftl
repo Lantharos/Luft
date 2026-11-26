@@ -161,9 +161,6 @@ settings-updates-version-available = Version { $version } is available
 settings-updates-version-available-new = A new version is available
 settings-updates-version-staged = Version { $version } is ready to install
 settings-updates-version-staged-new = A new version is ready to install
-settings-updates-restart-return = Restart to finish going back.
-settings-updates-restart-switch = Restart to finish. Your computer is back in a few minutes.
-settings-updates-restart-install-it = Restart to install it. Your computer is back in a few minutes.
 # $when is a relative time, like 5 minutes ago
 settings-updates-last-checked = Last checked { $when }
 settings-updates-never-checked = Not checked yet

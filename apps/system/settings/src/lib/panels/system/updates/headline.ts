@@ -24,17 +24,11 @@ export function headline(overview: UpdatesOverview | null, activity: Activity) {
 	return systemHeadline(overview.system) ?? t(overview.checked ? 'settings-updates-up-to-date' : 'settings-updates-never-checked');
 }
 
-function waiting({ system }: UpdatesOverview) {
-	if (system.returning) return t('settings-updates-restart-return');
-	if (system.switching) return t('settings-updates-restart-switch');
-	return system.staged && !system.available ? t('settings-updates-restart-install-it') : null;
-}
-
 export function subline(overview: UpdatesOverview | null, activity: Activity, failure: string | null) {
 	const error = failure ?? activity.error;
 	if (error) return error;
 	if (!overview) return '';
-	const restart = waiting(overview);
-	if (restart) return restart;
+	const { returning, switching, staged, available } = overview.system;
+	if (returning || switching || (staged && !available)) return '';
 	return overview.checked ? t('settings-updates-last-checked', { when: ago(overview.checked) }) : '';
 }

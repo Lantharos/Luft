@@ -80,6 +80,7 @@ export class KestrelPanel {
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker | Meta.Display, number][] = [];
   private readonly unwatchPreferences: () => void;
   private workspaceWindows: WorkspaceWindows | null = null;
+  private openedOrder: Shell.App[] = [];
   private readonly refreshAfterMotion = () => this.refreshApps();
   private readonly updateFocusAfterMotion = () => this.taskbar.updateFocus();
 
@@ -422,13 +423,19 @@ export class KestrelPanel {
     const apps = pinned
       .map(id => this.appSystem.lookup_app(id))
       .filter((app): app is Shell.App => app !== null);
-    for (const app of this.appSystem.get_running()) {
+    for (const app of this.runningInOpenedOrder()) {
       if (!apps.some(shown => shown.id === app.id) && (!this.scoped || this.windowsOf(app).length)) apps.push(app);
     }
     for (const app of this.startingHere()) {
       if (!apps.some(shown => shown.id === app.id)) apps.push(app);
     }
     this.taskbar.update(apps);
+  }
+
+  private runningInOpenedOrder(): Shell.App[] {
+    const running = this.appSystem.get_running();
+    this.openedOrder = [...this.openedOrder.filter(app => running.includes(app)), ...running.filter(app => !this.openedOrder.includes(app))];
+    return this.openedOrder;
   }
 
   private startingHere(): Shell.App[] {

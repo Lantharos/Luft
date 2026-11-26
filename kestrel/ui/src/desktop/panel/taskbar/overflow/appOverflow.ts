@@ -139,7 +139,7 @@ export class AppOverflow implements AppsRoom {
     this.popup.update(this.button, this.list);
   }
 
-  private syncIconGeometry(): void {
+  syncIconGeometry(): void {
     if (!this.button.mapped || !this.hidden.length) return;
     const [x, y] = this.button.get_transformed_position();
     const [width, height] = this.button.get_transformed_size();

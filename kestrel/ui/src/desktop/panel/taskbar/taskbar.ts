@@ -11,6 +11,7 @@ import { AppOverflow } from './overflow/appOverflow.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
+import { whenMoved } from '../../../shared/layout/moved.js';
 import { appIcons, taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Curve, Duration, liftIcon, Spring, stillMotion } from '../../../shared/motion/motion.js';
 import { moveRows } from '../../../shared/motion/rows.js';
@@ -86,6 +87,10 @@ export class Taskbar {
       taskbarPreferences.watch(key => { if (key === 'taskbar-badges') refresh(); }),
     );
     whenPixelScaleChanges(this.actor, () => this.relayout());
+    this.disconnectors.push(whenMoved(this.actor, () => {
+      for (const item of this.items.values()) this.syncIconGeometry(item);
+      this.overflow.syncIconGeometry();
+    }));
   }
 
   shutdown(): void {

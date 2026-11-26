@@ -22,7 +22,7 @@ const UPDATER_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Upda
 export const UPDATER_NAME = 'com.lantharos.Updater1';
 export const DOWNLOAD_SIZE = 200_000_000;
 const DOWNLOAD_STEP_MS = 250;
-const DOWNLOAD_STEPS = 160;
+const DOWNLOAD_STEPS = 80;
 const IMAGE = {image: 'ghcr.io/lantharos/luft:1-nightly', transport: 'registry'};
 const CHANNEL_TAGS: Record<string, string> = {stable: '1', nightly: '1-nightly'};
 const VERSION = '1.2-nightly.21';

@@ -9,10 +9,11 @@ session_timeout=30m
 max_startup_failures=3
 max_sign_ins=8
 inotify_per_session=24
+memory_per_session_kb=$((2 * 1024 * 1024))
 declare -A screens=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm [small]=1280x720 [square]=1024x768 [portrait]=800x1280)
 taskbar_positions=(left top right)
 scaled_groups="appearance:glass board:board board:corner board:glass board:touch board:view board:x11 input:scrolling panel:battery panel:markup panel:repaints panel:screenshot"
-edge_groups="taskbar:hiddenTaskbar taskbar:taskbar taskbar:taskbarOptions gust:panel panel:motion panel:repaints panel:screenshot panel:surfaces"
+edge_groups="taskbar:hiddenTaskbar taskbar:taskbar taskbar:taskbarOptions panel:motion panel:repaints panel:screenshot panel:surfaces"
 declare -A variant_groups=(
   [laptop]="$scaled_groups input:shakePointer tablet:keyboard"
   [laptop15]="$scaled_groups windows:serverDecorations windows:x11Frames"
@@ -127,11 +128,12 @@ start_worker() {
     capture_size="${screens[$variant]}"
     captures="$KESTREL_CAPTURE_DIR/$variant"
   fi
+  [[ "$variant" == default ]] && variant=""
   mkdir -p "$captures"
   KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \
     KESTREL_CAPTURE_CLAIMED="$out/claimed" KESTREL_CAPTURE_RESULTS="$out/results" \
     KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_SECONDARY_SIZE="$secondary" KESTREL_CAPTURE_DIR="$captures" \
-    KESTREL_CAPTURE_TASKBAR="$position" KESTREL_CAPTURE_RESUMED="$resumed" \
+    KESTREL_CAPTURE_TASKBAR="$position" KESTREL_CAPTURE_VARIANT="$variant" KESTREL_CAPTURE_RESUMED="$resumed" \
     timeout "$session_timeout" "$tools/session/desktop.sh" capture >> "$out/workers/$name.log" 2>&1 &
   running[$!]="$name"
   sizes[$!]="$size"
@@ -255,6 +257,16 @@ fit_jobs_to_inotify() {
   fi
 }
 
+fit_jobs_to_memory() {
+  local fitting
+  fitting=$(($(awk '/^MemAvailable:/ { print $2 }' /proc/meminfo) / memory_per_session_kb))
+  ((fitting >= 1)) || fitting=1
+  if ((jobs > fitting)); then
+    echo "Running $fitting sessions side by side instead of $jobs: there is free memory for only $fitting." >&2
+    jobs=$fitting
+  fi
+}
+
 stop_sessions() {
   if ((${#running[@]} > 0)); then
     kill "${!running[@]}" 2> /dev/null || true
@@ -287,6 +299,7 @@ fi
 require_build
 build_helpers
 fit_jobs_to_inotify
+fit_jobs_to_memory
 started=$EPOCHREALTIME
 declare -A running=()
 declare -A sizes=()

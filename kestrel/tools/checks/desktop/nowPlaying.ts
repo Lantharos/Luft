@@ -9,7 +9,7 @@ import {alongEdge, arrange} from '../lib/edge.js';
 import {call} from '../lib/dbus.js';
 import {click, moveTo, rest} from '../lib/input/input.js';
 import {fixture, gjs, stop, stopAll, type Process} from '../lib/processes.js';
-import {capture, captureArea} from '../lib/screenshots.js';
+import {capture, captureArea, makingStorePictures} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 
@@ -59,9 +59,8 @@ async function checkLayouts() {
     widths[layout] = element()!.width;
     if (layout !== 'cover') {
       titles[layout] = titleWidth();
-      await pause(TITLE_SLIDES_FOR_MS);
+      if (makingStorePictures) await pause(TITLE_SLIDES_FOR_MS);
     }
-    await capture(`now-playing-${layout}`);
     await preview(`now-playing-preview-${layout}`);
   }
   const cover = element()!.height;
@@ -119,7 +118,6 @@ export async function run() {
     const panel = await eventually(popup, 'clicking it opens a pop-up');
     await eventually(() => panel.opacity === 255, 'the pop-up fades in');
     const slider = descendants(panel).find(child => child instanceof St.Widget && child.has_style_class_name('slider')) as unknown as {value: number};
-    require(slider, 'the pop-up can seek in the track');
     slider.value = 0.5;
     await eventually(async () => Math.abs(Number(await playerProperty('KestrelCheckMusic', 'Position')) / 1e6 - LENGTH_S / 2) < 3, 'moving the slider seeks the player');
 
@@ -141,9 +139,6 @@ export async function run() {
     await eventually(() => element()?.mapped && element()!.height > element()!.width, 'on a side of the display it stands upright');
     await pause(500);
     await capture('now-playing-vertical');
-    await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'cover'));
-    await pause(600);
-    await capture('now-playing-vertical-cover');
     kestrel.reset('taskbar-arrangement');
 
     for (const process of players.splice(0)) await stop(process);

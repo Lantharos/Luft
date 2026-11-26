@@ -27,7 +27,7 @@ The checks, stand-in services and test clients are TypeScript in `kestrel/tools`
 | Option | Effect |
 | --- | --- |
 | `--only GROUPS` | Only these comma-separated groups. An area such as `apps` runs every group in it, `apps:mailman` one |
-| `--jobs N` | Up to N sessions at once, by default one per four processors; `--jobs 1` runs every group in one session |
+| `--jobs N` | Up to N sessions at once, by default one per four processors and fewer when memory runs short; `--jobs 1` runs every group in one session |
 | `--list` | Lists the groups |
 
 Some groups also run on two laptop panels at their automatic scale, on small screens, or with the taskbar on another edge, as the groups ending in `+laptop`, `+laptop15`, `+small`, `+square`, `+portrait`, `+left`, `+top` and `+right`, with their screenshots in folders of their own.
@@ -87,11 +87,12 @@ Some checks need more of the tree built, such as Heft and Settings for the table
 
 ## Store pictures
 
-The pictures in each app's and extension's `store` folder are captures from these groups, taken over Fog, Luft's default wallpaper, so they show its gold accent:
+The pictures in each app's and extension's `store` folder are captures from these groups, taken over Fog, Luft's default wallpaper, so they show its gold accent. `KESTREL_STORE_PICTURES=1` makes the checks wait until effects and pages have filled in before taking them, which ordinary runs skip:
 
 ```sh
-KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg kestrel/tools/session.sh capture --only apps:convertible,apps:flatbed,apps:settings
-KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg KESTREL_CAPTURE_SIZE=2880x1800:332x208mm kestrel/tools/session.sh capture --only apps:heft
+export KESTREL_STORE_PICTURES=1 KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg
+kestrel/tools/session.sh capture --only apps:convertible,apps:flatbed,apps:settings,desktop:seasons,desktop:nowPlaying
+KESTREL_CAPTURE_SIZE=2880x1800:332x208mm kestrel/tools/session.sh capture --only apps:heft
 ```
 
 | Pictures | Captures |
@@ -101,6 +102,8 @@ KESTREL_CAPTURE_WALLPAPER=os/image/files/usr/share/backgrounds/luft/Fog.jpg KEST
 | Heft | `heft-split-light` and `-dark`, a textbook beside handwritten notes, at 200% |
 | Keystrokes, Soundscapes, Strays and Tailor settings | `settings-extension-<name>`, with Tailor dressing stand-ins for Spotify and Vesktop |
 | Phosphor settings | `store-settings` from `desktop:phosphorStore` |
+| Seasons | `seasons-<effect>` from `desktop:seasons` |
+| Now Playing's layout previews | `now-playing-preview-<layout>` from `desktop:nowPlaying` |
 
 Each is turned into the store's WebP with `cwebp -q 80`, keeping the file's name.
 

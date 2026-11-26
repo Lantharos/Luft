@@ -22,7 +22,8 @@ Capture options:
   --only GROUPS   Run only these comma separated groups. An area such as
                   apps runs every group in it, apps:mailman runs one.
   --jobs N        Run up to N sessions side by side (default: one per four
-                  processors, fewer when inotify instances run short).
+                  processors, fewer when memory or inotify instances run
+                  short).
                   --jobs 1 runs every group in one session.
   --list          List the groups and exit.
 

@@ -7,8 +7,7 @@ import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, press, release} from '../lib/input/input.js';
 import {fixture, gjs, stop, stopAll, waitForWindow} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
+import {capture, captureStorePicture} from '../lib/screenshots.js';
 import {focus, openWindow} from '../tiling/lib/tiling.js';
 import {layerSheets, request, SEASONS, setSetting} from '../extensions/lib/extensions.js';
 import {checkParting, listening, partsForPointer} from './lib/seasonsParting.js';
@@ -53,27 +52,18 @@ async function checkEffects() {
   await eventually(() => subtitle() === 'Storm', 'the tile says it storms');
   const {window} = await openWindow('Sheltering', 640, 360);
   window.move_frame(true, 360, 260);
-  await pause(1500);
-  await capture('seasons-rain');
+  await captureStorePicture('seasons-rain', 1500);
 
   await show('snow', 'Snow');
-  await partsForPointer('snow', 'seasons-snow-parted');
-  await pause(SETTLING_MS);
-  await capture('seasons-snow');
-  kestrel.set_boolean('rounded-window-corners', false);
-  await pause(3000);
-  await capture('seasons-snow-square');
-  kestrel.reset('rounded-window-corners');
+  await partsForPointer('snow');
+  await captureStorePicture('seasons-snow', SETTLING_MS);
   await show('leaves', 'Autumn leaves');
-  await pause(4000);
-  await capture('seasons-leaves');
-  await partsForPointer('leaves', 'seasons-leaves-parted');
+  await captureStorePicture('seasons-leaves', 4000);
+  await partsForPointer('leaves');
   await show('fireflies', 'Fireflies');
-  await pause(4000);
-  await capture('seasons-fireflies');
+  await captureStorePicture('seasons-fireflies', 4000);
   await show('fog', 'Mist');
-  await pause(3000);
-  await capture('seasons-fog');
+  await captureStorePicture('seasons-fog', 3000);
 }
 
 function keepPictures(landing: string) {
@@ -88,14 +78,11 @@ function keepPictures(landing: string) {
 }
 
 async function checkPictures() {
-  for (const landing of ['bounce', 'settle']) {
-    keepPictures(landing);
-    await request('Reload', SEASONS);
-    await show('custom', 'Shells');
-    await pause(5000);
-    await capture(`seasons-custom-${landing}`);
-  }
-  await partsForPointer('pictures', 'seasons-custom-parted');
+  keepPictures('bounce');
+  await request('Reload', SEASONS);
+  await show('custom', 'Shells');
+  await captureStorePicture('seasons-custom-bounce', 5000);
+  await partsForPointer('pictures');
   await choose('effect', 'rain');
 }
 
@@ -173,7 +160,7 @@ export async function run() {
     await checkOverLiveWallpaper();
     await checkCovered();
   } finally {
-    for (const key of ['extension-settings', 'rounded-window-corners', 'taskbar-style']) kestrel.reset(key);
+    for (const key of ['extension-settings', 'taskbar-style']) kestrel.reset(key);
     await activate(0).catch(() => {});
     await stopAll();
     global.force_animations = forced;

@@ -5,7 +5,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
-import {settled} from './wait.js';
+import {pause, settled} from './wait.js';
 
 const SAMPLE_STEP = 3;
 const CAPTURE_SETTLE = 1000;
@@ -54,6 +54,13 @@ async function shoot(stream: Gio.OutputStream, area: Area | null = null) {
 export async function capture(name: string) {
   await settled(CAPTURE_SETTLE);
   await shoot(Gio.File.new_for_path(pathFor(name)).replace(null, false, Gio.FileCreateFlags.NONE, null));
+}
+
+export const makingStorePictures = !!GLib.getenv('KESTREL_STORE_PICTURES');
+
+export async function captureStorePicture(name: string, fillsIn: number) {
+  if (makingStorePictures) await pause(fillsIn);
+  await capture(name);
 }
 
 export async function screenshot(area: Area | null = null) {

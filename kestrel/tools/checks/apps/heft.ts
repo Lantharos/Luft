@@ -1,5 +1,6 @@
 import GLib from 'gi://GLib';
 
+import {makingStorePictures} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
 import {exists, removeTree} from './lib/files.js';
@@ -15,7 +16,7 @@ export async function run() {
     await withPalette(palette => withApp('heft', [], async app => {
       app.window.unmaximize();
       app.window.move_resize_frame(true, WINDOW.x, WINDOW.y, WINDOW.width, WINDOW.height);
-      await pause(LOADING);
+      if (makingStorePictures) await pause(LOADING);
       await saveBothStyles(app, palette, 'heft-split');
     }));
   } finally {

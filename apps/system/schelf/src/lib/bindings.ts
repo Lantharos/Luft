@@ -436,6 +436,7 @@ export type Declared = {
 	x11: boolean,
 	microphone: boolean,
 	camera: boolean,
+	record_windows: boolean,
 	unsandboxed: string | null,
 };
 

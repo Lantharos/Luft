@@ -15,6 +15,7 @@ export interface Frost {
   brightness: number;
   saturation: number;
   wash: Cogl.Color | null;
+  fluted: boolean;
 }
 
 export interface FrostMonitor {
@@ -77,7 +78,7 @@ export class FrostedWallpaper {
     const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
     const { x, y, width, height } = monitor;
     this.radius = frost.radius * scaleFactor;
-    this.blur = new Shell.BlurEffect({ brightness: frost.brightness, saturation: frost.saturation, radius: this.radius });
+    this.blur = new Shell.BlurEffect({ brightness: frost.brightness, saturation: frost.saturation, radius: this.radius, fluted: frost.fluted });
 
     this.source = new Clutter.Actor({ x, y, width, height, opacity: 0 });
     this.widget = new St.Widget({ width, height });

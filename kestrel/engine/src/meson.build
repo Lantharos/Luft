@@ -117,6 +117,7 @@ libshell_sources = [
   'shell-app-scope.c',
   'shell-app-system.c',
   'shell-blur-effect.c',
+  'shell-blur-flutes.c',
   'shell-blur-outline.c',
   'shell-desktop-filter-effect.c',
   'shell-development.c',

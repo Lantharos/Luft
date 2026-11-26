@@ -6,9 +6,16 @@ import St from 'gi://St';
 import { FrostedWallpaper, type Frost, type FrostMonitor } from '../../core/stage/background/frost.js';
 import * as Main from '../../core/main.js';
 
-const FROSTS: Record<'dark' | 'light', Frost> = {
-  dark: { name: 'dark', radius: 90, downscale: 4, brightness: 0.65, saturation: 1, wash: null },
-  light: { name: 'light', radius: 90, downscale: 4, brightness: 1, saturation: 1.5, wash: new Cogl.Color({ red: 250, green: 250, blue: 252, alpha: 77 }) },
+type Scheme = 'dark' | 'light';
+
+const FROSTS: Record<Scheme, Frost> = {
+  dark: { name: 'dark', radius: 90, downscale: 4, brightness: 0.65, saturation: 1, wash: null, fluted: false },
+  light: { name: 'light', radius: 90, downscale: 4, brightness: 1, saturation: 1.5, wash: new Cogl.Color({ red: 250, green: 250, blue: 252, alpha: 77 }), fluted: false },
+};
+
+const FLUTED: Record<Scheme, Frost> = {
+  dark: { name: 'fluted-dark', radius: 8, downscale: 1, brightness: 1, saturation: 1, wash: null, fluted: true },
+  light: { name: 'fluted-light', radius: 8, downscale: 1, brightness: 1, saturation: 1, wash: null, fluted: true },
 };
 
 interface LockBackdropOptions {
@@ -30,6 +37,7 @@ export class LockBackdrop {
   readonly actor: Clutter.Actor;
   loaded!: Promise<void[]>;
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly offscreen: boolean;
   private backdrops: MonitorBackdrop[] = [];
   private retiring: MonitorBackdrop[] = [];
@@ -41,6 +49,7 @@ export class LockBackdrop {
     St.ThemeContext.get_for_stage(global.stage).connectObject('notify::scale-factor', () => this.rebuild(), this.actor);
     Main.layoutManager.connectObject('monitors-changed', () => this.rebuild(), this.actor);
     this.interfaceSettings.connectObject('changed::color-scheme', () => this.rebuild(), this.actor);
+    this.settings.connectObject('changed::lock-screen-fluted', () => this.rebuild(), this.actor);
     this.actor.connect('destroy', () => this.destroyMonitors());
 
     this.rebuild();
@@ -62,10 +71,15 @@ export class LockBackdrop {
     for (const monitor of retired) monitor.destroy();
   }
 
+  private get frost(): Frost {
+    const scheme = this.interfaceSettings.get_string('color-scheme') === 'prefer-dark' ? 'dark' : 'light';
+    return (this.settings.get_boolean('lock-screen-fluted') ? FLUTED : FROSTS)[scheme];
+  }
+
   private rebuild(): void {
     const previous = this.backdrops;
     this.retiring.push(...previous);
-    const frost = FROSTS[this.interfaceSettings.get_string('color-scheme') === 'prefer-dark' ? 'dark' : 'light'];
+    const frost = this.frost;
     this.backdrops = Main.layoutManager.monitors.map((monitor: FrostMonitor, monitorIndex: number) => {
       const display = new Clutter.Actor({ x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height, visible: !this.offscreen });
       this.actor.add_child(display);

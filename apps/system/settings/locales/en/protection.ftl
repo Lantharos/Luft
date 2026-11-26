@@ -41,6 +41,9 @@ settings-notifications-content-description = When off, only the app name is show
 settings-notifications-content-lock-screen = Show message content on the lock screen
 # Lock delay option: lock as soon as the screen turns off
 settings-privacy-lock-immediately = Immediately
+# Lock screen look: the wallpaper seen through ribbed glass instead of frosted
+settings-privacy-lock-fluted = Fluted glass
+settings-privacy-lock-fluted-description = The lock screen shows your wallpaper through ribbed glass
 
 ## Privacy: location, camera and microphone
 

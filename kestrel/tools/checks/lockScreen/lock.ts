@@ -12,6 +12,7 @@ const {require, eventually} = checks('lock screen');
 const messages = () => new MessageTray.Source({title: 'Messages', iconName: 'mail-unread-symbolic'});
 const previews = () => styled('unlock-dialog-notification-preview-title').filter(actor => actor.mapped).map(textOf);
 const namesApp = () => styled('unlock-dialog-notification-source').some(source => source.mapped && showsText('Messages', source));
+const backdrop = () => styled('kestrel-lock')[0].get_first_child()!;
 
 async function checkBanner() {
   const source = messages();
@@ -42,11 +43,17 @@ async function checkLockScreen() {
     await capture('lock-screen-content');
     source.destroy();
     await eventually(() => previews().length === 0, 'the preview goes with its app');
+    const frosted = backdrop().get_children();
+    shell.set_boolean('lock-screen-fluted', true);
+    await eventually(() => frosted.every(actor => !actor.get_parent()), 'the lock screen swaps its frosted wallpaper for fluted glass');
+    await settled();
+    await capture('lock-screen-fluted');
     await showPrompt();
     require(Main.screenShield.locked, 'a key shows the unlock prompt');
     await capture('unlock-prompt');
   } finally {
     shell.reset('lock-screen-content');
+    shell.reset('lock-screen-fluted');
     await unlock();
   }
 }

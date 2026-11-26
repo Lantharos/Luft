@@ -417,6 +417,12 @@
 			"key": "com.lantharos.kestrel lock-screen-content"
 		},
 		{
+			"id": "privacy.lock-screen-fluted",
+			"page": "privacy",
+			"title": "settings-privacy-lock-fluted",
+			"key": "com.lantharos.kestrel lock-screen-fluted"
+		},
+		{
 			"id": "privacy.crash-reports",
 			"page": "privacy",
 			"title": "settings-crash-reports",

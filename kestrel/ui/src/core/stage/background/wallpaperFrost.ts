@@ -7,8 +7,8 @@ import { FrostedWallpaper, type Frost, type FrostMonitor } from './frost.js';
 export type FrostKind = 'blurred' | 'wide';
 
 const FROSTS: Record<FrostKind, Frost> = {
-  blurred: { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null },
-  wide: { name: 'wide', radius: 300, downscale: 32, brightness: 1, saturation: 1, wash: null },
+  blurred: { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null, fluted: false },
+  wide: { name: 'wide', radius: 300, downscale: 32, brightness: 1, saturation: 1, wash: null, fluted: false },
 };
 
 export interface WallpaperPiece {

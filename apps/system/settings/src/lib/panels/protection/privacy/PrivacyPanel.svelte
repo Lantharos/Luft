@@ -17,6 +17,7 @@
 	type Location = { enabled: boolean };
 	type Notifications = { 'show-in-lock-screen': boolean };
 	type Lookups = { 'online-lookups': boolean };
+	type LockLook = { 'lock-screen-fluted': boolean };
 	type Housekeeping = { 'remove-old-screenshots': boolean };
 	type Privacy = {
 		'disable-camera': boolean;
@@ -33,6 +34,7 @@
 	const location = useSettings<Location>('org.gnome.system.location', ['enabled']);
 	const notifications = useSettings<Notifications>('org.gnome.desktop.notifications', ['show-in-lock-screen']);
 	const lookups = useSettings<Lookups>(KESTREL_SCHEMA, ['online-lookups']);
+	const lockLook = useSettings<LockLook>(KESTREL_SCHEMA, ['lock-screen-fluted']);
 	const housekeeping = useSettings<Housekeeping>('com.lantharos.kestrel.housekeeping', ['remove-old-screenshots']);
 	const privacy = useSettings<Privacy>('org.gnome.desktop.privacy', [
 		'disable-camera',
@@ -102,6 +104,13 @@
 		<Switch label={t('settings-notifications-show-lock-screen')} checked={lockScreen} onchange={(on) => notifications.set('show-in-lock-screen', on)} />
 	</Row>
 	<MessageContent {lockScreen} />
+	<Row title={t('settings-privacy-lock-fluted')} description={t('settings-privacy-lock-fluted-description')}>
+		<Switch
+			label={t('settings-privacy-lock-fluted')}
+			checked={lockLook.values['lock-screen-fluted'] ?? false}
+			onchange={(on) => lockLook.set('lock-screen-fluted', on)}
+		/>
+	</Row>
 </Section>
 
 <Section title={t('settings-privacy-app-access')}>

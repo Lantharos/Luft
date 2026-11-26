@@ -117,6 +117,14 @@
         show their content; other apps show their name and a count.
       </description>
     </key>
+    <key name="lock-screen-fluted" type="b">
+      <default>false</default>
+      <summary>Show the wallpaper on the lock screen through fluted glass</summary>
+      <description>
+        When enabled, the lock screen shows the wallpaper lightly blurred
+        behind upright glass ribs instead of frosted.
+      </description>
+    </key>
     <key name="gust-layout" type="s">
       <default>'{"items":["net.imput.helium.desktop","com.lantharos.rover.desktop","com.lantharos.mailman.desktop","com.lantharos.draft.desktop","com.lantharos.magpie.desktop","com.lantharos.terminal.desktop","com.lantharos.schelf.desktop","com.lantharos.settings.desktop"],"folders":{}}'</default>
       <summary>Apps pinned to Gust, in order, and their folders</summary>

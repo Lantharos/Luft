@@ -442,6 +442,7 @@ export namespace Shell {
             "notify::brightness": (pspec: GObject.ParamSpec) => void;
             "notify::corner-radius": (pspec: GObject.ParamSpec) => void;
             "notify::dark-lift": (pspec: GObject.ParamSpec) => void;
+            "notify::fluted": (pspec: GObject.ParamSpec) => void;
             "notify::mode": (pspec: GObject.ParamSpec) => void;
             "notify::radius": (pspec: GObject.ParamSpec) => void;
             "notify::saturation": (pspec: GObject.ParamSpec) => void;
@@ -460,6 +461,7 @@ export namespace Shell {
             cornerRadius: number;
             dark_lift: number;
             darkLift: number;
+            fluted: boolean;
             mode: BlurMode;
             radius: number;
             saturation: number;
@@ -491,6 +493,8 @@ export namespace Shell {
 
         get darkLift(): number;
         set darkLift(val: number);
+
+        get fluted(): boolean;
 
         get mode(): BlurMode;
         set mode(val: BlurMode);

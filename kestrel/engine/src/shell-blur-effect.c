@@ -26,6 +26,7 @@
 
 #include "shell-blur-effect.h"
 #include "shell-backdrop.h"
+#include "shell-blur-flutes.h"
 #include "shell-blur-outline.h"
 #include "shell-global.h"
 
@@ -53,6 +54,10 @@
  * colour, see meta_compositor_add_frosted_wallpaper().
  * @SHELL_BLUR_STYLE_NIKO and @SHELL_BLUR_STYLE_NIKO_WALLPAPER blur the same
  * way as Luca and its wallpaper, and take the lightness of the Niko tint.
+ *
+ * A #ShellBlurEffect:fluted effect shows its blur through upright ribs that
+ * each mirror and compress what is behind them like a cylindrical lens, toned
+ * to the lightness of the glass surface colour.
  */
 
 static const gchar *position_glsl_declarations =
@@ -204,6 +209,7 @@ struct _ShellBlurEffect
   ShellBlurStyle style;
   float brightness;
   int radius;
+  gboolean fluted;
 };
 
 G_DEFINE_TYPE (ShellBlurEffect, shell_blur_effect, CLUTTER_TYPE_EFFECT)
@@ -218,6 +224,7 @@ enum {
   PROP_SATURATION,
   PROP_MODE,
   PROP_STYLE,
+  PROP_FLUTED,
   N_PROPS
 };
 
@@ -261,11 +268,14 @@ create_base_pipeline (CoglContext *ctx)
 }
 
 static CoglPipeline*
-create_brightness_pipeline (CoglContext *ctx)
+create_brightness_pipeline (CoglContext *ctx,
+                            gboolean     fluted)
 {
   static CoglPipelineKey brightness_pipeline_key = "shell-blur-effect-brightness";
+  static CoglPipelineKey fluted_pipeline_key = "shell-blur-effect-brightness-fluted";
+  CoglPipelineKey *key = fluted ? &fluted_pipeline_key : &brightness_pipeline_key;
   CoglPipeline *brightness_pipeline =
-    cogl_context_get_named_pipeline (ctx, &brightness_pipeline_key);
+    cogl_context_get_named_pipeline (ctx, key);
 
   if (G_UNLIKELY (brightness_pipeline == NULL))
     {
@@ -286,14 +296,14 @@ create_brightness_pipeline (CoglContext *ctx)
       cogl_pipeline_add_snippet (brightness_pipeline, snippet);
       g_object_unref (snippet);
 
-      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
-                                  brightness_glsl_declarations,
-                                  brightness_glsl);
+      snippet = fluted ?
+        shell_blur_fluted_snippet (brightness_glsl_declarations, brightness_glsl) :
+        cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+                          brightness_glsl_declarations,
+                          brightness_glsl);
       cogl_pipeline_add_snippet (brightness_pipeline, snippet);
       g_object_unref (snippet);
-      cogl_context_set_named_pipeline (ctx,
-                                       &brightness_pipeline_key,
-                                       brightness_pipeline);
+      cogl_context_set_named_pipeline (ctx, key, brightness_pipeline);
     }
 
   return cogl_pipeline_copy (brightness_pipeline);
@@ -319,7 +329,7 @@ create_pipelines (ShellBlurEffect *self,
                   CoglContext     *ctx)
 {
   self->actor_fb.pipeline = create_base_pipeline (ctx);
-  self->brightness_fb.pipeline = create_brightness_pipeline (ctx);
+  self->brightness_fb.pipeline = create_brightness_pipeline (ctx, self->fluted);
   self->brightness_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "brightness");
   self->surface_size_uniform =
@@ -482,6 +492,7 @@ update_brightness (ShellBlurEffect *self,
   gboolean background = self->mode == SHELL_BLUR_MODE_BACKGROUND;
   SurfaceShade shade = surface_shade (self);
   CoglColor color;
+  float luminosity;
   float size[2];
 
   clutter_actor_get_size (self->actor, &size[0], &size[1]);
@@ -500,6 +511,8 @@ update_brightness (ShellBlurEffect *self,
                                 background && !is_niko (self->style) ? GRAIN : 0.f);
   cogl_pipeline_set_uniform_1f (pipeline, self->speckle_uniform,
                                 background && is_niko (self->style) ? NIKO_SPECKLE : 0.f);
+  if (self->fluted)
+    shell_blur_set_flutes (pipeline, meta_compositor_get_glass_surface (get_compositor (), &luminosity));
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -944,7 +957,7 @@ wallpaper_pipeline (ShellBlurEffect *self,
 
   while (self->wallpaper_pipelines->len <= index)
     g_ptr_array_add (self->wallpaper_pipelines,
-                     create_brightness_pipeline (get_cogl_context ()));
+                     create_brightness_pipeline (get_cogl_context (), self->fluted));
 
   pipeline = g_ptr_array_index (self->wallpaper_pipelines, index);
   if (cogl_pipeline_get_layer_texture (pipeline, 0) != texture)
@@ -1169,6 +1182,10 @@ shell_blur_effect_get_property (GObject    *object,
       g_value_set_enum (value, self->style);
       break;
 
+    case PROP_FLUTED:
+      g_value_set_boolean (value, self->fluted);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -1238,6 +1255,10 @@ shell_blur_effect_set_property (GObject      *object,
 
     case PROP_STYLE:
       shell_blur_effect_set_style (self, g_value_get_enum (value));
+      break;
+
+    case PROP_FLUTED:
+      self->fluted = g_value_get_boolean (value);
       break;
 
     default:
@@ -1315,6 +1336,11 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
                        SHELL_BLUR_STYLE_LUCA,
                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
+  properties[PROP_FLUTED] =
+    g_param_spec_boolean ("fluted", NULL, NULL,
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -1328,7 +1354,6 @@ shell_blur_effect_init (ShellBlurEffect *self)
 
   self->backdrops = shell_backdrop_cache_new ();
   self->wallpaper_pipelines = g_ptr_array_new_with_free_func (g_object_unref);
-  create_pipelines (self, get_cogl_context ());
 }
 
 ShellBlurEffect *

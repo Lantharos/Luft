@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import '@luft/ui/styles.css';
+
+@layer components {
+	.chip {
+		display: inline-flex;
+		height: 32px;
+		align-items: center;
+		gap: 6px;
+		border-radius: var(--radius-pill);
+		background: var(--surface);
+		padding-inline: 12px;
+		color: var(--text-soft);
+		font-size: 12.5px;
+		font-weight: 500;
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.chip:hover:not(:disabled) {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.chip:disabled {
+		opacity: 0.4;
+	}
+
+	.board-tool {
+		display: grid;
+		height: 42px;
+		width: 42px;
+		place-items: center;
+		border-radius: var(--radius-pill);
+		color: var(--text-soft);
+		transition: background-color var(--motion-tap) var(--ease-decelerate), color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.board-tool:hover {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.board-tool.is-active {
+		background: var(--control-hover);
+		color: var(--text);
+	}
+
+	.chip.is-on {
+		background: var(--control-hover);
+		color: var(--text);
+	}
+}

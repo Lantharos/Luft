@@ -1,0 +1,37 @@
+[package]
+name = "easel"
+version = "0.1.0"
+description = "An image editor and whiteboard for Luft"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "easel_lib"
+
+[dependencies]
+dirs.workspace = true
+fast_image_resize.workspace = true
+gio.workspace = true
+glycin = { workspace = true, features = ["tokio"] }
+jpeg-encoder.workspace = true
+krilla = { workspace = true, features = ["raster-images"] }
+krilla-svg.workspace = true
+luft-app = { workspace = true, features = ["settings", "thumbnails"] }
+luft-i18n.workspace = true
+parking_lot.workspace = true
+png.workspace = true
+rayon.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+usvg.workspace = true
+webp.workspace = true
+zip = { workspace = true }
+zstd.workspace = true
+
+[lints]
+workspace = true

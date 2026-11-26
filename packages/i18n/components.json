@@ -57,6 +57,8 @@
 	{"name": "keys-desktop", "bundle": "keys-desktop", "mask": "apps/system/keys/desktop/locales/*/desktop.ftl", "sources": ["apps/system/keys/desktop/src"]},
 	{"name": "draft", "bundle": "draft", "mask": "apps/store/draft/locales/*/draft.ftl", "sources": ["apps/store/draft/src"]},
 	{"name": "draft-desktop", "bundle": "draft-desktop", "mask": "apps/store/draft/desktop/locales/*/desktop.ftl", "sources": ["apps/store/draft/desktop/src"]},
+	{"name": "easel", "bundle": "easel", "mask": "apps/store/easel/locales/*/easel.ftl", "sources": ["apps/store/easel/src"]},
+	{"name": "easel-desktop", "bundle": "easel-desktop", "mask": "apps/store/easel/desktop/locales/*/desktop.ftl", "sources": ["apps/store/easel/desktop/src"]},
 	{"name": "magpie", "bundle": "magpie", "mask": "apps/store/magpie/locales/*/magpie.ftl", "sources": ["apps/store/magpie/src"]},
 	{"name": "magpie-desktop", "bundle": "magpie-desktop", "mask": "apps/store/magpie/desktop/locales/*/desktop.ftl", "sources": ["apps/store/magpie/desktop/src"]},
 	{"name": "mailman", "bundle": "mailman", "mask": "apps/store/mailman/locales/*/mailman.ftl", "sources": ["apps/store/mailman/src/App.svelte", "apps/store/mailman/src/lib/app", "apps/store/mailman/src/lib/bridge", "apps/store/mailman/src/lib/list", "apps/store/mailman/src/lib/mail", "apps/store/mailman/src/lib/reader", "apps/store/mailman/src/lib/shell", "apps/store/mailman/src/lib/sidebar"]},

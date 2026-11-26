@@ -1,0 +1,7 @@
+{
+	"extends": "@luft/ui/tsconfig.base.json",
+	"compilerOptions": {
+		"types": ["node", "vite/client", "@webgpu/types"]
+	},
+	"include": ["src", "vite.config.ts"]
+}

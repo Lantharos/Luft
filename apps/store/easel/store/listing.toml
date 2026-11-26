@@ -1,0 +1,11 @@
+name = "Easel"
+summary = "Quick photo edits, deep image work and a whiteboard for ideas"
+description = "Crop, adjust and mark up a picture in seconds, work with layers when it takes more, and sketch ideas and diagrams on an endless board."
+keywords = ["image editor", "photo editor", "paint", "drawing", "draw", "sketch", "crop", "resize", "markup", "annotate", "layers", "whiteboard", "diagram", "brainstorm"]
+icon = "icon.svg"
+screenshots = ["editor.webp", "board.webp"]
+categories = ["Graphics", "Office"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#6a76f5"
+listed = false

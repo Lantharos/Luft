@@ -1,0 +1,16 @@
+id = "com.lantharos.easel"
+kind = "app"
+format = "sabine"
+permissions = "Sabine.toml"
+listing = "store/"
+licence = "GPL-3.0-or-later"
+repository = "Lantharos/Luft"
+
+[requires]
+sabine = "0.114"
+
+[channels.stable]
+keep = 3
+
+[channels.nightly]
+keep = 2

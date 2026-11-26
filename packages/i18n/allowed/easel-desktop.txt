@@ -1,0 +1,1 @@
+apps/store/easel/desktop/src/lib.rs	Easel

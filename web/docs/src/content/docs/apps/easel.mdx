@@ -1,0 +1,86 @@
+---
+title: Easel
+description: Quick photo edits, layered image work and a whiteboard for ideas.
+sidebar:
+  order: 13
+asks:
+  - image editor
+  - photo editor
+  - paint
+  - paint.net
+  - photoshop
+  - gimp
+  - mspaint
+  - whiteboard
+  - excalidraw
+  - { ask: crop a photo, to: quick-edits }
+  - { ask: blur a face, to: quick-edits }
+  - { ask: annotate a screenshot, to: quick-edits }
+  - { ask: resize a picture, to: quick-edits }
+  - { ask: layers, to: working-with-layers }
+  - { ask: magic wand, to: selecting }
+  - { ask: diagram, to: the-whiteboard }
+  - { ask: sticky notes, to: the-whiteboard }
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Easel edits pictures and holds a whiteboard. Opening a picture from Rover, or with **Open with**, gives quick edits. The editor has layers, selections and brushes for more, and **New board** starts an endless board for sketches and diagrams.
+
+<Shot name="easel" alt="Easel editing a photo with a text layer" />
+
+## Quick edits
+
+A picture you open from Rover shows on its own, with the kinds of edit along the bottom:
+
+- **Crop** to a free shape, the original's, a square, 16:9, 4:3 or 9:16. **Straighten** levels a tilted horizon, and the buttons beside it rotate and flip.
+- **Adjust** light, contrast, colour, warmth and sharpness, or press **Auto**.
+- **Mark up** with a pen, arrows, boxes and text.
+- **Hide** blurs or blacks out what you drag over, such as a face or a number.
+- **Size** makes the picture smaller.
+
+**Done** asks whether to replace the original or save a copy. **Open in editor** takes the picture, with your edits, into the editor.
+
+## Working with layers
+
+The editor's tools are on the left and the current tool's settings are on the right, above the layers. Each layer can be hidden, locked, renamed, made see-through or blended with the layers under it, and the menu beside **Layers** duplicates, merges down and deletes. Drag layers to reorder them. Text stays editable: pick the text tool and click the text.
+
+Easel saves layered work as an `.easel` file, which keeps every layer. **Export** writes PNG, JPEG, WebP or AVIF, at the size and quality you choose.
+
+## Selecting
+
+The select tool draws rectangles and ellipses, the lasso draws freely, and the magic wand picks similar colours. Hold <kbd>Shift</kbd> to add to a selection and <kbd>Alt</kbd> to take away from it, or choose **Add** or **Subtract**. **Feather** softens its edge. A selection limits painting, filling and moving to what's inside it.
+
+## Painting and drawing
+
+The brush and the eraser follow pen pressure, with size, hardness, opacity and smoothing. The **paint bucket** pours a colour into an area, **Gradient** blends the two colours in the corner along a line or out from a point, and **Shapes** draws boxes, ellipses, lines and arrows. The colour picker takes a colour from the picture; hold <kbd>Alt</kbd> to set the second colour.
+
+Pinch, or hold <kbd>Ctrl</kbd> and scroll, to zoom. Hold <kbd>Space</kbd> and drag, drag with the middle button, or swipe with two fingers to move around.
+
+## The whiteboard
+
+A board has no edges. Draw with the pen or the highlighter, and erase whole strokes with the eraser, or with the eraser end of a pen; a finger moves the board.
+
+- Draw a box, a circle or a line and hold still at the end: it becomes a clean shape.
+- Arrows started or ended on a shape stay attached to it when it moves.
+- Double-click a shape or a note to write in it.
+- Drop or paste pictures onto the board.
+- Drag over empty space to select several things, and group them with <kbd>Ctrl</kbd>+<kbd>G</kbd>.
+
+Boards export to PNG, JPEG, WebP, AVIF, SVG and PDF.
+
+## Keyboard shortcuts
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> | New image, new board |
+| <kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>Ctrl</kbd>+<kbd>E</kbd> | Save, export |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Undo, redo |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd> / <kbd>Ctrl</kbd>+<kbd>D</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> | Select all, deselect, invert the selection |
+| <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> | Copy, cut, paste |
+| <kbd>Ctrl</kbd>+<kbd>0</kbd> / <kbd>Ctrl</kbd>+<kbd>1</kbd> | Fit, actual size |
+| <kbd>V</kbd> <kbd>M</kbd> <kbd>L</kbd> <kbd>W</kbd> <kbd>B</kbd> <kbd>E</kbd> <kbd>G</kbd> <kbd>D</kbd> <kbd>T</kbd> <kbd>U</kbd> <kbd>I</kbd> <kbd>C</kbd> | Move, select, lasso, magic wand, brush, eraser, fill, gradient, text, shapes, colour picker, crop |
+| <kbd>[</kbd> / <kbd>]</kbd> | Smaller and larger brush |
+| <kbd>X</kbd> | Swap the two colours |
+| <kbd>V</kbd> <kbd>P</kbd> <kbd>H</kbd> <kbd>E</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>T</kbd> <kbd>N</kbd> | On a board: select, pen, highlighter, eraser, shapes, arrow, text, sticky note |
+| <kbd>Ctrl</kbd>+<kbd>G</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> | On a board: group, ungroup |

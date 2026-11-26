@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+	<defs>
+		<linearGradient id="es-l" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#f0b06a"/>
+			<stop offset="1" stop-color="#c0752f"/>
+		</linearGradient>
+		<linearGradient id="es-c" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffffff"/>
+			<stop offset="1" stop-color="#ece6ff"/>
+		</linearGradient>
+		<linearGradient id="es-a" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#7f8dff"/>
+			<stop offset="1" stop-color="#5461ef"/>
+		</linearGradient>
+		<linearGradient id="es-b" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffa07a"/>
+			<stop offset="1" stop-color="#ff6a58"/>
+		</linearGradient>
+		<clipPath id="es-k">
+			<rect x="12" y="18" width="21" height="21" rx="5.5"/>
+		</clipPath>
+	</defs>
+	<path d="M29.5 4h5l18 53.5a2.8 2.8 0 0 1-5.3 1.8L32 16 16.8 59.3a2.8 2.8 0 0 1-5.3-1.8Z" fill="url(#es-l)"/>
+	<rect x="7" y="8" width="50" height="36" rx="4.5" fill="url(#es-c)"/>
+	<rect x="12" y="18" width="21" height="21" rx="5.5" fill="url(#es-a)"/>
+	<circle cx="39.5" cy="23.5" r="11.5" fill="url(#es-b)"/>
+	<circle cx="39.5" cy="23.5" r="11.5" fill="#9a45cc" clip-path="url(#es-k)"/>
+	<rect x="25" y="4" width="14" height="7" rx="2.5" fill="#93511f"/>
+	<rect x="4" y="42" width="56" height="6.5" rx="3.25" fill="#93511f"/>
+</svg>

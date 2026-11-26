@@ -1,0 +1,3 @@
+apps/store/easel/src/lib/editor/settings.svelte.ts	Open Runde
+apps/store/easel/src/lib/editor/options/TextOptions.svelte	Open Runde
+apps/store/easel/src/lib/editor/options/TextOptions.svelte	Maple Mono NF

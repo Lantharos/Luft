@@ -8,6 +8,7 @@ use specta::Type;
 use super::album;
 use super::cache::{self, Source, ThumbnailSize};
 use super::child::Cancellation;
+use super::easel;
 use super::raster;
 use super::system::{Failure, Registry};
 
@@ -44,6 +45,8 @@ pub(super) fn thumbnail(
     let mime = content_type(&source.path);
     let generated = if raster::decodes(&mime, source.bytes) {
         raster::render(&source.path, size.pixels())
+    } else if easel::is_document(&mime, &source.path) {
+        easel::render(&source.path, size.pixels())
     } else {
         let thumbnailed = match registry.find(&mime) {
             Some(thumbnailer) => match thumbnailer.run(&source, size, cancellation) {

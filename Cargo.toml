@@ -5,6 +5,7 @@ members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/easel/desktop",
     "apps/store/flatbed/desktop",
     "apps/store/heft/desktop",
     "apps/system/keys/desktop",
@@ -102,6 +103,7 @@ default-members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/easel/desktop",
     "apps/store/flatbed/desktop",
     "apps/store/heft/desktop",
     "apps/system/keys/desktop",
@@ -305,6 +307,7 @@ jpeg-encoder = "0.7.1"
 jxl-oxide = { version = "0.12.6", features = ["image"] }
 kamadak-exif = "0.6.1"
 krilla = { version = "0.8.2", default-features = false, features = ["simple-text"] }
+krilla-svg = "0.8.1"
 landlock = "0.4.7"
 lettre = { version = "0.11.23", default-features = false }
 libc = "0.2.191"
@@ -391,6 +394,7 @@ uefi = { version = "0.41.0", features = ["alloc", "global_allocator"] }
 unic-langid = "0.9.6"
 ureq = { version = "3.4.2", features = ["platform-verifier"] }
 url = "2.5.8"
+usvg = "0.47.0"
 uzers = "0.12.2"
 walkdir = "2.5.0"
 wayland-client = "0.31.15"

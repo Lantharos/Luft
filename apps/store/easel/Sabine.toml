@@ -1,0 +1,45 @@
+[app]
+id = "com.lantharos.easel"
+name = "Easel"
+generic_name = "Image Editor"
+categories = ["Graphics", "2DGraphics", "RasterGraphics"]
+keywords = ["image editor", "photo editor", "paint", "drawing", "draw", "sketch", "crop", "resize", "markup", "annotate", "layers", "whiteboard", "diagram", "brainstorm", "paint.net", "photoshop", "gimp", "krita", "pinta", "mspaint", "excalidraw"]
+version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = [
+	"application/vnd.lantharos.easel",
+	"image/png",
+	"image/jpeg",
+	"image/webp",
+	"image/avif",
+	"image/gif",
+	"image/bmp",
+	"image/tiff",
+	"image/heic",
+	"image/heif"
+]
+
+[app.extensions]
+"application/vnd.lantharos.easel" = ["easel"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true
+
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It opens and saves pictures wherever they are, and decodes them in sandboxes of its own, which can't start inside another one."
+
+[bindings]
+path = "src/lib/bindings.ts"

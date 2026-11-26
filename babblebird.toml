@@ -104,6 +104,10 @@ name = "Heft"
 files = ["apps/store/heft/**/locales/{lang}/*.ftl"]
 
 [[areas]]
+name = "Easel"
+files = ["apps/store/easel/**/locales/{lang}/*.ftl"]
+
+[[areas]]
 name = "Magpie"
 files = ["apps/store/magpie/**/locales/{lang}/*.ftl"]
 

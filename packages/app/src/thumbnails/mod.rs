@@ -1,6 +1,7 @@
 mod album;
 mod cache;
 mod child;
+mod easel;
 mod generate;
 mod priority;
 mod raster;

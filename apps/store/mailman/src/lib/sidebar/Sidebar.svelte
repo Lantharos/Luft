@@ -61,8 +61,8 @@
 	});
 </script>
 
-<aside class="glass-sidebar drag-region">
-	<div class="flex h-[60px] flex-none items-center gap-2 px-3">
+<aside class="glass-sidebar drag-region gap-3 p-(--sheet-inset)">
+	<div class="flex flex-none items-center gap-2">
 		<button type="button" class="write" class:rail aria-label={rail ? t('mailman-sidebar-write') : undefined} onclick={() => composer.start()} {@attach tooltip(t('mailman-sidebar-write-tooltip'))}>
 			<PenLine size={rail ? 18 : 16} />
 			{#if !rail}<span>{t('mailman-sidebar-write')}</span>{/if}
@@ -74,11 +74,11 @@
 		{/if}
 	</div>
 	{#if !rail}
-		<div class="flex-none px-3 pb-3">
+		<div class="flex-none">
 			<SearchField bind:this={search} bind:value={query} label={t('mailman-sidebar-search')} variant="sidebar" onkeydown={searchKey} />
 		</div>
 	{/if}
-	<nav class="scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 pb-3" class:hidden-scroll={rail} {@attach selectionPill()}>
+	<nav class="scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" class:hidden-scroll={rail} {@attach selectionPill()}>
 		{#if rail}
 			<NavItem label={t('mailman-sidebar-search')} icon={Search} active={list.searching} {rail} onclick={onsearch} />
 		{/if}

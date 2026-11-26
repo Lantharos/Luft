@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import type { Context } from '../context.js';
 import type { AppearanceService } from '../appearance/service.js';
@@ -11,6 +12,7 @@ import { ContextMenus, type MenuEntry } from '../desktop/menus/contextMenus.js';
 import { coveredMonitors } from '../desktop/panel/coverage.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import { PanelSet } from '../desktop/panel/panels.js';
+import { systemMonitor } from '../desktop/panel/widgets/systemMonitor.js';
 import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
 import { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import { OverflowPopup } from '../desktop/panel/taskbar/overflow/overflowPopup.js';
@@ -45,6 +47,8 @@ import { TaskbarEditor } from '../desktop/panel/editing/editor.js';
 import { TaskbarService } from '../desktop/panel/editing/service.js';
 import { SystemServices } from '../system/services.js';
 import { PenActions } from '../system/hardware/pens/actions.js';
+
+const TERMINAL = 'com.lantharos.terminal.desktop';
 
 
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
@@ -335,9 +339,17 @@ export class DesktopUi {
 
   private desktopMenu(): MenuEntry[] {
     const { shown, touch } = this.panels.primary.screen;
+    const terminal = Shell.AppSystem.get_default().lookup_app(TERMINAL);
+    const monitor = systemMonitor();
+    const tools = [
+      ...terminal ? [{ label: t('desktop-menu-terminal'), run: () => terminal.activate() }] : [],
+      ...monitor ? [{ label: t('taskbar-system-monitor'), run: () => monitor.activate() }] : [],
+    ];
     return [
       { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance/wallpaper') },
       { label: t('desktop-menu-display-settings'), run: () => this.menus.settings('display') },
+      ...tools.length ? ['separator' as const, ...tools] : [],
+      'separator',
       ...shown && !touch ? [{ label: t('taskbar-arrange'), run: () => this.arrangeTaskbar() }] : [],
       { label: t('desktop-menu-settings'), run: () => this.menus.settings() },
     ];

@@ -3,6 +3,7 @@
 # Menu shown when right-clicking the desktop.
 desktop-menu-wallpaper = Change wallpaper
 desktop-menu-display-settings = Display settings
+desktop-menu-terminal = Terminal
 desktop-menu-settings = Settings
 
 ## Battery

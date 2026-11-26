@@ -43,9 +43,15 @@ export async function promote(id: string, version: string, channel: string, note
   return read<Release>(await request(`${id}/promote`, { method: 'POST', body: JSON.stringify({ version, channel, notes }) }));
 }
 
+const INDEX_ATTEMPTS = 4;
+const INDEX_RETRY_MS = 5000;
+
 export async function listed(index: string) {
-  const response = await fetch(`${INDEX}/${index}.json`);
-  if (response.status === 404) return [];
-  if (!response.ok) throw new Error(`schelf.store answered ${response.status} for ${index}`);
-  return ((await response.json()) as { releases: IndexRelease[] }).releases;
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(`${INDEX}/${index}.json`);
+    if (response.status === 404) return [];
+    if (response.ok) return ((await response.json()) as { releases: IndexRelease[] }).releases;
+    if (response.status < 500 || attempt === INDEX_ATTEMPTS) throw new Error(`schelf.store answered ${response.status} for ${index}`);
+    await Bun.sleep(INDEX_RETRY_MS * attempt);
+  }
 }

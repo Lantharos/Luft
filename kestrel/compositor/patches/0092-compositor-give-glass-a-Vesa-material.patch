@@ -1,0 +1,371 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 25 Nov 2026 17:33:21 +0100
+Subject: [PATCH] compositor: give glass a Vesa material
+
+Vesa glass blurs like Luca, and on app glass lights the window's
+rounded edges with a narrow rim in the colour of the glass behind it:
+brightest on the corner facing a light above and to the left, fading
+along the two edges that meet there, back at a lower strength on the
+opposite corner, and never gone anywhere along the outline. It never
+bends what is behind a window, since a bend along a long window edge
+looks like a fault in the glass. Apps hear it as its own material,
+draw their own tint over it like over Luca and can ask for it. A third
+frosted wallpaper, barely softened, is there for Vesa shell glass that
+blurs only the wallpaper.
+
+Upstream-Status: luft-only Kestrel's Vesa material
+---
+ src/compositor/compositor.c                   | 18 +++++-
+ src/compositor/meta-background-blur-private.h |  2 +
+ src/compositor/meta-background-effect.c       |  5 +-
+ src/compositor/meta-background-wallpaper.c    |  8 +++
+ src/compositor/meta-glass.h                   |  3 +
+ src/compositor/meta-window-corners.c          | 59 ++++++++++++++++++-
+ src/compositor/meta-window-corners.h          |  1 +
+ src/meta/compositor.h                         |  5 ++
+ src/wayland/meta-wayland-kestrel-glass.c      |  6 ++
+ src/wayland/protocol/kestrel-glass-v1.xml     | 19 +++---
+ 10 files changed, 113 insertions(+), 13 deletions(-)
+
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 04f81917f65277021c4c771440691ec9ad531402..fa40ad3b444e12cf246900659c752d62a3cbfb05 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -151,7 +151,7 @@ typedef struct _MetaCompositorPrivate
+   float background_blur_radius;
+   float background_saturation;
+   float background_noise;
+-  GArray *frosted_wallpaper[2];
++  GArray *frosted_wallpaper[3];
+   MetaGlassStyle glass_windows;
+   MetaGlassStyle glass_transients;
+   gboolean luca_from_wallpaper;
+@@ -1459,6 +1459,7 @@ meta_compositor_dispose (GObject *object)
+   g_clear_pointer (&priv->uncovered, mtk_region_unref);
+   g_clear_pointer (&priv->frosted_wallpaper[META_WALLPAPER_FROST_BLURRED], g_array_unref);
+   g_clear_pointer (&priv->frosted_wallpaper[META_WALLPAPER_FROST_WIDE], g_array_unref);
++  g_clear_pointer (&priv->frosted_wallpaper[META_WALLPAPER_FROST_CLEAR], g_array_unref);
+ 
+   G_OBJECT_CLASS (meta_compositor_parent_class)->dispose (object);
+ }
+@@ -1750,6 +1751,15 @@ niko_material (MetaCompositor *compositor)
+   return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_NIKO_WALLPAPER : META_GLASS_MATERIAL_NIKO;
+ }
+ 
++static MetaGlassMaterial
++vesa_material (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->luca_from_wallpaper ? META_GLASS_MATERIAL_VESA_WALLPAPER : META_GLASS_MATERIAL_VESA;
++}
++
+ MetaGlassMaterial
+ meta_compositor_get_glass_material (MetaCompositor       *compositor,
+                                     MetaGlassRole         role,
+@@ -1767,6 +1777,8 @@ meta_compositor_get_glass_material (MetaCompositor       *compositor,
+       return luca_material (compositor);
+     case META_GLASS_PREFERENCE_NIKO:
+       return niko_material (compositor);
++    case META_GLASS_PREFERENCE_VESA:
++      return vesa_material (compositor);
+     case META_GLASS_PREFERENCE_USER:
+       break;
+     }
+@@ -1778,6 +1790,8 @@ meta_compositor_get_glass_material (MetaCompositor       *compositor,
+       return META_GLASS_MATERIAL_SURFACE;
+     case META_GLASS_STYLE_NIKO:
+       return niko_material (compositor);
++    case META_GLASS_STYLE_VESA:
++      return vesa_material (compositor);
+     case META_GLASS_STYLE_LUCA:
+       break;
+     }
+@@ -1843,7 +1857,7 @@ meta_compositor_clear_frosted_wallpaper (MetaCompositor     *compositor,
+  *
+  * Adds a piece of blurred wallpaper that glass shows instead of blurring
+  * what is behind it: the blurred one for Luca glass that blurs only the
+- * wallpaper, the wide one for Maris.
++ * wallpaper, the wide one for Maris and the clear one for Vesa shell glass.
+  */
+ void
+ meta_compositor_add_frosted_wallpaper (MetaCompositor     *compositor,
+diff --git a/src/compositor/meta-background-blur-private.h b/src/compositor/meta-background-blur-private.h
+index c76b682c40b769846d299c2fca8cf637def918ac..bd68fe9e00de1812d16d1a5628cef43f1503bbdd 100644
+--- a/src/compositor/meta-background-blur-private.h
++++ b/src/compositor/meta-background-blur-private.h
+@@ -146,6 +146,8 @@ void meta_background_apply_corners (const MetaBackgroundPaint *paint,
+ 
+ gboolean meta_background_is_niko (MetaGlassMaterial material);
+ 
++gboolean meta_background_is_vesa (MetaGlassMaterial material);
++
+ void meta_background_add_glass_effect (const MetaBackgroundPaint *paint,
+                                        CoglPipeline              *pipeline);
+ 
+diff --git a/src/compositor/meta-background-effect.c b/src/compositor/meta-background-effect.c
+index 0ab5f3ddb72bf977f5269b58d5ce5f8be09cc64e..d4a9d0217270d14424d2bc0d22fd9ff8c82c911d 100644
+--- a/src/compositor/meta-background-effect.c
++++ b/src/compositor/meta-background-effect.c
+@@ -112,7 +112,10 @@ meta_background_apply_corners (const MetaBackgroundPaint *paint,
+   corners.bounds.origin.x -= space->origin.x;
+   corners.bounds.origin.y -= space->origin.y;
+   corners.radius *= paint->transform.scale;
+-  meta_window_corners_apply (&corners, META_WINDOW_CORNER_FILL_CLEAR, pipeline,
++  meta_window_corners_apply (&corners,
++                             meta_background_is_vesa (paint->material) ?
++                             META_WINDOW_CORNER_FILL_RIM : META_WINDOW_CORNER_FILL_CLEAR,
++                             pipeline,
+                              (int) roundf (space->size.width),
+                              (int) roundf (space->size.height));
+ }
+diff --git a/src/compositor/meta-background-wallpaper.c b/src/compositor/meta-background-wallpaper.c
+index f5de599f915959a28bffa23193e4f0f6f81b8bda..a52ea2c4cdf396236d50da014ffc510880c50e42 100644
+--- a/src/compositor/meta-background-wallpaper.c
++++ b/src/compositor/meta-background-wallpaper.c
+@@ -59,6 +59,13 @@ meta_background_is_niko (MetaGlassMaterial material)
+     material == META_GLASS_MATERIAL_NIKO_WALLPAPER;
+ }
+ 
++gboolean
++meta_background_is_vesa (MetaGlassMaterial material)
++{
++  return material == META_GLASS_MATERIAL_VESA ||
++    material == META_GLASS_MATERIAL_VESA_WALLPAPER;
++}
++
+ void
+ meta_background_add_glass_effect (const MetaBackgroundPaint *paint,
+                                   CoglPipeline              *pipeline)
+@@ -147,6 +154,7 @@ meta_background_shows_wallpaper (MetaCompositor    *compositor,
+ 
+   return material != META_GLASS_MATERIAL_LIVE &&
+     material != META_GLASS_MATERIAL_NIKO &&
++    material != META_GLASS_MATERIAL_VESA &&
+     meta_compositor_get_frosted_wallpaper (compositor, frost_of (material), 0, &area);
+ }
+ 
+diff --git a/src/compositor/meta-glass.h b/src/compositor/meta-glass.h
+index 7b1d9b33c33c2dc9b07b1e7945588ff1f69905bf..1ac077d48a7bfca0abe9be64dab36813b80f5d67 100644
+--- a/src/compositor/meta-glass.h
++++ b/src/compositor/meta-glass.h
+@@ -24,6 +24,8 @@ typedef enum
+   META_GLASS_MATERIAL_SURFACE,
+   META_GLASS_MATERIAL_NIKO,
+   META_GLASS_MATERIAL_NIKO_WALLPAPER,
++  META_GLASS_MATERIAL_VESA,
++  META_GLASS_MATERIAL_VESA_WALLPAPER,
+ } MetaGlassMaterial;
+ 
+ typedef enum
+@@ -38,4 +40,5 @@ typedef enum
+   META_GLASS_PREFERENCE_LUCA,
+   META_GLASS_PREFERENCE_MARIS,
+   META_GLASS_PREFERENCE_NIKO,
++  META_GLASS_PREFERENCE_VESA,
+ } MetaGlassPreference;
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index 913c5bd8668ec5399f21dc0134989aa587954274..5fac748f433d9c90eb7d185016a65058ce6a11c4 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -447,6 +447,50 @@ get_shadow_snippet (void)
+   return snippet;
+ }
+ 
++static CoglSnippet *
++get_rim_snippet (void)
++{
++  static CoglSnippet *snippet;
++
++  if (!snippet)
++    {
++      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
++        CORNER_DECLARATIONS
++        "uniform vec4 kestrel_radii;\n",
++        "float pixel = kestrel_pixel_size ();\n"
++        "vec2 half_size = kestrel_bounds.zw * 0.5;\n"
++        "vec2 offset = kestrel_position - kestrel_bounds.xy - half_size;\n"
++        "float radius = offset.y < 0.0 ?\n"
++        "  (offset.x < 0.0 ? kestrel_radii.x : kestrel_radii.y) :\n"
++        "  (offset.x < 0.0 ? kestrel_radii.w : kestrel_radii.z);\n"
++        "vec2 q = abs(offset) - half_size + radius;\n"
++        "float distance = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;\n"
++        "cogl_color_out *= clamp(0.5 - distance / pixel, 0.0, 1.0);\n"
++        "vec2 outward = sign(offset) * (all(greaterThan(q, vec2(0.0))) ? normalize(q) :\n"
++        "  (q.x > q.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0)));\n"
++        "float inside = max(-distance, 0.0);\n"
++        "float width = max(1.2, 1.5 * pixel);\n"
++        "float facing = dot(normalize(outward + offset / half_size * 1.5), vec2(-0.7071, -0.7071));\n"
++        "float lobe = pow(abs(facing), 3.0) * (facing > 0.0 ? 1.0 : 0.6);\n"
++        "float line = clamp(1.0 - inside / width, 0.0, 1.0) +\n"
++        "  0.21 * clamp(1.0 - inside / (4.0 * width), 0.0, 1.0);\n"
++        "vec3 color = cogl_color_out.rgb / max(cogl_color_out.a, 0.001);\n"
++        "float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));\n"
++        "float groove = smoothstep(0.5 * width, 1.5 * width, inside) *\n"
++        "  (1.0 - smoothstep(1.5 * width, 3.5 * width, inside));\n"
++        "float shade = groove * 0.18 * smoothstep(0.45, 0.85, luma) * (1.0 - lobe);\n"
++        "color = mix(vec3(luma), color, 1.0 + shade) * (1.0 - shade);\n"
++        "float peak = max(max(color.r, color.g), color.b);\n"
++        "vec3 hue = mix(vec3(1.0), color / max(peak, 0.001), smoothstep(0.0, 0.08, peak));\n"
++        "hue = mix(vec3(dot(hue, vec3(0.2126, 0.7152, 0.0722))), hue, 1.3);\n"
++        "vec3 glare = mix(mix(color, hue, 0.78), vec3(1.0), 0.115 * lobe * lobe);\n"
++        "color = mix(color, glare, min(line * mix(0.14, 1.0, lobe) * 0.7, 1.0));\n"
++        "cogl_color_out.rgb = clamp(color, 0.0, 1.0) * cogl_color_out.a;\n");
++    }
++
++  return snippet;
++}
++
+ void
+ meta_window_corners_apply (const MetaWindowCorners *corners,
+                            MetaWindowCornerFill     fill,
+@@ -461,9 +505,18 @@ meta_window_corners_apply (const MetaWindowCorners *corners,
+     return;
+ 
+   cogl_pipeline_add_snippet (pipeline, get_vertex_snippet ());
+-  cogl_pipeline_add_snippet (pipeline,
+-                             fill == META_WINDOW_CORNER_FILL_SHADOW ?
+-                             get_shadow_snippet () : get_clear_snippet ());
++  switch (fill)
++    {
++    case META_WINDOW_CORNER_FILL_CLEAR:
++      cogl_pipeline_add_snippet (pipeline, get_clear_snippet ());
++      break;
++    case META_WINDOW_CORNER_FILL_SHADOW:
++      cogl_pipeline_add_snippet (pipeline, get_shadow_snippet ());
++      break;
++    case META_WINDOW_CORNER_FILL_RIM:
++      cogl_pipeline_add_snippet (pipeline, get_rim_snippet ());
++      break;
++    }
+   bounds[0] = width;
+   bounds[1] = height;
+   location = cogl_pipeline_get_uniform_location (pipeline, "kestrel_size");
+diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
+index e3ebbcd6cfea265f8b94ad3bacabfaca965bdb26..8338977057c91064239a6fde7e1cf52cc0ea44b2 100644
+--- a/src/compositor/meta-window-corners.h
++++ b/src/compositor/meta-window-corners.h
+@@ -28,6 +28,7 @@ typedef enum
+ {
+   META_WINDOW_CORNER_FILL_CLEAR,
+   META_WINDOW_CORNER_FILL_SHADOW,
++  META_WINDOW_CORNER_FILL_RIM,
+ } MetaWindowCornerFill;
+ 
+ void meta_window_corners_set_rounded (gboolean rounded);
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index 1e29fb506a3153e0133e11da211818011bdbacca..88ed52b72b212ca899f0a8fdd7ef7398018fee81 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -126,12 +126,15 @@ void meta_compositor_get_background_blur_params (MetaCompositor *compositor,
+  * @META_GLASS_STYLE_NIKO: glass blurs what is behind it, or only the
+  *   wallpaper whenever Luca does, and takes the luminosity and some of the
+  *   hue of the Niko tint, like Acrylic, see meta_compositor_set_niko_tint()
++ * @META_GLASS_STYLE_VESA: glass blurs like Luca and catches light along
++ *   the edges of its window, like liquid glass
+  */
+ typedef enum
+ {
+   META_GLASS_STYLE_LUCA,
+   META_GLASS_STYLE_MARIS,
+   META_GLASS_STYLE_NIKO,
++  META_GLASS_STYLE_VESA,
+ } MetaGlassStyle;
+ 
+ /**
+@@ -139,11 +142,13 @@ typedef enum
+  * @META_WALLPAPER_FROST_BLURRED: the wallpaper blurred like Luca glass
+  * @META_WALLPAPER_FROST_WIDE: the wallpaper blurred so wide that only its
+  *   colours are left, for Maris
++ * @META_WALLPAPER_FROST_CLEAR: the wallpaper barely softened, for Vesa
+  */
+ typedef enum
+ {
+   META_WALLPAPER_FROST_BLURRED,
+   META_WALLPAPER_FROST_WIDE,
++  META_WALLPAPER_FROST_CLEAR,
+ } MetaWallpaperFrost;
+ 
+ META_EXPORT
+diff --git a/src/wayland/meta-wayland-kestrel-glass.c b/src/wayland/meta-wayland-kestrel-glass.c
+index 39bba81bc5e17df9082a16f97f616f30318784e2..f111b5b368fe0466a22c40b6c8a08527c4dc78f1 100644
+--- a/src/wayland/meta-wayland-kestrel-glass.c
++++ b/src/wayland/meta-wayland-kestrel-glass.c
+@@ -48,6 +48,9 @@ material_of (MetaGlassMaterial material)
+     case META_GLASS_MATERIAL_NIKO:
+     case META_GLASS_MATERIAL_NIKO_WALLPAPER:
+       return KESTREL_GLASS_V1_MATERIAL_NIKO;
++    case META_GLASS_MATERIAL_VESA:
++    case META_GLASS_MATERIAL_VESA_WALLPAPER:
++      return KESTREL_GLASS_V1_MATERIAL_VESA;
+     case META_GLASS_MATERIAL_LIVE:
+     case META_GLASS_MATERIAL_WALLPAPER:
+       break;
+@@ -160,6 +163,9 @@ glass_set_preference (struct wl_client   *client,
+     case KESTREL_GLASS_V1_PREFERENCE_NIKO:
+       set_preference (glass, META_GLASS_PREFERENCE_NIKO);
+       break;
++    case KESTREL_GLASS_V1_PREFERENCE_VESA:
++      set_preference (glass, META_GLASS_PREFERENCE_VESA);
++      break;
+     default:
+       set_preference (glass, META_GLASS_PREFERENCE_USER);
+       break;
+diff --git a/src/wayland/protocol/kestrel-glass-v1.xml b/src/wayland/protocol/kestrel-glass-v1.xml
+index 8f51209a4be7bf4437890e493b680d9aa1e07c38..0fe97f444b85ab4264d870eb4c0ce705500db981 100644
+--- a/src/wayland/protocol/kestrel-glass-v1.xml
++++ b/src/wayland/protocol/kestrel-glass-v1.xml
+@@ -26,16 +26,18 @@
+   <interface name="kestrel_glass_manager_v1" version="1">
+     <description summary="the material of a surface's glass">
+       Glass is the part of a surface a client asks to blur through
+-      ext_background_effect_v1. Kestrel draws it as one of three materials:
++      ext_background_effect_v1. Kestrel draws it as one of four materials:
+       Luca, a blur of what is behind the surface or only of the wallpaper;
+       Maris, the desktop's surface colour over a wide blur of the wallpaper
+-      that covers most of it; and Niko, a blur of what is behind the surface
+-      that takes the lightness of the surface colour.
++      that covers most of it; Niko, a blur of what is behind the surface
++      that takes the lightness of the surface colour; and Vesa, Luca's blur
++      with light caught along the window's edges.
+ 
+       Through a glass object, a client says what kind of surface the glass
+       belongs to and which material it would like, and hears which material
+-      the glass has. A client draws its own tint over Luca glass, and none
+-      over Maris or Niko glass, which already are the whole surface.
++      the glass has. A client draws its own tint over Luca and Vesa glass,
++      and none over Maris or Niko glass, which already are the whole
++      surface.
+     </description>
+ 
+     <enum name="error">
+@@ -80,6 +82,7 @@
+       <entry name="luca" value="1" summary="Luca"/>
+       <entry name="maris" value="2" summary="Maris"/>
+       <entry name="niko" value="3" summary="Niko"/>
++      <entry name="vesa" value="4" summary="Vesa"/>
+     </enum>
+ 
+     <enum name="material">
+@@ -89,6 +92,8 @@
+              summary="the surface colour over a wide blur of the wallpaper"/>
+       <entry name="niko" value="2"
+              summary="a blur of what is behind, or of the wallpaper only, in the lightness of the surface colour"/>
++      <entry name="vesa" value="3"
++             summary="a blur of what is behind, or of the wallpaper only, that catches light along the window's edges"/>
+     </enum>
+ 
+     <request name="destroy" type="destructor">
+@@ -105,8 +110,8 @@
+ 
+     <request name="set_preference">
+       <description summary="ask for a material">
+-        Maris is always granted. Luca and Niko are granted too, and then blur
+-        only the wallpaper whenever the person's Luca glass does, such as
++        Maris is always granted. Luca, Niko and Vesa are granted too, and then
++        blur only the wallpaper whenever the person's Luca glass does, such as
+         while the power saver is on. The default is user.
+       </description>
+       <arg name="preference" type="uint" enum="preference"/>

@@ -110,6 +110,8 @@ export namespace Shell {
         MARIS = 2,
         NIKO = 3,
         NIKO_WALLPAPER = 4,
+        VESA = 5,
+        VESA_WALLPAPER = 6,
     }
 
 
@@ -535,6 +537,8 @@ export namespace Shell {
         emit<K extends keyof BlurEffect.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<BlurEffect.SignalSignatures[K]>): void;
 
         // Methods
+        add_lens(lens: St.Widget): void;
+
         clear_outline_shade(): void;
 
         get_brightness(): number;

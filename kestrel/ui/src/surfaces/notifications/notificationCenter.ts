@@ -10,7 +10,7 @@ import St from 'gi://St';
 import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
-import { blurSurface } from '../../shared/layout/surface.js';
+import { blurSurface, glassControl } from '../../shared/layout/surface.js';
 import { Calendar } from './calendar/calendar.js';
 import { MediaCard } from './media.js';
 
@@ -57,6 +57,7 @@ export class NotificationCenter {
 
     this.media = new MediaCard(() => { if (this.actor.visible) this.layoutChanged(); });
     this.actor.add_child(this.media.actor);
+    glassControl(this.actor, this.media.actor);
     this.header.add_child(new St.Label({
       text: t('notifications-title'),
       style_class: 'kestrel-section-title',
@@ -141,6 +142,7 @@ export class NotificationCenter {
           actor => ensureActorVisibleInScrollView(this.scroll, actor), () => { if (this.actor.visible) this.layoutChanged(); });
         this.groups.set(source, group);
         this.list.add_child(group.actor);
+        glassControl(this.actor, group.actor);
       }
       const leaping = leapt.has(group.actor);
       group.refresh(this.actor.visible, animate && !added && !leaping);

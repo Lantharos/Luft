@@ -16,5 +16,6 @@ CoglPipeline *shell_backdrop_capture (GHashTable          *cache,
 ShellBackdropSpread *shell_backdrop_spread_new (ClutterActorMeta *effect,
                                                 GHashTable       *cache);
 void shell_backdrop_spread_set_reach (ShellBackdropSpread *spread,
-                                      float                reach);
+                                      float                reach,
+                                      float                margin);
 void shell_backdrop_spread_free (ShellBackdropSpread *spread);

@@ -22,6 +22,7 @@ export type GlassKind = 'taskbar' | 'surfaces' | 'windows' | 'see-through';
 
 const LUCA_RADIUS = 30;
 const NIKO_RADIUS = 60;
+const VESA_RADIUS = 4;
 
 const surfaces = new Set<Backdrop>();
 const cornered = new Set<Backdrop>();
@@ -79,9 +80,15 @@ function followTheme(actor: St.Widget, effect: Shell.BlurEffect): void {
   });
 }
 
+const RADII: Partial<Record<Shell.BlurStyle, number>> = {
+  [Shell.BlurStyle.NIKO]: NIKO_RADIUS,
+  [Shell.BlurStyle.NIKO_WALLPAPER]: NIKO_RADIUS,
+  [Shell.BlurStyle.VESA]: VESA_RADIUS,
+  [Shell.BlurStyle.VESA_WALLPAPER]: VESA_RADIUS,
+};
+
 function blurRadius(kind: GlassKind): number {
-  const niko = styles[kind] === Shell.BlurStyle.NIKO || styles[kind] === Shell.BlurStyle.NIKO_WALLPAPER;
-  return (niko ? NIKO_RADIUS : LUCA_RADIUS) * St.ThemeContext.get_for_stage(global.stage).scale_factor;
+  return (RADII[styles[kind]] ?? LUCA_RADIUS) * St.ThemeContext.get_for_stage(global.stage).scale_factor;
 }
 
 function applyStyle(effect: Shell.BlurEffect, kind: GlassKind): void {
@@ -124,6 +131,10 @@ export function blurSurface(actor: St.Widget, corners = 24, kind: GlassKind = 's
   if (solid) makeSolid(surface, true);
   if (square) followCorners(surface);
   actor.connect('destroy', () => surfaces.delete(surface));
+}
+
+export function glassControl(surface: St.Widget, control: St.Widget): void {
+  (surface.get_effect('backdrop') as Shell.BlurEffect).add_lens(control);
 }
 
 export function styleSurface(actor: St.Widget, corners = 24): void {

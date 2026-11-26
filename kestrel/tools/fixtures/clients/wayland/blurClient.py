@@ -11,8 +11,8 @@ GET_BACKGROUND_EFFECT, SET_BLUR_REGION = 1, 1
 GET_GLASS, SET_ROLE, SET_PREFERENCE = 1, 1, 2
 MATERIAL = 0
 ROLES = {"window": 0, "transient": 1}
-PREFERENCES = {"user": 0, "luca": 1, "maris": 2, "niko": 3}
-MATERIALS = ("luca", "maris", "niko")
+PREFERENCES = {"user": 0, "luca": 1, "maris": 2, "niko": 3, "vesa": 4}
+MATERIALS = ("luca", "maris", "niko", "vesa")
 
 
 def main():

@@ -28,6 +28,7 @@
 #include "shell-backdrop.h"
 #include "shell-blur-flutes.h"
 #include "shell-blur-outline.h"
+#include "shell-blur-vesa.h"
 #include "shell-global.h"
 
 #include "shell-enum-types.h"
@@ -58,6 +59,11 @@
  * A #ShellBlurEffect:fluted effect shows its blur through upright ribs that
  * each mirror and compress what is behind them like a cylindrical lens, toned
  * to the lightness of the glass surface colour.
+ *
+ * @SHELL_BLUR_STYLE_VESA and @SHELL_BLUR_STYLE_VESA_WALLPAPER blur like Luca
+ * and its wallpaper too, bend and light what they show along the edge, and
+ * do the same along the edge of every lens added with
+ * shell_blur_effect_add_lens().
  */
 
 static const gchar *position_glsl_declarations =
@@ -67,11 +73,13 @@ static const gchar *position_glsl_declarations =
 static const gchar *position_glsl =
 "  surface_position = surface_map.xy + cogl_tex_coord0_in.xy * surface_map.zw; \n";
 
-static const gchar *brightness_glsl_declarations =
+static const gchar *surface_glsl_declarations =
 "varying vec2 surface_position;                                            \n"
-"uniform float brightness;                                                 \n"
 "uniform vec2 surface_size;                                                \n"
-"uniform float corner_radius;                                              \n"
+"uniform float corner_radius;                                              \n";
+
+static const gchar *brightness_glsl_declarations =
+"uniform float brightness;                                                 \n"
 "uniform float bright_dim;                                                 \n"
 "uniform float dark_lift;                                                  \n"
 "uniform float saturation;                                                 \n"
@@ -144,11 +152,16 @@ static const gchar *brightness_glsl =
 "  vec2 q = p - half_size + vec2(r);                                        \n"
 "  float d = length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - r;       \n"
 "  if (corner_radius > 0.0)                                                \n"
-"    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d);                      \n";
+"    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d * max(vesa, 1.0));    \n";
 
 #define RESULT_SIZE_STEP 64
 #define GRAIN 0.005f
 #define NIKO_SPECKLE 0.02f
+#define VESA_BACKGROUND 0.35f
+#define VESA_SHADING 0.4f
+
+static const float WHOLE_EXTENT[2] = { 1.f, 1.f };
+static const float WHOLE_BOUNDS[4] = { 0.f, 0.f, 1.f, 1.f };
 
 typedef enum
 {
@@ -173,6 +186,12 @@ struct _ShellBlurEffect
   unsigned int tex_height;
   unsigned int result_width;
   unsigned int result_height;
+  float result_extent[2];
+  float open_edges[4];
+  float room[4];
+  float scale;
+  GPtrArray *lenses;
+  float result_bounds[4];
   ClutterActorBox paint_box;
 
   /* The cached contents */
@@ -213,6 +232,8 @@ struct _ShellBlurEffect
 };
 
 G_DEFINE_TYPE (ShellBlurEffect, shell_blur_effect, CLUTTER_TYPE_EFFECT)
+
+static GList *surfaces;
 
 enum {
   PROP_0,
@@ -296,6 +317,12 @@ create_brightness_pipeline (CoglContext *ctx,
       cogl_pipeline_add_snippet (brightness_pipeline, snippet);
       g_object_unref (snippet);
 
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+                                  surface_glsl_declarations,
+                                  NULL);
+      cogl_pipeline_add_snippet (brightness_pipeline, snippet);
+      g_object_unref (snippet);
+      shell_blur_vesa_add_refraction (brightness_pipeline);
       snippet = fluted ?
         shell_blur_fluted_snippet (brightness_glsl_declarations, brightness_glsl) :
         cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
@@ -303,6 +330,7 @@ create_brightness_pipeline (CoglContext *ctx,
                           brightness_glsl);
       cogl_pipeline_add_snippet (brightness_pipeline, snippet);
       g_object_unref (snippet);
+      shell_blur_vesa_add_lighting (brightness_pipeline);
       cogl_context_set_named_pipeline (ctx, key, brightness_pipeline);
     }
 
@@ -418,9 +446,16 @@ is_niko (ShellBlurStyle style)
 }
 
 static gboolean
+is_vesa (ShellBlurStyle style)
+{
+  return style == SHELL_BLUR_STYLE_VESA || style == SHELL_BLUR_STYLE_VESA_WALLPAPER;
+}
+
+static gboolean
 is_live (ShellBlurStyle style)
 {
-  return style == SHELL_BLUR_STYLE_LUCA || style == SHELL_BLUR_STYLE_NIKO;
+  return style == SHELL_BLUR_STYLE_LUCA || style == SHELL_BLUR_STYLE_NIKO ||
+    style == SHELL_BLUR_STYLE_VESA;
 }
 
 static void
@@ -450,6 +485,21 @@ copy_color (const CoglColor *color,
   out[2] = cogl_color_get_blue (color);
 }
 
+static void
+cancel_background (const CoglColor *background,
+                   float            kept,
+                   float           *cancel)
+{
+  float alpha = cogl_color_get_alpha (background);
+  float shown = alpha * kept;
+
+  copy_color (background, cancel);
+  cancel[0] *= (alpha - shown) / (1.f - shown);
+  cancel[1] *= (alpha - shown) / (1.f - shown);
+  cancel[2] *= (alpha - shown) / (1.f - shown);
+  cancel[3] = 1.f - (1.f - alpha) / (1.f - shown);
+}
+
 static SurfaceShade
 surface_shade (ShellBlurEffect *self)
 {
@@ -472,24 +522,50 @@ surface_shade (ShellBlurEffect *self)
       own_background (self, &background);
       copy_color (tint, shade.tint);
       shade.hue = cogl_color_get_alpha (tint);
-      copy_color (&background, shade.cancel);
-      shade.cancel[3] = cogl_color_get_alpha (&background);
-      shade.cancel[0] *= shade.cancel[3];
-      shade.cancel[1] *= shade.cancel[3];
-      shade.cancel[2] *= shade.cancel[3];
+      cancel_background (&background, 0.f, shade.cancel);
+    }
+  else if (is_vesa (self->style))
+    {
+      own_background (self, &background);
+      cancel_background (&background, VESA_BACKGROUND, shade.cancel);
     }
 
   return shade;
+}
+
+static gboolean
+find_open_edges (ShellBlurEffect *self,
+                 float           *open)
+{
+  MetaDisplay *display = shell_global_get_display (shell_global_get ());
+  graphene_rect_t extents;
+  MtkRectangle area, monitor;
+
+  clutter_actor_get_transformed_extents (self->actor, &extents);
+  mtk_rectangle_from_graphene_rect (&extents, MTK_ROUNDING_STRATEGY_ROUND, &area);
+  meta_display_get_monitor_geometry (display,
+                                     meta_display_get_monitor_index_for_rect (display, &area),
+                                     &monitor);
+  open[0] = area.x > monitor.x;
+  open[1] = area.y > monitor.y;
+  open[2] = area.x + area.width < monitor.x + monitor.width;
+  open[3] = area.y + area.height < monitor.y + monitor.height;
+  return open[0] && open[1] && open[2] && open[3];
 }
 
 static void
 update_brightness (ShellBlurEffect *self,
                    CoglPipeline    *pipeline,
                    const float     *map,
+                   const float     *extent,
+                   const float     *bounds,
                    uint8_t          paint_opacity)
 {
-  gboolean shaded = self->style == SHELL_BLUR_STYLE_LUCA || self->style == SHELL_BLUR_STYLE_WALLPAPER;
+  gboolean shaded = self->style == SHELL_BLUR_STYLE_LUCA || self->style == SHELL_BLUR_STYLE_WALLPAPER ||
+    is_vesa (self->style);
   gboolean background = self->mode == SHELL_BLUR_MODE_BACKGROUND;
+  gboolean vesa = background && is_vesa (self->style) && !self->fluted;
+  float shading = is_vesa (self->style) ? VESA_SHADING : 1.f;
   SurfaceShade shade = surface_shade (self);
   CoglColor color;
   float luminosity;
@@ -499,9 +575,10 @@ update_brightness (ShellBlurEffect *self,
   cogl_pipeline_set_uniform_float (pipeline, self->surface_size_uniform, 2, 1, size);
   cogl_pipeline_set_uniform_float (pipeline, self->surface_map_uniform, 4, 1, map);
   cogl_pipeline_set_uniform_1f (pipeline, self->corner_radius_uniform, self->corner_radius);
-  cogl_pipeline_set_uniform_1f (pipeline, self->bright_dim_uniform, shaded ? self->bright_dim : 0.f);
-  cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, shaded ? self->dark_lift : 0.f);
-  cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform, shaded ? self->saturation : 1.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->bright_dim_uniform, shaded ? self->bright_dim * shading : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->dark_lift_uniform, shaded ? self->dark_lift * shading : 0.f);
+  cogl_pipeline_set_uniform_1f (pipeline, self->saturation_uniform,
+                                shaded ? 1.f + (self->saturation - 1.f) * shading : 1.f);
   cogl_pipeline_set_uniform_1f (pipeline, self->brightness_uniform, self->brightness);
   cogl_pipeline_set_uniform_float (pipeline, self->surface_tint_uniform, 4, 1, shade.tint);
   cogl_pipeline_set_uniform_1f (pipeline, self->surface_luminosity_uniform, shade.luminosity);
@@ -513,6 +590,8 @@ update_brightness (ShellBlurEffect *self,
                                 background && is_niko (self->style) ? NIKO_SPECKLE : 0.f);
   if (self->fluted)
     shell_blur_set_flutes (pipeline, meta_compositor_get_glass_surface (get_compositor (), &luminosity));
+  shell_blur_vesa_set_uniforms (pipeline, vesa ? self->scale : 0.f, map, extent, bounds,
+                                self->open_edges, self->room, self->actor, self->lenses);
 
   cogl_color_init_from_4f (&color,
                            paint_opacity / 255.0, paint_opacity / 255.0,
@@ -592,12 +671,95 @@ show_result_area (ShellBlurEffect *self)
   graphene_matrix_init_scale (&matrix, self->result_width / width, self->result_height / height, 1.f);
   cogl_pipeline_set_layer_matrix (self->brightness_fb.pipeline, 0, &matrix);
   cogl_pipeline_set_uniform_float (self->brightness_fb.pipeline, self->result_area_end_uniform, 2, 1, end);
+  self->result_extent[0] = self->result_width / width;
+  self->result_extent[1] = self->result_height / height;
+  self->result_bounds[0] = 0.5f / width;
+  self->result_bounds[1] = 0.5f / height;
+  self->result_bounds[2] = end[0];
+  self->result_bounds[3] = end[1];
 }
 
 static float
 blur_reach (ShellBlurEffect *self)
 {
   return ceilf (1.5f * self->radius);
+}
+
+static float
+lens_band (ShellBlurEffect *self)
+{
+  float width, height;
+
+  if (self->mode != SHELL_BLUR_MODE_BACKGROUND || !is_vesa (self->style))
+    return 0.f;
+
+  clutter_actor_get_size (self->actor, &width, &height);
+  return shell_blur_vesa_reach (self->corner_radius, width, height);
+}
+
+static gboolean
+lies_beside (ShellBlurEffect *self,
+             ShellBlurEffect *other)
+{
+  return other != self && other->mode == SHELL_BLUR_MODE_BACKGROUND &&
+    clutter_actor_is_mapped (other->actor) &&
+    clutter_actor_get_paint_opacity (other->actor) > 0 &&
+    !clutter_actor_contains (other->actor, self->actor) &&
+    !clutter_actor_contains (self->actor, other->actor);
+}
+
+static void
+find_room (ShellBlurEffect *self)
+{
+  float reach = lens_band (self);
+  graphene_rect_t own, grown;
+  GList *l;
+
+  self->room[0] = self->room[1] = self->room[2] = self->room[3] = reach;
+  if (self->style != SHELL_BLUR_STYLE_VESA)
+    return;
+
+  clutter_actor_get_transformed_extents (self->actor, &own);
+  graphene_rect_inset_r (&own, -reach, -reach, &grown);
+  for (l = surfaces; l; l = l->next)
+    {
+      ShellBlurEffect *other = l->data;
+      graphene_rect_t box;
+      float left, top, right, bottom;
+
+      if (!lies_beside (self, other))
+        continue;
+
+      clutter_actor_get_transformed_extents (other->actor, &box);
+      if (!graphene_rect_intersection (&grown, &box, NULL))
+        continue;
+
+      left = own.origin.x - (box.origin.x + box.size.width);
+      top = own.origin.y - (box.origin.y + box.size.height);
+      right = box.origin.x - (own.origin.x + own.size.width);
+      bottom = box.origin.y - (own.origin.y + own.size.height);
+      if (left >= 0.f)
+        self->room[0] = MIN (self->room[0], left);
+      if (top >= 0.f)
+        self->room[1] = MIN (self->room[1], top);
+      if (right >= 0.f)
+        self->room[2] = MIN (self->room[2], right);
+      if (bottom >= 0.f)
+        self->room[3] = MIN (self->room[3], bottom);
+    }
+}
+
+static void
+pad_area (ClutterPaintContext *paint_context,
+          ClutterActorBox     *area,
+          float                pad)
+{
+  CoglFramebuffer *framebuffer = clutter_paint_context_get_framebuffer (paint_context);
+
+  area->x1 = MIN (area->x1, MAX (area->x1 - pad, 0.f));
+  area->y1 = MIN (area->y1, MAX (area->y1 - pad, 0.f));
+  area->x2 = MAX (area->x2, MIN (area->x2 + pad, cogl_framebuffer_get_width (framebuffer)));
+  area->y2 = MAX (area->y2, MIN (area->y2 + pad, cogl_framebuffer_get_height (framebuffer)));
 }
 
 static void
@@ -630,6 +792,9 @@ shell_blur_effect_set_actor (ClutterActorMeta *meta,
 
   /* we keep a back pointer here, to avoid going through the ActorMeta */
   self->actor = clutter_actor_meta_get_actor (meta);
+  surfaces = g_list_remove (surfaces, self);
+  if (self->actor)
+    surfaces = g_list_prepend (surfaces, self);
   sync_spread (self);
 }
 
@@ -746,6 +911,28 @@ paint_box_map (ShellBlurEffect *self,
 }
 
 static void
+add_shown_rectangle (ShellBlurEffect  *self,
+                     ClutterPaintNode *node)
+{
+  const ClutterActorBox *box = &self->paint_box;
+  float box_width = box->x2 - box->x1;
+  float box_height = box->y2 - box->y1;
+  float width, height;
+  ClutterActorBox shown;
+
+  clutter_actor_get_size (self->actor, &width, &height);
+  shown = (ClutterActorBox) {
+    MAX (box->x1, 0.f), MAX (box->y1, 0.f),
+    MIN (box->x2, width), MIN (box->y2, height),
+  };
+  clutter_paint_node_add_texture_rectangle (node, &shown,
+                                            (shown.x1 - box->x1) / box_width,
+                                            (shown.y1 - box->y1) / box_height,
+                                            (shown.x2 - box->x1) / box_width,
+                                            (shown.y2 - box->y1) / box_height);
+}
+
+static void
 add_blurred_pipeline (ShellBlurEffect  *self,
                       ClutterPaintNode *node,
                       uint8_t           paint_opacity)
@@ -754,13 +941,14 @@ add_blurred_pipeline (ShellBlurEffect  *self,
   float map[4];
 
   paint_box_map (self, map);
-  update_brightness (self, self->brightness_fb.pipeline, map, paint_opacity);
+  update_brightness (self, self->brightness_fb.pipeline, map,
+                     self->result_extent, self->result_bounds, paint_opacity);
 
   pipeline_node = clutter_pipeline_node_new (self->brightness_fb.pipeline);
   clutter_paint_node_set_static_name (pipeline_node, "ShellBlurEffect (final)");
   clutter_paint_node_add_child (node, pipeline_node);
 
-  clutter_paint_node_add_rectangle (pipeline_node, &self->paint_box);
+  add_shown_rectangle (self, pipeline_node);
 }
 
 static ClutterPaintNode *
@@ -773,12 +961,13 @@ create_blur_nodes (ShellBlurEffect  *self,
   float map[4];
 
   paint_box_map (self, map);
-  update_brightness (self, self->brightness_fb.pipeline, map, paint_opacity);
+  update_brightness (self, self->brightness_fb.pipeline, map,
+                     self->result_extent, self->result_bounds, paint_opacity);
   brightness_node = clutter_layer_node_new_to_framebuffer (self->brightness_fb.framebuffer,
                                                            self->brightness_fb.pipeline);
   clutter_paint_node_set_static_name (brightness_node, "ShellBlurEffect (brightness)");
   clutter_paint_node_add_child (node, brightness_node);
-  clutter_paint_node_add_rectangle (brightness_node, &self->paint_box);
+  add_shown_rectangle (self, brightness_node);
 
   blur_node = clutter_blur_node_new (self->tex_width, self->tex_height, self->radius);
   clutter_paint_node_set_static_name (blur_node, "ShellBlurEffect (blur)");
@@ -965,14 +1154,33 @@ wallpaper_pipeline (ShellBlurEffect *self,
   return pipeline;
 }
 
+static MetaWallpaperFrost
+wallpaper_frost (ShellBlurStyle style)
+{
+  switch (style)
+    {
+    case SHELL_BLUR_STYLE_MARIS:
+      return META_WALLPAPER_FROST_WIDE;
+    case SHELL_BLUR_STYLE_VESA_WALLPAPER:
+      return META_WALLPAPER_FROST_CLEAR;
+    case SHELL_BLUR_STYLE_LUCA:
+    case SHELL_BLUR_STYLE_WALLPAPER:
+    case SHELL_BLUR_STYLE_NIKO:
+    case SHELL_BLUR_STYLE_NIKO_WALLPAPER:
+    case SHELL_BLUR_STYLE_VESA:
+      break;
+    }
+
+  return META_WALLPAPER_FROST_BLURRED;
+}
+
 static void
 paint_wallpaper (ShellBlurEffect  *self,
                  ClutterPaintNode *node,
                  uint8_t           paint_opacity)
 {
   MetaCompositor *compositor = get_compositor ();
-  MetaWallpaperFrost frost = self->style == SHELL_BLUR_STYLE_MARIS ?
-    META_WALLPAPER_FROST_WIDE : META_WALLPAPER_FROST_BLURRED;
+  MetaWallpaperFrost frost = wallpaper_frost (self->style);
   graphene_rect_t extents;
   float width, height;
   MtkRectangle area;
@@ -1015,7 +1223,7 @@ paint_wallpaper (ShellBlurEffect  *self,
       map[1] = box.y1 - coords[1] * map[3];
 
       pipeline = wallpaper_pipeline (self, i, texture);
-      update_brightness (self, pipeline, map, paint_opacity);
+      update_brightness (self, pipeline, map, WHOLE_EXTENT, WHOLE_BOUNDS, paint_opacity);
       wallpaper_node = clutter_pipeline_node_new (pipeline);
       clutter_paint_node_set_static_name (wallpaper_node, "ShellBlurEffect (wallpaper)");
       clutter_paint_node_add_child (node, wallpaper_node);
@@ -1044,6 +1252,7 @@ paint_live (ShellBlurEffect         *self,
   if (self->mode == SHELL_BLUR_MODE_BACKGROUND &&
       !fit_to_framebuffer (paint_context, &area))
     return FALSE;
+  pad_area (paint_context, &area, ceilf (lens_band (self) * scale));
 
   if (!update_framebuffers (self, &area))
     return FALSE;
@@ -1052,7 +1261,7 @@ paint_live (ShellBlurEffect         *self,
 
   if (self->mode == SHELL_BLUR_MODE_BACKGROUND)
     {
-      shell_backdrop_spread_set_reach (self->spread, blur_reach (self));
+      shell_backdrop_spread_set_reach (self->spread, blur_reach (self), lens_band (self));
       backdrop = shell_backdrop_capture (self->backdrops, self->actor,
                                          paint_context, &actor_box, &area,
                                          scale, &background_changed);
@@ -1087,7 +1296,9 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
                               ClutterEffectPaintFlags  flags)
 {
   ShellBlurEffect *self = SHELL_BLUR_EFFECT (effect);
+  gboolean lit_by_vesa;
   uint8_t paint_opacity;
+  float offset_x, offset_y;
 
   g_assert (self->actor != NULL);
 
@@ -1107,6 +1318,9 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
       return;
     }
 
+  lit_by_vesa = is_vesa (self->style) && find_open_edges (self, self->open_edges);
+  find_room (self);
+  self->scale = stage_to_framebuffer (self, paint_context, &offset_x, &offset_y);
   if (!is_live (self->style))
     paint_wallpaper (self, node, paint_opacity);
   else if (!paint_live (self, node, paint_context, flags, paint_opacity))
@@ -1116,7 +1330,28 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
     }
 
   add_actor_node (self, node, -1);
-  shell_blur_add_outline (self->actor, node, &self->outline, self->corner_radius, paint_opacity);
+  if (!lit_by_vesa)
+    shell_blur_add_outline (self->actor, node, &self->outline, self->corner_radius, paint_opacity);
+}
+
+static gboolean
+shell_blur_effect_modify_paint_volume (ClutterEffect      *effect,
+                                       ClutterPaintVolume *volume)
+{
+  ShellBlurEffect *self = SHELL_BLUR_EFFECT (effect);
+  float band = lens_band (self);
+  graphene_point3d_t origin;
+
+  if (band <= 0.f)
+    return TRUE;
+
+  clutter_paint_volume_get_origin (volume, &origin);
+  origin.x -= band;
+  origin.y -= band;
+  clutter_paint_volume_set_origin (volume, &origin);
+  clutter_paint_volume_set_width (volume, clutter_paint_volume_get_width (volume) + 2.f * band);
+  clutter_paint_volume_set_height (volume, clutter_paint_volume_get_height (volume) + 2.f * band);
+  return TRUE;
 }
 
 static void
@@ -1132,9 +1367,11 @@ shell_blur_effect_finalize (GObject *object)
 {
   ShellBlurEffect *self = (ShellBlurEffect *)object;
 
+  surfaces = g_list_remove (surfaces, self);
   clear_graphics (self);
   g_clear_pointer (&self->wallpaper_pipelines, g_ptr_array_unref);
   g_clear_pointer (&self->backdrops, g_hash_table_unref);
+  g_clear_pointer (&self->lenses, g_ptr_array_unref);
   g_clear_pointer (&self->spread, shell_backdrop_spread_free);
 
   G_OBJECT_CLASS (shell_blur_effect_parent_class)->finalize (object);
@@ -1213,6 +1450,8 @@ shell_blur_effect_set_property (GObject      *object,
       if (self->corner_radius != g_value_get_float (value))
         {
           self->corner_radius = g_value_get_float (value);
+          if (self->actor && is_vesa (self->style))
+            clutter_actor_queue_relayout (self->actor);
           if (self->actor)
             clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
           g_object_notify_by_pspec (object, properties[PROP_CORNER_RADIUS]);
@@ -1292,6 +1531,7 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
   meta_class->set_actor = shell_blur_effect_set_actor;
 
   effect_class->paint_node = shell_blur_effect_paint_node;
+  effect_class->modify_paint_volume = shell_blur_effect_modify_paint_volume;
   effect_class->unrealize = shell_blur_effect_unrealize;
 
   properties[PROP_RADIUS] =
@@ -1353,6 +1593,7 @@ shell_blur_effect_init (ShellBlurEffect *self)
   self->saturation = 1.f;
 
   self->backdrops = shell_backdrop_cache_new ();
+  self->lenses = g_ptr_array_new ();
   self->wallpaper_pipelines = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
@@ -1466,6 +1707,8 @@ shell_blur_effect_set_style (ShellBlurEffect *self,
   self->style = style;
   clear_framebuffers (self);
   sync_spread (self);
+  if (self->actor)
+    clutter_actor_queue_relayout (self->actor);
   g_hash_table_remove_all (self->backdrops);
   g_clear_object (&self->last_backdrop);
 
@@ -1517,4 +1760,36 @@ shell_blur_effect_clear_outline_shade (ShellBlurEffect *self)
   g_return_if_fail (SHELL_IS_BLUR_EFFECT (self));
 
   set_outline (self, &(ShellBlurOutline) { 0 });
+}
+
+static void
+lens_destroyed (ShellBlurEffect *self,
+                ClutterActor    *lens)
+{
+  g_ptr_array_remove (self->lenses, lens);
+}
+
+/**
+ * shell_blur_effect_add_lens:
+ * @self: a #ShellBlurEffect
+ * @lens: a descendant of the effect's actor
+ *
+ * Makes @lens a piece of glass of its own inside Vesa glass, which bends and
+ * lights what the effect shows along the edge of @lens, rounded like its
+ * style's corners. Other styles leave it alone.
+ */
+void
+shell_blur_effect_add_lens (ShellBlurEffect *self,
+                            StWidget        *lens)
+{
+  g_return_if_fail (SHELL_IS_BLUR_EFFECT (self));
+  g_return_if_fail (ST_IS_WIDGET (lens));
+
+  if (g_ptr_array_find (self->lenses, lens, NULL))
+    return;
+
+  g_ptr_array_add (self->lenses, lens);
+  g_signal_connect_object (lens, "destroy", G_CALLBACK (lens_destroyed), self, G_CONNECT_SWAPPED);
+  if (self->actor)
+    clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
 }

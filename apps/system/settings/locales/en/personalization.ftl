@@ -67,6 +67,7 @@ settings-appearance-glass = Glass
 settings-appearance-glass-luca = Luca
 settings-appearance-glass-maris = Maris
 settings-appearance-glass-niko = Niko
+settings-appearance-glass-vesa = Vesa
 settings-appearance-glass-mixed = Mixed
 settings-appearance-glass-taskbar = Taskbar
 settings-appearance-glass-surfaces = Gust, panels and menus

@@ -4,11 +4,12 @@ import St from 'gi://St';
 import * as Main from '../../main.js';
 import { FrostedWallpaper, type Frost, type FrostMonitor } from './frost.js';
 
-export type FrostKind = 'blurred' | 'wide';
+export type FrostKind = 'blurred' | 'wide' | 'clear';
 
 const FROSTS: Record<FrostKind, Frost> = {
   blurred: { name: 'frosted', radius: 30, downscale: 4, brightness: 1, saturation: 1, wash: null, fluted: false },
   wide: { name: 'wide', radius: 300, downscale: 32, brightness: 1, saturation: 1, wash: null, fluted: false },
+  clear: { name: 'clear', radius: 4, downscale: 2, brightness: 1, saturation: 1, wash: null, fluted: false },
 };
 
 export interface WallpaperPiece {

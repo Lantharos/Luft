@@ -159,6 +159,7 @@ export namespace Meta {
         LUCA = 0,
         MARIS = 1,
         NIKO = 2,
+        VESA = 3,
     }
 
 
@@ -613,6 +614,7 @@ export namespace Meta {
     enum WallpaperFrost {
         BLURRED = 0,
         WIDE = 1,
+        CLEAR = 2,
     }
 
 

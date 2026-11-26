@@ -81,7 +81,8 @@
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
 				{ "value": "maris", "label": "settings-appearance-glass-maris" },
-				{ "value": "niko", "label": "settings-appearance-glass-niko" }
+				{ "value": "niko", "label": "settings-appearance-glass-niko" },
+				{ "value": "vesa", "label": "settings-appearance-glass-vesa" }
 			]
 		},
 		{
@@ -92,7 +93,8 @@
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
 				{ "value": "maris", "label": "settings-appearance-glass-maris" },
-				{ "value": "niko", "label": "settings-appearance-glass-niko" }
+				{ "value": "niko", "label": "settings-appearance-glass-niko" },
+				{ "value": "vesa", "label": "settings-appearance-glass-vesa" }
 			]
 		},
 		{
@@ -103,7 +105,8 @@
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
 				{ "value": "maris", "label": "settings-appearance-glass-maris" },
-				{ "value": "niko", "label": "settings-appearance-glass-niko" }
+				{ "value": "niko", "label": "settings-appearance-glass-niko" },
+				{ "value": "vesa", "label": "settings-appearance-glass-vesa" }
 			]
 		},
 		{
@@ -250,7 +253,8 @@
 			"options": [
 				{ "value": "luca", "label": "settings-appearance-glass-luca" },
 				{ "value": "maris", "label": "settings-appearance-glass-maris" },
-				{ "value": "niko", "label": "settings-appearance-glass-niko" }
+				{ "value": "niko", "label": "settings-appearance-glass-niko" },
+				{ "value": "vesa", "label": "settings-appearance-glass-vesa" }
 			]
 		},
 		{

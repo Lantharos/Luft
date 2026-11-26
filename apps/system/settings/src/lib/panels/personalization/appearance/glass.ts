@@ -1,6 +1,6 @@
 export const GLASS_SCHEMA = 'com.lantharos.kestrel.glass';
 
-export type GlassStyle = 'luca' | 'maris' | 'niko';
+export type GlassStyle = 'luca' | 'maris' | 'niko' | 'vesa';
 export type GlassKind = 'taskbar' | 'surfaces' | 'windows';
 export type GlassBlurs = 'everything' | 'wallpaper';
 

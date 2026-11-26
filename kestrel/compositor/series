@@ -89,3 +89,4 @@
 0089-compositor-give-glass-a-Niko-material.patch
 0090-wayland-let-apps-that-may-record-windows-list-captur.patch
 0091-backends-let-the-nested-session-s-viewer-create-its-.patch
+0092-compositor-give-glass-a-Vesa-material.patch

@@ -49,7 +49,7 @@ function nearSurface(color: number[]) {
   return Math.max(...expected.map((channel, index) => Math.abs(channel - color[index]))) < SURFACE_DISTANCE;
 }
 
-function choose(styles: Partial<Record<Kind, 'luca' | 'maris' | 'niko'>>, blurs: 'everything' | 'wallpaper' = 'everything') {
+function choose(styles: Partial<Record<Kind, 'luca' | 'maris' | 'niko' | 'vesa'>>, blurs: 'everything' | 'wallpaper' = 'everything') {
   for (const kind of KINDS) settings.set_string(kind, styles[kind] ?? 'luca');
   settings.set_string('blurs', blurs);
 }
@@ -128,7 +128,23 @@ export async function run() {
     require(redness(await centerOf(glass.window)) < NIKO_REDDISH, 'Niko glass on an app window shows the wallpaper instead of the window behind it while glass blurs only the wallpaper');
     interfaceSettings.reset('color-scheme');
 
+    choose({taskbar: 'vesa', surfaces: 'vesa', windows: 'vesa'});
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.VESA), 'every kind of glass turns to Vesa');
+    await settled();
+    require(reddish(await centerOf(glass.window)), 'Vesa glass on an app window blurs the window behind it');
+    await captureSurfaces('vesa');
+
+    choose({taskbar: 'vesa', surfaces: 'vesa', windows: 'vesa'}, 'wallpaper');
+    await eventually(() => backdrops().every(effect => effect.style === Shell.BlurStyle.VESA_WALLPAPER),
+      'Vesa glass blurs only the wallpaper when asked to');
+    await settled();
+    require(!reddish(await centerOf(glass.window)), 'Vesa glass on an app window shows the wallpaper instead of the window behind it while glass blurs only the wallpaper');
+
     choose({});
+    const vesa = await glassClient('Asks for Vesa', ['window', 'vesa']);
+    await eventually(() => vesa.materials.at(-1) === 'vesa', 'an app asking for Vesa hears it has Vesa');
+    await stop(vesa.process);
+
     const niko = await glassClient('Asks for Niko', ['window', 'niko']);
     await eventually(() => niko.materials.at(-1) === 'niko', 'an app asking for Niko hears it has Niko');
     await stop(niko.process);

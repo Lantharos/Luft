@@ -78,8 +78,17 @@
 		filter: blur(2px);
 	}
 
-	.luca .tint {
+	.luca .tint,
+	.vesa .tint {
 		background: var(--sidebar-glass);
+	}
+
+	.vesa .behind {
+		filter: blur(0.5px);
+	}
+
+	.vesa .tint {
+		box-shadow: inset 1px 1px 3px rgb(255 255 255 / 0.3);
 	}
 
 	.maris .behind {

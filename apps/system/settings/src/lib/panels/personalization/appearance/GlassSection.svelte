@@ -12,7 +12,8 @@
 	let styles = $derived<{ value: GlassStyle; label: string }[]>([
 		{ value: 'luca', label: t('settings-appearance-glass-luca') },
 		{ value: 'maris', label: t('settings-appearance-glass-maris') },
-		{ value: 'niko', label: t('settings-appearance-glass-niko') }
+		{ value: 'niko', label: t('settings-appearance-glass-niko') },
+		{ value: 'vesa', label: t('settings-appearance-glass-vesa') }
 	]);
 	let kinds = $derived<{ key: GlassKind; title: string }[]>([
 		{ key: 'taskbar', title: t('settings-appearance-glass-taskbar') },

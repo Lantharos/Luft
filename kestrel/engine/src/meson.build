@@ -119,6 +119,7 @@ libshell_sources = [
   'shell-blur-effect.c',
   'shell-blur-flutes.c',
   'shell-blur-outline.c',
+  'shell-blur-vesa.c',
   'shell-desktop-filter-effect.c',
   'shell-development.c',
   'shell-backdrop.c',

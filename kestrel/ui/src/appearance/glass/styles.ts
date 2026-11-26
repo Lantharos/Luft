@@ -20,6 +20,7 @@ const STYLES: Record<string, Meta.GlassStyle> = {
   luca: Meta.GlassStyle.LUCA,
   maris: Meta.GlassStyle.MARIS,
   niko: Meta.GlassStyle.NIKO,
+  vesa: Meta.GlassStyle.VESA,
 };
 
 type Scheme = keyof typeof NIKO;
@@ -78,6 +79,7 @@ export class GlassStyles {
   private readonly glassChanged = global.compositor.connect('glass-changed', () => this.sync());
   private readonly blurred = new FrostPieces('blurred', Meta.WallpaperFrost.BLURRED, () => this.published());
   private readonly wide = new FrostPieces('wide', Meta.WallpaperFrost.WIDE, () => this.published());
+  private readonly clear = new FrostPieces('clear', Meta.WallpaperFrost.CLEAR, () => this.published());
 
   constructor() {
     this.sync();
@@ -106,6 +108,8 @@ export class GlassStyles {
         return this.wide.ready ? Shell.BlurStyle.MARIS : Shell.BlurStyle.LUCA;
       case Meta.GlassStyle.NIKO:
         return frosted ? Shell.BlurStyle.NIKO_WALLPAPER : Shell.BlurStyle.NIKO;
+      case Meta.GlassStyle.VESA:
+        return wallpaperOnly && this.clear.ready ? Shell.BlurStyle.VESA_WALLPAPER : Shell.BlurStyle.VESA;
       default:
         return frosted ? Shell.BlurStyle.WALLPAPER : Shell.BlurStyle.LUCA;
     }
@@ -114,6 +118,7 @@ export class GlassStyles {
   private sync(): void {
     const wallpaperOnly = this.wallpaperOnly();
     this.blurred.want(wallpaperOnly);
+    this.clear.want(wallpaperOnly && KINDS.some(kind => this.chosen(kind) === Meta.GlassStyle.VESA));
     this.wide.want(KINDS.some(kind => this.chosen(kind) === Meta.GlassStyle.MARIS) || global.compositor.get_maris_requested());
     for (const kind of KINDS) setGlassStyle(kind, this.shellStyle(kind, this.blursWallpaperOnly(kind, wallpaperOnly)));
     global.compositor.set_glass(this.chosen('windows'), this.chosen('surfaces'), wallpaperOnly);
@@ -137,5 +142,6 @@ export class GlassStyles {
     this.conditions.destroy();
     this.blurred.destroy();
     this.wide.destroy();
+    this.clear.destroy();
   }
 }

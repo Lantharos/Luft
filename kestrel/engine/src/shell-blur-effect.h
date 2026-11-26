@@ -22,6 +22,8 @@
 
 #include <clutter/clutter.h>
 
+#include <st/st.h>
+
 G_BEGIN_DECLS
 
 /**
@@ -47,6 +49,10 @@ typedef enum
  *   the lightness of the Niko tint, see meta_compositor_set_niko_tint()
  * @SHELL_BLUR_STYLE_NIKO_WALLPAPER: show the compositor's blurred wallpaper
  *   in the lightness of the Niko tint
+ * @SHELL_BLUR_STYLE_VESA: blur what is beneath the actor as it changes, and
+ *   bend and light it along the actor's edge like liquid glass
+ * @SHELL_BLUR_STYLE_VESA_WALLPAPER: show the compositor's clear wallpaper,
+ *   bent and lit along the actor's edge like liquid glass
  *
  * How a background blur looks.
  */
@@ -57,6 +63,8 @@ typedef enum
   SHELL_BLUR_STYLE_MARIS,
   SHELL_BLUR_STYLE_NIKO,
   SHELL_BLUR_STYLE_NIKO_WALLPAPER,
+  SHELL_BLUR_STYLE_VESA,
+  SHELL_BLUR_STYLE_VESA_WALLPAPER,
 } ShellBlurStyle;
 
 #define SHELL_TYPE_BLUR_EFFECT (shell_blur_effect_get_type())
@@ -86,5 +94,8 @@ void shell_blur_effect_set_outline_shade (ShellBlurEffect *self,
                                           const float     *spans,
                                           int              n_spans);
 void shell_blur_effect_clear_outline_shade (ShellBlurEffect *self);
+
+void shell_blur_effect_add_lens (ShellBlurEffect *self,
+                                 StWidget        *lens);
 
 G_END_DECLS

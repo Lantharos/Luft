@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
-import { blurSurface } from '../../../shared/layout/surface.js';
+import { blurSurface, glassControl } from '../../../shared/layout/surface.js';
 import { GustGrid } from './grid.js';
 import { GustFooter } from './footer.js';
 import { SearchEngine, type SearchHost } from '../../search/engine.js';
@@ -45,6 +45,7 @@ export class GustPanel implements GustSurface {
     });
     blurSurface(this.actor);
     this.search = searchField(menus, 'kestrel-search', 16);
+    glassControl(this.actor, this.search);
     this.search.clutter_text.connect('text-changed', () => this.searchProvider.setText(this.search.get_text()));
     this.search.clutter_text.connect('key-press-event', (_text, event) => {
       if (event.get_key_symbol() === Clutter.KEY_Down) return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;

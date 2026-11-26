@@ -35,6 +35,7 @@
 		luca: 'settings-appearance-glass-luca',
 		maris: 'settings-appearance-glass-maris',
 		niko: 'settings-appearance-glass-niko',
+		vesa: 'settings-appearance-glass-vesa',
 		mixed: 'settings-appearance-glass-mixed'
 	};
 

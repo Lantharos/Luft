@@ -10,7 +10,7 @@ import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { t } from '../../shared/i18n/index.js';
 import { animateActor, Spring } from '../../shared/motion/motion.js';
-import { blurSurface } from '../../shared/layout/surface.js';
+import { blurSurface, glassControl } from '../../shared/layout/surface.js';
 import { type ExtensionTile, extensionTiles } from './extensionTiles.js';
 import { detach, type QuickControl, type QuickItem, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 import { styleControl } from './tiles/controlTile.js';
@@ -144,6 +144,7 @@ export class QuickSettings {
 
   private register(tile: RegisteredTile): void {
     this.tiles.push(tile);
+    glassControl(this.actor, tile.actor);
     this.menus.bind(tile.actor, () => this.tileMenu(tile));
     tile.actor.connect('notify::visible', () => this.grid.refresh());
     this.drag.attach(tile.actor);

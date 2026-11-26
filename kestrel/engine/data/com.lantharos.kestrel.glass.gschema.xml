@@ -3,6 +3,7 @@
     <value nick="luca" value="0"/>
     <value nick="maris" value="1"/>
     <value nick="niko" value="2"/>
+    <value nick="vesa" value="3"/>
   </enum>
 
   <enum id="com.lantharos.kestrel.GlassBlurs">
@@ -14,22 +15,22 @@
     <key name="taskbar" enum="com.lantharos.kestrel.GlassStyle">
       <default>'niko'</default>
       <summary>How the taskbar's glass looks</summary>
-      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour, “vesa” clear glass that bends what is behind it along its edges.</description>
     </key>
     <key name="surfaces" enum="com.lantharos.kestrel.GlassStyle">
       <default>'niko'</default>
       <summary>How the glass of Gust, panels and menus looks</summary>
-      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour. Apps’ popovers and palettes follow it too.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour, “vesa” clear glass that bends what is behind it along its edges. Apps’ popovers and palettes follow it too.</description>
     </key>
     <key name="windows" enum="com.lantharos.kestrel.GlassStyle">
       <default>'niko'</default>
       <summary>How the glass of app windows looks</summary>
-      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour, “vesa” clear glass that bends what is behind it along its edges.</description>
     </key>
     <key name="see-through" enum="com.lantharos.kestrel.GlassStyle">
       <default>'niko'</default>
       <summary>How the glass behind see-through windows looks</summary>
-      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour.</description>
+      <description>“luca” is glass that blurs what is behind it, “maris” the surface colour with a hint of the wallpaper, “niko” glass that blurs what is behind it in the lightness of the surface colour, “vesa” clear glass that bends what is behind it along its edges.</description>
     </key>
     <key name="blurs" enum="com.lantharos.kestrel.GlassBlurs">
       <default>'wallpaper'</default>

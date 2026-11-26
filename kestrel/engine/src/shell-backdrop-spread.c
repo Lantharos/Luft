@@ -17,11 +17,13 @@ struct _ShellBackdropSpread
   MetaStageRedrawClipFilter *filter;
   gulong before_paint_id;
   float reach;
+  float margin;
 };
 
 static gboolean
 blurred_area (ClutterActor     *actor,
               ClutterStageView *view,
+              float             margin,
               MtkRectangle     *area)
 {
   graphene_point3d_t corners[4];
@@ -48,6 +50,10 @@ blurred_area (ClutterActor     *actor,
   if (x1 >= x2 || y1 >= y2)
     return FALSE;
 
+  x1 -= margin;
+  y1 -= margin;
+  x2 += margin;
+  y2 += margin;
   corners[0] = GRAPHENE_POINT3D_INIT (x1, y1, 0.f);
   corners[1] = GRAPHENE_POINT3D_INIT (x2, y1, 0.f);
   corners[2] = GRAPHENE_POINT3D_INIT (x1, y2, 0.f);
@@ -77,7 +83,7 @@ shows_blur (ShellBackdropSpread *spread,
     clutter_actor_meta_get_enabled (spread->effect) &&
     clutter_actor_is_mapped (actor) &&
     clutter_actor_get_paint_opacity (actor) > 0 &&
-    blurred_area (actor, view, area);
+    blurred_area (actor, view, spread->margin, area);
 }
 
 static MtkRegion *
@@ -291,9 +297,11 @@ shell_backdrop_spread_new (ClutterActorMeta *effect,
 
 void
 shell_backdrop_spread_set_reach (ShellBackdropSpread *spread,
-                                 float                reach)
+                                 float                reach,
+                                 float                margin)
 {
   spread->reach = reach;
+  spread->margin = margin;
 }
 
 void

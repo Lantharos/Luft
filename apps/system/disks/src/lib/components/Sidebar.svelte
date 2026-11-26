@@ -5,7 +5,7 @@
 	import DriveIcon from './DriveIcon.svelte';
 </script>
 
-<aside class="glass-sidebar drag-region gap-3 px-3 py-4">
+<aside class="glass-sidebar drag-region gap-3 p-(--sheet-inset)">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto" aria-label={t('disks-drives')} {@attach selectionPill()}>
 		{#each disks.drives as drive (drive.id)}
 			{@const active = disks.drive?.id === drive.id}

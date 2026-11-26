@@ -27,7 +27,7 @@
 	$effect(() => projects?.watch());
 </script>
 
-<aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
+<aside class="glass-sidebar drag-region gap-3.5 p-(--sheet-inset)">
 	{#if publisher}
 		<button type="button" class="publisher" onclick={() => account.show()}>
 			<PublisherMark {publisher} />

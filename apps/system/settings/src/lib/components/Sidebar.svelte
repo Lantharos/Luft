@@ -77,7 +77,7 @@
 	</button>
 {/snippet}
 
-<aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
+<aside class="glass-sidebar drag-region gap-3.5 p-(--sheet-inset)">
 	<SearchField variant="sidebar" label={t('settings-search')} bind:value={app.query} onkeydown={openFirst} />
 	<nav bind:this={nav} class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		{#if present}

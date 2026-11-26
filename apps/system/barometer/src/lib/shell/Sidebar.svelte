@@ -11,7 +11,7 @@
 	let entries = $derived(monitor.devices ? resources(monitor.devices, settings.value.showVirtual) : []);
 </script>
 
-<aside class="glass-sidebar drag-region px-3 pt-4 pb-3">
+<aside class="glass-sidebar drag-region p-(--sheet-inset)">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" aria-label={t('barometer-views')} {@attach selectionPill()}>
 		<button type="button" class="nav-item" class:active={app.page === TASKS} aria-current={app.page === TASKS ? 'page' : undefined} onclick={() => app.open(TASKS)}>
 			<LayoutGrid size={18} />

@@ -13,12 +13,12 @@ import {show} from '../navigation.js';
 const {eventually, require} = checks('Luft app');
 const ID = 'com.example.Unreviewed';
 const PAGE = `extensions/${ID.toLowerCase()}`;
-const INSTALL_COPY: Point = [660, 505];
+const INSTALL_COPY: Point = [660, 466];
 const CONFIRM_COPY: Point = [660, 461];
-const STOP: Point = [956, 407];
-const RUN_FROM_FOLDER: Point = [660, 578];
+const STOP: Point = [956, 374];
+const RUN_FROM_FOLDER: Point = [660, 532];
 const CONFIRM_FOLDER: Point = [645, 512];
-const TAKE_BACK: Point = [938, 497];
+const TAKE_BACK: Point = [938, 458];
 const PAGE_CONTENT = {x: 300, y: 76, width: 720, height: 360};
 
 const alike = (frame: Frame, other: Frame) => frame.pixelsApart(other, 24) < 200;

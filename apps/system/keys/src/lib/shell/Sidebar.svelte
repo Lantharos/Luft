@@ -43,7 +43,7 @@
 	</section>
 {/snippet}
 
-<aside class="glass-sidebar drag-region px-3 py-4">
+<aside class="glass-sidebar drag-region p-(--sheet-inset)">
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto" {@attach selectionPill()}>
 		{@render group(t('keys-sidebar-layouts'), 'layout', layouts, t('keys-new-layout'))}
 		{@render group(t('keys-sidebar-methods'), 'method', methods, t('keys-new-method'))}

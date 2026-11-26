@@ -77,7 +77,7 @@
 		width: 100%;
 		flex-direction: column;
 		gap: 12px;
-		padding: 16px;
+		padding: 12px 14px;
 		text-align: left;
 	}
 
@@ -150,6 +150,10 @@
 		flex: 1 1 14rem;
 		flex-direction: column;
 		gap: 2px;
+	}
+
+	.text:not(:has(.description)) {
+		flex-basis: auto;
 	}
 
 	.truncate {

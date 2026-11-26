@@ -12,7 +12,7 @@
 	}
 </script>
 
-<aside class="glass-sidebar drag-region gap-3 px-3 py-4">
+<aside class="glass-sidebar drag-region gap-3 p-(--sheet-inset)">
 	<div class="nav-heading">
 		<h2>{t('boards-title')}</h2>
 		<button type="button" class="nav-action" aria-label={t('board-new')} {@attach tooltip(t('board-new'))} onclick={() => void app.addBoard()}>

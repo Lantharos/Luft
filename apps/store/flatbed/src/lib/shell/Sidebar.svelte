@@ -11,7 +11,7 @@
 	let { onadd, onsettings }: { onadd: () => void; onsettings: () => void } = $props();
 </script>
 
-<aside class="glass-sidebar drag-region flex flex-col px-3 pt-4 pb-3">
+<aside class="glass-sidebar drag-region flex flex-col p-(--sheet-inset)">
 	<h2 class="nav-heading">{t('sources-title')}</h2>
 	<nav class="flex flex-col gap-0.5" data-no-drag {@attach selectionPill()}>
 		{#each flatbed.scanners as scanner (scanner.id)}

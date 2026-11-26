@@ -34,7 +34,7 @@
 <style>
 	.sidebar {
 		gap: 10px;
-		padding: 12px 8px 8px;
+		padding: var(--sheet-inset);
 	}
 
 	.quick-open {

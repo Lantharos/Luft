@@ -13,10 +13,10 @@ import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 import {checkUnreviewed} from './unreviewed.js';
 
 const {eventually, require} = checks('Luft app');
-const HEAVY: Point = [944, 370];
+const HEAVY: Point = [948, 344];
 const SEASONS_SWITCH: Point = [928, 126];
-const LEFT_EDGE: Point = [891, 166];
-const RIGHT_EDGE: Point = [950, 166];
+const LEFT_EDGE: Point = [895, 220];
+const RIGHT_EDGE: Point = [954, 220];
 const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

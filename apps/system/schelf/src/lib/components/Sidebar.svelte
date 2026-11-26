@@ -47,7 +47,7 @@
 	<NavItem {title} {icon} {count} active={active(route)} onclick={() => navigation.open(route)} />
 {/snippet}
 
-<aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
+<aside class="glass-sidebar drag-region gap-3.5 p-(--sheet-inset)">
 	<SearchField variant="sidebar" label={t('sidebar-search')} bind:value={navigation.query} onkeydown={submit} />
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		<div class="flex flex-col gap-0.5">

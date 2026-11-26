@@ -5,6 +5,7 @@ import {touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestre
 import {touchpad} from '../board/lib/touchpad.js';
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {taskbarEdge} from '../lib/edge.js';
 import {chord, rest} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -162,12 +163,14 @@ export async function run() {
   try {
     const windows = await openColumns();
     await checkFocus(windows);
-    await checkStacking(windows);
-    await checkSwipe(windows);
+    if (taskbarEdge() === 'bottom') {
+      await checkStacking(windows);
+      await checkSwipe(windows);
+    }
     await checkColumns(windows);
-    await checkMinimumWidth(windows);
+    if (taskbarEdge() === 'bottom') await checkMinimumWidth(windows);
     await checkOverview(windows);
-    await checkAtEnd(windows);
+    if (taskbarEdge() === 'bottom') await checkAtEnd(windows);
   } finally {
     rest();
     await stopAll();

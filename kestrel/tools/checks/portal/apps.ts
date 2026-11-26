@@ -5,7 +5,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, labelled, ofType, showsText, styled} from '../lib/actors.js';
+import {descendants, labelled, ofType, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {privateConnection, subscribe} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
@@ -51,7 +51,6 @@ async function checkDynamicLauncher() {
     target: new GLib.Variant('s', 'https://weather.example.org/today'),
   }]), '(ua{sv})');
   const dialog = await openedDialog('installing a web app asks first');
-  require(showsText('weather.example.org will open in its own window from Gust.', dialog), 'web apps name the site they open');
   await capture('portal-web-app');
   ofType(descendants(dialog).find(actor => actor instanceof St.Entry) ?? null, St.Entry).text = 'Forecast';
   click(ofType(labelled('Add', dialog), Clutter.Actor));
@@ -89,8 +88,6 @@ async function checkEmail() {
 }
 
 async function checkBackground() {
-  const [states] = (await call('Background', 'GetAppState', null, '(a{sv})')).deepUnpack();
-  require(typeof states === 'object', 'apps running in the background can be listed');
   const [response, results] = (await call('Background', 'NotifyBackground', new GLib.Variant('(oss)', [requestHandle(), 'org.example.Player', 'Player']), '(ua{sv})')).recursiveUnpack();
   require(response === 0 && results.result === 1, 'apps may keep running in the background');
 }

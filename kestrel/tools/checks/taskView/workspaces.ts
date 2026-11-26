@@ -5,12 +5,11 @@ import {existing} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, moveTo, press, release, scroll} from '../lib/input/input.js';
 import {gjs, stop, waitForWindows} from '../lib/processes.js';
-import {capture, captureFrame} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {capture} from '../lib/screenshots.js';
+import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('workspace');
 const manager = global.workspace_manager;
-const SLIDE_PROGRESS = 0.4;
 
 const switchData = () => Main.wm.workspaceAnimation.currentSwitch;
 const switchedTo = (index: number) => manager.get_active_workspace_index() === index && !switchData();
@@ -22,12 +21,9 @@ async function openWindows() {
   return [app, windows] as const;
 }
 
-async function checkSlide() {
+async function checkSuperNumber() {
   hold(Clutter.KEY_Super_L);
   press(Clutter.KEY_2);
-  const slide = await waitUntil(switchData, 'the workspaces gust sliding');
-  await waitUntil(() => slide.monitors[0].progress >= SLIDE_PROGRESS, 'the workspaces are halfway through the slide');
-  (await captureFrame()).save('workspace-slide');
   release(Clutter.KEY_Super_L);
   await eventually(() => switchedTo(1), 'Super+2 switches to workspace two');
 }
@@ -59,7 +55,7 @@ export async function run() {
     await eventually(() => manager.n_workspaces === 2, 'an occupied workspace is followed by one empty workspace');
     second.change_workspace_by_index(1, false);
     await eventually(() => manager.n_workspaces === 3, 'a second occupied workspace adds one empty workspace');
-    await checkSlide();
+    await checkSuperNumber();
     await checkScrolling();
     await checkSwitcher();
   } finally {

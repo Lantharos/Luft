@@ -5,14 +5,15 @@ import Shell from 'gi://Shell';
 
 import {requireFresh} from '../lib/apps/freshness.js';
 import {checks} from '../lib/check.js';
-import {capture, captureFrame} from '../lib/screenshots.js';
-import {pause, settled} from '../lib/wait.js';
+import {capture} from '../lib/screenshots.js';
+import {pause} from '../lib/wait.js';
 import {phases, restart, sessionRecord, setStagedUpdate, signOutOfSession} from './lib/signIn.js';
 
 const {require, eventually} = checks('session restore of what apps showed');
 const GROUP = 'restore:contents';
 const OPEN_TIMEOUT = 40000;
 const KEPT_TIMEOUT = 10000;
+const STAYS_CLOSED_FOR = 2000;
 
 interface ShownApp {
   name: string;
@@ -53,12 +54,9 @@ function launch(app: ShownApp) {
   info.launch_uris(app.opened ? [app.opened] : [], global.create_launch_context_for_app(info, 0, -1));
 }
 
-const frameOf = (window: Meta.Window) => captureFrame(window.get_frame_rect());
-
 async function shown(app: ShownApp, label: string) {
-  const window = await eventually(() => windowOf(app), `${label}: ${app.name} opens`, OPEN_TIMEOUT);
+  await eventually(() => windowOf(app), `${label}: ${app.name} opens`, OPEN_TIMEOUT);
   await eventually(() => keptState(app), `${label}: ${app.name} keeps what it shows`, KEPT_TIMEOUT);
-  return window;
 }
 
 async function closeNormally(app: ShownApp, label: string) {
@@ -74,9 +72,7 @@ async function opened() {
   const kept: Record<string, string> = {};
   for (const app of RESTORED) {
     launch(app);
-    const window = await shown(app, 'before the restart');
-    await settled();
-    (await frameOf(window)).save(`restore-contents-${app.name}-before`);
+    await shown(app, 'before the restart');
     kept[app.name] = keptState(app)!;
   }
   for (const app of RESTORED) {
@@ -87,7 +83,6 @@ async function opened() {
   await shown(TERMINAL, 'before the restart');
   await closeNormally(TERMINAL, 'before the restart');
   await eventually(() => sessionRecord()?.windows.filter(window => window.app.startsWith('com.lantharos.')).length === RESTORED.length, 'the record notes the apps still open');
-  await capture('restore-contents-before');
   await setStagedUpdate(true);
   await restart('Restart and install');
   next('updated', {kept});
@@ -96,13 +91,11 @@ async function opened() {
 
 async function updated({kept}: Data) {
   for (const app of RESTORED) {
-    const window = await eventually(() => windowOf(app), `${app.name} opens again`, OPEN_TIMEOUT);
+    await eventually(() => windowOf(app), `${app.name} opens again`, OPEN_TIMEOUT);
     await eventually(() => keptStates(app).length === 1 && keptStates(app)[0] === kept[app.name], `${app.name} shows what it showed before the restart`, KEPT_TIMEOUT);
-    await settled();
-    (await frameOf(window)).save(`restore-contents-${app.name}-after`);
   }
-  await pause(KEPT_TIMEOUT / 2);
-  require(!windowOf(TERMINAL), 'Terminal, closed before the restart, stays closed');
+  await pause(STAYS_CLOSED_FOR);
+  require(!windowOf(TERMINAL) && desktopApp(TERMINAL).state === Shell.AppState.STOPPED, 'Terminal, closed before the restart, stays closed');
   require(!keptStates(TERMINAL).length, 'nothing Terminal showed is left behind');
   await capture('restore-contents-after');
   await closeNormally(ROVER, 'after the restart');

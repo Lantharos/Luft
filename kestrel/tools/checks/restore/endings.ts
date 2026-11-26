@@ -1,19 +1,19 @@
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
+import Shell from 'gi://Shell';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {GONE, install, LEDGER, NOTEBOOK, open, processesOf, quit, SKETCH, startsBySignIn, STARTUP, titled, uninstall, windowsOf, type TestApp} from './lib/apps.js';
-import {boxOf, kestrelUptime, maximized, near, phases, recordMode, restart, sessionRecord, setStagedUpdate, signOutOfSession, type Box} from './lib/signIn.js';
+import {boxOf, kestrelUptime, maximized, near, phases, recordMode, restart, sessionRecord, setStagedUpdate, signOutOfSession, windowsNoted, type Box} from './lib/signIn.js';
 
 const {require, eventually} = checks('session restore');
 const GROUP = 'restore:endings';
 const RESTORE_TIMEOUT = 40000;
-const NOT_RESTORED_WITHIN = 8000;
-const NOTED_AFTER = 1500;
+const NOT_RESTORED_WITHIN = 4000;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 interface Expected {
@@ -35,6 +35,7 @@ const {current, next, done} = phases<Data>(GROUP);
 const workArea = () => global.workspace_manager.get_active_workspace().get_work_area_for_monitor(0);
 const expectedOf = (window: Meta.Window): Expected =>
   ({title: window.get_title()!, workspace: window.get_workspace()!.index(), frame: boxOf(window), maximized: maximized(window), edges: window.get_tiled_edges()});
+const launched = (app: TestApp) => windowsOf(app).length || Shell.AppSystem.get_default().lookup_app(`${app.id}.desktop`)?.state !== Shell.AppState.STOPPED;
 const stackingOf = (titles: string[]) => global.display.sort_windows_by_stacking(titles.map(title => titled(title)!)).map(window => window.get_title()!);
 
 async function arrange(): Promise<Data> {
@@ -55,7 +56,7 @@ async function arrange(): Promise<Data> {
   second.maximize();
   sketch.activate(global.get_current_time());
   await settled();
-  await pause(NOTED_AFTER);
+  await eventually(() => windowsNoted([first, second, ledger, sketch]), 'the record notes where each window is');
   const windows = [first, second, ledger, sketch].map(expectedOf);
   return {windows, stacking: stackingOf([second, ledger, sketch].map(window => window.get_title()!)), focused: sketch.get_title()!, uptimes: {}};
 }
@@ -101,7 +102,6 @@ async function opened() {
   await noted([NOTEBOOK, SKETCH, LEDGER], 'the open apps are noted while the session runs');
   require(recordMode() === 0o600, 'only the account can read the record');
   require(!JSON.stringify(sessionRecord()).includes(`${NOTEBOOK.name} 1`), 'the record holds no window titles');
-  await capture('restore-before-update');
   await setStagedUpdate(true);
   return endWith('Restart and install', 'update', 'updated', data);
 }
@@ -118,7 +118,7 @@ async function updated(data: Data) {
 async function plain(data: Data) {
   data.uptimes['with a record that stays closed'] = kestrelUptime();
   await pause(NOT_RESTORED_WITHIN);
-  require([NOTEBOOK, SKETCH, LEDGER].every(app => !windowsOf(app).length), 'after an ordinary restart the apps stay closed while reopening is off');
+  require([NOTEBOOK, SKETCH, LEDGER].every(app => !launched(app)), 'after an ordinary restart the apps stay closed while reopening is off');
   kestrel.set_boolean('reopen-apps', true);
   await install(GONE, STARTUP);
   startsBySignIn(STARTUP);
@@ -149,7 +149,7 @@ async function reopened(data: Data) {
 async function empty(data: Data) {
   data.uptimes['with an empty record'] = kestrelUptime();
   await pause(NOT_RESTORED_WITHIN);
-  require([NOTEBOOK, SKETCH, STARTUP].every(app => !windowsOf(app).length), 'with nothing noted nothing opens');
+  require([NOTEBOOK, SKETCH, STARTUP].every(app => !launched(app)), 'with nothing noted nothing opens');
   for (const [state, seconds] of Object.entries(data.uptimes)) console.log(`Kestrel session restore: ready ${seconds.toFixed(2)} s after starting ${state}`);
   kestrel.reset('reopen-apps');
   uninstall(NOTEBOOK, SKETCH, LEDGER, STARTUP);

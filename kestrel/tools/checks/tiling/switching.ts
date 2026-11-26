@@ -6,13 +6,11 @@ import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {chord, rest} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
-import {pause, waitUntil} from '../lib/wait.js';
+import {waitUntil} from '../lib/wait.js';
 import {actorOf, area, edgeTiling, focus, frame, near, openWindow, resetTiling, restingTiles, sameRect, shownX, tiledTightly, useTiling} from './lib/tiling.js';
 
 const {require, eventually} = checks('tiling modes');
 const PLACES = [[60, 60, 560, 380], [420, 200, 620, 420], [800, 120, 520, 360]];
-const SNAP_SETTLE = 300;
 
 const tiled = (window: Meta.Window) => window.unconstrained;
 const untransformed = (window: Meta.Window) => actorOf(window).translation_x === 0 && actorOf(window).translation_y === 0 && !actorOf(window).has_clip;
@@ -32,10 +30,11 @@ async function openFloating() {
 
 async function snapLayoutsShown() {
   toggleSurface('snap');
-  await pause(SNAP_SETTLE);
-  const shown = !!named('kestrel-snap-layouts')?.visible;
-  if (shown) toggleSurface('snap');
-  return shown;
+  const layouts = named('kestrel-snap-layouts');
+  if (!layouts?.visible) return false;
+  toggleSurface('snap');
+  await waitUntil(() => !layouts.visible, 'snap layouts close');
+  return true;
 }
 
 export async function run() {
@@ -55,7 +54,6 @@ export async function run() {
     await eventually(() => windows.every(tiled) && windows.every(window => near(frame(window).height, area().height)) &&
       new Set(windows.map(shownX)).size === windows.length, 'switching to scrolling puts the windows side by side on a strip');
     await restingTiles();
-    await capture('tiling-switch-scrolling');
 
     useTiling('tiling');
     await eventually(() => tiledTightly(windows) && windows.every(untransformed), 'switching back to tiling tiles them again without leftover offsets');
@@ -76,7 +74,6 @@ export async function run() {
     await restingTiles();
     await focus(windows[0]);
     require(await snapLayoutsShown(), 'snap layouts are offered again');
-    await capture('tiling-switch-off');
 
     useTiling('tiling');
     await eventually(() => tiled(windows[0]) && tiled(windows[2]) && !tiled(windows[1]), 'turning tiling on again keeps the window floated by hand floating');

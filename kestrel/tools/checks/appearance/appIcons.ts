@@ -62,7 +62,7 @@ async function checkStyles(settings: Gio.Settings, slug: string, scheme: string)
     const icons = shownIcons();
     require(icons.length > 0, `the taskbar and Gust show app icons (${setting})`);
     await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paintFor(icon))), `${style} reaches every taskbar and Gust icon (${setting})`);
-    await capture(`icons-${style}-${scheme}-${slug}`);
+    if (slug === WALLPAPERS[0][0] || style === 'tinted') await capture(`icons-${style}-${scheme}-${slug}`);
   }
   toggleSurface('gust');
   await eventually(() => !named('kestrel-gust-panel')!.visible, 'Gust closes');

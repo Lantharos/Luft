@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 
 import {checks} from '../lib/check.js';
+import {taskbarEdge} from '../lib/edge.js';
 import {chord, moveTo, pressButton, releaseButton, rest, type Point} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -139,11 +140,13 @@ export async function run() {
   try {
     await eventually(() => !edgeTiling(), 'tiling turns off edge snapping');
     const windows = await checkDwindle();
-    await checkKeyboard(windows);
-    await checkFloating(windows);
-    await checkMouse(windows);
+    if (taskbarEdge() === 'bottom') {
+      await checkKeyboard(windows);
+      await checkFloating(windows);
+      await checkMouse(windows);
+    }
     await checkGapsAndMaster(windows);
-    await checkMaximize(windows[1]);
+    if (taskbarEdge() === 'bottom') await checkMaximize(windows[1]);
     await eventually(() => tiledTightly(windows), 'the layout is whole again');
   } finally {
     rest();

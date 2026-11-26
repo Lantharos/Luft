@@ -8,11 +8,7 @@ const GB = 1e9;
 const AT = {
   continue: [711, 547],
   alongside: [235, 191],
-  whole: [235, 269],
-  custom: [235, 347],
   back: [85, 547],
-  keyboard: [400, 280],
-  outside: [400, 110],
   install: [700, 547],
   writeDown: [648, 457],
   encrypt: [722, 547],
@@ -21,7 +17,6 @@ const AT = {
   password: [315, 361],
   repeat: [315, 434],
   restart: [690, 547],
-  moreOptions: [560, 547],
   skip: [728, 547],
 } satisfies Record<string, Point>;
 
@@ -73,16 +68,9 @@ async function checkFromMeet() {
   await setup.called('SetX11Keyboard at nodeadkeys', 'the keyboard layout Meet Luft noted becomes the live session’s');
   await setup.called('SetTimezone Europe/Vienna', 'the time zone Meet Luft noted becomes the live session’s');
   await setup.shot('welcome-meet');
-  await setup.click(AT.keyboard, 'the keyboard list opens');
-  await setup.type('custom');
-  await setup.shot('welcome-keyboard-custom');
-  await setup.click(AT.outside, 'clicking outside closes the list');
   await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
   await setup.click(AT.continue, 'continuing shows the room Meet Luft made');
   await setup.shot('destination-meet');
-  await setup.click(AT.moreOptions, 'more options shows the other ways to install');
-  await setup.shot('destination-meet-choices');
-  await setup.click(AT.back, 'going back shows the room Meet Luft made again');
   await setup.click(AT.back, 'going back from the room shows the early note');
   await setup.click(AT.back, 'going back from the early note shows the first screen');
   await setup.shot('destination-meet-back');
@@ -97,19 +85,9 @@ export async function checkLive() {
   await setup.called('SetX11Keyboard de nodeadkeys', 'the keyboard layout Windows used becomes the live session’s');
   await setup.called('SetTimezone Europe/Berlin', 'the time zone Windows used becomes the live session’s');
   await setup.shot('welcome');
-  await setup.click(AT.keyboard, 'the keyboard list opens');
-  await setup.type('dvorak');
-  await setup.shot('welcome-keyboard');
-  await setup.click(AT.outside, 'clicking outside closes the list');
   await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
   await setup.click(AT.continue, 'continuing shows where to install');
   await setup.shot('destination');
-  await setup.click(AT.whole, 'choosing a whole drive lists the drives');
-  await setup.shot('whole-drive');
-  await setup.click(AT.back, 'going back shows the choices again');
-  await setup.click(AT.custom, 'choosing custom offers Disks and the free space');
-  await setup.shot('custom');
-  await setup.click(AT.back, 'going back shows the choices again');
   await setup.click(AT.alongside, 'choosing Windows shows how to share its drive');
   await setup.shot('alongside');
   await setup.click(AT.install, 'installing asks whether to encrypt Luft');

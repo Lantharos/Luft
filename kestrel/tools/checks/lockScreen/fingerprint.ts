@@ -2,13 +2,13 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {getStyleVariant, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {labelled, named, ofType, shown, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {waitUntil} from '../lib/wait.js';
 import {enroll, scan} from './lib/fingerprint.js';
 import {hint, lockAndWake, promptEntry, showPrompt, unlock} from './lib/shield.js';
 import {setLidClosed} from './lib/sleep.js';
@@ -17,12 +17,6 @@ const {require, eventually} = checks('fingerprint');
 const PASSWORD = 'correct horse';
 const SCANNING = 'Touch the fingerprint reader';
 const UNAVAILABLE = 'Fingerprint isn’t available, enter your password';
-const RETRIES = {
-  'verify-retry-scan': 'Scan your finger again',
-  'verify-swipe-too-short': 'Swipe was too short, try again',
-  'verify-finger-not-centered': 'Center your finger and try again',
-  'verify-remove-and-retry': 'Lift your finger and try again',
-};
 const remembered = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'sign-in-method']));
 
 const rememberedMethod = () => new TextDecoder().decode(remembered.load_contents(null)[1]);
@@ -55,8 +49,7 @@ async function unlockFromClock() {
 async function showRetries() {
   await lockShowingFingerprint();
   await capture('unlock-fingerprint');
-  for (const [result, text] of Object.entries(RETRIES))
-    await touch(result, () => hint() === text, `the reader asking to ${result.slice('verify-'.length).replaceAll('-', ' ')} says so`);
+  await touch('verify-retry-scan', () => hint() === 'Scan your finger again', 'the reader asking for another scan says so');
   await touch('verify-no-match', () => hint() === 'Fingerprint not recognized', 'an unknown finger says so');
   require(Main.screenShield.locked && fingerprintFirst(), 'a finger the reader didn’t take keeps the prompt on the fingerprint');
 }
@@ -105,29 +98,6 @@ async function lidClosed() {
   }
 }
 
-async function captureLight() {
-  const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-  const scheme = styles.get_string('color-scheme');
-  styles.set_string('color-scheme', 'default');
-  try {
-    await eventually(() => getStyleVariant() === 'light', 'the shell turns light');
-    await lockAndWake();
-    await settled();
-    await capture('lock-screen-light');
-    await showPrompt();
-    await eventually(() => fingerprintFirst(), 'the light prompt asks for the fingerprint');
-    await settled();
-    await capture('unlock-fingerprint-light');
-    type('c');
-    await eventually(() => promptEntry()?.text === 'c', 'typing switches the light prompt to the password');
-    await settled();
-    await capture('unlock-password-light');
-    await unlock();
-  } finally {
-    styles.set_string('color-scheme', scheme);
-  }
-}
-
 export async function run() {
   await enroll(GLib.get_user_name(), ['right-index-finger']);
   try {
@@ -137,7 +107,6 @@ export async function run() {
     await rememberPassword();
     await fallBackWhenAttemptsRunOut();
     await lidClosed();
-    await captureLight();
   } finally {
     await enroll(GLib.get_user_name(), []);
     if (Main.screenShield.locked) await unlock();

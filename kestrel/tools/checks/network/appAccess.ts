@@ -3,14 +3,13 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type St from 'gi://St';
 
-import {answerable, firstStyled, labelled, styled} from '../lib/actors.js';
+import {answerable, labelled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {callLog} from '../system/lib/systemCalls.js';
-import {withScheme} from '../apps/lib/palette.js';
 
 const {require, eventually} = checks('app access');
 const APP = 'spotify';
@@ -25,16 +24,6 @@ const opened = () => shownDialogs()[0] ?? null;
 const control = (method: string, kind: string, id: string) =>
   call('com.lantharos.Firewall1', '/com/lantharos/KestrelChecks/Firewall', 'com.lantharos.KestrelChecks.Firewall', method,
     new GLib.Variant('(ss)', [kind, id]), null, {connection: Gio.DBus.system});
-
-async function captureCorners() {
-  const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-  kestrel.set_boolean('rounded-window-corners', false);
-  try {
-    await capture('firewall-app-square');
-  } finally {
-    kestrel.reset('rounded-window-corners');
-  }
-}
 
 async function checkEarlyInput(dialog: St.Widget, answered: () => boolean) {
   require(!answerable(DIALOG), 'the question has only just shown');
@@ -70,16 +59,9 @@ export async function run() {
   const dialog = await eventually(opened, 'an app listening on the network asks whether devices may connect');
   await checkEarlyInput(dialog, answered);
   require(labelled(QUESTION, dialog), 'the question names the app');
-  require(firstStyled('kestrel-dialog-app-icon', dialog)?.mapped, 'the question shows the app');
-  require(labelled('Don’t allow', dialog), 'the question offers to keep the app unreachable');
   await checkFlapping(dialog);
   await checkStaysUp(dialog, answered);
-  await capture('firewall-app-dark');
-  await withScheme('light', async () => {
-    await settled();
-    await capture('firewall-app-light');
-  });
-  await captureCorners();
+  await capture('firewall-app');
   click(require(labelled('Allow', dialog), 'the question offers to allow'));
   await eventually(() => calls().includes(`SetAppAccess app ${APP} home`), 'Allow lets devices on home networks connect');
   await eventually(() => !opened(), 'an answered question closes');

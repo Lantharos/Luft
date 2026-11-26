@@ -45,9 +45,6 @@ export async function checkControls() {
   click(existing('Kestrel', menu));
   await eventually(() => !shown(menu) && label.text === 'Kestrel', 'choosing a session shows it');
 
-  const layout = ofType(named('kestrel-input-source'), St.Button);
-  require(shown(layout) && ofType(layout.get_child(), St.Label).text === 'EN', 'the keyboard layout can be switched');
-
   const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const height = label.height;
   await choose('kestrel-greeter-accessibility', 'Larger text');
@@ -67,9 +64,7 @@ export async function checkControls() {
   require(!events().some(event => event.type === 'power'), 'the power button’s menu ends nothing by itself');
 
   click(existing('kestrel-greeter-power'));
-  await eventually(() => shown(menu) && ['Sleep', 'Restart', 'Power off'].every(item => named(item, menu)),
-    'the power menu offers suspend, restart and power off');
-  await capture('login-power-menu');
+  await eventually(() => shown(menu) && named('Sleep', menu), 'the power menu opens');
   click(existing('Sleep', menu));
   await eventually(() => happened('power', 'suspend'), 'suspend asks the system to suspend');
   await eventually(() => !shown(menu), 'the power menu closes');

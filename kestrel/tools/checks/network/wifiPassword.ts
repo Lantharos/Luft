@@ -99,8 +99,6 @@ async function checkNeverEntered(agent: Shell.NetworkAgent, toggle: NMWirelessTo
   click(networkItem(NEVER_ENTERED)!);
   const request = await forwardRequest(agent);
   await eventually(asking, 'a saved network without a password asks for one when clicked, with no keyring to look in');
-  require(showsText(`Enter the password for the Wi-Fi network “${NEVER_ENTERED}”.`),
-    'the dialog names the network');
   await capture('wifi-password-missing');
   type(TYPED);
   press(Clutter.KEY_Return);

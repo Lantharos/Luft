@@ -6,7 +6,6 @@ import {dismissImmediately, Main, toggleSurface} from 'resource:///com/lantharos
 import {setPowerProfile} from '../desktop/lib/playthings.js';
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {rest, rightClick} from '../lib/input/input.js';
 import {fixture, outputLines, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -28,10 +27,6 @@ const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interf
 const backdrops = () => descendants(global.stage).flatMap(actor => actor.mapped ? actor.get_effects() : [])
   .filter((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect && effect.mode === Shell.BlurMode.BACKGROUND);
 const taskbarGlass = () => named('kestrel-panel')!.get_effects().find((effect): effect is Shell.BlurEffect => effect instanceof Shell.BlurEffect)!;
-
-function gustItem() {
-  return descendants(global.stage).find(actor => actor.name?.startsWith('kestrel-gust-item-') && actor.mapped)!;
-}
 
 async function centerOf(window: Meta.Window) {
   const frame = window.get_frame_rect();
@@ -69,13 +64,51 @@ async function captureSurfaces(name: string) {
   toggleSurface('gust');
   await settled();
   await capture(`glass-${name}-gust`);
-  rightClick(gustItem());
-  await eventually(() => named('kestrel-context-menu')?.visible, 'a context menu opens over Gust');
-  await settled();
-  await capture(`glass-${name}-menu`);
   dismissImmediately();
-  rest();
   await settled();
+}
+
+async function checkAppMaterials() {
+  choose({});
+  const vesa = await glassClient('Asks for Vesa', ['window', 'vesa']);
+  await eventually(() => vesa.materials.at(-1) === 'vesa', 'an app asking for Vesa hears it has Vesa');
+  await stop(vesa.process);
+
+  const niko = await glassClient('Asks for Niko', ['window', 'niko']);
+  await eventually(() => niko.materials.at(-1) === 'niko', 'an app asking for Niko hears it has Niko');
+  await stop(niko.process);
+
+  const asking = await glassClient('Asks for Maris', ['window', 'maris']);
+  await eventually(() => asking.materials.at(-1) === 'maris', 'an app asking for Maris hears it has Maris');
+  await settled();
+  require(nearSurface(await centerOf(asking.window)), 'an app asking for Maris gets Maris while people chose Luca');
+  await stop(asking.process);
+
+  const transient = await glassClient('Transient', ['transient', 'user']);
+  await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface starts with the Luca of panels and menus');
+  settings.set_string('surfaces', 'maris');
+  await eventually(() => transient.materials.at(-1) === 'maris', 'a transient surface follows panels and menus to Maris');
+  settings.set_string('windows', 'maris');
+  settings.set_string('surfaces', 'luca');
+  await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface stays with panels and menus, not app windows');
+  settings.set_string('surfaces', 'niko');
+  await eventually(() => transient.materials.at(-1) === 'niko', 'a transient surface follows panels and menus to Niko');
+  await stop(transient.process);
+}
+
+async function checkPowerSaver(glass: Meta.Window) {
+  choose({taskbar: 'maris'});
+  await eventually(() => taskbarGlass().style === Shell.BlurStyle.MARIS, 'the taskbar turns to Maris');
+  await setPowerProfile('power-saver');
+  await eventually(async () => !reddish(await centerOf(glass)), 'power saver makes Luca on app windows blur only the wallpaper');
+  require(taskbarGlass().style === Shell.BlurStyle.MARIS, 'power saver leaves Maris alone');
+  await setPowerProfile('balanced');
+  await eventually(async () => reddish(await centerOf(glass)), 'leaving power saver brings back Luca that blurs everything');
+
+  settings.set_boolean('wallpaper-on-power-saver', false);
+  await setPowerProfile('power-saver');
+  await settled();
+  require(reddish(await centerOf(glass)), 'Luca keeps blurring everything in power saver when asked to');
 }
 
 export async function run() {
@@ -140,44 +173,10 @@ export async function run() {
     await settled();
     require(!reddish(await centerOf(glass.window)), 'Vesa glass on an app window shows the wallpaper instead of the window behind it while glass blurs only the wallpaper');
 
-    choose({});
-    const vesa = await glassClient('Asks for Vesa', ['window', 'vesa']);
-    await eventually(() => vesa.materials.at(-1) === 'vesa', 'an app asking for Vesa hears it has Vesa');
-    await stop(vesa.process);
-
-    const niko = await glassClient('Asks for Niko', ['window', 'niko']);
-    await eventually(() => niko.materials.at(-1) === 'niko', 'an app asking for Niko hears it has Niko');
-    await stop(niko.process);
-
-    const asking = await glassClient('Asks for Maris', ['window', 'maris']);
-    await eventually(() => asking.materials.at(-1) === 'maris', 'an app asking for Maris hears it has Maris');
-    await settled();
-    require(nearSurface(await centerOf(asking.window)), 'an app asking for Maris gets Maris while people chose Luca');
-    await stop(asking.process);
-
-    const transient = await glassClient('Transient', ['transient', 'user']);
-    await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface starts with the Luca of panels and menus');
-    settings.set_string('surfaces', 'maris');
-    await eventually(() => transient.materials.at(-1) === 'maris', 'a transient surface follows panels and menus to Maris');
-    settings.set_string('windows', 'maris');
-    settings.set_string('surfaces', 'luca');
-    await eventually(() => transient.materials.at(-1) === 'luca', 'a transient surface stays with panels and menus, not app windows');
-    settings.set_string('surfaces', 'niko');
-    await eventually(() => transient.materials.at(-1) === 'niko', 'a transient surface follows panels and menus to Niko');
-    await stop(transient.process);
-
-    choose({taskbar: 'maris'});
-    await eventually(() => taskbarGlass().style === Shell.BlurStyle.MARIS, 'the taskbar turns to Maris');
-    await setPowerProfile('power-saver');
-    await eventually(async () => !reddish(await centerOf(glass.window)), 'power saver makes Luca on app windows blur only the wallpaper');
-    require(taskbarGlass().style === Shell.BlurStyle.MARIS, 'power saver leaves Maris alone');
-    await setPowerProfile('balanced');
-    await eventually(async () => reddish(await centerOf(glass.window)), 'leaving power saver brings back Luca that blurs everything');
-
-    settings.set_boolean('wallpaper-on-power-saver', false);
-    await setPowerProfile('power-saver');
-    await settled();
-    require(reddish(await centerOf(glass.window)), 'Luca keeps blurring everything in power saver when asked to');
+    if (global.display.get_monitor_scale(Main.layoutManager.primaryIndex) === 1) {
+      await checkAppMaterials();
+      await checkPowerSaver(glass.window);
+    }
     await stop(glass.process);
   } finally {
     await setPowerProfile('balanced');

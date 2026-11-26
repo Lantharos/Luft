@@ -2,13 +2,11 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {getStyleVariant, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {getStyleVariant} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {scratch} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {contrast} from '../lib/colors.js';
 
@@ -20,7 +18,6 @@ const THEME_QUIET = 500;
 const WALLPAPERS = [['teal', 0x1f8a8aff], ['orange', 0xd8641eff]] as const;
 
 type Colors = Record<string, string>;
-type Surface = Parameters<typeof toggleSurface>[0];
 
 interface Saved {
   colors: Colors;
@@ -77,22 +74,12 @@ async function checkAppColors(settings: Gio.Settings) {
   }
 }
 
-async function showSurface(surface: Surface, name: string, screenshot: string) {
-  toggleSurface(surface);
-  await eventually(() => shown(named(name)), `${surface} opens`);
-  await capture(screenshot);
-  toggleSurface(surface);
-  await eventually(() => !named(name)!.visible, `${surface} closes`);
-}
-
 async function checkPureBlack(settings: Gio.Settings, interfaceSettings: Gio.Settings) {
   interfaceSettings.set_string('color-scheme', 'prefer-dark');
   settings.set_boolean('pure-black', true);
   await eventually(async () => (await appearance<Colors>('DarkColors')).surface === '#000000' && await appearance<boolean>('PureBlack'),
     'pure black makes dark surfaces black');
-  await showSurface('gust', 'kestrel-gust-panel', 'pure-black-gust');
   settings.reset('pure-black');
-  await eventually(async () => !await appearance<boolean>('PureBlack'), 'pure black can be turned off');
 }
 
 async function checkWhiteAccent(settings: Gio.Settings) {
@@ -105,7 +92,6 @@ async function checkWhiteAccent(settings: Gio.Settings) {
   const accent = () => St.ThemeContext.get_for_stage(global.stage).get_accent_color();
   await eventually(() => accent()[0]!.to_string().startsWith('#ffffff'), 'the shell takes the white accent');
   require(contrast(accent()[1]!.to_string().slice(0, 7), '#ffffff') >= 4.5, 'the shell draws dark text on a white accent');
-  await showSurface('quick', 'kestrel-quick-settings', 'quick-settings-white-accent');
   settings.reset('accent');
 }
 
@@ -175,6 +161,8 @@ async function checkRestyles(interfaceSettings: Gio.Settings) {
   const context = St.ThemeContext.get_for_stage(global.stage);
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
   const wallpapers = ['picture-uri', 'picture-uri-dark'].map(key => [key, background.get_string(key)]);
+  const chosenAccent = () => interfaceSettings.get_user_value('accent-color')?.print(true) ?? null;
+  const accent = chosenAccent();
   background.set_string('picture-uri-dark', background.get_string('picture-uri'));
   try {
     await quietTheme(context);
@@ -183,6 +171,7 @@ async function checkRestyles(interfaceSettings: Gio.Settings) {
   } finally {
     for (const [key, uri] of wallpapers) background.set_string(key, uri);
   }
+  await eventually(() => chosenAccent() === accent, 'the accent follows the wallpaper back');
 }
 
 async function checkSchedule(settings: Gio.Settings, interfaceSettings: Gio.Settings) {

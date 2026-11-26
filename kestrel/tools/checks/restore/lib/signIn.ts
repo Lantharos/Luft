@@ -52,6 +52,21 @@ export function sessionRecord(): SessionRecord | null {
   return GLib.file_test(path, GLib.FileTest.EXISTS) ? JSON.parse(read(path)) as SessionRecord : null;
 }
 
+type Placed = Pick<Recorded, 'monitor' | 'frame' | 'workspace' | 'maximized' | 'focused'>;
+
+const crashSnapshot = (): Placed[] => {
+  const path = GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!, 'windows.json']);
+  return GLib.file_test(path, GLib.FileTest.EXISTS) ? JSON.parse(read(path)) as Placed[] : [];
+};
+
+const placedLike = (window: Meta.Window, placed: Placed) => placed.monitor === window.get_monitor() && placed.workspace === window.get_workspace()?.index() &&
+  placed.maximized === maximized(window) && (placed.maximized || near(placed.frame, boxOf(window))) && placed.focused === (window === global.display.focus_window);
+
+export function windowsNoted(windows: Meta.Window[], kept: 'record' | 'crash' = 'record'): boolean {
+  const placed = kept === 'record' ? sessionRecord()?.windows ?? [] : crashSnapshot();
+  return windows.every(window => placed.some(entry => placedLike(window, entry)));
+}
+
 export function recordMode(): number {
   return recordFile().query_info('unix::mode', Gio.FileQueryInfoFlags.NONE, null).get_attribute_uint32('unix::mode') & 0o777;
 }

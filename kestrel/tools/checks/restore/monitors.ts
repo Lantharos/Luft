@@ -2,14 +2,13 @@ import Gio from 'gi://Gio';
 
 import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
-import {pause, settled} from '../lib/wait.js';
+import {settled} from '../lib/wait.js';
 import {install, NOTEBOOK, open, quit, titled, uninstall, windowsOf} from './lib/apps.js';
-import {boxOf, maximized, phases, restart, sessionRecord, signOutOfSession} from './lib/signIn.js';
+import {boxOf, maximized, phases, restart, sessionRecord, signOutOfSession, windowsNoted} from './lib/signIn.js';
 
 const {require, eventually} = checks('session restore on other displays');
 const GROUP = 'restore:monitors';
 const RESTORE_TIMEOUT = 40000;
-const NOTED_AFTER = 1500;
 const SECOND = 1;
 const ONE_DISPLAY = 'default';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -33,8 +32,8 @@ async function prepare(): Promise<never> {
   wide.move_to_monitor(SECOND);
   wide.maximize();
   await settled();
-  await pause(NOTED_AFTER);
-  await eventually(() => sessionRecord()?.windows.filter(window => window.monitor === SECOND).length === 2, 'both windows are noted on the second display');
+  await eventually(() => windowsNoted([moved, wide]) && sessionRecord()?.windows.filter(window => window.monitor === SECOND).length === 2,
+    'both windows are noted on the second display');
   await restart('Restart');
   next('signedIn', {moved: moved.get_title()!, maximized: wide.get_title()!}, ONE_DISPLAY);
   return signOutOfSession();

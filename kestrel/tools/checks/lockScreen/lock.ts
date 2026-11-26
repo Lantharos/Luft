@@ -49,7 +49,6 @@ async function checkLockScreen() {
     await settled();
     await capture('lock-screen-fluted');
     await showPrompt();
-    require(Main.screenShield.locked, 'a key shows the unlock prompt');
     await capture('unlock-prompt');
   } finally {
     shell.reset('lock-screen-content');

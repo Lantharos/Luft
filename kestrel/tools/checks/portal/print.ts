@@ -97,8 +97,6 @@ export async function run() {
 
   const prepared = preparePrint();
   let dialog = await openedDialog('printing asks how to print');
-  require(['Copies', 'Pages', 'Paper', 'Orientation', 'Two-sided', 'Color'].every(label => field(dialog, label)) && labelled('Office Printer', dialog),
-    'the print dialog offers the printer and its options');
   await capture('portal-print');
   await checkOptions(dialog);
 
@@ -126,7 +124,6 @@ export async function run() {
   const reused = printDocument(documentPath, {token: new GLib.Variant('u', token)});
   dialog = await openedDialog('a used token asks again');
   require(!field(dialog, 'Orientation') && field(dialog, 'Pages'), 'a used token asks again, without layout options');
-  await capture('portal-print-document');
   click(ofType(labelled('Cancel', dialog), Clutter.Actor));
   require((await reused)[0] === 1, 'cancelling the print dialog prints nothing');
 

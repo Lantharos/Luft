@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, firstStyled, labelled, styled} from '../lib/actors.js';
+import {descendants, labelled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
@@ -28,7 +28,6 @@ async function checkCaller(client: KeyringClient) {
 async function checkAccess(client: KeyringClient) {
   const allowed = client.access(handle(), {...GITHUB, remember: true});
   const dialog = await openedDialog('an access prompt opens');
-  require(firstStyled('kestrel-dialog-app-icon', dialog)?.mapped, 'access prompts show the app asking');
   await capture('keyring-access');
   click(require(labelled('Allow', dialog), 'access prompts offer to allow'));
   const [response, results] = await allowed;

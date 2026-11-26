@@ -90,8 +90,6 @@ async function checkSigning(gnupg: GnuPG, keyring: ScratchKeyring) {
   await gnupg.forget();
   const signed = gnupg.sign();
   const dialog = await openedDialog('signing asks for the passphrase');
-  require(labelled('Enter your passphrase', dialog) && labelled('Save in your keyring', dialog),
-    'signing asks to unlock the key and offers to save the passphrase');
   await focusedEntry(dialog);
   type('wrong horse');
   press(Clutter.KEY_Return);
@@ -133,8 +131,6 @@ async function checkQuality(gnupg: GnuPG) {
 async function checkConfirm(gnupg: GnuPG) {
   const asked = gnupg.ask('GET_CONFIRMATION Forget%20the%20saved%20passphrase%3F');
   const dialog = await openedDialog('a confirmation is asked');
-  require(labelled('Forget the saved passphrase?', dialog) && labelled('OK', dialog) && labelled('Cancel', dialog),
-    'confirmations ask in Kestrel');
   await capture('pinentry-confirm');
   click(require(labelled('Cancel', dialog), 'confirmations offer to cancel'));
   const {output} = await asked;

@@ -6,7 +6,7 @@ import {getStyleVariant} from 'resource:///com/lantharos/kestrel/kestrel.js';
 import {existing, styled} from '../lib/actors.js';
 import {click} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
-import {pause, settled} from '../lib/wait.js';
+import {settled} from '../lib/wait.js';
 import {eventually, require} from './lib/prompt.js';
 
 const CHANGE_IN_SECONDS = 4;
@@ -32,13 +32,11 @@ export async function checkStyleChange() {
   click(rows[2]);
   await eventually(() => getStyleVariant() === 'dark' && showing(THEO, 'wallpaper-dark.jpg', 'picture-uri-dark'),
     'a person whose schedule is in its dark hours is shown dark');
-  await pause(CROSSFADE);
-  await settled();
+  await settled(2 * CROSSFADE);
   await capture('login-schedule-dark');
   await eventually(() => getStyleVariant() === 'light' && showing(THEO, 'wallpaper.jpg', 'picture-uri'),
     'the login screen turns light with the light wallpaper when the schedule says so, while it stays on screen', (CHANGE_IN_SECONDS + 4) * 1000);
-  await pause(CROSSFADE);
-  await settled();
+  await settled(2 * CROSSFADE);
   await capture('login-schedule-light');
   for (const name of ['style.json', 'wallpaper-dark.jpg']) stored(THEO, name).delete(null);
   click(rows[1]);

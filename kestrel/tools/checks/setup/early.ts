@@ -1,8 +1,4 @@
-import Gio from 'gi://Gio';
-
 import {NIGHTLY_RELEASE} from '../../fixtures/setup/installer.js';
-import {changes} from '../apps/lib/apps.js';
-import {useScheme, type Scheme} from '../apps/lib/palette.js';
 import type {Point} from '../lib/input/input.js';
 import {require, Setup, type Release} from './lib/driver.js';
 
@@ -26,28 +22,11 @@ async function opened(release: Release) {
   return setup;
 }
 
-const interfaceStyle = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
-const currentScheme = (): Scheme => interfaceStyle.get_string('color-scheme') === 'prefer-dark' ? 'dark' : 'light';
-
-async function useStyle(setup: Setup, scheme: Scheme) {
-  await changes(setup.app, `Install Luft follows the ${scheme} style`, () => useScheme(scheme));
-  await setup.app.settle(() => true);
-}
-
-async function shoot(setup: Setup, name: string) {
-  const first = currentScheme();
-  const other = first === 'dark' ? 'light' : 'dark';
-  await setup.shot(`${name}-${first}`);
-  await useStyle(setup, other);
-  await setup.shot(`${name}-${other}`);
-  await useStyle(setup, first);
-}
-
 async function earlyStep(release: Release, name: string) {
   const setup = await opened(release);
   await setup.click(AT.continue, `continuing from the welcome screen says Luft isn’t finished yet on a ${name} build`);
   const shown = await body(setup);
-  await shoot(setup, `early-${name}`);
+  await setup.shot(`early-${name}`);
   return {setup, shown};
 }
 
@@ -56,7 +35,7 @@ async function checkNightly() {
   const welcome = await body(setup);
   await setup.click(AT.continue, 'continuing from the welcome screen says Luft isn’t finished yet');
   const early = await body(setup);
-  await shoot(setup, 'early-nightly');
+  await setup.shot('early-nightly');
   await setup.click(AT.back, 'Back on the early note goes back to the welcome screen');
   require((await body(setup)).looksLike(welcome, SAME_TOLERANCE), 'Back on the early note shows the welcome screen as it was');
   await setup.click(AT.continue, 'continuing shows the early note again');
@@ -81,7 +60,7 @@ export async function checkEarly() {
   const finished = await opened(RELEASES.finished);
   await finished.click(AT.continue, 'without the early mark, continuing from the welcome screen moves on');
   const next = await body(finished);
-  await shoot(finished, 'early-off');
+  await finished.shot('early-off');
   await finished.close();
   require(next.looksLike(nightly.destination, SAME_TOLERANCE), 'without the early mark, the welcome screen goes straight to where Luft goes');
 

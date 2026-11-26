@@ -8,12 +8,12 @@ import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {forgetCrashes} from '../extensions/lib/extensions.js';
 import {install, NOTEBOOK, open, processesOf, quit, titled, uninstall, windowsOf} from './lib/apps.js';
-import {boxOf, crashKestrel, maximized, near, phases, type Box} from './lib/signIn.js';
+import {boxOf, crashKestrel, maximized, near, phases, windowsNoted, type Box} from './lib/signIn.js';
 
 const {require, eventually} = checks('session restore after a crash');
 const GROUP = 'restore:crash';
 const RETURN_TIMEOUT = 40000;
-const NOTED_AFTER = 1500;
+const SECOND_COPY_WITHIN = 1500;
 
 interface Placed {
   title: string;
@@ -57,8 +57,7 @@ async function prepare(): Promise<never> {
   roverWindow.change_workspace_by_index(1, false);
   second.maximize();
   await settled();
-  await pause(NOTED_AFTER);
-  await capture('restore-before-crash');
+  await eventually(() => windowsNoted([roverWindow, first, second], 'crash'), 'Kestrel notes where each window is');
   next('crashed', {kestrel: ownPid(), rover, notebookPid: first.get_pid() as number, windows: [roverWindow, first, second].map(placedOf)});
   return crashKestrel();
 }
@@ -66,7 +65,7 @@ async function prepare(): Promise<never> {
 async function crashed(data: Data) {
   require(ownPid() !== data.kestrel, 'Kestrel starts again after it crashes');
   await eventually(() => data.windows.every(saved => titled(saved.title)), 'every window comes back', RETURN_TIMEOUT);
-  await pause(NOTED_AFTER);
+  await pause(SECOND_COPY_WITHIN);
   require(roverWindows().length === 1 && roverWindows()[0].get_pid() === data.windows[0].pid, 'Rover reconnects and is not opened a second time');
   require(processesOf(NOTEBOOK).size === 1 && windowsOf(NOTEBOOK).length === NOTEBOOK.windows, 'the app that closed with Kestrel opens again, once');
   require(!processesOf(NOTEBOOK).has(data.notebookPid), 'that app is a new process');

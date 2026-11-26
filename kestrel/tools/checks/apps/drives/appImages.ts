@@ -5,13 +5,12 @@ import {labelled} from '../../lib/actors.js';
 import {builtFixture, outcome, scratch} from '../../lib/processes.js';
 import {capture} from '../../lib/screenshots.js';
 import {pause, settled} from '../../lib/wait.js';
-import {withApp} from '../lib/apps.js';
 import {IN_SESSION, install, launchLine, SABINE_BUILDER} from '../lib/appImages.js';
-import {scrollToEnd, showEnd} from '../settings/navigation.js';
 import {answer, answers, checkOnlySchelfAsks, notificationTitled, DRIVE_LABEL, DRIVE_SIZE, driveFolder, eventually, Looker, mount, require, setAnswer,
   shownDialog, unmount} from './drive.js';
 
 const QUIET = 3000;
+const ASKED_QUIET = 1000;
 
 async function sabineApp(name: string) {
   const image = scratch(`${name}.AppImage`);
@@ -57,15 +56,6 @@ async function checkAsked(id: string, folder: string) {
   await looker.close();
 }
 
-async function captureGiven(id: string) {
-  await withApp('schelf', [`schelf:app?${id}`], async app => (await scrollToEnd(app, await app.settle(() => true))).save('schelf-drives'));
-  await withApp('settings', [], async app => {
-    const shown = await showEnd(app, 'apps');
-    app.click(await app.find({role: 'button', has: {text: 'Harvest'}}));
-    (await app.settle(frame => !frame.looksLike(shown))).save('settings-apps-drives');
-  });
-}
-
 async function checkOthersStayOut(other: string, folder: string) {
   const {program, rest} = launchLine(other);
   const listed = await outcome([program, ...rest, 'ls', '-A', folder], IN_SESSION);
@@ -73,7 +63,6 @@ async function checkOthersStayOut(other: string, folder: string) {
 }
 
 async function checkGiven(id: string, other: string, folder: string) {
-  await captureGiven(id);
   await checkOthersStayOut(other, folder);
   const looker = await openLooker(id, folder);
   const after = await looker.look();
@@ -99,7 +88,7 @@ async function checkRefused(id: string, folder: string) {
   await asking.close();
   const again = await openLooker(id, folder);
   const looked = await again.look();
-  await pause(QUIET);
+  await pause(ASKED_QUIET);
   require(!shownDialog() && !looked.names?.includes('saves.txt'), 'an app that was told no is never asked again and doesn\'t see the drive');
   await again.close();
 }

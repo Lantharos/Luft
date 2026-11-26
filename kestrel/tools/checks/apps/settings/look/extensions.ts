@@ -65,6 +65,7 @@ async function checkOwnPages(app: LuftApp) {
     kestrel.reset('taskbar-style');
     await request('Remove', VISUALIZER);
     await request('Remove', NOW_PLAYING);
+    kestrel.reset('taskbar-arrangement');
   }
   await installBuilt(SOUNDSCAPES);
   try {

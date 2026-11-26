@@ -1,15 +1,16 @@
-import {saveBothStyles, type Palette} from '../lib/palette.js';
 import type {Driver} from './driver.js';
 
-export async function checkOtherSystems(driver: Driver, palette: Palette) {
+const save = async (driver: Driver, name: string) => (await driver.app.settle(() => true)).save(`${name}-dark`);
+
+export async function checkOtherSystems(driver: Driver) {
   await driver.click('crucial');
-  await saveBothStyles(driver.app, palette, 'disks-other-system');
+  await save(driver, 'disks-other-system');
   await driver.click('removeSystem');
-  await saveBothStyles(driver.app, palette, 'disks-remove-system');
+  await save(driver, 'disks-remove-system');
   await driver.click('confirmRemoveSystem');
   await driver.called([
     'RemoveStartups EFI/Microsoft partitions=3', 'udisks Delete /dev/nvme1n1p2', 'udisks Delete /dev/nvme1n1p4', 'udisks Delete /dev/nvme1n1p3',
   ], 'disks takes Windows out of the startup list, then deletes its partitions');
-  await saveBothStyles(driver.app, palette, 'disks-system-removed');
+  await save(driver, 'disks-system-removed');
   await driver.click('systemDone');
 }

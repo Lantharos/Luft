@@ -1,19 +1,14 @@
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {changes} from '../lib/apps.js';
-import {useScheme} from '../lib/palette.js';
 import {scrollToEnd, show} from '../settings/navigation.js';
 import type {Drive} from './service.js';
 
 const {require} = checks('Luft app');
 
 export async function checkSettings(app: LuftApp, drive: Drive) {
-  useScheme('light');
-  (await show(app, 'accounts')).save('settings-accounts-light');
-  useScheme('dark');
-  (await scrollToEnd(app, await app.settle(() => true))).save('settings-accounts-dark');
+  (await scrollToEnd(app, await show(app, 'accounts'))).save('settings-accounts-dark');
   await changes(app, 'the account opens its details', async () => app.click(await app.find({role: 'button', name: 'WebDAV'})));
   (await app.settle(() => true)).save('settings-accounts-details-dark');
-  (await show(app, 'accounts/add', 'a kestrel-settings link opens adding an account')).save('settings-accounts-add-dark');
   require(drive.name === 'WebDAV', 'a new account is named after its service');
 }

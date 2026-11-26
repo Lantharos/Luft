@@ -45,7 +45,7 @@ const MENU_TOLERANCE = 6;
 const MENU_PIXELS = 100;
 const LISTEN_MS = 700;
 const AFTER_PRESS_MS = 400;
-const IDLE_MS = 10000;
+const IDLE_MS = 5000;
 const SETTLE_MS = 3000;
 const AUDIO_THREAD = /^(data-loop|pw-|soundboard-audi)/;
 const MOST_IDLE_WAKEUPS_PER_SECOND = 2;
@@ -122,7 +122,7 @@ function pressEscape() {
 async function checkMenus(app: LuftApp) {
   const empty = () => app.click(EMPTY_SPOT);
   empty();
-  await pause(AFTER_PRESS_MS);
+  await app.settle(() => true);
   const tileMenu = app.area(BESIDE_TILE);
   const boardMenu = app.area(BESIDE_BOARD);
   const popover = app.area(BELOW_SELECT);
@@ -150,22 +150,17 @@ async function checkMenus(app: LuftApp) {
   await closes(app, boardMenu, noBoardMenu, 'and that one closes too', empty);
 
   await opens(app, tileMenu, noTileMenu, 'the tile\'s menu opens once more', openTile);
-  await pause(AFTER_PRESS_MS);
   const edit = await app.find({role: 'menuitem', name: 'Edit…'});
   await opens(app, popover, noPopover, 'choosing Edit opens the editor', () => app.click(edit));
-  await pause(AFTER_PRESS_MS);
   await capture('soundboard-editor');
   await closes(app, tileMenu, noTileMenu, 'Escape closes the editor, and no menu is left behind', pressEscape);
 
   await opens(app, boardMenu, noBoardMenu, 'a board\'s menu opens for renaming', openBoard);
-  await pause(AFTER_PRESS_MS);
   const rename = await app.find({role: 'menuitem', name: 'Rename'});
   await opens(app, popover, noPopover, 'choosing Rename opens its dialog', () => app.click(rename));
-  await pause(AFTER_PRESS_MS);
   await capture('soundboard-rename');
   await closes(app, boardMenu, noBoardMenu, 'Escape closes the rename dialog', pressEscape);
 
-  await pause(AFTER_PRESS_MS);
   const microphone = await app.find({role: 'combobox', name: 'Your microphone'});
   const list = app.area({x: microphone.x, y: microphone.y + microphone.height + LIST_GAP, width: microphone.width, height: LIST_HEIGHT});
   const noList = await app.frame(list);

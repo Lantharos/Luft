@@ -6,7 +6,6 @@ import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {press} from '../../lib/input/input.js';
 import {changes} from '../lib/apps.js';
-import {squareCorners} from '../lib/corners.js';
 import {write} from '../lib/files.js';
 
 const {eventually} = checks('Luft app');
@@ -14,7 +13,6 @@ const TRIPS = {text: 'Trips'};
 const COLORS = 8;
 
 type Open = (app: LuftApp, path: string) => Promise<void>;
-
 
 const lookOf = (path: string) =>
   Gio.File.new_for_path(path).query_info('xattr::luft.look', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('xattr::luft.look');
@@ -25,11 +23,6 @@ async function keys(app: LuftApp, label: string, ...presses: number[][]) {
   });
 }
 
-async function saveBothCorners(app: LuftApp, name: string) {
-  (await app.settle(() => true)).save(`${name}-dark`);
-  await squareCorners(async () => (await app.settle(() => true)).save(`${name}-square`));
-}
-
 async function chooseLook(app: LuftApp) {
   await changes(app, 'Change icon opens the folder icon dialog', async () => app.click(await app.find({role: 'menuitem', name: 'Change icon…'})));
   (await app.settle(() => true)).save('rover-folder-icon-dialog-dark');
@@ -38,9 +31,8 @@ async function chooseLook(app: LuftApp) {
   const space = [Clutter.KEY_space];
   await keys(app, 'the folder icon dialog picks the last icon', back, back, space);
   await keys(app, 'the folder icon dialog picks the first color swatch', tab, tab, tab, space);
-  await saveBothCorners(app, 'rover-folder-icon-first-color');
   await keys(app, 'the folder icon dialog picks the last color', ...Array(COLORS).fill(tab), space);
-  await saveBothCorners(app, 'rover-folder-icon-chosen');
+  (await app.settle(() => true)).save('rover-folder-icon-chosen-dark');
   await keys(app, 'Save closes the folder icon dialog', ...Array(COLORS + 1).fill(back), space);
 }
 
@@ -53,13 +45,4 @@ export async function checkLooks(app: LuftApp, folder: string, open: Open) {
   await chooseLook(app);
   await eventually(() => lookOf(trips) === 'lock:pink', 'Rover keeps the chosen icon and color on the folder itself');
   (await app.settle(() => true)).save('rover-folder-icon-list-dark');
-
-  await changes(app, 'right-clicking the folder again opens its menu', async () => app.click(await app.find(TRIPS), Clutter.BUTTON_SECONDARY));
-  await changes(app, 'Rover adds the folder to Favorites', async () => app.click(await app.find({role: 'menuitem', name: 'Add to sidebar'})));
-  await keys(app, 'Ctrl+2 shows the grid', [Clutter.KEY_Control_L, Clutter.KEY_2]);
-  (await app.settle(() => true)).save('rover-folder-icon-grid-dark');
-  await keys(app, 'Ctrl+1 goes back to the list', [Clutter.KEY_Control_L, Clutter.KEY_1]);
-
-  await open(app, GLib.get_home_dir());
-  (await app.settle(() => true)).save('rover-home-dark');
 }

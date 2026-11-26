@@ -7,8 +7,8 @@ import {middle} from '../../lib/apps/probe.js';
 import {checks} from '../../lib/check.js';
 import {drag, press, type, type Point} from '../../lib/input/input.js';
 import {outcome} from '../../lib/processes.js';
-import {capture, type Frame} from '../../lib/screenshots.js';
-import {pause} from '../../lib/wait.js';
+import type {Frame} from '../../lib/screenshots.js';
+import {settled} from '../../lib/wait.js';
 import {changes, openApp} from '../lib/apps.js';
 
 const {require} = checks('Luft app');
@@ -16,7 +16,6 @@ const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Drop check']);
 const LEFT = 10;
 const TOP = 20;
 const MAGPIE_LEFT = 640;
-const MOVED_MS = 400;
 const ON_THE_PAGE: Point = [420, 400];
 const ON_THE_SIDEBAR: Point = [90, 400];
 const COLOR_TOLERANCE = 16;
@@ -67,13 +66,12 @@ async function overlap(rover: LuftApp, magpie: LuftApp) {
   rover.window.move_frame(true, LEFT, TOP);
   magpie.window.move_frame(true, MAGPIE_LEFT, TOP);
   magpie.window.make_above();
-  await pause(MOVED_MS);
+  await settled();
 }
 
 async function dropOn(rover: LuftApp, magpie: LuftApp, {kind, file, shown}: Sample, at: Point, where: string) {
   await drag(rover.at(middle(await rover.find({text: file}))), magpie.at(at), DRAG);
   const opened = await magpie.settle(shown);
-  await capture(`magpie-drop-${where.replaceAll(' ', '-')}-${kind.toLowerCase()}`);
   require(shown(opened), `a ${kind} dropped from Rover on ${where} opens in Magpie`);
 }
 

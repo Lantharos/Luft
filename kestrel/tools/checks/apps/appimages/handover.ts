@@ -8,7 +8,7 @@ import {checks} from '../../lib/check.js';
 import {middle} from '../../lib/apps/probe.js';
 import {centerOf, click, drag, press, type} from '../../lib/input/input.js';
 import {builtFixture, fixture, outcome, scratch} from '../../lib/processes.js';
-import {pause, waitUntil} from '../../lib/wait.js';
+import {settled, waitUntil} from '../../lib/wait.js';
 import {changes, openApp} from '../lib/apps.js';
 import {install, launchLine, SABINE_BUILDER} from '../lib/appImages.js';
 import {type Answer, copyInto, Receiver} from './receivers.js';
@@ -24,7 +24,6 @@ const LOAD_EXTENSION = '--load-extension=';
 const LEFT = 10;
 const TOP = 20;
 const RECEIVER_LEFT = 640;
-const MOVED_MS = 400;
 const DRAG = {steps: 24, interval: 30, hover: 500};
 
 const installedExtension = (argument: string) =>
@@ -55,7 +54,7 @@ function reportHanded(what: string, answer: Answer) {
 async function handOver(rover: LuftApp, receiver: Receiver, what: string) {
   receiver.window.move_frame(true, RECEIVER_LEFT, TOP);
   receiver.window.make_above();
-  await pause(MOVED_MS);
+  await settled();
   rover.window.activate(global.get_current_time());
   const handed = rover.at(middle(await rover.find({text: HANDED})));
   await drag(handed, centerOf(receiver.window.get_compositor_private<Meta.WindowActor>()), DRAG);

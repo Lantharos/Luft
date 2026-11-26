@@ -7,9 +7,8 @@ import type {LuftApp} from '../lib/apps/luftApp.js';
 import {freePorts} from '../lib/apps/ports.js';
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
-import {pause} from '../lib/wait.js';
 import {changes, withApp} from './lib/apps.js';
-import {exists, removeTree, write} from './lib/files.js';
+import {exists, read, removeTree, write} from './lib/files.js';
 import {A4, typeset, type Block} from './lib/paper.js';
 import {saveBothStyles, withPalette} from './lib/palette.js';
 import {CONTRACT} from './flatbed/contract.js';
@@ -18,7 +17,6 @@ const {eventually} = checks('Luft app');
 const MODEL = 'Canon PIXMA MX490 Series';
 const DPI = 150;
 const SCANNING_MS = 30000;
-const SETTLE = 1500;
 const SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'com.lantharos.flatbed', 'settings.json']);
 const DOCUMENT = GLib.build_filenamev([GLib.get_user_state_dir(), 'com.lantharos.flatbed']);
 const NO_SANE_DRIVERS = scratch('flatbed-sane');
@@ -39,12 +37,15 @@ function scannedPage(blocks: Block[], name: string): Uint8Array {
   return jpeg;
 }
 
+const scannedPages = () => {
+  const manifest = GLib.build_filenamev([DOCUMENT, 'document', 'document.json']);
+  return exists(manifest) ? (JSON.parse(read(manifest)) as {pages: unknown[]}).pages.length : 0;
+};
+
 async function scanContract(app: LuftApp) {
-  await pause(SETTLE);
   await changes(app, 'the feeder is chosen', async () => app.click(await app.find({role: 'radio', name: 'Feeder'})));
   app.click(await app.find({role: 'button', name: 'Scan'}));
-  await eventually(() => exists(GLib.build_filenamev([DOCUMENT, 'document'])), 'Flatbed keeps the pages it scans', SCANNING_MS);
-  await pause(SCANNING_MS / 10);
+  await eventually(() => scannedPages() === CONTRACT.length, 'Flatbed keeps every page the feeder scans', SCANNING_MS);
 }
 
 export async function run() {

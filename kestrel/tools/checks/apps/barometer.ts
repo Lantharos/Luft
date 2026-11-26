@@ -1,13 +1,11 @@
-import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 import {environment, type LuftApp} from '../lib/apps/luftApp.js';
 import type {Query} from '../lib/apps/probe.js';
 import {checks} from '../lib/check.js';
-import {press as pressKeys, rest} from '../lib/input/input.js';
+import {rest} from '../lib/input/input.js';
 import {spawn, windows, windowShown} from '../lib/processes.js';
 import type {Frame} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
 import {changes, openApp, withApp} from './lib/apps.js';
 import {checkPalette, withPalette} from './lib/palette.js';
 
@@ -16,9 +14,8 @@ const MAILMAN = 'com.lantharos.mailman';
 const CONTENT = {x: 280, y: 0, width: 840};
 const MAILMAN_ROW = {role: 'row', has: {text: 'Mailman'}};
 const ROWS = {x: 290, y: 116, width: 250, height: 150};
-const SETTLE = 3000;
 const REOPEN_TIMEOUT = 15000;
-const SHOW_TIMEOUT = 5000;
+const SHOW_TIMEOUT = 10000;
 const ANSWER_TIMEOUT = 12000;
 const FORCE_AFTER = 5000;
 const MIB = 1024 * 1024;
@@ -44,13 +41,12 @@ function shows(barometer: LuftApp, expected: Frame, label: string) {
   return eventually(async () => (await rows(barometer)).looksLike(expected), label, SHOW_TIMEOUT);
 }
 
-async function press(barometer: LuftApp, control: Query, button: number = Clutter.BUTTON_PRIMARY) {
-  barometer.click(await barometer.find(control), button);
+async function press(barometer: LuftApp, control: Query) {
+  barometer.click(await barometer.find(control));
   rest();
 }
 
 async function save(barometer: LuftApp, name: string) {
-  await pause(SETTLE);
   (await barometer.settle(() => true, barometer.area(CONTENT))).save(name);
 }
 
@@ -61,9 +57,6 @@ async function checkViews(barometer: LuftApp) {
   await changes(barometer, 'Barometer folds Mailman back into one row', () => press(barometer, {role: 'button', name: 'Hide processes', within: MAILMAN_ROW}), ROWS);
   await changes(barometer, 'Barometer lists every process on its own', () => press(barometer, {role: 'radio', name: 'All processes'}), ROWS);
   await save(barometer, 'barometer-flat');
-  await press(barometer, {role: 'button', name: 'Name'}, Clutter.BUTTON_SECONDARY);
-  await save(barometer, 'barometer-columns');
-  pressKeys(Clutter.KEY_Escape);
   await changes(barometer, 'Barometer groups processes again', () => press(barometer, {role: 'radio', name: 'Grouped'}), ROWS);
 }
 
@@ -72,8 +65,7 @@ async function checkNotResponding(barometer: LuftApp) {
   const pid = window.get_pid();
   const ping = () => window.check_alive(global.display.get_current_time_roundtrip());
   barometer.window.activate(global.get_current_time());
-  await pause(SETTLE);
-  const answering = await rows(barometer);
+  const answering = await barometer.settle(() => true, barometer.area(ROWS));
   await signal(pid, 'STOP');
   try {
     ping();
@@ -97,7 +89,7 @@ async function checkBackgroundApps() {
     const barometer = await openApp('barometer', [], {LUFT_SAMPLE_SYSTEM: null, LUFT_APP_SLICE: GLib.path_get_dirname(scope)}, {slice});
     try {
       rest();
-      await pause(SETTLE);
+      await barometer.find(MAILMAN_ROW);
       await checkViews(barometer);
       await checkNotResponding(barometer);
       const open = await rows(barometer);

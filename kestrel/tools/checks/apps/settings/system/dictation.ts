@@ -6,7 +6,6 @@ import {checks} from '../../../lib/check.js';
 import {freePorts, listening} from '../../../lib/apps/ports.js';
 import {fixture, repository, scratch, spawn, stop} from '../../../lib/processes.js';
 import type {Frame} from '../../../lib/screenshots.js';
-import {pause} from '../../../lib/wait.js';
 import {show} from '../navigation.js';
 
 const {require, eventually} = checks('dictation settings');
@@ -75,8 +74,7 @@ export async function checkDictation(app: LuftApp) {
       const state = await overview();
       return downloading(state, WHISPER) && !state.models[PARAKEET].download;
     }, 'going back to Japanese picks Whisper up again and stops Parakeet');
-    await pause(1000);
-    require(((await overview()).models[WHISPER].download?.received ?? 0) > kept, 'Whisper carries on from where it stopped');
+    await eventually(async () => ((await overview()).models[WHISPER].download?.received ?? 0) > kept, 'Whisper carries on from where it stopped');
   } finally {
     for (const key of ['enabled', 'language']) preferences.reset(key);
     await stop(service);

@@ -35,9 +35,8 @@ async function pick(app: LuftApp, search: string) {
   press(Clutter.KEY_Return);
 }
 
-async function tab(app: LuftApp, palette: Palette, key: number, name: string) {
-  await changes(app, `Keys switches to ${name}`, () => code(KEY_LEFTCTRL, key));
-  await saveBothStyles(app, palette, name);
+async function tab(app: LuftApp, key: number, name: string) {
+  (await changes(app, `Keys switches to ${name}`, () => code(KEY_LEFTCTRL, key))).save(`${name}-dark`);
 }
 
 async function create(app: LuftApp, palette: Palette) {
@@ -59,9 +58,9 @@ async function checkEditing(app: LuftApp, palette: Palette, symbols: string) {
   await eventually(() => read(symbols).includes('replace key <AC01> { type[Group1] = "FOUR_LEVEL", [ aring,'),
     'pressing a key picks it and a character found by name is assigned to it', SAVED);
   await saveBothStyles(app, palette, 'keys-inspector');
-  await tab(app, palette, KEY_2, 'keys-standard-dead-key');
-  await tab(app, palette, KEY_3, 'keys-layout-settings');
-  await tab(app, palette, KEY_1, 'keys-layout-again');
+  await tab(app, KEY_2, 'keys-standard-dead-key');
+  await tab(app, KEY_3, 'keys-layout-settings');
+  await tab(app, KEY_1, 'keys-layout-again');
   await changes(app, 'pressing a key picks it again', () => code(KEY_A));
 }
 

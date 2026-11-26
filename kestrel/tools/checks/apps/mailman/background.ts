@@ -13,6 +13,7 @@ const ID = 'com.lantharos.mailman';
 const IDLE_MEMORY_MB = 24;
 const SETTLE = 3000;
 const QUIT_TIMEOUT = 5000;
+const QUIT_RETRY = 500;
 const REOPEN_TIMEOUT = 15000;
 
 const mailmanWindow = () => windows().find(window => window.get_wm_class() === ID && windowShown(window));
@@ -33,9 +34,11 @@ export async function checkBackground() {
     const reopened = await eventually(mailmanWindow, 'opening Mailman again brings its window back', REOPEN_TIMEOUT);
     reopened.activate(global.get_current_time());
     await eventually(() => reopened.has_focus(), 'the window that comes back takes focus');
-    await pause(SETTLE);
-    press(Clutter.KEY_Control_L, Clutter.KEY_q);
-    await app.finished(QUIT_TIMEOUT);
+    await eventually(async () => {
+      press(Clutter.KEY_Control_L, Clutter.KEY_q);
+      await pause(QUIT_RETRY);
+      return !app.running;
+    }, 'Ctrl+Q quits Mailman', QUIT_TIMEOUT);
     await eventually(() => !mailmanWindow(), 'Ctrl+Q quits Mailman with its window');
   } finally {
     await app.close();

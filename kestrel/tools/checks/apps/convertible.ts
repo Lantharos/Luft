@@ -6,14 +6,13 @@ import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {chord, drag, rest} from '../lib/input/input.js';
 import {repository, scratch} from '../lib/processes.js';
-import {pause} from '../lib/wait.js';
+import type {Frame} from '../lib/screenshots.js';
 import {withApp} from './lib/apps.js';
 import {children, exists, read} from './lib/files.js';
 import {checkPalette, saveBothStyles, withPalette, type Palette} from './lib/palette.js';
 
 const {require, eventually} = checks('Luft app');
 const CONVERT_TIMEOUT = 30000;
-const SETTLE = 1500;
 const EDIT_MODE = {role: 'radio', name: 'Edit'};
 const REDACTED_AREA = {x: 260, y: 260, width: 160, height: 80};
 const BLACK_TOLERANCE = 4;
@@ -25,19 +24,11 @@ function placePicture(path: string) {
   Gio.File.new_for_path(PICTURE).copy(Gio.File.new_for_path(path), Gio.FileCopyFlags.OVERWRITE, null, null);
 }
 
-async function convert(app: LuftApp) {
-  await chord(Clutter.KEY_Control_L, Clutter.KEY_Return);
-  await pause(SETTLE);
-  (await app.frame()).save('convertible-queue');
-}
-
 async function checkDropPickDone(app: LuftApp, folder: string, picture: string, palette: Palette) {
-  await pause(SETTLE);
-  (await app.settle(() => true)).save('convertible-file');
   app.click(await app.find({role: 'radio', name: 'WebP'}));
   rest();
   await saveBothStyles(app, palette, 'convertible-format');
-  await convert(app);
+  await chord(Clutter.KEY_Control_L, Clutter.KEY_Return);
   const output = GLib.build_filenamev([folder, 'harbor.webp']);
   await eventually(() => exists(output), 'Convertible writes the picture next to the original', CONVERT_TIMEOUT);
   require(read(output).startsWith('RIFF'), 'the result is a real WebP file');
@@ -47,47 +38,18 @@ async function checkDropPickDone(app: LuftApp, folder: string, picture: string, 
 
 async function checkRedaction(app: LuftApp, folder: string) {
   app.click(await app.find({role: 'button', name: 'Show the finished list'}));
-  await pause(SETTLE);
   app.click(await app.find(EDIT_MODE));
-  await pause(SETTLE);
   app.click(await app.find({role: 'button', name: 'Redact'}));
   rest();
-  (await app.settle(() => true)).save('convertible-edit');
   const [left, top] = [240, 240];
   await drag(app.at([left, top]), app.at([left + 200, top + 120]));
-  await pause(SETTLE);
-  const redacted = await app.frame(app.area(REDACTED_AREA));
-  redacted.save('convertible-redacted');
-  require(redacted.share(['#000000'], BLACK_TOLERANCE) > REDACTED_SHARE, 'the redacted part of the preview turns solid black');
+  const blacked = (frame: Frame) => frame.share(['#000000'], BLACK_TOLERANCE) > REDACTED_SHARE;
+  const redacted = await app.settle(blacked, app.area(REDACTED_AREA));
+  require(blacked(redacted), 'the redacted part of the preview turns solid black');
   await chord(Clutter.KEY_Control_L, Clutter.KEY_Return);
-  await pause(SETTLE);
-  (await app.frame()).save('convertible-conflict');
   app.click(await app.find({role: 'button', name: 'Keep both'}));
-  await pause(SETTLE);
   const output = GLib.build_filenamev([folder, 'harbor (1).webp']);
   await eventually(() => exists(output), 'the edited picture is saved beside the first, without replacing it', CONVERT_TIMEOUT);
-}
-
-async function checkEditors(folder: string) {
-  const clip = repository('apps', 'store', 'convertible', 'desktop', 'tests', 'fixtures', 'clip.webm');
-  const song = repository('apps', 'store', 'convertible', 'desktop', 'tests', 'fixtures', 'tone.flac');
-  await withApp('convertible', [clip], async app => {
-    await pause(SETTLE);
-    app.click(await app.find(EDIT_MODE));
-    await pause(SETTLE);
-    (await app.settle(() => true)).save('convertible-video');
-  });
-  await withApp('convertible', [song], async app => {
-    await pause(SETTLE);
-    (await app.settle(() => true)).save('convertible-song');
-    app.click(await app.find(EDIT_MODE));
-    await pause(SETTLE);
-    (await app.settle(() => true)).save('convertible-trim');
-  });
-  await withApp('convertible', [GLib.build_filenamev([folder, 'harbor.jpg']), clip, song], async app => {
-    await pause(SETTLE);
-    (await app.settle(() => true)).save('convertible-batch');
-  });
 }
 
 export async function run() {
@@ -103,5 +65,4 @@ export async function run() {
       await checkRedaction(app, folder);
     });
   });
-  await checkEditors(folder);
 }

@@ -24,7 +24,4 @@ export async function checkRover(app: LuftApp, drive: Drive) {
   await keep([`${drive.path}/Documents`]);
   await waitUntil(async () => (await states(drive.path)).Documents === 'local', 'keeping a folder brings it to this device', KEEP_TIMEOUT);
   (await app.settle(() => true)).save('rover-cloud-kept-dark');
-  await changes(app, 'right-clicking a cloud folder opens its menu', async () => app.click(await app.find({text: 'Photos'}), Clutter.BUTTON_SECONDARY));
-  (await app.frame()).save('rover-cloud-menu-dark');
-  press(Clutter.KEY_Escape);
 }

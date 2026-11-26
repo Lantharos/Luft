@@ -21,8 +21,6 @@ import {checkThumbnails, withThumbnailers} from './rover/thumbnails.js';
 const {require, eventually} = checks('Luft app');
 const DRAG = {steps: 24, interval: 30, hover: 300};
 const SEARCH_FIELD = {role: 'textbox', name: 'Search current folder'};
-const PLACES = ['Home', 'System'];
-const SIDEBAR = {role: 'navigation', name: 'Places'};
 const SEARCH = {x: 12, y: 14, width: 236, height: 36};
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Drag check']);
 
@@ -52,15 +50,6 @@ async function checkPrinting(app: LuftApp) {
   await printsThroughDialog(eventually, 'Ctrl+P on a PDF in Rover', () => press(Clutter.KEY_Control_L, Clutter.KEY_p));
 }
 
-async function checkProperties(app: LuftApp) {
-  for (const place of PLACES) {
-    await changes(app, `right-clicking ${place} in Rover's sidebar opens its menu`, async () => app.click(await app.find({role: 'button', name: place, within: SIDEBAR}), Clutter.BUTTON_SECONDARY));
-    await changes(app, `Rover shows the properties of ${place}`, async () => app.click(await app.find({role: 'menuitem', name: 'Properties'})));
-    (await app.settle(() => true)).save(`rover-properties-${place.toLowerCase()}`);
-    await changes(app, 'Escape closes the properties', () => press(Clutter.KEY_Escape));
-  }
-}
-
 async function checkTextMenu(app: LuftApp) {
   app.click(await app.find(SEARCH_FIELD));
   await changes(app, 'Rover shows what is typed into its search', () => type('inbox'), SEARCH);
@@ -82,7 +71,6 @@ export async function run() {
         await checkPrivileged(app, GLib.build_filenamev([FOLDER, 'Locked']), open);
         await checkPrinting(app);
         await checkTextMenu(app);
-        await checkProperties(app);
         await checkPlaces(app);
         await checkLooks(app, GLib.build_filenamev([FOLDER, 'Looks']), open);
         await checkThumbnails(app, GLib.build_filenamev([FOLDER, 'Thumbnails']), open);

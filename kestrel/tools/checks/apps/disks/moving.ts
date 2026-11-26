@@ -1,36 +1,33 @@
 import {type} from '../../lib/input/input.js';
-import {squareCorners} from '../lib/corners.js';
-import {saveBothStyles, type Palette} from '../lib/palette.js';
 import {more, type Driver} from './driver.js';
 
-async function saveLooks(driver: Driver, palette: Palette, name: string) {
-  await saveBothStyles(driver.app, palette, name);
-  await squareCorners(async () => (await driver.app.settle(() => true)).save(`${name}-square`));
+async function saveLooks(driver: Driver, name: string) {
+  (await driver.app.settle(() => true)).save(`${name}-dark`);
 }
 
-export async function checkMoveLuft(driver: Driver, palette: Palette) {
+export async function checkMoveLuft(driver: Driver) {
   await driver.click('seagate');
   await driver.click('samsung');
   await driver.click(more('Samsung SSD 990 PRO 1TB'));
   await driver.click('moveLuft');
-  await saveLooks(driver, palette, 'disks-move-drive');
+  await saveLooks(driver, 'disks-move-drive');
   await driver.click('moveToSeagate');
   await driver.click('moveOn');
-  await saveLooks(driver, palette, 'disks-move-place');
+  await saveLooks(driver, 'disks-move-place');
   await driver.click('placeErase');
   await driver.click('placeOn');
-  await saveLooks(driver, palette, 'disks-move-erase');
+  await saveLooks(driver, 'disks-move-erase');
   await driver.click('eraseName');
   await driver.act('typing the drive’s name lets it be erased', () => type('Seagate ST1000DM010'));
-  await saveLooks(driver, palette, 'disks-move-erase-named');
+  await saveLooks(driver, 'disks-move-erase-named');
   await driver.click('eraseBack');
   await driver.click('placeFree');
-  await saveLooks(driver, palette, 'disks-move-size');
+  await saveLooks(driver, 'disks-move-size');
   await driver.click('sizeOn');
-  await saveLooks(driver, palette, 'disks-move-confirm');
+  await saveLooks(driver, 'disks-move-confirm');
   await driver.click('moveIt');
   await driver.called(['MoveSystem /org/freedesktop/UDisks2/drives/Seagate_Barracuda'], 'disks asks trustd to move Luft into the free space');
-  await saveLooks(driver, palette, 'disks-move-waiting');
+  await saveLooks(driver, 'disks-move-waiting');
   await driver.click('callOff');
   await driver.called(['CancelSystemMove'], 'disks calls off the move');
 }

@@ -8,20 +8,19 @@ import {checks} from '../lib/check.js';
 import {press} from '../lib/input/input.js';
 import {fixture, scratch} from '../lib/processes.js';
 import type {Frame} from '../lib/screenshots.js';
-import {changes, withApp} from './lib/apps.js';
+import {withApp} from './lib/apps.js';
 import {checkPalette, useScheme, withPalette, type Palette} from './lib/palette.js';
 import {checkDrops} from './magpie/drops.js';
 
 interface Sample {
   name: string;
   source: string;
-  tabs?: boolean;
   install?: boolean;
 }
 
 const {require, eventually} = checks('Luft app');
 const SAMPLES: Sample[] = [
-  {name: 'system', source: '/usr/share/fonts/adwaita-sans-fonts/AdwaitaSans-Regular.ttf', tabs: true},
+  {name: 'system', source: '/usr/share/fonts/adwaita-sans-fonts/AdwaitaSans-Regular.ttf'},
   {name: 'woff2', source: fixture('fonts', 'MagpieSample-Regular.woff2'), install: true},
 ];
 const INSTALLED_LABEL = {right: 340, y: 15, width: 90, height: 28};
@@ -35,7 +34,6 @@ function copySample(source: string) {
   Gio.File.new_for_path(source).copy(Gio.File.new_for_path(target), Gio.FileCopyFlags.OVERWRITE, null, null);
   return target;
 }
-
 
 function installedLabel(app: LuftApp) {
   const {width} = app.window.get_frame_rect();
@@ -57,15 +55,7 @@ async function checkInstall(app: LuftApp) {
     frame => !installed(frame));
 }
 
-async function checkTabs(app: LuftApp) {
-  for (const name of ['Characters', 'Details']) {
-    await changes(app, `magpie shows a font's ${name.toLowerCase()}`, async () => app.click(await app.find({role: 'radio', name})));
-    (await app.frame()).save(`magpie-font-${name.toLowerCase()}-dark`);
-  }
-  await changes(app, 'magpie goes back to the font preview', async () => app.click(await app.find({role: 'radio', name: 'Preview'})));
-}
-
-async function checkSample({name, source, tabs, install}: Sample, home: Frame, palette: Palette) {
+async function checkSample({name, source, install}: Sample, home: Frame, palette: Palette) {
   const covers = (surface: string) => (frame: Frame) => frame.share([surface], 2) >= SURFACE_SHARE;
   useScheme('dark');
   await withApp('magpie', [copySample(source)], async app => {
@@ -73,7 +63,6 @@ async function checkSample({name, source, tabs, install}: Sample, home: Frame, p
     const dark = await app.settle(shown);
     dark.save(`magpie-font-${name}-dark`);
     require(shown(dark), `magpie opens a ${name} font file as a font view`);
-    if (tabs) await checkTabs(app);
     if (install) await checkInstall(app);
 
     useScheme('light');

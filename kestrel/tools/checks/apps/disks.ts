@@ -75,7 +75,7 @@ async function checkSpace() {
 
 export async function run() {
   await withPalette(async palette => {
-    await withDriver([], driver => checkMoveLuft(driver, palette));
+    await withDriver([], checkMoveLuft);
     await withDriver([], async driver => {
       await checkPalette(driver.app, palette);
       await showDark(driver.app, palette);
@@ -84,7 +84,7 @@ export async function run() {
     }, LUFT_ROOT);
     await checkWriteImage(await checkDrives());
     await checkSpace();
-    await withDriver([], driver => checkOtherSystems(driver, palette));
+    await withDriver([], checkOtherSystems);
     await withDriver([], driver => checkLuftMoving(driver, palette));
   });
 }

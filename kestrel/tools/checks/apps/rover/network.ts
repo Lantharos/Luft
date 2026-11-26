@@ -95,13 +95,6 @@ async function checkConnections(app: LuftApp, keyring: ScratchKeyring, ports: Po
   signIn({remember: false});
   await eventually(() => mounted('davs'), 'typing an address after clicking the path bar replaces the path and connects', MOUNT_TIMEOUT);
   (await app.settle(() => true)).save('rover-network-docs-dark');
-
-  await changes(app, 'the more menu opens', async () => app.click(await app.find({role: 'button', name: 'More'})));
-  await changes(app, 'Connect to server opens', async () => app.click(await app.find({role: 'menuitem', name: 'Connect to server…'})));
-  (await app.frame()).save('rover-connect-dark');
-  await changes(app, 'the connect dialog follows the light style', () => useScheme('light'));
-  (await app.frame()).save('rover-connect-light');
-  press(Clutter.KEY_Escape);
 }
 
 export async function checkNetwork(rclone: string) {

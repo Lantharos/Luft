@@ -1,8 +1,6 @@
 name: Image
 
 on:
-  schedule:
-    - cron: "0 2 * * *"
   workflow_dispatch:
     inputs:
       rebuild:
@@ -80,7 +78,6 @@ jobs:
       packages: write
       id-token: write
     outputs:
-      skip: ${{ steps.version.outputs.skip }}
       version: ${{ steps.version.outputs.version }}
       tags: ${{ steps.version.outputs.tags }}
       notes: ${{ steps.version.outputs.notes }}
@@ -112,29 +109,17 @@ jobs:
 
       - name: Version and release notes
         id: version
-        env:
-          PUBLISH: ${{ steps.store.outputs.publish }}
         run: |
           nightly="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$MAJOR-nightly")"
           built="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$nightly")"
           fedora="$(os/image/build.sh base)"
           skopeo copy --retry-times 3 --digestfile "$RUNNER_TEMP/base" "docker://$fedora" "docker://$CACHE:fedora-bootc-${fedora#*@sha256:}"
           base="$CACHE@$(<"$RUNNER_TEMP/base")"
-          cef="$(os/image/build.sh cef)"
           store="$(os/image/build.sh store)"
           {
             echo "LUFT_BASE=$base"
             echo "LUFT_STORE=$store"
           } >> "$GITHUB_ENV"
-          if [[ "$GITHUB_EVENT_NAME" == schedule && "$built" == "$GITHUB_SHA" && "$PUBLISH" == "[]" &&
-                "$base" == "$(jq -r '."org.opencontainers.image.base.name" // empty' <<<"$nightly")" &&
-                "$cef" == "$(jq -r '."com.lantharos.cef" // empty' <<<"$nightly")" &&
-                "$store" == "$(jq -r '."com.lantharos.store" // empty' <<<"$nightly")" ]] &&
-            LUFT_BASE="$base" os/image/build.sh updates "$IMAGE:$MAJOR-nightly"; then
-            echo "Nothing changed since the last nightly."
-            echo "skip=1" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           last="$(git tag --list "v$MAJOR.*" | sed -nE "s/^v$MAJOR\.([0-9]+)$/\1/p" | sort -n | tail -n 1)"
           target="$MAJOR.$(( ${last:--1} + 1 ))"
           current="$(jq -r '."org.opencontainers.image.version" // empty' <<<"$nightly")"
@@ -151,7 +136,6 @@ jobs:
 
       - name: Parts
         id: parts
-        if: steps.version.outputs.skip != '1'
         env:
           LUFT_SECUREBOOT_CERT: os/image/keys/luft-secureboot.crt
           LUFT_REBUILD: ${{ inputs.rebuild && '1' || '' }}
@@ -362,7 +346,7 @@ jobs:
   store-part:
     name: Store part
     needs: [plan, store-publish]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' }}
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
     runs-on: ubuntu-26.04
     timeout-minutes: 75
     permissions:
@@ -406,7 +390,7 @@ jobs:
   parts:
     name: Part
     needs: plan
-    if: needs.plan.outputs.skip != '1' && needs.plan.outputs.parts != '[]'
+    if: needs.plan.outputs.parts != '[]'
     runs-on: ubuntu-26.04
     timeout-minutes: 120
     permissions:
@@ -432,7 +416,7 @@ jobs:
   signed-parts:
     name: Signed part
     needs: plan
-    if: needs.plan.outputs.skip != '1' && needs.plan.outputs.signed != '[]'
+    if: needs.plan.outputs.signed != '[]'
     runs-on: ubuntu-26.04
     timeout-minutes: 120
     environment: signing
@@ -469,7 +453,7 @@ jobs:
     name: Images
     needs: [plan, parts, signed-parts, store-part]
     if: >-
-      always() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' &&
+      always() && needs.plan.result == 'success' &&
       !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-26.04
     timeout-minutes: 120

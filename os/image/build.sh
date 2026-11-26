@@ -29,7 +29,6 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh base
        os/image/build.sh cef
        os/image/build.sh store
-       os/image/build.sh updates IMAGE
 
 Builds the Luft images with Podman and seals them as localhost/luft:$FEDORA and
 localhost/luft:$FEDORA-nvidia, with localhost/luft-system:$FEDORA(-nvidia) as the systems
@@ -56,8 +55,7 @@ digest). cef prints the CEF build the web runtime ships, pinned with its checksu
 os/image/parts/cef.lock, which the CEF workflow moves to the newest one Sabine would install. store
 prints the newest schelf.store release that's out, on any channel, of each app in
 os/image/parts/store/apps.toml as ID=VERSION=PART (LUFT_STORE, or empty for none);
-those apps ship from the store instead of being built into the image. updates lists the packages IMAGE adds to that Fedora image which have
-updates, and exits with 100 when there are some, like dnf check-upgrade.
+those apps ship from the store instead of being built into the image.
 
 The image says Luft is still early when os/versions.env sets EARLY=1, and that a
 stable version is out when LUFT_STABLE_RELEASED=1, which the nightly sets once
@@ -466,19 +464,6 @@ plan() {
   done < <(part_refs "${names[@]}")
 }
 
-updates() {
-  local built="$1" packages='%{NAME}.%{ARCH} %{EPOCHNUM}:%{VERSION}-%{RELEASE}\n'
-  pull_base
-  podman pull "${retries[@]}" --quiet "$built" >/dev/null
-  podman run --rm --network none "$base" rpm -qa --qf "$packages" |
-    podman run --rm --interactive --security-opt label=disable --volume "$image/stages:/run/luft/stages:ro" "$built" \
-      bash -c 'source /run/luft/stages/rpmfusion.sh
-        cat >/tmp/base-packages
-        mapfile -t added < <(rpm -qa --qf "$1" | grep -vxF -f /tmp/base-packages | grep -v "^gpg-pubkey\." | cut -d" " -f1)
-        use_rpmfusion &>/dev/null
-        dnf check-upgrade --quiet "${added[@]}"' updates "$packages"
-}
-
 [[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "${1:-luft}" in
@@ -487,11 +472,6 @@ case "${1:-luft}" in
   cef) resolve_cef ;;
   store) resolve_store ;;
   plan) base="$(resolve_base)"; cef="$(resolve_cef)"; store="$(resolve_store)"; snapshot_tree; plan "${@:2}" ;;
-  updates)
-    (($# == 2)) || { usage >&2; exit 2; }
-    base="$(resolve_base)"
-    updates "$2"
-    ;;
   part)
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"

@@ -15,7 +15,7 @@ Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay
 - It's split into **layers by package**, so an update downloads only the layers whose packages changed. The NVIDIA image is the standard one plus the driver, so they share every layer below it.
 - It's **sealed**: a signed startup image names the image's exact root file system by its composefs digest. Nothing is layered on top on the computer. Apps come from Flatpak and AppImages, and the Fedora packages someone adds, command-line tools among them, are merged over it as a system extension ([System packages](/developers/system/system-packages/)).
 
-Releases come from tags, and nightly builds from main every night it changed. [Updates and releases](/developers/system/updates/) covers how a computer moves between them.
+Releases come from tags, and nightly builds from main whenever one is started. [Updates and releases](/developers/system/updates/) covers how a computer moves between them.
 
 ## The boot chain
 

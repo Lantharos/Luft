@@ -22,7 +22,6 @@ const UNPLUGGED = GLib.build_filenamev([FOLDER, 'Written unplugged.txt']);
 const BACKUP = GLib.build_filenamev([FOLDER, 'Settings backup.txt']);
 const RECENT = scratch('kestrel-quarterly-report.txt');
 const HISTORY = GLib.build_filenamev([GLib.get_user_data_dir(), 'recently-used.xbel']);
-const KESTREL = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SECOND_APP = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.SearchCheckPrinters.desktop']);
 const INDEX_TIMEOUT = 20000;
 const REVEAL_TIMEOUT = 30000;
@@ -95,7 +94,6 @@ async function checkNames() {
   await eventually(() => row(`file:${uri(GLib.path_get_dirname(FERRIES))}`), 'search finds folders');
   search('settings backup');
   await eventually(() => row(`file:${uri(BACKUP)}`), 'the index finds a file that shares a name with an app');
-  const pinned = KESTREL.get_string('gust-layout');
   write(SECOND_APP, '[Desktop Entry]\nType=Application\nName=Printer Settings\nExec=true\nIcon=printer\n');
   try {
     search('settings');
@@ -107,7 +105,6 @@ async function checkNames() {
     await capture('search-files');
   } finally {
     GLib.unlink(SECOND_APP);
-    KESTREL.set_string('gust-layout', pinned);
   }
 
   await withHandler('text/plain', 'Text Check', async opened => {

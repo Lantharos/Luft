@@ -146,6 +146,7 @@ copy_host_settings() {
 
 use_luft_defaults() {
   python3 "$tools/session/luftDefaults.py" "$root" "$session/luft-defaults.d/luft"
+  printf '[com/lantharos/kestrel]\ngust-pin-new-apps=false\n' > "$session/luft-defaults.d/checks"
   dconf compile "$session/luft-defaults" "$session/luft-defaults.d"
   printf 'file-db:%s\n' "$session/luft-defaults" >> "$DCONF_PROFILE"
   export LANG=en_US.UTF-8 TZ=UTC

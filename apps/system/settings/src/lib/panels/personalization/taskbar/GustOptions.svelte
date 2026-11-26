@@ -18,6 +18,9 @@
 	<Row title={t('settings-gust-look')} description={t(look === 'palette' ? 'settings-gust-look-grid-description' : 'settings-gust-look-pinned-description')}>
 		<Segmented label={t('settings-gust-look')} options={looks} value={look} onchange={(value) => settings.set('gust-look', value)} />
 	</Row>
+	<Row title={t('settings-gust-pin-new-apps')} description={t('settings-gust-pin-new-apps-description')}>
+		<Switch label={t('settings-gust-pin-new-apps')} checked={settings.values['gust-pin-new-apps'] ?? true} onchange={(on) => settings.set('gust-pin-new-apps', on)} />
+	</Row>
 	<Row title={t('settings-gust-button')} description={t('settings-gust-button-description')}>
 		<Switch label={t('settings-gust-button')} checked={settings.values['taskbar-gust-button'] ?? true} onchange={(on) => settings.set('taskbar-gust-button', on)} />
 	</Row>

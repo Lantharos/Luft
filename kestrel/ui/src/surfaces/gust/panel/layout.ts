@@ -33,6 +33,16 @@ export class GustLayout {
     return this.layout.items.includes(id) || Object.values(this.layout.folders).some(folder => folder.apps.includes(id));
   }
 
+  adopt(ids: string[]): void {
+    const known = new Set(this.settings.get_strv('gust-known-apps'));
+    const fresh = known.size && this.settings.get_boolean('gust-pin-new-apps') ? ids.filter(id => !known.has(id) && !this.pinned(id)) : [];
+    if (fresh.length) {
+      this.layout.items.push(...fresh);
+      this.save();
+    }
+    if (ids.length !== known.size || ids.some(id => !known.has(id))) this.settings.set_strv('gust-known-apps', ids);
+  }
+
   pin(id: string): void {
     if (this.pinned(id)) return;
     this.layout.items.push(id);

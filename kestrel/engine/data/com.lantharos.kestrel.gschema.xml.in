@@ -129,6 +129,14 @@
       <default>'{"items":["net.imput.helium.desktop","com.lantharos.rover.desktop","com.lantharos.mailman.desktop","com.lantharos.draft.desktop","com.lantharos.magpie.desktop","com.lantharos.terminal.desktop","com.lantharos.schelf.desktop","com.lantharos.settings.desktop"],"folders":{}}'</default>
       <summary>Apps pinned to Gust, in order, and their folders</summary>
     </key>
+    <key name="gust-pin-new-apps" type="b">
+      <default>true</default>
+      <summary>Pin apps to Gust when they are installed</summary>
+    </key>
+    <key name="gust-known-apps" type="as">
+      <default>[]</default>
+      <summary>Apps Gust has already seen, so it pins only the ones installed after them</summary>
+    </key>
     <key name="quick-tile-order" type="as">
       <default>[]</default>
       <summary>Order of the Quick Settings tiles</summary>

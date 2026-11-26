@@ -225,6 +225,12 @@
 			]
 		},
 		{
+			"id": "gust.pin-new-apps",
+			"page": "taskbar",
+			"title": "settings-gust-pin-new-apps",
+			"key": "com.lantharos.kestrel gust-pin-new-apps"
+		},
+		{
 			"id": "gust.button",
 			"page": "taskbar",
 			"title": "settings-gust-button",

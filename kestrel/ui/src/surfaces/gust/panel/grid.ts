@@ -24,7 +24,10 @@ export class GustGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
   readonly hint = new AppHint();
-  private readonly layout = new GustLayout(() => { if (!this.drag.active) this.render(); });
+  private readonly layout = new GustLayout(() => {
+    this.allApps.refresh();
+    if (!this.drag.active) this.render();
+  });
   private readonly drag: GridDrag;
   private readonly allApps: AllApps;
   private readonly empty = new St.Label({ name: 'kestrel-gust-no-pins', text: t('gust-no-pins'), style_class: 'kestrel-gust-empty', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER, y_expand: true, visible: false });
@@ -60,6 +63,7 @@ export class GustGrid {
     this.catalog = apps;
     const named = apps.map(app => ({ app, name: appName(app) })).sort((a, b) => a.name.localeCompare(b.name));
     this.apps = new Map(named.map(({ app }) => [app.get_id()!, app]));
+    this.layout.adopt([...this.apps.keys()]);
     this.allApps.update(apps);
     this.catalogDirty = true;
     if (!this.drag.active) this.render();
@@ -79,6 +83,7 @@ export class GustGrid {
     return { label: t(pinned ? 'gust-unpin' : 'gust-pin'), run: () => {
       if (pinned) this.layout.unpin(id);
       else this.layout.pin(id);
+      this.allApps.refresh();
       this.render();
     } };
   }
@@ -92,6 +97,7 @@ export class GustGrid {
   private appItem(app: Gio.AppInfo): SearchItem {
     return {
       key: appKey(app.get_id()!), title: appName(app), description: '', icon: app,
+      pinned: this.layout.pinned(app.get_id()!),
       activate: () => this.launch(app),
       menu: () => this.appMenu(app),
     };

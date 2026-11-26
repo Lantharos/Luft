@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, named, ofType, shown, textOf} from '../../lib/actors.js';
+import {descendants, named, ofType, shown, styled, textOf} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
@@ -15,9 +15,8 @@ const list = () => named('kestrel-search-results', gust()!)!;
 export const rows = () => list().get_children().filter((actor): actor is St.Button => actor instanceof St.Button)
   .filter(actor => actor.visible && actor.name?.startsWith('kestrel-search-'));
 export const row = (key: string) => rows().find(actor => actor.name === `kestrel-search-${key}`) ?? null;
-const texts = (actor: St.Button) => actor.child!.get_last_child()!.get_last_child()!;
-export const titleOf = (actor: St.Button) => ofType(texts(actor).get_first_child(), St.Label).text;
-export const descriptionOf = (actor: St.Button) => ofType(texts(actor).get_last_child(), St.Label).text;
+export const titleOf = (actor: St.Button) => ofType(styled('kestrel-search-result-name', actor)[0], St.Label).text;
+export const descriptionOf = (actor: St.Button) => ofType(styled('kestrel-search-result-description', actor)[0], St.Label).text;
 export const bestTitle = () => rows()[0] && titleOf(rows()[0]);
 export const groupTitles = () => list().get_children().filter((actor): actor is St.Widget => actor instanceof St.Widget)
   .filter(actor => actor.visible && actor.has_style_class_name('kestrel-search-group')).map(textOf);

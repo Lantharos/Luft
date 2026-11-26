@@ -33,6 +33,11 @@ export class AllApps {
     if (this.actor.visible) this.render();
   }
 
+  refresh(): void {
+    this.current = false;
+    if (this.actor.visible) this.render();
+  }
+
   show(): void {
     this.actor.show();
     if (!this.current) this.render();

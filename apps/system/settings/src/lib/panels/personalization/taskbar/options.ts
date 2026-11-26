@@ -22,6 +22,7 @@ export type TaskbarSettings = {
 	'taskbar-shown': boolean;
 	'taskbar-gust-button': boolean;
 	'gust-look': GustLook;
+	'gust-pin-new-apps': boolean;
 	'search-web-engine': WebSearch;
 	'favorite-apps': string[];
 };
@@ -40,6 +41,7 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 	'taskbar-shown',
 	'taskbar-gust-button',
 	'gust-look',
+	'gust-pin-new-apps',
 	'search-web-engine',
 	'favorite-apps'
 ];

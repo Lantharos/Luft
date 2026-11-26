@@ -16,6 +16,7 @@ interface Row {
   highlight: St.Widget;
   icon: St.Icon | St.Label;
   title: St.Label;
+  pin: St.Icon;
   description: St.Label;
   item: SearchItem;
 }
@@ -148,6 +149,7 @@ export class SearchResults {
       row.title.text = item.title;
       row.actor.accessible_name = item.title;
     }
+    row.pin.visible = !!item.pinned;
     if (row.description.text !== item.description) {
       row.description.text = item.description;
       row.description.visible = !!item.description;
@@ -164,11 +166,14 @@ export class SearchResults {
     content.add_child(icon);
     const text = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     const title = new St.Label({ style_class: 'kestrel-search-result-name' });
+    const pin = new St.Icon({ icon_name: 'view-pin-symbolic', style_class: 'kestrel-search-result-pin', y_align: Clutter.ActorAlign.CENTER, visible: false });
+    const heading = new St.BoxLayout({ style_class: 'kestrel-search-result-heading' });
+    heading.add_child(title);
+    heading.add_child(pin);
     const description = new St.Label({ style_class: 'kestrel-search-result-description', visible: false });
-    for (const label of [title, description]) {
-      label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-      text.add_child(label);
-    }
+    for (const label of [title, description]) label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+    text.add_child(heading);
+    text.add_child(description);
     content.add_child(text);
     const highlight = new St.Widget({ style_class: 'kestrel-search-result-highlight', x_expand: true, y_expand: true, visible: false });
     const layers = new Clutter.Actor({ layout_manager: new Clutter.BinLayout(), x_expand: true, y_expand: false });
@@ -178,7 +183,7 @@ export class SearchResults {
       name: `kestrel-search-${item.key}`, style_class: 'kestrel-search-result', child: layers,
       x_expand: true, can_focus: true, track_hover: true,
     });
-    const row: Row = { actor, highlight, icon, title, description, item };
+    const row: Row = { actor, highlight, icon, title, pin, description, item };
     actor.connect('clicked', () => row.item.activate());
     actor.connect('key-press-event', (_actor, event) => {
       if (!row.item.reveal || !isControlEnter(event)) return Clutter.EVENT_PROPAGATE;

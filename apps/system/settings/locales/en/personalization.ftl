@@ -110,6 +110,8 @@ settings-gust-look-panel = Panel
 settings-gust-look-palette = Palette
 settings-gust-look-pinned-description = Your pinned apps and folders next to the taskbar
 settings-gust-look-grid-description = Every app in the middle of the screen, sorted into categories
+settings-gust-pin-new-apps = Pin new apps
+settings-gust-pin-new-apps-description = Apps you install show up with your pinned apps
 settings-gust-button = Show the Gust button
 settings-gust-button-description = Super opens Gust either way
 # Followed by a list of search engines

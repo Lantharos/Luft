@@ -17,6 +17,7 @@ export interface SearchItem {
   description: string;
   icon: Gio.Icon | IconApp;
   glyph?: string;
+  pinned?: boolean;
   preview?: Preview;
   activate(): void;
   reveal?(): void;

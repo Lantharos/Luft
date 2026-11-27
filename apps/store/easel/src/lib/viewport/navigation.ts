@@ -40,12 +40,16 @@ export class Navigation {
 	};
 
 	get panning() {
-		return this.#drag !== null || this.#pinch !== null;
+		return this.#drag !== null || this.#touches.size > 0;
 	}
 
 	claims(event: PointerEvent) {
 		if (event.pointerType === 'touch') return this.options.fingerPans || this.#touches.size > 0;
 		return event.button === 1 || (event.button === 0 && this.spaceHeld);
+	}
+
+	adopt(touch: PointerEvent) {
+		this.#touches.set(touch.pointerId, this.local(touch));
 	}
 
 	down(event: PointerEvent) {

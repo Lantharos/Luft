@@ -20,6 +20,8 @@
 	let { viewport, surface, handler, cursor = 'default', fingerPans = false, connect, onhover, adjust = (event) => event, children }: Props = $props();
 
 	const ERASER_BUTTON = 32;
+	const TOUCH_HOLD_MS = 120;
+	const TOUCH_SLOP_PX = 8;
 
 	let host = $state<HTMLDivElement>();
 	let canvas = $state<HTMLCanvasElement>();
@@ -27,6 +29,7 @@
 	let panning = $state(false);
 	let spaceHeld = $state(false);
 	let drawing: number | null = null;
+	let touch: { last: PointerEvent; started: boolean; timer: number } | null = null;
 
 	$effect(() => {
 		if (!host || !canvas) return;
@@ -80,6 +83,7 @@
 	function down(event: PointerEvent) {
 		if (!navigation) return;
 		navigation.spaceHeld = spaceHeld;
+		if (event.pointerType === 'touch' && touch) return startGesture(event);
 		if (navigation.claims(event)) {
 			event.preventDefault();
 			navigation.down(event);
@@ -90,7 +94,35 @@
 		event.preventDefault();
 		host!.setPointerCapture(event.pointerId);
 		drawing = event.pointerId;
-		handler.down(toolEvent(event));
+		if (event.pointerType !== 'touch') return handler.down(toolEvent(event));
+		touch = { last: event, started: false, timer: window.setTimeout(startTouchStroke, TOUCH_HOLD_MS) };
+	}
+
+	function startTouchStroke() {
+		if (!touch || touch.started) return;
+		window.clearTimeout(touch.timer);
+		touch.started = true;
+		handler?.down(toolEvent(touch.last));
+	}
+
+	function abandonTouchStroke() {
+		const { last, started, timer } = touch!;
+		window.clearTimeout(timer);
+		touch = null;
+		drawing = null;
+		if (started) {
+			if (handler?.cancel) handler.cancel();
+			else handler?.up?.(toolEvent(last));
+		}
+		return last;
+	}
+
+	function startGesture(event: PointerEvent) {
+		const last = abandonTouchStroke();
+		event.preventDefault();
+		navigation!.adopt(last);
+		navigation!.down(event);
+		panning = true;
 	}
 
 	function move(event: PointerEvent) {
@@ -100,7 +132,15 @@
 			return;
 		}
 		const tool = toolEvent(event);
-		if (drawing === event.pointerId) handler?.move?.(tool);
+		if (drawing === event.pointerId) {
+			if (touch && !touch.started) {
+				const moved = Math.hypot(event.clientX - touch.last.clientX, event.clientY - touch.last.clientY) > TOUCH_SLOP_PX;
+				if (!moved) return;
+				startTouchStroke();
+			}
+			if (touch) touch.last = event;
+			handler?.move?.(tool);
+		}
 		if (event.pointerType !== 'touch') onhover?.(tool);
 	}
 
@@ -112,6 +152,9 @@
 			return;
 		}
 		if (drawing !== event.pointerId) return;
+		if (touch && event.type === 'pointercancel') return void abandonTouchStroke();
+		startTouchStroke();
+		touch = null;
 		drawing = null;
 		handler?.up?.(toolEvent(event));
 	}

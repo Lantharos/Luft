@@ -4,6 +4,7 @@ ARG KERNEL
 FROM ${KERNEL} AS kernel
 
 FROM ${IMAGE} AS system
+RUN fc-cache -f
 
 FROM ${IMAGE} AS startup
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
@@ -19,5 +20,5 @@ RUN --mount=type=bind,from=system,target=/target \
     : "signed by ${SIGNED_BY}" && \
     luft-startup-image /target /kernel /run/secrets/secureboot-key /run/secrets/secureboot-cert /run/secrets/pcr-keys /out
 
-FROM ${IMAGE}
+FROM system
 COPY --from=startup /out/ /boot/EFI/Linux/

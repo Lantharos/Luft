@@ -34,7 +34,7 @@ pub fn cursors(palette: &Palette) -> Vec<Cursor> {
     vec![
         cursor(
             "default",
-            pen.waved_arrow("pointer"),
+            arrow.clone(),
             POINTER_HOT,
             &["left_ptr", "arrow", "top_left_arrow", "dnd-move"],
         ),
@@ -42,7 +42,7 @@ pub fn cursors(palette: &Palette) -> Vec<Cursor> {
             "right_ptr",
             format!(
                 r#"<g transform="translate(32 0) scale(-1 1)">{}</g>"#,
-                pen.waved_arrow("pointer-right")
+                arrow
             ),
             (26.5, 3.5),
             &["draft_large", "draft_small"],

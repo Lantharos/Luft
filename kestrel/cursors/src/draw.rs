@@ -1,5 +1,5 @@
 use crate::palette::Palette;
-use crate::shapes::{ARROW, ARROW_WAVE, DISC, DISC_WAVE, DOUBLE};
+use crate::shapes::{ARROW, DISC, DISC_WAVE, DOUBLE};
 
 pub const ANGLE: &str = "{angle}";
 const EDGE: f32 = 1.0;
@@ -46,14 +46,6 @@ impl Pen<'_> {
 
     pub fn arrow(&self) -> String {
         self.shape(ARROW)
-    }
-
-    pub fn waved_arrow(&self, id: &str) -> String {
-        format!(
-            r#"<clipPath id="{id}">{ARROW}</clipPath>{}<path clip-path="url(#{id})" d="{ARROW_WAVE}" fill="{}"/>"#,
-            self.shape(ARROW),
-            self.palette.wave,
-        )
     }
 
     pub fn busy_disc(&self) -> String {

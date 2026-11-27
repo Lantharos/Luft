@@ -81,10 +81,10 @@ index 4daa9076c26084a218f47f1501de96822573edc7..b036568c0735dd46502e9d2bc475dbb6
  meta_compositor_constructed (GObject *object)
  {
 diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
-index 8d191be632affa004990408ac0ad147c66a0baf6..76cf5d772979f8384b92b33003378e6ac0f5a5d6 100644
+index 37b5d19e9ecb4bdccd33d8d4ddbad9a7b03e698d..2db9babbd0bce985eeea5b1b8f4b54cfe8356ec7 100644
 --- a/src/compositor/meta-shaped-texture.c
 +++ b/src/compositor/meta-shaped-texture.c
-@@ -1325,8 +1325,7 @@ meta_shaped_texture_sync_window_corners (MetaShapedTexture *stex,
+@@ -1327,8 +1327,7 @@ meta_shaped_texture_sync_window_corners (MetaShapedTexture *stex,
  {
    MetaWindowCorners corners = meta_window_corners_for_actor (actor);
  

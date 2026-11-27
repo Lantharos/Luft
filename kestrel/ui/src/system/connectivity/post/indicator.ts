@@ -30,7 +30,7 @@ export class PostIndicator {
     this.box.add_child(new St.Icon({ icon_name: ICON, icon_size: ICON_SIZE }));
     this.box.add_child(this.label);
     this.actor = new St.Button({
-      name: 'kestrel-taskbar-post', style_class: 'kestrel-status-button kestrel-panel-status kestrel-post-button', child: this.box,
+      name: 'kestrel-taskbar-post', style_class: 'kestrel-status-button kestrel-panel-status kestrel-status-extra kestrel-post-button', child: this.box,
       can_focus: true, track_hover: true,
     });
     localized(this.actor, () => (this.actor.accessible_name = t('post')));

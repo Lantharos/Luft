@@ -21,7 +21,7 @@ Their types also land in the bindings of every app that uses them, so run `sabin
 
 Every Rust crate belongs to one Cargo workspace at the repository's root, with one `Cargo.lock` and the versions of shared dependencies in its `Cargo.toml`. `cargo clippy --all-targets` and `cargo test --workspace --no-fail-fast` there check them all, and `-p NAME` picks one. SushiBoot and the VM's display loader only build for UEFI, so they have no tests and get Clippy for `x86_64-unknown-uefi`; the rollback check below covers SushiBoot's boot counting. Some tests only pass as root, as CI runs them, so a few failures on your own account can be expected.
 
-Services test their own logic with `cargo test`, often against a stand-in server, such as `services/accounts` with token exchange and conflict names. Their path through the desktop is a headless group, such as `apps:cloud` for cloud drives against a local `rclone serve webdav` or `system:crashReports` against a stand-in for the crash inbox, and a headless session runs a private CUPS with two printers for the printing pages.
+Services test their own logic with `cargo test`, often against a stand-in server, such as `services/accounts` with token exchange and conflict names. Their path through the desktop is a headless group, such as `apps:cloud` for cloud drives against a local `rclone serve webdav` or `system:crashReports` against a stand-in for the crash inbox, and a headless session runs a private CUPS with three printers for the printing pages and the printing panel, one of which `system:printing` drives page by page.
 
 ## D-Bus interfaces
 

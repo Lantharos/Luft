@@ -52,6 +52,7 @@ interface SurfaceParts extends SurfaceFactories {
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
+  activeChanged: () => void;
   taskbar: TaskbarPlacement;
   gustReplaced: () => void;
 }
@@ -343,6 +344,7 @@ export class Surfaces {
   private setActive(surface: Surface | null): void {
     this.current = surface;
     this.parts.context.messageTray.bannerBlocked = surface === 'notifications';
+    this.parts.activeChanged();
   }
 
   private keyboardHeight(monitor: Monitor): number {

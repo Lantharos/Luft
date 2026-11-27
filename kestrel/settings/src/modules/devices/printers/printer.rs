@@ -27,6 +27,8 @@ pub const ATTRIBUTES: [&str; 22] = [
     "page-ranges-supported",
 ];
 
+const UNAVAILABLE: i32 = -1;
+
 #[derive(SerializeDict, Type)]
 #[zbus(signature = "a{sv}", rename_all = "kebab-case")]
 pub struct Printer {
@@ -52,6 +54,40 @@ pub struct Printer {
     page_ranges: bool,
 }
 
+#[derive(SerializeDict, Type)]
+#[zbus(signature = "a{sv}", rename_all = "kebab-case")]
+pub struct Status {
+    description: String,
+    markers: Vec<(String, i32, String)>,
+    reasons: Vec<String>,
+}
+
+impl Status {
+    pub fn from(attributes: &Attributes) -> Self {
+        Self {
+            description: description(attributes).unwrap_or_default(),
+            markers: markers(attributes),
+            reasons: reasons(attributes),
+        }
+    }
+}
+
+fn description(attributes: &Attributes) -> Option<String> {
+    attributes
+        .text("printer-info")
+        .filter(|info| !info.is_empty())
+        .or_else(|| attributes.text("printer-name"))
+        .map(str::to_owned)
+}
+
+fn reasons(attributes: &Attributes) -> Vec<String> {
+    attributes
+        .texts("printer-state-reasons")
+        .into_iter()
+        .filter(|reason| reason != "none")
+        .collect()
+}
+
 fn markers(attributes: &Attributes) -> Vec<(String, i32, String)> {
     let names = attributes.texts("marker-names");
     let levels = attributes.integers("marker-levels");
@@ -67,7 +103,7 @@ fn markers(attributes: &Attributes) -> Vec<(String, i32, String)> {
                 .get(*index)
                 .is_none_or(|kind| !kind.to_ascii_lowercase().contains("waste"))
         })
-        .filter(|(_, ((_, level), _))| *level >= 0)
+        .filter(|(_, ((_, level), _))| *level != UNAVAILABLE)
         .map(|(_, ((name, level), color))| (name, level, color))
         .collect()
 }
@@ -76,21 +112,14 @@ impl Printer {
     pub fn from(attributes: &Attributes) -> Option<Self> {
         let name = attributes.text("printer-name")?.to_owned();
         let text = |key| attributes.text(key).unwrap_or_default().to_owned();
-        let description = Some(text("printer-info"))
-            .filter(|info| !info.is_empty())
-            .unwrap_or_else(|| name.clone());
         Some(Self {
             default: false,
-            description,
+            description: description(attributes)?,
             location: text("printer-location"),
             model: text("printer-make-and-model"),
             device: text("device-uri"),
             state: attributes.integer("printer-state").unwrap_or_default(),
-            reasons: attributes
-                .texts("printer-state-reasons")
-                .into_iter()
-                .filter(|reason| reason != "none")
-                .collect(),
+            reasons: reasons(attributes),
             message: text("printer-state-message"),
             accepting: attributes.boolean("printer-is-accepting-jobs"),
             temporary: attributes.boolean("printer-is-temporary"),

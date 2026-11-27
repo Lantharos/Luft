@@ -12,7 +12,7 @@ use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 
 use super::defaults;
 use super::discovery::Discovered;
-use super::printer::{ATTRIBUTES, Printer};
+use super::printer::{ATTRIBUTES, Printer, Status};
 use crate::L10N;
 
 pub const PATH: &str = "/com/lantharos/Settings/Printing";
@@ -32,6 +32,25 @@ pub struct Job {
     state: i32,
     created: i32,
     mine: bool,
+    printed: i32,
+    pages: i32,
+}
+
+fn progress(attributes: &Attributes) -> (i32, i32) {
+    let count = |name| attributes.integer(name).unwrap_or_default();
+    [
+        ("job-impressions-completed", "job-impressions"),
+        ("job-media-sheets-completed", "job-media-sheets"),
+    ]
+    .into_iter()
+    .map(|(done, total)| (count(done), count(total)))
+    .find(|(_, total)| *total > 0)
+    .unwrap_or_else(|| {
+        (
+            count("job-impressions-completed").max(count("job-media-sheets-completed")),
+            0,
+        )
+    })
 }
 
 impl Job {
@@ -41,6 +60,7 @@ impl Job {
             .unwrap_or_default()
             .to_owned();
         let printer = attributes.text("job-printer-uri")?;
+        let (printed, pages) = progress(attributes);
         Some(Self {
             id: u32::try_from(attributes.integer("job-id")?).ok()?,
             printer: printer[printer.rfind(PRINTERS_PATH)? + PRINTERS_PATH.len()..].to_owned(),
@@ -49,6 +69,8 @@ impl Job {
             created: attributes.integer("time-at-creation").unwrap_or_default(),
             mine: owner == user,
             owner,
+            printed,
+            pages,
         })
     }
 }
@@ -184,6 +206,11 @@ impl Printing {
             .collect())
     }
 
+    async fn status(&self, printer: &str) -> fdo::Result<Status> {
+        let attributes = self.cups.status(printer).await.map_err(failed)?;
+        Ok(Status::from(&attributes))
+    }
+
     async fn cancel_job(&self, printer: &str, job: u32) -> fdo::Result<()> {
         self.cups.cancel_job(printer, job).await.map_err(failed)
     }
@@ -224,4 +251,13 @@ impl Printing {
 
     #[zbus(signal)]
     pub async fn changed(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    pub async fn job_finished(
+        emitter: &SignalEmitter<'_>,
+        job: u32,
+        printer: &str,
+        name: &str,
+        state: u32,
+    ) -> zbus::Result<()>;
 }

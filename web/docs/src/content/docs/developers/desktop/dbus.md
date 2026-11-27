@@ -48,6 +48,10 @@ These are on `com.lantharos.Kestrel` on the session bus. Sandboxed apps may only
 
 `kestrel-post` speaks LocalSend's protocol for [Post](/desktop/post/). D-Bus starts it as `com.lantharos.Kestrel.Post` the first time Kestrel calls it. `/com/lantharos/Kestrel/Post` has the devices nearby, whether it's looking, its name and the folder files go to as properties, and methods to send files or text, answer offers and PINs, cancel, and pair. Kestrel calls `Configure` with what people chose in `com.lantharos.kestrel.post` whenever that changes and whenever `kestrel-post` starts again, and Settings calls `StartPairing` and `StopPairing`. The rest of `kestrel-post` knows nothing of LocalSend, whose parts live in `src/localsend`, so another protocol could sit beside it. [Network](/security/network/) covers who it answers.
 
+## Printing
+
+`kestrel-settings` serves `com.lantharos.Settings.Printing` at `/com/lantharos/Settings/Printing` on `com.lantharos.Settings`, talking to CUPS over its socket with Luft's own IPP client in `packages/system/cups`. It subscribes to CUPS's notifications and sends `Changed` when printers or jobs change, including each page a printer reports. `Jobs` returns the jobs not yet done, with the pages printed and the total when CUPS knows it, from `job-impressions` or else `job-media-sheets`. `Status(s printer)` returns a printer's name for people, its `printer-state-reasons` and its supplies as `(name, level, colors)`, where `colors` holds one `#rrggbb` per colour of a cartridge and a level of -2 means unknown and -3 some left. `JobFinished(u job, s printer, s name, u state)` follows each of the caller's jobs that completed, was canceled or aborted. Kestrel's printing panel uses these, and Settings and the print portal use the rest.
+
 ## Keyring
 
 `com.lantharos.Keyring1.AppSecrets` at `/com/lantharos/Keyring1` keeps tokens of an app's own, without prompts. Secrets travel through file descriptors, never in the message.

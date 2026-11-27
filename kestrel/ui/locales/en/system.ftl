@@ -274,6 +274,53 @@ post-busy = { $device } is busy with another transfer
 post-unreachable = Couldn’t reach { $device }
 post-send-failed = Sending to { $device } didn’t finish
 
+## Printing panel, shown while documents print
+
+printing = Printing
+printing-settings = Printer settings
+printing-close = Close
+printing-cancel = Cancel
+# { $name } is the document's name
+printing-cancel-job = Cancel printing “{ $name }”
+printing-untitled = Untitled document
+printing-printing = Printing
+printing-waiting = Waiting to print
+printing-connecting = Connecting to the printer
+printing-stopped = Printing stopped
+# { $printed } pages have come out of { $pages }
+printing-pages = { $printed } of { $pages } { $pages ->
+    [one] page
+   *[other] pages
+}
+printing-pages-printed = { $printed ->
+    [one] 1 page printed
+   *[other] { $printed } pages printed
+}
+# { $printer } is the printer's name
+printing-printed = Printed on { $printer }
+# { $printer } is the printer's name
+printing-failed = Couldn’t print on { $printer }
+# { $name } is the document's name
+printing-failed-name = “{ $name }” couldn’t print
+printing-unreachable = Can’t reach the printer
+printing-ink-some = Some left
+printing-ink-unknown = Unknown
+printing-paper-empty = Out of paper
+printing-paper-low = Paper is running low
+printing-paper-jam = Paper is jammed
+printing-toner-empty = Out of toner
+printing-toner-low = Toner is low
+printing-ink-empty = Out of ink
+printing-ink-low = Ink is low
+printing-waste-full = The ink waste tank is full
+printing-door-open = A door is open
+printing-cover-open = The cover is open
+printing-tray-missing = A paper tray is missing
+printing-offline = The printer is offline
+printing-paused = The printer is paused
+printing-missing-driver = This printer needs a driver Luft doesn’t have
+printing-problem = The printer needs attention
+
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. Kestrel can't tell which program it is, only that it runs outside a sandbox.
 

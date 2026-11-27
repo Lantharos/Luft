@@ -1,0 +1,23 @@
+<node>
+  <interface name="com.lantharos.Settings.Printing">
+    <method name="Jobs">
+      <arg type="aa{sv}" direction="out"/>
+    </method>
+    <method name="Status">
+      <arg name="printer" type="s" direction="in"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="CancelJob">
+      <arg name="printer" type="s" direction="in"/>
+      <arg name="job" type="u" direction="in"/>
+    </method>
+    <signal name="Changed">
+    </signal>
+    <signal name="JobFinished">
+      <arg name="job" type="u"/>
+      <arg name="printer" type="s"/>
+      <arg name="name" type="s"/>
+      <arg name="state" type="u"/>
+    </signal>
+  </interface>
+</node>

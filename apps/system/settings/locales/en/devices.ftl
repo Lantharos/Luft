@@ -652,6 +652,8 @@ settings-printers-on-network = On your network
 settings-printers-found-nearby = Found on your network, set up by itself
 
 settings-printers-supplies = Ink and toner
+settings-printers-supply-some = Some left
+settings-printers-supply-unknown = Unknown
 settings-printers-queue = Waiting to print
 settings-printers-queue-empty = Nothing is waiting
 settings-printers-job-untitled = Untitled document

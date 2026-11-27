@@ -11,6 +11,8 @@ import { PrivacyIndicator } from '../../../system/capture/privacy/indicator.js';
 import { InputSourceIndicator } from '../../../system/input/inputSources/indicator.js';
 import { PostIndicator } from '../../../system/connectivity/post/indicator.js';
 import { currentPost } from '../../../system/connectivity/post/post.js';
+import { PrintIndicator } from '../../../system/printing/indicator.js';
+import { currentPrinting } from '../../../system/printing/printing.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import type { Taskbar } from '../taskbar/taskbar.js';
@@ -38,6 +40,7 @@ export class TaskbarElements implements PanelElements {
   readonly clockButton: St.Button;
   readonly quickButton: St.Button | null = null;
   readonly post: PostIndicator | null = null;
+  readonly printing: PrintIndicator | null = null;
   readonly tray: Tray | null = null;
   readonly privacy: PrivacyIndicator | null = null;
   readonly inputSource: InputSourceIndicator | null = null;
@@ -84,14 +87,22 @@ export class TaskbarElements implements PanelElements {
       pressable(quickButton, this.statusIcons);
       const statusGroup = this.statusGroup = new St.BoxLayout({ name: 'kestrel-taskbar-status-group', style_class: 'kestrel-status-group' });
       const post = currentPost();
+      const printing = currentPrinting();
+      const follow = () => {
+        if (this.post?.actor.visible || this.printing?.actor.visible) quickButton.add_style_class_name('kestrel-after-extra');
+        else quickButton.remove_style_class_name('kestrel-after-extra');
+      };
       if (post) {
         this.post = new PostIndicator(post, menus);
         statusGroup.add_child(this.post.actor);
-        const follow = () => (post.client.open ? quickButton.add_style_class_name('kestrel-after-post') : quickButton.remove_style_class_name('kestrel-after-post'));
-        const stop = post.client.onChanged(follow);
-        quickButton.connect('destroy', stop);
-        follow();
+        quickButton.connect('destroy', post.client.onChanged(follow));
       }
+      if (printing) {
+        this.printing = new PrintIndicator(printing, menus);
+        statusGroup.add_child(this.printing.actor);
+        quickButton.connect('destroy', printing.onChanged(follow));
+      }
+      follow();
       statusGroup.add_child(quickButton);
       menus.bind(quickButton, () => [
         { label: t('taskbar-network-settings'), run: () => menus.settings('network') },

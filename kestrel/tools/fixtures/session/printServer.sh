@@ -3,7 +3,12 @@ set -euo pipefail
 
 directory="$1"
 socket="$2"
-mkdir -p "$directory"/{root,spool/tmp,cache,state,log,out}
+mkdir -p "$directory"/{root,spool/tmp,cache,state,log,out,studio,bin/backend}
+for part in /usr/lib/cups/*; do
+  [[ "${part##*/}" == backend ]] || ln -sfn "$part" "$directory/bin/${part##*/}"
+done
+ln -sf /usr/lib/cups/backend/* "$directory/bin/backend/"
+ln -sf "$(dirname "$(realpath "$0")")/slowPrinter.sh" "$directory/bin/backend/slow"
 
 cat > "$directory/root/cups-files.conf" <<EOF
 FileDevice Yes
@@ -13,7 +18,7 @@ RequestRoot $directory/spool
 TempDir $directory/spool/tmp
 CacheDir $directory/cache
 StateDir $directory/state
-ServerBin /usr/lib/cups
+ServerBin $directory/bin
 DataDir /usr/share/cups
 AccessLog $directory/log/access_log
 ErrorLog $directory/log/error_log
@@ -104,6 +109,7 @@ EOF
 }
 ppd 'Office Printer' True True > "$directory/office.ppd"
 ppd 'Label Printer' False False > "$directory/label.ppd"
+ppd 'Studio Printer' True True > "$directory/studio.ppd"
 
 serve() {
   rm -f "$socket"
@@ -115,13 +121,21 @@ serve() {
   done
 }
 
+markers() {
+  local printer="$1"
+  shift
+  MARKERS="$(printf 'Attribute %s\n' "$@")" PRINTER="$printer" awk '
+    $0 ~ "^<(Default)?Printer " ENVIRON["PRINTER"] ">$" { inside = 1 }
+    inside && $0 == "</Printer>" { print ENVIRON["MARKERS"]; inside = 0 }
+    { print }' "$directory/root/printers.conf" > "$directory/root/printers.conf.new"
+  mv "$directory/root/printers.conf.new" "$directory/root/printers.conf"
+}
+
 supplies() {
-  sed -i '/^<\(Default\)\?Printer Office>/,/^<\/Printer>/{/^<\/Printer>/i\
-Attribute marker-colors \\#00B7EB,\\#E5007E,\\#FFD800,\\#1A1A1A\
-Attribute marker-levels 64,38,81,12\
-Attribute marker-names Cyan,Magenta,Yellow,Black\
-Attribute marker-types ink,ink,ink,ink
-}' "$directory/root/printers.conf"
+  markers Office 'marker-colors \#00B7EB,\#E5007E,\#FFD800,\#1A1A1A' 'marker-levels 64,38,81,12' \
+    'marker-names Cyan,Magenta,Yellow,Black' 'marker-types ink,ink,ink,ink'
+  markers Studio 'marker-colors \#39D2E7\#D945DD\#DFD31D,\#101010' 'marker-levels 80,60' \
+    'marker-names Color,Black' 'marker-types inkCartridge,inkCartridge'
 }
 
 export CUPS_SERVER="$socket"
@@ -131,6 +145,7 @@ trap 'kill $server' EXIT
 : > "$directory/out/label.pdf"
 lpadmin -p Office -E -v "file://$directory/out/office.pdf" -P "$directory/office.ppd" -D 'Office Printer' -L 'Second floor' 2> /dev/null
 lpadmin -p Labels -E -v "file://$directory/out/label.pdf" -P "$directory/label.ppd" -D 'Label Printer' 2> /dev/null
+lpadmin -p Studio -E -v "slow:$directory/studio" -P "$directory/studio.ppd" -D 'Studio Printer' -o printer-error-policy=abort-job 2> /dev/null
 kill "$server"
 wait "$server" || true
 supplies

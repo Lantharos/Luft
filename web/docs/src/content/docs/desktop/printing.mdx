@@ -8,7 +8,9 @@ asks:
   - { ask: airprint, to: printers-that-show-up-by-themselves }
   - { ask: usb printer, to: printers-that-show-up-by-themselves }
   - { ask: ink level, to: managing-printers }
-  - { ask: cancel print job, to: managing-printers }
+  - { ask: cancel print job, to: while-you-print }
+  - { ask: print progress, to: while-you-print }
+  - { ask: out of paper, to: while-you-print }
   - { ask: print queue, to: managing-printers }
   - { ask: default printer, to: managing-printers }
   - { ask: print test page, to: managing-printers }
@@ -28,6 +30,14 @@ Most printers need no setting up. Turn the printer on and print from any app: it
 A printer that's both on your network and plugged in by USB is used over the network, where it needs no driver. When it isn't on the network, the USB connection takes over.
 
 Printers are found on home networks only. On a network marked public in Settings → Network → Firewall, such as a café's, the computer doesn't answer or listen for other devices, so printers there don't show up. To print on one anyway, mark the network as home, or add the printer by its address. [Network](/security/network/#post-extensions-and-services) explains how discovery follows the firewall.
+
+## While you print
+
+When a document starts printing, a panel slides up above the taskbar, in the corner where notifications appear. It shows the document, how many pages have come out when the printer says, and a button to cancel it. Documents waiting behind it are listed below, each with its own cancel button, along with how much ink or toner the printer has left.
+
+If the printer runs out of paper, jams, runs low on ink or has a door open, the panel says so until it's fixed. Close the panel whenever you like: printing goes on, and the printer in the taskbar opens it again. It comes back by itself for the next document or a new problem.
+
+When the last document is done, the panel shows that briefly and goes away. A document that couldn't print stays in the panel until you close it.
 
 ## Managing printers
 

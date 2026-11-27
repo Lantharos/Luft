@@ -22,22 +22,36 @@ const CUPS_CREATE_LOCAL_PRINTER: u16 = 0x4028;
 const NOT_FOUND: u16 = 0x0406;
 const IDLE: i32 = 3;
 pub const LEASE_SECONDS: i32 = 3600;
-const EVENTS: [&str; 7] = [
+const EVENTS: [&str; 8] = [
     "job-created",
     "job-completed",
     "job-state-changed",
     "job-state",
+    "job-progress",
     "printer-added",
     "printer-deleted",
     "printer-state-changed",
 ];
-const JOB_ATTRIBUTES: [&str; 6] = [
+const JOB_ATTRIBUTES: [&str; 10] = [
     "job-id",
     "job-name",
     "job-originating-user-name",
     "job-state",
     "job-printer-uri",
     "time-at-creation",
+    "job-impressions",
+    "job-impressions-completed",
+    "job-media-sheets",
+    "job-media-sheets-completed",
+];
+const STATUS_ATTRIBUTES: [&str; 7] = [
+    "printer-name",
+    "printer-info",
+    "marker-names",
+    "marker-levels",
+    "marker-colors",
+    "marker-types",
+    "printer-state-reasons",
 ];
 const DEVICE_ATTRIBUTES: [&str; 5] = [
     "device-uri",
@@ -123,6 +137,10 @@ impl Cups {
             .into_iter()
             .next()
             .unwrap_or_default())
+    }
+
+    pub async fn status(&self, name: &str) -> io::Result<Attributes> {
+        self.printer(&printer_uri(name), &STATUS_ATTRIBUTES).await
     }
 
     pub async fn printers(&self, attributes: &[&str]) -> io::Result<Vec<Attributes>> {

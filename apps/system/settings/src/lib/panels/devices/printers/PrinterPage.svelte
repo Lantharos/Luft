@@ -18,6 +18,7 @@
 
 	const HELD = 4;
 	const PRINTING = 5;
+	const SOME_LEFT = -3;
 
 	let removing = $state(false);
 	let note = $state('');
@@ -73,8 +74,12 @@
 			{#each printer.markers as [name, level, color] (name)}
 				<Row title={name}>
 					<span class="swatch" style:background={swatch(color)}></span>
-					<ProgressBar fraction={level / 100} label={name} class="w-24" />
-					<span class="w-10 text-right tabular-nums">{percent(level / 100)}</span>
+					{#if level >= 0}
+						<ProgressBar fraction={level / 100} label={name} class="w-24" />
+						<span class="w-10 text-right tabular-nums">{percent(level / 100)}</span>
+					{:else}
+						<span class="value">{t(level === SOME_LEFT ? 'settings-printers-supply-some' : 'settings-printers-supply-unknown')}</span>
+					{/if}
 				</Row>
 			{/each}
 		</Section>

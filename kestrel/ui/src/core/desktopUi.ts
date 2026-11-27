@@ -28,6 +28,7 @@ import { watchTaskbarShapes } from '../desktop/panel/islands/shapes.js';
 import { setTaskbarBlurHeld } from '../desktop/panel/preferences/taskbarLook.js';
 import { Extensions } from '../extensions/extensions.js';
 import { createPost, type Post } from '../system/connectivity/post/post.js';
+import { createPrinting, type Printing } from '../system/printing/printing.js';
 import { afterMotion, dropAfterMotion } from '../shared/motion/afterMotion.js';
 import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
 import { t } from '../shared/i18n/index.js';
@@ -68,6 +69,7 @@ export class DesktopUi {
   private readonly liveWallpaper: LiveWallpaper;
   private readonly extensions: Extensions;
   private readonly post: Post;
+  private readonly printing: Printing;
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly penActions: PenActions;
@@ -217,6 +219,7 @@ export class DesktopUi {
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
+      activeChanged: () => this.syncPrinting(),
       taskbar: {
         depths: monitor => this.taskbarDepths(monitor),
         anchor: (surface, monitor) => this.taskbarAnchor(surface, monitor),
@@ -229,6 +232,7 @@ export class DesktopUi {
     context.layoutManager.addTopChrome(this.overflow.shield);
     context.layoutManager.addTopChrome(this.overflow.actor);
     this.post = createPost(this.extensions.host);
+    this.printing = createPrinting();
 
     this.panels = new PanelSet(context.layoutManager, monitor => ({
       gust: () => this.surfaces.toggle('gust', monitor()),
@@ -398,9 +402,15 @@ export class DesktopUi {
       panel.autoHide.setAllowed(panel.screen.shown && !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
     const primary = this.context.layoutManager.primaryMonitor;
     this.panels.showCorner(!!primary && !taskbarPreferences.on(primary.index).shown && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
+    this.syncPrinting(covered);
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
     this.extensions.syncDesktop(available && !this.taskView.visible && !this.board.shown, available, this.context.sessionMode.isLocked || !!this.context.screenShield?.active);
     if (!available) this.dismissImmediately();
+  }
+
+  private syncPrinting(covered = coveredMonitors(this.context.layoutManager.monitors)): void {
+    const primary = this.context.layoutManager.primaryMonitor;
+    this.printing.setAllowed(!!primary && this.desktopAvailable() && !this.surfaces.active && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
   }
 
   private followTaskbarEdge(): void {
@@ -512,6 +522,7 @@ export class DesktopUi {
     this.touchscreen.destroy();
     this.extensions.shutdown();
     this.post.destroy();
+    this.printing.destroy();
     this.rotation.destroy();
     this.copilot.destroy();
     this.penActions.destroy();

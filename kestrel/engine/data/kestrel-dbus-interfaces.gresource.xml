@@ -25,6 +25,7 @@
     <file preprocess="xml-stripblanks">org.gnome.SessionManager.Presence.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.SessionManager.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.NightLight.xml</file>
+    <file preprocess="xml-stripblanks">com.lantharos.Settings.Printing.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.KeyboardLight.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Settings.Rfkill.xml</file>
     <file preprocess="xml-stripblanks">com.lantharos.Kestrel.Brightness.xml</file>

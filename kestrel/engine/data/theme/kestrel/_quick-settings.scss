@@ -53,3 +53,37 @@
 .kestrel-media-artist { font-size: 12px; color: ink(0.62); }
 .kestrel-media-control { padding: 9px; }
 .kestrel-media-control:insensitive { color: ink(0.30); }
+
+.kestrel-print-panel { width: 380px; margin: 12px; padding: 14px; spacing: 12px; }
+.kestrel-print-header { spacing: 12px; }
+.kestrel-print-badge { width: 36px; height: 36px; border-radius: 12px; background-color: fill(0.07); }
+.kestrel-print-icon.done { color: $success; }
+.kestrel-print-icon.failed { color: $danger; }
+.kestrel-print-titles { spacing: 2px; }
+.kestrel-print-title { font-size: 14px; font-weight: 600; }
+.kestrel-print-subtitle { font-size: 12px; color: ink(0.62); }
+.kestrel-print-track { height: 6px; border-radius: 999px; background-color: fill(0.12); }
+.kestrel-print-track .kestrel-print-fill { height: 6px; border-radius: 999px; background-color: ink(); }
+.kestrel-print-status { spacing: 12px; }
+.kestrel-print-caption { font-size: 12px; color: ink(0.62); font-feature-settings: "tnum"; }
+.kestrel-print-button { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: ink(); background-color: fill(0.10); transition-duration: $motion-tap; }
+.kestrel-print-button:hover { background-color: fill(0.16); }
+.kestrel-print-button:active { background-color: fill(0.22); }
+.kestrel-print-button:focus { box-shadow: inset 0 0 0 1px ink(0.35); }
+.kestrel-print-warnings { spacing: 6px; }
+.kestrel-print-warning { spacing: 8px; padding: 10px 12px; border-radius: 12px; background-color: fill(0.07); color: $warning; }
+.kestrel-print-warning.serious { color: $danger; }
+.kestrel-print-warning-text { font-size: 13px; font-weight: 500; }
+.kestrel-print-queue { spacing: 2px; }
+.kestrel-print-row { spacing: 8px; padding: 6px 4px 6px 12px; border-radius: 12px; background-color: fill(0.07); }
+.kestrel-print-row-title { font-size: 13px; font-weight: 600; }
+.kestrel-print-row-subtitle { font-size: 11px; color: ink(0.65); }
+.kestrel-print-ink { spacing: 10px; padding: 0 2px; }
+.kestrel-print-marker { spacing: 6px; }
+.kestrel-print-marker-name { font-size: 12px; font-weight: 500; }
+.kestrel-print-marker-level { font-size: 12px; color: ink(0.62); font-feature-settings: "tnum"; }
+.kestrel-print-ink-track { height: 4px; border-radius: 999px; background-color: fill(0.12); }
+.kestrel-print-ink-track .kestrel-print-fill { height: 4px; }
+.kestrel-print-first { border-radius: 999px 0 0 999px; }
+.kestrel-print-last { border-radius: 0 999px 999px 0; }
+.kestrel-print-first.kestrel-print-last { border-radius: 999px; }

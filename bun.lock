@@ -17,7 +17,7 @@
       "name": "convertible",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -43,7 +43,7 @@
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.6",
         "@codemirror/view": "^6.43.13",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -63,7 +63,7 @@
       "name": "easel",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -84,7 +84,7 @@
       "name": "flatbed",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -104,7 +104,7 @@
       "name": "heft",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
@@ -125,7 +125,7 @@
       "name": "magpie",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
@@ -146,7 +146,7 @@
       "name": "mailman",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -166,7 +166,7 @@
       "name": "meet",
       "version": "0.1.2",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -186,7 +186,7 @@
       "name": "soundboard",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -206,7 +206,7 @@
       "name": "barometer",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -226,7 +226,7 @@
       "name": "disks",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -246,7 +246,7 @@
       "name": "keys",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -266,7 +266,7 @@
       "name": "rover",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -286,7 +286,7 @@
       "name": "schelf",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -306,7 +306,7 @@
       "name": "settings",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -328,7 +328,7 @@
       "name": "setup",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -349,7 +349,7 @@
       "name": "signin",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "@luft/i18n": "workspace:*",
@@ -369,7 +369,7 @@
       "name": "terminal",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
         "@xterm/addon-clipboard": "^0.2.0",
         "@xterm/addon-fit": "^0.11.0",
         "@xterm/addon-search": "^0.16.0",
@@ -472,7 +472,7 @@
       "name": "@luft/network",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
       },
       "devDependencies": {
         "typescript": "~6.0.3",
@@ -500,7 +500,7 @@
         "@codemirror/lang-markdown": "^6.5.2",
         "@codemirror/language": "^6.12.4",
         "@codemirror/language-data": "^6.5.2",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.114",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.115",
         "@lezer/highlight": "^1.2.5",
         "@luft/i18n": "workspace:*",
         "@luft/motion": "workspace:*",
@@ -928,7 +928,7 @@
 
     "@lantharos/pult": ["@lantharos/pult@0.15.0", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "jiti": "2.7.0" }, "bin": { "pult": "cli.mjs" } }, "sha512-Z6O7S7J4WYgZbck+PqG4yeSJi42ZmSmOBqB6lecCWrk60vyLnpF2QLuMe+9tlxoiZbxirwoTnc7VudHh9w+/WA=="],
 
-    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#40d5a51", {}, "Lantharos-Sabine-40d5a51", "sha512-jx95ZmElu6+cc0OYwSO7MUe6lMPvjVZEJy1wucdBdiFXFJgk/4Jkt7JFtuf5d4DIwRBixWUt5DrUkGw08HMuHQ=="],
+    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#f1e06e4", {}, "Lantharos-Sabine-f1e06e4", "sha512-MPC5dAtKwRGcsaixiwKPnf7Dk7QHki1/Si47G8FsQSi4Q2jTUhKCZ7h+xCRc52hZimpELd38vBKEGgX3kGvGiQ=="],
 
     "@lezer/common": ["@lezer/common@1.5.6", "", {}, "sha512-NZxu3q49ck+YYbEJPuIPIyFP37XneBvzPIarBHEXBLBVfkZqQieZ/Y2boYnGNYtmjpOZLnAKs/lwqtmDpi365w=="],
 

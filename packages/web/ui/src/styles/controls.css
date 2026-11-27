@@ -139,13 +139,13 @@
 		display: flex;
 		flex-direction: column;
 		border-radius: var(--radius-rows);
-		background: var(--group);
 	}
 
 	.row-group > * {
 		--surface-hover: color-mix(in oklab, var(--ink) 4%, transparent);
 		position: relative;
 		border-radius: 0;
+		background: var(--group);
 	}
 
 	.row-group > :first-child {

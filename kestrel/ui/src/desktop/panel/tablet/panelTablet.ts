@@ -45,8 +45,8 @@ export class PanelTablet {
     const { panel } = this;
     if (panel.screen.touch) panel.tablet.enter(() => this.fit(), true);
     else {
-      this.fit();
       panel.tablet.leave(true);
+      this.fit();
       if (panel.autoHide.shown) panel.actor.translation_y = 0;
     }
     panel.place();
@@ -65,8 +65,8 @@ export class PanelTablet {
       });
       return;
     }
-    this.fit();
     panel.tablet.leave(false);
+    this.fit();
     if (panel.autoHide.shown) {
       animateActor(panel.actor, {
         translation_y: 0, spring: Spring.smooth,

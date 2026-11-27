@@ -122,6 +122,12 @@
 			"key": "com.lantharos.kestrel.glass wallpaper-on-power-saver"
 		},
 		{
+			"id": "appearance.lock-screen-fluted",
+			"page": "appearance",
+			"title": "settings-appearance-lock-fluted",
+			"key": "com.lantharos.kestrel lock-screen-fluted"
+		},
+		{
 			"id": "taskbar.shown",
 			"page": "taskbar",
 			"title": "settings-taskbar-shown",
@@ -425,12 +431,6 @@
 			"page": "privacy",
 			"title": "settings-notifications-content-lock-screen",
 			"key": "com.lantharos.kestrel lock-screen-content"
-		},
-		{
-			"id": "privacy.lock-screen-fluted",
-			"page": "privacy",
-			"title": "settings-privacy-lock-fluted",
-			"key": "com.lantharos.kestrel lock-screen-fluted"
 		},
 		{
 			"id": "privacy.crash-reports",

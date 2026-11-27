@@ -182,6 +182,8 @@ Keep paths, page names and ids there, never passwords, tokens or anything unlock
 
 The `thumbnails` feature makes thumbnails in the shared freedesktop cache and sends them to the page in batches. Each `request` replaces the one before, so asking for the files on screen keeps the queue short while scrolling.
 
+Common pictures, Easel documents and Photoshop files are read in the app itself. A Photoshop file's thumbnail comes from the merged picture Photoshop saves alongside the layers: only the rows and columns the thumbnail needs are read from it, so a large file costs about as much as a small one, and the layers are never opened.
+
 Files that need a thumbnailer go to one of those in the `thumbnailers` folders of `~/.local/share` and `XDG_DATA_DIRS`. It runs in a bubblewrap sandbox that sees only `/usr`, its own program, the file itself and a private folder for the result, with no network and no way to open new user namespaces, so a hostile file can only break its own thumbnail.
 
 Luft's own thumbnailer, `luft-thumbnailer` in `services/thumbnailer`, gives AppImages, Flatpak bundles and `.flatpakref` files their app's icon. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded, so it never goes online. SVG icons are drawn with only the images embedded in them, never files they point to.

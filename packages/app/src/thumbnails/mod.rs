@@ -3,6 +3,7 @@ mod cache;
 mod child;
 mod easel;
 mod generate;
+mod photoshop;
 mod priority;
 mod raster;
 mod sandbox;

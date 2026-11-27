@@ -9,6 +9,7 @@ use super::album;
 use super::cache::{self, Source, ThumbnailSize};
 use super::child::Cancellation;
 use super::easel;
+use super::photoshop;
 use super::raster;
 use super::system::{Failure, Registry};
 
@@ -47,6 +48,8 @@ pub(super) fn thumbnail(
         raster::render(&source.path, size.pixels())
     } else if easel::is_document(&mime, &source.path) {
         easel::render(&source.path, size.pixels())
+    } else if photoshop::is_photoshop(&mime) {
+        photoshop::render(&source.path, size.pixels())
     } else {
         let thumbnailed = match registry.find(&mime) {
             Some(thumbnailer) => match thumbnailer.run(&source, size, cancellation) {

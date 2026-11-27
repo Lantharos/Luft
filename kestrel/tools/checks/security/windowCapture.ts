@@ -117,7 +117,8 @@ async function checkOverlay(socket: string, game: Meta.Window) {
   const overlays = global.top_window_group.get_n_children();
   const {process, lines} = await client(socket, 'overlay');
   try {
-    await eventually(() => lines.includes(`shown ${OVERLAY_WIDTH}x${OVERLAY_HEIGHT}`) && global.top_window_group.get_n_children() === overlays + 1,
+    await eventually(() => lines.filter(line => line === `shown ${OVERLAY_WIDTH}x${OVERLAY_HEIGHT}`).length === 2 && lines.includes('hidden') &&
+      global.top_window_group.get_n_children() === overlays + 1,
       'the app shows an overlay above every window');
     const {x, y} = global.top_window_group.get_last_child()!;
     const monitor = global.display.get_monitor_geometry(game.get_monitor());
@@ -131,36 +132,38 @@ async function checkOverlay(socket: string, game: Meta.Window) {
   await eventually(() => global.top_window_group.get_n_children() === overlays, 'the overlay goes away with the app');
 }
 
-async function recorded(socket: string, app: string, game: Meta.Window, {width, height}: Mtk.Rectangle) {
+const latestFrame = (lines: string[]) => lines.findLast(line => line.startsWith('ready'))?.split(' ') ?? [];
+
+async function recorded({lines}: Launched, game: Meta.Window, {width, height}: Mtk.Rectangle) {
   await eventually(() => (game.get_compositor_private() as Meta.WindowActor).opacity === 255, 'the game has finished opening');
-  await settled();
-  const capture = await client(socket, 'capture', app);
-  const {lines} = capture;
-  await eventually(() => lines.some(line => line.startsWith('ready')), 'the app records a frame of the window').catch(error => {
+  await eventually(() => latestFrame(lines)[2] === GAME_PIXEL, 'the app records a frame of the window').catch(error => {
     throw new Error(`${error.message}: ${lines.join(' | ')}`);
   });
   require(lines.some(line => line.startsWith('listed ')), 'the app finds the window by its app id');
-  const [, size, middle, corner] = lines.find(line => line.startsWith('ready'))!.split(' ');
-  require(size === `${width}x${height}` && middle === GAME_PIXEL, `the frame holds the window's picture (${size} ${middle})`);
+  const [, size, , corner] = latestFrame(lines);
+  require(size === `${width}x${height}`, `the frame is as large as the window's picture (${size})`);
   require(corner === GAME_PIXEL, `the frame leaves out the desktop's corners, title bar and shadow (${corner})`);
-  return capture;
 }
 
 async function checkCapture(socket: string, game: Meta.Window) {
-  const capture = await recorded(socket, GAME_APP, game, game.get_buffer_rect());
+  await settled();
+  const capture = await client(socket, 'capture', GAME_APP);
+  await recorded(capture, game, game.get_buffer_rect());
   require((await grants()).some(entry => entry.active === true), 'Settings shows that the app is recording');
   return capture;
 }
 
 async function checkFramed(socket: string) {
+  const capture = await client(socket, 'capture', `steam_app_${FRAMED_GAME}`);
   const game = gjs('clients/x11/x11Window.js', [FRAMED_TITLE, FRAMED_BACKGROUND, '', FRAMED_CLASS], {env: {SteamGameId: FRAMED_GAME}});
   try {
-    const window = await waitForWindow(FRAMED_TITLE, 'a Steam game with an X11 title bar opens');
+    const window = await waitForWindow(FRAMED_TITLE, 'a Steam game with an X11 title bar opens while an app waits to record it');
     require(window.get_wm_class() === FRAMED_CLASS, `the game names itself ${window.get_wm_class()}`);
     const content = window.frame_rect_to_client_rect(window.get_frame_rect());
     require(window.get_buffer_rect().height > content.height, 'Kestrel frames the X11 game');
-    await stop((await recorded(socket, `steam_app_${FRAMED_GAME}`, window, content)).process);
+    await recorded(capture, window, content);
   } finally {
+    await stop(capture.process);
     await stop(game);
   }
 }

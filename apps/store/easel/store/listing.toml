@@ -8,4 +8,4 @@ categories = ["Graphics", "Office"]
 homepage = "https://luft.computer"
 support = "https://github.com/Lantharos/Luft/issues"
 brand_color = "#6a76f5"
-listed = false
+listed = true

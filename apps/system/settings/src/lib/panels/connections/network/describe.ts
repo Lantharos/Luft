@@ -1,5 +1,4 @@
 import Wifi from '@luft/symbols/icons/wifi';
-import WifiHigh from '@luft/symbols/icons/wifi-high';
 import WifiLow from '@luft/symbols/icons/wifi-low';
 import WifiZero from '@luft/symbols/icons/wifi-zero';
 import { i18n, t } from '@luft/i18n';
@@ -27,7 +26,7 @@ export const securityLabel = (security: Security) => t(SECURITY_LABELS[security]
 export const linkLabel = (link: Link) => t(LINK_LABELS[link]);
 export const isSecured = (security: Security) => security !== 'open' && security !== 'owe';
 
-const SIGNAL_ICONS: Record<SignalLevel, typeof Wifi> = { excellent: Wifi, good: WifiHigh, ok: WifiLow, weak: WifiZero, none: WifiZero };
+const SIGNAL_ICONS: Record<SignalLevel, typeof Wifi> = { excellent: Wifi, good: Wifi, ok: WifiLow, weak: WifiZero, none: WifiZero };
 
 const SIGNAL_LABELS: Record<SignalLevel, string> = {
 	excellent: 'settings-network-signal-excellent',

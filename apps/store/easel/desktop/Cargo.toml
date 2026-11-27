@@ -16,6 +16,7 @@ fast_image_resize.workspace = true
 gio.workspace = true
 glycin = { workspace = true, features = ["tokio"] }
 half.workspace = true
+hayro.workspace = true
 jpeg-encoder.workspace = true
 krilla = { workspace = true, features = ["raster-images"] }
 krilla-svg.workspace = true

@@ -10,7 +10,7 @@ import { Editor } from '#lib/editor/editor.svelte.js';
 import { ToolSettings } from '#lib/editor/settings.svelte.js';
 import { openBoard, saveBoard, type BoardRecord } from '#lib/files/board-file.js';
 import { openImage, saveImage, type ImageRecord } from '#lib/files/image-file.svelte.js';
-import { baseName, extension, layeredDocument, pictureDocument, RAW, rawDocument } from '#lib/files/picture.js';
+import { baseName, extension, layeredDocument, pdfDocument, pictureDocument, RAW, rawDocument } from '#lib/files/picture.js';
 import type { RawDevelopment } from '#lib/adjust/develop.js';
 import { startGpu } from '#lib/gpu/device.js';
 import { kit } from '#lib/gpu/kit.js';
@@ -28,7 +28,7 @@ export type Screen =
 	| { kind: 'board'; whiteboard: Whiteboard; path: string | null; name: string }
 	| { kind: 'quick'; quick: QuickEdit; path: string; name: string };
 
-export type DialogKind = 'new-image' | 'new-board' | 'develop' | 'export' | 'history' | 'resize' | 'unsaved' | 'save-back' | null;
+export type DialogKind = 'new-image' | 'new-board' | 'develop' | 'export' | 'history' | 'resize' | 'unsaved' | 'save-back' | 'pdf-page' | null;
 
 const TOAST_MS = 2600;
 const CHOOSER = { timeoutMs: 24 * 60 * 60 * 1000 };
@@ -43,6 +43,7 @@ export class App {
 	pictures = $state<string | null>(null);
 	busy = $state(false);
 	developing = $state.raw<RawDevelopment | null>(null);
+	choosingPage = $state.raw<{ path: string; pages: number } | null>(null);
 	readonly tools = new ToolSettings();
 	readonly toasts = new Toasts(TOAST_MS);
 	#leaving: ((choice: 'save' | 'discard' | 'cancel') => void) | null = null;
@@ -113,6 +114,13 @@ export class App {
 				const record = opened.document as unknown as ImageRecord | BoardRecord;
 				if (record.kind === 'board') this.showBoard(await openBoard(record, opened.assets), path, baseName(path));
 				else this.showImage(await openImage(record, opened.layers), path, baseName(path));
+			} else if (extension(path) === 'pdf') {
+				const { pages } = await commands.pdfPages({ path });
+				if (pages === 1) this.showImage(await pdfDocument(path, 0), null, baseName(path));
+				else {
+					this.choosingPage = { path, pages };
+					this.dialog = 'pdf-page';
+				}
 			} else if (extension(path) === 'psd') {
 				this.showImage(await layeredDocument(path), null, baseName(path));
 			} else if (RAW.has(extension(path))) {
@@ -132,6 +140,17 @@ export class App {
 		} finally {
 			this.busy = false;
 		}
+	}
+
+	async openPdfPage(page: number) {
+		const { path } = this.choosingPage!;
+		this.closePageChoice();
+		await this.working(async () => this.showImage(await pdfDocument(path, page), null, baseName(path)));
+	}
+
+	closePageChoice() {
+		this.choosingPage = null;
+		this.dialog = null;
 	}
 
 	finishDeveloping() {

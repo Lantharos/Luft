@@ -154,6 +154,14 @@ easel-layer-add = Add a layer
 easel-layer-more = Layer actions
 # $number counts layers from 1
 easel-layer-name = Layer { $number }
+# $number is the page of the PDF the layer shows
+easel-pdf-page = Page { $number }
+easel-pdf-choose-page = Choose a page
+# $number is the page shown, $pages how many the PDF has
+easel-pdf-page-of = Page { $number } of { $pages }
+easel-pdf-previous-page = Previous page
+easel-pdf-next-page = Next page
+easel-pdf-open-page = Open page
 easel-layer-background = Background
 easel-layer-pasted = Pasted
 # $name is the copied layer's name

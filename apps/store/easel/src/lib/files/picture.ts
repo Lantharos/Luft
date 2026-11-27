@@ -8,6 +8,7 @@ import { fetchBytes, uploadBitmap, uploadImage } from './pixels';
 
 const BROWSER_DECODES = new Set(['png', 'jpg', 'jpeg', 'webp', 'avif', 'gif', 'bmp']);
 export const MAX_SIDE = 16384;
+const PDF_PREVIEW_SIDE = 576;
 export const RAW = new Set(['3fr', 'arw', 'cr2', 'cr3', 'crw', 'dng', 'erf', 'iiq', 'nef', 'orf', 'pef', 'raf', 'rw2']);
 
 export const extension = (path: string) => path.split('.').pop()!.toLowerCase();
@@ -59,6 +60,26 @@ export async function layeredDocument(path: string) {
 	doc.activeId = layers[layers.length - 1].id;
 	doc.invalidate();
 	return doc;
+}
+
+export async function pdfDocument(path: string, page: number) {
+	const decoded = await commands.renderPdfPage({ path, page, longest: MAX_SIDE });
+	const doc = new ImageDocument(decoded.width, decoded.height);
+	const paper = doc.newLayer('raster', t('easel-pdf-page', { number: page + 1 }));
+	uploadImage(paper.pixels, await fetchBytes(decoded.file), decoded.width, decoded.height);
+	await commands.releaseFiles({ paths: [decoded.file] });
+	const ink = doc.newLayer('raster', t('easel-layer-name', { number: 1 }));
+	doc.layers = [paper, ink];
+	doc.activeId = ink.id;
+	doc.invalidate();
+	return doc;
+}
+
+export async function pdfPreview(path: string, page: number) {
+	const decoded = await commands.renderPdfPage({ path, page, longest: PDF_PREVIEW_SIDE });
+	const bytes = await fetchBytes(decoded.file);
+	await commands.releaseFiles({ paths: [decoded.file] });
+	return new ImageData(new Uint8ClampedArray(bytes.buffer), decoded.width, decoded.height);
 }
 
 export async function rawDocument(path: string) {

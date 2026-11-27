@@ -10,8 +10,8 @@ use crate::l10n::L10N;
 
 const OPENS: &[&str] = &[
     "easel", "png", "jpg", "jpeg", "webp", "avif", "gif", "bmp", "tif", "tiff", "heic", "heif",
-    "psd", "3fr", "arw", "cr2", "cr3", "crw", "dng", "erf", "iiq", "nef", "orf", "pef", "raf",
-    "rw2",
+    "psd", "pdf", "3fr", "arw", "cr2", "cr3", "crw", "dng", "erf", "iiq", "nef", "orf", "pef",
+    "raf", "rw2",
 ];
 
 #[derive(Deserialize, Type)]

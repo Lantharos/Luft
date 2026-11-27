@@ -4,6 +4,7 @@
 	import HistoryDialog from '#lib/dialogs/HistoryDialog.svelte';
 	import NewBoardDialog from '#lib/dialogs/NewBoardDialog.svelte';
 	import NewImageDialog from '#lib/dialogs/NewImageDialog.svelte';
+	import PdfPageDialog from '#lib/dialogs/PdfPageDialog.svelte';
 	import ResizeDialog from '#lib/dialogs/ResizeDialog.svelte';
 	import SaveBackDialog from '#lib/dialogs/SaveBackDialog.svelte';
 	import UnsavedDialog from '#lib/dialogs/UnsavedDialog.svelte';
@@ -24,6 +25,8 @@
 	<NewBoardDialog oncreate={(template) => void app.newBoard(template)} onclose={close} />
 {:else if app.dialog === 'develop' && app.developing}
 	<DevelopDialog development={app.developing} onclose={() => app.finishDeveloping()} />
+{:else if app.dialog === 'pdf-page' && app.choosingPage}
+	<PdfPageDialog path={app.choosingPage.path} pages={app.choosingPage.pages} onopen={(page) => void app.openPdfPage(page)} onclose={() => app.closePageChoice()} />
 {:else if app.dialog === 'export' && screen.kind !== 'home'}
 	{@const areas = exportAreas(app)}
 	<ExportDialog size={(area) => exportSize(app, area)} {areas} vector={screen.kind === 'board'} run={(choice) => runExport(app, choice)} onclose={close} />

@@ -8,6 +8,13 @@ pub struct Path {
 }
 
 #[derive(Deserialize, Type)]
+pub struct PdfPage {
+    pub path: String,
+    pub page: u32,
+    pub longest: u32,
+}
+
+#[derive(Deserialize, Type)]
 pub struct Paths {
     pub paths: Vec<String>,
 }

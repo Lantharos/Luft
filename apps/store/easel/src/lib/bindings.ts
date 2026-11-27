@@ -71,9 +71,17 @@ export const commands = {
 	openLayered: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Layered>("open_layered", params, options),
+	pdfPages: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<PageCount>("pdf_pages", params, options),
 	releaseFiles: (params: {
 		paths: string[],
 	}, options?: CallOptions) => invoke<null>("release_files", params, options),
+	renderPdfPage: (params: {
+		path: string,
+		page: number,
+		longest: number,
+	}, options?: CallOptions) => invoke<Decoded>("render_pdf_page", params, options),
 	requestThumbnails: (params: {
 		paths: string[],
 		size: ThumbnailSize,
@@ -230,6 +238,10 @@ export type Output = {
 	width: number,
 	height: number,
 	channels: number,
+};
+
+export type PageCount = {
+	pages: number,
 };
 
 export type Palette = {

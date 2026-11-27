@@ -27,6 +27,8 @@ asks:
   - { ask: upscale, to: on-device-ai }
   - { ask: raw photo, to: camera-raw-and-photoshop-files }
   - { ask: psd, to: camera-raw-and-photoshop-files }
+  - { ask: draw on a pdf, to: pdfs }
+  - { ask: sign a pdf, to: pdfs }
   - { ask: diagram, to: the-whiteboard }
   - { ask: sticky notes, to: the-whiteboard }
   - { ask: kanban, to: the-whiteboard }
@@ -88,6 +90,10 @@ The first time you use one, Easel shows how large its model is and downloads it 
 Easel opens raw photos from most cameras, such as `.cr2`, `.cr3`, `.nef`, `.arw`, `.raf`, `.orf`, `.rw2` and `.dng`. **Develop** shows first, to set exposure, white balance, highlights and shadows while you watch, then the photo opens in the editor.
 
 Photoshop files open with their layers, each with its name, opacity, blend mode and visibility. Layered TIFF files open flattened.
+
+## PDFs
+
+A PDF opens as a picture of one of its pages, to draw or write on. When it has more than one page, Easel asks which. The page becomes the bottom layer, with an empty layer above it for what you add.
 
 ## Selecting
 

@@ -53,7 +53,20 @@ pub fn register(window: SabineWindow, state: &EaselState) -> SabineWindow {
         })
         .command_async("open_layered", |Path { path }| {
             blocking(move || layered::open_psd(FilePath::new(&path)))
-        });
+        })
+        .command_async("pdf_pages", |Path { path }| {
+            blocking(move || pdf::page_count(FilePath::new(&path)))
+        })
+        .command_async(
+            "render_pdf_page",
+            |PdfPage {
+                 path,
+                 page,
+                 longest,
+             }| {
+                blocking(move || pdf::render_page(FilePath::new(&path), page, longest))
+            },
+        );
     let window = register_saving(window, state);
     register_ai(window, state)
 }

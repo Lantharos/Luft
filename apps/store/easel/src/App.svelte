@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { events as sabineEvents } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
-	import { appearance, EmptyState, GlassShell, Spinner, Toast, WindowControls } from '@luft/ui';
+	import { appearance, droppedPaths, EmptyState, GlassShell, Spinner, Toast, WindowControls } from '@luft/ui';
 	import { events } from '#lib/bindings.js';
 	import { App } from '#lib/app/app.svelte.js';
 	import { provideApp } from '#lib/app/context.js';
@@ -33,9 +33,22 @@
 		if (event.shiftKey) app.dialog = 'new-board';
 		else app.dialog = 'new-image';
 	}
+
+	const carriesFiles = (event: DragEvent) => event.dataTransfer?.types.some((type) => type === 'Files' || type === 'text/uri-list') ?? false;
+
+	function dragOver(event: DragEvent) {
+		if (carriesFiles(event)) event.preventDefault();
+	}
+
+	function drop(event: DragEvent) {
+		if (!carriesFiles(event)) return;
+		event.preventDefault();
+		const paths = droppedPaths(event.dataTransfer!);
+		if (paths.length && app.ready) void app.openPaths(paths, false);
+	}
 </script>
 
-<svelte:window onkeydown={globalKeys} />
+<svelte:window onkeydown={globalKeys} ondragover={dragOver} ondrop={drop} />
 
 <div class="h-dvh w-screen overflow-hidden text-(--text)">
 	{#if app.failure}

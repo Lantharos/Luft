@@ -103,7 +103,7 @@ Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests
  src/compositor/meta-background-content.c      |  92 ++-
  src/compositor/meta-background.c              |  53 +-
  src/compositor/meta-shaped-texture-private.h  |   3 +
- src/compositor/meta-shaped-texture.c          |  71 +-
+ src/compositor/meta-shaped-texture.c          |  58 +-
  src/compositor/meta-surface-actor.c           |  20 +
  src/compositor/meta-texture-mipmap.c          |   3 +-
  src/core/meta-context.c                       |  40 ++
@@ -119,7 +119,7 @@ Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests
  src/wayland/meta-wayland-surface.c            | 226 ++++++-
  src/wayland/meta-wayland-transaction.c        |  32 +
  src/wayland/meta-wayland-transaction.h        |   4 +
- 97 files changed, 3517 insertions(+), 822 deletions(-)
+ 97 files changed, 3508 insertions(+), 818 deletions(-)
  create mode 100644 clutter/clutter/clutter-graphics-recovery-context.c
  create mode 100644 clutter/clutter/clutter-graphics-recovery-context.h
 
@@ -6683,7 +6683,7 @@ index 6730bb1bd1ecec3fe1ae43b1397c120c75458295..fa498f350c5563b2efc5f725b0b47358
 +void meta_shaped_texture_realize (MetaShapedTexture *stex);
 +void meta_shaped_texture_unrealize (MetaShapedTexture *stex);
 diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
-index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..37b5d19e9ecb4bdccd33d8d4ddbad9a7b03e698d 100644
+index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..8d191be632affa004990408ac0ad147c66a0baf6 100644
 --- a/src/compositor/meta-shaped-texture.c
 +++ b/src/compositor/meta-shaped-texture.c
 @@ -122,10 +122,11 @@ struct _MetaShapedTexture
@@ -6716,44 +6716,10 @@ index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..37b5d19e9ecb4bdccd33d8d4ddbad9a7
  }
  
  static void
-@@ -696,7 +693,8 @@ set_multi_texture (MetaShapedTexture *stex,
-       update_size (stex);
-     }
- 
--  meta_texture_mipmap_set_base_texture (stex->texture_mipmap, stex->texture);
-+  if (stex->is_realized)
-+    meta_texture_mipmap_set_base_texture (stex->texture_mipmap, stex->texture);
+@@ -1795,3 +1792,50 @@ meta_shaped_texture_set_color_repr (MetaShapedTexture            *stex,
+   meta_texture_mipmap_set_coeffs (stex->texture_mipmap, coeffs);
+   meta_shaped_texture_reset_pipelines (stex);
  }
- 
- static inline void
-@@ -1083,7 +1081,7 @@ meta_shaped_texture_set_create_mipmaps (MetaShapedTexture *stex,
-     {
-       stex->create_mipmaps = create_mipmaps;
- 
--      if (!stex->create_mipmaps)
-+      if (!stex->create_mipmaps && stex->is_realized)
-         meta_texture_mipmap_clear (stex->texture_mipmap);
-     }
- }
-@@ -1221,7 +1219,8 @@ meta_shaped_texture_update_area (MetaShapedTexture  *stex,
-                                     clip);
-     }
- 
--  meta_texture_mipmap_invalidate (stex->texture_mipmap);
-+  if (stex->is_realized)
-+    meta_texture_mipmap_invalidate (stex->texture_mipmap);
- 
-   return TRUE;
- }
-@@ -1792,6 +1791,56 @@ meta_shaped_texture_set_color_repr (MetaShapedTexture            *stex,
-   stex->premult = premult;
-   stex->coeffs = coeffs;
- 
--  meta_texture_mipmap_set_coeffs (stex->texture_mipmap, coeffs);
-+  if (stex->is_realized)
-+    meta_texture_mipmap_set_coeffs (stex->texture_mipmap, coeffs);
-+  meta_shaped_texture_reset_pipelines (stex);
-+}
 +
 +/**
 + * meta_shaped_texture_realize:
@@ -6773,8 +6739,6 @@ index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..37b5d19e9ecb4bdccd33d8d4ddbad9a7
 +    return;
 +
 +  stex->texture_mipmap = meta_texture_mipmap_new (cogl_context);
-+  meta_texture_mipmap_set_base_texture (stex->texture_mipmap, stex->texture);
-+  meta_texture_mipmap_set_coeffs (stex->texture_mipmap, stex->coeffs);
 +  stex->is_realized = TRUE;
 +
 +  update_size (stex);
@@ -6794,7 +6758,7 @@ index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..37b5d19e9ecb4bdccd33d8d4ddbad9a7
 +
 +  meta_shaped_texture_set_texture (stex, NULL);
 +  meta_shaped_texture_set_mask_texture (stex, NULL);
-   meta_shaped_texture_reset_pipelines (stex);
++  meta_shaped_texture_reset_pipelines (stex);
 +
 +  invalidate_size (stex);
 +
@@ -6802,7 +6766,7 @@ index e3714e5cd3f8a9ab288a1f4b97a2b2d5c95d717f..37b5d19e9ecb4bdccd33d8d4ddbad9a7
 +  stex->is_realized = FALSE;
 +
 +  clutter_content_invalidate (CLUTTER_CONTENT (stex));
- }
++}
 diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
 index 14c46fdf6d1ce2db83484475853685c71fbe32e3..1eb3c23235fb8dc2acb97ef365f788d61552e690 100644
 --- a/src/compositor/meta-surface-actor.c

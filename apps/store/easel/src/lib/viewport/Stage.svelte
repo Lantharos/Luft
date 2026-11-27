@@ -99,9 +99,8 @@
 			navigation.move(event);
 			return;
 		}
-		const tool = toolEvent(event);
-		if (drawing === event.pointerId) handler?.move?.(tool);
-		if (event.pointerType !== 'touch') onhover?.(tool);
+		if (drawing === event.pointerId) handler?.move?.(toolEvent(event));
+		else if (event.pointerType !== 'touch') onhover?.(toolEvent(event));
 	}
 
 	function up(event: PointerEvent) {

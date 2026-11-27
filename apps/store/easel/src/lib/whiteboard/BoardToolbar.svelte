@@ -15,9 +15,10 @@
 	import Type from '@luft/symbols/icons/type';
 	import { t } from '@luft/i18n';
 	import { MenuButton, MenuItem, tooltip } from '@luft/ui';
-	import { NOTE_COLORS, PEN_COLORS } from '#lib/board/model.js';
+	import { NOTE_COLORS, PEN_COLORS, type ShapeKind } from '#lib/board/model.js';
 	import { INK, resolve, type Look } from '#lib/board/render/look.js';
 	import type { BoardTool } from '#lib/board/tools/tool.js';
+	import { colorName, hint, SHAPE_KEYS, TOOL_KEYS } from './hints';
 	import type { Whiteboard } from './whiteboard.svelte';
 
 	interface Props {
@@ -34,6 +35,11 @@
 		{ id: 'highlighter', icon: Highlighter },
 		{ id: 'eraser', icon: Eraser }
 	];
+	const SHAPES: { kind: ShapeKind; icon: typeof Pen; label: () => string }[] = [
+		{ kind: 'rectangle', icon: Square, label: () => t('easel-shape-box') },
+		{ kind: 'ellipse', icon: Circle, label: () => t('easel-shape-ellipse') },
+		{ kind: 'diamond', icon: Square, label: () => t('easel-shape-diamond') }
+	];
 	const PLACING: { id: BoardTool; icon: typeof Pen }[] = [
 		{ id: 'text', icon: Type },
 		{ id: 'note', icon: StickyNote },
@@ -43,10 +49,12 @@
 	let notes = $derived(whiteboard.tool === 'note');
 	let colors = $derived(notes ? NOTE_COLORS : [INK, ...PEN_COLORS.slice(1)]);
 	let current = $derived(notes ? whiteboard.note : whiteboard.color);
+
+	const named = (tool: BoardTool) => hint(boardToolLabel[tool](), TOOL_KEYS[tool]!);
 </script>
 
 {#snippet button(id: BoardTool, Icon: typeof Pen)}
-	<button type="button" class={['board-tool', whiteboard.tool === id && 'is-active']} aria-label={boardToolLabel[id]()} aria-pressed={whiteboard.tool === id} onclick={() => whiteboard.choose(id)} {@attach tooltip(boardToolLabel[id]())}>
+	<button type="button" class={['board-tool', whiteboard.tool === id && 'is-active']} aria-label={boardToolLabel[id]()} aria-pressed={whiteboard.tool === id} onclick={() => whiteboard.choose(id)} {@attach tooltip(named(id))}>
 		<Icon size={20} />
 	</button>
 {/snippet}
@@ -54,19 +62,23 @@
 <nav class="floating-bar" aria-label={t('easel-board-tools')}>
 	{#each DRAWING as entry (entry.id)}{@render button(entry.id, entry.icon)}{/each}
 	<span class="divider"></span>
-	<MenuButton label={t('easel-board-shape')} class={['board-tool', whiteboard.tool === 'shape' && 'is-active']}>
+	<MenuButton label={t('easel-board-shape')} class={['board-tool', whiteboard.tool === 'shape' && 'is-active']} {@attach tooltip(named('shape'))}>
 		{#snippet trigger()}<Shapes size={20} />{/snippet}
 		{#snippet children(close)}
-			<MenuItem checked={whiteboard.shapeKind === 'rectangle'} onclick={() => (close(), (whiteboard.shapeKind = 'rectangle'), whiteboard.choose('shape'))}><Square size={16} />{t('easel-shape-box')}</MenuItem>
-			<MenuItem checked={whiteboard.shapeKind === 'ellipse'} onclick={() => (close(), (whiteboard.shapeKind = 'ellipse'), whiteboard.choose('shape'))}><Circle size={16} />{t('easel-shape-ellipse')}</MenuItem>
-			<MenuItem checked={whiteboard.shapeKind === 'diamond'} onclick={() => (close(), (whiteboard.shapeKind = 'diamond'), whiteboard.choose('shape'))}><Square size={16} class="rotate-45 scale-90" />{t('easel-shape-diamond')}</MenuItem>
+			{#each SHAPES as entry (entry.kind)}
+				<MenuItem checked={whiteboard.shapeKind === entry.kind} onclick={() => (close(), whiteboard.chooseShape(entry.kind))}>
+					<entry.icon size={16} class={entry.kind === 'diamond' ? 'rotate-45 scale-90' : undefined} />
+					<span class="flex-1">{entry.label()}</span>
+					<span class="text-[11.5px] text-(--text-muted)">{SHAPE_KEYS[entry.kind]}</span>
+				</MenuItem>
+			{/each}
 		{/snippet}
 	</MenuButton>
-	<MenuButton label={t('easel-board-arrow')} class={['board-tool', whiteboard.tool === 'arrow' && 'is-active']}>
+	<MenuButton label={t('easel-board-arrow')} class={['board-tool', whiteboard.tool === 'arrow' && 'is-active']} {@attach tooltip(named('arrow'))}>
 		{#snippet trigger()}{#if whiteboard.routing === 'elbow'}<Elbow size={20} />{:else}<ArrowUpRight size={20} />{/if}{/snippet}
 		{#snippet children(close)}
-			<MenuItem checked={whiteboard.routing === 'straight'} onclick={() => (close(), (whiteboard.routing = 'straight'), whiteboard.choose('arrow'))}><ArrowUpRight size={16} />{t('easel-arrow-straight')}</MenuItem>
-			<MenuItem checked={whiteboard.routing === 'elbow'} onclick={() => (close(), (whiteboard.routing = 'elbow'), whiteboard.choose('arrow'))}><Elbow size={16} />{t('easel-arrow-elbow')}</MenuItem>
+			<MenuItem checked={whiteboard.routing === 'straight'} onclick={() => (close(), whiteboard.chooseRoute('straight'))}><ArrowUpRight size={16} />{t('easel-arrow-straight')}</MenuItem>
+			<MenuItem checked={whiteboard.routing === 'elbow'} onclick={() => (close(), whiteboard.chooseRoute('elbow'))}><Elbow size={16} />{t('easel-arrow-elbow')}</MenuItem>
 		{/snippet}
 	</MenuButton>
 	{#each PLACING as entry (entry.id)}{@render button(entry.id, entry.icon)}{/each}
@@ -78,10 +90,11 @@
 				type="button"
 				role="radio"
 				aria-checked={current === color}
-				aria-label={color === INK ? t('easel-board-ink') : color}
+				aria-label={colorName(color)}
 				class={['dot', current === color && 'is-chosen']}
 				style:--dot={resolve(color, look)}
 				onclick={() => (notes ? (whiteboard.note = color) : (whiteboard.color = color))}
+				{@attach tooltip(colorName(color))}
 			></button>
 		{/each}
 	</div>

@@ -14,6 +14,7 @@
 	import Stage from '#lib/viewport/Stage.svelte';
 	import BoardOverlay from './BoardOverlay.svelte';
 	import BoardToolbar from './BoardToolbar.svelte';
+	import { hint } from './hints';
 	import { boardShortcut } from './shortcuts';
 	import { BoardSurface } from './surface';
 	import type { Whiteboard } from './whiteboard.svelte';
@@ -42,13 +43,6 @@
 	}
 
 	const drop = fileDrop((paths) => void addFiles(paths));
-
-	function doubleClick(event: MouseEvent) {
-		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-		const [x, y] = whiteboard.viewport.toDocument(event.clientX - rect.left, event.clientY - rect.top);
-		const hit = whiteboard.select.topAt(x, y);
-		if (hit && 'text' in hit) whiteboard.edit(hit.id);
-	}
 </script>
 
 <svelte:window onkeydown={(event) => boardShortcut(app, whiteboard, event)} ondragovercapture={drop.ondragover} ondropcapture={drop.ondrop} />
@@ -58,13 +52,13 @@
 		<header class="drag-region relative z-10 flex h-14 flex-none items-center gap-1.5 pr-3 pl-5">
 			<h1 class="truncate text-[15px] font-semibold">{name}{board.history.modified ? ' •' : ''}</h1>
 			<div class="flex-1"></div>
-			<button type="button" class="icon-button" aria-label={t('easel-undo')} disabled={!board.history.canUndo} onclick={() => board.undo()} {@attach tooltip(t('easel-undo'))}><Undo size={18} /></button>
-			<button type="button" class="icon-button" aria-label={t('easel-redo')} disabled={!board.history.canRedo} onclick={() => board.redo()} {@attach tooltip(t('easel-redo'))}><Redo size={18} /></button>
-			<button type="button" class="chip" onclick={() => app.fitBoard()}>{t('easel-zoom-fit')}</button>
-			<button type="button" class="button ml-1.5" onclick={() => (app.dialog = 'export')}>{t('easel-export')}</button>
+			<button type="button" class="icon-button" aria-label={t('easel-undo')} disabled={!board.history.canUndo} onclick={() => board.undo()} {@attach tooltip(hint(t('easel-undo'), 'Z', 'ctrl'))}><Undo size={18} /></button>
+			<button type="button" class="icon-button" aria-label={t('easel-redo')} disabled={!board.history.canRedo} onclick={() => board.redo()} {@attach tooltip(hint(t('easel-redo'), 'Z', 'ctrl', 'shift'))}><Redo size={18} /></button>
+			<button type="button" class="chip" onclick={() => app.fitBoard()} {@attach tooltip(hint(t('easel-zoom-fit'), '0', 'ctrl'))}>{t('easel-zoom-fit')}</button>
+			<button type="button" class="button ml-1.5" onclick={() => (app.dialog = 'export')} {@attach tooltip(hint(t('easel-export'), 'E', 'ctrl'))}>{t('easel-export')}</button>
 			<div class="ml-2.5"><WindowControls onclose={() => app.close()} /></div>
 		</header>
-		<div class="absolute inset-0 flex" role="presentation" ondblclick={doubleClick}>
+		<div class="absolute inset-0 flex">
 			<Stage
 				viewport={whiteboard.viewport}
 				surface={(canvas) => new BoardSurface(canvas, whiteboard, renderer, () => look)}
@@ -80,9 +74,9 @@
 			</Stage>
 		</div>
 		<div class="zoom">
-			<button type="button" class="icon-button" aria-label={t('easel-zoom-out')} onclick={() => whiteboard.viewport.zoomBy(0.8)}><Minus size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('easel-zoom-out')} onclick={() => whiteboard.viewport.zoomBy(0.8)} {@attach tooltip(hint(t('easel-zoom-out'), '-', 'ctrl'))}><Minus size={16} /></button>
 			<span class="w-11 text-center text-[12.5px] text-(--text-soft) tabular-nums">{percent}%</span>
-			<button type="button" class="icon-button" aria-label={t('easel-zoom-in')} onclick={() => whiteboard.viewport.zoomBy(1.25)}><Plus size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('easel-zoom-in')} onclick={() => whiteboard.viewport.zoomBy(1.25)} {@attach tooltip(hint(t('easel-zoom-in'), '+', 'ctrl'))}><Plus size={16} /></button>
 		</div>
 		<div class="toolbar">
 			<BoardToolbar {whiteboard} {look} onpicture={() => void app.choosePictures().then(addFiles)} />

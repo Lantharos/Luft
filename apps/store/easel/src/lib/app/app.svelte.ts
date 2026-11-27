@@ -284,7 +284,7 @@ export class App {
 				screen.editor.finishTool();
 				await saveImage(screen.editor.doc, path);
 			} else {
-				screen.whiteboard.finishEditing(null);
+				screen.whiteboard.finishEditing();
 				await saveBoard(screen.whiteboard.board, path);
 			}
 			screen.path = path;

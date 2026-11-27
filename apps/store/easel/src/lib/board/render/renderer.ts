@@ -4,7 +4,7 @@ import { packed, type Matrix } from '#lib/gpu/matrix.js';
 import type { Asset } from '../board.svelte';
 import { arrowPath, bounds, FRAME_BAND, intersects } from '../geometry';
 import { FRAME_TITLE_SIZE, LABEL_SIZE, NOTE_PADDING, NOTE_TEXT_SIZE, type BoardObject, type Box } from '../model';
-import { Labels, type LabelSpec } from './labels';
+import { Labels, type Label, type LabelSpec } from './labels';
 import { resolve, rgba, type Look } from './look';
 import { GRID, IMAGE, SOLID } from './shaders';
 import { diamondRing, ellipseRing, FLOATS, Mesh, rectangleRing } from './tessellate';
@@ -21,6 +21,7 @@ export interface BoardScene {
 	objects: BoardObject[];
 	lookup: (id: string) => BoardObject | undefined;
 	assets: Map<string, Asset>;
+	editing?: string | null;
 }
 
 interface Cached {
@@ -28,6 +29,16 @@ interface Cached {
 	look: Look;
 	buffer: GPUBuffer | null;
 	count: number;
+}
+
+function pixelAligned(x: number, y: number, label: Label, view: Matrix): Box {
+	const scale = view[0];
+	return {
+		x: (Math.round(x * scale + view[4]) - view[4]) / scale,
+		y: (Math.round(y * scale + view[5]) - view[5]) / scale,
+		w: label.texture.width / label.pixels,
+		h: label.texture.height / label.pixels
+	};
 }
 
 function pipeline(code: string, format: GPUTextureFormat, buffers: GPUVertexBufferLayout[] = [], topology: GPUPrimitiveTopology = 'triangle-strip') {
@@ -123,7 +134,7 @@ export class BoardRenderer {
 			pass.setBindGroup(1, kit.group(this.#grid, [kit.uniform(new Float32Array([...look.grid, spacing, Math.max(0.8, 1.2 * Math.min(1, scale)), 0, 0]))], 1));
 			pass.draw(3);
 		}
-		const bucket = 2 ** Math.ceil(Math.log2(Math.max(0.25, Math.min(8, scale))));
+		this.labels.begin(scale);
 		const solidGroup = kit.group(this.#solid, [viewBinding]);
 		const imageGroup = kit.group(this.#image, [viewBinding]);
 		const alive = new Set<string>();
@@ -142,12 +153,12 @@ export class BoardRenderer {
 				const texture = asset && this.#pictures.get(object.asset, asset.bitmap);
 				if (texture) this.#quad(pass, imageGroup, { x: object.x, y: object.y, w: object.w, h: object.h }, texture);
 			}
-			const label = this.#label(object, look);
+			const label = object.id === scene.editing ? null : this.#label(object, look);
 			if (label) {
-				const drawn = this.labels.get(label, bucket);
+				const drawn = this.labels.get(label);
 				const y = label.box.h === -1 ? label.box.y - drawn.height / 2 : label.box.y;
 				const x = label.align === 'center' && label.width ? label.box.x + (label.width - drawn.width) / 2 : label.box.x;
-				this.#quad(pass, imageGroup, { x, y, w: drawn.width, h: drawn.height }, drawn.texture);
+				this.#quad(pass, imageGroup, pixelAligned(x, y, drawn, view), drawn.texture);
 			}
 		}
 		for (const [id, cached] of this.#meshes) {

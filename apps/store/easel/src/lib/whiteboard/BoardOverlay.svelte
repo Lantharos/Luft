@@ -72,11 +72,12 @@
 			node.select();
 		}}
 		onpointerdown={(event) => event.stopPropagation()}
+		oninput={(event) => (whiteboard.draft = event.currentTarget.value)}
 		onkeydown={(event) => {
 			event.stopPropagation();
-			if (event.key === 'Escape' || (event.key === 'Enter' && (event.ctrlKey || event.metaKey))) whiteboard.finishEditing(event.currentTarget.value);
+			if (event.key === 'Escape' || (event.key === 'Enter' && (event.ctrlKey || event.metaKey))) whiteboard.finishEditing();
 		}}
-		onblur={(event) => whiteboard.finishEditing(event.currentTarget.value)}
+		onblur={() => whiteboard.finishEditing()}
 	></textarea>
 {/if}
 

@@ -126,11 +126,10 @@
 		finish();
 	}
 
-	function startMoving(event: DragEvent, row: SidebarRow) {
-		moving = row.key;
-		if (!event.dataTransfer) return;
-		event.dataTransfer.setData('text/html', Object.assign(document.createElement('span'), { textContent: row.label }).outerHTML);
-		event.dataTransfer.effectAllowed = 'move';
+	function startMoving(event: DragEvent, key: string) {
+		moving = key;
+		event.dataTransfer?.setData('application/x-rover-sidebar', key);
+		if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
 	}
 
 	function finish() {
@@ -160,7 +159,7 @@
 			onclick={() => open(row)}
 			onauxclick={(event) => onopentab(event, () => openInTab(row))}
 			oncontextmenu={(event) => onmenu(event, { kind: 'entry', row })}
-			ondragstart={(event) => startMoving(event, row)}
+			ondragstart={(event) => startMoving(event, row.key)}
 			ondragover={(event) => rowDragOver(event, row)}
 			ondragleave={drag.leave}
 			ondrop={(event) => rowDrop(event, row)}

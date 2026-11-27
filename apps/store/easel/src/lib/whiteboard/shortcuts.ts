@@ -1,15 +1,17 @@
 import { clipboard } from '@lantharos/sabine';
 import { t } from '@luft/i18n';
 import type { App } from '#lib/app/app.svelte.js';
-import { objectId, type BoardObject } from '#lib/board/model.js';
+import { objectId, type BoardObject, type ShapeKind } from '#lib/board/model.js';
 import { moved } from '#lib/board/transform.js';
 import type { BoardTool } from '#lib/board/tools/tool.js';
 import { addPicture } from '#lib/files/board-file.js';
+import { SHAPE_KEYS, TOOL_KEYS } from './hints';
 import type { Whiteboard } from './whiteboard.svelte';
 
 const OBJECTS = 'application/x-easel-objects';
 const OFFSET = 24;
-const KEYS: Record<string, BoardTool> = { v: 'select', p: 'pen', h: 'highlighter', e: 'eraser', s: 'shape', a: 'arrow', t: 'text', n: 'note', f: 'frame' };
+const TOOLS = new Map(Object.entries(TOOL_KEYS).map(([tool, key]) => [key.toLowerCase(), tool as BoardTool]));
+const SHAPES = new Map(Object.entries(SHAPE_KEYS).map(([shape, key]) => [key.toLowerCase(), shape as ShapeKind]));
 
 function copies(objects: BoardObject[], offset: number) {
 	const ids = new Map(objects.map((object) => [object.id, objectId()]));
@@ -82,6 +84,9 @@ export function boardShortcut(app: App, whiteboard: Whiteboard, event: KeyboardE
 	if ((key === 'delete' || key === 'backspace') && selection.length) return run(() => board.commit(t('easel-history-delete'), board.objects.filter((object) => !board.selected.has(object.id))));
 	if (key === 'escape') return run(() => board.select([]));
 	if (key === 'enter' && selection.length === 1 && 'text' in selection[0]) return run(() => whiteboard.edit(selection[0].id));
-	const tool = KEYS[key];
-	if (tool && !event.altKey) run(() => whiteboard.choose(tool));
+	if (event.altKey) return;
+	const tool = TOOLS.get(key);
+	if (tool) return run(() => whiteboard.choose(tool));
+	const shape = SHAPES.get(key);
+	if (shape) run(() => whiteboard.chooseShape(shape));
 }

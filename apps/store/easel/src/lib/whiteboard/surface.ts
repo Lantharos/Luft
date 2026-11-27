@@ -28,13 +28,14 @@ export class BoardSurface implements Surface {
 
 	draw() {
 		const { width, height } = this.canvas;
-		const { board, viewport, live, hidden } = this.whiteboard;
+		const { board, viewport, live, hidden, editing } = this.whiteboard;
 		const pass = kit.begin().beginRenderPass({ colorAttachments: [this.renderer.target(this.context.getCurrentTexture().createView(), width, height, canvasFormat)] });
 		const look = this.look();
 		const objects = !live ? board.objects : live.kind === 'frame' ? [live, ...board.objects] : [...board.objects, live];
-		this.renderer.render(pass, { objects, lookup: board.lookup, assets: board.assets }, viewport.matrix(), width, height, look, hidden, true);
+		this.renderer.render(pass, { objects, lookup: board.lookup, assets: board.assets, editing }, viewport.matrix(), width, height, look, hidden, true);
 		pass.end();
 		kit.flush();
+		if (this.renderer.labels.pending) this.invalidate();
 	}
 
 	destroy() {

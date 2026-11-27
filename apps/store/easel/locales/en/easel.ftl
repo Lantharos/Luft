@@ -255,6 +255,16 @@ easel-template-end = End
 easel-board-color = Pen colour
 easel-board-note-color = Note colour
 easel-board-ink = Ink
+easel-board-orange = Orange
+easel-board-blue = Blue
+easel-board-green = Green
+easel-board-red = Red
+easel-board-yellow = Yellow
+easel-board-peach = Peach
+easel-board-lilac = Lilac
+easel-board-shortcut = { $name } ({ $keys })
+easel-key-ctrl = Ctrl
+easel-key-shift = Shift
 
 ## Quick edit
 

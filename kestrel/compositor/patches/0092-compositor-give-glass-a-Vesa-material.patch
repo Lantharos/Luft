@@ -167,7 +167,7 @@ index 7b1d9b33c33c2dc9b07b1e7945588ff1f69905bf..1ac077d48a7bfca0abe9be64dab36813
 +  META_GLASS_PREFERENCE_VESA,
  } MetaGlassPreference;
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
-index 913c5bd8668ec5399f21dc0134989aa587954274..5bdf1d9ec9bf944cca5ffc414982661d3d42303a 100644
+index 913c5bd8668ec5399f21dc0134989aa587954274..5fac748f433d9c90eb7d185016a65058ce6a11c4 100644
 --- a/src/compositor/meta-window-corners.c
 +++ b/src/compositor/meta-window-corners.c
 @@ -447,6 +447,50 @@ get_shadow_snippet (void)

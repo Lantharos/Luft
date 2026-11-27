@@ -15,10 +15,13 @@ export interface Label {
 	width: number;
 	height: number;
 	lines: number;
+	scale: number;
+	pixels: number;
 }
 
 const MAX_PIXELS = 4096;
 const KEEP = 600;
+const FRAME_BUDGET_MS = 6;
 
 function wrap(context: OffscreenCanvasRenderingContext2D, text: string, width: number | null) {
 	const lines: string[] = [];
@@ -47,31 +50,48 @@ export function measureLabel(spec: LabelSpec) {
 	return { lines, width: spec.width ?? Math.max(1, ...lines.map((line) => context.measureText(line).width)), height: lines.length * spec.size * LINE_HEIGHT };
 }
 
+function rasterize(spec: LabelSpec, scale: number): Label {
+	const measured = measureLabel(spec);
+	const pixels = Math.min(scale, MAX_PIXELS / Math.max(measured.width, measured.height));
+	const canvas = new OffscreenCanvas(Math.max(1, Math.ceil(measured.width * pixels)), Math.max(1, Math.ceil(measured.height * pixels)));
+	const context = canvas.getContext('2d')!;
+	context.font = `${spec.weight} ${spec.size * pixels}px "Open Runde"`;
+	context.fillStyle = spec.color;
+	context.textAlign = spec.align;
+	const { fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = context.measureText(' ');
+	const line = spec.size * LINE_HEIGHT * pixels;
+	const x = spec.align === 'center' ? (measured.width * pixels) / 2 : 0;
+	measured.lines.forEach((text, row) => context.fillText(text, x, Math.round(row * line + (line + ascent - descent) / 2)));
+	const texture = device.createTexture({ size: [canvas.width, canvas.height], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
+	device.queue.copyExternalImageToTexture({ source: canvas }, { texture, premultipliedAlpha: true }, [canvas.width, canvas.height]);
+	return { texture, width: measured.width, height: measured.height, lines: measured.lines.length, scale, pixels };
+}
+
 export class Labels {
 	#cache = new Map<string, Label>();
+	#scale = 0;
+	#settled = false;
+	#started = 0;
+	pending = false;
 
-	get(spec: LabelSpec, scale: number): Label {
-		const key = `${scale}|${spec.size}|${spec.weight}|${spec.color}|${spec.width}|${spec.align}|${spec.text}`;
+	begin(scale: number) {
+		this.#settled = scale === this.#scale;
+		this.#scale = scale;
+		this.#started = performance.now();
+		this.pending = false;
+	}
+
+	#affordable() {
+		return this.#settled && performance.now() - this.#started < FRAME_BUDGET_MS;
+	}
+
+	get(spec: LabelSpec): Label {
+		const key = `${spec.size}|${spec.weight}|${spec.color}|${spec.width}|${spec.align}|${spec.text}`;
 		const cached = this.#cache.get(key);
-		if (cached) {
-			this.#cache.delete(key);
-			this.#cache.set(key, cached);
-			return cached;
-		}
-		const measured = measureLabel(spec);
-		const pixelScale = Math.min(scale, MAX_PIXELS / Math.max(measured.width, measured.height));
-		const canvas = new OffscreenCanvas(Math.max(1, Math.ceil(measured.width * pixelScale)), Math.max(1, Math.ceil(measured.height * pixelScale)));
-		const context = canvas.getContext('2d')!;
-		context.scale(pixelScale, pixelScale);
-		context.font = `${spec.weight} ${spec.size}px "Open Runde"`;
-		context.fillStyle = spec.color;
-		context.textBaseline = 'middle';
-		context.textAlign = spec.align;
-		const x = spec.align === 'center' ? measured.width / 2 : 0;
-		measured.lines.forEach((line, row) => context.fillText(line, x, (row + 0.5) * spec.size * LINE_HEIGHT));
-		const texture = device.createTexture({ size: [canvas.width, canvas.height], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT });
-		device.queue.copyExternalImageToTexture({ source: canvas }, { texture, premultipliedAlpha: true }, [canvas.width, canvas.height]);
-		const label = { texture, width: measured.width, height: measured.height, lines: measured.lines.length };
+		this.#cache.delete(key);
+		const label = cached && (cached.scale === this.#scale || !this.#affordable()) ? cached : rasterize(spec, this.#scale);
+		if (label !== cached) cached?.texture.destroy();
+		if (label.scale !== this.#scale) this.pending = true;
 		this.#cache.set(key, label);
 		if (this.#cache.size > KEEP) {
 			const [oldest, entry] = this.#cache.entries().next().value!;

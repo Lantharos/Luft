@@ -5,7 +5,7 @@ use rayon::prelude::*;
 use serde::Deserialize;
 use specta::Type;
 
-use super::on_glycin;
+use super::{loaders_sandbox, on_glycin};
 use crate::files::failed;
 
 #[derive(Deserialize, Type, Clone, Copy, PartialEq, Eq)]
@@ -76,8 +76,9 @@ pub fn encode(
         Format::Webp => Ok(webp::Encoder::from_rgba(&rgba, width, height)
             .encode(f32::from(quality))
             .to_vec()),
-        Format::Avif => on_glycin(async move {
+        Format::Avif => on_glycin(move || async move {
             let mut creator = Creator::new(MimeType::AVIF).await.map_err(failed)?;
+            creator.sandbox_selector(loaders_sandbox());
             creator
                 .add_frame(width, height, MemoryFormat::R8g8b8a8, rgba)
                 .map_err(failed)?;

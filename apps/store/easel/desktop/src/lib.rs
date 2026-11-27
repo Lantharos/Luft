@@ -9,12 +9,14 @@ mod state;
 use luft_app::{Backdrop, GlassWindow};
 use state::EaselState;
 
+pub const APP_ID: &str = "com.lantharos.easel";
+
 const WINDOW: GlassWindow = GlassWindow {
     title: "Easel",
     size: (1280, 820),
     min_size: (720, 480),
     sidebar_width: 64,
-    single_instance: Some("com.lantharos.easel"),
+    single_instance: Some(APP_ID),
     backdrop: Backdrop::WINDOW,
 };
 

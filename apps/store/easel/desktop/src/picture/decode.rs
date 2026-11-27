@@ -5,7 +5,7 @@ use glycin::{Loader, MainContextSelector, MemoryFormat, MemoryFormatSelection};
 use serde::Serialize;
 use specta::Type;
 
-use super::{context, on_glycin, premultiply};
+use super::{context, loaders_sandbox, on_glycin, premultiply};
 use crate::files::{cache_file, failed};
 
 #[derive(Serialize, Type)]
@@ -27,11 +27,12 @@ impl Decoded {
 
 pub fn decode(path: &Path) -> Result<Decoded, String> {
     let file = gio::File::for_path(path);
-    let (width, height, mut pixels) = on_glycin(async move {
+    let (width, height, mut pixels) = on_glycin(move || async move {
         let mut loader = Loader::new(file);
         loader
             .accepted_memory_formats(MemoryFormatSelection::R8g8b8a8)
-            .main_context_selector(MainContextSelector::Specific(context()));
+            .main_context_selector(MainContextSelector::Specific(context()))
+            .sandbox_selector(loaders_sandbox());
         let mut image = loader.load().await.map_err(failed)?;
         let frame = image.next_frame().await.map_err(failed)?;
         debug_assert_eq!(frame.memory_format(), MemoryFormat::R8g8b8a8);

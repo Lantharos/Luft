@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::Deserialize;
 use serde_json::Value;
 use specta::Type;
@@ -20,17 +22,17 @@ pub struct Write {
     value: Value,
 }
 
-fn file(name: StoreName) -> &'static str {
-    match name {
-        StoreName::Settings => "easel/settings.json",
-        StoreName::Recent => "easel/recent.json",
-    }
+fn file(name: StoreName) -> PathBuf {
+    luft_app::folders::config(crate::APP_ID).join(match name {
+        StoreName::Settings => "settings.json",
+        StoreName::Recent => "recent.json",
+    })
 }
 
 pub fn read(Read { name }: Read) -> Result<Value, String> {
-    Ok(luft_app::settings::load(file(name)).unwrap_or(Value::Null))
+    Ok(luft_app::settings::read(&file(name)).unwrap_or(Value::Null))
 }
 
 pub fn write(Write { name, value }: Write) -> Result<(), String> {
-    luft_app::settings::save(file(name), &value)
+    luft_app::settings::write(&file(name), &value)
 }

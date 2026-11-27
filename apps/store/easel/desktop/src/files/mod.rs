@@ -4,6 +4,7 @@ pub mod store;
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 
 use luft_i18n::t;
 
@@ -13,17 +14,19 @@ pub fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-pub fn cache_folder() -> Result<PathBuf, String> {
-    let folder = dirs::runtime_dir()
-        .or_else(dirs::cache_dir)
-        .ok_or_else(|| t!(L10N, "easel-error-no-cache"))?
-        .join("easel");
+static HANDOFF: LazyLock<Result<PathBuf, String>> = LazyLock::new(|| {
+    let folder = luft_app::folders::cache(crate::APP_ID).join("handoff");
+    let _ = fs::remove_dir_all(&folder);
     fs::create_dir_all(&folder).map_err(failed)?;
     Ok(folder)
+});
+
+fn handoff_folder() -> Result<&'static Path, String> {
+    HANDOFF.as_deref().map_err(Clone::clone)
 }
 
 pub fn cache_file(name: &str) -> Result<PathBuf, String> {
-    Ok(cache_folder()?.join(format!(
+    Ok(handoff_folder()?.join(format!(
         "{}-{name}",
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -33,10 +36,10 @@ pub fn cache_file(name: &str) -> Result<PathBuf, String> {
 }
 
 pub fn release(paths: &[String]) -> Result<(), String> {
-    let folder = cache_folder()?;
+    let folder = handoff_folder()?;
     for path in paths {
         let path = Path::new(path);
-        if path.parent() == Some(folder.as_path()) {
+        if path.parent() == Some(folder) {
             let _ = fs::remove_file(path);
         }
     }

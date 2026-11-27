@@ -1,6 +1,5 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use luft_app::file_manager;
 use luft_app::portal::{FileChooser, Filter, uri_path};
 use luft_i18n::t;
 use serde::Deserialize;
@@ -23,12 +22,6 @@ pub struct Open {
 pub struct Save {
     name: String,
     folder: Option<PathBuf>,
-}
-
-#[derive(Deserialize, Type)]
-pub struct Handoff {
-    path: String,
-    token: Option<String>,
 }
 
 fn path_of(uri: &str) -> Option<String> {
@@ -65,8 +58,4 @@ pub async fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, 
     .save()
     .await
     .map(|uri| uri.and_then(|uri| path_of(&uri)))
-}
-
-pub async fn show_in_folder(Handoff { path, token }: Handoff) -> Result<(), String> {
-    file_manager::show_in_folder(Path::new(&path), token.as_deref()).await
 }

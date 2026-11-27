@@ -100,12 +100,23 @@ pub fn mark_failed(source: &Source) {
     let _ = write(&entry(FAIL_FOLDER, source), source, &RgbaImage::new(1, 1));
 }
 
+static APP_ID: OnceLock<String> = OnceLock::new();
+
+pub fn open(app_id: &str) {
+    APP_ID.get_or_init(|| app_id.to_owned());
+}
+
+/// The desktop's shared thumbnail cache, or the app's own once Sabine
+/// confines the app, which keeps the shared one out of its reach.
 fn root() -> &'static Path {
     static ROOT: OnceLock<PathBuf> = OnceLock::new();
     ROOT.get_or_init(|| {
-        dirs::cache_dir()
-            .unwrap_or_else(std::env::temp_dir)
-            .join("thumbnails")
+        let cache = if sabine::documents::confined() {
+            crate::folders::cache(APP_ID.get().expect("the thumbnail cache is open"))
+        } else {
+            dirs::cache_dir().unwrap_or_else(std::env::temp_dir)
+        };
+        cache.join("thumbnails")
     })
 }
 

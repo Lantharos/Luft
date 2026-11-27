@@ -31,7 +31,7 @@ impl MagpieState {
     pub fn new() -> Self {
         let events = Events::default();
         Self {
-            thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
+            thumbnails: Thumbnails::new(crate::APP_ID, events.clone(), THUMBNAILS_READY),
             folders: FolderWatcher::new(events.clone()),
             mpris: Mpris::new(events.clone()),
             launch_paths: Arc::new(launch::resolve(&Activation::current_process())),

@@ -52,7 +52,7 @@ impl RoverState {
         let queue = OperationsQueue::new(events.clone());
         Self {
             history: History::new(events.clone(), queue.clone()),
-            thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
+            thumbnails: Thumbnails::new(crate::APP_ID, events.clone(), THUMBNAILS_READY),
             counts: FolderCounts::new(events.clone()),
             search: Search::new(events.clone()),
             measurements: Measurements::new(events.clone()),

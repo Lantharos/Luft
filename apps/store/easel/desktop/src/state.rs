@@ -1,5 +1,6 @@
 use luft_app::thumbnails::Thumbnails;
 use luft_app::{Activation, Appearance, Events};
+use sabine::documents::{Handed, within_reach};
 use serde::Serialize;
 use specta::Type;
 
@@ -32,7 +33,7 @@ impl EaselState {
     pub fn new() -> Self {
         let events = Events::default();
         Self {
-            thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
+            thumbnails: Thumbnails::new(crate::APP_ID, events.clone(), THUMBNAILS_READY),
             saves: Jobs::default(),
             exports: Jobs::default(),
             models: Models::new(events.clone()),
@@ -42,18 +43,22 @@ impl EaselState {
     }
 }
 
-pub fn launch_paths(activation: &Activation) -> Vec<String> {
-    activation
+async fn launch_paths() -> Result<Vec<String>, String> {
+    let files = Activation::current_process()
         .paths()
         .filter(|path| path.is_file())
+        .collect();
+    Ok(within_reach(files, Handed::Existing)
+        .await?
+        .into_iter()
         .map(|path| path.to_string_lossy().into_owned())
-        .collect()
+        .collect())
 }
 
 pub async fn app_state() -> Result<AppState, String> {
     Ok(AppState {
         appearance: Appearance::current().await,
-        launch_paths: launch_paths(&Activation::current_process()),
+        launch_paths: launch_paths().await?,
         pictures: dirs::picture_dir().map(|path| path.to_string_lossy().into_owned()),
     })
 }

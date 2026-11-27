@@ -7,8 +7,6 @@ use luft_i18n::t;
 
 use crate::l10n::L10N;
 
-const OWN_ID: &str = "com.lantharos.magpie";
-
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
@@ -17,7 +15,7 @@ pub fn others(path: &Path) -> Vec<App> {
     let (mime, _) = gio::content_type_guess(Some(path), None);
     let mut others: Vec<App> = gio::AppInfo::all_for_type(&mime)
         .iter()
-        .filter(|info| info.id().is_some_and(|id| !id.starts_with(OWN_ID)))
+        .filter(|info| info.id().is_some_and(|id| !id.starts_with(crate::APP_ID)))
         .filter_map(App::from_info)
         .collect();
     apps::sort_by_name(&mut others);

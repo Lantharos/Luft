@@ -4,7 +4,7 @@ mod params;
 
 use std::path::Path as FilePath;
 
-use luft_app::{Activation, Commands, Empty};
+use luft_app::{Commands, Empty};
 use sabine::{BridgeError, SabineWindow, WithBody};
 
 use crate::ai;
@@ -22,14 +22,10 @@ fn body(body: Option<Vec<u8>>) -> Result<Vec<u8>, BridgeError> {
 pub fn register(window: SabineWindow, state: &EaselState) -> SabineWindow {
     let window = events::declare(window)
         .command_async("app_state", |Empty {}| state::app_state())
-        .command("launch_paths", |activation: Activation| {
-            Ok(state::launch_paths(&activation))
-        })
         .command("store_read", store::read)
         .command("store_write", store::write)
         .command_async("choose_open", dialogs::choose_open)
         .command_async("choose_save", dialogs::choose_save)
-        .command_async("show_in_folder", dialogs::show_in_folder)
         .command("release_files", |Paths { paths }| files::release(&paths))
         .with(
             "request_thumbnails",

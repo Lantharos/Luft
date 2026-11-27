@@ -52,8 +52,9 @@ local_files = true
 provider = "schelf"
 
 [sandbox]
-unsandboxed = true
-reason = "It opens and saves pictures wherever they are, and decodes them in sandboxes of its own, which can't start inside another one."
+network = true
+filesystems = ["xdg-pictures"]
+talk = ["com.lantharos.Kestrel@/com/lantharos/Kestrel/Appearance"]
 
 [bindings]
 path = "src/lib/bindings.ts"

@@ -61,10 +61,6 @@ export const commands = {
 		id: number,
 		indices: number[],
 	}, options?: InvokeOptions) => invoke<null>("export_tiles", params, options),
-	launchPaths: (params: {
-		arguments: string[],
-		workingDirectory?: string | null,
-	}, options?: CallOptions) => invoke<string[]>("launch_paths", params, options),
 	openDocument: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Opened>("open_document", params, options),
@@ -108,10 +104,6 @@ export const commands = {
 		indices: number[],
 		mask: boolean,
 	}, options?: InvokeOptions) => invoke<null>("save_tiles", params, options),
-	showInFolder: (params: {
-		path: string,
-		token?: string | null,
-	}, options?: CallOptions) => invoke<null>("show_in_folder", params, options),
 	storeRead: (params: {
 		name: StoreName,
 	}, options?: CallOptions) => invoke<Value>("store_read", params, options),

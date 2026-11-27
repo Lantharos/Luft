@@ -68,8 +68,9 @@ impl Models {
         let mut library = self.library.lock();
         if library.is_none() {
             let events = self.events.clone();
+            let app_id = sabine::AppEnvironment::current().app_id(crate::APP_ID);
             *library = Some(
-                Library::open("easel", &CATALOG, move || {
+                Library::open(&app_id, &CATALOG, move || {
                     events.emit(MODELS_CHANGED, ());
                 })
                 .map_err(failed)?,

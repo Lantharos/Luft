@@ -66,7 +66,8 @@ struct Inner {
 }
 
 impl Thumbnails {
-    pub fn new(events: Events, ready_event: BridgeEvent<ThumbnailBatch>) -> Self {
+    pub fn new(app_id: &str, events: Events, ready_event: BridgeEvent<ThumbnailBatch>) -> Self {
+        cache::open(app_id);
         let (results, receiver) = mpsc::channel();
         let inner = Arc::new(Inner {
             state: Mutex::default(),

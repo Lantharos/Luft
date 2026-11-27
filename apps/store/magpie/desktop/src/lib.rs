@@ -12,12 +12,14 @@ mod photo;
 use app::state::MagpieState;
 use luft_app::{Backdrop, GlassWindow};
 
+const APP_ID: &str = "com.lantharos.magpie";
+
 const WINDOW: GlassWindow = GlassWindow {
     title: "Magpie",
     size: (1180, 780),
     min_size: (640, 460),
     sidebar_width: 280,
-    single_instance: Some("com.lantharos.magpie"),
+    single_instance: Some(APP_ID),
     backdrop: Backdrop::WINDOW,
 };
 

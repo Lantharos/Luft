@@ -7,7 +7,6 @@ easel-dialog-filter = Pictures, PDFs and Easel documents
 
 ## Problems
 
-easel-error-no-cache = There is no folder for temporary files
 easel-error-no-name = This file has no name
 easel-error-job-gone = This save was already finished
 easel-error-job-busy = This save is still being written

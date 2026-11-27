@@ -20,7 +20,7 @@ hayro.workspace = true
 jpeg-encoder.workspace = true
 krilla = { workspace = true, features = ["raster-images"] }
 krilla-svg.workspace = true
-luft-app = { workspace = true, features = ["settings", "thumbnails"] }
+luft-app = { workspace = true, features = ["folders", "settings", "thumbnails"] }
 luft-i18n.workspace = true
 luft-models.workspace = true
 ort = { workspace = true, features = ["api-24", "std", "load-dynamic"] }

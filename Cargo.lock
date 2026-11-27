@@ -5223,6 +5223,7 @@ dependencies = [
  "futures-util",
  "gio",
  "glib",
+ "hayro-syntax",
  "luft-cups",
  "luft-daylight",
  "luft-dbus",

@@ -7,6 +7,9 @@ use luft_cups::{Cups, PRINT_JOB, expect_success, printer_uri};
 use luft_dbus_macros::introspect;
 use luft_i18n::t;
 use tokio::fs::File;
+use tokio::io::{AsyncReadExt, AsyncSeekExt};
+
+use super::pages;
 use zbus::object_server::SignalEmitter;
 use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 
@@ -101,14 +104,26 @@ impl Printing {
         printer: &str,
         title: &str,
         format: &str,
-        document: File,
+        mut document: File,
         options: &JobOptions,
     ) -> fdo::Result<u32> {
+        let mut contents = Vec::new();
+        document.read_to_end(&mut contents).await.map_err(failed)?;
+        document.rewind().await.map_err(failed)?;
+        let pages = pages::printed(
+            contents,
+            format,
+            options.page_ranges.as_deref(),
+            options.copies,
+        );
         let mut request = self.cups.request(PRINT_JOB, &printer_uri(printer));
         request
             .name("job-name", title)
-            .mime_type("document-format", format)
-            .group(JOB);
+            .mime_type("document-format", format);
+        if let Some(pages) = pages {
+            request.integer("job-impressions", pages);
+        }
+        request.group(JOB);
         if let Some(copies) = options.copies {
             request.integer("copies", copies);
         }

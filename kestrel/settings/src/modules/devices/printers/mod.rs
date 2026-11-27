@@ -1,6 +1,7 @@
 mod defaults;
 mod discovery;
 mod home;
+mod pages;
 mod printer;
 mod printing;
 

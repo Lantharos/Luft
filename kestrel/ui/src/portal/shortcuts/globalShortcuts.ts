@@ -162,7 +162,7 @@ export class GlobalShortcutsPortal {
     session.release();
     for (const id of session.ids) {
       for (const accelerator of shortcuts[id]?.shortcuts ?? []) {
-        const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE | Meta.KeyBindingFlags.IGNORE_AUTOREPEAT);
+        const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE | Meta.KeyBindingFlags.IGNORE_AUTOREPEAT | Meta.KeyBindingFlags.NON_MASKABLE);
         if (action === Meta.KeyBindingAction.NONE) continue;
         this.keybindings.allow(Meta.external_binding_name_for_action(action), Shell.ActionMode.NORMAL);
         session.grabs.set(action, id);

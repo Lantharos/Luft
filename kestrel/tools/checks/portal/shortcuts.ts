@@ -1,12 +1,14 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import {firstStyled, labelled, ofType, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {subscribe} from '../lib/dbus.js';
 import {click, hold, press, release} from '../lib/input/input.js';
+import {gjs, outputLines, stop, waitForWindow} from '../lib/processes.js';
 import {call, PORTAL_PATH, portalDialog, sessionHandle} from '../lib/access/portal.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -16,6 +18,7 @@ const SHORTCUTS = 'GlobalShortcuts';
 const REQUEST = '/org/freedesktop/portal/desktop/request/kestrel/shortcuts';
 const SUCCESS = 0;
 const CANCELLED = 1;
+const GAME = 'Kestrel shortcuts: a game that holds the keyboard';
 
 type Shortcut = [string, {trigger_description?: string}];
 type Bound = [number, {shortcuts: Shortcut[]}];
@@ -88,6 +91,23 @@ async function checkTrigger(signals: Signal[], discordHandles: string[]) {
   await eventually(() => reached('Deactivated'), 'releasing it reaches the app too');
 }
 
+async function checkGame(signals: Signal[], discordHandles: string[]) {
+  const reached = () => signals.some(([signal, handle, id]) => signal === 'Activated' && id === 'board' && discordHandles.includes(handle));
+  const game = gjs('clients/x11/x11Game.js', [GAME], {flags: Gio.SubprocessFlags.STDOUT_PIPE});
+  const lines = outputLines(game);
+  try {
+    const window = await waitForWindow(GAME, 'a full-screen X11 game opens');
+    await eventually(() => window.is_fullscreen() && window.has_focus(), 'the game has focus');
+    (window as Meta.Window & {xwayland_may_grab_keyboard: boolean}).xwayland_may_grab_keyboard = true;
+    press(Clutter.KEY_Return);
+    await eventually(() => lines.includes('grabbed'), 'the game takes hold of the keyboard');
+    press(Clutter.KEY_F9);
+    await eventually(reached, 'a shortcut the person allowed reaches its app over the game');
+  } finally {
+    await stop(game);
+  }
+}
+
 async function checkDialog(signals: Signal[], {discord, discordAgain}: {discord: string; discordAgain: string}) {
   await call(SHORTCUTS, 'ConfigureShortcuts', new GLib.Variant('(osa{sv})', [discordAgain, '', {}]), null);
   const keys = () => styled('kestrel-shortcut-key', shortcutsDialog());
@@ -121,6 +141,7 @@ export async function run() {
     (signal, parameters) => signals.push([signal, ...parameters]));
   try {
     await checkTrigger(signals, [sessions.discord, sessions.discordAgain]);
+    await checkGame(signals, [sessions.discord, sessions.discordAgain]);
     await checkDialog(signals, sessions);
   } finally {
     unsubscribe();

@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 27 Nov 2026 14:30:45 +0100
+Subject: [PATCH] keybindings: let accelerator grabs stay active while an app
+ inhibits shortcuts
+
+A game clipper binds a shortcut through the global shortcuts portal so
+the person can save a clip while playing. Games that hold the keyboard,
+such as an Xwayland game granted its keyboard grab, inhibit shortcuts,
+and every accelerator grab was skipped then: the inhibition check read
+only the flags of the shared external-grab handler, so
+META_KEY_BINDING_NON_MASKABLE passed to meta_display_grab_accelerator()
+had no effect.
+
+The check now honours NON_MASKABLE on the binding as well as on its
+handler, so the shell can keep the accelerators the person approved for
+an app active over a game while its own shortcuts stay inhibitable.
+
+Upstream-Status: luft-only GNOME Shell offers no global shortcuts portal that would need it
+---
+ src/core/keybindings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/keybindings.c b/src/core/keybindings.c
+index 70eee5716022b51db5f4e2137b13785e55336b43..936e67ec8fee87d22a9578afa259580bf531529e 100644
+--- a/src/core/keybindings.c
++++ b/src/core/keybindings.c
+@@ -1484,7 +1484,7 @@ process_event (MetaDisplay          *display,
+     goto not_found;
+ 
+   if (display->focus_window &&
+-      !(binding->handler->flags & META_KEY_BINDING_NON_MASKABLE))
++      !((binding->flags | binding->handler->flags) & META_KEY_BINDING_NON_MASKABLE))
+     {
+       ClutterInputDevice *source;
+ 

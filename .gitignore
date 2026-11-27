@@ -8,6 +8,7 @@
 
 target/
 dist/
+bundles/
 node_modules/
 __pycache__/
 .astro/

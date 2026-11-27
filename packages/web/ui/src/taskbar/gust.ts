@@ -17,7 +17,7 @@ export const GUST_PATHS: Record<GustPart, string> = {
 };
 
 export const GUST_ON_DARK: GustFills = { disc: '#a3adb8', wave: '#ffffff' };
-export const GUST_ON_LIGHT: GustFills = { disc: ['#c3c9d1', '#a7aeb8'], wave: ['#3a3f47', '#1f2227'] };
+export const GUST_ON_LIGHT: GustFills = { disc: ['#9aa6b3', '#7c8795'], wave: '#ffffff' };
 
 const gradient = (id: string, [top, bottom]: readonly [string, string]) =>
 	`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/></linearGradient>`;

@@ -74,9 +74,11 @@ impl RoverState {
 
     pub async fn app_state(&self) -> AppState {
         let appearance = Appearance::current().await;
+        let settings = Settings::load();
+        *self.settings.write() = settings.clone();
         AppState {
             launch: self.launch.as_ref().clone(),
-            settings: self.settings.read().clone(),
+            settings,
             user_dirs: self.user_dirs.as_ref().clone(),
             can_manage_drives: crate::locations::drives::can_manage(),
             appearance,

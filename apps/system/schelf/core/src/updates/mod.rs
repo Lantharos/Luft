@@ -19,6 +19,8 @@ use crate::store::record;
 use crate::store::updates::StoreUpdate;
 use crate::{host, tools};
 
+mod held;
+
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppUpdate {
@@ -92,8 +94,9 @@ fn appimages() -> Vec<AppUpdate> {
 }
 
 /// The system packages someone asked for that Fedora or an added source has a newer version
-/// of. Package files only change when another file is opened.
-fn system() -> Result<Vec<AppUpdate>, String> {
+/// of, each with that version and its size. Package files only change when another file is
+/// opened.
+fn newer_packages() -> Result<Vec<(system_packages::Package, String, u64)>, String> {
     let packages = block_on(system_packages::list())?;
     let names: Vec<&str> = packages
         .requested()
@@ -105,23 +108,45 @@ fn system() -> Result<Vec<AppUpdate>, String> {
         .requested()
         .filter_map(|package| {
             let (to, size) = newest.get(&package.name)?;
-            let from = without_epoch(&package.version);
-            rpm_version::newer(to, from).then(|| AppUpdate {
+            rpm_version::newer(to, without_epoch(&package.version))
+                .then(|| (package.clone(), to.clone(), *size))
+        })
+        .collect())
+}
+
+/// Remembers the newer versions an update just left out, which the running Luft can't take.
+pub fn hold_back_unreachable() -> Result<(), String> {
+    held::remember(
+        newer_packages()?
+            .into_iter()
+            .map(|(package, to, _)| (package.name, to))
+            .collect(),
+    )
+}
+
+fn system() -> Result<Vec<AppUpdate>, String> {
+    let held = held::versions();
+    Ok(newer_packages()?
+        .into_iter()
+        .filter(|(package, to, _)| held.get(&package.name) != Some(to))
+        .map(|(package, to, size)| {
+            let from = without_epoch(&package.version).to_owned();
+            AppUpdate {
                 key: format!("system/{}", package.name),
                 source: Source::System,
                 id: package.name.clone(),
                 desktop: package.apps.first().cloned(),
                 name: package.name.clone(),
                 icon: None,
-                from: Some(from.to_owned()),
-                to: Some(to.clone()),
-                size: *size,
+                from: Some(from),
+                to: Some(to),
+                size,
                 platform: false,
                 installation: None,
                 reference: None,
-                package: Some(package.name.clone()),
+                package: Some(package.name),
                 store: None,
-            })
+            }
         })
         .collect())
 }

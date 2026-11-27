@@ -304,7 +304,10 @@ impl Job {
                 let _exclusive = task.exclusive()?;
                 staged.apply().map(drop)
             }
-            Self::UpdateSystemPackages => block_on(system_packages::update()),
+            Self::UpdateSystemPackages => {
+                block_on(system_packages::update())?;
+                crate::updates::hold_back_unreachable()
+            }
             Self::InstallSystemPackages { packages } => {
                 block_on(system_packages::install(packages, task))
             }

@@ -61,6 +61,14 @@ settings-appearance-wallpaper-span = Span displays
 settings-appearance-wallpaper-battery = Play videos on battery
 settings-appearance-wallpaper-battery-description = Otherwise video wallpapers pause until you plug in
 
+## Appearance: lock screen
+
+settings-appearance-lock-screen = Lock screen
+settings-appearance-lock-frosted = Frosted glass
+# Lock screen look: the wallpaper seen through ribbed glass instead of frosted
+settings-appearance-lock-fluted = Fluted glass
+settings-appearance-lock-fluted-description = Shows your wallpaper through ribbed glass
+
 ## Appearance: glass
 
 settings-appearance-glass = Glass

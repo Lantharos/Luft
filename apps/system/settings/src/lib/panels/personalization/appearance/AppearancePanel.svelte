@@ -3,6 +3,7 @@
 	import { t } from '@luft/i18n';
 	import Image from '@luft/symbols/icons/image';
 	import Layers from '@luft/symbols/icons/layers';
+	import Lock from '@luft/symbols/icons/lock';
 	import LayoutGrid from '@luft/symbols/icons/layout-grid';
 	import MousePointer2 from '@luft/symbols/icons/mouse-pointer-2';
 	import Type from '@luft/symbols/icons/type';
@@ -25,7 +26,7 @@
 	import { fontLibrary } from './fonts/library.svelte';
 	import StyleSection from './StyleSection.svelte';
 
-	type Kestrel = { 'app-icon-style': string; 'theme-apps': boolean };
+	type Kestrel = { 'app-icon-style': string; 'theme-apps': boolean; 'lock-screen-fluted': boolean };
 	type Interface = { 'text-scaling-factor': number; 'cursor-theme': string };
 
 	const WALLPAPER = 'wallpaper';
@@ -46,13 +47,14 @@
 		monochrome: 'settings-appearance-icons-monochrome'
 	};
 
-	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'theme-apps']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'theme-apps', 'lock-screen-fluted']);
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'cursor-theme']);
 	const glass = useSettings<Glass>(GLASS_SCHEMA, ['taskbar', 'surfaces', 'windows']);
 	const wallpaper = wallpaperName();
 
 	let font = $derived(appearance.typography.interface ?? fontLibrary.defaults?.interface ?? '');
 	let text = $derived([font, percent(desktop.values['text-scaling-factor'] ?? 1)].filter(Boolean).join(', '));
+	let fluted = $derived(kestrel.values['lock-screen-fluted'] ?? false);
 	let cursorName = $derived(desktop.values['cursor-theme'] ?? '');
 	let cursorTitle = $derived(cursors.themes?.find((theme) => theme.name === cursorName)?.title ?? cursorName.replace(/[-_]/g, ' '));
 
@@ -93,6 +95,14 @@
 	<SubPage title={t('settings-cursors')} onclose={() => open(null)}>
 		<CursorSection onbrowse={() => open('cursors')} />
 	</SubPage>
+{:else if app.section === 'lock'}
+	<SubPage title={t('settings-appearance-lock-screen')} onclose={() => open(null)}>
+		<Section>
+			<Row title={t('settings-appearance-lock-fluted')} description={t('settings-appearance-lock-fluted-description')}>
+				<Switch label={t('settings-appearance-lock-fluted')} checked={fluted} onchange={(on) => kestrel.set('lock-screen-fluted', on)} />
+			</Row>
+		</Section>
+	</SubPage>
 {:else}
 	<StyleSection />
 
@@ -111,6 +121,9 @@
 		</Row>
 		<Row title={t('settings-cursors')} icon={MousePointer2} onclick={() => open('cursor')}>
 			<RowValue text={cursorTitle} />
+		</Row>
+		<Row title={t('settings-appearance-lock-screen')} icon={Lock} onclick={() => open('lock')}>
+			<RowValue text={t(fluted ? 'settings-appearance-lock-fluted' : 'settings-appearance-lock-frosted')} />
 		</Row>
 	</Section>
 

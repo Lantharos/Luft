@@ -7,6 +7,7 @@
 	import HeroCard from '#lib/components/HeroCard.svelte';
 	import FingerprintSection from './FingerprintSection.svelte';
 	import PasswordDialog from './PasswordDialog.svelte';
+	import SignInSection from './signIn/SignInSection.svelte';
 	import { accountType, choosePicture, displayName } from './api';
 
 	let accounts = $state<Users | null>(null);
@@ -78,6 +79,8 @@
 	{/if}
 
 	<FingerprintSection />
+
+	<SignInSection />
 
 	{#if accounts.others.length}
 		<Section title={t('settings-users-others')}>

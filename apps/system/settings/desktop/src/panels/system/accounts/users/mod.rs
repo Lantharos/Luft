@@ -1,5 +1,6 @@
 mod password;
 mod picture;
+mod sign_in;
 
 use std::path::Path;
 
@@ -124,5 +125,5 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .command_async("users_choose_picture", choose_picture)
         .command_async("users_change_password", password::change);
-    luft_fingerprint::register(window, events)
+    sign_in::register(luft_fingerprint::register(window, events), events)
 }

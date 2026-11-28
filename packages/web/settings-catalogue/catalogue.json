@@ -549,6 +549,7 @@
 	],
 	"settingsOnly": [
 		{ "id": "accounts.online", "page": "accounts/add", "title": "settings-page-add-account", "why": "Online accounts hold sign-ins that only Settings may reach." },
+		{ "id": "accounts.sign-in", "page": "accounts", "title": "settings-page-accounts", "why": "Security keys, smart cards and turning off the password are set up in Settings, with the key or card at hand." },
 		{ "id": "accounts.login", "page": "accounts/login", "title": "settings-page-login", "why": "Automatic login and the login screen are set where Settings can warn about what they mean." },
 		{ "id": "security.remote-login", "page": "security/remote-login", "title": "settings-page-remote-login", "why": "Letting others sign in over SSH is turned on where Settings can warn about it." },
 		{ "id": "security.encryption", "page": "security/encryption", "title": "settings-page-encryption", "why": "Encryption, the recovery key and the TPM are managed in Settings." },

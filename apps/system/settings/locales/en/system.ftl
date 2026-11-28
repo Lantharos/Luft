@@ -106,6 +106,50 @@ settings-users-fingerprint-remove = Remove { $finger }
 settings-users-fingerprint-remove-title = Remove this fingerprint?
 # $finger is a finger name as used inside a sentence, like "right index finger"
 settings-users-fingerprint-remove-description = You won’t be able to use your { $finger } to sign in anymore.
+# Section of security keys and smart cards that sign in
+settings-users-keys = Security keys and smart cards
+settings-users-keys-key = Security key
+settings-users-keys-card = Smart card
+settings-users-keys-add-key = Add a security key
+settings-users-keys-add-card = Add a smart card
+settings-users-keys-add = Add
+settings-users-keys-remove-key = Remove security key
+settings-users-keys-remove-card = Remove smart card
+settings-users-keys-remove-key-title = Remove this security key?
+settings-users-keys-remove-card-title = Remove this smart card?
+# Shown when removing a key or card while password sign-in is off
+settings-users-keys-remove-last = If it’s the last way you sign in besides your password, password sign-in turns back on.
+settings-users-keys-plug-in = Plug in your security key.
+settings-users-keys-enter-pin = Enter your security key’s PIN.
+settings-users-keys-choose-pin = Your key has no PIN yet. Choose one, at least 4 characters.
+settings-users-keys-ready = Your key checks your fingerprint itself.
+settings-users-keys-waiting = Getting your key ready
+settings-users-keys-touch = Touch your security key.
+settings-users-keys-touch-again = Touch it once more.
+settings-users-keys-key-added = Your security key can now sign in and unlock.
+settings-users-keys-pin = PIN
+settings-users-keys-pin-confirm = Confirm PIN
+settings-users-keys-pin-mismatch = The PINs don’t match
+settings-users-keys-insert-card = Insert your smart card into the reader.
+settings-users-keys-card-pin = Enter your card’s PIN.
+settings-users-keys-card-pin-named = Enter the PIN of { $name }.
+settings-users-keys-card-added = Your smart card can now sign in and unlock. Taking it out locks the screen.
+settings-users-keys-not-authorized = You need to confirm it’s you first
+settings-users-keys-no-key = Plug in a security key that supports FIDO2
+settings-users-keys-no-card = Insert a smart card with a certificate on it
+settings-users-keys-wrong-pin = That PIN didn’t work
+settings-users-keys-blocked = The PIN is blocked after too many wrong tries
+settings-users-keys-pin-too-simple = This PIN is too simple for your key
+settings-users-keys-timed-out = The key wasn’t touched in time
+settings-users-keys-already-added = This one is already added
+settings-users-keys-nothing-else = Add a security key, smart card or fingerprint first
+settings-users-keys-failed = That didn’t work. Try again.
+# Switch that turns signing in with the password on and off
+settings-users-keys-password = Sign in with your password
+settings-users-keys-password-needs-another = Add a security key, smart card or fingerprint to turn this off
+settings-users-keys-password-off-title = Stop signing in with your password?
+settings-users-keys-password-off-description = You’ll sign in and unlock with your security key, smart card or fingerprint. If you lose them, enter your recovery key at the login screen to turn the password back on.
+settings-users-keys-password-off = Turn off
 
 ## Login screen
 

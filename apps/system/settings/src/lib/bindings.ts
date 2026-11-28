@@ -589,6 +589,24 @@ export const commands = {
 	sharingRevoke: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("sharing_revoke", params, options),
+	signInAddCard: (params: {
+		pin: string,
+	}, options?: CallOptions) => invoke<SignInChange>("sign_in_add_card", params, options),
+	signInAddKey: (params: {
+		pin: string,
+	}, options?: CallOptions) => invoke<SignInChange>("sign_in_add_key", params, options),
+	signInFindCard: (options?: CallOptions) => invoke<FoundSmartCard>("sign_in_find_card", {}, options),
+	signInFindKey: (options?: CallOptions) => invoke<FoundSecurityKey>("sign_in_find_key", {}, options),
+	signInMethods: (options?: CallOptions) => invoke<SignInMethods>("sign_in_methods", {}, options),
+	signInRemoveCard: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<SignInChange>("sign_in_remove_card", params, options),
+	signInRemoveKey: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<SignInChange>("sign_in_remove_key", params, options),
+	signInSetPassword: (params: {
+		allowed: boolean,
+	}, options?: CallOptions) => invoke<SignInChange>("sign_in_set_password", params, options),
 	soundCustomChoose: (params: {
 		name: string,
 	}, options?: CallOptions) => invoke<null>("sound_custom_choose", params, options),
@@ -714,6 +732,7 @@ export const events = {
 	securityUsb: (callback: (payload: UsbProtection) => void) => listen<UsbProtection>("security.usb", callback),
 	settingsChanged: (callback: (payload: SettingChange) => void) => listen<SettingChange>("settings.changed", callback),
 	sharingChanged: (callback: (payload: Shared[]) => void) => listen<Shared[]>("sharing.changed", callback),
+	signInTouch: (callback: (payload: number) => void) => listen<number>("sign-in.touch", callback),
 	soundChanged: (callback: (payload: SoundSnapshot) => void) => listen<SoundSnapshot>("sound.changed", callback),
 	soundLevel: (callback: (payload: number) => void) => listen<number>("sound.level", callback),
 	updatesActivity: (callback: (payload: Activity) => void) => listen<Activity>("updates.activity", callback),
@@ -1250,6 +1269,17 @@ export type FontFamily = {
 	monospace: boolean,
 	file: string,
 	removable: boolean,
+};
+
+export type FoundSecurityKey = {
+	found: boolean,
+	hasPin: boolean,
+	checksFingerprints: boolean,
+};
+
+export type FoundSmartCard = {
+	found: boolean,
+	name: string,
 };
 
 /**  A drive an app was given, plugged in or not. */
@@ -1867,6 +1897,23 @@ export type Shortcut = {
 };
 
 export type Side = "thisDevice" | "cloud";
+
+export type SignInChange = { outcome: "done" } | { outcome: "refused"; refusal: SignInRefusal };
+
+export type SignInEnrolled = {
+	id: string,
+	name: string,
+};
+
+export type SignInMethods = {
+	securityKeys: SignInEnrolled[],
+	smartCards: SignInEnrolled[],
+	password: boolean,
+	canTurnOffPassword: boolean,
+};
+
+/**  Why adding or changing failed, for the page to say in its own words. */
+export type SignInRefusal = "not-authorized" | "no-key" | "no-card" | "wrong-pin" | "blocked" | "pin-too-simple" | "timed-out" | "already-enrolled" | "nothing-else" | "failed";
 
 export type SigningKey = {
 	state: SigningKeyState,

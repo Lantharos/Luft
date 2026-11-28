@@ -49,11 +49,12 @@ Disks, startup, installing and system services are tested in QEMU VMs from `os/v
 
 | Command | Does |
 | --- | --- |
-| `os/vm/disk.sh [IMAGE]` | Installs a sealed image, by default `localhost/luft:45`, onto `os/vm/state/disk.qcow2` with the image's own installer. The account `luft` gets the password in `VM_PASSWORD`, `luft-vm` without it, which is also root's on the serial console and the code for adding Luft's key on shim's blue screen |
+| `os/vm/disk.sh [IMAGE]` | Installs a sealed image, by default `localhost/luft:45`, onto `os/vm/state/disk.qcow2` with the image's own installer. The account `luft` gets the password in `VM_PASSWORD`, `luft-vm` without it, which is also root's on the serial console and the code for adding Luft's key on shim's blue screen. `VM_ENCRYPTED=1` encrypts Luft with that password as its passphrase, typed at every start |
 | `os/vm/qemu.sh` | Starts a VM; `--help` lists options such as `SECURE_BOOT=1`, `TPM=0`, `ISO=`, extra drives and `HEADLESS=1` |
 | `os/vm/control.py` | Screenshots, keys, clicks and root commands over the serial console of a running VM, and `enroll` on shim's blue screen |
 | `os/vm/check.py session` | Starts the installed VM with Secure Boot, adds Luft's key, signs in, checks that Kestrel and its services stay up, and opens Settings |
 | `os/vm/check.py packages` | The same, then installs a system package and checks that Accounts still answers Settings and USB protection still takes Kestrel's unlock, both started on the `/usr` from before |
+| `os/vm/check.py memory` | On an encrypted VM started with little memory: swap grows and shrinks, a fullscreen game keeps its memory while background apps are swapped, and a game that keeps growing is warned about and closed instead of them |
 | `os/vm/check.py rollback` | Updates the VM to a new version and checks it's marked good, then to one whose login screen never starts, and checks that after three tries it goes back |
 
 `LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` keeps its screenshots, the serial console, the journal and `bootc status` in `check` inside it when a step fails or times out.
@@ -75,6 +76,7 @@ Checks of single parts live in a `vm` folder next to their code and share `os/vm
 | `services/packages/vm/run.sh` | An unreviewed extension is copied only with an administrator's approval, out of the account's reach | 1 min |
 | `services/packages/vm/plain/run.sh` | On an installed drive with the network, command-line tools come and go without a password, packages with a service or a setuid program, or whose scriptlets make one, need an administrator either way, and a package that can't be built doesn't hold back the others | 4 min |
 | `services/printers/vm/run.sh` | A network printer and a USB one set themselves up and print | 2 min |
+| `services/swap/vm/run.sh` | No swap on a drive without encryption, then `check.py memory` on an encrypted install with 6 GB of memory | 40 min |
 | `services/sleep/vm/run.sh` | Sleeping and waking, and shutting down instead of sleeping on with a low battery | 14 min |
 | `services/windows/vm/run.sh` | Fast Startup, the clock, Bluetooth pairings and a hibernated Windows on a real NTFS drive | 1 min |
 | `sushi/vm/run.sh` | Starting without a display reaches the login screen, with the graphics driver loading before and after it | 4 min |

@@ -9,6 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from control import DEFAULT_VM, PASSWORD, Machine, MachineError
+from memory import memory
 
 HERE = Path(__file__).resolve().parent
 USER = os.environ.get("VM_USER", "luft")
@@ -107,6 +108,15 @@ class Check:
     def enroll_key(self):
         self.machine.enroll(PASSWORD, 120)
         self.log("added Luft's key on shim's blue screen")
+
+    def unlock_disk(self, passphrase: str):
+        self.log("typing the disk's passphrase until Luft starts")
+        deadline = time.monotonic() + 600
+        while not self.succeeds("true"):
+            if time.monotonic() > deadline:
+                raise MachineError("Luft didn't start after its passphrase was typed")
+            self.machine.type(passphrase + "\n")
+        self.log("the disk is unlocked")
 
     def secure_boot(self):
         if "SecureBoot enabled" not in self.output("mokutil --sb-state"):
@@ -311,6 +321,9 @@ def main():
     scenarios.add_parser(
         "encryption", help="add Luft's key, and check that a policy requiring encryption has trustd encrypt Luft's "
                            "partition from the next restart")
+    scenarios.add_parser(
+        "memory", help="on a VM installed with VM_ENCRYPTED=1 and started with little memory, check swap growing and "
+                       "shrinking, the app in front keeping its memory and a growing app being the one closed")
     going_back = scenarios.add_parser(
         "rollback", help="update, then update to a version that never reaches the login screen, and check that the "
                          "computer goes back after three tries")
@@ -322,7 +335,8 @@ def main():
     shutil.rmtree(out, ignore_errors=True)
     check = Check(vm, out, arguments.minutes)
     try:
-        {"session": session, "packages": packages, "encryption": encryption, "rollback": rollback}[arguments.scenario](check, arguments)
+        {"session": session, "packages": packages, "encryption": encryption, "rollback": rollback,
+         "memory": lambda check, _: memory(check, USER)}[arguments.scenario](check, arguments)
     except (MachineError, OSError) as error:
         check.failed(error)
         check.stop()

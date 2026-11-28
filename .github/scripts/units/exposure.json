@@ -71,6 +71,7 @@
 	"services/sleep/data/luft-sleep-power-off.service": 0.9,
 	"services/speech/data/luft-speech.service": 5.9,
 	"services/speech/data/luft-transcription.service": 5.7,
+	"services/swap/data/luft-swap.service": 1.9,
 	"services/updater/data/updater-check.service": 0.9,
 	"services/updater/data/updater.service": 5.7,
 	"services/windows/data/neighbor-boot.service": 1.3,

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check that luft-swap leaves a drive without encryption alone
+ConditionKernelCommandLine=luft.swap-check=plain
+After=luft-swap.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-swap-plain-check
+
+[Install]
+WantedBy=multi-user.target

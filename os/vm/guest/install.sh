@@ -5,7 +5,8 @@ BUS=(com.lantharos.Installer1 /com/lantharos/Installer1 com.lantharos.Installer1
 TARGET=/dev/vdb
 INSTALL_TIMEOUT=1500
 ESP_ID=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
-{ read -r user; read -r password; } </run/luft-source/account
+RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
+{ read -r user; read -r password; read -r encrypted; } </run/luft-source/account
 
 report() { echo "luft-vm-install: $*"; }
 fail() {
@@ -16,13 +17,28 @@ fail() {
 call() { busctl --json=short call "${BUS[@]}" "$@"; }
 property() { busctl --json=short get-property "${BUS[@]}" "$1" | jq -r .data; }
 
+encryption() {
+  [[ "$encrypted" == 1 ]] || return 0
+  printf ',"encryption":{"recoveryKey":"%s","passphrase":"%s"}' "$RECOVERY_KEY" "$password"
+}
+
+open_root() {
+  local root
+  root="$(partition 4f68bce3-e8cd-4db1-96e7-fbcaf984b709)"
+  if [[ "$encrypted" == 1 ]]; then
+    printf '%s' "$password" | cryptsetup open --key-file - "$root" luft-vm-root || fail "Luft's encryption doesn't open"
+    root=/dev/mapper/luft-vm-root
+  fi
+  echo "$root"
+}
+
 install_luft() {
   local survey drive deadline=$((SECONDS + INSTALL_TIMEOUT)) stage
   survey="$(call Survey | jq -r '.data[0]')" || fail "the installer didn't survey the drives"
   drive="$(jq -r --arg device "$TARGET" '.drives[] | select(.device == $device) | .block' <<<"$survey")"
   [[ -n "$drive" ]] || fail "the installer doesn't offer $TARGET"
   call Configure s '{"locale":"en_US.UTF-8","keyboard":{"layout":"us","variant":""},"timezone":"UTC","hostname":"luft-vm"}' >/dev/null
-  call Install s "{\"target\":{\"kind\":\"whole\",\"drive\":\"$drive\"},\"variant\":\"default\"}" >/dev/null ||
+  call Install s "{\"target\":{\"kind\":\"whole\",\"drive\":\"$drive\"},\"variant\":\"default\"$(encryption)}" >/dev/null ||
     fail "installing didn't start"
   call CreateAccount sss "$user" "Luft VM" "$password" >/dev/null || fail "the account wasn't taken"
   while ((SECONDS < deadline)); do
@@ -43,7 +59,7 @@ partition() {
 finish_setup() {
   local root state
   mkdir -p /run/target
-  mount "$(partition 4f68bce3-e8cd-4db1-96e7-fbcaf984b709)" /run/target
+  mount "$(open_root)" /run/target
   root="$(dirname "$(compgen -G '/run/target/state/deploy/*/etc' | head -n1)")"
   state=/run/target/state/os/default/var
   rm -f "$state/lib/installer/first-boot" "$state/lib/kestrel-greeter/initial-session.toml" "$state"/lib/luft-keyring/*.handoff
@@ -56,6 +72,7 @@ finish_setup() {
   setfiles -r "$root" "$root/etc/selinux/targeted/contexts/files/file_contexts" \
     "$root/etc/systemd/system/getty.target.wants" "$root/etc/systemd/system/serial-getty@ttyS0.service.d"
   umount /run/target
+  [[ "$encrypted" != 1 ]] || cryptsetup close luft-vm-root
   report "setup is finished and root can sign in on the serial console"
 }
 

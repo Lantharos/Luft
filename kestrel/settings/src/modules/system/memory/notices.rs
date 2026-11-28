@@ -58,6 +58,11 @@ impl Notices {
             return;
         }
         let label = self.board.label(unit);
+        let because = if growing {
+            "keeps using more memory"
+        } else {
+            "is next to be closed"
+        };
         let (kestrel, board, name, bytes) = (
             self.kestrel.clone(),
             self.board.clone(),
@@ -69,7 +74,10 @@ impl Notices {
                 .running_low(&name, &label.app, &label.name, bytes, growing)
                 .await
             {
-                Ok(()) => board.warned(&name),
+                Ok(()) => {
+                    eprintln!("Warned that {name} {because}");
+                    board.warned(&name);
+                }
                 Err(error) => eprintln!("Couldn't warn that memory is running low: {error}"),
             }
         });

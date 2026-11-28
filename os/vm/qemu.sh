@@ -162,7 +162,7 @@ devices() {
   input=(-device virtio-keyboard-pci -device virtio-tablet-pci)
   nic=virtio-net-pci
   gpu=(-device "pcie-root-port,id=display-port,chassis=1"
-    -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,xres=$xres,yres=$yres")
+    -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,max_hostmem=1G,xres=$xres,yres=$yres")
   iommu=(-device "intel-iommu,intremap=on")
   if [[ "$windows" == 1 ]]; then
     cpu=host,-svm,-vmx,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff,hv_time,hv_vpindex,hv_synic,hv_stimer

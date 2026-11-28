@@ -40,8 +40,7 @@ export const devices: Devices = {
 	drives: [
 		{ id: 'drive:nvme0n1', name: 'nvme0n1', model: 'Samsung SSD 990 PRO 1TB', kind: 'nvme', size: 1000204886016, removable: false, virtual: false, readOnly: false },
 		{ id: 'drive:sda', name: 'sda', model: 'WDC WD20EZBX-00AYRA0', kind: 'hdd', size: 2000398934016, removable: false, virtual: false, readOnly: false },
-		{ id: 'drive:sdb', name: 'sdb', model: 'CT500MX500SSD1', kind: 'ssd', size: 500107862016, removable: false, virtual: false, readOnly: false },
-		{ id: 'drive:zram0', name: 'zram0', model: null, kind: 'zram', size: 8 * GIB, removable: false, virtual: true, readOnly: false }
+		{ id: 'drive:sdb', name: 'sdb', model: 'CT500MX500SSD1', kind: 'ssd', size: 500107862016, removable: false, virtual: false, readOnly: false }
 	],
 	networks: [
 		{ id: 'net:eno1', name: 'eno1', kind: 'ethernet', virtual: false, model: 'RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller', vendor: 'Realtek Semiconductor Co., Ltd.', driver: 'r8169', mac: 'b4:2e:99:3a:51:0c' },
@@ -130,7 +129,9 @@ export function tick(time: number, seconds: number, detailed: string | null): Ti
 			swapFree: 5.9 * GIB,
 			swapCached: 0.1 * GIB,
 			compressed: detailed === 'memory' ? { stored: 2.1 * GIB, size: 0.62 * GIB } : undefined,
-			swaps: detailed === 'memory' ? [{ name: 'zram0', kind: 'compressed', size: 8 * GIB, used: 2.1 * GIB }] : undefined
+			swaps: detailed === 'memory'
+				? [{ name: '/var/swap/0', kind: 'file', size: 4 * GIB, used: 1.9 * GIB }, { name: '/var/swap/1', kind: 'file', size: 4 * GIB, used: 0.2 * GIB }]
+				: undefined
 		},
 		gpus: [
 			{

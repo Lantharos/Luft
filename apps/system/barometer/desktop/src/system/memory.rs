@@ -131,14 +131,14 @@ fn swap_devices() -> Vec<SwapDevice> {
             let [path, kind, size, used, ..] = fields[..] else {
                 return None;
             };
-            let name = path.rsplit('/').next().unwrap_or(path);
+            let device = path.rsplit('/').next().unwrap_or(path);
             Some(SwapDevice {
-                kind: if name.starts_with("zram") {
+                kind: if device.starts_with("zram") {
                     "compressed".to_owned()
                 } else {
                     kind.to_owned()
                 },
-                name: name.to_owned(),
+                name: if kind == "file" { path } else { device }.to_owned(),
                 size: size.parse::<u64>().ok()? * KIB,
                 used: used.parse::<u64>().ok()? * KIB,
             })

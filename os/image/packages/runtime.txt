@@ -114,7 +114,6 @@ switcheroo-control
 swtpm
 swtpm-selinux
 systemd-boot-unsigned
-systemd-oomd-defaults
 tesseract
 tesseract-langpack-deu
 tesseract-langpack-eng
@@ -131,4 +130,3 @@ xdg-desktop-portal
 xdg-utils
 xdg-user-dirs
 xorg-x11-server-Xwayland
-zram-generator-defaults

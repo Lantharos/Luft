@@ -7,6 +7,7 @@ use tokio::io::Interest;
 use tokio::io::unix::AsyncFd;
 
 const SYSTEM_PRESSURE: &str = "/proc/pressure/memory";
+const LOW_STALL_SHARE: f64 = 10.0;
 
 pub struct Trigger {
     file: AsyncFd<File>,
@@ -51,7 +52,21 @@ pub fn running_low() -> bool {
             .and_then(|value| value.split_whitespace().next()?.parse().ok())
             .unwrap_or(0)
     };
-    let left = field("MemAvailable") + field("SwapFree");
-    let total = field("MemTotal") + field("SwapTotal");
-    left * 10 < total
+    field("MemAvailable") * 10 < field("MemTotal")
+        && stalled_share(SYSTEM_PRESSURE) >= LOW_STALL_SHARE
+}
+
+pub fn stalled_share(pressure: impl AsRef<Path>) -> f64 {
+    fs::read_to_string(pressure)
+        .ok()
+        .and_then(|pressure| {
+            pressure
+                .lines()
+                .find_map(|line| line.strip_prefix("some "))?
+                .split_whitespace()
+                .find_map(|field| field.strip_prefix("avg10="))?
+                .parse()
+                .ok()
+        })
+        .unwrap_or(0.0)
 }

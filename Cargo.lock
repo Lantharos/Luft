@@ -6498,6 +6498,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-swap"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "rustix",
+ "tempfile",
+]
+
+[[package]]
 name = "luft-thumbnailer"
 version = "0.1.0"
 dependencies = [

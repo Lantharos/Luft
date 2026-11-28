@@ -10,6 +10,11 @@
       <arg type="s" direction="in"/>
       <arg type="o" direction="out"/>
     </method>
+    <method name="SetUnitProperties">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="in"/>
+      <arg type="a(sv)" direction="in"/>
+    </method>
     <property name="Virtualization" type="s" access="read"/>
   </interface>
 </node>

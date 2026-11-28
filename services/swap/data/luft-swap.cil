@@ -1,0 +1,3 @@
+(filecon "/var/swap" dir (system_u object_r swapfile_t ((s0) (s0))))
+(filecon "/var/swap/.*" file (system_u object_r swapfile_t ((s0) (s0))))
+(typetransition unconfined_service_t var_t dir "swap" swapfile_t)

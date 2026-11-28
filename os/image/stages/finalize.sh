@@ -34,7 +34,7 @@ enable_units() {
   mapfile -t user < <(preset_units /usr/lib/systemd/user-preset/40-luft-*.preset)
   systemctl preset "${system[@]}"
   systemctl --global preset "${user[@]}"
-  systemctl mask bootc-fetch-apply-updates.timer debug-shell.service
+  systemctl mask bootc-fetch-apply-updates.timer debug-shell.service systemd-oomd.service systemd-oomd.socket
 }
 
 write_base_image() {

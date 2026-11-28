@@ -1,6 +1,6 @@
 use luft_dbus_macros::introspect;
 use zbus::proxy;
-use zbus::{OwnedFd, OwnedObjectPath};
+use zbus::{OwnedFd, OwnedObjectPath, Variant};
 
 #[introspect]
 #[proxy(
@@ -65,6 +65,12 @@ pub trait Hostname {
 pub trait Systemd {
     fn start_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
     fn stop_unit(&self, name: &str, mode: &str) -> zbus::Result<OwnedObjectPath>;
+    fn set_unit_properties(
+        &self,
+        name: &str,
+        runtime: bool,
+        properties: &[(&str, Variant<'_>)],
+    ) -> zbus::Result<()>;
 
     #[zbus(property)]
     fn virtualization(&self) -> zbus::Result<String>;

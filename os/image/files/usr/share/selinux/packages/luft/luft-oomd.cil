@@ -1,2 +1,0 @@
-(allow systemd_oomd_t self (capability (dac_override)))
-(allow systemd_oomd_t cgroup_t (file (write)))

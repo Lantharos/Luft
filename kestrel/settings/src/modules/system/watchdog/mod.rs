@@ -142,7 +142,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     let health = HealthProxy::new(&context.session).await?;
     let watchdog = WatchdogProxy::new(&context.system).await?;
     let display = display_session(&context.system, &login).await;
-    let mut relief = Relief::new(&context.session)
+    let mut relief = Relief::new(context)
         .await
         .inspect_err(|error| eprintln!("Couldn't watch Kestrel's memory: {error}"))
         .ok();
@@ -197,7 +197,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     }
                     let starved = match &mut relief {
                         Some(relief) if stalled >= RELIEVE_MEMORY_AFTER && relief.compositor_starved() => {
-                            relief.close_biggest_app().await;
+                            relief.relieve().await;
                             true
                         }
                         _ => false,

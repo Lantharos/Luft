@@ -8,6 +8,8 @@ use devices::{keyboard, power, printers, rfkill, sound};
 use system::security::{network_type, remote_login, signing_key, usb_protection};
 use system::{drives, housekeeping, memory, profile_locks, timezone, watchdog};
 
+pub use memory::Board;
+
 #[derive(Clone, Copy)]
 pub enum Module {
     A11y,

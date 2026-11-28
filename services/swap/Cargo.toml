@@ -1,0 +1,19 @@
+[package]
+name = "luft-swap"
+version = "0.1.0"
+description = "Swaps to files on the encrypted drive that grow and shrink with demand"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+libc.workspace = true
+rustix = { workspace = true, features = ["event", "fs", "param", "rand"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

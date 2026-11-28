@@ -36,3 +36,4 @@ stalld
 tiwilink-firmware
 toolbox
 WALinuxAgent-udev
+zram-generator

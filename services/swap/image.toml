@@ -1,0 +1,11 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-swap"]
+
+[files]
+"/usr/lib/systemd/system/" = ["data/luft-swap.service"]
+"/usr/share/selinux/packages/luft/" = ["data/luft-swap.cil"]
+
+[enable]
+system = ["luft-swap.service"]

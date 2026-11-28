@@ -37,21 +37,25 @@
 </script>
 
 {#if prints}
-	<Section title={t('settings-users-fingerprints')}>
-		{#each prints.enrolled as finger (finger)}
-			<Row title={fingerLabel(finger)} icon={Fingerprint}>
-				<IconButton icon={Trash} label={t('settings-users-fingerprint-remove', { finger: fingerLabel(finger) })} onclick={() => (removing = finger)} />
-			</Row>
-		{/each}
-		{#if available.length}
+	{#if prints.enrolled.length}
+		<Section title={t('settings-users-fingerprints')}>
+			{#each prints.enrolled as finger (finger)}
+				<Row title={fingerLabel(finger)} icon={Fingerprint}>
+					<IconButton icon={Trash} label={t('settings-users-fingerprint-remove', { finger: fingerLabel(finger) })} onclick={() => (removing = finger)} />
+				</Row>
+			{/each}
+		</Section>
+	{/if}
+	{#if available.length}
+		<Section title={prints.enrolled.length ? undefined : t('settings-users-fingerprints')}>
 			<Row
 				title={t('settings-users-fingerprint-add')}
-				icon={prints.enrolled.length ? undefined : Fingerprint}
+				icon={Fingerprint}
 				description={prints.enrolled.length ? undefined : t('settings-users-fingerprint-add-description')}
 				onclick={() => (enrolling = true)}
 			/>
-		{/if}
-	</Section>
+		</Section>
+	{/if}
 
 	{#if problem}
 		<p class="-mt-4 px-2 text-[13px] text-[var(--danger)]">{problem}</p>

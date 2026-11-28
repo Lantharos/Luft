@@ -28,6 +28,11 @@ const MESSAGES: Record<string, string> = {
   'This isn\'t set up for this account': 'auth-prompt-not-enrolled',
   'That isn\'t this computer\'s recovery key': 'auth-prompt-wrong-recovery-key',
 };
+const WAITING_ICONS: Record<string, string> = {
+  'Plug in your security key': 'security-key-symbolic',
+  'Touch your security key': 'security-key-symbolic',
+  'Insert your smart card': 'id-card-symbolic',
+};
 const FIELD_HINTS: Partial<Record<Way, string>> = {
   'security-key': 'auth-prompt-key-pin',
   'smart-card': 'auth-prompt-card-pin',
@@ -208,6 +213,7 @@ export const AuthPrompt = GObject.registerClass({
     this.stalled = false;
     this.retrying = false;
     this.told = null;
+    this.method.waitFor(null);
     this.method.setMessage(null);
     this.method.field.clear();
     this.useFieldFor(this.way);
@@ -219,6 +225,7 @@ export const AuthPrompt = GObject.registerClass({
     this.authentication.cancel();
     this.question = null;
     this.preemptiveAnswer = null;
+    this.method.waitFor(null);
     this.method.field.clear();
     this.setBusy(false);
     this.method.setMessage(null);
@@ -227,7 +234,7 @@ export const AuthPrompt = GObject.registerClass({
 
   focus(typed = ''): void {
     if (typed && this.ways.includes('password')) this.usePassword(typed);
-    else if (this.method.showsFingerprint) (this.method.firstSwitch ?? this).grab_key_focus();
+    else if (this.method.showsFingerprint || this.method.waiting) (this.method.firstSwitch ?? this).grab_key_focus();
     else this.method.field.entry.grab_key_focus();
   }
 
@@ -306,6 +313,10 @@ export const AuthPrompt = GObject.registerClass({
 
   private onMessage(text: string, isError: boolean): void {
     const shown = messageText(text);
+    if (!isError && text in WAITING_ICONS) {
+      this.method.waitFor(WAITING_ICONS[text], shown);
+      return;
+    }
     if (isError && text in MESSAGES) this.told = shown;
     if (!this.retrying || isError) this.method.setMessage(shown, isError);
   }
@@ -314,6 +325,7 @@ export const AuthPrompt = GObject.registerClass({
     this.retrying = false;
     this.told = null;
     this.question = { text, secret, step: (this.question?.step ?? 0) + 1 };
+    this.method.waitFor(null);
     this.updateBackButton();
 
     if (this.preemptiveAnswer !== null && secret) {
@@ -329,6 +341,7 @@ export const AuthPrompt = GObject.registerClass({
 
   private onFailed(authError: boolean, description: string): void {
     if (!authError) console.warn(`Authentication did not complete: ${description}`);
+    this.method.waitFor(null);
     const password = this.question?.secret && PASSWORD_QUESTIONS.includes(this.question.text);
     this.method.setMessage(this.told ?? KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
     this.told = null;

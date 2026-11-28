@@ -45,19 +45,27 @@
 </script>
 
 {#if methods}
-	<Section title={t('settings-users-keys')}>
-		{#each methods.securityKeys as key (key.id)}
-			<Row title={key.name || t('settings-users-keys-key')} icon={SecurityKey}>
-				<IconButton icon={Trash} label={t('settings-users-keys-remove-key')} onclick={() => (removing = { kind: 'key', entry: key })} />
-			</Row>
-		{/each}
-		{#each methods.smartCards as card (card.id)}
-			<Row title={card.name || t('settings-users-keys-card')} icon={IdCard}>
-				<IconButton icon={Trash} label={t('settings-users-keys-remove-card')} onclick={() => (removing = { kind: 'card', entry: card })} />
-			</Row>
-		{/each}
-		<Row title={t('settings-users-keys-add-key')} icon={methods.securityKeys.length ? undefined : SecurityKey} onclick={() => (adding = 'key')} />
-		<Row title={t('settings-users-keys-add-card')} icon={methods.smartCards.length ? undefined : IdCard} onclick={() => (adding = 'card')} />
+	{#if methods.securityKeys.length || methods.smartCards.length}
+		<Section title={t('settings-users-keys')}>
+			{#each methods.securityKeys as key (key.id)}
+				<Row title={key.name || t('settings-users-keys-key')} icon={SecurityKey}>
+					<IconButton icon={Trash} label={t('settings-users-keys-remove-key')} onclick={() => (removing = { kind: 'key', entry: key })} />
+				</Row>
+			{/each}
+			{#each methods.smartCards as card (card.id)}
+				<Row title={card.name || t('settings-users-keys-card')} icon={IdCard}>
+					<IconButton icon={Trash} label={t('settings-users-keys-remove-card')} onclick={() => (removing = { kind: 'card', entry: card })} />
+				</Row>
+			{/each}
+		</Section>
+	{/if}
+
+	<Section title={methods.securityKeys.length || methods.smartCards.length ? undefined : t('settings-users-keys')}>
+		<Row title={t('settings-users-keys-add-key')} icon={SecurityKey} onclick={() => (adding = 'key')} />
+		<Row title={t('settings-users-keys-add-card')} icon={IdCard} onclick={() => (adding = 'card')} />
+	</Section>
+
+	<Section>
 		<Row
 			title={t('settings-users-keys-password')}
 			description={methods.password && !methods.canTurnOffPassword ? t('settings-users-keys-password-needs-another') : undefined}

@@ -70,6 +70,10 @@ export class MethodArea extends St.Widget {
   private readonly fingerprintSwitches = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_align: Clutter.ActorAlign.START });
   private readonly passwordSwitches = new St.BoxLayout({ style_class: 'kestrel-auth-row', x_align: Clutter.ActorAlign.START });
   private readonly fingerprintRow = new St.BoxLayout({ style_class: 'kestrel-auth-fingerprint', x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.START });
+  private readonly waitingIcon = new St.Icon({ style_class: 'kestrel-auth-waiting-icon' });
+  private readonly waitingHint = label('kestrel-auth-hint');
+  private readonly waitingSwitches = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_align: Clutter.ActorAlign.START });
+  private readonly waitingRow = new St.BoxLayout({ style_class: 'kestrel-auth-fingerprint', x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.START });
   private readonly passwordColumn = new St.BoxLayout({ style_class: 'kestrel-auth-password', orientation: Clutter.Orientation.VERTICAL, y_align: Clutter.ActorAlign.START });
   private fingerprintPrimary = false;
   private fingerprintState: FingerprintState = { kind: 'idle' };
@@ -86,6 +90,12 @@ export class MethodArea extends St.Widget {
     this.fingerprintRow.add_child(this.glyph);
     this.fingerprintRow.add_child(fingerprintText);
 
+    const waitingText = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, y_align: Clutter.ActorAlign.CENTER });
+    waitingText.add_child(this.waitingHint);
+    waitingText.add_child(this.waitingSwitches);
+    this.waitingRow.add_child(this.waitingIcon);
+    this.waitingRow.add_child(waitingText);
+
     const row = new St.BoxLayout({ style_class: 'kestrel-auth-row' });
     row.add_child(this.message);
     row.add_child(this.passwordSwitches);
@@ -95,11 +105,11 @@ export class MethodArea extends St.Widget {
     this.message.hide();
     KestrelUi.localized(this, () => this.showSwitches());
 
-    for (const method of [this.fingerprintRow, this.passwordColumn]) {
+    for (const method of [this.fingerprintRow, this.waitingRow, this.passwordColumn]) {
       method.set_pivot_point(0, 0);
       this.add_child(method);
     }
-    this.fingerprintRow.set({ opacity: 0, visible: false, translation_y: HIDDEN_DROP });
+    for (const hidden of [this.fingerprintRow, this.waitingRow]) hidden.set({ opacity: 0, visible: false, translation_y: HIDDEN_DROP });
   }
 
   /** The ways someone may sign in, and the one the field is for now. */
@@ -109,9 +119,31 @@ export class MethodArea extends St.Widget {
     this.showSwitches();
   }
 
-  /** The first switch, for focusing while the fingerprint is asked for. */
+  /** The first switch, for focusing while the fingerprint or a key is asked for. */
   get firstSwitch(): St.Button | null {
-    return (this.fingerprintSwitches.get_first_child() as St.Button | null);
+    const switches = this.waiting ? this.waitingSwitches : this.fingerprintSwitches;
+    return (switches.get_first_child() as St.Button | null);
+  }
+
+  get waiting(): boolean {
+    return this.waitingRow.reactive;
+  }
+
+  /** Shows what to do with a key or card in place of the field, or brings the field back. */
+  waitFor(iconName: string | null, text = ''): void {
+    const field = this.fingerprintPrimary ? this.fingerprintRow : this.passwordColumn;
+    if (!iconName) {
+      if (!this.waiting) return;
+      this.reveal(field, this.waitingRow, false);
+      this.showSwitches();
+      return;
+    }
+    this.waitingIcon.icon_name = iconName;
+    this.waitingHint.text = text;
+    this.get_accessible().emit('notification', text, Atk.Live.POLITE);
+    if (this.waiting) return;
+    this.reveal(this.waitingRow, field, false);
+    this.showSwitches();
   }
 
   private showSwitches(): void {
@@ -129,7 +161,9 @@ export class MethodArea extends St.Widget {
     };
     if (this.ways.includes('fingerprint')) switches('fingerprint', this.fingerprintSwitches);
     else this.fingerprintSwitches.destroy_all_children();
-    switches(this.current === 'fingerprint' ? 'password' : this.current, this.passwordSwitches);
+    const [active, idle] = this.waiting ? [this.waitingSwitches, this.passwordSwitches] : [this.passwordSwitches, this.waitingSwitches];
+    idle.destroy_all_children();
+    switches(this.current === 'fingerprint' ? 'password' : this.current, active);
   }
 
   get showsFingerprint(): boolean {

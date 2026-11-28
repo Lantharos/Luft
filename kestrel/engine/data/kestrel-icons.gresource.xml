@@ -67,6 +67,7 @@
     <file preprocess="xml-stripblanks">scalable/status/caps-lock-off-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/caps-lock-on-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/check-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/id-card-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-high-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-medium-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-off-symbolic.svg</file>
@@ -81,6 +82,7 @@
     <file preprocess="xml-stripblanks">scalable/status/osk-shift-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-zwnj-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/post-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/security-key-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/switch-off-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/switch-on-symbolic.svg</file>
   </gresource>

@@ -82,7 +82,7 @@ pub fn plugged() -> Result<Vec<Plugged>, Error> {
                 name: if name.is_null() {
                     String::new()
                 } else {
-                    CStr::from_ptr(name).to_string_lossy().into_owned()
+                    without_interfaces(&CStr::from_ptr(name).to_string_lossy())
                 },
             }
         })
@@ -90,6 +90,23 @@ pub fn plugged() -> Result<Vec<Plugged>, Error> {
     let mut list = list;
     unsafe { (fido.fido_dev_info_free)(&raw mut list, MOST_DEVICES) };
     listed.map(|()| devices)
+}
+
+fn without_interfaces(product: &str) -> String {
+    let interface_list = |word: &str| {
+        word.contains('+')
+            && word.split('+').all(|part| {
+                !part.is_empty()
+                    && part
+                        .chars()
+                        .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit())
+            })
+    };
+    product
+        .split_whitespace()
+        .filter(|word| !interface_list(word))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -400,4 +417,19 @@ fn verify(
         .map(|()| unsafe { (fido.fido_assert_verify)(assertion, 0, kind, key.cast()) } == ffi::OK);
     unsafe { free(&raw mut key) };
     verified
+}
+
+#[cfg(test)]
+mod tests {
+    use super::without_interfaces;
+
+    #[test]
+    fn product_names_drop_their_interface_lists() {
+        assert_eq!(without_interfaces("YubiKey OTP+FIDO+CCID"), "YubiKey");
+        assert_eq!(
+            without_interfaces("Security Key by Yubico"),
+            "Security Key by Yubico"
+        );
+        assert_eq!(without_interfaces("Nitrokey 3"), "Nitrokey 3");
+    }
 }

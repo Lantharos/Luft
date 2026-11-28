@@ -12,6 +12,7 @@
 
 .kestrel-auth-fingerprint { spacing: 16px; }
 .kestrel-fingerprint-glyph { width: 56px; height: 56px; color: ink(); -kestrel-danger: $danger; }
+.kestrel-auth-waiting-icon { icon-size: 40px; padding: 8px; color: ink(); }
 .kestrel-auth-hint { font-size: 14px; font-weight: 500; color: ink(0.78); }
 .kestrel-auth-hint.warning { color: ink(); }
 .kestrel-auth-quiet { padding: 4px 0; font-size: 13px; font-weight: 500; color: ink(0.6); background-color: transparent; transition-duration: $motion-tap; }

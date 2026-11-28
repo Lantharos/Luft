@@ -288,3 +288,7 @@ desktop-updates-firmware-no-download = This update can't be downloaded.
 
 # Title of the folder chooser that opens a folder to a sandboxed app
 desktop-apps-folder-title = Choose a folder for the app
+
+## Erasing the computer
+
+desktop-erase-unavailable = This computer can’t be erased from here

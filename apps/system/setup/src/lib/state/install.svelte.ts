@@ -29,6 +29,7 @@ class InstallState {
 	fullName = $state('');
 	hostname = $state('');
 	intent = $state<Intent | null>(null);
+	forSomeoneElse = $state(false);
 	replacing = $state<LinuxSystem | null>(null);
 	movingBox = $state<MovingBox | null>(null);
 	target = $state<Target | null>(null);
@@ -79,7 +80,13 @@ class InstallState {
 		this.startError = '';
 		try {
 			await commands.installerInstall(
-				{ target, variant: this.hardware.nvidia ? 'nvidia' : 'default', windows: $state.snapshot(this.windowsChoices), encryption },
+				{
+					target,
+					variant: this.hardware.nvidia ? 'nvidia' : 'default',
+					windows: $state.snapshot(this.windowsChoices),
+					encryption,
+					forSomeoneElse: this.forSomeoneElse
+				},
 				WAIT_FOR_PERSON
 			);
 			this.replacing = target.kind === 'replace' ? (this.systems.find((system) => system.id === target.system) ?? null) : null;

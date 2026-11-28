@@ -56,6 +56,14 @@ setup-early-nightly-stable = This is a nightly build, made every day and barely 
 # github.com/Lantharos/Luft/issues stays as it is
 setup-early-report = Report a problem at github.com/Lantharos/Luft/issues
 
+## Who the computer is for
+
+setup-owner-title = Who’s this computer for?
+setup-owner-me = Me
+setup-owner-me-description = Set it up for yourself now.
+setup-owner-someone-else = Someone else
+setup-owner-someone-else-description = Install Luft now. Its owner sets it up when they first start it.
+
 ## Where Luft goes
 
 setup-destination-choose-title = Where should Luft go?
@@ -157,6 +165,10 @@ setup-protect-close = Close
 setup-protect-skip = Don’t encrypt
 # Button, verb: installs Luft encrypted
 setup-protect-encrypt = Encrypt
+# Shown above the passphrase fields when the computer's owner sets it up and it can't unlock by itself
+setup-protect-owner-passphrase = Choose a passphrase too. This computer asks for it every time it starts.
+# Button label while the computer becomes its owner's
+setup-protect-claiming = Getting ready
 
 ## Making room next to Windows
 
@@ -316,6 +328,11 @@ setup-finishing-secure-boot-stick = After the restart, a blue screen asks for th
 setup-finishing-secure-boot = After the restart, a blue screen asks for this code to finish setting up Secure Boot.
 setup-finishing-restart-started-stick = Restart to start using it. Take out the USB stick once Luft has started.
 setup-finishing-restart = Restart to start using it.
+# Shown with a code once Luft is installed for someone else
+setup-handover-secure-boot-stick = After the restart, a blue screen asks for this code. Take out the USB stick once Luft has started.
+setup-handover-secure-boot = After the restart, a blue screen asks for this code.
+setup-handover-restart-stick = Restart to get it ready for its owner. Take out the USB stick once Luft has started.
+setup-handover-restart = Restart to get it ready for its owner.
 setup-finishing-installing-title = Installing Luft
 setup-finishing-description = This takes a few minutes.
 setup-finishing-plug-in = Keep your computer plugged in until it’s done.
@@ -379,3 +396,18 @@ setup-ready-settings-title = Settings
 setup-ready-settings-detail = Wi-Fi, accounts, wallpaper and everything else.
 setup-ready-settings-secure-boot = Finish setting up Secure Boot whenever you’re ready, under Security.
 setup-ready-start = Start using Luft
+
+## Installed for someone else: the last screen of whoever installed it
+
+setup-handed-over-title = Ready for its owner
+setup-handed-over-description = When they start it, they choose their language, account and password.
+setup-handed-over-secure-boot = Secure Boot is on
+setup-handed-over-sealed = The drive is sealed
+# Button, verb: turns the computer off
+setup-shut-down = Shut down
+
+## The first screen its owner sees
+
+setup-welcome-title = Welcome to your new computer
+setup-welcome-line = A few questions, and it’s yours.
+setup-welcome-start = Get started

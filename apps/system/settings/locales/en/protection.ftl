@@ -271,6 +271,9 @@ settings-encryption-turn-on = Turn on
 settings-encryption-after-restart = Starts encrypting when you restart
 settings-encryption-encrypting = Encrypting, { $percent } done
 settings-encryption-encrypting-paused = Encrypting, paused at { $percent } until the computer is plugged in
+# Shown after a computer installed for someone else got its owner: the whole drive is encrypted again with a key nobody else has had. $percent is a percentage, like "42%"
+settings-encryption-new-key = Getting a new key of its own, { $percent } done
+settings-encryption-new-key-waiting = Carries on getting a new key of its own after the next restart
 # Button that takes back the request to encrypt before the computer restarts
 settings-encryption-dont-encrypt = Don’t encrypt
 settings-encryption-turn-on-title = Encrypt this computer

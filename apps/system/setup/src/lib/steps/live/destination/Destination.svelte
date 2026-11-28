@@ -33,7 +33,7 @@
 		if (view !== 'choose' || trail.length > 0) return;
 		if (install.meet) {
 			view = 'alongside';
-		} else if (install.intent === 'replace' && !replacing && replaceable.length === 1) {
+		} else if (install.intent === 'replace' && !install.forSomeoneElse && !replacing && replaceable.length === 1) {
 			replacing = replaceable[0].id;
 			view = 'replace';
 		}
@@ -63,7 +63,7 @@
 	});
 	let buttonLabel = $derived.by(() => {
 		if (install.starting) return 'setup-destination-starting';
-		if (target && install.encryptable(target)) return 'setup-continue';
+		if (target && protectable(target)) return 'setup-continue';
 		return view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install';
 	});
 	let chosenSystem = $derived(install.systems.find((system) => system.id === replacing) ?? null);
@@ -88,9 +88,13 @@
 		if (!(await commands.sessionFinish().catch(() => false))) await appWindow.close();
 	}
 
+	function protectable(chosen: Target) {
+		return !install.forSomeoneElse && install.encryptable(chosen);
+	}
+
 	function choose() {
 		if (!target) return;
-		if (!install.encryptable(target)) {
+		if (!protectable(target)) {
 			confirming = true;
 			return;
 		}
@@ -146,7 +150,7 @@
 					onclick={() => open('alongside')}
 				/>
 			{/if}
-			{#each install.systems as system (system.id)}
+			{#each install.forSomeoneElse ? [] : install.systems as system (system.id)}
 				<Choice
 					icon={ArrowRightLeft}
 					title={t('setup-destination-replace-choice', { system: system.name })}

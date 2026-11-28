@@ -28,6 +28,12 @@
 	"apps/system/setup/installer/src/install/configure/networks.rs": {
 		"/etc/NetworkManager/system-connections": "Reads the live system's Wi-Fi networks, to hand them to the installed one as NetworkManager's own configuration"
 	},
+	"apps/system/setup/installer/src/unclaimed/erase.rs": {
+		"/etc/passwd": "Reads whose fingerprints to take off the reader before the computer is erased"
+	},
+	"apps/system/setup/installer/src/unclaimed/identity.rs": {
+		"/etc/ssh": "Removes the SSH host keys sshd made, so a computer waiting for its owner makes its own at the next start"
+	},
 	"apps/system/terminal/desktop/src/shell/mod.rs": {
 		"/etc/shells": "Reads the shells people can pick"
 	},

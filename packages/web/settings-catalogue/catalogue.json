@@ -555,6 +555,7 @@
 		{ "id": "security.encryption", "page": "security/encryption", "title": "settings-page-encryption", "why": "Encryption, the recovery key and the TPM are managed in Settings." },
 		{ "id": "security.keyring", "page": "security/keyring", "title": "settings-page-keyring", "why": "Luft Keyring is managed in Settings, after you confirm it's you." },
 		{ "id": "network.firewall", "page": "network/firewall", "title": "settings-page-firewall", "why": "Which networks are home and which apps and ports others may reach are chosen in Settings." },
-		{ "id": "extensions.inside-luft", "page": "extensions", "title": "settings-page-extensions", "why": "Running an extension from its folder inside the desktop is approved in Settings." }
+		{ "id": "extensions.inside-luft", "page": "extensions", "title": "settings-page-extensions", "why": "Running an extension from its folder inside the desktop is approved in Settings." },
+		{ "id": "system.erase", "page": "system", "title": "settings-erase", "why": "Erasing removes every account, file and app for good, so it's only started in Settings, with an administrator's password." }
 	]
 }

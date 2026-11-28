@@ -6,19 +6,37 @@
 	import NetworkType from '#lib/steps/firstboot/NetworkType.svelte';
 	import SecureBoot from '#lib/steps/firstboot/SecureBoot.svelte';
 	import Ready from '#lib/steps/firstboot/Ready.svelte';
+	import HandedOver from '#lib/steps/handover/HandedOver.svelte';
 	import Account from '#lib/steps/live/Account.svelte';
 	import Destination from '#lib/steps/live/destination/Destination.svelte';
 	import Early from '#lib/steps/live/Early.svelte';
 	import Finishing from '#lib/steps/live/Finishing.svelte';
 	import Network from '#lib/steps/live/network/Network.svelte';
+	import Owner from '#lib/steps/live/Owner.svelte';
 	import Protect from '#lib/steps/live/Protect.svelte';
 	import Region from '#lib/steps/live/Region.svelte';
+	import Welcome from '#lib/steps/owner/Welcome.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
 	import { regional } from '#lib/state/regional.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 
-	const STEPS = { region: Region, early: Early, destination: Destination, network: Network, account: Account, finishing: Finishing, 'network-type': NetworkType, 'secure-boot': SecureBoot, protect: Protect, fingerprint: Fingerprint, ready: Ready };
+	const STEPS = {
+		welcome: Welcome,
+		region: Region,
+		early: Early,
+		owner: Owner,
+		destination: Destination,
+		network: Network,
+		account: Account,
+		finishing: Finishing,
+		'network-type': NetworkType,
+		'secure-boot': SecureBoot,
+		protect: Protect,
+		fingerprint: Fingerprint,
+		ready: Ready,
+		'handed-over': HandedOver
+	};
 
 	onMount(() => {
 		const stopping = setup.start();

@@ -11,7 +11,7 @@ async function onCable() {
 
 export async function begin(target: Target, encryption: Encryption | null) {
 	if (!(await install.install(target, encryption))) return;
-	if (install.replacing?.owner?.password) flow.skip('account');
+	if (install.forSomeoneElse || install.replacing?.owner?.password) flow.skip('account');
 	if (await onCable()) {
 		flow.skip('network');
 		void regional.locate();

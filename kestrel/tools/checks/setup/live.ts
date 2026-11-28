@@ -69,9 +69,11 @@ async function checkFromMeet() {
   await setup.called('SetTimezone Europe/Vienna', 'the time zone Meet Luft noted becomes the live session’s');
   await setup.shot('welcome-meet');
   await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
-  await setup.click(AT.continue, 'continuing shows the room Meet Luft made');
+  await setup.click(AT.continue, 'continuing asks who the computer is for');
+  await setup.choose('Me', 'installing for yourself shows the room Meet Luft made');
   await setup.shot('destination-meet');
-  await setup.click(AT.back, 'going back from the room shows the early note');
+  await setup.click(AT.back, 'going back from the room asks who the computer is for');
+  await setup.click(AT.back, 'going back from that question shows the early note');
   await setup.click(AT.back, 'going back from the early note shows the first screen');
   await setup.shot('destination-meet-back');
   await setup.close();
@@ -86,7 +88,9 @@ export async function checkLive() {
   await setup.called('SetTimezone Europe/Berlin', 'the time zone Windows used becomes the live session’s');
   await setup.shot('welcome');
   await setup.click(AT.continue, 'continuing says Luft isn’t finished yet');
-  await setup.click(AT.continue, 'continuing shows where to install');
+  await setup.click(AT.continue, 'continuing asks who the computer is for');
+  await setup.shot('owner');
+  await setup.choose('Me', 'installing for yourself shows where to install');
   await setup.shot('destination');
   await setup.click(AT.alongside, 'choosing Windows shows how to share its drive');
   await setup.shot('alongside');

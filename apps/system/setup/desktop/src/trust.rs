@@ -34,6 +34,8 @@ struct TrustState {
     key: SigningKey,
     key_available: bool,
     tpm: bool,
+    tpm_unlocks: bool,
+    sealed: bool,
 }
 
 #[derive(Deserialize, Type)]
@@ -44,11 +46,15 @@ struct RecoveryKey {
 async fn state(Empty {}: Empty) -> Result<Option<TrustState>, String> {
     Ok(TRUST.read().await?.map(|properties| {
         let key = group(&properties, "SigningKey");
+        let disk = group(&properties, "Disk");
         TrustState {
             secure_boot: named(get(&properties, "SecureBoot")),
             key: named(get(&key, "State")),
             key_available: get(&key, "Available").unwrap_or_default(),
             tpm: get(&group(&properties, "Tpm"), "Usable").unwrap_or_default(),
+            tpm_unlocks: get(&disk, "TpmUnlocks").unwrap_or_default(),
+            sealed: get::<Vec<String>>(&disk, "Unlock")
+                .is_some_and(|ways| ways.iter().any(|way| way == "tpm")),
         }
     }))
 }

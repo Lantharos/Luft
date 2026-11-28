@@ -17,6 +17,8 @@ export function encryptionSummary(disk: Disk, withoutKey: boolean) {
 	if (disk.encrypting === 'after-restart') return t('settings-encryption-after-restart');
 	if (disk.encrypting === 'encrypting') return t('settings-encryption-encrypting', args);
 	if (disk.encrypting === 'waiting') return t('settings-encryption-encrypting-paused', args);
+	if (disk.newKey === 'underway') return t('settings-encryption-new-key', { percent: percent(disk.newKeyProgress) });
+	if (disk.newKey === 'waiting') return t('settings-encryption-new-key-waiting');
 	if (disk.encrypted) return unlockSummary(disk, withoutKey);
 	return disk.canEncrypt ? t('settings-encryption-not-encrypted') : t('settings-encryption-not-encrypted-reinstall');
 }

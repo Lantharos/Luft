@@ -5,6 +5,7 @@
 	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { reportProblem } from '../about/api';
+	import EraseSection from '../erase/EraseSection.svelte';
 	import { firmware, openApps } from './api';
 	import AutomaticRows from './AutomaticRows.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
@@ -83,3 +84,5 @@
 		<ChannelRow choice={system.channel} {activity} {attempt} />
 	</Section>
 {/if}
+
+<EraseSection />

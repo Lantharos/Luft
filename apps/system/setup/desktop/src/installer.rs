@@ -28,6 +28,8 @@ const CHANGED: BridgeEvent<InstallerState> = BridgeEvent::new("installer.changed
 #[serde(rename_all = "kebab-case")]
 pub enum Phase {
     Live,
+    Handover,
+    Unclaimed,
     FirstBoot,
     #[default]
     Installed,
@@ -183,6 +185,28 @@ async fn finish_first_boot(Empty {}: Empty) -> Result<(), String> {
     call("FinishFirstBoot", &()).await
 }
 
+async fn leave_to_owner(Empty {}: Empty) -> Result<(), String> {
+    call("LeaveToOwner", &()).await
+}
+
+#[derive(Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+struct OwnerKeys {
+    #[specta(type = String)]
+    recovery_key: Zeroizing<String>,
+    #[specta(type = String)]
+    passphrase: Zeroizing<String>,
+}
+
+async fn claim(
+    OwnerKeys {
+        recovery_key,
+        passphrase,
+    }: OwnerKeys,
+) -> Result<(), String> {
+    call("Claim", &(recovery_key.as_str(), passphrase.as_str())).await
+}
+
 pub fn watch(events: Events) {
     luft_app::spawn(async move {
         let Ok(mut changes) = INSTALLER.changes().await else {
@@ -207,4 +231,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("installer_account", create_account)
         .command_async("installer_network_type", set_network_type)
         .command_async("installer_finish_first_boot", finish_first_boot)
+        .command_async("installer_leave_to_owner", leave_to_owner)
+        .command_async("installer_claim", claim)
 }

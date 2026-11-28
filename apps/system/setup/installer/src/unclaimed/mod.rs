@@ -8,7 +8,7 @@ use luft_installer_contract::Regional;
 
 use crate::install::Account;
 use crate::install::configure::deployment::Deployment;
-use crate::install::configure::{handoff, regional, setup_account};
+use crate::install::configure::{handoff, networks, regional, setup_account};
 use crate::phase;
 use crate::system::command::Tool;
 use crate::system::files::write;
@@ -31,6 +31,11 @@ pub fn claim(state_dir: &Path, regional: &Regional, account: &Account) -> Result
         .args(["hostname", &regional.hostname])
         .run()?;
     account.create(&system)?;
+    if let Err(error) = networks::keep_for_everyone(&system)
+        .and_then(|()| Tool::new("nmcli").args(["connection", "reload"]).run())
+    {
+        eprintln!("The Wi-Fi networks joined during setup stay the setup account's: {error:#}");
+    }
     handoff::prepare(&system, &account.name)?;
     std::fs::remove_file(phase::unclaimed_marker(state_dir))?;
     Ok(())

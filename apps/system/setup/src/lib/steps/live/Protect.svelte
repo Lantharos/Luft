@@ -2,8 +2,10 @@
 	import { t } from '@luft/i18n';
 	import { PasswordField, Spinner } from '@luft/ui';
 	import { commands, type Encryption } from '#lib/bindings.js';
+	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import KeyBackup from '#lib/components/trust/KeyBackup.svelte';
+	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 	import { begin } from './begin.js';
@@ -16,9 +18,16 @@
 	let problem = $state('');
 	let confirming = $state<{ encryption: Encryption | null } | null>(null);
 
+	let claiming = $state(false);
+
+	let owner = $derived(flow.phase === 'unclaimed');
 	let chip = $derived(setup.trust?.tpm ?? false);
-	let tpm = $derived(chip && setup.trust?.secureBoot === 'on');
-	let description = $derived(tpm ? 'setup-protect-tpm' : chip ? 'setup-protect-passphrase-secure-boot-off' : 'setup-protect-passphrase');
+	let tpm = $derived(owner ? (setup.trust?.tpmUnlocks ?? false) : chip && setup.trust?.secureBoot === 'on');
+	let description = $derived.by(() => {
+		if (owner) return 'setup-protect-keep-safe';
+		if (tpm) return 'setup-protect-tpm';
+		return chip ? 'setup-protect-passphrase-secure-boot-off' : 'setup-protect-passphrase';
+	});
 	let passphraseReady = $derived(tpm || (passphrase.length >= SHORTEST_PASSPHRASE && passphrase === repeated));
 	let ready = $derived(Boolean(install.recoveryKey) && install.recoveryKeyKept && passphraseReady);
 
@@ -34,19 +43,36 @@
 		confirming = { encryption: encrypt ? { recoveryKey: install.recoveryKey, passphrase: tpm ? '' : passphrase } : null };
 	}
 
+	async function claim() {
+		claiming = true;
+		problem = '';
+		try {
+			await install.configure();
+			await commands.installerClaim({ recoveryKey: install.recoveryKey, passphrase: tpm ? '' : passphrase }, WAIT_FOR_PERSON);
+		} catch (error) {
+			problem = String(error);
+			claiming = false;
+		}
+	}
+
 	async function start(encryption: Encryption | null) {
 		confirming = null;
 		if (install.target) await begin(install.target, encryption);
 	}
 </script>
 
-<StepFrame title={t('setup-protect-title')} description={t(description)} hideBack={install.starting}>
+<StepFrame title={t('setup-protect-title')} description={t(description)} hideBack={install.starting || claiming}>
 	<div class="flex flex-col gap-5">
-		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-keep-safe')}</p>
+		{#if !owner}
+			<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-keep-safe')}</p>
+		{/if}
 		{#if install.recoveryKey}
 			<KeyBackup key={install.recoveryKey} onkept={() => (install.recoveryKeyKept = true)} />
 		{/if}
 		{#if !tpm}
+			{#if owner}
+				<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-owner-passphrase')}</p>
+			{/if}
 			<div class="grid grid-cols-2 gap-3">
 				<PasswordField bind:value={passphrase} label={t('setup-protect-passphrase-label')} showLabel autocomplete="new-password" />
 				<PasswordField bind:value={repeated} label={t('setup-protect-repeat')} showLabel autocomplete="new-password" error={repeated && repeated !== passphrase ? t('setup-protect-mismatch') : ''} live />
@@ -57,10 +83,16 @@
 		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{problem || install.startError}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="plain-button large" disabled={install.starting} onclick={() => choose(false)}>{t('setup-protect-skip')}</button>
-		<button type="button" class="button primary large px-6" disabled={!ready || install.starting} onclick={() => choose(true)}>
-			{#if install.starting}<Spinner />{/if}{t(install.starting ? 'setup-destination-starting' : 'setup-protect-encrypt')}
-		</button>
+		{#if owner}
+			<button type="button" class="button primary large px-6" disabled={!ready || claiming} onclick={claim}>
+				{#if claiming}<Spinner />{/if}{t(claiming ? 'setup-protect-claiming' : 'setup-continue')}
+			</button>
+		{:else}
+			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => choose(false)}>{t('setup-protect-skip')}</button>
+			<button type="button" class="button primary large px-6" disabled={!ready || install.starting} onclick={() => choose(true)}>
+				{#if install.starting}<Spinner />{/if}{t(install.starting ? 'setup-destination-starting' : 'setup-protect-encrypt')}
+			</button>
+		{/if}
 	{/snippet}
 </StepFrame>
 

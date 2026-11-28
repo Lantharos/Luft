@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {changes, openApp} from '../../apps/lib/apps.js';
 import type {LuftApp} from '../../lib/apps/luftApp.js';
+import type {Box} from '../../lib/apps/probe.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
 import {press, rest, type, type Point} from '../../lib/input/input.js';
@@ -15,6 +16,9 @@ const CONTROL = `${CHECKS}.Installer`;
 
 interface InstallRequest {
   variant: string;
+  forSomeoneElse?: boolean;
+  recoveryKey?: string;
+  passphrase?: string;
   target: {kind: string; drive: string; size: number};
   encryption?: {recoveryKey?: string; passphrase: string};
 }
@@ -89,10 +93,14 @@ export class Setup {
     await eventually(async () => (await this.calls()).includes(name), label);
   }
 
-  async click(point: Point, label: string) {
-    await changes(this.app, label, () => this.app.click(point));
+  async click(target: Point | Box, label: string) {
+    await changes(this.app, label, () => this.app.click(target));
     await this.app.settle(() => true);
     rest();
+  }
+
+  async choose(name: string, label: string) {
+    await this.click(await this.app.find({role: 'button', name}), label);
   }
 
   async press(keyval: number, label: string) {
@@ -100,8 +108,8 @@ export class Setup {
     await this.app.settle(() => true);
   }
 
-  tap(point: Point) {
-    this.app.click(point);
+  tap(target: Point | Box) {
+    this.app.click(target);
   }
 
   async type(text: string) {

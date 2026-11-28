@@ -39,7 +39,7 @@ async function checkNightly() {
   await setup.click(AT.back, 'Back on the early note goes back to the welcome screen');
   require((await body(setup)).looksLike(welcome, SAME_TOLERANCE), 'Back on the early note shows the welcome screen as it was');
   await setup.click(AT.continue, 'continuing shows the early note again');
-  await setup.click(AT.continue, 'Continue on the early note shows where Luft goes');
+  await setup.click(AT.continue, 'Continue on the early note asks who the computer is for');
   const destination = await body(setup);
   await setup.close();
   return {early, destination};
@@ -62,7 +62,7 @@ export async function checkEarly() {
   const next = await body(finished);
   await finished.shot('early-off');
   await finished.close();
-  require(next.looksLike(nightly.destination, SAME_TOLERANCE), 'without the early mark, the welcome screen goes straight to where Luft goes');
+  require(next.looksLike(nightly.destination, SAME_TOLERANCE), 'without the early mark, the welcome screen goes straight to who the computer is for');
 
   await new Setup().useRelease(RELEASES.nightly);
 }

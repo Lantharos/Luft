@@ -98,7 +98,7 @@ fn write_private(path: &Path, contents: &str) -> Result<()> {
     Ok(file.sync_all()?)
 }
 
-pub fn carry_from_live(deployment: &Deployment) -> Result<()> {
+pub fn keep_for_everyone(deployment: &Deployment) -> Result<()> {
     let folder = deployment.etc(CONNECTIONS);
     fs::create_dir_all(&folder)?;
     let mut written = Vec::new();

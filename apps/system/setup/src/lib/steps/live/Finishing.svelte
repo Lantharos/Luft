@@ -25,6 +25,12 @@
 	let problem = $state('');
 	let showingDetails = $state(false);
 	let fromStick = $derived(!install.intent);
+	let installed = $derived.by(() => {
+		const stick = fromStick ? '-stick' : '';
+		if (install.forSomeoneElse) return { title: code ? 'setup-secure-boot-finish-title' : 'setup-finishing-installed-title', description: `setup-handover-${code ? 'secure-boot' : 'restart'}${stick}` };
+		if (code) return { title: 'setup-finishing-installed-title', description: fromStick ? 'setup-finishing-secure-boot-stick' : 'setup-finishing-secure-boot' };
+		return { title: 'setup-finishing-installed-title', description: fromStick ? 'setup-finishing-restart-started-stick' : 'setup-finishing-restart' };
+	});
 
 	async function restartNow() {
 		problem = '';
@@ -56,10 +62,7 @@
 		</Dialog>
 	{/if}
 {:else if install.finished && code}
-	<StepFrame
-		title={t('setup-finishing-installed-title')}
-		description={t(fromStick ? 'setup-finishing-secure-boot-stick' : 'setup-finishing-secure-boot')}
-	>
+	<StepFrame title={t(installed.title)} description={t(installed.description)}>
 		<EnrollSteps {code} />
 		{#if problem}
 			<p class="mt-5 text-[13.5px] text-[var(--danger)]">{problem}</p>
@@ -69,10 +72,7 @@
 		{/snippet}
 	</StepFrame>
 {:else if install.finished}
-	<StepFrame
-		title={t('setup-finishing-installed-title')}
-		description={t(fromStick ? 'setup-finishing-restart-started-stick' : 'setup-finishing-restart')}
-	>
+	<StepFrame title={t(installed.title)} description={t(installed.description)}>
 		{#if problem}
 			<p class="text-[13.5px] text-[var(--danger)]">{problem}</p>
 		{/if}

@@ -15,6 +15,10 @@ export const commands = {
 		fullName: string,
 		password: string,
 	}, options?: CallOptions) => invoke<null>("installer_account", params, options),
+	installerClaim: (params: {
+		recoveryKey: string,
+		passphrase: string,
+	}, options?: CallOptions) => invoke<null>("installer_claim", params, options),
 	installerConfigure: (params: {
 		locale: string,
 		keyboard: Keyboard,
@@ -27,7 +31,9 @@ export const commands = {
 		variant: string,
 		windows?: WindowsChoices,
 		encryption?: Encryption | null,
+		forSomeoneElse?: boolean,
 	}, options?: CallOptions) => invoke<null>("installer_install", params, options),
+	installerLeaveToOwner: (options?: CallOptions) => invoke<null>("installer_leave_to_owner", {}, options),
 	installerNetworkType: (params: {
 		connection: string,
 		networkType: string,
@@ -142,6 +148,7 @@ export const commands = {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("session_open_disks", params, options),
 	sessionRestart: (options?: CallOptions) => invoke<null>("session_restart", {}, options),
+	sessionShutDown: (options?: CallOptions) => invoke<null>("session_shut_down", {}, options),
 	trustEnroll: (options?: CallOptions) => invoke<string>("trust_enroll", {}, options),
 	trustKeyDrives: (options?: CallOptions) => invoke<KeyDrive[]>("trust_key_drives", {}, options),
 	trustPrintKey: (params: {
@@ -458,7 +465,7 @@ export type Palette = {
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
-export type Phase = "live" | "first-boot" | "installed";
+export type Phase = "live" | "handover" | "unclaimed" | "first-boot" | "installed";
 
 export type PortNetworks = "home" | "anywhere";
 
@@ -549,6 +556,8 @@ export type TrustState = {
 	key: SigningKey,
 	keyAvailable: boolean,
 	tpm: boolean,
+	tpmUnlocks: boolean,
+	sealed: boolean,
 };
 
 export type Typography = {

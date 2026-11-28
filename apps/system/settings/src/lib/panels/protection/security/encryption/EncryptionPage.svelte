@@ -20,7 +20,7 @@
 		{/if}
 	</Section>
 
-	{#if disk.encrypted}
+	{#if disk.encrypted && disk.newKey === 'no'}
 		<UnlockSection {trust} />
 	{/if}
 </SubPage>

@@ -54,6 +54,21 @@ async fn restart(Empty {}: Empty) -> Result<(), String> {
         .map_err(failed)
 }
 
+async fn shut_down(Empty {}: Empty) -> Result<(), String> {
+    dbus::system()
+        .await?
+        .call_method(
+            Some(LOGIN),
+            LOGIN_PATH,
+            Some(LOGIN_MANAGER),
+            "PowerOff",
+            &(true,),
+        )
+        .await
+        .map(drop)
+        .map_err(failed)
+}
+
 fn open_disks(Token { token }: Token) -> Result<(), String> {
     let app =
         gio_unix::DesktopAppInfo::new(DISKS).ok_or_else(|| t!(L10N, "desktop-disks-missing"))?;
@@ -64,5 +79,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command_async("session_finish", finish)
         .command_async("session_restart", restart)
+        .command_async("session_shut_down", shut_down)
         .command("session_open_disks", open_disks)
 }

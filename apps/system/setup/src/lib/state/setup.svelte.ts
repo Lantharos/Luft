@@ -34,6 +34,8 @@ class SetupState {
 			void regional.adoptFormats().catch(() => {});
 			this.newNetworks = (await commands.networkFirewall().catch(() => null))?.unclassified ?? [];
 			flow.begin(phase, firstBootSkips(this.trust, this.hardware, this.newNetworks));
+		} else if (phase === 'handover') {
+			flow.begin(phase, firstBootSkips(this.trust, this.hardware, []));
 		} else {
 			await regional.start();
 			flow.begin(phase, install.status?.release.early ? [] : ['early']);

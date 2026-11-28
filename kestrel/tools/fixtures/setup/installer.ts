@@ -18,6 +18,8 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <method name="Configure"><arg type="s" direction="in"/></method>
   <method name="CreateAccount"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="FinishFirstBoot"/>
+  <method name="LeaveToOwner"/>
+  <method name="Claim"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="SetNetworkType"><arg type="o" direction="in"/><arg type="s" direction="in"/></method>
   <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
   <method name="EnrollFingerprint"><arg type="s" direction="in"/></method>
@@ -184,6 +186,11 @@ export function publishInstaller(publish: Publish, calls: string[]) {
     },
     CreateAccount: (name: string, fullName: string) => calls.push(`installer CreateAccount ${name} ${fullName}`),
     FinishFirstBoot: () => calls.push('installer FinishFirstBoot'),
+    LeaveToOwner: () => calls.push('installer LeaveToOwner'),
+    Claim: (recoveryKey: string, passphrase: string) => {
+      requests.push(JSON.stringify({recoveryKey, passphrase}));
+      calls.push('installer Claim');
+    },
     SetNetworkTypeAsync: (parameters: [string, string], invocation: Gio.DBusMethodInvocation) =>
       answer(invocation, relay(FIREWALL, 'SetNetworkType', new GLib.Variant('(os)', parameters))),
     EnrollSigningKeyAsync: (_parameters: [], invocation: Gio.DBusMethodInvocation) => answer(invocation, relay(TRUST, 'EnrollSigningKey')),

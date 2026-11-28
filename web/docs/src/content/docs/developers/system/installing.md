@@ -46,8 +46,12 @@ The account's Luft Keyring is created with its password, plus a one-time key in 
 
 `FinishFirstBoot`, which only that account may call, removes the `initial_session`, the marker and the keyring's one-time key, and the next start shows the login screen. Setup doesn't stay open forever: `installer-expire-setup.service` counts the starts, and after five, or a day after installing, it finishes setup the same way before the login screen appears. The service stops doing setup's work at the same limits.
 
+## For someone else
+
+With `"forSomeoneElse": true`, `Install` needs no account and writes none. Luft's partition is encrypted with a temporary key instead of the owner's, the Wi-Fi joined on the stick isn't carried over, and the new system starts in setup as the `luft-setup` account until its owner has made theirs. [Computers waiting for their owner](/developers/system/unclaimed/) follows it from there.
+
 ## Setup mode
 
-`kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session. `kestrel-session` does the same by itself when `first-boot` names the person signing in. Setup mode runs as `kestrel-setup.target`, which starts the graphical session as the desktop does, so file dialogs, printing, the portal's appearance settings and Luft's palette all work. It keeps the firmware logo on screen while Sushi hands over and ends on the blurred wallpaper the desktop starts with, so there's no flash between them.
+`kestrel-session --setup` runs Kestrel in setup mode until Install Luft finishes, then starts the normal session, and `--setup-only` ends the session instead. `kestrel-session` does the same by itself when `first-boot` names the person signing in. Setup mode runs as `kestrel-setup.target`, which starts the graphical session as the desktop does, so file dialogs, printing, the portal's appearance settings and Luft's palette all work. It keeps the firmware logo on screen while Sushi hands over and ends on the blurred wallpaper the desktop starts with, so there's no flash between them.
 
 Services that belong only on the desktop wait for `kestrel-session.target`. The portal service stops with setup mode and starts again once the desktop's Kestrel is ready, since it learns which portals Kestrel serves when it starts, and setup mode serves fewer.

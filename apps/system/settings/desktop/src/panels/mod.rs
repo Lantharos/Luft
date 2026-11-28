@@ -37,5 +37,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = system::accounts::register(window, events);
     let window = system::language::register(window, events);
     let window = system::updates::register(window, events);
+    let window = system::erase::register(window);
     system::about::register(window, events)
 }

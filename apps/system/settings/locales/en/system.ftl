@@ -608,3 +608,15 @@ settings-apps-services-count = { $count ->
 settings-apps-full-access-off = It runs in a sandbox. Full access takes the sandbox away.
 # Button that opens Schelf to confirm giving the app full access
 settings-apps-full-access-give = Give full access
+
+## Erasing the computer
+
+settings-erase = Erase everything
+settings-erase-description = For selling this computer or giving it away.
+# Button, verb: opens the question whether to erase the computer
+settings-erase-open = Erase
+settings-erase-title = Erase everything?
+settings-erase-explanation = Every account, file and app on this computer is removed for good. Luft stays installed and starts like new.
+settings-erase-cancel = Cancel
+# Button, verb: erases the computer after asking for an administrator's password
+settings-erase-confirm = Erase

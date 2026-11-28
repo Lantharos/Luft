@@ -313,7 +313,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
                 copied + (COPIED - copied) * done,
             ))
         })?;
-        if let Err(error) = networks::carry_from_live(&deployment) {
+        if let Err(error) = networks::keep_for_everyone(&deployment) {
             eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");
         }
         handoff::prepare(&deployment, &user)?;

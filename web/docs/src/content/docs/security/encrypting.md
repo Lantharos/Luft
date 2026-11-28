@@ -13,6 +13,8 @@ Install Luft formats Luft's partition with `trustctl encryption format`, keyed b
 
 Replacing a Linux system while keeping its files next to Luft can't be encrypted while installing, since those files stay on the same unencrypted partition.
 
+A computer installed for someone else is encrypted with a temporary key until its owner sets it up, and then gets a new volume key as well ([Computers waiting for their owner](/developers/system/unclaimed/)).
+
 ## Encrypting in place
 
 Settings encrypts an installed Luft without moving its files. It needs Luft's own btrfs partition, the computer plugged in, and a recovery key, plus a passphrase without a TPM. Neither key is ever written to the disk or the firmware in the clear.
@@ -26,9 +28,9 @@ Old blocks are encrypted where they are. An SSD that keeps copies of blocks afte
 
 ## Requests for the next start
 
-Moving Luft to another drive and encrypting it in place happen in the startup image, where Luft's partition is already open. What they should do is kept in `luft-next-start` at the top of Luft's own file system, never in the firmware. On an encrypted Luft that puts the request inside the encryption, so only the running system can write one: another system started on the computer, or a firmware shell, can't make the next start copy Luft somewhere.
+Moving Luft to another drive, encrypting it in place and [erasing the computer](/developers/system/unclaimed/#erasing) happen in the startup image, where Luft's partition is already open. What they should do is kept in `luft-next-start` at the top of Luft's own file system, never in the firmware. On an encrypted Luft that puts the request inside the encryption, so only the running system can write one: another system started on the computer, or a firmware shell, can't make the next start copy Luft somewhere.
 
-Each request has a random ID, and an EFI variable (`MovingSystemDisk` or `EncryptingSystemDisk`) holds the ID of the one that waits. A request only counts while its ID is the one in the variable, so one left on an earlier copy of Luft is never picked up. Whoever can write firmware variables can call a waiting request off or make it run again, and nothing more: the variable names no partition and holds no key.
+Each request has a random ID, and an EFI variable (`MovingSystemDisk`, `EncryptingSystemDisk` or `ErasingSystemDisk`) holds the ID of the one that waits. A request only counts while its ID is the one in the variable, so one left on an earlier copy of Luft is never picked up. Whoever can write firmware variables can call a waiting request off or make it run again, and nothing more: the variable names no partition and holds no key.
 
 A request on an unencrypted disk is as trustworthy as the disk, and encrypting in place starts from exactly that: it protects what is written from then on, not against someone who changed the disk before.
 

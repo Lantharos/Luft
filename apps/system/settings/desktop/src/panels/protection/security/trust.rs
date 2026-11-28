@@ -74,6 +74,15 @@ enum EncryptingState {
     Waiting,
 }
 
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+enum NewKeyState {
+    #[default]
+    No,
+    Underway,
+    Waiting,
+}
+
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
@@ -81,6 +90,8 @@ pub struct Disk {
     encrypted: bool,
     encrypting: EncryptingState,
     progress: f64,
+    new_key: NewKeyState,
+    new_key_progress: f64,
     can_encrypt: bool,
     tpm_unlocks: bool,
     unlock: Vec<UnlockMethod>,
@@ -185,6 +196,8 @@ fn disk(map: &Map) -> Disk {
         encrypted: flag(map, "Encrypted"),
         encrypting: parse(text(map, "Encrypting")).unwrap_or_default(),
         progress: get(map, "Progress").unwrap_or_default(),
+        new_key: parse(text(map, "NewKey")).unwrap_or_default(),
+        new_key_progress: get(map, "NewKeyProgress").unwrap_or_default(),
         can_encrypt: flag(map, "CanEncrypt"),
         tpm_unlocks: flag(map, "TpmUnlocks"),
         unlock: get::<Vec<String>>(map, "Unlock")

@@ -1,0 +1,11 @@
+[Unit]
+Description=Signing in with security keys and smart cards
+
+[Socket]
+ListenStream=/run/luft-sign-in/verify
+SocketMode=0600
+DirectoryMode=0700
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

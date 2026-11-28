@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Trust1">
+    <method name="CheckRecoveryKey">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+  </interface>
+</node>

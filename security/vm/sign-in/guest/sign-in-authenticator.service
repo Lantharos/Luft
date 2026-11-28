@@ -1,0 +1,5 @@
+[Unit]
+Description=Software security key for sign-in checks
+
+[Service]
+ExecStart=/usr/libexec/sign-in-check/authenticator.py

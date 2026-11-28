@@ -14,6 +14,6 @@ pub use contents::{Collection, Contents, Item, Preferences, SshKey, SshPrivate, 
 pub use error::Error;
 pub use file::{Header, Stored};
 pub use key::{CHIP_KEY_SIZE, MasterKey};
-pub use wrap::{ChipWrap, PasswordWrap};
+pub use wrap::{ChipWrap, PasswordWrap, TokenWrap};
 
 pub use luft_keyring_wire::Secret;

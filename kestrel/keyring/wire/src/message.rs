@@ -28,7 +28,27 @@ pub enum Request {
 pub struct Grant {
     pub user: u32,
     pub password: Option<Secret>,
+    pub token: Option<Token>,
     pub reason: GrantReason,
+}
+
+/// What wraps the keyring's key for one security key or smart card that
+/// signs in, and every one the person has, so wraps for removed ones go.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Token {
+    pub id: String,
+    pub secret: Secret,
+    pub enrolled: Vec<String>,
+}
+
+impl Token {
+    pub fn encode(&self) -> Vec<u8> {
+        postcard::to_allocvec(self).expect("a token always encodes")
+    }
+
+    pub fn decode(bytes: &[u8]) -> Option<Self> {
+        postcard::from_bytes(bytes).ok()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -36,6 +56,7 @@ pub enum GrantReason {
     SignIn,
     Unlock,
     PasswordChanged,
+    KeyAdded,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,6 +80,7 @@ pub struct Unlock {
     pub reason: GrantReason,
     pub key: Option<Secret>,
     pub password: Option<Secret>,
+    pub token: Option<Token>,
     pub problem: Option<Problem>,
 }
 

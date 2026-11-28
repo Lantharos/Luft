@@ -13,14 +13,14 @@ pub enum Bus {
 }
 
 impl Bus {
-    fn name(self) -> &'static str {
+    pub(crate) fn name(self) -> &'static str {
         match self {
             Self::Usb => USB,
             Self::Thunderbolt => THUNDERBOLT,
         }
     }
 
-    fn named(name: &str) -> Option<Self> {
+    pub(crate) fn named(name: &str) -> Option<Self> {
         match name {
             USB => Some(Self::Usb),
             THUNDERBOLT => Some(Self::Thunderbolt),
@@ -126,7 +126,7 @@ impl Known {
     }
 }
 
-fn function(text: &str) -> Option<Function> {
+pub(crate) fn function(text: &str) -> Option<Function> {
     if text.len() != 6 {
         return None;
     }
@@ -138,7 +138,7 @@ fn function(text: &str) -> Option<Function> {
     })
 }
 
-fn plain(text: &str) -> String {
+pub(crate) fn plain(text: &str) -> String {
     text.chars()
         .map(|character| {
             if character.is_control() {

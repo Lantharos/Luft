@@ -7,6 +7,7 @@ pub use descriptors::Function;
 pub use events::{Event, Events};
 
 use crate::mode::Rules;
+use crate::sign_in::SignInDevices;
 use crate::trust::{Bus as Kind, Identity, Known, Trusted};
 use sysfs::{Bus, Device};
 
@@ -95,21 +96,26 @@ pub fn knows(id: &str, trusted: &Trusted) -> bool {
             .is_some_and(|(identity, port)| trusted.knows(&identity, &port))
 }
 
-/// Connects what `rules` let in of the device `id`, and says whether
-/// anything of it still waits.
-pub fn admit(id: &str, rules: Rules, trusted: &Trusted) -> Outcome {
+/// Connects what `rules` let in of the device `id`, and the part an enrolled
+/// security key or card reader signs in with, and says whether anything of
+/// it still waits.
+pub fn admit(id: &str, rules: Rules, trusted: &Trusted, sign_in: &SignInDevices) -> Outcome {
     let device = Device::named(id);
+    let Some(descriptors) = device.descriptors() else {
+        return Outcome::Connected;
+    };
+    let known = knows(id, trusted);
+    let enrolled = identity(id).filter(|identity| sign_in.signs_in(identity));
+    let approved = !rules.needs_approval(known);
     if !device.is_authorized() {
-        let Some(descriptors) = device.descriptors() else {
-            return Outcome::Connected;
-        };
         let functions: Vec<Function> = descriptors::functions(&descriptors).collect();
-        let known = knows(id, trusted);
-        if rules.needs_approval(known) {
-            return Outcome::WaitsForApproval;
-        }
-        if !rules.admits_device(known, &functions) {
-            return Outcome::WaitsForUnlock;
+        if enrolled.is_none() {
+            if !approved {
+                return Outcome::WaitsForApproval;
+            }
+            if !rules.admits_device(known, &functions) {
+                return Outcome::WaitsForUnlock;
+            }
         }
         device.authorize();
     }
@@ -122,9 +128,14 @@ pub fn admit(id: &str, rules: Rules, trusted: &Trusted) -> Outcome {
             continue;
         };
         let drive = interface.is_drive(function);
-        if rules.admits_part(function, drive) {
+        let signs_in = enrolled
+            .as_ref()
+            .is_some_and(|identity| sign_in.signs_in_with(identity, function));
+        if signs_in || (approved && rules.admits_part(function, drive)) {
             interface.authorize();
-        } else if rules.waits_for_unlock(function, drive) {
+        } else if !approved {
+            outcome = Outcome::WaitsForApproval;
+        } else if rules.waits_for_unlock(function, drive) && outcome == Outcome::Connected {
             outcome = Outcome::WaitsForUnlock;
         }
     }

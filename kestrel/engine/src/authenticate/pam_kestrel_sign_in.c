@@ -13,9 +13,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define METHOD_QUESTION "Sign in with (fingerprint/password): "
+#define METHOD_QUESTION "Sign in with (fingerprint/security-key/smart-card/recovery-key/password): "
 #define FINGERPRINT_QUESTION "Touch the fingerprint reader, or type password: "
 #define VERIFIED "kestrel-fingerprint-verified"
+#define METHOD "kestrel-sign-in-method"
 #define READY_TIMEOUT_MS 10000
 #define ROUND_MS 400
 
@@ -28,6 +29,14 @@ ask (pam_handle_t *handle,
   if (pam_prompt (handle, PAM_PROMPT_ECHO_ON, &answer, "%s", question) != PAM_SUCCESS)
     return NULL;
   return answer ? answer : strdup ("");
+}
+
+static void
+forget (pam_handle_t *handle,
+        void         *data,
+        int           status)
+{
+  free (data);
 }
 
 static bool
@@ -171,6 +180,11 @@ pam_sm_authenticate (pam_handle_t  *handle,
   answer = ask (handle, METHOD_QUESTION);
   if (!answer)
     return PAM_CONV_ERR;
+  if (pam_set_data (handle, METHOD, strdup (answer), forget) != PAM_SUCCESS)
+    {
+      free (answer);
+      return PAM_SERVICE_ERR;
+    }
   if (!answered (answer, "fingerprint"))
     return PAM_IGNORE;
 

@@ -1,0 +1,5 @@
+#%PAM-1.0
+auth       requisite   @pamdir@/pam_luft_sign_in.so password
+auth       substack    password-auth
+-auth      optional    @pamdir@/pam_luft_keyring.so
+account    include     password-auth

@@ -3,9 +3,11 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::mode::Mode;
+use crate::sign_in::SignInDevices;
 use crate::trust::Trusted;
 
 const STATE: &str = "var/lib/portguard";
+const SIGN_IN_DEVICES: &str = "var/lib/luft-sign-in/devices";
 const MODE: &str = "mode";
 const TRUSTED: &str = "trusted";
 
@@ -13,6 +15,7 @@ const TRUSTED: &str = "trusted";
 /// of the system, or of the one mounted at `root` before it starts.
 pub struct Store {
     folder: PathBuf,
+    sign_in: PathBuf,
 }
 
 impl Store {
@@ -23,6 +26,7 @@ impl Store {
     pub fn under(root: &Path) -> Self {
         Self {
             folder: root.join(STATE),
+            sign_in: root.join(SIGN_IN_DEVICES),
         }
     }
 
@@ -40,6 +44,12 @@ impl Store {
     pub fn trusted(&self) -> Trusted {
         fs::read_to_string(self.folder.join(TRUSTED))
             .map(|text| Trusted::parse(&text))
+            .unwrap_or_default()
+    }
+
+    pub fn sign_in_devices(&self) -> SignInDevices {
+        fs::read_to_string(&self.sign_in)
+            .map(|text| SignInDevices::parse(&text))
             .unwrap_or_default()
     }
 

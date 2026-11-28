@@ -25,6 +25,7 @@ fn send(handle: &Handle, password: Option<luft_keyring_wire::Secret>, reason: Gr
         send::grant(Grant {
             user,
             password,
+            token: handle.token(),
             reason,
         });
     }

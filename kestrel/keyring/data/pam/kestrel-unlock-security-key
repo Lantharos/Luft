@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth       required    @pamdir@/pam_luft_sign_in.so security-key
+-auth      optional    @pamdir@/pam_luft_keyring.so
+account    include     password-auth

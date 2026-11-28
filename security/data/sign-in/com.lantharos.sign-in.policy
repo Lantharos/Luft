@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Luft</vendor>
+  <vendor_url>https://github.com/Lantharos</vendor_url>
+
+  <action id="com.lantharos.sign-in.enroll">
+    <description>Sign in with a security key or smart card</description>
+    <message>Confirm it's you to sign in with this security key or smart card</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_self_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.sign-in.password-off">
+    <description>Stop signing in with a password</description>
+    <message>Confirm it's you to stop signing in with your password</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

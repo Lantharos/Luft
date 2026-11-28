@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use luft_keyring_vault::{
     Action, AuditLog, ChipWrap, Collection, Contents, Error, Header, Item, MasterKey, PasswordWrap,
-    Record, Secret, Stored,
+    Record, Secret, Stored, TokenWrap,
 };
 
 fn sample() -> Contents {
@@ -21,14 +21,20 @@ fn sample() -> Contents {
 }
 
 #[test]
-fn contents_come_back_only_with_the_master_key_through_either_wrap() {
+fn contents_come_back_only_with_the_master_key_through_any_wrap() {
     let folder = tempfile::tempdir().unwrap();
     let path = folder.path().join("vault");
     let key = MasterKey::generate().unwrap();
     let chip_key = [7; 32];
+    let token_secret = [9; 32];
     let header = Header {
         password: Some(PasswordWrap::create(&key, b"correct horse").unwrap()),
         chip: Some(ChipWrap::create(&key, &chip_key).unwrap()),
+        tokens: [(
+            "key".to_owned(),
+            TokenWrap::create(&key, &token_secret).unwrap(),
+        )]
+        .into(),
     };
     Stored::save(&path, &header, &key, &sample()).unwrap();
 
@@ -47,7 +53,8 @@ fn contents_come_back_only_with_the_master_key_through_either_wrap() {
         .unwrap()
         .open(&chip_key)
         .unwrap();
-    for key in [by_password, by_chip] {
+    let by_token = stored.header.tokens["key"].open(&token_secret).unwrap();
+    for key in [by_password, by_chip, by_token] {
         let item = &stored.open(&key).unwrap().collections[0].items[0];
         assert_eq!(item.secret.expose(), b"hunter2");
     }
@@ -58,6 +65,10 @@ fn contents_come_back_only_with_the_master_key_through_either_wrap() {
     ));
     assert!(matches!(
         stored.header.chip.as_ref().unwrap().open(&[8; 32]),
+        Err(Error::WrongKey)
+    ));
+    assert!(matches!(
+        stored.header.tokens["key"].open(&chip_key),
         Err(Error::WrongKey)
     ));
     assert!(matches!(
@@ -73,15 +84,12 @@ fn a_changed_header_no_longer_opens() {
     let key = MasterKey::generate().unwrap();
     let header = Header {
         password: Some(PasswordWrap::create(&key, b"pw").unwrap()),
-        chip: None,
+        ..Header::default()
     };
     Stored::save(&path, &header, &key, &sample()).unwrap();
 
     let mut bytes = std::fs::read(&path).unwrap();
-    let stripped = Header {
-        password: None,
-        chip: None,
-    };
+    let stripped = Header::default();
     let mut encoded = Vec::new();
     ciborium::into_writer(&stripped, &mut encoded).unwrap();
     let length = u32::from_le_bytes(bytes[9..13].try_into().unwrap()) as usize;

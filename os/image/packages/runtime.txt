@@ -69,6 +69,7 @@ libadwaita
 liberation-mono-fonts
 liberation-sans-fonts
 liberation-serif-fonts
+libfido2
 libgudev
 librsvg2
 libsoup3
@@ -87,7 +88,10 @@ nftables
 nss-mdns
 onnxruntime
 openconnect
+opensc
 pciutils
+pcsc-lite
+pcsc-lite-ccid
 pipewire
 pipewire-alsa
 pipewire-gstreamer

@@ -6,7 +6,8 @@ use std::sync::Arc;
 use tokio::sync::Notify;
 
 use luft_keyring_vault::{
-    AuditLog, ChipWrap, Contents, Error, Header, MasterKey, PasswordWrap, Record, Stored, now,
+    AuditLog, ChipWrap, Contents, Error, Header, MasterKey, PasswordWrap, Record, Stored,
+    TokenWrap, now,
 };
 
 use crate::requester::Requester;
@@ -87,6 +88,30 @@ impl Keyring {
             .is_some_and(|header| header.chip.is_some())
     }
 
+    pub fn token_wrap(&self, id: &str) -> Option<TokenWrap> {
+        self.header.as_ref()?.tokens.get(id).cloned()
+    }
+
+    /// Wraps the key for the security key or card `id`, and drops the wraps
+    /// of every one no longer `enrolled`.
+    pub fn keep_token_wraps(
+        &mut self,
+        id: &str,
+        secret: &[u8],
+        enrolled: &[String],
+    ) -> Result<(), Error> {
+        let header = self.header.as_ref().ok_or(Error::WrongKey)?;
+        let stale = header.tokens.keys().any(|known| !enrolled.contains(known));
+        if header.tokens.contains_key(id) && !stale {
+            return Ok(());
+        }
+        let wrap = TokenWrap::create(self.key().ok_or(Error::WrongKey)?, secret)?;
+        self.edit_header(|header| {
+            header.tokens.retain(|known, _| enrolled.contains(known));
+            header.tokens.insert(id.to_owned(), wrap);
+        })
+    }
+
     pub fn contents(&self) -> Option<&Contents> {
         self.unlocked.as_ref().map(|unlocked| &unlocked.contents)
     }
@@ -117,7 +142,7 @@ impl Keyring {
     ) -> Result<(), Error> {
         let header = Header {
             password: Some(password),
-            chip: None,
+            ..Header::default()
         };
         Stored::save(&self.paths.vault(), &header, &key, &contents)?;
         self.header = Some(header);

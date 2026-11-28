@@ -361,7 +361,7 @@ impl Protection {
     fn consider(&mut self, id: &str, announce: bool) -> Outcome {
         let outcome = match thunderbolt::named(id) {
             Some(name) => thunderbolt::admit(name, self.rules, &self.trusted),
-            None => usb::admit(id, self.rules, &self.trusted),
+            None => usb::admit(id, self.rules, &self.trusted, &self.store.sign_in_devices()),
         };
         if outcome != Outcome::WaitsForUnlock {
             self.held.remove(id);

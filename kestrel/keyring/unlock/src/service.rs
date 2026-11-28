@@ -156,8 +156,8 @@ impl Service {
             let mut users = self.users();
             let entry = users.entry(user).or_default();
             match &entry.listener {
-                Some((_, listener)) => Some(listener.clone()),
-                None => {
+                Some((_, listener)) if !listener.is_closed() => Some(listener.clone()),
+                _ => {
                     entry.pending = Some((grant, Instant::now()));
                     return;
                 }
@@ -172,13 +172,15 @@ impl Service {
         let Grant {
             user,
             password,
+            token,
             reason,
         } = grant;
-        if reason == GrantReason::PasswordChanged {
+        if matches!(reason, GrantReason::PasswordChanged | GrantReason::KeyAdded) {
             return Event::Unlock(Unlock {
                 reason,
                 key: None,
                 password,
+                token,
                 problem: None,
             });
         }
@@ -196,6 +198,7 @@ impl Service {
             reason,
             key,
             password,
+            token,
             problem,
         })
     }
@@ -217,6 +220,7 @@ impl Service {
             self.handoffs.waiting(user).then_some(Grant {
                 user,
                 password: None,
+                token: None,
                 reason: GrantReason::SignIn,
             })
         });

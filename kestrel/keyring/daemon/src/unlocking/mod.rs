@@ -9,7 +9,7 @@ use std::sync::atomic::Ordering;
 use std::time::Duration;
 
 use luft_keyring_vault::{ChipWrap, Contents, Error, MasterKey, PasswordWrap};
-use luft_keyring_wire::{Chip, Event, GrantReason, Problem, Reply, Request, Secret, Unlock};
+use luft_keyring_wire::{Chip, Event, GrantReason, Problem, Reply, Request, Secret, Token, Unlock};
 use tokio::sync::mpsc;
 use zeroize::Zeroizing;
 
@@ -63,6 +63,7 @@ impl Daemon {
             reason,
             key,
             password,
+            token,
             problem,
         } = unlock;
         if matches!(problem, Some(Problem::PolicyChanged | Problem::NotSealed)) {
@@ -80,31 +81,68 @@ impl Daemon {
             {
                 self.rewrap(&password).await;
             }
+            self.keep_token(token.as_ref()).await;
             self.signing_in.send_replace(false);
+            return;
+        }
+        if reason == GrantReason::KeyAdded {
             return;
         }
         if let Some(key) = &key
             && self.open_with_chip_key(key).await.is_ok()
         {
+            self.keep_token(token.as_ref()).await;
             self.unlocked_now(password).await;
             return;
+        }
+        if let Some(token) = &token {
+            match self.open_with_token(token).await {
+                Ok(()) => {
+                    self.keep_token(Some(token)).await;
+                    self.unlocked_now(password).await;
+                    return;
+                }
+                Err(error) => eprintln!(
+                    "The security key or card that signed in didn't open the keyring: {error}"
+                ),
+            }
         }
         if let Some(password) = &password
             && self.open_with_password(password.expose()).await.is_ok()
         {
+            self.keep_token(token.as_ref()).await;
             self.unlocked_now(None).await;
             return;
         }
         self.signing_in.send_replace(false);
         eprintln!("Signing in left the keyring locked: {problem:?}");
+        *self.waiting_token.lock().await = token;
         let daemon = self.clone();
         tokio::spawn(async move {
             match problem {
                 Some(Problem::NeedsPin) => daemon.ask_for_pin().await,
                 Some(Problem::PolicyChanged) => daemon.ask_for_password(Why::StartupChanged).await,
-                _ => daemon.ask_for_password(Why::FingerprintOnly).await,
+                _ => daemon.ask_for_password(Why::WithoutPassword).await,
             };
         });
+    }
+
+    async fn open_with_token(&self, token: &Token) -> Result<(), Error> {
+        let mut keyring = self.keyring.lock().await;
+        let wrap = keyring.token_wrap(&token.id).ok_or(Error::WrongKey)?;
+        let key = wrap.open(token.secret.expose())?;
+        keyring.install(key)
+    }
+
+    async fn keep_token(&self, token: Option<&Token>) {
+        let Some(token) = token else { return };
+        if let Err(error) = self.keyring.lock().await.keep_token_wraps(
+            &token.id,
+            token.secret.expose(),
+            &token.enrolled,
+        ) {
+            eprintln!("Couldn't let the security key or card unlock the keyring: {error}");
+        }
     }
 
     pub async fn ensure_unlocked(self: &Arc<Self>, requester: &Requester, insist: bool) -> bool {
@@ -183,6 +221,8 @@ impl Daemon {
     }
 
     pub async fn unlocked_now(self: &Arc<Self>, password: Option<Secret>) {
+        let waiting = self.waiting_token.lock().await.take();
+        self.keep_token(waiting.as_ref()).await;
         self.signing_in.send_replace(false);
         self.unlocked.send_replace(true);
         self.changed.notify_one();

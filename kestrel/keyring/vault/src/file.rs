@@ -6,7 +6,9 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
 
-use crate::{ChipWrap, Contents, Error, MasterKey, PasswordWrap, cipher};
+use std::collections::BTreeMap;
+
+use crate::{ChipWrap, Contents, Error, MasterKey, PasswordWrap, TokenWrap, cipher};
 
 const MAGIC: &[u8; 8] = b"LUFTKEYS";
 const VERSION: u8 = 1;
@@ -18,6 +20,8 @@ pub struct Header {
     pub password: Option<PasswordWrap>,
     #[serde(default)]
     pub chip: Option<ChipWrap>,
+    #[serde(default)]
+    pub tokens: BTreeMap<String, TokenWrap>,
 }
 
 pub struct Stored {

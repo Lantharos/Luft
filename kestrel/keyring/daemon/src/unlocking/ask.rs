@@ -20,7 +20,7 @@ enum PinOutcome {
 
 pub enum Why {
     App(String),
-    FingerprintOnly,
+    WithoutPassword,
     StartupChanged,
     PinLockedOut,
 }
@@ -32,7 +32,7 @@ impl Why {
         }
         match self {
             Self::App(app) => format!("{app} wants to use something you saved."),
-            Self::FingerprintOnly => "Your fingerprint can't unlock them on this computer, so your password is needed once.".into(),
+            Self::WithoutPassword => "Signing in without your password can't unlock them on this computer, so your password is needed once.".into(),
             Self::StartupChanged => "This computer's startup settings changed, so your password is needed once.".into(),
             Self::PinLockedOut => "There were too many wrong PINs. Enter your password instead.".into(),
         }

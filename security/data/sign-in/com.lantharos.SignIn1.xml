@@ -1,0 +1,71 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/SignIn1">
+  <!--
+    Signing in with security keys and smart cards, and turning password sign-in off.
+
+    Ways(uid): how an account signs in, best first, from "security-key", "smart-card",
+    "fingerprint" and "password". Password is listed last, and only while the account keeps it on or
+    has nothing else. Anyone may ask, so the login screen can open on the right way.
+
+    Everything else is about the caller's own account. Methods gives its security keys and smart
+    cards as (id, name), whether it chose to sign in with its password, and whether something else
+    could sign in instead. FindSecurityKey says whether a key that can sign in is plugged in,
+    whether it has a PIN and whether it checks fingerprints itself. AddSecurityKey makes a
+    credential on it, giving it the PIN first when it has none, and sends TouchSecurityKey(1) and
+    TouchSecurityKey(2) before the two touches it needs. FindSmartCard and AddSmartCard do the same
+    for the card in a reader. Adding asks polkit (com.lantharos.sign-in.enroll) to confirm it's
+    the caller.
+
+    SetPasswordSignIn(false) asks polkit (com.lantharos.sign-in.password-off) and fails with
+    NothingElse unless a security key, smart card or fingerprint can sign in instead. Removing the
+    last of them turns password sign-in back on.
+
+    Errors are under com.lantharos.SignIn1.Error: NotAuthorized, NoKey, NoCard, WrongPin, Blocked,
+    PinTooSimple, TimedOut, AlreadyEnrolled, NothingElse and Failed.
+  -->
+  <interface name="com.lantharos.SignIn1">
+    <method name="Ways">
+      <arg name="uid" type="u" direction="in"/>
+      <arg name="ways" type="as" direction="out"/>
+    </method>
+    <method name="Methods">
+      <arg name="security_keys" type="a(ss)" direction="out"/>
+      <arg name="smart_cards" type="a(ss)" direction="out"/>
+      <arg name="password" type="b" direction="out"/>
+      <arg name="can_turn_off_password" type="b" direction="out"/>
+    </method>
+    <method name="FindSecurityKey">
+      <arg name="found" type="b" direction="out"/>
+      <arg name="has_pin" type="b" direction="out"/>
+      <arg name="checks_fingerprints" type="b" direction="out"/>
+    </method>
+    <method name="AddSecurityKey">
+      <arg name="pin" type="s" direction="in"/>
+      <arg name="id" type="s" direction="out"/>
+    </method>
+    <method name="RemoveSecurityKey">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="FindSmartCard">
+      <arg name="found" type="b" direction="out"/>
+      <arg name="name" type="s" direction="out"/>
+    </method>
+    <method name="AddSmartCard">
+      <arg name="pin" type="s" direction="in"/>
+      <arg name="id" type="s" direction="out"/>
+    </method>
+    <method name="RemoveSmartCard">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="SetPasswordSignIn">
+      <arg name="allowed" type="b" direction="in"/>
+    </method>
+    <signal name="Changed">
+      <arg name="uid" type="u"/>
+    </signal>
+    <signal name="TouchSecurityKey">
+      <arg name="step" type="u"/>
+    </signal>
+  </interface>
+</node>

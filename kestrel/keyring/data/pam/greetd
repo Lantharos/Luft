@@ -1,6 +1,8 @@
 #%PAM-1.0
 auth       optional    pam_env.so
 auth       [success=ok ignore=ignore default=die]  @pamdir@/pam_kestrel_sign_in.so
+auth       [success=ok ignore=ignore default=die]  @pamdir@/pam_luft_sign_in.so
+auth       [success=2 default=ignore]  @pamdir@/pam_luft_sign_in.so verified
 auth       [success=1 default=ignore]  @pamdir@/pam_kestrel_sign_in.so verified
 auth       substack    password-auth
 -auth      optional    pam_kwallet5.so

@@ -1,0 +1,13 @@
+[Unit]
+Description=Signing in with security keys and smart cards, end to end
+Wants=greetd.service sign-in-authenticator.service
+ConditionKernelCommandLine=composefs
+After=greetd.service sign-in-authenticator.service luft-sign-in.socket pcscd.socket portguard.service kestrel-authenticate.socket
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/sign-in-check/check.py
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target

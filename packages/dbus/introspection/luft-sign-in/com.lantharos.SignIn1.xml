@@ -1,0 +1,46 @@
+<node>
+  <interface name="com.lantharos.SignIn1">
+    <method name="Ways">
+      <arg name="uid" type="u" direction="in"/>
+      <arg type="as" direction="out"/>
+    </method>
+    <method name="Methods">
+      <arg type="a(ss)" direction="out"/>
+      <arg type="a(ss)" direction="out"/>
+      <arg type="b" direction="out"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="FindSecurityKey">
+      <arg type="b" direction="out"/>
+      <arg type="b" direction="out"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="AddSecurityKey">
+      <arg name="pin" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="RemoveSecurityKey">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="FindSmartCard">
+      <arg type="b" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="AddSmartCard">
+      <arg name="pin" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="RemoveSmartCard">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="SetPasswordSignIn">
+      <arg name="allowed" type="b" direction="in"/>
+    </method>
+    <signal name="Changed">
+      <arg name="uid" type="u"/>
+    </signal>
+    <signal name="TouchSecurityKey">
+      <arg name="step" type="u"/>
+    </signal>
+  </interface>
+</node>

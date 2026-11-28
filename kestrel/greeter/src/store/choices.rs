@@ -4,6 +4,8 @@ use crate::error::Error;
 
 #[derive(Clone, Copy)]
 pub enum SignInMethod {
+    SecurityKey,
+    SmartCard,
     Fingerprint,
     Password,
 }
@@ -11,6 +13,8 @@ pub enum SignInMethod {
 impl SignInMethod {
     pub fn parse(name: &str) -> Result<Self, Error> {
         match name {
+            "security-key" => Ok(Self::SecurityKey),
+            "smart-card" => Ok(Self::SmartCard),
             "fingerprint" => Ok(Self::Fingerprint),
             "password" => Ok(Self::Password),
             _ => Err(Error::InvalidArgs(format!(
@@ -21,6 +25,8 @@ impl SignInMethod {
 
     pub fn name(self) -> &'static str {
         match self {
+            Self::SecurityKey => "security-key",
+            Self::SmartCard => "smart-card",
             Self::Fingerprint => "fingerprint",
             Self::Password => "password",
         }

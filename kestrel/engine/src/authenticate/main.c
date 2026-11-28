@@ -14,6 +14,9 @@
 
 #define PASSWORD_SERVICE "kestrel-unlock"
 #define FINGERPRINT_SERVICE "kestrel-unlock-fingerprint"
+#define LOCK_SCREEN_SERVICE "kestrel-unlock-screen"
+#define SECURITY_KEY_SERVICE "kestrel-unlock-security-key"
+#define SMART_CARD_SERVICE "kestrel-unlock-smart-card"
 #define SIGN_IN_FINGERPRINT_SERVICE "fingerprint-auth"
 
 typedef struct
@@ -146,6 +149,12 @@ service_for_mode (const char *mode)
     return PASSWORD_SERVICE;
   if (strcmp (mode, "fingerprint") == 0)
     return FINGERPRINT_SERVICE;
+  if (strcmp (mode, "lock-screen") == 0)
+    return LOCK_SCREEN_SERVICE;
+  if (strcmp (mode, "security-key") == 0)
+    return SECURITY_KEY_SERVICE;
+  if (strcmp (mode, "smart-card") == 0)
+    return SMART_CARD_SERVICE;
   return NULL;
 }
 

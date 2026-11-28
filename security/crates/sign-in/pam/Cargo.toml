@@ -1,0 +1,18 @@
+[package]
+name = "pam_luft_sign_in"
+description = "Signs people in with a security key, a smart card or their recovery key, and keeps passwords out when they turned them off"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+libc.workspace = true
+luft-keyring-wire.workspace = true
+luft-sign-in-wire.workspace = true
+
+[lints]
+workspace = true

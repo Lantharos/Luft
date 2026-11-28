@@ -1,0 +1,39 @@
+[package]
+name = "luft-sign-in"
+description = "Signs people in with security keys and smart cards, and keeps what they enrolled"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+base64.workspace = true
+cryptoki.workspace = true
+futures-util = { workspace = true, features = ["std"] }
+getrandom.workspace = true
+hkdf.workspace = true
+libc.workspace = true
+libloading.workspace = true
+luft-dbus = { workspace = true, features = ["service"] }
+luft-dbus-macros.workspace = true
+luft-keyring-wire.workspace = true
+luft-sign-in-wire.workspace = true
+p256 = { workspace = true, features = ["ecdh", "ecdsa", "pkcs8", "std"] }
+p384 = { workspace = true, features = ["ecdh", "ecdsa", "pkcs8", "std"] }
+portguard.workspace = true
+rsa = { workspace = true, features = ["encoding", "pkcs1v15", "std"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tokio = { workspace = true, features = ["macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
+x509-cert.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zeroize.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

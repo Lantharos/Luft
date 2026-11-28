@@ -1,0 +1,3 @@
+polkit.addRule(function (action, subject) {
+  if (action.id.indexOf("com.lantharos.sign-in.") === 0 && subject.user === "luft") return polkit.Result.YES;
+});

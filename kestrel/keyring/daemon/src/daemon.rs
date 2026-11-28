@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
-use luft_keyring_wire::Status;
+use luft_keyring_wire::{Status, Token};
 use tokio::sync::{Mutex, Notify, watch};
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
@@ -27,6 +27,7 @@ pub struct Daemon {
     pub prompting: Mutex<()>,
     pub signing_in: watch::Sender<bool>,
     pub reseal: AtomicBool,
+    pub waiting_token: Mutex<Option<Token>>,
     pub fingerprints: AtomicBool,
     pub unlocked: watch::Sender<bool>,
     pub screen_locked: AtomicBool,
@@ -52,6 +53,7 @@ impl Daemon {
             prompting: Mutex::new(()),
             signing_in: watch::Sender::new(false),
             reseal: AtomicBool::new(false),
+            waiting_token: Mutex::new(None),
             fingerprints: AtomicBool::new(false),
             unlocked: watch::Sender::new(false),
             screen_locked: AtomicBool::new(false),

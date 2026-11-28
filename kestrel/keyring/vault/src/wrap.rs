@@ -10,6 +10,7 @@ const PASSES: u32 = 3;
 const LANES: u32 = 4;
 const PASSWORD_CONTEXT: &[u8] = b"luft-keyring password wrap";
 const CHIP_CONTEXT: &[u8] = b"luft-keyring chip wrap";
+const TOKEN_CONTEXT: &[u8] = b"luft-keyring sign-in key wrap";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PasswordWrap {
@@ -76,6 +77,27 @@ impl ChipWrap {
 
     pub fn open(&self, chip_key: &[u8]) -> Result<MasterKey, Error> {
         let key = cipher::open(chip_key_array(chip_key)?, &self.sealed, CHIP_CONTEXT)
+            .ok_or(Error::WrongKey)?;
+        MasterKey::from_slice(&key)
+    }
+}
+
+/// The keyring's key wrapped by the secret a security key or smart card
+/// gives up only to its PIN or touch, named by the enrolment it belongs to.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TokenWrap {
+    sealed: Vec<u8>,
+}
+
+impl TokenWrap {
+    pub fn create(key: &MasterKey, secret: &[u8]) -> Result<Self, Error> {
+        Ok(Self {
+            sealed: cipher::seal(chip_key_array(secret)?, key.bytes(), TOKEN_CONTEXT),
+        })
+    }
+
+    pub fn open(&self, secret: &[u8]) -> Result<MasterKey, Error> {
+        let key = cipher::open(chip_key_array(secret)?, &self.sealed, TOKEN_CONTEXT)
             .ok_or(Error::WrongKey)?;
         MasterKey::from_slice(&key)
     }

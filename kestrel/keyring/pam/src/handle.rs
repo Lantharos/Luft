@@ -1,7 +1,7 @@
 use std::ffi::{CStr, c_char, c_int, c_void};
 use std::ptr;
 
-use luft_keyring_wire::Secret;
+use luft_keyring_wire::{Secret, TOKEN_STASH, Token, TokenStash};
 
 #[repr(C)]
 pub struct PamHandle {
@@ -62,6 +62,16 @@ impl Handle {
         let stash = unsafe { &*data.cast::<Stash>() }.clone();
         unsafe { pam_set_data(self.0, STASH.as_ptr(), ptr::null_mut(), None) };
         Some(stash)
+    }
+
+    pub fn token(&self) -> Option<Token> {
+        let mut data = ptr::null();
+        let found = unsafe { pam_get_data(self.0, TOKEN_STASH.as_ptr(), &raw mut data) };
+        if found != PAM_SUCCESS || data.is_null() {
+            return None;
+        }
+        let stash = unsafe { &*data.cast::<TokenStash>() };
+        Token::decode(unsafe { std::slice::from_raw_parts(stash.bytes, stash.length) })
     }
 
     pub fn uid(&self) -> Option<u32> {

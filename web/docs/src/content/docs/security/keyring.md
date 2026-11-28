@@ -13,12 +13,13 @@ Everything is in one file, `~/.local/share/luft-keyring/vault`, encrypted with X
 
 - by your password, with Argon2id at 64 MiB and three passes, which always works
 - with a TPM 2.0, by a key sealed to PCR 7 and PCR 15, optionally with a PIN
+- by a secret from each security key or smart card that signs in, which only the key after its PIN or the card gives up ([Security keys and smart cards](/security/sign-in/#unlocking-luft-keyring))
 
 While unlocked, the master key sits in locked memory that can't be dumped. Locking wipes it and every secret.
 
 ## Unlocking
 
-Only after the system's sign-in rules succeed does `pam_luft_keyring.so` tell the unlock service, which hands the TPM key only to your own `luft-keyring`: the installed program, in your user manager's unit, not traced, checked through a pidfd. That's how a fingerprint unlocks the keyring at the login screen and the lock screen alike. Without a TPM, or with a PIN, the keyring asks for the password or PIN once after you sign in.
+Only after the system's sign-in rules succeed does `pam_luft_keyring.so` tell the unlock service, which hands the TPM key only to your own `luft-keyring`: the installed program, in your user manager's unit, not traced, checked through a pidfd. That's how a fingerprint unlocks the keyring at the login screen and the lock screen alike. Without a TPM, or with a PIN, the keyring asks for the password or PIN once after you sign in with a fingerprint, while a security key or smart card unlocks it through its own wrap.
 
 PCR 7 ties the seal to the Secure Boot state and PCR 15 to this installation: with [device encryption](/security/encryption/), the disk's volume key is measured into PCR 15 at every start, so another system the firmware would start, even a signed one, can't unseal it. Kernel and Luft updates change neither, so they never cost a password prompt; a changed Secure Boot state means typing your password once. Without device encryption, PCR 15 only holds values another system could read off the disk and measure itself, so the seal rests on Secure Boot alone. Rescue and any shell that opens without a password extend PCR 15 first, so the seal stays closed there.
 

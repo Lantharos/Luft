@@ -68,6 +68,7 @@ Checks of single parts live in a `vm` folder next to their code and share `os/vm
 | `security/vm/encryption/run.sh` | On an installed drive with Secure Boot and a TPM, a policy that requires encryption has Luft encrypt itself from the next restart, unlocked by the TPM | 20 min |
 | `security/vm/firewall/run.sh` | Network types, per-app and per-program decisions, extension ports, other tables kept, across a restart | 3 min |
 | `security/vm/remote-login/run.sh` | Off by default, who may turn it on and sign in, penalties, going back to an older system, a policy that keeps it off or allows only keys | 2.5 min |
+| `security/vm/sign-in/run.sh` | Enrolling a software FIDO2 key and QEMU's emulated smart card, signing in with each through greetd with the password off, the keyring unlocking without a TPM, wrong PINs, taking the card out, and the reader held back while locked until it's enrolled | 12 min |
 | `security/vm/usb/run.sh` | Only known devices with sticks plugged into other ports, approval, No USB drives, and a stick plugged in before start | 6 min |
 | `services/locksmith/vm/run.sh` | A changed policy reaching a running session's locked settings, keeping accounts from being added, automatic sign-in and required encryption | 2 min |
 | `services/crashes/vm/run.sh` | Core dumps and panics become reports for the first person who asks | 1.5 min |

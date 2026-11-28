@@ -1,6 +1,6 @@
 ---
 title: D-Bus interfaces
-description: How Luft's services name their errors, and the interfaces Kestrel, Post, the keyring and the password service offer to apps.
+description: How Luft's services name their errors, and the interfaces Kestrel, Post, the keyring, the password service and sign-in offer to apps.
 sidebar:
   order: 6
 ---
@@ -80,3 +80,7 @@ A new kind of data for the keyring gets its own place in the vault's `Contents`,
 `com.lantharos.Password1` at `/com/lantharos/Password1` on the system bus changes the caller's own password, for people in an active session at the computer: `ChangePassword(h current, h new)`, both through file descriptors. It checks the new password against the system's rules, then runs the `kestrel-password` PAM rules, which need the current password and lock Luft Keyring with the new one in the same step. It answers `WrongPassword`, `TooWeak` with the broken rule as its message (`too-short`, `too-similar`, `dictionary-word`, `contains-name`, `too-simple` or `rejected`), or `Failed`.
 
 It runs as `kestrel-password.service`, which D-Bus starts for the call and which quits half a minute later, so the login screen's own settings service has no way to write `/etc`.
+
+## Signing in
+
+`com.lantharos.SignIn1` at `/com/lantharos/SignIn1` on the system bus is `luft-sign-in`, which keeps security keys and smart cards ([Security keys and smart cards](/security/sign-in/)). `Ways(u uid)` lists how an account signs in, best first, for anyone. The rest is about the caller's own account: `Methods` lists its keys and cards as `(id, name)`, whether it signs in with its password and whether it could turn that off; `FindSecurityKey`, `AddSecurityKey(s pin)`, `RemoveSecurityKey(s id)`, `FindSmartCard`, `AddSmartCard(s pin)`, `RemoveSmartCard(s id)` and `SetPasswordSignIn(b allowed)` change them. `TouchSecurityKey(u step)` says when adding waits for a touch, and `Changed(u uid)` follows every change. Errors are `NotAuthorized`, `NoKey`, `NoCard`, `WrongPin`, `Blocked`, `PinTooSimple`, `TimedOut`, `AlreadyEnrolled`, `NothingElse` and `Failed`.

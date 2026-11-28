@@ -12,6 +12,13 @@ asks:
   - { ask: show recovery key, to: device-encryption }
   - { ask: tpm pin, to: device-encryption }
   - { ask: encrypt usb drive, to: encrypting-other-drives }
+  - { ask: yubikey, to: security-keys-and-smart-cards }
+  - { ask: security key login, to: security-keys-and-smart-cards }
+  - { ask: fido2, to: security-keys-and-smart-cards }
+  - { ask: smart card login, to: security-keys-and-smart-cards }
+  - { ask: company badge, to: security-keys-and-smart-cards }
+  - { ask: turn off password, to: turning-off-the-password }
+  - { ask: lost security key, to: turning-off-the-password }
   - { ask: auto login, to: signing-in-automatically }
   - { ask: login without password, to: signing-in-automatically }
   - { ask: usb not working when locked, to: usb-protection }
@@ -68,7 +75,26 @@ An organization can require encryption. With a TPM, Luft then turns it on by its
 
 ## Luft Keyring
 
-Your passwords, sign-in tokens and keys live in Luft Keyring, encrypted in one file. Signing in unlocks it, with your password or a fingerprint, and it locks with the screen if you like. [Keyring](/files/keyring/) explains how apps get access.
+Your passwords, sign-in tokens and keys live in Luft Keyring, encrypted in one file. Signing in unlocks it, with your password, a fingerprint, a security key or a smart card, and it locks with the screen if you like. [Keyring](/files/keyring/) explains how apps get access.
+
+## Security keys and smart cards
+
+You can sign in and unlock with a FIDO2 security key, such as a YubiKey, or with a smart card in a card reader, such as a company badge. Add them in Settings, under Accounts → **Security keys and smart cards**:
+
+- **Add a security key** asks you to plug it in and type its PIN, or choose one if it has none, then to touch it twice. A key with its own fingerprint reader asks for your finger instead of a PIN.
+- **Add a smart card** asks you to insert the card and type its PIN.
+
+The login screen and the lock screen then open on the key or card: type its PIN, and touch the key when it asks. The links below the field switch to your password or fingerprint. Taking the card out locks the screen. Badges that only type a number, like many door badges, can't sign in: anyone could copy that number.
+
+Signing in this way unlocks [Luft Keyring](#luft-keyring) as your password does, also on a computer without a TPM, once you've used the key or card one time while the keyring was open.
+
+While the computer is locked or at the login screen, [USB protection](#usb-protection) lets your key or reader connect, but only the part that signs you in, and only when it's the exact model you added.
+
+### Turning off the password
+
+Once a security key, smart card or fingerprint can sign you in, you can turn off **Sign in with your password** in the same place. The login and lock screens then don't take your password any more, even from someone who saw you type it. Your password still exists: you use it for administrator prompts, and to turn password sign-in back on.
+
+You can't lock yourself out this way. If you remove the last key, card or fingerprint, the password signs in again by itself. If you lose them, choose **Lost your key?** at the login screen and type your [recovery key](#device-encryption): password sign-in turns back on, and you sign in with your password. Without device encryption there's no recovery key, so start **Rescue** from the boot menu and run `/usr/libexec/luft-sign-in allow-password NAME`, with your account's name.
 
 ## Signing in automatically
 
@@ -83,7 +109,7 @@ Settings, under Security, **USB devices** chooses how new USB devices are treate
 - **Only known devices** trusts what's plugged in when you choose it, each in the port it's in. A new device, or a known one in another port, stays disconnected until an administrator types their password to allow it, so a gadget can't type that password itself. Parts of the computer itself, such as a laptop's camera, fingerprint reader and Bluetooth, always work. **Known devices** lists what's trusted, with **Forget** for each, and **Allow** for devices that wait. This also covers devices plugged in before the computer starts, and Thunderbolt docks.
 - **Allow all** lets every device connect right away.
 
-Each choice except Allow all still holds devices back while locked. Devices already connected keep working when you change it, and changing it needs an administrator.
+Each choice except Allow all still holds devices back while locked, except the security keys and card readers someone signs in with, which connect the part that signs in. Devices already connected keep working when you change it, and changing it needs an administrator.
 
 If your only keyboard isn't known any more, for example because you moved it to another port, put it back where it was, or start **Rescue** from the boot menu: it asks for the recovery key and holds no device back ([Rescue](/system/recovery/#rescue)).
 

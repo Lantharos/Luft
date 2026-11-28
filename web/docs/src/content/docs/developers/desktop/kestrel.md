@@ -18,7 +18,7 @@ The login screen starts `kestrel-session`, which runs `kestrel-session.target` a
 | `kestrel-search` | Indexes the names and text of files in your home folder for Gust, at idle priority |
 | `kestrel-portal` | The portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown; its dialogs open in Kestrel |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
-| `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
+| `kestrel-authenticate` | Checks lock screen passwords, fingerprints, security keys and smart cards through the `kestrel-unlock` PAM rules ([Security keys and smart cards](/security/sign-in/)) |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([When Luft can't start](/developers/system/recovery/#hung-graphics)) |
 | `kestrel-wallpaper` | Plays live wallpapers |
 

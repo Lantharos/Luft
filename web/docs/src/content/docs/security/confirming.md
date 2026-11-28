@@ -23,7 +23,7 @@ Prompts name an app only by what can be checked: a sandboxed app by its sandbox'
 
 ## Signing in and unlocking
 
-At the login screen, greetd's PAM rules start with `pam_kestrel_sign_in.so`, which asks the login screen how this person signs in. For a fingerprint it runs the system's `fingerprint-auth` rules in `kestrel-authenticate --fingerprint`, and typing a password stops the reader at once. Otherwise, or once the reader gives up, `password-auth` asks for the password. Exactly one of the two decides, followed by the usual account, keyring and session rules. On the lock screen too, results from fprintd only change what the prompt shows; only the PAM rules let anyone in.
+At the login screen, greetd's PAM rules start with `pam_kestrel_sign_in.so`, which asks the login screen how this person signs in. For a fingerprint it runs the system's `fingerprint-auth` rules in `kestrel-authenticate --fingerprint`, and typing a password stops the reader at once. For a security key or smart card, `pam_luft_sign_in.so` asks `luft-sign-in` ([Security keys and smart cards](/security/sign-in/)). Otherwise, or once the reader gives up, `password-auth` asks for the password, unless the person turned password sign-in off. Exactly one decides, followed by the usual account, keyring and session rules. On the lock screen too, results from fprintd only change what the prompt shows; only the PAM rules let anyone in.
 
 ## What asks
 

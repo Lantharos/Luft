@@ -38,7 +38,7 @@ Sushi waits for a key, passphrase or PIN as long as it takes, and a wrong one as
 
 systemd's stub hands the startup image whatever lies next to it on the startup partition: credentials, and system and configuration extensions. That partition isn't encrypted, and the stub measures those files into PCR 12 and 13, which the disk's token isn't bound to. Luft puts nothing there, so when anything arrives, `luft-added-files.service` in the startup image extends PCR 11 and 15 before the disk is unlocked. The TPM then releases neither the disk key nor the keyring's, and the disk asks for its recovery key or passphrase.
 
-Hibernation is off: the kernel is locked down, swap is compressed memory only, and the startup image has no resume support, so nothing unencrypted is written out when the computer sleeps.
+Hibernation is off: the kernel is locked down and the startup image has no resume support, so nothing unencrypted is written out when the computer sleeps. Swap files live inside the encryption, and a drive without it gets no swap at all, as [Memory and swap](/developers/system/memory/#swap) explains.
 
 ## Older signed startup images
 

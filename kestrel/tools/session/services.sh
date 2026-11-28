@@ -73,6 +73,16 @@ stand_in_power_button() {
   export LUFT_INPUT_ROOT="$input"
 }
 
+stand_in_cgroups() {
+  local cgroups="$session/cgroups" manager
+  manager="$(sed -n 's|^0::/\(.*/user@[0-9]*\.service\).*|\1|p' /proc/self/cgroup)"
+  rm -rf "$cgroups"
+  mkdir -p "$cgroups/$manager/session.slice/kestrel.service" "$cgroups/$manager/app.slice"
+  echo $((6 << 30)) > "$cgroups/$manager/memory.low"
+  echo $((1 << 30)) > "$cgroups/$manager/session.slice/memory.low"
+  export LUFT_CGROUP_ROOT="$cgroups"
+}
+
 printer_ready() {
   [[ "$(lpstat -d)" == *Office* ]]
 }
@@ -102,8 +112,9 @@ wait_until "the sound server" test -S "$PULSE_RUNTIME_PATH/native"
 start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready
 stand_in_power_button
+stand_in_cgroups
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
-  --modules a11y,housekeeping,keyboard,network-type,night-light,power,printers,remote-login,sound,timezone,watchdog,xsettings
+  --modules a11y,housekeeping,keyboard,memory,network-type,night-light,power,printers,remote-login,sound,timezone,watchdog,xsettings
 gdbus wait --session --timeout 10 com.lantharos.Settings
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$root/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search

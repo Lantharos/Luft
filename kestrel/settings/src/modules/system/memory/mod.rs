@@ -21,8 +21,8 @@ use pressure::Trigger;
 use protection::Protection;
 use windows::{Label, Window};
 
-const BUILDING_STALL: Duration = Duration::from_millis(50);
-const BUILDING_WINDOW: Duration = Duration::from_secs(1);
+const BUILDING_STALL: Duration = Duration::from_millis(100);
+const BUILDING_WINDOW: Duration = Duration::from_secs(2);
 const CALM_AFTER: Duration = Duration::from_secs(30);
 const BETWEEN_WARNINGS: Duration = Duration::from_secs(120);
 const WARNING_HOLDS: Duration = Duration::from_secs(10 * 60);

@@ -181,8 +181,11 @@ devices() {
   [[ -z "${KERNEL:-}" ]] || extras+=(-kernel "$KERNEL" -initrd "$INITRD" -append "$APPEND")
   serial=(-chardev "socket,id=serial,path=$sockets/serial.sock,server=on,wait=off,logfile=${SERIAL:-$vm/serial.log},logappend=off"
     -serial chardev:serial)
-  display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
-  [[ "${HEADLESS:-0}" == 1 ]] && display=(-display none)
+  if [[ "${HEADLESS:-0}" == 1 ]]; then
+    display=(-display none)
+  else
+    display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
+  fi
 }
 
 start_tpm() {

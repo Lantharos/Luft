@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Lock from '@luft/symbols/icons/lock';
 	import Wifi from '@luft/symbols/icons/wifi';
-	import WifiHigh from '@luft/symbols/icons/wifi-high';
 	import WifiLow from '@luft/symbols/icons/wifi-low';
 	import WifiZero from '@luft/symbols/icons/wifi-zero';
 	import { t } from '@luft/i18n';
@@ -19,7 +18,7 @@
 	let { network, open, problem, onchoose, onjoin }: Props = $props();
 	let password = $state('');
 
-	const SIGNAL_ICONS: Record<SignalLevel, typeof Wifi> = { excellent: Wifi, good: WifiHigh, ok: WifiLow, weak: WifiZero, none: WifiZero };
+	const SIGNAL_ICONS: Record<SignalLevel, typeof Wifi> = { excellent: Wifi, good: Wifi, ok: WifiLow, weak: WifiZero, none: WifiZero };
 
 	let Signal = $derived(SIGNAL_ICONS[signalLevel(network.strength)]);
 	let statusId = $derived({ connected: 'setup-network-connected', connecting: 'setup-network-connecting', disconnected: network.joined ? 'setup-network-saved' : '', unplugged: '' }[network.state]);

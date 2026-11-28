@@ -16,6 +16,7 @@ pub struct StyleChoice {
     window: (f64, f64),
     coordinates: Option<(f64, f64)>,
     rounded_corners: bool,
+    fluted_lock_screen: bool,
 }
 
 impl StyleChoice {
@@ -25,6 +26,7 @@ impl StyleChoice {
         window: (f64, f64),
         coordinates: (f64, f64),
         rounded_corners: bool,
+        fluted_lock_screen: bool,
     ) -> Result<Self, Error> {
         let style = Style::parse(style)?;
         let hour = |value: f64| (0.0..=24.0).contains(&value);
@@ -53,11 +55,16 @@ impl StyleChoice {
             window,
             coordinates,
             rounded_corners,
+            fluted_lock_screen,
         })
     }
 
     pub fn rounded_corners(&self) -> bool {
         self.rounded_corners
+    }
+
+    pub fn fluted_lock_screen(&self) -> bool {
+        self.fluted_lock_screen
     }
 
     pub fn now(&self) -> (Style, Option<Duration>) {

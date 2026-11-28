@@ -260,12 +260,20 @@ impl Greeter {
         window: (f64, f64),
         coordinates: (f64, f64),
         rounded_corners: bool,
+        fluted_lock_screen: bool,
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        let style = StyleChoice::new(&style, schedule, window, coordinates, rounded_corners)?;
+        let style = StyleChoice::new(
+            &style,
+            schedule,
+            window,
+            coordinates,
+            rounded_corners,
+            fluted_lock_screen,
+        )?;
         let uid = access::caller_uid(connection, &header).await?;
         let _writing = self.writing.lock().await;
         Ok(self.store.save_user_style(uid, &style)?)
@@ -276,7 +284,7 @@ impl Greeter {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         uid: u32,
-    ) -> Result<(String, u32, bool), Error> {
+    ) -> Result<(String, u32, bool, bool), Error> {
         let _active = self.idle.hold();
         self.access.authorize_greeter(connection, &header).await?;
         let choice = self.store.user_style(uid);
@@ -287,7 +295,13 @@ impl Greeter {
             u32::try_from(change.as_secs() + 1).expect("changes come within a day")
         });
         let rounded_corners = choice.as_ref().is_none_or(StyleChoice::rounded_corners);
-        Ok((style.name().into(), seconds, rounded_corners))
+        let fluted_lock_screen = choice.as_ref().is_some_and(StyleChoice::fluted_lock_screen);
+        Ok((
+            style.name().into(),
+            seconds,
+            rounded_corners,
+            fluted_lock_screen,
+        ))
     }
 
     async fn set_shared_wallpaper(

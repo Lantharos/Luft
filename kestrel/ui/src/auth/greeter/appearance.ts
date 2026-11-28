@@ -45,18 +45,18 @@ function focusOf(details: Gio.File): GLib.Variant {
   }
 }
 
-type LoginStyle = [style: string, secondsUntilChange: number, roundedCorners: boolean];
+type LoginStyle = [style: string, secondsUntilChange: number, roundedCorners: boolean, flutedLockScreen: boolean];
 
 function currentStyle(uid: number): Promise<LoginStyle> {
   return new Promise(resolve => Gio.DBus.system.call(
     'com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'com.lantharos.Greeter1', 'CurrentStyle',
-    new GLib.Variant('(u)', [uid]), new GLib.VariantType('(sub)'), Gio.DBusCallFlags.NONE, STYLE_TIMEOUT, null,
+    new GLib.Variant('(u)', [uid]), new GLib.VariantType('(subb)'), Gio.DBusCallFlags.NONE, STYLE_TIMEOUT, null,
     (connection, result) => {
       try {
         resolve(connection!.call_finish(result).deepUnpack<LoginStyle>());
       } catch (error) {
         console.warn(`The login screen style is unknown: ${error}`);
-        resolve(['dark', 0, true]);
+        resolve(['dark', 0, true, false]);
       }
     }));
 }
@@ -93,10 +93,11 @@ export class LoginAppearance {
     });
     if (!style) {
       this.kestrel.reset('rounded-window-corners');
+      this.kestrel.reset('lock-screen-fluted');
       return;
     }
-    const [name, secondsUntilChange, roundedCorners] = style;
-    this.showStyle(name, roundedCorners);
+    const [name, secondsUntilChange, roundedCorners, flutedLockScreen] = style;
+    this.showStyle(name, roundedCorners, flutedLockScreen);
     if (secondsUntilChange) this.styleChange = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, secondsUntilChange, () => {
       this.styleChange = 0;
       void this.showWallpaperOf(uid);
@@ -119,10 +120,11 @@ export class LoginAppearance {
     this.background.apply();
   }
 
-  private showStyle(style: string, roundedCorners: boolean): void {
+  private showStyle(style: string, roundedCorners: boolean, flutedLockScreen: boolean): void {
     const scheme = style === 'light' ? 'default' : 'prefer-dark';
     if (this.interfaceSettings.get_string('color-scheme') !== scheme) this.interfaceSettings.set_string('color-scheme', scheme);
     if (this.kestrel.get_boolean('rounded-window-corners') !== roundedCorners) this.kestrel.set_boolean('rounded-window-corners', roundedCorners);
+    if (this.kestrel.get_boolean('lock-screen-fluted') !== flutedLockScreen) this.kestrel.set_boolean('lock-screen-fluted', flutedLockScreen);
   }
 
   wallpaperSampled(samples: Rgb[]): void {

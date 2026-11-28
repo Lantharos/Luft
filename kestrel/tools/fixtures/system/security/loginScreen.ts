@@ -20,6 +20,7 @@ const GREETER = `<node><interface name="com.lantharos.Greeter1">
   <method name="SetStyle">
     <arg name="style" type="s" direction="in"/><arg name="schedule" type="s" direction="in"/><arg name="window" type="(dd)" direction="in"/>
     <arg name="coordinates" type="(dd)" direction="in"/><arg name="rounded_corners" type="b" direction="in"/>
+    <arg name="fluted_lock_screen" type="b" direction="in"/>
   </method>
   <method name="SetDeveloperTools"><arg name="on" type="b" direction="in"/></method>
 </interface></node>`;

@@ -20,7 +20,7 @@ export class LoginWallpaper {
     this.signals = [
       ...watch(this.background, ['picture-uri', 'picture-uri-dark']),
       ...watch(this.interfaceSettings, ['color-scheme']),
-      ...watch(this.kestrel, ['wallpaper-focus', 'wallpaper-focus-dark', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'rounded-window-corners']),
+      ...watch(this.kestrel, ['wallpaper-focus', 'wallpaper-focus-dark', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'rounded-window-corners', 'lock-screen-fluted']),
       ...watch(this.nightLight, ['last-coordinates']),
     ];
     this.schedule();
@@ -45,7 +45,8 @@ export class LoginWallpaper {
     const window: [number, number] = [this.kestrel.get_double('dark-schedule-from'), this.kestrel.get_double('dark-schedule-to')];
     const place = schedule === 'sunset' ? this.nightLight.get_value('last-coordinates').deepUnpack<[number, number]>() : UNKNOWN_PLACE;
     const roundedCorners = this.kestrel.get_boolean('rounded-window-corners');
-    tellLoginScreen('SetStyle', new GLib.Variant('(ss(dd)(dd)b)', [style, schedule, window, place, roundedCorners]), 'login-style', 'style');
+    const flutedLockScreen = this.kestrel.get_boolean('lock-screen-fluted');
+    tellLoginScreen('SetStyle', new GLib.Variant('(ss(dd)(dd)bb)', [style, schedule, window, place, roundedCorners, flutedLockScreen]), 'login-style', 'style');
   }
 
   destroy(): void {

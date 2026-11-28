@@ -40,15 +40,16 @@ require(!Gio.File.new_for_path(`${folder}/wallpaper-dark.jpg`).query_exists(null
 
 const hour = new Date().getUTCHours();
 const uid = new Gio.Credentials().get_unix_user();
-const currentStyle = () => call('CurrentStyle', new GLib.Variant('(u)', [uid]))[0].deepUnpack<[string, number, boolean]>();
-const [, , roundedBeforeChoosing] = currentStyle();
-require(roundedBeforeChoosing, 'someone who never chose a style gets rounded corners on the login screen');
-call('SetStyle', new GLib.Variant('(ss(dd)(dd)b)', ['light', 'custom', [(hour + 23) % 24, (hour + 1) % 24], [91, 181], false]));
-const [style, secondsUntilChange, rounded] = currentStyle();
+const currentStyle = () => call('CurrentStyle', new GLib.Variant('(u)', [uid]))[0].deepUnpack<[string, number, boolean, boolean]>();
+const [, , roundedBeforeChoosing, flutedBeforeChoosing] = currentStyle();
+require(roundedBeforeChoosing && !flutedBeforeChoosing, 'someone who never chose a style gets rounded corners and frosted glass on the login screen');
+call('SetStyle', new GLib.Variant('(ss(dd)(dd)bb)', ['light', 'custom', [(hour + 23) % 24, (hour + 1) % 24], [91, 181], false, true]));
+const [style, secondsUntilChange, rounded, fluted] = currentStyle();
 require(style === 'dark' && secondsUntilChange > 0 && secondsUntilChange <= 3600,
   'the login screen follows the dark style schedule and knows when it changes next');
 require(!rounded, 'the login screen keeps square corners for someone who chose them');
-call('SetStyle', new GLib.Variant('(ss(dd)(dd)b)', ['dark', 'off', [0, 0], [91, 181], true]));
+require(fluted, 'the login screen shows fluted glass for someone who chose it');
+call('SetStyle', new GLib.Variant('(ss(dd)(dd)bb)', ['dark', 'off', [0, 0], [91, 181], true, false]));
 
 const user = GLib.get_user_name();
 call('SetHiddenUsers', new GLib.Variant('(as)', [[user]]));

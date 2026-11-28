@@ -53,6 +53,7 @@ interface App {
   title: string;
   unit: string;
   process: Process;
+  windows: Meta.Window[];
   window: Meta.Window;
 }
 
@@ -63,7 +64,7 @@ async function open(titles: string[], unit: string, gigabytes: number, command: 
   write(cgroupPath('app.slice', unit, 'memory.swap.current'), '0\n');
   write(cgroupPath('app.slice', unit, 'cgroup.procs'), `${windows.map(window => window.get_pid()).join('\n')}\n`);
   write(cgroupPath('app.slice', unit, 'cgroup.kill'), '');
-  return {title: titles.at(-1)!, unit, process, window: windows.at(-1)!};
+  return {title: titles.at(-1)!, unit, process, windows, window: windows.at(-1)!};
 }
 
 const client = (title: string, appId: string) => ['python3', fixture('clients', 'wayland', 'namedClient.py'), title, appId];
@@ -97,7 +98,9 @@ function hangUntil(done: () => boolean): boolean {
 }
 
 async function close(app: App) {
+  await spawn(['systemctl', '--user', 'stop', app.unit]).exited;
   await stop(app.process);
+  await eventually(() => app.windows.every(window => !global.display.list_all_windows().includes(window)), `${app.title} closes`);
   if (exists(cgroupPath('app.slice', app.unit))) removeTree(cgroupPath('app.slice', app.unit));
 }
 
@@ -105,7 +108,8 @@ async function checkProtection(systemd: Systemd, game: App, notes: App) {
   const keeps = (unit: string, bytes: number) => systemd.kept.get(unit) === bytes;
   game.window.activate(global.get_current_time());
   game.window.make_fullscreen();
-  await eventually(() => keeps('app.slice', BUDGET) && keeps(game.unit, BUDGET), 'the focused game\'s memory is kept, up to what the desktop leaves over');
+  await eventually(() => game.window.is_fullscreen() && keeps('app.slice', BUDGET) && keeps(game.unit, BUDGET),
+    'the focused game\'s memory is kept, up to what the desktop leaves over');
   notes.window.activate(global.get_current_time());
   await eventually(() => notes.window.has_focus(), 'another app takes the focus');
   require(keeps(game.unit, BUDGET) && !systemd.kept.has(notes.unit), 'a fullscreen game keeps its memory while something else has the focus');
@@ -113,7 +117,8 @@ async function checkProtection(systemd: Systemd, game: App, notes: App) {
   await eventually(() => keeps(notes.unit, BUDGET) && keeps(game.unit, 0), 'out of fullscreen, the protection moves to the focused app');
   game.window.activate(global.get_current_time());
   game.window.make_fullscreen();
-  await eventually(() => keeps(game.unit, BUDGET) && keeps(notes.unit, 0), 'and back to the game when it fills the screen again');
+  await eventually(() => game.window.is_fullscreen() && keeps(game.unit, BUDGET) && keeps(notes.unit, 0),
+    'and back to the game when it fills the screen again');
 }
 
 async function checkClosingOrder(game: App, notes: App, chat: App) {
@@ -146,7 +151,7 @@ export async function run() {
   const apps: App[] = [];
   try {
     const game = await open(['Stand-in Steam', 'Harbour Run'], scope('steam'), 4, ['sh', '-c', `python3 ${fixture('clients', 'wayland', 'namedClient.py')} 'Stand-in Steam' steam & exec python3 -c '${BALLAST}' "$@"`,
-      'sh', fixture('clients', 'wayland', 'namedClient.py'), 'Harbour Run', 'steam_app_12345']);
+      'sh', fixture('clients', 'wayland', 'namedClient.py'), 'Harbour Run', 'steam_app_70001']);
     apps.push(game);
     apps.push(await open(['Notes'], scope('notes'), 2, client('Notes', 'notes')));
     apps.push(await open(['Chat'], scope('chat'), 1, client('Chat', 'chat')));

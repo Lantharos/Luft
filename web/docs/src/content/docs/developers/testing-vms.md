@@ -49,7 +49,7 @@ Disks, startup, installing and system services are tested in QEMU VMs from `os/v
 
 | Command | Does |
 | --- | --- |
-| `os/vm/disk.sh [IMAGE]` | Installs a sealed image, by default `localhost/luft:45`, onto `os/vm/state/disk.qcow2` with the image's own installer. The account `luft` gets the password in `VM_PASSWORD`, `luft-vm` without it, which is also root's on the serial console and the code for adding Luft's key on shim's blue screen. `VM_ENCRYPTED=1` encrypts Luft with that password as its passphrase, typed at every start |
+| `os/vm/disk.sh [IMAGE]` | Installs a sealed image, by default `localhost/luft:45`, onto `os/vm/state/disk.qcow2` with the image's own installer. The account `luft` gets the password in `VM_PASSWORD`, `luft-vm` without it, which is also root's on the serial console and the code for adding Luft's key on shim's blue screen. `VM_ENCRYPTED=1` encrypts Luft with `VM_PASSPHRASE`, `luft-vm-disk` without it, typed at every start |
 | `os/vm/qemu.sh` | Starts a VM; `--help` lists options such as `SECURE_BOOT=1`, `TPM=0`, `ISO=`, extra drives and `HEADLESS=1` |
 | `os/vm/control.py` | Screenshots, keys, clicks and root commands over the serial console of a running VM, and `enroll` on shim's blue screen |
 | `os/vm/check.py session` | Starts the installed VM with Secure Boot, adds Luft's key, signs in, checks that Kestrel and its services stay up, and opens Settings |

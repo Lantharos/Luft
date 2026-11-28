@@ -20,12 +20,12 @@ place 755 "$here/hog.py" "$fixtures/hog.py"
 place 644 "$luft/kestrel/tools/fixtures/clients/wayland/client.py" "$fixtures/client.py"
 place 755 "$here/plain.sh" /usr/libexec/luft-swap-plain-check
 place 644 "$here/luft-swap-plain-check.service" /usr/lib/systemd/system/luft-swap-plain-check.service
-build_check_image "$base" "$image_name-swap-check" "systemctl enable luft-swap-plain-check.service"
-
-make_root_drive "$image_name-swap-check"
+build_check_image "$image_name:45" "$image_name-swap-plain-check" "systemctl enable luft-swap-plain-check.service"
+make_root_drive "$image_name-swap-plain-check"
 relabel_root_drive "$serial"
 SELINUX="selinux=1 enforcing=1" APPEND="luft.swap-check=plain" boot_root_drive "$serial" 5
 expect_in_log "$serial" luft-swap-check "PASS"
 
+build_check_image "$base" "$image_name-swap-check" true
 VM_ENCRYPTED=1 make_check_disk "$image_name-swap-check"
 MEMORY=6144 python3 "$luft/os/vm/check.py" --vm "$vm" --minutes 75 memory

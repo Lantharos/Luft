@@ -1,7 +1,9 @@
+import os
 import time
 
-from control import PASSWORD, MachineError
+from control import MachineError
 
+PASSPHRASE = os.environ.get("VM_PASSPHRASE", "luft-vm-disk")
 MANAGER = "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service"
 HOG = "/usr/libexec/luft-memory-check/hog.py"
 HEALTH = "com.lantharos.Kestrel /com/lantharos/Kestrel/Health com.lantharos.Kestrel.Health Check"
@@ -159,7 +161,7 @@ def growing_game_is_blamed(check, watch: Memory):
 def memory(check, user: str):
     check.start("installed")
     check.enroll_key()
-    check.unlock_disk(PASSWORD)
+    check.unlock_disk(PASSPHRASE)
     check.wait_for_greeter()
     check.sign_in()
     watch = Memory(check, user)

@@ -6,7 +6,7 @@ TARGET=/dev/vdb
 INSTALL_TIMEOUT=1500
 ESP_ID=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
 RECOVERY_KEY='legal winner thank year wave sausage worth useful legal winner thank yellow'
-{ read -r user; read -r password; read -r encrypted; } </run/luft-source/account
+{ read -r user; read -r password; read -r encrypted; read -r passphrase; } </run/luft-source/account
 
 report() { echo "luft-vm-install: $*"; }
 fail() {
@@ -19,14 +19,14 @@ property() { busctl --json=short get-property "${BUS[@]}" "$1" | jq -r .data; }
 
 encryption() {
   [[ "$encrypted" == 1 ]] || return 0
-  printf ',"encryption":{"recoveryKey":"%s","passphrase":"%s"}' "$RECOVERY_KEY" "$password"
+  printf ',"encryption":{"recoveryKey":"%s","passphrase":"%s"}' "$RECOVERY_KEY" "$passphrase"
 }
 
 open_root() {
   local root
   root="$(partition 4f68bce3-e8cd-4db1-96e7-fbcaf984b709)"
   if [[ "$encrypted" == 1 ]]; then
-    printf '%s' "$password" | cryptsetup open --key-file - "$root" luft-vm-root || fail "Luft's encryption doesn't open"
+    printf '%s' "$passphrase" | cryptsetup open --key-file - "$root" luft-vm-root || fail "Luft's encryption doesn't open"
     root=/dev/mapper/luft-vm-root
   fi
   echo "$root"

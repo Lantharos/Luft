@@ -22,7 +22,7 @@ The files live in `/var/swap`, numbered from 0. On btrfs, `luft-swap prepare` ma
 | Remove a file | the last added one, once it has held under 256 MB for five minutes while the others would still have 4 GB free and memory has room for what it holds |
 | Space wanted back | when the drive is past its margin, such a file goes at once |
 
-`luft-swap` checks every 10 seconds, every second while less than 3 GB of swap is free, and at once when memory pressure reaches a tenth of a second per second, so swap grows before it is needed rather than when it's already full. At start it turns file 0 back on and deletes any other file left from before; after a restart of the service it takes over the files that are still on.
+`luft-swap` checks every 10 seconds, every second while less than 3 GB of swap is free, and at once when tasks wait on memory for 100 ms within 2 seconds, so swap grows before it is needed rather than when it's already full. At start it turns file 0 back on and deletes any other file left from before; after a restart of the service it takes over the files that are still on.
 
 Swap is only made when the filesystem holding `/var` sits on dm-crypt: the mount's device, or a partition of it, is a `CRYPT-` device-mapper target, or everything below it is. A drive without encryption, or a live system on a USB stick, gets no swap at all, and so zswap has nothing to write to. Hibernation stays off.
 

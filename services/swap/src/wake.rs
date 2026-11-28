@@ -7,7 +7,7 @@ use rustix::event::{PollFd, PollFlags, Timespec, poll};
 
 const PRESSURE: &str = "/proc/pressure/memory";
 const STALLED: Duration = Duration::from_millis(100);
-const WINDOW: Duration = Duration::from_secs(1);
+const WINDOW: Duration = Duration::from_secs(2);
 
 pub struct Wake(File);
 

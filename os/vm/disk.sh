@@ -9,6 +9,7 @@ user="${VM_USER:-luft}"
 password="${VM_PASSWORD:-luft-vm}"
 followed="${VM_FOLLOWS:-ghcr.io/lantharos/luft:$MAJOR}"
 encrypted="${VM_ENCRYPTED:-0}"
+passphrase="${VM_PASSPHRASE:-luft-vm-disk}"
 
 usage() {
   cat <<USAGE
@@ -25,7 +26,7 @@ The installed system is set up and starts at the login screen. root has the
 same password on the serial console, and Luft's Secure Boot key is queued
 for shim with that password as the code, which os/vm/control.py enroll types.
 Updates follow VM_FOLLOWS (default ghcr.io/lantharos/luft:$MAJOR).
-VM_ENCRYPTED=1 encrypts Luft with that password as its passphrase, which
+VM_ENCRYPTED=1 encrypts Luft with VM_PASSPHRASE (default luft-vm-disk), which
 the VM then asks for at every start, since the helper VM has no TPM to seal to.
 USAGE
 }
@@ -42,7 +43,7 @@ mkdir -p "$work/source"
 
 podman save --quiet --format oci-archive --output "$work/source/luft.ociarchive" "$image"
 cp "$os/vm/guest/install.sh" "$os/vm/guest/queue-key.sh" "$os/vm/guest/serial-console.conf" "$work/source/"
-printf '%s\n%s\n%s\n' "$user" "$password" "$encrypted" >"$work/source/account"
+printf '%s\n%s\n%s\n%s\n' "$user" "$password" "$encrypted" "$passphrase" >"$work/source/account"
 mkfs.ext4 -q -L luft-source -d "$work/source" "$work/source.img" "$(($(du -sm "$work/source" | cut -f1) + 256))M"
 rm -rf "$work/source"
 

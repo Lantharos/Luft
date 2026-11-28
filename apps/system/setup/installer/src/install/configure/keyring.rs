@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::{DirBuilder, OpenOptions};
 use std::io::Write;
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
@@ -21,6 +22,7 @@ pub fn prepare(deployment: &Deployment, home: &Path, uid: &str, password: &str) 
     let header = Header {
         password: Some(PasswordWrap::create(&key, password.as_bytes())?),
         chip: Some(ChipWrap::create(&key, &handoff)?),
+        tokens: BTreeMap::new(),
     };
     Stored::save(&home.join(VAULT), &header, &key, &Contents::fresh())?;
     let state = deployment.var(STATE);

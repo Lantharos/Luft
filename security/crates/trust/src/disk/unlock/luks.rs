@@ -1,14 +1,17 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::paths;
 use crate::system::host::command::Tool;
+use crate::system::secrets::scratch::Scratch;
+use crate::system::secrets::secret::Secret;
 
 pub const SYSTEMD_CRYPTSETUP: &str = "/usr/bin/systemd-cryptsetup";
 const COPIED_HEADER: &str = "/run/trustd/copied-header";
+const ROOT_MAPPING: &str = "root";
 
 #[derive(Deserialize)]
 struct Metadata {
@@ -39,6 +42,8 @@ pub struct Token {
     pub tpm2_pcrs: Vec<u32>,
     #[serde(default)]
     pub filesystem: String,
+    #[serde(default)]
+    pub key: String,
 }
 
 #[derive(Deserialize)]
@@ -205,4 +210,20 @@ pub fn copy_header(from: &Path, to: &Path) -> Result<()> {
         .status();
     let _ = std::fs::remove_file(COPIED_HEADER);
     restored
+}
+
+pub fn attach_root(partition: &Path, key: &Secret) -> Result<()> {
+    let scratch = Scratch::empty()?;
+    let key_file = scratch.write("key", key)?;
+    Tool::new(SYSTEMD_CRYPTSETUP)
+        .args(["attach", ROOT_MAPPING])
+        .arg(partition)
+        .arg(&key_file)
+        .arg("discard,tpm2-measure-pcr=yes")
+        .status()
+        .context("Luft's partition couldn't be opened")?;
+    Tool::new("udevadm")
+        .args(["trigger", "--action=change", "--settle"])
+        .arg(partition)
+        .status()
 }

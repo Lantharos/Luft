@@ -9,6 +9,9 @@ use crate::system::secrets::secret::Secret;
 fn encrypted_disk() -> Result<(SystemDisk, luks::Header)> {
     let disk = SystemDisk::find()?;
     match disk.header()? {
+        Some(header) if header.reencrypting.is_some() => bail!(Unsupported(
+            "The disk is still getting its new key. Try again once that's done.".to_owned()
+        )),
         Some(header) => Ok((disk, header)),
         None => bail!(Unsupported("The disk isn't encrypted.".to_owned())),
     }

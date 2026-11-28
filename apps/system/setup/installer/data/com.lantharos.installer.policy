@@ -34,4 +34,14 @@
       <allow_active>yes</allow_active>
     </defaults>
   </action>
+
+  <action id="com.lantharos.installer.erase">
+    <description>Erase this computer</description>
+    <message>Authentication is required to erase everything on this computer</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
 </policyconfig>

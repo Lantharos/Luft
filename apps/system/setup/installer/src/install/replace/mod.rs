@@ -8,10 +8,9 @@ use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 use luft_i18n::t;
-use luft_installer_contract::Encryption;
 
 use super::configure::deployment::Deployment;
-use super::drive::encryption;
+use super::drive::encryption::{self, Protection};
 use super::drive::layout::Role;
 use super::drive::target::Mounted;
 use crate::L10N;
@@ -69,14 +68,14 @@ fn startup_partition(plan: &Plan) -> Result<()> {
 pub fn prepare(
     plan: &Plan,
     target: &Path,
-    encryption: Option<&Encryption>,
+    protection: Option<&Protection>,
 ) -> Result<(Mounted, Kept)> {
     writable(&plan.root)?;
     writable(&plan.home.part)?;
     let startups = startups(plan, &target.with_extension("esp"))?;
     let esp = plan.esp.device.clone();
     if let Some(subvolume) = &plan.subvolume {
-        if encryption.is_some() {
+        if protection.is_some() {
             bail!(t!(L10N, "installer-encryption-keeps-old"));
         }
         let top = Opened::new(
@@ -116,11 +115,11 @@ pub fn prepare(
         old::read(opened.path())
     };
     startup_partition(plan)?;
-    let mounted = match encryption {
-        Some(encryption) => {
+    let mounted = match protection {
+        Some(protection) => {
             disks::erase(&plan.root, Role::Root)?;
             Mounted::open_encrypted(
-                encryption::open(encryption, &plan.root.device)?,
+                encryption::open(protection, &plan.root.device)?,
                 target,
                 esp,
             )?

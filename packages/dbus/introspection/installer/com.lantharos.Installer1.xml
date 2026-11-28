@@ -20,6 +20,14 @@
     </method>
     <method name="FinishFirstBoot">
     </method>
+    <method name="LeaveToOwner">
+    </method>
+    <method name="Claim">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <method name="Erase">
+    </method>
     <method name="SetNetworkType">
       <arg name="network" type="o" direction="in"/>
       <arg name="kind" type="s" direction="in"/>

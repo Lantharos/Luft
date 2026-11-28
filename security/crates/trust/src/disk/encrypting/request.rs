@@ -60,7 +60,7 @@ pub fn sealed_key() -> Option<Secret> {
     creds::unseal(SEALED_KEY, &path).ok()
 }
 
-fn seal_for_startup(recovery_key: &Secret) -> Result<()> {
+pub fn seal_for_startup(recovery_key: &Secret) -> Result<()> {
     let scratch = Scratch::empty()?;
     let path = scratch.directory().join("sealed");
     creds::seal(SEALED_KEY, recovery_key, Protection::SignedStartup, &path)?;

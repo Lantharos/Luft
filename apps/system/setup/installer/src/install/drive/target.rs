@@ -3,9 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use luft_i18n::t;
 
-use luft_installer_contract::Encryption;
-
-use super::encryption::{self, Opened};
+use super::encryption::{self, Opened, Protection};
 use super::layout::Role;
 use super::partition::Created;
 use crate::L10N;
@@ -71,13 +69,13 @@ impl Mounted {
         drive_device: &str,
         parts: &[Created],
         skipped_esps: &[&str],
-        encryption: Option<&Encryption>,
+        protection: Option<&Protection>,
     ) -> Result<Self> {
         let system = find(parts, Role::Root).with_context(|| t!(L10N, "installer-no-root"))?;
         let esp = first_esp(drive_device, skipped_esps)?;
-        match encryption {
-            Some(encryption) => {
-                Self::open_encrypted(encryption::open(encryption, &system.device)?, root, esp)
+        match protection {
+            Some(protection) => {
+                Self::open_encrypted(encryption::open(protection, &system.device)?, root, esp)
             }
             None => Self::open(&system.device, "", root, &system.uuid, esp),
         }

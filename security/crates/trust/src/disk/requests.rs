@@ -29,6 +29,11 @@ pub const ENCRYPT: Kind = Kind {
     variable: "EncryptingSystemDisk",
 };
 
+pub const ERASE: Kind = Kind {
+    file: "erase.json",
+    variable: "ErasingSystemDisk",
+};
+
 #[derive(Serialize, Deserialize)]
 struct Kept<T> {
     id: String,
@@ -75,6 +80,16 @@ pub fn waiting_in<T: DeserializeOwned>(top: &Path, kind: Kind) -> Option<Waiting
 pub fn waiting<T: DeserializeOwned>(disk: &SystemDisk, kind: Kind) -> Option<Waiting<T>> {
     signal(kind)?;
     waiting_in(TopLevel::look(disk).ok()?.path(), kind)
+}
+
+pub fn mark(kind: Kind) -> Option<String> {
+    signal(kind).map(|(_, mark)| mark)
+}
+
+pub fn advance(kind: Kind, mark: &str) -> Result<()> {
+    let (id, _) = signal(kind).context("Nothing waits for the next start")?;
+    efi::set_luft_variable(kind.variable, Some(format!("{id} {mark}").as_bytes()))
+        .context("The firmware didn't keep how far the request got")
 }
 
 impl<T> Waiting<T> {

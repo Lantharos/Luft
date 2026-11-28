@@ -1,5 +1,5 @@
 mod initrd;
-mod request;
+pub mod request;
 
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
@@ -44,6 +44,10 @@ pub fn state(disk: &SystemDisk, header: Option<&luks::Header>) -> Option<Encrypt
     Some(header.map_or(Encrypting::AfterRestart, |header| {
         Encrypting::Underway(header.done)
     }))
+}
+
+pub fn requested(disk: &SystemDisk) -> bool {
+    requested_for(disk).is_some()
 }
 
 pub fn underway() -> bool {

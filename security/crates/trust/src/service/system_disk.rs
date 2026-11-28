@@ -8,7 +8,7 @@ use zbus::object_server::InterfaceRef;
 use super::PATH;
 use super::drives::{BATTERY_RETRY, follow_battery};
 use super::interface::Trust;
-use crate::disk::encrypting;
+use crate::disk;
 use crate::disk::layout::{self, Changing, Stage};
 use crate::drives::reencrypt::Progress;
 
@@ -55,7 +55,7 @@ impl Encryption {
 }
 
 pub async fn continue_work(connection: &Connection) -> zbus::Result<()> {
-    if tokio::task::spawn_blocking(encrypting::underway)
+    if tokio::task::spawn_blocking(disk::changing_keys)
         .await
         .unwrap_or(false)
     {
@@ -110,7 +110,7 @@ async fn announce(trust: &InterfaceRef<Trust>) {
     let _ = trust.get().await.disk_changed(trust.signal_emitter()).await;
 }
 
-fn start(trust: InterfaceRef<Trust>) {
+pub fn start(trust: InterfaceRef<Trust>) {
     tokio::spawn(async move {
         let (idle, encryption) = {
             let inner = trust.get().await;
@@ -138,7 +138,7 @@ fn start(trust: InterfaceRef<Trust>) {
         loop {
             let (sender, unplugged) = (sender.clone(), on_battery.clone());
             let finished = tokio::task::spawn_blocking(move || {
-                encrypting::run(&AtomicBool::default(), &unplugged, &mut |update| {
+                disk::change_keys(&unplugged, &mut |update| {
                     let _ = sender.send(update);
                 })
             })
@@ -148,7 +148,7 @@ fn start(trust: InterfaceRef<Trust>) {
                     tokio::time::sleep(BATTERY_RETRY).await;
                 }
                 Ok(Err(error)) => {
-                    eprintln!("Encrypting Luft's partition paused: {error:#}");
+                    eprintln!("Changing the keys of Luft's partition paused: {error:#}");
                     break;
                 }
                 _ => break,

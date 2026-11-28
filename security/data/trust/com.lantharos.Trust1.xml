@@ -25,7 +25,11 @@
     Disk: Device (s), Encrypted (b),
       Encrypting (s: "" when nothing is changing, "after-restart" once EncryptSystemDisk asked for it,
       "encrypting" while it runs, "waiting" while it's stopped, such as on battery), Progress (d, 0 to 1),
-      Remaining (t, seconds), CanEncrypt (b, Luft's partition can be encrypted in place),
+      Remaining (t, seconds),
+      NewKey (s: "" unless the disk is getting a new key after ClaimSystemDisk, "underway" while that runs,
+      "waiting" until the disk has been unlocked at the next start), NewKeyProgress (d, 0 to 1),
+      NewKeyRemaining (t, seconds), TemporaryKey (b, the disk still opens with the temporary key it was
+      installed or erased with), CanEncrypt (b, Luft's partition can be encrypted in place),
       TpmUnlocks (b, the TPM can unlock the disk, so a passphrase is optional),
       Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
       RecoveryKeyStored (b, the recovery key can be shown again), OlderRecoveryKey (b, the key kept is one of
@@ -67,6 +71,16 @@
          before it starts encrypting, each later restart asks for it to unlock, and the recovery key is added
          once it's done. Neither key is kept anywhere in the clear. -->
     <method name="EncryptSystemDisk">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <!--
+      Gives a disk that still opens with its temporary key to its owner: adds the recovery key, and the
+      passphrase where the TPM can't unlock the disk, removes the temporary key and what the TPM held
+      for it, and starts encrypting the whole disk again with a new key in the background. Only root
+      may call it, which is the installer finishing the owner's first start.
+    -->
+    <method name="ClaimSystemDisk">
       <arg name="recovery_key" type="s" direction="in"/>
       <arg name="passphrase" type="s" direction="in"/>
     </method>

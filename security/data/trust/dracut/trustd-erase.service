@@ -1,0 +1,19 @@
+[Unit]
+Description=Erase this computer once Settings asked for it
+DefaultDependencies=no
+ConditionPathExists=/sys/firmware/efi/efivars/ErasingSystemDisk-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
+After=systemd-cryptsetup@root.service trustd-unclaimed.service trustd-encrypt.service trustd-move.service
+Before=sysroot.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/trustctl system-disk erase-now
+SyslogIdentifier=trustd
+KeyringMode=shared
+TimeoutSec=infinity
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native

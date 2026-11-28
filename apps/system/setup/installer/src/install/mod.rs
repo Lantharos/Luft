@@ -9,7 +9,7 @@ use std::path::Path;
 use std::sync::{Condvar, Mutex};
 
 use anyhow::{Context, Result};
-use luft_installer_contract::{Encryption, Regional};
+use luft_installer_contract::Regional;
 use luft_meet::Handoff;
 use luft_meet::sealed::Code;
 
@@ -18,6 +18,7 @@ pub use configure::account::Account;
 use crate::config::Image;
 use configure::deployment::Deployment;
 use configure::{handoff, networks, trust};
+use drive::encryption::Protection;
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
@@ -30,6 +31,7 @@ use crate::system::wait;
 
 use crate::L10N;
 use crate::meet::{self, start, unpack};
+use crate::phase;
 
 const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
@@ -112,6 +114,12 @@ impl Answers {
         self.given.notify_all();
     }
 
+    pub fn given(&self) -> Option<(Regional, Account)> {
+        let mut inputs = self.inputs.lock().expect("answers lock");
+        let regional = inputs.regional.clone()?;
+        Some((regional, inputs.account.take()?))
+    }
+
     fn wait(&self, account_needed: bool) -> (Regional, Option<Account>) {
         let mut inputs = self.inputs.lock().expect("answers lock");
         loop {
@@ -147,7 +155,7 @@ pub struct Job<'a> {
     pub answers: &'a Answers,
     pub windows: Option<Windows>,
     pub meet: Option<Handoff>,
-    pub encryption: Option<Encryption>,
+    pub protection: Option<Protection>,
     pub box_code: Option<Code>,
 }
 
@@ -180,7 +188,7 @@ pub fn run(job: Job, report: impl Fn(Status)) -> bool {
 fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
     match &job.destination {
         Destination::Partitions(plan) => {
-            let parts = wait(partition::apply(plan, job.encryption.is_some()))?;
+            let parts = wait(partition::apply(plan, job.protection.is_some()))?;
             let skipped: Vec<&str> = job
                 .meet
                 .iter()
@@ -193,15 +201,59 @@ fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
                     &plan.device,
                     &parts,
                     &skipped,
-                    job.encryption.as_ref(),
+                    job.protection.as_ref(),
                 )?,
                 None,
             ))
         }
         Destination::Replace(plan) => {
-            let (mounted, kept) = replace::prepare(plan, job.target, job.encryption.as_ref())?;
+            let (mounted, kept) = replace::prepare(plan, job.target, job.protection.as_ref())?;
             Ok((mounted, Some(kept)))
         }
+    }
+}
+
+fn first_account(
+    job: &Job,
+    kept: &Option<Kept>,
+    account: Option<Account>,
+    deployment: &Deployment,
+    unpacked: impl Fn(f64),
+) -> Result<String> {
+    match (kept, account) {
+        (Some(kept), account) => {
+            kept.configure(
+                deployment,
+                account.as_ref().map(|account| account.password.as_str()),
+            )?;
+            Ok(kept.owner().to_owned())
+        }
+        (None, Some(account)) => {
+            account.create(deployment)?;
+            if let Some(windows) = &job.windows
+                && let Err(error) = windows.bring_bluetooth(deployment)
+            {
+                eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
+            }
+            let moving_box = job
+                .meet
+                .as_ref()
+                .and_then(Handoff::moving_box)
+                .zip(job.box_code.as_ref());
+            if let Some(sealed) = moving_box
+                && let Err(error) = unpack_box(
+                    sealed,
+                    deployment,
+                    &account,
+                    &job.target.with_extension("box"),
+                    &unpacked,
+                )
+            {
+                eprintln!("The moving box wasn't unpacked: {error:#}");
+            }
+            Ok(account.name)
+        }
+        (None, None) => anyhow::bail!(t!(L10N, "installer-account-missing")),
     }
 }
 
@@ -236,57 +288,36 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     drop(hidden);
     startup::place(&mounted, &job.target.with_extension("esp"))?;
     report(Status::at(Stage::Waiting, copied));
+    let for_someone_else = matches!(job.protection, Some(Protection::Temporary));
     let (regional, account) = job
         .answers
-        .wait(kept.as_ref().is_none_or(Kept::needs_password));
+        .wait(!for_someone_else && kept.as_ref().is_none_or(Kept::needs_password));
     report(Status::at(Stage::Configuring, copied));
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
-    if let (Some(encryption), Some(opened)) = (&job.encryption, mounted.encrypted()) {
+    if let (Some(encryption), Some(opened)) = (
+        job.protection.as_ref().and_then(Protection::of_owner),
+        mounted.encrypted(),
+    ) {
         trust::seal(&deployment, encryption, opened)?;
     }
     configure::regional::apply(&regional, &deployment)?;
-    let user = match (&kept, account) {
-        (Some(kept), account) => {
-            kept.configure(
-                &deployment,
-                account.as_ref().map(|account| account.password.as_str()),
-            )?;
-            kept.owner().to_owned()
-        }
-        (None, Some(account)) => {
-            account.create(&deployment)?;
-            if let Some(windows) = &job.windows
-                && let Err(error) = windows.bring_bluetooth(&deployment)
-            {
-                eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
-            }
-            if let Some(sealed) = moving_box
-                && let Err(error) = unpack_box(
-                    sealed,
-                    &deployment,
-                    &account,
-                    &job.target.with_extension("box"),
-                    &|done| {
-                        report(Status::at(
-                            Stage::Configuring,
-                            copied + (COPIED - copied) * done,
-                        ))
-                    },
-                )
-            {
-                eprintln!("The moving box wasn't unpacked: {error:#}");
-            }
-            account.name
-        }
-        (None, None) => anyhow::bail!(t!(L10N, "installer-account-missing")),
-    };
     if let Some(meet) = &job.meet {
         trust::remember_meet(&deployment, meet)?;
     }
-    if let Err(error) = networks::carry_from_live(&deployment) {
-        eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");
+    if for_someone_else {
+        handoff::wait_for_owner(&deployment, phase::WITH_INSTALLER)?;
+    } else {
+        let user = first_account(job, &kept, account, &deployment, |done| {
+            report(Status::at(
+                Stage::Configuring,
+                copied + (COPIED - copied) * done,
+            ))
+        })?;
+        if let Err(error) = networks::carry_from_live(&deployment) {
+            eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");
+        }
+        handoff::prepare(&deployment, &user)?;
     }
-    handoff::prepare(&deployment, &user)?;
     let secure_boot_code = trust::ask_shim_to_trust_luft(&deployment)?;
     drop(deployment);
     if let Some(kept) = kept {

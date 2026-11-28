@@ -129,6 +129,8 @@ enum RecoveryAction {
 enum EncryptionAction {
     /// Encrypt an empty partition with the recovery key and passphrase given on stdin, one per line, and open it
     Format { partition: PathBuf },
+    /// Encrypt an empty partition for a computer that waits for its owner, with a temporary key the partition carries itself, and open it
+    FormatUnclaimed { partition: PathBuf },
     /// Let the TPM unlock the partition once Luft is installed, with the recovery key on stdin, keeping trustd's state in STATE
     Seal {
         partition: PathBuf,
@@ -147,6 +149,12 @@ enum SystemDiskAction {
     StartEncrypting,
     /// The step at startup that copies Luft onto the drive Disks asked it to move to, before the system uses its files
     Move,
+    /// The step at startup that opens a partition that still carries its temporary key
+    OpenUnclaimed,
+    /// Erase this computer at the next restart, with what it starts with afterwards prepared in luft-next-start/erase
+    Erase,
+    /// The step at startup that erases this computer once Settings asked for it
+    EraseNow,
 }
 
 impl Command {
@@ -214,6 +222,9 @@ fn follow_up() {
     }
     if let Err(error) = disk::unlock::keys::note_older_kind() {
         eprintln!("Couldn't tell what kind of recovery key this computer keeps: {error:#}");
+    }
+    if let Err(error) = disk::unclaimed::seal_when_possible() {
+        eprintln!("Couldn't seal the disk's temporary key to the TPM: {error:#}");
     }
     if let Err(error) = disk::unlock::seal::follow_up() {
         eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
@@ -303,6 +314,10 @@ fn encryption(action: EncryptionAction) -> Result<()> {
             println!("{}", opened.display());
             Ok(())
         }
+        EncryptionAction::FormatUnclaimed { partition } => {
+            println!("{}", disk::unclaimed::format(&partition)?.display());
+            Ok(())
+        }
         EncryptionAction::Seal { partition, state } => {
             disk::encryption::seal(&partition, &ask::piped(1)?[0], &state)
         }
@@ -320,5 +335,8 @@ fn system_disk(action: SystemDiskAction) -> Result<()> {
         SystemDiskAction::OpenHalves => disk::layout::open_in_initrd(),
         SystemDiskAction::StartEncrypting => disk::encrypting::open_in_initrd(),
         SystemDiskAction::Move => disk::moving::copy_at_start(),
+        SystemDiskAction::OpenUnclaimed => disk::unclaimed::open_in_initrd(),
+        SystemDiskAction::Erase => disk::erasing::request(),
+        SystemDiskAction::EraseNow => disk::erasing::erase_at_start(),
     }
 }

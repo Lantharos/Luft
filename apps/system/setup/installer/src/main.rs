@@ -7,6 +7,7 @@ mod phase;
 mod service;
 mod survey;
 mod system;
+mod unclaimed;
 
 use std::process::ExitCode;
 

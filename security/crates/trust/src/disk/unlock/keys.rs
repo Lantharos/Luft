@@ -73,6 +73,10 @@ pub fn escrowed() -> Option<Secret> {
     creds::unseal(ESCROW_NAME, &paths::state(ESCROW)).ok()
 }
 
+pub fn forget_escrow() {
+    let _ = std::fs::remove_file(paths::state(ESCROW));
+}
+
 pub fn has_escrow() -> bool {
     paths::state(ESCROW).exists()
 }

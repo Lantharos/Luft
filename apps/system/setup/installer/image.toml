@@ -9,6 +9,7 @@ part = "services"
 "/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Installer1.service"]
 "/usr/lib/systemd/system/" = ["data/installer.service", "data/installer-expire-setup.service"]
 "/usr/share/polkit-1/actions/" = ["data/com.lantharos.installer.policy"]
+"/usr/share/polkit-1/rules.d/" = ["data/50-luft-setup.rules"]
 "/usr/share/selinux/packages/luft/" = ["data/installer.cil"]
 
 [enable]

@@ -15,7 +15,8 @@ use super::error::Error;
 use super::interface::Installer;
 use crate::first_boot::fingerprint::Enrolling;
 use crate::first_boot::window;
-use crate::phase;
+use crate::install::configure::setup_account;
+use crate::phase::{self, Phase};
 
 pub struct Enrollment {
     stop: Arc<Notify>,
@@ -35,9 +36,12 @@ pub async fn setup_app_user(
     state_dir: &Path,
     uid_of: impl FnOnce(&str) -> Option<u32>,
 ) -> Result<String, Error> {
-    let user = phase::pending_user(state_dir)
-        .filter(|_| window::is_open(state_dir))
-        .ok_or_else(Error::not_authorized)?;
+    let user = match phase::detect(state_dir) {
+        Phase::Handover | Phase::Unclaimed => setup_account::NAME.to_owned(),
+        _ => phase::pending_user(state_dir)
+            .filter(|_| window::is_open(state_dir))
+            .ok_or_else(Error::not_authorized)?,
+    };
     let uid = caller::uid(connection, header).await?;
     let from_user = uid.is_some() && uid == uid_of(&user);
     if from_user && caller::of_sender(connection, header).await == Caller::You {

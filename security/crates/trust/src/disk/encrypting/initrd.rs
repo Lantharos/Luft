@@ -10,10 +10,7 @@ use crate::drives::work;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 use crate::system::secrets::keyring;
-use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
-
-const MAPPING: &str = "root";
 
 fn start(partition: &Path, key: &Secret) -> Result<()> {
     Tool::new("cryptsetup")
@@ -35,22 +32,6 @@ fn start(partition: &Path, key: &Secret) -> Result<()> {
         .context("Encrypting Luft's partition couldn't start")
 }
 
-fn open(partition: &Path, key: &Secret) -> Result<()> {
-    let scratch = Scratch::empty()?;
-    let key_file = scratch.write("key", key)?;
-    Tool::new(luks::SYSTEMD_CRYPTSETUP)
-        .args(["attach", MAPPING])
-        .arg(partition)
-        .arg(&key_file)
-        .arg("discard,tpm2-measure-pcr=yes")
-        .status()
-        .context("Luft's partition couldn't be opened while it's being encrypted")?;
-    Tool::new("udevadm")
-        .args(["trigger", "--action=change", "--settle"])
-        .arg(partition)
-        .status()
-}
-
 fn start_encrypting(partition: &Path) -> Result<()> {
     let name = blocks::kernel_name(partition).context("Luft's partition has no name")?;
     let asked = Request::waiting_in(TopLevel::mount_from(partition, true)?.path())
@@ -63,7 +44,7 @@ fn start_encrypting(partition: &Path) -> Result<()> {
         return Ok(());
     };
     start(partition, keys.first())?;
-    open(partition, keys.first())?;
+    luks::attach_root(partition, keys.first())?;
     keys.keep_in_memory();
     Ok(())
 }
@@ -74,7 +55,7 @@ pub fn open_in_initrd() -> Result<()> {
         None => start_encrypting(&partition),
         Some(header) if header.reencrypting.is_some() => match request::sealed_key() {
             Some(key) => {
-                open(&partition, &key)?;
+                luks::attach_root(&partition, &key)?;
                 keyring::keep_for_trust_units(request::FIRST_KEY, &key);
                 Ok(())
             }

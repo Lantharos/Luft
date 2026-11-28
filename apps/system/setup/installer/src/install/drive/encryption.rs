@@ -28,13 +28,36 @@ fn uuid_of(device: &str) -> Result<String> {
         .to_owned())
 }
 
-pub fn open(encryption: &Encryption, partition: &str) -> Result<Opened> {
-    let given = Zeroizing::new(format!(
-        "{}\n{}\n",
-        *encryption.recovery_key, *encryption.passphrase
-    ));
-    let device = trustctl("format", partition)
-        .input(given.as_bytes())
+pub enum Protection {
+    Owner(Encryption),
+    Temporary,
+}
+
+impl Protection {
+    pub fn of_owner(&self) -> Option<&Encryption> {
+        match self {
+            Self::Owner(encryption) => Some(encryption),
+            Self::Temporary => None,
+        }
+    }
+
+    fn format(&self, partition: &str) -> Tool {
+        match self {
+            Self::Owner(encryption) => trustctl("format", partition).input(
+                Zeroizing::new(format!(
+                    "{}\n{}\n",
+                    *encryption.recovery_key, *encryption.passphrase
+                ))
+                .as_bytes(),
+            ),
+            Self::Temporary => trustctl("format-unclaimed", partition),
+        }
+    }
+}
+
+pub fn open(protection: &Protection, partition: &str) -> Result<Opened> {
+    let device = protection
+        .format(partition)
         .output()
         .with_context(|| t!(L10N, "installer-encryption-failed"))?
         .trim()

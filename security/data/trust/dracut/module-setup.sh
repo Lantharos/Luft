@@ -16,12 +16,14 @@ installkernel() {
 }
 
 install() {
-    inst_multiple trustctl systemd-creds systemd-ask-password cryptsetup udevadm cat mount umount cp blkid efibootmgr btrfs mkfs.btrfs \
+    inst_multiple trustctl systemd-creds systemd-ask-password cryptsetup udevadm cat mount umount cp blkid efibootmgr btrfs mkfs.btrfs dmsetup blkdiscard \
         systemd-cryptsetup
     inst_rules 61-trustd-drives.rules
     inst_simple "$moddir/trustd-move.service" "$systemdsystemunitdir/trustd-move.service"
     inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
     inst_simple "$moddir/trustd-move-drive.service" "$systemdsystemunitdir/trustd-move-drive.service"
+    inst_simple "$moddir/trustd-unclaimed.service" "$systemdsystemunitdir/trustd-unclaimed.service"
+    inst_simple "$moddir/trustd-erase.service" "$systemdsystemunitdir/trustd-erase.service"
     inst_multiple "$systemdsystemunitdir/systemd-pcrextend.socket" "$systemdsystemunitdir/systemd-pcrextend@.service" \
         "$systemdutildir/systemd-tpm2-setup" "$systemdsystemunitdir/systemd-tpm2-setup-early.service"
     inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"

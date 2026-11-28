@@ -1,9 +1,12 @@
+use std::path::Path;
+
 use anyhow::{Context, Result, bail};
 use luft_i18n::t;
 use zeroize::Zeroizing;
 
 use super::deployment::Deployment;
 use super::keyring;
+use super::setup_account;
 use crate::L10N;
 use crate::system::command::Tool;
 
@@ -15,10 +18,21 @@ pub struct Account {
     pub password: Zeroizing<String>,
 }
 
+pub fn ids(etc: &Path, name: &str) -> Result<String> {
+    let passwd = std::fs::read_to_string(etc.join("passwd"))?;
+    passwd
+        .lines()
+        .map(|line| line.split(':').collect::<Vec<_>>())
+        .find(|fields| fields.first() == Some(&name))
+        .and_then(|fields| Some(format!("{}:{}", fields.get(2)?, fields.get(3)?)))
+        .with_context(|| t!(L10N, "installer-account-not-saved"))
+}
+
 impl Account {
     pub fn check(&self) -> Result<()> {
         let mut letters = self.name.chars();
         let valid_name = self.name.len() <= 32
+            && self.name != setup_account::NAME
             && letters
                 .next()
                 .is_some_and(|first| first.is_ascii_lowercase() || first == '_')
@@ -37,13 +51,7 @@ impl Account {
     }
 
     pub fn ids(&self, deployment: &Deployment) -> Result<String> {
-        let passwd = std::fs::read_to_string(deployment.etc("passwd"))?;
-        passwd
-            .lines()
-            .map(|line| line.split(':').collect::<Vec<_>>())
-            .find(|fields| fields.first() == Some(&self.name.as_str()))
-            .and_then(|fields| Some(format!("{}:{}", fields.get(2)?, fields.get(3)?)))
-            .with_context(|| t!(L10N, "installer-account-not-saved"))
+        ids(&deployment.etc(""), &self.name)
     }
 
     pub fn create(&self, deployment: &Deployment) -> Result<()> {

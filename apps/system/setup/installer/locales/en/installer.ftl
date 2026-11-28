@@ -74,3 +74,4 @@ installer-box-unsealed = The moving box isn't locked with a code, so it isn't un
 # $path is a file path
 installer-unpack-failed = Couldn't unpack { $path }
 installer-wallpaper-unnamed = The wallpaper has no name
+installer-erase-failed = This computer couldn’t be erased

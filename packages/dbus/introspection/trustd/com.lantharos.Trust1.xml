@@ -7,6 +7,10 @@
       <arg name="recovery_key" type="s" direction="in"/>
       <arg name="passphrase" type="s" direction="in"/>
     </method>
+    <method name="ClaimSystemDisk">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
     <method name="CancelSystemDiskEncryption">
     </method>
     <method name="SetUpTpmUnlock">

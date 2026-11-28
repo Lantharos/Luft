@@ -1,0 +1,18 @@
+[Unit]
+Description=Open Luft's partition with the temporary key it carries until its owner sets the computer up
+DefaultDependencies=no
+After=tpm2.target systemd-pcrphase-initrd.service luft-added-files.service
+Before=cryptsetup.target initrd-root-device.target sysroot.mount systemd-cryptsetup@root.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/trustctl system-disk open-unclaimed
+SyslogIdentifier=trustd
+KeyringMode=shared
+TimeoutSec=infinity
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native

@@ -5,7 +5,7 @@ use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use zbus::message::Header;
-use zbus::object_server::SignalEmitter;
+use zbus::object_server::{ObjectServer, SignalEmitter};
 use zbus::{Connection, interface};
 
 use super::actions;
@@ -13,7 +13,8 @@ use super::error::Error;
 use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
-use super::system_disk::{Encryption, Resizing};
+use super::system_disk::{self, Encryption, Resizing};
+use super::PATH;
 use crate::boot::{other_systems, started, startup};
 use crate::disk;
 use crate::disk::layout::{self, old_system};
@@ -186,6 +187,27 @@ impl Trust {
             disk::encrypting::request(&recovery_key, &passphrase, on_battery)
         })
         .await
+    }
+
+    async fn claim_system_disk(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        #[zbus(object_server)] server: &ObjectServer,
+        recovery_key: String,
+        passphrase: String,
+    ) -> Result<(), Error> {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
+        let (recovery_key, passphrase) = (Secret::from(recovery_key), Secret::from(passphrase));
+        self.run(&emitter, move || {
+            disk::unclaimed::claim(&recovery_key, &passphrase)
+        })
+        .await?;
+        system_disk::start(server.interface(PATH).await?);
+        Ok(())
     }
 
     async fn cancel_system_disk_encryption(

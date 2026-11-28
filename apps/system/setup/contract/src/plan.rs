@@ -34,10 +34,13 @@ pub struct Encryption {
 }
 
 #[derive(Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct InstallPlan {
     pub target: Target,
     pub variant: String,
     #[serde(default)]
     pub windows: WindowsChoices,
     pub encryption: Option<Encryption>,
+    #[serde(default)]
+    pub for_someone_else: bool,
 }

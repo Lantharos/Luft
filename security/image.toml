@@ -34,6 +34,8 @@ part = "boot"
     "data/trust/dracut/trustd-encrypt.service",
     "data/trust/dracut/trustd-move.service",
     "data/trust/dracut/trustd-move-drive.service",
+    "data/trust/dracut/trustd-unclaimed.service",
+    "data/trust/dracut/trustd-erase.service",
 ]
 
 [links]

@@ -18,6 +18,7 @@ pub enum Mode {
     Upgrade,
     Firmware,
     Moving,
+    Erasing,
 }
 
 impl Mode {
@@ -29,6 +30,7 @@ impl Mode {
             Self::Upgrade => "system-upgrade",
             Self::Firmware => "firmware-upgrade",
             Self::Moving => "moving",
+            Self::Erasing => "erasing",
         }
     }
 }
@@ -43,6 +45,7 @@ impl FromStr for Mode {
             "updates" => Self::Updates,
             "system-upgrade" => Self::Upgrade,
             "firmware-upgrade" => Self::Firmware,
+            "erasing" => Self::Erasing,
             _ => return Err(format!("{name} isn't something the splash can show")),
         })
     }
@@ -164,6 +167,7 @@ mod tests {
             Command::Status,
             Command::UpdateRoot("/sysroot".into()),
             Command::Show(Mode::Updates),
+            Command::Show(Mode::Erasing),
             Command::KeyEnrollmentNotice(Some(KeyEnrollment {
                 code: "48217730".into(),
                 again: false,

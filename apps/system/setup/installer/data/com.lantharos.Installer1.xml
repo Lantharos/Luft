@@ -4,7 +4,9 @@
   <!--
     Installing Luft from the live system, and finishing first-run setup on the installed one.
 
-    Phase: "live" (started from the USB stick), "first-boot" (installed, setup still pending) or "installed".
+    Phase: "live" (started from the USB stick), "handover" (installed for someone else, and whoever installed
+      it is still finishing), "unclaimed" (waiting for its owner to set it up), "first-boot" (installed, the
+      account's setup still pending) or "installed".
     Stage: "idle", "preparing" (making room and partitions), "copying", "waiting" (copied, waiting for the
       account and regional settings), "configuring", "finished" or "failed" (Error says why).
     Progress: 0 to 1 over the whole install.
@@ -17,7 +19,9 @@
     Survey, Install, OpenMovingBox, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
     need com.lantharos.installer.set-up and have to come from Install Luft's own program. UseLanguage is taken
-    like Install on the live system and like a setup step after it.
+    like Install on the live system and like a setup step after it. On a computer installed for someone
+    else, the setup steps, LeaveToOwner and Claim answer the luft-setup account, which runs setup until
+    the owner has an account. Erase needs com.lantharos.installer.erase.
   -->
   <interface name="com.lantharos.Installer1">
     <property name="Phase" type="s" access="read"/>
@@ -39,10 +43,13 @@
     </method>
     <!-- JSON: {"target": {"kind": "whole", "drive"} | {"kind": "alongside", "drive", "size"} |
          {"kind": "free", "drive", "offset"} | {"kind": "replace", "system"}, "variant": "default" | "nvidia",
-         "windows": {"fastStartupOff", "universalClock", "bluetooth"}, "encryption": {"recoveryKey", "passphrase"} | null}.
+         "windows": {"fastStartupOff", "universalClock", "bluetooth"}, "encryption": {"recoveryKey", "passphrase"} | null,
+         "forSomeoneElse": true | false}.
          Starts right away; the Windows choices apply to the Windows on that drive. With encryption, Luft's partition
          is encrypted with the recovery key from trustd's GenerateRecoveryKey, and the passphrase too when the TPM
-         can't unlock it; replacing a system while keeping its files can't be encrypted. -->
+         can't unlock it; replacing a system while keeping its files can't be encrypted. For someone else,
+         the install needs no account, Luft's partition is encrypted with a temporary key it carries
+         itself, and the new system starts in the "handover" phase. -->
     <method name="Install">
       <arg name="request" type="s" direction="in"/>
     </method>
@@ -70,6 +77,20 @@
     </method>
     <!-- Only the account setup is pending for: stops signing in automatically. -->
     <method name="FinishFirstBoot"/>
+    <!-- In the "handover" phase: makes the next start the owner's ("unclaimed"), and forgets the machine ID,
+         SSH host keys and stored secrets this start made, so the owner's first start makes the computer's own. -->
+    <method name="LeaveToOwner"/>
+    <!-- In the "unclaimed" phase: writes the settings from Configure and creates the account from CreateAccount
+         on this system, and has trustd's ClaimSystemDisk replace the disk's temporary key with the recovery key,
+         and the passphrase when the TPM can't unlock it. The owner's session then starts in place of setup's,
+         in the "first-boot" phase. -->
+    <method name="Claim">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <!-- Restarts to erase the computer: every account, file, app and setting goes, the disk gets a new
+         temporary key in place of all its keys, and Luft starts in the "unclaimed" phase. -->
+    <method name="Erase"/>
     <!-- Only for the account setup is pending for, while its setup window is open: makes one of the
          computer's Wi-Fi or wired networks "home" or "public" in the firewall, without the password
          the firewall asks everyone else for. -->

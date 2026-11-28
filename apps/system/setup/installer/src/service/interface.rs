@@ -1,6 +1,8 @@
 use std::ffi::CString;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use anyhow::Context;
 use luft_dbus::idle::Idle;
@@ -27,14 +29,18 @@ use crate::first_boot::fingerprint::Enrolling;
 use crate::install::configure::regional;
 use crate::install::drive::plan;
 use crate::install::windows::Windows;
+use crate::install::drive::encryption::Protection;
 use crate::install::{self, Account, Answers, Destination, Job, Stage, Status};
 use crate::options::Options;
 use crate::phase::Phase;
+use crate::unclaimed::{self, erase};
 use crate::{first_boot, meet, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
 const SET_UP: &str = "com.lantharos.installer.set-up";
+const ERASE: &str = "com.lantharos.installer.erase";
+const LEAVING: Duration = Duration::from_secs(1);
 const FIREWALL: &str = "com.lantharos.Firewall1";
 const FIREWALL_PATH: &str = "/com/lantharos/Firewall1";
 
@@ -91,6 +97,22 @@ impl Installer {
     ) -> Result<String, Error> {
         self.authorize(connection, header, SET_UP).await?;
         setup::setup_app_user(connection, header, &self.options.state_dir, uid_of).await
+    }
+
+    /// Does what ends the caller's own session once the caller has its answer.
+    fn soon(&self, failure: &'static str, work: fn() -> anyhow::Result<()>) {
+        let idle = self.idle.clone();
+        tokio::spawn(async move {
+            let _activity = idle.hold();
+            tokio::time::sleep(LEAVING).await;
+            if let Err(error) = work() {
+                eprintln!("{failure}: {error:#}");
+            }
+        });
+    }
+
+    fn scratch(&self) -> PathBuf {
+        self.options.target.with_extension("unclaimed")
     }
 
     async fn blocking<T: Send + 'static>(
@@ -209,7 +231,10 @@ impl Installer {
             ))
         })?;
         let image = self.config.image(&request.variant)?;
-        let encryption = request.encryption.take();
+        let protection = match (request.for_someone_else, request.encryption.take()) {
+            (true, _) => Some(Protection::Temporary),
+            (false, encryption) => encryption.map(Protection::Owner),
+        };
         let smallest = self.config.smallest_system;
         let handoff = self.meet.clone();
         let scratch = self.options.target.with_extension("moving-box");
@@ -251,7 +276,7 @@ impl Installer {
                     answers: &answers,
                     windows,
                     meet,
-                    encryption,
+                    protection,
                     box_code: box_code.as_deref().and_then(|code| Code::parse(code)),
                 };
                 install::run(job, |status| {
@@ -350,6 +375,73 @@ impl Installer {
         Self::blocking(move || first_boot::finish(&state_dir)).await
     }
 
+    /// Ends the part of whoever installed Luft for someone else, once Luft's
+    /// key is in place: from the next start on, the computer waits for its owner.
+    async fn leave_to_owner(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.setup_app_user(connection, &header).await?;
+        if phase::detect(&self.options.state_dir) != Phase::Handover {
+            return Err(Error::not_authorized());
+        }
+        let _activity = self.idle.hold();
+        let (state_dir, scratch) = (self.options.state_dir.clone(), self.scratch());
+        Self::blocking(move || unclaimed::leave_to_owner(&state_dir, &scratch)).await
+    }
+
+    /// Makes the computer its owner's: the account and settings given with
+    /// CreateAccount and Configure, and the disk's keys in place of the
+    /// temporary one. The owner's session then starts in place of setup's.
+    async fn claim(
+        &self,
+        recovery_key: String,
+        passphrase: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        let (recovery_key, passphrase) = (Zeroizing::new(recovery_key), Zeroizing::new(passphrase));
+        self.setup_app_user(connection, &header).await?;
+        if phase::detect(&self.options.state_dir) != Phase::Unclaimed {
+            return Err(Error::not_authorized());
+        }
+        let _activity = self.idle.hold();
+        let (regional, account) = self
+            .answers
+            .given()
+            .ok_or_else(|| Error::Failed(t!(L10N, "installer-account-missing")))?;
+        luft_trust::call::<_, ()>(
+            &TRUST,
+            "ClaimSystemDisk",
+            &(recovery_key.as_str(), passphrase.as_str()),
+        )
+        .await
+        .map_err(Error::Failed)?;
+        let state_dir = self.options.state_dir.clone();
+        Self::blocking(move || unclaimed::claim(&state_dir, &regional, &account)).await?;
+        self.soon("The owner's session didn't start", unclaimed::start_owner_session);
+        Ok(())
+    }
+
+    /// Erases every account, file and app at the next start, which this
+    /// begins, and leaves Luft waiting for a new owner.
+    async fn erase(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, ERASE).await?;
+        if phase::detect(&self.options.state_dir) != Phase::Installed {
+            return Err(Error::not_authorized());
+        }
+        let _activity = self.idle.hold();
+        let scratch = self.scratch();
+        Self::blocking(move || erase::prepare(&scratch)).await?;
+        self.soon("The computer didn't restart to be erased", erase::restart);
+        Ok(())
+    }
+
     /// Says whether a network the computer is on is a home or a public one,
     /// for the person setting it up, whom the firewall would otherwise ask
     /// for the password they just chose.
@@ -434,7 +526,7 @@ impl Installer {
     ) -> Result<(), Error> {
         match phase::detect(&self.options.state_dir) {
             Phase::Live => self.authorize(connection, &header, INSTALL).await?,
-            Phase::FirstBoot | Phase::Installed => {
+            Phase::Handover | Phase::Unclaimed | Phase::FirstBoot | Phase::Installed => {
                 self.setup_app_user(connection, &header).await?;
             }
         }

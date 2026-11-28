@@ -34,6 +34,7 @@ fn title(mode: Mode, destination: &str) -> Option<String> {
         ),
         Mode::Firmware => Some("Updating firmware".to_owned()),
         Mode::Moving => Some(format!("Moving Luft to {destination}")),
+        Mode::Erasing => Some("Erasing this computer".to_owned()),
     }
 }
 
@@ -114,7 +115,7 @@ impl Activity {
         let alpha = self.alpha.value(now);
         let title = self.title.clone().filter(|_| alpha > 0.0)?;
         let keep_on = match self.mode {
-            Mode::Moving => "Keep the computer on and plugged in.",
+            Mode::Moving | Mode::Erasing => "Keep the computer on and plugged in.",
             _ => "Don't turn off your computer.",
         };
         let note = match self.progress {

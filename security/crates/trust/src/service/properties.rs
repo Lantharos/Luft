@@ -89,6 +89,20 @@ fn encrypting(
     }
 }
 
+fn new_key(
+    getting: bool,
+    running: Option<Option<Progress>>,
+) -> (&'static str, f64, u64) {
+    match (getting, running) {
+        (false, _) => ("", 0.0, 0),
+        (true, None) => ("waiting", 0.0, 0),
+        (true, Some(live)) => {
+            let live = live.unwrap_or_default();
+            ("underway", live.done, live.remaining_seconds)
+        }
+    }
+}
+
 fn resize(waiting: Option<Change>, changing: Option<&Changing>) -> &'static str {
     match (changing.map(|changing| changing.stage), waiting) {
         (Some(Stage::Moving), _) => "moving",
@@ -110,6 +124,7 @@ pub fn disk(
         return dict([("Encrypted", false.into())]);
     };
     let (state, progress, remaining) = encrypting(disk.encrypting, running);
+    let (new_key, new_key_progress, new_key_remaining) = new_key(disk.getting_new_key, running);
     let moving = &disk.moving;
     let (failed, earlier) = (moving.failed.as_ref(), moving.earlier.as_ref());
     dict([
@@ -118,6 +133,10 @@ pub fn disk(
         ("Encrypting", state.into()),
         ("Progress", progress.into()),
         ("Remaining", remaining.into()),
+        ("NewKey", new_key.into()),
+        ("NewKeyProgress", new_key_progress.into()),
+        ("NewKeyRemaining", new_key_remaining.into()),
+        ("TemporaryKey", disk.temporary_key.into()),
         ("CanEncrypt", disk.can_encrypt.into()),
         ("TpmUnlocks", disk.tpm_unlocks.into()),
         ("Unlock", disk.unlock.clone().into()),

@@ -13,6 +13,7 @@ const CONTEXTS: &str = "etc/selinux/targeted/contexts/files/file_contexts";
 
 pub struct Deployment {
     pub root: PathBuf,
+    mounted: bool,
 }
 
 fn bind(source: &Path, target: &Path) -> Result<()> {
@@ -23,14 +24,37 @@ fn bind(source: &Path, target: &Path) -> Result<()> {
         .run()
 }
 
+pub fn installed(target: &Path) -> Result<Vec<PathBuf>> {
+    Ok(std::fs::read_dir(target.join(DEPLOYMENTS))
+        .with_context(|| t!(L10N, "installer-no-deployment"))?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.is_dir())
+        .collect())
+}
+
+pub fn relabel_in(root: &Path, contexts: &Path, flags: &[&str], paths: &[PathBuf]) -> Result<()> {
+    if paths.is_empty() || !contexts.exists() {
+        return Ok(());
+    }
+    Tool::new("setfiles")
+        .args(flags)
+        .arg("-r")
+        .arg(root)
+        .arg(contexts)
+        .args(paths)
+        .run()
+}
+
 impl Deployment {
-    pub fn mount(target: &Path, at: &Path) -> Result<Self> {
-        let state = std::fs::read_dir(target.join(DEPLOYMENTS))
-            .with_context(|| t!(L10N, "installer-no-deployment"))?
-            .flatten()
-            .map(|entry| entry.path())
-            .find(|path| path.is_dir())
-            .with_context(|| t!(L10N, "installer-no-deployment"))?;
+    pub fn running() -> Self {
+        Self {
+            root: PathBuf::from("/"),
+            mounted: false,
+        }
+    }
+
+    pub fn image(target: &Path, state: &Path, at: &Path) -> Result<Self> {
         let id = state
             .file_name()
             .with_context(|| t!(L10N, "installer-deployment-unnamed"))?;
@@ -43,9 +67,18 @@ impl Deployment {
             .arg(at)
             .run()
             .with_context(|| t!(L10N, "installer-deployment-unopened"))?;
-        let deployment = Self {
+        Ok(Self {
             root: at.to_owned(),
-        };
+            mounted: true,
+        })
+    }
+
+    pub fn mount(target: &Path, at: &Path) -> Result<Self> {
+        let state = installed(target)?
+            .into_iter()
+            .next()
+            .with_context(|| t!(L10N, "installer-no-deployment"))?;
+        let deployment = Self::image(target, &state, at)?;
         bind(&state.join("etc"), &at.join("etc"))?;
         bind(&target.join(SHARED_VAR), &at.join("var"))?;
         Ok(deployment)
@@ -67,23 +100,20 @@ impl Deployment {
         self.set_contexts(&[], paths)
     }
 
+    pub fn contexts(&self) -> PathBuf {
+        self.root.join(CONTEXTS)
+    }
+
     fn set_contexts(&self, flags: &[&str], paths: &[PathBuf]) -> Result<()> {
-        let contexts = self.root.join(CONTEXTS);
-        if paths.is_empty() || !contexts.exists() {
-            return Ok(());
-        }
-        Tool::new("setfiles")
-            .args(flags)
-            .arg("-r")
-            .arg(&self.root)
-            .arg(contexts)
-            .args(paths)
-            .run()
+        relabel_in(&self.root, &self.contexts(), flags, paths)
     }
 }
 
 impl Drop for Deployment {
     fn drop(&mut self) {
+        if !self.mounted {
+            return;
+        }
         if let Err(error) = Tool::new("umount").arg("--recursive").arg(&self.root).run() {
             eprintln!("The new system's deployment couldn't be unmounted: {error:#}");
         }

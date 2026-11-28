@@ -1,15 +1,20 @@
 pub mod encrypting;
 pub mod encryption;
 pub mod layout;
+pub mod erasing;
 pub mod moving;
+pub mod rekey;
 mod requests;
+pub mod unclaimed;
 pub mod unlock;
 
 use std::path::PathBuf;
+use std::sync::atomic::AtomicBool;
 
 use anyhow::{Context, Result};
 use luft_meet::resize::Change;
 
+use crate::drives::reencrypt::Progress;
 use crate::system::firmware::tpm::Tpm;
 use crate::system::host::blocks::{self, Mount};
 use crate::system::host::journal;
@@ -71,6 +76,8 @@ pub struct DiskStatus {
     pub device: String,
     pub encrypted: bool,
     pub encrypting: Option<encrypting::Encrypting>,
+    pub getting_new_key: bool,
+    pub temporary_key: bool,
     pub can_encrypt: bool,
     pub tpm_unlocks: bool,
     pub unlock: Vec<&'static str>,
@@ -111,6 +118,19 @@ pub fn encrypted() -> bool {
     })
 }
 
+pub fn changing_keys() -> bool {
+    encrypting::underway() || rekey::underway()
+}
+
+pub fn change_keys(on_battery: &AtomicBool, report: &mut impl FnMut(Progress)) -> Result<bool> {
+    let stop = AtomicBool::default();
+    if rekey::underway() {
+        rekey::run(&stop, report)
+    } else {
+        encrypting::run(&stop, on_battery, report)
+    }
+}
+
 pub fn status(tpm: &Tpm) -> Option<DiskStatus> {
     let disk = SystemDisk::find().ok()?;
     let header = disk.header().ok().flatten();
@@ -119,6 +139,10 @@ pub fn status(tpm: &Tpm) -> Option<DiskStatus> {
         device: disk.device().display().to_string(),
         encrypted: header.is_some() && encrypting.is_none(),
         encrypting,
+        getting_new_key: rekey::state(&disk, header.as_ref()),
+        temporary_key: header
+            .as_ref()
+            .is_some_and(|header| header.has(unclaimed::temporary::TOKEN)),
         can_encrypt: encrypting::possible(&disk),
         tpm_unlocks: keys::unavailable_reason(tpm).is_none(),
         unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),

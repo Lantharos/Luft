@@ -4,6 +4,7 @@ import {checkFingerprint} from '../checks/greeter/fingerprint.js';
 import {checkPeople} from '../checks/greeter/people.js';
 import {reportResources} from '../checks/greeter/resources.js';
 import {checkScheduledStyle, checkStyleChange} from '../checks/greeter/schedule.js';
+import {checkRecoveryKey, checkSecurityKey} from '../checks/greeter/securityKey.js';
 import {checkSigningIn} from '../checks/greeter/signIn.js';
 import {capture} from '../checks/lib/screenshots.js';
 
@@ -13,6 +14,8 @@ export async function run() {
   await capture('login-clock');
   await checkPeople();
   await checkFingerprint();
+  await checkSecurityKey();
+  await checkRecoveryKey();
   await checkStyleChange();
   await checkCorners();
   await checkControls();

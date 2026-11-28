@@ -16,7 +16,10 @@ import { Monument } from '../monument/monument.js';
 import { LockBackdrop } from './backdrop.js';
 import { NotificationsBox } from './notifications.js';
 import { LockFingerprint } from './lockFingerprint.js';
-import { rememberMethod } from './signInMethod.js';
+import { rememberedMethod, rememberMethod, type SignInMethod } from './signInMethod.js';
+import type { AuthenticatorMode } from '../prompt/greetd.js';
+import { allowsPassword, fetchWays, pickMethod, usableWays } from '../prompt/ways.js';
+import { getLoginManager } from '../../session/actions/loginManager.js';
 
 const IDLE_TIMEOUT = 2 * 60;
 const LIFT_TIME = 560;
@@ -24,6 +27,13 @@ const FROST_SCALE = 1.04;
 const UI_SCALE = 1.03;
 const UI_SHARE = 0.4;
 const UI_DELAY = 0.35;
+
+const MODES: Record<SignInMethod, AuthenticatorMode | null> = {
+  'security-key': 'security-key',
+  'smart-card': 'smart-card',
+  'fingerprint': null,
+  'password': 'lock-screen',
+};
 
 export namespace UnlockDialog {
   export interface Signals extends St.Widget.SignalSignatures {
@@ -50,8 +60,11 @@ export class UnlockDialog extends St.Widget {
   allowCancel = false;
   private readonly userName = GLib.get_user_name();
   private readonly user = AccountsService.UserManager.get_default().get_user(this.userName);
-  private readonly authentication = new Authentication(connectAuthenticator);
+  private readonly authentication = new Authentication(connectAuthenticator, { mode: 'lock-screen' });
   private readonly fingerprint: LockFingerprint;
+  private ways: SignInMethod[] = ['password'];
+  private way: SignInMethod = 'password';
+  private running: AuthenticatorMode | null = null;
   private authPrompt: AuthPrompt | null = null;
   private promptActive = false;
   private readonly promptBox = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
@@ -96,8 +109,11 @@ export class UnlockDialog extends St.Widget {
     this.fingerprint = new LockFingerprint({
       userName: this.userName,
       promptShown: () => this.monument.wake.promptShown,
+      chosen: () => this.way === 'fingerprint',
+      passwordAllowed: () => allowsPassword(this.ways),
       unlock: () => this.unlockWithFingerprint(),
     });
+    getLoginManager().connectObject('lid-changed', () => this.pickAgain(), this);
 
     Main.ctrlAltTabManager.addGroup(this, 'ctrl-alt-tab-unlock', 'dialog-password-symbolic');
     Main.keyboard.connectObject('visibility-changed', () => {
@@ -109,7 +125,7 @@ export class UnlockDialog extends St.Widget {
     });
 
     Main.screenShield.connectObject('lock-screen-shown', () => {
-      this.fingerprint.start();
+      void this.learnWays().then(() => this.fingerprint.start());
       this.schedulePrewarm();
     }, this);
 
@@ -141,16 +157,57 @@ export class UnlockDialog extends St.Widget {
     });
   }
 
+  private async learnWays(): Promise<void> {
+    this.ways = await fetchWays(this.user.get_uid());
+    this.fingerprint.enrolled = this.ways.includes('fingerprint');
+    if (!this.promptActive) this.use(pickMethod(this.ways, rememberedMethod(), getLoginManager().lidClosed));
+  }
+
+  private pickAgain(): void {
+    if (this.authPrompt?.typed) return;
+    this.choose(pickMethod(this.ways, rememberedMethod(), getLoginManager().lidClosed));
+  }
+
+  private use(way: SignInMethod): void {
+    this.way = way;
+    this.authPrompt?.setWays(usableWays(this.ways, getLoginManager().lidClosed), way);
+    this.fingerprint.sync(true);
+  }
+
+  private choose(way: string): void {
+    this.use(way as SignInMethod);
+    if (this.way === 'fingerprint') this.fingerprint.start();
+    if (this.promptActive) this.converse();
+  }
+
+  /**
+   * Runs the authenticator rules that go with the chosen way: the password's alongside the
+   * fingerprint reader when the password may sign in, nothing else beside it when it may not.
+   */
+  private converse(): void {
+    const mode = MODES[this.way] ?? (allowsPassword(this.ways) ? 'lock-screen' : null);
+    if (mode === this.running) return;
+    this.running = mode;
+    if (mode) {
+      this.authentication.useMode(mode);
+      this.authPrompt!.begin(this.userName);
+    } else {
+      this.authentication.cancel();
+    }
+  }
+
   private createAuthPrompt(): AuthPrompt {
     if (this.authPrompt) return this.authPrompt;
     const prompt = new AuthPrompt(this.authentication);
     prompt.connect('cancelled', () => this.fail());
+    prompt.connect('use-way', (_prompt, way: string) => this.choose(way));
     prompt.connect('succeeded', () => {
-      if (!this.fingerprint.matched) rememberMethod('password');
+      if (!this.fingerprint.matched) rememberMethod(this.way === 'fingerprint' ? 'password' : this.way);
       this.fingerprint.cancel();
       this.emit('unlocked');
     });
     prompt.setUser(this.user);
+    prompt.setWays(usableWays(this.ways, getLoginManager().lidClosed), this.way);
     this.promptBox.add_child(prompt);
     this.authPrompt = prompt;
     return prompt;
@@ -160,11 +217,12 @@ export class UnlockDialog extends St.Widget {
     if (this.promptActive) return;
     const prompt = this.createAuthPrompt();
     this.promptActive = true;
-    prompt.begin(this.userName);
     this.fingerprint.attach(prompt);
+    this.converse();
   }
 
   private unlockWithFingerprint(): void {
+    rememberMethod('fingerprint');
     this.authentication.cancel();
     if (this.promptActive) this.authPrompt!.succeed();
     else this.emit('unlocked');
@@ -177,6 +235,7 @@ export class UnlockDialog extends St.Widget {
     if (focus === null || this.authPrompt!.contains(focus)) this.grab_key_focus();
 
     this.promptActive = false;
+    this.running = null;
     this.authentication.cancel();
     this.fingerprint.detach();
   }
@@ -216,6 +275,7 @@ export class UnlockDialog extends St.Widget {
   }
 
   private onDestroy(): void {
+    getLoginManager().disconnectObject(this);
     if (this.prewarmId) GLib.Source.remove(this.prewarmId);
     this.popModal();
     this.controls.destroy();

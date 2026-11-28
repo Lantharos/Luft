@@ -1,7 +1,7 @@
 import type GObject from 'gi://GObject';
 
 import * as Signals from '../../core/runtime/signals.js';
-import type { GreetdChannel, GreetdReply, SessionOptions } from './greetd.js';
+import type { AuthenticatorMode, GreetdChannel, GreetdReply, SessionOptions } from './greetd.js';
 
 export interface AuthenticationSignals {
   succeeded: () => void;
@@ -22,8 +22,17 @@ export class Authentication extends Signals.EventEmitter {
   private configuring = false;
   private busy = false;
 
-  constructor(private readonly openChannel: () => Promise<GreetdChannel>, private readonly sessionOptions: SessionOptions = {}) {
+  constructor(private readonly openChannel: () => Promise<GreetdChannel>, private sessionOptions: SessionOptions = {}) {
     super();
+  }
+
+  get mode(): AuthenticatorMode | undefined {
+    return this.sessionOptions.mode;
+  }
+
+  /** Which of the authenticator's rules the next attempt goes through. */
+  useMode(mode: AuthenticatorMode): void {
+    this.sessionOptions = { ...this.sessionOptions, mode };
   }
 
   begin(userName: string): void {

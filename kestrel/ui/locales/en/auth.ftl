@@ -79,6 +79,8 @@ auth-prompt-submit = Submit
 auth-prompt-wrong-password = That password didn’t work
 auth-prompt-failed = That didn’t work. Try again.
 fingerprint-not-recognized = Fingerprint not recognized
+# Shown while the fingerprint reader gets ready, before it listens
+fingerprint-preparing = Getting the sensor ready
 # Shown while the fingerprint reader waits for a finger
 fingerprint-scanning = Touch the fingerprint reader
 fingerprint-retry-scan = Scan your finger again
@@ -87,6 +89,8 @@ fingerprint-finger-not-centered = Center your finger and try again
 fingerprint-remove-and-retry = Lift your finger and try again
 # Shown above the password field when the fingerprint stops working
 fingerprint-unavailable = Fingerprint isn’t available, enter your password
+# Shown when the fingerprint stops working and the password is turned off
+fingerprint-unavailable-no-password = Fingerprint isn’t available
 # Link button that swaps the fingerprint request for the password field
 auth-prompt-use-password = Use password instead
 # Link button that starts the fingerprint reader again
@@ -95,6 +99,28 @@ auth-prompt-try-fingerprint = Try fingerprint again
 auth-prompt-use-fingerprint = Use fingerprint
 # Screen-reader label of the button that shows the typed password
 auth-prompt-show-password = Show password
+# Link button that swaps the current way of signing in for a security key
+auth-prompt-use-security-key = Use security key
+# Link button that swaps the current way of signing in for a smart card
+auth-prompt-use-smart-card = Use smart card
+# Link button for someone who turned the password off and lost their key or card
+auth-prompt-use-recovery-key = Lost your key?
+# Placeholder of the field for a security key's PIN
+auth-prompt-key-pin = Security key PIN
+# Placeholder of the field for a smart card's PIN
+auth-prompt-card-pin = Smart card PIN
+# Placeholder of the field for the disk's recovery key, 12 words
+auth-prompt-recovery-key = Recovery key
+auth-prompt-plug-in-key = Plug in your security key
+auth-prompt-touch-key = Touch your security key
+auth-prompt-insert-card = Insert your smart card
+# Shown after the recovery key turned password sign-in back on
+auth-prompt-password-back = Password sign-in is back on. Enter your password.
+auth-prompt-password-off = Password sign-in is turned off
+auth-prompt-wrong-pin = That PIN didn’t work
+auth-prompt-pin-blocked = The PIN is blocked after too many wrong tries
+auth-prompt-not-enrolled = This isn’t set up for your account
+auth-prompt-wrong-recovery-key = That isn’t this computer’s recovery key
 
 ## Administrator authentication
 

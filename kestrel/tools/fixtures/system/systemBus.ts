@@ -13,6 +13,7 @@ import {PACKAGES_NAME, publishPackages} from './software/packages.js';
 import {PRINTERS_NAME, publishPrinters} from './devices/printers.js';
 import {publishRemoteLogin, REMOTE_LOGIN_NAME} from './security/remoteLogin.js';
 import {publishSecurity, SECURITY_NAMES} from './security/security.js';
+import {publishSignIn, SIGN_IN_NAME} from './security/signIn.js';
 import {pluggedInDrive} from './devices/udisks/drives.js';
 import {publishUdisks} from './devices/udisks/service.js';
 import {publishUpdater, UPDATER_NAME} from './software/updater.js';
@@ -60,9 +61,9 @@ publishFiles(publish, calls);
 publishPrinters(publish, calls);
 publishUpdater(publish, calls);
 publishPackages(publish, calls, publishLoginScreen(publish, calls));
-publishFingerprint(publish, calls);
+publishSignIn(publish, publishFingerprint(publish, calls));
 publishChanges(publish, calls);
 
-for (const name of [...BASIC_NAMES, CHANGES_NAME, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, FILES_NAME, PRINTERS_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, REMOTE_LOGIN_NAME, LOGIN_SCREEN_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, CHANGES_NAME, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, FILES_NAME, PRINTERS_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, SIGN_IN_NAME, REMOTE_LOGIN_NAME, LOGIN_SCREEN_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

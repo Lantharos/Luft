@@ -2,6 +2,7 @@ import {withApp} from './lib/apps.js';
 import {showDark, withPalette} from './lib/palette.js';
 import {checkLive} from './settings/live.js';
 import {checkRecoveryKey} from './settings/security/recoveryKey.js';
+import {checkSignIn} from './settings/security/signIn.js';
 import {checkAccessibility} from './settings/system/accessibility.js';
 import {checkChannel} from './settings/system/channel.js';
 import {checkDictation} from './settings/system/dictation.js';
@@ -19,6 +20,7 @@ export async function run() {
       await checkHardware(app);
       await checkPrinters(app);
       await checkRecoveryKey(app);
+      await checkSignIn(app);
       await checkDictation(app);
     });
     await checkReport();

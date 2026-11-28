@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {FINGERPRINT_NAME, publishFingerprint} from '../system/security/fingerprint.js';
+import {publishSignIn, SIGN_IN_NAME} from '../system/security/signIn.js';
 import {answerInhibit} from '../system/basics.js';
 
 const [images, events] = ARGV;
@@ -134,14 +135,15 @@ publish('org.freedesktop.locale1', {
   X11Options: '',
 }, '/org/freedesktop/locale1');
 
-publishFingerprint((xml, implementation, path) => {
+const publishXml = (xml: string, implementation: object, path: string) => {
   const exported = Gio.DBusExportedObject.wrapJSObject(xml, implementation);
   exported.export(Gio.DBus.system, path);
   published.push(exported);
   return exported;
-}, []);
+};
+publishSignIn(publishXml, publishFingerprint(publishXml, []));
 
-for (const name of ['org.freedesktop.Accounts', 'org.freedesktop.login1', 'org.freedesktop.locale1', FINGERPRINT_NAME, 'com.lantharos.KestrelChecks'])
+for (const name of ['org.freedesktop.Accounts', 'org.freedesktop.login1', 'org.freedesktop.locale1', FINGERPRINT_NAME, SIGN_IN_NAME, 'com.lantharos.KestrelChecks'])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 
 new GLib.MainLoop(null, false).run();

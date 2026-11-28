@@ -64,12 +64,13 @@ async function typeToSwitch() {
   require(rememberedMethod() === 'password', 'the password is remembered as the way to unlock');
 }
 
-async function rememberPassword() {
+async function leadWithFingerprint() {
   await lockAndWake();
   await showPrompt();
-  await eventually(() => promptEntry() && !usePassword() && shown(labelled('Use fingerprint')),
-    'after unlocking with the password it asks for the password, with the fingerprint a click away');
-  await touch('verify-match', () => !Main.screenShield.locked, 'a finger still unlocks while the password is asked for');
+  await eventually(() => fingerprintFirst() && hint() === SCANNING, 'after unlocking with the password the fingerprint still comes first');
+  type('c');
+  await eventually(() => promptEntry() && shown(labelled('Use fingerprint')), 'the password keeps the fingerprint a click away');
+  await touch('verify-match', () => !Main.screenShield.locked, 'a finger still unlocks while the password is typed');
 }
 
 async function fallBackWhenAttemptsRunOut() {
@@ -104,7 +105,7 @@ export async function run() {
     await unlockFromClock();
     await showRetries();
     await typeToSwitch();
-    await rememberPassword();
+    await leadWithFingerprint();
     await fallBackWhenAttemptsRunOut();
     await lidClosed();
   } finally {

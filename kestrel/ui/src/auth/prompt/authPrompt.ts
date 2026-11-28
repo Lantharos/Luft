@@ -8,10 +8,31 @@ import * as KestrelUi from '../../kestrelUi.js';
 import { Avatar } from '../../shared/widgets/userWidget.js';
 import type { Authentication } from './authentication.js';
 import type { FingerprintState } from './fingerprintState.js';
-import { MethodArea } from './methodArea.js';
+import { MethodArea, type Way } from './methodArea.js';
 import { StatusRing } from './statusRing.js';
 
 const PASSWORD_QUESTIONS = ['Password:', 'Password: '];
+const QUESTIONS: Record<string, string> = {
+  'Security key PIN: ': 'auth-prompt-key-pin',
+  'Smart card PIN: ': 'auth-prompt-card-pin',
+  'Recovery key: ': 'auth-prompt-recovery-key',
+};
+const MESSAGES: Record<string, string> = {
+  'Plug in your security key': 'auth-prompt-plug-in-key',
+  'Touch your security key': 'auth-prompt-touch-key',
+  'Insert your smart card': 'auth-prompt-insert-card',
+  'Password sign-in is back on': 'auth-prompt-password-back',
+  'Password sign-in is turned off': 'auth-prompt-password-off',
+  'Wrong PIN': 'auth-prompt-wrong-pin',
+  'The PIN is blocked': 'auth-prompt-pin-blocked',
+  'This isn\'t set up for this account': 'auth-prompt-not-enrolled',
+  'That isn\'t this computer\'s recovery key': 'auth-prompt-wrong-recovery-key',
+};
+const FIELD_HINTS: Partial<Record<Way, string>> = {
+  'security-key': 'auth-prompt-key-pin',
+  'smart-card': 'auth-prompt-card-pin',
+  'recovery-key': 'auth-prompt-recovery-key',
+};
 const SUCCESS_FILL = 260;
 const SUCCESS_HOLD = 320;
 const RETRY_FILL = 420;
@@ -30,14 +51,16 @@ interface AuthPromptSignals extends St.BoxLayout.SignalSignatures {
   'succeeded': () => void;
   'user-name': (name: string) => void;
   'loading': (busy: boolean) => void;
-  'use-password': () => void;
-  'use-fingerprint': () => void;
+  'use-way': (way: string) => void;
 }
 
 function questionHint(question: string): string {
   if (PASSWORD_QUESTIONS.includes(question)) return KestrelUi.t('auth-prompt-password');
+  if (question in QUESTIONS) return KestrelUi.t(QUESTIONS[question]);
   return question.replace(/[:：] *$/, '').trim();
 }
+
+const messageText = (text: string) => (text in MESSAGES ? KestrelUi.t(MESSAGES[text]) : text);
 
 function displayName(user: AccountsService.User | null): string {
   if (!user?.is_loaded) return '';
@@ -50,8 +73,7 @@ export const AuthPrompt = GObject.registerClass({
     'succeeded': {},
     'user-name': { param_types: [GObject.TYPE_STRING] },
     'loading': { param_types: [GObject.TYPE_BOOLEAN] },
-    'use-password': {},
-    'use-fingerprint': {},
+    'use-way': { param_types: [GObject.TYPE_STRING] },
   },
 }, class AuthPrompt extends St.BoxLayout {
   declare connect: GObject.SignalMethods<this, AuthPromptSignals>['connect'];
@@ -66,6 +88,9 @@ export const AuthPrompt = GObject.registerClass({
   private stalled = false;
   private retrying = false;
   private successId = 0;
+  private told: string | null = null;
+  private way: Way = 'password';
+  private ways: Way[] = ['password'];
   private user: AccountsService.User | null = null;
   private readonly avatarWell = new St.Bin({ style_class: 'kestrel-auth-avatar-well' });
   private readonly ring = new StatusRing(this.avatarWell);
@@ -98,8 +123,7 @@ export const AuthPrompt = GObject.registerClass({
     field.connect('changed', () => {
       if (field.text) this.method.fadeMessage();
     });
-    this.method.connect('use-password', () => this.usePassword(''));
-    this.method.connect('use-fingerprint', () => this.emit('use-fingerprint'));
+    this.method.connect('use-way', (_method, way: string) => (way === 'password' ? this.usePassword('') : this.emit('use-way', way)));
 
     this.setBusy(false);
     this.updateBackButton();
@@ -115,11 +139,15 @@ export const AuthPrompt = GObject.registerClass({
       return Clutter.EVENT_STOP;
     }
     const character = event.get_key_unicode();
-    if (this.method.showsFingerprint && character && GLib.unichar_isgraph(character)) {
+    if (this.method.showsFingerprint && this.ways.includes('password') && character && GLib.unichar_isgraph(character)) {
       this.usePassword(character);
       return Clutter.EVENT_STOP;
     }
     return Clutter.EVENT_PROPAGATE;
+  }
+
+  get typed(): boolean {
+    return this.method.field.text !== '';
   }
 
   get userName(): string | null {
@@ -156,6 +184,22 @@ export const AuthPrompt = GObject.registerClass({
     this.method.setMessage(null);
   }
 
+  /**
+   * The ways the person may sign in and the one this attempt uses, so the
+   * prompt opens on it without showing another first.
+   */
+  setWays(ways: Way[], way: Way): void {
+    this.ways = ways;
+    this.way = way;
+    this.method.setWays(ways, way);
+    if (!this.question) this.useFieldFor(way);
+  }
+
+  private useFieldFor(way: Way): void {
+    const hint = FIELD_HINTS[way];
+    this.method.field.useEntry(way !== 'recovery-key', hint ? KestrelUi.t(hint) : '');
+  }
+
   begin(userName: string): void {
     this.activeUserName = userName;
     this.askingUserName = false;
@@ -163,9 +207,10 @@ export const AuthPrompt = GObject.registerClass({
     this.answered = false;
     this.stalled = false;
     this.retrying = false;
+    this.told = null;
     this.method.setMessage(null);
     this.method.field.clear();
-    this.method.field.useEntry(true, '');
+    this.useFieldFor(this.way);
     this.updateBackButton();
     this.authentication.begin(userName);
   }
@@ -181,19 +226,19 @@ export const AuthPrompt = GObject.registerClass({
   }
 
   focus(typed = ''): void {
-    if (typed) this.usePassword(typed);
-    else if (this.method.showsFingerprint) this.method.usePassword.grab_key_focus();
+    if (typed && this.ways.includes('password')) this.usePassword(typed);
+    else if (this.method.showsFingerprint) (this.method.firstSwitch ?? this).grab_key_focus();
     else this.method.field.entry.grab_key_focus();
   }
 
-  setFingerprint(state: FingerprintState, primary: boolean): void {
-    if (primary && !this.method.showsFingerprint && this.method.field.text !== '') {
-      this.emit('use-password');
+  setFingerprint(state: FingerprintState, primary: boolean, instant = false): void {
+    if (primary && !this.method.showsFingerprint && this.method.field.text !== '' && this.way === 'password') {
+      this.emit('use-way', 'password');
       return;
     }
     const focus = global.stage.key_focus;
     const focused = focus !== null && this.contains(focus);
-    this.method.showFingerprint(state, primary);
+    this.method.showFingerprint(state, primary, instant);
     this.showFingerprintOnRing(state);
     if (focused) this.focus();
   }
@@ -227,7 +272,7 @@ export const AuthPrompt = GObject.registerClass({
   }
 
   private usePassword(typed: string): void {
-    if (this.method.showsFingerprint) this.emit('use-password');
+    if (this.method.showsFingerprint || this.way !== 'password') this.emit('use-way', 'password');
     const { field } = this.method;
     if (typed && !field.waiting) field.insert(typed);
     this.focus();
@@ -260,11 +305,14 @@ export const AuthPrompt = GObject.registerClass({
   }
 
   private onMessage(text: string, isError: boolean): void {
-    if (!this.retrying) this.method.setMessage(text, isError);
+    const shown = messageText(text);
+    if (isError && text in MESSAGES) this.told = shown;
+    if (!this.retrying || isError) this.method.setMessage(shown, isError);
   }
 
   private onQuestion(text: string, secret: boolean): void {
     this.retrying = false;
+    this.told = null;
     this.question = { text, secret, step: (this.question?.step ?? 0) + 1 };
     this.updateBackButton();
 
@@ -282,7 +330,8 @@ export const AuthPrompt = GObject.registerClass({
   private onFailed(authError: boolean, description: string): void {
     if (!authError) console.warn(`Authentication did not complete: ${description}`);
     const password = this.question?.secret && PASSWORD_QUESTIONS.includes(this.question.text);
-    this.method.setMessage(KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
+    this.method.setMessage(this.told ?? KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
+    this.told = null;
     this.ring.fail();
     this.method.field.shake();
     KestrelUi.playSound('error');

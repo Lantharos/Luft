@@ -144,6 +144,7 @@ export class Greeter {
     const users = this.accounts.listed(this.config);
     const offerOthers = this.accounts.hasUnlisted(this.config);
     const selected = users.includes(this.selected!) ? this.selected : this.accounts.lastSignedIn(users);
+    this.signIn.learn(users.map(user => user.get_uid()));
     this.userList.show(users, offerOthers, selected);
     this.choose(selected);
   }
@@ -179,8 +180,10 @@ export class Greeter {
       this.prompt.askForUserName();
       return;
     }
-    this.signIn.prepare(this.selected.get_uid());
-    this.prompt.begin(this.selected.user_name);
+    const user = this.selected;
+    void this.signIn.prepare(user.get_uid()).then(() => {
+      if (this.started && this.selected === user) this.prompt.begin(user.user_name);
+    });
   }
 
   private stop(): void {
@@ -195,8 +198,7 @@ export class Greeter {
     this.useSession(this.preferredSession(known ? user : null));
     this.prompt.setUser(known ? user : null);
     this.prompt.allowGoingBack(true);
-    this.signIn.prepare(known ? user.get_uid() : null);
-    this.prompt.begin(name);
+    void this.signIn.prepare(known ? user.get_uid() : null).then(() => this.prompt.begin(name));
   }
 
   private goBack(): void {

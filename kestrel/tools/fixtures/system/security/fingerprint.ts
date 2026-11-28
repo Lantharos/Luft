@@ -118,4 +118,5 @@ export function publishFingerprint(publish: Publish, calls: string[]) {
       return true;
     },
   }, '/com/lantharos/KestrelChecks/Fingerprint');
+  return (user: string) => enrolled.get(user) ?? [];
 }

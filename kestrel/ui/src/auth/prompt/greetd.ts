@@ -11,8 +11,10 @@ const HEADER_SIZE = 4;
 const NATIVE_LITTLE_ENDIAN = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
 const AUTHENTICATOR_SOCKET = '/run/kestrel/authenticate';
 
+export type AuthenticatorMode = 'fingerprint' | 'lock-screen' | 'security-key' | 'smart-card';
+
 export interface SessionOptions {
-  mode?: 'fingerprint';
+  mode?: AuthenticatorMode;
 }
 
 type GreetdRequest =

@@ -136,7 +136,7 @@ export class FingerprintGlyph extends St.DrawingArea {
   present(state: FingerprintState): void {
     this.cancelHold();
     this.now = GLib.get_monotonic_time() / 1000;
-    this.opacity = state.kind === 'unavailable' ? 64 : 255;
+    this.opacity = state.kind === 'unavailable' ? 64 : state.kind === 'preparing' ? 150 : 255;
     switch (state.kind) {
     case 'retry':
       this.breathing = false;

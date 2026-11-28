@@ -29,7 +29,13 @@ const CONVERSATIONS: Record<string, Step[]> = {
   ines: [{secret: 'Password: ', answer: 'harbor'}],
 };
 const UNKNOWN: Step[] = [{secret: 'Password: ', answer: null}];
-const METHOD_QUESTION = 'Sign in with (fingerprint/password): ';
+const SECURITY_KEY: Step[] = [{secret: 'Security key PIN: ', answer: '2468'}, {info: 'Touch your security key'}];
+const SMART_CARD: Step[] = [{info: 'Insert your smart card'}, {secret: 'Smart card PIN: ', answer: '1357'}];
+export const RECOVERY_KEY = 'abandon ability able about above absent absorb abstract absurd abuse access accident';
+const RECOVERED: Step[] = [{visible: 'Recovery key: ', answer: RECOVERY_KEY}, {info: 'Password sign-in is back on'}];
+const PASSWORD_OFF: Step[] = [{error: 'Password sign-in is turned off', answer: 'never'}];
+const UIDS: Record<string, number> = {mara: 2001, theo: 2002, ines: 2003};
+const METHOD_QUESTION = 'Sign in with (fingerprint/security-key/smart-card/recovery-key/password): ';
 const FINGERPRINT_QUESTION = 'Touch the fingerprint reader, or type password: ';
 const ROUND = 400;
 
@@ -61,9 +67,26 @@ function error(description: string, type = 'error') {
   return {type: 'error', error_type: type, description};
 }
 
+function passwordAllowed(user: string) {
+  const reply = Gio.DBus.system.call_sync('com.lantharos.SignIn1', '/com/lantharos/SignIn1', 'com.lantharos.SignIn1', 'Ways',
+    new GLib.Variant('(u)', [UIDS[user] ?? new Gio.Credentials().get_unix_user()]), null, Gio.DBusCallFlags.NONE, -1, null);
+  return reply.deepUnpack<[string[]]>()[0].includes('password');
+}
+
+function stepsFor(user: string, method: string | undefined): Step[] {
+  const password = CONVERSATIONS[user] ?? UNKNOWN;
+  switch (method) {
+  case 'security-key': return SECURITY_KEY;
+  case 'smart-card': return SMART_CARD;
+  case 'recovery-key': return [...RECOVERED, ...password];
+  default: return passwordAllowed(user) ? password : PASSWORD_OFF;
+  }
+}
+
 async function choose(session: Configuring, method: string | undefined, closed: Promise<void>) {
   session.chosen = true;
   record({type: 'sign-in-method', username: session.user, method});
+  session.steps = stepsFor(session.user, method);
   session.reader = method === 'fingerprint' ? await openReader(session.user, closed) : null;
   return session.reader ? message({visible: FINGERPRINT_QUESTION}) : message(session.steps[0]);
 }

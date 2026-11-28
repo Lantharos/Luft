@@ -7,6 +7,7 @@ type RetryReason = 'retry-scan' | 'swipe-too-short' | 'finger-not-centered' | 'r
 
 export type FingerprintState =
   | { kind: 'idle' }
+  | { kind: 'preparing' }
   | { kind: 'scanning' }
   | { kind: 'retry'; reason: RetryReason }
   | { kind: 'no-match' }
@@ -44,12 +45,13 @@ const RETRY_MESSAGES: Record<RetryReason, string> = {
   'remove-and-retry': 'fingerprint-remove-and-retry',
 };
 
-export function describeFingerprint(state: FingerprintState): string | null {
+export function describeFingerprint(state: FingerprintState, passwordAllowed = true): string | null {
   switch (state.kind) {
+  case 'preparing': return KestrelUi.t('fingerprint-preparing');
   case 'scanning': return KestrelUi.t('fingerprint-scanning');
   case 'retry': return KestrelUi.t(RETRY_MESSAGES[state.reason]);
   case 'no-match': return KestrelUi.t('fingerprint-not-recognized');
-  case 'unavailable': return KestrelUi.t('fingerprint-unavailable');
+  case 'unavailable': return KestrelUi.t(passwordAllowed ? 'fingerprint-unavailable' : 'fingerprint-unavailable-no-password');
   default: return null;
   }
 }

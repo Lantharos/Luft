@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 	<g class="ink">
 		<path d="M0.6 6.3C0.6 5.6 1.1 5.1 1.8 5.1H3.1L4.9 2.5c.5-.7 1.4-.4 1.4.4v10.2c0 .8-.9 1.1-1.4.4L3.1 10.9H1.8C1.1 10.9 0.6 10.4 0.6 9.7Z"/>
-		<path d="M8.47 5.06A4.4 4.4 0 0 1 8.47 10.94" fill="none" stroke-width="2.4"/>
-		<path d="M11.89 1.98A9 9 0 0 1 11.89 14.02" fill="none" stroke-width="2.4"/>
+		<path d="M8.77 4.92A4.6 4.6 0 0 1 8.77 11.08" fill="none" stroke-width="2.4"/>
+		<path d="M11.82 2.18A8.7 8.7 0 0 1 11.82 13.82" fill="none" stroke-width="2.4"/>
 	</g>
 </svg>

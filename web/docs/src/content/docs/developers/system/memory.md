@@ -26,7 +26,7 @@ The files live in `/var/swap`, numbered from 0. On btrfs, `luft-swap prepare` ma
 
 Swap is only made when the filesystem holding `/var` sits on dm-crypt: the mount's device, or a partition of it, is a `CRYPT-` device-mapper target, or everything below it is. A drive without encryption, or a live system on a USB stick, gets no swap at all, and so zswap has nothing to write to. Hibernation stays off.
 
-The policy in `luft-swap.cil` labels `/var/swap` and its files `swapfile_t`, and a named type transition gives the folder that label when the service makes it, so its files inherit it.
+The policy in `luft-swap.cil` labels `/var/swap` and its files `swapfile_t`. A new btrfs subvolume starts out unlabelled, so `luft-swap prepare` runs `restorecon` on the folder at every start, and the files made in it inherit its label.
 
 ## The app in front
 

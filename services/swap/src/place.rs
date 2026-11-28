@@ -4,6 +4,7 @@ use std::io;
 use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::{DirBuilderExt, FileTypeExt, MetadataExt, PermissionsExt};
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 use rustix::fs::{StatFs, fstatfs, major, minor};
@@ -17,6 +18,7 @@ const BTRFS_IOCTL: u8 = 0x94;
 const BTRFS_SUBVOL_CREATE: u8 = 14;
 const BTRFS_NAME_LIMIT: usize = 4088;
 const SYSFS_BLOCK: &str = "/sys/dev/block";
+const RESTORECON: &str = "/usr/sbin/restorecon";
 
 #[repr(C)]
 struct VolumeArguments {
@@ -42,18 +44,26 @@ pub fn drive(directory: &Path) -> io::Result<Drive> {
 }
 
 pub fn prepare(directory: &Path) -> Result<()> {
-    if directory.exists() {
-        return Ok(());
+    if !directory.exists() {
+        if !encrypted(directory)? {
+            return Ok(());
+        }
+        create(directory)?;
     }
+    let labelled = Command::new(RESTORECON).arg("-R").arg(directory).status()?;
+    if !labelled.success() {
+        bail!("restorecon couldn't label {}", directory.display());
+    }
+    Ok(())
+}
+
+fn create(directory: &Path) -> Result<()> {
     let parent = directory
         .parent()
         .context("the swap folder has no parent")?;
     let name = directory
         .file_name()
         .context("the swap folder has no name")?;
-    if !encrypted(directory)? {
-        return Ok(());
-    }
     if is_btrfs(parent)? {
         create_subvolume(parent, name)
             .with_context(|| format!("couldn't make {} a subvolume", directory.display()))?;
